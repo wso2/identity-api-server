@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionType;
 import org.wso2.carbon.identity.api.server.action.management.v1.EndpointResponse;
+import org.wso2.carbon.identity.api.server.action.management.v1.ORRuleResponse;
 import javax.validation.constraints.*;
 
 
@@ -73,6 +74,7 @@ public enum StatusEnum {
 
     private StatusEnum status;
     private EndpointResponse endpoint;
+    private ORRuleResponse rule;
 
     /**
     **/
@@ -182,6 +184,24 @@ public enum StatusEnum {
         this.endpoint = endpoint;
     }
 
+    /**
+    **/
+    public ActionResponse rule(ORRuleResponse rule) {
+
+        this.rule = rule;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("rule")
+    @Valid
+    public ORRuleResponse getRule() {
+        return rule;
+    }
+    public void setRule(ORRuleResponse rule) {
+        this.rule = rule;
+    }
+
 
 
     @Override
@@ -199,12 +219,13 @@ public enum StatusEnum {
             Objects.equals(this.name, actionResponse.name) &&
             Objects.equals(this.description, actionResponse.description) &&
             Objects.equals(this.status, actionResponse.status) &&
-            Objects.equals(this.endpoint, actionResponse.endpoint);
+            Objects.equals(this.endpoint, actionResponse.endpoint) &&
+            Objects.equals(this.rule, actionResponse.rule);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, type, name, description, status, endpoint);
+        return Objects.hash(id, type, name, description, status, endpoint, rule);
     }
 
     @Override
@@ -219,6 +240,7 @@ public enum StatusEnum {
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
+        sb.append("    rule: ").append(toIndentedString(rule)).append("\n");
         sb.append("}");
         return sb.toString();
     }
