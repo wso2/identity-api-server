@@ -25,14 +25,14 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 
 /**
- * Expressions in the rule.
+ * Represents a single logical condition or comparison within a rule. An expression defines a field, an operator, and a value that is evaluated.
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "Expressions in the rule.")
+@ApiModel(description = "Represents a single logical condition or comparison within a rule. An expression defines a field, an operator, and a value that is evaluated.")
 public class Expression  {
   
     private String field;
@@ -40,6 +40,7 @@ public class Expression  {
     private String value;
 
     /**
+    * The field or attribute of the entity being evaluated (e.g.,application, role).
     **/
     public Expression field(String field) {
 
@@ -47,7 +48,7 @@ public class Expression  {
         return this;
     }
     
-    @ApiModelProperty(example = "application", required = true, value = "")
+    @ApiModelProperty(example = "application", required = true, value = "The field or attribute of the entity being evaluated (e.g.,application, role).")
     @JsonProperty("field")
     @Valid
     @NotNull(message = "Property field cannot be null.")
@@ -60,6 +61,7 @@ public class Expression  {
     }
 
     /**
+    * The comparison operator used to evaluate the field and value. Common operators include \&quot;equals\&quot;, \&quot;contains\&quot;, \&quot;startsWith\&quot;, etc.
     **/
     public Expression operator(String operator) {
 
@@ -67,7 +69,7 @@ public class Expression  {
         return this;
     }
     
-    @ApiModelProperty(example = "equals", required = true, value = "")
+    @ApiModelProperty(example = "equals", required = true, value = "The comparison operator used to evaluate the field and value. Common operators include \"equals\", \"contains\", \"startsWith\", etc.")
     @JsonProperty("operator")
     @Valid
     @NotNull(message = "Property operator cannot be null.")
@@ -80,6 +82,7 @@ public class Expression  {
     }
 
     /**
+    * The value that the field is compared against based on the operator.
     **/
     public Expression value(String value) {
 
@@ -87,7 +90,7 @@ public class Expression  {
         return this;
     }
     
-    @ApiModelProperty(example = "myapp", required = true, value = "")
+    @ApiModelProperty(example = "myapp", required = true, value = "The value that the field is compared against based on the operator.")
     @JsonProperty("value")
     @Valid
     @NotNull(message = "Property value cannot be null.")

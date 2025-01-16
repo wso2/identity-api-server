@@ -28,14 +28,14 @@ import org.wso2.carbon.identity.api.server.action.management.v1.Expression;
 import javax.validation.constraints.*;
 
 /**
- * Expressions combined with AND condition.
+ * A sub-rule that combines expressions with AND condition.
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "Expressions combined with AND condition.")
+@ApiModel(description = "A sub-rule that combines expressions with AND condition.")
 public class ANDRule  {
   
 
@@ -76,6 +76,7 @@ public enum ConditionEnum {
 
 
     /**
+    * The logical condition for combining the expressions. For ANDRule, the value must always be \&quot;AND\&quot;.
     **/
     public ANDRule condition(ConditionEnum condition) {
 
@@ -83,7 +84,7 @@ public enum ConditionEnum {
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "")
+    @ApiModelProperty(required = true, value = "The logical condition for combining the expressions. For ANDRule, the value must always be \"AND\".")
     @JsonProperty("condition")
     @Valid
     @NotNull(message = "Property condition cannot be null.")
@@ -96,6 +97,7 @@ public enum ConditionEnum {
     }
 
     /**
+    * A list of expressions that are combined using the AND condition. All expressions must evaluate to true for the ANDRule to pass.
     **/
     public ANDRule expressions(List<Expression> expressions) {
 
@@ -103,11 +105,11 @@ public enum ConditionEnum {
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "")
+    @ApiModelProperty(required = true, value = "A list of expressions that are combined using the AND condition. All expressions must evaluate to true for the ANDRule to pass.")
     @JsonProperty("expressions")
     @Valid
     @NotNull(message = "Property expressions cannot be null.")
-    @Size(min=1)
+ @Size(min=1)
     public List<Expression> getExpressions() {
         return expressions;
     }
