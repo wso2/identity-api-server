@@ -712,6 +712,11 @@ public class ServerConfigManagementService {
                 authenticatorListItem.setType(AuthenticatorListItem.TypeEnum.LOCAL);
                 authenticatorListItem.setDefinedBy(
                         AuthenticatorListItem.DefinedByEnum.valueOf(config.getDefinedByType().toString()));
+                if (AuthenticatorPropertyConstants.DefinedByType.USER == config.getDefinedByType()) {
+                    UserDefinedLocalAuthenticatorConfig userDefinedConfig = (UserDefinedLocalAuthenticatorConfig) config;
+                    authenticatorListItem.setImage(userDefinedConfig.getImageUrl());
+                    authenticatorListItem.setDescription(userDefinedConfig.getDescription());
+                }
                 String[] tags = config.getTags();
                 if (ArrayUtils.isNotEmpty(tags)) {
                     authenticatorListItem.setTags(Arrays.asList(tags));
@@ -784,15 +789,16 @@ public class ServerConfigManagementService {
         if (config instanceof RequestPathAuthenticatorConfig) {
             authenticator.setType(Authenticator.TypeEnum.REQUEST_PATH);
             authenticator.setDefinedBy(Authenticator.DefinedByEnum.SYSTEM);
-            setAuthenticatorProperties(config, authenticator);
         } else {
             authenticator.setType(Authenticator.TypeEnum.LOCAL);
             if (AuthenticatorPropertyConstants.DefinedByType.USER == config.getDefinedByType()) {
                 authenticator.setDefinedBy(Authenticator.DefinedByEnum.USER);
-                resolveEndpointConfiguration(authenticator, config);
+                UserDefinedLocalAuthenticatorConfig userDefinedConfig = (UserDefinedLocalAuthenticatorConfig) config;
+                authenticator.setImage(userDefinedConfig.getImageUrl());
+                authenticator.setDescription(userDefinedConfig.getDescription());
+                resolveEndpointConfiguration(authenticator, userDefinedConfig);
             } else {
                 authenticator.setDefinedBy(Authenticator.DefinedByEnum.SYSTEM);
-                setAuthenticatorProperties(config, authenticator);
             }
         }
         String[] tags = config.getTags();
@@ -802,12 +808,11 @@ public class ServerConfigManagementService {
         return authenticator;
     }
 
-    private void resolveEndpointConfiguration(Authenticator authenticator, LocalAuthenticatorConfig config)
+    private void resolveEndpointConfiguration(Authenticator authenticator, UserDefinedLocalAuthenticatorConfig config)
             throws IdentityApplicationManagementServerException {
 
         try {
-            UserDefinedLocalAuthenticatorConfig userDefinedConfig = (UserDefinedLocalAuthenticatorConfig) config;
-            UserDefinedAuthenticatorEndpointConfig endpointConfig = userDefinedConfig.getEndpointConfig();
+            UserDefinedAuthenticatorEndpointConfig endpointConfig = config.getEndpointConfig();
 
             AuthenticationType authenticationType = new AuthenticationType();
             authenticationType.setType(AuthenticationType.TypeEnum.fromValue(
