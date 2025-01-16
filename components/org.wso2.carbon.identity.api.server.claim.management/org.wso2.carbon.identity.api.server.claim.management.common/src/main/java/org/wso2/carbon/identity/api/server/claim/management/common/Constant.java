@@ -283,4 +283,5 @@ public class Constant {
     public static final String PROP_REG_EX = "RegEx";
     public static final String PROP_REQUIRED = "Required";
     public static final String PROP_SUPPORTED_BY_DEFAULT = "SupportedByDefault";
+    public static final String PROP_UNIQUENESS_SCOPE = "UniquenessScope";
 }

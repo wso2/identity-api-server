@@ -24,6 +24,7 @@ package org.wso2.carbon.identity.api.server.action.management.v1.constants;
 public class ActionMgtEndpointConstants {
 
     private ActionMgtEndpointConstants() {
+
     }
 
     public static final String ACTION_MANAGEMENT_PREFIX = "ACTION-";
@@ -47,11 +48,18 @@ public class ActionMgtEndpointConstants {
         ERROR_NO_ACTION_FOUND_ON_GIVEN_ACTION_TYPE_AND_ID("60012",
                 "Action is not found.",
                 "No action is found for given action id and action type"),
+        ERROR_INVALID_RULE("60013", "Invalid rule.", "%s"),
 
         // Server errors.
         ERROR_NOT_IMPLEMENTED_ACTION_TYPE("650015",
                 "Unable to perform the operation.",
-                "The requested action type is not currently supported by the server.");
+                "The requested action type is not currently supported by the server."),
+        ERROR_NOT_IMPLEMENTED_ACTION_RULE_FLOW_TYPE("650016",
+                "Unable to perform the operation.",
+                "Rules are not supported for the specified action type by the server."),
+        ERROR_WHILE_INITIALIZING_RULE_BUILDER("650017",
+                "Unable to perform the operation.",
+                "Error while retrieving rule metadata for rule validations.");
 
         private final String code;
         private final String message;

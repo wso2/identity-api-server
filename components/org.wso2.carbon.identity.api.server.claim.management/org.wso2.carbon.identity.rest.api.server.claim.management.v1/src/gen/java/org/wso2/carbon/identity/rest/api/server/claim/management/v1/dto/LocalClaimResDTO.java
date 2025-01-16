@@ -20,6 +20,7 @@ import io.swagger.annotations.ApiModel;
 import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.AttributeMappingDTO;
+import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ClaimResDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.PropertyDTO;
 import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.*;
@@ -64,7 +65,19 @@ public class LocalClaimResDTO extends ClaimResDTO {
     @Valid 
     private Boolean supportedByDefault = null;
 
+    public enum UniquenessScopeEnum {
+         NONE,  WITHIN_USERSTORE,  ACROSS_USERSTORES, 
+    };
     @Valid 
+    private UniquenessScopeEnum uniquenessScope = null;
+
+    public enum SharedProfileValueResolvingMethodEnum {
+        FromOrigin, FromSharedProfile, FromFirstFoundInHierarchy,
+    };
+    @Valid
+    private SharedProfileValueResolvingMethodEnum sharedProfileValueResolvingMethod = null;
+
+    @Valid
     private List<AttributeMappingDTO> attributeMapping = new ArrayList<AttributeMappingDTO>();
 
     @Valid 
@@ -191,6 +204,32 @@ public class LocalClaimResDTO extends ClaimResDTO {
     }
 
     /**
+    * Specifies the scope of uniqueness validation for the claim value.
+    **/
+    @ApiModelProperty(value = "Specifies the scope of uniqueness validation for the claim value.")
+    @JsonProperty("uniquenessScope")
+    public UniquenessScopeEnum getUniquenessScope() {
+        return uniquenessScope;
+    }
+    public void setUniquenessScope(UniquenessScopeEnum uniquenessScope) {
+        this.uniquenessScope = uniquenessScope;
+    }
+
+    /**
+     * Specifies claim value resolving method for shared user profile.
+     **/
+    @ApiModelProperty(value = "Specifies claim value resolving method for shared user profile.")
+    @JsonProperty("sharedProfileValueResolvingMethod")
+    public SharedProfileValueResolvingMethodEnum getSharedProfileValueResolvingMethod() {
+        return sharedProfileValueResolvingMethod;
+    }
+
+    public void setSharedProfileValueResolvingMethod(
+            SharedProfileValueResolvingMethodEnum sharedProfileValueResolvingMethod) {
+        this.sharedProfileValueResolvingMethod = sharedProfileValueResolvingMethod;
+    }
+
+    /**
     * Userstore attribute mappings.
     **/
     @ApiModelProperty(value = "Userstore attribute mappings.")
@@ -231,6 +270,8 @@ public class LocalClaimResDTO extends ClaimResDTO {
         sb.append("    regEx: ").append(regEx).append("\n");
         sb.append("    required: ").append(required).append("\n");
         sb.append("    supportedByDefault: ").append(supportedByDefault).append("\n");
+        sb.append("    uniquenessScope: ").append(uniquenessScope).append("\n");
+        sb.append("    sharedProfileValueResolvingMethod: ").append(sharedProfileValueResolvingMethod).append("\n");
         sb.append("    attributeMapping: ").append(attributeMapping).append("\n");
         sb.append("    properties: ").append(properties).append("\n");
         
