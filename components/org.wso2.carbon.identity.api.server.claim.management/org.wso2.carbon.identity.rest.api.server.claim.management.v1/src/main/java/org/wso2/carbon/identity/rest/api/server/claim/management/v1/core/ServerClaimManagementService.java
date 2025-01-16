@@ -159,6 +159,8 @@ public class ServerClaimManagementService {
             ClaimConstants.ErrorMessage.ERROR_CODE_EXISTING_EXTERNAL_CLAIM_URI.getCode(),
             ClaimConstants.ErrorMessage.ERROR_CODE_EXISTING_LOCAL_CLAIM_URI.getCode()
     );
+    private static final boolean RESTRICT_CLAIM_TO_PRIMARY_USERSTORE = Boolean.parseBoolean(IdentityUtil.getProperty(
+            "ClaimManagement.RestrictClaimsToPrimaryUserStore"));
 
     private static final List<String> forbiddenErrorScenarios = Arrays.asList(
             ClaimConstants.ErrorMessage.ERROR_CODE_NO_RENAME_SYSTEM_DIALECT.getCode(),
@@ -1500,6 +1502,15 @@ public class ServerClaimManagementService {
                     primaryUserstoreDomainName.equalsIgnoreCase(attributeMappingDTO.getUserstore())) {
                 throw handleClaimManagementClientError(ERROR_CODE_EMPTY_MAPPED_ATTRIBUTES_IN_LOCAL_CLAIM,
                         BAD_REQUEST, attributeMappingDTO.getUserstore());
+            }
+            if (RESTRICT_CLAIM_TO_PRIMARY_USERSTORE) {
+                // If the `ClaimManagement.RestrictClaimsToPrimaryUserStore` is enabled, we can only use the primary
+                // userstore for the claim mapping.
+                if (!primaryUserstoreDomainName.equalsIgnoreCase(attributeMappingDTO.getUserstore())) {
+                    throw handleClaimManagementClientError(ERROR_CODE_INVALID_USERSTORE.getCode(), "You can only use"
+                                    + " 'PRIMARY' userstore for the claim mapping.", BAD_REQUEST,
+                            attributeMappingDTO.getUserstore());
+                }
             }
             if (!isUserStoreExists(attributeMappingDTO.getUserstore())) {
                 throw handleClaimManagementClientError(ERROR_CODE_INVALID_USERSTORE, BAD_REQUEST,
