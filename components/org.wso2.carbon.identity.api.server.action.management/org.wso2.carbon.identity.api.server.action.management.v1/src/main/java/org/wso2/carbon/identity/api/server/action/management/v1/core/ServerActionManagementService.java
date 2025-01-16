@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.action.management.exception.ActionMgtException;
 import org.wso2.carbon.identity.action.management.model.Action;
+import org.wso2.carbon.identity.action.management.model.ActionRule;
 import org.wso2.carbon.identity.action.management.model.Authentication;
 import org.wso2.carbon.identity.action.management.model.EndpointConfig;
 import org.wso2.carbon.identity.api.server.action.management.common.ActionManagementServiceHolder;
@@ -38,6 +39,7 @@ import org.wso2.carbon.identity.api.server.action.management.v1.EndpointResponse
 import org.wso2.carbon.identity.api.server.action.management.v1.Link;
 import org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants;
 import org.wso2.carbon.identity.api.server.action.management.v1.util.ActionMgtEndpointUtil;
+import org.wso2.carbon.identity.api.server.action.management.v1.util.RuleMapper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,10 +74,10 @@ public class ServerActionManagementService {
     public ActionResponse createAction(String actionType, ActionModel actionModel) {
 
         try {
-            validateActionType(actionType);
+            Action.ActionTypes validatedActionType = validateActionType(actionType);
+            String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             return buildActionResponse(ActionManagementServiceHolder.getActionManagementService()
-                    .addAction(actionType, buildAction(actionModel),
-                            CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
+                    .addAction(actionType, buildAction(validatedActionType, actionModel, tenantDomain), tenantDomain));
         } catch (ActionMgtException e) {
             throw ActionMgtEndpointUtil.handleActionMgtException(e);
         }
@@ -121,10 +123,11 @@ public class ServerActionManagementService {
     public ActionResponse updateAction(String actionType, String actionId, ActionUpdateModel actionUpdateModel) {
 
         try {
-            validateActionType(actionType);
+            Action.ActionTypes validatedActionType = validateActionType(actionType);
+            String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             return buildActionResponse(ActionManagementServiceHolder.getActionManagementService()
-                    .updateAction(actionType, actionId, buildUpdatingAction(actionUpdateModel),
-                            CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
+                    .updateAction(actionType, actionId,
+                            buildUpdatingAction(validatedActionType, actionUpdateModel, tenantDomain), tenantDomain));
         } catch (ActionMgtException e) {
             throw ActionMgtEndpointUtil.handleActionMgtException(e);
         }
@@ -197,10 +200,11 @@ public class ServerActionManagementService {
     /**
      * Build ActionResponse from Action.
      *
-     * @param action Action object.
-     * @return ActionResponse object.
+     * @param action action object
+     * @return ActionResponse object
+     * @throws ActionMgtException If an error occurs while building the ActionResponse.
      */
-    private ActionResponse buildActionResponse(Action action) {
+    private ActionResponse buildActionResponse(Action action) throws ActionMgtException {
 
         return new ActionResponse()
                 .id(action.getId())
@@ -212,7 +216,9 @@ public class ServerActionManagementService {
                         .uri(action.getEndpoint().getUri())
                         .authentication(new AuthenticationTypeResponse()
                                 .type(AuthenticationTypeResponse.TypeEnum.valueOf(action.getEndpoint()
-                                        .getAuthentication().getType().toString()))));
+                                        .getAuthentication().getType().toString()))))
+                .rule((action.getActionRule() != null) ? RuleMapper.toORRuleResponse(action.getActionRule()) :
+                        null);
     }
 
     /**
@@ -251,16 +257,25 @@ public class ServerActionManagementService {
     }
 
     /**
-     * Create Action from the Action model.
+     * Build Action from the ActionModel.
      *
-     * @param actionModel Action model.
+     * @param actionType   Action Type.
+     * @param actionModel  Action Model.
+     * @param tenantDomain Tenant Domain.
      * @return Action.
+     * @throws ActionMgtException If an error occurs while building the Action.
      */
-    private Action buildAction(ActionModel actionModel) {
+    private Action buildAction(Action.ActionTypes actionType, ActionModel actionModel, String tenantDomain)
+            throws ActionMgtException {
 
         Authentication authentication = buildAuthentication(
                 Authentication.Type.valueOf(actionModel.getEndpoint().getAuthentication().getType().toString()),
                 actionModel.getEndpoint().getAuthentication().getProperties());
+
+        ActionRule actionRule = null;
+        if (actionModel.getRule() != null) {
+            actionRule = RuleMapper.toActionRule(actionModel.getRule(), actionType, tenantDomain);
+        }
 
         return new Action.ActionRequestBuilder()
                 .name(actionModel.getName())
@@ -269,16 +284,21 @@ public class ServerActionManagementService {
                         .uri(actionModel.getEndpoint().getUri())
                         .authentication(authentication)
                         .build())
+                .rule(actionRule)
                 .build();
     }
 
     /**
      * Build Action from the ActionUpdateModel.
      *
-     * @param actionUpdateModel ActionUpdateModel.
+     * @param actionType        Action Type.
+     * @param actionUpdateModel Action Update Model.
+     * @param tenantDomain      Tenant Domain.
      * @return Action.
+     * @throws ActionMgtException If an error occurs while building the Action.
      */
-    private Action buildUpdatingAction(ActionUpdateModel actionUpdateModel) {
+    private Action buildUpdatingAction(Action.ActionTypes actionType, ActionUpdateModel actionUpdateModel,
+                                       String tenantDomain) throws ActionMgtException {
 
         EndpointConfig endpointConfig = null;
         if (actionUpdateModel.getEndpoint() != null) {
@@ -295,10 +315,17 @@ public class ServerActionManagementService {
                     .build();
         }
 
+        ActionRule actionRule = null;
+        if (actionUpdateModel.getRule() != null) {
+            actionRule = RuleMapper.toActionRule(actionUpdateModel.getRule(), actionType,
+                    tenantDomain);
+        }
+
         return new Action.ActionRequestBuilder()
                 .name(actionUpdateModel.getName())
                 .description(actionUpdateModel.getDescription())
                 .endpoint(endpointConfig)
+                .rule(actionRule)
                 .build();
     }
 
@@ -365,18 +392,24 @@ public class ServerActionManagementService {
         }
     }
 
-    private void validateActionType(String actionType) {
+    private Action.ActionTypes validateActionType(String actionType) {
 
-        Action.ActionTypes actionTypeEnum =
-                Arrays.stream(Action.ActionTypes.filterByCategory(Action.ActionTypes.Category.PRE_POST))
-                        .filter(actionTypeObj -> actionTypeObj.getPathParam().equals(actionType))
-                        .findFirst()
-                        .orElseThrow(() -> ActionMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST,
-                                ERROR_INVALID_ACTION_TYPE));
+        Action.ActionTypes actionTypeEnum = getActionTypeFromPath(actionType);
 
         if (NOT_IMPLEMENTED_ACTION_TYPES.contains(actionTypeEnum.getPathParam())) {
             throw ActionMgtEndpointUtil.handleException(Response.Status.NOT_IMPLEMENTED,
                     ERROR_NOT_IMPLEMENTED_ACTION_TYPE);
         }
+
+        return actionTypeEnum;
+    }
+
+    private Action.ActionTypes getActionTypeFromPath(String actionType) {
+
+        return Arrays.stream(Action.ActionTypes.filterByCategory(Action.ActionTypes.Category.PRE_POST))
+                .filter(actionTypeObj -> actionTypeObj.getPathParam().equals(actionType))
+                .findFirst()
+                .orElseThrow(() -> ActionMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST,
+                        ERROR_INVALID_ACTION_TYPE));
     }
 }

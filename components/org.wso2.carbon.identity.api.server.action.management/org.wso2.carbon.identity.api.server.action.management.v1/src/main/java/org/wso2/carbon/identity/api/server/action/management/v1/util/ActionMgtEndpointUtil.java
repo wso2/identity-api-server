@@ -18,10 +18,12 @@
 
 package org.wso2.carbon.identity.api.server.action.management.v1.util;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.action.management.exception.ActionMgtClientException;
 import org.wso2.carbon.identity.action.management.exception.ActionMgtException;
+import org.wso2.carbon.identity.action.management.exception.ActionMgtServerException;
 import org.wso2.carbon.identity.action.management.model.Action;
 import org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants;
 import org.wso2.carbon.identity.api.server.common.Constants;
@@ -89,6 +91,28 @@ public class ActionMgtEndpointUtil {
         errorCode = errorCode.contains(ERROR_CODE_DELIMITER) ? errorCode :
                 ActionMgtEndpointConstants.ACTION_MANAGEMENT_PREFIX + errorCode;
         return handleException(status, errorCode, e.getMessage(), e.getDescription());
+    }
+
+    public static ActionMgtServerException buildActionMgtServerException(ActionMgtEndpointConstants.ErrorMessage error,
+                                                                         Throwable e, String... data) {
+
+        String description = error.getDescription();
+        if (ArrayUtils.isNotEmpty(data)) {
+            description = String.format(description, data);
+        }
+
+        return new ActionMgtServerException(error.getMessage(), description, error.getCode(), e);
+    }
+
+    public static ActionMgtClientException buildActionMgtClientException(ActionMgtEndpointConstants.ErrorMessage error,
+                                                                         Throwable e, String... data) {
+
+        String description = error.getDescription();
+        if (ArrayUtils.isNotEmpty(data)) {
+            description = String.format(description, data);
+        }
+
+        return new ActionMgtClientException(error.getMessage(), description, error.getCode());
     }
 
     /**
