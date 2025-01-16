@@ -252,7 +252,7 @@ public class ServerAPIResourceManagementService {
                     removedScopeNames, CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
             // Replacing Authorization Details Types
             APIResourceManagementServiceHolder.getAuthorizationDetailsTypeManager()
-                    .replaceAuthorizationDetailsTypes(apiResourceID,
+                    .updateAuthorizationDetailsTypes(apiResourceID,
                             apiResourcePatchModel.getRemovedAuthorizationDetailsTypes(),
                             toAuthorizationDetailsTypes(apiResourcePatchModel.getAddedAuthorizationDetailsTypes()),
                             CarbonContext.getThreadLocalCarbonContext().getTenantDomain()
