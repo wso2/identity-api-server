@@ -47,6 +47,7 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.DESCRIPTION_KEY;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_LOGINFLOW_AI_RESULT;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_LOGINFLOW_AI_RESULT_STATUS;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_WHILE_CONVERTING_LOGINFLOW_AI_SERVER_RESPONSE;
 
 /**
  * Service class for login flow AI related operations.
@@ -56,7 +57,8 @@ public class LoginFlowAIService {
     private static final Log log = LogFactory.getLog(LoginFlowAIService.class);
 
     /**
-     * Generate authentication sequence.
+     * Generate authentication sequence using login flow AI. Here we generate the authentication sequence based on the
+     * available user claims metadata and authenticators.
      *
      * @param loginFlowGenerateRequest LoginFlowGenerateRequest.
      * @return LoginFlowGenerateResponse.
@@ -116,7 +118,7 @@ public class LoginFlowAIService {
             LoginFlowResultResponse response = new LoginFlowResultResponse();
             Map<String, Object> generationResultMap = (Map<String, Object>) generationResult;
             response.setStatus(getStatusFromResult(generationResultMap));
-            if (!((Map<?, ?>) generationResult).containsKey(AI_RESPONSE_DATA_KEY)) {
+            if (!generationResultMap.containsKey(AI_RESPONSE_DATA_KEY)) {
                 throw new AIServerException(ERROR_CODE_ERROR_GETTING_LOGINFLOW_AI_RESULT_STATUS.getMessage(),
                         ERROR_CODE_ERROR_GETTING_LOGINFLOW_AI_RESULT_STATUS.getCode());
             }
@@ -158,12 +160,11 @@ public class LoginFlowAIService {
 
         if (resultMap.containsKey(AI_RESPONSE_STATUS_KEY)) {
             String status = (String) resultMap.get(AI_RESPONSE_STATUS_KEY);
-            if ("IN_PROGRESS".equals(status)) {
-                return StatusEnum.IN_PROGRESS;
-            } else if ("COMPLETED".equals(status)) {
-                return StatusEnum.COMPLETED;
-            } else if ("FAILED".equals(status)) {
-                return StatusEnum.FAILED;
+            try {
+                return StatusEnum.fromValue(status);
+            } catch (IllegalArgumentException e) {
+                throw new AIServerException(ERROR_CODE_ERROR_GETTING_LOGINFLOW_AI_RESULT.getMessage(),
+                        ERROR_CODE_ERROR_GETTING_LOGINFLOW_AI_RESULT.getCode());
             }
         }
         throw new AIServerException(ERROR_CODE_ERROR_GETTING_LOGINFLOW_AI_RESULT.getMessage(),
@@ -172,6 +173,7 @@ public class LoginFlowAIService {
 
     private APIError handleClientException(AIClientException error) {
 
+        log.debug("Client error occurred while invoking Loginflow-ai service.", error);
         ErrorResponse.Builder errorResponseBuilder = new ErrorResponse.Builder()
                 .withCode(error.getErrorCode())
                 .withMessage(error.getMessage());
@@ -185,6 +187,7 @@ public class LoginFlowAIService {
 
     private APIError handleServerException(AIServerException error) {
 
+        log.error("Server error occurred while invoking Loginflow-ai service.", error);
         ErrorResponse.Builder errorResponseBuilder = new ErrorResponse.Builder()
                 .withCode(error.getErrorCode())
                 .withMessage(error.getMessage());
@@ -196,7 +199,7 @@ public class LoginFlowAIService {
         return new APIError(Response.Status.INTERNAL_SERVER_ERROR, errorResponseBuilder.build());
     }
 
-    private static Map<String, Object> convertObjectToMap(Object object) {
+    private static Map<String, Object> convertObjectToMap(Object object) throws AIServerException {
 
         if (object instanceof Map) {
             Map<String, Object> map = new HashMap<>();
@@ -216,11 +219,11 @@ public class LoginFlowAIService {
             }
             return map;
         }
-        log.warn("Object is not an instance of Map. Returning an empty map.");
-        return new HashMap<>();
+        throw new AIServerException(ERROR_WHILE_CONVERTING_LOGINFLOW_AI_SERVER_RESPONSE.getMessage(),
+                ERROR_WHILE_CONVERTING_LOGINFLOW_AI_SERVER_RESPONSE.getCode());
     }
 
-    private static Object[] convertListToArray(List<?> list) {
+    private static Object[] convertListToArray(List<?> list) throws AIServerException {
 
         Object[] array = new Object[list.size()];
         for (int i = 0; i < list.size(); i++) {

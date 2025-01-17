@@ -196,7 +196,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
-    public Response getLoginFlowResult(String operationId) {
+    public Response getLoginFlowGenerationResult(String operationId) {
 
         LoginFlowResultResponse loginFlowAIGenerationResult = loginFlowAIService.getLoginFlowAIGenerationResult(
                 operationId);
@@ -204,7 +204,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
-    public Response getLoginFlowStatus(String operationId) {
+    public Response getLoginFlowGenerationStatus(String operationId) {
 
         LoginFlowStatusResponse loginFlowAIStatus = loginFlowAIService.getLoginFlowAIStatus(operationId);
         return Response.ok(loginFlowAIStatus).build();

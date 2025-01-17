@@ -118,9 +118,9 @@ public interface ApplicationsApiService {
 
       public Response getInboundSAMLConfiguration(String applicationId);
 
-      public Response getLoginFlowResult(String operationId);
+      public Response getLoginFlowGenerationResult(String operationId);
 
-      public Response getLoginFlowStatus(String operationId);
+      public Response getLoginFlowGenerationStatus(String operationId);
 
       public Response getOIDCMetadata();
 

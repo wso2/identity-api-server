@@ -44,7 +44,7 @@ public class LoginFlowStatusResponse  {
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("operation_id")
+    @JsonProperty("operationId")
     @Valid
     public String getOperationId() {
         return operationId;

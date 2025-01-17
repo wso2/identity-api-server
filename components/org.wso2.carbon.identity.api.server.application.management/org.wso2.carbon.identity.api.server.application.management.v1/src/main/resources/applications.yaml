@@ -2624,9 +2624,6 @@ paths:
       description: >
         This API provides the capability to initiate the generation of a login flow.
         <br>
-        <b>Permission required:</b>
-        * /permission/admin/manage/identity/applicationmgt/update
-        <br>
         <b>Scope required:</b>
         * internal_application_mgt_update
       operationId: generateLoginFlow
@@ -2666,14 +2663,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /applications/loginflow/status/{operation_id}:
+  /applications/loginflow/status/{operationId}:
     get:
       tags:
         - LoginFlow
       summary: Get the status of the login flow generation process
-      operationId: getLoginFlowStatus
+      description: >
+        This API provides the capability to retrieve the status of the login flow generation process.
+        <br>
+        <b>Scope required:</b>
+        * internal_application_mgt_update
+      operationId: getLoginFlowGenerationStatus
       parameters:
-        - name: operation_id
+        - name: operationId
           in: path
           required: true
           schema:
@@ -2691,6 +2693,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: Not Found
           content:
@@ -2698,14 +2712,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /applications/loginflow/result/{operation_id}:
+  /applications/loginflow/result/{operationId}:
     get:
       tags:
         - LoginFlow
       summary: Get the final login flow result
-      operationId: getLoginFlowResult
+      description: >
+        This API provides the capability to retrieve the final login flow result.
+        <br>
+        <b>Scope required:</b>
+        * internal_application_mgt_update
+      operationId: getLoginFlowGenerationResult
       parameters:
-        - name: operation_id
+        - name: operationId
           in: path
           required: true
           schema:
@@ -2719,6 +2738,18 @@ paths:
                 $ref: '#/components/schemas/LoginFlowResultResponse'
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
           content:
             application/json:
               schema:
@@ -4461,25 +4492,25 @@ components:
     LoginFlowGenerateRequest:
       type: object
       properties:
-        available_authenticators:
+        availableAuthenticators:
           type: object
           additionalProperties:
             type: array
             items:
               type: object
               additionalProperties: true
-        user_claims:
+        userClaims:
           type: array
           items:
             type: object
             additionalProperties: true
-        user_query:
+        userQuery:
           type: string
 
     LoginFlowGenerateResponse:
       type: object
       properties:
-        operation_id:
+        operationId:
           type: string
 
     StatusEnum:
@@ -4488,15 +4519,11 @@ components:
         - IN_PROGRESS
         - COMPLETED
         - FAILED
-      x-enum-varnames:
-        - IN_PROGRESS
-        - COMPLETED
-        - FAILED
 
     LoginFlowStatusResponse:
       type: object
       properties:
-        operation_id:
+        operationId:
           type: string
         status:
           type: object

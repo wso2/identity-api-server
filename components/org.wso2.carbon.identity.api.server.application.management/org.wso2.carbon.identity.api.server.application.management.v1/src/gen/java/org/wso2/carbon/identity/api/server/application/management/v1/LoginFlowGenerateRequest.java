@@ -51,7 +51,7 @@ public class LoginFlowGenerateRequest  {
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("available_authenticators")
+    @JsonProperty("availableAuthenticators")
     @Valid
     public Map<String, List<Map<String, Object>>> getAvailableAuthenticators() {
         return availableAuthenticators;
@@ -78,7 +78,7 @@ public class LoginFlowGenerateRequest  {
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("user_claims")
+    @JsonProperty("userClaims")
     @Valid
     public List<Map<String, Object>> getUserClaims() {
         return userClaims;
@@ -104,7 +104,7 @@ public class LoginFlowGenerateRequest  {
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("user_query")
+    @JsonProperty("userQuery")
     @Valid
     public String getUserQuery() {
         return userQuery;

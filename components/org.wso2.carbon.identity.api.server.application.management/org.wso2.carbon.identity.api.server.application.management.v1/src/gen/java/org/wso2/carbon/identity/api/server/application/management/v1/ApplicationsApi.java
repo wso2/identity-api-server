@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -419,7 +419,7 @@ public class ApplicationsApi  {
     @Path("/loginflow/generate")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Initiate login flow generation", notes = "This API provides the capability to initiate the generation of a login flow. <br> <b>Permission required:</b> * /permission/admin/manage/identity/applicationmgt/update <br> <b>Scope required:</b> * internal_application_mgt_update ", response = LoginFlowGenerateResponse.class, authorizations = {
+    @ApiOperation(value = "Initiate login flow generation", notes = "This API provides the capability to initiate the generation of a login flow. <br> <b>Scope required:</b> * internal_application_mgt_update ", response = LoginFlowGenerateResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -754,10 +754,10 @@ public class ApplicationsApi  {
 
     @Valid
     @GET
-    @Path("/loginflow/result/{operation_id}")
+    @Path("/loginflow/result/{operationId}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get the final login flow result", notes = "", response = LoginFlowResultResponse.class, authorizations = {
+    @ApiOperation(value = "Get the final login flow result", notes = "This API provides the capability to retrieve the final login flow result. <br> <b>Scope required:</b> * internal_application_mgt_update ", response = LoginFlowResultResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -766,19 +766,21 @@ public class ApplicationsApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = LoginFlowResultResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class)
     })
-    public Response getLoginFlowResult(@ApiParam(value = "",required=true) @PathParam("operation_id") String operationId) {
+    public Response getLoginFlowGenerationResult(@ApiParam(value = "",required=true) @PathParam("operationId") String operationId) {
 
-        return delegate.getLoginFlowResult(operationId );
+        return delegate.getLoginFlowGenerationResult(operationId );
     }
 
     @Valid
     @GET
-    @Path("/loginflow/status/{operation_id}")
+    @Path("/loginflow/status/{operationId}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get the status of the login flow generation process", notes = "", response = LoginFlowStatusResponse.class, authorizations = {
+    @ApiOperation(value = "Get the status of the login flow generation process", notes = "This API provides the capability to retrieve the status of the login flow generation process. <br> <b>Scope required:</b> * internal_application_mgt_update ", response = LoginFlowStatusResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -787,11 +789,13 @@ public class ApplicationsApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = LoginFlowStatusResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class)
     })
-    public Response getLoginFlowStatus(@ApiParam(value = "",required=true) @PathParam("operation_id") String operationId) {
+    public Response getLoginFlowGenerationStatus(@ApiParam(value = "",required=true) @PathParam("operationId") String operationId) {
 
-        return delegate.getLoginFlowStatus(operationId );
+        return delegate.getLoginFlowGenerationStatus(operationId );
     }
 
     @Valid

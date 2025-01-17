@@ -222,7 +222,10 @@ public class ApplicationManagementConstants {
                 "Error occurred while getting the Login Flow AI result status."),
         ERROR_CODE_ERROR_GETTING_LOGINFLOW_AI_RESULT("65601",
                 "Error occurred while getting the Login Flow AI result.",
-                "Error occurred while getting the Login Flow AI result.");
+                "Error occurred while getting the Login Flow AI result."),
+        ERROR_WHILE_CONVERTING_LOGINFLOW_AI_SERVER_RESPONSE("65602",
+                "Error occurred while converting the AI server response.",
+                "Could not convert the AI server response to a valid response.");
 
         private final String code;
         private final String message;

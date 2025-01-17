@@ -43,7 +43,7 @@ public class LoginFlowGenerateResponse  {
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("operation_id")
+    @JsonProperty("operationId")
     @Valid
     public String getOperationId() {
         return operationId;
