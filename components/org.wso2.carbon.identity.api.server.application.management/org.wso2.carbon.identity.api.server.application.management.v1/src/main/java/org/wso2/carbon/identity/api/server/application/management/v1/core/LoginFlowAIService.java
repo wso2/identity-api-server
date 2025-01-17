@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -22,6 +22,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.wso2.carbon.identity.ai.service.mgt.exceptions.AIClientException;
+import org.wso2.carbon.identity.ai.service.mgt.exceptions.AIServerException;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowGenerateRequest;
 import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowGenerateResponse;
@@ -30,8 +32,6 @@ import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowSt
 import org.wso2.carbon.identity.api.server.application.management.v1.StatusEnum;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
-import org.wso2.carbon.identity.application.mgt.ai.LoginFlowAIClientException;
-import org.wso2.carbon.identity.application.mgt.ai.LoginFlowAIServerException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -39,6 +39,12 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.AI_RESPONSE_DATA_KEY;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.AI_RESPONSE_STATUS_KEY;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.AUTHENTICATOR_IDP_KEY;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.AUTHENTICATOR_NAME_KEY;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.CLAIM_URI_KEY;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.DESCRIPTION_KEY;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_LOGINFLOW_AI_RESULT;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_LOGINFLOW_AI_RESULT_STATUS;
 
@@ -62,8 +68,8 @@ public class LoginFlowAIService {
             JSONArray userClaimsJsonArray = new JSONArray();
             for (Map<String, Object> userClaim : userClaims) {
                 userClaimsJsonArray.put(new JSONObject()
-                        .put("claimURI", userClaim.get("claimURI"))
-                        .put("description", userClaim.get("description")));
+                        .put(CLAIM_URI_KEY, userClaim.get(CLAIM_URI_KEY))
+                        .put(DESCRIPTION_KEY, userClaim.get(DESCRIPTION_KEY)));
             }
 
             JSONObject availableAuthenticators = new JSONObject();
@@ -76,9 +82,9 @@ public class LoginFlowAIService {
                 JSONArray authenticatorsJsonArray = new JSONArray();
                 for (Map<String, Object> authenticator : authenticatorList) {
                     authenticatorsJsonArray.put(new JSONObject()
-                            .put("name", authenticator.get("name"))
-                            .put("idp", authenticator.get("idp"))
-                            .put("description", authenticator.get("description")));
+                            .put(AUTHENTICATOR_NAME_KEY, authenticator.get(AUTHENTICATOR_NAME_KEY))
+                            .put(AUTHENTICATOR_IDP_KEY, authenticator.get(AUTHENTICATOR_IDP_KEY))
+                            .put(DESCRIPTION_KEY, authenticator.get(DESCRIPTION_KEY)));
                 }
                 availableAuthenticators.put(authenticatorType, authenticatorsJsonArray);
             }
@@ -89,9 +95,9 @@ public class LoginFlowAIService {
             LoginFlowGenerateResponse response = new LoginFlowGenerateResponse();
             response.setOperationId(operationId);
             return response;
-        } catch (LoginFlowAIServerException e) {
+        } catch (AIServerException e) {
             throw handleServerException(e);
-        } catch (LoginFlowAIClientException e) {
+        } catch (AIClientException e) {
             throw handleClientException(e);
         }
     }
@@ -110,16 +116,16 @@ public class LoginFlowAIService {
             LoginFlowResultResponse response = new LoginFlowResultResponse();
             Map<String, Object> generationResultMap = (Map<String, Object>) generationResult;
             response.setStatus(getStatusFromResult(generationResultMap));
-            if (!((Map<?, ?>) generationResult).containsKey("data")) {
-                throw new LoginFlowAIServerException(ERROR_CODE_ERROR_GETTING_LOGINFLOW_AI_RESULT_STATUS.getMessage(),
+            if (!((Map<?, ?>) generationResult).containsKey(AI_RESPONSE_DATA_KEY)) {
+                throw new AIServerException(ERROR_CODE_ERROR_GETTING_LOGINFLOW_AI_RESULT_STATUS.getMessage(),
                         ERROR_CODE_ERROR_GETTING_LOGINFLOW_AI_RESULT_STATUS.getCode());
             }
-            Map<String, Object> dataMap = (Map<String, Object>) generationResultMap.get("data");
+            Map<String, Object> dataMap = (Map<String, Object>) generationResultMap.get(AI_RESPONSE_DATA_KEY);
             response.setData(dataMap);
             return response;
-        } catch (LoginFlowAIServerException e) {
+        } catch (AIServerException e) {
             throw handleServerException(e);
-        } catch (LoginFlowAIClientException e) {
+        } catch (AIClientException e) {
             throw handleClientException(e);
         }
     }
@@ -140,18 +146,18 @@ public class LoginFlowAIService {
 
             response.status(convertObjectToMap(generationStatus));
             return response;
-        } catch (LoginFlowAIServerException e) {
+        } catch (AIServerException e) {
             throw handleServerException(e);
-        } catch (LoginFlowAIClientException e) {
+        } catch (AIClientException e) {
             throw handleClientException(e);
         }
     }
 
     private StatusEnum getStatusFromResult(Map<String, Object> resultMap)
-            throws LoginFlowAIServerException {
+            throws AIServerException {
 
-        if (resultMap.containsKey("status")) {
-            String status = (String) resultMap.get("status");
+        if (resultMap.containsKey(AI_RESPONSE_STATUS_KEY)) {
+            String status = (String) resultMap.get(AI_RESPONSE_STATUS_KEY);
             if ("IN_PROGRESS".equals(status)) {
                 return StatusEnum.IN_PROGRESS;
             } else if ("COMPLETED".equals(status)) {
@@ -160,31 +166,31 @@ public class LoginFlowAIService {
                 return StatusEnum.FAILED;
             }
         }
-        throw new LoginFlowAIServerException(ERROR_CODE_ERROR_GETTING_LOGINFLOW_AI_RESULT.getMessage(),
+        throw new AIServerException(ERROR_CODE_ERROR_GETTING_LOGINFLOW_AI_RESULT.getMessage(),
                 ERROR_CODE_ERROR_GETTING_LOGINFLOW_AI_RESULT.getCode());
     }
 
-    private APIError handleClientException(LoginFlowAIClientException error) {
+    private APIError handleClientException(AIClientException error) {
 
         ErrorResponse.Builder errorResponseBuilder = new ErrorResponse.Builder()
                 .withCode(error.getErrorCode())
                 .withMessage(error.getMessage());
-        if (error.getLoginFlowAIResponse() != null) {
-            Response.Status status = Response.Status.fromStatusCode(error.getLoginFlowAIResponse().getStatusCode());
-            errorResponseBuilder.withDescription(error.getLoginFlowAIResponse().getResponseBody());
+        if (error.getServerMessage() != null) {
+            Response.Status status = Response.Status.fromStatusCode(error.getServerStatusCode());
+            errorResponseBuilder.withDescription(error.getServerMessage());
             return new APIError(status, errorResponseBuilder.build());
         }
         return new APIError(Response.Status.BAD_REQUEST, errorResponseBuilder.build());
     }
 
-    private APIError handleServerException(LoginFlowAIServerException error) {
+    private APIError handleServerException(AIServerException error) {
 
         ErrorResponse.Builder errorResponseBuilder = new ErrorResponse.Builder()
                 .withCode(error.getErrorCode())
                 .withMessage(error.getMessage());
-        if (error.getBrandingAIResponse() != null) {
-            Response.Status status = Response.Status.fromStatusCode(error.getBrandingAIResponse().getStatusCode());
-            errorResponseBuilder.withDescription(error.getBrandingAIResponse().getResponseBody());
+        if (error.getServerMessage() != null) {
+            Response.Status status = Response.Status.fromStatusCode(error.getServerStatusCode());
+            errorResponseBuilder.withDescription(error.getServerMessage());
             return new APIError(status, errorResponseBuilder.build());
         }
         return new APIError(Response.Status.INTERNAL_SERVER_ERROR, errorResponseBuilder.build());
@@ -232,4 +238,3 @@ public class LoginFlowAIService {
         return array;
     }
 }
-

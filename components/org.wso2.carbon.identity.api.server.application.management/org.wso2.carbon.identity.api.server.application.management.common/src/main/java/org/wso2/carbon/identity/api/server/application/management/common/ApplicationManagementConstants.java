@@ -87,6 +87,15 @@ public class ApplicationManagementConstants {
     public static final String CODE_IDTOKEN = "code id_token";
     public static final String CODE_IDTOKEN_TOKEN = "code id_token token";
 
+    // LoginFlow AI Constants.
+    public static final String CLAIM_URI_KEY = "claimURI";
+    public static final String DESCRIPTION_KEY = "description";
+    public static final String AUTHENTICATOR_NAME_KEY = "name";
+    public static final String AUTHENTICATOR_IDP_KEY = "idp";
+    public static final String AI_RESPONSE_DATA_KEY = "data";
+    public static final String AI_RESPONSE_STATUS_KEY = "status";
+
+
     /**
      * Enums for error messages.
      */
