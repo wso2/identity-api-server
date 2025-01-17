@@ -47,7 +47,7 @@ public class BrandingPreferenceAIMgtOSGiServiceFactory extends AbstractFactoryBe
             if (taskOperationService != null) {
                 this.brandingAiPreferenceManager = taskOperationService;
             } else {
-                throw new Exception("Unable to retrieve ConfigurationManager service.");
+                throw new Exception("Unable to retrieve BrandingAIPreferenceManager service.");
             }
         }
         return this.brandingAiPreferenceManager;

@@ -20,6 +20,8 @@ package org.wso2.carbon.identity.api.server.branding.preference.management.v1.co
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.identity.ai.service.mgt.exceptions.AIClientException;
+import org.wso2.carbon.identity.ai.service.mgt.exceptions.AIServerException;
 import org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceServiceHolder;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationRequestModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationResponseModel;
@@ -27,8 +29,6 @@ import org.wso2.carbon.identity.api.server.branding.preference.management.v1.mod
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationStatusModel;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
-import org.wso2.carbon.identity.branding.preference.management.core.exception.BrandingAIClientException;
-import org.wso2.carbon.identity.branding.preference.management.core.exception.BrandingAIServerException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -61,9 +61,9 @@ public class BrandingAIPreferenceManagementService {
             BrandingGenerationResponseModel response = new BrandingGenerationResponseModel();
             response.setOperationId(operationId);
             return response;
-        } catch (BrandingAIServerException e) {
+        } catch (AIServerException e) {
             throw handleServerException(e);
-        } catch (BrandingAIClientException e) {
+        } catch (AIClientException e) {
             throw handleClientException(e);
         }
     }
@@ -82,9 +82,9 @@ public class BrandingAIPreferenceManagementService {
             BrandingGenerationStatusModel response = new BrandingGenerationStatusModel();
             response.setStatus(convertObjectToMap(generationStatus));
             return response;
-        } catch (BrandingAIServerException e) {
+        } catch (AIServerException e) {
             throw handleServerException(e);
-        } catch (BrandingAIClientException e) {
+        } catch (AIClientException e) {
             throw handleClientException(e);
         }
     }
@@ -106,22 +106,22 @@ public class BrandingAIPreferenceManagementService {
             response.setStatus(getStatusFromResult(resultMap));
 
             if (!resultMap.containsKey("data")) {
-                throw new BrandingAIServerException(ERROR_CODE_ERROR_GETTING_BRANDING_RESULT_STATUS.getMessage(),
+                throw new AIServerException(ERROR_CODE_ERROR_GETTING_BRANDING_RESULT_STATUS.getMessage(),
                         ERROR_CODE_ERROR_GETTING_BRANDING_RESULT_STATUS.getCode());
             }
 
             Map<String, Object> dataMap = (Map<String, Object>) resultMap.get("data");
             response.setData(dataMap);
             return response;
-        } catch (BrandingAIServerException e) {
+        } catch (AIServerException e) {
             throw handleServerException(e);
-        } catch (BrandingAIClientException e) {
+        } catch (AIClientException e) {
             throw handleClientException(e);
         }
     }
 
     private BrandingGenerationResultModel.StatusEnum getStatusFromResult(Map<String, Object> resultMap)
-            throws BrandingAIServerException {
+            throws AIServerException {
 
         if (resultMap.containsKey("status")) {
             String status = (String) resultMap.get("status");
@@ -133,32 +133,32 @@ public class BrandingAIPreferenceManagementService {
                 return BrandingGenerationResultModel.StatusEnum.FAILED;
             }
         }
-        throw new BrandingAIServerException(ERROR_CODE_ERROR_GETTING_BRANDING_RESULT.getMessage(),
+        throw new AIServerException(ERROR_CODE_ERROR_GETTING_BRANDING_RESULT.getMessage(),
                 ERROR_CODE_ERROR_GETTING_BRANDING_RESULT.getCode());
     }
 
 
-    private APIError handleClientException(BrandingAIClientException error) {
+    private APIError handleClientException(AIClientException error) {
 
         ErrorResponse.Builder errorResponseBuilder = new ErrorResponse.Builder()
                 .withCode(error.getErrorCode())
                 .withMessage(error.getMessage());
-        if (error.getBrandingAIResponse() != null) {
-            Response.Status status = Response.Status.fromStatusCode(error.getBrandingAIResponse().getStatusCode());
-            errorResponseBuilder.withDescription(error.getBrandingAIResponse().getResponseBody());
+        if (error.getServerMessage() != null) {
+            Response.Status status = Response.Status.fromStatusCode(error.getServerStatusCode());
+            errorResponseBuilder.withDescription(error.getServerMessage());
             return new APIError(status, errorResponseBuilder.build());
         }
         return new APIError(Response.Status.BAD_REQUEST, errorResponseBuilder.build());
     }
 
-    private APIError handleServerException(BrandingAIServerException error) {
+    private APIError handleServerException(AIServerException error) {
 
         ErrorResponse.Builder errorResponseBuilder = new ErrorResponse.Builder()
                 .withCode(error.getErrorCode())
                 .withMessage(error.getMessage());
-        if (error.getBrandingAIResponse() != null) {
-            Response.Status status = Response.Status.fromStatusCode(error.getBrandingAIResponse().getStatusCode());
-            errorResponseBuilder.withDescription(error.getBrandingAIResponse().getResponseBody());
+        if (error.getServerMessage() != null) {
+            Response.Status status = Response.Status.fromStatusCode(error.getServerStatusCode());
+            errorResponseBuilder.withDescription(error.getServerMessage());
             return new APIError(status, errorResponseBuilder.build());
         }
         return new APIError(Response.Status.INTERNAL_SERVER_ERROR, errorResponseBuilder.build());
