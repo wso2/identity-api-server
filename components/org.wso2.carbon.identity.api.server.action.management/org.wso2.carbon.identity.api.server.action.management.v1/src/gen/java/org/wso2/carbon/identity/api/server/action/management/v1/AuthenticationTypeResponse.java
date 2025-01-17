@@ -24,12 +24,15 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 
+/**
+ * Authentication configurations of the action.
+ **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-
+@ApiModel(description = "Authentication configurations of the action.")
 public class AuthenticationTypeResponse  {
   
 
@@ -68,6 +71,7 @@ public enum TypeEnum {
     private TypeEnum type;
 
     /**
+    * Type of the authentication.
     **/
     public AuthenticationTypeResponse type(TypeEnum type) {
 
@@ -75,7 +79,7 @@ public enum TypeEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "BASIC", required = true, value = "")
+    @ApiModelProperty(example = "BASIC", required = true, value = "Type of the authentication.")
     @JsonProperty("type")
     @Valid
     @NotNull(message = "Property type cannot be null.")

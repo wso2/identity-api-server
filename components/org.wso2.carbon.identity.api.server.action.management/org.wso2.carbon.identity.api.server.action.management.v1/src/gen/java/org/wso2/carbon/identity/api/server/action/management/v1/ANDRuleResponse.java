@@ -28,14 +28,14 @@ import org.wso2.carbon.identity.api.server.action.management.v1.ExpressionRespon
 import javax.validation.constraints.*;
 
 /**
- * Expressions combined with AND condition.
+ * Represents a rule configuration that combines multiple expressions with an AND condition. All expressions in the ANDRule must evaluate to true for the rule to be satisfied.
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "Expressions combined with AND condition.")
+@ApiModel(description = "Represents a rule configuration that combines multiple expressions with an AND condition. All expressions in the ANDRule must evaluate to true for the rule to be satisfied.")
 public class ANDRuleResponse  {
   
 
@@ -76,6 +76,7 @@ public enum ConditionEnum {
 
 
     /**
+    * The logical condition for combining the expressions. For ANDRule, the value must always be \&quot;AND\&quot;.
     **/
     public ANDRuleResponse condition(ConditionEnum condition) {
 
@@ -83,7 +84,7 @@ public enum ConditionEnum {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "The logical condition for combining the expressions. For ANDRule, the value must always be \"AND\".")
     @JsonProperty("condition")
     @Valid
     public ConditionEnum getCondition() {
@@ -94,6 +95,7 @@ public enum ConditionEnum {
     }
 
     /**
+    * A list of expressions that are combined using the AND condition. All expressions must evaluate to true for the ANDRule to pass.
     **/
     public ANDRuleResponse expressions(List<ExpressionResponse> expressions) {
 
@@ -101,7 +103,7 @@ public enum ConditionEnum {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "A list of expressions that are combined using the AND condition. All expressions must evaluate to true for the ANDRule to pass.")
     @JsonProperty("expressions")
     @Valid @Size(min=1)
     public List<ExpressionResponse> getExpressions() {
