@@ -122,6 +122,7 @@ public class ApiModelToSAMLSSOServiceProvider implements Function<SAML2ServicePr
         if (attributeProfile != null) {
             setIfNotNull(attributeProfile.getEnabled(), dto::setEnableAttributeProfile);
             setIfNotNull(attributeProfile.getAlwaysIncludeAttributesInResponse(), dto::setEnableAttributesByDefault);
+            setIfNotNull(attributeProfile.getNameFormat(), dto::setAttributeNameFormat);
         }
     }
 

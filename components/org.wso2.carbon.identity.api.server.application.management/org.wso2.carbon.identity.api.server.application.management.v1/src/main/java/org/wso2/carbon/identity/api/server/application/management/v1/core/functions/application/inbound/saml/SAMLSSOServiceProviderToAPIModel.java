@@ -131,7 +131,8 @@ public class SAMLSSOServiceProviderToAPIModel implements Function<SAMLSSOService
 
         return new SAMLAttributeProfile()
                 .enabled(dto.isEnableAttributeProfile())
-                .alwaysIncludeAttributesInResponse(dto.isEnableAttributesByDefault());
+                .alwaysIncludeAttributesInResponse(dto.isEnableAttributesByDefault())
+                .nameFormat(dto.getAttributeNameFormat());
     }
 
     private String getIssuerWithoutQualifier(SAMLSSOServiceProviderDTO dto) {
