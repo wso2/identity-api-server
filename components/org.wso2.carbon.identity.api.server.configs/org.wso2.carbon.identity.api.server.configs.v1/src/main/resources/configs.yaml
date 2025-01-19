@@ -1185,7 +1185,7 @@ components:
           example: basic
         description:
           type: string
-          example: "Description for local authenticator configuration."
+          example: "Description for user defined local authenticator configuration."
         image:
           type: string
           example: "https://example.com/logo/my-logo.png"
@@ -1227,7 +1227,7 @@ components:
           example: basic
         description:
           type: string
-          example: "Description for local authenticator configuration."
+          example: "Description for user defined local authenticator configuration."
         image:
           type: string
           example: "https://example.com/logo/my-logo.png"

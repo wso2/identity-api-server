@@ -181,7 +181,7 @@ public enum TypeEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "Description for local authenticator configuration.", value = "")
+    @ApiModelProperty(example = "Description for user defined local authenticator configuration.", value = "")
     @JsonProperty("description")
     @Valid
     public String getDescription() {
