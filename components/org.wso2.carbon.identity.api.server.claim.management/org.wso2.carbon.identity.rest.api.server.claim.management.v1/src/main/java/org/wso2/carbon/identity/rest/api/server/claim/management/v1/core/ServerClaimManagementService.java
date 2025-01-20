@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) (2019-2023), WSO2 LLC. (http://www.wso2.org).
+ *  Copyright (c) (2019-2025), WSO2 LLC. (http://www.wso2.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -47,6 +47,7 @@ import org.wso2.carbon.identity.claim.metadata.mgt.model.LocalClaim;
 import org.wso2.carbon.identity.claim.metadata.mgt.util.ClaimConstants;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.organization.management.service.exception.OrganizationManagementException;
+import org.wso2.carbon.identity.organization.management.service.util.OrganizationManagementUtil;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.AttributeMappingDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.AttributeProfileDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ClaimDialectReqDTO;
@@ -83,6 +84,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
@@ -123,7 +126,9 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_LOCAL_CLAIM_NOT_FOUND;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_PAGINATION_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_SORTING_NOT_IMPLEMENTED;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_UNAUTHORIZED_ORG_FOR_ATTRIBUTE_MAPPING_UPDATE;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_UNAUTHORIZED_ORG_FOR_CLAIM_MANAGEMENT;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_UNAUTHORIZED_ORG_FOR_CLAIM_PROPERTY_UPDATE;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_USERSTORE_NOT_SPECIFIED_IN_MAPPINGS;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.LOCAL_DIALECT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.LOCAL_DIALECT_PATH;
@@ -170,6 +175,8 @@ public class ServerClaimManagementService {
             ClaimConstants.ErrorMessage.ERROR_CODE_NO_DELETE_SYSTEM_DIALECT.getCode(),
             ClaimConstants.ErrorMessage.ERROR_CODE_NO_DELETE_SYSTEM_CLAIM.getCode()
     );
+
+    public static final String FALSE = "false";
 
     /**
      * Add a claim dialect.
@@ -448,7 +455,14 @@ public class ServerClaimManagementService {
     public void updateLocalClaim(String claimId, LocalClaimReqDTO localClaimReqDTO) {
 
         try {
-            validateClaimModificationEligibility();
+            if (isSubOrganizationContext()) {
+                /*
+                 * For sub organizations, only attribute mappings are allowed to be updated. Updating any other
+                 * claim properties are restricted.
+                 */
+                validateAttributeMappingUpdate(claimId, createLocalClaim(localClaimReqDTO));
+            }
+
             if (!StringUtils.equals(base64DecodeId(claimId), localClaimReqDTO.getClaimURI())) {
                 throw handleClaimManagementClientError(ERROR_CODE_LOCAL_CLAIM_CONFLICT, CONFLICT,
                         base64DecodeId(claimId));
@@ -973,6 +987,12 @@ public class ServerClaimManagementService {
         return externalClaimResDTOList;
     }
 
+    /**
+     * Builds the LocalClaimResDTO and handles default values for mandatory properties.
+     * If any new properties are added and default value handling logic is updated in this method,
+     * {@link #populateDefaultProperties(LocalClaim)} should be updated accordingly as well.
+     *
+     */
     private LocalClaimResDTO getLocalClaimResDTO(LocalClaim localClaim) {
 
         LocalClaimResDTO localClaimResDTO = new LocalClaimResDTO();
@@ -1625,5 +1645,56 @@ public class ServerClaimManagementService {
                     getCode(), Constant.ErrorMessage.ERROR_CODE_ERROR_RESOLVING_ORGANIZATION.getDescription());
         }
 
+    }
+
+    private boolean isSubOrganizationContext() throws ClaimMetadataClientException {
+
+        try {
+            return OrganizationManagementUtil.isOrganization(ContextLoader.getTenantDomainFromContext());
+        } catch (OrganizationManagementException e) {
+            throw new ClaimMetadataClientException(Constant.ErrorMessage.ERROR_CODE_ERROR_RESOLVING_ORGANIZATION.
+                    getCode(), Constant.ErrorMessage.ERROR_CODE_ERROR_RESOLVING_ORGANIZATION.getDescription());
+        }
+    }
+
+    private void validateAttributeMappingUpdate(String claimID, LocalClaim incomingLocalClaim)
+            throws ClaimMetadataException {
+
+        Optional<LocalClaim>
+                existingLocalClaim = getClaimMetadataManagementService().getLocalClaim(base64DecodeId(claimID),
+                ContextLoader.getTenantDomainFromContext());
+
+        if (!existingLocalClaim.isPresent()) {
+            throw handleClaimManagementClientError(ERROR_CODE_LOCAL_CLAIM_NOT_FOUND, BAD_REQUEST, claimID);
+        }
+
+        populateDefaultProperties(existingLocalClaim.get());
+        if (Objects.hash(existingLocalClaim.get().getClaimProperties().entrySet()) !=
+                Objects.hash(incomingLocalClaim.getClaimProperties().entrySet())) {
+            throw handleClaimManagementClientError(ERROR_CODE_UNAUTHORIZED_ORG_FOR_CLAIM_PROPERTY_UPDATE, FORBIDDEN);
+        }
+
+        for (AttributeMapping existingMapping : existingLocalClaim.get().getMappedAttributes()) {
+            if (IdentityUtil.getPrimaryDomainName().equals(existingMapping.getUserStoreDomain())) {
+                Optional<AttributeMapping> incomingAttributeMapping = incomingLocalClaim.getMappedAttributes().stream()
+                        .filter(mapping -> IdentityUtil.getPrimaryDomainName().equals(mapping.getUserStoreDomain()))
+                        .findFirst();
+                // Not allowing to update the primary userstore attribute mapping for sub-orgs.
+                if (incomingAttributeMapping.isPresent() && !StringUtils.equals(existingMapping.getAttributeName(),
+                        incomingAttributeMapping.get().getAttributeName())) {
+                    throw handleClaimManagementClientError(ERROR_CODE_UNAUTHORIZED_ORG_FOR_ATTRIBUTE_MAPPING_UPDATE,
+                            FORBIDDEN, existingMapping.getUserStoreDomain());
+                }
+            }
+        }
+    }
+
+    private void populateDefaultProperties(LocalClaim localClaim) {
+
+        localClaim.getClaimProperties().putIfAbsent(PROP_DESCRIPTION, StringUtils.EMPTY);
+        localClaim.getClaimProperties().putIfAbsent(PROP_DISPLAY_ORDER, "0");
+        localClaim.getClaimProperties().putIfAbsent(PROP_READ_ONLY, FALSE);
+        localClaim.getClaimProperties().putIfAbsent(PROP_REQUIRED, FALSE);
+        localClaim.getClaimProperties().putIfAbsent(PROP_SUPPORTED_BY_DEFAULT, FALSE);
     }
 }
