@@ -37,6 +37,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Claim;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimMappings;
 import org.wso2.carbon.identity.api.server.application.management.v1.DiscoverableGroup;
+import org.wso2.carbon.identity.api.server.application.management.v1.GroupBasicInfo;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestedClaimConfiguration;
@@ -487,7 +488,15 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 : serviceProvider.getDiscoverableGroups()) {
             DiscoverableGroup apiDiscoverableGroup = new DiscoverableGroup();
             apiDiscoverableGroup.setUserStore(discoverableGroup.getUserStore());
-            apiDiscoverableGroup.setGroups(Arrays.asList(discoverableGroup.getGroups()));
+            List<GroupBasicInfo> apiGroupBasicInfos = new ArrayList<>();
+            for (org.wso2.carbon.identity.application.common.model.GroupBasicInfo groupBasicInfo :
+                    discoverableGroup.getGroups()) {
+                GroupBasicInfo apiGroupBasicInfo = new GroupBasicInfo();
+                apiGroupBasicInfo.setId(groupBasicInfo.getId());
+                apiGroupBasicInfo.setName(groupBasicInfo.getName());
+                apiGroupBasicInfos.add(apiGroupBasicInfo);
+            }
+            apiDiscoverableGroup.setGroups(apiGroupBasicInfos);
             apiDiscoverableGroups.add(apiDiscoverableGroup);
         }
         return apiDiscoverableGroups;

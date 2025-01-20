@@ -21,6 +21,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalS
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.Certificate;
 import org.wso2.carbon.identity.api.server.application.management.v1.DiscoverableGroup;
+import org.wso2.carbon.identity.api.server.application.management.v1.GroupBasicInfo;
 import org.wso2.carbon.identity.api.server.application.management.v1.TrustedAppConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
 import org.wso2.carbon.identity.application.common.model.ClientAttestationMetaData;
@@ -109,7 +110,16 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
             org.wso2.carbon.identity.application.common.model.DiscoverableGroup discoverableGroup =
                     new org.wso2.carbon.identity.application.common.model.DiscoverableGroup();
             discoverableGroup.setUserStore(apiDiscoverableGroup.getUserStore());
-            discoverableGroup.setGroups(apiDiscoverableGroup.getGroups().toArray(new String[0]));
+            List<org.wso2.carbon.identity.application.common.model.GroupBasicInfo> groupBasicInfos = new ArrayList<>();
+            for (GroupBasicInfo apiGroupBasicInfo : apiDiscoverableGroup.getGroups()) {
+                org.wso2.carbon.identity.application.common.model.GroupBasicInfo groupBasicInfo =
+                        new org.wso2.carbon.identity.application.common.model.GroupBasicInfo();
+                groupBasicInfo.setId(apiGroupBasicInfo.getId());
+                groupBasicInfo.setName(apiGroupBasicInfo.getName());
+                groupBasicInfos.add(groupBasicInfo);
+            }
+            discoverableGroup.setGroups(
+                    groupBasicInfos.toArray(new org.wso2.carbon.identity.application.common.model.GroupBasicInfo[0]));
             discoverableGroups.add(discoverableGroup);
         }
         serviceProvider.setDiscoverableGroups(

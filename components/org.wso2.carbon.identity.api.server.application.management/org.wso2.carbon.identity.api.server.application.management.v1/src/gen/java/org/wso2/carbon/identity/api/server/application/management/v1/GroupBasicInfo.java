@@ -22,9 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
-import org.wso2.carbon.identity.api.server.application.management.v1.GroupBasicInfo;
 import javax.validation.constraints.*;
 
 
@@ -33,66 +30,52 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class DiscoverableGroup  {
+public class GroupBasicInfo  {
   
-    private String userStore;
-    private List<GroupBasicInfo> groups = new ArrayList<>();
-
+    private String id;
+    private String name;
 
     /**
-    * The user store domain to which the groups belong.
+    * The unique identifier of the group.
     **/
-    public DiscoverableGroup userStore(String userStore) {
+    public GroupBasicInfo id(String id) {
 
-        this.userStore = userStore;
+        this.id = id;
         return this;
     }
     
-    @ApiModelProperty(example = "PRIMARY", required = true, value = "The user store domain to which the groups belong.")
-    @JsonProperty("userStore")
+    @ApiModelProperty(example = "bf5abd05-3667-4a2a-a6c2-2fb9f4d26e47", required = true, value = "The unique identifier of the group.")
+    @JsonProperty("id")
     @Valid
-    @NotNull(message = "Property userStore cannot be null.")
-    public String getUserStore() {
-
-        return userStore;
+    @NotNull(message = "Property id cannot be null.")
+    public String getId() {
+        return id;
     }
 
-    public void setUserStore(String userStore) {
-
-        this.userStore = userStore;
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**
-    * List of groups configured for discoverability.
+    * The name of the group.
     **/
-    public DiscoverableGroup groups(List<GroupBasicInfo> groups) {
+    public GroupBasicInfo name(String name) {
 
-        this.groups = groups;
+        this.name = name;
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "List of groups configured for discoverability.")
-    @JsonProperty("groups")
+    @ApiModelProperty(example = "GroupA", value = "The name of the group.")
+    @JsonProperty("name")
     @Valid
-    @NotNull(message = "Property groups cannot be null.")
-    @Size(min=1)
-    public List<GroupBasicInfo> getGroups() {
-
-        return groups;
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setGroups(List<GroupBasicInfo> groups) {
 
-        this.groups = groups;
-    }
-
-    public DiscoverableGroup addGroupsItem(GroupBasicInfo groupsItem) {
-
-        this.groups.add(groupsItem);
-        return this;
-    }
-
-    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -103,24 +86,24 @@ public class DiscoverableGroup  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        DiscoverableGroup discoverableGroup = (DiscoverableGroup) o;
-        return Objects.equals(this.userStore, discoverableGroup.userStore) &&
-            Objects.equals(this.groups, discoverableGroup.groups);
+        GroupBasicInfo groupBasicInfo = (GroupBasicInfo) o;
+        return Objects.equals(this.id, groupBasicInfo.id) &&
+            Objects.equals(this.name, groupBasicInfo.name);
     }
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(userStore, groups);
+        return Objects.hash(id, name);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class DiscoverableGroup {\n");
-        sb.append("    userStore: ").append(toIndentedString(userStore)).append("\n");
-        sb.append("    groups: ").append(toIndentedString(groups)).append("\n");
+        sb.append("class GroupBasicInfo {\n");
+        
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("}");
         return sb.toString();
     }
