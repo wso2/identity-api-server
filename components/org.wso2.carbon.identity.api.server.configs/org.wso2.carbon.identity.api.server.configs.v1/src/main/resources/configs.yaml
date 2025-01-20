@@ -1183,6 +1183,12 @@ components:
         displayName:
           type: string
           example: basic
+        description:
+          type: string
+          example: "Description for user defined local authenticator configuration."
+        image:
+          type: string
+          example: "https://example.com/logo/my-logo.png"
         isEnabled:
           type: boolean
           default: true
@@ -1219,6 +1225,12 @@ components:
         displayName:
           type: string
           example: basic
+        description:
+          type: string
+          example: "Description for user defined local authenticator configuration."
+        image:
+          type: string
+          example: "https://example.com/logo/my-logo.png"
         isEnabled:
           type: boolean
           default: true

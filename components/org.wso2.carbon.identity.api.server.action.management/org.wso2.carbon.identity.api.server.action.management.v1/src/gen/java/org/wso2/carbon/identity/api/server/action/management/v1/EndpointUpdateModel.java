@@ -25,18 +25,22 @@ import io.swagger.annotations.ApiModelProperty;
 import org.wso2.carbon.identity.api.server.action.management.v1.AuthenticationType;
 import javax.validation.constraints.*;
 
+/**
+ * Updating endpoint configurations of the action.
+ **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-
+@ApiModel(description = "Updating endpoint configurations of the action.")
 public class EndpointUpdateModel  {
   
     private String uri;
     private AuthenticationType authentication;
 
     /**
+    * Updating HTTPS URI of the endpoint.
     **/
     public EndpointUpdateModel uri(String uri) {
 
@@ -44,7 +48,7 @@ public class EndpointUpdateModel  {
         return this;
     }
     
-    @ApiModelProperty(example = "https://abc.com/token", value = "")
+    @ApiModelProperty(example = "https://myextension.com/token", value = "Updating HTTPS URI of the endpoint.")
     @JsonProperty("uri")
     @Valid @Pattern(regexp="^https?://.+")
     public String getUri() {
