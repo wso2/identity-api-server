@@ -46,6 +46,7 @@ import org.wso2.carbon.identity.claim.metadata.mgt.model.LocalClaim;
 import org.wso2.carbon.identity.claim.metadata.mgt.util.ClaimConstants;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.organization.management.service.exception.OrganizationManagementException;
+import org.wso2.carbon.identity.organization.management.service.util.OrganizationManagementUtil;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.AttributeMappingDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ClaimDialectReqDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ClaimDialectResDTO;
@@ -981,6 +982,12 @@ public class ServerClaimManagementService {
         return externalClaimResDTOList;
     }
 
+    /**
+     * Builds the LocalClaimResDTO and handles default values for mandatory properties.
+     * If any new properties are added and default value handling logic is updated in this method,
+     * {@link #populateDefaultProperties(LocalClaim)} should be updated accordingly as well.
+     *
+     */
     private LocalClaimResDTO getLocalClaimResDTO(LocalClaim localClaim) {
 
         LocalClaimResDTO localClaimResDTO = new LocalClaimResDTO();
@@ -1548,9 +1555,7 @@ public class ServerClaimManagementService {
     private boolean isSubOrganizationContext() throws ClaimMetadataClientException {
 
         try {
-            String organizationId =
-                    getOrganizationManager().resolveOrganizationId(ContextLoader.getTenantDomainFromContext());
-            return !getOrganizationManager().isPrimaryOrganization(organizationId);
+            return OrganizationManagementUtil.isOrganization(ContextLoader.getTenantDomainFromContext());
         } catch (OrganizationManagementException e) {
             throw new ClaimMetadataClientException(Constant.ErrorMessage.ERROR_CODE_ERROR_RESOLVING_ORGANIZATION.
                     getCode(), Constant.ErrorMessage.ERROR_CODE_ERROR_RESOLVING_ORGANIZATION.getDescription());
