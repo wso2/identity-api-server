@@ -790,6 +790,7 @@ public class ServerConfigManagementService {
         if (config instanceof RequestPathAuthenticatorConfig) {
             authenticator.setType(Authenticator.TypeEnum.REQUEST_PATH);
             authenticator.setDefinedBy(Authenticator.DefinedByEnum.SYSTEM);
+            setAuthenticatorProperties(config, authenticator);
         } else {
             authenticator.setType(Authenticator.TypeEnum.LOCAL);
             if (AuthenticatorPropertyConstants.DefinedByType.USER == config.getDefinedByType()) {
@@ -800,6 +801,7 @@ public class ServerConfigManagementService {
                 resolveEndpointConfiguration(authenticator, userDefinedConfig);
             } else {
                 authenticator.setDefinedBy(Authenticator.DefinedByEnum.SYSTEM);
+                setAuthenticatorProperties(config, authenticator);
             }
         }
         String[] tags = config.getTags();
@@ -835,6 +837,13 @@ public class ServerConfigManagementService {
         endpoint.setAuthentication(authenticationType);
         endpoint.setUri(endpointConfig.getAuthenticatorEndpointUri());
         authenticator.addEndpointItem(endpoint);
+    }
+
+    private void setAuthenticatorProperties(LocalAuthenticatorConfig config, Authenticator authenticator) {
+
+        List<AuthenticatorProperty> authenticatorProperties = Arrays.stream(config.getProperties())
+                .map(propertyToExternal).collect(Collectors.toList());
+        authenticator.setProperties(authenticatorProperties);
     }
 
     private Function<Property, AuthenticatorProperty> propertyToExternal = property -> {
