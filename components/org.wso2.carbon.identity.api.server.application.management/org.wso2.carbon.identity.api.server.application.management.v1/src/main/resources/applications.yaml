@@ -2153,8 +2153,6 @@ paths:
               * internal_application_mgt_view
       parameters:
         - $ref: '#/components/parameters/domainQueryParam'
-        - $ref: '#/components/parameters/limitQueryParam'
-        - $ref: '#/components/parameters/offsetQueryParam'
         - $ref: '#/components/parameters/filterQueryParam'
       operationId: getGroups
       responses:
@@ -2163,7 +2161,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GroupListResponse'
+                type: array
+                items:
+                  $ref: '#/components/schemas/GroupBasicInfo'
         '401':
           description: Unauthorized
         '403':
@@ -4199,30 +4199,6 @@ components:
         isConfidential:
           type: boolean
           default: false
-
-    GroupListResponse:
-      type: object
-      properties:
-        totalResults:
-          type: integer
-          description: "Number of results that match the listing operation."
-          example: 1
-        startIndex:
-          type: integer
-          description: "Index of the first element of the page, which will be equal to offset + 1."
-          example: 1
-        count:
-          type: integer
-          description: "Number of elements in the returned page."
-          example: 10
-        applications:
-          type: array
-          items:
-            $ref: '#/components/schemas/GroupBasicInfo'
-        links:
-          type: array
-          items:
-            $ref: '#/components/schemas/Link'
 
     AdaptiveAuthTemplates:
       type: object

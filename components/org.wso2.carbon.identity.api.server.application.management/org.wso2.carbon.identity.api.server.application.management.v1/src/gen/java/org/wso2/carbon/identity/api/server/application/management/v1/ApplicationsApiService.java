@@ -40,7 +40,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.CustomInbou
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.Error;
 import java.io.File;
-import org.wso2.carbon.identity.api.server.application.management.v1.GroupListResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.GroupBasicInfo;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
@@ -105,7 +105,7 @@ public interface ApplicationsApiService {
 
       public Response getCustomProtocolMetadata(String inboundProtocolId);
 
-      public Response getGroups(String domain, Integer limit, Integer offset, String filter);
+      public Response getGroups(String domain, String filter);
 
       public Response getInboundAuthenticationConfigurations(String applicationId);
 

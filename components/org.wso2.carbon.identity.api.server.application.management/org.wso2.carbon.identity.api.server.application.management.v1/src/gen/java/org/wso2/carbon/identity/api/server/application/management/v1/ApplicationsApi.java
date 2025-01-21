@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.application.management.v1;
 
+import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
@@ -42,7 +43,6 @@ import org.wso2.carbon.identity.api.server.application.management.v1.CustomInbou
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.Error;
 import java.io.File;
-import org.wso2.carbon.identity.api.server.application.management.v1.GroupListResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
@@ -60,6 +60,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Application
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
 
@@ -633,22 +634,22 @@ public class ApplicationsApi  {
     @Path("/meta/groups")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve the list of groups available for the application. ", notes = "This API provides the capability to retrieve the list of groups available for the application. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = GroupListResponse.class, authorizations = {
+    @ApiOperation(value = "Retrieve the list of groups available for the application. ", notes = "This API provides the capability to retrieve the list of groups available for the application. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = GroupBasicInfo.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Application Metadata", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = GroupListResponse.class),
+        @ApiResponse(code = 200, message = "OK", response = GroupBasicInfo.class, responseContainer = "List"),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getGroups(    @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "The domain name of the user store used to filter the groups.  /applications/meta/groups?domain=PRIMARY ",required=true)  @QueryParam("domain") String domain,     @Valid @Min(1)@ApiParam(value = "Maximum number of records to return. ", defaultValue="30") @DefaultValue("30")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Number of records to skip for pagination. ", defaultValue="0") @DefaultValue("0")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew', and 'eq' operations with 'and', 'or' logical operators. Please note that 'and' and 'or' operators in filters follow the general precedence of logical operators ex: A and B or C and D = (A and B) or (C and D)). Currently supports only filtering based on the 'name', the 'clientId', and the 'issuer' attributes.  /applications?filter=name+eq+user_portal <br> /applications?filter=name+co+prod+or+clientId+co+123 ")  @QueryParam("filter") String filter) {
+    public Response getGroups(    @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "The domain name of the user store used to filter the groups.  /applications/meta/groups?domain=PRIMARY ",required=true)  @QueryParam("domain") String domain,     @Valid@ApiParam(value = "Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew', and 'eq' operations with 'and', 'or' logical operators. Please note that 'and' and 'or' operators in filters follow the general precedence of logical operators ex: A and B or C and D = (A and B) or (C and D)). Currently supports only filtering based on the 'name', the 'clientId', and the 'issuer' attributes.  /applications?filter=name+eq+user_portal <br> /applications?filter=name+co+prod+or+clientId+co+123 ")  @QueryParam("filter") String filter) {
 
-        return delegate.getGroups(domain,  limit,  offset,  filter );
+        return delegate.getGroups(domain,  filter );
     }
 
     @Valid

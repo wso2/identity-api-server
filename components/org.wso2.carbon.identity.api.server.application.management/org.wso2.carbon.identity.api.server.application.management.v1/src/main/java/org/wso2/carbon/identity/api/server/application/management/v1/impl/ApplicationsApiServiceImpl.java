@@ -441,6 +441,12 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
                 searchContext)).build();
     }
 
+    @Override
+    public Response getGroups(String domain, String filter) {
+
+        return Response.ok().entity(applicationManagementService.getGroups(domain, filter)).build();
+    }
+
     private URI getResourceLocation(String resourceId) {
 
         return ContextLoader.buildURIForHeader(Constants.V1_API_PATH_COMPONENT +
