@@ -94,6 +94,7 @@ public enum ConditionEnum {
     }
 
     /**
+    * A list of sub-rules that are combined using the OR condition. Each sub-rule is an ANDRule.
     **/
     public ORRuleResponse rules(List<ANDRuleResponse> rules) {
 
@@ -101,7 +102,7 @@ public enum ConditionEnum {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "A list of sub-rules that are combined using the OR condition. Each sub-rule is an ANDRule.")
     @JsonProperty("rules")
     @Valid @Size(min=1)
     public List<ANDRuleResponse> getRules() {

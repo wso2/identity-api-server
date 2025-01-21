@@ -34,6 +34,7 @@ import org.wso2.carbon.identity.idle.account.identification.exception.IdleAccoun
 import org.wso2.carbon.identity.idle.account.identification.exception.IdleAccountIdentificationException;
 import org.wso2.carbon.identity.idle.account.identification.exception.IdleAccountIdentificationServerException;
 import org.wso2.carbon.identity.idle.account.identification.models.InactiveUserModel;
+import org.wso2.carbon.identity.idle.account.identification.services.IdleAccountIdentificationService;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -58,7 +59,13 @@ import static org.wso2.carbon.identity.api.idle.account.identification.common.ut
  */
 public class InactiveUsersManagementApiService {
 
+    private final IdleAccountIdentificationService idleAccountIdentificationService;
     private static final Log LOG = LogFactory.getLog(InactiveUsersManagementApiService.class);
+
+    public InactiveUsersManagementApiService(IdleAccountIdentificationService idleAccountIdentificationService) {
+
+        this.idleAccountIdentificationService = idleAccountIdentificationService;
+    }
 
     /**
      * Get inactive users.
@@ -79,11 +86,11 @@ public class InactiveUsersManagementApiService {
             validateDatesCombination(inactiveAfterDate, excludeBeforeDate);
 
             if (excludeBeforeDate == null) {
-                inactiveUsers = IdleAccountIdentificationServiceHolder.getIdleAccountIdentificationService().
-                        getInactiveUsersFromSpecificDate(inactiveAfterDate, tenantDomain);
+                inactiveUsers = idleAccountIdentificationService
+                        .getInactiveUsersFromSpecificDate(inactiveAfterDate, tenantDomain);
             } else {
-                inactiveUsers = IdleAccountIdentificationServiceHolder.getIdleAccountIdentificationService().
-                        getLimitedInactiveUsersFromSpecificDate(inactiveAfterDate, excludeBeforeDate, tenantDomain);
+                inactiveUsers = idleAccountIdentificationService
+                        .getLimitedInactiveUsersFromSpecificDate(inactiveAfterDate, excludeBeforeDate, tenantDomain);
             }
             return buildResponse(inactiveUsers);
         } catch (IdleAccountIdentificationException e) {
