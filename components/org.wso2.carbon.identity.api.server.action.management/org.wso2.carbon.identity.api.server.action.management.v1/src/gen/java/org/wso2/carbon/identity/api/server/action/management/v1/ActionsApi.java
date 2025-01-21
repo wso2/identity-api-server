@@ -18,29 +18,19 @@
 
 package org.wso2.carbon.identity.api.server.action.management.v1;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Set;
 
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionBasicResponse;
-import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionTypesResponseItem;
-import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.Error;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionsApiService;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
@@ -101,7 +91,7 @@ public class ActionsApi  {
     })
     public Response createAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "This represents the information of the action to be created." ,required=true) @Valid String body) {
 
-        return delegate.createAction(actionType,  body);
+        return delegate.createAction(actionType,  body );
     }
 
     @Valid
