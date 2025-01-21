@@ -25,13 +25,14 @@ import org.wso2.carbon.identity.action.management.exception.ActionMgtException;
 import org.wso2.carbon.identity.action.management.model.Action;
 import org.wso2.carbon.identity.api.server.action.management.common.ActionManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionBasicResponse;
-import org.wso2.carbon.identity.api.server.action.management.v1.builder.ActionBuilder;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionType;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionTypesResponseItem;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
+import org.wso2.carbon.identity.api.server.action.management.v1.builder.ActionBuilder;
 import org.wso2.carbon.identity.api.server.action.management.v1.util.ActionBuilderUtil;
+import org.wso2.carbon.identity.api.server.action.management.v1.util.ActionDeserializer;
 import org.wso2.carbon.identity.api.server.action.management.v1.util.ActionMgtEndpointUtil;
 
 import java.util.ArrayList;
@@ -61,13 +62,14 @@ public class ServerActionManagementService {
         NOT_IMPLEMENTED_ACTION_TYPES.add(Action.ActionTypes.AUTHENTICATION.getPathParam());
     }
 
-    public ActionResponse createAction(String actionType, ActionModel actionModel) {
+    public ActionResponse createAction(String actionType, String jsonBody) {
 
         try {
             Action.ActionTypes validatedActionType = validateActionType(actionType);
+            Action action = buildAction(validatedActionType, jsonBody);
             String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             return buildActionResponse(ActionManagementServiceHolder.getActionManagementService()
-                    .addAction(actionType, buildAction(validatedActionType, actionModel), tenantDomain));
+                    .addAction(actionType, action, tenantDomain));
         } catch (ActionMgtException e) {
             throw ActionMgtEndpointUtil.handleActionMgtException(e);
         }
@@ -110,14 +112,14 @@ public class ServerActionManagementService {
         }
     }
 
-    public ActionResponse updateAction(String actionType, String actionId, ActionUpdateModel actionUpdateModel) {
+    public ActionResponse updateAction(String actionType, String actionId, String jsonBody) {
 
         try {
             Action.ActionTypes validatedActionType = validateActionType(actionType);
+            Action updatingAction = buildUpdatingAction(validatedActionType, jsonBody);
             String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             return buildActionResponse(ActionManagementServiceHolder.getActionManagementService()
-                    .updateAction(actionType, actionId,
-                            buildUpdatingAction(validatedActionType, actionUpdateModel), tenantDomain));
+                    .updateAction(actionType, actionId, updatingAction, tenantDomain));
         } catch (ActionMgtException e) {
             throw ActionMgtEndpointUtil.handleActionMgtException(e);
         }
@@ -203,14 +205,15 @@ public class ServerActionManagementService {
     /**
      * Build Action from the ActionModel.
      *
-     * @param actionType  Action Type.
-     * @param actionModel Action Model.
+     * @param actionType Action Type.
+     * @param jsonBody   JSON body.
      * @return Action.
      * @throws ActionMgtException If an error occurs while building the Action.
      */
-    private Action buildAction(Action.ActionTypes actionType, ActionModel actionModel)
+    private Action buildAction(Action.ActionTypes actionType, String jsonBody)
             throws ActionMgtException {
 
+        ActionModel actionModel = ActionDeserializer.deserializeActionModel(actionType, jsonBody);
         ActionBuilder actionBuilder = ActionBuilderUtil.getActionBuilder(actionType);
         return actionBuilder.buildAction(actionModel);
     }
@@ -218,14 +221,15 @@ public class ServerActionManagementService {
     /**
      * Build Action from the ActionUpdateModel.
      *
-     * @param actionType        Action Type.
-     * @param actionUpdateModel Action Update Model.
+     * @param actionType Action Type.
+     * @param jsonBody   JSON body.
      * @return Action.
      * @throws ActionMgtException If an error occurs while building the Action.
      */
-    private Action buildUpdatingAction(Action.ActionTypes actionType, ActionUpdateModel actionUpdateModel)
+    private Action buildUpdatingAction(Action.ActionTypes actionType, String jsonBody)
             throws ActionMgtException {
 
+        ActionUpdateModel actionUpdateModel = ActionDeserializer.deserializeActionUpdateModel(actionType, jsonBody);
         ActionBuilder actionBuilder = ActionBuilderUtil.getActionBuilder(actionType);
         return actionBuilder.buildAction(actionUpdateModel);
     }

@@ -99,33 +99,9 @@ public class ActionsApi  {
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response createAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "This represents the information of the action to be created." ,required=true) @Valid String jsonPayload) 
-            throws JsonProcessingException{
+    public Response createAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "This represents the information of the action to be created." ,required=true) @Valid String body) {
 
-        ActionModel actionModel = null;
-        ObjectMapper objectMapper = new ObjectMapper();
-        switch (actionType) {
-            case "preIssueAccessToken":
-                actionModel = objectMapper.readValue(jsonPayload, ActionModel.class);
-                break;
-            case "preUpdatePassword":
-                actionModel = objectMapper.readValue(jsonPayload, PreUpdatePasswordActionModel.class);
-                // Validate the object
-                ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-                Validator validator = factory.getValidator();
-                Set<ConstraintViolation<PreUpdatePasswordActionModel>> violations =
-                        validator.validate((PreUpdatePasswordActionModel) actionModel);
-
-                // Check for violations
-                if (!violations.isEmpty()) {
-                    throw new ConstraintViolationException(violations);
-                }
-                break;
-            default:
-                break;
-        }
-
-        return delegate.createAction(actionType,  actionModel);
+        return delegate.createAction(actionType,  body);
     }
 
     @Valid
@@ -269,32 +245,8 @@ public class ActionsApi  {
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response updateAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Unique identifier of the action.",required=true) @PathParam("actionId") String actionId, @ApiParam(value = "This represents the action to be updated." ,required=true) @Valid String jsonPayload) 
-            throws JsonProcessingException{
+    public Response updateAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Unique identifier of the action.",required=true) @PathParam("actionId") String actionId, @ApiParam(value = "This represents the action to be updated." ,required=true) @Valid String body) {
 
-        ActionUpdateModel actionUpdateModel = null;
-        ObjectMapper objectMapper = new ObjectMapper();
-        switch (actionType) {
-            case "preIssueAccessToken":
-                actionUpdateModel = objectMapper.readValue(jsonPayload, ActionUpdateModel.class);
-                break;
-            case "preUpdatePassword":
-                actionUpdateModel = objectMapper.readValue(jsonPayload, PreUpdatePasswordActionUpdateModel.class);
-                // Validate the object
-                ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-                Validator validator = factory.getValidator();
-                Set<ConstraintViolation<PreUpdatePasswordActionUpdateModel>> violations =
-                        validator.validate((PreUpdatePasswordActionUpdateModel) actionUpdateModel);
-
-                // Check for violations
-                if (!violations.isEmpty()) {
-                    throw new ConstraintViolationException(violations);
-                }
-                break;
-            default:
-                break;
-        }
-        
         return delegate.updateAction(actionType,  actionId,  body );
     }
 

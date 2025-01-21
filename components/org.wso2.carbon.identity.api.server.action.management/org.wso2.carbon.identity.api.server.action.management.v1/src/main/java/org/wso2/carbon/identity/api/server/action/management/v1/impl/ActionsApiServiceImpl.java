@@ -48,9 +48,9 @@ public class ActionsApiServiceImpl implements ActionsApiService {
     }
 
     @Override
-    public Response createAction(String actionType, ActionModel actionModel) {
+    public Response createAction(String actionType, String body) {
 
-        ActionResponse actionResponse = serverActionManagementService.createAction(actionType, actionModel);
+        ActionResponse actionResponse = serverActionManagementService.createAction(actionType, body);
         URI location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT +
                 ActionMgtEndpointConstants.ACTION_PATH_COMPONENT + "/" + actionResponse.getId());
         return Response.created(location).entity(actionResponse).build();
@@ -88,9 +88,8 @@ public class ActionsApiServiceImpl implements ActionsApiService {
     }
 
     @Override
-    public Response updateAction(String actionType, String actionId, ActionUpdateModel actionUpdateModel) {
+    public Response updateAction(String actionType, String actionId, String body) {
 
-        return Response.ok().entity(serverActionManagementService.updateAction(actionType, actionId, actionUpdateModel))
-                .build();
+        return Response.ok().entity(serverActionManagementService.updateAction(actionType, actionId, body)).build();
     }
 }
