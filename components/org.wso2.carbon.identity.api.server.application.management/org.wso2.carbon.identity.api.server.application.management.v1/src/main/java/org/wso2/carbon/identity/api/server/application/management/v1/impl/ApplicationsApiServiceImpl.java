@@ -44,11 +44,11 @@ import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApp
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.LoginFlowAIService;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationMetadataService;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationSharingService;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.TransferResource;
+import org.wso2.carbon.identity.api.server.application.management.v1.factories.LoginFlowAIServiceFactory;
 import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 
@@ -71,9 +71,6 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
     @Autowired
     private ServerApplicationSharingService applicationSharingService;
-    
-    @Autowired
-    private LoginFlowAIService loginFlowAIService;
 
     @Deprecated
     @Override
@@ -198,15 +195,16 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response getLoginFlowGenerationResult(String operationId) {
 
-        LoginFlowResultResponse loginFlowAIGenerationResult = loginFlowAIService.getLoginFlowAIGenerationResult(
-                operationId);
+        LoginFlowResultResponse loginFlowAIGenerationResult = LoginFlowAIServiceFactory.getLoginFlowAIService()
+                .getLoginFlowAIGenerationResult(operationId);
         return Response.ok(loginFlowAIGenerationResult).build();
     }
 
     @Override
     public Response getLoginFlowGenerationStatus(String operationId) {
 
-        LoginFlowStatusResponse loginFlowAIStatus = loginFlowAIService.getLoginFlowAIStatus(operationId);
+        LoginFlowStatusResponse loginFlowAIStatus = LoginFlowAIServiceFactory.getLoginFlowAIService()
+                .getLoginFlowAIStatus(operationId);
         return Response.ok(loginFlowAIStatus).build();
     }
 
@@ -297,8 +295,8 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response generateLoginFlow(LoginFlowGenerateRequest loginFlowGenerateRequest) {
 
-        LoginFlowGenerateResponse loginFlowGenerateResponse = loginFlowAIService.generateAuthenticationSequence(
-                loginFlowGenerateRequest);
+        LoginFlowGenerateResponse loginFlowGenerateResponse = LoginFlowAIServiceFactory.getLoginFlowAIService()
+                .generateAuthenticationSequence(loginFlowGenerateRequest);
         return Response.accepted(loginFlowGenerateResponse).build();
     }
 

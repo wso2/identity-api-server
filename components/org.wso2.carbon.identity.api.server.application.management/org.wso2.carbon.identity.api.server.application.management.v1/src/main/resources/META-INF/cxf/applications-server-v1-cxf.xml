@@ -19,7 +19,6 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
     <bean class="org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService"/>
-    <bean class="org.wso2.carbon.identity.api.server.application.management.v1.core.LoginFlowAIService"/>
     <bean class="org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationMetadataService"/>
     <bean class="org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationSharingService"/>
     <bean class="org.wso2.carbon.identity.api.server.application.management.v1.impl.ApplicationsApiServiceImpl"/>
@@ -64,10 +63,6 @@
           class="org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder">
         <property name="orgApplicationManager" ref="orgApplicationManagerServiceFactoryBean"/>
     </bean>
-    <bean id="loginFlowAIManagementServiceHolderBean"
-          class="org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder">
-        <property name="loginFlowAIManagementService" ref="loginFlowAIManagementServiceFactoryBean"/>
-    </bean>
 
     <bean id="applicationManagementServiceFactoryBean"
           class="org.wso2.carbon.identity.api.server.application.management.common.factory.ApplicationManagementOSGiServiceFactory"/>
@@ -90,6 +85,4 @@
           class="org.wso2.carbon.identity.api.server.application.management.common.factory.APIResourceMgtOSGiServiceFactory"/>
     <bean id="orgApplicationManagerServiceFactoryBean"
           class="org.wso2.carbon.identity.api.server.application.management.common.factory.OrgApplicationManagerOSGiServiceFactory"/>
-    <bean id="loginFlowAIManagementServiceFactoryBean"
-          class="org.wso2.carbon.identity.api.server.application.management.common.factory.LoginFlowAIManagementOSGiServiceFactory"/>
 </beans>

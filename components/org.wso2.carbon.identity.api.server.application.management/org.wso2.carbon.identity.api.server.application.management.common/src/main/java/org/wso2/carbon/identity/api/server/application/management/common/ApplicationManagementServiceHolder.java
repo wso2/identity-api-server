@@ -15,6 +15,7 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.resource.mgt.APIResourceManager;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.application.mgt.AuthorizedAPIManagementService;
@@ -44,7 +45,13 @@ public class ApplicationManagementServiceHolder {
     private static APIResourceManager apiResourceManager;
     private static AuthorizedAPIManagementService authorizedAPIManagementService;
     private static OrgApplicationManager orgApplicationManager;
-    private static LoginFlowAIManager loginFlowAIManagementService;
+
+    private static class LoginFlowAIManagerServiceHolder {
+
+        static final LoginFlowAIManager SERVICE =
+                (LoginFlowAIManager) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(LoginFlowAIManager.class, null);
+    }
 
     public static ApplicationManagementService getApplicationManagementService() {
 
@@ -203,15 +210,6 @@ public class ApplicationManagementServiceHolder {
      */
     public static LoginFlowAIManager getLoginFlowAIManagementService() {
 
-        return loginFlowAIManagementService;
-    }
-
-    /**
-     * Set LoginFlowAIManagementService.
-     * @param loginFlowAIManagementService LoginFlowAIManager.
-     */
-    public static void setLoginFlowAIManagementService(LoginFlowAIManager loginFlowAIManagementService) {
-
-        ApplicationManagementServiceHolder.loginFlowAIManagementService = loginFlowAIManagementService;
+        return LoginFlowAIManagerServiceHolder.SERVICE;
     }
 }
