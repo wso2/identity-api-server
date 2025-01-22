@@ -28,14 +28,14 @@ import org.wso2.carbon.identity.api.server.action.management.v1.ANDRule;
 import javax.validation.constraints.*;
 
 /**
- * Rule configuration for the action. Combined with OR condition.
+ * Represents a rule configuration that combines multiple sub-rules with an OR condition. If any of the sub-rules evaluate to true, the ORRule is considered satisfied.
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "Rule configuration for the action. Combined with OR condition.")
+@ApiModel(description = "Represents a rule configuration that combines multiple sub-rules with an OR condition. If any of the sub-rules evaluate to true, the ORRule is considered satisfied.")
 public class ORRule  {
   
 
@@ -76,6 +76,7 @@ public enum ConditionEnum {
 
 
     /**
+    * The logical condition for combining the sub-rules. For ORRule, the value must always be \&quot;OR\&quot;.
     **/
     public ORRule condition(ConditionEnum condition) {
 
@@ -83,7 +84,7 @@ public enum ConditionEnum {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "The logical condition for combining the sub-rules. For ORRule, the value must always be \"OR\".")
     @JsonProperty("condition")
     @Valid
     public ConditionEnum getCondition() {

@@ -40,6 +40,7 @@ public class ActionUpdateModel  {
     private ORRule rule;
 
     /**
+    * Updating name of the action.
     **/
     public ActionUpdateModel name(String name) {
 
@@ -47,7 +48,7 @@ public class ActionUpdateModel  {
         return this;
     }
     
-    @ApiModelProperty(example = "Access Token Pre Issue", value = "")
+    @ApiModelProperty(example = "Pre Issue Access Token Action", value = "Updating name of the action.")
     @JsonProperty("name")
     @Valid @Size(min=1,max=255)
     public String getName() {
@@ -58,6 +59,7 @@ public class ActionUpdateModel  {
     }
 
     /**
+    * Updating description of the action.
     **/
     public ActionUpdateModel description(String description) {
 
@@ -65,7 +67,7 @@ public class ActionUpdateModel  {
         return this;
     }
     
-    @ApiModelProperty(example = "This is the configuration of pre-action for issuing access token.", value = "")
+    @ApiModelProperty(example = "This action invokes before issuing an access token.", value = "Updating description of the action.")
     @JsonProperty("description")
     @Valid @Size(max=255)
     public String getDescription() {

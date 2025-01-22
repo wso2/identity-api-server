@@ -40,6 +40,7 @@ public class ActionModel  {
     private ORRule rule;
 
     /**
+    * Name of the action.
     **/
     public ActionModel name(String name) {
 
@@ -47,7 +48,7 @@ public class ActionModel  {
         return this;
     }
     
-    @ApiModelProperty(example = "Access Token Pre Issue", required = true, value = "")
+    @ApiModelProperty(example = "Pre Issue Access Token Action", required = true, value = "Name of the action.")
     @JsonProperty("name")
     @Valid
     @NotNull(message = "Property name cannot be null.")
@@ -60,6 +61,7 @@ public class ActionModel  {
     }
 
     /**
+    * Description of the action.
     **/
     public ActionModel description(String description) {
 
@@ -67,7 +69,7 @@ public class ActionModel  {
         return this;
     }
     
-    @ApiModelProperty(example = "This is the configuration of pre-action for issuing access token.", value = "")
+    @ApiModelProperty(example = "This action invokes before issuing an access token.", value = "Description of the action.")
     @JsonProperty("description")
     @Valid @Size(max=255)
     public String getDescription() {
