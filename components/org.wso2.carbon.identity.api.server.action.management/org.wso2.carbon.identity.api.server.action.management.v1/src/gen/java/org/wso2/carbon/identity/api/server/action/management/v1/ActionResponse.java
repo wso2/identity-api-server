@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionType;
 import org.wso2.carbon.identity.api.server.action.management.v1.EndpointResponse;
+import org.wso2.carbon.identity.api.server.action.management.v1.ORRuleResponse;
 import javax.validation.constraints.*;
 
 
@@ -73,8 +74,10 @@ public enum StatusEnum {
 
     private StatusEnum status;
     private EndpointResponse endpoint;
+    private ORRuleResponse rule;
 
     /**
+    * Unique identifier of the action.
     **/
     public ActionResponse id(String id) {
 
@@ -82,7 +85,7 @@ public enum StatusEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "24f64d17-9824-4e28-8413-de45728d8e84", value = "")
+    @ApiModelProperty(example = "24f64d17-9824-4e28-8413-de45728d8e84", value = "Unique identifier of the action.")
     @JsonProperty("id")
     @Valid
     public String getId() {
@@ -111,6 +114,7 @@ public enum StatusEnum {
     }
 
     /**
+    * Name of the action.
     **/
     public ActionResponse name(String name) {
 
@@ -118,7 +122,7 @@ public enum StatusEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "Access Token Pre Issue", value = "")
+    @ApiModelProperty(example = "Access Token Pre Issue", value = "Name of the action.")
     @JsonProperty("name")
     @Valid @Size(min=1,max=255)
     public String getName() {
@@ -129,6 +133,7 @@ public enum StatusEnum {
     }
 
     /**
+    * Description of the action.
     **/
     public ActionResponse description(String description) {
 
@@ -136,7 +141,7 @@ public enum StatusEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "This is the configuration of pre-action for issuing access token.", value = "")
+    @ApiModelProperty(example = "This action invokes before issuing an access token.", value = "Description of the action.")
     @JsonProperty("description")
     @Valid @Size(max=255)
     public String getDescription() {
@@ -147,6 +152,7 @@ public enum StatusEnum {
     }
 
     /**
+    * Status of the action.
     **/
     public ActionResponse status(StatusEnum status) {
 
@@ -154,7 +160,7 @@ public enum StatusEnum {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(example = "ACTIVE", value = "Status of the action.")
     @JsonProperty("status")
     @Valid
     public StatusEnum getStatus() {
@@ -182,6 +188,24 @@ public enum StatusEnum {
         this.endpoint = endpoint;
     }
 
+    /**
+    **/
+    public ActionResponse rule(ORRuleResponse rule) {
+
+        this.rule = rule;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("rule")
+    @Valid
+    public ORRuleResponse getRule() {
+        return rule;
+    }
+    public void setRule(ORRuleResponse rule) {
+        this.rule = rule;
+    }
+
 
 
     @Override
@@ -199,12 +223,13 @@ public enum StatusEnum {
             Objects.equals(this.name, actionResponse.name) &&
             Objects.equals(this.description, actionResponse.description) &&
             Objects.equals(this.status, actionResponse.status) &&
-            Objects.equals(this.endpoint, actionResponse.endpoint);
+            Objects.equals(this.endpoint, actionResponse.endpoint) &&
+            Objects.equals(this.rule, actionResponse.rule);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, type, name, description, status, endpoint);
+        return Objects.hash(id, type, name, description, status, endpoint, rule);
     }
 
     @Override
@@ -219,6 +244,7 @@ public enum StatusEnum {
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
+        sb.append("    rule: ").append(toIndentedString(rule)).append("\n");
         sb.append("}");
         return sb.toString();
     }

@@ -27,12 +27,15 @@ import java.util.List;
 import java.util.Map;
 import javax.validation.constraints.*;
 
+/**
+ * The type of authentication required by the action&#39;s endpoint. The following options are supported: - NONE: No authentication is required. &lt;br&gt;   &#x60;&#x60;{     \&quot;type\&quot;: \&quot;NONE\&quot;   }&#x60;&#x60;  - BASIC: Basic authentication with a username and password.&lt;br&gt;   &#x60;&#x60;{     \&quot;type\&quot;: \&quot;BASIC\&quot;,     \&quot;properties\&quot;: {       \&quot;username\&quot;: \&quot;auth_username\&quot;,       \&quot;password\&quot;: \&quot;auth_password\&quot;     }   }&#x60;&#x60;  - API_KEY: API key-based authentication, where the key is provided in an HTTP header.&lt;br&gt;   &#x60;&#x60;{     \&quot;type\&quot;: \&quot;API_KEY\&quot;,     \&quot;properties\&quot;: {       \&quot;header\&quot;: \&quot;X-API-Key\&quot;,       \&quot;value\&quot;: \&quot;12345-abcde-67890\&quot;     }   }&#x60;&#x60;  - BEARER: Bearer token-based authentication.&lt;br/&gt;   &#x60;&#x60;{     \&quot;type\&quot;: \&quot;BEARER\&quot;,     \&quot;properties\&quot;: {       \&quot;accessToken\&quot;: \&quot;0d6fed02-eac0-332b-8998-213a543139a0\&quot;     }   }&#x60;&#x60; 
+ **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-
+@ApiModel(description = "The type of authentication required by the action's endpoint. The following options are supported: - NONE: No authentication is required. <br>   ``{     \"type\": \"NONE\"   }``  - BASIC: Basic authentication with a username and password.<br>   ``{     \"type\": \"BASIC\",     \"properties\": {       \"username\": \"auth_username\",       \"password\": \"auth_password\"     }   }``  - API_KEY: API key-based authentication, where the key is provided in an HTTP header.<br>   ``{     \"type\": \"API_KEY\",     \"properties\": {       \"header\": \"X-API-Key\",       \"value\": \"12345-abcde-67890\"     }   }``  - BEARER: Bearer token-based authentication.<br/>   ``{     \"type\": \"BEARER\",     \"properties\": {       \"accessToken\": \"0d6fed02-eac0-332b-8998-213a543139a0\"     }   }`` ")
 public class AuthenticationType  {
   
 
@@ -69,7 +72,7 @@ public enum TypeEnum {
 }
 
     private TypeEnum type;
-    private Map<String, Object> properties = new HashMap<String, Object>();
+    private Map<String, Object> properties = null;
 
 
     /**
@@ -93,6 +96,7 @@ public enum TypeEnum {
     }
 
     /**
+    * Authentication properties specific to the selected type.
     **/
     public AuthenticationType properties(Map<String, Object> properties) {
 
@@ -100,11 +104,9 @@ public enum TypeEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "{\"username\":\"auth_username\",\"password\":\"auth_password\"}", required = true, value = "")
+    @ApiModelProperty(value = "Authentication properties specific to the selected type.")
     @JsonProperty("properties")
     @Valid
-    @NotNull(message = "Property properties cannot be null.")
-
     public Map<String, Object> getProperties() {
         return properties;
     }
@@ -114,6 +116,9 @@ public enum TypeEnum {
 
 
     public AuthenticationType putPropertiesItem(String key, Object propertiesItem) {
+        if (this.properties == null) {
+            this.properties = new HashMap<String, Object>();
+        }
         this.properties.put(key, propertiesItem);
         return this;
     }

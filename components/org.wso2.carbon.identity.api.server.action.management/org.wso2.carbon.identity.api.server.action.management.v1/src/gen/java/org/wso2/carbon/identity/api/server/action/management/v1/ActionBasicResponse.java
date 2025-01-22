@@ -78,6 +78,7 @@ public enum StatusEnum {
 
 
     /**
+    * Unique identifier of the action.
     **/
     public ActionBasicResponse id(String id) {
 
@@ -85,7 +86,7 @@ public enum StatusEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "24f64d17-9824-4e28-8413-de45728d8e84", value = "")
+    @ApiModelProperty(example = "24f64d17-9824-4e28-8413-de45728d8e84", value = "Unique identifier of the action.")
     @JsonProperty("id")
     @Valid
     public String getId() {
@@ -114,6 +115,7 @@ public enum StatusEnum {
     }
 
     /**
+    * Name of the action.
     **/
     public ActionBasicResponse name(String name) {
 
@@ -121,7 +123,7 @@ public enum StatusEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "Access Token Pre Issue", value = "")
+    @ApiModelProperty(example = "Access Token Pre Issue", value = "Name of the action.")
     @JsonProperty("name")
     @Valid @Size(min=1,max=255)
     public String getName() {
@@ -132,6 +134,7 @@ public enum StatusEnum {
     }
 
     /**
+    * Description of the action.
     **/
     public ActionBasicResponse description(String description) {
 
@@ -139,7 +142,7 @@ public enum StatusEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "This is the configuration of pre-action for issuing access token.", value = "")
+    @ApiModelProperty(example = "This action invokes before issuing an access token.", value = "Description of the action.")
     @JsonProperty("description")
     @Valid @Size(max=255)
     public String getDescription() {
@@ -150,6 +153,7 @@ public enum StatusEnum {
     }
 
     /**
+    * Status of the action.
     **/
     public ActionBasicResponse status(StatusEnum status) {
 
@@ -157,7 +161,7 @@ public enum StatusEnum {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "Status of the action.")
     @JsonProperty("status")
     @Valid
     public StatusEnum getStatus() {
@@ -175,7 +179,7 @@ public enum StatusEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "[{\"href\":\"/t/wso2.com/api/server/v1/actions/preIssueAccessToken/24f64d17-9824-4e28-8413-de45728d8e84\",\"method\":\"GET\",\"rel\":\"self\"}]", value = "")
+    @ApiModelProperty(example = "[{\"href\":\"/api/server/v1/actions/preIssueAccessToken/24f64d17-9824-4e28-8413-de45728d8e84\",\"method\":\"GET\",\"rel\":\"self\"}]", value = "")
     @JsonProperty("links")
     @Valid
     public List<Link> getLinks() {
