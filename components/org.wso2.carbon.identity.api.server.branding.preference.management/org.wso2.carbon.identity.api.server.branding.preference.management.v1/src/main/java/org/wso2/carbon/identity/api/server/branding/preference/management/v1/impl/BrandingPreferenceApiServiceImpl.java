@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -22,6 +22,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.BrandingPreferenceApiService;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.core.BrandingPreferenceManagementService;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.factories.BrandingAIPreferenceManagementServiceFactory;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationRequestModel;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationResponseModel;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationResultModel;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationStatusModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingPreferenceModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.CustomTextModel;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
@@ -32,6 +37,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.APPLICATION_TYPE;
@@ -182,6 +188,34 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
         }
         return Response.ok()
                 .entity(brandingPreferenceManagementService.getBrandingPreference(type, name, locale)).build();
+    }
+
+    @Override
+    public Response generateBrandingPreference(BrandingGenerationRequestModel brandingGenerationRequestModel) {
+
+        BrandingGenerationResponseModel response = BrandingAIPreferenceManagementServiceFactory
+                .getBrandingAIPreferenceManagementService().generateBrandingPreference(
+                brandingGenerationRequestModel);
+        return Response.accepted().entity(response).build();
+
+    }
+
+    @Override
+    public Response getBrandingGenerationResult(String operationId) {
+
+        BrandingGenerationResultModel response = BrandingAIPreferenceManagementServiceFactory
+                .getBrandingAIPreferenceManagementService()
+                .getBrandingPreferenceGenerationResult(operationId);
+        return Response.ok().entity(response).build();
+    }
+
+    @Override
+    public Response getBrandingGenerationStatus(String operationId) {
+
+        BrandingGenerationStatusModel response = BrandingAIPreferenceManagementServiceFactory
+                .getBrandingAIPreferenceManagementService()
+                .getBrandingPreferenceGenerationStatus(operationId);
+        return Response.ok().entity(response).build();
     }
 
     @Override
