@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,15 +18,21 @@
 
 package org.wso2.carbon.identity.api.server.branding.preference.management.v1.factories;
 
-import org.wso2.carbon.identity.api.server.branding.preference.management.v1.BrandingPreferenceApiService;
-import org.wso2.carbon.identity.api.server.branding.preference.management.v1.impl.BrandingPreferenceApiServiceImpl;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.core.BrandingAIPreferenceManagementService;
 
-public class BrandingPreferenceApiServiceFactory {
+/**
+ * Factory class for Branding AI Preference Management Service.
+ */
+public class BrandingAIPreferenceManagementServiceFactory {
 
-   private final static BrandingPreferenceApiService service = new BrandingPreferenceApiServiceImpl();
+    private static final BrandingAIPreferenceManagementService SERVICE;
 
-   public static BrandingPreferenceApiService getBrandingPreferenceApi()
-   {
-      return service;
-   }
+    static {
+        SERVICE = new BrandingAIPreferenceManagementService();
+    }
+
+    public static BrandingAIPreferenceManagementService getBrandingAIPreferenceManagementService() {
+
+        return SERVICE;
+    }
 }
