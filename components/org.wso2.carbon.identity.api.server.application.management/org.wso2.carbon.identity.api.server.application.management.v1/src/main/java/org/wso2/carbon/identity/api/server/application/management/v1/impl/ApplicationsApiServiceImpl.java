@@ -196,7 +196,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     public Response getLoginFlowGenerationResult(String operationId) {
 
         LoginFlowResultResponse loginFlowAIGenerationResult = LoginFlowAIServiceFactory.getLoginFlowAIService()
-                .getLoginFlowAIGenerationResult(operationId);
+                .getAuthenticationSequenceGenerationResult(operationId);
         return Response.ok(loginFlowAIGenerationResult).build();
     }
 
@@ -204,7 +204,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     public Response getLoginFlowGenerationStatus(String operationId) {
 
         LoginFlowStatusResponse loginFlowAIStatus = LoginFlowAIServiceFactory.getLoginFlowAIService()
-                .getLoginFlowAIStatus(operationId);
+                .getAuthenticationSequenceGenerationStatus(operationId);
         return Response.ok(loginFlowAIStatus).build();
     }
 

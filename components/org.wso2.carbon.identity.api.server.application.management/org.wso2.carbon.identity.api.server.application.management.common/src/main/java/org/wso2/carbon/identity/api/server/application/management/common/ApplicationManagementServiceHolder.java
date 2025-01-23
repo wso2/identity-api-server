@@ -206,7 +206,7 @@ public class ApplicationManagementServiceHolder {
 
     /**
      * Get LoginFlowAIManagementService.
-     * @return LoginFlowAIManagementService
+     * @return LoginFlowAIManagementService.
      */
     public static LoginFlowAIManager getLoginFlowAIManagementService() {
 

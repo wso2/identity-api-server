@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -62,7 +62,7 @@ public class LoginFlowStatusResponse  {
         return this;
     }
     
-    @ApiModelProperty(value = "A generic object representing the status")
+    @ApiModelProperty(example = "{\"retrieving_examples\":true,\"optimization_and_validation_complete\":true,\"login_flow_generation_complete\":false,\"optimizing_and_validating_user_query\":true,\"generating_authentication_sequence\":true,\"retrieval_of_examples_complete\":true,\"optimizing_and_validating_final_login_flow\":false,\"generation_of_authentication_sequence_complete\":true}", value = "A generic object representing the status")
     @JsonProperty("status")
     @Valid
     public Object getStatus() {

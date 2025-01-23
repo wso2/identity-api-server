@@ -36,32 +36,33 @@ import javax.xml.bind.annotation.*;
 
 public class LoginFlowGenerateRequest  {
   
-    private Map<String, List<Map<String, Object>>> availableAuthenticators = null;
+    private Map<String, Object> availableAuthenticators = null;
 
     private List<Map<String, Object>> userClaims = null;
 
     private String userQuery;
 
     /**
+    * Available authenticators of the organization. It&#39;s expected to provide the authenticator name, description, and the IDP.
     **/
-    public LoginFlowGenerateRequest availableAuthenticators(Map<String, List<Map<String, Object>>> availableAuthenticators) {
+    public LoginFlowGenerateRequest availableAuthenticators(Map<String, Object> availableAuthenticators) {
 
         this.availableAuthenticators = availableAuthenticators;
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "Available authenticators of the organization. It's expected to provide the authenticator name, description, and the IDP. ")
     @JsonProperty("availableAuthenticators")
     @Valid
-    public Map<String, List<Map<String, Object>>> getAvailableAuthenticators() {
+    public Map<String, Object> getAvailableAuthenticators() {
         return availableAuthenticators;
     }
-    public void setAvailableAuthenticators(Map<String, List<Map<String, Object>>> availableAuthenticators) {
+    public void setAvailableAuthenticators(Map<String, Object> availableAuthenticators) {
         this.availableAuthenticators = availableAuthenticators;
     }
 
 
-    public LoginFlowGenerateRequest putAvailableAuthenticatorsItem(String key, List<Map<String, Object>> availableAuthenticatorsItem) {
+    public LoginFlowGenerateRequest putAvailableAuthenticatorsItem(String key, Object availableAuthenticatorsItem) {
         if (this.availableAuthenticators == null) {
             this.availableAuthenticators = new HashMap<>();
         }
@@ -70,6 +71,7 @@ public class LoginFlowGenerateRequest  {
     }
 
         /**
+    * Metadata of the available user claims for the organization.  Provide the claim URI and a human-readable description of the claim. 
     **/
     public LoginFlowGenerateRequest userClaims(List<Map<String, Object>> userClaims) {
 
@@ -77,7 +79,7 @@ public class LoginFlowGenerateRequest  {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "Metadata of the available user claims for the organization.  Provide the claim URI and a human-readable description of the claim. ")
     @JsonProperty("userClaims")
     @Valid
     public List<Map<String, Object>> getUserClaims() {

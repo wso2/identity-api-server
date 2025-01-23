@@ -41,8 +41,6 @@ import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.AI_RESPONSE_DATA_KEY;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.AI_RESPONSE_STATUS_KEY;
-import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.AUTHENTICATOR_IDP_KEY;
-import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.AUTHENTICATOR_NAME_KEY;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.CLAIM_URI_KEY;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.DESCRIPTION_KEY;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_LOGINFLOW_AI_RESULT;
@@ -75,22 +73,10 @@ public class LoginFlowAIService {
             }
 
             JSONObject availableAuthenticators = new JSONObject();
-            Map<String, List<Map<String, Object>>> authenticators = loginFlowGenerateRequest
-                    .getAvailableAuthenticators();
-            for (Map.Entry<String, List<Map<String, Object>>> entry : authenticators.entrySet()) {
-                String authenticatorType = entry.getKey();
-                List<Map<String, Object>> authenticatorList = entry.getValue();
-
-                JSONArray authenticatorsJsonArray = new JSONArray();
-                for (Map<String, Object> authenticator : authenticatorList) {
-                    authenticatorsJsonArray.put(new JSONObject()
-                            .put(AUTHENTICATOR_NAME_KEY, authenticator.get(AUTHENTICATOR_NAME_KEY))
-                            .put(AUTHENTICATOR_IDP_KEY, authenticator.get(AUTHENTICATOR_IDP_KEY))
-                            .put(DESCRIPTION_KEY, authenticator.get(DESCRIPTION_KEY)));
-                }
-                availableAuthenticators.put(authenticatorType, authenticatorsJsonArray);
+            Map<String, Object> authenticators = loginFlowGenerateRequest.getAvailableAuthenticators();
+            for (Map.Entry<String, Object> authenticator : authenticators.entrySet()) {
+                availableAuthenticators.put(authenticator.getKey(), authenticator.getValue());
             }
-
             String operationId = ApplicationManagementServiceHolder.getLoginFlowAIManagementService()
                     .generateAuthenticationSequence(loginFlowGenerateRequest.getUserQuery(), userClaimsJsonArray,
                             availableAuthenticators);
@@ -110,7 +96,7 @@ public class LoginFlowAIService {
      * @param operationId Operation ID of the login flow AI generation.
      * @return LoginFlowResultResponse.
      */
-    public LoginFlowResultResponse getLoginFlowAIGenerationResult(String operationId) {
+    public LoginFlowResultResponse getAuthenticationSequenceGenerationResult(String operationId) {
 
         try {
             Object generationResult = ApplicationManagementServiceHolder.getLoginFlowAIManagementService()
@@ -138,15 +124,19 @@ public class LoginFlowAIService {
      * @param operationId Operation ID of the login flow AI generation.
      * @return LoginFlowStatusResponse.
      */
-    public LoginFlowStatusResponse getLoginFlowAIStatus(String operationId) {
+    public LoginFlowStatusResponse getAuthenticationSequenceGenerationStatus(String operationId) {
 
         try {
             Object generationStatus = ApplicationManagementServiceHolder.getLoginFlowAIManagementService()
                     .getAuthenticationSequenceGenerationStatus(operationId);
             LoginFlowStatusResponse response = new LoginFlowStatusResponse();
             response.setOperationId(operationId);
-
-            response.status(convertObjectToMap(generationStatus));
+            Map<String, Object> objectMap = convertObjectToMap(generationStatus);
+            if (!objectMap.containsKey(AI_RESPONSE_STATUS_KEY)) {
+                throw new AIServerException(ERROR_CODE_ERROR_GETTING_LOGINFLOW_AI_RESULT_STATUS.getMessage(),
+                        ERROR_CODE_ERROR_GETTING_LOGINFLOW_AI_RESULT_STATUS.getCode());
+            }
+            response.status(objectMap.get(AI_RESPONSE_STATUS_KEY));
             return response;
         } catch (AIServerException e) {
             throw handleServerException(e);
