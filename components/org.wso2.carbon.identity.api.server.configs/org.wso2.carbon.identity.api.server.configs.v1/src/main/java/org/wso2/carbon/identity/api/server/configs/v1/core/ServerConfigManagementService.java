@@ -40,6 +40,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.exception.JWTClientAuthent
 import org.wso2.carbon.identity.api.server.configs.v1.function.CORSConfigurationToCORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.function.DCRConnectorUtil;
 import org.wso2.carbon.identity.api.server.configs.v1.function.JWTConnectorUtil;
+import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticationType;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorProperty;
@@ -47,6 +48,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.Endpoint;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationConfiguration;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
@@ -74,9 +76,12 @@ import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfi
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
+import org.wso2.carbon.identity.application.common.model.UserDefinedAuthenticatorEndpointConfig;
+import org.wso2.carbon.identity.application.common.model.UserDefinedLocalAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationManagementUtil;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
+import org.wso2.carbon.identity.base.AuthenticatorPropertyConstants;
 import org.wso2.carbon.identity.core.ServiceURLBuilder;
 import org.wso2.carbon.identity.core.URLBuilderException;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceClientException;
@@ -100,6 +105,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -692,7 +698,8 @@ public class ServerConfigManagementService {
     }
 
     private List<AuthenticatorListItem> buildAuthenticatorListResponse(
-            LocalAuthenticatorConfig[] localConfigs, RequestPathAuthenticatorConfig[] requestPathConfigs) {
+            LocalAuthenticatorConfig[] localConfigs, RequestPathAuthenticatorConfig[] requestPathConfigs)
+            throws IdentityApplicationManagementServerException {
 
         List<AuthenticatorListItem> authenticatorListItems = new ArrayList<>();
         if (localConfigs != null) {
@@ -706,6 +713,11 @@ public class ServerConfigManagementService {
                 authenticatorListItem.setType(AuthenticatorListItem.TypeEnum.LOCAL);
                 authenticatorListItem.setDefinedBy(
                         AuthenticatorListItem.DefinedByEnum.valueOf(config.getDefinedByType().toString()));
+                if (AuthenticatorPropertyConstants.DefinedByType.USER == config.getDefinedByType()) {
+                    UserDefinedLocalAuthenticatorConfig userDefinedConfig = castToUserDefinedConfig(config);
+                    authenticatorListItem.setImage(userDefinedConfig.getImageUrl());
+                    authenticatorListItem.setDescription(userDefinedConfig.getDescription());
+                }
                 String[] tags = config.getTags();
                 if (ArrayUtils.isNotEmpty(tags)) {
                     authenticatorListItem.setTags(Arrays.asList(tags));
@@ -767,28 +779,71 @@ public class ServerConfigManagementService {
         return null;
     }
 
-    private Authenticator buildAuthenticatorResponse(LocalAuthenticatorConfig config) {
+    private Authenticator buildAuthenticatorResponse(LocalAuthenticatorConfig config)
+            throws IdentityApplicationManagementServerException {
 
         Authenticator authenticator = new Authenticator();
         authenticator.setId(base64URLEncode(config.getName()));
         authenticator.setName(config.getName());
         authenticator.setDisplayName(config.getDisplayName());
         authenticator.setIsEnabled(config.isEnabled());
-        authenticator.definedBy(Authenticator.DefinedByEnum.valueOf(config.getDefinedByType().toString()));
         if (config instanceof RequestPathAuthenticatorConfig) {
             authenticator.setType(Authenticator.TypeEnum.REQUEST_PATH);
+            authenticator.setDefinedBy(Authenticator.DefinedByEnum.SYSTEM);
+            setAuthenticatorProperties(config, authenticator);
         } else {
             authenticator.setType(Authenticator.TypeEnum.LOCAL);
+            if (AuthenticatorPropertyConstants.DefinedByType.USER == config.getDefinedByType()) {
+                authenticator.setDefinedBy(Authenticator.DefinedByEnum.USER);
+                UserDefinedLocalAuthenticatorConfig userDefinedConfig = castToUserDefinedConfig(config);
+                authenticator.setImage(userDefinedConfig.getImageUrl());
+                authenticator.setDescription(userDefinedConfig.getDescription());
+                resolveEndpointConfiguration(authenticator, userDefinedConfig);
+            } else {
+                authenticator.setDefinedBy(Authenticator.DefinedByEnum.SYSTEM);
+                setAuthenticatorProperties(config, authenticator);
+            }
         }
         String[] tags = config.getTags();
         if (ArrayUtils.isNotEmpty(tags)) {
             authenticator.setTags(Arrays.asList(tags));
         }
-        List<AuthenticatorProperty> authenticatorProperties =
-                Arrays.stream(config.getProperties()).map(propertyToExternal)
-                        .collect(Collectors.toList());
-        authenticator.setProperties(authenticatorProperties);
         return authenticator;
+    }
+
+    private UserDefinedLocalAuthenticatorConfig castToUserDefinedConfig(LocalAuthenticatorConfig config)
+            throws IdentityApplicationManagementServerException {
+
+        try {
+            return (UserDefinedLocalAuthenticatorConfig) config;
+        } catch (ClassCastException e) {
+            throw new IdentityApplicationManagementServerException(String.format("For authenticator: %s of " +
+                    "definedBy: USER, the authenticator config must be an instance of " +
+                    "UserDefinedLocalAuthenticatorConfig", config.getName()) , e);
+        }
+    }
+
+    private void resolveEndpointConfiguration(Authenticator authenticator, UserDefinedLocalAuthenticatorConfig config) {
+
+        UserDefinedAuthenticatorEndpointConfig endpointConfig = config.getEndpointConfig();
+
+        AuthenticationType authenticationType = new AuthenticationType();
+        authenticationType.setType(AuthenticationType.TypeEnum.fromValue(
+                endpointConfig.getAuthenticatorEndpointAuthenticationType()));
+        authenticationType.setProperties(new HashMap<>(
+                endpointConfig.getAuthenticatorEndpointAuthenticationProperties()));
+
+        Endpoint endpoint = new Endpoint();
+        endpoint.setAuthentication(authenticationType);
+        endpoint.setUri(endpointConfig.getAuthenticatorEndpointUri());
+        authenticator.addEndpointItem(endpoint);
+    }
+
+    private void setAuthenticatorProperties(LocalAuthenticatorConfig config, Authenticator authenticator) {
+
+        List<AuthenticatorProperty> authenticatorProperties = Arrays.stream(config.getProperties())
+                .map(propertyToExternal).collect(Collectors.toList());
+        authenticator.setProperties(authenticatorProperties);
     }
 
     private Function<Property, AuthenticatorProperty> propertyToExternal = property -> {

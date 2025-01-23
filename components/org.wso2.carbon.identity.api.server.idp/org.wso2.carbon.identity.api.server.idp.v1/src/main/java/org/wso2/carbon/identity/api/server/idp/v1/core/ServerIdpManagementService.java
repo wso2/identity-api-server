@@ -41,6 +41,7 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.idp.common.Constants;
 import org.wso2.carbon.identity.api.server.idp.common.IdentityProviderServiceHolder;
+import org.wso2.carbon.identity.api.server.idp.v1.impl.FederatedAuthenticatorConfigBuilderFactory;
 import org.wso2.carbon.identity.api.server.idp.v1.model.AssociationRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.AssociationResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Certificate;
@@ -93,6 +94,7 @@ import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.application.common.model.ProvisioningConnectorConfig;
 import org.wso2.carbon.identity.application.common.model.RoleMapping;
 import org.wso2.carbon.identity.application.common.model.SubProperty;
+import org.wso2.carbon.identity.application.common.model.UserDefinedFederatedAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
 import org.wso2.carbon.identity.base.AuthenticatorPropertyConstants.DefinedByType;
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
@@ -115,7 +117,6 @@ import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
 import org.wso2.carbon.idp.mgt.dao.IdPManagementDAO;
 import org.wso2.carbon.idp.mgt.model.ConnectedAppsResult;
 import org.wso2.carbon.idp.mgt.model.IdpSearchResult;
-import org.wso2.carbon.user.core.UserCoreConstants;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.TypeDescription;
@@ -586,31 +587,10 @@ public class ServerIdpManagementService {
             listResponse = new FederatedAuthenticatorListResponse();
             FederatedAuthenticatorConfig[] fedAuthConfigs = idP.getFederatedAuthenticatorConfigs();
             if (fedAuthConfigs != null) {
-                List<FederatedAuthenticatorListItem> fedAuthList = new ArrayList<>();
-                String defaultAuthenticator = null;
-                for (FederatedAuthenticatorConfig config : fedAuthConfigs) {
-                    String fedAuthId = base64URLEncode(config.getName());
-                    FederatedAuthenticatorListItem listItem = new FederatedAuthenticatorListItem();
-                    listItem.setAuthenticatorId(fedAuthId);
-                    listItem.setName(config.getName());
-                    listItem.setIsEnabled(config.isEnabled());
-                    FederatedAuthenticatorConfig federatedAuthenticatorConfig =
-                            ApplicationAuthenticatorService.getInstance().getFederatedAuthenticatorByName(
-                                    config.getName());
-                    if (federatedAuthenticatorConfig != null) {
-                        String[] tags = federatedAuthenticatorConfig.getTags();
-                        if (ArrayUtils.isNotEmpty(tags)) {
-                            listItem.setTags(Arrays.asList(tags));
-                        }
-                    }
-                    listItem.setSelf(
-                            ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT + IDP_PATH_COMPONENT +
-                                    "/%s/federated-authenticators/%s", idpId, fedAuthId)).toString());
-                    fedAuthList.add(listItem);
-                    if (idP.getDefaultAuthenticatorConfig() != null) {
-                        defaultAuthenticator = base64URLEncode(idP.getDefaultAuthenticatorConfig().getName());
-                    }
-                }
+                List<FederatedAuthenticatorListItem> fedAuthList = FederatedAuthenticatorConfigBuilderFactory.build(
+                        fedAuthConfigs, idP.getResourceId());
+                String defaultAuthenticator = (idP.getDefaultAuthenticatorConfig() != null ? base64URLEncode(idP
+                        .getDefaultAuthenticatorConfig().getName()) : null);
                 listResponse.setDefaultAuthenticatorId(defaultAuthenticator);
                 listResponse.setAuthenticators(fedAuthList);
             }
@@ -1695,6 +1675,7 @@ public class ServerIdpManagementService {
         String authenticatorId = base64URLEncode(authenticatorConfig.getName());
         metaFederatedAuthenticator.setName(authenticatorConfig.getName());
         metaFederatedAuthenticator.setAuthenticatorId(authenticatorId);
+        metaFederatedAuthenticator.setDefinedBy(MetaFederatedAuthenticatorListItem.DefinedByEnum.SYSTEM);
         FederatedAuthenticatorConfig federatedAuthenticatorConfig = ApplicationAuthenticatorService.getInstance()
                 .getFederatedAuthenticatorByName(authenticatorConfig.getName());
         if (federatedAuthenticatorConfig != null) {
@@ -1723,6 +1704,7 @@ public class ServerIdpManagementService {
                 metaFederatedAuthenticator.setTags(Arrays.asList(tags));
             }
         }
+        metaFederatedAuthenticator.setDefinedBy(MetaFederatedAuthenticator.DefinedByEnum.SYSTEM);
         Property[] properties = authenticatorConfig.getProperties();
         List<MetaProperty> metaProperties = Arrays.stream(properties).map(propertyToExternalMeta).collect(Collectors
                 .toList());
@@ -1758,7 +1740,8 @@ public class ServerIdpManagementService {
     }
 
     private void updateFederatedAuthenticatorConfig(IdentityProvider idp, FederatedAuthenticatorRequest
-            federatedAuthenticatorRequest, boolean isNewFederatedAuthenticator) {
+            federatedAuthenticatorRequest, boolean isNewFederatedAuthenticator)
+            throws IdentityProviderManagementClientException {
 
         if (federatedAuthenticatorRequest != null) {
             List<FederatedAuthenticator> federatedAuthenticators = federatedAuthenticatorRequest.getAuthenticators();
@@ -1766,34 +1749,21 @@ public class ServerIdpManagementService {
             FederatedAuthenticatorConfig defaultAuthConfig = null;
             List<FederatedAuthenticatorConfig> fedAuthConfigs = new ArrayList<>();
             for (FederatedAuthenticator authenticator : federatedAuthenticators) {
-                FederatedAuthenticatorConfig authConfig = new FederatedAuthenticatorConfig();
-                authConfig.setName(base64URLDecode(authenticator.getAuthenticatorId()));
-                authConfig.setDisplayName(getDisplayNameOfAuthenticator(authConfig.getName()));
-                authConfig.setEnabled(authenticator.getIsEnabled());
+                String authenticatorName = getDecodedAuthenticatorName(authenticator.getAuthenticatorId());
+                DefinedByType definedByType;
+                if (isNewFederatedAuthenticator) {
+                    definedByType = resolveDefinedByTypeToCreateFederatedAuthenticator(
+                            authenticator.getDefinedBy());
+                } else {
+                    definedByType = resolveDefinedByTypeToUpdateFederatedAuthenticator(authenticatorName);
+                }
+                if (definedByType == DefinedByType.USER && federatedAuthenticators.size() > 1) {
+                    throw handleException(Response.Status.BAD_REQUEST,
+                            Constants.ErrorMessage.ERROR_COED_MULTIPLE_USER_DEFINED_AUTHENTICATORS_FOUND, null);
+                }
+                FederatedAuthenticatorConfig authConfig = FederatedAuthenticatorConfigBuilderFactory.build(
+                        authenticator, authenticatorName, definedByType);
 
-                String definedByType = null;
-                if (authenticator.getDefinedBy() != null) {
-                    definedByType = authenticator.getDefinedBy().toString();
-                }
-                authConfig.setDefinedByType(resolveDefinedByType(authConfig.getName(),
-                        definedByType, isNewFederatedAuthenticator));
-
-                List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> authProperties =
-                        authenticator.getProperties();
-                if (IdentityApplicationConstants.Authenticator.SAML2SSO.FED_AUTH_NAME.equals(authConfig.getName())) {
-                    validateSamlMetadata(authProperties);
-                }
-                if (authProperties != null) {
-                    if (!areAllDistinct(authProperties)) {
-                        throw handleException(Response.Status.BAD_REQUEST,
-                                Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT, " Duplicate properties are found in " +
-                                        "the request.");
-                    }
-                    List<Property> properties = authProperties.stream()
-                            .map(propertyToInternal)
-                            .collect(Collectors.toList());
-                    authConfig.setProperties(properties.toArray(new Property[0]));
-                }
                 fedAuthConfigs.add(authConfig);
 
                 if (StringUtils.equals(defaultAuthenticator, authenticator.getAuthenticatorId())) {
@@ -1808,30 +1778,6 @@ public class ServerIdpManagementService {
             idp.setFederatedAuthenticatorConfigs(fedAuthConfigs.toArray(new FederatedAuthenticatorConfig[0]));
             idp.setDefaultAuthenticatorConfig(defaultAuthConfig);
         }
-    }
-
-    /**
-     * Returns the 'DisplayName' property of the federated authenticator identified by authenticator name.
-     *
-     * @param authenticatorName Federated authenticator name.
-     * @return Display name of authenticator.
-     */
-    private String getDisplayNameOfAuthenticator(String authenticatorName) {
-
-        try {
-            FederatedAuthenticatorConfig[] authenticatorConfigs =
-                    IdentityProviderServiceHolder.getIdentityProviderManager()
-                            .getAllFederatedAuthenticators();
-            for (FederatedAuthenticatorConfig config : authenticatorConfigs) {
-
-                if (StringUtils.equals(config.getName(), authenticatorName)) {
-                    return config.getDisplayName();
-                }
-            }
-        } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_IDP, null);
-        }
-        return null;
     }
 
     private void updateOutboundConnectorConfig(IdentityProvider idp,
@@ -2079,7 +2025,8 @@ public class ServerIdpManagementService {
         return apiProperty;
     };
 
-    private IdentityProvider createIDP(IdentityProviderPOSTRequest identityProviderPOSTRequest) {
+    private IdentityProvider createIDP(IdentityProviderPOSTRequest identityProviderPOSTRequest)
+            throws IdentityProviderManagementClientException {
 
         String idpJWKSUri = null;
         IdentityProvider idp = new IdentityProvider();
@@ -2457,30 +2404,8 @@ public class ServerIdpManagementService {
 
         FederatedAuthenticatorConfig[] fedAuthConfigs = idp.getFederatedAuthenticatorConfigs();
         FederatedAuthenticatorListResponse fedAuthIDPResponse = new FederatedAuthenticatorListResponse();
-        List<FederatedAuthenticatorListItem> authenticators = new ArrayList<>();
-        for (FederatedAuthenticatorConfig fedAuthConfig : fedAuthConfigs) {
-            FederatedAuthenticatorListItem fedAuthListItem = new FederatedAuthenticatorListItem();
-            fedAuthListItem.setAuthenticatorId(base64URLEncode(fedAuthConfig.getName()));
-            fedAuthListItem.setName(fedAuthConfig.getName());
-            fedAuthListItem.setIsEnabled(fedAuthConfig.isEnabled());
-            fedAuthListItem.setDefinedBy(FederatedAuthenticatorListItem.DefinedByEnum.valueOf(
-                    fedAuthConfig.getDefinedByType().toString()));
-            FederatedAuthenticatorConfig federatedAuthenticatorConfig =
-                    ApplicationAuthenticatorService.getInstance().getFederatedAuthenticatorByName(
-                            fedAuthConfig.getName());
-            if (federatedAuthenticatorConfig != null) {
-                String[] tags = federatedAuthenticatorConfig.getTags();
-                if (ArrayUtils.isNotEmpty(tags)) {
-                    fedAuthListItem.setTags(Arrays.asList(tags));
-                }
-            }
-            fedAuthListItem.setSelf(
-                    ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT + IDP_PATH_COMPONENT +
-                                    "/%s/federated-authenticators/%s", idp.getResourceId(),
-                            base64URLEncode(fedAuthConfig.getName())))
-                            .toString());
-            authenticators.add(fedAuthListItem);
-        }
+        List<FederatedAuthenticatorListItem> authenticators =
+                FederatedAuthenticatorConfigBuilderFactory.build(fedAuthConfigs, idp.getResourceId());
         fedAuthIDPResponse.setDefaultAuthenticatorId(idp.getDefaultAuthenticatorConfig() != null ? base64URLEncode(idp
                 .getDefaultAuthenticatorConfig().getName()) : null);
         fedAuthIDPResponse.setAuthenticators(authenticators);
@@ -2538,7 +2463,7 @@ public class ServerIdpManagementService {
             JustInTimeProvisioning.SchemeEnum provisioningType = getProvisioningType(jitProvisionConfig);
             jitConfig.setScheme(provisioningType);
             String provisioningUserStore = StringUtils.isNotBlank(jitProvisionConfig.getProvisioningUserStore()) ?
-                    jitProvisionConfig.getProvisioningUserStore() : UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME;
+                    jitProvisionConfig.getProvisioningUserStore() : IdentityUtil.getPrimaryDomainName();
             jitConfig.setUserstore(provisioningUserStore);
             jitConfig.setAssociateLocalUser(jitProvisionConfig.isAssociateLocalUserEnabled());
             String attributeSyncMethod = StringUtils.isNotBlank(jitProvisionConfig.getAttributeSyncMethod()) ?
@@ -2695,6 +2620,12 @@ public class ServerIdpManagementService {
 
         Gson gson = new Gson();
         IdentityProvider clonedIdentityProvider = gson.fromJson(gson.toJson(idP), IdentityProvider.class);
+        if (idP.getFederatedAuthenticatorConfigs().length == 1 &&
+                idP.getFederatedAuthenticatorConfigs()[0].getDefinedByType() == DefinedByType.USER) {
+            UserDefinedFederatedAuthenticatorConfig clonedFedAuth = gson.fromJson(gson.toJson(
+                    idP.getFederatedAuthenticatorConfigs()[0]), UserDefinedFederatedAuthenticatorConfig.class);
+            clonedIdentityProvider.setFederatedAuthenticatorConfigs(new FederatedAuthenticatorConfig[]{clonedFedAuth});
+        }
         return clonedIdentityProvider;
     }
 
@@ -2839,46 +2770,27 @@ public class ServerIdpManagementService {
      * @return Federated authenticator config of the specified ID.
      */
     private FederatedAuthenticatorConfig updateFederatedAuthenticatorConfig(String federatedAuthenticatorId,
-                                                                            FederatedAuthenticatorPUTRequest
-                                                                                    authenticator) {
+                  FederatedAuthenticatorPUTRequest authenticator) throws IdentityProviderManagementClientException {
 
-        FederatedAuthenticatorConfig authConfig = new FederatedAuthenticatorConfig();
-        String authenticatorName = base64URLDecode(federatedAuthenticatorId);
-        authConfig.setName(authenticatorName);
-        authConfig.setDisplayName(getDisplayNameOfAuthenticator(authenticatorName));
-        authConfig.setEnabled(authenticator.getIsEnabled());
+        String authenticatorName = getDecodedAuthenticatorName(federatedAuthenticatorId);
+        DefinedByType definedByType = resolveDefinedByTypeToUpdateFederatedAuthenticator(authenticatorName);
 
-        String definedByType = null;
-        if (authenticator.getDefinedBy() != null) {
-            definedByType = authenticator.getDefinedBy().toString();
-        }
-        authConfig.setDefinedByType(resolveDefinedByType(authenticatorName, definedByType, false));
-
-        List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> authProperties = authenticator.getProperties();
-        if (IdentityApplicationConstants.Authenticator.SAML2SSO.FED_AUTH_NAME.equals(authenticatorName)) {
-            validateSamlMetadata(authProperties);
-        }
-        if (IdentityApplicationConstants.Authenticator.OIDC.FED_AUTH_NAME.equals(authenticatorName)) {
-            validateDuplicateOpenIDConnectScopes(authProperties);
-            validateDefaultOpenIDConnectScopes(authProperties);
-        }
-        List<Property> properties = authProperties.stream().map(propertyToInternal).collect(Collectors.toList());
-        authConfig.setProperties(properties.toArray(new Property[0]));
-        return authConfig;
+        return FederatedAuthenticatorConfigBuilderFactory.build(authenticator, authenticatorName, definedByType);
     }
 
-    private DefinedByType resolveDefinedByType(
-            String authenticatorName, String definedByType, boolean isNewFederatedAuthenticator) {
+    private DefinedByType resolveDefinedByTypeToCreateFederatedAuthenticator(
+            FederatedAuthenticator.DefinedByEnum definedByType) {
 
         /* For new federated authenticators:
          If 'definedByType' is not null, use the value provided in the request payload. If not, default to SYSTEM. */
-        if (isNewFederatedAuthenticator) {
-            if (definedByType != null) {
-                return DefinedByType.valueOf(definedByType);
-            } else {
-                 return DefinedByType.SYSTEM;
-            }
+        if (definedByType != null) {
+            return DefinedByType.valueOf(definedByType.toString());
         }
+        return DefinedByType.SYSTEM;
+    }
+
+    private DefinedByType resolveDefinedByTypeToUpdateFederatedAuthenticator(String authenticatorName) {
+
         /* For existing federated authenticators, disregard any value provided in the request payload.
          Instead, resolve and retrieve the 'definedBy' type of the corresponding existing authenticator.
          If the authenticator config is present in the ApplicationAuthenticatorService list, return its type,
@@ -2889,105 +2801,6 @@ public class ServerIdpManagementService {
             return DefinedByType.valueOf(authenticatorConfig.getDefinedByType().toString());
         }
         return DefinedByType.USER;
-    }
-
-    /**
-     * Verify if scopes have not been set in both Scopes field and Additional Query Parameters field
-     *
-     * @param oidcAuthenticatorProperties Authenticator properties of OIDC authenticator.
-     */
-    private void validateDuplicateOpenIDConnectScopes(List<org.wso2.carbon.identity.api.server.idp.v1.model.Property>
-                                                              oidcAuthenticatorProperties) {
-
-        if (oidcAuthenticatorProperties != null) {
-            boolean scopesFieldFilled = false;
-            boolean queryParamsScopesFilled = false;
-            for (org.wso2.carbon.identity.api.server.idp.v1
-                    .model.Property oidcAuthenticatorProperty : oidcAuthenticatorProperties) {
-                if (IdentityApplicationConstants.Authenticator.OIDC.SCOPES.equals(oidcAuthenticatorProperty.getKey()) &&
-                        StringUtils.isNotBlank(oidcAuthenticatorProperty.getValue())) {
-                    scopesFieldFilled = true;
-                }
-                if (IdentityApplicationConstants.Authenticator.OIDC.QUERY_PARAMS.equals
-                        (oidcAuthenticatorProperty.getKey())
-                        && oidcAuthenticatorProperty.getValue().contains("scope=")) {
-                    queryParamsScopesFilled = true;
-                }
-            }
-            if (scopesFieldFilled && queryParamsScopesFilled) {
-                throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
-                        .ERROR_CODE_DUPLICATE_OIDC_SCOPES, null);
-            }
-        }
-    }
-
-    /**
-     * Verify if scopes contain `openid`.
-     *
-     * @param oidcAuthenticatorProperties Authenticator properties of OIDC authenticator.
-     */
-    private void validateDefaultOpenIDConnectScopes(List<org.wso2.carbon.identity.api.server.idp.v1.model.Property>
-                                                            oidcAuthenticatorProperties) {
-
-        if (oidcAuthenticatorProperties != null) {
-            for (org.wso2.carbon.identity.api.server.idp.v1
-                    .model.Property oidcAuthenticatorProperty : oidcAuthenticatorProperties) {
-                if (IdentityApplicationConstants.Authenticator.OIDC.SCOPES.equals(oidcAuthenticatorProperty.getKey())) {
-                    String scopes = oidcAuthenticatorProperty.getValue();
-                    if (StringUtils.isNotBlank(scopes) && !scopes.contains("openid")) {
-                        throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
-                                .ERROR_CODE_INVALID_OIDC_SCOPES, null);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * If selectMode property is set as saml metadata file configuration mode, this function validates whether a
-     * valid base-64 encoded SAML metadata file content is provided with the property key 'meta_data_saml'. If found,
-     * it will decode the file content and update the value of 'meta_data_saml' property with decoded content.
-     *
-     * @param samlAuthenticatorProperties Authenticator properties of SAML authenticator.
-     */
-    private void validateSamlMetadata(List<org.wso2.carbon.identity.api.server.idp.v1.model.Property>
-                                              samlAuthenticatorProperties) {
-
-        if (samlAuthenticatorProperties != null) {
-            for (org.wso2.carbon.identity.api.server.idp.v1.model.Property property : samlAuthenticatorProperties) {
-
-                if (Constants.SELECT_MODE.equals(property.getKey()) &&
-                        Constants.SELECT_MODE_METADATA.equals(property.getValue())) {
-                    // SAML metadata file configuration has been selected. Hence we need to validate whether valid SAML
-                    // metadata (property with key = 'meta_data_saml') is sent.
-
-                    boolean validMetadataFound = false;
-                    String encodedData = null;
-                    int positionOfMetadataKey = -1;
-
-                    for (int i = 0; i < samlAuthenticatorProperties.size(); i++) {
-                        if (Constants.META_DATA_SAML.equals(samlAuthenticatorProperties.get(i).getKey()) &&
-                                StringUtils.isNotBlank
-                                        (samlAuthenticatorProperties.get(i).getValue())) {
-                            validMetadataFound = true;
-                            encodedData = samlAuthenticatorProperties.get(i).getValue();
-                            positionOfMetadataKey = i;
-                        }
-                    }
-                    if (validMetadataFound) {
-                        String metadata = base64Decode(encodedData);
-                        // Add decoded data to property list.
-                        org.wso2.carbon.identity.api.server.idp.v1.model.Property metadataProperty =
-                                samlAuthenticatorProperties.get(positionOfMetadataKey);
-                        metadataProperty.setValue(metadata);
-                        samlAuthenticatorProperties.set(positionOfMetadataKey, metadataProperty);
-                    } else {
-                        throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
-                                .ERROR_CODE_INVALID_SAML_METADATA, null);
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -3046,7 +2859,7 @@ public class ServerIdpManagementService {
      * @return FederatedAuthenticator.
      */
     private FederatedAuthenticator createFederatedAuthenticator(String authenticatorId,
-                                                                IdentityProvider identityProvider) {
+                   IdentityProvider identityProvider) throws IdentityProviderManagementServerException {
 
         FederatedAuthenticatorConfig[] authConfigs = identityProvider.getFederatedAuthenticatorConfigs();
         if (ArrayUtils.isEmpty(authConfigs)) {
@@ -3066,24 +2879,9 @@ public class ServerIdpManagementService {
         }
         FederatedAuthenticator federatedAuthenticator = new FederatedAuthenticator();
         if (config != null) {
+            federatedAuthenticator = FederatedAuthenticatorConfigBuilderFactory.build(config);
             federatedAuthenticator.setAuthenticatorId(authenticatorId);
-            federatedAuthenticator.setName(config.getName());
-            federatedAuthenticator.setIsEnabled(config.isEnabled());
             federatedAuthenticator.setIsDefault(isDefaultAuthenticator);
-            federatedAuthenticator.setDefinedBy(FederatedAuthenticator.DefinedByEnum.valueOf(
-                    config.getDefinedByType().toString()));
-            FederatedAuthenticatorConfig federatedAuthenticatorConfig =
-                    ApplicationAuthenticatorService.getInstance().getFederatedAuthenticatorByName(
-                            config.getName());
-            if (federatedAuthenticatorConfig != null) {
-                String[] tags = federatedAuthenticatorConfig.getTags();
-                if (ArrayUtils.isNotEmpty(tags)) {
-                    federatedAuthenticator.setTags(Arrays.asList(tags));
-                }
-            }
-            List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> properties =
-                    Arrays.stream(config.getProperties()).map(propertyToExternal).collect(Collectors.toList());
-            federatedAuthenticator.setProperties(properties);
         }
         return federatedAuthenticator;
     }
@@ -3418,6 +3216,10 @@ public class ServerIdpManagementService {
                 errorResponse = getErrorBuilder(errorEnum, data).build(log, e.getMessage());
             }
             errorResponse.setDescription(e.getMessage());
+            IdentityProviderManagementClientException clientException = (IdentityProviderManagementClientException) e;
+            if (StringUtils.isNotEmpty(clientException.getDescription())) {
+                errorResponse.setDescription(clientException.getDescription());
+            }
             status = Response.Status.BAD_REQUEST;
         } else if (e instanceof IdentityProviderManagementServerException) {
             if (e.getErrorCode() != null) {
@@ -3853,6 +3655,17 @@ public class ServerIdpManagementService {
         if (FrameworkConstants.ORGANIZATION_LOGIN_IDP_NAME.equals(idpName)) {
             throw new IdentityProviderManagementClientException(String.format("The Connection with name %s is " +
                     "a system reserved name.", idpName));
+        }
+    }
+
+    private String getDecodedAuthenticatorName(String authId) throws IdentityProviderManagementClientException {
+
+        try {
+            return base64URLDecode(authId);
+        } catch (IllegalArgumentException e) {
+            Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_NON_DECODABLE_AUTH_ID;
+            throw new IdentityProviderManagementClientException(error.getCode(),
+                    String.format(error.getDescription(), authId));
         }
     }
 }

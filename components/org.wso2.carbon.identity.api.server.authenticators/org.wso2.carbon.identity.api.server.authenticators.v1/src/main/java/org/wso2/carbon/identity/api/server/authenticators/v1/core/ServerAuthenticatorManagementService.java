@@ -23,13 +23,17 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.api.server.authenticators.common.AuthenticatorsServiceHolder;
 import org.wso2.carbon.identity.api.server.authenticators.common.Constants;
+import org.wso2.carbon.identity.api.server.authenticators.v1.impl.LocalAuthenticatorConfigBuilderFactory;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.ConnectedApp;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.ConnectedApps;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Link;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.NameFilter;
+import org.wso2.carbon.identity.api.server.authenticators.v1.model.UserDefinedLocalAuthenticatorCreation;
+import org.wso2.carbon.identity.api.server.authenticators.v1.model.UserDefinedLocalAuthenticatorUpdate;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
@@ -37,10 +41,15 @@ import org.wso2.carbon.identity.application.common.ApplicationAuthenticatorServi
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementClientException;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementServerException;
+import org.wso2.carbon.identity.application.common.exception.AuthenticatorMgtClientException;
+import org.wso2.carbon.identity.application.common.exception.AuthenticatorMgtException;
+import org.wso2.carbon.identity.application.common.exception.AuthenticatorMgtServerException;
 import org.wso2.carbon.identity.application.common.model.FederatedAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticatorConfig;
+import org.wso2.carbon.identity.application.common.model.UserDefinedLocalAuthenticatorConfig;
+import org.wso2.carbon.identity.application.common.util.AuthenticatorMgtExceptionBuilder.AuthenticatorMgtError;
 import org.wso2.carbon.identity.base.AuthenticatorPropertyConstants.DefinedByType;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.core.model.ExpressionNode;
@@ -66,6 +75,7 @@ import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.authenticators.common.Constants.AUTHENTICATOR_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.common.Util.base64URLDecode;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
 
 /**
@@ -107,7 +117,12 @@ public class ServerAuthenticatorManagementService {
             LocalAuthenticatorConfig[] localAuthenticatorConfigs = AuthenticatorsServiceHolder.getInstance()
                     .getApplicationManagementService().getAllLocalAuthenticators(ContextLoader
                             .getTenantDomainFromContext());
-
+            List<UserDefinedLocalAuthenticatorConfig> userDefinedLocalAuthConfigs = getApplicationAuthenticatorService()
+                    .getAllUserDefinedLocalAuthenticators(ContextLoader.getTenantDomainFromContext());
+            if (CollectionUtils.isNotEmpty(userDefinedLocalAuthConfigs)) {
+                localAuthenticatorConfigs = (LocalAuthenticatorConfig[]) ArrayUtils.addAll(localAuthenticatorConfigs,
+                        userDefinedLocalAuthConfigs.toArray(new LocalAuthenticatorConfig[0]));
+            }
             int localAuthenticatorsCount = localAuthenticatorConfigs.length;
             RequestPathAuthenticatorConfig[] requestPathAuthenticatorConfigs = new RequestPathAuthenticatorConfig[0];
 
@@ -147,6 +162,8 @@ public class ServerAuthenticatorManagementService {
                     null);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_IDPS, null);
+        } catch (AuthenticatorMgtException e) {
+            throw handleAuthenticatorException(e);
         }
     }
 
@@ -167,15 +184,21 @@ public class ServerAuthenticatorManagementService {
                             .getTenantDomainFromContext());
 
             FederatedAuthenticatorConfig[] federatedAuthenticatorConfigs = AuthenticatorsServiceHolder.getInstance()
-                    .getIdentityProviderManager().getAllFederatedAuthenticators();
+                    .getIdentityProviderManager()
+                    .getAllFederatedAuthenticators(ContextLoader.getTenantDomainFromContext());
+
+            List<UserDefinedLocalAuthenticatorConfig> userDefinedLocalAuthConfigs = getApplicationAuthenticatorService()
+                    .getAllUserDefinedLocalAuthenticators(ContextLoader.getTenantDomainFromContext());
 
             return buildTagsListResponse(localAuthenticatorConfigs, requestPathAuthenticatorConfigs,
-                    federatedAuthenticatorConfigs);
+                    federatedAuthenticatorConfigs, userDefinedLocalAuthConfigs);
         } catch (IdentityApplicationManagementException e) {
             throw handleApplicationMgtException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_AUTHENTICATORS,
                     null);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_IDPS, null);
+        } catch (AuthenticatorMgtException e) {
+            throw handleAuthenticatorException(e);
         }
     }
 
@@ -190,6 +213,71 @@ public class ServerAuthenticatorManagementService {
         } catch (IdentityApplicationManagementException e) {
             throw handleApplicationMgtException(e, Constants.ErrorMessage
                     .ERROR_CODE_ERROR_RETRIEVING_IDP_CONNECTED_APPS, authenticatorId);
+        }
+    }
+
+    /**
+     * Add the user defined local authenticator.
+     *
+     * @param config          The user defined local authenticator update request.
+     * @return The created authenticator.
+     */
+    public Authenticator addUserDefinedLocalAuthenticator(UserDefinedLocalAuthenticatorCreation config) {
+
+        try {
+            UserDefinedLocalAuthenticatorConfig createdConfig = getApplicationAuthenticatorService()
+                    .addUserDefinedLocalAuthenticator(
+                            LocalAuthenticatorConfigBuilderFactory.build(config),
+                            CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            return LocalAuthenticatorConfigBuilderFactory.build(createdConfig);
+        } catch (AuthenticatorMgtException e) {
+            throw handleAuthenticatorException(e);
+        }
+    }
+
+    /**
+     * Deletes the user defined local authenticator.
+     *
+     * @param authenticatorId The authenticator ID.
+     */
+    public void deleteUserDefinedLocalAuthenticator(String authenticatorId) {
+
+        try {
+            getApplicationAuthenticatorService().deleteUserDefinedLocalAuthenticator(base64URLDecode(authenticatorId),
+                            CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+        } catch (AuthenticatorMgtException e) {
+            throw handleAuthenticatorException(e);
+        }
+    }
+
+    /**
+     * Updates the user defined local authenticator.
+     *
+     * @param authenticatorId The authenticator ID.
+     * @param config          The user defined local authenticator update request.
+     * @return The updated authenticator.
+     */
+    public Authenticator updateUserDefinedLocalAuthenticator(
+            String authenticatorId, UserDefinedLocalAuthenticatorUpdate config) {
+
+        try {
+            String authenticatorName = base64URLDecode(authenticatorId);
+            String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            LocalAuthenticatorConfig existingAuthenticator = getApplicationAuthenticatorService()
+                    .getLocalAuthenticatorByName(authenticatorName, tenantDomain);
+            if (existingAuthenticator == null) {
+                AuthenticatorMgtError error = AuthenticatorMgtError.ERROR_CODE_ERROR_AUTHENTICATOR_NOT_FOUND;
+                throw handleAuthenticatorException(new AuthenticatorMgtClientException(error.getCode(),
+                                error.getMessage(), String.format(error.getMessage(), authenticatorName)),
+                        Response.Status.NOT_FOUND);
+            }
+            UserDefinedLocalAuthenticatorConfig updatedConfig = getApplicationAuthenticatorService()
+                    .updateUserDefinedLocalAuthenticator(
+                            LocalAuthenticatorConfigBuilderFactory.build(config, existingAuthenticator),
+                            tenantDomain);
+            return LocalAuthenticatorConfigBuilderFactory.build(updatedConfig);
+        } catch (AuthenticatorMgtException e) {
+            throw handleAuthenticatorException(e);
         }
     }
 
@@ -383,9 +471,8 @@ public class ServerAuthenticatorManagementService {
         if (fedAuthConfigs != null) {
             for (FederatedAuthenticatorConfig config : fedAuthConfigs) {
                 if (config.isEnabled()) {
-                    FederatedAuthenticatorConfig federatedAuthenticatorConfig =
-                            ApplicationAuthenticatorService.getInstance()
-                                    .getFederatedAuthenticatorByName(config.getName());
+                    FederatedAuthenticatorConfig federatedAuthenticatorConfig = getApplicationAuthenticatorService()
+                            .getFederatedAuthenticatorByName(config.getName());
                     if (federatedAuthenticatorConfig != null) {
                         String[] tags = federatedAuthenticatorConfig.getTags();
                         if (ArrayUtils.isNotEmpty(tags)) {
@@ -538,7 +625,8 @@ public class ServerAuthenticatorManagementService {
 
     private List<String> buildTagsListResponse(LocalAuthenticatorConfig[] localAuthenticatorConfigs,
                                                RequestPathAuthenticatorConfig[] requestPathAuthenticatorConfigs,
-                                               FederatedAuthenticatorConfig[] federatedAuthenticatorConfigs) {
+                                               FederatedAuthenticatorConfig[] federatedAuthenticatorConfigs,
+                                               List<UserDefinedLocalAuthenticatorConfig> userDefinedLocalAuthConfigs) {
 
         ArrayList<String> tagsList = new ArrayList<>();
         if (localAuthenticatorConfigs != null) {
@@ -559,6 +647,14 @@ public class ServerAuthenticatorManagementService {
         }
         if (ArrayUtils.isNotEmpty(federatedAuthenticatorConfigs)) {
             for (FederatedAuthenticatorConfig config : federatedAuthenticatorConfigs) {
+                String[] tags = config.getTags();
+                if (ArrayUtils.isNotEmpty(tags)) {
+                    tagsList.addAll(Arrays.asList(tags));
+                }
+            }
+        }
+        if (!userDefinedLocalAuthConfigs.isEmpty()) {
+            for (UserDefinedLocalAuthenticatorConfig config : userDefinedLocalAuthConfigs) {
                 String[] tags = config.getTags();
                 if (ArrayUtils.isNotEmpty(tags)) {
                     tagsList.addAll(Arrays.asList(tags));
@@ -909,6 +1005,56 @@ public class ServerAuthenticatorManagementService {
     }
 
     /**
+     * Handle IdentityProviderManagementException, extract error code, error description and status code to be sent
+     * in the response.
+     *
+     * @param e         IdentityProviderManagementException.
+     * @return APIError.
+     */
+    private APIError handleAuthenticatorException(AuthenticatorMgtException e, Response.Status... responseStatus) {
+
+        ErrorResponse.Builder errorResponseBuilder = new ErrorResponse.Builder()
+                .withCode(e.getErrorCode())
+                .withMessage(e.getMessage())
+                .withDescription(e.getDescription());
+        Response.Status status = null;
+        if (ArrayUtils.isNotEmpty(responseStatus)) {
+            status = responseStatus[0];
+        }
+        ErrorResponse errorResponse;
+
+        if (e instanceof AuthenticatorMgtClientException) {
+            errorResponse = errorResponseBuilder.build(log, e.getMessage());
+            if (e.getErrorCode() != null) {
+                String errorCode = e.getErrorCode();
+                errorCode =
+                        errorCode.contains(org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER) ?
+                                errorCode : Constants.AUTHENTICATOR_ERROR_PREFIX + errorCode;
+                errorResponse.setCode(errorCode);
+            }
+            errorResponse.setDescription(e.getDescription());
+            if (status == null) {
+                status = Response.Status.BAD_REQUEST;
+            }
+        } else if (e instanceof AuthenticatorMgtServerException) {
+            errorResponse = errorResponseBuilder.build(log, e, e.getMessage());
+            if (e.getErrorCode() != null) {
+                String errorCode = e.getErrorCode();
+                errorCode =
+                        errorCode.contains(org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER) ?
+                                errorCode : Constants.AUTHENTICATOR_ERROR_PREFIX + errorCode;
+                errorResponse.setCode(errorCode);
+            }
+            errorResponse.setDescription(e.getDescription());
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+        } else {
+            errorResponse = errorResponseBuilder.build(log, e, e.getMessage());
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+        }
+        return new APIError(status, errorResponse);
+    }
+
+    /**
      * Handle exceptions generated in the API.
      *
      * @param status HTTP status.
@@ -985,5 +1131,10 @@ public class ServerAuthenticatorManagementService {
             Response.Status status = Response.Status.NOT_IMPLEMENTED;
             throw new APIError(status, errorResponse);
         }
+    }
+
+    private ApplicationAuthenticatorService getApplicationAuthenticatorService() {
+
+        return AuthenticatorsServiceHolder.getInstance().getApplicationAuthenticatorService();
     }
 }

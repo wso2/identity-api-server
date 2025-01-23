@@ -25,14 +25,22 @@ import java.util.List;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.ConnectedApps;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Error;
+import org.wso2.carbon.identity.api.server.authenticators.v1.model.UserDefinedLocalAuthenticatorCreation;
+import org.wso2.carbon.identity.api.server.authenticators.v1.model.UserDefinedLocalAuthenticatorUpdate;
 import javax.ws.rs.core.Response;
 
 
 public interface AuthenticatorsApiService {
 
+      public Response addUserDefinedLocalAuthenticator(UserDefinedLocalAuthenticatorCreation userDefinedLocalAuthenticatorCreation);
+
       public Response authenticatorsGet(String filter, Integer limit, Integer offset);
 
       public Response authenticatorsMetaTagsGet();
 
+      public Response deleteUserDefinedLocalAuthenticator(String authenticatorId);
+
       public Response getConnectedAppsOfLocalAuthenticator(String authenticatorId, Integer limit, Integer offset);
+
+      public Response updateUserDefinedLocalAuthenticator(String authenticatorId, UserDefinedLocalAuthenticatorUpdate userDefinedLocalAuthenticatorUpdate);
 }
