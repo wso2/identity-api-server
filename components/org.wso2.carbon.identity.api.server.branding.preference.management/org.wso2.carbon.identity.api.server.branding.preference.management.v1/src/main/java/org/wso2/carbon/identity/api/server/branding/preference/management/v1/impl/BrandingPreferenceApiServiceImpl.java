@@ -287,7 +287,18 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
     @Override
     public Response updateCustomText(CustomTextModel customTextModel) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        if (StringUtils.isBlank(customTextModel.getType().toString())) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        if (!ORGANIZATION_TYPE.equals(customTextModel.getType().toString())) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        if (StringUtils.isBlank(customTextModel.getScreen())) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        CustomTextModel updatedCustomTextModel =
+                brandingPreferenceManagementService.updateCustomTextPreference(customTextModel);
+        return Response.ok().entity(updatedCustomTextModel).build();
     }
 }

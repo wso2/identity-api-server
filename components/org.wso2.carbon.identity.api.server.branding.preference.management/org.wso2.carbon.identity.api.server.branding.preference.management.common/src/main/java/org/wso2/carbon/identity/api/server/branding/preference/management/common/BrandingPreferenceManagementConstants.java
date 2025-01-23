@@ -97,7 +97,10 @@ public class BrandingPreferenceManagementConstants {
                 "Error while retrieving branding preference generation result status for operation."),
         ERROR_CODE_ERROR_GETTING_BRANDING_RESULT("65010",
                 "Error while getting branding preference generation result.",
-                "Error while retrieving branding preference generation result for operation.");
+                "Error while retrieving branding preference generation result for operation."),
+        ERROR_WHILE_CONVERTING_BRANDING_AI_SERVER_RESPONSE("65602",
+                "Error occurred while converting the AI server response.",
+                "Could not convert the AI server response to a valid response.");
 
 
         private final String code;

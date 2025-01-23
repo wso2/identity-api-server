@@ -225,15 +225,19 @@ paths:
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '403':
-          $ref: '#/components/responses/Forbidden'
-        '409':
-          $ref: '#/components/responses/Conflict'
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           $ref: '#/components/responses/ServerError'
-        '501':
-          $ref: '#/components/responses/NotImplemented'
   '/branding-preference/status/{operationId}':
     get:
       tags:
@@ -254,9 +258,17 @@ paths:
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -278,6 +290,24 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/BrandingGenerationResultModel'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
 
   '/branding-preference/text':
     get:
@@ -564,16 +594,13 @@ components:
     BrandingGenerationRequestModel:
       type: object
       properties:
-        # Define properties related to the organization that are used to generate branding preferences
-        # Example property:
         websiteUrl:
           type: string
-          description: URL of the company's website.
+          description: URL of the organization's website.
+          example: "https://wso2.com/"
     BrandingGenerationResponseModel:
       type: object
       properties:
-        # Define properties related to the organization that are used to generate branding preferences
-        # Example property:
         operationId:
           type: string
           description: Operation id of the initiated branding generation process.

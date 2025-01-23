@@ -159,11 +159,9 @@ public class BrandingPreferenceApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 202, message = "Branding generation process started", response = BrandingGenerationResponseModel.class),
         @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
-        @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
-        @ApiResponse(code = 409, message = "Conflict.", response = Error.class),
-        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class),
-        @ApiResponse(code = 501, message = "Not Implemented.", response = Error.class)
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
     })
     public Response generateBrandingPreference(@ApiParam(value = "This represents the properties of the organization used to generate branding preferences, including the organization's website URL." ,required=true) @Valid BrandingGenerationRequestModel brandingGenerationRequestModel) {
 
@@ -182,7 +180,12 @@ public class BrandingPreferenceApi  {
         })
     }, tags={ "Branding Preference", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = BrandingGenerationResultModel.class)
+        @ApiResponse(code = 200, message = "OK", response = BrandingGenerationResultModel.class),
+        @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 404, message = "Requested resource is not found.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
     })
     public Response getBrandingGenerationResult(@ApiParam(value = "The unique identifier for the branding generation operation.",required=true) @PathParam("operationId") String operationId) {
 
@@ -203,8 +206,8 @@ public class BrandingPreferenceApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = BrandingGenerationStatusModel.class),
         @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
-        @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
         @ApiResponse(code = 404, message = "Requested resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
     })

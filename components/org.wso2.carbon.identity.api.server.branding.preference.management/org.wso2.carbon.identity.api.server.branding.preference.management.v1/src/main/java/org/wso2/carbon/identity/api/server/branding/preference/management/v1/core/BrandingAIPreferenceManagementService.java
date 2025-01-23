@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -38,6 +38,7 @@ import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_BRANDING_RESULT;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_BRANDING_RESULT_STATUS;
+import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_WHILE_CONVERTING_BRANDING_AI_SERVER_RESPONSE;
 
 /**
  * Service class for AI branding preference management.
@@ -166,7 +167,7 @@ public class BrandingAIPreferenceManagementService {
         return new APIError(Response.Status.INTERNAL_SERVER_ERROR, errorResponseBuilder.build());
     }
 
-    private static Map<String, Object> convertObjectToMap(Object object) {
+    private static Map<String, Object> convertObjectToMap(Object object) throws AIServerException {
 
         if (object instanceof Map) {
             Map<String, Object> map = new HashMap<>();
@@ -186,11 +187,11 @@ public class BrandingAIPreferenceManagementService {
             }
             return map;
         }
-        LOG.warn("Object is not an instance of Map. Returning an empty map.");
-        return new HashMap<>();
+        throw new AIServerException(ERROR_WHILE_CONVERTING_BRANDING_AI_SERVER_RESPONSE.getMessage(),
+                ERROR_WHILE_CONVERTING_BRANDING_AI_SERVER_RESPONSE.getCode());
     }
 
-    private static Object[] convertListToArray(List<?> list) {
+    private static Object[] convertListToArray(List<?> list) throws AIServerException {
 
         Object[] array = new Object[list.size()];
         for (int i = 0; i < list.size(); i++) {
@@ -208,6 +209,3 @@ public class BrandingAIPreferenceManagementService {
         return array;
     }
 }
-
-
-

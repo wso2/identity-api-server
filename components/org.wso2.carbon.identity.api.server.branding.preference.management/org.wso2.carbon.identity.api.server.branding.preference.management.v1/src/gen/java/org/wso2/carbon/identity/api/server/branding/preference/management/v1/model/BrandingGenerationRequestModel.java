@@ -35,7 +35,7 @@ public class BrandingGenerationRequestModel  {
     private String websiteUrl;
 
     /**
-    * URL of the company&#39;s website.
+    * URL of the organization&#39;s website.
     **/
     public BrandingGenerationRequestModel websiteUrl(String websiteUrl) {
 
@@ -43,7 +43,7 @@ public class BrandingGenerationRequestModel  {
         return this;
     }
     
-    @ApiModelProperty(value = "URL of the company's website.")
+    @ApiModelProperty(example = "https://wso2.com/", value = "URL of the organization's website.")
     @JsonProperty("websiteUrl")
     @Valid
     public String getWebsiteUrl() {
