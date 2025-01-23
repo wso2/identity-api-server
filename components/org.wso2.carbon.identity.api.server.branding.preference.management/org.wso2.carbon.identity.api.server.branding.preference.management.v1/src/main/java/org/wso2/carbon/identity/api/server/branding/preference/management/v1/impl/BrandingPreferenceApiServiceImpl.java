@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -21,8 +21,8 @@ package org.wso2.carbon.identity.api.server.branding.preference.management.v1.im
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.BrandingPreferenceApiService;
-import org.wso2.carbon.identity.api.server.branding.preference.management.v1.core.BrandingAIPreferenceManagementService;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.core.BrandingPreferenceManagementService;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.factories.BrandingAIPreferenceManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationRequestModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationResponseModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationResultModel;
@@ -58,9 +58,6 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
 
     @Autowired
     private BrandingPreferenceManagementService brandingPreferenceManagementService;
-
-    @Autowired
-    private BrandingAIPreferenceManagementService brandingAIPreferenceManagementService;
 
     //TODO: Improve API to manage application level & language level theming resources in addition to the tenant level.
 
@@ -194,10 +191,11 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
     }
 
     @Override
-    public Response generateBrandingPreference(BrandingGenerationRequestModel brandingGenerationModel) {
+    public Response generateBrandingPreference(BrandingGenerationRequestModel brandingGenerationRequestModel) {
 
-        BrandingGenerationResponseModel response = brandingAIPreferenceManagementService.generateBrandingPreference(
-                brandingGenerationModel);
+        BrandingGenerationResponseModel response = BrandingAIPreferenceManagementServiceFactory
+                .getBrandingAIPreferenceManagementService().generateBrandingPreference(
+                brandingGenerationRequestModel);
         return Response.accepted().entity(response).build();
 
     }
@@ -205,7 +203,8 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
     @Override
     public Response getBrandingGenerationResult(String operationId) {
 
-        BrandingGenerationResultModel response = brandingAIPreferenceManagementService
+        BrandingGenerationResultModel response = BrandingAIPreferenceManagementServiceFactory
+                .getBrandingAIPreferenceManagementService()
                 .getBrandingPreferenceGenerationResult(operationId);
         return Response.ok().entity(response).build();
     }
@@ -213,7 +212,8 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
     @Override
     public Response getBrandingGenerationStatus(String operationId) {
 
-        BrandingGenerationStatusModel response = brandingAIPreferenceManagementService
+        BrandingGenerationStatusModel response = BrandingAIPreferenceManagementServiceFactory
+                .getBrandingAIPreferenceManagementService()
                 .getBrandingPreferenceGenerationStatus(operationId);
         return Response.ok().entity(response).build();
     }
@@ -287,18 +287,7 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
     @Override
     public Response updateCustomText(CustomTextModel customTextModel) {
 
-        if (StringUtils.isBlank(customTextModel.getType().toString())) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
-        if (!ORGANIZATION_TYPE.equals(customTextModel.getType().toString())) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        if (StringUtils.isBlank(customTextModel.getScreen())) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
-
-        CustomTextModel updatedCustomTextModel =
-                brandingPreferenceManagementService.updateCustomTextPreference(customTextModel);
-        return Response.ok().entity(updatedCustomTextModel).build();
+        // do some magic!
+        return Response.ok().entity("magic!").build();
     }
 }

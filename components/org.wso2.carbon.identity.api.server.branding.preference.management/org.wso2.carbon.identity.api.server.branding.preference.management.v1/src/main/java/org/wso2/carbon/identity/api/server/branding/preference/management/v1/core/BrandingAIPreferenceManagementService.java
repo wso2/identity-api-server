@@ -44,7 +44,7 @@ import static org.wso2.carbon.identity.api.server.branding.preference.management
  */
 public class BrandingAIPreferenceManagementService {
 
-    private static final Log log = LogFactory.getLog(BrandingAIPreferenceManagementService.class);
+    private static final Log LOG = LogFactory.getLog(BrandingAIPreferenceManagementService.class);
 
     /**
      * Initiates the branding preference generation process by invoking BrandingPreferenceManager.
@@ -140,6 +140,7 @@ public class BrandingAIPreferenceManagementService {
 
     private APIError handleClientException(AIClientException error) {
 
+        LOG.debug("Client error occurred while invoking AI service.", error);
         ErrorResponse.Builder errorResponseBuilder = new ErrorResponse.Builder()
                 .withCode(error.getErrorCode())
                 .withMessage(error.getMessage());
@@ -153,6 +154,7 @@ public class BrandingAIPreferenceManagementService {
 
     private APIError handleServerException(AIServerException error) {
 
+        LOG.error("Server error occurred while generating branding preference.", error);
         ErrorResponse.Builder errorResponseBuilder = new ErrorResponse.Builder()
                 .withCode(error.getErrorCode())
                 .withMessage(error.getMessage());
@@ -184,7 +186,7 @@ public class BrandingAIPreferenceManagementService {
             }
             return map;
         }
-        log.warn("Object is not an instance of Map. Returning an empty map.");
+        LOG.warn("Object is not an instance of Map. Returning an empty map.");
         return new HashMap<>();
     }
 

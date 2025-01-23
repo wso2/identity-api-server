@@ -19,12 +19,9 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
     <bean class="org.wso2.carbon.identity.api.server.branding.preference.management.v1.core.BrandingPreferenceManagementService"/>
-    <bean class="org.wso2.carbon.identity.api.server.branding.preference.management.v1.core.BrandingAIPreferenceManagementService"/>
     <bean class="org.wso2.carbon.identity.api.server.branding.preference.management.v1.impl.BrandingPreferenceApiServiceImpl"/>
     <bean id="brandingPreferenceManagerFactoryBean" class="org.wso2.carbon.identity.api.server.branding.preference.management.common.factory.BrandingPreferenceMgtOSGiServiceFactory"/>
-    <bean id="brandingPreferenceAiManagerFactoryBean" class="org.wso2.carbon.identity.api.server.branding.preference.management.common.factory.BrandingPreferenceAIMgtOSGiServiceFactory"/>
     <bean id="brandingPreferenceServiceImplDataHolderBean" class="org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceServiceHolder">
         <property name="brandingPreferenceManager" ref="brandingPreferenceManagerFactoryBean"/>
-        <property name="brandingPreferenceAiManager" ref="brandingPreferenceAiManagerFactoryBean"/>
     </bean>
 </beans>

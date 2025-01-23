@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -175,7 +175,7 @@ public class BrandingPreferenceApi  {
     @Path("/result/{operationId}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Return the result of a branding generation operation.", notes = "This API endpoint returns the result of an AI branding generation operation for a given operation ID. Depending on the operation status, the response may include an error message or the generated branding preferences.<br/> <b>Scope(Permission) required:</b> `internal_branding_preference_update` ", response = BrandingGenerationResultModel.class, authorizations = {
+    @ApiOperation(value = "Return the result of a branding generation operation.", notes = "This API endpoint returns the result of an AI branding generation operation for a given operation ID. Depending on the operation status, the response may include an error message or the generated branding preferences.<br/> ", response = BrandingGenerationResultModel.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -186,8 +186,7 @@ public class BrandingPreferenceApi  {
     })
     public Response getBrandingGenerationResult(@ApiParam(value = "The unique identifier for the branding generation operation.",required=true) @PathParam("operationId") String operationId) {
 
-        Response brandingGenerationResult = delegate.getBrandingGenerationResult(operationId);
-        return brandingGenerationResult;
+        return delegate.getBrandingGenerationResult(operationId );
     }
 
     @Valid
@@ -195,7 +194,7 @@ public class BrandingPreferenceApi  {
     @Path("/status/{operationId}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get the status of a branding generation operation.", notes = "This API endpoint return the status of the AI branding generation process that initiated using the `/generate` endpoint.<br/> <b>Scope(Permission) required:</b> `internal_branding_preference_update` ", response = BrandingGenerationStatusModel.class, authorizations = {
+    @ApiOperation(value = "Get the status of a branding generation operation.", notes = "This API endpoint returns the status of the AI branding generation process that initiated using the `/generate` endpoint.<br/> ", response = BrandingGenerationStatusModel.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             

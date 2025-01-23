@@ -241,7 +241,7 @@ paths:
       operationId: getBrandingGenerationStatus
       summary: Get the status of a branding generation operation.
       description: |
-        This API endpoint return the status of the AI branding generation process that initiated using the `/generate` endpoint.<br/>
+        This API endpoint returns the status of the AI branding generation process that initiated using the `/generate` endpoint.<br/>
       parameters:
         - $ref: '#/components/parameters/operationId'
       responses:
@@ -278,7 +278,6 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/BrandingGenerationResultModel'
-
 
   '/branding-preference/text':
     get:
@@ -567,7 +566,7 @@ components:
       properties:
         # Define properties related to the organization that are used to generate branding preferences
         # Example property:
-        website_url:
+        websiteUrl:
           type: string
           description: URL of the company's website.
     BrandingGenerationResponseModel:
@@ -575,7 +574,7 @@ components:
       properties:
         # Define properties related to the organization that are used to generate branding preferences
         # Example property:
-        operation_id:
+        operationId:
           type: string
           description: Operation id of the initiated branding generation process.
     BrandingGenerationStatusModel:
