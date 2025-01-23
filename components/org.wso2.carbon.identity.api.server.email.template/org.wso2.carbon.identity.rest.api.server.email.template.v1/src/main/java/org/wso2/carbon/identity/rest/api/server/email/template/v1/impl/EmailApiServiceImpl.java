@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2019-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -45,6 +45,7 @@ public class EmailApiServiceImpl implements EmailApiService {
     private final ServerEmailTemplatesService emailTemplatesService;
 
     public EmailApiServiceImpl() {
+
         try {
             this.emailTemplatesService = ServerEmailTemplatesServiceFactory.getServerEmailTemplatesService();
         } catch (IllegalStateException e) {
