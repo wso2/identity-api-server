@@ -18,12 +18,12 @@
 
 package org.wso2.carbon.identity.rest.api.server.email.template.v2;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 
+import org.wso2.carbon.identity.rest.api.server.email.template.v2.factories.EmailApiServiceFactory;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateType;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateTypeOverview;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateTypeWithID;
@@ -44,8 +44,12 @@ import javax.validation.constraints.*;
 
 public class EmailApi  {
 
-    @Autowired
-    private EmailApiService delegate;
+    private final EmailApiService delegate;
+
+    public EmailApi() {
+
+        this.delegate = EmailApiServiceFactory.getEmailApi();
+    }
 
     @Valid
     @POST

@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.identity.api.server.email.template.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.email.mgt.EmailTemplateManager;
 
 /**
@@ -23,17 +24,19 @@ import org.wso2.carbon.email.mgt.EmailTemplateManager;
  */
 public class EmailTemplatesServiceHolder {
 
-    private static EmailTemplateManager emailTemplateManager;
+    private EmailTemplatesServiceHolder() {}
+
+    private static class EmailTemplateManagerHolder {
+        static final EmailTemplateManager SERVICE = (EmailTemplateManager) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(EmailTemplateManager.class, null);
+    }
 
     /**
      * Get EmailTemplateManager osgi service.
      * @return EmailTemplateManager
      */
     public static EmailTemplateManager getEmailTemplateManager() {
-        return emailTemplateManager;
-    }
 
-    public static void setEmailTemplateManager(EmailTemplateManager emailTemplateManager) {
-        EmailTemplatesServiceHolder.emailTemplateManager = emailTemplateManager;
+        return EmailTemplateManagerHolder.SERVICE;
     }
 }
