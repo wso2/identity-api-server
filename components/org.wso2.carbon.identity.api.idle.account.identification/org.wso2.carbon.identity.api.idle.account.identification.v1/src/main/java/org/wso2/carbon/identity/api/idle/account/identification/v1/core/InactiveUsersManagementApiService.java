@@ -77,22 +77,8 @@ public class InactiveUsersManagementApiService {
      */
     public List<InactiveUser> getInactiveUsers(String inactiveAfter, String excludeBefore, String tenantDomain) {
 
-        List<InactiveUserModel> inactiveUsers = null;
         try {
-            validateDates(inactiveAfter, excludeBefore);
-            LocalDateTime inactiveAfterDate = convertToDateObject(inactiveAfter, DATE_INACTIVE_AFTER);
-            LocalDateTime excludeBeforeDate = convertToDateObject(excludeBefore, DATE_EXCLUDE_BEFORE);
-
-            validateDatesCombination(inactiveAfterDate, excludeBeforeDate);
-
-            if (excludeBeforeDate == null) {
-                inactiveUsers = idleAccountIdentificationService
-                        .getInactiveUsersFromSpecificDate(inactiveAfterDate, tenantDomain);
-            } else {
-                inactiveUsers = idleAccountIdentificationService
-                        .getLimitedInactiveUsersFromSpecificDate(inactiveAfterDate, excludeBeforeDate, tenantDomain);
-            }
-            return buildResponse(inactiveUsers);
+            return getInactiveUsers(inactiveAfter, excludeBefore, tenantDomain, null);
         } catch (IdleAccountIdentificationException e) {
             throw handleIdleAccIdentificationException(e, ErrorMessage.ERROR_RETRIEVING_INACTIVE_USERS, tenantDomain);
         }
@@ -110,27 +96,41 @@ public class InactiveUsersManagementApiService {
     public List<InactiveUser> getInactiveUsers(String inactiveAfter, String excludeBefore, String tenantDomain,
                                                String filter) throws IdleAccountIdentificationClientException {
 
-        List<ExpressionNode> expressionNodes = getExpressionNodes(filter);
-        if (validateExpressionNodes(expressionNodes)) {
-            boolean isDisabled = Boolean.parseBoolean(expressionNodes.get(0).getValue());
-            List<InactiveUserModel> inactiveUsers;
-            try {
-                validateDates(inactiveAfter, excludeBefore);
-                LocalDateTime inactiveAfterDate = convertToDateObject(inactiveAfter, DATE_INACTIVE_AFTER);
-                LocalDateTime excludeBeforeDate = convertToDateObject(excludeBefore, DATE_EXCLUDE_BEFORE);
+        List<InactiveUserModel> inactiveUsers = null;
+        try {
+            validateDates(inactiveAfter, excludeBefore);
+            LocalDateTime inactiveAfterDate = convertToDateObject(inactiveAfter, DATE_INACTIVE_AFTER);
+            LocalDateTime excludeBeforeDate = convertToDateObject(excludeBefore, DATE_EXCLUDE_BEFORE);
 
-                validateDatesCombination(inactiveAfterDate, excludeBeforeDate);
+            validateDatesCombination(inactiveAfterDate, excludeBeforeDate);
 
-                inactiveUsers = IdleAccountIdentificationServiceHolder.getIdleAccountIdentificationService()
-                        .filterInactiveUsersIfDisabled(inactiveAfterDate, excludeBeforeDate, tenantDomain, isDisabled);
-
+            if (filter == null) {
+                if (excludeBeforeDate == null) {
+                    inactiveUsers = idleAccountIdentificationService
+                            .getInactiveUsersFromSpecificDate(inactiveAfterDate, tenantDomain);
+                } else {
+                    inactiveUsers =
+                            idleAccountIdentificationService.getLimitedInactiveUsersFromSpecificDate(inactiveAfterDate,
+                                    excludeBeforeDate, tenantDomain);
+                }
                 return buildResponse(inactiveUsers);
-            } catch (IdleAccountIdentificationException e) {
-                throw handleIdleAccIdentificationException(e, ErrorMessage.ERROR_RETRIEVING_INACTIVE_USERS,
-                        tenantDomain);
+            } else {
+                List<ExpressionNode> expressionNodes = getExpressionNodes(filter);
+                if (validateExpressionNodes(expressionNodes)) {
+                    boolean isDisabled = Boolean.parseBoolean(expressionNodes.get(0).getValue());
+
+                    inactiveUsers = IdleAccountIdentificationServiceHolder.getIdleAccountIdentificationService()
+                            .filterInactiveUsersIfDisabled(inactiveAfterDate, excludeBeforeDate, tenantDomain,
+                                    isDisabled);
+
+                    return buildResponse(inactiveUsers);
+                }
+                return getInactiveUsers(inactiveAfter, excludeBefore, tenantDomain);
             }
+
+        } catch (IdleAccountIdentificationException e) {
+            throw handleIdleAccIdentificationException(e, ErrorMessage.ERROR_RETRIEVING_INACTIVE_USERS, tenantDomain);
         }
-        return getInactiveUsers(inactiveAfter, excludeBefore, tenantDomain);
     }
 
     /**
@@ -180,8 +180,8 @@ public class InactiveUsersManagementApiService {
      *
      * @param dateString Date as a string.
      * @param dateType   Date type.
-     * @throws IdleAccountIdentificationClientException IdleAccIdentificationClientException.
      * @return List of inactive users.
+     * @throws IdleAccountIdentificationClientException IdleAccIdentificationClientException.
      */
     private LocalDateTime convertToDateObject(String dateString, String dateType)
             throws IdleAccountIdentificationClientException {
