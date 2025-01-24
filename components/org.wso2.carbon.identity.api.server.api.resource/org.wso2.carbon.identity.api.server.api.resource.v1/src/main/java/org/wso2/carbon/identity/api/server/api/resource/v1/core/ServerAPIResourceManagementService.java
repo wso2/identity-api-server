@@ -23,9 +23,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.identity.api.resource.mgt.APIResourceManager;
 import org.wso2.carbon.identity.api.resource.mgt.APIResourceMgtException;
 import org.wso2.carbon.identity.api.resource.mgt.model.APIResourceSearchResult;
-import org.wso2.carbon.identity.api.server.api.resource.common.APIResourceManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCreationModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceListItem;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceListResponse;
@@ -69,7 +69,13 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
  */
 public class ServerAPIResourceManagementService {
 
+    private final APIResourceManager apiResourceManager;
     private static final Log LOG = LogFactory.getLog(ServerAPIResourceManagementService.class);
+
+    public ServerAPIResourceManagementService(APIResourceManager apiResourceManager) {
+
+        this.apiResourceManager = apiResourceManager;
+    }
 
     /**
      * Add API resource.
@@ -84,8 +90,8 @@ public class ServerAPIResourceManagementService {
         }
         try {
             APIResource apiResource = createAPIResource(apIResourceCreationModel);
-            APIResource createdAPIResource = APIResourceManagementServiceHolder.getApiResourceManager()
-                    .addAPIResource(apiResource, CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            APIResource createdAPIResource = apiResourceManager.addAPIResource(apiResource,
+                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
             if (createdAPIResource == null) {
                 LOG.error(ErrorMessage.ERROR_CODE_ADD_API_RESOURCE.getDescription());
                 throw APIResourceMgtEndpointUtil.handleException(Response.Status.INTERNAL_SERVER_ERROR,
@@ -132,12 +138,12 @@ public class ServerAPIResourceManagementService {
 
             APIResourceSearchResult apiResourceSearchResult;
             if (CollectionUtils.isNotEmpty(requestedAttributeList)) {
-                apiResourceSearchResult = APIResourceManagementServiceHolder.getApiResourceManager()
-                        .getAPIResourcesWithRequiredAttributes(before, after, limit + 1, filter, paginationSortOrder,
+                apiResourceSearchResult = apiResourceManager.getAPIResourcesWithRequiredAttributes(before,
+                        after, limit + 1, filter, paginationSortOrder,
                                 CarbonContext.getThreadLocalCarbonContext().getTenantDomain(), requestedAttributeList);
             } else {
-                apiResourceSearchResult = APIResourceManagementServiceHolder.getApiResourceManager()
-                        .getAPIResources(before, after, limit + 1, filter, paginationSortOrder,
+                apiResourceSearchResult = apiResourceManager.getAPIResources(before,
+                        after, limit + 1, filter, paginationSortOrder,
                                 CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
             }
             List<APIResource> apiResources = apiResourceSearchResult.getAPIResources();
@@ -205,8 +211,8 @@ public class ServerAPIResourceManagementService {
     private APIResource getAPIResourceById(String apiResourceID) {
 
         try {
-            APIResource apiResource = APIResourceManagementServiceHolder.getApiResourceManager()
-                    .getAPIResourceById(apiResourceID, CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            APIResource apiResource = apiResourceManager.getAPIResourceById(apiResourceID,
+                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
             if (apiResource == null) {
                 throw APIResourceMgtEndpointUtil.handleException(Response.Status.NOT_FOUND,
                         APIResourceMgtEndpointConstants.ErrorMessage.ERROR_CODE_API_RESOURCE_NOT_FOUND, apiResourceID);
@@ -248,7 +254,7 @@ public class ServerAPIResourceManagementService {
                     .type(currentAPIResource.getType())
                     .description(description);
             APIResource apiResource = apiResourceBuilder.build();
-            APIResourceManagementServiceHolder.getApiResourceManager().updateAPIResource(apiResource, addedScopes,
+            apiResourceManager.updateAPIResource(apiResource, addedScopes,
                     removedScopeNames, CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
             // Replacing Authorization Details Types
             APIResourceManagementServiceHolder.getAuthorizationDetailsTypeManager()
@@ -274,14 +280,12 @@ public class ServerAPIResourceManagementService {
                 LOG.debug("Deleting API Resource with ID: " + apiResourceID);
             }
             String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-            APIResource apiResource = APIResourceManagementServiceHolder.getApiResourceManager()
-                    .getAPIResourceById(apiResourceID, tenantDomain);
+            APIResource apiResource = apiResourceManager.getAPIResourceById(apiResourceID, tenantDomain);
             if (apiResource == null) {
                 return;
             }
             handleSystemAPI(apiResource);
-            APIResourceManagementServiceHolder.getApiResourceManager().deleteAPIResourceById(apiResourceID,
-                    tenantDomain);
+            apiResourceManager.deleteAPIResourceById(apiResourceID, tenantDomain);
         } catch (APIResourceMgtException e) {
             throw APIResourceMgtEndpointUtil.handleAPIResourceMgtException(e);
         }
@@ -296,8 +300,8 @@ public class ServerAPIResourceManagementService {
     public List<Scope> getScopesByAPIId(String apiResourceId) {
 
         try {
-            APIResource apiResource = APIResourceManagementServiceHolder.getApiResourceManager()
-                    .getAPIResourceById(apiResourceId, CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            APIResource apiResource = apiResourceManager.getAPIResourceById(apiResourceId,
+                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
             if (apiResource == null) {
                 throw APIResourceMgtEndpointUtil.handleException(Response.Status.NOT_FOUND,
                         APIResourceMgtEndpointConstants.ErrorMessage.ERROR_CODE_API_RESOURCE_NOT_FOUND, apiResourceId);
@@ -317,15 +321,15 @@ public class ServerAPIResourceManagementService {
     public void putScopesByAPIId(String apiResourceId, List<ScopeCreationModel> scopeCreationModels) {
 
         try {
-            APIResource apiResource = APIResourceManagementServiceHolder.getApiResourceManager()
-                    .getAPIResourceById(apiResourceId, CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            APIResource apiResource = apiResourceManager.getAPIResourceById(apiResourceId,
+                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
             if (apiResource == null) {
                 throw APIResourceMgtEndpointUtil.handleException(Response.Status.NOT_FOUND,
                         APIResourceMgtEndpointConstants.ErrorMessage.ERROR_CODE_API_RESOURCE_NOT_FOUND, apiResourceId);
             }
             handleSystemAPI(apiResource);
             List<Scope> scopes = createScopes(scopeCreationModels);
-            APIResourceManagementServiceHolder.getApiResourceManager().putScopes(apiResourceId, apiResource.getScopes(),
+            apiResourceManager.putScopes(apiResourceId, apiResource.getScopes(),
                     scopes, CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
         } catch (APIResourceMgtException e) {
             throw APIResourceMgtEndpointUtil.handleAPIResourceMgtException(e);
@@ -345,13 +349,12 @@ public class ServerAPIResourceManagementService {
                 LOG.debug("Deleting scope with ID: " + scopeName + " of API Resource ID: " + apiResourceId);
             }
             String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-            APIResource apiResource = APIResourceManagementServiceHolder.getApiResourceManager()
-                    .getAPIResourceById(apiResourceId, tenantDomain);
+            APIResource apiResource = apiResourceManager.getAPIResourceById(apiResourceId, tenantDomain);
             if (apiResource == null) {
                 return;
             }
             handleSystemAPI(apiResource);
-            APIResourceManagementServiceHolder.getApiResourceManager().deleteAPIScopeByScopeName(apiResourceId,
+            apiResourceManager.deleteAPIScopeByScopeName(apiResourceId,
                     scopeName, tenantDomain);
         } catch (APIResourceMgtException e) {
             throw APIResourceMgtEndpointUtil.handleAPIResourceMgtException(e);
@@ -373,15 +376,13 @@ public class ServerAPIResourceManagementService {
             }
             String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
 
-            APIResource apiResource = APIResourceManagementServiceHolder.getApiResourceManager()
-                    .getAPIResourceById(apiResourceId, tenantDomain);
+            APIResource apiResource = apiResourceManager.getAPIResourceById(apiResourceId, tenantDomain);
             if (apiResource == null) {
                 throw APIResourceMgtEndpointUtil.handleException(Response.Status.NOT_FOUND,
                         APIResourceMgtEndpointConstants.ErrorMessage.ERROR_CODE_API_RESOURCE_NOT_FOUND, apiResourceId);
             }
 
-            Scope scopeWithMetadata = APIResourceManagementServiceHolder.getApiResourceManager()
-                    .getScopeByName(scopeName, tenantDomain);
+            Scope scopeWithMetadata = apiResourceManager.getScopeByName(scopeName, tenantDomain);
             if (scopeWithMetadata == null) {
                 throw APIResourceMgtEndpointUtil.handleException(Response.Status.NOT_FOUND,
                         APIResourceMgtEndpointConstants.ErrorMessage.ERROR_CODE_INVALID_SCOPE_NAME);
@@ -400,8 +401,7 @@ public class ServerAPIResourceManagementService {
                     .apiID(scopeWithMetadata.getApiID())
                     .orgID(scopeWithMetadata.getOrgID());
             Scope scopeForUpdate = scopeBuilder.build();
-            APIResourceManagementServiceHolder.getApiResourceManager().updateScopeMetadata(scopeForUpdate, apiResource,
-                    tenantDomain);
+            apiResourceManager.updateScopeMetadata(scopeForUpdate, apiResource, tenantDomain);
         } catch (APIResourceMgtException e) {
             throw APIResourceMgtEndpointUtil.handleAPIResourceMgtException(e);
         }
@@ -416,8 +416,8 @@ public class ServerAPIResourceManagementService {
     public List<Scope> getScopesByTenant(String filter) {
 
         try {
-            return APIResourceManagementServiceHolder.getApiResourceManager()
-                    .getScopesByTenantDomain(CarbonContext.getThreadLocalCarbonContext().getTenantDomain(), filter);
+            return apiResourceManager.getScopesByTenantDomain(CarbonContext.getThreadLocalCarbonContext()
+                    .getTenantDomain(), filter);
         } catch (APIResourceMgtException e) {
             throw APIResourceMgtEndpointUtil.handleAPIResourceMgtException(e);
         }

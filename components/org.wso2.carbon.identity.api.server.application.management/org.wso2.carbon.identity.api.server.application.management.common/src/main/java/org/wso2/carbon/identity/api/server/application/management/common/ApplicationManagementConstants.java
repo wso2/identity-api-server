@@ -87,6 +87,12 @@ public class ApplicationManagementConstants {
     public static final String CODE_IDTOKEN = "code id_token";
     public static final String CODE_IDTOKEN_TOKEN = "code id_token token";
 
+    // LoginFlow AI Constants.
+    public static final String CLAIM_URI_KEY = "claimURI";
+    public static final String DESCRIPTION_KEY = "description";
+    public static final String AI_RESPONSE_DATA_KEY = "data";
+    public static final String AI_RESPONSE_STATUS_KEY = "status";
+
     /**
      * Enums for error messages.
      */
@@ -209,7 +215,18 @@ public class ApplicationManagementConstants {
         ERROR_RETRIEVING_USER_BY_ID("65503", "Error occurred while retrieving user",
                 "Error occurred while retrieving user by userid: %s."),
         ERROR_RETRIEVING_USERSTORE_MANAGER("65504", "Error retrieving userstore manager.",
-                "Error occurred while retrieving userstore manager.");
+                "Error occurred while retrieving userstore manager."),
+
+        // Login Flow AI Service related error messages.
+        ERROR_CODE_ERROR_GETTING_LOGINFLOW_AI_RESULT_STATUS("65600",
+                "Error occurred while getting the Login Flow AI result status.",
+                "Error occurred while getting the Login Flow AI result status."),
+        ERROR_CODE_ERROR_GETTING_LOGINFLOW_AI_RESULT("65601",
+                "Error occurred while getting the Login Flow AI result.",
+                "Error occurred while getting the Login Flow AI result."),
+        ERROR_WHILE_CONVERTING_LOGINFLOW_AI_SERVER_RESPONSE("65602",
+                "Error occurred while converting the AI server response.",
+                "Could not convert the AI server response to a valid response.");
 
         private final String code;
         private final String message;

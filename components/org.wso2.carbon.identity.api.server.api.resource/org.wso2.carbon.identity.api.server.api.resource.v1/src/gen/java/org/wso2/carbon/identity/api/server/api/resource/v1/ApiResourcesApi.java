@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.api.resource.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
@@ -41,6 +40,7 @@ import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
+import org.wso2.carbon.identity.api.server.api.resource.v1.factories.ApiResourcesApiServiceFactory;
 
 import javax.validation.constraints.*;
 
@@ -49,8 +49,12 @@ import javax.validation.constraints.*;
 
 public class ApiResourcesApi  {
 
-    @Autowired
-    private ApiResourcesApiService delegate;
+    private final ApiResourcesApiService delegate;
+
+    public ApiResourcesApi() {
+
+        this.delegate = ApiResourcesApiServiceFactory.getApiResourcesApi();
+    }
 
     @Valid
     @POST

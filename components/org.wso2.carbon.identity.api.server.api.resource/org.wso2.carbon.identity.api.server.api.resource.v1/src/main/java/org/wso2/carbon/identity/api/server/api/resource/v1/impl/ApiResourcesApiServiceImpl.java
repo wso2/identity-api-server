@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.api.resource.v1.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCreationModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourcePatchModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceResponse;
@@ -29,6 +28,7 @@ import org.wso2.carbon.identity.api.server.api.resource.v1.ScopePatchModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants;
 import org.wso2.carbon.identity.api.server.api.resource.v1.core.AuthorizationDetailsTypeManagementService;
 import org.wso2.carbon.identity.api.server.api.resource.v1.core.ServerAPIResourceManagementService;
+import org.wso2.carbon.identity.api.server.api.resource.v1.factories.ServerAPIResourceManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.application.common.model.AuthorizationDetailsType;
 
@@ -44,8 +44,17 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
  */
 public class ApiResourcesApiServiceImpl implements ApiResourcesApiService {
 
-    @Autowired
-    ServerAPIResourceManagementService serverAPIResourceManagementService;
+    private final ServerAPIResourceManagementService serverAPIResourceManagementService;
+
+    public ApiResourcesApiServiceImpl() {
+
+        try {
+            this.serverAPIResourceManagementService = ServerAPIResourceManagementServiceFactory
+                    .getServerAPIResourceManagementService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating API resource management service.", e);
+        }
+    }
 
     @Autowired
     AuthorizationDetailsTypeManagementService typeMgtService;

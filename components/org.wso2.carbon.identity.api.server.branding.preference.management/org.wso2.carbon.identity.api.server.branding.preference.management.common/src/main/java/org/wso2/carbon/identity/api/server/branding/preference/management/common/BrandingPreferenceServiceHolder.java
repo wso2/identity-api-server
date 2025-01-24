@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.com).
+ * Copyright (c) 2021-2024, WSO2 LLC. (http://www.wso2.com).
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
+ * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,14 +18,26 @@
 
 package org.wso2.carbon.identity.api.server.branding.preference.management.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.branding.preference.management.core.BrandingPreferenceManager;
+import org.wso2.carbon.identity.branding.preference.management.core.ai.BrandingAIPreferenceManager;
 
 /**
  * Service holder class for branding preference management.
  */
 public class BrandingPreferenceServiceHolder {
 
-    private static BrandingPreferenceManager brandingPreferenceManager;
+    private static class BrandingPreferenceManagerHolder {
+
+        static final BrandingPreferenceManager SERVICE = (BrandingPreferenceManager) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(BrandingPreferenceManager.class, null);
+    }
+
+    private static class BrandingAIPreferenceManagerServiceHolder {
+
+        static final BrandingAIPreferenceManager SERVICE = (BrandingAIPreferenceManager) PrivilegedCarbonContext.
+                getThreadLocalCarbonContext().getOSGiService(BrandingAIPreferenceManager.class, null);
+    }
 
     /**
      * Get BrandingPreferenceManager OSGi service.
@@ -34,16 +46,16 @@ public class BrandingPreferenceServiceHolder {
      */
     public static BrandingPreferenceManager getBrandingPreferenceManager() {
 
-        return brandingPreferenceManager;
+        return BrandingPreferenceManagerHolder.SERVICE;
     }
 
     /**
-     * Set BrandingPreferenceManager OSGi service.
+     * Get AIBrandingPreferenceManager OSGi service.
      *
-     * @param brandingPreferenceManager Branding Preference Manager.
+     * @return AI Branding Preference Manager.
      */
-    public static void setBrandingPreferenceManager(BrandingPreferenceManager brandingPreferenceManager) {
+    public static BrandingAIPreferenceManager getBrandingPreferenceAiManager() {
 
-        BrandingPreferenceServiceHolder.brandingPreferenceManager = brandingPreferenceManager;
+        return BrandingAIPreferenceManagerServiceHolder.SERVICE;
     }
 }

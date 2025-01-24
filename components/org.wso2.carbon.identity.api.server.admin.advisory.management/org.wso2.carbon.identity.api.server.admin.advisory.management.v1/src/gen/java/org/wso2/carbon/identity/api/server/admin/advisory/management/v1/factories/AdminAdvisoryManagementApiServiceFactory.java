@@ -26,10 +26,16 @@ import org.wso2.carbon.identity.api.server.admin.advisory.management.v1.impl.Adm
  */
 public class AdminAdvisoryManagementApiServiceFactory {
 
-   private static final AdminAdvisoryManagementApiService service = new AdminAdvisoryManagementApiServiceImpl();
+   private static final AdminAdvisoryManagementApiService SERVICE = new AdminAdvisoryManagementApiServiceImpl();
 
+   /**
+    * Get admin advisory management service.
+    *
+    * @return AdminAdvisoryManagementApiService
+    */
    public static AdminAdvisoryManagementApiService getAdminAdvisoryManagementApi() {
-      return service;
+
+      return SERVICE;
    }
 
    private AdminAdvisoryManagementApiServiceFactory() {
