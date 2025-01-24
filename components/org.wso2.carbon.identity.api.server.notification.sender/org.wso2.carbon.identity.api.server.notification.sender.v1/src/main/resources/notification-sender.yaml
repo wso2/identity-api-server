@@ -608,6 +608,291 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /notification-senders/push:
+    get:
+      tags:
+        - Push Notification Senders
+      summary: Get a list of push notification senders
+      description: |
+        This API provides the capability to retrieve the list of push notification senders. <br>
+          <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/configmgt/view <br>
+          <b>Scope required:</b> <br>
+            * internal_config_mgt_view
+      operationId: getPushSenders
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PushProviderList'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "405":
+          description: Method Not Allowed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - Push Notification Senders
+      summary: Create a push notification sender
+      description: |
+        This API provides the capability to create a push notification sender.\n\nIf the 'name' is not defined, 'PushPublisher' is taken as the default name. <br>
+          <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/configmgt/add <br>
+          <b>Scope required:</b> <br>
+            * internal_config_mgt_add
+      operationId: createPushSender
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PushSenderAdd'
+            example:
+              provider: FCM
+              properties:
+                - key: FCM.serviceAccount
+                  value: {"FCMUrl": "UrlValue"}
+      responses:
+        "201":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PushSender'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "405":
+          description: Method Not Allowed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /notification-senders/push/{sender-name}:
+    get:
+      tags:
+        - Push Notification Senders
+      summary: Retrieve a push notification sender by name
+      description: |
+        This API provides the capability to retrieve a push notification sender by name.
+        The URL encoded push notification sender name is used as sender-name.<br>
+          <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/configmgt/view <br>
+          <b>Scope required:</b> <br>
+            * internal_config_mgt_view
+      operationId: getPushSender
+      parameters:
+        - name: sender-name
+          in: path
+          description: name of the push notification sender
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PushSender'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "405":
+          description: Method Not Allowed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - Push Notification Senders
+      summary: Update a push notification sender
+      description: |
+        This API provides the capability to update a push notification sender by name.
+        The URL encoded push notification sender name is used as sender-name.<br>
+          <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/configmgt/update <br>
+          <b>Scope required:</b> <br>
+            * internal_config_mgt_update
+      operationId: updatePushSender
+      parameters:
+        - name: sender-name
+          in: path
+          description: name of the push notification sender
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PushSenderUpdateRequest'
+            example:
+              provider: FCM
+              properties:
+                - key: FCM.serviceAccount
+                  value: {"FCMUrl": "UrlValue"}
+        required: true
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PushSender'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "405":
+          description: Method Not Allowed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - Push Notification Senders
+      summary: Delete a push notification sender by name
+      description: |
+        This API provides the capability to delete a push notification sender by name.
+        The URL encoded push notification sender name is used as sender-name.<br>
+          <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/configmgt/delete <br>
+          <b>Scope required:</b> <br>
+            * internal_config_mgt_delete
+      operationId: deletePushSender
+      parameters:
+        - name: sender-name
+          in: path
+          description: name of the email sender
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "405":
+          description: Method Not Allowed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
     Error:
@@ -690,6 +975,27 @@ components:
               value: "X-Version: 1, Authorization: bearer ,Accept: application/json ,Content-Type: application/json"
           items:
             $ref: '#/components/schemas/Properties'
+    PushSenderAdd:
+      required:
+        - provider
+        - properties
+      type: object
+      properties:
+        name:
+          type: string
+          example: PushPublisher
+        provider:
+          type: string
+          example: fcm
+        properties:
+          type: array
+          example:
+            - key: fcm.serviceAccount
+              value: jsonString
+            - key: aws.keyId
+              value: sampleKeyId
+          items:
+            $ref: '#/components/schemas/Properties'
     EmailSender:
       required:
         - fromAddress
@@ -761,6 +1067,26 @@ components:
               value: "X-Version: 1, Authorization: bearer ,Accept: application/json ,Content-Type: application/json"
           items:
             $ref: '#/components/schemas/Properties'
+    PushSender:
+      required:
+        - provider
+        - name
+      properties:
+        name:
+          type: string
+          example: PushPublisher
+        provider:
+          type: string
+          example: fcm
+        properties:
+          type: array
+          example:
+            - key: fcm.serviceAccount
+              value: "jsonString"
+            - key: aws.keyId
+              value: "sampleKeyId"
+          items:
+            $ref: '#/components/schemas/Properties'
     EmailSenderUpdateRequest:
       required:
         - fromAddress
@@ -823,6 +1149,23 @@ components:
               value: "X-Version: 1, Authorization: bearer ,Accept: application/json ,Content-Type: application/json"
           items:
             $ref: '#/components/schemas/Properties'
+    PushSenderUpdateRequest:
+      required:
+        - provider
+        - properties
+      type: object
+      properties:
+        provider:
+          type: string
+        properties:
+          type: array
+          example:
+            - key: fcm.serviceAccount
+              value: "jsonString"
+            - key: aws.keyId
+              value: "sampleKeyId"
+          items:
+            $ref: '#/components/schemas/Properties'
     Properties:
       required:
         - key
@@ -844,6 +1187,10 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/SMSSender'
+    PushProviderList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PushSender'
   parameters:
     typeQueryParam:
       name: type
