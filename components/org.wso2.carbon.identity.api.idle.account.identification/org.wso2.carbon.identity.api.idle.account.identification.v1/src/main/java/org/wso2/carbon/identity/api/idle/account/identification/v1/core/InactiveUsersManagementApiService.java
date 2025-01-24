@@ -114,19 +114,19 @@ public class InactiveUsersManagementApiService {
                                     excludeBeforeDate, tenantDomain);
                 }
                 return buildResponse(inactiveUsers);
-            } else {
-                List<ExpressionNode> expressionNodes = getExpressionNodes(filter);
-                if (validateExpressionNodes(expressionNodes)) {
-                    boolean isDisabled = Boolean.parseBoolean(expressionNodes.get(0).getValue());
-
-                    inactiveUsers = IdleAccountIdentificationServiceHolder.getIdleAccountIdentificationService()
-                            .filterInactiveUsersIfDisabled(inactiveAfterDate, excludeBeforeDate, tenantDomain,
-                                    isDisabled);
-
-                    return buildResponse(inactiveUsers);
-                }
-                return getInactiveUsers(inactiveAfter, excludeBefore, tenantDomain);
             }
+
+            List<ExpressionNode> expressionNodes = getExpressionNodes(filter);
+            if (validateExpressionNodes(expressionNodes)) {
+                boolean isDisabled = Boolean.parseBoolean(expressionNodes.get(0).getValue());
+
+                inactiveUsers = IdleAccountIdentificationServiceHolder.getIdleAccountIdentificationService()
+                        .filterInactiveUsersIfDisabled(inactiveAfterDate, excludeBeforeDate, tenantDomain,
+                                isDisabled);
+
+                return buildResponse(inactiveUsers);
+            }
+            return getInactiveUsers(inactiveAfter, excludeBefore, tenantDomain);
 
         } catch (IdleAccountIdentificationException e) {
             throw handleIdleAccIdentificationException(e, ErrorMessage.ERROR_RETRIEVING_INACTIVE_USERS, tenantDomain);
@@ -320,16 +320,16 @@ public class InactiveUsersManagementApiService {
         // Filter example : isDisabled eq true.
         List<ExpressionNode> expressionNodes = new ArrayList<>();
         FilterTreeBuilder filterTreeBuilder;
-        try {
-            if (StringUtils.isNotBlank(filter)) {
+        if (StringUtils.isNotBlank(filter)) {
+            try {
                 filterTreeBuilder = new FilterTreeBuilder(filter);
                 Node rootNode = filterTreeBuilder.buildTree();
                 setExpressionNodeList(rootNode, expressionNodes);
+            } catch (IOException | IdentityException e) {
+                ErrorMessage error = ErrorMessage.ERROR_INVALID_FILTER;
+                throw new IdleAccountIdentificationClientException(error.getCode(), error.getMessage(),
+                        String.format(error.getDescription()));
             }
-        } catch (IOException | IdentityException e) {
-            ErrorMessage error = ErrorMessage.ERROR_INVALID_FILTER;
-            throw new IdleAccountIdentificationClientException(error.getCode(), error.getMessage(),
-                    String.format(error.getDescription()));
         }
         return expressionNodes;
     }
@@ -344,21 +344,19 @@ public class InactiveUsersManagementApiService {
     private void setExpressionNodeList(Node node, List<ExpressionNode> expression)
             throws IdleAccountIdentificationClientException {
 
-        if (node instanceof ExpressionNode) {
-            if (StringUtils.isNotBlank(((ExpressionNode) node).getAttributeValue())) {
-                if (((ExpressionNode) node).getAttributeValue().contains(IS_DISABLED)) {
-                    if (TRUE_VALUE.contains(((ExpressionNode) node).getValue())) {
-                        ((ExpressionNode) node).setValue(TRUE_VALUE);
-                    } else if (FALSE_VALUE.contains(((ExpressionNode) node).getValue())) {
-                        ((ExpressionNode) node).setValue(FALSE_VALUE);
-                    } else {
-                        String message = "Invalid value: " + ((ExpressionNode) node).getValue() + "is passed for '" +
-                                IS_DISABLED + "' attribute in the filter. It should be '" + TRUE_VALUE + "' or '" +
-                                FALSE_VALUE + "'";
-                        ErrorMessage error = ErrorMessage.ERROR_INVALID_FILTER;
-                        throw new IdleAccountIdentificationClientException(error.getCode(), error.getMessage(),
-                                message);
-                    }
+        if (node instanceof ExpressionNode && StringUtils.isNotBlank(((ExpressionNode) node).getAttributeValue())) {
+            if (((ExpressionNode) node).getAttributeValue().contains(IS_DISABLED)) {
+                if (TRUE_VALUE.contains(((ExpressionNode) node).getValue())) {
+                    ((ExpressionNode) node).setValue(TRUE_VALUE);
+                } else if (FALSE_VALUE.contains(((ExpressionNode) node).getValue())) {
+                    ((ExpressionNode) node).setValue(FALSE_VALUE);
+                } else {
+                    String message = "Invalid value: " + ((ExpressionNode) node).getValue() + "is passed for '" +
+                            IS_DISABLED + "' attribute in the filter. It should be '" + TRUE_VALUE + "' or '" +
+                            FALSE_VALUE + "'";
+                    ErrorMessage error = ErrorMessage.ERROR_INVALID_FILTER;
+                    throw new IdleAccountIdentificationClientException(error.getCode(), error.getMessage(),
+                            message);
                 }
             }
             expression.add((ExpressionNode) node);
@@ -375,7 +373,7 @@ public class InactiveUsersManagementApiService {
     private boolean validateExpressionNodes(List<ExpressionNode> expressionNodes)
             throws IdleAccountIdentificationClientException {
 
-        if (expressionNodes.get(0).getAttributeValue().equals(IS_DISABLED)) {
+        if (IS_DISABLED.equals(expressionNodes.get(0).getAttributeValue())) {
             return true;
         }
 
