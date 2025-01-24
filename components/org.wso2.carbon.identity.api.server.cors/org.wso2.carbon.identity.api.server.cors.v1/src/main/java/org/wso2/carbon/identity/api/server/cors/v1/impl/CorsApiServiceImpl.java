@@ -32,6 +32,7 @@ public class CorsApiServiceImpl implements CorsApiService {
     private final CORSService corsService;
 
     public CorsApiServiceImpl() {
+
         try {
             this.corsService = CORSServiceFactory.getCORSService();
         } catch (IllegalStateException e) {
