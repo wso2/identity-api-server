@@ -3676,10 +3676,13 @@ components:
       properties:
         enable:
           type: boolean
+          description: "Indicates whether the hybrid flow is enabled."
           example: true
         responseType:
           type: string
-          example: code id_token
+          description: "Specifies the allowed response types for the hybrid flow, provided as a comma-separated string. 
+          The supported combinations are: 'code token', 'code id_token token', and 'code id_token'."
+          example: code id_token,code token
     AccessTokenConfiguration:
       type: object
       properties:
