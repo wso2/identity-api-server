@@ -23,11 +23,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
 import org.wso2.carbon.identity.api.resource.mgt.APIResourceMgtClientException;
+import org.wso2.carbon.identity.api.server.api.resource.common.APIResourceManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesCreationModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesGetModel;
 import org.wso2.carbon.identity.application.common.model.AuthorizationDetailsType;
-import org.wso2.carbon.identity.oauth2.rar.AuthorizationDetailsSchemaValidator;
-import org.wso2.carbon.identity.oauth2.rar.exception.AuthorizationDetailsProcessingException;
+import org.wso2.carbon.identity.oauth.rar.exception.AuthorizationDetailsProcessingException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -148,7 +148,8 @@ public class AuthorizationDetailsTypeMgtUtil {
         }
 
         try {
-            if (AuthorizationDetailsSchemaValidator.getInstance().isValidSchema(new JSONObject(schema).toString())) {
+            if (APIResourceManagementServiceHolder.getAuthorizationDetailsSchemaValidator()
+                    .isValidSchema(new JSONObject(schema).toString())) {
                 return true;
             }
 

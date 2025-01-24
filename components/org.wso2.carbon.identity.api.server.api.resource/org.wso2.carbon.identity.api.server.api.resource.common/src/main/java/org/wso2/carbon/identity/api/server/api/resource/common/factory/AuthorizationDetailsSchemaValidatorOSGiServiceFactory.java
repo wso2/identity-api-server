@@ -20,15 +20,15 @@ package org.wso2.carbon.identity.api.server.api.resource.common.factory;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.api.resource.mgt.AuthorizationDetailsTypeManager;
+import org.wso2.carbon.identity.oauth.rar.core.AuthorizationDetailsSchemaValidator;
 
 /**
- * Factory class for {@link AuthorizationDetailsTypeManager}.
+ * Factory class for {@link AuthorizationDetailsSchemaValidator}.
  */
-public class AuthorizationDetailsTypeMgtOSGiServiceFactory extends
-        AbstractFactoryBean<AuthorizationDetailsTypeManager> {
+public class AuthorizationDetailsSchemaValidatorOSGiServiceFactory extends
+        AbstractFactoryBean<AuthorizationDetailsSchemaValidator> {
 
-    private AuthorizationDetailsTypeManager authorizationDetailsTypeManager;
+    private AuthorizationDetailsSchemaValidator authorizationDetailsSchemaValidator;
 
     @Override
     public Class<?> getObjectType() {
@@ -37,15 +37,15 @@ public class AuthorizationDetailsTypeMgtOSGiServiceFactory extends
     }
 
     @Override
-    protected AuthorizationDetailsTypeManager createInstance() throws Exception {
+    protected AuthorizationDetailsSchemaValidator createInstance() throws Exception {
 
-        if (this.authorizationDetailsTypeManager == null) {
-            this.authorizationDetailsTypeManager = (AuthorizationDetailsTypeManager) PrivilegedCarbonContext.
-                    getThreadLocalCarbonContext().getOSGiService(AuthorizationDetailsTypeManager.class, null);
-            if (this.authorizationDetailsTypeManager == null) {
-                throw new Exception("Unable to retrieve AuthorizationDetailsTypeManager service.");
+        if (this.authorizationDetailsSchemaValidator == null) {
+            this.authorizationDetailsSchemaValidator = (AuthorizationDetailsSchemaValidator) PrivilegedCarbonContext.
+                    getThreadLocalCarbonContext().getOSGiService(AuthorizationDetailsSchemaValidator.class, null);
+            if (this.authorizationDetailsSchemaValidator == null) {
+                throw new Exception("Unable to retrieve AuthorizationDetailsSchemaValidator service.");
             }
         }
-        return this.authorizationDetailsTypeManager;
+        return this.authorizationDetailsSchemaValidator;
     }
 }

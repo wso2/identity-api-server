@@ -22,6 +22,7 @@ import org.wso2.carbon.identity.api.resource.collection.mgt.APIResourceCollectio
 import org.wso2.carbon.identity.api.resource.mgt.APIResourceManager;
 import org.wso2.carbon.identity.api.resource.mgt.AuthorizationDetailsTypeManager;
 import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
+import org.wso2.carbon.identity.oauth.rar.core.AuthorizationDetailsSchemaValidator;
 
 /**
  * Service holder class for api resource management.
@@ -32,6 +33,7 @@ public class APIResourceManagementServiceHolder {
     private static APIResourceCollectionManager apiResourceCollectionManager;
     private static OAuthAdminServiceImpl oAuthAdminServiceImpl;
     private static AuthorizationDetailsTypeManager authorizationDetailsTypeManager;
+    private static AuthorizationDetailsSchemaValidator authorizationDetailsSchemaValidator;
 
     /**
      * Get APIResourceManager osgi service.
@@ -112,5 +114,26 @@ public class APIResourceManagementServiceHolder {
             AuthorizationDetailsTypeManager authorizationDetailsTypeManager) {
 
         APIResourceManagementServiceHolder.authorizationDetailsTypeManager = authorizationDetailsTypeManager;
+    }
+
+    /**
+     * Set {@link AuthorizationDetailsSchemaValidator} instance.
+     *
+     * @return AuthorizationDetailsSchemaValidator instance.
+     */
+    public static AuthorizationDetailsSchemaValidator getAuthorizationDetailsSchemaValidator() {
+
+        return authorizationDetailsSchemaValidator;
+    }
+
+    /**
+     * Set {@link AuthorizationDetailsSchemaValidator} instance.
+     *
+     * @param authorizationDetailsSchemaValidator AuthorizationDetailsSchemaValidator instance.
+     */
+    public static void setAuthorizationDetailsSchemaValidator(
+            AuthorizationDetailsSchemaValidator authorizationDetailsSchemaValidator) {
+
+        APIResourceManagementServiceHolder.authorizationDetailsSchemaValidator = authorizationDetailsSchemaValidator;
     }
 }
