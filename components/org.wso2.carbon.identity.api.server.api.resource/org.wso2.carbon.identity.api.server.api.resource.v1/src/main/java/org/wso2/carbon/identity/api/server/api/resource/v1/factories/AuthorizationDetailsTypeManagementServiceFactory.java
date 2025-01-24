@@ -24,7 +24,7 @@ import org.wso2.carbon.identity.api.server.api.resource.common.APIResourceManage
 import org.wso2.carbon.identity.api.server.api.resource.v1.core.AuthorizationDetailsTypeManagementService;
 
 /**
- * Factory class for ServerAPIResourceManagementService.
+ * Factory class for AuthorizationDetailsTypeManagementService.
  */
 public class AuthorizationDetailsTypeManagementServiceFactory {
 
