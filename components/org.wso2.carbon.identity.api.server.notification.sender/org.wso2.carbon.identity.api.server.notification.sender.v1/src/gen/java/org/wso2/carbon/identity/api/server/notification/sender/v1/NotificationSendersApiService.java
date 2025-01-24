@@ -26,6 +26,9 @@ import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSen
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSenderAdd;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSenderUpdateRequest;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.Error;
+import org.wso2.carbon.identity.api.server.notification.sender.v1.model.PushSender;
+import org.wso2.carbon.identity.api.server.notification.sender.v1.model.PushSenderAdd;
+import org.wso2.carbon.identity.api.server.notification.sender.v1.model.PushSenderUpdateRequest;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.SMSSender;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.SMSSenderAdd;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.SMSSenderUpdateRequest;
@@ -36,9 +39,13 @@ public interface NotificationSendersApiService {
 
       public Response createEmailSender(EmailSenderAdd emailSenderAdd);
 
+      public Response createPushSender(PushSenderAdd pushSenderAdd);
+
       public Response createSMSSender(SMSSenderAdd smSSenderAdd);
 
       public Response deleteEmailSender(String senderName);
+
+      public Response deletePushSender(String senderName);
 
       public Response deleteSMSSender(String senderName);
 
@@ -46,11 +53,17 @@ public interface NotificationSendersApiService {
 
       public Response getEmailSenders();
 
+      public Response getPushSender(String senderName);
+
+      public Response getPushSenders();
+
       public Response getSMSSender(String senderName);
 
       public Response getSMSSenders();
 
       public Response updateEmailSender(String senderName, EmailSenderUpdateRequest emailSenderUpdateRequest);
+
+      public Response updatePushSender(String senderName, PushSenderUpdateRequest pushSenderUpdateRequest);
 
       public Response updateSMSSender(String senderName, SMSSenderUpdateRequest smSSenderUpdateRequest);
 }
