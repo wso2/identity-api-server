@@ -99,22 +99,4 @@ public class SelfServiceMgtServiceFactory {
         }
         return service;
     }
-
-    private static ServerApplicationManagementService getServerApplicationManagementService() {
-
-        try {
-            return ServerApplicationManagementServiceFactory.getServerApplicationManagementService();
-        } catch (IllegalStateException e) {
-            throw new RuntimeException("Error occurred while initiating ServerApplicationManagementService.", e);
-        }
-    }
-
-    private static ServerUserStoreService getServerUserStoreService() {
-
-        try {
-            return ServerUserStoreServiceFactory.getServerUserStoreService();
-        } catch (IllegalStateException e) {
-            throw new RuntimeException("Error occurred while initiating ServerUserStoreService.", e);
-        }
-    }
 }
