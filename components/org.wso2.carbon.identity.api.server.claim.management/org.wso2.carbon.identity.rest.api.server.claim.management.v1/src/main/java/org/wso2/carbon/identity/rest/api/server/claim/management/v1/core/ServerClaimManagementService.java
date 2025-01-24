@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) (2019-2025), WSO2 LLC. (http://www.wso2.org).
+ *  Copyright (c) (2019-2023), WSO2 LLC. (http://www.wso2.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.common.error.bulk.BulkAPIError;
 import org.wso2.carbon.identity.api.server.common.error.bulk.BulkErrorResponse;
+import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataClientException;
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
 import org.wso2.carbon.identity.claim.metadata.mgt.model.AttributeMapping;
@@ -46,6 +47,7 @@ import org.wso2.carbon.identity.claim.metadata.mgt.model.ExternalClaim;
 import org.wso2.carbon.identity.claim.metadata.mgt.model.LocalClaim;
 import org.wso2.carbon.identity.claim.metadata.mgt.util.ClaimConstants;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
+import org.wso2.carbon.identity.organization.management.service.OrganizationManager;
 import org.wso2.carbon.identity.organization.management.service.exception.OrganizationManagementException;
 import org.wso2.carbon.identity.organization.management.service.util.OrganizationManagementUtil;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.AttributeMappingDTO;
@@ -95,7 +97,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import static org.wso2.carbon.identity.api.server.claim.management.common.ClaimManagementDataHolder.getClaimMetadataManagementService;
-import static org.wso2.carbon.identity.api.server.claim.management.common.ClaimManagementDataHolder.getOrganizationManager;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.CMT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_ATTRIBUTE_FILTERING_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_CLAIMS_NOT_FOUND_FOR_DIALECT;
@@ -178,6 +179,16 @@ public class ServerClaimManagementService {
 
     public static final String FALSE = "false";
 
+    private final ClaimMetadataManagementService claimMetadataManagementService;
+    private final OrganizationManager organizationManager;
+
+    public ServerClaimManagementService(ClaimMetadataManagementService claimMetadataManagementService,
+                                        OrganizationManager organizationManager) {
+
+        this.claimMetadataManagementService = claimMetadataManagementService;
+        this.organizationManager = organizationManager;
+    }
+
     /**
      * Add a claim dialect.
      *
@@ -209,7 +220,7 @@ public class ServerClaimManagementService {
 
         try {
             validateClaimModificationEligibility();
-            getClaimMetadataManagementService().addClaimDialect(
+            claimMetadataManagementService.addClaimDialect(
                     createClaimDialect(dialectURI),
                     ContextLoader.getTenantDomainFromContext());
         } catch (ClaimMetadataException e) {
@@ -235,7 +246,7 @@ public class ServerClaimManagementService {
             return;
         }
         try {
-            getClaimMetadataManagementService().removeClaimDialect(
+            claimMetadataManagementService.removeClaimDialect(
                     new ClaimDialect(claimDialectURI),
                     ContextLoader.getTenantDomainFromContext());
         } catch (ClaimMetadataException e) {
@@ -253,7 +264,7 @@ public class ServerClaimManagementService {
     public ClaimDialectResDTO getClaimDialect(String dialectId) {
 
         try {
-            List<ClaimDialect> claimDialectList = getClaimMetadataManagementService().getClaimDialects(
+            List<ClaimDialect> claimDialectList = claimMetadataManagementService.getClaimDialects(
                     ContextLoader.getTenantDomainFromContext());
             String decodedDialectId;
             if (StringUtils.equals(dialectId, LOCAL_DIALECT_PATH)) {
@@ -287,8 +298,8 @@ public class ServerClaimManagementService {
 
         handleNotImplementedCapabilities(limit, offset, filter, sort);
         try {
-            List<ClaimDialect> claimDialectList = getClaimMetadataManagementService().getClaimDialects(
-                    ContextLoader.getTenantDomainFromContext());
+            List<ClaimDialect> claimDialectList = claimMetadataManagementService.getClaimDialects(ContextLoader
+                    .getTenantDomainFromContext());
 
             return getClaimDialectResDTOs(claimDialectList);
 
@@ -312,8 +323,7 @@ public class ServerClaimManagementService {
             validateClaimModificationEligibility();
             // If the old and new dialect uri is the same we don't need to do a db update.
             if (!StringUtils.equals(base64DecodeId(dialectId), claimDialectReqDTO.getDialectURI())) {
-                getClaimMetadataManagementService().renameClaimDialect(
-                        createClaimDialect(base64DecodeId(dialectId)),
+                claimMetadataManagementService.renameClaimDialect(createClaimDialect(base64DecodeId(dialectId)),
                         createClaimDialect(claimDialectReqDTO),
                         ContextLoader.getTenantDomainFromContext());
             } else {
@@ -351,8 +361,8 @@ public class ServerClaimManagementService {
         try {
             validateClaimModificationEligibility();
             validateAttributeMappings(localClaimReqDTO.getAttributeMapping());
-            getClaimMetadataManagementService().addLocalClaim(createLocalClaim(localClaimReqDTO),
-                    ContextLoader.getTenantDomainFromContext());
+            claimMetadataManagementService.addLocalClaim(createLocalClaim(localClaimReqDTO), ContextLoader
+                    .getTenantDomainFromContext());
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_ADDING_LOCAL_CLAIM,
                     localClaimReqDTO.getClaimURI());
@@ -379,9 +389,7 @@ public class ServerClaimManagementService {
             return;
         }
         try {
-            getClaimMetadataManagementService().removeLocalClaim(
-                    claimURI,
-                    ContextLoader.getTenantDomainFromContext());
+            claimMetadataManagementService.removeLocalClaim(claimURI, ContextLoader.getTenantDomainFromContext());
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_DELETING_LOCAL_CLAIM, claimId);
         }
@@ -397,8 +405,8 @@ public class ServerClaimManagementService {
     public LocalClaimResDTO getLocalClaim(String claimId) {
 
         try {
-            List<LocalClaim> localClaimList = getClaimMetadataManagementService().getLocalClaims(
-                    ContextLoader.getTenantDomainFromContext());
+            List<LocalClaim> localClaimList = claimMetadataManagementService.getLocalClaims(ContextLoader
+                    .getTenantDomainFromContext());
 
             LocalClaim localClaim = extractLocalClaimFromClaimList(base64DecodeId(claimId), localClaimList);
 
@@ -430,8 +438,8 @@ public class ServerClaimManagementService {
         handleNotImplementedCapabilities(attributes, limit, offset, filter, sort);
 
         try {
-            List<LocalClaim> localClaimList = getClaimMetadataManagementService().getLocalClaims(
-                    ContextLoader.getTenantDomainFromContext());
+            List<LocalClaim> localClaimList = claimMetadataManagementService.getLocalClaims(ContextLoader
+                    .getTenantDomainFromContext());
 
             if (excludeIdentityClaims != null && excludeIdentityClaims) {
                 localClaimList = localClaimList.stream()
@@ -473,7 +481,7 @@ public class ServerClaimManagementService {
                         BAD_REQUEST);
             }
             validateAttributeMappings(localClaimReqDTO.getAttributeMapping());
-            getClaimMetadataManagementService().updateLocalClaim(createLocalClaim(localClaimReqDTO),
+            claimMetadataManagementService.updateLocalClaim(createLocalClaim(localClaimReqDTO),
                     ContextLoader.getTenantDomainFromContext());
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_UPDATING_LOCAL_CLAIM, claimId);
@@ -551,7 +559,7 @@ public class ServerClaimManagementService {
     private void deleteObsoleteLocalClaims(List<LocalClaimReqDTO> localClaimReqDTOList, List<ClaimErrorDTO> errors)
             throws ClaimMetadataException {
 
-        List<String> claimsToDelete =  getLocalClaimResDTOs(getClaimMetadataManagementService()
+        List<String> claimsToDelete =  getLocalClaimResDTOs(claimMetadataManagementService
                     .getLocalClaims(ContextLoader.getTenantDomainFromContext())).stream()
                     .map(LocalClaimResDTO::getClaimURI)
                     .filter(claimURI -> localClaimReqDTOList.stream()
@@ -627,12 +635,12 @@ public class ServerClaimManagementService {
 
         try {
             if (LOCAL_DIALECT_PATH.equals(dialectId)) {
-                List<LocalClaimResDTO> localClaimResDTOList = getLocalClaimResDTOs(getClaimMetadataManagementService()
+                List<LocalClaimResDTO> localClaimResDTOList = getLocalClaimResDTOs(claimMetadataManagementService
                         .getLocalClaims(ContextLoader.getTenantDomainFromContext()));
                 claimResDTOList.addAll(localClaimResDTOList);
                 dialectConfiguration.setClaims(claimResDTOList);
             } else {
-                List<ExternalClaim> externalClaimList = getClaimMetadataManagementService().getExternalClaims(
+                List<ExternalClaim> externalClaimList = claimMetadataManagementService.getExternalClaims(
                         base64DecodeId(dialectId),
                         ContextLoader.getTenantDomainFromContext());
                 List<ExternalClaimResDTO>  externalClaimResDTOList = getExternalClaimResDTOs(externalClaimList);
@@ -742,8 +750,7 @@ public class ServerClaimManagementService {
                 throw handleClaimManagementClientError(ERROR_CODE_INVALID_DIALECT_ID, NOT_FOUND, dialectId);
             }
 
-            getClaimMetadataManagementService().addExternalClaim(
-                    createExternalClaim(dialectId, externalClaimReqDTO),
+            claimMetadataManagementService.addExternalClaim(createExternalClaim(dialectId, externalClaimReqDTO),
                     ContextLoader.getTenantDomainFromContext());
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_ADDING_EXTERNAL_CLAIM,
@@ -773,9 +780,7 @@ public class ServerClaimManagementService {
         }
 
         try {
-            getClaimMetadataManagementService().removeExternalClaim(
-                    externalClaimDialectURI,
-                    externalClaimURI,
+            claimMetadataManagementService.removeExternalClaim(externalClaimDialectURI, externalClaimURI,
                     ContextLoader.getTenantDomainFromContext());
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_DELETING_EXTERNAL_CLAIM, claimId);
@@ -793,7 +798,7 @@ public class ServerClaimManagementService {
     public ExternalClaimResDTO getExternalClaim(String dialectId, String claimId) {
 
         try {
-            List<ExternalClaim> externalClaimList = getClaimMetadataManagementService().getExternalClaims(
+            List<ExternalClaim> externalClaimList = claimMetadataManagementService.getExternalClaims(
                     base64DecodeId(dialectId),
                     ContextLoader.getTenantDomainFromContext());
 
@@ -831,8 +836,8 @@ public class ServerClaimManagementService {
         handleNotImplementedCapabilities(limit, offset, filter, sort);
 
         try {
-            List<ClaimDialect> claimDialectList = getClaimMetadataManagementService().getClaimDialects(
-                    ContextLoader.getTenantDomainFromContext());
+            List<ClaimDialect> claimDialectList = claimMetadataManagementService.getClaimDialects(ContextLoader
+                    .getTenantDomainFromContext());
             String decodedDialectId = base64DecodeId(dialectId);
             ClaimDialect claimDialect = extractDialectFromDialectList(decodedDialectId, claimDialectList);
 
@@ -840,7 +845,7 @@ public class ServerClaimManagementService {
                 throw handleClaimManagementClientError(ERROR_CODE_DIALECT_NOT_FOUND, NOT_FOUND, dialectId);
             }
 
-            List<ExternalClaim> externalClaimList = getClaimMetadataManagementService().getExternalClaims(
+            List<ExternalClaim> externalClaimList = claimMetadataManagementService.getExternalClaims(
                     base64DecodeId(dialectId),
                     ContextLoader.getTenantDomainFromContext());
             return getExternalClaimResDTOs(externalClaimList);
@@ -865,8 +870,7 @@ public class ServerClaimManagementService {
                 throw handleClaimManagementClientError(ERROR_CODE_EXTERNAL_CLAIM_CONFLICT, CONFLICT,
                         base64DecodeId(claimId), dialectId);
             }
-            getClaimMetadataManagementService().updateExternalClaim(
-                    createExternalClaim(dialectId, externalClaimReqDTO),
+            claimMetadataManagementService.updateExternalClaim(createExternalClaim(dialectId, externalClaimReqDTO),
                     ContextLoader.getTenantDomainFromContext());
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_UPDATING_EXTERNAL_CLAIM, claimId, dialectId);
@@ -1385,7 +1389,7 @@ public class ServerClaimManagementService {
     private boolean isDialectExists(String dialectId) throws ClaimMetadataException {
 
         List<ClaimDialect> claimDialectList =
-                getClaimMetadataManagementService().getClaimDialects(ContextLoader.getTenantDomainFromContext());
+                claimMetadataManagementService.getClaimDialects(ContextLoader.getTenantDomainFromContext());
         ClaimDialect claimDialect = extractDialectFromDialectList(base64DecodeId(dialectId), claimDialectList);
 
         return claimDialect != null;
@@ -1393,8 +1397,8 @@ public class ServerClaimManagementService {
 
     private boolean isLocalClaimExist(String claimId) throws ClaimMetadataException {
 
-        List<LocalClaim> localClaimList = getClaimMetadataManagementService().getLocalClaims(
-                ContextLoader.getTenantDomainFromContext());
+        List<LocalClaim> localClaimList = claimMetadataManagementService.getLocalClaims(ContextLoader
+                .getTenantDomainFromContext());
         LocalClaim localClaim = extractLocalClaimFromClaimList(base64DecodeId(claimId), localClaimList);
 
         return localClaim != null;
@@ -1402,7 +1406,7 @@ public class ServerClaimManagementService {
 
     private boolean isExternalClaimExist(String dialectId, String claimId) throws ClaimMetadataException {
 
-        List<ExternalClaim> externalClaimList = getClaimMetadataManagementService().getExternalClaims(
+        List<ExternalClaim> externalClaimList = claimMetadataManagementService.getExternalClaims(
                 base64DecodeId(dialectId),
                 ContextLoader.getTenantDomainFromContext());
         ExternalClaim externalClaim = extractExternalClaimFromClaimList(base64DecodeId(claimId), externalClaimList);
@@ -1627,8 +1631,8 @@ public class ServerClaimManagementService {
 
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         try {
-            String organizationId = getOrganizationManager().resolveOrganizationId(tenantDomain);
-            boolean isPrimaryOrg = getOrganizationManager().isPrimaryOrganization(organizationId);
+            String organizationId = organizationManager.resolveOrganizationId(tenantDomain);
+            boolean isPrimaryOrg = organizationManager.isPrimaryOrganization(organizationId);
             if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain) && !isPrimaryOrg) {
                 throw handleClaimManagementClientError(ERROR_CODE_UNAUTHORIZED_ORG_FOR_CLAIM_MANAGEMENT, FORBIDDEN,
                         organizationId);
