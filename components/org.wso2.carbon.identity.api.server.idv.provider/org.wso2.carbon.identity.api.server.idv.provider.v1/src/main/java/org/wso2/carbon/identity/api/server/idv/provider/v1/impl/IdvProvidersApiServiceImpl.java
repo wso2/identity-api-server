@@ -40,6 +40,7 @@ public class IdvProvidersApiServiceImpl implements IdvProvidersApiService {
     private final IdVProviderService idVProviderService;
 
     public IdvProvidersApiServiceImpl() {
+    
         try {
             this.idVProviderService = IdVProviderServiceFactory.getIdVProviderService();
         } catch (IllegalStateException e) {
