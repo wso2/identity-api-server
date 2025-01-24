@@ -52,6 +52,7 @@ public class ServerClaimManagementServiceFactory {
      * @return ServerClaimManagementService
      */
     public static ServerClaimManagementService getServerClaimManagementService() {
+
         return SERVICE;
     }
 }
