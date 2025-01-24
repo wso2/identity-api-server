@@ -18,9 +18,9 @@
 
 package org.wso2.carbon.identity.api.server.organization.configs.v1.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.organization.configs.v1.OrganizationConfigsApiService;
 import org.wso2.carbon.identity.api.server.organization.configs.v1.core.OrganizationConfigsService;
+import org.wso2.carbon.identity.api.server.organization.configs.v1.factories.OrganizationConfigsServiceFactory;
 import org.wso2.carbon.identity.api.server.organization.configs.v1.model.Config;
 
 import javax.ws.rs.core.Response;
@@ -30,8 +30,16 @@ import javax.ws.rs.core.Response;
  */
 public class OrganizationConfigsApiServiceImpl implements OrganizationConfigsApiService {
 
-    @Autowired
-    private OrganizationConfigsService organizationConfigsService;
+    private final OrganizationConfigsService organizationConfigsService;
+
+    public OrganizationConfigsApiServiceImpl() {
+
+        try {
+            this.organizationConfigsService = OrganizationConfigsServiceFactory.getOrganizationConfigsService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating organization configuration service.", e);
+        }
+    }
 
     @Override
     public Response createDiscoveryConfig(Config config) {
@@ -51,5 +59,12 @@ public class OrganizationConfigsApiServiceImpl implements OrganizationConfigsApi
     public Response getDiscoveryConfig() {
 
         return Response.ok().entity(organizationConfigsService.getDiscoveryConfiguration()).build();
+    }
+
+    @Override
+    public Response updateDiscoveryConfig(Config config) {
+
+        organizationConfigsService.updateDiscoveryConfiguration(config);
+        return Response.ok().entity(config).build();
     }
 }

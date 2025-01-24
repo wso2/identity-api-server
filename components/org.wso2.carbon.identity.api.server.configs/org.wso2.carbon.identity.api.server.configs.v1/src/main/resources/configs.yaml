@@ -1183,6 +1183,12 @@ components:
         displayName:
           type: string
           example: basic
+        description:
+          type: string
+          example: "Description for user defined local authenticator configuration."
+        image:
+          type: string
+          example: "https://example.com/logo/my-logo.png"
         isEnabled:
           type: boolean
           default: true
@@ -1219,6 +1225,12 @@ components:
         displayName:
           type: string
           example: basic
+        description:
+          type: string
+          example: "Description for user defined local authenticator configuration."
+        image:
+          type: string
+          example: "https://example.com/logo/my-logo.png"
         isEnabled:
           type: boolean
           default: true
@@ -1242,9 +1254,42 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AuthenticatorProperty'
+        endpoint:
+          type: array
+          items:
+            $ref: '#/components/schemas/Endpoint'
       required:
         - name
         - displayName
+    Endpoint:
+      type: object
+      properties:
+        uri:
+          type: string
+          example: https://abc.com/token
+          pattern: '^https?://.+'
+        authentication:
+          $ref: '#/components/schemas/AuthenticationType'
+    AuthenticationType:
+      type: object
+      required:
+        - type
+        - properties
+      properties:
+        type:
+          type: string
+          enum:
+            - NONE
+            - BEARER
+            - API_KEY
+            - BASIC
+          example: BASIC
+        properties:
+          type: object
+          additionalProperties: true
+          example:
+            username: "auth_username"
+            password: "auth_password"
     AuthenticatorProperty:
       required:
         - key

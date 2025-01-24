@@ -18,15 +18,14 @@
 
 package org.wso2.carbon.identity.api.server.organization.configs.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 
+import org.wso2.carbon.identity.api.server.organization.configs.v1.factories.OrganizationConfigsApiServiceFactory;
 import org.wso2.carbon.identity.api.server.organization.configs.v1.model.Config;
 import org.wso2.carbon.identity.api.server.organization.configs.v1.model.Error;
-import org.wso2.carbon.identity.api.server.organization.configs.v1.OrganizationConfigsApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -40,8 +39,12 @@ import javax.validation.constraints.*;
 
 public class OrganizationConfigsApi  {
 
-    @Autowired
-    private OrganizationConfigsApiService delegate;
+    private final OrganizationConfigsApiService delegate;
+
+    public OrganizationConfigsApi() {
+
+        this.delegate = OrganizationConfigsApiServiceFactory.getOrganizationConfigsApi();
+    }
 
     @Valid
     @POST
@@ -99,7 +102,7 @@ public class OrganizationConfigsApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Discovery" })
+    }, tags={ "Discovery", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response.", response = Config.class),
         @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
@@ -110,6 +113,29 @@ public class OrganizationConfigsApi  {
     public Response getDiscoveryConfig() {
 
         return delegate.getDiscoveryConfig();
+    }
+
+    @Valid
+    @PUT
+    @Path("/discovery")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update organization discovery configuration.", notes = "This API provides the capability to update discovery configuration of the primary organization. <br>     <b>Scope(Permission) required:</b> <br>     * internal_config_mgt_update ", response = Config.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+
+        })
+    }, tags={ "Discovery" })
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Successful Response", response = Config.class),
+        @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
+        @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
+        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
+    })
+    public Response updateDiscoveryConfig(@ApiParam(value = "" ) @Valid Config config) {
+
+        return delegate.updateDiscoveryConfig(config );
     }
 
 }

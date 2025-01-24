@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,10 +18,11 @@
 
 package org.wso2.carbon.identity.rest.api.server.email.template.v2.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.EmailApiService;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.core.ApplicationEmailTemplatesService;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.core.ServerEmailTemplatesService;
+import org.wso2.carbon.identity.rest.api.server.email.template.v2.factories.ApplicationEmailTemplatesServiceFactory;
+import org.wso2.carbon.identity.rest.api.server.email.template.v2.factories.ServerEmailTemplatesServiceFactory;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateTypeOverview;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateTypeWithID;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateWithID;
@@ -43,11 +44,19 @@ import static org.wso2.carbon.identity.api.server.email.template.common.Constant
  */
 public class EmailApiServiceImpl implements EmailApiService {
 
-    @Autowired
-    private ServerEmailTemplatesService emailTemplatesService;
+    private final ServerEmailTemplatesService emailTemplatesService;
+    private final ApplicationEmailTemplatesService applicationEmailTemplatesService;
 
-    @Autowired
-    private ApplicationEmailTemplatesService applicationEmailTemplatesService;
+    public EmailApiServiceImpl() {
+
+        try {
+            this.emailTemplatesService = ServerEmailTemplatesServiceFactory.getServerEmailTemplatesService();
+            this.applicationEmailTemplatesService = ApplicationEmailTemplatesServiceFactory
+                    .getApplicationEmailTemplatesService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating email template management services.", e);
+        }
+    }
 
     @Override
     public Response addAppEmailTemplate(
@@ -113,19 +122,22 @@ public class EmailApiServiceImpl implements EmailApiService {
     }
 
     @Override
-    public Response getAppEmailTemplate(String templateTypeId, String appUuid, String locale,
+    public Response getAppEmailTemplate(String templateTypeId, String appUuid, String locale, Boolean resolve,
                                         Integer limit, Integer offset, String sortOrder, String sortBy) {
 
-        return Response.ok().entity(applicationEmailTemplatesService.
-                getEmailTemplate(templateTypeId, locale, appUuid, limit, offset, sortOrder, sortBy)).build();
+        return Response.ok()
+                .entity(applicationEmailTemplatesService.getEmailTemplate(templateTypeId, locale, appUuid, resolve,
+                        limit, offset, sortOrder, sortBy)).build();
     }
 
     @Override
-    public Response getAppTemplatesListOfEmailTemplateType(
-            String templateTypeId, String appUuid, Integer limit, Integer offset, String sortOrder, String sortBy) {
+    public Response getAppTemplatesListOfEmailTemplateType(String templateTypeId, String appUuid, Boolean resolve,
+                                                           Integer limit, Integer offset, String sortOrder,
+                                                           String sortBy) {
 
-        return Response.ok().entity(applicationEmailTemplatesService.
-                getTemplatesListOfEmailTemplateType(templateTypeId, appUuid, limit, offset, sortOrder, sortBy)).build();
+        return Response.ok()
+                .entity(applicationEmailTemplatesService.getTemplatesListOfEmailTemplateType(templateTypeId, appUuid,
+                        resolve, limit, offset, sortOrder, sortBy)).build();
     }
 
     @Override

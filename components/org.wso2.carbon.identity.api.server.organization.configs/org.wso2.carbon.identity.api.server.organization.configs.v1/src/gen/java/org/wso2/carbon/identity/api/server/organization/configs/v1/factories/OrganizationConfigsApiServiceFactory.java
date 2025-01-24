@@ -21,12 +21,20 @@ package org.wso2.carbon.identity.api.server.organization.configs.v1.factories;
 import org.wso2.carbon.identity.api.server.organization.configs.v1.OrganizationConfigsApiService;
 import org.wso2.carbon.identity.api.server.organization.configs.v1.impl.OrganizationConfigsApiServiceImpl;
 
+/**
+ * Factory class for OrganizationConfigsApiService.
+ */
 public class OrganizationConfigsApiServiceFactory {
 
-   private final static OrganizationConfigsApiService service = new OrganizationConfigsApiServiceImpl();
+   private static final OrganizationConfigsApiService SERVICE = new OrganizationConfigsApiServiceImpl();
 
-   public static OrganizationConfigsApiService getOrganizationConfigsApi()
-   {
-      return service;
+   /**
+    * Get OrganizationConfigsApiService.
+    *
+    * @return OrganizationConfigsApiService.
+    */
+   public static OrganizationConfigsApiService getOrganizationConfigsApi() {
+
+      return SERVICE;
    }
 }

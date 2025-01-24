@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.extension.management.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.extension.mgt.ExtensionManager;
 
 /**
@@ -25,39 +26,21 @@ import org.wso2.carbon.identity.extension.mgt.ExtensionManager;
  */
 public class ExtensionManagementServiceHolder {
 
-    private static ExtensionManagementServiceHolder instance = new ExtensionManagementServiceHolder();
-
-    private ExtensionManager extensionManager;
-
     private ExtensionManagementServiceHolder() {}
 
-    /**
-     * Get instance of ExtensionManagementServiceHolder.
-     *
-     * @return ExtensionManagementServiceHolder.
-     */
-    public static ExtensionManagementServiceHolder getInstance() {
+    private static class ExtensionManagerHolder {
 
-        return instance;
+        static final ExtensionManager SERVICE = (ExtensionManager) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(ExtensionManager.class, null);
     }
 
     /**
      * Get ExtensionManager osgi service.
      *
-     * @return ApplicationManagementService
+     * @return ExtensionManager
      */
-    public ExtensionManager getExtensionManager() {
+    public static ExtensionManager getExtensionManager() {
 
-        return ExtensionManagementServiceHolder.getInstance().extensionManager;
-    }
-
-    /**
-     * Set ExtensionManager osgi service.
-     *
-     * @param extensionManager ExtensionManager.
-     */
-    public void setExtensionManager(ExtensionManager extensionManager) {
-
-        ExtensionManagementServiceHolder.getInstance().extensionManager = extensionManager;
+        return ExtensionManagerHolder.SERVICE;
     }
 }

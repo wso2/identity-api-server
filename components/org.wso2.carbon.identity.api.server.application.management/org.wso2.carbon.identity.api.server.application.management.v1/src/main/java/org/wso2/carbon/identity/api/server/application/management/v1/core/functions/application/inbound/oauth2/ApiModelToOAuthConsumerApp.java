@@ -16,7 +16,6 @@
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.v1.AccessTokenConfiguration;
@@ -37,8 +36,12 @@ import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.ws.rs.core.Response;
 
@@ -201,9 +204,11 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
     private void validateHybridFlowResponseType(OAuthConsumerAppDTO consumerAppDTO,
                                                 HybridFlowConfiguration hybridFlowResponseType) {
 
-        String[] allowedResponseTypes = {ApplicationManagementConstants.CODE_TOKEN,
-                                         ApplicationManagementConstants.CODE_IDTOKEN,
-                                         ApplicationManagementConstants.CODE_IDTOKEN_TOKEN};
+        Set<String> allowedResponseTypesSet = new HashSet<>(Arrays.asList(
+                ApplicationManagementConstants.CODE_TOKEN,
+                ApplicationManagementConstants.CODE_IDTOKEN,
+                ApplicationManagementConstants.CODE_IDTOKEN_TOKEN
+        ));
 
         if (StringUtils.isBlank(hybridFlowResponseType.getResponseType())) {
             throw new APIError(Response.Status.BAD_REQUEST,
@@ -215,7 +220,10 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
                                     .Hybrid_FLOW_RESPONSE_TYPE_NOT_FOUND.getDescription()).build());
         }
 
-        if (!ArrayUtils.contains(allowedResponseTypes, hybridFlowResponseType.getResponseType())) {
+        List<String> hybridFlowResponseTypes =
+                new ArrayList<>(Arrays.asList(hybridFlowResponseType.getResponseType().split(",")));
+
+        if (!allowedResponseTypesSet.containsAll(hybridFlowResponseTypes)) {
             throw new APIError(Response.Status.BAD_REQUEST,
                     new ErrorResponse.Builder().withCode(ApplicationManagementConstants.ErrorMessage
                                     .Hybrid_FLOW_RESPONSE_TYPE_INCORRECT.getCode())

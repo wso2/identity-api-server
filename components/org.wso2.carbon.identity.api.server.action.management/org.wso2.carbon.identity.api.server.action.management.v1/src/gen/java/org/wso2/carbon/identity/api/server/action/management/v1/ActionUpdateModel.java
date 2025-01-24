@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.wso2.carbon.identity.api.server.action.management.v1.EndpointUpdateModel;
+import org.wso2.carbon.identity.api.server.action.management.v1.ORRule;
 import javax.validation.constraints.*;
 
 
@@ -36,8 +37,10 @@ public class ActionUpdateModel  {
     private String name;
     private String description;
     private EndpointUpdateModel endpoint;
+    private ORRule rule;
 
     /**
+    * Updating name of the action.
     **/
     public ActionUpdateModel name(String name) {
 
@@ -45,7 +48,7 @@ public class ActionUpdateModel  {
         return this;
     }
     
-    @ApiModelProperty(example = "Access Token Pre Issue", value = "")
+    @ApiModelProperty(example = "Pre Issue Access Token Action", value = "Updating name of the action.")
     @JsonProperty("name")
     @Valid @Size(min=1,max=255)
     public String getName() {
@@ -56,6 +59,7 @@ public class ActionUpdateModel  {
     }
 
     /**
+    * Updating description of the action.
     **/
     public ActionUpdateModel description(String description) {
 
@@ -63,7 +67,7 @@ public class ActionUpdateModel  {
         return this;
     }
     
-    @ApiModelProperty(example = "This is the configuration of pre-action for issuing access token.", value = "")
+    @ApiModelProperty(example = "This action invokes before issuing an access token.", value = "Updating description of the action.")
     @JsonProperty("description")
     @Valid @Size(max=255)
     public String getDescription() {
@@ -91,6 +95,24 @@ public class ActionUpdateModel  {
         this.endpoint = endpoint;
     }
 
+    /**
+    **/
+    public ActionUpdateModel rule(ORRule rule) {
+
+        this.rule = rule;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("rule")
+    @Valid
+    public ORRule getRule() {
+        return rule;
+    }
+    public void setRule(ORRule rule) {
+        this.rule = rule;
+    }
+
 
 
     @Override
@@ -105,12 +127,13 @@ public class ActionUpdateModel  {
         ActionUpdateModel actionUpdateModel = (ActionUpdateModel) o;
         return Objects.equals(this.name, actionUpdateModel.name) &&
             Objects.equals(this.description, actionUpdateModel.description) &&
-            Objects.equals(this.endpoint, actionUpdateModel.endpoint);
+            Objects.equals(this.endpoint, actionUpdateModel.endpoint) &&
+            Objects.equals(this.rule, actionUpdateModel.rule);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, endpoint);
+        return Objects.hash(name, description, endpoint, rule);
     }
 
     @Override
@@ -122,6 +145,7 @@ public class ActionUpdateModel  {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
+        sb.append("    rule: ").append(toIndentedString(rule)).append("\n");
         sb.append("}");
         return sb.toString();
     }

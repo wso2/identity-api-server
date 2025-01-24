@@ -18,10 +18,10 @@
 
 package org.wso2.carbon.identity.api.server.idp.v1.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.idp.v1.TrustedTokenIssuersApiService;
 import org.wso2.carbon.identity.api.server.idp.v1.core.ServerIdpManagementService;
+import org.wso2.carbon.identity.api.server.idp.v1.factories.ServerIdpManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPOSTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Patch;
@@ -41,8 +41,16 @@ import static org.wso2.carbon.identity.api.server.idp.common.Constants.TRUSTED_T
  */
 public class TrustedTokenIssuersApiServiceImpl implements TrustedTokenIssuersApiService {
 
-    @Autowired
-    private ServerIdpManagementService idpManagementService;
+    private final ServerIdpManagementService idpManagementService;
+
+    public TrustedTokenIssuersApiServiceImpl() {
+
+        try {
+            this.idpManagementService = ServerIdpManagementServiceFactory.getServerIdpManagementService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating ServerIdpManagementService.", e);
+        }
+    }
 
     @Override
     public Response addTrustedTokenIssuer(TrustedTokenIssuerPOSTRequest trustedTokenIssuerPOSTRequest) {

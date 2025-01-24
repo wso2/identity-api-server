@@ -28,6 +28,7 @@ public class Constants {
     public static final String AUTHENTICATOR_ERROR_PREFIX = "AUT-";
     public static final String FEDERATED_AUTHENTICATORS = "federatedAuthenticators";
     public static final String AUTHENTICATOR_PATH_COMPONENT = "/authenticators";
+    public static final String CONFIGS_AUTHENTICATOR_PATH_COMPONENT = "/configs/authenticators/%s";
     public static final String PATH_SEPERATOR = "/";
     public static final String PAGE_LINK_REL_NEXT = "next";
     public static final String PAGE_LINK_REL_PREVIOUS = "previous";
@@ -70,6 +71,7 @@ public class Constants {
                 "Filter needs to be in the format <attribute>+<operation>+<value>. Eg: tag+eq+2FA"),
         ERROR_CODE_UNSUPPORTED_FILTER_ATTRIBUTE("60002", "Unsupported filter attribute.",
                 "The filter attribute '%s' is not supported."),
+
         ERROR_CODE_ERROR_LISTING_AUTHENTICATORS("65001", "Unable to list the existing authenticators.",
                 "Server encountered an error while listing the authenticators."),
         ERROR_CODE_ERROR_LISTING_IDPS("65002", "Unable to list the existing identity providers.",

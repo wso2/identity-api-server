@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2020-2025, WSO2 LLC. (http://www.wso2.com).
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
+ * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,7 +22,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
-import org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderServiceHolder;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSender;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSenderAdd;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSenderUpdateRequest;
@@ -53,7 +52,16 @@ import static org.wso2.carbon.identity.notification.sender.tenant.config.Notific
  */
 public class NotificationSenderManagementService {
 
+    private final org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementService
+            notificationSenderManagementService;
     private static final Log log = LogFactory.getLog(NotificationSenderManagementService.class);
+
+    public NotificationSenderManagementService(
+            org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementService
+                                                       notificationSenderManagementService) {
+
+        this.notificationSenderManagementService = notificationSenderManagementService;
+    }
 
     /**
      * Create an email sender resource with a resource file.
@@ -65,8 +73,7 @@ public class NotificationSenderManagementService {
 
         EmailSenderDTO dto = buildEmailSenderDTO(emailSenderAdd);
         try {
-            EmailSenderDTO emailSenderDTO = NotificationSenderServiceHolder.getNotificationSenderManagementService()
-                    .addEmailSender(dto);
+            EmailSenderDTO emailSenderDTO = notificationSenderManagementService.addEmailSender(dto);
             return buildEmailSenderFromDTO(emailSenderDTO);
         } catch (NotificationSenderManagementException e) {
             throw handleException(e);
@@ -83,8 +90,7 @@ public class NotificationSenderManagementService {
 
         SMSSenderDTO dto = buildSMSSenderDTO(smsSenderAdd);
         try {
-            SMSSenderDTO smsSenderDTO = NotificationSenderServiceHolder.getNotificationSenderManagementService()
-                    .addSMSSender(dto);
+            SMSSenderDTO smsSenderDTO = notificationSenderManagementService.addSMSSender(dto);
             return buildSMSSenderFromDTO(smsSenderDTO);
         } catch (NotificationSenderManagementException e) {
             throw handleException(e);
@@ -117,8 +123,7 @@ public class NotificationSenderManagementService {
     public void deleteNotificationSender(String notificationSenderName) {
 
         try {
-            NotificationSenderServiceHolder.getNotificationSenderManagementService()
-                    .deleteNotificationSender(notificationSenderName);
+            notificationSenderManagementService.deleteNotificationSender(notificationSenderName);
         } catch (NotificationSenderManagementException e) {
                 throw handleException(e);
         }
@@ -133,8 +138,7 @@ public class NotificationSenderManagementService {
     public EmailSender getEmailSender(String senderName) {
 
         try {
-            EmailSenderDTO emailSenderDTO = NotificationSenderServiceHolder.getNotificationSenderManagementService()
-                    .getEmailSender(senderName);
+            EmailSenderDTO emailSenderDTO = notificationSenderManagementService.getEmailSender(senderName);
             return buildEmailSenderFromDTO(emailSenderDTO);
         } catch (NotificationSenderManagementException e) {
             throw handleException(e);
@@ -150,8 +154,7 @@ public class NotificationSenderManagementService {
     public SMSSender getSMSSender(String senderName) {
 
         try {
-            SMSSenderDTO smsSenderDTO = NotificationSenderServiceHolder.getNotificationSenderManagementService()
-                    .getSMSSender(senderName, false);
+            SMSSenderDTO smsSenderDTO = notificationSenderManagementService.getSMSSender(senderName, false);
             return buildSMSSenderFromDTO(smsSenderDTO);
         } catch (NotificationSenderManagementException e) {
             throw handleException(e);
@@ -183,8 +186,7 @@ public class NotificationSenderManagementService {
     public List<EmailSender> getEmailSenders() {
 
         try {
-            List<EmailSenderDTO> emailSenders = NotificationSenderServiceHolder.getNotificationSenderManagementService()
-                    .getEmailSenders();
+            List<EmailSenderDTO> emailSenders = notificationSenderManagementService.getEmailSenders();
             return emailSenders.stream().map(this::buildEmailSenderFromDTO).collect(Collectors.toList());
         } catch (NotificationSenderManagementException e) {
             throw handleException(e);
@@ -199,8 +201,7 @@ public class NotificationSenderManagementService {
     public List<SMSSender> getSMSSenders() {
 
         try {
-            List<SMSSenderDTO> smsSenders = NotificationSenderServiceHolder.getNotificationSenderManagementService()
-                    .getSMSSenders(false);
+            List<SMSSenderDTO> smsSenders = notificationSenderManagementService.getSMSSenders(false);
             return smsSenders.stream().map(this::buildSMSSenderFromDTO).collect(Collectors.toList());
         } catch (NotificationSenderManagementException e) {
             throw handleException(e);
@@ -234,8 +235,7 @@ public class NotificationSenderManagementService {
 
         EmailSenderDTO dto = buildEmailSenderDTO(senderName, emailSenderUpdateRequest);
         try {
-            EmailSenderDTO emailSenderDTO = NotificationSenderServiceHolder.getNotificationSenderManagementService()
-                    .updateEmailSender(dto);
+            EmailSenderDTO emailSenderDTO = notificationSenderManagementService.updateEmailSender(dto);
             return buildEmailSenderFromDTO(emailSenderDTO);
         } catch (NotificationSenderManagementException e) {
             throw handleException(e);
@@ -253,8 +253,7 @@ public class NotificationSenderManagementService {
 
         SMSSenderDTO dto = buildSMSSenderDTO(senderName, smsSenderUpdateRequest);
         try {
-            SMSSenderDTO smsSenderDTO = NotificationSenderServiceHolder.getNotificationSenderManagementService()
-                    .updateSMSSender(dto);
+            SMSSenderDTO smsSenderDTO = notificationSenderManagementService.updateSMSSender(dto);
             return buildSMSSenderFromDTO(smsSenderDTO);
         } catch (NotificationSenderManagementException e) {
             throw handleException(e);

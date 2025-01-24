@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,12 +18,12 @@
 
 package org.wso2.carbon.identity.rest.api.server.email.template.v2;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 
+import org.wso2.carbon.identity.rest.api.server.email.template.v2.factories.EmailApiServiceFactory;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateType;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateTypeOverview;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateTypeWithID;
@@ -44,8 +44,12 @@ import javax.validation.constraints.*;
 
 public class EmailApi  {
 
-    @Autowired
-    private EmailApiService delegate;
+    private final EmailApiService delegate;
+
+    public EmailApi() {
+
+        this.delegate = EmailApiServiceFactory.getEmailApi();
+    }
 
     @Valid
     @POST
@@ -233,9 +237,9 @@ public class EmailApi  {
         @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
-    public Response getAppEmailTemplate(@ApiParam(value = "Email Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "Application UUID.",required=true) @PathParam("app-uuid") String appUuid, @ApiParam(value = "This should be a valid locale.",required=true) @PathParam("locale") String locale,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to return. _<b>This option is not yet supported.<b>_")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination. _<b>This option is not yet supported.<b>_")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Define the order in which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_", allowableValues="asc, desc")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_")  @QueryParam("sortBy") String sortBy) {
+    public Response getAppEmailTemplate(@ApiParam(value = "Email Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "Application UUID.",required=true) @PathParam("app-uuid") String appUuid, @ApiParam(value = "This should be a valid locale.",required=true) @PathParam("locale") String locale,     @Valid@ApiParam(value = "Specifies whether to return resolved template/s throughout the ancestor organization hierarchy.", defaultValue="false") @DefaultValue("false")  @QueryParam("resolve") Boolean resolve,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to return. _<b>This option is not yet supported.<b>_")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination. _<b>This option is not yet supported.<b>_")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Define the order in which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_", allowableValues="asc, desc")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_")  @QueryParam("sortBy") String sortBy) {
 
-        return delegate.getAppEmailTemplate(templateTypeId,  appUuid,  locale,  limit,  offset,  sortOrder,  sortBy );
+        return delegate.getAppEmailTemplate(templateTypeId,  appUuid,  locale,  resolve,  limit,  offset,  sortOrder,  sortBy );
     }
 
     @Valid
@@ -257,9 +261,9 @@ public class EmailApi  {
         @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
-    public Response getAppTemplatesListOfEmailTemplateType(@ApiParam(value = "Email Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "Application UUID.",required=true) @PathParam("app-uuid") String appUuid,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to return. _<b>This option is not yet supported.<b>_")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination. _<b>This option is not yet supported.<b>_")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Define the order in which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_", allowableValues="asc, desc")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_")  @QueryParam("sortBy") String sortBy) {
+    public Response getAppTemplatesListOfEmailTemplateType(@ApiParam(value = "Email Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "Application UUID.",required=true) @PathParam("app-uuid") String appUuid,     @Valid@ApiParam(value = "Specifies whether to return resolved template/s throughout the ancestor organization hierarchy.", defaultValue="false") @DefaultValue("false")  @QueryParam("resolve") Boolean resolve,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to return. _<b>This option is not yet supported.<b>_")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination. _<b>This option is not yet supported.<b>_")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Define the order in which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_", allowableValues="asc, desc")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_")  @QueryParam("sortBy") String sortBy) {
 
-        return delegate.getAppTemplatesListOfEmailTemplateType(templateTypeId,  appUuid,  limit,  offset,  sortOrder,  sortBy );
+        return delegate.getAppTemplatesListOfEmailTemplateType(templateTypeId,  appUuid,  resolve,  limit,  offset,  sortOrder,  sortBy );
     }
 
     @Valid

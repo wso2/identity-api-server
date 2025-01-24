@@ -58,6 +58,7 @@ public class ActionTypesResponseItem  {
     }
 
     /**
+    * Display name of the action type.
     **/
     public ActionTypesResponseItem displayName(String displayName) {
 
@@ -65,7 +66,7 @@ public class ActionTypesResponseItem  {
         return this;
     }
     
-    @ApiModelProperty(example = "Pre Issue Access Token.", value = "")
+    @ApiModelProperty(example = "Pre Issue Access Token.", value = "Display name of the action type.")
     @JsonProperty("displayName")
     @Valid
     public String getDisplayName() {
@@ -76,6 +77,7 @@ public class ActionTypesResponseItem  {
     }
 
     /**
+    * Description of the action type.
     **/
     public ActionTypesResponseItem description(String description) {
 
@@ -83,7 +85,7 @@ public class ActionTypesResponseItem  {
         return this;
     }
     
-    @ApiModelProperty(example = "Extension point configuration for Pre Issue Access Token.", value = "")
+    @ApiModelProperty(example = "Extension point configuration for Pre Issue Access Token.", value = "Description of the action type.")
     @JsonProperty("description")
     @Valid
     public String getDescription() {
@@ -94,6 +96,7 @@ public class ActionTypesResponseItem  {
     }
 
     /**
+    * Number of actions configured under the action type.
     **/
     public ActionTypesResponseItem count(Integer count) {
 
@@ -101,7 +104,7 @@ public class ActionTypesResponseItem  {
         return this;
     }
     
-    @ApiModelProperty(example = "2", value = "")
+    @ApiModelProperty(example = "1", value = "Number of actions configured under the action type.")
     @JsonProperty("count")
     @Valid
     public Integer getCount() {
@@ -112,6 +115,7 @@ public class ActionTypesResponseItem  {
     }
 
     /**
+    * API endpoint referring to the location of the given action type.
     **/
     public ActionTypesResponseItem self(String self) {
 
@@ -119,7 +123,7 @@ public class ActionTypesResponseItem  {
         return this;
     }
     
-    @ApiModelProperty(example = "/t/wso2.com/api/server/v1/actions/preIssueAccessToken", value = "")
+    @ApiModelProperty(example = "/api/server/v1/actions/preIssueAccessToken/24f64d17-9824-4e28-8413-de45728d8e84", value = "API endpoint referring to the location of the given action type.")
     @JsonProperty("self")
     @Valid
     public String getSelf() {

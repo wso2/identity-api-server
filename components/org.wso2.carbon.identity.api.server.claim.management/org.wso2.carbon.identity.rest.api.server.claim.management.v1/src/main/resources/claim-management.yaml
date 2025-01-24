@@ -736,6 +736,22 @@ definitions:
         type: boolean
         description: Specifies if the claim will be prompted during user registration and displayed on the user profile.
         example: true
+      uniquenessScope:
+        type: string
+        description: Specifies the scope of uniqueness validation for the claim value.
+        enum:
+          - NONE
+          - WITHIN_USERSTORE
+          - ACROSS_USERSTORES
+        example: "NONE"
+      sharedProfileValueResolvingMethod:
+        type: string
+        description: Specifies claim value resolving method for shared user profile.
+        enum:
+          - FromOrigin
+          - FromSharedProfile
+          - FromFirstFoundInHierarchy
+        example: "FromOrigin"
       attributeMapping:
         type: array
         description: Userstore attribute mappings.
@@ -746,6 +762,8 @@ definitions:
         description: Define any additional properties if required.
         items:
           $ref: '#/definitions/Property'
+      profiles:
+        $ref: '#/definitions/Profiles'
 
   #-----------------------------------------------------
   # The Local Claim Response object
@@ -796,6 +814,22 @@ definitions:
             type: boolean
             description: Specifies if the claim will be prompted during user registration and displayed on the user profile.
             example: true
+          uniquenessScope:
+            type: string
+            description: Specifies the scope of uniqueness validation for the claim value.
+            enum:
+              - NONE
+              - WITHIN_USERSTORE
+              - ACROSS_USERSTORES
+            example: "NONE"
+          sharedProfileValueResolvingMethod:
+            type: string
+            description: Specifies claim value resolving method for shared user profile.
+            enum:
+              - FromOrigin
+              - FromSharedProfile
+              - FromFirstFoundInHierarchy
+            example: "FromOrigin"
           attributeMapping:
             type: array
             description: Userstore attribute mappings.
@@ -806,6 +840,8 @@ definitions:
             description: Define any additional properties if required.
             items:
               $ref: '#/definitions/Property'
+          profiles:
+            $ref: '#/definitions/Profiles'
 
   #-----------------------------------------------------
   # The Additional Attribute Mapping object
@@ -915,6 +951,41 @@ definitions:
             description: Define any additional properties if required.
             items:
               $ref: '#/definitions/Property'
+
+  #-----------------------------------------------------
+  # Profiles Object
+  #-----------------------------------------------------
+  Profiles:
+    type: object
+    description: Attribute profiles.
+    additionalProperties:
+      $ref: '#/definitions/AttributeProfile'
+    example:
+      console:
+        readOnly: false
+        required: true
+        supportedByDefault: true
+      endUser:
+        readOnly: false
+        required: false
+        supportedByDefault: true
+      selfRegister:
+        readOnly: true
+        required: false
+        supportedByDefault: false
+
+  AttributeProfile:
+    type: object
+    properties:
+      readOnly:
+        type: boolean
+        example: false
+      required:
+        type: boolean
+        example: false
+      supportedByDefault:
+        type: boolean
+        example: true
 
   #-----------------------------------------------------
   # Property Object

@@ -22,7 +22,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionType;
+import org.wso2.carbon.identity.api.server.action.management.v1.Link;
 import javax.validation.constraints.*;
 
 
@@ -71,8 +74,11 @@ public enum StatusEnum {
 }
 
     private StatusEnum status;
+    private List<Link> links = null;
+
 
     /**
+    * Unique identifier of the action.
     **/
     public ActionBasicResponse id(String id) {
 
@@ -80,7 +86,7 @@ public enum StatusEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "24f64d17-9824-4e28-8413-de45728d8e84", value = "")
+    @ApiModelProperty(example = "24f64d17-9824-4e28-8413-de45728d8e84", value = "Unique identifier of the action.")
     @JsonProperty("id")
     @Valid
     public String getId() {
@@ -109,6 +115,7 @@ public enum StatusEnum {
     }
 
     /**
+    * Name of the action.
     **/
     public ActionBasicResponse name(String name) {
 
@@ -116,7 +123,7 @@ public enum StatusEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "Access Token Pre Issue", value = "")
+    @ApiModelProperty(example = "Access Token Pre Issue", value = "Name of the action.")
     @JsonProperty("name")
     @Valid @Size(min=1,max=255)
     public String getName() {
@@ -127,6 +134,7 @@ public enum StatusEnum {
     }
 
     /**
+    * Description of the action.
     **/
     public ActionBasicResponse description(String description) {
 
@@ -134,7 +142,7 @@ public enum StatusEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "This is the configuration of pre-action for issuing access token.", value = "")
+    @ApiModelProperty(example = "This action invokes before issuing an access token.", value = "Description of the action.")
     @JsonProperty("description")
     @Valid @Size(max=255)
     public String getDescription() {
@@ -145,6 +153,7 @@ public enum StatusEnum {
     }
 
     /**
+    * Status of the action.
     **/
     public ActionBasicResponse status(StatusEnum status) {
 
@@ -152,7 +161,7 @@ public enum StatusEnum {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "Status of the action.")
     @JsonProperty("status")
     @Valid
     public StatusEnum getStatus() {
@@ -162,7 +171,33 @@ public enum StatusEnum {
         this.status = status;
     }
 
+    /**
+    **/
+    public ActionBasicResponse links(List<Link> links) {
 
+        this.links = links;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "[{\"href\":\"/api/server/v1/actions/preIssueAccessToken/24f64d17-9824-4e28-8413-de45728d8e84\",\"method\":\"GET\",\"rel\":\"self\"}]", value = "")
+    @JsonProperty("links")
+    @Valid
+    public List<Link> getLinks() {
+        return links;
+    }
+    public void setLinks(List<Link> links) {
+        this.links = links;
+    }
+
+    public ActionBasicResponse addLinksItem(Link linksItem) {
+        if (this.links == null) {
+            this.links = new ArrayList<Link>();
+        }
+        this.links.add(linksItem);
+        return this;
+    }
+
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -178,12 +213,13 @@ public enum StatusEnum {
             Objects.equals(this.type, actionBasicResponse.type) &&
             Objects.equals(this.name, actionBasicResponse.name) &&
             Objects.equals(this.description, actionBasicResponse.description) &&
-            Objects.equals(this.status, actionBasicResponse.status);
+            Objects.equals(this.status, actionBasicResponse.status) &&
+            Objects.equals(this.links, actionBasicResponse.links);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, type, name, description, status);
+        return Objects.hash(id, type, name, description, status, links);
     }
 
     @Override
@@ -197,6 +233,7 @@ public enum StatusEnum {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
+        sb.append("    links: ").append(toIndentedString(links)).append("\n");
         sb.append("}");
         return sb.toString();
     }
