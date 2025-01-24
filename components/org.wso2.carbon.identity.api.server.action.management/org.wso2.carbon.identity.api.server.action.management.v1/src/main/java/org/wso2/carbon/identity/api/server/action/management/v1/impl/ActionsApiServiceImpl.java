@@ -41,9 +41,10 @@ public class ActionsApiServiceImpl implements ActionsApiService {
     private final ServerActionManagementService serverActionManagementService;
 
     public ActionsApiServiceImpl() {
+
         try {
             this.serverActionManagementService = ActionManagementServiceFactory.getActionManagementService();
-        } catch (Exception e) {
+        } catch (IllegalStateException e) {
             throw new RuntimeException("Error occurred while initiating server action management service.", e);
         }
     }
