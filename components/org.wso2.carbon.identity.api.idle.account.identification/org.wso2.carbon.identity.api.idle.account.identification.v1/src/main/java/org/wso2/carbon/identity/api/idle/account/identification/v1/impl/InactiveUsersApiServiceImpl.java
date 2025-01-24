@@ -22,6 +22,7 @@ import org.wso2.carbon.identity.api.idle.account.identification.common.ContextLo
 import org.wso2.carbon.identity.api.idle.account.identification.v1.InactiveUsersApiService;
 import org.wso2.carbon.identity.api.idle.account.identification.v1.core.InactiveUsersManagementApiService;
 import org.wso2.carbon.identity.api.idle.account.identification.v1.factories.InactiveUsersManagementApiServiceFactory;
+import org.wso2.carbon.identity.idle.account.identification.exception.IdleAccountIdentificationClientException;
 
 import javax.ws.rs.core.Response;
 
@@ -47,5 +48,19 @@ public class InactiveUsersApiServiceImpl implements InactiveUsersApiService {
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         return Response.ok().entity(inactiveUsersManagementApiService
                 .getInactiveUsers(inactiveAfter, excludeBefore, tenantDomain)).build();
+    }
+
+    @Override
+    public Response getInactiveUsers(String inactiveAfter, String excludeBefore, String filter)
+            throws IdleAccountIdentificationClientException {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+
+        if (filter != null) {
+            return Response.ok().entity(
+                    inactiveUsersManagementApiService.getInactiveUsers(inactiveAfter, excludeBefore, tenantDomain,
+                            filter)).build();
+        }
+        return getInactiveUsers(inactiveAfter, excludeBefore);
     }
 }
