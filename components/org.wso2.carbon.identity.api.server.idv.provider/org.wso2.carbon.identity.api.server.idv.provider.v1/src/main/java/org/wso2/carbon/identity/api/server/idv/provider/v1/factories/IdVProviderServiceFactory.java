@@ -42,7 +42,7 @@ public class IdVProviderServiceFactory {
     /**
      * Get IdVProviderService.
      *
-     * @return IdVProviderService
+     * @return IdVProviderService.
      */
     public static IdVProviderService getIdVProviderService() {
 
