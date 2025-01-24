@@ -72,7 +72,7 @@ public class SelfServiceMgtServiceTest {
         APIResourceManager apiResourceManager = mock(APIResourceManager.class);
         AuthorizedAPIManagementService authorizedAPIManagementService = mock(AuthorizedAPIManagementService.class);
 
-        // Create SelfServiceMgtService with mock dependencies
+        // Create SelfServiceMgtService with mock dependencies.
         selfServiceMgtService = new SelfServiceMgtService(
                 identityGovernanceService,
                 applicationManagementService,
