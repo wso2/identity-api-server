@@ -21,8 +21,8 @@ package org.wso2.carbon.identity.api.server.branding.preference.management.v1.im
 import org.apache.commons.lang3.StringUtils;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.BrandingPreferenceApiService;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.core.BrandingPreferenceManagementService;
-import org.wso2.carbon.identity.api.server.branding.preference.management.v1.factories.BrandingPreferenceManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.factories.BrandingAIPreferenceManagementServiceFactory;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.factories.BrandingPreferenceManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationRequestModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationResponseModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationResultModel;
