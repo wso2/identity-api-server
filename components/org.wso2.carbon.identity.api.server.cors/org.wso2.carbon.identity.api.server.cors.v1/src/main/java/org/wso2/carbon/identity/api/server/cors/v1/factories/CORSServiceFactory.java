@@ -45,6 +45,7 @@ public class CORSServiceFactory {
      * @return CORSService.
      */
     public static CORSService getCORSService() {
+
         return SERVICE;
     }
 }
