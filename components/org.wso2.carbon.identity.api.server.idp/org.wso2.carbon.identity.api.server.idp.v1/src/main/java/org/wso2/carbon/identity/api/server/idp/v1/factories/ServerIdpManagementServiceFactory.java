@@ -56,7 +56,7 @@ public class ServerIdpManagementServiceFactory {
     /**
      * Get ServerIdpManagementService.
      *
-     * @return ServerIdpManagementService
+     * @return ServerIdpManagementService.
      */
     public static ServerIdpManagementService getServerIdpManagementService() {
 

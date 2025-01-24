@@ -31,7 +31,7 @@ public class IdentityProvidersApiServiceFactory {
    /**
     * Get Identity Providers API Service.
     *
-    * @return IdentityProvidersApiService
+    * @return IdentityProvidersApiService.
     */
    public static IdentityProvidersApiService getIdentityProvidersApi() {
 

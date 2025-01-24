@@ -31,7 +31,7 @@ public class TrustedTokenIssuersApiServiceFactory {
    /**
     * Get Trusted Token Issuers API Service.
     *
-    * @return TrustedTokenIssuersApiService
+    * @return TrustedTokenIssuersApiService.
     */
    public static TrustedTokenIssuersApiService getTrustedTokenIssuersApi() {
 
