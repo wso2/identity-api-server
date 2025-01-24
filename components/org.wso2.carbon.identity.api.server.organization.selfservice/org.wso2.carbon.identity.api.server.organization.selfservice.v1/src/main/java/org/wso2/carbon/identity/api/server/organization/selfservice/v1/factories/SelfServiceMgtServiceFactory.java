@@ -19,12 +19,8 @@
 package org.wso2.carbon.identity.api.server.organization.selfservice.v1.factories;
 
 import org.wso2.carbon.identity.api.resource.mgt.APIResourceManager;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService;
-import org.wso2.carbon.identity.api.server.application.management.v1.factories.ServerApplicationManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.organization.selfservice.common.SelfServiceMgtServiceHolder;
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.core.SelfServiceMgtService;
-import org.wso2.carbon.identity.api.server.userstore.v1.core.ServerUserStoreService;
-import org.wso2.carbon.identity.api.server.userstore.v1.factories.ServerUserStoreServiceFactory;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.application.mgt.AuthorizedAPIManagementService;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
