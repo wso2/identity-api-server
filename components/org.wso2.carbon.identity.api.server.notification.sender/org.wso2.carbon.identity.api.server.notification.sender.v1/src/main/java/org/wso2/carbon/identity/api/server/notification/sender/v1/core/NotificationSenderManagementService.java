@@ -27,10 +27,14 @@ import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSen
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSenderAdd;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSenderUpdateRequest;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.Properties;
+import org.wso2.carbon.identity.api.server.notification.sender.v1.model.PushSender;
+import org.wso2.carbon.identity.api.server.notification.sender.v1.model.PushSenderAdd;
+import org.wso2.carbon.identity.api.server.notification.sender.v1.model.PushSenderUpdateRequest;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.SMSSender;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.SMSSenderAdd;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.SMSSenderUpdateRequest;
 import org.wso2.carbon.identity.notification.sender.tenant.config.dto.EmailSenderDTO;
+import org.wso2.carbon.identity.notification.sender.tenant.config.dto.PushSenderDTO;
 import org.wso2.carbon.identity.notification.sender.tenant.config.dto.SMSSenderDTO;
 import org.wso2.carbon.identity.notification.sender.tenant.config.exception.NotificationSenderManagementClientException;
 import org.wso2.carbon.identity.notification.sender.tenant.config.exception.NotificationSenderManagementException;
@@ -88,6 +92,24 @@ public class NotificationSenderManagementService {
     }
 
     /**
+     * Create a push sender resource with a resource file.
+     *
+     * @param pushSenderAdd Push sender post request.
+     * @return Push sender.
+     */
+    public PushSender addPushSender(PushSenderAdd pushSenderAdd) {
+
+        PushSenderDTO dto = buildPushSenderDTO(pushSenderAdd);
+        try {
+            PushSenderDTO pushSenderDTO = NotificationSenderServiceHolder.getNotificationSenderManagementService()
+                    .addPushSender(dto);
+            return buildPushSenderFromDTO(pushSenderDTO);
+        } catch (NotificationSenderManagementException e) {
+            throw handleException(e);
+        }
+    }
+
+    /**
      * Delete a SMS/Email sender by name.
      *
      * @param notificationSenderName Name of the notification sender.
@@ -137,6 +159,23 @@ public class NotificationSenderManagementService {
     }
 
     /**
+     * Retrieve the push sender details by name.
+     *
+     * @param senderName Push sender's name.
+     * @return Push sender.
+     */
+    public PushSender getPushSender(String senderName) {
+
+        try {
+            PushSenderDTO pushSenderDTO = NotificationSenderServiceHolder.getNotificationSenderManagementService()
+                    .getPushSender(senderName, false);
+            return buildPushSenderFromDTO(pushSenderDTO);
+        } catch (NotificationSenderManagementException e) {
+            throw handleException(e);
+        }
+    }
+
+    /**
      * Retrieve all email senders of the tenant.
      *
      * @return Email senders of the tenant.
@@ -163,6 +202,22 @@ public class NotificationSenderManagementService {
             List<SMSSenderDTO> smsSenders = NotificationSenderServiceHolder.getNotificationSenderManagementService()
                     .getSMSSenders(false);
             return smsSenders.stream().map(this::buildSMSSenderFromDTO).collect(Collectors.toList());
+        } catch (NotificationSenderManagementException e) {
+            throw handleException(e);
+        }
+    }
+
+    /**
+     * Retrieve all push senders of the tenant.
+     *
+     * @return Push senders of the tenant.
+     */
+    public List<PushSender> getPushSenders() {
+
+        try {
+            List<PushSenderDTO> pushSenders = NotificationSenderServiceHolder.getNotificationSenderManagementService()
+                    .getPushSenders(false);
+            return pushSenders.stream().map(this::buildPushSenderFromDTO).collect(Collectors.toList());
         } catch (NotificationSenderManagementException e) {
             throw handleException(e);
         }
@@ -201,6 +256,25 @@ public class NotificationSenderManagementService {
             SMSSenderDTO smsSenderDTO = NotificationSenderServiceHolder.getNotificationSenderManagementService()
                     .updateSMSSender(dto);
             return buildSMSSenderFromDTO(smsSenderDTO);
+        } catch (NotificationSenderManagementException e) {
+            throw handleException(e);
+        }
+    }
+
+    /**
+     * Update push sender details by name.
+     *
+     * @param senderName               Push sender's name.
+     * @param pushSenderUpdateRequest Push sender's updated configurations.
+     * @return Updated push sender.
+     */
+    public PushSender updatePushSender(String senderName, PushSenderUpdateRequest pushSenderUpdateRequest) {
+
+        PushSenderDTO dto = buildPushSenderDTO(senderName, pushSenderUpdateRequest);
+        try {
+            PushSenderDTO pushSenderDTO = NotificationSenderServiceHolder.getNotificationSenderManagementService()
+                    .updatePushSender(dto);
+            return buildPushSenderFromDTO(pushSenderDTO);
         } catch (NotificationSenderManagementException e) {
             throw handleException(e);
         }
@@ -317,6 +391,42 @@ public class NotificationSenderManagementService {
         });
         smsSender.setProperties(properties);
         return smsSender;
+    }
+
+    private PushSenderDTO buildPushSenderDTO(PushSenderAdd pushSenderAdd) {
+
+        PushSenderDTO dto = new PushSenderDTO();
+        dto.setName(pushSenderAdd.getName());
+        dto.setProvider(pushSenderAdd.getProvider());
+        List<Properties> properties = pushSenderAdd.getProperties();
+        properties.forEach((prop) -> dto.getProperties().put(prop.getKey(), prop.getValue()));
+        return dto;
+    }
+
+    private PushSenderDTO buildPushSenderDTO(String senderName, PushSenderUpdateRequest pushSenderUpdateRequest) {
+
+        PushSenderDTO dto = new PushSenderDTO();
+        dto.setName(senderName);
+        dto.setProvider(pushSenderUpdateRequest.getProvider());
+        List<Properties> properties = pushSenderUpdateRequest.getProperties();
+        properties.forEach((prop) -> dto.getProperties().put(prop.getKey(), prop.getValue()));
+        return dto;
+    }
+
+    private PushSender buildPushSenderFromDTO(PushSenderDTO dto) {
+
+        PushSender pushSender = new PushSender();
+        pushSender.setName(dto.getName());
+        pushSender.setProvider(dto.getProvider());
+        List<Properties> properties = new ArrayList<>();
+        dto.getProperties().forEach((key, value) -> {
+            Properties prop = new Properties();
+            prop.setKey(key);
+            prop.setValue(value);
+            properties.add(prop);
+        });
+        pushSender.setProperties(properties);
+        return pushSender;
     }
 
     private APIError buildServerError(NotificationSenderManagementException e) {

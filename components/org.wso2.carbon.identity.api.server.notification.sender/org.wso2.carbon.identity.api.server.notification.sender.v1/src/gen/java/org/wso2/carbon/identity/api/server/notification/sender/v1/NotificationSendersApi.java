@@ -26,6 +26,9 @@ import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSen
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSenderAdd;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSenderUpdateRequest;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.Error;
+import org.wso2.carbon.identity.api.server.notification.sender.v1.model.PushSender;
+import org.wso2.carbon.identity.api.server.notification.sender.v1.model.PushSenderAdd;
+import org.wso2.carbon.identity.api.server.notification.sender.v1.model.PushSenderUpdateRequest;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.SMSSender;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.SMSSenderAdd;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.SMSSenderUpdateRequest;
@@ -70,6 +73,32 @@ public class NotificationSendersApi  {
     public Response createEmailSender(@ApiParam(value = "" ) @Valid EmailSenderAdd emailSenderAdd) {
 
         return delegate.createEmailSender(emailSenderAdd );
+    }
+
+    @Valid
+    @POST
+    @Path("/push")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Create a push notification sender", notes = "This API provides the capability to create a push notification sender.\\n\\nIf the 'name' is not defined, 'PushPublisher' is taken as the default name. <br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/configmgt/add <br>   <b>Scope required:</b> <br>     * internal_config_mgt_add ", response = PushSender.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Push Notification Senders", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 201, message = "Successful Response", response = PushSender.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 405, message = "Method Not Allowed.", response = Error.class),
+        @ApiResponse(code = 409, message = "Conflict", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response createPushSender(@ApiParam(value = "" ) @Valid PushSenderAdd pushSenderAdd) {
+
+        return delegate.createPushSender(pushSenderAdd );
     }
 
     @Valid
@@ -121,6 +150,31 @@ public class NotificationSendersApi  {
     public Response deleteEmailSender(@ApiParam(value = "name of the email sender",required=true) @PathParam("sender-name") String senderName) {
 
         return delegate.deleteEmailSender(senderName );
+    }
+
+    @Valid
+    @DELETE
+    @Path("/push/{sender-name}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Delete a push notification sender by name", notes = "This API provides the capability to delete a push notification sender by name. The URL encoded push notification sender name is used as sender-name.<br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/configmgt/delete <br>   <b>Scope required:</b> <br>     * internal_config_mgt_delete ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Push Notification Senders", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "No Content", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 405, message = "Method Not Allowed.", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response deletePushSender(@ApiParam(value = "name of the email sender",required=true) @PathParam("sender-name") String senderName) {
+
+        return delegate.deletePushSender(senderName );
     }
 
     @Valid
@@ -200,6 +254,56 @@ public class NotificationSendersApi  {
 
     @Valid
     @GET
+    @Path("/push/{sender-name}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve a push notification sender by name", notes = "This API provides the capability to retrieve a push notification sender by name. The URL encoded push notification sender name is used as sender-name.<br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/configmgt/view <br>   <b>Scope required:</b> <br>     * internal_config_mgt_view ", response = PushSender.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Push Notification Senders", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = PushSender.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 405, message = "Method Not Allowed.", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getPushSender(@ApiParam(value = "name of the push notification sender",required=true) @PathParam("sender-name") String senderName) {
+
+        return delegate.getPushSender(senderName );
+    }
+
+    @Valid
+    @GET
+    @Path("/push")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Get a list of push notification senders", notes = "This API provides the capability to retrieve the list of push notification senders. <br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/configmgt/view <br>   <b>Scope required:</b> <br>     * internal_config_mgt_view ", response = PushSender.class, responseContainer = "List", authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Push Notification Senders", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = PushSender.class, responseContainer = "List"),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 405, message = "Method Not Allowed.", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getPushSenders() {
+
+        return delegate.getPushSenders();
+    }
+
+    @Valid
+    @GET
     @Path("/sms/{sender-name}")
     
     @Produces({ "application/json" })
@@ -271,6 +375,31 @@ public class NotificationSendersApi  {
     public Response updateEmailSender(@ApiParam(value = "name of the email sender",required=true) @PathParam("sender-name") String senderName, @ApiParam(value = "" ,required=true) @Valid EmailSenderUpdateRequest emailSenderUpdateRequest) {
 
         return delegate.updateEmailSender(senderName,  emailSenderUpdateRequest );
+    }
+
+    @Valid
+    @PUT
+    @Path("/push/{sender-name}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update a push notification sender", notes = "This API provides the capability to update a push notification sender by name. The URL encoded push notification sender name is used as sender-name.<br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/configmgt/update <br>   <b>Scope required:</b> <br>     * internal_config_mgt_update ", response = PushSender.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Push Notification Senders", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = PushSender.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 405, message = "Method Not Allowed.", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response updatePushSender(@ApiParam(value = "name of the push notification sender",required=true) @PathParam("sender-name") String senderName, @ApiParam(value = "" ,required=true) @Valid PushSenderUpdateRequest pushSenderUpdateRequest) {
+
+        return delegate.updatePushSender(senderName,  pushSenderUpdateRequest );
     }
 
     @Valid

@@ -30,6 +30,9 @@ import org.wso2.carbon.identity.api.server.notification.sender.v1.core.Notificat
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSender;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSenderAdd;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSenderUpdateRequest;
+import org.wso2.carbon.identity.api.server.notification.sender.v1.model.PushSender;
+import org.wso2.carbon.identity.api.server.notification.sender.v1.model.PushSenderAdd;
+import org.wso2.carbon.identity.api.server.notification.sender.v1.model.PushSenderUpdateRequest;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.SMSSender;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.SMSSenderAdd;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.SMSSenderUpdateRequest;
@@ -46,6 +49,7 @@ import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenant
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.EMAIL_PUBLISHER_TYPE;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.NOTIFICATION_SENDER_CONTEXT_PATH;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.PLUS;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.PUSH_PUBLISHER_TYPE;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SMS_PUBLISHER_TYPE;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.URL_ENCODED_SPACE;
 
@@ -79,6 +83,25 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     }
 
     @Override
+    public Response createPushSender(PushSenderAdd pushSenderAdd) {
+
+        // do some magic!
+        PushSender pushSender = notificationSenderManagementService.addPushSender(pushSenderAdd);
+        URI location = null;
+        try {
+            location = ContextLoader.buildURIForHeader(
+                    V1_API_PATH_COMPONENT + NOTIFICATION_SENDER_CONTEXT_PATH + "/" + PUSH_PUBLISHER_TYPE + "/" +
+                            URLEncoder.encode(pushSender.getName(), StandardCharsets.UTF_8.name())
+                                    .replace(PLUS, URL_ENCODED_SPACE));
+        } catch (UnsupportedEncodingException e) {
+            ErrorResponse errorResponse =
+                    new ErrorResponse.Builder().withMessage("Error due to unsupported encoding.").build();
+            throw new APIError(Response.Status.METHOD_NOT_ALLOWED, errorResponse);
+        }
+        return Response.created(location).entity(pushSender).build();
+    }
+
+    @Override
     public Response createSMSSender(SMSSenderAdd smSSenderAdd) {
 
         SMSSender smsSender = notificationSenderManagementService.addSMSSender(smSSenderAdd);
@@ -102,6 +125,13 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
         if (StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
             return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
         }
+        notificationSenderManagementService.deleteNotificationSender(senderName);
+        return Response.noContent().build();
+    }
+
+    @Override
+    public Response deletePushSender(String senderName) {
+
         notificationSenderManagementService.deleteNotificationSender(senderName);
         return Response.noContent().build();
     }
@@ -132,6 +162,18 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     }
 
     @Override
+    public Response getPushSender(String senderName) {
+
+        return Response.ok().entity(notificationSenderManagementService.getPushSender(senderName)).build();
+    }
+
+    @Override
+    public Response getPushSenders() {
+
+        return Response.ok().entity(notificationSenderManagementService.getPushSenders()).build();
+    }
+
+    @Override
     public Response getSMSSender(String senderName) {
 
         return Response.ok().entity(notificationSenderManagementService.getSMSSender(senderName)).build();
@@ -151,6 +193,14 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
         }
         return Response.ok()
                 .entity(notificationSenderManagementService.updateEmailSender(senderName, emailSenderUpdateRequest))
+                .build();
+    }
+
+    @Override
+    public Response updatePushSender(String senderName, PushSenderUpdateRequest pushSenderUpdateRequest) {
+
+        return Response.ok()
+                .entity(notificationSenderManagementService.updatePushSender(senderName, pushSenderUpdateRequest))
                 .build();
     }
 

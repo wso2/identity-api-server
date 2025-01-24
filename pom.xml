@@ -41,7 +41,7 @@
         <developerConnection>scm:git:https://github.com/wso2/identity-api-server.git
         </developerConnection>
         <connection>scm:git:https://github.com/wso2/identity-api-server.git</connection>
-        <tag>v1.2.252</tag>
+        <tag>HEAD</tag>
     </scm>
 
 
@@ -813,7 +813,7 @@
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
         <findsecbugs-plugin.version>1.12.0</findsecbugs-plugin.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
-        <identity.event.handler.version>1.9.12</identity.event.handler.version>
+        <identity.event.handler.version>1.9.34</identity.event.handler.version>
         <identity.inbound.oauth2.version>7.0.169</identity.inbound.oauth2.version>
         <identity.inbound.saml2.version>5.11.44</identity.inbound.saml2.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
