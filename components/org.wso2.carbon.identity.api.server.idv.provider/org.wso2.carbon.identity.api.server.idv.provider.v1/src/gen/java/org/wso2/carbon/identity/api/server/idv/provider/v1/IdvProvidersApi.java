@@ -18,17 +18,16 @@
 
 package org.wso2.carbon.identity.api.server.idv.provider.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 
+import org.wso2.carbon.identity.api.server.idv.provider.v1.factories.IdvProvidersApiServiceFactory;
 import org.wso2.carbon.identity.api.server.idv.provider.v1.model.Error;
 import org.wso2.carbon.identity.api.server.idv.provider.v1.model.IdVProviderListResponse;
 import org.wso2.carbon.identity.api.server.idv.provider.v1.model.IdVProviderRequest;
 import org.wso2.carbon.identity.api.server.idv.provider.v1.model.IdVProviderResponse;
-import org.wso2.carbon.identity.api.server.idv.provider.v1.IdvProvidersApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -42,8 +41,12 @@ import javax.validation.constraints.*;
 
 public class IdvProvidersApi  {
 
-    @Autowired
-    private IdvProvidersApiService delegate;
+    private final IdvProvidersApiService delegate;
+
+    public IdvProvidersApi() {
+
+        this.delegate = IdvProvidersApiServiceFactory.getIdvProvidersApi();
+    }
 
     @Valid
     @POST
