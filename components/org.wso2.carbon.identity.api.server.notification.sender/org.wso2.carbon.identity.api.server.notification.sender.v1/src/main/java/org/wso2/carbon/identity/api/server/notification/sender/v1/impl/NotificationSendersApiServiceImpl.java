@@ -85,7 +85,6 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     @Override
     public Response createPushSender(PushSenderAdd pushSenderAdd) {
 
-        // do some magic!
         PushSender pushSender = notificationSenderManagementService.addPushSender(pushSenderAdd);
         URI location = null;
         try {
