@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2020-2025, WSO2 LLC. (http://www.wso2.com).
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
+ * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,7 +19,6 @@
 package org.wso2.carbon.identity.api.server.notification.sender.v1.impl;
 
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.base.MultitenantConstants;
 
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
@@ -27,6 +26,7 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.NotificationSendersApiService;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.core.NotificationSenderManagementService;
+import org.wso2.carbon.identity.api.server.notification.sender.v1.factories.NotificationSenderManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSender;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSenderAdd;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSenderUpdateRequest;
@@ -54,8 +54,17 @@ import static org.wso2.carbon.identity.api.server.notification.sender.common.Not
  */
 public class NotificationSendersApiServiceImpl implements NotificationSendersApiService {
 
-    @Autowired
-    private NotificationSenderManagementService notificationSenderManagementService;
+    private final NotificationSenderManagementService notificationSenderManagementService;
+
+    public NotificationSendersApiServiceImpl() {
+
+        try {
+            this.notificationSenderManagementService = NotificationSenderManagementServiceFactory
+                    .getNotificationSenderManagementService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating notification sender service.", e);
+        }
+    }
 
     @Override
     public Response createEmailSender(EmailSenderAdd emailSenderAdd) {
