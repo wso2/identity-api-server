@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2019 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019-2025, WSO2 LLC. (http://www.wso2.com).
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
+ * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
@@ -96,6 +96,7 @@ import org.wso2.carbon.identity.application.common.model.RoleMapping;
 import org.wso2.carbon.identity.application.common.model.SubProperty;
 import org.wso2.carbon.identity.application.common.model.UserDefinedFederatedAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
+import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
 import org.wso2.carbon.identity.base.AuthenticatorPropertyConstants.DefinedByType;
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
 import org.wso2.carbon.identity.claim.metadata.mgt.model.LocalClaim;
@@ -114,6 +115,7 @@ import org.wso2.carbon.identity.template.mgt.model.Template;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
+import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 import org.wso2.carbon.idp.mgt.dao.IdPManagementDAO;
 import org.wso2.carbon.idp.mgt.model.ConnectedAppsResult;
 import org.wso2.carbon.idp.mgt.model.IdpSearchResult;
@@ -180,7 +182,19 @@ import static org.wso2.carbon.identity.configuration.mgt.core.search.constant.Co
  */
 public class ServerIdpManagementService {
 
+    private final IdentityProviderManager identityProviderManager;
+    private final ClaimMetadataManagementService claimMetadataManagementService;
+    private final TemplateManager templateManager;
+
     private static final Log log = LogFactory.getLog(ServerIdpManagementService.class);
+
+    public ServerIdpManagementService(IdentityProviderManager identityProviderManager, TemplateManager templateManager,
+                                      ClaimMetadataManagementService claimMetadataManagementService) {
+
+        this.identityProviderManager = identityProviderManager;
+        this.templateManager = templateManager;
+        this.claimMetadataManagementService = claimMetadataManagementService;
+    }
 
     /**
      * Get list of identity providers.
@@ -201,9 +215,8 @@ public class ServerIdpManagementService {
             if (StringUtils.isNotBlank(requiredAttributes)) {
                 requestedAttributeList = new ArrayList<>(Arrays.asList(requiredAttributes.split(",")));
             }
-            return createIDPListResponse(
-                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPs(limit, offset, filter,
-                            sortOrder, sortBy, ContextLoader.getTenantDomainFromContext(), requestedAttributeList),
+            return createIDPListResponse(identityProviderManager.getIdPs(limit, offset, filter, sortOrder, sortBy,
+                            ContextLoader.getTenantDomainFromContext(), requestedAttributeList),
                     requestedAttributeList);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_IDPS, null);
@@ -229,10 +242,9 @@ public class ServerIdpManagementService {
             if (StringUtils.isNotBlank(requiredAttributes)) {
                 requestedAttributeList = new ArrayList<>(Arrays.asList(requiredAttributes.split(",")));
             }
-            return createIDPListResponse(
-                    IdentityProviderServiceHolder.getIdentityProviderManager().getTrustedTokenIssuers(limit, offset,
-                            filter, sortBy, sortOrder, ContextLoader.getTenantDomainFromContext(),
-                            requestedAttributeList), requestedAttributeList);
+            return createIDPListResponse(identityProviderManager.getTrustedTokenIssuers(limit, offset, filter, sortBy,
+                    sortOrder, ContextLoader.getTenantDomainFromContext(), requestedAttributeList),
+                            requestedAttributeList);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_TRUSTED_TOKEN_ISSUERS, null);
         }
@@ -249,8 +261,8 @@ public class ServerIdpManagementService {
         IdentityProvider identityProvider;
         try {
             validateSystemReservedIDP(identityProviderPOSTRequest.getName());
-            identityProvider = IdentityProviderServiceHolder.getIdentityProviderManager().addIdPWithResourceId(
-                    createIDP(identityProviderPOSTRequest), ContextLoader.getTenantDomainFromContext());
+            identityProvider = identityProviderManager.addIdPWithResourceId(createIDP(identityProviderPOSTRequest),
+                    ContextLoader.getTenantDomainFromContext());
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_IDP, null);
         }
@@ -266,8 +278,7 @@ public class ServerIdpManagementService {
     public IdentityProviderResponse getIDP(String idpId) {
 
         try {
-            IdentityProvider identityProvider =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId,
+            IdentityProvider identityProvider = identityProviderManager.getIdPByResourceId(idpId,
                             ContextLoader.getTenantDomainFromContext(), true);
             if (identityProvider == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
@@ -292,9 +303,8 @@ public class ServerIdpManagementService {
     public IdentityProviderResponse patchIDP(String identityProviderId, List<Patch> patchRequest) {
 
         try {
-            IdentityProvider identityProvider =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(identityProviderId,
-                            ContextLoader.getTenantDomainFromContext(), true);
+            IdentityProvider identityProvider = identityProviderManager.getIdPByResourceId(identityProviderId,
+                    ContextLoader.getTenantDomainFromContext(), true);
             if (identityProvider == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         identityProviderId);
@@ -302,9 +312,8 @@ public class ServerIdpManagementService {
             IdentityProvider idpToUpdate = createIdPClone(identityProvider);
             processPatchRequest(patchRequest, idpToUpdate);
             validateSystemReservedIDP(idpToUpdate.getIdentityProviderName());
-            IdentityProvider updatedIdP = IdentityProviderServiceHolder.getIdentityProviderManager()
-                    .updateIdPByResourceId(identityProviderId, idpToUpdate,
-                            ContextLoader.getTenantDomainFromContext());
+            IdentityProvider updatedIdP = identityProviderManager.updateIdPByResourceId(identityProviderId, idpToUpdate,
+                    ContextLoader.getTenantDomainFromContext());
             return createIDPResponse(updatedIdP);
 
         } catch (IdentityProviderManagementException e) {
@@ -320,7 +329,7 @@ public class ServerIdpManagementService {
     public void deleteIDP(String identityProviderId) {
 
         try {
-            IdentityProviderServiceHolder.getIdentityProviderManager().deleteIdPByResourceId(identityProviderId,
+            identityProviderManager.deleteIdPByResourceId(identityProviderId,
                     ContextLoader.getTenantDomainFromContext());
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_DELETING_IDP, identityProviderId);
@@ -336,7 +345,7 @@ public class ServerIdpManagementService {
     public void forceDeleteIDP(String identityProviderId) {
 
         try {
-            IdentityProviderServiceHolder.getIdentityProviderManager().forceDeleteIdpByResourceId(identityProviderId,
+            identityProviderManager.forceDeleteIdpByResourceId(identityProviderId,
                     ContextLoader.getTenantDomainFromContext());
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_DELETING_IDP, identityProviderId);
@@ -367,8 +376,7 @@ public class ServerIdpManagementService {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             identityProvider = RESIDENT_IDP_RESERVED_NAME.equals(idpId) ? dao.getIdPByName(null,
                     RESIDENT_IDP_RESERVED_NAME, IdentityTenantUtil.getTenantId(tenantDomain), tenantDomain) :
-                    IdentityProviderServiceHolder.getIdentityProviderManager().
-                            getIdPByResourceId(idpId, tenantDomain, true);
+                    identityProviderManager.getIdPByResourceId(idpId, tenantDomain, true);
             idpToExport = createIdPClone(identityProvider);
             if (idpToExport == null) {
                 throw handleException(Response.Status.NOT_FOUND,
@@ -408,7 +416,7 @@ public class ServerIdpManagementService {
         IdentityProvider identityProvider;
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            identityProvider = IdentityProviderServiceHolder.getIdentityProviderManager().addIdPWithResourceId(
+            identityProvider = identityProviderManager.addIdPWithResourceId(
                     getIDPFromFile(fileInputStream, fileDetail), tenantDomain);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_IMPORTING_IDP, null);
@@ -430,11 +438,9 @@ public class ServerIdpManagementService {
             identityProvider = getIDPFromFile(fileInputStream, fileDetail);
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             if (RESIDENT_IDP_RESERVED_NAME.equals(identityProviderId)) {
-                IdentityProviderServiceHolder.getIdentityProviderManager().updateResidentIdP(identityProvider,
-                        tenantDomain);
+                identityProviderManager.updateResidentIdP(identityProvider, tenantDomain);
             } else {
-                IdentityProviderServiceHolder.getIdentityProviderManager().updateIdPByResourceId(identityProviderId,
-                        identityProvider, tenantDomain);
+                identityProviderManager.updateIdPByResourceId(identityProviderId, identityProvider, tenantDomain);
             }
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP, null);
@@ -450,9 +456,8 @@ public class ServerIdpManagementService {
 
         List<MetaFederatedAuthenticatorListItem> metaAuthenticators = new ArrayList<>();
         try {
-            FederatedAuthenticatorConfig[] authenticatorConfigs =
-                    IdentityProviderServiceHolder.getIdentityProviderManager()
-                            .getAllFederatedAuthenticators();
+            FederatedAuthenticatorConfig[] authenticatorConfigs = identityProviderManager
+                    .getAllFederatedAuthenticators();
             if (ArrayUtils.isNotEmpty(authenticatorConfigs)) {
                 for (FederatedAuthenticatorConfig authenticatorConfig : authenticatorConfigs) {
                     MetaFederatedAuthenticatorListItem metaFederatedAuthenticator =
@@ -477,9 +482,8 @@ public class ServerIdpManagementService {
         MetaFederatedAuthenticator authenticator = null;
         try {
             String authenticatorName = decodeAuthenticatorID(id);
-            FederatedAuthenticatorConfig[] authenticatorConfigs =
-                    IdentityProviderServiceHolder.getIdentityProviderManager()
-                            .getAllFederatedAuthenticators();
+            FederatedAuthenticatorConfig[] authenticatorConfigs = identityProviderManager
+                    .getAllFederatedAuthenticators();
             if (ArrayUtils.isNotEmpty(authenticatorConfigs)) {
                 for (FederatedAuthenticatorConfig authenticatorConfig : authenticatorConfigs) {
                     if (StringUtils.equals(authenticatorConfig.getName(), authenticatorName)) {
@@ -523,8 +527,7 @@ public class ServerIdpManagementService {
 
         List<MetaOutboundConnectorListItem> metaOutboundConnectors = new ArrayList<>();
         try {
-            ProvisioningConnectorConfig[] connectorConfigs = IdentityProviderServiceHolder.getIdentityProviderManager()
-                    .getAllProvisioningConnectors();
+            ProvisioningConnectorConfig[] connectorConfigs = identityProviderManager.getAllProvisioningConnectors();
             if (ArrayUtils.isNotEmpty(connectorConfigs)) {
                 for (ProvisioningConnectorConfig connectorConfig : connectorConfigs) {
                     MetaOutboundConnectorListItem metaOutboundConnector = createMetaOutboundConnectorListItem
@@ -549,8 +552,7 @@ public class ServerIdpManagementService {
         String connectorName = base64URLDecode(id);
         MetaOutboundConnector connector = null;
         try {
-            ProvisioningConnectorConfig[] connectorConfigs = IdentityProviderServiceHolder.getIdentityProviderManager()
-                    .getAllProvisioningConnectors();
+            ProvisioningConnectorConfig[] connectorConfigs = identityProviderManager.getAllProvisioningConnectors();
             if (ArrayUtils.isNotEmpty(connectorConfigs)) {
                 for (ProvisioningConnectorConfig connectorConfig : connectorConfigs) {
                     if (StringUtils.equals(connectorConfig.getName(), connectorName)) {
@@ -576,9 +578,8 @@ public class ServerIdpManagementService {
         FederatedAuthenticatorListResponse listResponse;
 
         try {
-            IdentityProvider idP =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId, ContextLoader
-                            .getTenantDomainFromContext(), true);
+            IdentityProvider idP = identityProviderManager.getIdPByResourceId(idpId, ContextLoader
+                    .getTenantDomainFromContext(), true);
 
             if (idP == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
@@ -610,9 +611,8 @@ public class ServerIdpManagementService {
     public FederatedAuthenticator getFederatedAuthenticator(String idpId, String authenticatorId) {
 
         try {
-            IdentityProvider idp =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId, ContextLoader
-                            .getTenantDomainFromContext(), true);
+            IdentityProvider idp = identityProviderManager.getIdPByResourceId(idpId, ContextLoader
+                    .getTenantDomainFromContext(), true);
             if (idp == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
@@ -644,9 +644,8 @@ public class ServerIdpManagementService {
             authenticatorRequest) {
 
         try {
-            IdentityProvider idp =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId, ContextLoader
-                            .getTenantDomainFromContext(), true);
+            IdentityProvider idp = identityProviderManager.getIdPByResourceId(idpId, ContextLoader
+                    .getTenantDomainFromContext(), true);
             if (idp == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
@@ -655,9 +654,8 @@ public class ServerIdpManagementService {
             // IDP object.
             IdentityProvider idpToUpdate = createIdPClone(idp);
             updateFederatedAuthenticatorConfig(idpToUpdate, authenticatorRequest, false);
-            IdentityProvider updatedIdp = IdentityProviderServiceHolder.getIdentityProviderManager()
-                    .updateIdPByResourceId(
-                            idpId, idpToUpdate, ContextLoader.getTenantDomainFromContext());
+            IdentityProvider updatedIdp = identityProviderManager.updateIdPByResourceId(idpId, idpToUpdate,
+                        ContextLoader.getTenantDomainFromContext());
             return createFederatedAuthenticatorResponse(updatedIdp);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP, StringUtils.EMPTY);
@@ -675,9 +673,8 @@ public class ServerIdpManagementService {
                                                                FederatedAuthenticatorPUTRequest authenticator) {
 
         try {
-            IdentityProvider idp =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId, ContextLoader
-                            .getTenantDomainFromContext(), true);
+            IdentityProvider idp = identityProviderManager.getIdPByResourceId(idpId, ContextLoader
+                    .getTenantDomainFromContext(), true);
             if (idp == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
@@ -715,9 +712,8 @@ public class ServerIdpManagementService {
                 idpToUpdate.setDefaultAuthenticatorConfig(null);
             }
 
-            IdentityProvider updatedIdP = IdentityProviderServiceHolder.getIdentityProviderManager()
-                    .updateIdPByResourceId(idpId, idpToUpdate, ContextLoader
-                            .getTenantDomainFromContext());
+            IdentityProvider updatedIdP = identityProviderManager.updateIdPByResourceId(idpId, idpToUpdate,
+                    ContextLoader.getTenantDomainFromContext());
             return createFederatedAuthenticator(federatedAuthenticatorId, updatedIdP);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP_AUTHENTICATOR,
@@ -734,9 +730,8 @@ public class ServerIdpManagementService {
     public OutboundConnectorListResponse getOutboundConnectors(String idpId) {
 
         try {
-            IdentityProvider idp =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId, ContextLoader
-                            .getTenantDomainFromContext(), true);
+            IdentityProvider idp = identityProviderManager.getIdPByResourceId(idpId, ContextLoader
+                    .getTenantDomainFromContext(), true);
             if (idp == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
@@ -775,9 +770,8 @@ public class ServerIdpManagementService {
     public OutboundConnector getOutboundConnector(String idpId, String connectorId) {
 
         try {
-            IdentityProvider idp =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId, ContextLoader
-                            .getTenantDomainFromContext(), true);
+            IdentityProvider idp = identityProviderManager.getIdPByResourceId(idpId, ContextLoader
+                    .getTenantDomainFromContext(), true);
             if (idp == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
@@ -808,9 +802,8 @@ public class ServerIdpManagementService {
             outboundConnectorRequest) {
 
         try {
-            IdentityProvider idp =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId, ContextLoader
-                            .getTenantDomainFromContext(), true);
+            IdentityProvider idp = identityProviderManager.getIdPByResourceId(idpId, ContextLoader
+                    .getTenantDomainFromContext(), true);
             if (idp == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
@@ -820,9 +813,8 @@ public class ServerIdpManagementService {
             IdentityProvider idpToUpdate = createIdPClone(idp);
             updateOutboundConnectorConfig(idpToUpdate, outboundConnectorRequest);
 
-            IdentityProvider updatedIdp = IdentityProviderServiceHolder.getIdentityProviderManager()
-                    .updateIdPByResourceId(
-                            idpId, idpToUpdate, ContextLoader.getTenantDomainFromContext());
+            IdentityProvider updatedIdp = identityProviderManager.updateIdPByResourceId(idpId, idpToUpdate,
+                    ContextLoader.getTenantDomainFromContext());
             return createOutboundProvisioningResponse(updatedIdp);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP, StringUtils.EMPTY);
@@ -842,9 +834,8 @@ public class ServerIdpManagementService {
                                                              outboundConnector) {
 
         try {
-            IdentityProvider idp =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId, ContextLoader
-                            .getTenantDomainFromContext(), true);
+            IdentityProvider idp = identityProviderManager.getIdPByResourceId(idpId, ContextLoader
+                    .getTenantDomainFromContext(), true);
             if (idp == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
@@ -879,9 +870,8 @@ public class ServerIdpManagementService {
                 idpToUpdate.setDefaultProvisioningConnectorConfig(null);
             }
 
-            IdentityProvider updatedIdP = IdentityProviderServiceHolder.getIdentityProviderManager()
-                    .updateIdPByResourceId(idpId, idpToUpdate, ContextLoader
-                            .getTenantDomainFromContext());
+            IdentityProvider updatedIdP = identityProviderManager.updateIdPByResourceId(idpId, idpToUpdate,
+                    ContextLoader.getTenantDomainFromContext());
             return createOutboundConnector(connectorId, updatedIdP);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP_CONNECTOR, connectorId);
@@ -897,9 +887,8 @@ public class ServerIdpManagementService {
     public Claims getClaimConfig(String idpId) {
 
         try {
-            IdentityProvider identityProvider =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId, ContextLoader
-                            .getTenantDomainFromContext(), true);
+            IdentityProvider identityProvider = identityProviderManager.getIdPByResourceId(idpId, ContextLoader
+                    .getTenantDomainFromContext(), true);
             if (identityProvider == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
@@ -924,16 +913,13 @@ public class ServerIdpManagementService {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             validateClaims(tenantDomain, claims);
             IdentityProvider idP =
-                    createIdPClone(IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId,
-                            tenantDomain, true));
+                    createIdPClone(identityProviderManager.getIdPByResourceId(idpId, tenantDomain, true));
             if (idP == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
             }
             updateClaims(idP, claims);
-            IdentityProvider updatedIdP =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().updateIdPByResourceId(idpId,
-                            idP, tenantDomain);
+            IdentityProvider updatedIdP = identityProviderManager.updateIdPByResourceId(idpId, idP, tenantDomain);
             return createClaimResponse(updatedIdP.getClaimConfig());
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP_CLAIMS, idpId);
@@ -949,9 +935,8 @@ public class ServerIdpManagementService {
     public Roles getRoleConfig(String idpId) {
 
         try {
-            IdentityProvider identityProvider =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId, ContextLoader
-                            .getTenantDomainFromContext(), true);
+            IdentityProvider identityProvider = identityProviderManager.getIdPByResourceId(idpId, ContextLoader
+                    .getTenantDomainFromContext(), true);
             if (identityProvider == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
@@ -972,8 +957,7 @@ public class ServerIdpManagementService {
     public Roles updateRoleConfig(String idpId, Roles roles) {
 
         try {
-            IdentityProvider idP =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId, ContextLoader
+            IdentityProvider idP = identityProviderManager.getIdPByResourceId(idpId, ContextLoader
                             .getTenantDomainFromContext(), true);
             if (idP == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
@@ -981,8 +965,7 @@ public class ServerIdpManagementService {
             }
             updateRoles(idP, roles);
 
-            IdentityProvider updatedIdP =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().updateIdPByResourceId(idpId,
+            IdentityProvider updatedIdP = identityProviderManager.updateIdPByResourceId(idpId,
                             idP, ContextLoader.getTenantDomainFromContext());
             return createRoleResponse(updatedIdP);
         } catch (IdentityProviderManagementException e) {
@@ -999,8 +982,8 @@ public class ServerIdpManagementService {
     public List<IdPGroup> getGroupConfig(String idpId) {
 
         try {
-            IdentityProvider identityProvider = IdentityProviderServiceHolder.getIdentityProviderManager()
-                    .getIdPByResourceId(idpId, ContextLoader.getTenantDomainFromContext(), true);
+            IdentityProvider identityProvider = identityProviderManager.getIdPByResourceId(idpId,
+                    ContextLoader.getTenantDomainFromContext(), true);
             if (identityProvider == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
@@ -1021,17 +1004,16 @@ public class ServerIdpManagementService {
     public List<IdPGroup> updateGroupConfig(String idpId, List<IdPGroup> groups) {
 
         try {
-            IdentityProvider idP = IdentityProviderServiceHolder.getIdentityProviderManager()
-                    .getIdPByResourceId(idpId, ContextLoader.getTenantDomainFromContext(), true);
+            IdentityProvider idP = identityProviderManager.getIdPByResourceId(idpId, ContextLoader
+                    .getTenantDomainFromContext(), true);
             if (idP == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
             }
             updateGroups(idP, groups);
 
-            IdentityProvider updatedIdP =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().updateIdPByResourceId(idpId,
-                            idP, ContextLoader.getTenantDomainFromContext());
+            IdentityProvider updatedIdP = identityProviderManager.updateIdPByResourceId(idpId, idP,
+                    ContextLoader.getTenantDomainFromContext());
             return createGroupResponse(updatedIdP);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP_GROUPS, idpId);
@@ -1047,9 +1029,8 @@ public class ServerIdpManagementService {
     public ProvisioningResponse getProvisioningConfig(String idpId) {
 
         try {
-            IdentityProvider identityProvider =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId, ContextLoader
-                            .getTenantDomainFromContext(), true);
+            IdentityProvider identityProvider = identityProviderManager.getIdPByResourceId(idpId, ContextLoader
+                    .getTenantDomainFromContext(), true);
             if (identityProvider == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
@@ -1063,9 +1044,8 @@ public class ServerIdpManagementService {
     public AssociationResponse getFederatedAssociationConfig(String idpId) {
 
         try {
-            IdentityProvider identityProvider =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId, ContextLoader
-                            .getTenantDomainFromContext(), true);
+            IdentityProvider identityProvider = identityProviderManager.getIdPByResourceId(idpId, ContextLoader
+                    .getTenantDomainFromContext(), true);
             if (identityProvider == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
@@ -1080,9 +1060,8 @@ public class ServerIdpManagementService {
     public AssociationResponse updateFederatedAssociationConfig(String idpId, AssociationRequest associationRequest) {
 
         try {
-            IdentityProvider idP =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId, ContextLoader
-                            .getTenantDomainFromContext(), true);
+            IdentityProvider idP = identityProviderManager.getIdPByResourceId(idpId, ContextLoader
+                    .getTenantDomainFromContext(), true);
 
             if (idP == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
@@ -1091,9 +1070,8 @@ public class ServerIdpManagementService {
 
             updateFederatedAssociation(idP, associationRequest);
 
-            IdentityProvider updatedIdP =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().updateIdPByResourceId(idpId,
-                            idP, ContextLoader.getTenantDomainFromContext());
+            IdentityProvider updatedIdP = identityProviderManager.updateIdPByResourceId(idpId, idP, ContextLoader
+                    .getTenantDomainFromContext());
 
             return createAssociationResponse(updatedIdP);
         } catch (IdentityProviderManagementException e) {
@@ -1110,8 +1088,7 @@ public class ServerIdpManagementService {
     public JustInTimeProvisioning getJITConfig(String idpId) {
 
         try {
-            IdentityProvider identityProvider =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId, ContextLoader
+            IdentityProvider identityProvider = identityProviderManager.getIdPByResourceId(idpId, ContextLoader
                             .getTenantDomainFromContext(), true);
             if (identityProvider == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
@@ -1133,18 +1110,16 @@ public class ServerIdpManagementService {
     public JustInTimeProvisioning updateJITConfig(String idpId, JustInTimeProvisioning justInTimeProvisioningConfig) {
 
         try {
-            IdentityProvider idP =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId, ContextLoader
-                            .getTenantDomainFromContext(), true);
+            IdentityProvider idP = identityProviderManager.getIdPByResourceId(idpId, ContextLoader
+                    .getTenantDomainFromContext(), true);
             if (idP == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
             }
             updateJIT(idP, justInTimeProvisioningConfig);
 
-            IdentityProvider updatedIdP =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().updateIdPByResourceId(idpId,
-                            idP, ContextLoader.getTenantDomainFromContext());
+            IdentityProvider updatedIdP = identityProviderManager.updateIdPByResourceId(idpId, idP, ContextLoader
+                    .getTenantDomainFromContext());
             return createJITResponse(updatedIdP);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP_JIT, idpId);
@@ -1162,9 +1137,8 @@ public class ServerIdpManagementService {
     public ConnectedApps getConnectedApps(String resourceId, Integer limit, Integer offset) {
 
         try {
-            ConnectedAppsResult connectedAppsResult =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().getConnectedApplications(resourceId,
-                            limit, offset, ContextLoader.getTenantDomainFromContext());
+            ConnectedAppsResult connectedAppsResult = identityProviderManager.getConnectedApplications(resourceId,
+                    limit, offset, ContextLoader.getTenantDomainFromContext());
             return createConnectedAppsResponse(resourceId, connectedAppsResult);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_CONNECTED_APPS,
@@ -1184,7 +1158,6 @@ public class ServerIdpManagementService {
             searchContext) {
 
         try {
-            TemplateManager templateManager = IdentityProviderServiceHolder.getTemplateManager();
             List<Template> templateList = templateManager.listTemplates(
                     TemplateMgtConstants.TemplateType.IDP_TEMPLATE.toString(), limit, offset, getSearchCondition
                             (TemplateMgtConstants.TemplateType.IDP_TEMPLATE.toString(), ContextLoader
@@ -1349,7 +1322,7 @@ public class ServerIdpManagementService {
     public IdentityProviderTemplate getIDPTemplate(String templateId) {
 
         try {
-            Template idpTemplate = IdentityProviderServiceHolder.getTemplateManager().getTemplateById(templateId);
+            Template idpTemplate = templateManager.getTemplateById(templateId);
             return createIDPTemplateResponse(idpTemplate);
         } catch (TemplateManagementException e) {
             throw handleTemplateMgtException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_TEMPLATE,
@@ -1369,7 +1342,7 @@ public class ServerIdpManagementService {
 
         try {
             Template idpTemplate = generateIDPTemplate(identityProviderTemplate);
-            IdentityProviderServiceHolder.getTemplateManager().updateTemplateById(templateId, idpTemplate);
+            templateManager.updateTemplateById(templateId, idpTemplate);
         } catch (TemplateManagementException e) {
             throw handleTemplateMgtException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP_TEMPLATE,
                     identityProviderTemplate.getId());
@@ -1388,7 +1361,6 @@ public class ServerIdpManagementService {
     public String createIDPTemplate(IdentityProviderTemplate identityProviderTemplate) {
 
         try {
-            TemplateManager templateManager = IdentityProviderServiceHolder.getTemplateManager();
             Template idpTemplate = generateIDPTemplate(identityProviderTemplate);
             return templateManager.addTemplate(idpTemplate);
         } catch (TemplateManagementException e) {
@@ -1407,7 +1379,6 @@ public class ServerIdpManagementService {
     public void deleteIDPTemplate(String templateId) {
 
         try {
-            TemplateManager templateManager = IdentityProviderServiceHolder.getTemplateManager();
             templateManager.deleteTemplateById(templateId);
         } catch (TemplateManagementException e) {
             throw handleTemplateMgtException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_DELETING_IDP_TEMPLATE,
@@ -2581,9 +2552,8 @@ public class ServerIdpManagementService {
 
         LocalClaim localClaim;
         try {
-            List<LocalClaim> localClaimList =
-                    IdentityProviderServiceHolder.getClaimMetadataManagementService().getLocalClaims(
-                            ContextLoader.getTenantDomainFromContext());
+            List<LocalClaim> localClaimList = claimMetadataManagementService.getLocalClaims(ContextLoader
+                    .getTenantDomainFromContext());
 
             localClaim = extractLocalClaimFromClaimList(claimUri, localClaimList);
         } catch (ClaimMetadataException e) {
@@ -2707,9 +2677,8 @@ public class ServerIdpManagementService {
      */
     private boolean isValidConnector(String connectorId) throws IdentityProviderManagementException {
 
-        ProvisioningConnectorConfig[] supportedConnectorConfigs =
-                IdentityProviderServiceHolder.getIdentityProviderManager()
-                        .getAllProvisioningConnectors();
+        ProvisioningConnectorConfig[] supportedConnectorConfigs = identityProviderManager
+                .getAllProvisioningConnectors();
         if (supportedConnectorConfigs != null) {
             String connectorName = base64URLDecode(connectorId);
             for (ProvisioningConnectorConfig supportedConfig : supportedConnectorConfigs) {
@@ -2813,8 +2782,7 @@ public class ServerIdpManagementService {
     private boolean isValidAuthenticator(String federatedAuthenticatorId) throws
             IdentityProviderManagementException {
 
-        FederatedAuthenticatorConfig[] supportedAuthConfigs = IdentityProviderServiceHolder.getIdentityProviderManager()
-                .getAllFederatedAuthenticators();
+        FederatedAuthenticatorConfig[] supportedAuthConfigs = identityProviderManager.getAllFederatedAuthenticators();
         if (supportedAuthConfigs != null) {
             String authenticatorName = base64URLDecode(federatedAuthenticatorId);
             for (FederatedAuthenticatorConfig supportedConfig : supportedAuthConfigs) {
@@ -3417,8 +3385,7 @@ public class ServerIdpManagementService {
     private List<LocalClaim> getLocalClaimURIs(String tenantDomain) throws IdentityProviderManagementServerException {
 
         try {
-            List<LocalClaim> localClaimsList =
-                    IdentityProviderServiceHolder.getClaimMetadataManagementService().getLocalClaims(tenantDomain);
+            List<LocalClaim> localClaimsList = claimMetadataManagementService.getLocalClaims(tenantDomain);
             if (localClaimsList.isEmpty()) {
                 if (log.isDebugEnabled()) {
                     log.debug("No local claims found for tenant:" + tenantDomain + ".Therefore, skipping " +
