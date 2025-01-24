@@ -18,8 +18,9 @@
 
 package org.wso2.carbon.identity.api.server.application.management.v1.core;
 
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.MediaType;
+import java.util.Arrays;
+
+import javax.activation.MimeType;
 
 /**
  * The TransferResource class represents a resource to be transferred,
@@ -28,13 +29,13 @@ import org.springframework.http.MediaType;
 public class TransferResource {
 
     private String resourceName;
-    private MediaType resourceType;
-    private ByteArrayResource resource;
+    private MimeType resourceType;
+    private byte[] resource;
 
-    public TransferResource(String resourceName, ByteArrayResource resource, MediaType resourceType) {
+    public TransferResource(String resourceName, byte[] resource, MimeType resourceType) {
 
         this.resourceName = resourceName;
-        this.resource = resource;
+        this.resource = resource != null ? Arrays.copyOf(resource, resource.length) : new byte[0];
         this.resourceType = resourceType;
     }
 
@@ -48,22 +49,22 @@ public class TransferResource {
         this.resourceName = resourceName;
     }
 
-    public ByteArrayResource getResource() {
+    public byte[] getResource() {
 
-        return resource;
+        return resource != null ? Arrays.copyOf(resource, resource.length) : new byte[0];
     }
 
-    public void setResource(ByteArrayResource resource) {
+    public void setResource(byte[] resource) {
 
-        this.resource = resource;
+        this.resource = resource != null ? Arrays.copyOf(resource, resource.length) : new byte[0];
     }
 
-    public MediaType getResourceType() {
+    public MimeType getResourceType() {
 
         return resourceType;
     }
 
-    public void setResourceType(MediaType resourceType) {
+    public void setResourceType(MimeType resourceType) {
 
         this.resourceType = resourceType;
     }

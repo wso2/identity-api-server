@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019, WSO2 LLC. (http://www.wso2.com) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,6 @@ package org.wso2.carbon.identity.api.server.application.management.v1.impl;
 
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
@@ -49,6 +46,9 @@ import org.wso2.carbon.identity.api.server.application.management.v1.core.Server
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationSharingService;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.TransferResource;
 import org.wso2.carbon.identity.api.server.application.management.v1.factories.LoginFlowAIServiceFactory;
+import org.wso2.carbon.identity.api.server.application.management.v1.factories.ServerApplicationManagementServiceFactory;
+import org.wso2.carbon.identity.api.server.application.management.v1.factories.ServerApplicationMetadataServiceFactory;
+import org.wso2.carbon.identity.api.server.application.management.v1.factories.ServerApplicationSharingServiceFactory;
 import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 
@@ -63,14 +63,23 @@ import javax.ws.rs.core.Response;
  */
 public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
-    @Autowired
-    private ServerApplicationManagementService applicationManagementService;
+    private final ServerApplicationManagementService applicationManagementService;
+    private final ServerApplicationMetadataService applicationMetadataService;
+    private final ServerApplicationSharingService applicationSharingService;
 
-    @Autowired
-    private ServerApplicationMetadataService applicationMetadataService;
+    public ApplicationsApiServiceImpl() {
 
-    @Autowired
-    private ServerApplicationSharingService applicationSharingService;
+        try {
+            this.applicationManagementService = ServerApplicationManagementServiceFactory
+                    .getServerApplicationManagementService();
+            this.applicationMetadataService = ServerApplicationMetadataServiceFactory
+                    .getServerApplicationMetadataService();
+            this.applicationSharingService = ServerApplicationSharingServiceFactory
+                    .getServerApplicationSharingService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating application management services.", e);
+        }
+    }
 
     @Deprecated
     @Override
@@ -282,13 +291,13 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
         );
 
         return Response.ok()
-                .type(MediaType.APPLICATION_OCTET_STREAM_VALUE)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""
+                .type("application/octet-stream")
+                .header("Content-Disposition", "attachment; filename=\""
                         + transferResource.getResourceName() + "\"")
-                .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate")
-                .header(HttpHeaders.PRAGMA, "no-cache")
-                .header(HttpHeaders.EXPIRES, "0")
-                .entity(transferResource.getResource().getByteArray())
+                .header("Cache-Control", "no-cache, no-store, must-revalidate")
+                .header("Pragma", "no-cache")
+                .header("Expires", "0")
+                .entity(transferResource.getResource())
                 .build();
     }
 
