@@ -21,12 +21,20 @@ package org.wso2.carbon.identity.api.server.extension.management.v1.factories;
 import org.wso2.carbon.identity.api.server.extension.management.v1.ExtensionsApiService;
 import org.wso2.carbon.identity.api.server.extension.management.v1.impl.ExtensionsApiServiceImpl;
 
+/**
+ * Extensions Api Service Factory.
+ */
 public class ExtensionsApiServiceFactory {
 
-   private final static ExtensionsApiService service = new ExtensionsApiServiceImpl();
+   private static final ExtensionsApiService SERVICE = new ExtensionsApiServiceImpl();
 
-   public static ExtensionsApiService getExtensionsApi()
-   {
-      return service;
+   /**
+    * Get Extensions Api Service.
+    *
+    * @return ExtensionsApiService
+    */
+   public static ExtensionsApiService getExtensionsApi() {
+
+      return SERVICE;
    }
 }
