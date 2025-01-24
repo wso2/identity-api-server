@@ -24,12 +24,12 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants;
-import org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceServiceHolder;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.core.utils.BrandingPreferenceUtils;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingPreferenceModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.CustomTextModel;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.branding.preference.management.core.BrandingPreferenceManager;
 import org.wso2.carbon.identity.branding.preference.management.core.exception.BrandingPreferenceMgtClientException;
 import org.wso2.carbon.identity.branding.preference.management.core.exception.BrandingPreferenceMgtException;
 import org.wso2.carbon.identity.branding.preference.management.core.exception.BrandingPreferenceMgtServerException;
@@ -70,7 +70,13 @@ import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenant
  */
 public class BrandingPreferenceManagementService {
 
+    private final BrandingPreferenceManager brandingPreferenceManager;
     private static final Log log = LogFactory.getLog(BrandingPreferenceManagementService.class);
+
+    public BrandingPreferenceManagementService(BrandingPreferenceManager brandingPreferenceManager) {
+
+        this.brandingPreferenceManager = brandingPreferenceManager;
+    }
 
     /**
      * Create a branding preference resource with a resource file.
@@ -89,8 +95,7 @@ public class BrandingPreferenceManagementService {
         BrandingPreference responseDTO;
         try {
             BrandingPreference requestDTO = buildRequestDTOFromBrandingRequest(brandingPreferenceModel);
-            responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
-                    addBrandingPreference(requestDTO);
+            responseDTO = brandingPreferenceManager.addBrandingPreference(requestDTO);
         } catch (BrandingPreferenceMgtException e) {
             if (BRANDING_PREFERENCE_ALREADY_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
                 if (log.isDebugEnabled()) {
@@ -127,7 +132,7 @@ public class BrandingPreferenceManagementService {
         }
 
         try {
-            BrandingPreferenceServiceHolder.getBrandingPreferenceManager().deleteBrandingPreference(type, name, locale);
+            brandingPreferenceManager.deleteBrandingPreference(type, name, locale);
         } catch (BrandingPreferenceMgtException e) {
             if (BRANDING_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
                 if (log.isDebugEnabled()) {
@@ -160,12 +165,11 @@ public class BrandingPreferenceManagementService {
             BrandingPreference responseDTO;
             if (APPLICATION_TYPE.equals(type)) {
                 // Get application specific branding preference.
-                responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
-                        getBrandingPreference(APPLICATION_TYPE, name, DEFAULT_LOCALE);
+                responseDTO = brandingPreferenceManager.getBrandingPreference(APPLICATION_TYPE, name, DEFAULT_LOCALE);
             } else {
                 // Get tenant specific branding preference.(default branding preference)
-                responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
-                        getBrandingPreference(ORGANIZATION_TYPE, tenantDomain, DEFAULT_LOCALE);
+                responseDTO = brandingPreferenceManager.getBrandingPreference(ORGANIZATION_TYPE, tenantDomain,
+                        DEFAULT_LOCALE);
             }
 
             return buildBrandingResponseFromResponseDTO(responseDTO);
@@ -216,12 +220,12 @@ public class BrandingPreferenceManagementService {
             BrandingPreference responseDTO;
             if (APPLICATION_TYPE.equals(type)) {
                 // Get application specific branding preference.
-                responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
-                        resolveBrandingPreference(APPLICATION_TYPE, name, DEFAULT_LOCALE, restrictToPublished);
+                responseDTO = brandingPreferenceManager.resolveBrandingPreference(APPLICATION_TYPE, name,
+                        DEFAULT_LOCALE, restrictToPublished);
             } else {
                 // Get default branding preference.
-                responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
-                        resolveBrandingPreference(ORGANIZATION_TYPE, tenantDomain, DEFAULT_LOCALE, restrictToPublished);
+                responseDTO = brandingPreferenceManager.resolveBrandingPreference(ORGANIZATION_TYPE, tenantDomain,
+                        DEFAULT_LOCALE, restrictToPublished);
             }
 
             return buildBrandingResponseFromResponseDTO(responseDTO);
@@ -255,8 +259,7 @@ public class BrandingPreferenceManagementService {
         BrandingPreference responseDTO;
         try {
             BrandingPreference requestDTO = buildRequestDTOFromBrandingRequest(brandingPreferenceModel);
-            responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
-                    replaceBrandingPreference(requestDTO);
+            responseDTO = brandingPreferenceManager.replaceBrandingPreference(requestDTO);
         } catch (BrandingPreferenceMgtException e) {
             if (BRANDING_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
                 if (log.isDebugEnabled()) {
@@ -295,8 +298,7 @@ public class BrandingPreferenceManagementService {
         CustomText responseDTO;
         try {
             CustomText requestDTO = buildRequestDTOFromCustomTextRequest(customTextModal);
-            responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
-                    addCustomText(requestDTO);
+            responseDTO = brandingPreferenceManager.addCustomText(requestDTO);
         } catch (BrandingPreferenceMgtException e) {
             if (CUSTOM_TEXT_PREFERENCE_ALREADY_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
                 if (log.isDebugEnabled()) {
@@ -326,7 +328,7 @@ public class BrandingPreferenceManagementService {
         }
 
         try {
-            BrandingPreferenceServiceHolder.getBrandingPreferenceManager().deleteCustomText(type, name, screen, locale);
+            brandingPreferenceManager.deleteCustomText(type, name, screen, locale);
         } catch (BrandingPreferenceMgtException e) {
             if (CUSTOM_TEXT_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
                 if (log.isDebugEnabled()) {
@@ -346,7 +348,7 @@ public class BrandingPreferenceManagementService {
 
         String tenantDomain = getTenantDomainFromContext();
         try {
-            BrandingPreferenceServiceHolder.getBrandingPreferenceManager().deleteAllCustomText();
+            brandingPreferenceManager.deleteAllCustomText();
         } catch (BrandingPreferenceMgtException e) {
             if (CUSTOM_TEXT_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
                 if (log.isDebugEnabled()) {
@@ -378,8 +380,7 @@ public class BrandingPreferenceManagementService {
             locale = DEFAULT_LOCALE;
         }
         try {
-            CustomText responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
-                    getCustomText(type, name, screen, locale);
+            CustomText responseDTO = brandingPreferenceManager.getCustomText(type, name, screen, locale);
             return buildCustomTextResponseFromResponseDTO(responseDTO);
         } catch (BrandingPreferenceMgtException e) {
             if (CUSTOM_TEXT_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
@@ -412,8 +413,7 @@ public class BrandingPreferenceManagementService {
             locale = DEFAULT_LOCALE;
         }
         try {
-            CustomText responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
-                    resolveCustomText(type, name, screen, locale);
+            CustomText responseDTO = brandingPreferenceManager.resolveCustomText(type, name, screen, locale);
             return buildCustomTextResponseFromResponseDTO(responseDTO);
         } catch (BrandingPreferenceMgtException e) {
             if (CUSTOM_TEXT_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
@@ -446,8 +446,7 @@ public class BrandingPreferenceManagementService {
         CustomText responseDTO;
         try {
             CustomText requestDTO = buildRequestDTOFromCustomTextRequest(customTextModel);
-            responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
-                    replaceCustomText(requestDTO);
+            responseDTO = brandingPreferenceManager.replaceCustomText(requestDTO);
         } catch (BrandingPreferenceMgtException e) {
             if (CUSTOM_TEXT_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
                 if (log.isDebugEnabled()) {

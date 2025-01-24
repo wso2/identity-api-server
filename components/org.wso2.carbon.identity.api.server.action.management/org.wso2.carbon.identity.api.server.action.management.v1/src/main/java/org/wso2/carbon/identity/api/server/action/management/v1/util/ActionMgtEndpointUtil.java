@@ -18,10 +18,12 @@
 
 package org.wso2.carbon.identity.api.server.action.management.v1.util;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.action.management.exception.ActionMgtClientException;
 import org.wso2.carbon.identity.action.management.exception.ActionMgtException;
+import org.wso2.carbon.identity.action.management.exception.ActionMgtServerException;
 import org.wso2.carbon.identity.action.management.model.Action;
 import org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants;
 import org.wso2.carbon.identity.api.server.common.Constants;
@@ -31,9 +33,9 @@ import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
 
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.action.management.constant.ActionMgtConstants.ErrorMessages.ERROR_NO_ACTION_CONFIGURED_ON_GIVEN_ACTION_TYPE_AND_ID;
+import static org.wso2.carbon.identity.action.management.constant.error.ErrorMessage.ERROR_NO_ACTION_CONFIGURED_ON_GIVEN_ACTION_TYPE_AND_ID;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ACTION_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.PATH_CONSTANT;
+import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.PATH_SEPARATOR;
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER;
 
 /**
@@ -43,7 +45,7 @@ public class ActionMgtEndpointUtil {
 
     private static final Log LOG = LogFactory.getLog(ActionMgtEndpointUtil.class);
     private static final String ACTION_TYPE_LINK_FORMAT = Constants.V1_API_PATH_COMPONENT + ACTION_PATH_COMPONENT
-            + PATH_CONSTANT;
+            + PATH_SEPARATOR;
 
     public static String buildURIForActionType(String actionType) {
 
@@ -89,6 +91,28 @@ public class ActionMgtEndpointUtil {
         errorCode = errorCode.contains(ERROR_CODE_DELIMITER) ? errorCode :
                 ActionMgtEndpointConstants.ACTION_MANAGEMENT_PREFIX + errorCode;
         return handleException(status, errorCode, e.getMessage(), e.getDescription());
+    }
+
+    public static ActionMgtServerException buildActionMgtServerException(ActionMgtEndpointConstants.ErrorMessage error,
+                                                                         Throwable e, String... data) {
+
+        String description = error.getDescription();
+        if (ArrayUtils.isNotEmpty(data)) {
+            description = String.format(description, data);
+        }
+
+        return new ActionMgtServerException(error.getMessage(), description, error.getCode(), e);
+    }
+
+    public static ActionMgtClientException buildActionMgtClientException(ActionMgtEndpointConstants.ErrorMessage error,
+                                                                         Throwable e, String... data) {
+
+        String description = error.getDescription();
+        if (ArrayUtils.isNotEmpty(data)) {
+            description = String.format(description, data);
+        }
+
+        return new ActionMgtClientException(error.getMessage(), description, error.getCode());
     }
 
     /**

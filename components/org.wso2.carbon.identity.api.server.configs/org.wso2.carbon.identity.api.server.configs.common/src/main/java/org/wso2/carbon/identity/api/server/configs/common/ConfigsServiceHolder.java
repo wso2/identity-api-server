@@ -1,26 +1,31 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *                                                                         
- * Licensed under the Apache License, Version 2.0 (the "License");         
- * you may not use this file except in compliance with the License.        
- * You may obtain a copy of the License at                                 
- *                                                                         
- * http://www.apache.org/licenses/LICENSE-2.0                              
- *                                                                         
- * Unless required by applicable law or agreed to in writing, software     
- * distributed under the License is distributed on an "AS IS" BASIS,       
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and     
- * limitations under the License.
+ * Copyright (c) 2020-2025, WSO2 LLC. (http://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.wso2.carbon.identity.api.server.configs.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
 import org.wso2.carbon.identity.oauth2.impersonation.services.ImpersonationConfigMgtService;
+import org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.core.JWTClientAuthenticatorMgtService;
 import org.wso2.carbon.idp.mgt.IdentityProviderManager;
+import org.wso2.carbon.idp.mgt.IdpManager;
 import org.wso2.carbon.logging.service.RemoteLoggingConfigService;
 
 /**
@@ -28,20 +33,49 @@ import org.wso2.carbon.logging.service.RemoteLoggingConfigService;
  */
 public class ConfigsServiceHolder {
 
-    private static ConfigsServiceHolder instance = new ConfigsServiceHolder();
-
-    private ApplicationManagementService applicationManagementService;
-    private IdentityProviderManager identityProviderManager;
-    private CORSManagementService corsManagementService;
-    private RemoteLoggingConfigService remoteLoggingConfigService;
-    private ImpersonationConfigMgtService impersonationConfigMgtService;
-    private DCRConfigurationMgtService dcrConfigurationMgtService;
-
     private ConfigsServiceHolder() {}
 
-    public static ConfigsServiceHolder getInstance() {
+    private static class ApplicationManagementServiceHolder {
 
-        return instance;
+        static final ApplicationManagementService SERVICE = (ApplicationManagementService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(ApplicationManagementService.class, null);
+    }
+
+    private static class IdentityProviderManagerHolder {
+
+        static final IdentityProviderManager SERVICE = (IdentityProviderManager) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(IdpManager.class, null);
+    }
+
+    private static class CORSManagementServiceHolder {
+
+        static final CORSManagementService SERVICE = (CORSManagementService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(CORSManagementService.class, null);
+    }
+
+    private static class RemoteLoggingConfigServiceHolder {
+
+        static final RemoteLoggingConfigService SERVICE = (RemoteLoggingConfigService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RemoteLoggingConfigService.class, null);
+    }
+
+    private static class ImpersonationConfigMgtServiceHolder {
+
+        static final ImpersonationConfigMgtService SERVICE = (ImpersonationConfigMgtService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(ImpersonationConfigMgtService.class, null);
+    }
+
+    private static class DCRConfigurationMgtServiceHolder {
+
+        static final DCRConfigurationMgtService SERVICE = (DCRConfigurationMgtService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(DCRConfigurationMgtService.class, null);
+    }
+
+    private static class JWTClientAuthenticatorMgtServiceHolder {
+
+        static final JWTClientAuthenticatorMgtService SERVICE =
+                (JWTClientAuthenticatorMgtService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(JWTClientAuthenticatorMgtService.class, null);
     }
 
     /**
@@ -49,19 +83,9 @@ public class ConfigsServiceHolder {
      *
      * @return ApplicationManagementService
      */
-    public ApplicationManagementService getApplicationManagementService() {
+    public static ApplicationManagementService getApplicationManagementService() {
 
-        return ConfigsServiceHolder.getInstance().applicationManagementService;
-    }
-
-    /**
-     * Set ApplicationManagementService osgi service.
-     *
-     * @param applicationManagementService ApplicationManagementService.
-     */
-    public void setApplicationManagementService(ApplicationManagementService applicationManagementService) {
-
-        ConfigsServiceHolder.getInstance().applicationManagementService = applicationManagementService;
+        return ApplicationManagementServiceHolder.SERVICE;
     }
 
     /**
@@ -69,19 +93,9 @@ public class ConfigsServiceHolder {
      *
      * @return IdentityProviderManager
      */
-    public IdentityProviderManager getIdentityProviderManager() {
+    public static IdentityProviderManager getIdentityProviderManager() {
 
-        return ConfigsServiceHolder.getInstance().identityProviderManager;
-    }
-
-    /**
-     * Set IdentityProviderManager osgi service.
-     *
-     * @param identityProviderManager IdentityProviderManager.
-     */
-    public void setIdentityProviderManager(IdentityProviderManager identityProviderManager) {
-
-        ConfigsServiceHolder.getInstance().identityProviderManager = identityProviderManager;
+        return IdentityProviderManagerHolder.SERVICE;
     }
 
     /**
@@ -89,19 +103,9 @@ public class ConfigsServiceHolder {
      *
      * @return CORSManagementService
      */
-    public CORSManagementService getCorsManagementService() {
+    public static CORSManagementService getCorsManagementService() {
 
-        return ConfigsServiceHolder.getInstance().corsManagementService;
-    }
-
-    /**
-     * Set CORSManagementService osgi service.
-     *
-     * @param corsManagementService CORSManagementService.
-     */
-    public void setCorsManagementService(CORSManagementService corsManagementService) {
-
-        ConfigsServiceHolder.getInstance().corsManagementService = corsManagementService;
+        return CORSManagementServiceHolder.SERVICE;
     }
 
     /**
@@ -109,37 +113,9 @@ public class ConfigsServiceHolder {
      *
      * @return RemoteLoggingConfigService
      */
-    public RemoteLoggingConfigService getRemoteLoggingConfigService() {
+    public static RemoteLoggingConfigService getRemoteLoggingConfigService() {
 
-        return ConfigsServiceHolder.getInstance().remoteLoggingConfigService;
-    }
-    /**
-     * Set RemoteLoggingConfigService osgi service.
-     *
-     * @param remoteLoggingConfigService RemoteLoggingConfigService.
-     */
-    public void setRemoteLoggingConfigService(RemoteLoggingConfigService remoteLoggingConfigService) {
-
-        ConfigsServiceHolder.getInstance().remoteLoggingConfigService = remoteLoggingConfigService;
-    }
-
-    /**
-     * Get DCRConfigurationMgtService osgi service.
-     *
-     * @return DCRConfigurationMgtService
-     */
-    public DCRConfigurationMgtService getDcrConfigurationMgtService() {
-
-        return ConfigsServiceHolder.getInstance().dcrConfigurationMgtService;
-    }
-    /**
-     * Set DCRConfigurationMgtService osgi service.
-     *
-     * @param dcrConfigurationMgtService DCRConfigurationMgtService.
-     */
-    public void setDcrConfigurationMgtService(DCRConfigurationMgtService dcrConfigurationMgtService) {
-
-        ConfigsServiceHolder.getInstance().dcrConfigurationMgtService = dcrConfigurationMgtService;
+        return RemoteLoggingConfigServiceHolder.SERVICE;
     }
 
     /**
@@ -147,18 +123,28 @@ public class ConfigsServiceHolder {
      *
      * @return RemoteLoggingConfigService
      */
-    public ImpersonationConfigMgtService getImpersonationConfigMgtService() {
+    public static ImpersonationConfigMgtService getImpersonationConfigMgtService() {
 
-        return ConfigsServiceHolder.getInstance().impersonationConfigMgtService;
+        return ImpersonationConfigMgtServiceHolder.SERVICE;
     }
 
     /**
-     * Set  Impersonation Config Mgt osgi service.
+     * Get DCRConfigurationMgtService osgi service.
      *
-     * @param impersonationConfigMgtService ImpersonationConfigMgtService.
+     * @return DCRConfigurationMgtService
      */
-    public void setImpersonationConfigMgtService(ImpersonationConfigMgtService impersonationConfigMgtService) {
+    public static DCRConfigurationMgtService getDcrConfigurationMgtService() {
 
-        ConfigsServiceHolder.getInstance().impersonationConfigMgtService = impersonationConfigMgtService;
+        return DCRConfigurationMgtServiceHolder.SERVICE;
+    }
+
+    /**
+     * Get JWTClientAuthenticatorMgtService osgi service.
+     *
+     * @return JWTClientAuthenticatorMgtService
+     */
+    public static JWTClientAuthenticatorMgtService getJWTClientAuthenticatorMgtService() {
+
+        return JWTClientAuthenticatorMgtServiceHolder.SERVICE;
     }
 }

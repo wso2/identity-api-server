@@ -174,19 +174,19 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     }
 
     @Override
-    public Response getAllAppTemplatesOfEmailTemplateType(String templateTypeId, String appUuid) {
+    public Response getAllAppTemplatesOfEmailTemplateType(String templateTypeId, String appUuid, Boolean resolve) {
 
         return Response.ok().entity(
                 templatesService.getAllTemplatesOfTemplateType(templateTypeId, appUuid,
-                        Constants.NOTIFICATION_CHANNEL_EMAIL)).build();
+                        Constants.NOTIFICATION_CHANNEL_EMAIL, resolve)).build();
     }
 
     @Override
-    public Response getAllAppTemplatesOfSMSTemplateType(String templateTypeId, String appUuid) {
+    public Response getAllAppTemplatesOfSMSTemplateType(String templateTypeId, String appUuid, Boolean resolve) {
 
         return Response.ok().entity(
                 templatesService.getAllTemplatesOfTemplateType(templateTypeId, appUuid,
-                        Constants.NOTIFICATION_CHANNEL_SMS)).build();
+                        Constants.NOTIFICATION_CHANNEL_SMS, resolve)).build();
     }
 
     @Override
@@ -197,17 +197,17 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     }
 
     @Override
-    public Response getAllOrgTemplatesOfEmailTemplateType(String templateTypeId) {
+    public Response getAllOrgTemplatesOfEmailTemplateType(String templateTypeId, Boolean resolve) {
 
         return Response.ok().entity(templatesService.getAllTemplatesOfTemplateType(templateTypeId,
-                        Constants.NOTIFICATION_CHANNEL_EMAIL)).build();
+                        Constants.NOTIFICATION_CHANNEL_EMAIL, resolve)).build();
     }
 
     @Override
-    public Response getAllOrgTemplatesOfSMSTemplateType(String templateTypeId) {
+    public Response getAllOrgTemplatesOfSMSTemplateType(String templateTypeId, Boolean resolve) {
 
         return Response.ok().entity(templatesService.getAllTemplatesOfTemplateType(templateTypeId,
-                        Constants.NOTIFICATION_CHANNEL_SMS)).build();
+                        Constants.NOTIFICATION_CHANNEL_SMS, resolve)).build();
     }
 
     @Override
@@ -232,16 +232,16 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     }
 
     @Override
-    public Response getAppEmailTemplate(String templateTypeId, String appUuid, String locale) {
+    public Response getAppEmailTemplate(String templateTypeId, String appUuid, String locale, Boolean resolve) {
 
-        return Response.ok().entity(templatesService.getEmailTemplate(templateTypeId, locale, appUuid))
+        return Response.ok().entity(templatesService.getEmailTemplate(templateTypeId, locale, appUuid, resolve))
                 .build();
     }
 
     @Override
-    public Response getAppSMSTemplate(String templateTypeId, String appUuid, String locale) {
+    public Response getAppSMSTemplate(String templateTypeId, String appUuid, String locale, Boolean resolve) {
 
-        return Response.ok().entity(templatesService.getSMSTemplate(templateTypeId, locale, appUuid))
+        return Response.ok().entity(templatesService.getSMSTemplate(templateTypeId, locale, appUuid, resolve))
                 .build();
     }
 
@@ -253,15 +253,15 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     }
 
     @Override
-    public Response getOrgEmailTemplate(String templateTypeId, String locale) {
+    public Response getOrgEmailTemplate(String templateTypeId, String locale, Boolean resolve) {
 
-        return Response.ok().entity(templatesService.getEmailTemplate(templateTypeId, locale)).build();
+        return Response.ok().entity(templatesService.getEmailTemplate(templateTypeId, locale, resolve)).build();
     }
 
     @Override
-    public Response getOrgSMSTemplate(String templateTypeId, String locale) {
+    public Response getOrgSMSTemplate(String templateTypeId, String locale, Boolean resolve) {
 
-        return Response.ok().entity(templatesService.getSMSTemplate(templateTypeId, locale)).build();
+        return Response.ok().entity(templatesService.getSMSTemplate(templateTypeId, locale, resolve)).build();
     }
 
     @Override

@@ -18,16 +18,10 @@
 
 package org.wso2.carbon.identity.api.expired.password.identification.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import java.io.InputStream;
-import java.util.List;
-
+import org.wso2.carbon.identity.api.expired.password.identification.v1.factories.PasswordExpiredUsersApiServiceFactory;
 import org.wso2.carbon.identity.api.expired.password.identification.v1.model.Error;
 import org.wso2.carbon.identity.api.expired.password.identification.v1.model.PasswordExpiredUser;
 import org.wso2.carbon.identity.api.expired.password.identification.v1.model.Unauthorized;
-import org.wso2.carbon.identity.api.expired.password.identification.v1.PasswordExpiredUsersApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -41,8 +35,12 @@ import javax.validation.constraints.*;
 
 public class PasswordExpiredUsersApi  {
 
-    @Autowired
-    private PasswordExpiredUsersApiService delegate;
+    private final PasswordExpiredUsersApiService delegate;
+
+    public PasswordExpiredUsersApi() {
+
+        this.delegate = PasswordExpiredUsersApiServiceFactory.getPasswordExpiredUsersApi();
+    }
 
     @Valid
     @GET

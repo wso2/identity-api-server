@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.action.management.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
@@ -29,7 +28,6 @@ import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionTypesResponseItem;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
-import org.wso2.carbon.identity.api.server.action.management.v1.AuthenticationTypeProperties;
 import org.wso2.carbon.identity.api.server.action.management.v1.Error;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionsApiService;
 
@@ -37,37 +35,41 @@ import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
-
-import javax.validation.constraints.*;
+import org.wso2.carbon.identity.api.server.action.management.v1.factories.ActionsApiServiceFactory;
 
 @Path("/actions")
 @Api(description = "The actions API")
 
 public class ActionsApi  {
 
-    @Autowired
-    private ActionsApiService delegate;
+    private final ActionsApiService delegate;
+
+    public ActionsApi() {
+
+        this.delegate = ActionsApiServiceFactory.getActionsApi();
+    }
 
     @Valid
     @POST
     @Path("/{actionType}/{actionId}/activate")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Activates the action by given Id. ", notes = "This API provides the capability to activate an action by action Id. <br>   <b>Scope required:</b> <br>       * internal_action_mgt_update ", response = ActionBasicResponse.class, authorizations = {
+    @ApiOperation(value = "Activate Action", notes = "This API activates an action using the action's type and unique ID.    <b>Scope (Permission) required:</b> ``internal_action_mgt_update``  ", response = ActionBasicResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Actions", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = ActionBasicResponse.class),
+        @ApiResponse(code = 200, message = "Action Activated", response = ActionBasicResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class),
+        @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response activateAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Id of the Action.",required=true) @PathParam("actionId") String actionId) {
+    public Response activateAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Unique identifier of the action.",required=true) @PathParam("actionId") String actionId) {
 
         return delegate.activateAction(actionType,  actionId );
     }
@@ -77,22 +79,21 @@ public class ActionsApi  {
     @Path("/{actionType}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Add action ", notes = "This API provides the capability to store the action information that is provided by users.<br>   <b>Scope required:</b> <br>       * internal_action_mgt_create ", response = ActionResponse.class, authorizations = {
+    @ApiOperation(value = "Add Action", notes = "This API creates an action and returns the action details along with the action's unique ID.   <b>Scope (Permission) required:</b> ``internal_action_mgt_create``  ", response = ActionResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Actions", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 201, message = "Successful response.", response = ActionResponse.class),
+        @ApiResponse(code = 201, message = "Action Created", response = ActionResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-        @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response createAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "This represents the action to be created." ,required=true) @Valid ActionModel actionModel) {
+    public Response createAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "This represents the information of the action to be created." ,required=true) @Valid ActionModel actionModel) {
 
         return delegate.createAction(actionType,  actionModel );
     }
@@ -102,21 +103,22 @@ public class ActionsApi  {
     @Path("/{actionType}/{actionId}/deactivate")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Deactivates the action by given Id. ", notes = "This API provides the capability to deactivate an action by action Id. <br>   <b>Scope required:</b> <br>       * internal_action_mgt_update ", response = ActionBasicResponse.class, authorizations = {
+    @ApiOperation(value = "Deactivate Action", notes = "This API deactivates an action using the action's type and unique ID.    <b>Scope (Permission) required:</b> ``internal_action_mgt_update``  ", response = ActionBasicResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Actions", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = ActionBasicResponse.class),
+        @ApiResponse(code = 200, message = "Action Deactivated", response = ActionBasicResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class),
+        @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response deactivateAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Id of the Action.",required=true) @PathParam("actionId") String actionId) {
+    public Response deactivateAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Unique identifier of the action.",required=true) @PathParam("actionId") String actionId) {
 
         return delegate.deactivateAction(actionType,  actionId );
     }
@@ -126,21 +128,21 @@ public class ActionsApi  {
     @Path("/{actionType}/{actionId}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete action by action type and action id. ", notes = "This API provides the capability to delete an action by action type. <br>   <b>Scope required:</b> <br>       * internal_action_mgt_delete ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete Action", notes = "This API deletes an action using the action's type and unique ID.    <b>Scope (Permission) required:</b> ``internal_action_mgt_delete``  ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Actions", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "Successfully Deleted", response = Void.class),
+        @ApiResponse(code = 204, message = "Action Deleted", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class),
+        @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response deleteAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Id of the Action.",required=true) @PathParam("actionId") String actionId) {
+    public Response deleteAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Unique identifier of the action.",required=true) @PathParam("actionId") String actionId) {
 
         return delegate.deleteAction(actionType,  actionId );
     }
@@ -150,7 +152,7 @@ public class ActionsApi  {
     @Path("/{actionType}/{actionId}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve Action information by given Id. ", notes = "This API provides the capability to retrieve the action by action Id.<br>   <b>Scope required:</b> <br>       * internal_action_mgt_view ", response = ActionResponse.class, authorizations = {
+    @ApiOperation(value = "Retrieve Action by ID", notes = "This API provides the capability to retrieve the action by action Id.    <b>Scope (Permission) required:</b> ``internal_action_mgt_view``  ", response = ActionResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -165,7 +167,7 @@ public class ActionsApi  {
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response getActionByActionId(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Id of the Action.",required=true) @PathParam("actionId") String actionId) {
+    public Response getActionByActionId(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Unique identifier of the action.",required=true) @PathParam("actionId") String actionId) {
 
         return delegate.getActionByActionId(actionType,  actionId );
     }
@@ -175,20 +177,17 @@ public class ActionsApi  {
     @Path("/types")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Detailed summary of the Action Types ", notes = "This API provides the capability to retrieve the detailed summary of the action types.<br>   <b>Scope required:</b> <br>       * internal_action_mgt_view ", response = ActionTypesResponseItem.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "List Action Types", notes = "This API returns the detailed summary of the action types.   <b>Scope (Permission) required:</b> ``internal_action_mgt_view``  ", response = ActionTypesResponseItem.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Actions", })
+    }, tags={ "Action Types", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = ActionTypesResponseItem.class, responseContainer = "List"),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class),
-        @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response getActionTypes() {
 
@@ -200,14 +199,14 @@ public class ActionsApi  {
     @Path("/{actionType}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "List action ", notes = "This API provides the capability to retrieve the action by action type.<br>   <b>Scope required:</b> <br>       * internal_action_mgt_view ", response = ActionResponse.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "List Actions", notes = "This API returns actions according to the action type.    <b>Scope (Permission) required:</b> ``internal_action_mgt_view``  ", response = ActionBasicResponse.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Actions", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = ActionResponse.class, responseContainer = "List"),
+        @ApiResponse(code = 200, message = "OK", response = ActionBasicResponse.class, responseContainer = "List"),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
@@ -225,47 +224,24 @@ public class ActionsApi  {
     @Path("/{actionType}/{actionId}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update Action information by given Id. ", notes = "This API provides the capability to update Action information by given Id. <br>   <b>Scope required:</b> <br>       * internal_action_mgt_update ", response = ActionResponse.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Actions", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = ActionResponse.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
-    })
-    public Response updateAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Id of the Action.",required=true) @PathParam("actionId") String actionId, @ApiParam(value = "This represents the action information to be updated." ,required=true) @Valid ActionUpdateModel actionUpdateModel) {
-
-        return delegate.updateAction(actionType,  actionId,  actionUpdateModel );
-    }
-
-    @Valid
-    @PUT
-    @Path("/{actionType}/{actionId}/{authType}")
-    @Consumes({ "application/json" })
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Update Action endpoint authentication information by given Id. ", notes = "This API provides the capability to update Action endpoint authentication information by given Id. <br>   <b>Scope required:</b> <br>       * internal_action_mgt_update ", response = ActionResponse.class, authorizations = {
+    @ApiOperation(value = "Update Action", notes = "This API updates an action and return the updated action.    <b>Scope (Permission) required:</b> ``internal_action_mgt_update``  ", response = ActionResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Actions" })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = ActionResponse.class),
+        @ApiResponse(code = 200, message = "Action Updated", response = ActionResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class),
+        @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response updateActionEndpointAuthentication(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Id of the Action.",required=true) @PathParam("actionId") String actionId, @ApiParam(value = "Authentication Type of the Action Endpoint.",required=true, allowableValues="none, basic, apiKey, bearer") @PathParam("authType") String authType, @ApiParam(value = "This represents the action endpoint authentication to be updated." ,required=true) @Valid AuthenticationTypeProperties authenticationTypeProperties) {
+    public Response updateAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Unique identifier of the action.",required=true) @PathParam("actionId") String actionId, @ApiParam(value = "This represents the action to be updated." ,required=true) @Valid ActionUpdateModel body) {
 
-        return delegate.updateActionEndpointAuthentication(actionType,  actionId,  authType,  authenticationTypeProperties );
+        return delegate.updateAction(actionType,  actionId,  body );
     }
 
 }

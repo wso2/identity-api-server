@@ -1,17 +1,19 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021-2025, WSO2 LLC. (http://www.wso2.com).
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto;
@@ -20,6 +22,7 @@ import io.swagger.annotations.ApiModel;
 import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.AttributeMappingDTO;
+import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ProfilesDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.PropertyDTO;
 import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.*;
@@ -60,12 +63,28 @@ public class LocalClaimReqDTO {
     @Valid 
     private Boolean supportedByDefault = null;
 
+    public enum UniquenessScopeEnum {
+         NONE,  WITHIN_USERSTORE,  ACROSS_USERSTORES, 
+    };
     @Valid 
+    private UniquenessScopeEnum uniquenessScope = null;
+
+    public enum SharedProfileValueResolvingMethodEnum {
+        FromOrigin, FromSharedProfile, FromFirstFoundInHierarchy,
+    };
+
+    @Valid
+    private SharedProfileValueResolvingMethodEnum sharedProfileValueResolvingMethod = null;
+
+    @Valid
     @NotNull(message = "Property attributeMapping cannot be null.") 
     private List<AttributeMappingDTO> attributeMapping = new ArrayList<AttributeMappingDTO>();
 
     @Valid 
     private List<PropertyDTO> properties = new ArrayList<PropertyDTO>();
+
+    @Valid 
+    private ProfilesDTO profiles = null;
 
     /**
     * A unique URI specific to the claim.
@@ -164,6 +183,32 @@ public class LocalClaimReqDTO {
     }
 
     /**
+    * Specifies the scope of uniqueness validation for the claim value.
+    **/
+    @ApiModelProperty(value = "Specifies the scope of uniqueness validation for the claim value.")
+    @JsonProperty("uniquenessScope")
+    public UniquenessScopeEnum getUniquenessScope() {
+        return uniquenessScope;
+    }
+    public void setUniquenessScope(UniquenessScopeEnum uniquenessScope) {
+        this.uniquenessScope = uniquenessScope;
+    }
+
+    /**
+     * Specifies claim value resolving method for shared user profile.
+     **/
+    @ApiModelProperty(value = "Specifies claim value resolving method for shared user profile.")
+    @JsonProperty("sharedProfileValueResolvingMethod")
+    public SharedProfileValueResolvingMethodEnum getSharedProfileValueResolvingMethod() {
+        return sharedProfileValueResolvingMethod;
+    }
+
+    public void setSharedProfileValueResolvingMethod(
+            SharedProfileValueResolvingMethodEnum sharedProfileValueResolvingMethod) {
+        this.sharedProfileValueResolvingMethod = sharedProfileValueResolvingMethod;
+    }
+
+    /**
     * Userstore attribute mappings.
     **/
     @ApiModelProperty(required = true, value = "Userstore attribute mappings.")
@@ -187,6 +232,17 @@ public class LocalClaimReqDTO {
         this.properties = properties;
     }
 
+    /**
+    **/
+    @ApiModelProperty(value = "Define any attribute profiles.")
+    @JsonProperty("profiles")
+    public ProfilesDTO getProfiles() {
+        return profiles;
+    }
+    public void setProfiles(ProfilesDTO profiles) {
+        this.profiles = profiles;
+    }
+
     @Override
     public String toString() {
 
@@ -201,8 +257,11 @@ public class LocalClaimReqDTO {
         sb.append("    regEx: ").append(regEx).append("\n");
         sb.append("    required: ").append(required).append("\n");
         sb.append("    supportedByDefault: ").append(supportedByDefault).append("\n");
+        sb.append("    uniquenessScope: ").append(uniquenessScope).append("\n");
+        sb.append("    sharedProfileValueResolvingMethod: ").append(sharedProfileValueResolvingMethod).append("\n");
         sb.append("    attributeMapping: ").append(attributeMapping).append("\n");
         sb.append("    properties: ").append(properties).append("\n");
+        sb.append("    profiles: ").append(profiles).append("\n");
         
         sb.append("}\n");
         return sb.toString();

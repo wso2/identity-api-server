@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.identity.api.server.claim.management.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
 import org.wso2.carbon.identity.organization.management.service.OrganizationManager;
 
@@ -24,18 +25,26 @@ import org.wso2.carbon.identity.organization.management.service.OrganizationMana
  */
 public class ClaimManagementDataHolder {
 
-    private static ClaimMetadataManagementService claimMetadataManagementService;
-    private static OrganizationManager organizationManager;
+    private static class OrganizationManagerHolder {
 
-    public static ClaimMetadataManagementService getClaimMetadataManagementService() {
-
-        return claimMetadataManagementService;
+        static final OrganizationManager SERVICE = (OrganizationManager) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(OrganizationManager.class, null);
     }
 
-    public static void setClaimMetadataManagementService(
-            ClaimMetadataManagementService claimMetadataManagementService) {
+    private static class ClaimMetadataManagementServiceHolder {
 
-        ClaimManagementDataHolder.claimMetadataManagementService = claimMetadataManagementService;
+        static final ClaimMetadataManagementService SERVICE = (ClaimMetadataManagementService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(ClaimMetadataManagementService.class, null);
+    }
+
+    /**
+     * Get ClaimMetadataManagementService OSGi service.
+     *
+     * @return ClaimMetadataManagementService.
+     */
+    public static ClaimMetadataManagementService getClaimMetadataManagementService() {
+
+        return ClaimMetadataManagementServiceHolder.SERVICE;
     }
 
     /**
@@ -45,16 +54,6 @@ public class ClaimManagementDataHolder {
      */
     public static OrganizationManager getOrganizationManager() {
 
-        return organizationManager;
-    }
-
-    /**
-     * Set organizationManager OSGi service.
-     *
-     * @param organizationManager Organization Manager.
-     */
-    public static void setOrganizationManager(OrganizationManager organizationManager) {
-
-        ClaimManagementDataHolder.organizationManager = organizationManager;
+        return OrganizationManagerHolder.SERVICE;
     }
 }

@@ -18,12 +18,12 @@
 
 package org.wso2.carbon.identity.api.server.extension.management.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 
+import org.wso2.carbon.identity.api.server.extension.management.v1.factories.ExtensionsApiServiceFactory;
 import org.wso2.carbon.identity.api.server.extension.management.v1.model.Error;
 import org.wso2.carbon.identity.api.server.extension.management.v1.model.ExtensionListItem;
 import org.wso2.carbon.identity.api.server.extension.management.v1.model.ExtensionResponseModel;
@@ -42,8 +42,12 @@ import javax.validation.constraints.*;
 
 public class ExtensionsApi  {
 
-    @Autowired
-    private ExtensionsApiService delegate;
+    private final ExtensionsApiService delegate;
+
+    public ExtensionsApi() {
+
+        this.delegate = ExtensionsApiServiceFactory.getExtensionsApi();
+    }
 
     @Valid
     @GET

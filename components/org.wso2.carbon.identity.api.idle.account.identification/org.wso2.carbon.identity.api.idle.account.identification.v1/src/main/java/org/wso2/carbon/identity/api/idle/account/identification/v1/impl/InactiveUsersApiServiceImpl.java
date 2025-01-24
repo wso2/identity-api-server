@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,10 +18,11 @@
 
 package org.wso2.carbon.identity.api.idle.account.identification.v1.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.idle.account.identification.common.ContextLoader;
 import org.wso2.carbon.identity.api.idle.account.identification.v1.InactiveUsersApiService;
 import org.wso2.carbon.identity.api.idle.account.identification.v1.core.InactiveUsersManagementApiService;
+import org.wso2.carbon.identity.api.idle.account.identification.v1.factories.InactiveUsersManagementApiServiceFactory;
+import org.wso2.carbon.identity.idle.account.identification.exception.IdleAccountIdentificationClientException;
 
 import javax.ws.rs.core.Response;
 
@@ -30,14 +31,36 @@ import javax.ws.rs.core.Response;
  */
 public class InactiveUsersApiServiceImpl implements InactiveUsersApiService {
 
-    @Autowired
-    private InactiveUsersManagementApiService inactiveUsersManagementApiService;
+    private final InactiveUsersManagementApiService inactiveUsersManagementApiService;
+
+    public InactiveUsersApiServiceImpl() {
+        try {
+            this.inactiveUsersManagementApiService = InactiveUsersManagementApiServiceFactory
+                    .getInactiveUsersManagementApiService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating inactive users management service.", e);
+        }
+    }
 
     @Override
     public Response getInactiveUsers(String inactiveAfter, String excludeBefore) {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
-        return Response.ok().entity(
-                inactiveUsersManagementApiService.getInactiveUsers(inactiveAfter, excludeBefore, tenantDomain)).build();
+        return Response.ok().entity(inactiveUsersManagementApiService
+                .getInactiveUsers(inactiveAfter, excludeBefore, tenantDomain)).build();
+    }
+
+    @Override
+    public Response getInactiveUsers(String inactiveAfter, String excludeBefore, String filter)
+            throws IdleAccountIdentificationClientException {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+
+        if (filter != null) {
+            return Response.ok().entity(
+                    inactiveUsersManagementApiService.getInactiveUsers(inactiveAfter, excludeBefore, tenantDomain,
+                            filter)).build();
+        }
+        return getInactiveUsers(inactiveAfter, excludeBefore);
     }
 }
