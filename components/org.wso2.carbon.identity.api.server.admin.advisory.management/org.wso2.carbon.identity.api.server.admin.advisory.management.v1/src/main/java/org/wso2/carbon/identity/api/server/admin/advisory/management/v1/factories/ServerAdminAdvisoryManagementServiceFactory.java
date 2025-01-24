@@ -46,6 +46,7 @@ public class ServerAdminAdvisoryManagementServiceFactory {
      * @return ServerAdminAdvisoryManagementService
      */
     public static ServerAdminAdvisoryManagementService getServerAdminAdvisoryManagementService() {
+
         return SERVICE;
     }
 }
