@@ -46,6 +46,7 @@ public class ValidationRulesManagementApiServiceFactory {
      * @return ValidationRulesManagementApiService.
      */
     public static ValidationRulesManagementApiService getValidationRulesManagementApiService() {
+
         return SERVICE;
     }
 }
