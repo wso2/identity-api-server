@@ -52,7 +52,7 @@ public class IdentityProviderServiceHolder {
     /**
      * Get IdentityProviderManager osgi service.
      *
-     * @return IdentityProviderManager
+     * @return IdentityProviderManager.
      */
     public static IdentityProviderManager getIdentityProviderManager() {
 
