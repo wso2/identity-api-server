@@ -44,7 +44,7 @@ public class BrandingGenerationResponseModel  {
     }
     
     @ApiModelProperty(value = "Operation id of the initiated branding generation process.")
-    @JsonProperty("operationId")
+    @JsonProperty("operation_id")
     @Valid
     public String getOperationId() {
         return operationId;

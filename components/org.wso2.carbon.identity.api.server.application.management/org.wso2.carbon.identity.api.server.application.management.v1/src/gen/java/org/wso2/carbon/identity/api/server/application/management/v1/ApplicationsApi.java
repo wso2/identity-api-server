@@ -754,7 +754,7 @@ public class ApplicationsApi  {
 
     @Valid
     @GET
-    @Path("/loginflow/result/{operationId}")
+    @Path("/loginflow/result/{operation_id}")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Get the final login flow result", notes = "This API provides the capability to retrieve the final login flow result. <br> <b>Scope required:</b> * internal_application_mgt_update ", response = LoginFlowResultResponse.class, authorizations = {
@@ -770,14 +770,14 @@ public class ApplicationsApi  {
         @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class)
     })
-    public Response getLoginFlowGenerationResult(@ApiParam(value = "",required=true) @PathParam("operationId") String operationId) {
+    public Response getLoginFlowGenerationResult(@ApiParam(value = "",required=true) @PathParam("operation_id") String operationId) {
 
         return delegate.getLoginFlowGenerationResult(operationId );
     }
 
     @Valid
     @GET
-    @Path("/loginflow/status/{operationId}")
+    @Path("/loginflow/status/{operation_id}")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Get the status of the login flow generation process", notes = "This API provides the capability to retrieve the status of the login flow generation process. <br> <b>Scope required:</b> * internal_application_mgt_update ", response = LoginFlowStatusResponse.class, authorizations = {
@@ -793,7 +793,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class)
     })
-    public Response getLoginFlowGenerationStatus(@ApiParam(value = "",required=true) @PathParam("operationId") String operationId) {
+    public Response getLoginFlowGenerationStatus(@ApiParam(value = "",required=true) @PathParam("operation_id") String operationId) {
 
         return delegate.getLoginFlowGenerationStatus(operationId );
     }

@@ -36,6 +36,8 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.AI_RESPONSE_DATA_KEY;
+import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.AI_RESPONSE_STATUS_KEY;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_BRANDING_RESULT;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_BRANDING_RESULT_STATUS;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_WHILE_CONVERTING_BRANDING_AI_SERVER_RESPONSE;
@@ -81,7 +83,12 @@ public class BrandingAIPreferenceManagementService {
             Object generationStatus = BrandingPreferenceServiceHolder.getBrandingPreferenceAiManager()
                     .getBrandingPreferenceGenerationStatus(operationId);
             BrandingGenerationStatusModel response = new BrandingGenerationStatusModel();
-            response.setStatus(convertObjectToMap(generationStatus));
+            Map<String, Object> generationStatusMap = convertObjectToMap(generationStatus);
+            if (!generationStatusMap.containsKey(AI_RESPONSE_STATUS_KEY)) {
+                throw new AIServerException(ERROR_CODE_ERROR_GETTING_BRANDING_RESULT_STATUS.getMessage(),
+                        ERROR_CODE_ERROR_GETTING_BRANDING_RESULT_STATUS.getCode());
+            }
+            response.setStatus(generationStatusMap.get(AI_RESPONSE_STATUS_KEY));
             return response;
         } catch (AIServerException e) {
             throw handleServerException(e);
@@ -106,12 +113,12 @@ public class BrandingAIPreferenceManagementService {
             Map<String, Object> resultMap = convertObjectToMap(generationResult);
             response.setStatus(getStatusFromResult(resultMap));
 
-            if (!resultMap.containsKey("data")) {
+            if (!resultMap.containsKey(AI_RESPONSE_DATA_KEY)) {
                 throw new AIServerException(ERROR_CODE_ERROR_GETTING_BRANDING_RESULT_STATUS.getMessage(),
                         ERROR_CODE_ERROR_GETTING_BRANDING_RESULT_STATUS.getCode());
             }
 
-            Map<String, Object> dataMap = (Map<String, Object>) resultMap.get("data");
+            Map<String, Object> dataMap = (Map<String, Object>) resultMap.get(AI_RESPONSE_DATA_KEY);
             response.setData(dataMap);
             return response;
         } catch (AIServerException e) {
