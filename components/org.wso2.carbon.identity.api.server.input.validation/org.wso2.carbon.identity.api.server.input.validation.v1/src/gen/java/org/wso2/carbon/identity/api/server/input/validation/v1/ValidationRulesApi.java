@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2022-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,18 +18,17 @@
 
 package org.wso2.carbon.identity.api.server.input.validation.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 
+import org.wso2.carbon.identity.api.server.input.validation.v1.factories.ValidationRulesApiServiceFactory;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.Error;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidationConfigModel;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidationConfigModelForField;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidatorModel;
-import org.wso2.carbon.identity.api.server.input.validation.v1.ValidationRulesApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -43,8 +42,12 @@ import javax.validation.constraints.*;
 
 public class ValidationRulesApi  {
 
-    @Autowired
-    private ValidationRulesApiService delegate;
+    private final ValidationRulesApiService delegate;
+
+    public ValidationRulesApi() {
+
+        this.delegate = ValidationRulesApiServiceFactory.getValidationRulesApi();
+    }
 
     @Valid
     @GET
