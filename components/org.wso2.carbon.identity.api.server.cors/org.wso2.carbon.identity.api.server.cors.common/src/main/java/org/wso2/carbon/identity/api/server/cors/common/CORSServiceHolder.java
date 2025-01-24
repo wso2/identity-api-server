@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.identity.api.server.cors.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 
 /**
@@ -23,15 +24,12 @@ import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
  */
 public class CORSServiceHolder {
 
-    private static CORSServiceHolder instance = new CORSServiceHolder();
-
-    private CORSManagementService corsManagementService;
-
     private CORSServiceHolder() {}
 
-    public static CORSServiceHolder getInstance() {
+    private static class CORSManagementServiceHolder {
 
-        return instance;
+        static final CORSManagementService SERVICE = (CORSManagementService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(CORSManagementService.class, null);
     }
 
     /**
@@ -39,18 +37,8 @@ public class CORSServiceHolder {
      *
      * @return CORSManagementService
      */
-    public CORSManagementService getCorsManagementService() {
+    public static CORSManagementService getCorsManagementService() {
 
-        return CORSServiceHolder.getInstance().corsManagementService;
-    }
-
-    /**
-     * Set CORSManagementService osgi service.
-     *
-     * @param corsManagementService CORSManagementService.
-     */
-    public void setCorsManagementService(CORSManagementService corsManagementService) {
-
-        CORSServiceHolder.getInstance().corsManagementService = corsManagementService;
+        return CORSManagementServiceHolder.SERVICE;
     }
 }
