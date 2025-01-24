@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2020-2025, WSO2 LLC. (http://www.wso2.com).
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
+ * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,7 +11,7 @@
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
+ * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
  */
@@ -24,12 +24,12 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
-import org.wso2.carbon.identity.api.server.cors.common.CORSServiceHolder;
 import org.wso2.carbon.identity.api.server.cors.common.Constants;
 import org.wso2.carbon.identity.api.server.cors.v1.function.CORSApplicationToCORSApplicationObject;
 import org.wso2.carbon.identity.api.server.cors.v1.function.CORSOriginToCORSOriginObject;
 import org.wso2.carbon.identity.api.server.cors.v1.model.CORSApplicationObject;
 import org.wso2.carbon.identity.api.server.cors.v1.model.CORSOriginObject;
+import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceClientException;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceException;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceServerException;
@@ -48,7 +48,13 @@ import static org.wso2.carbon.identity.api.server.cors.common.Constants.ErrorMes
  */
 public class CORSService {
 
+    private final CORSManagementService corsManagementService;
     private static final Log log = LogFactory.getLog(CORSService.class);
+
+    public CORSService(CORSManagementService corsManagementService) {
+
+        this.corsManagementService = corsManagementService;
+    }
 
     /**
      * Get a list of associated applications of a CORS origin.
@@ -59,8 +65,8 @@ public class CORSService {
 
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            List<String> corsOriginIdList = CORSServiceHolder.getInstance().getCorsManagementService()
-                    .getTenantCORSOrigins(tenantDomain).stream().map(CORSOrigin::getId).collect(Collectors.toList());
+            List<String> corsOriginIdList = corsManagementService.getTenantCORSOrigins(tenantDomain)
+                    .stream().map(CORSOrigin::getId).collect(Collectors.toList());
 
             // Throw an exception if corsOriginId is not valid.
             if (!corsOriginIdList.contains(corsOriginId)) {
@@ -68,7 +74,7 @@ public class CORSService {
                         .description(), corsOriginId), ERROR_CODE_INVALID_CORS_ORIGIN_ID.code());
             }
 
-            List<CORSApplication> applicationList = CORSServiceHolder.getInstance().getCorsManagementService()
+            List<CORSApplication> applicationList = corsManagementService
                     .getCORSApplicationsByCORSOriginId(corsOriginId, tenantDomain);
             return applicationList.stream().map(new CORSApplicationToCORSApplicationObject())
                     .collect(Collectors.toList());
@@ -86,8 +92,7 @@ public class CORSService {
 
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            List<CORSOrigin> corsOriginList = CORSServiceHolder.getInstance().getCorsManagementService()
-                    .getTenantCORSOrigins(tenantDomain);
+            List<CORSOrigin> corsOriginList = corsManagementService.getTenantCORSOrigins(tenantDomain);
             return corsOriginList.stream().map(new CORSOriginToCORSOriginObject()).collect(Collectors.toList());
         } catch (CORSManagementServiceException e) {
             throw handleCORSException(e, Constants.ErrorMessage.ERROR_CODE_CORS_RETRIEVE, null);
