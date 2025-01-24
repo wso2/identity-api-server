@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -20,8 +20,9 @@ package org.wso2.carbon.identity.api.server.api.resource.v1.core;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.identity.api.resource.mgt.APIResourceManager;
 import org.wso2.carbon.identity.api.resource.mgt.APIResourceMgtException;
-import org.wso2.carbon.identity.api.server.api.resource.common.APIResourceManagementServiceHolder;
+import org.wso2.carbon.identity.api.resource.mgt.AuthorizationDetailsTypeManager;
 import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesCreationModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesGetModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants;
@@ -44,6 +45,15 @@ import static org.wso2.carbon.identity.api.server.api.resource.v1.util.Authoriza
 public class AuthorizationDetailsTypeManagementService {
 
     private static final Log LOG = LogFactory.getLog(AuthorizationDetailsTypeManagementService.class);
+    private final AuthorizationDetailsTypeManager authorizationDetailsTypeManager;
+    private final APIResourceManager apiResourceManager;
+
+    public AuthorizationDetailsTypeManagementService(APIResourceManager apiResourceManager,
+                                                     AuthorizationDetailsTypeManager authorizationDetailsTypeManager) {
+
+        this.apiResourceManager = apiResourceManager;
+        this.authorizationDetailsTypeManager = authorizationDetailsTypeManager;
+    }
 
     /**
      * Adds a list of authorization details types to a specified API resource.
@@ -62,7 +72,7 @@ public class AuthorizationDetailsTypeManagementService {
         try {
             this.assertApiResourceIdExistence(apiResourceId);
 
-            return APIResourceManagementServiceHolder.getAuthorizationDetailsTypeManager().addAuthorizationDetailsTypes(
+            return this.authorizationDetailsTypeManager.addAuthorizationDetailsTypes(
                     apiResourceId,
                     AuthorizationDetailsTypeMgtUtil.toAuthorizationDetailsTypes(creationModels),
                     getThreadLocalCarbonContext().getTenantDomain()
@@ -85,12 +95,11 @@ public class AuthorizationDetailsTypeManagementService {
                     apiResourceId, authorizationDetailsTypeId));
         }
         try {
-            APIResourceManagementServiceHolder.getAuthorizationDetailsTypeManager()
-                    .deleteAuthorizationDetailsTypeByApiIdAndTypeId(
-                            apiResourceId,
-                            authorizationDetailsTypeId,
-                            getThreadLocalCarbonContext().getTenantDomain()
-                    );
+            this.authorizationDetailsTypeManager.deleteAuthorizationDetailsTypeByApiIdAndTypeId(
+                    apiResourceId,
+                    authorizationDetailsTypeId,
+                    getThreadLocalCarbonContext().getTenantDomain()
+            );
         } catch (APIResourceMgtException e) {
             throw APIResourceMgtEndpointUtil.handleAPIResourceMgtException(e);
         }
@@ -111,8 +120,7 @@ public class AuthorizationDetailsTypeManagementService {
                     apiResourceId, authorizationDetailsTypeId));
         }
         try {
-            AuthorizationDetailsType authorizationDetailsType = APIResourceManagementServiceHolder
-                    .getAuthorizationDetailsTypeManager()
+            AuthorizationDetailsType authorizationDetailsType = this.authorizationDetailsTypeManager
                     .getAuthorizationDetailsTypeByApiIdAndTypeId(
                             apiResourceId,
                             authorizationDetailsTypeId,
@@ -143,7 +151,7 @@ public class AuthorizationDetailsTypeManagementService {
             LOG.debug("Retrieving authorization details type against resource id: " + apiResourceId);
         }
         try {
-            final APIResource apiResource = APIResourceManagementServiceHolder.getApiResourceManager()
+            final APIResource apiResource = this.apiResourceManager
                     .getAPIResourceById(apiResourceId, getThreadLocalCarbonContext().getTenantDomain());
 
             if (apiResource == null) {
@@ -182,7 +190,7 @@ public class AuthorizationDetailsTypeManagementService {
                 );
             }
 
-            APIResourceManagementServiceHolder.getAuthorizationDetailsTypeManager().updateAuthorizationDetailsType(
+            this.authorizationDetailsTypeManager.updateAuthorizationDetailsType(
                     apiResourceId,
                     toAuthorizationDetailsType(authorizationDetailsTypeId, creationModel),
                     getThreadLocalCarbonContext().getTenantDomain()
@@ -202,12 +210,11 @@ public class AuthorizationDetailsTypeManagementService {
     public boolean isAuthorizationDetailsTypeIdExists(String apiResourceId, String authorizationDetailsTypeId) {
 
         try {
-            return APIResourceManagementServiceHolder.getAuthorizationDetailsTypeManager()
-                    .getAuthorizationDetailsTypeByApiIdAndTypeId(
-                            apiResourceId,
-                            authorizationDetailsTypeId,
-                            getThreadLocalCarbonContext().getTenantDomain()
-                    ) != null;
+            return this.authorizationDetailsTypeManager.getAuthorizationDetailsTypeByApiIdAndTypeId(
+                    apiResourceId,
+                    authorizationDetailsTypeId,
+                    getThreadLocalCarbonContext().getTenantDomain()
+            ) != null;
         } catch (APIResourceMgtException e) {
             throw APIResourceMgtEndpointUtil.handleAPIResourceMgtException(e);
         }
@@ -225,8 +232,7 @@ public class AuthorizationDetailsTypeManagementService {
             LOG.debug("Checking authorization details type exists against filter: " + filter);
         }
         try {
-            return APIResourceManagementServiceHolder
-                    .getAuthorizationDetailsTypeManager()
+            return this.authorizationDetailsTypeManager
                     .isAuthorizationDetailsTypeExists(
                             filter, getThreadLocalCarbonContext().getTenantDomain()
                     );
@@ -247,8 +253,7 @@ public class AuthorizationDetailsTypeManagementService {
             LOG.debug("Retrieving all authorization details type against filter: " + filter);
         }
         try {
-            final List<AuthorizationDetailsType> authorizationDetailsTypes = APIResourceManagementServiceHolder
-                    .getAuthorizationDetailsTypeManager()
+            final List<AuthorizationDetailsType> authorizationDetailsTypes = this.authorizationDetailsTypeManager
                     .getAuthorizationDetailsTypes(filter, getThreadLocalCarbonContext().getTenantDomain());
 
             return toAuthorizationDetailsGetModels(authorizationDetailsTypes);
@@ -259,7 +264,7 @@ public class AuthorizationDetailsTypeManagementService {
 
     private void assertApiResourceIdExistence(final String apiResourceId) throws APIResourceMgtException {
 
-        final APIResource apiResource = APIResourceManagementServiceHolder.getApiResourceManager()
+        final APIResource apiResource = this.apiResourceManager
                 .getAPIResourceById(apiResourceId, getThreadLocalCarbonContext().getTenantDomain());
 
         if (apiResource == null) {

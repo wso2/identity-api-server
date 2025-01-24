@@ -26,6 +26,7 @@ import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.api.resource.mgt.APIResourceManager;
 import org.wso2.carbon.identity.api.resource.mgt.APIResourceMgtException;
 import org.wso2.carbon.identity.api.resource.mgt.model.APIResourceSearchResult;
+import org.wso2.carbon.identity.api.server.api.resource.common.APIResourceManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCreationModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceListItem;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceListResponse;

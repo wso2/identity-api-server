@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,9 +18,9 @@
 
 package org.wso2.carbon.identity.api.server.api.resource.v1.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesApiService;
 import org.wso2.carbon.identity.api.server.api.resource.v1.core.AuthorizationDetailsTypeManagementService;
+import org.wso2.carbon.identity.api.server.api.resource.v1.factories.AuthorizationDetailsTypeManagementServiceFactory;
 
 import javax.ws.rs.core.Response;
 
@@ -31,8 +31,17 @@ import static javax.ws.rs.core.Response.Status.NOT_FOUND;
  */
 public class AuthorizationDetailsTypesApiServiceImpl implements AuthorizationDetailsTypesApiService {
 
-    @Autowired
-    AuthorizationDetailsTypeManagementService typeMgtService;
+    private final AuthorizationDetailsTypeManagementService typeMgtService;
+
+    public AuthorizationDetailsTypesApiServiceImpl() {
+
+        try {
+            this.typeMgtService = AuthorizationDetailsTypeManagementServiceFactory
+                    .getAuthorizationDetailsTypeManagementService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating AuthorizationDetailsTypeManagementService.", e);
+        }
+    }
 
     @Override
     public Response authorizationDetailsTypesGet(String filter) {

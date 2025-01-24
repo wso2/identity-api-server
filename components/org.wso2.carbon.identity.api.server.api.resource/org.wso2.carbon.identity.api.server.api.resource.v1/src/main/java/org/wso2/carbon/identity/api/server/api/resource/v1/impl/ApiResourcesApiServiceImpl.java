@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -28,6 +28,7 @@ import org.wso2.carbon.identity.api.server.api.resource.v1.ScopePatchModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants;
 import org.wso2.carbon.identity.api.server.api.resource.v1.core.AuthorizationDetailsTypeManagementService;
 import org.wso2.carbon.identity.api.server.api.resource.v1.core.ServerAPIResourceManagementService;
+import org.wso2.carbon.identity.api.server.api.resource.v1.factories.AuthorizationDetailsTypeManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.api.resource.v1.factories.ServerAPIResourceManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.application.common.model.AuthorizationDetailsType;
@@ -45,19 +46,19 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
 public class ApiResourcesApiServiceImpl implements ApiResourcesApiService {
 
     private final ServerAPIResourceManagementService serverAPIResourceManagementService;
+    private final AuthorizationDetailsTypeManagementService typeMgtService;
 
     public ApiResourcesApiServiceImpl() {
 
         try {
             this.serverAPIResourceManagementService = ServerAPIResourceManagementServiceFactory
                     .getServerAPIResourceManagementService();
+            this.typeMgtService = AuthorizationDetailsTypeManagementServiceFactory
+                    .getAuthorizationDetailsTypeManagementService();
         } catch (IllegalStateException e) {
             throw new RuntimeException("Error occurred while initiating API resource management service.", e);
         }
     }
-
-    @Autowired
-    AuthorizationDetailsTypeManagementService typeMgtService;
 
     @Override
     public Response addAPIResource(APIResourceCreationModel apIResourceCreationModel) {
