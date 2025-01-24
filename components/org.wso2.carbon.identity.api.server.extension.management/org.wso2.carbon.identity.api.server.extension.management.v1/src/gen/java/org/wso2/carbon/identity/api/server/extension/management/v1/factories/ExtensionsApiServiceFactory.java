@@ -31,7 +31,7 @@ public class ExtensionsApiServiceFactory {
    /**
     * Get Extensions Api Service.
     *
-    * @return ExtensionsApiService
+    * @return ExtensionsApiService.
     */
    public static ExtensionsApiService getExtensionsApi() {
 
