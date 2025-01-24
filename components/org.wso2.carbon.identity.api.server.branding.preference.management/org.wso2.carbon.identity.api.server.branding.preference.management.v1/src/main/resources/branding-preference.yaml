@@ -199,6 +199,115 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
+  '/branding-preference/generate':
+    post:
+      tags:
+        - Branding Preference
+      operationId: generateBrandingPreference
+      summary: Generate branding preferences using AI based on the organization's website.
+      description: |
+        This API endpoint initiates the generation of a new set of branding preferences by leveraging AI to analyze the organization's website. This is typically used when an organization wants to create branding preferences using AI. The endpoint requires a website URL and generates matching branding details based on the website's properties.<br>
+        <b>Scope(Permission) required:</b> `internal_branding_preference_update`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BrandingGenerationRequestModel'
+        description: This represents the properties of the organization used to generate branding preferences, including the organization's website URL.
+        required: true
+      responses:
+        '202':
+          description: Branding generation process started
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/BrandingGenerationResponseModel'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  '/branding-preference/status/{operationId}':
+    get:
+      tags:
+        - Branding Preference
+      operationId: getBrandingGenerationStatus
+      summary: Get the status of a branding generation operation.
+      description: |
+        This API endpoint returns the status of the AI branding generation process that initiated using the `/generate` endpoint.<br/>
+      parameters:
+        - $ref: '#/components/parameters/operationId'
+      responses:
+        '200':
+          description: OK
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/BrandingGenerationStatusModel'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  '/branding-preference/result/{operationId}':
+    get:
+      tags:
+        - Branding Preference
+      operationId: getBrandingGenerationResult
+      summary: Return the result of a branding generation operation.
+      description: |
+        This API endpoint returns the result of an AI branding generation operation for a given operation ID. Depending on the operation status, the response may include an error message or the generated branding preferences.<br/>
+      parameters:
+        - $ref: '#/components/parameters/operationId'
+      responses:
+        '200':
+          description: OK
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/BrandingGenerationResultModel'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
 
   '/branding-preference/text':
     get:
@@ -417,6 +526,15 @@ components:
         type: boolean
         default: false
       example: true
+    operationId:
+      in: path
+      name: operationId
+      required: true
+      description: The unique identifier for the branding generation operation.
+      schema:
+        type: string
+      example: "945fa326-bf78-45f6-bfda-c9644650b821"
+
 
   schemas:
     BrandingPreferenceModel:
@@ -473,7 +591,58 @@ components:
               "selfSignUpEnabled": true
             }
           }
-
+    BrandingGenerationRequestModel:
+      type: object
+      properties:
+        websiteUrl:
+          type: string
+          description: URL of the organization's website.
+          example: "https://wso2.com/"
+    BrandingGenerationResponseModel:
+      type: object
+      properties:
+        operationId:
+          type: string
+          description: Operation id of the initiated branding generation process.
+    BrandingGenerationStatusModel:
+      type: object
+      properties:
+        status:
+          type: object
+          description: "This is the JSON structured branding preference"
+          example: {
+            "render_webpage": true,
+            "extract_webpage_content": true,
+            "webpage_extraction_completed": true,
+            "generate_branding": true,
+            "branding_generation_status": {
+              "color_palette": true,
+              "style_properties": true
+            },
+            "branding_generation_completed_status": {
+              "color_palette": false,
+              "style_properties": false
+            },
+            "create_branding_theme": false,
+            "branding_generation_completed": false
+          }
+    BrandingGenerationResultModel:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - IN_PROGRESS
+            - COMPLETED
+            - FAILED
+          description: The current result of the AI branding operation.
+        data:
+          type: object
+          description: |
+            The payload of the response, which varies based on the operation status.
+            - For IN_PROGRESS status, an empty JSON object is returned.
+            - For COMPLETED status, the `BrandingPreferenceModel` is returned.
+            - For FAILED status, an error message is returned.
     CustomTextModel:
       required:
         - type

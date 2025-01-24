@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.expired.password.identification.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.password.expiry.services.ExpiredPasswordIdentificationService;
 
 /**
@@ -25,7 +26,13 @@ import org.wso2.carbon.identity.password.expiry.services.ExpiredPasswordIdentifi
  */
 public class PasswordExpiryServiceHolder {
 
-    private static ExpiredPasswordIdentificationService expiredPasswordIdentificationService;
+    private PasswordExpiryServiceHolder() {}
+
+    private static class ExpiredPasswordIdentificationServiceHolder {
+        static final ExpiredPasswordIdentificationService SERVICE =
+                (ExpiredPasswordIdentificationService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(ExpiredPasswordIdentificationService.class, null);
+    }
 
     /**
      * Get ExpiredPasswordIdentificationService OSGi service.
@@ -33,18 +40,6 @@ public class PasswordExpiryServiceHolder {
      * @return ExpiredPassword identification Service.
      */
     public static ExpiredPasswordIdentificationService getExpiredPasswordIdentificationService() {
-
-        return expiredPasswordIdentificationService;
-    }
-
-    /**
-     * Set ExpiredPasswordIdentificationService OSGi service.
-     *
-     * @param expiredPasswordIdentificationService ExpiredPassword identification Service.
-     */
-    public static void setExpiredPasswordIdentificationService(
-            ExpiredPasswordIdentificationService expiredPasswordIdentificationService) {
-
-        PasswordExpiryServiceHolder.expiredPasswordIdentificationService = expiredPasswordIdentificationService;
+        return ExpiredPasswordIdentificationServiceHolder.SERVICE;
     }
 }

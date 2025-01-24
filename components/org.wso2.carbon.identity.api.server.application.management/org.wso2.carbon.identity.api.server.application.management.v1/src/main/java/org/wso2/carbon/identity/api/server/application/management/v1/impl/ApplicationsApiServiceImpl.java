@@ -33,6 +33,10 @@ import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedA
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowGenerateRequest;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowGenerateResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowResultResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowStatusResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
@@ -44,6 +48,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.core.Server
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationMetadataService;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationSharingService;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.TransferResource;
+import org.wso2.carbon.identity.api.server.application.management.v1.factories.LoginFlowAIServiceFactory;
 import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 
@@ -188,6 +193,22 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
+    public Response getLoginFlowGenerationResult(String operationId) {
+
+        LoginFlowResultResponse loginFlowAIGenerationResult = LoginFlowAIServiceFactory.getLoginFlowAIService()
+                .getAuthenticationSequenceGenerationResult(operationId);
+        return Response.ok(loginFlowAIGenerationResult).build();
+    }
+
+    @Override
+    public Response getLoginFlowGenerationStatus(String operationId) {
+
+        LoginFlowStatusResponse loginFlowAIStatus = LoginFlowAIServiceFactory.getLoginFlowAIService()
+                .getAuthenticationSequenceGenerationStatus(operationId);
+        return Response.ok(loginFlowAIStatus).build();
+    }
+
+    @Override
     public Response getPassiveStsConfiguration(String applicationId) {
 
         PassiveStsConfiguration passiveStsApp = applicationManagementService.getPassiveStsConfiguration(applicationId);
@@ -269,6 +290,14 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
                 .header(HttpHeaders.EXPIRES, "0")
                 .entity(transferResource.getResource().getByteArray())
                 .build();
+    }
+
+    @Override
+    public Response generateLoginFlow(LoginFlowGenerateRequest loginFlowGenerateRequest) {
+
+        LoginFlowGenerateResponse loginFlowGenerateResponse = LoginFlowAIServiceFactory.getLoginFlowAIService()
+                .generateAuthenticationSequence(loginFlowGenerateRequest);
+        return Response.accepted(loginFlowGenerateResponse).build();
     }
 
     @Override

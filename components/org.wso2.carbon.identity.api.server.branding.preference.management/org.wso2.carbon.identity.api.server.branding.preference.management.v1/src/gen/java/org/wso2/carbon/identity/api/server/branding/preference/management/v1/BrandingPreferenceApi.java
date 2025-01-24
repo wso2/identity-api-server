@@ -18,16 +18,19 @@
 
 package org.wso2.carbon.identity.api.server.branding.preference.management.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationRequestModel;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationResponseModel;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationResultModel;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationStatusModel;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.factories.BrandingPreferenceApiServiceFactory;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingPreferenceModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.CustomTextModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.Error;
-import org.wso2.carbon.identity.api.server.branding.preference.management.v1.BrandingPreferenceApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -41,8 +44,12 @@ import javax.validation.constraints.*;
 
 public class BrandingPreferenceApi  {
 
-    @Autowired
-    private BrandingPreferenceApiService delegate;
+    private final BrandingPreferenceApiService delegate;
+
+    public BrandingPreferenceApi() {
+
+        this.delegate = BrandingPreferenceApiServiceFactory.getBrandingPreferenceApi();
+    }
 
     @Valid
     @POST
@@ -139,6 +146,77 @@ public class BrandingPreferenceApi  {
     public Response deleteCustomText(    @Valid@ApiParam(value = "Type to filter the retrieval of customizations.", allowableValues="ORG, APP, CUSTOM")  @QueryParam("type") String type,     @Valid@ApiParam(value = "Tenant/Application name to filter the retrieval of customizations.")  @QueryParam("name") String name,     @Valid@ApiParam(value = "Locale to filter the retrieval of customizations.")  @QueryParam("locale") String locale,     @Valid@ApiParam(value = "Screen to filter the retrieval of customizations.")  @QueryParam("screen") String screen) {
 
         return delegate.deleteCustomText(type,  name,  locale,  screen );
+    }
+
+    @Valid
+    @POST
+    @Path("/generate")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Generate branding preferences using AI based on the organization's website.", notes = "This API endpoint initiates the generation of a new set of branding preferences by leveraging AI to analyze the organization's website. This is typically used when an organization wants to create branding preferences using AI. The endpoint requires a website URL and generates matching branding details based on the website's properties.<br> <b>Scope(Permission) required:</b> `internal_branding_preference_update` ", response = BrandingGenerationResponseModel.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+
+        })
+    }, tags={ "Branding Preference", })
+    @ApiResponses(value = {
+        @ApiResponse(code = 202, message = "Branding generation process started", response = BrandingGenerationResponseModel.class),
+        @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
+    })
+    public Response generateBrandingPreference(@ApiParam(value = "This represents the properties of the organization used to generate branding preferences, including the organization's website URL." ,required=true) @Valid BrandingGenerationRequestModel brandingGenerationRequestModel) {
+
+        return delegate.generateBrandingPreference(brandingGenerationRequestModel );
+    }
+
+    @Valid
+    @GET
+    @Path("/result/{operationId}")
+
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Return the result of a branding generation operation.", notes = "This API endpoint returns the result of an AI branding generation operation for a given operation ID. Depending on the operation status, the response may include an error message or the generated branding preferences.<br/> ", response = BrandingGenerationResultModel.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+
+        })
+    }, tags={ "Branding Preference", })
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK", response = BrandingGenerationResultModel.class),
+        @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 404, message = "Requested resource is not found.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
+    })
+    public Response getBrandingGenerationResult(@ApiParam(value = "The unique identifier for the branding generation operation.",required=true) @PathParam("operationId") String operationId) {
+
+        return delegate.getBrandingGenerationResult(operationId );
+    }
+
+    @Valid
+    @GET
+    @Path("/status/{operationId}")
+
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Get the status of a branding generation operation.", notes = "This API endpoint returns the status of the AI branding generation process that initiated using the `/generate` endpoint.<br/> ", response = BrandingGenerationStatusModel.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+
+        })
+    }, tags={ "Branding Preference", })
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK", response = BrandingGenerationStatusModel.class),
+        @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 404, message = "Requested resource is not found.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
+    })
+    public Response getBrandingGenerationStatus(@ApiParam(value = "The unique identifier for the branding generation operation.",required=true) @PathParam("operationId") String operationId) {
+
+        return delegate.getBrandingGenerationStatus(operationId );
     }
 
     @Valid
