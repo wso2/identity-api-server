@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2021-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.branding.preference.management.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
@@ -28,10 +27,10 @@ import org.wso2.carbon.identity.api.server.branding.preference.management.v1.mod
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationResponseModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationResultModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationStatusModel;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.factories.BrandingPreferenceApiServiceFactory;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingPreferenceModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.CustomTextModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.Error;
-import org.wso2.carbon.identity.api.server.branding.preference.management.v1.BrandingPreferenceApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -45,8 +44,12 @@ import javax.validation.constraints.*;
 
 public class BrandingPreferenceApi  {
 
-    @Autowired
-    private BrandingPreferenceApiService delegate;
+    private final BrandingPreferenceApiService delegate;
+
+    public BrandingPreferenceApi() {
+
+        this.delegate = BrandingPreferenceApiServiceFactory.getBrandingPreferenceApi();
+    }
 
     @Valid
     @POST
@@ -153,10 +156,10 @@ public class BrandingPreferenceApi  {
     @ApiOperation(value = "Generate branding preferences using AI based on the organization's website.", notes = "This API endpoint initiates the generation of a new set of branding preferences by leveraging AI to analyze the organization's website. This is typically used when an organization wants to create branding preferences using AI. The endpoint requires a website URL and generates matching branding details based on the website's properties.<br> <b>Scope(Permission) required:</b> `internal_branding_preference_update` ", response = BrandingGenerationResponseModel.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Branding Preference", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 202, message = "Branding generation process started", response = BrandingGenerationResponseModel.class),
         @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
@@ -171,15 +174,15 @@ public class BrandingPreferenceApi  {
     @Valid
     @GET
     @Path("/result/{operationId}")
-    
+
     @Produces({ "application/json" })
     @ApiOperation(value = "Return the result of a branding generation operation.", notes = "This API endpoint returns the result of an AI branding generation operation for a given operation ID. Depending on the operation status, the response may include an error message or the generated branding preferences.<br/> ", response = BrandingGenerationResultModel.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Branding Preference", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK", response = BrandingGenerationResultModel.class),
         @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
@@ -195,15 +198,15 @@ public class BrandingPreferenceApi  {
     @Valid
     @GET
     @Path("/status/{operationId}")
-    
+
     @Produces({ "application/json" })
     @ApiOperation(value = "Get the status of a branding generation operation.", notes = "This API endpoint returns the status of the AI branding generation process that initiated using the `/generate` endpoint.<br/> ", response = BrandingGenerationStatusModel.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Branding Preference", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK", response = BrandingGenerationStatusModel.class),
         @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
