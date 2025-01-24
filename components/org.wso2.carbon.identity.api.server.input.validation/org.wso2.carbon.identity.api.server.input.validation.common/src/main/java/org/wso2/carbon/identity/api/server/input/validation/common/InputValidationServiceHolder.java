@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.input.validation.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.input.validation.mgt.services.InputValidationManagementService;
 
 /**
@@ -25,7 +26,13 @@ import org.wso2.carbon.identity.input.validation.mgt.services.InputValidationMan
  */
 public class InputValidationServiceHolder {
 
-    private static InputValidationManagementService inputValidationMgtService;
+    private InputValidationServiceHolder () {};
+
+    private static class InputValidationManagementServiceHolder {
+        static final InputValidationManagementService SERVICE = (InputValidationManagementService)
+                PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(InputValidationManagementService.class, null);
+    }
 
     /**
      * Get InputValidationMgtService OSGi service.
@@ -34,16 +41,6 @@ public class InputValidationServiceHolder {
      */
     public static InputValidationManagementService getInputValidationMgtService() {
 
-        return inputValidationMgtService;
-    }
-
-    /**
-     * Set InputValidationMgtService OSGi service.
-     *
-     * @param inputValidationMgtService Input Validation Management Service.
-     */
-    public static void setInputValidationMgtService(InputValidationManagementService inputValidationMgtService) {
-
-        InputValidationServiceHolder.inputValidationMgtService = inputValidationMgtService;
+        return InputValidationManagementServiceHolder.SERVICE;
     }
 }
