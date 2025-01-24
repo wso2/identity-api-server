@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.action.management.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
@@ -36,16 +35,19 @@ import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
-
-import javax.validation.constraints.*;
+import org.wso2.carbon.identity.api.server.action.management.v1.factories.ActionsApiServiceFactory;
 
 @Path("/actions")
 @Api(description = "The actions API")
 
 public class ActionsApi  {
 
-    @Autowired
-    private ActionsApiService delegate;
+    private final ActionsApiService delegate;
+
+    public ActionsApi() {
+
+        this.delegate = ActionsApiServiceFactory.getActionsApi();
+    }
 
     @Valid
     @POST
