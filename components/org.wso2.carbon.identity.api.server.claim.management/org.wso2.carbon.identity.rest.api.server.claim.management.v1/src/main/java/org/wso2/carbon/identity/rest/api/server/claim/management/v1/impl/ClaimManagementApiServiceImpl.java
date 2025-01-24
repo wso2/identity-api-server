@@ -45,6 +45,8 @@ import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIF
  */
 public class ClaimManagementApiServiceImpl extends ClaimManagementApiService {
 
+    private static final String HTTP_HEADER_CONTENT_DISPOSITION = "Content-Disposition";
+
     private final ServerClaimManagementService claimManagementService;
 
     public ClaimManagementApiServiceImpl() {
@@ -184,7 +186,7 @@ public class ClaimManagementApiServiceImpl extends ClaimManagementApiService {
 
         return Response.ok()
                 .type(fileContent.getFileType())
-                .header("Content-Disposition", "attachment; filename=\""
+                .header(HTTP_HEADER_CONTENT_DISPOSITION, "attachment; filename=\""
                         + fileContent.getFileName() + "\"")
                 .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate")
                 .header(HttpHeaders.PRAGMA, "no-cache")
