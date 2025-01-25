@@ -1,18 +1,21 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2020-2025, WSO2 LLC. (http://www.wso2.com).
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
+
 package org.wso2.carbon.identity.api.server.tenant.management.v1.core;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -23,7 +26,6 @@ import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants;
-import org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.AdditionalClaims;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.ChannelVerifiedTenantModel;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.LifeCycleStatus;
@@ -72,7 +74,6 @@ import static org.wso2.carbon.identity.api.server.tenant.management.common.Tenan
 import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.TENANT_MANAGEMENT_PATH_COMPONENT;
 import static org.wso2.carbon.stratos.common.constants.TenantConstants.ErrorMessage.ERROR_CODE_INVALID_EMAIL;
 import static org.wso2.carbon.stratos.common.constants.TenantConstants.ErrorMessage.ERROR_CODE_MISSING_REQUIRED_PARAMETER;
-
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
 /**
@@ -80,11 +81,20 @@ import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
  */
 public class ServerTenantManagementService {
 
+    private final TenantMgtService tenantMgtService;
+    private final RealmService realmService;
+
     private static final Log log = LogFactory.getLog(ServerTenantManagementService.class);
     private static final String VERIFIED_LITE_USER = "verified-lite-user";
     private static final String INLINE_PASSWORD = "inline-password";
     private static final String CODE = "code";
     private static final String PURPOSE = "purpose";
+
+    public ServerTenantManagementService(TenantMgtService tenantMgtService, RealmService realmService) {
+
+        this.tenantMgtService = tenantMgtService;
+        this.realmService = realmService;
+    }
 
     /**
      * Add a tenant.
@@ -95,7 +105,6 @@ public class ServerTenantManagementService {
     public String addTenant(TenantModel tenantModel) {
 
         String resourceId;
-        TenantMgtService tenantMgtService = TenantManagementServiceHolder.getTenantMgtService();
         try {
             Tenant tenant = createTenantInfoBean(tenantModel);
             resourceId = tenantMgtService.addTenant(tenant);
@@ -119,8 +128,6 @@ public class ServerTenantManagementService {
     public TenantsListResponse listTenants(Integer limit, Integer offset, String sortOrder, String sortBy,
                                            String filter) {
 
-        TenantMgtService tenantMgtService = TenantManagementServiceHolder.getTenantMgtService();
-
         try {
             TenantSearchResult tenantSearchResult = tenantMgtService.listTenants(limit, offset, sortOrder, sortBy,
                     filter);
@@ -140,7 +147,7 @@ public class ServerTenantManagementService {
     public TenantResponseModel getTenant(String tenantUniqueID) {
 
         try {
-            Tenant tenant = TenantManagementServiceHolder.getTenantMgtService().getTenant(tenantUniqueID);
+            Tenant tenant = tenantMgtService.getTenant(tenantUniqueID);
             return createTenantResponse(tenant);
         } catch (TenantMgtException e) {
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
@@ -157,7 +164,7 @@ public class ServerTenantManagementService {
     public TenantResponseModel getTenantByDomain(String domain) {
 
         try {
-            Tenant tenant = TenantManagementServiceHolder.getTenantMgtService().getTenantByDomain(domain);
+            Tenant tenant = tenantMgtService.getTenantByDomain(domain);
             return createTenantResponse(tenant);
         } catch (TenantMgtException e) {
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
@@ -174,7 +181,7 @@ public class ServerTenantManagementService {
     public boolean isDomainAvailable(String tenantDomain) {
 
         try {
-            return TenantManagementServiceHolder.getTenantMgtService().isDomainAvailable(tenantDomain);
+            return tenantMgtService.isDomainAvailable(tenantDomain);
         } catch (TenantMgtException e) {
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
                     ERROR_CODE_ERROR_RETRIEVING_TENANT, tenantDomain);
@@ -190,7 +197,7 @@ public class ServerTenantManagementService {
     public List<OwnerResponse> getOwners(String tenantUniqueID) {
 
         try {
-            User user = TenantManagementServiceHolder.getTenantMgtService().getOwner(tenantUniqueID);
+            User user = tenantMgtService.getOwner(tenantUniqueID);
             return createOwnerResponse(user);
         } catch (TenantMgtException e) {
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
@@ -201,7 +208,7 @@ public class ServerTenantManagementService {
     public OwnerInfoResponse getOwner(String tenantUniqueID, String ownerID, String additionalClaims) {
 
         try {
-            Tenant tenant = TenantManagementServiceHolder.getTenantMgtService().getTenant(tenantUniqueID);
+            Tenant tenant = tenantMgtService.getTenant(tenantUniqueID);
             validateTenantOwnerId(tenant, ownerID);
 
             String[] claimsList = StringUtils.split(additionalClaims, ",");
@@ -215,12 +222,12 @@ public class ServerTenantManagementService {
     public void updateOwner(String tenantUniqueID, String ownerID, OwnerPutModel ownerPutModel) {
 
         try {
-            Tenant tenant = TenantManagementServiceHolder.getTenantMgtService().getTenant(tenantUniqueID);
+            Tenant tenant = tenantMgtService.getTenant(tenantUniqueID);
             validateTenantOwnerId(tenant, ownerID);
 
             createTenantInfoBean(tenant, ownerPutModel);
 
-            TenantManagementServiceHolder.getTenantMgtService().updateOwner(tenant);
+            tenantMgtService.updateOwner(tenant);
         } catch (TenantMgtException e) {
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
                     ERROR_CODE_ERROR_UPDATING_OWNER, tenantUniqueID);
@@ -235,7 +242,7 @@ public class ServerTenantManagementService {
     public void deleteTenantMetadata(String tenantUniqueID) {
 
         try {
-            TenantManagementServiceHolder.getTenantMgtService().deleteTenantMetaData(tenantUniqueID);
+            tenantMgtService.deleteTenantMetaData(tenantUniqueID);
         } catch (TenantMgtException e) {
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
                     ERROR_CODE_DELETE_TENANT_METADATA, tenantUniqueID);
@@ -254,9 +261,9 @@ public class ServerTenantManagementService {
         boolean activated = tenantPutModel.getActivated();
         try {
             if (activated) {
-                TenantManagementServiceHolder.getTenantMgtService().activateTenant(tenantUniqueID);
+                tenantMgtService.activateTenant(tenantUniqueID);
             } else {
-                TenantManagementServiceHolder.getTenantMgtService().deactivateTenant(tenantUniqueID);
+                tenantMgtService.deactivateTenant(tenantUniqueID);
             }
         } catch (TenantMgtException e) {
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
@@ -306,7 +313,6 @@ public class ServerTenantManagementService {
 
     private OwnerInfoResponse createOwnerInfoResponse(Tenant tenant, String[] claimsList) throws TenantMgtException {
 
-        RealmService realmService = TenantManagementServiceHolder.getRealmService();
         OwnerInfoResponse ownerInfoResponse = new OwnerInfoResponse();
         ownerInfoResponse.setId(tenant.getAdminUserId());
         ownerInfoResponse.setUsername(tenant.getAdminName());
@@ -606,7 +612,6 @@ public class ServerTenantManagementService {
 
     public String addTenant(ChannelVerifiedTenantModel channelVerifiedTenantModel) {
         String resourceId;
-        TenantMgtService tenantMgtService = TenantManagementServiceHolder.getTenantMgtService();
         try {
             validateInputAgainstCode(channelVerifiedTenantModel);
             Tenant tenant = createTenantInfoBean(channelVerifiedTenantModel);

@@ -24,7 +24,12 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import java.io.InputStream;
+import java.util.List;
+
+import org.wso2.carbon.identity.api.server.tenant.management.v1.factories.TenantsApiServiceFactory;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.Error;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.OwnerInfoResponse;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.OwnerPutModel;
@@ -53,8 +58,12 @@ import javax.ws.rs.core.Response;
 
 public class TenantsApi  {
 
-    @Autowired
-    private TenantsApiService delegate;
+    private final TenantsApiService delegate;
+
+    public TenantsApi() {
+
+        this.delegate = TenantsApiServiceFactory.getTenantsApi();
+    }
 
     @Valid
     @POST
@@ -108,15 +117,15 @@ public class TenantsApi  {
     @Valid
     @GET
     @Path("/{tenant-id}/owners/{owner-id}")
-    
+
     @Produces({ "application/json" })
     @ApiOperation(value = "Retrieve tenant owner.", notes = "Retrieve the tenant owner identified by the provided tenant id and owner id.  <b>Permission required:</b> * /permission/protected/manage/monitor/tenants/list  <b>scope required:</b> * internal_list_tenants ", response = OwnerInfoResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Tenants", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK", response = OwnerInfoResponse.class),
         @ApiResponse(code = 400, message = "Invalid Input Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -257,10 +266,10 @@ public class TenantsApi  {
     @ApiOperation(value = "Update tenant owner.", notes = "This API provides the capability to update the tenant owner.  <b>Permission required:</b> * /permission/protected/manage/modify/tenants  <b>scope required:</b> * internal_modify_tenants ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Tenants", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful", response = Void.class),
         @ApiResponse(code = 206, message = "Partial Content", response = Error.class),
         @ApiResponse(code = 400, message = "Invalid Input Request", response = Error.class),
