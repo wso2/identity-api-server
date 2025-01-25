@@ -877,13 +877,13 @@
         <identity.verification.version>1.0.15</identity.verification.version>
 
         <!-- Organization management core Version -->
-        <org.wso2.carbon.identity.organization.management.core.version>1.1.12
+        <org.wso2.carbon.identity.organization.management.core.version>1.1.20
         </org.wso2.carbon.identity.organization.management.core.version>
         <org.wso2.carbon.identity.organization.management.core.version.range>[1.0.0, 2.0.0)
         </org.wso2.carbon.identity.organization.management.core.version.range>
 
         <!-- Organization management service Version -->
-        <org.wso2.carbon.identity.organization.management.version>1.4.66
+        <org.wso2.carbon.identity.organization.management.version>1.4.71-SNAPSHOT
         </org.wso2.carbon.identity.organization.management.version>
 
         <!-- Unit test versions -->
