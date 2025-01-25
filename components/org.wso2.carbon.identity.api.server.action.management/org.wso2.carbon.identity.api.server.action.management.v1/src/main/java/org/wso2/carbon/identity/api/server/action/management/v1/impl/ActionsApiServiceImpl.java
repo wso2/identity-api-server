@@ -18,9 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.action.management.v1.impl;
 
-import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
-import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionsApiService;
 import org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants;
 import org.wso2.carbon.identity.api.server.action.management.v1.core.ServerActionManagementService;
