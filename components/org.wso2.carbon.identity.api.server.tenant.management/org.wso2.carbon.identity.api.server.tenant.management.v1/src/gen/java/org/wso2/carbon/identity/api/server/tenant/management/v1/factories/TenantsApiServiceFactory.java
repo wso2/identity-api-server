@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2020-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -21,12 +21,20 @@ package org.wso2.carbon.identity.api.server.tenant.management.v1.factories;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.TenantsApiService;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.impl.TenantsApiServiceImpl;
 
+/**
+ * Factory class for TenantsApiService.
+ */
 public class TenantsApiServiceFactory {
 
-   private final static TenantsApiService service = new TenantsApiServiceImpl();
+   private final static TenantsApiService SERVICE = new TenantsApiServiceImpl();
 
+   /**
+    * Get TenantsApiService.
+    *
+    * @return TenantsApiService
+    */
    public static TenantsApiService getTenantsApi()
    {
-      return service;
+      return SERVICE;
    }
 }
