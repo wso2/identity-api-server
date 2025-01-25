@@ -23,10 +23,10 @@ import org.wso2.carbon.identity.api.server.rule.metadata.v1.impl.RulesApiService
 
 public class RulesApiServiceFactory {
 
-   private final static RulesApiService service = new RulesApiServiceImpl();
+   private static final RulesApiService SERVICE = new RulesApiServiceImpl();
 
-   public static RulesApiService getRulesApi()
-   {
-      return service;
+   public static RulesApiService getRulesApi() {
+
+      return SERVICE;
    }
 }
