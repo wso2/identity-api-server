@@ -43,7 +43,6 @@ public class TemplatesServiceHolder {
         static final NotificationTemplateManager SERVICE = resolveNotificationTemplateManager();
     }
 
-
     private static NotificationTemplateManager resolveNotificationTemplateManager() {
 
         Hashtable<String, String> serviceProperties = new Hashtable<>();
