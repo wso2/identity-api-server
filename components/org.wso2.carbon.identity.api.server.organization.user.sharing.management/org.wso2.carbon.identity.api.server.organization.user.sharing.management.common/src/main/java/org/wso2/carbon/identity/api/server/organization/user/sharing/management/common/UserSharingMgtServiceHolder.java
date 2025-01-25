@@ -23,7 +23,7 @@ import org.wso2.carbon.identity.organization.management.organization.user.sharin
 
 
 /**
- * Holds the services which the shared user invitation management API component is using.
+ * Holds the services which the shared user sharing management API component is using.
  */
 public class UserSharingMgtServiceHolder {
 
@@ -39,7 +39,7 @@ public class UserSharingMgtServiceHolder {
         }
 
     /**
-     * Get UserSharingPolicyHandlerService OSGi service.
+     * Get UserSharingPolicyHandlerService service.
      *
      * @return UserSharingPolicyHandlerService.
      */

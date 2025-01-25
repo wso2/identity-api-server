@@ -19,17 +19,17 @@
 package org.wso2.carbon.identity.api.server.organization.user.sharing.management.common;
 
 /**
- * Holds the constants which the shared user invitation management API component is using.
+ * Holds the constants which the user sharing management API component is using.
  */
 public class UserSharingMgtConstants {
 
     public static final String ERROR_PREFIX = "USM-";
-    public static final String ERROR_FAIL_STATUS = "Failed";
+    public static final String ERROR_UNSUPPORTED_PARAM = "Unsupported param.";
 
     public static final String USER_IDS = "userIds";
 
     /**
-     * Enum for shared user invitation management related errors.
+     * Enum for user sharing management related errors.
      * Error Code - code to identify the error.
      * Error Message - What went wrong.
      * Error Description - Why it went wrong.
@@ -50,16 +50,16 @@ public class UserSharingMgtConstants {
                 "Unable to create the invitation.",
                 "Multiple invitations found for users given in the list %s."),
         ERROR_CODE_UNSUPPORTED_LIMIT("60004",
-                "Unsupported param.",
+                ERROR_UNSUPPORTED_PARAM,
                 "Limit param is not supported yet."),
         ERROR_CODE_UNSUPPORTED_OFFSET("60005",
-                "Unsupported param.",
+                ERROR_UNSUPPORTED_PARAM,
                 "Offset param is not supported yet."),
         ERROR_CODE_UNSUPPORTED_SORT_ORDER("60006",
-                "Unsupported param.",
+                ERROR_UNSUPPORTED_PARAM,
                 "Sort order param is not supported yet."),
         ERROR_CODE_UNSUPPORTED_SORT_BY("60007",
-                "Unsupported param.",
+                ERROR_UNSUPPORTED_PARAM,
                 "Sort order param is not supported yet."),
         ERROR_CODE_ACTIVE_INVITATION_AVAILABLE("60008",
                 "Invitation already exists.",
