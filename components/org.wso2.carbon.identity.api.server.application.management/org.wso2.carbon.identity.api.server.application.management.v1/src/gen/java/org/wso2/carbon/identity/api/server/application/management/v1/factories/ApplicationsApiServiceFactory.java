@@ -21,12 +21,20 @@ package org.wso2.carbon.identity.api.server.application.management.v1.factories;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationsApiService;
 import org.wso2.carbon.identity.api.server.application.management.v1.impl.ApplicationsApiServiceImpl;
 
+/**
+ * Factory class for ApplicationsApiService.
+ */
 public class ApplicationsApiServiceFactory {
 
-   private final static ApplicationsApiService service = new ApplicationsApiServiceImpl();
+   private static final ApplicationsApiService SERVICE = new ApplicationsApiServiceImpl();
 
-   public static ApplicationsApiService getApplicationsApi()
-   {
-      return service;
+   /**
+    * Get ApplicationsApiService.
+    *
+    * @return ApplicationsApiService.
+    */
+   public static ApplicationsApiService getApplicationsApi() {
+
+      return SERVICE;
    }
 }

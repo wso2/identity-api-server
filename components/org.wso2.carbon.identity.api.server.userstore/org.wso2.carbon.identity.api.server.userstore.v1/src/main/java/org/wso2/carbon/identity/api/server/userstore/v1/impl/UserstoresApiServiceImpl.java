@@ -1,28 +1,30 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019-2025, WSO2 LLC. (http://www.wso2.com).
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.wso2.carbon.identity.api.server.userstore.v1.impl;
 
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
+import org.apache.http.HttpHeaders;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.FileContent;
 import org.wso2.carbon.identity.api.server.userstore.v1.UserstoresApiService;
 import org.wso2.carbon.identity.api.server.userstore.v1.core.ServerUserStoreService;
+import org.wso2.carbon.identity.api.server.userstore.v1.factories.ServerUserStoreServiceFactory;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.ClaimAttributeMapping;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.PatchDocument;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.RDBMSConnectionReq;
@@ -44,8 +46,16 @@ import static org.wso2.carbon.identity.api.server.userstore.common.UserStoreCons
  */
 public class UserstoresApiServiceImpl implements UserstoresApiService {
 
-    @Autowired
-    private ServerUserStoreService serverUserStoreService;
+    private final ServerUserStoreService serverUserStoreService;
+
+    public UserstoresApiServiceImpl() {
+
+        try {
+            this.serverUserStoreService = ServerUserStoreServiceFactory.getServerUserStoreService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating ServerUserStoreService.", e);
+        }
+    }
 
     @Override
     public Response addUserStore(UserStoreReq userStoreReq) {
@@ -68,7 +78,7 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
 
         return Response.ok()
                 .type(fileContent.getFileType())
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""
+                .header("Content-Disposition", "attachment; filename=\""
                         + fileContent.getFileName() + "\"")
                 .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate")
                 .header(HttpHeaders.PRAGMA, "no-cache")
@@ -76,8 +86,6 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
                 .entity(fileContent.getContent().getBytes(StandardCharsets.UTF_8))
                 .build();
     }
-
-
 
     @Override
     public Response getAvailableUserStoreTypes() {
