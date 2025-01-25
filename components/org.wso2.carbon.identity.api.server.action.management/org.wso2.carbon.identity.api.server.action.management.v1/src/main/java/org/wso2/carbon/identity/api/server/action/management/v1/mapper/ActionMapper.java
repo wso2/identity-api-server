@@ -16,20 +16,22 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.api.server.action.management.v1.builder;
+package org.wso2.carbon.identity.api.server.action.management.v1.mapper;
 
 import org.wso2.carbon.identity.action.management.exception.ActionMgtException;
 import org.wso2.carbon.identity.action.management.model.Action;
+import org.wso2.carbon.identity.api.server.action.management.v1.ActionBasicResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
+import org.wso2.carbon.identity.api.server.action.management.v1.util.ActionMapperUtil;
 
 /**
  * This interface defines the Action ActionConverter.
  * Action ActionConverter is the component that is responsible for the conversions between Action and ExtendedAction
  * objects.
  */
-public interface ActionBuilder {
+public interface ActionMapper {
 
     Action.ActionTypes getSupportedActionType();
 
@@ -39,7 +41,7 @@ public interface ActionBuilder {
      * @param actionModel ActionModel object.
      * @return Action object.
      */
-    Action buildAction(ActionModel actionModel) throws ActionMgtException;
+    Action toAction(ActionModel actionModel) throws ActionMgtException;
 
     /**
      * Convert {@link ActionUpdateModel} object into {@link Action} object.
@@ -47,7 +49,7 @@ public interface ActionBuilder {
      * @param actionUpdateModel ActionUpdateModel object.
      * @return Action object.
      */
-    Action buildAction(ActionUpdateModel actionUpdateModel) throws ActionMgtException;
+    Action toAction(ActionUpdateModel actionUpdateModel) throws ActionMgtException;
 
     /**
      * Convert {@link Action} object into {@link ActionResponse} object.
@@ -55,5 +57,16 @@ public interface ActionBuilder {
      * @param action Action object.
      * @return ActionResponse object.
      */
-    ActionResponse buildActionResponse(Action action) throws ActionMgtException;
+    ActionResponse toActionResponse(Action action) throws ActionMgtException;
+
+    /**
+     * Convert {@link Action} object into {@link ActionBasicResponse} object.
+     *
+     * @param action Action object.
+     * @return ActionBasicResponse object.
+     */
+    default ActionBasicResponse toActionBasicResponse(Action action) throws ActionMgtException {
+
+        return ActionMapperUtil.buildActionBasicResponse(action);
+    }
 }

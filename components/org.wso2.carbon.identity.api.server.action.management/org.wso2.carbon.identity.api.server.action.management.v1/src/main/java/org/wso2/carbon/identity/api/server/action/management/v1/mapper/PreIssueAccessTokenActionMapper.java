@@ -16,19 +16,19 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.api.server.action.management.v1.builder;
+package org.wso2.carbon.identity.api.server.action.management.v1.mapper;
 
 import org.wso2.carbon.identity.action.management.exception.ActionMgtException;
 import org.wso2.carbon.identity.action.management.model.Action;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
-import org.wso2.carbon.identity.api.server.action.management.v1.util.ActionBuilderUtil;
+import org.wso2.carbon.identity.api.server.action.management.v1.util.ActionMapperUtil;
 
 /**
  * Pre Issue Access Token Action Builder.
  */
-public class PreIssueAccessTokenActionBuilder implements ActionBuilder {
+public class PreIssueAccessTokenActionMapper implements ActionMapper {
 
     @Override
     public Action.ActionTypes getSupportedActionType() {
@@ -37,20 +37,20 @@ public class PreIssueAccessTokenActionBuilder implements ActionBuilder {
     }
 
     @Override
-    public Action buildAction(ActionModel actionModel) throws ActionMgtException {
+    public Action toAction(ActionModel actionModel) throws ActionMgtException {
 
-        return ActionBuilderUtil.buildActionRequest(getSupportedActionType(), actionModel);
+        return ActionMapperUtil.buildActionRequest(getSupportedActionType(), actionModel);
     }
 
     @Override
-    public Action buildAction(ActionUpdateModel actionUpdateModel) throws ActionMgtException {
+    public Action toAction(ActionUpdateModel actionUpdateModel) throws ActionMgtException {
 
-        return ActionBuilderUtil.buildUpdatingActionRequest(getSupportedActionType(), actionUpdateModel);
+        return ActionMapperUtil.buildUpdatingActionRequest(getSupportedActionType(), actionUpdateModel);
     }
 
     @Override
-    public ActionResponse buildActionResponse(Action action) throws ActionMgtException {
+    public ActionResponse toActionResponse(Action action) throws ActionMgtException {
 
-        return ActionBuilderUtil.buildActionResponse(action);
+        return ActionMapperUtil.buildActionResponse(action);
     }
 }

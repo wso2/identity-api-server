@@ -49,9 +49,7 @@ public class ActionMgtEndpointConstants {
                 "Action is not found.",
                 "No action is found for given action id and action type"),
         ERROR_INVALID_RULE("60013", "Invalid rule.", "%s"),
-        ERROR_NO_ACTION_BUILDER_FOUND("60014", "Action builder not found.",
-                "No action builder found for the given action type."),
-        ERROR_INVALID_PAYLOAD("60015", "Invalid Request body.",
+        ERROR_INVALID_PAYLOAD("60014", "Invalid Request body.",
                 "Provided request body content is not in the expected format."),
 
         // Server errors.

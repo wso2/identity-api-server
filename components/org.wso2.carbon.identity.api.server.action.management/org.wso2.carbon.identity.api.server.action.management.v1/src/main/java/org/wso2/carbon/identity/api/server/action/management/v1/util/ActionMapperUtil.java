@@ -34,9 +34,6 @@ import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateMode
 import org.wso2.carbon.identity.api.server.action.management.v1.AuthenticationTypeResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.EndpointResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.Link;
-import org.wso2.carbon.identity.api.server.action.management.v1.builder.ActionBuilder;
-import org.wso2.carbon.identity.api.server.action.management.v1.builder.PreIssueAccessTokenActionBuilder;
-import org.wso2.carbon.identity.api.server.action.management.v1.builder.PreUpdatePasswordActionBuilder;
 import org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants;
 
 import java.util.ArrayList;
@@ -51,35 +48,7 @@ import static org.wso2.carbon.identity.api.server.action.management.v1.constants
 /**
  * Utility class for Action Builder.
  */
-public class ActionBuilderUtil {
-
-    /**
-     * Get ActionBuilder object based on the action type.
-     *
-     * @param actionType Action type.
-     * @return ActionBuilder object.
-     */
-    public static ActionBuilder getActionBuilder(Action.ActionTypes actionType) {
-
-        ActionBuilder actionBuilder = null;
-        switch (actionType) {
-            case PRE_ISSUE_ACCESS_TOKEN:
-                actionBuilder = new PreIssueAccessTokenActionBuilder();
-                break;
-            case PRE_UPDATE_PASSWORD:
-                actionBuilder = new PreUpdatePasswordActionBuilder();
-                break;
-            default:
-                break;
-        }
-
-        if (actionBuilder == null) {
-            throw ActionMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST,
-                    ActionMgtEndpointConstants.ErrorMessage.ERROR_NO_ACTION_BUILDER_FOUND);
-        }
-
-        return actionBuilder;
-    }
+public class ActionMapperUtil {
 
     /**
      * Build Action object from ActionModel.
@@ -91,7 +60,7 @@ public class ActionBuilderUtil {
     public static Action buildActionRequest(Action.ActionTypes actionType, ActionModel actionModel)
             throws ActionMgtException {
 
-        Authentication authentication = ActionBuilderUtil.buildAuthentication(
+        Authentication authentication = ActionMapperUtil.buildAuthentication(
                 Authentication.Type.valueOf(actionModel.getEndpoint().getAuthentication().getType().toString()),
                 actionModel.getEndpoint().getAuthentication().getProperties());
 
@@ -218,7 +187,7 @@ public class ActionBuilderUtil {
      * @param authPropertiesMap Authentication properties.
      * @return Authentication object.
      */
-    public static Authentication buildAuthentication(Authentication.Type authType,
+    private static Authentication buildAuthentication(Authentication.Type authType,
                                                      Map<String, Object> authPropertiesMap)
             throws ActionMgtClientException {
 

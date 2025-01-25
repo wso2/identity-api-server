@@ -30,8 +30,8 @@ import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionType;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionTypesResponseItem;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
-import org.wso2.carbon.identity.api.server.action.management.v1.builder.ActionBuilder;
-import org.wso2.carbon.identity.api.server.action.management.v1.util.ActionBuilderUtil;
+import org.wso2.carbon.identity.api.server.action.management.v1.mapper.ActionMapper;
+import org.wso2.carbon.identity.api.server.action.management.v1.mapper.ActionMapperFactory;
 import org.wso2.carbon.identity.api.server.action.management.v1.util.ActionDeserializer;
 import org.wso2.carbon.identity.api.server.action.management.v1.util.ActionMgtEndpointUtil;
 
@@ -63,6 +63,7 @@ public class ServerActionManagementService {
     }
 
     static {
+        NOT_IMPLEMENTED_ACTION_TYPES.add(Action.ActionTypes.PRE_UPDATE_PASSWORD.getPathParam());
         NOT_IMPLEMENTED_ACTION_TYPES.add(Action.ActionTypes.PRE_UPDATE_PROFILE.getPathParam());
         NOT_IMPLEMENTED_ACTION_TYPES.add(Action.ActionTypes.PRE_REGISTRATION.getPathParam());
         NOT_IMPLEMENTED_ACTION_TYPES.add(Action.ActionTypes.AUTHENTICATION.getPathParam());
@@ -89,7 +90,7 @@ public class ServerActionManagementService {
 
             List<ActionBasicResponse> actionBasicResponses = new ArrayList<>();
             for (Action action : actions) {
-                actionBasicResponses.add(ActionBuilderUtil.buildActionBasicResponse(action));
+                actionBasicResponses.add(buildActionBasicResponse(action));
             }
             return actionBasicResponses;
         } catch (ActionMgtException e) {
@@ -142,8 +143,8 @@ public class ServerActionManagementService {
 
         try {
             validateActionType(actionType);
-            return ActionBuilderUtil.buildActionBasicResponse(actionManagementService.activateAction(actionType, 
-                    actionId, CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
+            return buildActionBasicResponse(actionManagementService.activateAction(actionType, actionId,
+                            CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
         } catch (ActionMgtException e) {
             throw ActionMgtEndpointUtil.handleActionMgtException(e);
         }
@@ -153,8 +154,8 @@ public class ServerActionManagementService {
 
         try {
             validateActionType(actionType);
-            return ActionBuilderUtil.buildActionBasicResponse(actionManagementService.deactivateAction(actionType, 
-                    actionId, CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
+            return buildActionBasicResponse(actionManagementService.deactivateAction(actionType, actionId,
+                            CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
         } catch (ActionMgtException e) {
             throw ActionMgtEndpointUtil.handleActionMgtException(e);
         }
@@ -198,8 +199,21 @@ public class ServerActionManagementService {
      */
     private ActionResponse buildActionResponse(Action action) throws ActionMgtException {
 
-        ActionBuilder actionBuilder = ActionBuilderUtil.getActionBuilder(action.getType());
-        return actionBuilder.buildActionResponse(action);
+        ActionMapper actionMapper = ActionMapperFactory.getActionMapper(action.getType());
+        return actionMapper.toActionResponse(action);
+    }
+
+    /**
+     * Build ActionBasicResponse from Action.
+     *
+     * @param action action object
+     * @return ActionBasicResponse object
+     * @throws ActionMgtException If an error occurs while building the ActionBasicResponse.
+     */
+    private ActionBasicResponse buildActionBasicResponse(Action action) throws ActionMgtException {
+
+        ActionMapper actionMapper = ActionMapperFactory.getActionMapper(action.getType());
+        return actionMapper.toActionBasicResponse(action);
     }
 
     /**
@@ -214,8 +228,8 @@ public class ServerActionManagementService {
             throws ActionMgtException {
 
         ActionModel actionModel = ActionDeserializer.deserializeActionModel(actionType, jsonBody);
-        ActionBuilder actionBuilder = ActionBuilderUtil.getActionBuilder(actionType);
-        return actionBuilder.buildAction(actionModel);
+        ActionMapper actionMapper = ActionMapperFactory.getActionMapper(actionType);
+        return actionMapper.toAction(actionModel);
     }
 
     /**
@@ -230,8 +244,8 @@ public class ServerActionManagementService {
             throws ActionMgtException {
 
         ActionUpdateModel actionUpdateModel = ActionDeserializer.deserializeActionUpdateModel(actionType, jsonBody);
-        ActionBuilder actionBuilder = ActionBuilderUtil.getActionBuilder(actionType);
-        return actionBuilder.buildAction(actionUpdateModel);
+        ActionMapper actionMapper = ActionMapperFactory.getActionMapper(actionType);
+        return actionMapper.toAction(actionUpdateModel);
     }
 
     private Action.ActionTypes validateActionType(String actionType) {

@@ -16,25 +16,25 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.api.server.action.management.v1.builder;
+package org.wso2.carbon.identity.api.server.action.management.v1.mapper;
 
 import org.wso2.carbon.identity.action.management.exception.ActionMgtException;
 import org.wso2.carbon.identity.action.management.model.Action;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
-import org.wso2.carbon.identity.api.server.action.management.v1.PasswordSharing;
 import org.wso2.carbon.identity.api.server.action.management.v1.PreUpdatePasswordActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.PreUpdatePasswordActionResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.PreUpdatePasswordActionUpdateModel;
-import org.wso2.carbon.identity.api.server.action.management.v1.util.ActionBuilderUtil;
+import org.wso2.carbon.identity.api.server.action.management.v1.util.ActionMapperUtil;
 import org.wso2.carbon.identity.certificate.management.model.Certificate;
-import org.wso2.carbon.identity.user.pre.update.password.action.model.PreUpdatePasswordAction;
+import org.wso2.carbon.identity.user.pre.update.password.action.service.model.PasswordSharing;
+import org.wso2.carbon.identity.user.pre.update.password.action.service.model.PreUpdatePasswordAction;
 
 /**
  * Pre Update Password Action Builder.
  */
-public class PreUpdatePasswordActionBuilder implements ActionBuilder {
+public class PreUpdatePasswordActionMapper implements ActionMapper {
 
     @Override
     public Action.ActionTypes getSupportedActionType() {
@@ -43,18 +43,18 @@ public class PreUpdatePasswordActionBuilder implements ActionBuilder {
     }
 
     @Override
-    public Action buildAction(ActionModel actionModel) throws ActionMgtException {
+    public Action toAction(ActionModel actionModel) throws ActionMgtException {
 
-        Action basicAction = ActionBuilderUtil.buildActionRequest(getSupportedActionType(), actionModel);
+        Action basicAction = ActionMapperUtil.buildActionRequest(getSupportedActionType(), actionModel);
         return new PreUpdatePasswordAction.RequestBuilder(basicAction)
                 .passwordSharing(buildPasswordSharingRequest((PreUpdatePasswordActionModel) actionModel))
                 .build();
     }
 
     @Override
-    public Action buildAction(ActionUpdateModel actionUpdateModel) throws ActionMgtException {
+    public Action toAction(ActionUpdateModel actionUpdateModel) throws ActionMgtException {
 
-        Action basicUpdatingAction = ActionBuilderUtil.buildUpdatingActionRequest(getSupportedActionType(),
+        Action basicUpdatingAction = ActionMapperUtil.buildUpdatingActionRequest(getSupportedActionType(),
                 actionUpdateModel);
         return new PreUpdatePasswordAction.RequestBuilder(basicUpdatingAction)
                 .passwordSharing(
@@ -63,39 +63,34 @@ public class PreUpdatePasswordActionBuilder implements ActionBuilder {
     }
 
     @Override
-    public ActionResponse buildActionResponse(Action action) throws ActionMgtException {
+    public ActionResponse toActionResponse(Action action) throws ActionMgtException {
 
-        ActionResponse actionResponse = ActionBuilderUtil.buildActionResponse(action);
+        ActionResponse actionResponse = ActionMapperUtil.buildActionResponse(action);
         return new PreUpdatePasswordActionResponse(actionResponse)
                 .passwordSharing(buildPasswordSharingResponse((PreUpdatePasswordAction) action));
     }
 
-    private org.wso2.carbon.identity.user.pre.update.password.action.model.PasswordSharing
-        buildPasswordSharingRequest(PreUpdatePasswordActionModel actionModel) {
+    private PasswordSharing buildPasswordSharingRequest(PreUpdatePasswordActionModel actionModel) {
 
-        return new org.wso2.carbon.identity.user.pre.update.password.action.model.PasswordSharing.Builder()
-                        .format(org.wso2.carbon.identity.user.pre.update.password.action.model.PasswordSharing.Format
-                                .valueOf(actionModel.getPasswordSharing().getFormat().value()))
-                        .certificate(new Certificate.Builder()
-                                .certificateContent(actionModel.getPasswordSharing().getCertificate())
-                                .build())
-                        .build();
+        return new PasswordSharing.Builder()
+                .format(PasswordSharing.Format.valueOf(actionModel.getPasswordSharing().getFormat().value()))
+                .certificate(new Certificate.Builder()
+                        .certificateContent(actionModel.getPasswordSharing().getCertificate())
+                        .build())
+                .build();
     }
 
-    private org.wso2.carbon.identity.user.pre.update.password.action.model.PasswordSharing
-        buildPasswordSharingUpdateRequest(PreUpdatePasswordActionUpdateModel actionModel) {
+    private PasswordSharing buildPasswordSharingUpdateRequest(PreUpdatePasswordActionUpdateModel actionModel) {
 
         if (actionModel.getPasswordSharing() == null) {
             return null;
         }
 
-        org.wso2.carbon.identity.user.pre.update.password.action.model.PasswordSharing.Builder passwordSharingBuilder =
-                new org.wso2.carbon.identity.user.pre.update.password.action.model.PasswordSharing.Builder();
+        PasswordSharing.Builder passwordSharingBuilder = new PasswordSharing.Builder();
 
         if (actionModel.getPasswordSharing().getFormat() != null) {
-            passwordSharingBuilder.format(
-                    org.wso2.carbon.identity.user.pre.update.password.action.model.PasswordSharing.Format
-                            .valueOf(actionModel.getPasswordSharing().getFormat().value()));
+            passwordSharingBuilder
+                    .format(PasswordSharing.Format.valueOf(actionModel.getPasswordSharing().getFormat().value()));
         }
 
         if (actionModel.getPasswordSharing().getCertificate() != null) {
@@ -107,10 +102,12 @@ public class PreUpdatePasswordActionBuilder implements ActionBuilder {
         return passwordSharingBuilder.build();
     }
 
-    private PasswordSharing buildPasswordSharingResponse(PreUpdatePasswordAction action) {
+    private org.wso2.carbon.identity.api.server.action.management.v1.PasswordSharing
+        buildPasswordSharingResponse(PreUpdatePasswordAction action) {
 
-        return new PasswordSharing()
-                .format(PasswordSharing.FormatEnum.valueOf(action.getPasswordSharing().getFormat().name()))
+        return new org.wso2.carbon.identity.api.server.action.management.v1.PasswordSharing()
+                .format(org.wso2.carbon.identity.api.server.action.management.v1.PasswordSharing.FormatEnum
+                        .valueOf(action.getPasswordSharing().getFormat().name()))
                 .certificate(action.getPasswordSharing().getCertificate() == null ? null :
                         action.getPasswordSharing().getCertificate().getCertificateContent());
     }
