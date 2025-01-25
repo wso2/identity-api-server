@@ -179,6 +179,10 @@ public class ApplicationManagementConstants {
                 "Hybrid flow response type is incorrect.",
                 "The response type for the hybrid flow should be either 'code token' or 'code id_token' or " +
                         "'code id_token token'"),
+        AUTHORIZATION_DETAILS_TYPES_NOT_FOUND("60519",
+                "API authorization details types not found.",
+                "One or more authorization detail types in the request were not found for the " +
+                        "API resource with ID '%s' in the tenant domain '%s'."),
 
         // Server Errors.
         ERROR_RETRIEVING_SAML_METADATA("65001",
