@@ -521,9 +521,11 @@ public class ServerAuthenticatorManagementService {
          authenticator and should always be classified as a SYSTEM type. Otherwise, it can be classified as either
          SYSTEM or USER, depending on the 'definedBy' type of the federated authenticator. */
         if (identityProvider.getFederatedAuthenticatorConfigs().length == 1) {
-            DefinedByType definedByType =
-                    identityProvider.getFederatedAuthenticatorConfigs()[0].getDefinedByType();
+            FederatedAuthenticatorConfig federatedAuthenticatorConfig = identityProvider
+                    .getFederatedAuthenticatorConfig(identityProvider.getFederatedAuthenticatorConfigs()[0].getName());
+            DefinedByType definedByType = federatedAuthenticatorConfig.getDefinedByType();
             authenticator.definedBy(Authenticator.DefinedByEnum.valueOf(definedByType.toString()));
+            authenticator.setTags(Arrays.asList(federatedAuthenticatorConfig.getTags()));
         } else {
             authenticator.definedBy(Authenticator.DefinedByEnum.SYSTEM);
         }
