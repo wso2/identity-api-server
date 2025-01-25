@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.organization.user.sharing.management.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.UserSharingPolicyHandlerService;
 
 
@@ -26,26 +27,24 @@ import org.wso2.carbon.identity.organization.management.organization.user.sharin
  */
 public class UserSharingMgtServiceHolder {
 
-    private static UserSharingPolicyHandlerService userSharingPolicyHandlerService;
+    private UserSharingMgtServiceHolder() {
+
+    }
+
+    private static class UserSharingPolicyHandlerServiceHolder {
+
+        private static final UserSharingPolicyHandlerService SERVICE = (UserSharingPolicyHandlerService)
+                PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(UserSharingPolicyHandlerService.class, null);
+        }
 
     /**
-     * Get User Sharing Policy Handler Service.
+     * Get UserSharingPolicyHandlerService OSGi service.
      *
      * @return UserSharingPolicyHandlerService.
      */
     public static UserSharingPolicyHandlerService getUserSharingPolicyHandlerService() {
 
-        return userSharingPolicyHandlerService;
-    }
-
-    /**
-     * Set User Sharing Policy Handler Service.
-     *
-     * @param userSharingPolicyHandlerService UserSharingPolicyHandlerService.
-     */
-    public static void setUserSharingPolicyHandlerService(
-            UserSharingPolicyHandlerService userSharingPolicyHandlerService) {
-
-        UserSharingMgtServiceHolder.userSharingPolicyHandlerService = userSharingPolicyHandlerService;
+        return UserSharingMgtServiceHolder.UserSharingPolicyHandlerServiceHolder.SERVICE;
     }
 }

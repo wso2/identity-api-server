@@ -30,6 +30,7 @@ import org.wso2.carbon.identity.api.server.organization.user.sharing.management.
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserSharedRolesResponse;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareWithAllRequestBody;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.UserSharingPolicyHandlerService;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.UserSharingPolicyHandlerServiceImpl;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.RoleWithAudienceDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.GeneralUserShareDO;
@@ -57,14 +58,19 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
  */
 public class UsersApiServiceCore {
 
+    private final UserSharingPolicyHandlerService userSharingPolicyHandlerService;
+
+    public UsersApiServiceCore(UserSharingPolicyHandlerService userSharingPolicyHandlerService) {
+
+        this.userSharingPolicyHandlerService = userSharingPolicyHandlerService;
+    }
+
     /**
      * Handles sharing a user across specific organizations.
      *
      * @param userShareRequestBody Contains details for user sharing.
      */
     public void shareUser(UserShareRequestBody userShareRequestBody) {
-
-        UserSharingPolicyHandlerServiceImpl userSharingPolicyHandlerService = new UserSharingPolicyHandlerServiceImpl();
 
         // Populate selectiveUserShareDO object from the request body.
         SelectiveUserShareDO selectiveUserShareDO = new SelectiveUserShareDO();
@@ -112,8 +118,6 @@ public class UsersApiServiceCore {
      */
     public void shareUserWithAll(UserShareWithAllRequestBody userShareWithAllRequestBody) {
 
-        UserSharingPolicyHandlerServiceImpl userSharingPolicyHandlerService = new UserSharingPolicyHandlerServiceImpl();
-
         // Populate GeneralUserShareDO object from the request body.
         GeneralUserShareDO generalUserShareDO = new GeneralUserShareDO();
 
@@ -153,8 +157,6 @@ public class UsersApiServiceCore {
      */
     public void unshareUser(UserUnshareRequestBody userUnshareRequestBody) {
 
-        UserSharingPolicyHandlerServiceImpl userSharingPolicyHandlerService = new UserSharingPolicyHandlerServiceImpl();
-
         // Populate SelectiveUserUnshareDO object from the request body.
         SelectiveUserUnshareDO selectiveUserUnshareDO = new SelectiveUserUnshareDO();
 
@@ -180,8 +182,6 @@ public class UsersApiServiceCore {
      * @param userUnshareWithAllRequestBody Contains details for removing shared access.
      */
     public void unshareUserWithAll(UserUnshareWithAllRequestBody userUnshareWithAllRequestBody) {
-
-        UserSharingPolicyHandlerServiceImpl userSharingPolicyHandlerService = new UserSharingPolicyHandlerServiceImpl();
 
         // Populate GeneralUserUnshareDO object from the request body.
         GeneralUserUnshareDO generalUserUnshareDO = new GeneralUserUnshareDO();

@@ -21,12 +21,20 @@ package org.wso2.carbon.identity.api.server.organization.user.sharing.management
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.UsersApiService;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.impl.UsersApiServiceImpl;
 
+/**
+ * Factory class for UsersApiService.
+ */
 public class UsersApiServiceFactory {
 
-   private final static UsersApiService service = new UsersApiServiceImpl();
+   private final static UsersApiService SERVICE = new UsersApiServiceImpl();
 
-   public static UsersApiService getUsersApi()
-   {
-      return service;
+   /**
+    * Get UsersApiService.
+    *
+    * @return UsersApiService.
+    */
+   public static UsersApiService getUsersApi() {
+
+      return SERVICE;
    }
 }

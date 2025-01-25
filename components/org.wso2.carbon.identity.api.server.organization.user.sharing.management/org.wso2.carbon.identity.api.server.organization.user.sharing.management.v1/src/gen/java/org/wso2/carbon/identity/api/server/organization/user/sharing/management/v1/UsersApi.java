@@ -18,12 +18,12 @@
 
 package org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 
+import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.factories.UsersApiServiceFactory;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.Error;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.ProcessSuccessResponse;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserShareRequestBody;
@@ -46,8 +46,12 @@ import javax.validation.constraints.*;
 
 public class UsersApi  {
 
-    @Autowired
-    private UsersApiService delegate;
+    private final UsersApiService delegate;
+
+    public UsersApi() {
+
+        this.delegate = UsersApiServiceFactory.getUsersApi();
+    }
 
     @Valid
     @POST

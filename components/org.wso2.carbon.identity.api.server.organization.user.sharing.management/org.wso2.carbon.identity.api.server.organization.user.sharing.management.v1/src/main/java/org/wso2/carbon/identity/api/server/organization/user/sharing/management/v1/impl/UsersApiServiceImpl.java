@@ -19,9 +19,9 @@
 package org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.impl;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.UsersApiService;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.core.UsersApiServiceCore;
+import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.factories.UsersApiServiceCoreFactory;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserShareRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserShareWithAllRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserSharedOrganizationsResponse;
@@ -36,8 +36,16 @@ import javax.ws.rs.core.Response;
  */
 public class UsersApiServiceImpl implements UsersApiService {
 
-    @Autowired
-    private UsersApiServiceCore usersApiServiceCore;
+    private final UsersApiServiceCore usersApiServiceCore;
+
+    public UsersApiServiceImpl() {
+
+        try {
+            this.usersApiServiceCore = UsersApiServiceCoreFactory.getUsersApiServiceCore();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating ServerUserStoreService.", e);
+        }
+    }
 
     @Override
     public Response processUserSharing(UserShareRequestBody userShareRequestBody) {
