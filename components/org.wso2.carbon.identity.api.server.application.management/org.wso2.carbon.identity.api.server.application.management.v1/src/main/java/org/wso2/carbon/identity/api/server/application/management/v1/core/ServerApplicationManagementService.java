@@ -1585,7 +1585,6 @@ public class ServerApplicationManagementService {
                 if (rootNode == null) {
                     throw buildClientError(ErrorMessage.INVALID_FILTER_FORMAT);
                 }
-                validateFilterTree(rootNode);
                 ExpressionNode expressionNode;
                 if (!(rootNode instanceof ExpressionNode)) {
                     throw Utils.buildClientError(INVALID_GROUP_FILTER.getCode(), INVALID_GROUP_FILTER.getMessage(),
