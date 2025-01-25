@@ -72,11 +72,16 @@ public class PreUpdatePasswordActionMapper implements ActionMapper {
 
     private PasswordSharing buildPasswordSharingRequest(PreUpdatePasswordActionModel actionModel) {
 
+        Certificate certificate = null;
+        if (actionModel.getPasswordSharing().getCertificate() != null) {
+            // Certificate is an optional field.
+            certificate = new Certificate.Builder()
+                    .certificateContent(actionModel.getPasswordSharing().getCertificate())
+                    .build();
+        }
         return new PasswordSharing.Builder()
                 .format(PasswordSharing.Format.valueOf(actionModel.getPasswordSharing().getFormat().value()))
-                .certificate(new Certificate.Builder()
-                        .certificateContent(actionModel.getPasswordSharing().getCertificate())
-                        .build())
+                .certificate(certificate)
                 .build();
     }
 

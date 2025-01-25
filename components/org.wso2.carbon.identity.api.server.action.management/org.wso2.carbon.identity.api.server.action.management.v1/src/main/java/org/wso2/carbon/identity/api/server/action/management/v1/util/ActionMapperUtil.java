@@ -46,7 +46,7 @@ import static org.wso2.carbon.identity.api.server.action.management.v1.constants
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_INVALID_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES;
 
 /**
- * Utility class for Action Builder.
+ * Utility class for Action Mapper.
  */
 public class ActionMapperUtil {
 
