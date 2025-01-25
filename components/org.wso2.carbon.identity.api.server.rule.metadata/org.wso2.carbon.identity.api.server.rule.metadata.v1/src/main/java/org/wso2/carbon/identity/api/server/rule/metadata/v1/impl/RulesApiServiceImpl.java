@@ -18,9 +18,9 @@
 
 package org.wso2.carbon.identity.api.server.rule.metadata.v1.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.rule.metadata.v1.RulesApiService;
 import org.wso2.carbon.identity.api.server.rule.metadata.v1.core.ServerRuleMetadataService;
+import org.wso2.carbon.identity.api.server.rule.metadata.v1.factories.ServerRuleMetadataServiceFactory;
 
 import javax.ws.rs.core.Response;
 
@@ -29,8 +29,16 @@ import javax.ws.rs.core.Response;
  */
 public class RulesApiServiceImpl implements RulesApiService {
 
-    @Autowired
-    private ServerRuleMetadataService serverRuleMetadataService;
+    private final ServerRuleMetadataService serverRuleMetadataService;
+
+    public RulesApiServiceImpl() {
+
+        try {
+            serverRuleMetadataService = ServerRuleMetadataServiceFactory.getServerRuleMetadataService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while retrieving RuleMetadataService.", e);
+        }
+    }
 
     @Override
     public Response getExpressionMeta(String flow) {
