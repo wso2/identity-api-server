@@ -43,7 +43,7 @@ public class LoginFlowGenerateRequest  {
     private String userQuery;
 
     /**
-    * Available authenticators of the organization. It&#39;s expected to provide the authenticator name, description, and the IDP.
+    * Available authenticators of the organization. It&#39;s expected to provide the authenticator name, description, and the IDP. 
     **/
     public LoginFlowGenerateRequest availableAuthenticators(Map<String, Object> availableAuthenticators) {
 
@@ -52,7 +52,7 @@ public class LoginFlowGenerateRequest  {
     }
     
     @ApiModelProperty(value = "Available authenticators of the organization. It's expected to provide the authenticator name, description, and the IDP. ")
-    @JsonProperty("availableAuthenticators")
+    @JsonProperty("available_authenticators")
     @Valid
     public Map<String, Object> getAvailableAuthenticators() {
         return availableAuthenticators;
@@ -80,7 +80,7 @@ public class LoginFlowGenerateRequest  {
     }
     
     @ApiModelProperty(value = "Metadata of the available user claims for the organization.  Provide the claim URI and a human-readable description of the claim. ")
-    @JsonProperty("userClaims")
+    @JsonProperty("user_claims")
     @Valid
     public List<Map<String, Object>> getUserClaims() {
         return userClaims;
@@ -106,7 +106,7 @@ public class LoginFlowGenerateRequest  {
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("userQuery")
+    @JsonProperty("user_query")
     @Valid
     public String getUserQuery() {
         return userQuery;

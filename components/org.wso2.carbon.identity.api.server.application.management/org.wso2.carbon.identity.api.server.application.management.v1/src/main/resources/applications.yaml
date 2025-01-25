@@ -2671,7 +2671,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /applications/loginflow/status/{operationId}:
+  /applications/loginflow/status/{operation_id}:
     get:
       tags:
         - LoginFlow
@@ -2683,7 +2683,7 @@ paths:
         * internal_application_mgt_update
       operationId: getLoginFlowGenerationStatus
       parameters:
-        - name: operationId
+        - name: operation_id
           in: path
           required: true
           schema:
@@ -2720,7 +2720,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /applications/loginflow/result/{operationId}:
+  /applications/loginflow/result/{operation_id}:
     get:
       tags:
         - LoginFlow
@@ -2732,7 +2732,7 @@ paths:
         * internal_application_mgt_update
       operationId: getLoginFlowGenerationResult
       parameters:
-        - name: operationId
+        - name: operation_id
           in: path
           required: true
           schema:
@@ -4503,13 +4503,13 @@ components:
     LoginFlowGenerateRequest:
       type: object
       properties:
-        availableAuthenticators:
+        available_authenticators:
           type: object
           additionalProperties: true
           description: |
             Available authenticators of the organization.
             It's expected to provide the authenticator name, description, and the IDP.
-        userClaims:
+        user_claims:
           type: array
           items:
             type: object
@@ -4517,10 +4517,10 @@ components:
           description: |
             Metadata of the available user claims for the organization. 
             Provide the claim URI and a human-readable description of the claim.
-        userQuery:
+        user_query:
           type: string
       example: {
-        "availableAuthenticators": {
+        "available_authenticators": {
           "local": [
             {
               "description": "Login users with username and password credentials.",
@@ -4541,7 +4541,7 @@ components:
             }
           ]
         },
-        "userClaims": [
+        "user_claims": [
           {
             "claimURI": "http://example.com/claims/email",
             "description": "Email address of the user."
@@ -4551,12 +4551,12 @@ components:
             "description": "Role of the user in the application."
           }
         ],
-        "userQuery": "GoogleOIDCAuthenticator followed by SMS-OTP if user has admin role."
+        "user_query": "GoogleOIDCAuthenticator followed by SMS-OTP if user has admin role."
       }
     LoginFlowGenerateResponse:
       type: object
       properties:
-        operationId:
+        operation_id:
           type: string
     StatusEnum:
       type: string
@@ -4567,7 +4567,7 @@ components:
     LoginFlowStatusResponse:
       type: object
       properties:
-        operationId:
+        operation_id:
           type: string
         status:
           type: object
