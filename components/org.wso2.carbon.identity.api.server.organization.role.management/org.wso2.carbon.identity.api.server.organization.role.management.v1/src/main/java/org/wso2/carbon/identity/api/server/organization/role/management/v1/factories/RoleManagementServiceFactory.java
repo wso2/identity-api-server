@@ -53,6 +53,7 @@ public class RoleManagementServiceFactory {
      * @return RoleManagementService.
      */
     public static RoleManagementService getRoleManagementService() {
+    
         return SERVICE;
     }
 }
