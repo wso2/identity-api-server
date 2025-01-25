@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.com).
+ * Copyright (c) 2021-2025, WSO2 LLC. (http://www.wso2.com).
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
+ * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.secret.management.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.secret.mgt.core.SecretManager;
 
 /**
@@ -25,7 +26,15 @@ import org.wso2.carbon.identity.secret.mgt.core.SecretManager;
  */
 public class SecretManagementServiceHolder {
 
-    private static SecretManager secretConfigManager;
+    private SecretManagementServiceHolder() {
+
+    }
+
+    private static class SecretManagerServiceHolder {
+
+        static final SecretManager SERVICE = (SecretManager) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                .getOSGiService(SecretManager.class, null);
+    }
 
     /**
      * Get SecretManager OSGi service.
@@ -34,17 +43,6 @@ public class SecretManagementServiceHolder {
      */
     public static SecretManager getSecretConfigManager() {
 
-        return secretConfigManager;
+        return SecretManagerServiceHolder.SERVICE;
     }
-
-    /**
-     * Set SecretManager OSGi service.
-     *
-     * @param secretConfigManager Secret Manager.
-     */
-    public static void setSecretConfigManager(SecretManager secretConfigManager) {
-
-        SecretManagementServiceHolder.secretConfigManager = secretConfigManager;
-    }
-
 }

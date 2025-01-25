@@ -44,7 +44,7 @@ public class BrandingGenerationRequestModel  {
     }
     
     @ApiModelProperty(example = "https://wso2.com/", value = "URL of the organization's website.")
-    @JsonProperty("websiteUrl")
+    @JsonProperty("website_url")
     @Valid
     public String getWebsiteUrl() {
         return websiteUrl;
