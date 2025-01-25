@@ -31,7 +31,7 @@ public class TenantsApiServiceFactory {
    /**
     * Get TenantsApiService.
     *
-    * @return TenantsApiService
+    * @return TenantsApiService.
     */
    public static TenantsApiService getTenantsApi()
    {
