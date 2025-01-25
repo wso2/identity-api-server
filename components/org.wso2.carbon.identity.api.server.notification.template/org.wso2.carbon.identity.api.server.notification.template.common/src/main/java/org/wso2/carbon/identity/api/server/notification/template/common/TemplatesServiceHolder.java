@@ -26,7 +26,6 @@ import org.wso2.carbon.email.mgt.constants.I18nMgtConstants;
 import org.wso2.carbon.identity.governance.service.notification.NotificationTemplateManager;
 
 import java.util.Hashtable;
-
 /**
  * This class is used to hold the TemplateManager service.
  */
