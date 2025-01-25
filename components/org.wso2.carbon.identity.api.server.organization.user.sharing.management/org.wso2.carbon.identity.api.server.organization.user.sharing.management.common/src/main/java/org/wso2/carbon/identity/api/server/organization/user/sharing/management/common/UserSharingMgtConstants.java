@@ -28,6 +28,9 @@ public class UserSharingMgtConstants {
 
     public static final String USER_IDS = "userIds";
 
+    public static final String RESPONSE_STATUS_PROCESSING = "Processing";
+    public static final String RESPONSE_DETAIL_USER_SHARE = "User sharing process triggered successfully.";
+
     /**
      * Enum for user sharing management related errors.
      * Error Code - code to identify the error.

@@ -22,6 +22,7 @@ import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.UserSharingMgtConstants;
+import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.ProcessSuccessResponse;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.RoleWithAudience;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserShareRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserShareRequestBodyOrganizations;
@@ -31,6 +32,7 @@ import org.wso2.carbon.identity.api.server.organization.user.sharing.management.
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareWithAllRequestBody;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.UserSharingPolicyHandlerService;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.exception.UserShareMgtException;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.RoleWithAudienceDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.GeneralUserShareDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.SelectiveUserShareDO;
@@ -69,7 +71,7 @@ public class UsersApiServiceCore {
      *
      * @param userShareRequestBody Contains details for user sharing.
      */
-    public void shareUser(UserShareRequestBody userShareRequestBody) {
+    public void shareUser(UserShareRequestBody userShareRequestBody) throws UserShareMgtException {
 
         // Populate selectiveUserShareDO object from the request body.
         SelectiveUserShareDO selectiveUserShareDO = new SelectiveUserShareDO();
@@ -103,11 +105,7 @@ public class UsersApiServiceCore {
         }
         selectiveUserShareDO.setOrganizations(organizationsList);
 
-        try {
-            userSharingPolicyHandlerService.populateSelectiveUserShare(selectiveUserShareDO);
-        } catch (Exception e) {
-            // TODO: Handle exceptions in selective share API
-        }
+        userSharingPolicyHandlerService.populateSelectiveUserShare(selectiveUserShareDO);
     }
 
     /**
@@ -115,7 +113,7 @@ public class UsersApiServiceCore {
      *
      * @param userShareWithAllRequestBody Contains details for sharing users with all organizations.
      */
-    public void shareUserWithAll(UserShareWithAllRequestBody userShareWithAllRequestBody) {
+    public void shareUserWithAll(UserShareWithAllRequestBody userShareWithAllRequestBody) throws UserShareMgtException {
 
         // Populate GeneralUserShareDO object from the request body.
         GeneralUserShareDO generalUserShareDO = new GeneralUserShareDO();
@@ -142,11 +140,7 @@ public class UsersApiServiceCore {
         }
         generalUserShareDO.setRoles(rolesList);
 
-        try {
-            userSharingPolicyHandlerService.populateGeneralUserShare(generalUserShareDO);
-        } catch (Exception e) {
-            // TODO: Handle exceptions in shareUserWithAll API
-        }
+        userSharingPolicyHandlerService.populateGeneralUserShare(generalUserShareDO);
     }
 
     /**
@@ -154,7 +148,7 @@ public class UsersApiServiceCore {
      *
      * @param userUnshareRequestBody Contains details for user unsharing.
      */
-    public void unshareUser(UserUnshareRequestBody userUnshareRequestBody) {
+    public void unshareUser(UserUnshareRequestBody userUnshareRequestBody) throws UserShareMgtException {
 
         // Populate SelectiveUserUnshareDO object from the request body.
         SelectiveUserUnshareDO selectiveUserUnshareDO = new SelectiveUserUnshareDO();
@@ -168,11 +162,7 @@ public class UsersApiServiceCore {
         // Set organizations.
         selectiveUserUnshareDO.setOrganizations(userUnshareRequestBody.getOrganizations());
 
-        try {
-            userSharingPolicyHandlerService.populateSelectiveUserUnshare(selectiveUserUnshareDO);
-        } catch (Exception e) {
-            // TODO: Handle exceptions in unshareUser API
-        }
+        userSharingPolicyHandlerService.populateSelectiveUserUnshare(selectiveUserUnshareDO);
     }
 
     /**
@@ -180,7 +170,8 @@ public class UsersApiServiceCore {
      *
      * @param userUnshareWithAllRequestBody Contains details for removing shared access.
      */
-    public void unshareUserWithAll(UserUnshareWithAllRequestBody userUnshareWithAllRequestBody) {
+    public void unshareUserWithAll(UserUnshareWithAllRequestBody userUnshareWithAllRequestBody)
+            throws UserShareMgtException {
 
         // Populate GeneralUserUnshareDO object from the request body.
         GeneralUserUnshareDO generalUserUnshareDO = new GeneralUserUnshareDO();
@@ -191,11 +182,7 @@ public class UsersApiServiceCore {
         userCriteria.put(USER_IDS, userIds);
         generalUserUnshareDO.setUserCriteria(userCriteria);
 
-        try {
-            userSharingPolicyHandlerService.populateGeneralUserUnshare(generalUserUnshareDO);
-        } catch (Exception e) {
-            // TODO: Handle exceptions in unshareUserWithAll API
-        }
+        userSharingPolicyHandlerService.populateGeneralUserUnshare(generalUserUnshareDO);
     }
 
     /**
@@ -210,7 +197,7 @@ public class UsersApiServiceCore {
      * @return UserSharedOrganizationsResponse containing accessible organizations.
      */
     public UserSharedOrganizationsResponse getSharedOrganizations(String userId, String after, String before,
-                                                                  Integer limit, String filter, Boolean recursive) {
+                                                                  Integer limit, String filter, Boolean recursive) throws UserShareMgtException {
         // Core logic to retrieve shared organizations
         UserSharedOrganizationsResponse response = new UserSharedOrganizationsResponse();
         // Populate the response with shared organizations
@@ -230,7 +217,7 @@ public class UsersApiServiceCore {
      * @return UserSharedRolesResponse containing shared roles.
      */
     public UserSharedRolesResponse getSharedRoles(String userId, String orgId, String after, String before,
-                                                  Integer limit, String filter, Boolean recursive) {
+                                                  Integer limit, String filter, Boolean recursive) throws UserShareMgtException {
         // Core logic to retrieve shared roles for the user in the specified organization
         UserSharedRolesResponse response = new UserSharedRolesResponse();
         // Populate the response with shared roles
@@ -287,5 +274,13 @@ public class UsersApiServiceCore {
             return String.format(error.getDescription(), data);
         }
         return error.getDescription();
+    }
+
+    public ProcessSuccessResponse getProcessSuccessResponse(String status, String details) {
+
+        ProcessSuccessResponse processSuccessResponse = new ProcessSuccessResponse();
+        processSuccessResponse.status(status);
+        processSuccessResponse.setDetails(details);
+        return processSuccessResponse;
     }
 }
