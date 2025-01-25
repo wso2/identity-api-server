@@ -46,7 +46,7 @@ public class TenantManagementServiceHolder {
     /**
      * Get TenantMgtService osgi service.
      *
-     * @return TenantMgtService
+     * @return TenantMgtService.
      */
     public static TenantMgtService getTenantMgtService() {
 
