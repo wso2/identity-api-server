@@ -19,6 +19,7 @@
 package org.wso2.carbon.identity.api.server.action.management.v1.mapper;
 
 import org.wso2.carbon.identity.action.management.exception.ActionMgtException;
+import org.wso2.carbon.identity.action.management.exception.ActionMgtServerException;
 import org.wso2.carbon.identity.action.management.model.Action;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
@@ -45,6 +46,10 @@ public class PreUpdatePasswordActionMapper implements ActionMapper {
     @Override
     public Action toAction(ActionModel actionModel) throws ActionMgtException {
 
+        if (!(actionModel instanceof PreUpdatePasswordActionModel)) {
+            throw new ActionMgtServerException("Unsupported action model for action type: " + getSupportedActionType());
+        }
+
         Action basicAction = ActionMapperUtil.buildActionRequest(getSupportedActionType(), actionModel);
         return new PreUpdatePasswordAction.RequestBuilder(basicAction)
                 .passwordSharing(buildPasswordSharingRequest((PreUpdatePasswordActionModel) actionModel))
@@ -53,6 +58,11 @@ public class PreUpdatePasswordActionMapper implements ActionMapper {
 
     @Override
     public Action toAction(ActionUpdateModel actionUpdateModel) throws ActionMgtException {
+
+        if (!(actionUpdateModel instanceof PreUpdatePasswordActionUpdateModel)) {
+            throw new ActionMgtServerException("Unsupported action update model for action type: " +
+                    getSupportedActionType());
+        }
 
         Action basicUpdatingAction = ActionMapperUtil.buildUpdatingActionRequest(getSupportedActionType(),
                 actionUpdateModel);
@@ -64,6 +74,11 @@ public class PreUpdatePasswordActionMapper implements ActionMapper {
 
     @Override
     public ActionResponse toActionResponse(Action action) throws ActionMgtException {
+
+        if (!(action instanceof PreUpdatePasswordAction)) {
+            throw new ActionMgtServerException("Unsupported action response for action type: " +
+                    getSupportedActionType());
+        }
 
         ActionResponse actionResponse = ActionMapperUtil.buildActionResponse(action);
         return new PreUpdatePasswordActionResponse(actionResponse)

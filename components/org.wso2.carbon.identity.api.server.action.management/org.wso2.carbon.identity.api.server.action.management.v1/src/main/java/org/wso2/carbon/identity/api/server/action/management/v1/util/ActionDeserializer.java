@@ -60,9 +60,11 @@ public class ActionDeserializer {
                     validateActionModel(actionModel, ActionModel.class);
                     break;
                 case PRE_UPDATE_PASSWORD:
-                    actionModel = objectMapper.readValue(jsonBody, PreUpdatePasswordActionModel.class);
+                    PreUpdatePasswordActionModel preUpdatePasswordActionModel = objectMapper.readValue(jsonBody,
+                            PreUpdatePasswordActionModel.class);
                     // Validate the object
-                    validateActionModel((PreUpdatePasswordActionModel) actionModel, PreUpdatePasswordActionModel.class);
+                    validateActionModel(preUpdatePasswordActionModel, PreUpdatePasswordActionModel.class);
+                    actionModel = preUpdatePasswordActionModel;
                     break;
                 default:
                     break;
@@ -94,10 +96,11 @@ public class ActionDeserializer {
                     validateActionModel(actionUpdateModel, ActionUpdateModel.class);
                     break;
                 case PRE_UPDATE_PASSWORD:
-                    actionUpdateModel = objectMapper.readValue(jsonBody, PreUpdatePasswordActionUpdateModel.class);
+                    PreUpdatePasswordActionUpdateModel preUpdatePasswordActionUpdateModel =
+                            objectMapper.readValue(jsonBody, PreUpdatePasswordActionUpdateModel.class);
                     // Validate the object
-                    validateActionModel((PreUpdatePasswordActionUpdateModel) actionUpdateModel,
-                            PreUpdatePasswordActionUpdateModel.class);
+                    validateActionModel(preUpdatePasswordActionUpdateModel, PreUpdatePasswordActionUpdateModel.class);
+                    actionUpdateModel = preUpdatePasswordActionUpdateModel;
                     break;
                 default:
                     break;

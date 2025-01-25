@@ -65,7 +65,6 @@ public class PreUpdatePasswordActionResponse extends ActionResponse {
     @Override
     public boolean equals(java.lang.Object o) {
 
-        super.equals(o);
         if (this == o) {
             return true;
         }
