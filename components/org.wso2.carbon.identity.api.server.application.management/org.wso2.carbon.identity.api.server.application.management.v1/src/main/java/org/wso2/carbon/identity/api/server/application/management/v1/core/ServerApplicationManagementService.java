@@ -206,7 +206,7 @@ import static org.wso2.carbon.identity.application.common.util.IdentityApplicati
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.Error.UNEXPECTED_SERVER_ERROR;
 import static org.wso2.carbon.identity.application.mgt.ApplicationConstants.ErrorMessage.ERROR_RETRIEVING_GROUP_LIST;
 import static org.wso2.carbon.identity.application.mgt.ApplicationConstants.ErrorMessage.INVALID_GROUP_FILTER;
-import static org.wso2.carbon.identity.application.mgt.ApplicationConstants.FILTER_SW;
+import static org.wso2.carbon.identity.application.mgt.ApplicationConstants.FILTER_CO;
 import static org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.PrimitiveOperator.EQUALS;
 import static org.wso2.carbon.identity.cors.mgt.core.constant.ErrorMessages.ERROR_CODE_INVALID_APP_ID;
 import static org.wso2.carbon.identity.organization.management.service.util.Utils.isLegacyAuthzRuntime;
@@ -1593,7 +1593,7 @@ public class ServerApplicationManagementService {
                 }
                 expressionNode = (ExpressionNode) rootNode;
                 if (!StringUtils.equals(expressionNode.getAttributeValue(), NAME) || !StringUtils.equals(
-                        expressionNode.getOperation(), FILTER_SW)) {
+                        expressionNode.getOperation(), FILTER_CO)) {
                     throw Utils.buildClientError(INVALID_GROUP_FILTER.getCode(), INVALID_GROUP_FILTER.getMessage(),
                             INVALID_GROUP_FILTER.getDescription());
                 }

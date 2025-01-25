@@ -2800,7 +2800,7 @@ components:
     domainQueryParam:
       in: query
       name: domain
-      required: true
+      required: false
       description: |
         The domain name of the user store used to filter the groups.
 
