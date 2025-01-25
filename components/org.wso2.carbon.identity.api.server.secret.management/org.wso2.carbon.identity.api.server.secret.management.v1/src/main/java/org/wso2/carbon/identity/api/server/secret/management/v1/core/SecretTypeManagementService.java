@@ -1,17 +1,19 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.com).
+ * Copyright (c) 2021-2025, WSO2 LLC. (http://www.wso2.com).
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.wso2.carbon.identity.api.server.secret.management.v1.core;
@@ -22,10 +24,10 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.secret.management.common.SecretManagementConstants;
-import org.wso2.carbon.identity.api.server.secret.management.common.SecretManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretTypeAddRequest;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretTypeResponse;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretTypeUpdateRequest;
+import org.wso2.carbon.identity.secret.mgt.core.SecretManager;
 import org.wso2.carbon.identity.secret.mgt.core.exception.SecretManagementClientException;
 import org.wso2.carbon.identity.secret.mgt.core.exception.SecretManagementException;
 import org.wso2.carbon.identity.secret.mgt.core.exception.SecretManagementServerException;
@@ -41,7 +43,13 @@ import static org.wso2.carbon.identity.secret.mgt.core.constant.SecretConstants.
  */
 public class SecretTypeManagementService {
 
+    private final SecretManager secretManager;
     private static final Log log = LogFactory.getLog(SecretManagementService.class);
+
+    public SecretTypeManagementService(SecretManager secretManager) {
+
+        this.secretManager = secretManager;
+    }
 
     /**
      * Create a secret Type.
@@ -55,7 +63,7 @@ public class SecretTypeManagementService {
         SecretType requestDTO, responseDTO;
         try {
             requestDTO = buildSecretTypeRequestDTOFromSecretTypeAddRequest(secretTypeAddRequest);
-            responseDTO = SecretManagementServiceHolder.getSecretConfigManager().addSecretType(requestDTO);
+            responseDTO = secretManager.addSecretType(requestDTO);
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.ERROR_CODE_ERROR_ADDING_SECRET,
                     secretTypeAddRequest.getName());
@@ -114,7 +122,7 @@ public class SecretTypeManagementService {
     public void deleteSecretType(String secretTypeName) {
 
         try {
-            SecretManagementServiceHolder.getSecretConfigManager().deleteSecretType(secretTypeName);
+            secretManager.deleteSecretType(secretTypeName);
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.
                     ERROR_CODE_ERROR_DELETING_SECRET, secretTypeName);
@@ -130,8 +138,7 @@ public class SecretTypeManagementService {
     public SecretTypeResponse getSecretType(String secretTypeName) {
 
         try {
-            SecretType responseDTO = SecretManagementServiceHolder.getSecretConfigManager().getSecretType
-                    (secretTypeName);
+            SecretType responseDTO = secretManager.getSecretType(secretTypeName);
             SecretTypeResponse secretTypeResponse = new SecretTypeResponse();
             secretTypeResponse.setId(responseDTO.getId());
             secretTypeResponse.setName(responseDTO.getName());
@@ -156,7 +163,7 @@ public class SecretTypeManagementService {
         SecretTypeAddRequest secretAdd = buildSecretTypeAddFromSecretTypeUpdateRequest(name, secretUpdateRequest);
         try {
             requestDTO = buildSecretTypeRequestDTOFromSecretTypeAddRequest(secretAdd);
-            responseDTO = SecretManagementServiceHolder.getSecretConfigManager().replaceSecretType(requestDTO);
+            responseDTO = secretManager.replaceSecretType(requestDTO);
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_SECRET,
                     name);
