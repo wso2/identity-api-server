@@ -29,9 +29,9 @@ public class UserSharingMgtServiceHolder {
     private static UserSharingPolicyHandlerService userSharingPolicyHandlerService;
 
     /**
-     * Get Invitation Core osgi service.
+     * Get User Sharing Policy Handler Service.
      *
-     * @return InvitationCoreService.
+     * @return UserSharingPolicyHandlerService.
      */
     public static UserSharingPolicyHandlerService getUserSharingPolicyHandlerService() {
 
@@ -39,9 +39,9 @@ public class UserSharingMgtServiceHolder {
     }
 
     /**
-     * Set Invitation Core osgi service.
+     * Set User Sharing Policy Handler Service.
      *
-     * @param userSharingPolicyHandlerService InvitationCoreService.
+     * @param userSharingPolicyHandlerService UserSharingPolicyHandlerService.
      */
     public static void setUserSharingPolicyHandlerService(
             UserSharingPolicyHandlerService userSharingPolicyHandlerService) {

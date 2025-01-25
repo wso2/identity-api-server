@@ -48,6 +48,8 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.UserSharingMgtConstants.USER_IDS;
+
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 /**
@@ -70,7 +72,7 @@ public class UsersApiServiceCore {
         // Set user criteria.
         Map<String, UserCriteriaType> userCriteria = new HashMap<>();
         UserCriteriaType userIds = new UserIdList(userShareRequestBody.getUserCriteria().getUserIds());
-        userCriteria.put("userIds", userIds);
+        userCriteria.put(USER_IDS, userIds);
         selectiveUserShareDO.setUserCriteria(userCriteria);
 
         // Set organizations.
@@ -118,7 +120,7 @@ public class UsersApiServiceCore {
         // Set user criteria.
         Map<String, UserCriteriaType> userCriteria = new HashMap<>();
         UserCriteriaType userIds = new UserIdList(userShareWithAllRequestBody.getUserCriteria().getUserIds());
-        userCriteria.put("userIds", userIds);
+        userCriteria.put(USER_IDS, userIds);
         generalUserShareDO.setUserCriteria(userCriteria);
 
         // Set policy.
@@ -159,7 +161,7 @@ public class UsersApiServiceCore {
         // Set user criteria.
         Map<String, UserCriteriaType> userCriteria = new HashMap<>();
         UserCriteriaType userIds = new UserIdList(userUnshareRequestBody.getUserCriteria().getUserIds());
-        userCriteria.put("userIds", userIds);
+        userCriteria.put(USER_IDS, userIds);
         selectiveUserUnshareDO.setUserCriteria(userCriteria);
 
         // Set organizations.
@@ -187,7 +189,7 @@ public class UsersApiServiceCore {
         // Set user criteria.
         Map<String, UserCriteriaType> userCriteria = new HashMap<>();
         UserCriteriaType userIds = new UserIdList(userUnshareWithAllRequestBody.getUserCriteria().getUserIds());
-        userCriteria.put("userIds", userIds);
+        userCriteria.put(USER_IDS, userIds);
         generalUserUnshareDO.setUserCriteria(userCriteria);
 
         try {
@@ -287,5 +289,4 @@ public class UsersApiServiceCore {
         }
         return error.getDescription();
     }
-
 }

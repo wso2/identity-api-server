@@ -23,8 +23,10 @@ package org.wso2.carbon.identity.api.server.organization.user.sharing.management
  */
 public class UserSharingMgtConstants {
 
-    public static final String ERROR_PREFIX = "OUI-";
+    public static final String ERROR_PREFIX = "USM-";
     public static final String ERROR_FAIL_STATUS = "Failed";
+
+    public static final String USER_IDS = "userIds";
 
     /**
      * Enum for shared user invitation management related errors.
@@ -83,7 +85,7 @@ public class UserSharingMgtConstants {
         ERROR_CODE_INVALID_USER_INFORMATION("60014",
                 "Unable to create an invitation to all the users given in the list.",
                 "User invitation creation failed for the users: %s"),
-        ERROR_CODE_INVALID_GROUP("60014",
+        ERROR_CODE_INVALID_GROUP("60015",
                 "Invalid group list provided.",
                 "The provided group lists are not valid."),
 

@@ -30,14 +30,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.wso2.carbon.multitenancy</groupId>
-            <artifactId>org.wso2.carbon.tenant.mgt</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.extension.identity.verification</groupId>
-            <artifactId>org.wso2.carbon.extension.identity.verification.provider</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.wso2.carbon.identity.organization.management</groupId>
             <artifactId>org.wso2.carbon.identity.organization.management.organization.user.sharing</artifactId>
         </dependency>

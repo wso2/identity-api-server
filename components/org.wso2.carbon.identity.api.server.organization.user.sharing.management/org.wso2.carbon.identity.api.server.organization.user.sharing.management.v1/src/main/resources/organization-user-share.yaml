@@ -12,16 +12,12 @@ info:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 servers:
-  # Added by API Auto Mocking Plugin
-  - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/DinukaBimsaraBodaragama/user-sahred-access-API-4/1.0.2
   - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
     variables:
       tenant-domain:
         default: "carbon.super"
       server-url:
         default: "localhost:9443"
-
 paths:
   /users/share:
     post:
@@ -31,7 +27,7 @@ paths:
       description: |
         This API shares one or more users across specified organizations, assigning roles based on the provided policy. The policy defines the sharing scope for each organization, including whether access extends to child organizations.
         
-        <b>Permission required:</b> `internal_user_shared_access_add`
+        <b>Scope(Permission) required:</b> `internal_user_shared_access_add`
       operationId: processUserSharing
       requestBody:
         content:
@@ -83,7 +79,7 @@ paths:
       description: |
         This API shares users across all organizations, applying the provided roles to each organization. The policy determines the scope of sharing, including whether it applies to all current organizations or future organizations as well.
         
-        <b>Permission required:</b> `internal_user_shared_access_add`
+        <b>Scope(Permission) required:</b> `internal_user_shared_access_add`
       operationId: processUserSharingAll
       requestBody:
         content:
@@ -135,7 +131,7 @@ paths:
         This API removes shared access for one or more users from specified organizations.
         The payload includes the list of user IDs and the organizations from which the users should be unshared.
         
-        <b>Permission required:</b> `internal_user_shared_access_delete`
+        <b>Scope(Permission) required:</b> `internal_user_shared_access_delete`
       operationId: processUserUnsharing
       requestBody:
         content:
@@ -179,7 +175,7 @@ paths:
       description: |
         This API removes all shared access for one or more users, unsharing them from all organizations.
         
-        <b>Permission required:</b> `internal_user_shared_access_delete`
+        <b>Scope(Permission) required:</b> `internal_user_shared_access_delete`
       operationId: removeUserSharing
       requestBody:
         content:
@@ -220,7 +216,7 @@ paths:
       description: |
         This API retrieves the list of organizations where the specified user has shared access, with support for pagination and filtering.
 
-        <b>Permission required:</b> `internal_user_shared_access_view`
+        <b>Scope(Permission) required:</b> `internal_user_shared_access_view`
       parameters:
         - in: path
           name: userId
@@ -282,7 +278,7 @@ paths:
       description: |
         This API fetches the roles assigned to the specified user within a particular organization, with support for pagination, filtering, and recursion.
 
-        <b>Permission required:</b> `internal_user_shared_access_view`
+        <b>Scope(Permission) required:</b> `internal_user_shared_access_view`
       parameters:
         - in: path
           name: userId
