@@ -31,7 +31,7 @@ public class ChannelVerifiedTenantsApiServiceFactory {
    /**
     * Get ChannelVerifiedTenantsApiService.
     *
-    * @return ChannelVerifiedTenantsApiService
+    * @return ChannelVerifiedTenantsApiService.
     */
    public static ChannelVerifiedTenantsApiService getChannelVerifiedTenantsApi()
    {
