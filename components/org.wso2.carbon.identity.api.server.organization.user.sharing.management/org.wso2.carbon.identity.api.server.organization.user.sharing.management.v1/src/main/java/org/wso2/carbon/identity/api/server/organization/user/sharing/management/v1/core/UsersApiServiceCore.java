@@ -38,7 +38,7 @@ import org.wso2.carbon.identity.organization.management.organization.user.sharin
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.GeneralUserUnshareDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.SelectiveUserUnshareDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.usercriteria.UserCriteriaType;
-import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.usercriteria.UserIds;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.usercriteria.UserIdList;
 import org.wso2.carbon.identity.organization.resource.sharing.policy.management.constant.PolicyEnum;
 
 import java.util.ArrayList;
@@ -69,7 +69,7 @@ public class UsersApiServiceCore {
 
         // Set user criteria.
         Map<String, UserCriteriaType> userCriteria = new HashMap<>();
-        UserCriteriaType userIds = new UserIds(userShareRequestBody.getUserCriteria().getUserIds());
+        UserCriteriaType userIds = new UserIdList(userShareRequestBody.getUserCriteria().getUserIds());
         userCriteria.put("userIds", userIds);
         selectiveUserShareDO.setUserCriteria(userCriteria);
 
@@ -117,7 +117,7 @@ public class UsersApiServiceCore {
 
         // Set user criteria.
         Map<String, UserCriteriaType> userCriteria = new HashMap<>();
-        UserCriteriaType userIds = new UserIds(userShareWithAllRequestBody.getUserCriteria().getUserIds());
+        UserCriteriaType userIds = new UserIdList(userShareWithAllRequestBody.getUserCriteria().getUserIds());
         userCriteria.put("userIds", userIds);
         generalUserShareDO.setUserCriteria(userCriteria);
 
@@ -158,7 +158,7 @@ public class UsersApiServiceCore {
 
         // Set user criteria.
         Map<String, UserCriteriaType> userCriteria = new HashMap<>();
-        UserCriteriaType userIds = new UserIds(userUnshareRequestBody.getUserCriteria().getUserIds());
+        UserCriteriaType userIds = new UserIdList(userUnshareRequestBody.getUserCriteria().getUserIds());
         userCriteria.put("userIds", userIds);
         selectiveUserUnshareDO.setUserCriteria(userCriteria);
 
@@ -186,7 +186,7 @@ public class UsersApiServiceCore {
 
         // Set user criteria.
         Map<String, UserCriteriaType> userCriteria = new HashMap<>();
-        UserCriteriaType userIds = new UserIds(userUnshareWithAllRequestBody.getUserCriteria().getUserIds());
+        UserCriteriaType userIds = new UserIdList(userUnshareWithAllRequestBody.getUserCriteria().getUserIds());
         userCriteria.put("userIds", userIds);
         generalUserUnshareDO.setUserCriteria(userCriteria);
 
