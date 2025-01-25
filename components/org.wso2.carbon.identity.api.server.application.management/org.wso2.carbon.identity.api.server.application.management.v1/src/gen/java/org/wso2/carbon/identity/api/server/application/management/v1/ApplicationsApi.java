@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -19,7 +19,6 @@
 package org.wso2.carbon.identity.api.server.application.management.v1;
 
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
@@ -44,6 +43,10 @@ import org.wso2.carbon.identity.api.server.application.management.v1.CustomInbou
 import org.wso2.carbon.identity.api.server.application.management.v1.Error;
 import java.io.File;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowGenerateRequest;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowGenerateResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowResultResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowStatusResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
@@ -63,6 +66,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
+import org.wso2.carbon.identity.api.server.application.management.v1.factories.ApplicationsApiServiceFactory;
 
 import javax.validation.constraints.*;
 
@@ -71,8 +75,12 @@ import javax.validation.constraints.*;
 
 public class ApplicationsApi  {
 
-    @Autowired
-    private ApplicationsApiService delegate;
+    private final ApplicationsApiService delegate;
+
+    public ApplicationsApi() {
+
+        this.delegate = ApplicationsApiServiceFactory.getApplicationsApi();
+    }
 
     @Valid
     @POST
@@ -411,6 +419,30 @@ public class ApplicationsApi  {
     }
 
     @Valid
+    @POST
+    @Path("/loginflow/generate")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Initiate login flow generation", notes = "This API provides the capability to initiate the generation of a login flow. <br> <b>Scope required:</b> * internal_application_mgt_update ", response = LoginFlowGenerateResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "LoginFlow", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 202, message = "Accepted", response = LoginFlowGenerateResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response generateLoginFlow(@ApiParam(value = "" ,required=true) @Valid LoginFlowGenerateRequest loginFlowGenerateRequest) {
+
+        return delegate.generateLoginFlow(loginFlowGenerateRequest );
+    }
+
+    @Valid
     @GET
     @Path("/meta/adaptive-auth-templates")
     
@@ -722,6 +754,52 @@ public class ApplicationsApi  {
     public Response getInboundSAMLConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.getInboundSAMLConfiguration(applicationId );
+    }
+
+    @Valid
+    @GET
+    @Path("/loginflow/result/{operationId}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Get the final login flow result", notes = "This API provides the capability to retrieve the final login flow result. <br> <b>Scope required:</b> * internal_application_mgt_update ", response = LoginFlowResultResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "LoginFlow", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = LoginFlowResultResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class)
+    })
+    public Response getLoginFlowGenerationResult(@ApiParam(value = "",required=true) @PathParam("operationId") String operationId) {
+
+        return delegate.getLoginFlowGenerationResult(operationId );
+    }
+
+    @Valid
+    @GET
+    @Path("/loginflow/status/{operationId}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Get the status of the login flow generation process", notes = "This API provides the capability to retrieve the status of the login flow generation process. <br> <b>Scope required:</b> * internal_application_mgt_update ", response = LoginFlowStatusResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "LoginFlow", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = LoginFlowStatusResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class)
+    })
+    public Response getLoginFlowGenerationStatus(@ApiParam(value = "",required=true) @PathParam("operationId") String operationId) {
+
+        return delegate.getLoginFlowGenerationStatus(operationId );
     }
 
     @Valid

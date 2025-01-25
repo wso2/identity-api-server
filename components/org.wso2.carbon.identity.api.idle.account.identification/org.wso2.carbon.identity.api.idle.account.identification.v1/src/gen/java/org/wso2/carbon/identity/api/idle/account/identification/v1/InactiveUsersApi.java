@@ -27,6 +27,7 @@ import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
+import org.wso2.carbon.identity.idle.account.identification.exception.IdleAccountIdentificationClientException;
 
 @Path("/inactive-users")
 @Api(description = "The inactive-users API")
@@ -53,8 +54,12 @@ public class InactiveUsersApi  {
             @ApiResponse(code = 403, message = "Resource Forbidden", response = Void.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response getInactiveUsers(    @Valid@ApiParam(value = "Latest active date of login.")  @QueryParam("inactiveAfter") String inactiveAfter,     @Valid@ApiParam(value = "Date to exclude the oldest inactive users.")  @QueryParam("excludeBefore") String excludeBefore) {
+    public Response getInactiveUsers(
+            @Valid @ApiParam(value = "Latest active date of login.") @QueryParam("inactiveAfter") String inactiveAfter,
+            @Valid @ApiParam(value = "Date to exclude the oldest inactive users.") @QueryParam("excludeBefore") String excludeBefore,
+            @Valid @ApiParam(value = "Filter inactive users by account state disabled.") @QueryParam("filter") String filter)
+            throws IdleAccountIdentificationClientException {
 
-        return delegate.getInactiveUsers(inactiveAfter,  excludeBefore );
+        return delegate.getInactiveUsers(inactiveAfter, excludeBefore, filter);
     }
 }

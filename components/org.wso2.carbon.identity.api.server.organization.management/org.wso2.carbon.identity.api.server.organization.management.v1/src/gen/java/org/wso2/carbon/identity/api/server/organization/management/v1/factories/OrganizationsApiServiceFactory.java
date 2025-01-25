@@ -21,12 +21,20 @@ package org.wso2.carbon.identity.api.server.organization.management.v1.factories
 import org.wso2.carbon.identity.api.server.organization.management.v1.OrganizationsApiService;
 import org.wso2.carbon.identity.api.server.organization.management.v1.impl.OrganizationsApiServiceImpl;
 
+/**
+ * Factory class for OrganizationsApiService.
+ */
 public class OrganizationsApiServiceFactory {
 
-   private final static OrganizationsApiService service = new OrganizationsApiServiceImpl();
+   private static final OrganizationsApiService SERVICE = new OrganizationsApiServiceImpl();
 
-   public static OrganizationsApiService getOrganizationsApi()
-   {
-      return service;
+   /**
+    * Get OrganizationsApiService.
+    *
+    * @return OrganizationsApiService.
+    */
+   public static OrganizationsApiService getOrganizationsApi() {
+
+      return SERVICE;
    }
 }

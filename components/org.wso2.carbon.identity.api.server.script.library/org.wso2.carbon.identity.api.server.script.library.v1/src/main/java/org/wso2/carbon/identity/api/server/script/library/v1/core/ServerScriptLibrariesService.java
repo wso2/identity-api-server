@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2020 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2020-2025, WSO2 LLC. (http://www.wso2.com).
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
+ * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.wso2.carbon.identity.api.server.script.library.v1.core;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -26,13 +27,13 @@ import org.wso2.carbon.identity.api.server.common.Util;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.script.library.common.Constants;
-import org.wso2.carbon.identity.api.server.script.library.common.ScriptLibraryServiceHolder;
 import org.wso2.carbon.identity.api.server.script.library.v1.model.ScriptLibrary;
 import org.wso2.carbon.identity.api.server.script.library.v1.model.ScriptLibraryListResponse;
 import org.wso2.carbon.identity.api.server.script.library.v1.model.ScriptLibraryPOSTRequest;
 import org.wso2.carbon.identity.api.server.script.library.v1.model.ScriptLibraryPUTRequest;
 import org.wso2.carbon.identity.api.server.script.library.v1.model.ScriptLibraryResponse;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
+import org.wso2.carbon.identity.functions.library.mgt.FunctionLibraryManagementService;
 import org.wso2.carbon.identity.functions.library.mgt.exception.FunctionLibraryManagementClientException;
 import org.wso2.carbon.identity.functions.library.mgt.exception.FunctionLibraryManagementException;
 import org.wso2.carbon.identity.functions.library.mgt.exception.FunctionLibraryManagementServerException;
@@ -57,7 +58,13 @@ import static org.wso2.carbon.identity.api.server.script.library.common.Constant
  */
 public class ServerScriptLibrariesService {
 
+    private final FunctionLibraryManagementService functionLibraryManagementService;
     private static final Log log = LogFactory.getLog(ServerScriptLibrariesService.class);
+
+    public ServerScriptLibrariesService(FunctionLibraryManagementService functionLibraryManagementService) {
+
+        this.functionLibraryManagementService = functionLibraryManagementService;
+    }
 
     /**
      * Get list of Script Libraries.
@@ -70,8 +77,8 @@ public class ServerScriptLibrariesService {
 
         List<FunctionLibrary> functionLibraries;
         try {
-            functionLibraries = ScriptLibraryServiceHolder.getScriptLibraryManagementService()
-                    .listFunctionLibraries(ContextLoader.getTenantDomainFromContext());
+            functionLibraries = functionLibraryManagementService.listFunctionLibraries(ContextLoader
+                    .getTenantDomainFromContext());
         } catch (FunctionLibraryManagementException e) {
             throw handleScriptLibraryError(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_SCRIPT_LIBRARIES);
         }
@@ -123,9 +130,8 @@ public class ServerScriptLibrariesService {
         if (isScriptLibraryAvailable(scriptLibraryId)) {
             FunctionLibrary functionLibrary;
             try {
-                functionLibrary = ScriptLibraryServiceHolder.getScriptLibraryManagementService()
-                        .getFunctionLibrary(scriptLibraryId,
-                                ContextLoader.getTenantDomainFromContext());
+                functionLibrary = functionLibraryManagementService.getFunctionLibrary(scriptLibraryId,
+                        ContextLoader.getTenantDomainFromContext());
             } catch (FunctionLibraryManagementException e) {
                 throw handleScriptLibraryError(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_SCRIPT_LIBRARY);
             }
@@ -166,9 +172,8 @@ public class ServerScriptLibrariesService {
                     scriptLibraryPOSTRequest);
             try {
                 if (scriptLibraryPOSTRequest.getName().contains(Constants.SCRIPT_LIBRARY_EXTENSION)) {
-                    ScriptLibraryServiceHolder.getScriptLibraryManagementService()
-                            .createFunctionLibrary(functionLibrary,
-                                    ContextLoader.getTenantDomainFromContext());
+                    functionLibraryManagementService.createFunctionLibrary(functionLibrary, ContextLoader
+                            .getTenantDomainFromContext());
                 } else {
                     throw handleScriptLibraryClientError(Constants.ErrorMessage.ERROR_SCRIPT_LIBRARY_NAME_VALIDATION,
                             Response.Status.BAD_REQUEST);
@@ -204,9 +209,8 @@ public class ServerScriptLibrariesService {
             FunctionLibrary functionLibrary = createScriptLibraryPut(scriptLibraryName, scriptLibraryPUTRequestContent,
                     scriptLibraryPUTRequest);
             try {
-                ScriptLibraryServiceHolder.getScriptLibraryManagementService()
-                        .updateFunctionLibrary(scriptLibraryName, functionLibrary,
-                                ContextLoader.getTenantDomainFromContext());
+                functionLibraryManagementService.updateFunctionLibrary(scriptLibraryName, functionLibrary,
+                        ContextLoader.getTenantDomainFromContext());
             } catch (FunctionLibraryManagementException e) {
                 throw handleScriptLibraryError(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_SCRIPT_LIBRARY);
             }
@@ -227,9 +231,8 @@ public class ServerScriptLibrariesService {
 
         if (isScriptLibraryAvailable(scriptLibraryName)) {
             try {
-                FunctionLibrary functionLibrary = ScriptLibraryServiceHolder.getScriptLibraryManagementService()
-                        .getFunctionLibrary(scriptLibraryName,
-                                ContextLoader.getTenantDomainFromContext());
+                FunctionLibrary functionLibrary = functionLibraryManagementService
+                        .getFunctionLibrary(scriptLibraryName, ContextLoader.getTenantDomainFromContext());
                 return functionLibrary.getFunctionLibraryScript();
             } catch (FunctionLibraryManagementException e) {
                 throw handleScriptLibraryError(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_SCRIPT_LIBRARY);
@@ -249,8 +252,8 @@ public class ServerScriptLibrariesService {
 
         if (isScriptLibraryAvailable(scriptLibraryId)) {
             try {
-                ScriptLibraryServiceHolder.getScriptLibraryManagementService()
-                        .deleteFunctionLibrary(scriptLibraryId, ContextLoader.getTenantDomainFromContext());
+                functionLibraryManagementService.deleteFunctionLibrary(scriptLibraryId,
+                        ContextLoader.getTenantDomainFromContext());
             } catch (FunctionLibraryManagementException e) {
                 throw handleScriptLibraryError(e, Constants.ErrorMessage.ERROR_CODE_ERROR_DELETING_SCRIPT_LIBRARY);
             }
@@ -267,8 +270,8 @@ public class ServerScriptLibrariesService {
 
         boolean isAvailable;
         try {
-            isAvailable = ScriptLibraryServiceHolder.getScriptLibraryManagementService()
-                    .isFunctionLibraryExists(scriptLibraryName, ContextLoader.getTenantDomainFromContext());
+            isAvailable = functionLibraryManagementService.isFunctionLibraryExists(scriptLibraryName,
+                    ContextLoader.getTenantDomainFromContext());
         } catch (FunctionLibraryManagementException e) {
             throw handleScriptLibraryError(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_SCRIPT_LIBRARY);
         }

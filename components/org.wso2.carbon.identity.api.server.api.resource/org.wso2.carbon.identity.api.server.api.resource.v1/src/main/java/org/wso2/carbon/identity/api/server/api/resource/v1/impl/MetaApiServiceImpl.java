@@ -18,9 +18,9 @@
 
 package org.wso2.carbon.identity.api.server.api.resource.v1.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.api.resource.v1.MetaApiService;
 import org.wso2.carbon.identity.api.server.api.resource.v1.core.ServerAPIResourceCollectionManagementService;
+import org.wso2.carbon.identity.api.server.api.resource.v1.factories.ServerAPIResourceCollectionManagementServiceFactory;
 
 import javax.ws.rs.core.Response;
 
@@ -29,8 +29,18 @@ import javax.ws.rs.core.Response;
  */
 public class MetaApiServiceImpl implements MetaApiService {
 
-    @Autowired
-    ServerAPIResourceCollectionManagementService serverAPIResourceManagementService;
+    private final ServerAPIResourceCollectionManagementService serverAPIResourceManagementService;
+
+    public MetaApiServiceImpl() {
+
+        try {
+            this.serverAPIResourceManagementService = ServerAPIResourceCollectionManagementServiceFactory
+                    .getServerAPIResourceCollectionManagementService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating API resource collection management service.",
+                    e);
+        }
+    }
 
     @Override
     public Response getAPIResourceCollectionByCollectionId(String collectionId) {

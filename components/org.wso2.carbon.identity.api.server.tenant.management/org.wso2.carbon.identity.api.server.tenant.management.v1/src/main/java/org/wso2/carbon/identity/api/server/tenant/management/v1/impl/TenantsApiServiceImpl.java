@@ -18,12 +18,12 @@
 
 package org.wso2.carbon.identity.api.server.tenant.management.v1.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.TenantsApiService;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.core.ServerTenantManagementService;
+import org.wso2.carbon.identity.api.server.tenant.management.v1.factories.ServerTenantManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.OwnerPutModel;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantModel;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantPutModel;
@@ -37,8 +37,15 @@ import javax.ws.rs.core.Response;
  */
 public class TenantsApiServiceImpl implements TenantsApiService {
 
-    @Autowired
-    private ServerTenantManagementService tenantManagementService;
+    private final ServerTenantManagementService tenantManagementService;
+
+    public TenantsApiServiceImpl() {
+        try {
+            this.tenantManagementService = ServerTenantManagementServiceFactory.getServerTenantManagementService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating ServerTenantManagementService.", e);
+        }
+    }
 
     @Override
     public Response addTenant(TenantModel tenantModel) {

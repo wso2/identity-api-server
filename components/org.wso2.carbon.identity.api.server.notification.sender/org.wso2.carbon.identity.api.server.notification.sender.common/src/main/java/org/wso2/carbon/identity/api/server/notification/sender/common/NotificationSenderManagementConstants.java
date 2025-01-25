@@ -28,4 +28,5 @@ public class NotificationSenderManagementConstants {
     public static final String URL_ENCODED_SPACE = "%20";
     public static final String EMAIL_PUBLISHER_TYPE = "email";
     public static final String SMS_PUBLISHER_TYPE = "sms";
+    public static final String PUSH_PUBLISHER_TYPE = "push";
 }

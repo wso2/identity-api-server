@@ -21,12 +21,20 @@ package org.wso2.carbon.identity.api.server.idv.provider.v1.factories;
 import org.wso2.carbon.identity.api.server.idv.provider.v1.IdvProvidersApiService;
 import org.wso2.carbon.identity.api.server.idv.provider.v1.impl.IdvProvidersApiServiceImpl;
 
+/**
+ * Factory class for IdvProvidersApiService.
+ */
 public class IdvProvidersApiServiceFactory {
 
-   private final static IdvProvidersApiService service = new IdvProvidersApiServiceImpl();
+   private final static IdvProvidersApiService SERVICE = new IdvProvidersApiServiceImpl();
 
-   public static IdvProvidersApiService getIdvProvidersApi()
-   {
-      return service;
+   /**
+    * Get IdvProvidersApiService.
+    *
+    * @return IdvProvidersApiService.
+    */
+   public static IdvProvidersApiService getIdvProvidersApi() {
+
+      return SERVICE;
    }
 }
