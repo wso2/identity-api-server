@@ -16,18 +16,17 @@
 
 package org.wso2.carbon.identity.api.server.authenticators.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 
+import org.wso2.carbon.identity.api.server.authenticators.v1.factories.AuthenticatorsApiServiceFactory;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.ConnectedApps;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Error;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.UserDefinedLocalAuthenticatorCreation;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.UserDefinedLocalAuthenticatorUpdate;
-import org.wso2.carbon.identity.api.server.authenticators.v1.AuthenticatorsApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -41,8 +40,12 @@ import javax.validation.constraints.*;
 
 public class AuthenticatorsApi  {
 
-    @Autowired
-    private AuthenticatorsApiService delegate;
+    private final AuthenticatorsApiService delegate;
+
+    public AuthenticatorsApi() {
+
+        this.delegate = AuthenticatorsApiServiceFactory.getAuthenticatorsApi();
+    }
 
     @Valid
     @POST
