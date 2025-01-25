@@ -51,7 +51,6 @@ public class OrganizationManagementServiceFactory {
 
         SERVICE = new OrganizationManagementService(orgApplicationManager,
                 organizationManager, organizationDiscoveryManager);
-
     }
 
     /**
