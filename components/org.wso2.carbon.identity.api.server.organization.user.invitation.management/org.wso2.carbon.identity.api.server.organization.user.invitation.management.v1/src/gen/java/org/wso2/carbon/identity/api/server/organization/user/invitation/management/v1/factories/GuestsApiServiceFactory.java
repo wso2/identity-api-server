@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -21,12 +21,20 @@ package org.wso2.carbon.identity.api.server.organization.user.invitation.managem
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.GuestsApiService;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.impl.GuestsApiServiceImpl;
 
+/**
+ * This class is the factory class for GuestsApiService.
+ */
 public class GuestsApiServiceFactory {
 
-   private final static GuestsApiService service = new GuestsApiServiceImpl();
+   private static final GuestsApiService SERVICE = new GuestsApiServiceImpl();
 
-   public static GuestsApiService getGuestsApi()
-   {
-      return service;
+   /**
+    * Get GuestsApiService.
+    *
+    * @return GuestsApiService.
+    */
+   public static GuestsApiService getGuestsApi() {
+
+      return SERVICE;
    }
 }
