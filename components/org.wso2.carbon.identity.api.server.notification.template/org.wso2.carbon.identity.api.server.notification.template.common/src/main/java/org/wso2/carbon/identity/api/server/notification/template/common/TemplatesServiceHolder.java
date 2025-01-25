@@ -19,30 +19,51 @@
 package org.wso2.carbon.identity.api.server.notification.template.common;
 
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.email.mgt.constants.I18nMgtConstants;
 import org.wso2.carbon.identity.governance.service.notification.NotificationTemplateManager;
+
+import java.util.Hashtable;
 
 /**
  * This class is used to hold the TemplateManager service.
  */
 public class TemplatesServiceHolder {
 
-    private static NotificationTemplateManager notificationTemplateManager;
+    private static final Log LOG = LogFactory.getLog(TemplatesServiceHolder.class);
 
-    /**
-     * Get TemplateManager osgi service.
-     * @return TemplateManager
-     */
-    public static NotificationTemplateManager getNotificationTemplateManager() {
+    private TemplatesServiceHolder () {
 
-        return notificationTemplateManager;
+    }
+
+    private static class NotificationTemplateManagerHolder {
+
+        static final NotificationTemplateManager SERVICE = resolveNotificationTemplateManager();
+    }
+
+
+    private static NotificationTemplateManager resolveNotificationTemplateManager() {
+
+        Hashtable<String, String> serviceProperties = new Hashtable<>();
+        serviceProperties.put(I18nMgtConstants.SERVICE_PROPERTY_KEY_SERVICE_NAME,
+                I18nMgtConstants.SERVICE_PROPERTY_VAL_NOTIFICATION_TEMPLATE_MANAGER);
+        NotificationTemplateManager taskOperationService = (NotificationTemplateManager) PrivilegedCarbonContext.
+                getThreadLocalCarbonContext().getOSGiService(NotificationTemplateManager.class, serviceProperties);
+        if (taskOperationService == null) {
+            LOG.debug("Unable to retrieve NotificationTemplateManager service.");
+        }
+        return taskOperationService;
     }
 
     /**
-     * Set TemplateManager osgi service.
-     * @param notificationTemplateManager TemplateManager
+     * Get NotificationTemplateManager osgi service.
+     *
+     * @return NotificationTemplateManager.
      */
-    public static void setNotificationTemplateManager(NotificationTemplateManager notificationTemplateManager) {
+    public static NotificationTemplateManager getNotificationTemplateManager() {
 
-        TemplatesServiceHolder.notificationTemplateManager = notificationTemplateManager;
+        return NotificationTemplateManagerHolder.SERVICE;
     }
 }
