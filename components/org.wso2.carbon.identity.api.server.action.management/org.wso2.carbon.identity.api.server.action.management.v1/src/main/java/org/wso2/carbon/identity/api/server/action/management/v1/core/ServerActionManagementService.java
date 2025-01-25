@@ -63,7 +63,6 @@ public class ServerActionManagementService {
     }
 
     static {
-        NOT_IMPLEMENTED_ACTION_TYPES.add(Action.ActionTypes.PRE_UPDATE_PASSWORD.getPathParam());
         NOT_IMPLEMENTED_ACTION_TYPES.add(Action.ActionTypes.PRE_UPDATE_PROFILE.getPathParam());
         NOT_IMPLEMENTED_ACTION_TYPES.add(Action.ActionTypes.PRE_REGISTRATION.getPathParam());
         NOT_IMPLEMENTED_ACTION_TYPES.add(Action.ActionTypes.AUTHENTICATION.getPathParam());
