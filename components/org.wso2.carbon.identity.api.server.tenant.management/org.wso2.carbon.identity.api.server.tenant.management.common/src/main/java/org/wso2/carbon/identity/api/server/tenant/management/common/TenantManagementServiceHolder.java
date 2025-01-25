@@ -56,7 +56,7 @@ public class TenantManagementServiceHolder {
     /**
      * Get RealmService osgi service.
      *
-     * @return RealmService
+     * @return RealmService.
      */
     public static RealmService getRealmService() {
 
