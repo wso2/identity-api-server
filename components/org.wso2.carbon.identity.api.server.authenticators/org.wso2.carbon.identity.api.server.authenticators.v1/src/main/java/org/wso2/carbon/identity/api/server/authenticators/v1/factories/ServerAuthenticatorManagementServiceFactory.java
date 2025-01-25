@@ -23,6 +23,7 @@ import org.wso2.carbon.identity.api.server.authenticators.v1.core.ServerAuthenti
 import org.wso2.carbon.identity.application.common.ApplicationAuthenticatorService;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.idp.mgt.IdentityProviderManager;
+import org.wso2.carbon.idp.mgt.IdpManager;
 
 /**
  * Factory class for ServerAuthenticatorManagementService.
@@ -34,7 +35,7 @@ public class ServerAuthenticatorManagementServiceFactory {
     static {
         ApplicationManagementService applicationManagementService = AuthenticatorsServiceHolder
                 .getApplicationManagementService();
-        IdentityProviderManager idpManager = AuthenticatorsServiceHolder.getIdentityProviderManager();
+        IdpManager idpManager = AuthenticatorsServiceHolder.getIdentityProviderManager();
         ApplicationAuthenticatorService applicationAuthenticatorService = AuthenticatorsServiceHolder
                 .getApplicationAuthenticatorService();
 

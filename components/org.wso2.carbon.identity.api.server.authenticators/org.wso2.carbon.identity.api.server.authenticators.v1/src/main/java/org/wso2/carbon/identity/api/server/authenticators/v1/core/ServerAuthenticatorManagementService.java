@@ -60,7 +60,7 @@ import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
-import org.wso2.carbon.idp.mgt.IdentityProviderManager;
+import org.wso2.carbon.idp.mgt.IdpManager;
 import org.wso2.carbon.idp.mgt.model.ConnectedAppsResult;
 import org.wso2.carbon.idp.mgt.model.IdpSearchResult;
 
@@ -86,12 +86,12 @@ import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
 public class ServerAuthenticatorManagementService {
 
     private final ApplicationManagementService applicationManagementService;
-    private final IdentityProviderManager idpManager;
+    private final IdpManager idpManager;
     private final ApplicationAuthenticatorService applicationAuthenticatorService;
     private static final Log log = LogFactory.getLog(ServerAuthenticatorManagementService.class);
 
     public ServerAuthenticatorManagementService(ApplicationManagementService applicationManagementService,
-                                                IdentityProviderManager idpManager,
+                                                IdpManager idpManager,
                                                 ApplicationAuthenticatorService applicationAuthenticatorService) {
 
         this.applicationManagementService = applicationManagementService;

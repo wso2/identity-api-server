@@ -19,7 +19,6 @@ package org.wso2.carbon.identity.api.server.authenticators.common;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.application.common.ApplicationAuthenticatorService;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
-import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 import org.wso2.carbon.idp.mgt.IdpManager;
 
 /**
@@ -39,7 +38,7 @@ public class AuthenticatorsServiceHolder {
 
     private static class IdentityProviderManagerHolder {
 
-        static final IdentityProviderManager SERVICE = (IdentityProviderManager) PrivilegedCarbonContext
+        static final IdpManager SERVICE = (IdpManager) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(IdpManager.class, null);
     }
 
@@ -65,7 +64,7 @@ public class AuthenticatorsServiceHolder {
      *
      * @return IdpManager
      */
-    public static IdentityProviderManager getIdentityProviderManager() {
+    public static IdpManager getIdentityProviderManager() {
 
         return IdentityProviderManagerHolder.SERVICE;
     }
