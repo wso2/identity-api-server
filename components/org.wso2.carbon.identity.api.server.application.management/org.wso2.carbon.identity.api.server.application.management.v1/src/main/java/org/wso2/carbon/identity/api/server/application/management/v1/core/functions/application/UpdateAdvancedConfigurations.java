@@ -99,8 +99,7 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
                                              AdvancedApplicationConfiguration advancedConfigurations) {
 
         if (!serviceProvider.isDiscoverable() ||
-                advancedConfigurations.getDiscoverableGroups() == null ||
-                advancedConfigurations.getDiscoverableGroups().isEmpty()) {
+                advancedConfigurations.getDiscoverableGroups() == null) {
             return;
         }
 
