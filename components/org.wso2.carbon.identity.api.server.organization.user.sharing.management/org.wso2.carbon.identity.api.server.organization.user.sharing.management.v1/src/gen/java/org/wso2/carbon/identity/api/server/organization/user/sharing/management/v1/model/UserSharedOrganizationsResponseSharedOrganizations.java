@@ -34,42 +34,8 @@ public class UserSharedOrganizationsResponseSharedOrganizations  {
   
     private String orgId;
     private String orgName;
-    private String sharedType;
     private String sharedUserId;
-
-@XmlType(name="PolicyEnum")
-@XmlEnum(String.class)
-public enum PolicyEnum {
-
-    @XmlEnumValue("SELECTED_ORG_ONLY") SELECTED_ORG_ONLY(String.valueOf("SELECTED_ORG_ONLY")), @XmlEnumValue("SELECTED_ORG_WITH_ALL_EXISTING_CHILDREN_ONLY") SELECTED_ORG_WITH_ALL_EXISTING_CHILDREN_ONLY(String.valueOf("SELECTED_ORG_WITH_ALL_EXISTING_CHILDREN_ONLY")), @XmlEnumValue("SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN") SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN(String.valueOf("SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN")), @XmlEnumValue("SELECTED_ORG_WITH_EXISTING_IMMEDIATE_CHILDREN_ONLY") SELECTED_ORG_WITH_EXISTING_IMMEDIATE_CHILDREN_ONLY(String.valueOf("SELECTED_ORG_WITH_EXISTING_IMMEDIATE_CHILDREN_ONLY")), @XmlEnumValue("SELECTED_ORG_WITH_EXISTING_IMMEDIATE_AND_FUTURE_CHILDREN") SELECTED_ORG_WITH_EXISTING_IMMEDIATE_AND_FUTURE_CHILDREN(String.valueOf("SELECTED_ORG_WITH_EXISTING_IMMEDIATE_AND_FUTURE_CHILDREN")), @XmlEnumValue("NO_ORG") NO_ORG(String.valueOf("NO_ORG"));
-
-
-    private String value;
-
-    PolicyEnum(String v) {
-        value = v;
-    }
-
-    public String value() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return String.valueOf(value);
-    }
-
-    public static PolicyEnum fromValue(String value) {
-        for (PolicyEnum b : PolicyEnum.values()) {
-            if (b.value.equals(value)) {
-                return b;
-            }
-        }
-        throw new IllegalArgumentException("Unexpected value '" + value + "'");
-    }
-}
-
-    private PolicyEnum policy;
+    private String sharedType;
     private String rolesRef;
 
     /**
@@ -111,25 +77,6 @@ public enum PolicyEnum {
     }
 
     /**
-    * Shared type of the user (pulled/pushed)
-    **/
-    public UserSharedOrganizationsResponseSharedOrganizations sharedType(String sharedType) {
-
-        this.sharedType = sharedType;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "Pushed", value = "Shared type of the user (pulled/pushed)")
-    @JsonProperty("sharedType")
-    @Valid
-    public String getSharedType() {
-        return sharedType;
-    }
-    public void setSharedType(String sharedType) {
-        this.sharedType = sharedType;
-    }
-
-    /**
     * ID of the shared user
     **/
     public UserSharedOrganizationsResponseSharedOrganizations sharedUserId(String sharedUserId) {
@@ -149,22 +96,22 @@ public enum PolicyEnum {
     }
 
     /**
-    * The scope of sharing for this organization.
+    * Shared type of the user (SHARED/INVITED)
     **/
-    public UserSharedOrganizationsResponseSharedOrganizations policy(PolicyEnum policy) {
+    public UserSharedOrganizationsResponseSharedOrganizations sharedType(String sharedType) {
 
-        this.policy = policy;
+        this.sharedType = sharedType;
         return this;
     }
     
-    @ApiModelProperty(value = "The scope of sharing for this organization.")
-    @JsonProperty("policy")
+    @ApiModelProperty(example = "SHARED", value = "Shared type of the user (SHARED/INVITED)")
+    @JsonProperty("sharedType")
     @Valid
-    public PolicyEnum getPolicy() {
-        return policy;
+    public String getSharedType() {
+        return sharedType;
     }
-    public void setPolicy(PolicyEnum policy) {
-        this.policy = policy;
+    public void setSharedType(String sharedType) {
+        this.sharedType = sharedType;
     }
 
     /**
@@ -200,15 +147,14 @@ public enum PolicyEnum {
         UserSharedOrganizationsResponseSharedOrganizations userSharedOrganizationsResponseSharedOrganizations = (UserSharedOrganizationsResponseSharedOrganizations) o;
         return Objects.equals(this.orgId, userSharedOrganizationsResponseSharedOrganizations.orgId) &&
             Objects.equals(this.orgName, userSharedOrganizationsResponseSharedOrganizations.orgName) &&
-            Objects.equals(this.sharedType, userSharedOrganizationsResponseSharedOrganizations.sharedType) &&
             Objects.equals(this.sharedUserId, userSharedOrganizationsResponseSharedOrganizations.sharedUserId) &&
-            Objects.equals(this.policy, userSharedOrganizationsResponseSharedOrganizations.policy) &&
+            Objects.equals(this.sharedType, userSharedOrganizationsResponseSharedOrganizations.sharedType) &&
             Objects.equals(this.rolesRef, userSharedOrganizationsResponseSharedOrganizations.rolesRef);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(orgId, orgName, sharedType, sharedUserId, policy, rolesRef);
+        return Objects.hash(orgId, orgName, sharedUserId, sharedType, rolesRef);
     }
 
     @Override
@@ -219,9 +165,8 @@ public enum PolicyEnum {
         
         sb.append("    orgId: ").append(toIndentedString(orgId)).append("\n");
         sb.append("    orgName: ").append(toIndentedString(orgName)).append("\n");
-        sb.append("    sharedType: ").append(toIndentedString(sharedType)).append("\n");
         sb.append("    sharedUserId: ").append(toIndentedString(sharedUserId)).append("\n");
-        sb.append("    policy: ").append(toIndentedString(policy)).append("\n");
+        sb.append("    sharedType: ").append(toIndentedString(sharedType)).append("\n");
         sb.append("    rolesRef: ").append(toIndentedString(rolesRef)).append("\n");
         sb.append("}");
         return sb.toString();
