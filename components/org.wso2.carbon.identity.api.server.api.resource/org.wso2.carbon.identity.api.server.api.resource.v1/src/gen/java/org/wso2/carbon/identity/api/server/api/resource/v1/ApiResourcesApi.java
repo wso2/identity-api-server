@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.api.resource.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
@@ -28,16 +27,20 @@ import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCreationMo
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceListResponse;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourcePatchModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceResponse;
+import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesCreationModel;
+import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesGetModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.Error;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeCreationModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeGetModel;
+import org.wso2.carbon.identity.api.server.api.resource.v1.ScopePatchModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ApiResourcesApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
+import org.wso2.carbon.identity.api.server.api.resource.v1.factories.ApiResourcesApiServiceFactory;
 
 import javax.validation.constraints.*;
 
@@ -46,8 +49,12 @@ import javax.validation.constraints.*;
 
 public class ApiResourcesApi  {
 
-    @Autowired
-    private ApiResourcesApiService delegate;
+    private final ApiResourcesApiService delegate;
+
+    public ApiResourcesApi() {
+
+        this.delegate = ApiResourcesApiServiceFactory.getApiResourcesApi();
+    }
 
     @Valid
     @POST
@@ -72,6 +79,28 @@ public class ApiResourcesApi  {
     public Response addAPIResource(@ApiParam(value = "This represents the API resource to be created." ,required=true) @Valid APIResourceCreationModel apIResourceCreationModel) {
 
         return delegate.addAPIResource(apIResourceCreationModel );
+    }
+
+    @Valid
+    @PUT
+    @Path("/{apiResourceId}/authorization-details-types")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Adds new authorization details types to the API resource", notes = "This API is used to add a new authorization details type to API resource.  <b>Permission required:</b>     * /permission/admin/manage/identity/apiresourcemgt/update    <b>Scope required:</b>     * internal_api_resource_update ", response = AuthorizationDetailsTypesGetModel.class, responseContainer = "List", authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "API Resource Authorization Details Types", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successfully added a list of authorization details types", response = AuthorizationDetailsTypesGetModel.class, responseContainer = "List"),
+        @ApiResponse(code = 401, message = "Unauthorized request", response = Error.class),
+        @ApiResponse(code = 404, message = "Requested resource is not found", response = Error.class),
+        @ApiResponse(code = 500, message = "Encountered a server error", response = Error.class)
+    })
+    public Response addAuthorizationDetailsTypes(@ApiParam(value = "ID of the API Resource.",required=true) @PathParam("apiResourceId") String apiResourceId, @ApiParam(value = "" ) @Valid List<AuthorizationDetailsTypesCreationModel> authorizationDetailsTypesCreationModel) {
+
+        return delegate.addAuthorizationDetailsTypes(apiResourceId,  authorizationDetailsTypesCreationModel );
     }
 
     @Valid
@@ -239,6 +268,27 @@ public class ApiResourcesApi  {
     }
 
     @Valid
+    @DELETE
+    @Path("/{apiResourceId}/authorization-details-types/{authorizationDetailsTypeId}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Deletes a registered authorization details type by type ID", notes = "This API is used to delete a registered authorization details type by a given type ID.  <b>Permission required:</b>     * /permission/admin/manage/identity/apiresourcemgt/delete    <b>Scope required:</b>     * internal_api_resource_delete ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "API Resource Authorization Details Types", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "Successfully deleted an authorization details type by type ID", response = Void.class),
+        @ApiResponse(code = 401, message = "Unauthorized request", response = Error.class),
+        @ApiResponse(code = 500, message = "Encountered a server error", response = Error.class)
+    })
+    public Response deleteAuthorizationDetailsType(@ApiParam(value = "ID of the API Resource.",required=true) @PathParam("apiResourceId") String apiResourceId, @ApiParam(value = "The ID of the authorization details type that is to be retrieved",required=true) @PathParam("authorizationDetailsTypeId") String authorizationDetailsTypeId) {
+
+        return delegate.deleteAuthorizationDetailsType(apiResourceId,  authorizationDetailsTypeId );
+    }
+
+    @Valid
     @GET
     
     
@@ -258,6 +308,72 @@ public class ApiResourcesApi  {
     public Response getAPIResources(    @Valid@ApiParam(value = "Base64 encoded cursor value for backward pagination. ")  @QueryParam("before") String before,     @Valid@ApiParam(value = "Base64 encoded cursor value for forward pagination. ")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations. ")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Maximum number of records to return. ")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Specifies the required attributes in the response. Only 'properties' attribute is currently supported.")  @QueryParam("attributes") String attributes) {
 
         return delegate.getAPIResources(before,  after,  filter,  limit,  attributes );
+    }
+
+    @Valid
+    @GET
+    @Path("/{apiResourceId}/authorization-details-types/{authorizationDetailsTypeId}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Returns a registered authorization details type by type ID", notes = "This API is used to retrieve details of a registered authorization details type by a given type ID.  <b>Permission required:</b>     * /permission/admin/manage/identity/apiresourcemgt/view    <b>Scope required:</b>     * internal_api_resource_view ", response = AuthorizationDetailsTypesGetModel.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "API Resource Authorization Details Types", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successfully retrieved an authorization details type by type ID", response = AuthorizationDetailsTypesGetModel.class),
+        @ApiResponse(code = 401, message = "Unauthorized request", response = Error.class),
+        @ApiResponse(code = 404, message = "Requested resource is not found", response = Error.class),
+        @ApiResponse(code = 500, message = "Encountered a server error", response = Error.class)
+    })
+    public Response getAuthorizationDetailsType(@ApiParam(value = "ID of the API Resource.",required=true) @PathParam("apiResourceId") String apiResourceId, @ApiParam(value = "The ID of the authorization details type that is to be retrieved",required=true) @PathParam("authorizationDetailsTypeId") String authorizationDetailsTypeId) {
+
+        return delegate.getAuthorizationDetailsType(apiResourceId,  authorizationDetailsTypeId );
+    }
+
+    @Valid
+    @GET
+    @Path("/{apiResourceId}/authorization-details-types")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Lists all registered authorization details types", notes = "This API is used to get all registered authorization details types.  <b>Permission required:</b>     * /permission/admin/manage/identity/apiresourcemgt/view    <b>Scope required:</b>     * internal_api_resource_view ", response = AuthorizationDetailsTypesGetModel.class, responseContainer = "List", authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "API Resource Authorization Details Types", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successfully retrieved a list of authorization details types", response = AuthorizationDetailsTypesGetModel.class, responseContainer = "List"),
+        @ApiResponse(code = 401, message = "Unauthorized request", response = Error.class),
+        @ApiResponse(code = 404, message = "Requested resource is not found", response = Error.class),
+        @ApiResponse(code = 500, message = "Encountered a server error", response = Error.class)
+    })
+    public Response getAuthorizationDetailsTypes(@ApiParam(value = "ID of the API Resource.",required=true) @PathParam("apiResourceId") String apiResourceId) {
+
+        return delegate.getAuthorizationDetailsTypes(apiResourceId );
+    }
+
+    @Valid
+    @PATCH
+    @Path("/{apiResourceId}/authorization-details-types/{authorizationDetailsTypeId}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Updates a registered authorization details type by type ID", notes = "This API is used to update a registered authorization details type by a given type ID.  <b>Permission required:</b>     * /permission/admin/manage/identity/apiresourcemgt/update    <b>Scope required:</b>     * internal_api_resource_update ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "API Resource Authorization Details Types" })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "No Content", response = Void.class),
+        @ApiResponse(code = 401, message = "Unauthorized request", response = Error.class),
+        @ApiResponse(code = 404, message = "Requested resource is not found", response = Error.class),
+        @ApiResponse(code = 500, message = "Encountered a server error", response = Error.class)
+    })
+    public Response updateAuthorizationDetailsType(@ApiParam(value = "ID of the API Resource.",required=true) @PathParam("apiResourceId") String apiResourceId, @ApiParam(value = "The ID of the authorization details type that is to be retrieved",required=true) @PathParam("authorizationDetailsTypeId") String authorizationDetailsTypeId, @ApiParam(value = "" ) @Valid AuthorizationDetailsTypesCreationModel authorizationDetailsTypesCreationModel) {
+
+        return delegate.updateAuthorizationDetailsType(apiResourceId,  authorizationDetailsTypeId,  authorizationDetailsTypesCreationModel );
     }
 
 }

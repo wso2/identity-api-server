@@ -18,9 +18,9 @@
 
 package org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.GuestsApiService;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.core.GuestApiServiceCore;
+import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.factories.GuestApiServiceCoreFactory;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.AcceptanceRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.IntrospectRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.IntrospectSuccessResponse;
@@ -36,8 +36,16 @@ import javax.ws.rs.core.Response;
  */
 public class GuestsApiServiceImpl implements GuestsApiService {
 
-    @Autowired
-    private GuestApiServiceCore guestApiServiceCore;
+    private final GuestApiServiceCore guestApiServiceCore;
+
+    public GuestsApiServiceImpl() {
+
+        try {
+            this.guestApiServiceCore = GuestApiServiceCoreFactory.getGuestApiServiceCore();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating user invitation management services.", e);
+        }
+    }
 
     @Override
     public Response invitationAcceptPost(AcceptanceRequestBody acceptanceRequestBody) {

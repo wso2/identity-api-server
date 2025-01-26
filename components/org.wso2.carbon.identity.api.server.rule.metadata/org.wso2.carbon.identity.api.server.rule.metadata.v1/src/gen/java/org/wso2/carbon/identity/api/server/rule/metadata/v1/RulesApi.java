@@ -18,12 +18,12 @@
 
 package org.wso2.carbon.identity.api.server.rule.metadata.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 
+import org.wso2.carbon.identity.api.server.rule.metadata.v1.factories.RulesApiServiceFactory;
 import org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Error;
 import org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition;
 import org.wso2.carbon.identity.api.server.rule.metadata.v1.RulesApiService;
@@ -40,8 +40,12 @@ import javax.validation.constraints.*;
 
 public class RulesApi  {
 
-    @Autowired
-    private RulesApiService delegate;
+    private final RulesApiService delegate;
+
+    public RulesApi() {
+
+        this.delegate = RulesApiServiceFactory.getRulesApi();
+    }
 
     @Valid
     @GET

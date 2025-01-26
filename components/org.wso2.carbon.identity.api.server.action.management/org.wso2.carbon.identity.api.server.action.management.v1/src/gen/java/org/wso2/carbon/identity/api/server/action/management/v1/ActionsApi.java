@@ -18,17 +18,14 @@
 
 package org.wso2.carbon.identity.api.server.action.management.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionBasicResponse;
-import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionTypesResponseItem;
-import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.Error;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionsApiService;
 
@@ -36,16 +33,19 @@ import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
-
-import javax.validation.constraints.*;
+import org.wso2.carbon.identity.api.server.action.management.v1.factories.ActionsApiServiceFactory;
 
 @Path("/actions")
 @Api(description = "The actions API")
 
 public class ActionsApi  {
 
-    @Autowired
-    private ActionsApiService delegate;
+    private final ActionsApiService delegate;
+
+    public ActionsApi() {
+
+        this.delegate = ActionsApiServiceFactory.getActionsApi();
+    }
 
     @Valid
     @POST
@@ -91,9 +91,9 @@ public class ActionsApi  {
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response createAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "This represents the information of the action to be created." ,required=true) @Valid ActionModel actionModel) {
+    public Response createAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "This represents the information of the action to be created." ,required=true) @Valid String body) {
 
-        return delegate.createAction(actionType,  actionModel );
+        return delegate.createAction(actionType,  body );
     }
 
     @Valid
@@ -237,7 +237,7 @@ public class ActionsApi  {
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response updateAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Unique identifier of the action.",required=true) @PathParam("actionId") String actionId, @ApiParam(value = "This represents the action to be updated." ,required=true) @Valid ActionUpdateModel body) {
+    public Response updateAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Unique identifier of the action.",required=true) @PathParam("actionId") String actionId, @ApiParam(value = "This represents the action to be updated." ,required=true) @Valid String body) {
 
         return delegate.updateAction(actionType,  actionId,  body );
     }

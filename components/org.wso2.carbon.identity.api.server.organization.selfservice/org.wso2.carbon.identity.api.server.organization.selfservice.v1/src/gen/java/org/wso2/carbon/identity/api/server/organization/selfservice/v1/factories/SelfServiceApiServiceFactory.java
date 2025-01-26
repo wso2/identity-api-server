@@ -21,12 +21,20 @@ package org.wso2.carbon.identity.api.server.organization.selfservice.v1.factorie
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.SelfServiceApiService;
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.impl.SelfServiceApiServiceImpl;
 
+/**
+ * Factory class for SelfServiceApiService.
+ */
 public class SelfServiceApiServiceFactory {
 
-   private final static SelfServiceApiService service = new SelfServiceApiServiceImpl();
+   private static final SelfServiceApiService SERVICE = new SelfServiceApiServiceImpl();
 
-   public static SelfServiceApiService getSelfServiceApi()
-   {
-      return service;
+   /**
+    * Get SelfServiceApiService.
+    *
+    * @return SelfServiceApiService.
+    */
+   public static SelfServiceApiService getSelfServiceApi() {
+
+      return SERVICE;
    }
 }

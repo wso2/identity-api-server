@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.rule.metadata.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.rule.metadata.service.RuleMetadataService;
 
 /**
@@ -25,15 +26,23 @@ import org.wso2.carbon.identity.rule.metadata.service.RuleMetadataService;
  */
 public class RuleMetadataServiceHolder {
 
-    private static RuleMetadataService ruleMetadataService;
+    private RuleMetadataServiceHolder() {
 
-    public static RuleMetadataService getRuleMetadataService() {
-
-        return ruleMetadataService;
     }
 
-    public static void setRuleMetadataService(RuleMetadataService ruleMetadataService) {
+    private static class RuleMetadataServiceHolderInstance {
 
-        RuleMetadataServiceHolder.ruleMetadataService = ruleMetadataService;
+        static final RuleMetadataService SERVICE = (RuleMetadataService) PrivilegedCarbonContext.
+                getThreadLocalCarbonContext().getOSGiService(RuleMetadataService.class, null);
+    }
+
+    /**
+     * Get Rule Metadata Service osgi service.
+     *
+     * @return RuleMetadataService.
+     */
+    public static RuleMetadataService getRuleMetadataService() {
+
+        return RuleMetadataServiceHolderInstance.SERVICE;
     }
 }

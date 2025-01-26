@@ -535,7 +535,6 @@ components:
         type: string
       example: "945fa326-bf78-45f6-bfda-c9644650b821"
 
-
   schemas:
     BrandingPreferenceModel:
       required:
@@ -594,14 +593,14 @@ components:
     BrandingGenerationRequestModel:
       type: object
       properties:
-        websiteUrl:
+        website_url:
           type: string
           description: URL of the organization's website.
           example: "https://wso2.com/"
     BrandingGenerationResponseModel:
       type: object
       properties:
-        operationId:
+        operation_id:
           type: string
           description: Operation id of the initiated branding generation process.
     BrandingGenerationStatusModel:

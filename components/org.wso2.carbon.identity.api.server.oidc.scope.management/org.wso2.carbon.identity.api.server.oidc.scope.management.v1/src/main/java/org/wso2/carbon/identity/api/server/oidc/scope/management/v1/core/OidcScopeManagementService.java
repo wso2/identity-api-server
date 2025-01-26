@@ -1,18 +1,21 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2020-2025, WSO2 LLC. (http://www.wso2.com).
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
+
 package org.wso2.carbon.identity.api.server.oidc.scope.management.v1.core;
 
 import org.apache.commons.logging.Log;
@@ -24,6 +27,7 @@ import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.Scope;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.ScopeUpdateRequest;
 import org.wso2.carbon.identity.oauth.IdentityOAuthAdminException;
 import org.wso2.carbon.identity.oauth.IdentityOAuthClientException;
+import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
 import org.wso2.carbon.identity.oauth.dto.ScopeDTO;
 
 import java.util.ArrayList;
@@ -32,14 +36,18 @@ import java.util.List;
 
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.api.server.oidc.scope.management.common.OIDCScopeManagementServiceHolder.getOAuthAdminService;
-
 /**
  * OIDC scope management APIs are processed in this class.
  */
 public class OidcScopeManagementService {
 
+    private final OAuthAdminServiceImpl oauthAdminService;
     private static final Log LOG = LogFactory.getLog(OidcScopeManagementService.class);
+
+    public OidcScopeManagementService(OAuthAdminServiceImpl oauthAdminService) {
+
+        this.oauthAdminService = oauthAdminService;
+    }
 
     /**
      * Add an OIDC scope.
@@ -54,7 +62,7 @@ public class OidcScopeManagementService {
             String[] claimArray = claimList.toArray(new String[claimList.size()]);
             ScopeDTO scopeDTO = new ScopeDTO(scopeObject.getName(), scopeObject.getDisplayName(),
                     scopeObject.getDescription(), claimArray);
-            getOAuthAdminService().addScope(scopeDTO);
+            oauthAdminService.addScope(scopeDTO);
             return scopeDTO.getName();
         } catch (IdentityOAuthAdminException e) {
             throw handleException(e, "Server encountered an error while adding OIDC scope: " + scopeObject.getName());
@@ -69,7 +77,7 @@ public class OidcScopeManagementService {
     public void deleteScope(String id) {
 
         try {
-            getOAuthAdminService().deleteScope(id);
+            oauthAdminService.deleteScope(id);
         } catch (IdentityOAuthClientException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(e);
@@ -88,7 +96,7 @@ public class OidcScopeManagementService {
     public Scope getScope(String id) {
 
         try {
-            ScopeDTO scopeDTO = getOAuthAdminService().getScope(id);
+            ScopeDTO scopeDTO = oauthAdminService.getScope(id);
             return convertScopeDTOObjectToScope(scopeDTO);
         } catch (IdentityOAuthAdminException e) {
             throw handleException(e, "Server encountered an error while retrieving OIDC scope: " + id);
@@ -103,7 +111,7 @@ public class OidcScopeManagementService {
     public List<Scope> getScopes() {
 
         try {
-            ScopeDTO[] scopes = getOAuthAdminService().getScopes();
+            ScopeDTO[] scopes = oauthAdminService.getScopes();
             return buildScopeList(scopes);
         } catch (IdentityOAuthAdminException e) {
             throw handleException(e, "Server encountered an error while listing OIDC scopes.");
@@ -124,7 +132,7 @@ public class OidcScopeManagementService {
             String[] claimArray = claimList.toArray(new String[claimList.size()]);
             ScopeDTO scopeDTO = new ScopeDTO(id, scopeUpdateObject.getDisplayName(),
                     scopeUpdateObject.getDescription(), claimArray);
-            getOAuthAdminService().updateScope(scopeDTO);
+            oauthAdminService.updateScope(scopeDTO);
         } catch (IdentityOAuthAdminException e) {
             throw handleException(e, "Server encountered an error while updating OIDC scope: " + id);
         }

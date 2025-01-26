@@ -49,6 +49,8 @@ public class ActionMgtEndpointConstants {
                 "Action is not found.",
                 "No action is found for given action id and action type"),
         ERROR_INVALID_RULE("60013", "Invalid rule.", "%s"),
+        ERROR_INVALID_PAYLOAD("60014", "Invalid Request body.",
+                "Provided request body content is not in the expected format."),
 
         // Server errors.
         ERROR_NOT_IMPLEMENTED_ACTION_TYPE("650015",

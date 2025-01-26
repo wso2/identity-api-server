@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.organization.selfservice.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.resource.mgt.APIResourceManager;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.application.mgt.AuthorizedAPIManagementService;
@@ -28,33 +29,42 @@ import org.wso2.carbon.identity.governance.IdentityGovernanceService;
  */
 public class SelfServiceMgtServiceHolder {
 
-    private static IdentityGovernanceService identityGovernanceService;
+    private SelfServiceMgtServiceHolder() {
 
-    private static ApplicationManagementService applicationManagementService;
+    }
 
-    private static APIResourceManager apiResourceManager;
+    private static class IdentityGovernanceServiceHolder {
 
-    private static AuthorizedAPIManagementService authorizedAPIManagementService;
+        static final IdentityGovernanceService SERVICE = (IdentityGovernanceService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(IdentityGovernanceService.class, null);
+    }
+
+    private static class ApplicationManagementServiceHolder {
+
+        static final ApplicationManagementService SERVICE = (ApplicationManagementService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(ApplicationManagementService.class, null);
+    }
+
+    private static class APIResourceManagerServiceHolder {
+
+        static final APIResourceManager SERVICE = (APIResourceManager) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(APIResourceManager.class, null);
+    }
+
+    private static class AuthorizedAPIManagementServiceHolder {
+
+        static final AuthorizedAPIManagementService SERVICE = (AuthorizedAPIManagementService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(AuthorizedAPIManagementService.class, null);
+    }
 
     /**
      * Get Application Management OSGI service.
      *
-     * @return Application management service..
+     * @return Application management service.
      */
     public static ApplicationManagementService getApplicationManagementService() {
 
-        return applicationManagementService;
-    }
-
-    /**
-     * Set Application Management OSGI service.
-     *
-     * @param applicationManagementService Application management service.
-     */
-    public static void setApplicationManagementService(
-            ApplicationManagementService applicationManagementService) {
-
-        SelfServiceMgtServiceHolder.applicationManagementService = applicationManagementService;
+        return ApplicationManagementServiceHolder.SERVICE;
     }
 
     /**
@@ -64,17 +74,7 @@ public class SelfServiceMgtServiceHolder {
      */
     public static IdentityGovernanceService getIdentityGovernanceService() {
 
-        return identityGovernanceService;
-    }
-
-    /**
-     * Set Identity Governance OSGI service.
-     *
-     * @param identityGovernanceService Identity Governance service.
-     */
-    public static void setIdentityGovernanceService(IdentityGovernanceService identityGovernanceService) {
-
-        SelfServiceMgtServiceHolder.identityGovernanceService = identityGovernanceService;
+        return IdentityGovernanceServiceHolder.SERVICE;
     }
 
     /**
@@ -84,17 +84,7 @@ public class SelfServiceMgtServiceHolder {
      */
     public static APIResourceManager getAPIResourceManager() {
 
-        return apiResourceManager;
-    }
-
-    /**
-     * Set APIResourceManager.
-     *
-     * @param apiResourceManager APIResourceManager.
-     */
-    public static void setAPIResourceManager(APIResourceManager apiResourceManager) {
-
-        SelfServiceMgtServiceHolder.apiResourceManager = apiResourceManager;
+        return APIResourceManagerServiceHolder.SERVICE;
     }
 
     /**
@@ -104,17 +94,6 @@ public class SelfServiceMgtServiceHolder {
      */
     public static AuthorizedAPIManagementService getAuthorizedAPIManagementService() {
 
-        return authorizedAPIManagementService;
-    }
-
-    /**
-     * Set AuthorizedAPIManagementService.
-     *
-     * @param authorizedAPIManagementService AuthorizedAPIManagementService.
-     */
-    public static void setAuthorizedAPIManagementService(AuthorizedAPIManagementService
-                                                                 authorizedAPIManagementService) {
-
-        SelfServiceMgtServiceHolder.authorizedAPIManagementService = authorizedAPIManagementService;
+        return AuthorizedAPIManagementServiceHolder.SERVICE;
     }
 }

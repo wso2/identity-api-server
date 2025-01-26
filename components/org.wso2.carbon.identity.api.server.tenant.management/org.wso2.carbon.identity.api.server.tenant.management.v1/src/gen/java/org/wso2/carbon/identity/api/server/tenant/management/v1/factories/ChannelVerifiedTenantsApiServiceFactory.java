@@ -21,12 +21,20 @@ package org.wso2.carbon.identity.api.server.tenant.management.v1.factories;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.ChannelVerifiedTenantsApiService;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.impl.ChannelVerifiedTenantsApiServiceImpl;
 
+/**
+ * Factory class for ChannelVerifiedTenantsApiService.
+ */
 public class ChannelVerifiedTenantsApiServiceFactory {
 
-   private final static ChannelVerifiedTenantsApiService service = new ChannelVerifiedTenantsApiServiceImpl();
+   private final static ChannelVerifiedTenantsApiService SERVICE = new ChannelVerifiedTenantsApiServiceImpl();
 
+   /**
+    * Get ChannelVerifiedTenantsApiService.
+    *
+    * @return ChannelVerifiedTenantsApiService.
+    */
    public static ChannelVerifiedTenantsApiService getChannelVerifiedTenantsApi()
    {
-      return service;
+      return SERVICE;
    }
 }
