@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -22,12 +22,16 @@ import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCreationMo
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourcePatchModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceResponse;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ApiResourcesApiService;
+import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesCreationModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeCreationModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopePatchModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants;
+import org.wso2.carbon.identity.api.server.api.resource.v1.core.AuthorizationDetailsTypeManagementService;
 import org.wso2.carbon.identity.api.server.api.resource.v1.core.ServerAPIResourceManagementService;
+import org.wso2.carbon.identity.api.server.api.resource.v1.factories.AuthorizationDetailsTypeManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.api.resource.v1.factories.ServerAPIResourceManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
+import org.wso2.carbon.identity.application.common.model.AuthorizationDetailsType;
 
 import java.net.URI;
 import java.util.List;
@@ -42,12 +46,15 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
 public class ApiResourcesApiServiceImpl implements ApiResourcesApiService {
 
     private final ServerAPIResourceManagementService serverAPIResourceManagementService;
+    private final AuthorizationDetailsTypeManagementService typeMgtService;
 
     public ApiResourcesApiServiceImpl() {
 
         try {
             this.serverAPIResourceManagementService = ServerAPIResourceManagementServiceFactory
                     .getServerAPIResourceManagementService();
+            this.typeMgtService = AuthorizationDetailsTypeManagementServiceFactory
+                    .getAuthorizationDetailsTypeManagementService();
         } catch (IllegalStateException e) {
             throw new RuntimeException("Error occurred while initiating API resource management service.", e);
         }
@@ -61,6 +68,15 @@ public class ApiResourcesApiServiceImpl implements ApiResourcesApiService {
         URI location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT +
                 APIResourceMgtEndpointConstants.API_RESOURCE_PATH_COMPONENT + "/" + apiResourceResponse.getId());
         return Response.created(location).entity(apiResourceResponse).build();
+    }
+
+    @Override
+    public Response addAuthorizationDetailsTypes(
+            String apiResourceId, List<AuthorizationDetailsTypesCreationModel> authorizationDetailsTypesCreationModel) {
+
+        List<AuthorizationDetailsType> authorizationDetailsTypes =
+                typeMgtService.addAuthorizationDetailsTypes(apiResourceId, authorizationDetailsTypesCreationModel);
+        return Response.ok().entity(authorizationDetailsTypes).build();
     }
 
     @Override
@@ -114,9 +130,37 @@ public class ApiResourcesApiServiceImpl implements ApiResourcesApiService {
     }
 
     @Override
+    public Response deleteAuthorizationDetailsType(String apiResourceId, String authorizationDetailsTypeId) {
+
+        typeMgtService.deleteAuthorizationDetailsTypeById(apiResourceId, authorizationDetailsTypeId);
+        return Response.noContent().build();
+    }
+
+    @Override
     public Response getAPIResources(String before, String after, String filter, Integer limit, String attributes) {
 
         return Response.ok().entity(serverAPIResourceManagementService.getAPIResources(before, after, filter, limit,
                 attributes)).build();
+    }
+
+    @Override
+    public Response getAuthorizationDetailsType(String apiResourceId, String authorizationDetailsTypeId) {
+
+        return Response.ok().entity(typeMgtService
+                .getAuthorizationDetailsTypeById(apiResourceId, authorizationDetailsTypeId)).build();
+    }
+
+    @Override
+    public Response getAuthorizationDetailsTypes(String apiResourceId) {
+
+        return Response.ok().entity(typeMgtService.getAuthorizationDetailsTypes(apiResourceId)).build();
+    }
+
+    @Override
+    public Response updateAuthorizationDetailsType(String apiResourceId, String authorizationDetailsTypeId,
+                                                   AuthorizationDetailsTypesCreationModel creationModel) {
+
+        typeMgtService.updateAuthorizationDetailsTypes(apiResourceId, authorizationDetailsTypeId, creationModel);
+        return Response.noContent().build();
     }
 }

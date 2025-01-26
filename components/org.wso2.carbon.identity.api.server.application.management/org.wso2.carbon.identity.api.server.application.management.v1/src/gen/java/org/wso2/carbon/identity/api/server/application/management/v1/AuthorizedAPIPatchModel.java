@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -37,6 +37,10 @@ public class AuthorizedAPIPatchModel  {
     private List<String> addedScopes = null;
 
     private List<String> removedScopes = null;
+
+    private List<String> addedAuthorizationDetailsTypes = null;
+
+    private List<String> removedAuthorizationDetailsTypes = null;
 
 
     /**
@@ -91,6 +95,58 @@ public class AuthorizedAPIPatchModel  {
         return this;
     }
 
+        /**
+    **/
+    public AuthorizedAPIPatchModel addedAuthorizationDetailsTypes(List<String> addedAuthorizationDetailsTypes) {
+
+        this.addedAuthorizationDetailsTypes = addedAuthorizationDetailsTypes;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("addedAuthorizationDetailsTypes")
+    @Valid
+    public List<String> getAddedAuthorizationDetailsTypes() {
+        return addedAuthorizationDetailsTypes;
+    }
+    public void setAddedAuthorizationDetailsTypes(List<String> addedAuthorizationDetailsTypes) {
+        this.addedAuthorizationDetailsTypes = addedAuthorizationDetailsTypes;
+    }
+
+    public AuthorizedAPIPatchModel addAddedAuthorizationDetailsTypesItem(String addedAuthorizationDetailsTypesItem) {
+        if (this.addedAuthorizationDetailsTypes == null) {
+            this.addedAuthorizationDetailsTypes = new ArrayList<>();
+        }
+        this.addedAuthorizationDetailsTypes.add(addedAuthorizationDetailsTypesItem);
+        return this;
+    }
+
+        /**
+    **/
+    public AuthorizedAPIPatchModel removedAuthorizationDetailsTypes(List<String> removedAuthorizationDetailsTypes) {
+
+        this.removedAuthorizationDetailsTypes = removedAuthorizationDetailsTypes;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("removedAuthorizationDetailsTypes")
+    @Valid
+    public List<String> getRemovedAuthorizationDetailsTypes() {
+        return removedAuthorizationDetailsTypes;
+    }
+    public void setRemovedAuthorizationDetailsTypes(List<String> removedAuthorizationDetailsTypes) {
+        this.removedAuthorizationDetailsTypes = removedAuthorizationDetailsTypes;
+    }
+
+    public AuthorizedAPIPatchModel addRemovedAuthorizationDetailsTypesItem(String removedAuthorizationDetailsTypesItem) {
+        if (this.removedAuthorizationDetailsTypes == null) {
+            this.removedAuthorizationDetailsTypes = new ArrayList<>();
+        }
+        this.removedAuthorizationDetailsTypes.add(removedAuthorizationDetailsTypesItem);
+        return this;
+    }
+
     
 
     @Override
@@ -104,12 +160,14 @@ public class AuthorizedAPIPatchModel  {
         }
         AuthorizedAPIPatchModel authorizedAPIPatchModel = (AuthorizedAPIPatchModel) o;
         return Objects.equals(this.addedScopes, authorizedAPIPatchModel.addedScopes) &&
-            Objects.equals(this.removedScopes, authorizedAPIPatchModel.removedScopes);
+            Objects.equals(this.removedScopes, authorizedAPIPatchModel.removedScopes) &&
+            Objects.equals(this.addedAuthorizationDetailsTypes, authorizedAPIPatchModel.addedAuthorizationDetailsTypes) &&
+            Objects.equals(this.removedAuthorizationDetailsTypes, authorizedAPIPatchModel.removedAuthorizationDetailsTypes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(addedScopes, removedScopes);
+        return Objects.hash(addedScopes, removedScopes, addedAuthorizationDetailsTypes, removedAuthorizationDetailsTypes);
     }
 
     @Override
@@ -120,6 +178,8 @@ public class AuthorizedAPIPatchModel  {
         
         sb.append("    addedScopes: ").append(toIndentedString(addedScopes)).append("\n");
         sb.append("    removedScopes: ").append(toIndentedString(removedScopes)).append("\n");
+        sb.append("    addedAuthorizationDetailsTypes: ").append(toIndentedString(addedAuthorizationDetailsTypes)).append("\n");
+        sb.append("    removedAuthorizationDetailsTypes: ").append(toIndentedString(removedAuthorizationDetailsTypes)).append("\n");
         sb.append("}");
         return sb.toString();
     }
