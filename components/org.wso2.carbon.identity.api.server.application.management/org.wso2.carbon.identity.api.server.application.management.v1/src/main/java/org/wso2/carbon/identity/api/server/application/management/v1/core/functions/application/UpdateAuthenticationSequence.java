@@ -19,9 +19,11 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationStepModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.Authenticator;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
+import org.wso2.carbon.identity.application.common.ApplicationAuthenticatorService;
 import org.wso2.carbon.identity.application.common.model.AuthenticationStep;
 import org.wso2.carbon.identity.application.common.model.FederatedAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
@@ -31,6 +33,7 @@ import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticato
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.script.AuthenticationScriptConfig;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
+import org.wso2.carbon.identity.base.AuthenticatorPropertyConstants.DefinedByType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -159,12 +162,14 @@ public class UpdateAuthenticationSequence implements UpdateFunction<ServiceProvi
             if (FrameworkConstants.LOCAL_IDP_NAME.equals(option.getIdp())) {
                 LocalAuthenticatorConfig localAuthOption = new LocalAuthenticatorConfig();
                 localAuthOption.setEnabled(true);
+                localAuthOption.setDefinedByType(resolveDefinedByType(option));
                 localAuthOption.setName(option.getAuthenticator());
                 localAuthOptions.add(localAuthOption);
             } else {
                 FederatedAuthenticatorConfig federatedAuthConfig = new FederatedAuthenticatorConfig();
                 federatedAuthConfig.setEnabled(true);
                 federatedAuthConfig.setName(option.getAuthenticator());
+                federatedAuthConfig.setDefinedByType(resolveDefinedByType(option));
                 IdentityProvider federatedIdp = new IdentityProvider();
                 federatedIdp.setIdentityProviderName(option.getIdp());
                 federatedIdp.setFederatedAuthenticatorConfigs(new FederatedAuthenticatorConfig[]{federatedAuthConfig});
@@ -177,6 +182,25 @@ public class UpdateAuthenticationSequence implements UpdateFunction<ServiceProvi
         authenticationStep.setFederatedIdentityProviders(federatedAuthOptions.toArray(new IdentityProvider[0]));
 
         return authenticationStep;
+    }
+
+    private DefinedByType resolveDefinedByType(Authenticator authenticator) {
+
+        if (FrameworkConstants.LOCAL_IDP_NAME.equals(authenticator.getIdp())) {
+            LocalAuthenticatorConfig localAuthConfig = ApplicationAuthenticatorService.getInstance()
+                    .getLocalAuthenticatorByName(authenticator.getAuthenticator());
+            if (localAuthConfig != null) {
+                return localAuthConfig.getDefinedByType();
+            }
+        } else {
+            FederatedAuthenticatorConfig federatedAuthConfig = ApplicationAuthenticatorService.getInstance()
+                    .getFederatedAuthenticatorByName(authenticator.getAuthenticator());
+            if (federatedAuthConfig != null) {
+                return federatedAuthConfig.getDefinedByType();
+            }
+        }
+
+        return DefinedByType.USER;
     }
 
     private int getSubjectStepId(Integer subjectStepId, int numSteps) {
