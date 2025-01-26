@@ -814,7 +814,7 @@ public class ServerConfigManagementService {
                 UserDefinedLocalAuthenticatorConfig userDefinedConfig = castToUserDefinedConfig(config);
                 authenticator.setImage(userDefinedConfig.getImageUrl());
                 authenticator.setDescription(userDefinedConfig.getDescription());
-                resolveEndpointConfiguration(authenticator, userDefinedConfig);
+                resolveEndpointConfigurationForAuthenticatorFromConfig(authenticator, userDefinedConfig);
             } else {
                 authenticator.setDefinedBy(Authenticator.DefinedByEnum.SYSTEM);
                 setAuthenticatorProperties(config, authenticator);
@@ -839,8 +839,12 @@ public class ServerConfigManagementService {
         }
     }
 
-    private void resolveEndpointConfiguration(Authenticator authenticator, UserDefinedLocalAuthenticatorConfig config) {
+    private void resolveEndpointConfigurationForAuthenticatorFromConfig(
+            Authenticator authenticator, UserDefinedLocalAuthenticatorConfig config) {
 
+        /* Only the endpoint URI of the endpoint configurations of the user-defined authenticator is set to the
+        authenticator. The authentication properties in the config are aliases for secrets and must not be included
+         in the response body.*/
         UserDefinedAuthenticatorEndpointConfig endpointConfig = config.getEndpointConfig();
         Endpoint endpoint = new Endpoint();
         endpoint.setUri(endpointConfig.getAuthenticatorEndpointUri());

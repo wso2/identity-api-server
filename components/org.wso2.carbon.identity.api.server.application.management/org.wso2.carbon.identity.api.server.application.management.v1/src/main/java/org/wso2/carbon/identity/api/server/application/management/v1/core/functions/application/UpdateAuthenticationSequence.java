@@ -157,19 +157,21 @@ public class UpdateAuthenticationSequence implements UpdateFunction<ServiceProvi
         List<LocalAuthenticatorConfig> localAuthOptions = new ArrayList<>();
         List<IdentityProvider> federatedAuthOptions = new ArrayList<>();
 
+        /* The defined type of the authenticator (USER or SYSTEM) will not be resolved here. Since this is flow of
+         the authenticator is being configured for application authentication flows, only the type of the authenticator
+         local or federated) is relevant. Therefore, resolving by the defined type is not necessary.
+         */
         stepModel.getOptions().forEach(option -> {
             // TODO : add validations to swagger so that we don't need to check inputs here.
             if (FrameworkConstants.LOCAL_IDP_NAME.equals(option.getIdp())) {
                 LocalAuthenticatorConfig localAuthOption = new LocalAuthenticatorConfig();
                 localAuthOption.setEnabled(true);
-                localAuthOption.setDefinedByType(resolveDefinedByType(option));
                 localAuthOption.setName(option.getAuthenticator());
                 localAuthOptions.add(localAuthOption);
             } else {
                 FederatedAuthenticatorConfig federatedAuthConfig = new FederatedAuthenticatorConfig();
                 federatedAuthConfig.setEnabled(true);
                 federatedAuthConfig.setName(option.getAuthenticator());
-                federatedAuthConfig.setDefinedByType(resolveDefinedByType(option));
                 IdentityProvider federatedIdp = new IdentityProvider();
                 federatedIdp.setIdentityProviderName(option.getIdp());
                 federatedIdp.setFederatedAuthenticatorConfigs(new FederatedAuthenticatorConfig[]{federatedAuthConfig});
@@ -182,25 +184,6 @@ public class UpdateAuthenticationSequence implements UpdateFunction<ServiceProvi
         authenticationStep.setFederatedIdentityProviders(federatedAuthOptions.toArray(new IdentityProvider[0]));
 
         return authenticationStep;
-    }
-
-    private DefinedByType resolveDefinedByType(Authenticator authenticator) {
-
-        if (FrameworkConstants.LOCAL_IDP_NAME.equals(authenticator.getIdp())) {
-            LocalAuthenticatorConfig localAuthConfig = ApplicationAuthenticatorService.getInstance()
-                    .getLocalAuthenticatorByName(authenticator.getAuthenticator());
-            if (localAuthConfig != null) {
-                return localAuthConfig.getDefinedByType();
-            }
-        } else {
-            FederatedAuthenticatorConfig federatedAuthConfig = ApplicationAuthenticatorService.getInstance()
-                    .getFederatedAuthenticatorByName(authenticator.getAuthenticator());
-            if (federatedAuthConfig != null) {
-                return federatedAuthConfig.getDefinedByType();
-            }
-        }
-
-        return DefinedByType.USER;
     }
 
     private int getSubjectStepId(Integer subjectStepId, int numSteps) {
