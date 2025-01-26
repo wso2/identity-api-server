@@ -62,7 +62,6 @@ public class UserSharingMgtConstants {
                 "The UUID provided in the request is not in a valid format. " +
                         "Please provide a valid UUID.");
 
-
         private final String code;
         private final String message;
         private final String description;

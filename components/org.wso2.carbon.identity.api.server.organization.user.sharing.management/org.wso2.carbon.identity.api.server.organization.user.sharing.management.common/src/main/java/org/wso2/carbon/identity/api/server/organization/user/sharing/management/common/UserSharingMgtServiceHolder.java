@@ -21,7 +21,6 @@ package org.wso2.carbon.identity.api.server.organization.user.sharing.management
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.UserSharingPolicyHandlerService;
 
-
 /**
  * Holds the services which the shared user sharing management API component is using.
  */
