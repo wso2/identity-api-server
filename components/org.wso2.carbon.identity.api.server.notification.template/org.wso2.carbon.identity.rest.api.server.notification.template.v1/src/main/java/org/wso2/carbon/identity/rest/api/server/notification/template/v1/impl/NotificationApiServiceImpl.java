@@ -18,11 +18,12 @@
 
 package org.wso2.carbon.identity.rest.api.server.notification.template.v1.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.notification.template.common.Constants;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.NotificationApiService;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.core.TemplateTypeService;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.core.TemplatesService;
+import org.wso2.carbon.identity.rest.api.server.notification.template.v1.factories.TemplateTypeServiceFactory;
+import org.wso2.carbon.identity.rest.api.server.notification.template.v1.factories.TemplatesServiceFactory;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.EmailTemplate;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.EmailTemplateWithID;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.SMSTemplate;
@@ -33,17 +34,15 @@ import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.T
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.TemplateTypeWithID;
 
 import java.net.URI;
+
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIForHeader;
 import static org.wso2.carbon.identity.api.server.notification.template.common.Constants.APP_TEMPLATES_PATH;
-import static org.wso2.carbon.identity.api.server.notification.template.common.
-        Constants.NOTIFICATION_TEMPLATES_API_BASE_PATH_EMAIL;
-import static org.wso2.carbon.identity.api.server.notification.template.common.
-        Constants.NOTIFICATION_TEMPLATES_API_BASE_PATH_SMS;
-import static org.wso2.carbon.identity.api.server.notification.template.common.
-        Constants.NOTIFICATION_TEMPLATES_API_PATH;
+import static org.wso2.carbon.identity.api.server.notification.template.common.Constants.NOTIFICATION_TEMPLATES_API_BASE_PATH_EMAIL;
+import static org.wso2.carbon.identity.api.server.notification.template.common.Constants.NOTIFICATION_TEMPLATES_API_BASE_PATH_SMS;
+import static org.wso2.carbon.identity.api.server.notification.template.common.Constants.NOTIFICATION_TEMPLATES_API_PATH;
 import static org.wso2.carbon.identity.api.server.notification.template.common.Constants.ORG_TEMPLATES_PATH;
 import static org.wso2.carbon.identity.api.server.notification.template.common.Constants.PATH_SEPARATOR;
 import static org.wso2.carbon.identity.api.server.notification.template.common.Constants.TEMPLATE_TYPES_PATH;
@@ -53,10 +52,14 @@ import static org.wso2.carbon.identity.api.server.notification.template.common.C
  */
 public class NotificationApiServiceImpl implements NotificationApiService {
 
-    @Autowired
-    private TemplatesService templatesService;
-    @Autowired
-    private TemplateTypeService templateTypeService;
+    private final TemplatesService templatesService;
+    private final TemplateTypeService templateTypeService;
+
+    public NotificationApiServiceImpl() {
+
+        templatesService = TemplatesServiceFactory.getTemplatesService();
+        templateTypeService = TemplateTypeServiceFactory.getTemplateTypeService();
+    }
 
     @Override
     public Response addAppEmailTemplate(String templateTypeId, String appUuid,
