@@ -31,8 +31,8 @@ import org.wso2.carbon.identity.api.server.organization.user.sharing.management.
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareWithAllRequestBody;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.UserSharingPolicyHandlerService;
-import org.wso2.carbon.identity.organization.management.organization.user.sharing.exception.UserShareMgtClientException;
-import org.wso2.carbon.identity.organization.management.organization.user.sharing.exception.UserShareMgtException;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.exception.UserSharingMgtClientException;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.exception.UserSharingMgtException;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.GeneralUserShareDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.GeneralUserUnshareDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.ResponseLinkDO;
@@ -76,10 +76,10 @@ public class UsersApiServiceCore {
      *
      * @param userShareRequestBody Contains details for user sharing.
      */
-    public void shareUser(UserShareRequestBody userShareRequestBody) throws UserShareMgtException {
+    public void shareUser(UserShareRequestBody userShareRequestBody) throws UserSharingMgtException {
 
         if (userShareRequestBody == null) {
-            throw new UserShareMgtClientException(INVALID_SELECTIVE_USER_SHARE_REQUEST_BODY.getCode(),
+            throw new UserSharingMgtClientException(INVALID_SELECTIVE_USER_SHARE_REQUEST_BODY.getCode(),
                     INVALID_SELECTIVE_USER_SHARE_REQUEST_BODY.getMessage(),
                     INVALID_SELECTIVE_USER_SHARE_REQUEST_BODY.getDescription());
         }
@@ -124,10 +124,11 @@ public class UsersApiServiceCore {
      *
      * @param userShareWithAllRequestBody Contains details for sharing users with all organizations.
      */
-    public void shareUserWithAll(UserShareWithAllRequestBody userShareWithAllRequestBody) throws UserShareMgtException {
+    public void shareUserWithAll(UserShareWithAllRequestBody userShareWithAllRequestBody)
+            throws UserSharingMgtException {
 
         if (userShareWithAllRequestBody == null) {
-            throw new UserShareMgtClientException(INVALID_GENERAL_USER_SHARE_REQUEST_BODY.getCode(),
+            throw new UserSharingMgtClientException(INVALID_GENERAL_USER_SHARE_REQUEST_BODY.getCode(),
                     INVALID_GENERAL_USER_SHARE_REQUEST_BODY.getMessage(),
                     INVALID_GENERAL_USER_SHARE_REQUEST_BODY.getDescription());
         }
@@ -165,10 +166,10 @@ public class UsersApiServiceCore {
      *
      * @param userUnshareRequestBody Contains details for user unsharing.
      */
-    public void unshareUser(UserUnshareRequestBody userUnshareRequestBody) throws UserShareMgtException {
+    public void unshareUser(UserUnshareRequestBody userUnshareRequestBody) throws UserSharingMgtException {
 
         if (userUnshareRequestBody == null) {
-            throw new UserShareMgtClientException(INVALID_SELECTIVE_USER_UNSHARE_REQUEST_BODY.getCode(),
+            throw new UserSharingMgtClientException(INVALID_SELECTIVE_USER_UNSHARE_REQUEST_BODY.getCode(),
                     INVALID_SELECTIVE_USER_UNSHARE_REQUEST_BODY.getMessage(),
                     INVALID_SELECTIVE_USER_UNSHARE_REQUEST_BODY.getDescription());
         }
@@ -194,10 +195,10 @@ public class UsersApiServiceCore {
      * @param userUnshareWithAllRequestBody Contains details for removing shared access.
      */
     public void unshareUserWithAll(UserUnshareWithAllRequestBody userUnshareWithAllRequestBody)
-            throws UserShareMgtException {
+            throws UserSharingMgtException {
 
         if (userUnshareWithAllRequestBody == null) {
-            throw new UserShareMgtClientException(INVALID_GENERAL_USER_UNSHARE_REQUEST_BODY.getCode(),
+            throw new UserSharingMgtClientException(INVALID_GENERAL_USER_UNSHARE_REQUEST_BODY.getCode(),
                     INVALID_GENERAL_USER_UNSHARE_REQUEST_BODY.getMessage(),
                     INVALID_GENERAL_USER_UNSHARE_REQUEST_BODY.getDescription());
         }
@@ -227,10 +228,10 @@ public class UsersApiServiceCore {
      */
     public UserSharedOrganizationsResponse getSharedOrganizations(String userId, String after, String before,
                                                                   Integer limit, String filter, Boolean recursive)
-            throws UserShareMgtException {
+            throws UserSharingMgtException {
 
         if (userId == null) {
-            throw new UserShareMgtClientException(INVALID_UUID_FORMAT.getCode(),
+            throw new UserSharingMgtClientException(INVALID_UUID_FORMAT.getCode(),
                     INVALID_UUID_FORMAT.getMessage(),
                     INVALID_UUID_FORMAT.getDescription());
         }
@@ -276,10 +277,10 @@ public class UsersApiServiceCore {
      */
     public UserSharedRolesResponse getSharedRoles(String userId, String orgId, String after, String before,
                                                   Integer limit, String filter, Boolean recursive)
-            throws UserShareMgtException {
+            throws UserSharingMgtException {
 
         if (userId == null || orgId == null) {
-            throw new UserShareMgtClientException(INVALID_UUID_FORMAT.getCode(),
+            throw new UserSharingMgtClientException(INVALID_UUID_FORMAT.getCode(),
                     INVALID_UUID_FORMAT.getMessage(),
                     INVALID_UUID_FORMAT.getDescription());
         }
