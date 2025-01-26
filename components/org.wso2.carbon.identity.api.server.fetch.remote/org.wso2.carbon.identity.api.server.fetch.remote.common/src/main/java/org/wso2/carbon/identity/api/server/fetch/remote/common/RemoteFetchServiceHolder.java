@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2020-2025, WSO2 LLC. (http://www.wso2.com).
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
+ * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.fetch.remote.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.remotefetch.common.RemoteFetchConfigurationService;
 
 /**
@@ -25,23 +26,21 @@ import org.wso2.carbon.identity.remotefetch.common.RemoteFetchConfigurationServi
  */
 public class RemoteFetchServiceHolder {
 
-    private static RemoteFetchConfigurationService remoteFetchConfigurationService;
+    private RemoteFetchServiceHolder() {}
+
+    private static class RemoteFetchConfigurationServiceHolder {
+
+        static final RemoteFetchConfigurationService SERVICE = (RemoteFetchConfigurationService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RemoteFetchConfigurationService.class, null);
+    }
 
     /**
      * Get RemoteFetchConfigurationService osgi service.
+     *
      * @return RemoteFetchConfigurationService
      */
     public static RemoteFetchConfigurationService getRemoteFetchConfigurationService() {
 
-        return remoteFetchConfigurationService;
-    }
-
-    /**
-     * Set RemoteFetchConfigurationService osgi service.
-     */
-    public static void setRemoteFetchConfigurationService
-            (RemoteFetchConfigurationService remoteFetchConfigurationService) {
-
-        RemoteFetchServiceHolder.remoteFetchConfigurationService = remoteFetchConfigurationService;
+        return RemoteFetchConfigurationServiceHolder.SERVICE;
     }
 }
