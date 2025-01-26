@@ -38,6 +38,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.exception.JWTClientAuthent
 import org.wso2.carbon.identity.api.server.configs.v1.function.CORSConfigurationToCORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.function.DCRConnectorUtil;
 import org.wso2.carbon.identity.api.server.configs.v1.function.JWTConnectorUtil;
+import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticationType;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorProperty;
@@ -846,8 +847,15 @@ public class ServerConfigManagementService {
         authenticator. The authentication properties in the config are aliases for secrets and must not be included
          in the response body.*/
         UserDefinedAuthenticatorEndpointConfig endpointConfig = config.getEndpointConfig();
+
+        AuthenticationType authenticationType = new AuthenticationType();
+        authenticationType.setType(AuthenticationType.TypeEnum.fromValue(
+                endpointConfig.getAuthenticatorEndpointAuthenticationType()));
+        authenticationType.setProperties(null);
+
         Endpoint endpoint = new Endpoint();
         endpoint.setUri(endpointConfig.getAuthenticatorEndpointUri());
+        endpoint.setAuthentication(authenticationType);
         authenticator.endpoint(endpoint);
     }
 
