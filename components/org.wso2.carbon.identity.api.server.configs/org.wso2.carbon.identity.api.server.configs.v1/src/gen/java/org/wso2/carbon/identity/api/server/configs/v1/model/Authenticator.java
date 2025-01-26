@@ -112,8 +112,7 @@ public enum TypeEnum {
 
     private List<AuthenticatorProperty> properties = null;
 
-    private List<Endpoint> endpoint = null;
-
+    private Endpoint endpoint;
 
     /**
     **/
@@ -317,7 +316,7 @@ public enum TypeEnum {
 
         /**
     **/
-    public Authenticator endpoint(List<Endpoint> endpoint) {
+    public Authenticator endpoint(Endpoint endpoint) {
 
         this.endpoint = endpoint;
         return this;
@@ -326,22 +325,14 @@ public enum TypeEnum {
     @ApiModelProperty(value = "")
     @JsonProperty("endpoint")
     @Valid
-    public List<Endpoint> getEndpoint() {
+    public Endpoint getEndpoint() {
         return endpoint;
     }
-    public void setEndpoint(List<Endpoint> endpoint) {
+    public void setEndpoint(Endpoint endpoint) {
         this.endpoint = endpoint;
     }
 
-    public Authenticator addEndpointItem(Endpoint endpointItem) {
-        if (this.endpoint == null) {
-            this.endpoint = new ArrayList<>();
-        }
-        this.endpoint.add(endpointItem);
-        return this;
-    }
 
-    
 
     @Override
     public boolean equals(java.lang.Object o) {

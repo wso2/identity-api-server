@@ -848,7 +848,7 @@ public class ServerConfigManagementService {
         UserDefinedAuthenticatorEndpointConfig endpointConfig = config.getEndpointConfig();
         Endpoint endpoint = new Endpoint();
         endpoint.setUri(endpointConfig.getAuthenticatorEndpointUri());
-        authenticator.addEndpointItem(endpoint);
+        authenticator.endpoint(endpoint);
     }
 
     private void setAuthenticatorProperties(LocalAuthenticatorConfig config, Authenticator authenticator) {
