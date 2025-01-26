@@ -58,7 +58,7 @@ public class UsersApi  {
     @Path("/share")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Share a user across specific organizations", notes = "This API shares one or more users across specified organizations, assigning roles based on the provided policy. The policy defines the sharing scope for each organization, including whether access extends to child organizations.  <b>Scope(Permission) required:</b> `internal_user_shared_access_add` ", response = ProcessSuccessResponse.class, tags={ "User Sharing", })
+    @ApiOperation(value = "Share a user across specific organizations", notes = "This API shares one or more users across specified organizations, assigning roles based on the provided policy. The policy defines the sharing scope for each organization, including whether access extends to child organizations.  <b>Scope(Permission) required:</b> `internal_user_share` ", response = ProcessSuccessResponse.class, tags={ "User Sharing", })
     @ApiResponses(value = { 
         @ApiResponse(code = 202, message = "Sharing process triggered successfully.", response = ProcessSuccessResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
@@ -74,7 +74,7 @@ public class UsersApi  {
     @Path("/share-with-all")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Share a user with all organizations", notes = "This API shares users across all organizations, applying the provided roles to each organization. The policy determines the scope of sharing, including whether it applies to all current organizations or future organizations as well.  <b>Scope(Permission) required:</b> `internal_user_shared_access_add` ", response = ProcessSuccessResponse.class, tags={ "User Sharing", })
+    @ApiOperation(value = "Share a user with all organizations", notes = "This API shares users across all organizations, applying the provided roles to each organization. The policy determines the scope of sharing, including whether it applies to all current organizations or future organizations as well.  <b>Scope(Permission) required:</b> `internal_user_share` ", response = ProcessSuccessResponse.class, tags={ "User Sharing", })
     @ApiResponses(value = { 
         @ApiResponse(code = 202, message = "Sharing process triggered successfully.", response = ProcessSuccessResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
@@ -90,7 +90,7 @@ public class UsersApi  {
     @Path("/unshare")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Unshare a user from specific organizations", notes = "This API removes shared access for one or more users from specified organizations. The payload includes the list of user IDs and the organizations from which the users should be unshared.  <b>Scope(Permission) required:</b> `internal_user_shared_access_delete` ", response = ProcessSuccessResponse.class, tags={ "User Sharing", })
+    @ApiOperation(value = "Unshare a user from specific organizations", notes = "This API removes shared access for one or more users from specified organizations. The payload includes the list of user IDs and the organizations from which the users should be unshared.  <b>Scope(Permission) required:</b> `internal_user_unshare` ", response = ProcessSuccessResponse.class, tags={ "User Sharing", })
     @ApiResponses(value = { 
         @ApiResponse(code = 202, message = "Unsharing process triggered successfully.", response = ProcessSuccessResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
@@ -106,7 +106,7 @@ public class UsersApi  {
     @Path("/unshare-with-all")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Remove a user's shared access", notes = "This API removes all shared access for one or more users, unsharing them from all organizations.  <b>Scope(Permission) required:</b> `internal_user_shared_access_delete` ", response = ProcessSuccessResponse.class, tags={ "User Sharing", })
+    @ApiOperation(value = "Remove a user's shared access", notes = "This API removes all shared access for one or more users, unsharing them from all organizations.  <b>Scope(Permission) required:</b> `internal_user_unshare` ", response = ProcessSuccessResponse.class, tags={ "User Sharing", })
     @ApiResponses(value = { 
         @ApiResponse(code = 202, message = "Share removal process triggered successfully.", response = ProcessSuccessResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),

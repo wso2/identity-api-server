@@ -27,7 +27,7 @@ paths:
       description: |
         This API shares one or more users across specified organizations, assigning roles based on the provided policy. The policy defines the sharing scope for each organization, including whether access extends to child organizations.
         
-        <b>Scope(Permission) required:</b> `internal_user_shared_access_add`
+        <b>Scope(Permission) required:</b> `internal_user_share`
       operationId: processUserSharing
       requestBody:
         content:
@@ -79,7 +79,7 @@ paths:
       description: |
         This API shares users across all organizations, applying the provided roles to each organization. The policy determines the scope of sharing, including whether it applies to all current organizations or future organizations as well.
         
-        <b>Scope(Permission) required:</b> `internal_user_shared_access_add`
+        <b>Scope(Permission) required:</b> `internal_user_share`
       operationId: processUserSharingAll
       requestBody:
         content:
@@ -131,7 +131,7 @@ paths:
         This API removes shared access for one or more users from specified organizations.
         The payload includes the list of user IDs and the organizations from which the users should be unshared.
         
-        <b>Scope(Permission) required:</b> `internal_user_shared_access_delete`
+        <b>Scope(Permission) required:</b> `internal_user_unshare`
       operationId: processUserUnsharing
       requestBody:
         content:
@@ -175,7 +175,7 @@ paths:
       description: |
         This API removes all shared access for one or more users, unsharing them from all organizations.
         
-        <b>Scope(Permission) required:</b> `internal_user_shared_access_delete`
+        <b>Scope(Permission) required:</b> `internal_user_unshare`
       operationId: removeUserSharing
       requestBody:
         content:
