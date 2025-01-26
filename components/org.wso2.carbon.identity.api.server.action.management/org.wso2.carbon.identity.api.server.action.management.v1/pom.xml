@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.action.management</artifactId>
-        <version>1.3.52-SNAPSHOT</version>
+        <version>1.3.56-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -42,6 +42,11 @@
                     <artifactId>jsr311-api</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <artifactId>org.wso2.carbon.identity.user.pre.update.password.action</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.jaxrs</groupId>
@@ -160,6 +165,7 @@
                         <configuration>
                             <sources>
                                 <source>src/gen/java</source>
+                                <source>src/extend/java</source>
                             </sources>
                         </configuration>
                     </execution>
