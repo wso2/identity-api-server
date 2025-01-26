@@ -37,7 +37,7 @@ public interface ActionsApiService {
 
       public Response activateAction(String actionType, String actionId);
 
-      public Response createAction(String actionType, ActionModel actionModel);
+      public Response createAction(String actionType, String body);
 
       public Response deactivateAction(String actionType, String actionId);
 
@@ -49,5 +49,5 @@ public interface ActionsApiService {
 
       public Response getActionsByActionType(String actionType);
 
-      public Response updateAction(String actionType, String actionId, ActionUpdateModel actionUpdateModel);
+      public Response updateAction(String actionType, String actionId, String body);
 }
