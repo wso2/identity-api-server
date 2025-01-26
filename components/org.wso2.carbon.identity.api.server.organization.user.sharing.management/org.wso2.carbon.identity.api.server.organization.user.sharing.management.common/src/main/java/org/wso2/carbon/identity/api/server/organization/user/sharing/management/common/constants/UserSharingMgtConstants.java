@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.api.server.organization.user.sharing.management.common;
+package org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants;
 
 /**
  * Holds the constants which the user sharing management API component is using.
@@ -30,6 +30,7 @@ public class UserSharingMgtConstants {
 
     public static final String RESPONSE_STATUS_PROCESSING = "Processing";
     public static final String RESPONSE_DETAIL_USER_SHARE = "User sharing process triggered successfully.";
+    public static final String RESPONSE_DETAIL_USER_UNSHARE = "User unsharing process triggered successfully.";
 
     /**
      * Enum for user sharing management related errors.

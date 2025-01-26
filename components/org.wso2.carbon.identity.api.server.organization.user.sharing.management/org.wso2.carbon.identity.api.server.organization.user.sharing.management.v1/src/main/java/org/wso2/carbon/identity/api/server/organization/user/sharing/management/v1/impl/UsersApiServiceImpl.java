@@ -21,7 +21,6 @@ package org.wso2.carbon.identity.api.server.organization.user.sharing.management
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.UsersApiService;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.core.UsersApiServiceCore;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.factories.UsersApiServiceCoreFactory;
-import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.ProcessSuccessResponse;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserShareRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserShareWithAllRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserSharedOrganizationsResponse;
@@ -30,12 +29,12 @@ import org.wso2.carbon.identity.api.server.organization.user.sharing.management.
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareWithAllRequestBody;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.exception.UserShareMgtClientException;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.exception.UserShareMgtException;
-import org.wso2.carbon.identity.organization.management.organization.user.sharing.exception.UserShareMgtServerException;
 
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.UserSharingMgtConstants.RESPONSE_DETAIL_USER_SHARE;
-import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.UserSharingMgtConstants.RESPONSE_STATUS_PROCESSING;
+import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.RESPONSE_DETAIL_USER_SHARE;
+import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.RESPONSE_DETAIL_USER_UNSHARE;
+import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.RESPONSE_STATUS_PROCESSING;
 
 /**
  * Implementation of the user sharing management APIs.
@@ -90,7 +89,7 @@ public class UsersApiServiceImpl implements UsersApiService {
             usersApiServiceCore.unshareUser(userUnshareRequestBody);
             return Response.status(Response.Status.ACCEPTED)
                     .entity(usersApiServiceCore.getProcessSuccessResponse(RESPONSE_STATUS_PROCESSING,
-                            RESPONSE_DETAIL_USER_SHARE)).build();
+                            RESPONSE_DETAIL_USER_UNSHARE)).build();
         } catch (UserShareMgtClientException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (UserShareMgtException e) {
@@ -105,7 +104,7 @@ public class UsersApiServiceImpl implements UsersApiService {
             usersApiServiceCore.unshareUserWithAll(userUnshareWithAllRequestBody);
             return Response.status(Response.Status.ACCEPTED)
                     .entity(usersApiServiceCore.getProcessSuccessResponse(RESPONSE_STATUS_PROCESSING,
-                            RESPONSE_DETAIL_USER_SHARE)).build();
+                            RESPONSE_DETAIL_USER_UNSHARE)).build();
         } catch (UserShareMgtClientException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (UserShareMgtException e) {

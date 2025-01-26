@@ -519,20 +519,14 @@ components:
                 type: string
                 description: Name of the child organization
                 example: "Organization Name"
-              sharedType:
-                type: string
-                description: Shared type of the user (pulled/pushed)
-                example: "Pushed"
               sharedUserId:
                 type: string
                 description: ID of the shared user
                 example: "7a1b7d63-8cfc-4dc9-9332-3f84641b72d8"
-              policy:
+              sharedType:
                 type: string
-                description: The scope of sharing for this organization.
-                enum: ["SELECTED_ORG_ONLY", "SELECTED_ORG_WITH_ALL_EXISTING_CHILDREN_ONLY",
-                       "SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN",
-                       "SELECTED_ORG_WITH_EXISTING_IMMEDIATE_CHILDREN_ONLY", "SELECTED_ORG_WITH_EXISTING_IMMEDIATE_AND_FUTURE_CHILDREN", "NO_ORG"]
+                description: Shared type of the user (SHARED/INVITED)
+                example: "SHARED"
               rolesRef:
                 type: string
                 description: URL reference to retrieve paginated roles for the shared user in this organization

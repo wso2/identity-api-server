@@ -18,21 +18,24 @@
 
 package org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.core;
 
-import org.apache.commons.lang.StringUtils;
-import org.wso2.carbon.identity.api.server.common.error.APIError;
-import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
-import org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.UserSharingMgtConstants;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.ProcessSuccessResponse;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.RoleWithAudience;
+import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.RoleWithAudienceAudience;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserShareRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserShareRequestBodyOrganizations;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserShareWithAllRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserSharedOrganizationsResponse;
+import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserSharedOrganizationsResponseLinks;
+import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserSharedOrganizationsResponseSharedOrganizations;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserSharedRolesResponse;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareWithAllRequestBody;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.UserSharingPolicyHandlerService;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.exception.UserShareMgtException;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.ResponseLinkDO;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.ResponseOrgDetailsDO;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.ResponseSharedOrgsDO;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.ResponseSharedRolesDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.RoleWithAudienceDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.GeneralUserShareDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.SelectiveUserShareDO;
@@ -48,11 +51,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.Response;
-
-import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.UserSharingMgtConstants.USER_IDS;
-
-import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.USER_IDS;
 
 /**
  * Core service class for handling user sharing management APIs.
@@ -198,10 +197,32 @@ public class UsersApiServiceCore {
      */
     public UserSharedOrganizationsResponse getSharedOrganizations(String userId, String after, String before,
                                                                   Integer limit, String filter, Boolean recursive) throws UserShareMgtException {
-        // Core logic to retrieve shared organizations
-        UserSharedOrganizationsResponse response = new UserSharedOrganizationsResponse();
-        // Populate the response with shared organizations
-        return response;
+
+        ResponseSharedOrgsDO result =
+                userSharingPolicyHandlerService.getSharedOrganizationsOfUser(userId, after, before, limit, filter,
+                        recursive);
+
+        List<UserSharedOrganizationsResponseLinks> responseLinks = new ArrayList<>();
+        List<ResponseLinkDO> resultLinks = result.getResponseLinks();
+        for (ResponseLinkDO resultLink : resultLinks) {
+            UserSharedOrganizationsResponseLinks links = new UserSharedOrganizationsResponseLinks();
+            links.href(resultLink.getHref());
+            links.rel(resultLink.getRel());
+            responseLinks.add(links);
+        }
+
+        List<UserSharedOrganizationsResponseSharedOrganizations> reponseOrgs = new ArrayList<>();
+        List<ResponseOrgDetailsDO> resultOrgDetails = result.getSharedOrgs();
+        for (ResponseOrgDetailsDO resultOrgDetail : resultOrgDetails) {
+            UserSharedOrganizationsResponseSharedOrganizations org =
+                    new UserSharedOrganizationsResponseSharedOrganizations().orgId(resultOrgDetail.getOrganizationId())
+                            .orgName(resultOrgDetail.getOrganizationName())
+                            .sharedUserId(resultOrgDetail.getSharedUserId()).sharedType(resultOrgDetail.getSharedType())
+                            .rolesRef(resultOrgDetail.getRolesRef());
+            reponseOrgs.add(org);
+        }
+
+        return new UserSharedOrganizationsResponse().links(responseLinks).sharedOrganizations(reponseOrgs);
     }
 
     /**
@@ -217,65 +238,44 @@ public class UsersApiServiceCore {
      * @return UserSharedRolesResponse containing shared roles.
      */
     public UserSharedRolesResponse getSharedRoles(String userId, String orgId, String after, String before,
-                                                  Integer limit, String filter, Boolean recursive) throws UserShareMgtException {
-        // Core logic to retrieve shared roles for the user in the specified organization
-        UserSharedRolesResponse response = new UserSharedRolesResponse();
-        // Populate the response with shared roles
-        return response;
-    }
+                                                  Integer limit, String filter, Boolean recursive)
+            throws UserShareMgtException {
 
+        ResponseSharedRolesDO result =
+                userSharingPolicyHandlerService.getRolesSharedWithUserInOrganization(userId, orgId, after, before,
+                        limit, filter, recursive);
 
-    private boolean isUnsupportedParamAvailable(Integer limit, Integer offset, String sortOrder, String sortBy) {
+        List<UserSharedOrganizationsResponseLinks> responseLinks = new ArrayList<>();
+        List<ResponseLinkDO> resultLinks = result.getResponseLinks();
+        for (ResponseLinkDO resultLink : resultLinks) {
+            UserSharedOrganizationsResponseLinks links = new UserSharedOrganizationsResponseLinks();
+            links.href(resultLink.getHref());
+            links.rel(resultLink.getRel());
+            responseLinks.add(links);
+        }
 
-        if (limit != null) {
-            throw handleException(BAD_REQUEST, UserSharingMgtConstants.ErrorMessage
-                    .ERROR_CODE_UNSUPPORTED_LIMIT, String.valueOf(limit));
+        List<RoleWithAudience> responseRoles = new ArrayList<>();
+        List<RoleWithAudienceDO> resultRoleDetails = result.getSharedRoles();
+
+        for (RoleWithAudienceDO resultRoleDetail : resultRoleDetails) {
+            RoleWithAudience roleWithAudience = new RoleWithAudience();
+            roleWithAudience.setDisplayName(resultRoleDetail.getRoleName());
+            roleWithAudience.setAudience(new RoleWithAudienceAudience()
+                    .display(resultRoleDetail.getAudienceName())
+                    .type(resultRoleDetail.getAudienceType()));
+            responseRoles.add(roleWithAudience);
         }
-        if (offset != null) {
-            throw handleException(BAD_REQUEST, UserSharingMgtConstants.ErrorMessage
-                    .ERROR_CODE_UNSUPPORTED_OFFSET, String.valueOf(offset));
-        }
-        if (StringUtils.isNotBlank(sortOrder)) {
-            throw handleException(BAD_REQUEST, UserSharingMgtConstants.ErrorMessage
-                    .ERROR_CODE_UNSUPPORTED_SORT_ORDER, sortOrder);
-        }
-        if (StringUtils.isNotBlank(sortBy)) {
-            throw handleException(BAD_REQUEST, UserSharingMgtConstants.ErrorMessage
-                    .ERROR_CODE_UNSUPPORTED_SORT_BY, sortBy);
-        }
-        return false;
+
+        return new UserSharedRolesResponse().links(responseLinks).roles(responseRoles);
     }
 
     /**
-     * Helper method to handle exceptions.
+     * Constructs a success response object for a completed process.
      *
-     * @param status   HTTP status of the error.
-     * @param error Error message to be returned.
-     * @param data     Additional error data.
-     * @return APIError object for error response.
+     * @param status The status of the process (e.g., "Processing").
+     * @param details Additional details or description about the process.
+     * @return A {@link ProcessSuccessResponse} object containing the status and details of the process.
      */
-    private APIError handleException(Response.Status status, UserSharingMgtConstants.ErrorMessage error,
-                                     String data) {
-
-        return new APIError(status, getErrorBuilder(error, data).build());
-    }
-
-    private ErrorResponse.Builder getErrorBuilder(UserSharingMgtConstants.ErrorMessage errorMsg, String data) {
-
-        return new ErrorResponse.Builder()
-                .withCode(errorMsg.getCode())
-                .withMessage(errorMsg.getMessage())
-                .withDescription(includeData(errorMsg, data));
-    }
-
-    private String includeData(UserSharingMgtConstants.ErrorMessage error, String data) {
-
-        if (StringUtils.isNotBlank(data)) {
-            return String.format(error.getDescription(), data);
-        }
-        return error.getDescription();
-    }
-
     public ProcessSuccessResponse getProcessSuccessResponse(String status, String details) {
 
         ProcessSuccessResponse processSuccessResponse = new ProcessSuccessResponse();
