@@ -50,7 +50,6 @@ import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticato
 import org.wso2.carbon.identity.application.common.model.UserDefinedLocalAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.util.AuthenticatorMgtExceptionBuilder.AuthenticatorMgtError;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
-import org.wso2.carbon.identity.base.AuthenticatorPropertyConstants.DefinedByType;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.core.model.ExpressionNode;
 import org.wso2.carbon.identity.core.model.FilterTreeBuilder;
@@ -521,9 +520,10 @@ public class ServerAuthenticatorManagementService {
          authenticator and should always be classified as a SYSTEM type. Otherwise, it can be classified as either
          SYSTEM or USER, depending on the 'definedBy' type of the federated authenticator. */
         if (identityProvider.getFederatedAuthenticatorConfigs().length == 1) {
-            DefinedByType definedByType =
-                    identityProvider.getFederatedAuthenticatorConfigs()[0].getDefinedByType();
-            authenticator.definedBy(Authenticator.DefinedByEnum.valueOf(definedByType.toString()));
+            FederatedAuthenticatorConfig federatedAuthConfig = resolveFederatedAuthenticatorConfig(identityProvider);
+            authenticator.definedBy(Authenticator.DefinedByEnum.valueOf(
+                    String.valueOf(federatedAuthConfig.getDefinedByType())));
+            authenticator.setTags(Arrays.asList(federatedAuthConfig.getTags()));
         } else {
             authenticator.definedBy(Authenticator.DefinedByEnum.SYSTEM);
         }
@@ -534,6 +534,20 @@ public class ServerAuthenticatorManagementService {
         authenticators.add(authenticator);
         authenticator.setSelf(ContextLoader.buildURIForBody(
                 String.format("/v1/identity-providers/%s", identityProvider.getResourceId())).toString());
+    }
+
+    private FederatedAuthenticatorConfig resolveFederatedAuthenticatorConfig(IdentityProvider identityProvider) {
+
+        try {
+            return idpManager.getFederatedAuthenticatorByName(
+                    identityProvider.getFederatedAuthenticatorConfigs()[0].getName(),
+                    ContextLoader.getTenantDomainFromContext());
+        } catch (IdentityProviderManagementException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
+                    .ERROR_CODE_ERROR_LISTING_AUTHENTICATORS, String.format("An error occurred whiling " +
+                    "retrieving federated authenticator configuration for identity provider: %s",
+                    identityProvider.getIdentityProviderName()));
+        }
     }
 
     /**

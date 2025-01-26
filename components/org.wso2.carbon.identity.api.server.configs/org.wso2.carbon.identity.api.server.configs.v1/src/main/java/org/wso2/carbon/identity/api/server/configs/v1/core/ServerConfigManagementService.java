@@ -38,7 +38,6 @@ import org.wso2.carbon.identity.api.server.configs.v1.exception.JWTClientAuthent
 import org.wso2.carbon.identity.api.server.configs.v1.function.CORSConfigurationToCORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.function.DCRConnectorUtil;
 import org.wso2.carbon.identity.api.server.configs.v1.function.JWTConnectorUtil;
-import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticationType;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorProperty;
@@ -110,7 +109,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -816,7 +814,7 @@ public class ServerConfigManagementService {
                 UserDefinedLocalAuthenticatorConfig userDefinedConfig = castToUserDefinedConfig(config);
                 authenticator.setImage(userDefinedConfig.getImageUrl());
                 authenticator.setDescription(userDefinedConfig.getDescription());
-                resolveEndpointConfiguration(authenticator, userDefinedConfig);
+                resolveEndpointConfigurationForAuthenticatorFromConfig(authenticator, userDefinedConfig);
             } else {
                 authenticator.setDefinedBy(Authenticator.DefinedByEnum.SYSTEM);
                 setAuthenticatorProperties(config, authenticator);
@@ -841,18 +839,14 @@ public class ServerConfigManagementService {
         }
     }
 
-    private void resolveEndpointConfiguration(Authenticator authenticator, UserDefinedLocalAuthenticatorConfig config) {
+    private void resolveEndpointConfigurationForAuthenticatorFromConfig(
+            Authenticator authenticator, UserDefinedLocalAuthenticatorConfig config) {
 
+        /* Only the endpoint URI of the endpoint configurations of the user-defined authenticator is set to the
+        authenticator. The authentication properties in the config are aliases for secrets and must not be included
+         in the response body.*/
         UserDefinedAuthenticatorEndpointConfig endpointConfig = config.getEndpointConfig();
-
-        AuthenticationType authenticationType = new AuthenticationType();
-        authenticationType.setType(AuthenticationType.TypeEnum.fromValue(
-                endpointConfig.getAuthenticatorEndpointAuthenticationType()));
-        authenticationType.setProperties(new HashMap<>(
-                endpointConfig.getAuthenticatorEndpointAuthenticationProperties()));
-
         Endpoint endpoint = new Endpoint();
-        endpoint.setAuthentication(authenticationType);
         endpoint.setUri(endpointConfig.getAuthenticatorEndpointUri());
         authenticator.addEndpointItem(endpoint);
     }
