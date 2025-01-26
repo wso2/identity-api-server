@@ -31,6 +31,7 @@ import org.wso2.carbon.identity.api.server.organization.user.sharing.management.
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareWithAllRequestBody;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.UserSharingPolicyHandlerService;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.exception.UserShareMgtClientException;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.exception.UserShareMgtException;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.GeneralUserShareDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.GeneralUserUnshareDO;
@@ -51,6 +52,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_GENERAL_USER_SHARE_REQUEST_BODY;
+import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_GENERAL_USER_UNSHARE_REQUEST_BODY;
+import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_SELECTIVE_USER_SHARE_REQUEST_BODY;
+import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_SELECTIVE_USER_UNSHARE_REQUEST_BODY;
+import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_UUID_FORMAT;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.USER_IDS;
 
 /**
@@ -71,6 +77,12 @@ public class UsersApiServiceCore {
      * @param userShareRequestBody Contains details for user sharing.
      */
     public void shareUser(UserShareRequestBody userShareRequestBody) throws UserShareMgtException {
+
+        if (userShareRequestBody == null) {
+            throw new UserShareMgtClientException(INVALID_SELECTIVE_USER_SHARE_REQUEST_BODY.getCode(),
+                    INVALID_SELECTIVE_USER_SHARE_REQUEST_BODY.getMessage(),
+                    INVALID_SELECTIVE_USER_SHARE_REQUEST_BODY.getDescription());
+        }
 
         // Populate selectiveUserShareDO object from the request body.
         SelectiveUserShareDO selectiveUserShareDO = new SelectiveUserShareDO();
@@ -114,6 +126,12 @@ public class UsersApiServiceCore {
      */
     public void shareUserWithAll(UserShareWithAllRequestBody userShareWithAllRequestBody) throws UserShareMgtException {
 
+        if (userShareWithAllRequestBody == null) {
+            throw new UserShareMgtClientException(INVALID_GENERAL_USER_SHARE_REQUEST_BODY.getCode(),
+                    INVALID_GENERAL_USER_SHARE_REQUEST_BODY.getMessage(),
+                    INVALID_GENERAL_USER_SHARE_REQUEST_BODY.getDescription());
+        }
+
         // Populate GeneralUserShareDO object from the request body.
         GeneralUserShareDO generalUserShareDO = new GeneralUserShareDO();
 
@@ -149,6 +167,12 @@ public class UsersApiServiceCore {
      */
     public void unshareUser(UserUnshareRequestBody userUnshareRequestBody) throws UserShareMgtException {
 
+        if (userUnshareRequestBody == null) {
+            throw new UserShareMgtClientException(INVALID_SELECTIVE_USER_UNSHARE_REQUEST_BODY.getCode(),
+                    INVALID_SELECTIVE_USER_UNSHARE_REQUEST_BODY.getMessage(),
+                    INVALID_SELECTIVE_USER_UNSHARE_REQUEST_BODY.getDescription());
+        }
+
         // Populate SelectiveUserUnshareDO object from the request body.
         SelectiveUserUnshareDO selectiveUserUnshareDO = new SelectiveUserUnshareDO();
 
@@ -171,6 +195,12 @@ public class UsersApiServiceCore {
      */
     public void unshareUserWithAll(UserUnshareWithAllRequestBody userUnshareWithAllRequestBody)
             throws UserShareMgtException {
+
+        if (userUnshareWithAllRequestBody == null) {
+            throw new UserShareMgtClientException(INVALID_GENERAL_USER_UNSHARE_REQUEST_BODY.getCode(),
+                    INVALID_GENERAL_USER_UNSHARE_REQUEST_BODY.getMessage(),
+                    INVALID_GENERAL_USER_UNSHARE_REQUEST_BODY.getDescription());
+        }
 
         // Populate GeneralUserUnshareDO object from the request body.
         GeneralUserUnshareDO generalUserUnshareDO = new GeneralUserUnshareDO();
@@ -198,6 +228,12 @@ public class UsersApiServiceCore {
     public UserSharedOrganizationsResponse getSharedOrganizations(String userId, String after, String before,
                                                                   Integer limit, String filter, Boolean recursive)
             throws UserShareMgtException {
+
+        if (userId == null) {
+            throw new UserShareMgtClientException(INVALID_UUID_FORMAT.getCode(),
+                    INVALID_UUID_FORMAT.getMessage(),
+                    INVALID_UUID_FORMAT.getDescription());
+        }
 
         ResponseSharedOrgsDO result =
                 userSharingPolicyHandlerService.getSharedOrganizationsOfUser(userId, after, before, limit, filter,
@@ -241,6 +277,12 @@ public class UsersApiServiceCore {
     public UserSharedRolesResponse getSharedRoles(String userId, String orgId, String after, String before,
                                                   Integer limit, String filter, Boolean recursive)
             throws UserShareMgtException {
+
+        if (userId == null || orgId == null) {
+            throw new UserShareMgtClientException(INVALID_UUID_FORMAT.getCode(),
+                    INVALID_UUID_FORMAT.getMessage(),
+                    INVALID_UUID_FORMAT.getDescription());
+        }
 
         ResponseSharedRolesDO result =
                 userSharingPolicyHandlerService.getRolesSharedWithUserInOrganization(userId, orgId, after, before,

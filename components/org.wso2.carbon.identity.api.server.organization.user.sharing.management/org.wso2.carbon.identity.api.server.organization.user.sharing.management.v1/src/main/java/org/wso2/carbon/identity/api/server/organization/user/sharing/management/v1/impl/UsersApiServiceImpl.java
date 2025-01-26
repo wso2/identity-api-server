@@ -48,7 +48,7 @@ public class UsersApiServiceImpl implements UsersApiService {
         try {
             this.usersApiServiceCore = UsersApiServiceCoreFactory.getUsersApiServiceCore();
         } catch (IllegalStateException e) {
-            throw new RuntimeException("Error occurred while initiating ServerUserStoreService.", e);
+            throw new RuntimeException("Error occurred while initiating UsersApiService.", e);
         }
     }
 
