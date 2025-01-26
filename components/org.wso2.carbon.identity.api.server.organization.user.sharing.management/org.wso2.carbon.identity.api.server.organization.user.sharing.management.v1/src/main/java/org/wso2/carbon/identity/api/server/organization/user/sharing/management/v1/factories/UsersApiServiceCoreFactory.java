@@ -27,7 +27,7 @@ import org.wso2.carbon.identity.organization.management.organization.user.sharin
  */
 public class UsersApiServiceCoreFactory {
 
-    private final static UsersApiServiceCore SERVICE;
+    private static final UsersApiServiceCore SERVICE;
 
     static {
         UserSharingPolicyHandlerService userSharingPolicyHandlerService = UserSharingMgtServiceHolder

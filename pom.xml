@@ -883,7 +883,7 @@
         </org.wso2.carbon.identity.organization.management.core.version.range>
 
         <!-- Organization management service Version -->
-        <org.wso2.carbon.identity.organization.management.version>1.4.71-SNAPSHOT
+        <org.wso2.carbon.identity.organization.management.version>1.4.75-SNAPSHOT
         </org.wso2.carbon.identity.organization.management.version>
 
         <!-- Unit test versions -->

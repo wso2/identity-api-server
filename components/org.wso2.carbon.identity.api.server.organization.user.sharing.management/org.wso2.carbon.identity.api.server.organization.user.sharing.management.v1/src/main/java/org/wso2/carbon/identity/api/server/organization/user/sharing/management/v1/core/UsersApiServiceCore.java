@@ -32,15 +32,15 @@ import org.wso2.carbon.identity.api.server.organization.user.sharing.management.
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareWithAllRequestBody;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.UserSharingPolicyHandlerService;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.exception.UserShareMgtException;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.GeneralUserShareDO;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.GeneralUserUnshareDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.ResponseLinkDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.ResponseOrgDetailsDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.ResponseSharedOrgsDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.ResponseSharedRolesDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.RoleWithAudienceDO;
-import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.GeneralUserShareDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.SelectiveUserShareDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.SelectiveUserShareOrgDetailsDO;
-import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.GeneralUserUnshareDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.SelectiveUserUnshareDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.usercriteria.UserCriteriaType;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.usercriteria.UserIdList;
@@ -90,7 +90,7 @@ public class UsersApiServiceCore {
 
             List<RoleWithAudienceDO> roleWithAudiences = new ArrayList<>();
 
-            for(RoleWithAudience role : org.getRoles()) {
+            for (RoleWithAudience role : org.getRoles()) {
                 RoleWithAudienceDO roleWithAudienceDO = new RoleWithAudienceDO();
                 roleWithAudienceDO.setRoleName(role.getDisplayName());
                 roleWithAudienceDO.setAudienceName(role.getAudience().getDisplay());
@@ -196,7 +196,8 @@ public class UsersApiServiceCore {
      * @return UserSharedOrganizationsResponse containing accessible organizations.
      */
     public UserSharedOrganizationsResponse getSharedOrganizations(String userId, String after, String before,
-                                                                  Integer limit, String filter, Boolean recursive) throws UserShareMgtException {
+                                                                  Integer limit, String filter, Boolean recursive)
+            throws UserShareMgtException {
 
         ResponseSharedOrgsDO result =
                 userSharingPolicyHandlerService.getSharedOrganizationsOfUser(userId, after, before, limit, filter,
@@ -272,7 +273,7 @@ public class UsersApiServiceCore {
     /**
      * Constructs a success response object for a completed process.
      *
-     * @param status The status of the process (e.g., "Processing").
+     * @param status  The status of the process (e.g., "Processing").
      * @param details Additional details or description about the process.
      * @return A {@link ProcessSuccessResponse} object containing the status and details of the process.
      */
