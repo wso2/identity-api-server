@@ -3168,7 +3168,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DiscoverableGroup'
-          minItems: 1
           description: List of groups from user stores where users in those groups can discover the application.
         certificate:
           $ref: '#/components/schemas/Certificate'

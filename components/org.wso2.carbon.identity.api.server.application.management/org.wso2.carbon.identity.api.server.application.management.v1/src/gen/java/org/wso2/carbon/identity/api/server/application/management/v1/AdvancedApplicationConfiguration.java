@@ -104,7 +104,6 @@ public class AdvancedApplicationConfiguration  {
     @ApiModelProperty(value = "List of groups from user stores where users in those groups can discover the application.")
     @JsonProperty("discoverableGroups")
     @Valid
-    @Size(min=1)
     public List<DiscoverableGroup> getDiscoverableGroups() {
 
         return discoverableGroups;
