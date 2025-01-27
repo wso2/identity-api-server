@@ -629,6 +629,32 @@
                 <version>${org.wso2.carbon.identity.organization.management.version}</version>
                 <scope>provided</scope>
             </dependency>
+
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.organization.user.sharing.management.common</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.organization.management</groupId>
+                <artifactId>org.wso2.carbon.identity.organization.management.organization.user.sharing</artifactId>
+                <version>${org.wso2.carbon.identity.organization.management.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.organization.management</groupId>
+                <artifactId>org.wso2.carbon.identity.organization.resource.sharing.policy.management</artifactId>
+                <version>${org.wso2.carbon.identity.organization.management.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
                 <artifactId>org.wso2.carbon.identity.api.server.organization.selfservice.common</artifactId>
@@ -846,13 +872,13 @@
         <identity.verification.version>1.0.15</identity.verification.version>
 
         <!-- Organization management core Version -->
-        <org.wso2.carbon.identity.organization.management.core.version>1.1.12
+        <org.wso2.carbon.identity.organization.management.core.version>1.1.20
         </org.wso2.carbon.identity.organization.management.core.version>
         <org.wso2.carbon.identity.organization.management.core.version.range>[1.0.0, 2.0.0)
         </org.wso2.carbon.identity.organization.management.core.version.range>
 
         <!-- Organization management service Version -->
-        <org.wso2.carbon.identity.organization.management.version>1.4.56
+        <org.wso2.carbon.identity.organization.management.version>1.4.80
         </org.wso2.carbon.identity.organization.management.version>
 
         <!-- Unit test versions -->
@@ -890,6 +916,7 @@
         <module>components/org.wso2.carbon.identity.api.idle.account.identification</module>
         <module>components/org.wso2.carbon.identity.api.expired.password.identification</module>
         <module>components/org.wso2.carbon.identity.api.server.organization.user.invitation.management</module>
+        <module>components/org.wso2.carbon.identity.api.server.organization.user.sharing.management</module>
         <module>components/org.wso2.carbon.identity.api.server.api.resource</module>
         <module>components/org.wso2.carbon.identity.api.server.organization.configs</module>
         <module>components/org.wso2.carbon.identity.api.server.organization.selfservice</module>
