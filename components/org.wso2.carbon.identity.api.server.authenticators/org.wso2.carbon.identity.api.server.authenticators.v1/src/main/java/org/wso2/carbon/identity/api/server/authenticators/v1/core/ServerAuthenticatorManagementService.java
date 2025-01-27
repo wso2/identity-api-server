@@ -129,12 +129,6 @@ public class ServerAuthenticatorManagementService {
 
             LocalAuthenticatorConfig[] localAuthenticatorConfigs = applicationManagementService
                     .getAllLocalAuthenticators(ContextLoader.getTenantDomainFromContext());
-            List<UserDefinedLocalAuthenticatorConfig> userDefinedLocalAuthConfigs = applicationAuthenticatorService
-                    .getAllUserDefinedLocalAuthenticators(ContextLoader.getTenantDomainFromContext());
-            if (CollectionUtils.isNotEmpty(userDefinedLocalAuthConfigs)) {
-                localAuthenticatorConfigs = (LocalAuthenticatorConfig[]) ArrayUtils.addAll(localAuthenticatorConfigs,
-                        userDefinedLocalAuthConfigs.toArray(new LocalAuthenticatorConfig[0]));
-            }
             int localAuthenticatorsCount = localAuthenticatorConfigs.length;
             RequestPathAuthenticatorConfig[] requestPathAuthenticatorConfigs = new RequestPathAuthenticatorConfig[0];
 
@@ -172,8 +166,6 @@ public class ServerAuthenticatorManagementService {
                     null);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_IDPS, null);
-        } catch (AuthenticatorMgtException e) {
-            throw handleAuthenticatorException(e);
         }
     }
 
