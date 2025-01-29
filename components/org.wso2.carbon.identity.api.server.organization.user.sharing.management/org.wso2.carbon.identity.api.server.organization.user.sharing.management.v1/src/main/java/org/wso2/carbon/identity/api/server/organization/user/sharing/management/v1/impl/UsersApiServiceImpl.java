@@ -21,6 +21,7 @@ package org.wso2.carbon.identity.api.server.organization.user.sharing.management
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.UsersApiService;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.core.UsersApiServiceCore;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.factories.UsersApiServiceCoreFactory;
+import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.Error;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserShareRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserShareWithAllRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserSharedOrganizationsResponse;
@@ -30,8 +31,6 @@ import org.wso2.carbon.identity.api.server.organization.user.sharing.management.
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.exception.UserSharingMgtClientException;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.exception.UserSharingMgtException;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 import javax.ws.rs.core.Response;
@@ -149,12 +148,9 @@ public class UsersApiServiceImpl implements UsersApiService {
     /**
      * Builds a structured error response.
      */
-    private Map<String, Object> buildErrorResponse(UserSharingMgtException e) {
-        Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("traceId", UUID.randomUUID().toString());
-        errorResponse.put("errorCode", e.getErrorCode());
-        errorResponse.put("message", e.getMessage());
-        errorResponse.put("description", e.getDescription());
-        return errorResponse;
+    private Error buildErrorResponse(UserSharingMgtException e) {
+
+        return new Error().code(e.getErrorCode()).code(e.getErrorCode()).message(e.getMessage())
+                .description(e.getDescription()).traceId(UUID.randomUUID());
     }
 }
