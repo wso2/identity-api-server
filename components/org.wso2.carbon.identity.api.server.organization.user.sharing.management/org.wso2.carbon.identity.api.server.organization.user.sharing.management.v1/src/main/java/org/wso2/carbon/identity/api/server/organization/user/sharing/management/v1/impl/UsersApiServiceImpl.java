@@ -30,6 +30,10 @@ import org.wso2.carbon.identity.api.server.organization.user.sharing.management.
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.exception.UserSharingMgtClientException;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.exception.UserSharingMgtException;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.RESPONSE_DETAIL_USER_SHARE;
@@ -61,9 +65,9 @@ public class UsersApiServiceImpl implements UsersApiService {
                     .entity(usersApiServiceCore.getProcessSuccessResponse(RESPONSE_STATUS_PROCESSING,
                             RESPONSE_DETAIL_USER_SHARE)).build();
         } catch (UserSharingMgtClientException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(buildErrorResponse(e)).build();
         } catch (UserSharingMgtException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
         }
     }
 
@@ -76,9 +80,9 @@ public class UsersApiServiceImpl implements UsersApiService {
                     .entity(usersApiServiceCore.getProcessSuccessResponse(RESPONSE_STATUS_PROCESSING,
                             RESPONSE_DETAIL_USER_SHARE)).build();
         } catch (UserSharingMgtClientException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(buildErrorResponse(e)).build();
         } catch (UserSharingMgtException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
         }
     }
 
@@ -91,9 +95,9 @@ public class UsersApiServiceImpl implements UsersApiService {
                     .entity(usersApiServiceCore.getProcessSuccessResponse(RESPONSE_STATUS_PROCESSING,
                             RESPONSE_DETAIL_USER_UNSHARE)).build();
         } catch (UserSharingMgtClientException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(buildErrorResponse(e)).build();
         } catch (UserSharingMgtException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
         }
     }
 
@@ -106,9 +110,9 @@ public class UsersApiServiceImpl implements UsersApiService {
                     .entity(usersApiServiceCore.getProcessSuccessResponse(RESPONSE_STATUS_PROCESSING,
                             RESPONSE_DETAIL_USER_UNSHARE)).build();
         } catch (UserSharingMgtClientException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(buildErrorResponse(e)).build();
         } catch (UserSharingMgtException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
         }
     }
 
@@ -121,9 +125,9 @@ public class UsersApiServiceImpl implements UsersApiService {
                     userId, after, before, limit, filter, recursive);
             return Response.ok().entity(response).build();
         } catch (UserSharingMgtClientException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(buildErrorResponse(e)).build();
         } catch (UserSharingMgtException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
         }
     }
 
@@ -136,9 +140,21 @@ public class UsersApiServiceImpl implements UsersApiService {
                     userId, orgId, after, before, limit, filter, recursive);
             return Response.ok().entity(response).build();
         } catch (UserSharingMgtClientException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(buildErrorResponse(e)).build();
         } catch (UserSharingMgtException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
         }
+    }
+
+    /**
+     * Builds a structured error response.
+     */
+    private Map<String, Object> buildErrorResponse(UserSharingMgtException e) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("traceId", UUID.randomUUID().toString());
+        errorResponse.put("errorCode", e.getErrorCode());
+        errorResponse.put("message", e.getMessage());
+        errorResponse.put("description", e.getDescription());
+        return errorResponse;
     }
 }
