@@ -92,7 +92,7 @@ public class UsersApiServiceCore {
         }
 
         // Populate selectiveUserShareDO object from the request body.
-        SelectiveUserShareDO selectiveUserShareDO = populateGeneralUserShareDO(userShareRequestBody);
+        SelectiveUserShareDO selectiveUserShareDO = populateSelectiveUserShareDO(userShareRequestBody);
 
         try {
             userSharingPolicyHandlerService.populateSelectiveUserShare(selectiveUserShareDO);
@@ -258,7 +258,7 @@ public class UsersApiServiceCore {
      * @param userShareRequestBody Contains details for user sharing.
      * @return A populated SelectiveUserShareDO object.
      */
-    private SelectiveUserShareDO populateGeneralUserShareDO(UserShareRequestBody userShareRequestBody) {
+    private SelectiveUserShareDO populateSelectiveUserShareDO(UserShareRequestBody userShareRequestBody) {
 
         SelectiveUserShareDO selectiveUserShareDO = new SelectiveUserShareDO();
 
