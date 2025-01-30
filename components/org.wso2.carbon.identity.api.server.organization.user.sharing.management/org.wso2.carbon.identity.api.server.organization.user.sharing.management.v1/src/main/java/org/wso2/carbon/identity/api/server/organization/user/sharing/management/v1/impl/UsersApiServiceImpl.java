@@ -150,7 +150,7 @@ public class UsersApiServiceImpl implements UsersApiService {
      */
     private Error buildErrorResponse(UserSharingMgtException e) {
 
-        return new Error().code(e.getErrorCode()).code(e.getErrorCode()).message(e.getMessage())
-                .description(e.getDescription()).traceId(UUID.randomUUID());
+        return new Error().code(e.getErrorCode()).message(e.getMessage()).description(e.getDescription())
+                .traceId(UUID.randomUUID());
     }
 }
