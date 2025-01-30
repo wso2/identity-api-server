@@ -23,18 +23,12 @@ import org.wso2.carbon.identity.api.server.organization.user.sharing.management.
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.factories.UsersApiServiceCoreFactory;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserShareRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserShareWithAllRequestBody;
-import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserSharedOrganizationsResponse;
-import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserSharedRolesResponse;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareWithAllRequestBody;
-import org.wso2.carbon.identity.organization.management.organization.user.sharing.exception.UserSharingMgtClientException;
-import org.wso2.carbon.identity.organization.management.organization.user.sharing.exception.UserSharingMgtException;
 
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.RESPONSE_DETAIL_USER_SHARE;
-import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.RESPONSE_DETAIL_USER_UNSHARE;
-import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.RESPONSE_STATUS_PROCESSING;
+import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.ERROR_INITIATING_USERS_API_SERVICE;
 
 /**
  * Implementation of the user sharing management APIs.
@@ -48,97 +42,45 @@ public class UsersApiServiceImpl implements UsersApiService {
         try {
             this.usersApiServiceCore = UsersApiServiceCoreFactory.getUsersApiServiceCore();
         } catch (IllegalStateException e) {
-            throw new RuntimeException("Error occurred while initiating UsersApiService.", e);
+            throw new RuntimeException(ERROR_INITIATING_USERS_API_SERVICE.getMessage(), e);
         }
     }
 
     @Override
     public Response processUserSharing(UserShareRequestBody userShareRequestBody) {
 
-        try {
-            usersApiServiceCore.shareUser(userShareRequestBody);
-            return Response.status(Response.Status.ACCEPTED)
-                    .entity(usersApiServiceCore.getProcessSuccessResponse(RESPONSE_STATUS_PROCESSING,
-                            RESPONSE_DETAIL_USER_SHARE)).build();
-        } catch (UserSharingMgtClientException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-        } catch (UserSharingMgtException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
-        }
+        return usersApiServiceCore.shareUser(userShareRequestBody);
     }
 
     @Override
     public Response processUserSharingAll(UserShareWithAllRequestBody userShareWithAllRequestBody) {
 
-        try {
-            usersApiServiceCore.shareUserWithAll(userShareWithAllRequestBody);
-            return Response.status(Response.Status.ACCEPTED)
-                    .entity(usersApiServiceCore.getProcessSuccessResponse(RESPONSE_STATUS_PROCESSING,
-                            RESPONSE_DETAIL_USER_SHARE)).build();
-        } catch (UserSharingMgtClientException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-        } catch (UserSharingMgtException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
-        }
+        return usersApiServiceCore.shareUserWithAll(userShareWithAllRequestBody);
     }
 
     @Override
     public Response processUserUnsharing(UserUnshareRequestBody userUnshareRequestBody) {
 
-        try {
-            usersApiServiceCore.unshareUser(userUnshareRequestBody);
-            return Response.status(Response.Status.ACCEPTED)
-                    .entity(usersApiServiceCore.getProcessSuccessResponse(RESPONSE_STATUS_PROCESSING,
-                            RESPONSE_DETAIL_USER_UNSHARE)).build();
-        } catch (UserSharingMgtClientException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-        } catch (UserSharingMgtException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
-        }
+        return usersApiServiceCore.unshareUser(userUnshareRequestBody);
     }
 
     @Override
     public Response removeUserSharing(UserUnshareWithAllRequestBody userUnshareWithAllRequestBody) {
 
-        try {
-            usersApiServiceCore.unshareUserWithAll(userUnshareWithAllRequestBody);
-            return Response.status(Response.Status.ACCEPTED)
-                    .entity(usersApiServiceCore.getProcessSuccessResponse(RESPONSE_STATUS_PROCESSING,
-                            RESPONSE_DETAIL_USER_UNSHARE)).build();
-        } catch (UserSharingMgtClientException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-        } catch (UserSharingMgtException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
-        }
+        return usersApiServiceCore.unshareUserWithAll(userUnshareWithAllRequestBody);
     }
 
     @Override
     public Response usersUserIdSharedOrganizationsGet(String userId, String after, String before, Integer limit,
                                                       String filter, Boolean recursive) {
 
-        try {
-            UserSharedOrganizationsResponse response = usersApiServiceCore.getSharedOrganizations(
-                    userId, after, before, limit, filter, recursive);
-            return Response.ok().entity(response).build();
-        } catch (UserSharingMgtClientException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-        } catch (UserSharingMgtException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
-        }
+        return usersApiServiceCore.getSharedOrganizations(userId, after, before, limit, filter, recursive);
     }
 
     @Override
     public Response usersUserIdSharedRolesGet(String userId, String orgId, String after, String before, Integer limit,
                                               String filter, Boolean recursive) {
 
-        try {
-            UserSharedRolesResponse response = usersApiServiceCore.getSharedRoles(
-                    userId, orgId, after, before, limit, filter, recursive);
-            return Response.ok().entity(response).build();
-        } catch (UserSharingMgtClientException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-        } catch (UserSharingMgtException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
-        }
+        return usersApiServiceCore.getSharedRoles(userId, orgId, after, before, limit, filter, recursive);
     }
 }
