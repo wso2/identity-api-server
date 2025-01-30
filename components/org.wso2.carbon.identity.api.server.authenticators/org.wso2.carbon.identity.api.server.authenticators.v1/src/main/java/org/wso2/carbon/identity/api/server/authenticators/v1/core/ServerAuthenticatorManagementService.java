@@ -515,7 +515,9 @@ public class ServerAuthenticatorManagementService {
             FederatedAuthenticatorConfig federatedAuthConfig = resolveFederatedAuthenticatorConfig(identityProvider);
             authenticator.definedBy(Authenticator.DefinedByEnum.valueOf(
                     String.valueOf(federatedAuthConfig.getDefinedByType())));
-            authenticator.setTags(Arrays.asList(federatedAuthConfig.getTags()));
+            if (federatedAuthConfig.getTags() != null) {
+                authenticator.setTags(Arrays.asList(federatedAuthConfig.getTags()));
+            }
         } else {
             authenticator.definedBy(Authenticator.DefinedByEnum.SYSTEM);
         }
