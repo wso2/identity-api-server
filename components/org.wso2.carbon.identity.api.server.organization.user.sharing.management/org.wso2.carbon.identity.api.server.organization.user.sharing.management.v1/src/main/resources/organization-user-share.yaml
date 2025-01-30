@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   version: 1.0.2
-  title: 'User Share API Definition'
+  title: 'User Sharing API Definition'
   description: |-
     This API provides organization administrators with the ability to manage user access across child organizations. It supports operations to share users with specific or all child organizations, retrieve shared access details, and remove shared access as needed. The API also includes features for paginated retrieval of organizations and roles associated with shared users.
   contact:
@@ -346,6 +346,9 @@ components:
       description: |
         The request body for sharing users with multiple child organizations.
         Includes a list of users, organizations, sharing scope as policy, and roles.
+      required:
+        - userCriteria
+        - organizations
       properties:
         userCriteria:
           type: object
@@ -362,6 +365,9 @@ components:
           description: List of organizations specifying sharing scope and roles.
           items:
             type: object
+            required:
+              - orgId
+              - policy
             properties:
               orgId:
                 type: string
@@ -400,6 +406,9 @@ components:
       description: |
         Process a request to share users with all organizations. 
         The payload contains the roles applicable across all organizations and a policy that defines the scope of sharing.
+      required:
+        - userCriteria
+        - policy
       properties:
         userCriteria:
           type: object
@@ -441,6 +450,9 @@ components:
       description: |
         The request body for unsharing users from multiple organizations.
         Includes a list of user IDs and a list of organization IDs.
+      required:
+        - userCriteria
+        - organizations
       properties:
         userCriteria:
           type: object
@@ -471,6 +483,8 @@ components:
       description: |
         The request body for unsharing users from all organizations.
         Includes a list of user IDs.
+      required:
+        - userCriteria
       properties:
         userCriteria:
           type: object

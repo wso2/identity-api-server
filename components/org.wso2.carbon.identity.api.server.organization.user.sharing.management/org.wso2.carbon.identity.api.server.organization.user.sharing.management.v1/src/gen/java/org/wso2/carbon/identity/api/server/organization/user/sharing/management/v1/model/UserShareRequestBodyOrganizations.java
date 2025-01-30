@@ -82,9 +82,11 @@ public enum PolicyEnum {
         return this;
     }
     
-    @ApiModelProperty(value = "The ID of the organization to share the users with.")
+    @ApiModelProperty(required = true, value = "The ID of the organization to share the users with.")
     @JsonProperty("orgId")
     @Valid
+    @NotNull(message = "Property orgId cannot be null.")
+
     public String getOrgId() {
         return orgId;
     }
@@ -101,9 +103,11 @@ public enum PolicyEnum {
         return this;
     }
     
-    @ApiModelProperty(value = "The scope of sharing for this organization.")
+    @ApiModelProperty(required = true, value = "The scope of sharing for this organization.")
     @JsonProperty("policy")
     @Valid
+    @NotNull(message = "Property policy cannot be null.")
+
     public PolicyEnum getPolicy() {
         return policy;
     }
