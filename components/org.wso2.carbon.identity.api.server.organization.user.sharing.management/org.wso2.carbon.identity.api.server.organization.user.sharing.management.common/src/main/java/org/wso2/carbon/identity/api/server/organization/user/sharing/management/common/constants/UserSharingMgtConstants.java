@@ -24,7 +24,6 @@ package org.wso2.carbon.identity.api.server.organization.user.sharing.management
 public class UserSharingMgtConstants {
 
     public static final String ERROR_PREFIX = "USM-";
-    public static final String ERROR_UNSUPPORTED_PARAM = "Unsupported param.";
 
     public static final String USER_IDS = "userIds";
 
@@ -44,23 +43,28 @@ public class UserSharingMgtConstants {
         INVALID_SELECTIVE_USER_SHARE_REQUEST_BODY("60000",
                 "Invalid selective user share request body.",
                 "The user criteria provided for selective sharing is either null or empty. " +
-                        "Please provide valid criteria."),
+                        "Please provide valid selective user sharing criteria."),
         INVALID_GENERAL_USER_SHARE_REQUEST_BODY("60001",
                 "Invalid general user share request body.",
                 "The user criteria provided for general sharing is either null or empty. " +
-                        "Please provide valid criteria."),
+                        "Please provide valid general user sharing criteria."),
         INVALID_SELECTIVE_USER_UNSHARE_REQUEST_BODY("60002",
                 "Invalid selective user unshare request body.",
                 "The user criteria provided for selective unsharing is either null or empty. " +
-                        "Please provide valid criteria."),
+                        "Please provide valid selective user unsharing criteria."),
         INVALID_GENERAL_USER_UNSHARE_REQUEST_BODY("60003",
                 "Invalid general user unshare request body.",
                 "The user criteria provided for general unsharing is either null or empty. " +
-                        "Please provide valid criteria."),
+                        "Please provide valid general user unsharing criteria."),
         INVALID_UUID_FORMAT("60004",
                 "Invalid UUID format.",
                 "The UUID provided in the request is not in a valid format. " +
-                        "Please provide a valid UUID.");
+                        "Please provide a valid UUID."),
+
+        // Server errors.
+        ERROR_INITIATING_USERS_API_SERVICE("65001",
+                "Error initiating UsersApiService.",
+                "Error occurred while initiating UsersApiService.");
 
         private final String code;
         private final String message;
