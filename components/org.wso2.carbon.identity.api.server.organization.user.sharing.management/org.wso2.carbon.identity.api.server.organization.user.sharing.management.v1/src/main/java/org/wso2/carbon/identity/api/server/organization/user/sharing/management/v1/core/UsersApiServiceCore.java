@@ -372,7 +372,7 @@ public class UsersApiServiceCore {
                                     resultOrgDetail.getOrganizationId())
                             .orgName(resultOrgDetail.getOrganizationName())
                             .sharedUserId(resultOrgDetail.getSharedUserId())
-                            .sharedType(resultOrgDetail.getSharedType())
+                            .sharedType(resultOrgDetail.getSharedType().toString())
                             .rolesRef(resultOrgDetail.getRolesRef());
             responseOrgs.add(org);
         }
