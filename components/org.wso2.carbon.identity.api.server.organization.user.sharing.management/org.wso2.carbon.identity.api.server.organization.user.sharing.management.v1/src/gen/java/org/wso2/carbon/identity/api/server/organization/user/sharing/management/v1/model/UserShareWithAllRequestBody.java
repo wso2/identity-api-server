@@ -85,9 +85,11 @@ public enum PolicyEnum {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(required = true, value = "")
     @JsonProperty("userCriteria")
     @Valid
+    @NotNull(message = "Property userCriteria cannot be null.")
+
     public UserShareRequestBodyUserCriteria getUserCriteria() {
         return userCriteria;
     }
@@ -104,9 +106,11 @@ public enum PolicyEnum {
         return this;
     }
     
-    @ApiModelProperty(value = "A policy to specify the sharing scope.")
+    @ApiModelProperty(required = true, value = "A policy to specify the sharing scope.")
     @JsonProperty("policy")
     @Valid
+    @NotNull(message = "Property policy cannot be null.")
+
     public PolicyEnum getPolicy() {
         return policy;
     }
