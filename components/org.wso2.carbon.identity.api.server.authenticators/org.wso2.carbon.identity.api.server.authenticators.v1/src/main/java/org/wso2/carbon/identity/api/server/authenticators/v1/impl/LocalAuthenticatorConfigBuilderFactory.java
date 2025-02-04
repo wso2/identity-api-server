@@ -92,6 +92,7 @@ public class LocalAuthenticatorConfigBuilderFactory {
         authConfig.setImageUrl(config.getImage());
         authConfig.setDescription(config.getDescription());
         authConfig.setEnabled(config.getIsEnabled());
+        validateEndpointAuthProperties(config.getEndpoint());
         authConfig.setEndpointConfig(buildEndpointConfig(config.getEndpoint()));
 
         return authConfig;
@@ -145,6 +146,16 @@ public class LocalAuthenticatorConfigBuilderFactory {
             return AuthenticatorPropertyConstants.AuthenticationType.VERIFICATION;
         } else {
             return AuthenticatorPropertyConstants.AuthenticationType.IDENTIFICATION;
+        }
+    }
+
+    private static void validateEndpointAuthProperties(Endpoint endpoint) throws AuthenticatorMgtClientException {
+
+        if (endpoint.getAuthentication().getProperties() == null ||
+                endpoint.getAuthentication().getProperties().isEmpty()) {
+            AuthenticatorMgtError error = AuthenticatorMgtError.ERROR_CODE_INVALID_ENDPOINT_CONFIG;
+            throw new AuthenticatorMgtClientException(error.getCode(), error.getMessage(),
+                    "Authentication properties are not provided");
         }
     }
 }

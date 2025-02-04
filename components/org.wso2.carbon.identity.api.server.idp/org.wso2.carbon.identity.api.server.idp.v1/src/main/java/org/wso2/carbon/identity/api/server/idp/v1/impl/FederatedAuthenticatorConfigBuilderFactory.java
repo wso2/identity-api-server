@@ -105,6 +105,7 @@ public class FederatedAuthenticatorConfigBuilderFactory {
                         getDisplayNameOfAuthenticator(authenticatorName),
                         authenticator.getEndpoint(), properties, authenticator.getIsEnabled(), definedByType);
 
+        validateEndpointAuthProperties(config);
         return FederatedAuthenticatorConfigBuilderFactory.createFederatedAuthenticatorConfig(config);
     }
 
@@ -223,9 +224,11 @@ public class FederatedAuthenticatorConfigBuilderFactory {
                     new UserDefinedAuthenticatorEndpointConfig.UserDefinedAuthenticatorEndpointConfigBuilder();
             endpointConfigBuilder.uri(config.endpoint.getUri());
             endpointConfigBuilder.authenticationType(config.endpoint.getAuthentication().getType().toString());
-            endpointConfigBuilder.authenticationProperties(config.endpoint.getAuthentication().getProperties()
-                    .entrySet().stream().collect(Collectors.toMap(
-                            Map.Entry::getKey, entry -> entry.getValue().toString())));
+            if (config.endpoint.getAuthentication().getProperties() != null) {
+                endpointConfigBuilder.authenticationProperties(config.endpoint.getAuthentication().getProperties()
+                        .entrySet().stream().collect(Collectors.toMap(
+                                Map.Entry::getKey, entry -> entry.getValue().toString())));
+            }
             authConfig.setEndpointConfig(endpointConfigBuilder.build());
 
             return authConfig;
@@ -337,7 +340,7 @@ public class FederatedAuthenticatorConfigBuilderFactory {
     }
 
     /**
-     * Verify if scopes have not been set in both Scopes field and Additional Query Parameters field
+     * Verify if scopes have not been set in both Scopes field and Additional Query Parameters field.
      *
      * @param oidcAuthenticatorProperties Authenticator properties of OIDC authenticator.
      */
@@ -386,6 +389,20 @@ public class FederatedAuthenticatorConfigBuilderFactory {
                     }
                 }
             }
+        }
+    }
+
+    private static void validateEndpointAuthProperties(Config config) throws IdentityProviderManagementClientException {
+
+        if (DefinedByType.SYSTEM == config.definedByType) {
+            return;
+        }
+
+        if (config.endpoint.getAuthentication().getProperties() == null ||
+                config.endpoint.getAuthentication().getProperties().isEmpty()) {
+            throw new IdentityProviderManagementClientException(Constants.ErrorMessage
+                    .ERROR_CODE_INVALID_INPUT.getCode(), Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT.getMessage(),
+                    "Authenticator endpoint authentication properties are not provided");
         }
     }
 
