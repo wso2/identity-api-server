@@ -61,7 +61,7 @@ public class ActionMapperUtil {
             throws ActionMgtException {
 
         Authentication authentication = ActionMapperUtil.buildAuthentication(
-                Authentication.Type.valueOf(actionModel.getEndpoint().getAuthentication().getType().toString()),
+                Authentication.Type.valueOfName(actionModel.getEndpoint().getAuthentication().getType().toString()),
                 actionModel.getEndpoint().getAuthentication().getProperties());
 
         ActionRule actionRule = null;
@@ -97,7 +97,7 @@ public class ActionMapperUtil {
 
             Authentication authentication = null;
             if (actionUpdateModel.getEndpoint().getAuthentication() != null) {
-                authentication = buildAuthentication(Authentication.Type.valueOf(actionUpdateModel.getEndpoint()
+                authentication = buildAuthentication(Authentication.Type.valueOfName(actionUpdateModel.getEndpoint()
                                 .getAuthentication().getType().toString()),
                         actionUpdateModel.getEndpoint().getAuthentication().getProperties());
             }
