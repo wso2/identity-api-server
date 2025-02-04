@@ -2765,7 +2765,7 @@ public class ServerIdpManagementService {
          If the authenticator config is present in the ApplicationAuthenticatorService list, return its type,
          if not return USER. */
         FederatedAuthenticatorConfig authenticatorConfig = ApplicationAuthenticatorService.getInstance()
-                .getFederatedAuthenticatorByName(authenticatorName, "test");
+                .getFederatedAuthenticatorByName(authenticatorName);
         if (authenticatorConfig != null) {
             return DefinedByType.valueOf(authenticatorConfig.getDefinedByType().toString());
         }
