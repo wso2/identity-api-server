@@ -82,7 +82,7 @@ public class FederatedAuthenticatorConfigBuilderFactory {
                         getDisplayNameOfAuthenticator(authenticatorName),
                         authenticator.getEndpoint(), properties, authenticator.getIsEnabled(), definedByType);
 
-        validateFederatedAuthenticatorConfigForPUTRequest(config);
+        validateFederatedAuthenticatorConfigForUpdateRequest(config);
         return FederatedAuthenticatorConfigBuilderFactory.createFederatedAuthenticatorConfig(config);
     }
 
@@ -107,7 +107,7 @@ public class FederatedAuthenticatorConfigBuilderFactory {
                         getDisplayNameOfAuthenticator(authenticatorName),
                         authenticator.getEndpoint(), properties, authenticator.getIsEnabled(), definedByType);
 
-        validateFederatedAuthenticatorConfig(config);
+        validateFederatedAuthenticatorConfigForCreateRequest(config);
         return FederatedAuthenticatorConfigBuilderFactory.createFederatedAuthenticatorConfig(config);
     }
 
@@ -237,20 +237,20 @@ public class FederatedAuthenticatorConfigBuilderFactory {
         }
     }
 
-    private static void validateFederatedAuthenticatorConfig(Config config)
+    private static void validateFederatedAuthenticatorConfigForCreateRequest(Config config)
             throws IdentityProviderManagementClientException {
 
         if (config.definedByType == DefinedByType.SYSTEM) {
             validateSystemDefinedFederatedAuthenticatorModel(config);
         } else {
-            validateUserDefinedFederatedAuthenticatorModel(config);
+            validateUserDefinedFederatedAuthenticatorModelForCreateRequest(config);
         }
     }
 
-    private static void validateUserDefinedFederatedAuthenticatorModel(Config config)
+    private static void validateUserDefinedFederatedAuthenticatorModelForCreateRequest(Config config)
             throws IdentityProviderManagementClientException {
 
-        validateUserDefinedFederatedAuthenticatorModelForPUTRequest(config);
+        validateUserDefinedFederatedAuthenticatorModelForUpdateRequest(config);
         if (config.endpoint.getAuthentication().getProperties() == null ||
                 config.endpoint.getAuthentication().getProperties().isEmpty()) {
             throw new IdentityProviderManagementClientException(
@@ -261,17 +261,17 @@ public class FederatedAuthenticatorConfigBuilderFactory {
         }
     }
 
-    private static void validateFederatedAuthenticatorConfigForPUTRequest(Config config)
+    private static void validateFederatedAuthenticatorConfigForUpdateRequest(Config config)
             throws IdentityProviderManagementClientException {
 
         if (config.definedByType == DefinedByType.SYSTEM) {
             validateSystemDefinedFederatedAuthenticatorModel(config);
         } else {
-            validateUserDefinedFederatedAuthenticatorModelForPUTRequest(config);
+            validateUserDefinedFederatedAuthenticatorModelForUpdateRequest(config);
         }
     }
 
-    private static void validateUserDefinedFederatedAuthenticatorModelForPUTRequest(Config config)
+    private static void validateUserDefinedFederatedAuthenticatorModelForUpdateRequest(Config config)
             throws IdentityProviderManagementClientException {
 
         // The User-defined authenticator configs must not have properties configurations; throw an error if they do.
