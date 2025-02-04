@@ -81,6 +81,7 @@ public class LocalAuthenticatorConfigBuilderFactory {
     public static UserDefinedLocalAuthenticatorConfig build(UserDefinedLocalAuthenticatorCreation config)
             throws AuthenticatorMgtClientException {
 
+        validateUserDefinedLocalAuthenticatorConfig(config);
         String authenticationType = AuthenticatorPropertyConstants.AuthenticationType.IDENTIFICATION.toString();
         if (config.getAuthenticationType() != null) {
             authenticationType = config.getAuthenticationType().toString();
@@ -92,7 +93,6 @@ public class LocalAuthenticatorConfigBuilderFactory {
         authConfig.setImageUrl(config.getImage());
         authConfig.setDescription(config.getDescription());
         authConfig.setEnabled(config.getIsEnabled());
-        validateEndpointAuthProperties(config.getEndpoint());
         authConfig.setEndpointConfig(buildEndpointConfig(config.getEndpoint()));
 
         return authConfig;
@@ -149,13 +149,15 @@ public class LocalAuthenticatorConfigBuilderFactory {
         }
     }
 
-    private static void validateEndpointAuthProperties(Endpoint endpoint) throws AuthenticatorMgtClientException {
+    private static void validateUserDefinedLocalAuthenticatorConfig(UserDefinedLocalAuthenticatorCreation config)
+            throws AuthenticatorMgtClientException {
 
-        if (endpoint.getAuthentication().getProperties() == null ||
-                endpoint.getAuthentication().getProperties().isEmpty()) {
+        if (config.getEndpoint().getAuthentication().getProperties() == null ||
+                config.getEndpoint().getAuthentication().getProperties().isEmpty()) {
             AuthenticatorMgtError error = AuthenticatorMgtError.ERROR_CODE_INVALID_ENDPOINT_CONFIG;
             throw new AuthenticatorMgtClientException(error.getCode(), error.getMessage(),
-                    "Authentication properties are not provided");
+                    "Endpoint authentication properties must be provided for user defined local authenticator: "
+                            + config.getName());
         }
     }
 }

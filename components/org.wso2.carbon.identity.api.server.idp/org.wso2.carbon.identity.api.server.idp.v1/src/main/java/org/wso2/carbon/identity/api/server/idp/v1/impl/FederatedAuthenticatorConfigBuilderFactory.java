@@ -256,7 +256,8 @@ public class FederatedAuthenticatorConfigBuilderFactory {
             throw new IdentityProviderManagementClientException(
                     Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT.getCode(),
                     Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT.getMessage(),
-                    "Authenticator endpoint authentication properties are not provided");
+                    "Endpoint authentication properties must be provided for user defined federated authenticator: "
+                            + config.authenticatorName);
         }
     }
 
