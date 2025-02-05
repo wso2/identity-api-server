@@ -70,20 +70,19 @@ public class FederatedAuthenticatorConfigBuilderFactory {
      * @throws IdentityProviderManagementClientException If an error occurs while building
      *                                                   the FederatedAuthenticatorConfig.
      */
-    public static FederatedAuthenticatorConfig build(FederatedAuthenticatorPUTRequest authenticator, String 
-            authenticatorName, DefinedByType definedByType) throws IdentityProviderManagementClientException {
+    public static FederatedAuthenticatorConfig build(FederatedAuthenticatorPUTRequest authenticator,
+                                                     String authenticatorName, DefinedByType definedByType)
+            throws IdentityProviderManagementClientException {
 
-        List<Property> properties = Optional.ofNullable(authenticator.getProperties())
-                .map(props -> props.stream().map(propertyToInternal).collect(Collectors.toList()))
-                .orElse(null);
-        validateAuthPropForFederatedAuthenticatorPUTRequest(authenticatorName, properties);
-        FederatedAuthenticatorConfigBuilderFactory.Config config =
-                new FederatedAuthenticatorConfigBuilderFactory.Config(authenticatorName,
-                        getDisplayNameOfAuthenticator(authenticatorName),
-                        authenticator.getEndpoint(), properties, authenticator.getIsEnabled(), definedByType);
+        Config config = new Config(authenticatorName, definedByType, authenticator.getIsEnabled(),
+                authenticator.getEndpoint(), authenticator.getProperties());
 
-        validateFederatedAuthenticatorConfigForUpdateRequest(config);
-        return FederatedAuthenticatorConfigBuilderFactory.createFederatedAuthenticatorConfig(config);
+        FederatedAuthenticatorConfig federatedAuthenticatorConfig = getFederatedAuthenticatorConfigUpdateModel(config);
+        federatedAuthenticatorConfig.setName(config.authenticatorName);
+        federatedAuthenticatorConfig.setDisplayName(config.displayName);
+        federatedAuthenticatorConfig.setEnabled(config.isEnabled);
+
+        return federatedAuthenticatorConfig;
     }
 
     /**
@@ -95,20 +94,19 @@ public class FederatedAuthenticatorConfigBuilderFactory {
      * @throws IdentityProviderManagementClientException    If an error occurs while building the
      *                                                      FederatedAuthenticatorConfig.
      */
-    public static FederatedAuthenticatorConfig build(FederatedAuthenticator authenticator, String
-            authenticatorName, DefinedByType definedByType) throws IdentityProviderManagementClientException {
+    public static FederatedAuthenticatorConfig build(FederatedAuthenticator authenticator,
+                                                     String authenticatorName, DefinedByType definedByType)
+            throws IdentityProviderManagementClientException {
 
-        List<Property> properties = Optional.ofNullable(authenticator.getProperties())
-                .map(props -> props.stream().map(propertyToInternal).collect(Collectors.toList()))
-                .orElse(null);
-        validateAuthPropForFederatedAuthenticator(authenticatorName, properties);
-        FederatedAuthenticatorConfigBuilderFactory.Config config =
-                new FederatedAuthenticatorConfigBuilderFactory.Config(authenticatorName,
-                        getDisplayNameOfAuthenticator(authenticatorName),
-                        authenticator.getEndpoint(), properties, authenticator.getIsEnabled(), definedByType);
+        Config config = new Config(authenticatorName, definedByType, authenticator.getIsEnabled(),
+                authenticator.getEndpoint(), authenticator.getProperties());
 
-        validateFederatedAuthenticatorConfigForCreateRequest(config);
-        return FederatedAuthenticatorConfigBuilderFactory.createFederatedAuthenticatorConfig(config);
+        FederatedAuthenticatorConfig federatedAuthenticatorConfig = getFederatedAuthenticatorConfigCreateModel(config);
+        federatedAuthenticatorConfig.setName(config.authenticatorName);
+        federatedAuthenticatorConfig.setDisplayName(config.displayName);
+        federatedAuthenticatorConfig.setEnabled(config.isEnabled);
+
+        return federatedAuthenticatorConfig;
     }
 
     /**
@@ -176,22 +174,29 @@ public class FederatedAuthenticatorConfigBuilderFactory {
 
         return authenticators;
     }
-    
-    private static FederatedAuthenticatorConfig createFederatedAuthenticatorConfig(Config config)
+
+    private static FederatedAuthenticatorConfig getFederatedAuthenticatorConfigCreateModel(Config config)
             throws IdentityProviderManagementClientException {
 
-        FederatedAuthenticatorConfig federatedAuthenticatorConfig;
         if (DefinedByType.SYSTEM == config.definedByType) {
-            federatedAuthenticatorConfig = createSystemDefinedFederatedAuthenticator(config);
-        } else {
-            federatedAuthenticatorConfig = createUserDefinedFederatedAuthenticator(config);
+            validateSystemDefinedFederatedAuthenticatorForCreateRequest(config);
+            return createSystemDefinedFederatedAuthenticator(config);
         }
 
-        federatedAuthenticatorConfig.setName(config.authenticatorName);
-        federatedAuthenticatorConfig.setDisplayName(config.displayName);
-        federatedAuthenticatorConfig.setEnabled(config.isEnabled);
+        validateUserDefinedFederatedAuthenticatorModelForCreateRequest(config);
+        return createUserDefinedFederatedAuthenticator(config);
+    }
 
-        return federatedAuthenticatorConfig;
+    private static FederatedAuthenticatorConfig getFederatedAuthenticatorConfigUpdateModel(Config config)
+            throws IdentityProviderManagementClientException {
+
+        if (DefinedByType.SYSTEM == config.definedByType) {
+            validateSystemDefinedFederatedAuthenticatorForUpdateRequest(config);
+            return createSystemDefinedFederatedAuthenticator(config);
+        }
+
+        validateUserDefinedFederatedAuthenticatorModelUpdateRequest(config);
+        return createUserDefinedFederatedAuthenticator(config);
     }
 
     private static FederatedAuthenticatorConfig createSystemDefinedFederatedAuthenticator(Config config) {
@@ -202,7 +207,7 @@ public class FederatedAuthenticatorConfigBuilderFactory {
         return authConfig;
     }
 
-    private static void validateSystemDefinedFederatedAuthenticatorModel(Config config)
+    private static void validateSystemDefinedFederatedAuthenticatorForCreateRequest(Config config)
             throws IdentityProviderManagementClientException {
 
         // The System-defined authenticator configs must not have endpoint configurations; throw an error if they do.
@@ -210,6 +215,45 @@ public class FederatedAuthenticatorConfigBuilderFactory {
             Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_ENDPOINT_PROVIDED_FOR_SYSTEM_AUTH;
             throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
                     String.format(error.getDescription(), config.authenticatorName));
+        }
+
+        if (config.properties == null) {
+            return;
+        }
+
+        if (IdentityApplicationConstants.Authenticator.SAML2SSO.FED_AUTH_NAME.equals(config.authenticatorName)) {
+            validateSamlMetadata(config.properties);
+        }
+
+        if (!areAllDistinct(config.properties)) {
+            Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT;
+            throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
+                    String.format(error.getDescription(), " Duplicate properties are found in " +
+                            "the request."));
+        }
+    }
+
+    private static void validateSystemDefinedFederatedAuthenticatorForUpdateRequest(Config config)
+            throws IdentityProviderManagementClientException {
+
+        // The System-defined authenticator configs must not have endpoint configurations; throw an error if they do.
+        if (config.endpoint != null) {
+            Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_ENDPOINT_PROVIDED_FOR_SYSTEM_AUTH;
+            throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
+                    String.format(error.getDescription(), config.authenticatorName));
+        }
+
+        if (config.properties == null) {
+            return;
+        }
+
+        if (IdentityApplicationConstants.Authenticator.SAML2SSO.FED_AUTH_NAME.equals(config.authenticatorName)) {
+            validateSamlMetadata(config.properties);
+        }
+
+        if (IdentityApplicationConstants.Authenticator.OIDC.FED_AUTH_NAME.equals(config.authenticatorName)) {
+            validateDuplicateOpenIDConnectScopes(config.properties);
+            validateDefaultOpenIDConnectScopes(config.properties);
         }
     }
 
@@ -237,22 +281,16 @@ public class FederatedAuthenticatorConfigBuilderFactory {
         }
     }
 
-    private static void validateFederatedAuthenticatorConfigForCreateRequest(Config config)
-            throws IdentityProviderManagementClientException {
-
-        if (config.definedByType == DefinedByType.SYSTEM) {
-            validateSystemDefinedFederatedAuthenticatorModel(config);
-        } else {
-            validateUserDefinedFederatedAuthenticatorModelForCreateRequest(config);
-        }
-    }
-
     private static void validateUserDefinedFederatedAuthenticatorModelForCreateRequest(Config config)
             throws IdentityProviderManagementClientException {
 
-        validateUserDefinedFederatedAuthenticatorModelForUpdateRequest(config);
-        if (config.endpoint.getAuthentication().getProperties() == null ||
-                config.endpoint.getAuthentication().getProperties().isEmpty()) {
+        validateUserDefinedFederatedAuthenticatorModelUpdateRequest(config);
+        if (config.endpoint.getAuthentication().getType() == AuthenticationType.TypeEnum.NONE) {
+            return;
+        }
+
+        if (config.endpoint.getAuthentication().getProperties() == null
+                || config.endpoint.getAuthentication().getProperties().isEmpty()) {
             throw new IdentityProviderManagementClientException(
                     Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT.getCode(),
                     Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT.getMessage(),
@@ -261,17 +299,7 @@ public class FederatedAuthenticatorConfigBuilderFactory {
         }
     }
 
-    private static void validateFederatedAuthenticatorConfigForUpdateRequest(Config config)
-            throws IdentityProviderManagementClientException {
-
-        if (config.definedByType == DefinedByType.SYSTEM) {
-            validateSystemDefinedFederatedAuthenticatorModel(config);
-        } else {
-            validateUserDefinedFederatedAuthenticatorModelForUpdateRequest(config);
-        }
-    }
-
-    private static void validateUserDefinedFederatedAuthenticatorModelForUpdateRequest(Config config)
+    private static void validateUserDefinedFederatedAuthenticatorModelUpdateRequest(Config config)
             throws IdentityProviderManagementClientException {
 
         // The User-defined authenticator configs must not have properties configurations; throw an error if they do.
@@ -286,40 +314,6 @@ public class FederatedAuthenticatorConfigBuilderFactory {
             Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_NO_ENDPOINT_PROVIDED;
             throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
                     String.format(error.getDescription(), config.authenticatorName));
-        }
-    }
-
-    private static void validateAuthPropForFederatedAuthenticator(
-            String authenticatorName, List<Property> properties) throws IdentityProviderManagementClientException {
-
-        if (properties == null) {
-            return;
-        }
-
-        if (IdentityApplicationConstants.Authenticator.SAML2SSO.FED_AUTH_NAME.equals(authenticatorName)) {
-            validateSamlMetadata(properties);
-        }
-        if (!areAllDistinct(properties)) {
-            Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT;
-            throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
-                    String.format(error.getDescription(), " Duplicate properties are found in " +
-                            "the request."));
-        }
-    }
-
-    private static void validateAuthPropForFederatedAuthenticatorPUTRequest(
-            String authenticatorName, List<Property> properties) throws IdentityProviderManagementClientException {
-
-        if (properties == null) {
-            return;
-        }
-
-        if (IdentityApplicationConstants.Authenticator.SAML2SSO.FED_AUTH_NAME.equals(authenticatorName)) {
-            validateSamlMetadata(properties);
-        }
-        if (IdentityApplicationConstants.Authenticator.OIDC.FED_AUTH_NAME.equals(authenticatorName)) {
-            validateDuplicateOpenIDConnectScopes(properties);
-            validateDefaultOpenIDConnectScopes(properties);
         }
     }
 
@@ -527,13 +521,16 @@ public class FederatedAuthenticatorConfigBuilderFactory {
         private final List<Property> properties;
         private final Boolean isEnabled;
 
-        public Config(String authenticatorName, String displayName, Endpoint endpoint,
-                      List<Property> properties, Boolean isEnabled, DefinedByType definedByType) {
+        public Config(String authenticatorName, DefinedByType definedByType, Boolean isEnabled, Endpoint endpoint,
+                      List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> properties)
+                throws IdentityProviderManagementClientException {
 
             this.authenticatorName = authenticatorName;
-            this.displayName = displayName;
+            this.displayName = getDisplayNameOfAuthenticator(authenticatorName);
             this.endpoint = endpoint;
-            this.properties = properties;
+            this.properties = Optional.ofNullable(properties)
+                    .map(props -> props.stream().map(propertyToInternal).collect(Collectors.toList()))
+                    .orElse(null);
             this.isEnabled = isEnabled;
             this.definedByType = definedByType;
         }

@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.authenticators.v1.impl;
 
+import org.wso2.carbon.identity.api.server.authenticators.v1.model.AuthenticationType;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Endpoint;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.UserDefinedLocalAuthenticatorCreation;
@@ -151,6 +152,10 @@ public class LocalAuthenticatorConfigBuilderFactory {
 
     private static void validateUserDefinedLocalAuthenticatorConfig(UserDefinedLocalAuthenticatorCreation config)
             throws AuthenticatorMgtClientException {
+
+        if (config.getEndpoint().getAuthentication().getType() == AuthenticationType.TypeEnum.NONE) {
+            return;
+        }
 
         if (config.getEndpoint().getAuthentication().getProperties() == null ||
                 config.getEndpoint().getAuthentication().getProperties().isEmpty()) {
