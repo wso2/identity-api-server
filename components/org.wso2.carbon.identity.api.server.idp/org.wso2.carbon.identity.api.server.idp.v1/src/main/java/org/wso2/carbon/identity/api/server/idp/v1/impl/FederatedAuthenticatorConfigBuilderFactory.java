@@ -74,13 +74,18 @@ public class FederatedAuthenticatorConfigBuilderFactory {
                                                      String authenticatorName, DefinedByType definedByType)
             throws IdentityProviderManagementClientException {
 
-        Config config = new Config(authenticatorName, definedByType, authenticator.getIsEnabled(),
-                authenticator.getEndpoint(), authenticator.getProperties());
+        FederatedAuthenticatorConfigDTO fedAuthConfigDTO = new FederatedAuthenticatorConfigDTO()
+                .definedByType(definedByType)
+                .authenticatorName(authenticatorName)
+                .endpoint(authenticator.getEndpoint())
+                .properties(authenticator.getProperties())
+                .isEnabled(authenticator.getIsEnabled());
 
-        FederatedAuthenticatorConfig federatedAuthenticatorConfig = getFederatedAuthenticatorConfigUpdateModel(config);
-        federatedAuthenticatorConfig.setName(config.authenticatorName);
-        federatedAuthenticatorConfig.setDisplayName(config.displayName);
-        federatedAuthenticatorConfig.setEnabled(config.isEnabled);
+        FederatedAuthenticatorConfig federatedAuthenticatorConfig =
+                getFederatedAuthenticatorConfigUpdateModel(fedAuthConfigDTO);
+        federatedAuthenticatorConfig.setName(fedAuthConfigDTO.authenticatorName);
+        federatedAuthenticatorConfig.setDisplayName(fedAuthConfigDTO.displayName);
+        federatedAuthenticatorConfig.setEnabled(fedAuthConfigDTO.isEnabled);
 
         return federatedAuthenticatorConfig;
     }
@@ -98,13 +103,18 @@ public class FederatedAuthenticatorConfigBuilderFactory {
                                                      String authenticatorName, DefinedByType definedByType)
             throws IdentityProviderManagementClientException {
 
-        Config config = new Config(authenticatorName, definedByType, authenticator.getIsEnabled(),
-                authenticator.getEndpoint(), authenticator.getProperties());
+        FederatedAuthenticatorConfigDTO fedAuthConfigDTO = new FederatedAuthenticatorConfigDTO()
+                .definedByType(definedByType)
+                .authenticatorName(authenticatorName)
+                .endpoint(authenticator.getEndpoint())
+                .properties(authenticator.getProperties())
+                .isEnabled(authenticator.getIsEnabled());
 
-        FederatedAuthenticatorConfig federatedAuthenticatorConfig = getFederatedAuthenticatorConfigCreateModel(config);
-        federatedAuthenticatorConfig.setName(config.authenticatorName);
-        federatedAuthenticatorConfig.setDisplayName(config.displayName);
-        federatedAuthenticatorConfig.setEnabled(config.isEnabled);
+        FederatedAuthenticatorConfig federatedAuthenticatorConfig =
+                getFederatedAuthenticatorConfigCreateModel(fedAuthConfigDTO);
+        federatedAuthenticatorConfig.setName(fedAuthConfigDTO.authenticatorName);
+        federatedAuthenticatorConfig.setDisplayName(fedAuthConfigDTO.displayName);
+        federatedAuthenticatorConfig.setEnabled(fedAuthConfigDTO.isEnabled);
 
         return federatedAuthenticatorConfig;
     }
@@ -175,57 +185,44 @@ public class FederatedAuthenticatorConfigBuilderFactory {
         return authenticators;
     }
 
-    private static FederatedAuthenticatorConfig getFederatedAuthenticatorConfigCreateModel(Config config)
-            throws IdentityProviderManagementClientException {
+    private static FederatedAuthenticatorConfig getFederatedAuthenticatorConfigCreateModel(
+            FederatedAuthenticatorConfigDTO fedAuthConfigDTO) throws IdentityProviderManagementClientException {
 
-        if (DefinedByType.SYSTEM == config.definedByType) {
-            validateSystemDefinedFederatedAuthenticatorForCreateRequest(config);
-            return createSystemDefinedFederatedAuthenticator(config);
+        if (DefinedByType.SYSTEM == fedAuthConfigDTO.definedByType) {
+            performSystemDefinedFederatedAuthenticatorValidationForCreateRequest(fedAuthConfigDTO);
+            return createSystemDefinedFederatedAuthenticator(fedAuthConfigDTO);
         }
 
-        validateUserDefinedFederatedAuthenticatorModelForCreateRequest(config);
-        return createUserDefinedFederatedAuthenticator(config);
+        performUserDefinedFederatedAuthenticatorValidationsForCreateRequest(fedAuthConfigDTO);
+        return createUserDefinedFederatedAuthenticator(fedAuthConfigDTO);
     }
 
-    private static FederatedAuthenticatorConfig getFederatedAuthenticatorConfigUpdateModel(Config config)
-            throws IdentityProviderManagementClientException {
+    private static FederatedAuthenticatorConfig getFederatedAuthenticatorConfigUpdateModel(
+            FederatedAuthenticatorConfigDTO fedAuthConfigDTO) throws IdentityProviderManagementClientException {
 
-        if (DefinedByType.SYSTEM == config.definedByType) {
-            validateSystemDefinedFederatedAuthenticatorForUpdateRequest(config);
-            return createSystemDefinedFederatedAuthenticator(config);
+        if (DefinedByType.SYSTEM == fedAuthConfigDTO.definedByType) {
+            performSystemDefinedFederatedAuthenticatorValidationsForUpdateRequest(fedAuthConfigDTO);
+            return createSystemDefinedFederatedAuthenticator(fedAuthConfigDTO);
         }
 
-        validateUserDefinedFederatedAuthenticatorModelUpdateRequest(config);
-        return createUserDefinedFederatedAuthenticator(config);
+        performUserDefinedFederatedAuthenticatorCommonValidations(fedAuthConfigDTO);
+        return createUserDefinedFederatedAuthenticator(fedAuthConfigDTO);
     }
 
-    private static FederatedAuthenticatorConfig createSystemDefinedFederatedAuthenticator(Config config) {
+    private static FederatedAuthenticatorConfig createSystemDefinedFederatedAuthenticator(
+            FederatedAuthenticatorConfigDTO fedAuthConfigDTO) {
 
         FederatedAuthenticatorConfig authConfig = new FederatedAuthenticatorConfig();
         authConfig.setDefinedByType(DefinedByType.SYSTEM);
-        authConfig.setProperties(config.properties.toArray(new Property[0]));
+        authConfig.setProperties(fedAuthConfigDTO.properties.toArray(new Property[0]));
         return authConfig;
     }
 
-    private static void validateSystemDefinedFederatedAuthenticatorForCreateRequest(Config config)
-            throws IdentityProviderManagementClientException {
+    private static void performSystemDefinedFederatedAuthenticatorValidationForCreateRequest(
+            FederatedAuthenticatorConfigDTO fedAuthConfigDTO) throws IdentityProviderManagementClientException {
 
-        // The System-defined authenticator configs must not have endpoint configurations; throw an error if they do.
-        if (config.endpoint != null) {
-            Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_ENDPOINT_PROVIDED_FOR_SYSTEM_AUTH;
-            throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
-                    String.format(error.getDescription(), config.authenticatorName));
-        }
-
-        if (config.properties == null) {
-            return;
-        }
-
-        if (IdentityApplicationConstants.Authenticator.SAML2SSO.FED_AUTH_NAME.equals(config.authenticatorName)) {
-            validateSamlMetadata(config.properties);
-        }
-
-        if (!areAllDistinct(config.properties)) {
+        performSystemDefinedFederatedAuthenticatorCommonValidations(fedAuthConfigDTO);
+        if (!areAllDistinct(fedAuthConfigDTO.properties)) {
             Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT;
             throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
                     String.format(error.getDescription(), " Duplicate properties are found in " +
@@ -233,41 +230,46 @@ public class FederatedAuthenticatorConfigBuilderFactory {
         }
     }
 
-    private static void validateSystemDefinedFederatedAuthenticatorForUpdateRequest(Config config)
-            throws IdentityProviderManagementClientException {
+    private static void performSystemDefinedFederatedAuthenticatorValidationsForUpdateRequest(
+            FederatedAuthenticatorConfigDTO fedAuthConfigDTO) throws IdentityProviderManagementClientException {
 
-        // The System-defined authenticator configs must not have endpoint configurations; throw an error if they do.
-        if (config.endpoint != null) {
-            Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_ENDPOINT_PROVIDED_FOR_SYSTEM_AUTH;
-            throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
-                    String.format(error.getDescription(), config.authenticatorName));
-        }
-
-        if (config.properties == null) {
-            return;
-        }
-
-        if (IdentityApplicationConstants.Authenticator.SAML2SSO.FED_AUTH_NAME.equals(config.authenticatorName)) {
-            validateSamlMetadata(config.properties);
-        }
-
-        if (IdentityApplicationConstants.Authenticator.OIDC.FED_AUTH_NAME.equals(config.authenticatorName)) {
-            validateDuplicateOpenIDConnectScopes(config.properties);
-            validateDefaultOpenIDConnectScopes(config.properties);
+        performSystemDefinedFederatedAuthenticatorCommonValidations(fedAuthConfigDTO);
+        if (IdentityApplicationConstants.Authenticator.OIDC.FED_AUTH_NAME.equals(fedAuthConfigDTO.authenticatorName)) {
+            validateDuplicateOpenIDConnectScopes(fedAuthConfigDTO.properties);
+            validateDefaultOpenIDConnectScopes(fedAuthConfigDTO.properties);
         }
     }
 
-    private static UserDefinedFederatedAuthenticatorConfig createUserDefinedFederatedAuthenticator(Config config)
+    private static void performSystemDefinedFederatedAuthenticatorCommonValidations(
+            FederatedAuthenticatorConfigDTO fedAuthConfigDTO) throws IdentityProviderManagementClientException {
+
+        if (IdentityApplicationConstants.Authenticator.SAML2SSO.FED_AUTH_NAME
+                .equals(fedAuthConfigDTO.authenticatorName)) {
+            validateSamlMetadata(fedAuthConfigDTO.properties);
+        }
+
+        // The System-defined authenticator configs must not have endpoint configurations; throw an error if they do.
+        if (fedAuthConfigDTO.endpoint != null) {
+            Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_ENDPOINT_PROVIDED_FOR_SYSTEM_AUTH;
+            throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
+                    String.format(error.getDescription(), fedAuthConfigDTO.authenticatorName));
+        }
+    }
+
+    private static UserDefinedFederatedAuthenticatorConfig createUserDefinedFederatedAuthenticator(
+            FederatedAuthenticatorConfigDTO federatedAuthenticatorConfigDTO)
             throws IdentityProviderManagementClientException {
 
         try {
             UserDefinedFederatedAuthenticatorConfig authConfig = new UserDefinedFederatedAuthenticatorConfig();
             UserDefinedAuthenticatorEndpointConfig.UserDefinedAuthenticatorEndpointConfigBuilder endpointConfigBuilder =
                     new UserDefinedAuthenticatorEndpointConfig.UserDefinedAuthenticatorEndpointConfigBuilder();
-            endpointConfigBuilder.uri(config.endpoint.getUri());
-            endpointConfigBuilder.authenticationType(config.endpoint.getAuthentication().getType().toString());
-            if (config.endpoint.getAuthentication().getProperties() != null) {
-                endpointConfigBuilder.authenticationProperties(config.endpoint.getAuthentication().getProperties()
+            endpointConfigBuilder.uri(federatedAuthenticatorConfigDTO.endpoint.getUri());
+            endpointConfigBuilder.authenticationType(
+                    federatedAuthenticatorConfigDTO.endpoint.getAuthentication().getType().toString());
+            if (federatedAuthenticatorConfigDTO.endpoint.getAuthentication().getProperties() != null) {
+                endpointConfigBuilder.authenticationProperties(
+                        federatedAuthenticatorConfigDTO.endpoint.getAuthentication().getProperties()
                         .entrySet().stream().collect(Collectors.toMap(
                                 Map.Entry::getKey, entry -> entry.getValue().toString())));
             }
@@ -281,41 +283,42 @@ public class FederatedAuthenticatorConfigBuilderFactory {
         }
     }
 
-    private static void validateUserDefinedFederatedAuthenticatorModelForCreateRequest(Config config)
-            throws IdentityProviderManagementClientException {
+    private static void performUserDefinedFederatedAuthenticatorValidationsForCreateRequest(
+            FederatedAuthenticatorConfigDTO fedAuthConfigDTO) throws IdentityProviderManagementClientException {
 
-        validateUserDefinedFederatedAuthenticatorModelUpdateRequest(config);
-        if (config.endpoint.getAuthentication().getType() == AuthenticationType.TypeEnum.NONE) {
+        performUserDefinedFederatedAuthenticatorCommonValidations(fedAuthConfigDTO);
+        if (fedAuthConfigDTO.endpoint.getAuthentication().getType() == AuthenticationType.TypeEnum.NONE) {
             return;
         }
 
-        if (config.endpoint.getAuthentication().getProperties() == null
-                || config.endpoint.getAuthentication().getProperties().isEmpty()) {
+        if (fedAuthConfigDTO.endpoint.getAuthentication().getProperties() == null
+                || fedAuthConfigDTO.endpoint.getAuthentication().getProperties().isEmpty()) {
             throw new IdentityProviderManagementClientException(
                     Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT.getCode(),
                     Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT.getMessage(),
                     "Endpoint authentication properties must be provided for user defined federated authenticator: "
-                            + config.authenticatorName);
+                            + fedAuthConfigDTO.authenticatorName);
         }
     }
 
-    private static void validateUserDefinedFederatedAuthenticatorModelUpdateRequest(Config config)
-            throws IdentityProviderManagementClientException {
+    private static void performUserDefinedFederatedAuthenticatorCommonValidations(
+            FederatedAuthenticatorConfigDTO fedAuthConfigDTO) throws IdentityProviderManagementClientException {
 
         // The User-defined authenticator configs must not have properties configurations; throw an error if they do.
-        if (config.properties != null) {
+        if (fedAuthConfigDTO.properties != null) {
             Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_PROPERTIES_PROVIDED_FOR_USER_AUTH;
             throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
-                    String.format(error.getDescription(), config.authenticatorName));
+                    String.format(error.getDescription(), fedAuthConfigDTO.authenticatorName));
         }
 
         // The User-defined authenticator configs must have endpoint configurations; throw an error if they don't.
-        if (config.endpoint == null) {
+        if (fedAuthConfigDTO.endpoint == null) {
             Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_NO_ENDPOINT_PROVIDED;
             throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
-                    String.format(error.getDescription(), config.authenticatorName));
+                    String.format(error.getDescription(), fedAuthConfigDTO.authenticatorName));
         }
     }
+
 
     /**
      * If selectMode property is set as saml metadata file configuration mode, this function validates whether a
@@ -446,33 +449,6 @@ public class FederatedAuthenticatorConfigBuilderFactory {
         return apiProperty;
     };
 
-    /**
-     * Returns the 'DisplayName' property of the federated authenticator identified by authenticator name.
-     *
-     * @param authenticatorName Federated authenticator name.
-     * @return Display name of authenticator.
-     */
-    private static String getDisplayNameOfAuthenticator(String authenticatorName)
-            throws IdentityProviderManagementClientException {
-
-        try {
-            FederatedAuthenticatorConfig[] authenticatorConfigs =
-                    IdentityProviderServiceHolder.getIdentityProviderManager()
-                            .getAllFederatedAuthenticators();
-            for (FederatedAuthenticatorConfig config : authenticatorConfigs) {
-
-                if (StringUtils.equals(config.getName(), authenticatorName)) {
-                    return config.getDisplayName();
-                }
-            }
-        } catch (IdentityProviderManagementException e) {
-            Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_IDP;
-            throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
-                    error.getDescription());
-        }
-        return null;
-    }
-
     private static void resolveEndpointConfiguration(FederatedAuthenticator authenticator,
              FederatedAuthenticatorConfig config) throws IdentityProviderManagementServerException {
 
@@ -513,26 +489,68 @@ public class FederatedAuthenticatorConfigBuilderFactory {
     /**
      * Config class to build FederatedAuthenticatorConfig.
      */
-    public static class Config {
-        private final DefinedByType definedByType;
-        private final String authenticatorName;
-        private final String displayName;
-        private final Endpoint endpoint;
-        private final List<Property> properties;
-        private final Boolean isEnabled;
+    private static class FederatedAuthenticatorConfigDTO {
+        private DefinedByType definedByType;
+        private String authenticatorName;
+        private String displayName;
+        private Endpoint endpoint;
+        private List<Property> properties;
+        private Boolean isEnabled;
 
-        public Config(String authenticatorName, DefinedByType definedByType, Boolean isEnabled, Endpoint endpoint,
-                      List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> properties)
+        FederatedAuthenticatorConfigDTO definedByType(DefinedByType definedByType) {
+
+            this.definedByType = definedByType;
+            return this;
+        }
+
+        FederatedAuthenticatorConfigDTO authenticatorName(String authenticatorName)
                 throws IdentityProviderManagementClientException {
 
             this.authenticatorName = authenticatorName;
             this.displayName = getDisplayNameOfAuthenticator(authenticatorName);
+            return this;
+        }
+
+        FederatedAuthenticatorConfigDTO endpoint(Endpoint endpoint) {
+
             this.endpoint = endpoint;
+            return this;
+        }
+
+        FederatedAuthenticatorConfigDTO properties(
+                List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> properties) {
+
             this.properties = Optional.ofNullable(properties)
                     .map(props -> props.stream().map(propertyToInternal).collect(Collectors.toList()))
                     .orElse(null);
+            return this;
+        }
+
+        FederatedAuthenticatorConfigDTO isEnabled(Boolean isEnabled) {
+
             this.isEnabled = isEnabled;
-            this.definedByType = definedByType;
+            return this;
+        }
+
+        private static String getDisplayNameOfAuthenticator(String authenticatorName)
+                throws IdentityProviderManagementClientException {
+
+            try {
+                FederatedAuthenticatorConfig[] authenticatorConfigs =
+                        IdentityProviderServiceHolder.getIdentityProviderManager()
+                                .getAllFederatedAuthenticators();
+                for (FederatedAuthenticatorConfig config : authenticatorConfigs) {
+
+                    if (StringUtils.equals(config.getName(), authenticatorName)) {
+                        return config.getDisplayName();
+                    }
+                }
+            } catch (IdentityProviderManagementException e) {
+                Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_IDP;
+                throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
+                        error.getDescription());
+            }
+            return null;
         }
     }
 }
