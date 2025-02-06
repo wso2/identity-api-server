@@ -150,6 +150,11 @@ public class Util {
             errorResponse = getErrorBuilder(errorEnum).build(log, exception.getMessage());
             errorResponse.setDescription(exception.getMessage());
             status = Response.Status.BAD_REQUEST;
+            // If error is a known error, get the status code assigned to mapped error.
+            Constants.ErrorMessage errorMessage = Constants.getNTMMappedErrorMessage(errorCode);
+            if (errorMessage != null) {
+                status = errorMessage.getHttpStatus();
+            }
         } else {
             // Server error
             errorResponse = getErrorBuilder(errorEnum).build(log, exception, errorEnum.getDescription());
