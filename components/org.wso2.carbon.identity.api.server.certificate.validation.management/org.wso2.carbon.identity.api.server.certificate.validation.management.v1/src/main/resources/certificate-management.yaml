@@ -349,17 +349,27 @@ components:
           type: array
           items:
             type: string
+            example: 'ocspvalidator'
+            description: Certificate validator type
     Validator:
       type: object
       properties:
         enable:
           type: boolean
+          example: true
+          description: Validator is enabled or not
         priority:
           type: integer
+          example: 1
+          description: Validator priority
         fullChainValidation:
           type: boolean
+          example: true
+          description: Full chain validation is enabled or not
         retryCount:
           type: integer
+          example: 3
+          description: Retry count
     CACertificates:
       type: object
       properties:
@@ -372,30 +382,44 @@ components:
       properties:
         issuerDN:
           type: string
+          example: 'CN=WSO2 CA, OU=WSO2, O=WSO2, L=Colombo, ST=Western, C=LK'
+          description: Issuer DN
         crlUrls:
           type: array
           items:
             type: string
+            example: 'http://localhost:9443/crl'
+            description: CRL URL
         ocspUrls:
           type: array
           items:
             type: string
+            example: 'http://localhost:9443/ocsp'
+            description: OCSP URL
         id:
           type: string
+          example: '1'
+          description: Certificate ID
         serialNumber:
           type: string
+          example: '1'
+          description: Serial Number
 
     CACertificateAddRequest:
       type: object
       properties:
         certificate:
           type: string
+          example: 'LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNMRENDQWRLZ0F3SUJBZ0lCQURBS0JnZ3Foa2pPUFFRREFqQjlNUXN3Q1FZRFZRUUdFd0pDUlRFUE1BMEcKQTFVRUNoTUdSMjUxVkV4VE1TVXdJd1lEVlFRTEV4eEhiblZVVEZNZ1kyVnlkR2xtYVdOaGRHVWdZWFYwYUc5eQphWFI1TVE4d0RRWURWUVFJRXdaTVpYVjJaVzR4SlRBakJnTlZCQU1USEVkdWRWUk1VeUJqWlhKMGFXWnBZMkYwClpTQmhkWFJvYjNKcGRIa3dIaGNOTVRFd05USXpNakF6T0RJeFdoY05NVEl4TWpJeU1EYzBNVFV4V2pCOU1Rc3cKQ1FZRFZRUUdFd0pDUlRFUE1BMEdBMVVFQ2hNR1IyNTFWRXhUTVNVd0l3WURWUVFMRXh4SGJuVlVURk1nWTJWeQpkR2xtYVdOaGRHVWdZWFYwYUc5eWFYUjVNUTh3RFFZRFZRUUlFd1pNWlhWMlpXNHhKVEFqQmdOVkJBTVRIRWR1CmRWUk1VeUJqWlhKMGFXWnBZMkYwWlNCaGRYUm9iM0pwZEhrd1dUQVRCZ2NxaGtqT1BRSUJCZ2dxaGtqT1BRTUIKQndOQ0FBUlMySTBqaXVObjE0WTJzU0FMQ1gzSXlicWlJSlV2eFVwaitvTmZ6bmd2ai9OaXl2MjM5NEJXblc0WAp1UTRSVEVpeXdLODdXUmNXTUdnSkI1a1gvdDJubzBNd1FUQVBCZ05WSFJNQkFmOEVCVEFEQVFIL01BOEdBMVVkCkR3RUIvd1FGQXdNSEJnQXdIUVlEVlIwT0JCWUVGUEMwZ2Y2WUVyKzFLTGxrUUFQTHpCOW1UaWdETUFvR0NDcUcKU000OUJBTUNBMGdBTUVVQ0lER3V3RDFLUHlHK2hSZjg4TWV5TVFjcU9GWkQwVGJWbGVGK1VzQUdRNGVuQWlFQQpsNHdPdUR3S1FhK3VwYzhHZnRYRTJDLy80bUtBTkJDNkl0MDFnVWFUSXBvPQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0t'
+          description: Base64 encoded certificate
 
     CACertificateUpdateRequest:
       type: object
       properties:
         certificate:
           type: string
+          example: 'LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNMRENDQWRLZ0F3SUJBZ0lCQURBS0JnZ3Foa2pPUFFRREFqQjlNUXN3Q1FZRFZRUUdFd0pDUlRFUE1BMEcKQTFVRUNoTUdSMjUxVkV4VE1TVXdJd1lEVlFRTEV4eEhiblZVVEZNZ1kyVnlkR2xtYVdOaGRHVWdZWFYwYUc5eQphWFI1TVE4d0RRWURWUVFJRXdaTVpYVjJaVzR4SlRBakJnTlZCQU1USEVkdWRWUk1VeUJqWlhKMGFXWnBZMkYwClpTQmhkWFJvYjNKcGRIa3dIaGNOTVRFd05USXpNakF6T0RJeFdoY05NVEl4TWpJeU1EYzBNVFV4V2pCOU1Rc3cKQ1FZRFZRUUdFd0pDUlRFUE1BMEdBMVVFQ2hNR1IyNTFWRXhUTVNVd0l3WURWUVFMRXh4SGJuVlVURk1nWTJWeQpkR2xtYVdOaGRHVWdZWFYwYUc5eWFYUjVNUTh3RFFZRFZRUUlFd1pNWlhWMlpXNHhKVEFqQmdOVkJBTVRIRWR1CmRWUk1VeUJqWlhKMGFXWnBZMkYwWlNCaGRYUm9iM0pwZEhrd1dUQVRCZ2NxaGtqT1BRSUJCZ2dxaGtqT1BRTUIKQndOQ0FBUlMySTBqaXVObjE0WTJzU0FMQ1gzSXlicWlJSlV2eFVwaitvTmZ6bmd2ai9OaXl2MjM5NEJXblc0WAp1UTRSVEVpeXdLODdXUmNXTUdnSkI1a1gvdDJubzBNd1FUQVBCZ05WSFJNQkFmOEVCVEFEQVFIL01BOEdBMVVkCkR3RUIvd1FGQXdNSEJnQXdIUVlEVlIwT0JCWUVGUEMwZ2Y2WUVyKzFLTGxrUUFQTHpCOW1UaWdETUFvR0NDcUcKU000OUJBTUNBMGdBTUVVQ0lER3V3RDFLUHlHK2hSZjg4TWV5TVFjcU9GWkQwVGJWbGVGK1VzQUdRNGVuQWlFQQpsNHdPdUR3S1FhK3VwYzhHZnRYRTJDLy80bUtBTkJDNkl0MDFnVWFUSXBvPQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0t'
+          description: Base64 encoded certificate
   #-----------------------------------------------------
   # Descriptions of Authenticators API responses.
   #-----------------------------------------------------

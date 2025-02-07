@@ -43,6 +43,7 @@ public class CACertificate  {
     private String serialNumber;
 
     /**
+    * Issuer DN
     **/
     public CACertificate issuerDN(String issuerDN) {
 
@@ -50,7 +51,7 @@ public class CACertificate  {
         return this;
     }
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(example = "CN=WSO2 CA, OU=WSO2, O=WSO2, L=Colombo, ST=Western, C=LK", value = "Issuer DN")
     @JsonProperty("issuerDN")
     @Valid
     public String getIssuerDN() {
@@ -113,6 +114,7 @@ public class CACertificate  {
     }
 
         /**
+    * Certificate ID
     **/
     public CACertificate id(String id) {
 
@@ -120,7 +122,7 @@ public class CACertificate  {
         return this;
     }
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(example = "1", value = "Certificate ID")
     @JsonProperty("id")
     @Valid
     public String getId() {
@@ -131,6 +133,7 @@ public class CACertificate  {
     }
 
     /**
+    * Serial Number
     **/
     public CACertificate serialNumber(String serialNumber) {
 
@@ -138,7 +141,7 @@ public class CACertificate  {
         return this;
     }
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(example = "1", value = "Serial Number")
     @JsonProperty("serialNumber")
     @Valid
     public String getSerialNumber() {

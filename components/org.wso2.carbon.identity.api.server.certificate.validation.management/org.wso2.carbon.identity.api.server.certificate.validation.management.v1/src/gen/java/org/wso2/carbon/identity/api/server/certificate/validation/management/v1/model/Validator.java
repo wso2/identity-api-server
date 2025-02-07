@@ -38,6 +38,7 @@ public class Validator  {
     private Integer retryCount;
 
     /**
+    * Validator is enabled or not
     **/
     public Validator enable(Boolean enable) {
 
@@ -45,7 +46,7 @@ public class Validator  {
         return this;
     }
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(example = "true", value = "Validator is enabled or not")
     @JsonProperty("enable")
     @Valid
     public Boolean getEnable() {
@@ -56,6 +57,7 @@ public class Validator  {
     }
 
     /**
+    * Validator priority
     **/
     public Validator priority(Integer priority) {
 
@@ -63,7 +65,7 @@ public class Validator  {
         return this;
     }
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(example = "1", value = "Validator priority")
     @JsonProperty("priority")
     @Valid
     public Integer getPriority() {
@@ -74,6 +76,7 @@ public class Validator  {
     }
 
     /**
+    * Full chain validation is enabled or not
     **/
     public Validator fullChainValidation(Boolean fullChainValidation) {
 
@@ -81,7 +84,7 @@ public class Validator  {
         return this;
     }
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(example = "true", value = "Full chain validation is enabled or not")
     @JsonProperty("fullChainValidation")
     @Valid
     public Boolean getFullChainValidation() {
@@ -92,6 +95,7 @@ public class Validator  {
     }
 
     /**
+    * Retry count
     **/
     public Validator retryCount(Integer retryCount) {
 
@@ -99,7 +103,7 @@ public class Validator  {
         return this;
     }
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(example = "3", value = "Retry count")
     @JsonProperty("retryCount")
     @Valid
     public Integer getRetryCount() {
