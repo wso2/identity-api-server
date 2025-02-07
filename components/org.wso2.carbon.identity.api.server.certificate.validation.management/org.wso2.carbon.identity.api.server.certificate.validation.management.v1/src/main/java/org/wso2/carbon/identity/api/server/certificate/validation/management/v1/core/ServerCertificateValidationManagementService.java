@@ -131,7 +131,7 @@ public class ServerCertificateValidationManagementService {
 
         try {
             CACertificateInfo caCertificate = certificateValidationManagementService
-                    .getCaCertificate(certificateId, ContextLoader.getTenantDomainFromContext());
+                    .getCACertificate(certificateId, ContextLoader.getTenantDomainFromContext());
 
             return mapCACertificateToApiModel(caCertificate);
         } catch (CertificateValidationManagementException e) {

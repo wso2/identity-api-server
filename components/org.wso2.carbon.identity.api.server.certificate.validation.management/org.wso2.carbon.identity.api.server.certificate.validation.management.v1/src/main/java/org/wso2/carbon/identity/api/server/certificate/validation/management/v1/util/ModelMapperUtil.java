@@ -24,11 +24,11 @@ import org.wso2.carbon.identity.api.server.certificate.validation.management.v1.
 import org.wso2.carbon.identity.api.server.certificate.validation.management.v1.model.Validators;
 import org.wso2.carbon.identity.x509Certificate.validation.model.CACertificateInfo;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * Utility class for Certificate Validation Management endpoint.
+ * Utility class for Certificate Validation Management Model Mapping.
  */
 public class ModelMapperUtil {
 
@@ -45,10 +45,9 @@ public class ModelMapperUtil {
     public static Validators mapValidatorsToApiModel
     (List<org.wso2.carbon.identity.x509Certificate.validation.model.Validator> validators) {
 
-        List<String> validatorList = new ArrayList<>();
-        for (org.wso2.carbon.identity.x509Certificate.validation.model.Validator validator : validators) {
-            validatorList.add(validator.getDisplayName());
-        }
+        List<String> validatorList = validators.stream()
+                .map(org.wso2.carbon.identity.x509Certificate.validation.model.Validator::getDisplayName)
+                .collect(Collectors.toList());
         return new Validators().validators(validatorList);
     }
 
@@ -96,11 +95,9 @@ public class ModelMapperUtil {
      */
     public static CACertificates mapCACertificatesToApiModel(List<CACertificateInfo> caCertificateInfoList) {
 
-        List<CACertificate>
-                caCertificates = new ArrayList<>();
-        for (CACertificateInfo caCertificateInfo : caCertificateInfoList) {
-            caCertificates.add(mapCACertificateToApiModel(caCertificateInfo));
-        }
+        List<CACertificate> caCertificates = caCertificateInfoList.stream()
+                .map(ModelMapperUtil::mapCACertificateToApiModel)
+                .collect(Collectors.toList());
         return new CACertificates().certificates(caCertificates);
     }
 

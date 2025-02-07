@@ -23,7 +23,7 @@ import org.wso2.carbon.identity.api.server.certificate.validation.management.v1.
 import org.wso2.carbon.identity.x509Certificate.validation.service.CertificateValidationManagementService;
 
 /**
- * Factory class for ServerAuthenticatorManagementService.
+ * Factory class for ServerCertificateValidationManagementService.
  */
 public class ServerCertificateValidationManagementServiceFactory {
 
