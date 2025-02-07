@@ -25,11 +25,12 @@ import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
 import org.wso2.carbon.identity.x509Certificate.validation.exception.CertificateValidationManagementClientException;
 import org.wso2.carbon.identity.x509Certificate.validation.exception.CertificateValidationManagementException;
 
-import javax.ws.rs.core.Response;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.x509Certificate.validation.constant.error.ErrorMessage.ERROR_CERTIFICATE_DOES_NOT_EXIST;
 import static org.wso2.carbon.identity.x509Certificate.validation.constant.error.ErrorMessage.ERROR_INVALID_VALIDATOR_NAME;
