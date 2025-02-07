@@ -24,7 +24,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.certificate.validation.management.v1.model.Validator;
 import javax.validation.constraints.*;
 
 
@@ -35,12 +34,12 @@ import javax.xml.bind.annotation.*;
 
 public class Validators  {
 
-    private List<Validator> validators = null;
+    private List<String> validators = null;
 
 
     /**
     **/
-    public Validators validators(List<Validator> validators) {
+    public Validators validators(List<String> validators) {
 
         this.validators = validators;
         return this;
@@ -49,16 +48,16 @@ public class Validators  {
     @ApiModelProperty(value = "")
     @JsonProperty("Validators")
     @Valid
-    public List<Validator> getValidators() {
+    public List<String> getValidators() {
         return validators;
     }
-    public void setValidators(List<Validator> validators) {
+    public void setValidators(List<String> validators) {
         this.validators = validators;
     }
 
-    public Validators addValidatorsItem(Validator validatorsItem) {
+    public Validators addValidatorsItem(String validatorsItem) {
         if (this.validators == null) {
-            this.validators = new ArrayList<>();
+            this.validators = new ArrayList<String>();
         }
         this.validators.add(validatorsItem);
         return this;

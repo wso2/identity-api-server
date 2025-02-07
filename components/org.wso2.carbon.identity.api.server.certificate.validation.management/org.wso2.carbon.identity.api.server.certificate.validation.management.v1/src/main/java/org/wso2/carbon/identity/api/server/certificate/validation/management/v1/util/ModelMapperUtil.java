@@ -45,9 +45,9 @@ public class ModelMapperUtil {
     public static Validators mapValidatorsToApiModel
     (List<org.wso2.carbon.identity.x509Certificate.validation.model.Validator> validators) {
 
-        List<Validator> validatorList = new ArrayList<>();
+        List<String> validatorList = new ArrayList<>();
         for (org.wso2.carbon.identity.x509Certificate.validation.model.Validator validator : validators) {
-            validatorList.add(mapValidatorToApiModel(validator));
+            validatorList.add(validator.getDisplayName());
         }
         return new Validators().validators(validatorList);
     }

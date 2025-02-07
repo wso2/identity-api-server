@@ -348,7 +348,7 @@ components:
         Validators:
           type: array
           items:
-            $ref: '#/components/schemas/Validator'
+            type: string
     Validator:
       type: object
       properties:

@@ -58,7 +58,7 @@ public class CACertificates  {
 
     public CACertificates addCertificatesItem(CACertificate certificatesItem) {
         if (this.certificates == null) {
-            this.certificates = new ArrayList<>();
+            this.certificates = new ArrayList<CACertificate>();
         }
         this.certificates.add(certificatesItem);
         return this;

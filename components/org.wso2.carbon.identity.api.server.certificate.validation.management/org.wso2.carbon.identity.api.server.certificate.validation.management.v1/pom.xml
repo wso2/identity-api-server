@@ -47,8 +47,9 @@
                                 <apiPackage>org.wso2.carbon.identity.api.server.certificate.validation.management.v1</apiPackage>
                                 <modelPackage>org.wso2.carbon.identity.api.server.certificate.validation.management.v1.model</modelPackage>
                                 <packageName>org.wso2.carbon.identity.api.server.certificate.validation.management.v1</packageName>
-                                <dateLibrary>java8</dateLibrary>
+                                <dateLibrary>java17</dateLibrary>
                                 <hideGenerationTimestamp>true</hideGenerationTimestamp>
+                                <ignoreFileOverride>${project.basedir}/.openapi-generator-ignore</ignoreFileOverride>
                             </configOptions>
                             <output>.</output>
                             <skipOverwrite>false</skipOverwrite>

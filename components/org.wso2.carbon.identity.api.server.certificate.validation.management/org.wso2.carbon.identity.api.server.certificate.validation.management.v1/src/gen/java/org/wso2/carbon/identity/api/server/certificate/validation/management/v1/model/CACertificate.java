@@ -80,7 +80,7 @@ public class CACertificate  {
 
     public CACertificate addCrlUrlsItem(String crlUrlsItem) {
         if (this.crlUrls == null) {
-            this.crlUrls = new ArrayList<>();
+            this.crlUrls = new ArrayList<String>();
         }
         this.crlUrls.add(crlUrlsItem);
         return this;
@@ -106,7 +106,7 @@ public class CACertificate  {
 
     public CACertificate addOcspUrlsItem(String ocspUrlsItem) {
         if (this.ocspUrls == null) {
-            this.ocspUrls = new ArrayList<>();
+            this.ocspUrls = new ArrayList<String>();
         }
         this.ocspUrls.add(ocspUrlsItem);
         return this;
