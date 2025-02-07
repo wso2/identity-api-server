@@ -18,14 +18,20 @@
 
 package org.wso2.carbon.identity.api.server.certificate.validation.management.v1.impl;
 
+import static org.wso2.carbon.identity.api.server.certificate.validation.management.v1.constants.CertificateValidationMgtEndpointConstants.CERTIFICATE_MANAGEMENT_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.certificate.validation.management.v1.constants.CertificateValidationMgtEndpointConstants.CERTIFICATE_VALIDATION_MANAGEMENT_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.certificate.validation.management.v1.constants.CertificateValidationMgtEndpointConstants.PATH_SEPARATOR;
+import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
+import java.net.URI;
+import javax.ws.rs.core.Response;
 import org.wso2.carbon.identity.api.server.certificate.validation.management.v1.CertificateValidationApiService;
 import org.wso2.carbon.identity.api.server.certificate.validation.management.v1.core.ServerCertificateValidationManagementService;
 import org.wso2.carbon.identity.api.server.certificate.validation.management.v1.factories.ServerCertificateValidationManagementServiceFactory;
+import org.wso2.carbon.identity.api.server.certificate.validation.management.v1.model.CACertificate;
 import org.wso2.carbon.identity.api.server.certificate.validation.management.v1.model.CACertificateAddRequest;
 import org.wso2.carbon.identity.api.server.certificate.validation.management.v1.model.CACertificateUpdateRequest;
 import org.wso2.carbon.identity.api.server.certificate.validation.management.v1.model.Validator;
-
-import javax.ws.rs.core.Response;
+import org.wso2.carbon.identity.api.server.common.ContextLoader;
 
 /**
  * Certificate Validation API service implementation.
@@ -48,8 +54,12 @@ public class CertificateValidationApiServiceImpl implements CertificateValidatio
     @Override
     public Response addCACertificate(CACertificateAddRequest caCertificateAddRequest) {
 
-        return Response.ok().entity(certificateValidationManagementService
-                .addCACertificate(caCertificateAddRequest.getCertificate())).build();
+        CACertificate caCertificate = certificateValidationManagementService
+                .addCACertificate(caCertificateAddRequest.getCertificate());
+        URI location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT +
+                CERTIFICATE_VALIDATION_MANAGEMENT_PATH_COMPONENT + CERTIFICATE_MANAGEMENT_PATH_COMPONENT +
+                PATH_SEPARATOR + caCertificate.getId());
+        return Response.created(location).entity(caCertificate).build();
     }
 
     @Override
