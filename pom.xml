@@ -307,6 +307,12 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.extension.identity.x509certificate</groupId>
+                <artifactId>org.wso2.carbon.extension.identity.x509Certificate.validation</artifactId>
+                <version>${identity.x509Certificate.validation.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.identity.inbound.auth.saml2</groupId>
                 <artifactId>org.wso2.carbon.identity.sso.saml</artifactId>
                 <version>${identity.inbound.saml2.version}</version>
@@ -381,6 +387,12 @@
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
                 <artifactId>org.wso2.carbon.identity.api.server.authenticators.common</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.certificate.validation.management.common</artifactId>
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>
@@ -855,6 +867,7 @@
         <identity.event.handler.version>1.9.34</identity.event.handler.version>
         <identity.inbound.oauth2.version>7.0.224</identity.inbound.oauth2.version>
         <identity.inbound.saml2.version>5.11.44</identity.inbound.saml2.version>
+        <identity.x509Certificate.validation.version>1.1.19-SNAPSHOT</identity.x509Certificate.validation.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <mavan.findbugsplugin.exclude.file>findbugs-exclude-filter.xml</mavan.findbugsplugin.exclude.file>
         <carbon.kernel.version>4.10.25</carbon.kernel.version>
@@ -905,6 +918,7 @@
         <module>components/org.wso2.carbon.identity.api.server.cors</module>
         <module>components/org.wso2.carbon.identity.api.server.notification.sender</module>
         <module>components/org.wso2.carbon.identity.api.server.authenticators</module>
+        <module>components/org.wso2.carbon.identity.api.server.certificate.validation.management</module>
         <module>components/org.wso2.carbon.identity.api.server.secret.management</module>
         <module>components/org.wso2.carbon.identity.api.server.branding.preference.management</module>
         <module>components/org.wso2.carbon.identity.api.server.input.validation</module>
