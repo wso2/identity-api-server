@@ -630,7 +630,8 @@ public class ServerAuthenticatorManagementService {
         authenticator.setType(Authenticator.TypeEnum.LOCAL);
 
         authenticator.definedBy(Authenticator.DefinedByEnum.valueOf(config.getDefinedByType().toString()));
-        if (config.getDefinedByType() == AuthenticatorPropertyConstants.DefinedByType.USER) {
+        if (AuthenticatorPropertyConstants.DefinedByType.USER.equals(config.getDefinedByType()) && config instanceof
+                UserDefinedLocalAuthenticatorConfig) {
             UserDefinedLocalAuthenticatorConfig userDefinedConfig = (UserDefinedLocalAuthenticatorConfig) config;
             authenticator.setImage(userDefinedConfig.getImageUrl());
             authenticator.setDescription(userDefinedConfig.getDescription());
