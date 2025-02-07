@@ -21,12 +21,20 @@ package org.wso2.carbon.identity.api.server.api.resource.v1.factories;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ApiResourcesApiService;
 import org.wso2.carbon.identity.api.server.api.resource.v1.impl.ApiResourcesApiServiceImpl;
 
+/**
+ * Factory class for ApiResourcesApiService.
+ */
 public class ApiResourcesApiServiceFactory {
 
-   private final static ApiResourcesApiService service = new ApiResourcesApiServiceImpl();
+   private final static ApiResourcesApiService SERVICE = new ApiResourcesApiServiceImpl();
 
-   public static ApiResourcesApiService getApiResourcesApi()
-   {
-      return service;
+   /**
+    * Get ApiResourcesApiService.
+    *
+    * @return ApiResourcesApiService.
+    */
+   public static ApiResourcesApiService getApiResourcesApi() {
+
+      return SERVICE;
    }
 }

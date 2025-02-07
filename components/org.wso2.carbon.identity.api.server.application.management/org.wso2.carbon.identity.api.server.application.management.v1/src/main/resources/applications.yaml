@@ -2616,6 +2616,158 @@ paths:
                 $ref: '#/components/schemas/Error'
       tags:
         - Organization Application Sharing
+  /applications/loginflow/generate:
+    post:
+      tags:
+        - LoginFlow
+      summary: Initiate login flow generation
+      description: >
+        This API provides the capability to initiate the generation of a login flow.
+        <br>
+        <b>Scope required:</b>
+        * internal_application_mgt_update
+      operationId: generateLoginFlow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginFlowGenerateRequest'
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginFlowGenerateResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /applications/loginflow/status/{operation_id}:
+    get:
+      tags:
+        - LoginFlow
+      summary: Get the status of the login flow generation process
+      description: >
+        This API provides the capability to retrieve the status of the login flow generation process.
+        <br>
+        <b>Scope required:</b>
+        * internal_application_mgt_update
+      operationId: getLoginFlowGenerationStatus
+      parameters:
+        - name: operation_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginFlowStatusResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /applications/loginflow/result/{operation_id}:
+    get:
+      tags:
+        - LoginFlow
+      summary: Get the final login flow result
+      description: >
+        This API provides the capability to retrieve the final login flow result.
+        <br>
+        <b>Scope required:</b>
+        * internal_application_mgt_update
+      operationId: getLoginFlowGenerationResult
+      parameters:
+        - name: operation_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginFlowResultResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
 components:
   parameters:
@@ -3680,10 +3832,13 @@ components:
       properties:
         enable:
           type: boolean
+          description: "Indicates whether the hybrid flow is enabled."
           example: true
         responseType:
           type: string
-          example: code id_token
+          description: "Specifies the allowed response types for the hybrid flow, provided as a comma-separated string. 
+          The supported combinations are: 'code token', 'code id_token token', and 'code id_token'."
+          example: code id_token,code token
     AccessTokenConfiguration:
       type: object
       properties:
@@ -4250,6 +4405,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AuthorizedScope'
+        authorizedAuthorizationDetailsTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuthorizedAuthorizationDetailsTypes'
 
     AuthorizedScope:
       type: object
@@ -4263,6 +4422,27 @@ components:
         displayName:
           type: string
           example: Read Bookings
+
+    AuthorizedAuthorizationDetailsTypes:
+      type: object
+      required:
+        - type
+        - name
+      properties:
+        id:
+          type: string
+          example: a9403470-dd11-46b4-8db9-aaa31f1d4423
+          description: an unique id of the registered authorization details type
+        type:
+          type: string
+          example: payment_initiation
+          description: an unique type of the authorization details type
+        name:
+          type: string
+          minLength: 3
+          maxLength: 255
+          description: display name of the authorization details type
+          example: Payment Initiation
 
     AuthorizedAPICreationModel:
       type: object
@@ -4278,6 +4458,11 @@ components:
           items:
             type: string
             example: bookings:read
+        authorizationDetailsTypes:
+          type: array
+          items:
+            type: string
+            example: payment_initiation
 
     AuthorizedAPIPatchModel:
       type: object
@@ -4292,6 +4477,16 @@ components:
           items:
             type: string
             example: bookings:view
+        addedAuthorizationDetailsTypes:
+          type: array
+          items:
+            type: string
+            example: payment_initiation
+        removedAuthorizationDetailsTypes:
+          type: array
+          items:
+            type: string
+            example: account_information
 
     ApplicationSharePOSTRequest:
       type: object
@@ -4349,7 +4544,100 @@ components:
         ref:
           type: string
           example: '/t/wso2.com/api/server/v1/organizations/b4526d91-a8bf-43d2-8b14-c548cf73065b'
-
+    LoginFlowGenerateRequest:
+      type: object
+      properties:
+        available_authenticators:
+          type: object
+          additionalProperties: true
+          description: |
+            Available authenticators of the organization.
+            It's expected to provide the authenticator name, description, and the IDP.
+        user_claims:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          description: |
+            Metadata of the available user claims for the organization. 
+            Provide the claim URI and a human-readable description of the claim.
+        user_query:
+          type: string
+      example: {
+        "available_authenticators": {
+          "local": [
+            {
+              "description": "Login users with username and password credentials.",
+              "idp": "LOCAL",
+              "name": "BasicAuthenticator"
+            },
+            {
+              "description": "Two-factor authentication using SMS one-time passcode.",
+              "idp": "LOCAL",
+              "name": "sms-otp-authenticator"
+            }
+          ],
+          "social": [
+            {
+              "description": "Login users with existing Google accounts.",
+              "idp": "Google",
+              "name": "GoogleOIDCAuthenticator"
+            }
+          ]
+        },
+        "user_claims": [
+          {
+            "claimURI": "http://example.com/claims/email",
+            "description": "Email address of the user."
+          },
+          {
+            "claimURI": "http://example.com/claims/role",
+            "description": "Role of the user in the application."
+          }
+        ],
+        "user_query": "GoogleOIDCAuthenticator followed by SMS-OTP if user has admin role."
+      }
+    LoginFlowGenerateResponse:
+      type: object
+      properties:
+        operation_id:
+          type: string
+    StatusEnum:
+      type: string
+      enum:
+        - IN_PROGRESS
+        - COMPLETED
+        - FAILED
+    LoginFlowStatusResponse:
+      type: object
+      properties:
+        operation_id:
+          type: string
+        status:
+          type: object
+          description: A generic object representing the status
+          example: {
+            "retrieving_examples": true,
+            "optimization_and_validation_complete": true,
+            "login_flow_generation_complete": false,
+            "optimizing_and_validating_user_query": true,
+            "generating_authentication_sequence": true,
+            "retrieval_of_examples_complete": true,
+            "optimizing_and_validating_final_login_flow": false,
+            "generation_of_authentication_sequence_complete": true
+          }
+    LoginFlowResultResponse:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        data:
+          type: object
+          description: |
+            The payload of the response, which varies based on the operation status.
+            - For IN_PROGRESS status, an empty JSON object is returned.
+            - For COMPLETED status, the authentication sequence is returned.
+            - For FAILED status, an error message is returned.
     Error:
       type: object
       properties:

@@ -18,10 +18,10 @@
 
 package org.wso2.carbon.identity.api.server.idv.provider.v1.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.idv.provider.v1.IdvProvidersApiService;
 import org.wso2.carbon.identity.api.server.idv.provider.v1.core.IdVProviderService;
+import org.wso2.carbon.identity.api.server.idv.provider.v1.factories.IdVProviderServiceFactory;
 import org.wso2.carbon.identity.api.server.idv.provider.v1.model.IdVProviderListResponse;
 import org.wso2.carbon.identity.api.server.idv.provider.v1.model.IdVProviderRequest;
 import org.wso2.carbon.identity.api.server.idv.provider.v1.model.IdVProviderResponse;
@@ -37,8 +37,16 @@ import javax.ws.rs.core.Response;
  */
 public class IdvProvidersApiServiceImpl implements IdvProvidersApiService {
 
-    @Autowired
-    IdVProviderService idVProviderService;
+    private final IdVProviderService idVProviderService;
+
+    public IdvProvidersApiServiceImpl() {
+    
+        try {
+            this.idVProviderService = IdVProviderServiceFactory.getIdVProviderService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating IdVProviderService.", e);
+        }
+    }
 
     @Override
     public Response addIdVProvider(IdVProviderRequest idVProviderRequest) {

@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.organization.configs.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.organization.config.service.OrganizationConfigManager;
 
 /**
@@ -25,7 +26,13 @@ import org.wso2.carbon.identity.organization.config.service.OrganizationConfigMa
  */
 public class OrganizationConfigsServiceHolder {
 
-    private static OrganizationConfigManager organizationConfigManager;
+    public OrganizationConfigsServiceHolder() {}
+
+    private static class OrganizationConfigManagerHolder {
+
+        static final OrganizationConfigManager SERVICE = (OrganizationConfigManager) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(OrganizationConfigManager.class, null);
+    }
 
     /**
      * Get OrganizationConfigManager OSGi service.
@@ -34,16 +41,6 @@ public class OrganizationConfigsServiceHolder {
      */
     public static OrganizationConfigManager getOrganizationConfigManager() {
 
-        return organizationConfigManager;
-    }
-
-    /**
-     * Set OrganizationConfigManager OSGi service.
-     *
-     * @param organizationConfigManager OrganizationConfigManager.
-     */
-    public static void setOrganizationConfigManager(OrganizationConfigManager organizationConfigManager) {
-
-        OrganizationConfigsServiceHolder.organizationConfigManager = organizationConfigManager;
+        return OrganizationConfigManagerHolder.SERVICE;
     }
 }

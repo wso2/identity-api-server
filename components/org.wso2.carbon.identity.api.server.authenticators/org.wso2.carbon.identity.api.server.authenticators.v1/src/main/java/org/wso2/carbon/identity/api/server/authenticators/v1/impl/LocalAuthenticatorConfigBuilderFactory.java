@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.authenticators.v1.impl;
 
+import org.wso2.carbon.identity.api.server.authenticators.v1.model.AuthenticationType;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Endpoint;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.UserDefinedLocalAuthenticatorCreation;
@@ -59,6 +60,8 @@ public class LocalAuthenticatorConfigBuilderFactory {
         authenticator.setName(config.getName());
         authenticator.setId(authenticatorId);
         authenticator.setDisplayName(config.getDisplayName());
+        authenticator.setImage(config.getImageUrl());
+        authenticator.description(config.getDescription());
         authenticator.setIsEnabled(config.isEnabled());
         authenticator.setDefinedBy(Authenticator.DefinedByEnum.USER);
         authenticator.setType(Authenticator.TypeEnum.LOCAL);
@@ -79,6 +82,7 @@ public class LocalAuthenticatorConfigBuilderFactory {
     public static UserDefinedLocalAuthenticatorConfig build(UserDefinedLocalAuthenticatorCreation config)
             throws AuthenticatorMgtClientException {
 
+        validateUserDefinedLocalAuthenticatorConfig(config);
         String authenticationType = AuthenticatorPropertyConstants.AuthenticationType.IDENTIFICATION.toString();
         if (config.getAuthenticationType() != null) {
             authenticationType = config.getAuthenticationType().toString();
@@ -87,6 +91,8 @@ public class LocalAuthenticatorConfigBuilderFactory {
                 AuthenticatorPropertyConstants.AuthenticationType.valueOf(authenticationType));
         authConfig.setName(config.getName());
         authConfig.setDisplayName(config.getDisplayName());
+        authConfig.setImageUrl(config.getImage());
+        authConfig.setDescription(config.getDescription());
         authConfig.setEnabled(config.getIsEnabled());
         authConfig.setEndpointConfig(buildEndpointConfig(config.getEndpoint()));
 
@@ -108,6 +114,8 @@ public class LocalAuthenticatorConfigBuilderFactory {
                 resolveAuthenticationType(existingConfig));
         authConfig.setName(existingConfig.getName());
         authConfig.setDisplayName(config.getDisplayName());
+        authConfig.setImageUrl(config.getImage());
+        authConfig.setDescription(config.getDescription());
         authConfig.setEnabled(config.getIsEnabled());
         authConfig.setEndpointConfig(buildEndpointConfig(config.getEndpoint()));
 
@@ -139,6 +147,22 @@ public class LocalAuthenticatorConfigBuilderFactory {
             return AuthenticatorPropertyConstants.AuthenticationType.VERIFICATION;
         } else {
             return AuthenticatorPropertyConstants.AuthenticationType.IDENTIFICATION;
+        }
+    }
+
+    private static void validateUserDefinedLocalAuthenticatorConfig(UserDefinedLocalAuthenticatorCreation config)
+            throws AuthenticatorMgtClientException {
+
+        if (config.getEndpoint().getAuthentication().getType() == AuthenticationType.TypeEnum.NONE) {
+            return;
+        }
+
+        if (config.getEndpoint().getAuthentication().getProperties() == null ||
+                config.getEndpoint().getAuthentication().getProperties().isEmpty()) {
+            AuthenticatorMgtError error = AuthenticatorMgtError.ERROR_CODE_INVALID_ENDPOINT_CONFIG;
+            throw new AuthenticatorMgtClientException(error.getCode(), error.getMessage(),
+                    "Endpoint authentication properties must be provided for user defined local authenticator: "
+                            + config.getName());
         }
     }
 }

@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2019 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019-2024, WSO2 LLC. (http://www.wso2.com).
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
+ * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,12 +20,12 @@ package org.wso2.carbon.identity.api.server.idp.v1.impl;
 
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
+import org.apache.http.HttpHeaders;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.FileContent;
 import org.wso2.carbon.identity.api.server.idp.v1.IdentityProvidersApiService;
 import org.wso2.carbon.identity.api.server.idp.v1.core.ServerIdpManagementService;
+import org.wso2.carbon.identity.api.server.idp.v1.factories.ServerIdpManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.idp.v1.model.AssociationRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorPUTRequest;
@@ -55,8 +55,16 @@ import static org.wso2.carbon.identity.api.server.idp.common.Constants.IDP_TEMPL
  */
 public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiService {
 
-    @Autowired
-    private ServerIdpManagementService idpManagementService;
+    private final ServerIdpManagementService idpManagementService;
+
+    public IdentityProvidersApiServiceImpl() {
+
+        try {
+            this.idpManagementService = ServerIdpManagementServiceFactory.getServerIdpManagementService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating ServerIdpManagementService.", e);
+        }
+    }
 
     @Override
     public Response addIDP(IdentityProviderPOSTRequest identityProviderPOSTRequest) {
@@ -104,7 +112,7 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
 
         return Response.ok()
                 .type(fileContent.getFileType())
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""
+                .header("Content-Disposition", "attachment; filename=\""
                         + fileContent.getFileName() + "\"")
                 .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate")
                 .header(HttpHeaders.PRAGMA, "no-cache")

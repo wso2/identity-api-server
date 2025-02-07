@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.organization.user.invitation.management.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.organization.user.invitation.management.InvitationCoreService;
 
 /**
@@ -25,7 +26,15 @@ import org.wso2.carbon.identity.organization.user.invitation.management.Invitati
  */
 public class UserInvitationMgtServiceHolder {
 
-    private static InvitationCoreService invitationCoreService;
+    private UserInvitationMgtServiceHolder() {
+
+    }
+
+    private static class InvitationCoreServiceHolder {
+
+        static final InvitationCoreService SERVICE = (InvitationCoreService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(InvitationCoreService.class, null);
+    }
 
     /**
      * Get Invitation Core osgi service.
@@ -34,16 +43,6 @@ public class UserInvitationMgtServiceHolder {
      */
     public static InvitationCoreService getInvitationCoreService() {
 
-        return invitationCoreService;
-    }
-
-    /**
-     * Set Invitation Core osgi service.
-     *
-     * @param invitationCoreService InvitationCoreService.
-     */
-    public static void setInvitationCoreService(InvitationCoreService invitationCoreService) {
-
-        UserInvitationMgtServiceHolder.invitationCoreService = invitationCoreService;
+        return InvitationCoreServiceHolder.SERVICE;
     }
 }
