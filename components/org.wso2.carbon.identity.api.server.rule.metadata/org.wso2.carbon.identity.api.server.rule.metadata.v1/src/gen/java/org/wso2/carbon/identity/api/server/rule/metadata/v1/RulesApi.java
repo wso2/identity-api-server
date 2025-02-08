@@ -64,7 +64,7 @@ public class RulesApi  {
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getExpressionMeta(    @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Specifies the flow to retrieve rule metadata. This ensures that the metadata returned is relevant to the given flow.  Note: At present, only the 'preIssueAccessToken' flow is supported. ",required=true, allowableValues="preIssueAccessToken, prePasswordUpdate, preProfileUpdate, preLogin, postLogin, inLogin, preRegistration, inRegistration, inPasswordExpiry")  @QueryParam("flow") String flow) {
+    public Response getExpressionMeta(    @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Specifies the flow to retrieve rule metadata. This ensures that the metadata returned is relevant to the given flow.  Note: At present, only the 'preIssueAccessToken' and 'preUpdatePassword' flows are supported. ",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preProfileUpdate, preLogin, postLogin, inLogin, preRegistration, inRegistration, inPasswordExpiry")  @QueryParam("flow") String flow) {
 
         return delegate.getExpressionMeta(flow );
     }
