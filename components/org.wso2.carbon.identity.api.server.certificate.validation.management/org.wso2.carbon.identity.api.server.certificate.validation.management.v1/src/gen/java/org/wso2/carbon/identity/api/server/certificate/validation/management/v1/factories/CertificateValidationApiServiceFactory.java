@@ -35,5 +35,5 @@ public class CertificateValidationApiServiceFactory {
      */
     public static CertificateValidationApiService getCertificateValidationApi() {
         return SERVICE;
-   }
+    }
 }

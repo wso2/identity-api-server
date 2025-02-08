@@ -49,7 +49,7 @@ paths:
       x-codeSamples:
         - lang: Curl
           source: |
-            curl --location 'https://localhost:9443/o/api/server/v1/certificate-validation/revocation-validators' \
+            curl --location 'https://localhost:9443/api/server/v1/certificate-validation/revocation-validators' \
             -H 'Accept: application/json' \
             -H 'Authorization: Basic YWRtaW46YWRtaW4='
   /certificate-validation/revocation-validators/{validatorName}:
