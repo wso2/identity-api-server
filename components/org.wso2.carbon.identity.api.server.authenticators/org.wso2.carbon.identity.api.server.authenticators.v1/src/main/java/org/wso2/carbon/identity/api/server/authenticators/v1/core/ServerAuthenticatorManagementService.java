@@ -50,6 +50,7 @@ import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticato
 import org.wso2.carbon.identity.application.common.model.UserDefinedLocalAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.util.AuthenticatorMgtExceptionBuilder.AuthenticatorMgtError;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
+import org.wso2.carbon.identity.base.AuthenticatorPropertyConstants;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.core.model.ExpressionNode;
 import org.wso2.carbon.identity.core.model.FilterTreeBuilder;
@@ -627,7 +628,14 @@ public class ServerAuthenticatorManagementService {
         authenticator.setDisplayName(config.getDisplayName());
         authenticator.setIsEnabled(config.isEnabled());
         authenticator.setType(Authenticator.TypeEnum.LOCAL);
+
         authenticator.definedBy(Authenticator.DefinedByEnum.valueOf(config.getDefinedByType().toString()));
+        if (AuthenticatorPropertyConstants.DefinedByType.USER.equals(config.getDefinedByType()) && config instanceof
+                UserDefinedLocalAuthenticatorConfig) {
+            UserDefinedLocalAuthenticatorConfig userDefinedConfig = (UserDefinedLocalAuthenticatorConfig) config;
+            authenticator.setImage(userDefinedConfig.getImageUrl());
+            authenticator.setDescription(userDefinedConfig.getDescription());
+        }
         String[] tags = config.getTags();
         if (ArrayUtils.isNotEmpty(tags)) {
             authenticator.setTags(Arrays.asList(tags));
