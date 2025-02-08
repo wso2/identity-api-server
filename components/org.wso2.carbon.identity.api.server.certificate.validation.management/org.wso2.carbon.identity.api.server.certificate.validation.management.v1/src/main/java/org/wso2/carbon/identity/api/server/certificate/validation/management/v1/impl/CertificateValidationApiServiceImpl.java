@@ -18,6 +18,12 @@
 
 package org.wso2.carbon.identity.api.server.certificate.validation.management.v1.impl;
 
+import static org.wso2.carbon.identity.api.server.certificate.validation.management.v1.constants.CertificateValidationMgtEndpointConstants.CERTIFICATE_MANAGEMENT_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.certificate.validation.management.v1.constants.CertificateValidationMgtEndpointConstants.CERTIFICATE_VALIDATION_MANAGEMENT_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.certificate.validation.management.v1.constants.CertificateValidationMgtEndpointConstants.PATH_SEPARATOR;
+import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
+import java.net.URI;
+import javax.ws.rs.core.Response;
 import org.wso2.carbon.identity.api.server.certificate.validation.management.v1.CertificateValidationApiService;
 import org.wso2.carbon.identity.api.server.certificate.validation.management.v1.core.ServerCertificateValidationManagementService;
 import org.wso2.carbon.identity.api.server.certificate.validation.management.v1.factories.ServerCertificateValidationManagementServiceFactory;
@@ -26,15 +32,6 @@ import org.wso2.carbon.identity.api.server.certificate.validation.management.v1.
 import org.wso2.carbon.identity.api.server.certificate.validation.management.v1.model.CACertificateUpdateRequest;
 import org.wso2.carbon.identity.api.server.certificate.validation.management.v1.model.Validator;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
-
-import java.net.URI;
-
-import javax.ws.rs.core.Response;
-
-import static org.wso2.carbon.identity.api.server.certificate.validation.management.v1.constants.CertificateValidationMgtEndpointConstants.CERTIFICATE_MANAGEMENT_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.certificate.validation.management.v1.constants.CertificateValidationMgtEndpointConstants.CERTIFICATE_VALIDATION_MANAGEMENT_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.certificate.validation.management.v1.constants.CertificateValidationMgtEndpointConstants.PATH_SEPARATOR;
-import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 
 /**
  * Certificate Validation API service implementation.
@@ -97,7 +94,8 @@ public class CertificateValidationApiServiceImpl implements CertificateValidatio
     }
 
     @Override
-    public Response updateCACertificateById(String certificateId, CACertificateUpdateRequest caCertificateUpdateRequest) {
+    public Response updateCACertificateById(String certificateId,
+                                            CACertificateUpdateRequest caCertificateUpdateRequest) {
 
         return Response.ok().entity(certificateValidationManagementService.updateCACertificate(certificateId,
                 caCertificateUpdateRequest.getCertificate())).build();
