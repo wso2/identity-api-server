@@ -116,6 +116,10 @@
             </plugin>
             <!--This plugin is used to generate the API classes from the OpenAPI definition.-->
             <!--Uncomment and execute if the API is updated.-->
+            <!--Due to some limitations in open api generator, following auto generated files are manually updated.-->
+            <!--src/gen/java/ActionsApi.java -> createAction() and updateAction() methods are updated.-->
+            <!--src/gen/java/ActionApiService.java -> createAction() and updateAction() methods are updated.-->
+            <!--Also model classes in the src/extend/java are manually created.-->
 <!--            <plugin>-->
 <!--                <groupId>org.openapitools</groupId>-->
 <!--                <artifactId>openapi-generator-maven-plugin</artifactId>-->
