@@ -97,8 +97,7 @@ public class CertificateValidationApiServiceImpl implements CertificateValidatio
     }
 
     @Override
-    public Response updateCACertificateById(String certificateId,
-                                            CACertificateUpdateRequest caCertificateUpdateRequest) {
+    public Response updateCACertificateById(String certificateId, CACertificateUpdateRequest caCertificateUpdateRequest) {
 
         return Response.ok().entity(certificateValidationManagementService.updateCACertificate(certificateId,
                 caCertificateUpdateRequest.getCertificate())).build();

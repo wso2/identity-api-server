@@ -56,7 +56,7 @@ public class CertificateValidationApi  {
     @Path("/ca")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Add a new ca certificate", notes = "", response = CACertificate.class, authorizations = {
+    @ApiOperation(value = "Add a new ca certificate", notes = "Add a new ca certificate \\n\\n <b>Scope(Permission) required:</b> `internal_cert_validation_mgt_create` \\n\\n", response = CACertificate.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
 
@@ -79,7 +79,7 @@ public class CertificateValidationApi  {
     @Path("/ca/{certificate-id}")
 
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete a ca certificate by id", notes = "", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete a ca certificate by id", notes = "Delete ca certificate specified by the certificate id \\n\\n <b>Scope(Permission) required:</b> `internal_cert_validation_mgt_delete` \\n\\n", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
 
@@ -102,7 +102,7 @@ public class CertificateValidationApi  {
     @Path("/ca/{certificate-id}")
 
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get a ca certificate by certificate id", notes = "", response = CACertificate.class, authorizations = {
+    @ApiOperation(value = "Get a ca certificate by certificate id", notes = "Get ca certificate specified by the certificate id \\n\\n <b>Scope(Permission) required:</b> `internal_cert_validation_mgt_view` \\n\\n", response = CACertificate.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
 
@@ -126,14 +126,17 @@ public class CertificateValidationApi  {
     @Path("/ca")
 
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get all ca certificates", notes = "", response = CACertificates.class, authorizations = {
+    @ApiOperation(value = "Get all ca certificates", notes = "List all ca certificates \\n\\n <b>Scope(Permission) required:</b> `internal_cert_validation_mgt_view` \\n\\n", response = CACertificates.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
 
         })
     }, tags={ "Certificate Authority Certificates", })
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Successful response", response = CACertificates.class)
+        @ApiResponse(code = 200, message = "Successful response", response = CACertificates.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response getCACertificates() {
 
@@ -145,7 +148,7 @@ public class CertificateValidationApi  {
     @Path("/revocation-validators/{validatorName}")
 
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get a specific certificate validator configurations", notes = "", response = Validator.class, authorizations = {
+    @ApiOperation(value = "Get a specific certificate validator configurations", notes = "Get certificate validator configuration specified by the name \\n\\n <b>Scope(Permission) required:</b> `internal_cert_validation_mgt_view` \\n\\n", response = Validator.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
 
@@ -169,7 +172,7 @@ public class CertificateValidationApi  {
     @Path("/revocation-validators")
 
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get all certificate validator configurations", notes = "", response = Validators.class, authorizations = {
+    @ApiOperation(value = "Get all certificate validator configurations", notes = "List all certificate validator configurations \\n\\n <b>Scope(Permission) required:</b> `internal_cert_validation_mgt_view` \\n\\n", response = Validators.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
 
@@ -194,7 +197,7 @@ public class CertificateValidationApi  {
     @Path("/ca/{certificate-id}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update a ca certificate by certificate id", notes = "", response = CACertificate.class, authorizations = {
+    @ApiOperation(value = "Update a ca certificate by certificate id", notes = "Patch ca certificate specified by the certificate id. \\n\\n <b>Scope(Permission) required:</b> `internal_cert_validation_mgt_update` \\n\\n", response = CACertificate.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
 
@@ -217,7 +220,7 @@ public class CertificateValidationApi  {
     @Path("/revocation-validators/{validatorName}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update the certificate validator configurations", notes = "", response = Validator.class, authorizations = {
+    @ApiOperation(value = "Update the certificate validator configurations", notes = "Patch certificate validator specified by the name. \\n\\n <b>Scope(Permission) required:</b> `internal_cert_validation_mgt_update` \\n\\n", response = Validator.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
 

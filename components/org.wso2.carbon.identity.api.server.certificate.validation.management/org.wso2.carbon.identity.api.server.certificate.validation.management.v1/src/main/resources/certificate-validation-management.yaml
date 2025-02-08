@@ -23,6 +23,7 @@ paths:
   /certificate-validation/revocation-validators:
     get:
       summary: Get all certificate validator configurations
+      description: 'List all certificate validator configurations \n\n <b>Scope(Permission) required:</b> `internal_cert_validation_mgt_view` \n\n'
       operationId: getCertificateRevocationValidators
       tags:
         - Certificate Revocation Validators
@@ -45,9 +46,16 @@ paths:
           $ref: '#/components/responses/ServerError'
         '501':
           $ref: '#/components/responses/NotImplemented'
+      x-codeSamples:
+        - lang: Curl
+          source: |
+            curl --location 'https://localhost:9443/o/api/server/v1/certificate-validation/revocation-validators' \
+            -H 'Accept: application/json' \
+            -H 'Authorization: Basic YWRtaW46YWRtaW4='
   /certificate-validation/revocation-validators/{validatorName}:
     get:
       summary: Get a specific certificate validator configurations
+      description: 'Get certificate validator configuration specified by the name \n\n <b>Scope(Permission) required:</b> `internal_cert_validation_mgt_view` \n\n'
       operationId: getCertificateRevocationValidator
       tags:
         - Certificate Revocation Validators
@@ -86,8 +94,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+      x-codeSamples:
+        - lang: Curl
+          source: |
+            curl --location 'https://localhost:9443/api/server/v1/certificate-validation/revocation-validators/{validator-name}' \
+            -H 'Accept: application/json' \
+            -H 'Authorization: Basic YWRtaW46YWRtaW4='
     put:
       summary: Update the certificate validator configurations
+      description: 'Patch certificate validator specified by the name. \n\n <b>Scope(Permission) required:</b> `internal_cert_validation_mgt_update` \n\n'
       operationId: updateCertificateRevocationValidator
       tags:
         - Certificate Revocation Validators
@@ -126,9 +141,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        x-codeSamples:
+          - lang: Curl
+            source: |
+              curl --location 'https://localhost:9443/api/server/v1/certificate-validation/revocation-validators/{validator-name}' \
+              -H 'Authorization: Basic YWRtaW46YWRtaW4=' \
+              -H 'Content-Type: application/json' \
+              -d '{
+                  "enable": false,
+                  "priority": 2,
+                  "fullChainValidation": true,
+                  "retryCount": 2
+              }'
+        x-codegen-request-body-name: body
   /certificate-validation/ca:
     get:
       summary: Get all ca certificates
+      description: 'List all ca certificates \n\n <b>Scope(Permission) required:</b> `internal_cert_validation_mgt_view` \n\n'
       operationId: getCACertificates
       tags:
         - Certificate Authority Certificates
@@ -139,8 +168,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CACertificates'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        x-codeSamples:
+          - lang: Curl
+            source: |
+              curl --location 'https://localhost:9443/api/server/v1/certificate-validation/ca' \
+              -H 'Authorization: Basic YWRtaW46YWRtaW4='
     post:
       summary: Add a new ca certificate
+      description: 'Add a new ca certificate \n\n <b>Scope(Permission) required:</b> `internal_cert_validation_mgt_create` \n\n'
       operationId: addCACertificate
       tags:
         - Certificate Authority Certificates
@@ -173,9 +218,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        x-codeSamples:
+          - lang: Curl
+            source: |
+              curl --location 'https://localhost:9443/api/server/v1/certificate-validation/ca' \
+              -H 'Authorization: Basic YWRtaW46YWRtaW4=' \
+              -H 'Content-Type: application/json' \
+              -d '{
+                  "certificate": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNMRENDQWRLZ0F3SUJBZ0lCQURBS0JnZ3Foa2pPUFFRREFqQjlNUXN3Q1FZRFZRUUdFd0pDUlRFUE1BMEcKQTFVRUNoTUdSMjUxVkV4VE1TVXdJd1lEVlFRTEV4eEhiblZVVEZNZ1kyVnlkR2xtYVdOaGRHVWdZWFYwYUc5eQphWFI1TVE4d0RRWURWUVFJRXdaTVpYVjJaVzR4SlRBakJnTlZCQU1USEVkdWRWUk1VeUJqWlhKMGFXWnBZMkYwClpTQmhkWFJvYjNKcGRIa3dIaGNOTVRFd05USXpNakF6T0RJeFdoY05NVEl4TWpJeU1EYzBNVFV4V2pCOU1Rc3cKQ1FZRFZRUUdFd0pDUlRFUE1BMEdBMVVFQ2hNR1IyNTFWRXhUTVNVd0l3WURWUVFMRXh4SGJuVlVURk1nWTJWeQpkR2xtYVdOaGRHVWdZWFYwYUc5eWFYUjVNUTh3RFFZRFZRUUlFd1pNWlhWMlpXNHhKVEFqQmdOVkJBTVRIRWR1CmRWUk1VeUJqWlhKMGFXWnBZMkYwWlNCaGRYUm9iM0pwZEhrd1dUQVRCZ2NxaGtqT1BRSUJCZ2dxaGtqT1BRTUIKQndOQ0FBUlMySTBqaXVObjE0WTJzU0FMQ1gzSXlicWlJSlV2eFVwaitvTmZ6bmd2ai9OaXl2MjM5NEJXblc0WAp1UTRSVEVpeXdLODdXUmNXTUdnSkI1a1gvdDJubzBNd1FUQVBCZ05WSFJNQkFmOEVCVEFEQVFIL01BOEdBMVVkCkR3RUIvd1FGQXdNSEJnQXdIUVlEVlIwT0JCWUVGUEMwZ2Y2WUVyKzFLTGxrUUFQTHpCOW1UaWdETUFvR0NDcUcKU000OUJBTUNBMGdBTUVVQ0lER3V3RDFLUHlHK2hSZjg4TWV5TVFjcU9GWkQwVGJWbGVGK1VzQUdRNGVuQWlFQQpsNHdPdUR3S1FhK3VwYzhHZnRYRTJDLy80bUtBTkJDNkl0MDFnVWFUSXBvPQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0t"
+              }'
   /certificate-validation/ca/{certificate-id}:
     get:
       summary: Get a ca certificate by certificate id
+      description: 'Get ca certificate specified by the certificate id \n\n <b>Scope(Permission) required:</b> `internal_cert_validation_mgt_view` \n\n'
       operationId: getCACertificateById
       tags:
         - Certificate Authority Certificates
@@ -214,8 +269,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        x-codeSamples:
+          - lang: Curl
+            source: |
+              curl --location 'https://localhost:9443/api/server/v1/certificate-validation/ca' \
+              -H 'Authorization: Basic YWRtaW46YWRtaW4=' \
+              -H 'Content-Type: application/json' \
+              -d '{
+                  "certificate": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNMRENDQWRLZ0F3SUJBZ0lCQURBS0JnZ3Foa2pPUFFRREFqQjlNUXN3Q1FZRFZRUUdFd0pDUlRFUE1BMEcKQTFVRUNoTUdSMjUxVkV4VE1TVXdJd1lEVlFRTEV4eEhiblZVVEZNZ1kyVnlkR2xtYVdOaGRHVWdZWFYwYUc5eQphWFI1TVE4d0RRWURWUVFJRXdaTVpYVjJaVzR4SlRBakJnTlZCQU1USEVkdWRWUk1VeUJqWlhKMGFXWnBZMkYwClpTQmhkWFJvYjNKcGRIa3dIaGNOTVRFd05USXpNakF6T0RJeFdoY05NVEl4TWpJeU1EYzBNVFV4V2pCOU1Rc3cKQ1FZRFZRUUdFd0pDUlRFUE1BMEdBMVVFQ2hNR1IyNTFWRXhUTVNVd0l3WURWUVFMRXh4SGJuVlVURk1nWTJWeQpkR2xtYVdOaGRHVWdZWFYwYUc5eWFYUjVNUTh3RFFZRFZRUUlFd1pNWlhWMlpXNHhKVEFqQmdOVkJBTVRIRWR1CmRWUk1VeUJqWlhKMGFXWnBZMkYwWlNCaGRYUm9iM0pwZEhrd1dUQVRCZ2NxaGtqT1BRSUJCZ2dxaGtqT1BRTUIKQndOQ0FBUlMySTBqaXVObjE0WTJzU0FMQ1gzSXlicWlJSlV2eFVwaitvTmZ6bmd2ai9OaXl2MjM5NEJXblc0WAp1UTRSVEVpeXdLODdXUmNXTUdnSkI1a1gvdDJubzBNd1FUQVBCZ05WSFJNQkFmOEVCVEFEQVFIL01BOEdBMVVkCkR3RUIvd1FGQXdNSEJnQXdIUVlEVlIwT0JCWUVGUEMwZ2Y2WUVyKzFLTGxrUUFQTHpCOW1UaWdETUFvR0NDcUcKU000OUJBTUNBMGdBTUVVQ0lER3V3RDFLUHlHK2hSZjg4TWV5TVFjcU9GWkQwVGJWbGVGK1VzQUdRNGVuQWlFQQpsNHdPdUR3S1FhK3VwYzhHZnRYRTJDLy80bUtBTkJDNkl0MDFnVWFUSXBvPQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0t"
+              }'
     put:
       summary: Update a ca certificate by certificate id
+      description: 'Patch ca certificate specified by the certificate id. \n\n <b>Scope(Permission) required:</b> `internal_cert_validation_mgt_update` \n\n'
       operationId: updateCACertificateById
       tags:
         - Certificate Authority Certificates
@@ -254,8 +319,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        x-codeSamples:
+          - lang: Curl
+            source: |
+              curl --location 'https://localhost:9443/api/server/v1/certificate-validation/ca/{certificate-id}' \
+              -H 'Authorization: Basic YWRtaW46YWRtaW4=' \
+              -H 'Content-Type: application/json' \
+              -d '{
+                  "certificate": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNMRENDQWRLZ0F3SUJBZ0lCQURBS0JnZ3Foa2pPUFFRREFqQjlNUXN3Q1FZRFZRUUdFd0pDUlRFUE1BMEcKQTFVRUNoTUdSMjUxVkV4VE1TVXdJd1lEVlFRTEV4eEhiblZVVEZNZ1kyVnlkR2xtYVdOaGRHVWdZWFYwYUc5eQphWFI1TVE4d0RRWURWUVFJRXdaTVpYVjJaVzR4SlRBakJnTlZCQU1USEVkdWRWUk1VeUJqWlhKMGFXWnBZMkYwClpTQmhkWFJvYjNKcGRIa3dIaGNOTVRFd05USXpNakF6T0RJeFdoY05NVEl4TWpJeU1EYzBNVFV4V2pCOU1Rc3cKQ1FZRFZRUUdFd0pDUlRFUE1BMEdBMVVFQ2hNR1IyNTFWRXhUTVNVd0l3WURWUVFMRXh4SGJuVlVURk1nWTJWeQpkR2xtYVdOaGRHVWdZWFYwYUc5eWFYUjVNUTh3RFFZRFZRUUlFd1pNWlhWMlpXNHhKVEFqQmdOVkJBTVRIRWR1CmRWUk1VeUJqWlhKMGFXWnBZMkYwWlNCaGRYUm9iM0pwZEhrd1dUQVRCZ2NxaGtqT1BRSUJCZ2dxaGtqT1BRTUIKQndOQ0FBUlMySTBqaXVObjE0WTJzU0FMQ1gzSXlicWlJSlV2eFVwaitvTmZ6bmd2ai9OaXl2MjM5NEJXblc0WAp1UTRSVEVpeXdLODdXUmNXTUdnSkI1a1gvdDJubzBNd1FUQVBCZ05WSFJNQkFmOEVCVEFEQVFIL01BOEdBMVVkCkR3RUIvd1FGQXdNSEJnQXdIUVlEVlIwT0JCWUVGUEMwZ2Y2WUVyKzFLTGxrUUFQTHpCOW1UaWdETUFvR0NDcUcKU000OUJBTUNBMGdBTUVVQ0lER3V3RDFLUHlHK2hSZjg4TWV5TVFjcU9GWkQwVGJWbGVGK1VzQUdRNGVuQWlFQQpsNHdPdUR3S1FhK3VwYzhHZnRYRTJDLy80bUtBTkJDNkl0MDFnVWFUSXBvPQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0t"
+              }'
+        x-codegen-request-body-name: body
     delete:
       summary: Delete a ca certificate by id
+      description: 'Delete ca certificate specified by the certificate id \n\n <b>Scope(Permission) required:</b> `internal_cert_validation_mgt_delete` \n\n'
       operationId: deleteCACertificateById
       tags:
         - Certificate Authority Certificates
@@ -284,6 +360,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+      x-codeSamples:
+        - lang: Curl
+          source: |
+            curl --location --request DELETE 
+            'https://localhost:9443/api/server/v1/certificate-validation/ca/{certificate-id}' \
+            -H 'Authorization: Basic YWRtaW46YWRtaW4='
 components:
   parameters:
     filterQueryParam:
