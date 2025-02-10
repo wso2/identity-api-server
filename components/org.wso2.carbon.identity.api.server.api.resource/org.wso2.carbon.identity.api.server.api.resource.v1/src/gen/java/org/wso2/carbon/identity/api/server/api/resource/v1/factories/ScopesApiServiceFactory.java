@@ -21,12 +21,20 @@ package org.wso2.carbon.identity.api.server.api.resource.v1.factories;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopesApiService;
 import org.wso2.carbon.identity.api.server.api.resource.v1.impl.ScopesApiServiceImpl;
 
+/**
+ * Factory class for ScopesApiService.
+ */
 public class ScopesApiServiceFactory {
 
-   private final static ScopesApiService service = new ScopesApiServiceImpl();
+   private final static ScopesApiService SERVICE = new ScopesApiServiceImpl();
 
-   public static ScopesApiService getScopesApi()
-   {
-      return service;
+   /**
+    * Get ScopesApiService.
+    *
+    * @return ScopesApiService.
+    */
+   public static ScopesApiService getScopesApi() {
+
+      return SERVICE;
    }
 }

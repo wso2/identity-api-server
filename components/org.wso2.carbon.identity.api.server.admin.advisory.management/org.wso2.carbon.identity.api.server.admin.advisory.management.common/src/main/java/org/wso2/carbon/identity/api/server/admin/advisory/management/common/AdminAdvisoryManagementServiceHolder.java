@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -19,34 +19,26 @@
 package org.wso2.carbon.identity.api.server.admin.advisory.management.common;
 
 import org.wso2.carbon.admin.advisory.mgt.service.AdminAdvisoryManagementService;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 
 /**
  * Service holder class for admin advisory management.
  */
 public class AdminAdvisoryManagementServiceHolder {
 
-    private static AdminAdvisoryManagementService adminAdvisoryManagementService;
+    public AdminAdvisoryManagementServiceHolder() {}
+
+    private static class AdminAdvisoryServiceHolder {
+
+        static final AdminAdvisoryManagementService SERVICE = (AdminAdvisoryManagementService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(AdminAdvisoryManagementService.class, null);
+    }
 
     /**
      * Get admin advisory management service.
      */
     public static AdminAdvisoryManagementService getAdminAdvisoryManagementService() {
 
-        return adminAdvisoryManagementService;
-    }
-
-    /**
-     * Set admin advisory management service.
-     *
-     * @param adminAdvisoryManagementService the admin advisory management service
-     */
-    public static void setAdminAdvisoryManagementService
-    (AdminAdvisoryManagementService adminAdvisoryManagementService) {
-
-        AdminAdvisoryManagementServiceHolder.adminAdvisoryManagementService = adminAdvisoryManagementService;
-    }
-
-    private AdminAdvisoryManagementServiceHolder() {
-
+        return AdminAdvisoryServiceHolder.SERVICE;
     }
 }

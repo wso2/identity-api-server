@@ -26,6 +26,7 @@ paths:
     get:
       tags:
         - Get inactive users
+      summary: Get inactive users
       description: Get inactive users list for a specified period.
       operationId: getInactiveUsers
       parameters:
@@ -39,8 +40,20 @@ paths:
           name: excludeBefore
           schema:
             type: string
-          description: Date to exclude the oldest inactive users.
+          description: Exclude users whose last active date is before this date.
           example: 2023-01-01
+        - in: query
+          name: filter
+          schema:
+           type: string
+          description: |
+           Filter inactive users based on whether their account state is DISABLED.
+           **Usage**:
+           - If `isDisabled eq true`: Returns inactive users whose accounts are disabled.
+           - If `isDisabled eq false`: Returns inactive users whose accounts are not disabled.
+           **NOTE**:
+           - The `filter` parameter can only be used as specified above.
+          example: isDisabled eq true
       responses:
         '200':
           $ref: '#/components/responses/Success'

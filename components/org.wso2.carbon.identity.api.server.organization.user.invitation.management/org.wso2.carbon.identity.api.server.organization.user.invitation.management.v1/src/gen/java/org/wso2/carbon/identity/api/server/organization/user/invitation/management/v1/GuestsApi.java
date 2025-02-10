@@ -18,12 +18,12 @@
 
 package org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 
+import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.factories.GuestsApiServiceFactory;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.AcceptanceRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.Error;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.IntrospectRequestBody;
@@ -45,8 +45,12 @@ import javax.validation.constraints.*;
 
 public class GuestsApi  {
 
-    @Autowired
-    private GuestsApiService delegate;
+    private final GuestsApiService delegate;
+
+    public GuestsApi() {
+
+        this.delegate = GuestsApiServiceFactory.getGuestsApi();
+    }
 
     @Valid
     @POST

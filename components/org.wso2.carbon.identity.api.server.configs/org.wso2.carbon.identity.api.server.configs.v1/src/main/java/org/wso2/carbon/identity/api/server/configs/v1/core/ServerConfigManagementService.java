@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2020 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2020-2025, WSO2 LLC. (http://www.wso2.com).
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
+ * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,10 +32,8 @@ import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
-import org.wso2.carbon.identity.api.server.configs.common.ConfigsServiceHolder;
 import org.wso2.carbon.identity.api.server.configs.common.Constants;
 import org.wso2.carbon.identity.api.server.configs.common.SchemaConfigParser;
-import org.wso2.carbon.identity.api.server.configs.common.factory.JWTAuthenticationMgtOGSiServiceFactory;
 import org.wso2.carbon.identity.api.server.configs.v1.exception.JWTClientAuthenticatorException;
 import org.wso2.carbon.identity.api.server.configs.v1.function.CORSConfigurationToCORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.function.DCRConnectorUtil;
@@ -81,21 +79,28 @@ import org.wso2.carbon.identity.application.common.model.UserDefinedLocalAuthent
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationManagementUtil;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
+import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.base.AuthenticatorPropertyConstants;
 import org.wso2.carbon.identity.core.ServiceURLBuilder;
 import org.wso2.carbon.identity.core.URLBuilderException;
+import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceClientException;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceException;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceServerException;
 import org.wso2.carbon.identity.cors.mgt.core.model.CORSConfiguration;
+import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
 import org.wso2.carbon.identity.oauth.dcr.exception.DCRMException;
 import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationConfigMgtClientException;
 import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationConfigMgtException;
 import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationConfigMgtServerException;
 import org.wso2.carbon.identity.oauth2.impersonation.models.ImpersonationConfig;
+import org.wso2.carbon.identity.oauth2.impersonation.services.ImpersonationConfigMgtService;
+import org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.core.JWTClientAuthenticatorMgtService;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
+import org.wso2.carbon.idp.mgt.IdpManager;
+import org.wso2.carbon.logging.service.RemoteLoggingConfigService;
 import org.wso2.carbon.logging.service.data.RemoteServerLoggerData;
 import org.wso2.carbon.user.api.UserRealm;
 import org.wso2.carbon.user.api.UserStoreException;
@@ -105,7 +110,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -129,7 +133,32 @@ import static org.wso2.carbon.identity.api.server.configs.common.Constants.PATH_
  */
 public class ServerConfigManagementService {
 
+    private final ApplicationManagementService applicationManagementService;
+    private final IdpManager idpManager;
+    private final CORSManagementService corsManagementService;
+    private final RemoteLoggingConfigService remoteLoggingConfigService;
+    private final ImpersonationConfigMgtService impersonationConfigMgtService;
+    private final JWTClientAuthenticatorMgtService jwtClientAuthenticatorMgtService;
+    private final DCRConfigurationMgtService dcrConfigurationMgtService;
+
     private static final Log log = LogFactory.getLog(ServerConfigManagementService.class);
+
+    public ServerConfigManagementService(ApplicationManagementService applicationManagementService,
+                                         IdpManager idpManager,
+                                         CORSManagementService corsManagementService,
+                                         RemoteLoggingConfigService remoteLoggingConfigService,
+                                         ImpersonationConfigMgtService impersonationConfigMgtService,
+                                         DCRConfigurationMgtService dcrConfigurationMgtService,
+                                         JWTClientAuthenticatorMgtService jwtClientAuthenticatorMgtService) {
+
+        this.applicationManagementService = applicationManagementService;
+        this.idpManager = idpManager;
+        this.corsManagementService = corsManagementService;
+        this.remoteLoggingConfigService = remoteLoggingConfigService;
+        this.impersonationConfigMgtService = impersonationConfigMgtService;
+        this.dcrConfigurationMgtService = dcrConfigurationMgtService;
+        this.jwtClientAuthenticatorMgtService = jwtClientAuthenticatorMgtService;
+    }
 
     /**
      * Get list of local authenticators supported by the server.
@@ -142,14 +171,12 @@ public class ServerConfigManagementService {
             LocalAuthenticatorConfig[] localConfigs = null;
             RequestPathAuthenticatorConfig[] requestPathConfigs = null;
             if (StringUtils.isBlank(type) || type.equals(Authenticator.TypeEnum.LOCAL.value())) {
-                localConfigs = ConfigsServiceHolder.getInstance()
-                        .getApplicationManagementService()
-                        .getAllLocalAuthenticators(ContextLoader.getTenantDomainFromContext());
+                localConfigs = applicationManagementService.getAllLocalAuthenticators(ContextLoader
+                        .getTenantDomainFromContext());
             }
             if (StringUtils.isBlank(type) || type.equals(Authenticator.TypeEnum.REQUEST_PATH.value())) {
-                requestPathConfigs = ConfigsServiceHolder.getInstance()
-                        .getApplicationManagementService()
-                        .getAllRequestPathAuthenticators(ContextLoader.getTenantDomainFromContext());
+                requestPathConfigs = applicationManagementService.getAllRequestPathAuthenticators(ContextLoader
+                        .getTenantDomainFromContext());
             }
             return buildAuthenticatorListResponse(localConfigs, requestPathConfigs);
         } catch (IdentityApplicationManagementException e) {
@@ -167,15 +194,15 @@ public class ServerConfigManagementService {
     public Authenticator getAuthenticator(String authenticatorId) {
 
         try {
-            LocalAuthenticatorConfig authenticatorConfig = getAuthenticatorById(
-                    ConfigsServiceHolder.getInstance().getApplicationManagementService().getAllLocalAuthenticators(
+            LocalAuthenticatorConfig authenticatorConfig = getAuthenticatorById(applicationManagementService
+                    .getAllLocalAuthenticators(
                             ContextLoader.getTenantDomainFromContext()), authenticatorId);
             if (authenticatorConfig != null) {
                 return buildAuthenticatorResponse(authenticatorConfig);
             }
 
-            RequestPathAuthenticatorConfig requestPathConfig = getAuthenticatorById(ConfigsServiceHolder.getInstance
-                    ().getApplicationManagementService().getAllRequestPathAuthenticators(ContextLoader
+            RequestPathAuthenticatorConfig requestPathConfig = getAuthenticatorById(applicationManagementService
+                    .getAllRequestPathAuthenticators(ContextLoader
                     .getTenantDomainFromContext()), authenticatorId);
             if (requestPathConfig != null) {
                 return buildAuthenticatorResponse(requestPathConfig);
@@ -254,9 +281,7 @@ public class ServerConfigManagementService {
     public void patchConfigs(List<Patch> patchRequest) {
 
         try {
-            IdentityProvider residentIdP =
-                    ConfigsServiceHolder.getInstance().getIdentityProviderManager().getResidentIdP(ContextLoader
-                            .getTenantDomainFromContext());
+            IdentityProvider residentIdP = idpManager.getResidentIdP(ContextLoader.getTenantDomainFromContext());
             // Resident Identity Provider can be null only due to an internal server error.
             if (residentIdP == null) {
                 throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
@@ -266,8 +291,7 @@ public class ServerConfigManagementService {
             processPatchRequest(patchRequest, idpToUpdate);
             // To avoid updating non-existing authenticators in DB layer.
             idpToUpdate.setFederatedAuthenticatorConfigs(new FederatedAuthenticatorConfig[0]);
-            ConfigsServiceHolder.getInstance().getIdentityProviderManager()
-                    .updateResidentIdP(idpToUpdate, ContextLoader.getTenantDomainFromContext());
+            idpManager.updateResidentIdP(idpToUpdate, ContextLoader.getTenantDomainFromContext());
 
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_CONFIGS, null);
@@ -308,7 +332,7 @@ public class ServerConfigManagementService {
             applicationClone.setInboundProvisioningConfig(inboundProvisioningConfig);
 
             try {
-                ConfigsServiceHolder.getInstance().getApplicationManagementService().updateApplicationByResourceId
+                applicationManagementService.updateApplicationByResourceId
                         (applicationClone.getApplicationResourceId(), applicationClone, ContextLoader
                                 .getTenantDomainFromContext(), ContextLoader.getUsernameFromContext());
             } catch (IdentityApplicationManagementException e) {
@@ -331,8 +355,8 @@ public class ServerConfigManagementService {
         ImpersonationConfiguration impersonationConfiguration = new ImpersonationConfiguration();
         try {
             // Get the impersonation configuration for the tenant domain
-            ImpersonationConfig impersonationConfig = ConfigsServiceHolder.getInstance()
-                    .getImpersonationConfigMgtService().getImpersonationConfig(tenantDomain);
+            ImpersonationConfig impersonationConfig = impersonationConfigMgtService
+                    .getImpersonationConfig(tenantDomain);
 
             // Enable email notifications based on the retrieved configuration
             return impersonationConfiguration.enableEmailNotification(impersonationConfig.isEnableEmailNotification());
@@ -360,8 +384,7 @@ public class ServerConfigManagementService {
         ImpersonationConfig impersonationConfig;
         try {
             // Get the current impersonation configuration for the tenant domain
-            impersonationConfig = ConfigsServiceHolder.getInstance()
-                    .getImpersonationConfigMgtService().getImpersonationConfig(tenantDomain);
+            impersonationConfig = impersonationConfigMgtService.getImpersonationConfig(tenantDomain);
         } catch (ImpersonationConfigMgtException e) {
             // Handle exceptions related to retrieving impersonation configuration
             throw handleImpersonationConfigException(e, Constants.ErrorMessage.ERROR_CODE_IMP_CONFIG_RETRIEVE, null);
@@ -392,8 +415,7 @@ public class ServerConfigManagementService {
             }
 
             // Update the impersonation configuration for the tenant with the patched configuration
-            ConfigsServiceHolder.getInstance().getImpersonationConfigMgtService()
-                    .setImpersonationConfig(impersonationConfig, tenantDomain);
+            impersonationConfigMgtService.setImpersonationConfig(impersonationConfig, tenantDomain);
         } catch (ImpersonationConfigMgtException e) {
             // Handle exceptions related to updating impersonation configuration
             throw handleImpersonationConfigException(e, Constants.ErrorMessage.ERROR_CODE_IMP_CONFIG_UPDATE, null);
@@ -408,8 +430,7 @@ public class ServerConfigManagementService {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
-            CORSConfiguration corsConfiguration = ConfigsServiceHolder.getInstance().getCorsManagementService()
-                    .getCORSConfiguration(tenantDomain);
+            CORSConfiguration corsConfiguration = corsManagementService.getCORSConfiguration(tenantDomain);
 
             return new CORSConfigurationToCORSConfig().apply(corsConfiguration);
         } catch (CORSManagementServiceException e) {
@@ -431,8 +452,7 @@ public class ServerConfigManagementService {
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         CORSConfiguration corsConfiguration;
         try {
-            corsConfiguration = ConfigsServiceHolder.getInstance().getCorsManagementService()
-                    .getCORSConfiguration(tenantDomain);
+            corsConfiguration = corsManagementService.getCORSConfiguration(tenantDomain);
         } catch (CORSManagementServiceException e) {
             throw handleCORSException(e, Constants.ErrorMessage.ERROR_CODE_CORS_CONFIG_RETRIEVE, null);
         }
@@ -500,8 +520,7 @@ public class ServerConfigManagementService {
             }
 
             // Set the patched configuration object as the new CORS configuration for the tenant.
-            ConfigsServiceHolder.getInstance().getCorsManagementService()
-                    .setCORSConfiguration(corsConfiguration, tenantDomain);
+            corsManagementService.setCORSConfiguration(corsConfiguration, tenantDomain);
         } catch (CORSManagementServiceException e) {
             throw handleCORSException(e, Constants.ErrorMessage.ERROR_CODE_CORS_CONFIG_UPDATE, null);
         }
@@ -589,8 +608,7 @@ public class ServerConfigManagementService {
         remoteServerLoggerData.setLogType(logType.toUpperCase(Locale.ENGLISH));
 
         try {
-            ConfigsServiceHolder.getInstance().getRemoteLoggingConfigService()
-                    .resetRemoteServerConfig(remoteServerLoggerData);
+            remoteLoggingConfigService.resetRemoteServerConfig(remoteServerLoggerData);
         } catch (ConfigurationException | IOException e) {
             log.error("Error while resetting remote server configuration.", e);
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
@@ -673,8 +691,7 @@ public class ServerConfigManagementService {
         remoteServerLoggerData.setLogType(logType.toUpperCase(Locale.ENGLISH));
 
         try {
-            ConfigsServiceHolder.getInstance().getRemoteLoggingConfigService()
-                    .addRemoteServerConfig(remoteServerLoggerData);
+            remoteLoggingConfigService.addRemoteServerConfig(remoteServerLoggerData);
         } catch (ConfigurationException | IOException e) {
             log.error("Error while updating remote server configuration.", e);
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
@@ -798,7 +815,7 @@ public class ServerConfigManagementService {
                 UserDefinedLocalAuthenticatorConfig userDefinedConfig = castToUserDefinedConfig(config);
                 authenticator.setImage(userDefinedConfig.getImageUrl());
                 authenticator.setDescription(userDefinedConfig.getDescription());
-                resolveEndpointConfiguration(authenticator, userDefinedConfig);
+                resolveEndpointConfigurationForAuthenticatorFromConfig(authenticator, userDefinedConfig);
             } else {
                 authenticator.setDefinedBy(Authenticator.DefinedByEnum.SYSTEM);
                 setAuthenticatorProperties(config, authenticator);
@@ -823,20 +840,23 @@ public class ServerConfigManagementService {
         }
     }
 
-    private void resolveEndpointConfiguration(Authenticator authenticator, UserDefinedLocalAuthenticatorConfig config) {
+    private void resolveEndpointConfigurationForAuthenticatorFromConfig(
+            Authenticator authenticator, UserDefinedLocalAuthenticatorConfig config) {
 
+        /* Only the endpoint URI of the endpoint configurations of the user-defined authenticator is set to the
+        authenticator. The authentication properties in the config are aliases for secrets and must not be included
+         in the response body.*/
         UserDefinedAuthenticatorEndpointConfig endpointConfig = config.getEndpointConfig();
 
         AuthenticationType authenticationType = new AuthenticationType();
         authenticationType.setType(AuthenticationType.TypeEnum.fromValue(
                 endpointConfig.getAuthenticatorEndpointAuthenticationType()));
-        authenticationType.setProperties(new HashMap<>(
-                endpointConfig.getAuthenticatorEndpointAuthenticationProperties()));
+        authenticationType.setProperties(null);
 
         Endpoint endpoint = new Endpoint();
-        endpoint.setAuthentication(authenticationType);
         endpoint.setUri(endpointConfig.getAuthenticatorEndpointUri());
-        authenticator.addEndpointItem(endpoint);
+        endpoint.setAuthentication(authenticationType);
+        authenticator.endpoint(endpoint);
     }
 
     private void setAuthenticatorProperties(LocalAuthenticatorConfig config, Authenticator authenticator) {
@@ -975,8 +995,7 @@ public class ServerConfigManagementService {
 
         IdentityProvider residentIdP;
         try {
-            residentIdP = ConfigsServiceHolder.getInstance().getIdentityProviderManager().getResidentIdP(ContextLoader
-                    .getTenantDomainFromContext());
+            residentIdP = idpManager.getResidentIdP(ContextLoader.getTenantDomainFromContext());
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_CONFIGS, null);
         }
@@ -993,8 +1012,8 @@ public class ServerConfigManagementService {
 
         ServiceProvider residentSP;
         try {
-            residentSP = ConfigsServiceHolder.getInstance().getApplicationManagementService()
-                    .getServiceProvider(ApplicationConstants.LOCAL_SP, ContextLoader.getTenantDomainFromContext());
+            residentSP = applicationManagementService.getServiceProvider(ApplicationConstants.LOCAL_SP,
+                    ContextLoader.getTenantDomainFromContext());
         } catch (IdentityApplicationManagementException e) {
             throw handleApplicationMgtException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_CONFIGS, null);
         }
@@ -1253,10 +1272,10 @@ public class ServerConfigManagementService {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
-            if (JWTAuthenticationMgtOGSiServiceFactory.getInstance() != null) {
+            if (jwtClientAuthenticatorMgtService != null) {
 
                 return new JWTValidatorConfig()
-                        .enableTokenReuse(JWTAuthenticationMgtOGSiServiceFactory.getInstance()
+                        .enableTokenReuse(jwtClientAuthenticatorMgtService
                                 .getPrivateKeyJWTClientAuthenticatorConfiguration(tenantDomain).isEnableTokenReuse());
             }
             throw new JWTClientAuthenticatorException(ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND.message(),
@@ -1287,8 +1306,9 @@ public class ServerConfigManagementService {
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         JWTValidatorConfig jwtValidatorConfig = null;
         try {
-            if (JWTAuthenticationMgtOGSiServiceFactory.getInstance() != null) {
-                jwtValidatorConfig = JWTConnectorUtil.getJWTValidatorConfig(tenantDomain);
+            if (jwtClientAuthenticatorMgtService != null) {
+                jwtValidatorConfig = JWTConnectorUtil.getJWTValidatorConfig(tenantDomain,
+                        jwtClientAuthenticatorMgtService);
             } else {
                 throw new JWTClientAuthenticatorException(ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND.message(),
                         ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND.code());
@@ -1333,12 +1353,8 @@ public class ServerConfigManagementService {
             }
 
             // Set the patched configuration object as the new JWT Authentication configuration for the tenant.
-            if (JWTAuthenticationMgtOGSiServiceFactory.getInstance() != null) {
-                JWTAuthenticationMgtOGSiServiceFactory.getInstance()
-                        .setPrivateKeyJWTClientAuthenticatorConfiguration
-                                (JWTConnectorUtil.getJWTDaoConfig(jwtValidatorConfig),
-                                        tenantDomain);
-            }
+            jwtClientAuthenticatorMgtService.setPrivateKeyJWTClientAuthenticatorConfiguration
+                    (JWTConnectorUtil.getJWTDaoConfig(jwtValidatorConfig), tenantDomain);
         } catch (Exception e) {
             throw JWTConnectorUtil.handlePrivateKeyJWTValidationException(e,
                     Constants.ErrorMessage.ERROR_CODE_PRIVATE_KEY_JWT_VALIDATOR_CONFIG_UPDATE, null);
@@ -1354,7 +1370,7 @@ public class ServerConfigManagementService {
 
         try {
 
-            return DCRConnectorUtil.getDCRConfig();
+            return DCRConnectorUtil.getDCRConfig(dcrConfigurationMgtService);
         } catch (DCRMException e) {
             throw DCRConnectorUtil.handleDCRConfigException(e, Constants.ErrorMessage.ERROR_CODE_DCR_CONFIG_RETRIEVE,
                     null);
@@ -1374,7 +1390,7 @@ public class ServerConfigManagementService {
 
         DCRConfig dcrConfig = null;
         try {
-            dcrConfig = DCRConnectorUtil.getDCRConfig();
+            dcrConfig = DCRConnectorUtil.getDCRConfig(dcrConfigurationMgtService);
         } catch (DCRMException e) {
             throw DCRConnectorUtil.handleDCRConfigException(e,
                     Constants.ErrorMessage.ERROR_CODE_DCR_CONFIG_RETRIEVE, null);
@@ -1433,7 +1449,7 @@ public class ServerConfigManagementService {
 
             // Set the patched configuration object as the new DCR configuration for the tenant.
         try {
-            DCRConnectorUtil.setDCRConfig(dcrConfig);
+            DCRConnectorUtil.setDCRConfig(dcrConfig, dcrConfigurationMgtService);
         } catch (DCRMException e) {
             throw DCRConnectorUtil.handleDCRConfigException(e,
                     Constants.ErrorMessage.ERROR_CODE_DCR_CONFIG_UPDATE, e.getMessage());
@@ -1465,8 +1481,7 @@ public class ServerConfigManagementService {
         validateLogType(logType);
         try {
             // Backend logic only supports logType in Uppercase.
-            return ConfigsServiceHolder.getInstance().getRemoteLoggingConfigService().getRemoteServerConfig(
-                    logType.toUpperCase(Locale.ENGLISH));
+            return remoteLoggingConfigService.getRemoteServerConfig(logType.toUpperCase(Locale.ENGLISH));
         } catch (ConfigurationException e) {
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     Constants.ErrorMessage.ERROR_CODE_ERROR_GETTING_REMOTE_LOGGING_CONFIGS, null);
@@ -1478,7 +1493,7 @@ public class ServerConfigManagementService {
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         validateTenantDomain(tenantDomain, "Listing remote server configuration service is not available for %s");
         try {
-            return ConfigsServiceHolder.getInstance().getRemoteLoggingConfigService().getRemoteServerConfigs();
+            return remoteLoggingConfigService.getRemoteServerConfigs();
         } catch (ConfigurationException e) {
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     Constants.ErrorMessage.ERROR_CODE_ERROR_GETTING_REMOTE_LOGGING_CONFIGS, null);
@@ -1493,8 +1508,7 @@ public class ServerConfigManagementService {
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         InboundAuthSAML2Config inboundAuthConfig = new InboundAuthSAML2Config();
         try {
-            IdentityProvider residentIdp = ConfigsServiceHolder.getInstance().getIdentityProviderManager()
-                    .getResidentIdP(tenantDomain);
+            IdentityProvider residentIdp = idpManager.getResidentIdP(tenantDomain);
             if (residentIdp != null) {
                 FederatedAuthenticatorConfig federatedAuthConfig = IdentityApplicationManagementUtil
                         .getFederatedAuthenticator(residentIdp.getFederatedAuthenticatorConfigs(),
@@ -1562,8 +1576,7 @@ public class ServerConfigManagementService {
         validateSAMLAuthConfigUpdate(authConfigToUpdate);
 
         try {
-            IdentityProvider residentIdp = ConfigsServiceHolder.getInstance().getIdentityProviderManager()
-                    .getResidentIdP(tenantDomain);
+            IdentityProvider residentIdp = idpManager.getResidentIdP(tenantDomain);
             if (residentIdp != null) {
                 FederatedAuthenticatorConfig federatedAuthConfig = IdentityApplicationManagementUtil
                         .getFederatedAuthenticator(residentIdp.getFederatedAuthenticatorConfigs(),
@@ -1584,8 +1597,7 @@ public class ServerConfigManagementService {
                         authConfigToUpdate);
                 federatedAuthConfig.setProperties(updatedIdpProperties);
                 residentIdp.setFederatedAuthenticatorConfigs(new FederatedAuthenticatorConfig[]{federatedAuthConfig});
-                ConfigsServiceHolder.getInstance().getIdentityProviderManager().updateResidentIdP(
-                        residentIdp, tenantDomain);
+                idpManager.updateResidentIdP(residentIdp, tenantDomain);
             } else {
                 throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                         Constants.ErrorMessage.ERROR_CODE_RESIDENT_IDP_NOT_FOUND, tenantDomain);
@@ -1654,8 +1666,7 @@ public class ServerConfigManagementService {
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         InboundAuthPassiveSTSConfig inboundAuthConfig = new InboundAuthPassiveSTSConfig();
         try {
-            IdentityProvider residentIdp = ConfigsServiceHolder.getInstance().getIdentityProviderManager()
-                    .getResidentIdP(tenantDomain);
+            IdentityProvider residentIdp = idpManager.getResidentIdP(tenantDomain);
             if (residentIdp != null) {
                 FederatedAuthenticatorConfig federatedAuthConfig = IdentityApplicationManagementUtil
                         .getFederatedAuthenticator(residentIdp.getFederatedAuthenticatorConfigs(),
@@ -1710,8 +1721,7 @@ public class ServerConfigManagementService {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
-            IdentityProvider residentIdp = ConfigsServiceHolder.getInstance().getIdentityProviderManager()
-                    .getResidentIdP(tenantDomain);
+            IdentityProvider residentIdp = idpManager.getResidentIdP(tenantDomain);
             if (residentIdp != null) {
                 /*
                  Note: SAML 'samlAuthnRequestsSigningEnabled' property is used as the authentication request
@@ -1742,8 +1752,7 @@ public class ServerConfigManagementService {
                     }
                 }
                 residentIdp.setFederatedAuthenticatorConfigs(new FederatedAuthenticatorConfig[]{federatedAuthConfig});
-                ConfigsServiceHolder.getInstance().getIdentityProviderManager().updateResidentIdP(
-                        residentIdp, tenantDomain);
+                idpManager.updateResidentIdP(residentIdp, tenantDomain);
             } else {
                 throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                         Constants.ErrorMessage.ERROR_CODE_RESIDENT_IDP_NOT_FOUND, tenantDomain);

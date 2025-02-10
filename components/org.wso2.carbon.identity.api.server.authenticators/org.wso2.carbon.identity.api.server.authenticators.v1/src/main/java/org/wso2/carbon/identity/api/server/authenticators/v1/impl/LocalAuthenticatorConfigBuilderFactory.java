@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.authenticators.v1.impl;
 
+import org.wso2.carbon.identity.api.server.authenticators.v1.model.AuthenticationType;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Endpoint;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.UserDefinedLocalAuthenticatorCreation;
@@ -81,6 +82,7 @@ public class LocalAuthenticatorConfigBuilderFactory {
     public static UserDefinedLocalAuthenticatorConfig build(UserDefinedLocalAuthenticatorCreation config)
             throws AuthenticatorMgtClientException {
 
+        validateUserDefinedLocalAuthenticatorConfig(config);
         String authenticationType = AuthenticatorPropertyConstants.AuthenticationType.IDENTIFICATION.toString();
         if (config.getAuthenticationType() != null) {
             authenticationType = config.getAuthenticationType().toString();
@@ -145,6 +147,22 @@ public class LocalAuthenticatorConfigBuilderFactory {
             return AuthenticatorPropertyConstants.AuthenticationType.VERIFICATION;
         } else {
             return AuthenticatorPropertyConstants.AuthenticationType.IDENTIFICATION;
+        }
+    }
+
+    private static void validateUserDefinedLocalAuthenticatorConfig(UserDefinedLocalAuthenticatorCreation config)
+            throws AuthenticatorMgtClientException {
+
+        if (config.getEndpoint().getAuthentication().getType() == AuthenticationType.TypeEnum.NONE) {
+            return;
+        }
+
+        if (config.getEndpoint().getAuthentication().getProperties() == null ||
+                config.getEndpoint().getAuthentication().getProperties().isEmpty()) {
+            AuthenticatorMgtError error = AuthenticatorMgtError.ERROR_CODE_INVALID_ENDPOINT_CONFIG;
+            throw new AuthenticatorMgtClientException(error.getCode(), error.getMessage(),
+                    "Endpoint authentication properties must be provided for user defined local authenticator: "
+                            + config.getName());
         }
     }
 }

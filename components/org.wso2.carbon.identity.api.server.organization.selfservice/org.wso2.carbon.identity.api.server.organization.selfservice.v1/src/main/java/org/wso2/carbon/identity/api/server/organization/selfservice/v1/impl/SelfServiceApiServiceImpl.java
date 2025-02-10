@@ -18,9 +18,9 @@
 
 package org.wso2.carbon.identity.api.server.organization.selfservice.v1.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.SelfServiceApiService;
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.core.SelfServiceMgtService;
+import org.wso2.carbon.identity.api.server.organization.selfservice.v1.factories.SelfServiceMgtServiceFactory;
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.model.PropertyPatchReq;
 
 import javax.ws.rs.core.Response;
@@ -30,8 +30,16 @@ import javax.ws.rs.core.Response;
  */
 public class SelfServiceApiServiceImpl implements SelfServiceApiService {
 
-    @Autowired
-    private SelfServiceMgtService selfServiceMgtService;
+    private final SelfServiceMgtService selfServiceMgtService;
+
+    public SelfServiceApiServiceImpl() {
+
+        try {
+            this.selfServiceMgtService = SelfServiceMgtServiceFactory.getSelfServiceMgtService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("SelfServiceMgtService is not available from OSGi context.", e);
+        }
+    }
 
     @Override
     public Response organizationPreferenceGet() {

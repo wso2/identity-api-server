@@ -58,7 +58,7 @@ public class RoleManagementEndpointUtils {
      */
     public static RoleManager getRoleManager() {
 
-        return OrganizationRoleManagementServiceHolder.getInstance().getRoleManager();
+        return OrganizationRoleManagementServiceHolder.getRoleManager();
     }
 
     /**
@@ -66,7 +66,7 @@ public class RoleManagementEndpointUtils {
      */
     public static OrganizationUserResidentResolverService getOrganizationUserResidentResolverService() {
 
-        return OrganizationRoleManagementServiceHolder.getInstance().getOrganizationUserResidentResolverService();
+        return OrganizationRoleManagementServiceHolder.getOrganizationUserResidentResolverService();
     }
 
     /**

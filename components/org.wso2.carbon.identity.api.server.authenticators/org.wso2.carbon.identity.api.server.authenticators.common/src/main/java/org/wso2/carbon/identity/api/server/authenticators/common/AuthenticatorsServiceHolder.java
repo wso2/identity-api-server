@@ -16,28 +16,37 @@
 
 package org.wso2.carbon.identity.api.server.authenticators.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.application.common.ApplicationAuthenticatorService;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
-import org.wso2.carbon.idp.mgt.IdentityProviderManager;
+import org.wso2.carbon.idp.mgt.IdpManager;
 
 /**
  * Service holder class for server configuration related services.
  */
 public class AuthenticatorsServiceHolder {
 
-    private static AuthenticatorsServiceHolder instance = new AuthenticatorsServiceHolder();
-
-    private ApplicationManagementService applicationManagementService;
-    private IdentityProviderManager identityProviderManager;
-    private ApplicationAuthenticatorService applicationAuthenticatorService;
-
     private AuthenticatorsServiceHolder() {
 
     }
 
-    public static AuthenticatorsServiceHolder getInstance() {
+    private static class ApplicationManagementServiceHolder {
 
-        return instance;
+        static final ApplicationManagementService SERVICE = (ApplicationManagementService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(ApplicationManagementService.class, null);
+    }
+
+    private static class IdentityProviderManagerHolder {
+
+        static final IdpManager SERVICE = (IdpManager) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(IdpManager.class, null);
+    }
+
+    private static class ApplicationAuthenticatorServiceHolder {
+
+        static final ApplicationAuthenticatorService SERVICE = (ApplicationAuthenticatorService)
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().getOSGiService(
+                        ApplicationAuthenticatorService.class, null);
     }
 
     /**
@@ -45,39 +54,19 @@ public class AuthenticatorsServiceHolder {
      *
      * @return ApplicationManagementService
      */
-    public ApplicationManagementService getApplicationManagementService() {
+    public static ApplicationManagementService getApplicationManagementService() {
 
-        return AuthenticatorsServiceHolder.getInstance().applicationManagementService;
+        return ApplicationManagementServiceHolder.SERVICE;
     }
 
     /**
-     * Set ApplicationManagementService osgi service.
+     * Get IdpManager osgi service.
      *
-     * @param applicationManagementService ApplicationManagementService.
+     * @return IdpManager
      */
-    public void setApplicationManagementService(ApplicationManagementService applicationManagementService) {
+    public static IdpManager getIdentityProviderManager() {
 
-        AuthenticatorsServiceHolder.getInstance().applicationManagementService = applicationManagementService;
-    }
-
-    /**
-     * Get IdentityProviderManager osgi service.
-     *
-     * @return IdentityProviderManager
-     */
-    public IdentityProviderManager getIdentityProviderManager() {
-
-        return AuthenticatorsServiceHolder.getInstance().identityProviderManager;
-    }
-
-    /**
-     * Set IdentityProviderManager osgi service.
-     *
-     * @param identityProviderManager IdentityProviderManager.
-     */
-    public void setIdentityProviderManager(IdentityProviderManager identityProviderManager) {
-
-        AuthenticatorsServiceHolder.getInstance().identityProviderManager = identityProviderManager;
+        return IdentityProviderManagerHolder.SERVICE;
     }
 
     /**
@@ -85,18 +74,8 @@ public class AuthenticatorsServiceHolder {
      *
      * @return ApplicationAuthenticatorService
      */
-    public ApplicationAuthenticatorService getApplicationAuthenticatorService() {
+    public static ApplicationAuthenticatorService getApplicationAuthenticatorService() {
 
-        return AuthenticatorsServiceHolder.getInstance().applicationAuthenticatorService;
-    }
-
-    /**
-     * Set ApplicationAuthenticatorService osgi service.
-     *
-     * @param applicationAuthenticatorService ApplicationAuthenticatorService.
-     */
-    public void setApplicationAuthenticatorService(ApplicationAuthenticatorService applicationAuthenticatorService) {
-
-        AuthenticatorsServiceHolder.getInstance().applicationAuthenticatorService = applicationAuthenticatorService;
+        return ApplicationAuthenticatorServiceHolder.SERVICE;
     }
 }

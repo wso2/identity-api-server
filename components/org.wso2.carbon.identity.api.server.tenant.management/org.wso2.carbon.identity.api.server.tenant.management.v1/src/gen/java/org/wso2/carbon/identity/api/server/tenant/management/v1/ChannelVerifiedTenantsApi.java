@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.wso2.carbon.identity.api.server.tenant.management.v1.factories.ChannelVerifiedTenantsApiServiceFactory;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.ChannelVerifiedTenantModel;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.Error;
 
@@ -40,8 +40,12 @@ import javax.ws.rs.core.Response;
 
 public class ChannelVerifiedTenantsApi  {
 
-    @Autowired
-    private ChannelVerifiedTenantsApiService delegate;
+    private final ChannelVerifiedTenantsApiService delegate;
+
+    public ChannelVerifiedTenantsApi() {
+
+        this.delegate = ChannelVerifiedTenantsApiServiceFactory.getChannelVerifiedTenantsApi();
+    }
 
     @Valid
     @POST

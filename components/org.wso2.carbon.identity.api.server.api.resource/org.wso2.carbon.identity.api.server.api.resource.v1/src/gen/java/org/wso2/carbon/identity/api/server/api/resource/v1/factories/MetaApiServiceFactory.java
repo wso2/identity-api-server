@@ -26,10 +26,15 @@ import org.wso2.carbon.identity.api.server.api.resource.v1.impl.MetaApiServiceIm
  */
 public class MetaApiServiceFactory {
 
-   private final static MetaApiService service = new MetaApiServiceImpl();
+   private final static MetaApiService SERVICE = new MetaApiServiceImpl();
 
-   public static MetaApiService getMetaApi()
-   {
-      return service;
+   /**
+    * Get MetaApiService.
+    *
+    * @return MetaApiService.
+    */
+   public static MetaApiService getMetaApi() {
+
+      return SERVICE;
    }
 }

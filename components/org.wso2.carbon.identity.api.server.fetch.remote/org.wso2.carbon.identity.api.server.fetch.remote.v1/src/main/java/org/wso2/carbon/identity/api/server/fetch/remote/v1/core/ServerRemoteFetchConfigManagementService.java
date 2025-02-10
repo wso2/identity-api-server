@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2020-2025, WSO2 LLC. (http://www.wso2.com).
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
+ * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,7 +27,6 @@ import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.fetch.remote.common.RemoteFetchConfigurationConstants;
-import org.wso2.carbon.identity.api.server.fetch.remote.common.RemoteFetchServiceHolder;
 import org.wso2.carbon.identity.api.server.fetch.remote.v1.model.ActionListenerAttributes;
 import org.wso2.carbon.identity.api.server.fetch.remote.v1.model.PushEventWebHookPOSTRequest;
 import org.wso2.carbon.identity.api.server.fetch.remote.v1.model.PushEventWebHookPOSTRequestCommits;
@@ -43,6 +42,7 @@ import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 import org.wso2.carbon.identity.remotefetch.common.BasicRemoteFetchConfiguration;
 import org.wso2.carbon.identity.remotefetch.common.DeploymentRevision;
 import org.wso2.carbon.identity.remotefetch.common.RemoteFetchConfiguration;
+import org.wso2.carbon.identity.remotefetch.common.RemoteFetchConfigurationService;
 import org.wso2.carbon.identity.remotefetch.common.exceptions.RemoteFetchClientException;
 import org.wso2.carbon.identity.remotefetch.common.exceptions.RemoteFetchCoreException;
 import org.wso2.carbon.identity.remotefetch.common.exceptions.RemoteFetchServerException;
@@ -79,7 +79,13 @@ import static org.wso2.carbon.identity.api.server.fetch.remote.v1.core.RemoteFet
  */
 public class ServerRemoteFetchConfigManagementService {
 
+    private final RemoteFetchConfigurationService remoteFetchConfigurationService;
     private static final Log log = LogFactory.getLog(ServerRemoteFetchConfigManagementService.class);
+
+    public ServerRemoteFetchConfigManagementService(RemoteFetchConfigurationService remoteFetchConfigurationService) {
+
+        this.remoteFetchConfigurationService = remoteFetchConfigurationService;
+    }
 
     /**
      * Get list of remote fetch configurations.
@@ -92,8 +98,7 @@ public class ServerRemoteFetchConfigManagementService {
         OptionalInt optionalIntOffset = OptionalInt.empty();
 
         try {
-            return createRemoteFetchConfigurationListResponse(RemoteFetchServiceHolder.
-                    getRemoteFetchConfigurationService()
+            return createRemoteFetchConfigurationListResponse(remoteFetchConfigurationService
                     .getBasicRemoteFetchConfigurationList(optionalIntLimit, optionalIntOffset));
         } catch (RemoteFetchCoreException e) {
             throw handleRemoteFetchConfigurationException(e, RemoteFetchConfigurationConstants.
@@ -109,8 +114,7 @@ public class ServerRemoteFetchConfigManagementService {
     public void deleteRemoteFetchConfig(String remoteFetchConfigurationId) {
 
         try {
-            RemoteFetchServiceHolder.getRemoteFetchConfigurationService()
-                    .deleteRemoteFetchConfiguration(remoteFetchConfigurationId);
+            remoteFetchConfigurationService.deleteRemoteFetchConfiguration(remoteFetchConfigurationId);
         } catch (RemoteFetchCoreException e) {
             throw handleRemoteFetchConfigurationException(e, RemoteFetchConfigurationConstants.
                     ErrorMessage.ERROR_CODE_ERROR_DELETING_RF_CONFIGS, remoteFetchConfigurationId);
@@ -126,8 +130,7 @@ public class ServerRemoteFetchConfigManagementService {
     public RemoteFetchConfigurationGetResponse getRemoteFetchConfig(String remoteFetchConfigurationId) {
 
         try {
-            RemoteFetchConfiguration remoteFetchConfiguration =
-                    RemoteFetchServiceHolder.getRemoteFetchConfigurationService()
+            RemoteFetchConfiguration remoteFetchConfiguration = remoteFetchConfigurationService
                             .getRemoteFetchConfiguration(remoteFetchConfigurationId);
             if (remoteFetchConfiguration == null) {
                 throw handleException(Response.Status.NOT_FOUND, RemoteFetchConfigurationConstants.
@@ -151,9 +154,8 @@ public class ServerRemoteFetchConfigManagementService {
                                         RemoteFetchConfigurationPatchRequest remoteFetchConfigurationPatchRequest) {
 
         try {
-            RemoteFetchConfiguration remoteFetchConfiguration =
-                    RemoteFetchServiceHolder.getRemoteFetchConfigurationService()
-                            .getRemoteFetchConfiguration(id);
+            RemoteFetchConfiguration remoteFetchConfiguration = remoteFetchConfigurationService
+                    .getRemoteFetchConfiguration(id);
             if (remoteFetchConfiguration == null) {
                 throw handleException(Response.Status.NOT_FOUND, RemoteFetchConfigurationConstants.
                         ErrorMessage.ERROR_CODE_RE_CONFIG_NOT_FOUND, id);
@@ -167,8 +169,7 @@ public class ServerRemoteFetchConfigManagementService {
             setIfNotNull(remoteFetchConfigurationPatchRequest.getRemoteFetchName(),
                     remoteFetchConfigurationToUpdate::setRemoteFetchName);
 
-            RemoteFetchServiceHolder.getRemoteFetchConfigurationService()
-                    .updateRemoteFetchConfiguration(remoteFetchConfigurationToUpdate);
+            remoteFetchConfigurationService.updateRemoteFetchConfiguration(remoteFetchConfigurationToUpdate);
         } catch (RemoteFetchCoreException e) {
             throw handleRemoteFetchConfigurationException(e, RemoteFetchConfigurationConstants.ErrorMessage.
                     ERROR_CODE_ERROR_UPDATING_RF_CONFIG, null);
@@ -183,12 +184,10 @@ public class ServerRemoteFetchConfigManagementService {
     public void triggerRemoteFetch(String remoteFetchConfigurationId) {
 
         try {
-            RemoteFetchConfiguration remoteFetchConfiguration =
-                    RemoteFetchServiceHolder.getRemoteFetchConfigurationService()
-                            .getRemoteFetchConfiguration(remoteFetchConfigurationId);
+            RemoteFetchConfiguration remoteFetchConfiguration = remoteFetchConfigurationService
+                    .getRemoteFetchConfiguration(remoteFetchConfigurationId);
             if (remoteFetchConfiguration != null) {
-                RemoteFetchServiceHolder.getRemoteFetchConfigurationService()
-                        .triggerRemoteFetch(remoteFetchConfiguration);
+                remoteFetchConfigurationService.triggerRemoteFetch(remoteFetchConfiguration);
             } else {
                 throw handleException(Response.Status.NOT_FOUND, RemoteFetchConfigurationConstants.
                         ErrorMessage.ERROR_CODE_RE_CONFIG_NOT_FOUND, remoteFetchConfigurationId);
@@ -209,9 +208,8 @@ public class ServerRemoteFetchConfigManagementService {
 
         try {
             validatePOSTRequest(remoteFetchConfigurationPOSTRequest);
-            return RemoteFetchServiceHolder.getRemoteFetchConfigurationService()
-                    .addRemoteFetchConfiguration(createRemoteFetchConfiguration(remoteFetchConfigurationPOSTRequest))
-                    .getId();
+            return remoteFetchConfigurationService.addRemoteFetchConfiguration(createRemoteFetchConfiguration(
+                    remoteFetchConfigurationPOSTRequest)).getId();
         } catch (RemoteFetchCoreException e) {
             throw handleRemoteFetchConfigurationException(e, RemoteFetchConfigurationConstants.ErrorMessage.
                     ERROR_CODE_ERROR_ADDING_RF_CONFIG, null);
@@ -274,13 +272,12 @@ public class ServerRemoteFetchConfigManagementService {
     public StatusListResponse getStatus(String remoteFetchConfigurationId) {
 
         try {
-            RemoteFetchConfiguration remoteFetchConfiguration =
-                    RemoteFetchServiceHolder.getRemoteFetchConfigurationService()
-                            .getRemoteFetchConfiguration(remoteFetchConfigurationId);
+            RemoteFetchConfiguration remoteFetchConfiguration = remoteFetchConfigurationService
+                    .getRemoteFetchConfiguration(remoteFetchConfigurationId);
 
             if (remoteFetchConfiguration != null) {
 
-                return createStatusListResponse(RemoteFetchServiceHolder.getRemoteFetchConfigurationService()
+                return createStatusListResponse(remoteFetchConfigurationService
                         .getDeploymentRevisions(remoteFetchConfigurationId));
             } else {
                 throw handleException(Response.Status.NOT_FOUND, RemoteFetchConfigurationConstants.
@@ -471,8 +468,7 @@ public class ServerRemoteFetchConfigManagementService {
                 remoteFetchConfigurationGetResponse::setConfigurationDeployerType);
         setIfNotNull(remoteFetchConfiguration.getRepositoryManagerType(),
                 remoteFetchConfigurationGetResponse::setRepositoryManagerType);
-        StatusListResponse statusListResponse = this.createStatusListResponse(RemoteFetchServiceHolder
-                .getRemoteFetchConfigurationService()
+        StatusListResponse statusListResponse = this.createStatusListResponse(remoteFetchConfigurationService
                 .getDeploymentRevisions(remoteFetchConfiguration.getRemoteFetchConfigurationId()));
         remoteFetchConfigurationGetResponse.setStatus(statusListResponse);
         return remoteFetchConfigurationGetResponse;
@@ -593,8 +589,7 @@ public class ServerRemoteFetchConfigManagementService {
             String cloneURL = pushEventWebHookPOSTRequest.getRepository().getCloneUrl();
             String branch = populateBranch(pushEventWebHookPOSTRequest.getRef());
             List<String> modifiedFiles = extractAddedAndModifiedFiles(pushEventWebHookPOSTRequest.getCommits());
-            RemoteFetchServiceHolder
-                    .getRemoteFetchConfigurationService().handleWebHook(cloneURL, branch, modifiedFiles);
+            remoteFetchConfigurationService.handleWebHook(cloneURL, branch, modifiedFiles);
         } catch (RemoteFetchCoreException e) {
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR, RemoteFetchConfigurationConstants.ErrorMessage
                     .ERROR_CODE_ERROR_WEB_HOOK_REMOTE_FETCH, null);

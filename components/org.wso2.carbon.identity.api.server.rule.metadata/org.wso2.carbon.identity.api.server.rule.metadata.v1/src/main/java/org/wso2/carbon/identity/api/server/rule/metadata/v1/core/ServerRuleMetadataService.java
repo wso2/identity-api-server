@@ -19,7 +19,6 @@
 package org.wso2.carbon.identity.api.server.rule.metadata.v1.core;
 
 import org.wso2.carbon.context.CarbonContext;
-import org.wso2.carbon.identity.api.server.rule.metadata.common.RuleMetadataServiceHolder;
 import org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Field;
 import org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Link;
 import org.wso2.carbon.identity.api.server.rule.metadata.v1.util.RuleMetadataAPIErrorBuilder;
@@ -32,6 +31,7 @@ import org.wso2.carbon.identity.rule.metadata.model.OptionsInputValue;
 import org.wso2.carbon.identity.rule.metadata.model.OptionsReferenceValue;
 import org.wso2.carbon.identity.rule.metadata.model.OptionsValue;
 import org.wso2.carbon.identity.rule.metadata.model.Value;
+import org.wso2.carbon.identity.rule.metadata.service.RuleMetadataService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +40,13 @@ import java.util.List;
  * Service class for Rule Metadata Service.
  */
 public class ServerRuleMetadataService {
+
+    private final RuleMetadataService ruleMetadataService;
+
+    public ServerRuleMetadataService(RuleMetadataService ruleMetadataService) {
+
+        this.ruleMetadataService = ruleMetadataService;
+    }
 
     /**
      * Get the expression metadata for the given flow.
@@ -52,8 +59,7 @@ public class ServerRuleMetadataService {
         try {
             FlowType flowType = FlowType.valueOfFlowAlias(flow);
 
-            List<FieldDefinition> fieldDefinitions =
-                    RuleMetadataServiceHolder.getRuleMetadataService().getExpressionMeta(flowType,
+            List<FieldDefinition> fieldDefinitions = ruleMetadataService.getExpressionMeta(flowType,
                             CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
 
             List<org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition>
