@@ -1647,7 +1647,7 @@ public class ServerApplicationManagementService {
 
         try {
             List<org.wso2.carbon.identity.application.common.model.GroupBasicInfo> groupBasicInfos =
-                    getApplicationManagementService().getGroups(
+                    applicationManagementService.getGroups(
                             PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(), domain,
                             filterNode);
             return groupBasicInfos.stream().map(groupBasicInfo -> new GroupBasicInfo().id(groupBasicInfo.getId())
