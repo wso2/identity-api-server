@@ -42,6 +42,7 @@ import org.wso2.carbon.identity.application.common.model.Scope;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -91,6 +92,8 @@ public class ServerAPIResourceCollectionManagementService {
             }
             apiResourceCollectionListResponse.setTotalResults(apiResourceCollectionSearchResult.getTotalCount());
             apiResourceCollectionListResponse.setApiResourceCollections(apiResourceCollections.stream()
+                    .sorted(Comparator.comparing(APIResourceCollection::getDisplayName,
+                            Comparator.nullsFirst(String.CASE_INSENSITIVE_ORDER)))
                     .map(apiResourceCollection -> buildAPIResourceCollectionListItem(apiResourceCollection,
                             CollectionUtils.isNotEmpty(requestedAttributeList))).collect(Collectors.toList()));
         } catch (APIResourceCollectionMgtException e) {
