@@ -1712,10 +1712,9 @@ public class ServerClaimManagementService {
             throw handleClaimManagementClientError(ERROR_CODE_UNAUTHORIZED_ORG_FOR_CLAIM_PROPERTY_UPDATE, FORBIDDEN);
         }
 
-        // Validate the allowed property: ExcludedUserStores.
-        String allowedKey = Constant.PROP_EXCLUDED_USER_STORES;
-        String existingValue = existingLocalClaim.getClaimProperties().get(allowedKey);
-        String incomingValue = incomingLocalClaim.getClaimProperties().get(allowedKey);
+        // Validate ExcludedUserStores property.
+        String existingValue = existingLocalClaim.getClaimProperties().get(Constant.PROP_EXCLUDED_USER_STORES);
+        String incomingValue = incomingLocalClaim.getClaimProperties().get(Constant.PROP_EXCLUDED_USER_STORES);
         String primaryUserStoreDomain = IdentityUtil.getPrimaryDomainName();
 
         List<String> existingStores = Arrays.asList(
