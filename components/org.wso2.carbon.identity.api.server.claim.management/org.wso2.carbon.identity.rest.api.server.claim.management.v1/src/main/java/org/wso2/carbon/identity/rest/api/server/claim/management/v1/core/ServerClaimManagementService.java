@@ -1723,8 +1723,10 @@ public class ServerClaimManagementService {
         List<String> incomingStores = Arrays.asList(
                 ArrayUtils.nullToEmpty(StringUtils.split(incomingValue, ",")));
 
-        boolean existingHasPrimary = existingStores.contains(primaryUserStoreDomain);
-        boolean incomingHasPrimary = incomingStores.contains(primaryUserStoreDomain);
+        boolean existingHasPrimary = existingStores.stream()
+                .anyMatch(store -> StringUtils.equalsIgnoreCase(store, primaryUserStoreDomain));
+        boolean incomingHasPrimary = incomingStores.stream()
+                .anyMatch(store -> StringUtils.equalsIgnoreCase(store, primaryUserStoreDomain));
 
         // If one contains the primary user store but not the other, the update is not allowed.
         if (existingHasPrimary != incomingHasPrimary) {
