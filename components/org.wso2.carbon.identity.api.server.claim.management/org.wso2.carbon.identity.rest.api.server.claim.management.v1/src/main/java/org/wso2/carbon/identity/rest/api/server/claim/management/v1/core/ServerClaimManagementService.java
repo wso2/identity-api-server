@@ -86,7 +86,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -1672,9 +1671,17 @@ public class ServerClaimManagementService {
             throw handleClaimManagementClientError(ERROR_CODE_LOCAL_CLAIM_NOT_FOUND, BAD_REQUEST, claimID);
         }
 
+        // Validate claim properties.
         populateDefaultProperties(existingLocalClaim.get());
-        if (Objects.hash(existingLocalClaim.get().getClaimProperties().entrySet()) !=
-                Objects.hash(incomingLocalClaim.getClaimProperties().entrySet())) {
+        Map<String, String> filteredExistingProperties =
+                existingLocalClaim.get().getClaimProperties().entrySet().stream()
+                        .filter(entry -> !Constant.ALLOWED_PROPERTY_KEYS_FOR_SUB_ORG_UPDATE.contains(entry.getKey()))
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        Map<String, String> filteredIncomingProperties = incomingLocalClaim.getClaimProperties().entrySet().stream()
+                .filter(entry -> !Constant.ALLOWED_PROPERTY_KEYS_FOR_SUB_ORG_UPDATE.contains(entry.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        if (!filteredExistingProperties.equals(filteredIncomingProperties)) {
             throw handleClaimManagementClientError(ERROR_CODE_UNAUTHORIZED_ORG_FOR_CLAIM_PROPERTY_UPDATE, FORBIDDEN);
         }
 

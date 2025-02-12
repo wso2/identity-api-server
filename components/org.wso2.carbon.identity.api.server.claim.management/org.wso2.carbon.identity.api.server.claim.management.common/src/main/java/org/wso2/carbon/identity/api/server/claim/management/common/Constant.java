@@ -16,9 +16,12 @@
 
 package org.wso2.carbon.identity.api.server.claim.management.common;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * Claim Management constant class.
@@ -285,4 +288,8 @@ public class Constant {
     public static final String PROP_SUPPORTED_BY_DEFAULT = "SupportedByDefault";
     public static final String PROP_UNIQUENESS_SCOPE = "UniquenessScope";
     public static final String PROP_PROFILES_PREFIX = "Profiles.";
+    public static final String PROP_EXCLUDED_USER_STORES = "ExcludedUserStores";
+
+    public static final Set<String> ALLOWED_PROPERTY_KEYS_FOR_SUB_ORG_UPDATE = Collections.unmodifiableSet(
+            new HashSet<>(Collections.singletonList(PROP_EXCLUDED_USER_STORES)));
 }
