@@ -214,7 +214,11 @@ public class Constant {
                 "allowed for this organization.", "Unable to update the claim properties."),
         ERROR_CODE_UNAUTHORIZED_ORG_FOR_ATTRIBUTE_MAPPING_UPDATE("CMT-60010",
                 "Unable to update attribute mappings.",
-                "Updating the mapped attribute for userstore: %s is not allowed for this organization");
+                "Updating the mapped attribute for userstore: %s is not allowed for this organization"),
+        ERROR_CODE_UNAUTHORIZED_ORG_FOR_EXCLUDED_USER_STORES_PROPERTY_UPDATE("CMT-60011",
+                "Unable to update excluded user stores property.",
+                "Updating the excluded user stores property for userstore: %s is not allowed for this " +
+                        "organization");
 
         private final String code;
         private final String message;
