@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -40,6 +40,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.CustomInbou
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.Error;
 import java.io.File;
+import org.wso2.carbon.identity.api.server.application.management.v1.GroupBasicInfo;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowGenerateRequest;
 import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowGenerateResponse;
@@ -109,6 +110,8 @@ public interface ApplicationsApiService {
       public Response getCustomInboundConfiguration(String applicationId, String inboundProtocolId);
 
       public Response getCustomProtocolMetadata(String inboundProtocolId);
+
+      public Response getGroups(String domain, String filter);
 
       public Response getInboundAuthenticationConfigurations(String applicationId);
 
