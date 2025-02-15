@@ -1726,7 +1726,8 @@ public class ServerIdpManagementService {
                     definedByType = resolveDefinedByTypeToCreateFederatedAuthenticator(
                             authenticator.getDefinedBy());
                 } else {
-                    definedByType = resolveDefinedByTypeToUpdateFederatedAuthenticator(authenticatorName);
+                    definedByType = resolveDefinedByTypeToUpdateFederatedAuthenticator(authenticatorName,
+                            authenticator.getDefinedBy());
                 }
                 if (definedByType == DefinedByType.USER && federatedAuthenticators.size() > 1) {
                     throw handleException(Response.Status.BAD_REQUEST,
@@ -2742,7 +2743,10 @@ public class ServerIdpManagementService {
                   FederatedAuthenticatorPUTRequest authenticator) throws IdentityProviderManagementClientException {
 
         String authenticatorName = getDecodedAuthenticatorName(federatedAuthenticatorId);
-        DefinedByType definedByType = resolveDefinedByTypeToUpdateFederatedAuthenticator(authenticatorName);
+        /* As this operation is only for updating an existing authenticator, the definedByType parameter in the PUT
+         request is ignored. */
+        DefinedByType definedByType = resolveDefinedByTypeToUpdateFederatedAuthenticator(authenticatorName,
+                null);
 
         return FederatedAuthenticatorConfigBuilderFactory.build(authenticator, authenticatorName, definedByType);
     }
@@ -2758,18 +2762,25 @@ public class ServerIdpManagementService {
         return DefinedByType.SYSTEM;
     }
 
-    private DefinedByType resolveDefinedByTypeToUpdateFederatedAuthenticator(String authenticatorName) {
+    private DefinedByType resolveDefinedByTypeToUpdateFederatedAuthenticator(String authenticatorName,
+                FederatedAuthenticator.DefinedByEnum definedByType) {
 
-        /* For existing federated authenticators, disregard any value provided in the request payload.
-         Instead, resolve and retrieve the 'definedBy' type of the corresponding existing authenticator.
-         If the authenticator config is present in the ApplicationAuthenticatorService list, return its type,
-         if not return USER. */
-        FederatedAuthenticatorConfig authenticatorConfig = ApplicationAuthenticatorService.getInstance()
-                .getFederatedAuthenticatorByName(authenticatorName);
-        if (authenticatorConfig != null) {
-            return DefinedByType.valueOf(authenticatorConfig.getDefinedByType().toString());
+        try {
+            /* For existing federated authenticators, disregard any value provided in the request payload.
+             Instead, resolve and retrieve the 'definedBy' type of the corresponding existing authenticator.
+             If the authenticator config is present in the ApplicationAuthenticatorService list, return its type,
+             if not, considering this adding new authenticator and invoke
+             resolveDefinedByTypeToCreateFederatedAuthenticator method. */
+            FederatedAuthenticatorConfig authenticatorConfig = identityProviderManager.getFederatedAuthenticatorByName(
+                    authenticatorName, ContextLoader.getTenantDomainFromContext());
+            if (authenticatorConfig != null) {
+                return DefinedByType.valueOf(authenticatorConfig.getDefinedByType().toString());
+            }
+            return resolveDefinedByTypeToCreateFederatedAuthenticator(definedByType);
+        } catch (IdentityProviderManagementException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
+                    .ERROR_CODE_ERROR_RETRIEVING_IDP_AUTHENTICATOR, authenticatorName);
         }
-        return DefinedByType.USER;
     }
 
     /**
