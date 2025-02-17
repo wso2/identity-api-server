@@ -20,7 +20,7 @@ package org.wso2.carbon.identity.api.server.rule.metadata.v1.factories;
 
 import org.wso2.carbon.identity.api.server.rule.metadata.common.RuleMetadataServiceHolder;
 import org.wso2.carbon.identity.api.server.rule.metadata.v1.core.ServerRuleMetadataService;
-import org.wso2.carbon.identity.rule.metadata.service.RuleMetadataService;
+import org.wso2.carbon.identity.rule.metadata.api.service.RuleMetadataService;
 
 /**
  * Factory class for ServerRuleMetadataService.
