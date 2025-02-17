@@ -29,8 +29,8 @@ import org.wso2.carbon.identity.api.server.action.management.v1.PreUpdatePasswor
 import org.wso2.carbon.identity.api.server.action.management.v1.PreUpdatePasswordActionUpdateModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.util.ActionMapperUtil;
 import org.wso2.carbon.identity.certificate.management.model.Certificate;
-import org.wso2.carbon.identity.user.pre.update.password.action.service.model.PasswordSharing;
-import org.wso2.carbon.identity.user.pre.update.password.action.service.model.PreUpdatePasswordAction;
+import org.wso2.carbon.identity.user.pre.update.password.action.api.model.PasswordSharing;
+import org.wso2.carbon.identity.user.pre.update.password.action.api.model.PreUpdatePasswordAction;
 
 /**
  * Pre Update Password Action Builder.
