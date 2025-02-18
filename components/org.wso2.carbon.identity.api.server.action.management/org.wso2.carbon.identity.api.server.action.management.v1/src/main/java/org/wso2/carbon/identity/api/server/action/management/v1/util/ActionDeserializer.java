@@ -20,7 +20,7 @@ package org.wso2.carbon.identity.api.server.action.management.v1.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.wso2.carbon.identity.action.management.model.Action;
+import org.wso2.carbon.identity.action.management.api.model.Action;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.PreUpdatePasswordActionModel;

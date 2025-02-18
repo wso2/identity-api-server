@@ -18,8 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.action.management.v1.mapper;
 
-import org.wso2.carbon.identity.action.management.exception.ActionMgtServerException;
-import org.wso2.carbon.identity.action.management.model.Action;
+import org.wso2.carbon.identity.action.management.api.exception.ActionMgtServerException;
+import org.wso2.carbon.identity.action.management.api.model.Action;
 
 /**
  * Factory class to get the ActionMapper based on the action type.
