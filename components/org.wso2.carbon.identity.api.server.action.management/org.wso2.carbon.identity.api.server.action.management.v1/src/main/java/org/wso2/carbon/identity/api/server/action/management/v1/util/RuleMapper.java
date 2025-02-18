@@ -18,9 +18,9 @@
 
 package org.wso2.carbon.identity.api.server.action.management.v1.util;
 
-import org.wso2.carbon.identity.action.management.exception.ActionMgtException;
-import org.wso2.carbon.identity.action.management.model.Action;
-import org.wso2.carbon.identity.action.management.model.ActionRule;
+import org.wso2.carbon.identity.action.management.api.exception.ActionMgtException;
+import org.wso2.carbon.identity.action.management.api.model.Action;
+import org.wso2.carbon.identity.action.management.api.model.ActionRule;
 import org.wso2.carbon.identity.api.server.action.management.v1.ANDRule;
 import org.wso2.carbon.identity.api.server.action.management.v1.ANDRuleResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ExpressionResponse;

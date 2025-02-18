@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.action.management.v1.factories;
 
-import org.wso2.carbon.identity.action.management.service.ActionManagementService;
+import org.wso2.carbon.identity.action.management.api.service.ActionManagementService;
 import org.wso2.carbon.identity.api.server.action.management.common.ActionManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.action.management.v1.core.ServerActionManagementService;
 
