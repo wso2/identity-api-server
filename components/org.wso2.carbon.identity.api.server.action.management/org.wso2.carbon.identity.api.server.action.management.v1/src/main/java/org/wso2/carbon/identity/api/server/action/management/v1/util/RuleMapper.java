@@ -27,13 +27,13 @@ import org.wso2.carbon.identity.api.server.action.management.v1.ExpressionRespon
 import org.wso2.carbon.identity.api.server.action.management.v1.ORRule;
 import org.wso2.carbon.identity.api.server.action.management.v1.ORRuleResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants;
-import org.wso2.carbon.identity.rule.management.exception.RuleManagementClientException;
-import org.wso2.carbon.identity.rule.management.exception.RuleManagementException;
-import org.wso2.carbon.identity.rule.management.model.ANDCombinedRule;
-import org.wso2.carbon.identity.rule.management.model.Expression;
-import org.wso2.carbon.identity.rule.management.model.FlowType;
-import org.wso2.carbon.identity.rule.management.model.ORCombinedRule;
-import org.wso2.carbon.identity.rule.management.util.RuleBuilder;
+import org.wso2.carbon.identity.rule.management.api.exception.RuleManagementClientException;
+import org.wso2.carbon.identity.rule.management.api.exception.RuleManagementException;
+import org.wso2.carbon.identity.rule.management.api.model.ANDCombinedRule;
+import org.wso2.carbon.identity.rule.management.api.model.Expression;
+import org.wso2.carbon.identity.rule.management.api.model.FlowType;
+import org.wso2.carbon.identity.rule.management.api.model.ORCombinedRule;
+import org.wso2.carbon.identity.rule.management.api.util.RuleBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
