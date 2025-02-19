@@ -71,7 +71,7 @@ public class FederatedAuthenticatorConfigBuilderFactory {
      *                                                   the FederatedAuthenticatorConfig.
      */
     public static FederatedAuthenticatorConfig build(FederatedAuthenticatorPUTRequest authenticator, String 
-            authenticatorName, DefinedByType definedByType) throws IdentityProviderManagementClientException {
+            authenticatorName, DefinedByType definedByType, String amrValue) throws IdentityProviderManagementClientException {
 
         List<Property> properties = Optional.ofNullable(authenticator.getProperties())
                 .map(props -> props.stream().map(propertyToInternal).collect(Collectors.toList()))
@@ -80,7 +80,7 @@ public class FederatedAuthenticatorConfigBuilderFactory {
         FederatedAuthenticatorConfigBuilderFactory.Config config =
                 new FederatedAuthenticatorConfigBuilderFactory.Config(authenticatorName,
                         getDisplayNameOfAuthenticator(authenticatorName),
-                        authenticator.getEndpoint(), properties, authenticator.getIsEnabled(), definedByType);
+                        authenticator.getEndpoint(), properties, authenticator.getIsEnabled(), definedByType, amrValue);
         return FederatedAuthenticatorConfigBuilderFactory.createFederatedAuthenticatorConfig(config);
     }
 
@@ -94,7 +94,7 @@ public class FederatedAuthenticatorConfigBuilderFactory {
      *                                                      FederatedAuthenticatorConfig.
      */
     public static FederatedAuthenticatorConfig build(FederatedAuthenticator authenticator, String
-            authenticatorName, DefinedByType definedByType) throws IdentityProviderManagementClientException {
+            authenticatorName, DefinedByType definedByType, String amrValue) throws IdentityProviderManagementClientException {
 
         List<Property> properties = Optional.ofNullable(authenticator.getProperties())
                 .map(props -> props.stream().map(propertyToInternal).collect(Collectors.toList()))
@@ -103,7 +103,7 @@ public class FederatedAuthenticatorConfigBuilderFactory {
         FederatedAuthenticatorConfigBuilderFactory.Config config =
                 new FederatedAuthenticatorConfigBuilderFactory.Config(authenticatorName,
                         getDisplayNameOfAuthenticator(authenticatorName),
-                        authenticator.getEndpoint(), properties, authenticator.getIsEnabled(), definedByType);
+                        authenticator.getEndpoint(), properties, authenticator.getIsEnabled(), definedByType, amrValue);
 
         return FederatedAuthenticatorConfigBuilderFactory.createFederatedAuthenticatorConfig(config);
     }
@@ -124,6 +124,7 @@ public class FederatedAuthenticatorConfigBuilderFactory {
 
         federatedAuthenticator.setName(config.getName());
         federatedAuthenticator.setIsEnabled(config.isEnabled());
+        federatedAuthenticator.setAmrValue(config.getAmrValue());
         String[] tags = resolveAuthenticatorTags(config);
         if (ArrayUtils.isNotEmpty(tags)) {
             federatedAuthenticator.setTags(Arrays.asList(tags));
@@ -159,6 +160,7 @@ public class FederatedAuthenticatorConfigBuilderFactory {
             authenticatorListItem.setAuthenticatorId(base64URLEncode(config.getName()));
             authenticatorListItem.setName(config.getName());
             authenticatorListItem.setIsEnabled(config.isEnabled());
+            authenticatorListItem.setAmrValue(config.getAmrValue());
             authenticatorListItem.definedBy(FederatedAuthenticatorListItem.DefinedByEnum.valueOf(
                     config.getDefinedByType().toString()));
             String[] tags = resolveAuthenticatorTags(config);
@@ -187,6 +189,7 @@ public class FederatedAuthenticatorConfigBuilderFactory {
         federatedAuthenticatorConfig.setName(config.authenticatorName);
         federatedAuthenticatorConfig.setDisplayName(config.displayName);
         federatedAuthenticatorConfig.setEnabled(config.isEnabled);
+        federatedAuthenticatorConfig.setAmrValue(config.amrValue);
 
         return federatedAuthenticatorConfig;
     }
@@ -491,9 +494,10 @@ public class FederatedAuthenticatorConfigBuilderFactory {
         private final Endpoint endpoint;
         private final List<Property> properties;
         private final Boolean isEnabled;
+        private final String amrValue;
 
         public Config(String authenticatorName, String displayName, Endpoint endpoint,
-                      List<Property> properties, Boolean isEnabled, DefinedByType definedByType) {
+                      List<Property> properties, Boolean isEnabled, DefinedByType definedByType, String amrValue) {
 
             this.authenticatorName = authenticatorName;
             this.displayName = displayName;
@@ -501,6 +505,7 @@ public class FederatedAuthenticatorConfigBuilderFactory {
             this.properties = properties;
             this.isEnabled = isEnabled;
             this.definedByType = definedByType;
+            this.amrValue = amrValue;
         }
     }
 }

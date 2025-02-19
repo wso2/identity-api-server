@@ -56,6 +56,7 @@ public class IdentityProviderResponse  {
     private Claims claims;
     private Roles roles;
     private List<IdPGroup> groups = null;
+    private String amrValue;
 
     private FederatedAuthenticatorListResponse federatedAuthenticators;
     private ProvisioningResponse provisioning;
@@ -392,6 +393,16 @@ public class IdentityProviderResponse  {
     }
     public void setImplicitAssociation(AssociationResponse implicitAssociation) {
         this.implicitAssociation = implicitAssociation;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("amrValue")
+    @Valid
+    public String getAmrValue() {
+        return amrValue;
+    }
+    public void setAmrValue(String amrValue) {
+        this.amrValue = amrValue;
     }
 
 

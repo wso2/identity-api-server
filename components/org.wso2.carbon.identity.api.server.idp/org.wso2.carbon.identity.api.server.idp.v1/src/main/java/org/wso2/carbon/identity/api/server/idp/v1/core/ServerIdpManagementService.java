@@ -1722,6 +1722,8 @@ public class ServerIdpManagementService {
             for (FederatedAuthenticator authenticator : federatedAuthenticators) {
                 String authenticatorName = getDecodedAuthenticatorName(authenticator.getAuthenticatorId());
                 DefinedByType definedByType;
+                String amrValue = authenticator.getAmrValue();
+
                 if (isNewFederatedAuthenticator) {
                     definedByType = resolveDefinedByTypeToCreateFederatedAuthenticator(
                             authenticator.getDefinedBy());
@@ -1733,7 +1735,7 @@ public class ServerIdpManagementService {
                             Constants.ErrorMessage.ERROR_COED_MULTIPLE_USER_DEFINED_AUTHENTICATORS_FOUND, null);
                 }
                 FederatedAuthenticatorConfig authConfig = FederatedAuthenticatorConfigBuilderFactory.build(
-                        authenticator, authenticatorName, definedByType);
+                        authenticator, authenticatorName, definedByType, amrValue);
 
                 fedAuthConfigs.add(authConfig);
 
@@ -2743,8 +2745,10 @@ public class ServerIdpManagementService {
 
         String authenticatorName = getDecodedAuthenticatorName(federatedAuthenticatorId);
         DefinedByType definedByType = resolveDefinedByTypeToUpdateFederatedAuthenticator(authenticatorName);
+        String amrValue = authenticator.getAmrValue();
 
-        return FederatedAuthenticatorConfigBuilderFactory.build(authenticator, authenticatorName, definedByType);
+        return FederatedAuthenticatorConfigBuilderFactory.build(authenticator, authenticatorName, definedByType,
+                amrValue);
     }
 
     private DefinedByType resolveDefinedByTypeToCreateFederatedAuthenticator(
