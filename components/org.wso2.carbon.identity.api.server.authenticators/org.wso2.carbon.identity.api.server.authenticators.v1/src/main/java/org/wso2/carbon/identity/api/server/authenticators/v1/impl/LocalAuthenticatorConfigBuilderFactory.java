@@ -93,6 +93,7 @@ public class LocalAuthenticatorConfigBuilderFactory {
         authConfig.setDisplayName(config.getDisplayName());
         authConfig.setImageUrl(config.getImage());
         authConfig.setDescription(config.getDescription());
+        authConfig.setAmrValue(config.getAmrValue());
         authConfig.setEnabled(config.getIsEnabled());
         authConfig.setEndpointConfig(buildEndpointConfig(config.getEndpoint()));
 
@@ -116,6 +117,7 @@ public class LocalAuthenticatorConfigBuilderFactory {
         authConfig.setDisplayName(config.getDisplayName());
         authConfig.setImageUrl(config.getImage());
         authConfig.setDescription(config.getDescription());
+        authConfig.setAmrValue(config.getAmrValue());
         authConfig.setEnabled(config.getIsEnabled());
         authConfig.setEndpointConfig(buildEndpointConfig(config.getEndpoint()));
 

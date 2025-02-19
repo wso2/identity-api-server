@@ -40,6 +40,7 @@ public class UserDefinedLocalAuthenticatorCreation  {
     private String id;
     private String displayName;
     private Boolean isEnabled;
+    private String amrValue;
 
 @XmlType(name="AuthenticationTypeEnum")
 @XmlEnum(String.class)
@@ -211,6 +212,24 @@ public enum AuthenticationTypeEnum {
     }
 
     /**
+     **/
+
+    public UserDefinedLocalAuthenticatorCreation amrValue(String amrValue) {
+        this.amrValue = amrValue;
+        return this;
+    }
+
+    @ApiModelProperty(example = "User defined AMR Value for the authenticator", value = "")
+    @JsonProperty("amrValue")
+    @Valid
+    public String getAmrValue() {
+        return amrValue;
+    }
+    public void setAmrValue(String amrValue) {
+        this.amrValue = amrValue;
+    }
+
+    /**
     **/
     public UserDefinedLocalAuthenticatorCreation endpoint(Endpoint endpoint) {
 
@@ -246,6 +265,7 @@ public enum AuthenticationTypeEnum {
             Objects.equals(this.id, userDefinedLocalAuthenticatorCreation.id) &&
             Objects.equals(this.displayName, userDefinedLocalAuthenticatorCreation.displayName) &&
             Objects.equals(this.isEnabled, userDefinedLocalAuthenticatorCreation.isEnabled) &&
+            Objects.equals(this.amrValue, userDefinedLocalAuthenticatorCreation.amrValue) &&
             Objects.equals(this.authenticationType, userDefinedLocalAuthenticatorCreation.authenticationType) &&
             Objects.equals(this.image, userDefinedLocalAuthenticatorCreation.image) &&
             Objects.equals(this.description, userDefinedLocalAuthenticatorCreation.description) &&
@@ -254,7 +274,8 @@ public enum AuthenticationTypeEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, id, displayName, isEnabled, authenticationType, image, description, endpoint);
+        return Objects.hash(name, id, displayName, isEnabled, amrValue, authenticationType, image, description,
+                endpoint);
     }
 
     @Override
@@ -267,6 +288,7 @@ public enum AuthenticationTypeEnum {
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
+        sb.append("    amrValue: ").append(toIndentedString(amrValue)).append("\n");
         sb.append("    authenticationType: ").append(toIndentedString(authenticationType)).append("\n");
         sb.append("    image: ").append(toIndentedString(image)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
