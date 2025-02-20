@@ -189,4 +189,28 @@ public class AuthenticatorsApi  {
         return delegate.updateUserDefinedLocalAuthenticator(authenticatorId,  userDefinedLocalAuthenticatorUpdate );
     }
 
+//    @Valid
+//    @PUT
+//    @Path("local/{authenticator-id}")
+//    @Consumes({ "application/json" })
+//    @Produces({ "application/json" })
+//    @ApiOperation(value = "Update a default local authenticator. ", notes = "This API provides the capability to " +
+//            "update a local authenticator configurations. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/local_authenticator/update <br> <b>Scope required:</b> <br>     * internal_local_authenticator_update <br> ", response = Authenticator.class, authorizations = {
+//        @Authorization(value = "BasicAuth"),
+//        @Authorization(value = "OAuth2", scopes = {
+//
+//        })
+//    }, tags={ "Default Local authenticators" })
+//    @ApiResponses(value = {
+//            @ApiResponse(code = 200, message = "Successful response", response = Authenticator.class),
+//            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+//            @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+//            @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+//            @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+//    })
+//    public Response updateDefaultLocalAuthenticator(@ApiParam(value = "ID of an authenticator",required=true) @PathParam("authenticator-id") String authenticatorId, @ApiParam(value = "This represents the default local authenticator to be updated." ,required=true) @Valid UserDefinedLocalAuthenticatorUpdate defaultLocalAuthenticatorUpdate) {
+//
+//        return delegate.updateDefaultLocalAuthenticator(authenticatorId,  defaultLocalAuthenticatorUpdate );
+//    }
+
 }

@@ -79,13 +79,15 @@ public class FederatedAuthenticatorConfigBuilderFactory {
                 .authenticatorName(authenticatorName)
                 .endpoint(authenticator.getEndpoint())
                 .properties(authenticator.getProperties())
-                .isEnabled(authenticator.getIsEnabled());
+                .isEnabled(authenticator.getIsEnabled())
+                .amrValue(authenticator.getAmrValue());
 
         FederatedAuthenticatorConfig federatedAuthenticatorConfig =
                 getFederatedAuthenticatorConfigUpdateModel(fedAuthConfigDTO);
         federatedAuthenticatorConfig.setName(fedAuthConfigDTO.authenticatorName);
         federatedAuthenticatorConfig.setDisplayName(fedAuthConfigDTO.displayName);
         federatedAuthenticatorConfig.setEnabled(fedAuthConfigDTO.isEnabled);
+        federatedAuthenticatorConfig.setAmrValue(fedAuthConfigDTO.amrValue);
 
         return federatedAuthenticatorConfig;
     }
@@ -108,13 +110,15 @@ public class FederatedAuthenticatorConfigBuilderFactory {
                 .authenticatorName(authenticatorName)
                 .endpoint(authenticator.getEndpoint())
                 .properties(authenticator.getProperties())
-                .isEnabled(authenticator.getIsEnabled());
+                .isEnabled(authenticator.getIsEnabled())
+                .amrValue(authenticator.getAmrValue());
 
         FederatedAuthenticatorConfig federatedAuthenticatorConfig =
                 getFederatedAuthenticatorConfigCreateModel(fedAuthConfigDTO);
         federatedAuthenticatorConfig.setName(fedAuthConfigDTO.authenticatorName);
         federatedAuthenticatorConfig.setDisplayName(fedAuthConfigDTO.displayName);
         federatedAuthenticatorConfig.setEnabled(fedAuthConfigDTO.isEnabled);
+        federatedAuthenticatorConfig.setAmrValue(fedAuthConfigDTO.amrValue);
 
         return federatedAuthenticatorConfig;
     }
@@ -496,6 +500,7 @@ public class FederatedAuthenticatorConfigBuilderFactory {
         private Endpoint endpoint;
         private List<Property> properties;
         private Boolean isEnabled;
+        private String amrValue;
 
         FederatedAuthenticatorConfigDTO definedByType(DefinedByType definedByType) {
 
@@ -514,6 +519,12 @@ public class FederatedAuthenticatorConfigBuilderFactory {
         FederatedAuthenticatorConfigDTO endpoint(Endpoint endpoint) {
 
             this.endpoint = endpoint;
+            return this;
+        }
+
+        FederatedAuthenticatorConfigDTO amrValue(String amrValue) {
+
+            this.amrValue = amrValue;
             return this;
         }
 

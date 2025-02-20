@@ -280,6 +280,29 @@ public class ServerAuthenticatorManagementService {
         }
     }
 
+//    public Authenticator updateDefaultLocalAuthenticator(String authenticatorId,
+//                                            UserDefinedLocalAuthenticatorUpdate defaultLocalAuthenticatorUpdate) {
+//        try {
+//            String authenticatorName = base64URLDecode(authenticatorId);
+//            String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+//            LocalAuthenticatorConfig existingAuthenticator = applicationAuthenticatorService
+//                    .getLocalAuthenticatorByName(authenticatorName, tenantDomain);
+//            if (existingAuthenticator == null) {
+//                AuthenticatorMgtError error = AuthenticatorMgtError.ERROR_CODE_ERROR_AUTHENTICATOR_NOT_FOUND;
+//                throw handleAuthenticatorException(new AuthenticatorMgtClientException(error.getCode(),
+//                                error.getMessage(), String.format(error.getMessage(), authenticatorName)),
+//                        Response.Status.NOT_FOUND);
+//            }
+//            UserDefinedLocalAuthenticatorConfig updatedConfig = applicationAuthenticatorService
+//                    .updateDefaultLocalAuthenticator(//Update ApplicationAuthenticatorService
+//                            LocalAuthenticatorConfigBuilderFactory.build(config, existingAuthenticator),
+//                            tenantDomain);
+//            return LocalAuthenticatorConfigBuilderFactory.build(updatedConfig);
+//        } catch (AuthenticatorMgtException e) {
+//            throw handleAuthenticatorException(e);
+//        }
+//    }
+
     private ConnectedApps createConnectedAppsResponse(String resourceId, ConnectedAppsResult connectedAppsResult) {
 
         ConnectedApps connectedAppsResponse = new ConnectedApps();
@@ -636,6 +659,7 @@ public class ServerAuthenticatorManagementService {
             authenticator.setImage(userDefinedConfig.getImageUrl());
             authenticator.setDescription(userDefinedConfig.getDescription());
         }
+        authenticator.amrValue(config.getAmrValue());
         String[] tags = config.getTags();
         if (ArrayUtils.isNotEmpty(tags)) {
             authenticator.setTags(Arrays.asList(tags));

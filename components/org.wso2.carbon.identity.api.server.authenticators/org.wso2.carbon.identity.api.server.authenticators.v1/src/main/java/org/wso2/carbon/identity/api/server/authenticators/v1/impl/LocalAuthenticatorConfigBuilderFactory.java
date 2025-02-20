@@ -62,6 +62,7 @@ public class LocalAuthenticatorConfigBuilderFactory {
         authenticator.setDisplayName(config.getDisplayName());
         authenticator.setImage(config.getImageUrl());
         authenticator.description(config.getDescription());
+        authenticator.setAmrValue(config.getAmrValue());//Update UserDefinedLocalAuthenticatorConfig in framework
         authenticator.setIsEnabled(config.isEnabled());
         authenticator.setDefinedBy(Authenticator.DefinedByEnum.USER);
         authenticator.setType(Authenticator.TypeEnum.LOCAL);

@@ -36,6 +36,7 @@ public class Authenticator  {
     private String name;
     private String displayName;
     private Boolean isEnabled;
+    private String amrValue;
 
 @XmlType(name="DefinedByEnum")
 @XmlEnum(String.class)
@@ -255,6 +256,24 @@ public enum TypeEnum {
     }
 
     /**
+     **/
+    public Authenticator amrValue(String amrValue) {
+
+        this.amrValue = amrValue;
+        return this;
+    }
+
+    @ApiModelProperty(example = "AMR Values", value = "")
+    @JsonProperty("amrValue")
+    @Valid
+    public String getAmrValue() {
+        return amrValue;
+    }
+    public void setAmrValue(String amrValue) {
+        this.amrValue = amrValue;
+    }
+
+    /**
     **/
     public Authenticator tags(List<String> tags) {
 
@@ -315,6 +334,7 @@ public enum TypeEnum {
             Objects.equals(this.displayName, authenticator.displayName) &&
             Objects.equals(this.isEnabled, authenticator.isEnabled) &&
             Objects.equals(this.definedBy, authenticator.definedBy) &&
+                Objects.equals(this.amrValue, authenticator.amrValue) &&
             Objects.equals(this.type, authenticator.type) &&
             Objects.equals(this.image, authenticator.image) &&
             Objects.equals(this.description, authenticator.description) &&
@@ -324,7 +344,8 @@ public enum TypeEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, displayName, isEnabled, definedBy, type, image, description, tags, self);
+        return Objects.hash(id, name, displayName, isEnabled, definedBy, amrValue, type, image, description, tags,
+                self);
     }
 
     @Override
@@ -338,6 +359,7 @@ public enum TypeEnum {
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
         sb.append("    definedBy: ").append(toIndentedString(definedBy)).append("\n");
+        sb.append("    amrValue: ").append(toIndentedString(amrValue)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    image: ").append(toIndentedString(image)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
