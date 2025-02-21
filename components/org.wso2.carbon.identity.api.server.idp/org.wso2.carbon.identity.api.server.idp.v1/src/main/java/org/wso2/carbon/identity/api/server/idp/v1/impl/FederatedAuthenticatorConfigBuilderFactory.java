@@ -173,6 +173,7 @@ public class FederatedAuthenticatorConfigBuilderFactory {
             FederatedAuthenticatorListItem authenticatorListItem = new FederatedAuthenticatorListItem();
             authenticatorListItem.setAuthenticatorId(base64URLEncode(config.getName()));
             authenticatorListItem.setName(config.getName());
+            authenticatorListItem.setAmrValue(config.getAmrValue());
             authenticatorListItem.setIsEnabled(config.isEnabled());
             authenticatorListItem.definedBy(FederatedAuthenticatorListItem.DefinedByEnum.valueOf(
                     config.getDefinedByType().toString()));

@@ -651,7 +651,6 @@ public class ServerAuthenticatorManagementService {
         authenticator.setDisplayName(config.getDisplayName());
         authenticator.setIsEnabled(config.isEnabled());
         authenticator.setType(Authenticator.TypeEnum.LOCAL);
-
         authenticator.definedBy(Authenticator.DefinedByEnum.valueOf(config.getDefinedByType().toString()));
         if (AuthenticatorPropertyConstants.DefinedByType.USER.equals(config.getDefinedByType()) && config instanceof
                 UserDefinedLocalAuthenticatorConfig) {

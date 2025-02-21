@@ -191,7 +191,7 @@ public class AuthenticatorsApi  {
 
 //    @Valid
 //    @PUT
-//    @Path("local/{authenticator-id}")
+//    @Path("system/{authenticator-id}")
 //    @Consumes({ "application/json" })
 //    @Produces({ "application/json" })
 //    @ApiOperation(value = "Update a default local authenticator. ", notes = "This API provides the capability to " +

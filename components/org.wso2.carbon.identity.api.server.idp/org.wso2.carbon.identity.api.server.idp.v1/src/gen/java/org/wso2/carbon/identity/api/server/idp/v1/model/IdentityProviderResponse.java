@@ -56,7 +56,7 @@ public class IdentityProviderResponse  {
     private Claims claims;
     private Roles roles;
     private List<IdPGroup> groups = null;
-    private String amrValue;
+//    private String amrValue;
 
     private FederatedAuthenticatorListResponse federatedAuthenticators;
     private ProvisioningResponse provisioning;
@@ -395,15 +395,21 @@ public class IdentityProviderResponse  {
         this.implicitAssociation = implicitAssociation;
     }
 
-    @ApiModelProperty(value = "")
-    @JsonProperty("amrValue")
-    @Valid
-    public String getAmrValue() {
-        return amrValue;
-    }
-    public void setAmrValue(String amrValue) {
-        this.amrValue = amrValue;
-    }
+
+//    public IdentityProviderResponse amrValue(String amrValue) {
+//        this.amrValue = amrValue;
+//        return this;
+//    }
+//
+//    @ApiModelProperty(value = "")
+//    @JsonProperty("amrValue")
+//    @Valid
+//    public String getAmrValue() {
+//        return amrValue;
+//    }
+//    public void setAmrValue(String amrValue) {
+//        this.amrValue = amrValue;
+//    }
 
 
 
@@ -422,6 +428,7 @@ public class IdentityProviderResponse  {
             Objects.equals(this.description, identityProviderResponse.description) &&
             Objects.equals(this.templateId, identityProviderResponse.templateId) &&
             Objects.equals(this.isEnabled, identityProviderResponse.isEnabled) &&
+//                Objects.equals(this.amrValue, identityProviderResponse.amrValue) &&
             Objects.equals(this.isPrimary, identityProviderResponse.isPrimary) &&
             Objects.equals(this.image, identityProviderResponse.image) &&
             Objects.equals(this.isFederationHub, identityProviderResponse.isFederationHub) &&
@@ -439,7 +446,8 @@ public class IdentityProviderResponse  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, templateId, isEnabled, isPrimary, image, isFederationHub, homeRealmIdentifier, certificate, alias, idpIssuerName, claims, roles, groups, federatedAuthenticators, provisioning, implicitAssociation);
+        return Objects.hash(id, name, description, templateId, isEnabled, isPrimary, image, isFederationHub,
+                homeRealmIdentifier, certificate, alias, idpIssuerName, claims, roles, groups, federatedAuthenticators, provisioning, implicitAssociation);
     }
 
     @Override
@@ -453,6 +461,7 @@ public class IdentityProviderResponse  {
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
+//        sb.append("    amrValue: ").append(toIndentedString(amrValue)).append("\n");
         sb.append("    isPrimary: ").append(toIndentedString(isPrimary)).append("\n");
         sb.append("    image: ").append(toIndentedString(image)).append("\n");
         sb.append("    isFederationHub: ").append(toIndentedString(isFederationHub)).append("\n");
