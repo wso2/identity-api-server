@@ -339,6 +339,9 @@ components:
             - SYSTEM
             - USER
           readOnly: true
+        amrValue:
+            type: string
+            example: basicAuth
         type:
           type: string
           enum:
