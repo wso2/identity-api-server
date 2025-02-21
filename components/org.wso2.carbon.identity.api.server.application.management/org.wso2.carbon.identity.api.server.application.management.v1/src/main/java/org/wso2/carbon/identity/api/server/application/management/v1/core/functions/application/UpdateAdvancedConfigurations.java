@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019-2025, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.Certificate;
+import org.wso2.carbon.identity.api.server.application.management.v1.DiscoverableGroup;
+import org.wso2.carbon.identity.api.server.application.management.v1.GroupBasicInfo;
 import org.wso2.carbon.identity.api.server.application.management.v1.TrustedAppConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
 import org.wso2.carbon.identity.application.common.model.ClientAttestationMetaData;
@@ -27,6 +29,7 @@ import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthent
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.SpTrustedAppMetadata;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ADDITIONAL_SP_PROP_NOT_SUPPORTED;
@@ -49,6 +52,7 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
             handleAdditionalSpProperties(advancedConfigurations.getAdditionalSpProperties());
             setIfNotNull(advancedConfigurations.getSaas(), serviceProvider::setSaasApp);
             setIfNotNull(advancedConfigurations.getDiscoverableByEndUsers(), serviceProvider::setDiscoverable);
+            updateDiscoverableGroupList(serviceProvider, advancedConfigurations);
 
             LocalAndOutboundAuthenticationConfig config = getLocalAndOutboundConfig(serviceProvider);
             setIfNotNull(advancedConfigurations.getSkipLoginConsent(), config::setSkipConsent);
@@ -81,6 +85,45 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
             handleTrustedAppConfigurations(advancedConfigurations.getTrustedAppConfiguration(), serviceProvider);
             updateCertificate(advancedConfigurations.getCertificate(), serviceProvider);
         }
+    }
+
+    /**
+     * Update the application properties according to the advanced configurations API model.
+     *
+     * @param serviceProvider        The service provider that requires updating with the properties specified in
+     *                               the given API model.
+     * @param advancedConfigurations The advanced configuration API model properties that need to be used to update
+     *                               the service provider.
+     */
+    private void updateDiscoverableGroupList(ServiceProvider serviceProvider,
+                                             AdvancedApplicationConfiguration advancedConfigurations) {
+
+        if (!serviceProvider.isDiscoverable() ||
+                advancedConfigurations.getDiscoverableGroups() == null) {
+            return;
+        }
+
+        List<org.wso2.carbon.identity.application.common.model.DiscoverableGroup> discoverableGroups =
+                new ArrayList<>();
+        for (DiscoverableGroup apiDiscoverableGroup : advancedConfigurations.getDiscoverableGroups()) {
+            org.wso2.carbon.identity.application.common.model.DiscoverableGroup discoverableGroup =
+                    new org.wso2.carbon.identity.application.common.model.DiscoverableGroup();
+            discoverableGroup.setUserStore(apiDiscoverableGroup.getUserStore());
+            List<org.wso2.carbon.identity.application.common.model.GroupBasicInfo> groupBasicInfos = new ArrayList<>();
+            for (GroupBasicInfo apiGroupBasicInfo : apiDiscoverableGroup.getGroups()) {
+                org.wso2.carbon.identity.application.common.model.GroupBasicInfo groupBasicInfo =
+                        new org.wso2.carbon.identity.application.common.model.GroupBasicInfo();
+                groupBasicInfo.setId(apiGroupBasicInfo.getId());
+                groupBasicInfo.setName(apiGroupBasicInfo.getName());
+                groupBasicInfos.add(groupBasicInfo);
+            }
+            discoverableGroup.setGroups(
+                    groupBasicInfos.toArray(new org.wso2.carbon.identity.application.common.model.GroupBasicInfo[0]));
+            discoverableGroups.add(discoverableGroup);
+        }
+        serviceProvider.setDiscoverableGroups(
+                discoverableGroups.toArray(
+                        new org.wso2.carbon.identity.application.common.model.DiscoverableGroup[0]));
     }
 
     /**
