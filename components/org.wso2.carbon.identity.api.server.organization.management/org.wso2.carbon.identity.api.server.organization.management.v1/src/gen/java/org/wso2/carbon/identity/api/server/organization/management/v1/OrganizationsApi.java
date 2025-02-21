@@ -131,7 +131,7 @@ public class OrganizationsApi  {
         @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
         @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
     })
-    public Response organizationDiscoveryPost(@ApiParam(value = "This represents the organization discovery attributes to be added." ,required=true) @Valid OrganizationDiscoveryPostRequest organizationDiscoveryPostRequest) {
+    public Response organizationDiscoveryPost(@ApiParam(value = "This represents the organization discovery attributes to be added." ,required=true) @Valid @NotNull(message = "Request body organizationDiscoveryPostRequest cannot be null.") OrganizationDiscoveryPostRequest organizationDiscoveryPostRequest) {
 
         return delegate.organizationDiscoveryPost(organizationDiscoveryPostRequest );
     }

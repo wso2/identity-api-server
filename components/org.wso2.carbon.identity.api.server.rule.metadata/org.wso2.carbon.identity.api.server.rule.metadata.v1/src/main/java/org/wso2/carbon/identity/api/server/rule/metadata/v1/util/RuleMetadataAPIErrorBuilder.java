@@ -22,8 +22,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
-import org.wso2.carbon.identity.rule.metadata.exception.RuleMetadataClientException;
-import org.wso2.carbon.identity.rule.metadata.exception.RuleMetadataException;
+import org.wso2.carbon.identity.rule.metadata.api.exception.RuleMetadataClientException;
+import org.wso2.carbon.identity.rule.metadata.api.exception.RuleMetadataException;
 
 import javax.ws.rs.core.Response;
 

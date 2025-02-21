@@ -653,7 +653,7 @@ public class ServerIdpManagementService {
             // Need to create a clone, since modifying the fields of the original object, will modify the cached
             // IDP object.
             IdentityProvider idpToUpdate = createIdPClone(idp);
-            updateFederatedAuthenticatorConfig(idpToUpdate, authenticatorRequest, false);
+            updateFederatedAuthenticatorConfig(idpToUpdate, authenticatorRequest, IdpOperation.UPDATE);
             IdentityProvider updatedIdp = identityProviderManager.updateIdPByResourceId(idpId, idpToUpdate,
                         ContextLoader.getTenantDomainFromContext());
             return createFederatedAuthenticatorResponse(updatedIdp);
@@ -673,8 +673,8 @@ public class ServerIdpManagementService {
                                                                FederatedAuthenticatorPUTRequest authenticator) {
 
         try {
-            IdentityProvider idp = identityProviderManager.getIdPByResourceId(idpId, ContextLoader
-                    .getTenantDomainFromContext(), true);
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            IdentityProvider idp = identityProviderManager.getIdPByResourceId(idpId, tenantDomain, true);
             if (idp == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
@@ -683,6 +683,7 @@ public class ServerIdpManagementService {
             // IDP object.
             IdentityProvider idpToUpdate = createIdPClone(idp);
 
+            checkAuthenticatorExistence(federatedAuthenticatorId, tenantDomain);
             // Create new FederatedAuthenticatorConfig to store the federated authenticator information.
             FederatedAuthenticatorConfig authConfig = updateFederatedAuthenticatorConfig(federatedAuthenticatorId,
                     authenticator);
@@ -694,14 +695,9 @@ public class ServerIdpManagementService {
                 fedAuthConfigs[configPos] = authConfig;
             } else {
                 // If configPos is -1 add new authenticator to the list.
-                if (isValidAuthenticator(federatedAuthenticatorId)) {
-                    List<FederatedAuthenticatorConfig> authConfigList = new ArrayList<>(Arrays.asList(fedAuthConfigs));
-                    authConfigList.add(authConfig);
-                    fedAuthConfigs = authConfigList.toArray(new FederatedAuthenticatorConfig[0]);
-                } else {
-                    throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage
-                            .ERROR_CODE_AUTHENTICATOR_NOT_FOUND_FOR_IDP, federatedAuthenticatorId);
-                }
+                List<FederatedAuthenticatorConfig> authConfigList = new ArrayList<>(Arrays.asList(fedAuthConfigs));
+                authConfigList.add(authConfig);
+                fedAuthConfigs = authConfigList.toArray(new FederatedAuthenticatorConfig[0]);
             }
             idpToUpdate.setFederatedAuthenticatorConfigs(fedAuthConfigs);
 
@@ -1711,8 +1707,7 @@ public class ServerIdpManagementService {
     }
 
     private void updateFederatedAuthenticatorConfig(IdentityProvider idp, FederatedAuthenticatorRequest
-            federatedAuthenticatorRequest, boolean isNewFederatedAuthenticator)
-            throws IdentityProviderManagementClientException {
+            federatedAuthenticatorRequest, IdpOperation operation) throws IdentityProviderManagementClientException {
 
         if (federatedAuthenticatorRequest != null) {
             List<FederatedAuthenticator> federatedAuthenticators = federatedAuthenticatorRequest.getAuthenticators();
@@ -1722,11 +1717,12 @@ public class ServerIdpManagementService {
             for (FederatedAuthenticator authenticator : federatedAuthenticators) {
                 String authenticatorName = getDecodedAuthenticatorName(authenticator.getAuthenticatorId());
                 DefinedByType definedByType;
-                if (isNewFederatedAuthenticator) {
-                    definedByType = resolveDefinedByTypeToCreateFederatedAuthenticator(
+                if (IdpOperation.CREATION.equals(operation)) {
+                    definedByType = resolveDefinedByTypeToIdpCreateOperation(
                             authenticator.getDefinedBy());
                 } else {
-                    definedByType = resolveDefinedByTypeToUpdateFederatedAuthenticator(authenticatorName);
+                    definedByType = resolveDefinedByTypeToIdpUpdateOperation(authenticatorName,
+                            authenticator.getDefinedBy());
                 }
                 if (definedByType == DefinedByType.USER && federatedAuthenticators.size() > 1) {
                     throw handleException(Response.Status.BAD_REQUEST,
@@ -2035,7 +2031,8 @@ public class ServerIdpManagementService {
         }
         idp.setFederationHub(identityProviderPOSTRequest.getIsFederationHub());
 
-        updateFederatedAuthenticatorConfig(idp, identityProviderPOSTRequest.getFederatedAuthenticators(), true);
+        updateFederatedAuthenticatorConfig(idp, identityProviderPOSTRequest.getFederatedAuthenticators(),
+                IdpOperation.CREATION);
         if (identityProviderPOSTRequest.getProvisioning() != null) {
             updateOutboundConnectorConfig(idp, identityProviderPOSTRequest.getProvisioning().getOutboundConnectors());
             updateJIT(idp, identityProviderPOSTRequest.getProvisioning().getJit());
@@ -2742,12 +2739,14 @@ public class ServerIdpManagementService {
                   FederatedAuthenticatorPUTRequest authenticator) throws IdentityProviderManagementClientException {
 
         String authenticatorName = getDecodedAuthenticatorName(federatedAuthenticatorId);
-        DefinedByType definedByType = resolveDefinedByTypeToUpdateFederatedAuthenticator(authenticatorName);
+        /* As this operation is only for updating an existing authenticator, the definedByType parameter in the PUT
+         request is ignored. */
+        DefinedByType definedByType = resolveDefinedByTypeToFederatedAuthenticatorUpdate(authenticatorName);
 
         return FederatedAuthenticatorConfigBuilderFactory.build(authenticator, authenticatorName, definedByType);
     }
 
-    private DefinedByType resolveDefinedByTypeToCreateFederatedAuthenticator(
+    private DefinedByType resolveDefinedByTypeToIdpCreateOperation(
             FederatedAuthenticator.DefinedByEnum definedByType) {
 
         /* For new federated authenticators:
@@ -2758,40 +2757,64 @@ public class ServerIdpManagementService {
         return DefinedByType.SYSTEM;
     }
 
-    private DefinedByType resolveDefinedByTypeToUpdateFederatedAuthenticator(String authenticatorName) {
+    private DefinedByType resolveDefinedByTypeToIdpUpdateOperation(String authenticatorName,
+                                                                   FederatedAuthenticator.DefinedByEnum definedByType) {
 
-        /* For existing federated authenticators, disregard any value provided in the request payload.
-         Instead, resolve and retrieve the 'definedBy' type of the corresponding existing authenticator.
-         If the authenticator config is present in the ApplicationAuthenticatorService list, return its type,
-         if not return USER. */
-        FederatedAuthenticatorConfig authenticatorConfig = ApplicationAuthenticatorService.getInstance()
-                .getFederatedAuthenticatorByName(authenticatorName);
-        if (authenticatorConfig != null) {
-            return DefinedByType.valueOf(authenticatorConfig.getDefinedByType().toString());
+        try {
+            /* For existing federated authenticators, disregard any value provided in the request payload.
+             Instead, resolve and retrieve the 'definedBy' type of the corresponding existing authenticator.
+             If the authenticator config is present in the ApplicationAuthenticatorService list, return its type,
+             if not, considering this adding new authenticator and invoke
+             resolveDefinedByTypeToCreateFederatedAuthenticator method. */
+            FederatedAuthenticatorConfig authenticatorConfig = identityProviderManager.getFederatedAuthenticatorByName(
+                    authenticatorName, ContextLoader.getTenantDomainFromContext());
+            if (authenticatorConfig != null) {
+                return DefinedByType.valueOf(authenticatorConfig.getDefinedByType().toString());
+            }
+            return resolveDefinedByTypeToIdpCreateOperation(definedByType);
+        } catch (IdentityProviderManagementException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
+                    .ERROR_CODE_ERROR_RETRIEVING_IDP_AUTHENTICATOR, authenticatorName);
         }
-        return DefinedByType.USER;
+    }
+
+    private DefinedByType resolveDefinedByTypeToFederatedAuthenticatorUpdate(String authenticatorName) {
+
+        try {
+            /* For existing federated authenticators, disregard any value provided in the request payload.
+             Instead, resolve the 'definedBy' type of the corresponding existing authenticator. */
+            FederatedAuthenticatorConfig authenticatorConfig = identityProviderManager.getFederatedAuthenticatorByName(
+                    authenticatorName, ContextLoader.getTenantDomainFromContext());
+            return DefinedByType.valueOf(authenticatorConfig.getDefinedByType().toString());
+        } catch (IdentityProviderManagementException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
+                    .ERROR_CODE_ERROR_RETRIEVING_IDP_AUTHENTICATOR, authenticatorName);
+        }
     }
 
     /**
-     * Verify whether the sent authenticatorId is a supported authenticator type by the server.
+     * Verify if an authenticator config exists by the provided name on the server.
      *
-     * @param federatedAuthenticatorId Federated Authenticator ID.
-     * @return whether Authenticator is a supported one by the server.
-     * @throws IdentityProviderManagementException IdentityProviderManagementException.
+     * @param federatedAuthenticatorId  Federated Authenticator ID.
+     * @param tenantDomain              Tenant domain.
+     * @throws IdentityProviderManagementException IdentityProviderManagementException, if authenticator config is not
+     * existing in the server.
      */
-    private boolean isValidAuthenticator(String federatedAuthenticatorId) throws
+    private void checkAuthenticatorExistence(String federatedAuthenticatorId, String tenantDomain) throws
             IdentityProviderManagementException {
 
-        FederatedAuthenticatorConfig[] supportedAuthConfigs = identityProviderManager.getAllFederatedAuthenticators();
+        FederatedAuthenticatorConfig[] supportedAuthConfigs = identityProviderManager
+                .getAllFederatedAuthenticators(tenantDomain);
         if (supportedAuthConfigs != null) {
             String authenticatorName = base64URLDecode(federatedAuthenticatorId);
             for (FederatedAuthenticatorConfig supportedConfig : supportedAuthConfigs) {
                 if (StringUtils.equals(supportedConfig.getName(), authenticatorName)) {
-                    return true;
+                    return;
                 }
             }
         }
-        return false;
+        throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage
+                .ERROR_CODE_AUTHENTICATOR_NOT_FOUND_FOR_IDP, federatedAuthenticatorId);
     }
 
     /**
@@ -3634,5 +3657,10 @@ public class ServerIdpManagementService {
             throw new IdentityProviderManagementClientException(error.getCode(),
                     String.format(error.getDescription(), authId));
         }
+    }
+
+    private enum IdpOperation {
+        CREATION,
+        UPDATE
     }
 }

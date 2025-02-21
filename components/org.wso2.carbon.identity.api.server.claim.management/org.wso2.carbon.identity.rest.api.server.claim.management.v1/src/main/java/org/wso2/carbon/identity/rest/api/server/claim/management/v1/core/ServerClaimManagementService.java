@@ -86,7 +86,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -130,6 +129,7 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_UNAUTHORIZED_ORG_FOR_ATTRIBUTE_MAPPING_UPDATE;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_UNAUTHORIZED_ORG_FOR_CLAIM_MANAGEMENT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_UNAUTHORIZED_ORG_FOR_CLAIM_PROPERTY_UPDATE;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_UNAUTHORIZED_ORG_FOR_EXCLUDED_USER_STORES_PROPERTY_UPDATE;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_USERSTORE_NOT_SPECIFIED_IN_MAPPINGS;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.LOCAL_DIALECT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.LOCAL_DIALECT_PATH;
@@ -465,10 +465,10 @@ public class ServerClaimManagementService {
         try {
             if (isSubOrganizationContext()) {
                 /*
-                 * For sub organizations, only attribute mappings are allowed to be updated. Updating any other
-                 * claim properties are restricted.
+                 * For sub organizations, only attribute mappings and ExcludedUserStores are allowed to be updated.
+                 * Updating any other claim properties are restricted.
                  */
-                validateAttributeMappingUpdate(claimId, createLocalClaim(localClaimReqDTO));
+                validateLocalClaimUpdate(claimId, createLocalClaim(localClaimReqDTO));
             }
 
             if (!StringUtils.equals(base64DecodeId(claimId), localClaimReqDTO.getClaimURI())) {
@@ -1661,7 +1661,7 @@ public class ServerClaimManagementService {
         }
     }
 
-    private void validateAttributeMappingUpdate(String claimID, LocalClaim incomingLocalClaim)
+    private void validateLocalClaimUpdate(String claimID, LocalClaim incomingLocalClaim)
             throws ClaimMetadataException {
 
         Optional<LocalClaim>
@@ -1672,11 +1672,7 @@ public class ServerClaimManagementService {
             throw handleClaimManagementClientError(ERROR_CODE_LOCAL_CLAIM_NOT_FOUND, BAD_REQUEST, claimID);
         }
 
-        populateDefaultProperties(existingLocalClaim.get());
-        if (Objects.hash(existingLocalClaim.get().getClaimProperties().entrySet()) !=
-                Objects.hash(incomingLocalClaim.getClaimProperties().entrySet())) {
-            throw handleClaimManagementClientError(ERROR_CODE_UNAUTHORIZED_ORG_FOR_CLAIM_PROPERTY_UPDATE, FORBIDDEN);
-        }
+        validateLocalClaimProperties(existingLocalClaim.get(), incomingLocalClaim);
 
         for (AttributeMapping existingMapping : existingLocalClaim.get().getMappedAttributes()) {
             if (IdentityUtil.getPrimaryDomainName().equals(existingMapping.getUserStoreDomain())) {
@@ -1690,6 +1686,51 @@ public class ServerClaimManagementService {
                             FORBIDDEN, existingMapping.getUserStoreDomain());
                 }
             }
+        }
+    }
+
+    /**
+     * Validates the claim properties.
+     *
+     * @param existingLocalClaim the existing local claim.
+     * @param incomingLocalClaim the incoming local claim with updated properties.
+     */
+    private void validateLocalClaimProperties(LocalClaim existingLocalClaim, LocalClaim incomingLocalClaim) {
+
+        // Populate default properties on the existing claim.
+        populateDefaultProperties(existingLocalClaim);
+
+        // Filter out allowed keys from both existing and incoming claim properties.
+        Map<String, String> filteredExistingProperties = existingLocalClaim.getClaimProperties().entrySet().stream()
+                .filter(entry -> !Constant.ALLOWED_PROPERTY_KEYS_FOR_SUB_ORG_UPDATE.contains(entry.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        Map<String, String> filteredIncomingProperties = incomingLocalClaim.getClaimProperties().entrySet().stream()
+                .filter(entry -> !Constant.ALLOWED_PROPERTY_KEYS_FOR_SUB_ORG_UPDATE.contains(entry.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        if (!filteredExistingProperties.equals(filteredIncomingProperties)) {
+            throw handleClaimManagementClientError(ERROR_CODE_UNAUTHORIZED_ORG_FOR_CLAIM_PROPERTY_UPDATE, FORBIDDEN);
+        }
+
+        // Validate ExcludedUserStores property.
+        String existingValue = existingLocalClaim.getClaimProperties().get(Constant.PROP_EXCLUDED_USER_STORES);
+        String incomingValue = incomingLocalClaim.getClaimProperties().get(Constant.PROP_EXCLUDED_USER_STORES);
+        String primaryUserStoreDomain = IdentityUtil.getPrimaryDomainName();
+
+        List<String> existingStores = Arrays.asList(
+                ArrayUtils.nullToEmpty(StringUtils.split(existingValue, ",")));
+        List<String> incomingStores = Arrays.asList(
+                ArrayUtils.nullToEmpty(StringUtils.split(incomingValue, ",")));
+
+        boolean existingHasPrimary = existingStores.stream()
+                .anyMatch(store -> StringUtils.equalsIgnoreCase(store, primaryUserStoreDomain));
+        boolean incomingHasPrimary = incomingStores.stream()
+                .anyMatch(store -> StringUtils.equalsIgnoreCase(store, primaryUserStoreDomain));
+
+        // If one contains the primary user store but not the other, the update is not allowed.
+        if (existingHasPrimary != incomingHasPrimary) {
+            throw handleClaimManagementClientError(ERROR_CODE_UNAUTHORIZED_ORG_FOR_EXCLUDED_USER_STORES_PROPERTY_UPDATE,
+                    FORBIDDEN, primaryUserStoreDomain);
         }
     }
 

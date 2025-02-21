@@ -19,7 +19,7 @@
 package org.wso2.carbon.identity.api.server.action.management.common;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.action.management.service.ActionManagementService;
+import org.wso2.carbon.identity.action.management.api.service.ActionManagementService;
 
 /**
  * Service holder class for action management.
