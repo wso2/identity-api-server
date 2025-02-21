@@ -43,4 +43,6 @@ public interface AuthenticatorsApiService {
       public Response getConnectedAppsOfLocalAuthenticator(String authenticatorId, Integer limit, Integer offset);
 
       public Response updateUserDefinedLocalAuthenticator(String authenticatorId, UserDefinedLocalAuthenticatorUpdate userDefinedLocalAuthenticatorUpdate);
+
+//      public Response updateDefaultLocalAuthenticator(String authenticatorId, UserDefinedLocalAuthenticatorUpdate userDefinedLocalAuthenticatorUpdate);
 }

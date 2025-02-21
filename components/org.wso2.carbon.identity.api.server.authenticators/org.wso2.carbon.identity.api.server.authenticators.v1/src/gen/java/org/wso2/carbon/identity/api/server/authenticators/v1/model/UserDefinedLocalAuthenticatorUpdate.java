@@ -41,6 +41,7 @@ public class UserDefinedLocalAuthenticatorUpdate  {
     private String image;
     private String description;
     private Endpoint endpoint;
+    private String amrValue;
 
     /**
     **/
@@ -138,6 +139,21 @@ public class UserDefinedLocalAuthenticatorUpdate  {
         this.endpoint = endpoint;
     }
 
+    public UserDefinedLocalAuthenticatorUpdate amrValue(String amrValue) {
+
+        this.amrValue = amrValue;
+        return this;
+    }
+
+    @ApiModelProperty(example = "amrValue", value = "")
+    @JsonProperty("amrValue")
+    @Valid
+    public String getAmrValue() {
+        return amrValue;
+    }
+    public void setAmrValue(String amrValue) {
+        this.amrValue = amrValue;
+    }
 
 
     @Override
