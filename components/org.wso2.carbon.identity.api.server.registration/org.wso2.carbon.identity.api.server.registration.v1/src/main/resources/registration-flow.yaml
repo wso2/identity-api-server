@@ -19,9 +19,6 @@ security:
   - BasicAuth: []
 
 servers:
-  # Added by API Auto Mocking Plugin
-  - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/THAMINDUA_1/registration_flow_api/1.0
   - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
     variables:
       tenant-domain:
