@@ -90,4 +90,12 @@ public class AuthenticatorsApiServiceImpl implements AuthenticatorsApiService {
         return Response.ok().entity(authenticatorManagementService
                 .updateUserDefinedLocalAuthenticator(authenticatorId, userDefinedLocalAuthenticatorUpdate)).build();
     }
+
+    //Default Local Authenticators
+//    public Response updateDefaultLocalAuthenticator(
+//            String authenticatorId, UserDefinedLocalAuthenticatorUpdate defaultLocalAuthenticatorUpdate) {
+//
+//        return Response.ok().entity(authenticatorManagementService.updateDefaultLocalAuthenticator(authenticatorId, defaultLocalAuthenticatorUpdate))
+//                .build();
+//    }
 }

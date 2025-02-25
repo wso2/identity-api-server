@@ -38,6 +38,7 @@ public class AuthenticatorListItem  {
     private String description;
     private String image;
     private Boolean isEnabled = true;
+    private String amrValue;
 
 @XmlType(name="DefinedByEnum")
 @XmlEnum(String.class)
@@ -256,6 +257,24 @@ public enum TypeEnum {
 
     /**
     **/
+    public AuthenticatorListItem amrValue(String amrValue) {
+
+        this.amrValue = amrValue;
+        return this;
+    }
+
+    @ApiModelProperty(example = "amrValue", value = "")
+    @JsonProperty("amrValue")
+    @Valid
+    public String getAmrValue() {
+        return amrValue;
+    }
+    public void setAmrValue(String amrValue) {
+        this.amrValue = amrValue;
+    }
+
+    /**
+     **/
     public AuthenticatorListItem tags(List<String> tags) {
 
         this.tags = tags;
@@ -317,6 +336,7 @@ public enum TypeEnum {
             Objects.equals(this.image, authenticatorListItem.image) &&
             Objects.equals(this.isEnabled, authenticatorListItem.isEnabled) &&
             Objects.equals(this.definedBy, authenticatorListItem.definedBy) &&
+                Objects.equals(this.amrValue, authenticatorListItem.amrValue) &&
             Objects.equals(this.type, authenticatorListItem.type) &&
             Objects.equals(this.tags, authenticatorListItem.tags) &&
             Objects.equals(this.self, authenticatorListItem.self);
@@ -324,7 +344,7 @@ public enum TypeEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, displayName, description, image, isEnabled, definedBy, type, tags, self);
+        return Objects.hash(id, name, displayName, description, image, isEnabled, definedBy,amrValue, type, tags, self);
     }
 
     @Override
@@ -340,6 +360,7 @@ public enum TypeEnum {
         sb.append("    image: ").append(toIndentedString(image)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
         sb.append("    definedBy: ").append(toIndentedString(definedBy)).append("\n");
+        sb.append("    amrValue: ").append(toIndentedString(amrValue)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
