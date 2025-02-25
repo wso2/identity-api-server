@@ -24,51 +24,37 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 
+/**
+ * Update the system authenticator AMR Value
+ **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-
-public class ConnectedApp  {
+@ApiModel(description = "Update the system authenticator AMR Value")
+public class SystemLocalAuthenticatorUpdate  {
   
-    private String appId;
-    private String self;
+    private String amrValue;
 
     /**
     **/
-    public ConnectedApp appId(String appId) {
+    public SystemLocalAuthenticatorUpdate amrValue(String amrValue) {
 
-        this.appId = appId;
+        this.amrValue = amrValue;
         return this;
     }
     
-    @ApiModelProperty(example = "app-id", value = "")
-    @JsonProperty("appId")
+    @ApiModelProperty(example = "basic", required = true, value = "")
+    @JsonProperty("amrValue")
     @Valid
-    public String getAppId() {
-        return appId;
-    }
-    public void setAppId(String appId) {
-        this.appId = appId;
-    }
+    @NotNull(message = "Property amrValue cannot be null.")
 
-    /**
-    **/
-    public ConnectedApp self(String self) {
-
-        this.self = self;
-        return this;
+    public String getAmrValue() {
+        return amrValue;
     }
-
-    @ApiModelProperty(example = "connected-app-url", value = "")
-    @JsonProperty("self")
-    @Valid
-    public String getSelf() {
-        return self;
-    }
-    public void setSelf(String self) {
-        this.self = self;
+    public void setAmrValue(String amrValue) {
+        this.amrValue = amrValue;
     }
 
 
@@ -82,24 +68,22 @@ public class ConnectedApp  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ConnectedApp connectedApp = (ConnectedApp) o;
-        return Objects.equals(this.appId, connectedApp.appId) &&
-            Objects.equals(this.self, connectedApp.self);
+        SystemLocalAuthenticatorUpdate systemLocalAuthenticatorUpdate = (SystemLocalAuthenticatorUpdate) o;
+        return Objects.equals(this.amrValue, systemLocalAuthenticatorUpdate.amrValue);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(appId, self);
+        return Objects.hash(amrValue);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class ConnectedApp {\n");
+        sb.append("class SystemLocalAuthenticatorUpdate {\n");
         
-        sb.append("    appId: ").append(toIndentedString(appId)).append("\n");
-        sb.append("    self: ").append(toIndentedString(self)).append("\n");
+        sb.append("    amrValue: ").append(toIndentedString(amrValue)).append("\n");
         sb.append("}");
         return sb.toString();
     }
