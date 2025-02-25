@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -23,15 +23,10 @@ import org.wso2.carbon.identity.api.server.organization.user.sharing.management.
 
 public class UsersApiServiceFactory {
 
-   private static final UsersApiService SERVICE = new UsersApiServiceImpl();
+   private final static UsersApiService service = new UsersApiServiceImpl();
 
-   /**
-    * Get UsersApiService.
-    *
-    * @return UsersApiService.
-    */
-   public static UsersApiService getUsersApi() {
-
-      return SERVICE;
+   public static UsersApiService getUsersApi()
+   {
+      return service;
    }
 }

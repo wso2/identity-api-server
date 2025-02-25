@@ -21,10 +21,10 @@ package org.wso2.carbon.identity.api.server.action.management.v1.util;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.identity.action.management.exception.ActionMgtClientException;
-import org.wso2.carbon.identity.action.management.exception.ActionMgtException;
-import org.wso2.carbon.identity.action.management.exception.ActionMgtServerException;
-import org.wso2.carbon.identity.action.management.model.Action;
+import org.wso2.carbon.identity.action.management.api.exception.ActionMgtClientException;
+import org.wso2.carbon.identity.action.management.api.exception.ActionMgtException;
+import org.wso2.carbon.identity.action.management.api.exception.ActionMgtServerException;
+import org.wso2.carbon.identity.action.management.api.model.Action;
 import org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants;
 import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
@@ -33,7 +33,7 @@ import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
 
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.action.management.constant.error.ErrorMessage.ERROR_NO_ACTION_CONFIGURED_ON_GIVEN_ACTION_TYPE_AND_ID;
+import static org.wso2.carbon.identity.action.management.api.constant.ErrorMessage.ERROR_NO_ACTION_CONFIGURED_ON_GIVEN_ACTION_TYPE_AND_ID;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ACTION_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.PATH_SEPARATOR;
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER;

@@ -19,7 +19,7 @@
 package org.wso2.carbon.identity.api.server.rule.metadata.common;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.rule.metadata.service.RuleMetadataService;
+import org.wso2.carbon.identity.rule.metadata.api.service.RuleMetadataService;
 
 /**
  * Service holder class for Rule Metadata Service.

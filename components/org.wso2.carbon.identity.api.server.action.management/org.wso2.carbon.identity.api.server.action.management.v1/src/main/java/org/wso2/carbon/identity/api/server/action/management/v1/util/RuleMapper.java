@@ -18,22 +18,22 @@
 
 package org.wso2.carbon.identity.api.server.action.management.v1.util;
 
-import org.wso2.carbon.identity.action.management.exception.ActionMgtException;
-import org.wso2.carbon.identity.action.management.model.Action;
-import org.wso2.carbon.identity.action.management.model.ActionRule;
+import org.wso2.carbon.identity.action.management.api.exception.ActionMgtException;
+import org.wso2.carbon.identity.action.management.api.model.Action;
+import org.wso2.carbon.identity.action.management.api.model.ActionRule;
 import org.wso2.carbon.identity.api.server.action.management.v1.ANDRule;
 import org.wso2.carbon.identity.api.server.action.management.v1.ANDRuleResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ExpressionResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ORRule;
 import org.wso2.carbon.identity.api.server.action.management.v1.ORRuleResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants;
-import org.wso2.carbon.identity.rule.management.exception.RuleManagementClientException;
-import org.wso2.carbon.identity.rule.management.exception.RuleManagementException;
-import org.wso2.carbon.identity.rule.management.model.ANDCombinedRule;
-import org.wso2.carbon.identity.rule.management.model.Expression;
-import org.wso2.carbon.identity.rule.management.model.FlowType;
-import org.wso2.carbon.identity.rule.management.model.ORCombinedRule;
-import org.wso2.carbon.identity.rule.management.util.RuleBuilder;
+import org.wso2.carbon.identity.rule.management.api.exception.RuleManagementClientException;
+import org.wso2.carbon.identity.rule.management.api.exception.RuleManagementException;
+import org.wso2.carbon.identity.rule.management.api.model.ANDCombinedRule;
+import org.wso2.carbon.identity.rule.management.api.model.Expression;
+import org.wso2.carbon.identity.rule.management.api.model.FlowType;
+import org.wso2.carbon.identity.rule.management.api.model.ORCombinedRule;
+import org.wso2.carbon.identity.rule.management.api.util.RuleBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -135,6 +135,8 @@ public class RuleMapper {
         switch (actionType) {
             case PRE_ISSUE_ACCESS_TOKEN:
                 return FlowType.PRE_ISSUE_ACCESS_TOKEN;
+            case PRE_UPDATE_PASSWORD:
+                return FlowType.PRE_UPDATE_PASSWORD;
             default:
                 throw ActionMgtEndpointUtil.handleException(Response.Status.NOT_IMPLEMENTED,
                         ActionMgtEndpointConstants.ErrorMessage.ERROR_NOT_IMPLEMENTED_ACTION_RULE_FLOW_TYPE);

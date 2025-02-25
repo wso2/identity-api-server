@@ -40,7 +40,7 @@ import javax.xml.bind.annotation.*;
 public class UserShareRequestBody  {
   
     private UserShareRequestBodyUserCriteria userCriteria;
-    private List<UserShareRequestBodyOrganizations> organizations = null;
+    private List<UserShareRequestBodyOrganizations> organizations = new ArrayList<>();
 
 
     /**
@@ -51,9 +51,11 @@ public class UserShareRequestBody  {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(required = true, value = "")
     @JsonProperty("userCriteria")
     @Valid
+    @NotNull(message = "Property userCriteria cannot be null.")
+
     public UserShareRequestBodyUserCriteria getUserCriteria() {
         return userCriteria;
     }
@@ -70,9 +72,11 @@ public class UserShareRequestBody  {
         return this;
     }
     
-    @ApiModelProperty(value = "List of organizations specifying sharing scope and roles.")
+    @ApiModelProperty(required = true, value = "List of organizations specifying sharing scope and roles.")
     @JsonProperty("organizations")
     @Valid
+    @NotNull(message = "Property organizations cannot be null.")
+
     public List<UserShareRequestBodyOrganizations> getOrganizations() {
         return organizations;
     }
@@ -81,9 +85,6 @@ public class UserShareRequestBody  {
     }
 
     public UserShareRequestBody addOrganizationsItem(UserShareRequestBodyOrganizations organizationsItem) {
-        if (this.organizations == null) {
-            this.organizations = new ArrayList<>();
-        }
         this.organizations.add(organizationsItem);
         return this;
     }

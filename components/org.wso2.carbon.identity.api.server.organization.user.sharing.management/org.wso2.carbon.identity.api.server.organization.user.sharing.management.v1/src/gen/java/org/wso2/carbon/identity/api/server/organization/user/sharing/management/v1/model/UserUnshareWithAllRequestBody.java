@@ -46,9 +46,11 @@ public class UserUnshareWithAllRequestBody  {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(required = true, value = "")
     @JsonProperty("userCriteria")
     @Valid
+    @NotNull(message = "Property userCriteria cannot be null.")
+
     public UserUnshareRequestBodyUserCriteria getUserCriteria() {
         return userCriteria;
     }

@@ -20,12 +20,12 @@ package org.wso2.carbon.identity.api.server.action.management.v1.util;
 
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.action.management.exception.ActionMgtClientException;
-import org.wso2.carbon.identity.action.management.exception.ActionMgtException;
-import org.wso2.carbon.identity.action.management.model.Action;
-import org.wso2.carbon.identity.action.management.model.ActionRule;
-import org.wso2.carbon.identity.action.management.model.Authentication;
-import org.wso2.carbon.identity.action.management.model.EndpointConfig;
+import org.wso2.carbon.identity.action.management.api.exception.ActionMgtClientException;
+import org.wso2.carbon.identity.action.management.api.exception.ActionMgtException;
+import org.wso2.carbon.identity.action.management.api.model.Action;
+import org.wso2.carbon.identity.action.management.api.model.ActionRule;
+import org.wso2.carbon.identity.action.management.api.model.Authentication;
+import org.wso2.carbon.identity.action.management.api.model.EndpointConfig;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionBasicResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
@@ -61,7 +61,7 @@ public class ActionMapperUtil {
             throws ActionMgtException {
 
         Authentication authentication = ActionMapperUtil.buildAuthentication(
-                Authentication.Type.valueOf(actionModel.getEndpoint().getAuthentication().getType().toString()),
+                Authentication.Type.valueOfName(actionModel.getEndpoint().getAuthentication().getType().toString()),
                 actionModel.getEndpoint().getAuthentication().getProperties());
 
         ActionRule actionRule = null;
@@ -97,7 +97,7 @@ public class ActionMapperUtil {
 
             Authentication authentication = null;
             if (actionUpdateModel.getEndpoint().getAuthentication() != null) {
-                authentication = buildAuthentication(Authentication.Type.valueOf(actionUpdateModel.getEndpoint()
+                authentication = buildAuthentication(Authentication.Type.valueOfName(actionUpdateModel.getEndpoint()
                                 .getAuthentication().getType().toString()),
                         actionUpdateModel.getEndpoint().getAuthentication().getProperties());
             }

@@ -146,10 +146,17 @@ public class Util {
             errorResponse = getErrorBuilder(errorMessage).build(log, exception, errorEnum.getDescription());
             status = errorMessage.getHttpStatus();
         } else if (exception instanceof NotificationTemplateManagerClientException) {
-            // Send client error with original exception message.
-            errorResponse = getErrorBuilder(errorEnum).build(log, exception.getMessage());
-            errorResponse.setDescription(exception.getMessage());
-            status = Response.Status.BAD_REQUEST;
+            Constants.ErrorMessage errorMessage = Constants.getNTMMappedErrorMessage(errorCode);
+            if (errorMessage != null) {
+                // Specific error with code is found.
+                errorResponse = getErrorBuilder(errorMessage).build(log, exception.getMessage());
+                status = errorMessage.getHttpStatus();
+            } else {
+                // Send client error with original exception message.
+                errorResponse = getErrorBuilder(errorEnum).build(log, exception.getMessage());
+                errorResponse.setDescription(exception.getMessage());
+                status = Response.Status.BAD_REQUEST;
+            }
         } else {
             // Server error
             errorResponse = getErrorBuilder(errorEnum).build(log, exception, errorEnum.getDescription());

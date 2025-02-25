@@ -860,12 +860,12 @@
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
         <identity.governance.version>1.11.27</identity.governance.version>
-        <carbon.identity.framework.version>7.8.12-SNAPSHOT</carbon.identity.framework.version>
+        <carbon.identity.framework.version>7.8.1</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
         <findsecbugs-plugin.version>1.12.0</findsecbugs-plugin.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
         <identity.event.handler.version>1.9.34</identity.event.handler.version>
-        <identity.inbound.oauth2.version>7.0.255-SNAPSHOT</identity.inbound.oauth2.version>
+        <identity.inbound.oauth2.version>7.0.224</identity.inbound.oauth2.version>
         <identity.inbound.saml2.version>5.11.51</identity.inbound.saml2.version>
         <identity.x509Certificate.validation.version>1.1.19</identity.x509Certificate.validation.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
@@ -918,6 +918,7 @@
         <module>components/org.wso2.carbon.identity.api.server.cors</module>
         <module>components/org.wso2.carbon.identity.api.server.notification.sender</module>
         <module>components/org.wso2.carbon.identity.api.server.authenticators</module>
+        <module>components/org.wso2.carbon.identity.api.server.certificate.validation.management</module>
         <module>components/org.wso2.carbon.identity.api.server.secret.management</module>
         <module>components/org.wso2.carbon.identity.api.server.branding.preference.management</module>
         <module>components/org.wso2.carbon.identity.api.server.input.validation</module>

@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.core;
 
+import org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants;
+import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.Error;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.ProcessSuccessResponse;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.RoleWithAudience;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.RoleWithAudienceAudience;
@@ -51,12 +53,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+
+import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_GENERAL_USER_SHARE_REQUEST_BODY;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_GENERAL_USER_UNSHARE_REQUEST_BODY;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_SELECTIVE_USER_SHARE_REQUEST_BODY;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_SELECTIVE_USER_UNSHARE_REQUEST_BODY;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_UUID_FORMAT;
+import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.RESPONSE_DETAIL_USER_SHARE;
+import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.RESPONSE_DETAIL_USER_UNSHARE;
+import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.RESPONSE_STATUS_PROCESSING;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.USER_IDS;
 
 /**
@@ -76,47 +84,25 @@ public class UsersApiServiceCore {
      *
      * @param userShareRequestBody Contains details for user sharing.
      */
-    public void shareUser(UserShareRequestBody userShareRequestBody) throws UserSharingMgtException {
+    public Response shareUser(UserShareRequestBody userShareRequestBody) {
 
         if (userShareRequestBody == null) {
-            throw new UserSharingMgtClientException(INVALID_SELECTIVE_USER_SHARE_REQUEST_BODY.getCode(),
-                    INVALID_SELECTIVE_USER_SHARE_REQUEST_BODY.getMessage(),
-                    INVALID_SELECTIVE_USER_SHARE_REQUEST_BODY.getDescription());
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(buildErrorResponse(makeRequestError(INVALID_SELECTIVE_USER_SHARE_REQUEST_BODY))).build();
         }
 
         // Populate selectiveUserShareDO object from the request body.
-        SelectiveUserShareDO selectiveUserShareDO = new SelectiveUserShareDO();
+        SelectiveUserShareDO selectiveUserShareDO = populateSelectiveUserShareDO(userShareRequestBody);
 
-        // Set user criteria.
-        Map<String, UserCriteriaType> userCriteria = new HashMap<>();
-        UserCriteriaType userIds = new UserIdList(userShareRequestBody.getUserCriteria().getUserIds());
-        userCriteria.put(USER_IDS, userIds);
-        selectiveUserShareDO.setUserCriteria(userCriteria);
-
-        // Set organizations.
-        List<SelectiveUserShareOrgDetailsDO> organizationsList = new ArrayList<>();
-        for (UserShareRequestBodyOrganizations org : userShareRequestBody.getOrganizations()) {
-            SelectiveUserShareOrgDetailsDO selectiveUserShareOrgDetailsDO = new SelectiveUserShareOrgDetailsDO();
-            selectiveUserShareOrgDetailsDO.setOrganizationId(org.getOrgId());
-            selectiveUserShareOrgDetailsDO.setPolicy(PolicyEnum.getPolicyByValue(org.getPolicy().value()));
-
-            List<RoleWithAudienceDO> roleWithAudiences = new ArrayList<>();
-
-            for (RoleWithAudience role : org.getRoles()) {
-                RoleWithAudienceDO roleWithAudienceDO = new RoleWithAudienceDO();
-                roleWithAudienceDO.setRoleName(role.getDisplayName());
-                roleWithAudienceDO.setAudienceName(role.getAudience().getDisplay());
-                roleWithAudienceDO.setAudienceType(role.getAudience().getType());
-                roleWithAudiences.add(roleWithAudienceDO);
-            }
-
-            selectiveUserShareOrgDetailsDO.setRoles(roleWithAudiences);
-
-            organizationsList.add(selectiveUserShareOrgDetailsDO);
+        try {
+            userSharingPolicyHandlerService.populateSelectiveUserShare(selectiveUserShareDO);
+            return Response.status(Response.Status.ACCEPTED)
+                    .entity(getProcessSuccessResponse(RESPONSE_DETAIL_USER_SHARE)).build();
+        } catch (UserSharingMgtClientException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(buildErrorResponse(e)).build();
+        } catch (UserSharingMgtException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
         }
-        selectiveUserShareDO.setOrganizations(organizationsList);
-
-        userSharingPolicyHandlerService.populateSelectiveUserShare(selectiveUserShareDO);
     }
 
     /**
@@ -124,41 +110,25 @@ public class UsersApiServiceCore {
      *
      * @param userShareWithAllRequestBody Contains details for sharing users with all organizations.
      */
-    public void shareUserWithAll(UserShareWithAllRequestBody userShareWithAllRequestBody)
-            throws UserSharingMgtException {
+    public Response shareUserWithAll(UserShareWithAllRequestBody userShareWithAllRequestBody) {
 
         if (userShareWithAllRequestBody == null) {
-            throw new UserSharingMgtClientException(INVALID_GENERAL_USER_SHARE_REQUEST_BODY.getCode(),
-                    INVALID_GENERAL_USER_SHARE_REQUEST_BODY.getMessage(),
-                    INVALID_GENERAL_USER_SHARE_REQUEST_BODY.getDescription());
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(buildErrorResponse(makeRequestError(INVALID_GENERAL_USER_SHARE_REQUEST_BODY))).build();
         }
 
         // Populate GeneralUserShareDO object from the request body.
-        GeneralUserShareDO generalUserShareDO = new GeneralUserShareDO();
+        GeneralUserShareDO generalUserShareDO = populateGeneralUserShareDO(userShareWithAllRequestBody);
 
-        // Set user criteria.
-        Map<String, UserCriteriaType> userCriteria = new HashMap<>();
-        UserCriteriaType userIds = new UserIdList(userShareWithAllRequestBody.getUserCriteria().getUserIds());
-        userCriteria.put(USER_IDS, userIds);
-        generalUserShareDO.setUserCriteria(userCriteria);
-
-        // Set policy.
-        generalUserShareDO.setPolicy(PolicyEnum.getPolicyByValue(userShareWithAllRequestBody.getPolicy().value()));
-
-        // Set roles.
-        List<RoleWithAudienceDO> rolesList = new ArrayList<>();
-        if (userShareWithAllRequestBody.getRoles() != null) {
-            for (RoleWithAudience role : userShareWithAllRequestBody.getRoles()) {
-                RoleWithAudienceDO roleDetails = new RoleWithAudienceDO();
-                roleDetails.setRoleName(role.getDisplayName());
-                roleDetails.setAudienceName(role.getAudience().getDisplay());
-                roleDetails.setAudienceType(role.getAudience().getType());
-                rolesList.add(roleDetails);
-            }
+        try {
+            userSharingPolicyHandlerService.populateGeneralUserShare(generalUserShareDO);
+            return Response.status(Response.Status.ACCEPTED)
+                    .entity(getProcessSuccessResponse(RESPONSE_DETAIL_USER_SHARE)).build();
+        } catch (UserSharingMgtClientException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(buildErrorResponse(e)).build();
+        } catch (UserSharingMgtException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
         }
-        generalUserShareDO.setRoles(rolesList);
-
-        userSharingPolicyHandlerService.populateGeneralUserShare(generalUserShareDO);
     }
 
     /**
@@ -166,27 +136,26 @@ public class UsersApiServiceCore {
      *
      * @param userUnshareRequestBody Contains details for user unsharing.
      */
-    public void unshareUser(UserUnshareRequestBody userUnshareRequestBody) throws UserSharingMgtException {
+    public Response unshareUser(UserUnshareRequestBody userUnshareRequestBody) {
 
         if (userUnshareRequestBody == null) {
-            throw new UserSharingMgtClientException(INVALID_SELECTIVE_USER_UNSHARE_REQUEST_BODY.getCode(),
-                    INVALID_SELECTIVE_USER_UNSHARE_REQUEST_BODY.getMessage(),
-                    INVALID_SELECTIVE_USER_UNSHARE_REQUEST_BODY.getDescription());
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(buildErrorResponse(makeRequestError(INVALID_SELECTIVE_USER_UNSHARE_REQUEST_BODY))).build();
         }
 
         // Populate SelectiveUserUnshareDO object from the request body.
-        SelectiveUserUnshareDO selectiveUserUnshareDO = new SelectiveUserUnshareDO();
+        SelectiveUserUnshareDO selectiveUserUnshareDO = populateSelectiveUserUnshareDO(userUnshareRequestBody);
 
-        // Set user criteria.
-        Map<String, UserCriteriaType> userCriteria = new HashMap<>();
-        UserCriteriaType userIds = new UserIdList(userUnshareRequestBody.getUserCriteria().getUserIds());
-        userCriteria.put(USER_IDS, userIds);
-        selectiveUserUnshareDO.setUserCriteria(userCriteria);
-
-        // Set organizations.
-        selectiveUserUnshareDO.setOrganizations(userUnshareRequestBody.getOrganizations());
-
-        userSharingPolicyHandlerService.populateSelectiveUserUnshare(selectiveUserUnshareDO);
+        try {
+            userSharingPolicyHandlerService.populateSelectiveUserUnshare(selectiveUserUnshareDO);
+            return Response.status(Response.Status.ACCEPTED)
+                    .entity(getProcessSuccessResponse(RESPONSE_DETAIL_USER_UNSHARE))
+                    .build();
+        } catch (UserSharingMgtClientException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(buildErrorResponse(e)).build();
+        } catch (UserSharingMgtException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
+        }
     }
 
     /**
@@ -194,25 +163,26 @@ public class UsersApiServiceCore {
      *
      * @param userUnshareWithAllRequestBody Contains details for removing shared access.
      */
-    public void unshareUserWithAll(UserUnshareWithAllRequestBody userUnshareWithAllRequestBody)
-            throws UserSharingMgtException {
+    public Response unshareUserWithAll(UserUnshareWithAllRequestBody userUnshareWithAllRequestBody) {
 
         if (userUnshareWithAllRequestBody == null) {
-            throw new UserSharingMgtClientException(INVALID_GENERAL_USER_UNSHARE_REQUEST_BODY.getCode(),
-                    INVALID_GENERAL_USER_UNSHARE_REQUEST_BODY.getMessage(),
-                    INVALID_GENERAL_USER_UNSHARE_REQUEST_BODY.getDescription());
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(buildErrorResponse(makeRequestError(INVALID_GENERAL_USER_UNSHARE_REQUEST_BODY))).build();
         }
 
         // Populate GeneralUserUnshareDO object from the request body.
-        GeneralUserUnshareDO generalUserUnshareDO = new GeneralUserUnshareDO();
+        GeneralUserUnshareDO generalUserUnshareDO = populateGeneralUserUnshareDO(userUnshareWithAllRequestBody);
 
-        // Set user criteria.
-        Map<String, UserCriteriaType> userCriteria = new HashMap<>();
-        UserCriteriaType userIds = new UserIdList(userUnshareWithAllRequestBody.getUserCriteria().getUserIds());
-        userCriteria.put(USER_IDS, userIds);
-        generalUserUnshareDO.setUserCriteria(userCriteria);
-
-        userSharingPolicyHandlerService.populateGeneralUserUnshare(generalUserUnshareDO);
+        try {
+            userSharingPolicyHandlerService.populateGeneralUserUnshare(generalUserUnshareDO);
+            return Response.status(Response.Status.ACCEPTED)
+                    .entity(getProcessSuccessResponse(RESPONSE_DETAIL_USER_UNSHARE))
+                    .build();
+        } catch (UserSharingMgtClientException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(buildErrorResponse(e)).build();
+        } catch (UserSharingMgtException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
+        }
     }
 
     /**
@@ -226,41 +196,26 @@ public class UsersApiServiceCore {
      * @param recursive Whether to include child organizations.
      * @return UserSharedOrganizationsResponse containing accessible organizations.
      */
-    public UserSharedOrganizationsResponse getSharedOrganizations(String userId, String after, String before,
-                                                                  Integer limit, String filter, Boolean recursive)
-            throws UserSharingMgtException {
+    public Response getSharedOrganizations(String userId, String after, String before,
+                                           Integer limit, String filter, Boolean recursive) {
 
         if (userId == null) {
-            throw new UserSharingMgtClientException(INVALID_UUID_FORMAT.getCode(),
-                    INVALID_UUID_FORMAT.getMessage(),
-                    INVALID_UUID_FORMAT.getDescription());
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(buildErrorResponse(makeRequestError(INVALID_UUID_FORMAT))).build();
         }
 
-        ResponseSharedOrgsDO result =
-                userSharingPolicyHandlerService.getSharedOrganizationsOfUser(userId, after, before, limit, filter,
-                        recursive);
+        try {
+            ResponseSharedOrgsDO result =
+                    userSharingPolicyHandlerService.getSharedOrganizationsOfUser(userId, after, before, limit, filter,
+                            recursive);
 
-        List<UserSharedOrganizationsResponseLinks> responseLinks = new ArrayList<>();
-        List<ResponseLinkDO> resultLinks = result.getResponseLinks();
-        for (ResponseLinkDO resultLink : resultLinks) {
-            UserSharedOrganizationsResponseLinks links = new UserSharedOrganizationsResponseLinks();
-            links.href(resultLink.getHref());
-            links.rel(resultLink.getRel());
-            responseLinks.add(links);
+            UserSharedOrganizationsResponse response = populateUserSharedOrganizationsResponse(result);
+            return Response.ok().entity(response).build();
+        } catch (UserSharingMgtClientException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(buildErrorResponse(e)).build();
+        } catch (UserSharingMgtException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
         }
-
-        List<UserSharedOrganizationsResponseSharedOrganizations> reponseOrgs = new ArrayList<>();
-        List<ResponseOrgDetailsDO> resultOrgDetails = result.getSharedOrgs();
-        for (ResponseOrgDetailsDO resultOrgDetail : resultOrgDetails) {
-            UserSharedOrganizationsResponseSharedOrganizations org =
-                    new UserSharedOrganizationsResponseSharedOrganizations().orgId(resultOrgDetail.getOrganizationId())
-                            .orgName(resultOrgDetail.getOrganizationName())
-                            .sharedUserId(resultOrgDetail.getSharedUserId()).sharedType(resultOrgDetail.getSharedType())
-                            .rolesRef(resultOrgDetail.getRolesRef());
-            reponseOrgs.add(org);
-        }
-
-        return new UserSharedOrganizationsResponse().links(responseLinks).sharedOrganizations(reponseOrgs);
     }
 
     /**
@@ -275,32 +230,169 @@ public class UsersApiServiceCore {
      * @param recursive Whether to include child roles.
      * @return UserSharedRolesResponse containing shared roles.
      */
-    public UserSharedRolesResponse getSharedRoles(String userId, String orgId, String after, String before,
-                                                  Integer limit, String filter, Boolean recursive)
-            throws UserSharingMgtException {
+    public Response getSharedRoles(String userId, String orgId, String after, String before,
+                                   Integer limit, String filter, Boolean recursive) {
 
         if (userId == null || orgId == null) {
-            throw new UserSharingMgtClientException(INVALID_UUID_FORMAT.getCode(),
-                    INVALID_UUID_FORMAT.getMessage(),
-                    INVALID_UUID_FORMAT.getDescription());
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(buildErrorResponse(makeRequestError(INVALID_UUID_FORMAT))).build();
         }
 
-        ResponseSharedRolesDO result =
-                userSharingPolicyHandlerService.getRolesSharedWithUserInOrganization(userId, orgId, after, before,
-                        limit, filter, recursive);
+        try {
+            ResponseSharedRolesDO result =
+                    userSharingPolicyHandlerService.getRolesSharedWithUserInOrganization(userId, orgId, after, before,
+                            limit, filter, recursive);
 
-        List<UserSharedOrganizationsResponseLinks> responseLinks = new ArrayList<>();
-        List<ResponseLinkDO> resultLinks = result.getResponseLinks();
-        for (ResponseLinkDO resultLink : resultLinks) {
-            UserSharedOrganizationsResponseLinks links = new UserSharedOrganizationsResponseLinks();
-            links.href(resultLink.getHref());
-            links.rel(resultLink.getRel());
-            responseLinks.add(links);
+            UserSharedRolesResponse response = populateUserSharedRolesResponse(result);
+            return Response.ok().entity(response).build();
+        } catch (UserSharingMgtClientException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(buildErrorResponse(e)).build();
+        } catch (UserSharingMgtException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
         }
+    }
+
+    /**
+     * Populates a SelectiveUserShareDO object from the provided UserShareRequestBody.
+     *
+     * @param userShareRequestBody Contains details for user sharing.
+     * @return A populated SelectiveUserShareDO object.
+     */
+    private SelectiveUserShareDO populateSelectiveUserShareDO(UserShareRequestBody userShareRequestBody) {
+
+        SelectiveUserShareDO selectiveUserShareDO = new SelectiveUserShareDO();
+
+        // Set user criteria.
+        Map<String, UserCriteriaType> userCriteria =
+                populateUserCriteria(userShareRequestBody.getUserCriteria().getUserIds());
+        selectiveUserShareDO.setUserCriteria(userCriteria);
+
+        // Set organizations.
+        List<SelectiveUserShareOrgDetailsDO> organizationsList = new ArrayList<>();
+        for (UserShareRequestBodyOrganizations org : userShareRequestBody.getOrganizations()) {
+            SelectiveUserShareOrgDetailsDO selectiveUserShareOrgDetailsDO = new SelectiveUserShareOrgDetailsDO();
+            selectiveUserShareOrgDetailsDO.setOrganizationId(org.getOrgId());
+            selectiveUserShareOrgDetailsDO.setPolicy(PolicyEnum.getPolicyByValue(org.getPolicy().value()));
+            selectiveUserShareOrgDetailsDO.setRoles(populateRoleWithAudienceDO(org.getRoles()));
+            organizationsList.add(selectiveUserShareOrgDetailsDO);
+        }
+        selectiveUserShareDO.setOrganizations(organizationsList);
+
+        return selectiveUserShareDO;
+    }
+
+    private Map<String, UserCriteriaType> populateUserCriteria(List<String> userIdList) {
+
+        Map<String, UserCriteriaType> userCriteria = new HashMap<>();
+        UserCriteriaType userIds = new UserIdList(userIdList);
+        userCriteria.put(USER_IDS, userIds);
+        return userCriteria;
+    }
+
+    /**
+     * Populates a GeneralUserShareDO object from the provided UserShareWithAllRequestBody.
+     *
+     * @param userShareWithAllRequestBody Contains details for sharing users with all organizations.
+     * @return A populated GeneralUserShareDO object.
+     */
+    private GeneralUserShareDO populateGeneralUserShareDO(UserShareWithAllRequestBody userShareWithAllRequestBody) {
+
+        GeneralUserShareDO generalUserShareDO = new GeneralUserShareDO();
+
+        // Set user criteria.
+        Map<String, UserCriteriaType> userCriteria =
+                populateUserCriteria(userShareWithAllRequestBody.getUserCriteria().getUserIds());
+        generalUserShareDO.setUserCriteria(userCriteria);
+
+        // Set policy.
+        generalUserShareDO.setPolicy(PolicyEnum.getPolicyByValue(userShareWithAllRequestBody.getPolicy().value()));
+
+        // Set roles.
+        List<RoleWithAudienceDO> rolesList = populateRoleWithAudienceDO(userShareWithAllRequestBody.getRoles());
+        generalUserShareDO.setRoles(rolesList);
+        return generalUserShareDO;
+    }
+
+    /**
+     * Populates a SelectiveUserUnshareDO object from the provided UserUnshareRequestBody.
+     *
+     * @param userUnshareRequestBody Contains details for user unsharing.
+     * @return A populated SelectiveUserUnshareDO object.
+     */
+    private SelectiveUserUnshareDO populateSelectiveUserUnshareDO(UserUnshareRequestBody userUnshareRequestBody) {
+
+        SelectiveUserUnshareDO selectiveUserUnshareDO = new SelectiveUserUnshareDO();
+
+        // Set user criteria.
+        Map<String, UserCriteriaType> userCriteria =
+                populateUserCriteria(userUnshareRequestBody.getUserCriteria().getUserIds());
+        selectiveUserUnshareDO.setUserCriteria(userCriteria);
+
+        // Set organizations.
+        selectiveUserUnshareDO.setOrganizations(userUnshareRequestBody.getOrganizations());
+
+        return selectiveUserUnshareDO;
+    }
+
+    /**
+     * Populates a GeneralUserUnshareDO object from the provided UserUnshareWithAllRequestBody.
+     *
+     * @param userUnshareWithAllRequestBody Contains details for removing shared access.
+     * @return A populated GeneralUserUnshareDO object.
+     */
+    private GeneralUserUnshareDO populateGeneralUserUnshareDO(
+            UserUnshareWithAllRequestBody userUnshareWithAllRequestBody) {
+
+        GeneralUserUnshareDO generalUserUnshareDO = new GeneralUserUnshareDO();
+
+        // Set user criteria.
+        Map<String, UserCriteriaType> userCriteria =
+                populateUserCriteria(userUnshareWithAllRequestBody.getUserCriteria().getUserIds());
+        generalUserUnshareDO.setUserCriteria(userCriteria);
+
+        return generalUserUnshareDO;
+    }
+
+    /**
+     * Populates a UserSharedOrganizationsResponse object from the provided ResponseSharedOrgsDO.
+     *
+     * @param result The ResponseSharedOrgsDO containing the shared organization's data.
+     * @return A populated UserSharedOrganizationsResponse object.
+     */
+    private UserSharedOrganizationsResponse populateUserSharedOrganizationsResponse(ResponseSharedOrgsDO result) {
+
+        List<UserSharedOrganizationsResponseLinks> responseLinks =
+                populateUserSharedOrganizationsResponseLinks(result.getResponseLinks());
+
+        List<UserSharedOrganizationsResponseSharedOrganizations> responseOrgs = new ArrayList<>();
+        List<ResponseOrgDetailsDO> resultOrgDetails = result.getSharedOrgs();
+        for (ResponseOrgDetailsDO resultOrgDetail : resultOrgDetails) {
+            UserSharedOrganizationsResponseSharedOrganizations org =
+                    new UserSharedOrganizationsResponseSharedOrganizations().orgId(
+                                    resultOrgDetail.getOrganizationId())
+                            .orgName(resultOrgDetail.getOrganizationName())
+                            .sharedUserId(resultOrgDetail.getSharedUserId())
+                            .sharedType(resultOrgDetail.getSharedType().toString())
+                            .rolesRef(resultOrgDetail.getRolesRef());
+            responseOrgs.add(org);
+        }
+
+        return new UserSharedOrganizationsResponse().links(responseLinks).sharedOrganizations(responseOrgs);
+    }
+
+    /**
+     * Populates a UserSharedRolesResponse object from the provided ResponseSharedRolesDO.
+     *
+     * @param result The ResponseSharedRolesDO containing the shared role's data.
+     * @return A populated UserSharedRolesResponse object.
+     */
+    private UserSharedRolesResponse populateUserSharedRolesResponse(ResponseSharedRolesDO result) {
+
+        List<UserSharedOrganizationsResponseLinks> responseLinks =
+                populateUserSharedOrganizationsResponseLinks(result.getResponseLinks());
 
         List<RoleWithAudience> responseRoles = new ArrayList<>();
         List<RoleWithAudienceDO> resultRoleDetails = result.getSharedRoles();
-
         for (RoleWithAudienceDO resultRoleDetail : resultRoleDetails) {
             RoleWithAudience roleWithAudience = new RoleWithAudience();
             roleWithAudience.setDisplayName(resultRoleDetail.getRoleName());
@@ -314,17 +406,79 @@ public class UsersApiServiceCore {
     }
 
     /**
+     * Populates a list of RoleWithAudienceDO objects from the provided list of RoleWithAudience.
+     *
+     * @param roles The list of RoleWithAudience objects to be converted.
+     * @return A list of RoleWithAudienceDO objects.
+     */
+    private List<RoleWithAudienceDO> populateRoleWithAudienceDO(List<RoleWithAudience> roles) {
+
+        List<RoleWithAudienceDO> rolesList = new ArrayList<>();
+        if (roles != null) {
+            for (RoleWithAudience role : roles) {
+                RoleWithAudienceDO roleDetails = new RoleWithAudienceDO();
+                roleDetails.setRoleName(role.getDisplayName());
+                roleDetails.setAudienceName(role.getAudience().getDisplay());
+                roleDetails.setAudienceType(role.getAudience().getType());
+                rolesList.add(roleDetails);
+            }
+        }
+        return rolesList;
+    }
+
+    /**
+     * Populates a list of UserSharedOrganizationsResponseLinks objects from the provided list of ResponseLinkDO.
+     *
+     * @param resultLinks The list of ResponseLinkDO objects to be converted.
+     * @return A list of UserSharedOrganizationsResponseLinks objects.
+     */
+    private List<UserSharedOrganizationsResponseLinks> populateUserSharedOrganizationsResponseLinks(
+            List<ResponseLinkDO> resultLinks) {
+
+        List<UserSharedOrganizationsResponseLinks> responseLinks = new ArrayList<>();
+        for (ResponseLinkDO resultLink : resultLinks) {
+            UserSharedOrganizationsResponseLinks links = new UserSharedOrganizationsResponseLinks();
+            links.href(resultLink.getHref());
+            links.rel(resultLink.getRel());
+            responseLinks.add(links);
+        }
+        return responseLinks;
+    }
+
+    /**
      * Constructs a success response object for a completed process.
      *
-     * @param status  The status of the process (e.g., "Processing").
      * @param details Additional details or description about the process.
      * @return A {@link ProcessSuccessResponse} object containing the status and details of the process.
      */
-    public ProcessSuccessResponse getProcessSuccessResponse(String status, String details) {
+    private ProcessSuccessResponse getProcessSuccessResponse(String details) {
 
         ProcessSuccessResponse processSuccessResponse = new ProcessSuccessResponse();
-        processSuccessResponse.status(status);
+        processSuccessResponse.status(RESPONSE_STATUS_PROCESSING);
         processSuccessResponse.setDetails(details);
         return processSuccessResponse;
+    }
+
+    /**
+     * Creates a UserSharingMgtClientException based on the provided error message.
+     *
+     * @param error The error message containing the code, message, and description.
+     * @return A UserSharingMgtClientException with the specified error details.
+     */
+    private UserSharingMgtClientException makeRequestError(UserSharingMgtConstants.ErrorMessage error) {
+
+        return new UserSharingMgtClientException(error.getCode(), error.getMessage(), error.getDescription());
+    }
+
+    /**
+     * Builds a structured error response.
+     *
+     * @param e The exception containing error details.
+     * @return An Error object containing the error code, message, description, and a trace ID.
+     */
+    private Error buildErrorResponse(UserSharingMgtException e) {
+
+        return new Error().code(e.getErrorCode()).message(e.getMessage()).description(e.getDescription())
+                .traceId(UUID.randomUUID());
     }
 }
