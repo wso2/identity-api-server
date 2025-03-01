@@ -26,8 +26,6 @@ paths:
       description: |
         Retrieve metadata information of all the workflow engines in the system.
 
-          <b>Permission required:</b>
-            * /permission/admin/manage/humantask/viewtasks
       operationId: searchWorkFlowEngines
       responses:
         "200":
@@ -53,9 +51,7 @@ paths:
       summary: Retrieve all the available workflows.
       description: |
         Retrieve all the available workflows in the system.
-        
-        <b>Permission required:</b>
-              * /permission/admin/manage/humantask/viewtasks
+
       operationId: listWorkflows
       parameters:
         - $ref: '#/components/parameters/limitQueryParam'
@@ -103,8 +99,6 @@ paths:
       description: |
         Create a new workflow using the specified workflow template and execution engine.
 
-          <b>Permission required:</b>
-            * /permission/admin/manage/humantask/viewtasks
       operationId: createWorkflow
       requestBody:
         description: Contains the details of the newly created workflow.
@@ -193,8 +187,6 @@ paths:
       description: |
         Update a workflow identified by workflow-id.
 
-          <b>Permission required:</b>
-            * /permission/admin/manage/humantask/viewtasks
       operationId: updateWorkflow
       parameters:
         - $ref: '#/components/parameters/workflowIdPathParam'
@@ -242,8 +234,8 @@ paths:
   /workflow-associations:
     get:
       summary: Retrieve all the available workflow associations.
-      description: "Retrieve all the available workflow associations in the system.\n\
-        \  \n  <b>Permission required:</b>\n    * /permission/admin/manage/humantask/viewtasks\n"
+      description: |
+        Retrieve all the available workflow associations in the system.
       operationId: listWorkflowAssociations
       parameters:
         - $ref: '#/components/parameters/limitQueryParam'
@@ -292,8 +284,6 @@ paths:
       description: |
         Create a new workflow association by assigning a user operation to an existing workflow.
 
-          <b>Permission required:</b>
-            * /permission/admin/manage/humantask/viewtasks
       operationId: createWorkflowAssociation
       requestBody:
         description: Contains the details of the newly created workflow association.
@@ -323,8 +313,8 @@ paths:
   /workflow-associations/{association-id}:
     delete:
       summary: Delete the workflow association by association id.
-      description: "Delete a specific workflow association identified by the association\
-        \ id.\n  \n  <b>Permission required:</b>\n    * /permission/admin/manage/humantask/viewtasks\n"
+      description: |
+        Delete a specific workflow association identified by the association.
       operationId: deleteWorkflowAssociationById
       parameters:
         - $ref: '#/components/parameters/associationIdPathParam'
@@ -347,8 +337,6 @@ paths:
       description: |
         Enable or disable a specific workflow association.
 
-          <b>Permission required:</b>
-            * /permission/admin/manage/humantask/viewtasks
       operationId: updateWorkflowAssociationStatus
       parameters:
         - $ref: '#/components/parameters/associationIdPathParam'
