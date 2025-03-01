@@ -248,6 +248,16 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.identity.workflow.impl.bps</groupId>
+                <artifactId>org.wso2.carbon.identity.workflow.impl</artifactId>
+                <version>${workflow.imple.bps.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.workflow.impl.bps</groupId>
+                <artifactId>org.wso2.carbon.identity.workflow.mgt</artifactId>
+                <version>${workflow.imple.bps.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
                 <artifactId>org.wso2.carbon.identity.api.server.common</artifactId>
                 <scope>provided</scope>
@@ -878,6 +888,7 @@
         <org.wso2.carbon.event.publisher.version>5.2.61</org.wso2.carbon.event.publisher.version>
         <identity.branding.preference.management.version>1.1.18</identity.branding.preference.management.version>
         <apache.felix.scr.ds.annotations.version>1.2.4</apache.felix.scr.ds.annotations.version>
+        <workflow.imple.bps.version>5.5.16-SNAPSHOT</workflow.imple.bps.version>
 
         <!--<maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>-->
 
@@ -937,6 +948,7 @@
         <module>components/org.wso2.carbon.identity.api.server.action.management</module>
         <module>components/org.wso2.carbon.identity.api.server.notification.template</module>
         <module>components/org.wso2.carbon.identity.api.server.rule.metadata</module>
+        <module>components/org.wso2.carbon.identity.api.server.workflow.engine</module>
     </modules>
 
 </project>
