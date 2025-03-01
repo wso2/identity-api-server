@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -47,7 +47,7 @@ public class WorkflowAssociationsApi  {
     
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Create a new workflow association.", notes = "Create a new workflow association by assigning a user operation to an existing workflow.    <b>Permission required:</b>     * /permission/admin/manage/humantask/viewtasks ", response = WorkflowAssociation.class, authorizations = {
+    @ApiOperation(value = "Create a new workflow association.", notes = "Create a new workflow association by assigning a user operation to an existing workflow. ", response = WorkflowAssociation.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -71,7 +71,7 @@ public class WorkflowAssociationsApi  {
     @Path("/{association-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete the workflow association by association id.", notes = "Delete a specific workflow association identified by the association id.      <b>Permission required:</b>     * /permission/admin/manage/humantask/viewtasks ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete the workflow association by association id.", notes = "Delete a specific workflow association identified by the association. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -95,7 +95,7 @@ public class WorkflowAssociationsApi  {
     
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve all the available workflow associations.", notes = "Retrieve all the available workflow associations in the system.      <b>Permission required:</b>     * /permission/admin/manage/humantask/viewtasks ", response = WorkflowAssociation.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Retrieve all the available workflow associations.", notes = "Retrieve all the available workflow associations in the system. ", response = WorkflowAssociation.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -119,7 +119,7 @@ public class WorkflowAssociationsApi  {
     @Path("/{association-id}/status")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update the status of a workflow association.", notes = "Enable or disable a specific workflow association.    <b>Permission required:</b>     * /permission/admin/manage/humantask/viewtasks ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update the status of a workflow association.", notes = "Enable or disable a specific workflow association. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.identity.rest.api.server.workflow.engine.v1;
 
-import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.factories.WorkflowEnginesApiServiceFactory;
 import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.model.Error;
 import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.model.WorkflowEngine;
 
@@ -33,18 +32,14 @@ import io.swagger.annotations.*;
 
 public class WorkflowEnginesApi  {
 
-    private final WorkflowEnginesApiService delegate;
-
-    public WorkflowEnginesApi(){
-        this.delegate = WorkflowEnginesApiServiceFactory.getWorkflowEnginesApi();
-    }
+    private WorkflowEnginesApiService delegate;
 
     @Valid
     @GET
     
     
     @Produces({ "*/*", "application/json" })
-    @ApiOperation(value = "Retrieve all the available workflow engines.", notes = "Retrieve metadata information of all the workflow engines in the system.    <b>Permission required:</b>     * /permission/admin/manage/humantask/viewtasks ", response = WorkflowEngine.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Retrieve all the available workflow engines.", notes = "Retrieve metadata information of all the workflow engines in the system. ", response = WorkflowEngine.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             

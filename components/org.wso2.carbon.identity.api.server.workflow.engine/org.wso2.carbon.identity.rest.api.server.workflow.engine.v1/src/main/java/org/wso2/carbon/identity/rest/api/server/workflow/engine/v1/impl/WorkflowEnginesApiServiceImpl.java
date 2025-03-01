@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -19,8 +19,6 @@
 package org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.impl;
 
 import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.*;
-import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.model.*;
-import java.util.List;
 
 import javax.ws.rs.core.Response;
 
@@ -29,7 +27,6 @@ public class WorkflowEnginesApiServiceImpl implements WorkflowEnginesApiService 
     @Override
     public Response searchWorkFlowEngines() {
 
-        // do some magic!
         return Response.ok().entity("magic!").build();
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -47,7 +47,7 @@ public class WorkflowsApi  {
     
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Create a new workflow.", notes = "Create a new workflow using the specified workflow template and execution engine.    <b>Permission required:</b>     * /permission/admin/manage/humantask/viewtasks ", response = WorkflowSummary.class, authorizations = {
+    @ApiOperation(value = "Create a new workflow.", notes = "Create a new workflow using the specified workflow template and execution engine. ", response = WorkflowSummary.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -119,7 +119,7 @@ public class WorkflowsApi  {
     
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve all the available workflows.", notes = "Retrieve all the available workflows in the system.  <b>Permission required:</b>       * /permission/admin/manage/humantask/viewtasks ", response = WorkflowSummary.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Retrieve all the available workflows.", notes = "Retrieve all the available workflows in the system. ", response = WorkflowSummary.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -143,7 +143,7 @@ public class WorkflowsApi  {
     @Path("/{workflow-id}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update an existing workflow.", notes = "Update a workflow identified by workflow-id.    <b>Permission required:</b>     * /permission/admin/manage/humantask/viewtasks ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update an existing workflow.", notes = "Update a workflow identified by workflow-id. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             

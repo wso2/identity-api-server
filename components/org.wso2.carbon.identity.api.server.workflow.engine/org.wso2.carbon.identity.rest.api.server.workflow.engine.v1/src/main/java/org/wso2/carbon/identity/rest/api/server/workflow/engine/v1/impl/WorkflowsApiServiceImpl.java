@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -42,35 +42,30 @@ public class WorkflowsApiServiceImpl implements WorkflowsApiService {
     @Override
     public Response createWorkflow(WorkflowCreation requestBody) {
 
-        // do some magic!
         return Response.ok().entity(workflowService.addWorkflow(requestBody, null)).build();
     }
 
     @Override
     public Response deleteWorkflowById(String workflowId) {
 
-        // do some magic!
         return Response.ok().entity(workflowService.removeWorkflow(workflowId)).build();
     }
 
     @Override
     public Response getWorkflowById(String workflowId) {
 
-        // do some magic!
         return Response.ok().entity(workflowService.getWorkflow(workflowId)).build();
     }
 
     @Override
     public Response listWorkflows(Integer limit, Integer offset, String filter) {
 
-        // do some magic!
         return Response.ok().entity(workflowService.listPaginatedWorkflows(limit, offset, filter)).build();
     }
 
     @Override
     public Response updateWorkflow(String workflowId, WorkflowCreation requestBody) {
 
-        // do some magic!
         return Response.ok().entity(workflowService.addWorkflow(requestBody, workflowId)).build();
     }
 }

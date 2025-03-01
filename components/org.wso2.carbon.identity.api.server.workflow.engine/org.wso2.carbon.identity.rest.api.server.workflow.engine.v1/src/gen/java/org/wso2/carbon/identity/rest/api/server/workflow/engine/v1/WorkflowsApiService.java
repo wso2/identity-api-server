@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,16 +18,7 @@
 
 package org.wso2.carbon.identity.rest.api.server.workflow.engine.v1;
 
-import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.*;
-import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.model.*;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import java.io.InputStream;
-import java.util.List;
-import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.model.DetailedWorkflow;
-import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.model.Error;
 import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.model.WorkflowCreation;
-import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.model.WorkflowSummary;
 import javax.ws.rs.core.Response;
 
 
