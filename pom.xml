@@ -559,6 +559,12 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.identity.user.registration.mgt</artifactId>
+                <version>${carbon.identity.framework.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.admin.advisory.mgt</artifactId>
                 <version>${carbon.kernel.version}</version>
@@ -752,6 +758,11 @@
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.registration.management.common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -937,6 +948,7 @@
         <module>components/org.wso2.carbon.identity.api.server.action.management</module>
         <module>components/org.wso2.carbon.identity.api.server.notification.template</module>
         <module>components/org.wso2.carbon.identity.api.server.rule.metadata</module>
+        <module>components/org.wso2.carbon.identity.api.server.registration.management</module>
     </modules>
 
 </project>
