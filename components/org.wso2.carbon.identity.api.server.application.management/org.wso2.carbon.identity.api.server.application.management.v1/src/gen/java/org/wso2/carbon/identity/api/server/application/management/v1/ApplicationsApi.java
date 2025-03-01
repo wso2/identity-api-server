@@ -674,6 +674,7 @@ public class ApplicationsApi  {
     }, tags={ "Application Metadata", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = GroupBasicInfo.class, responseContainer = "List"),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
