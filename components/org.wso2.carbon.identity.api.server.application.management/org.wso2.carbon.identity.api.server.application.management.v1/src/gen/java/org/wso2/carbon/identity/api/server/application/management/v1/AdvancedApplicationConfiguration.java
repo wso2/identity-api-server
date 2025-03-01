@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -27,6 +27,7 @@ import java.util.List;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfigurationAttestationMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.Certificate;
+import org.wso2.carbon.identity.api.server.application.management.v1.DiscoverableGroup;
 import org.wso2.carbon.identity.api.server.application.management.v1.TrustedAppConfiguration;
 import javax.validation.constraints.*;
 
@@ -40,6 +41,7 @@ public class AdvancedApplicationConfiguration  {
   
     private Boolean saas;
     private Boolean discoverableByEndUsers;
+    private List<DiscoverableGroup> discoverableGroups = null;
     private Certificate certificate;
     private Boolean skipLoginConsent;
     private Boolean skipLogoutConsent;
@@ -88,6 +90,37 @@ public class AdvancedApplicationConfiguration  {
     }
     public void setDiscoverableByEndUsers(Boolean discoverableByEndUsers) {
         this.discoverableByEndUsers = discoverableByEndUsers;
+    }
+
+    /**
+    * List of groups from user stores where users in those groups can discover the application.
+    **/
+    public AdvancedApplicationConfiguration discoverableGroups(List<DiscoverableGroup> discoverableGroups) {
+
+        this.discoverableGroups = discoverableGroups;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "List of groups from user stores where users in those groups can discover the application.")
+    @JsonProperty("discoverableGroups")
+    @Valid
+    public List<DiscoverableGroup> getDiscoverableGroups() {
+
+        return discoverableGroups;
+    }
+
+    public void setDiscoverableGroups(List<DiscoverableGroup> discoverableGroups) {
+
+        this.discoverableGroups = discoverableGroups;
+    }
+
+    public AdvancedApplicationConfiguration addDiscoverableGroupsItem(DiscoverableGroup discoverableGroupsItem) {
+
+        if (this.discoverableGroups == null) {
+            this.discoverableGroups = new ArrayList<>();
+        }
+        this.discoverableGroups.add(discoverableGroupsItem);
+        return this;
     }
 
     /**
@@ -317,6 +350,7 @@ public class AdvancedApplicationConfiguration  {
         AdvancedApplicationConfiguration advancedApplicationConfiguration = (AdvancedApplicationConfiguration) o;
         return Objects.equals(this.saas, advancedApplicationConfiguration.saas) &&
             Objects.equals(this.discoverableByEndUsers, advancedApplicationConfiguration.discoverableByEndUsers) &&
+            Objects.equals(this.discoverableGroups, advancedApplicationConfiguration.discoverableGroups) &&
             Objects.equals(this.certificate, advancedApplicationConfiguration.certificate) &&
             Objects.equals(this.skipLoginConsent, advancedApplicationConfiguration.skipLoginConsent) &&
             Objects.equals(this.skipLogoutConsent, advancedApplicationConfiguration.skipLogoutConsent) &&
@@ -332,7 +366,7 @@ public class AdvancedApplicationConfiguration  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(saas, discoverableByEndUsers, certificate, skipLoginConsent, skipLogoutConsent, useExternalConsentPage, returnAuthenticatedIdpList, enableAuthorization, fragment, enableAPIBasedAuthentication, attestationMetaData, trustedAppConfiguration, additionalSpProperties);
+        return Objects.hash(saas, discoverableByEndUsers, discoverableGroups, certificate, skipLoginConsent, skipLogoutConsent, useExternalConsentPage, returnAuthenticatedIdpList, enableAuthorization, fragment, enableAPIBasedAuthentication, attestationMetaData, trustedAppConfiguration, additionalSpProperties);
     }
 
     @Override
@@ -343,6 +377,7 @@ public class AdvancedApplicationConfiguration  {
         
         sb.append("    saas: ").append(toIndentedString(saas)).append("\n");
         sb.append("    discoverableByEndUsers: ").append(toIndentedString(discoverableByEndUsers)).append("\n");
+        sb.append("    discoverableGroups: ").append(toIndentedString(discoverableGroups)).append("\n");
         sb.append("    certificate: ").append(toIndentedString(certificate)).append("\n");
         sb.append("    skipLoginConsent: ").append(toIndentedString(skipLoginConsent)).append("\n");
         sb.append("    skipLogoutConsent: ").append(toIndentedString(skipLogoutConsent)).append("\n");

@@ -2139,6 +2139,56 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  '/applications/meta/groups':
+    get:
+      tags:
+        - Application Metadata
+      summary: |
+        Retrieve the list of groups available for the application.
+      description: >
+        This API provides the capability to retrieve the list of groups available for the application. <br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/view <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_view
+      parameters:
+        - $ref: '#/components/parameters/domainQueryParam'
+        - $ref: '#/components/parameters/filterQueryParam'
+      operationId: getGroups
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GroupBasicInfo'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   /applications/templates:
     get:
       tags:
@@ -2907,6 +2957,16 @@ components:
         Application template ID. This should be a valid locale.
       schema:
         type: string
+    domainQueryParam:
+      in: query
+      name: domain
+      required: false
+      description: |
+        The domain name of the user store used to filter the groups.
+
+        /applications/meta/groups?domain=PRIMARY
+      schema:
+        type: string
   securitySchemes:
     BasicAuth:
       type: http
@@ -3264,6 +3324,11 @@ components:
           type: boolean
           example: false
           description: Decides whether the application is visible for end users.
+        discoverableGroups:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscoverableGroup'
+          description: List of groups from user stores where users in those groups can discover the application.
         certificate:
           $ref: '#/components/schemas/Certificate'
         skipLoginConsent:
@@ -3363,6 +3428,35 @@ components:
           type: string
           description: Decides the apple app id for the application.
           example: "APPLETEAMID.com.org.mobile.sample"
+    DiscoverableGroup:
+      type: object
+      required:
+        - userStore
+        - groups
+      properties:
+        userStore:
+          type: string
+          description: The user store domain to which the groups belong.
+          example: "PRIMARY"
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/GroupBasicInfo'
+          minItems: 1
+          description: List of groups configured for discoverability.
+    GroupBasicInfo:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the group.
+          example: "bf5abd05-3667-4a2a-a6c2-2fb9f4d26e47"
+        name:
+          type: string
+          description: The name of the group.
+          example: "GroupA"
     Certificate:
       type: object
       properties:

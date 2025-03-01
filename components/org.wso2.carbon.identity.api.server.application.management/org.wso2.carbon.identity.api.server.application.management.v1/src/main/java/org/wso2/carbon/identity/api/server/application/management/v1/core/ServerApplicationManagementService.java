@@ -56,6 +56,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedS
 import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticator;
 import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticatorsModal;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.GroupBasicInfo;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.Link;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
@@ -208,6 +209,9 @@ import static org.wso2.carbon.identity.application.authentication.framework.util
 import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.WS_TRUST;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.Error.INVALID_REQUEST;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.Error.UNEXPECTED_SERVER_ERROR;
+import static org.wso2.carbon.identity.application.mgt.ApplicationConstants.ErrorMessage.ERROR_RETRIEVING_GROUP_LIST;
+import static org.wso2.carbon.identity.application.mgt.ApplicationConstants.ErrorMessage.INVALID_GROUP_FILTER;
+import static org.wso2.carbon.identity.application.mgt.ApplicationConstants.FILTER_CO;
 import static org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.PrimitiveOperator.EQUALS;
 import static org.wso2.carbon.identity.cors.mgt.core.constant.ErrorMessages.ERROR_CODE_INVALID_APP_ID;
 import static org.wso2.carbon.identity.organization.management.service.util.Utils.isLegacyAuthzRuntime;
@@ -1603,6 +1607,53 @@ public class ServerApplicationManagementService {
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error retrieving authorized APIs of application with id: " + applicationId;
             throw handleIdentityApplicationManagementException(e, msg);
+        }
+    }
+
+    /**
+     * Get the list of groups in the user store that match the given filter.
+     *
+     * @param domain The user store domain.
+     * @param filter The filter to be applied.
+     * @return List of groups.
+     */
+    public List<GroupBasicInfo> getGroups(String domain, String filter) {
+
+        Node filterNode = null;
+        // Get the filter tree and validate it before sending the filter to the backend.
+        if (StringUtils.isNotBlank(filter)) {
+            try {
+                FilterTreeBuilder filterTreeBuilder = new FilterTreeBuilder(filter);
+                Node rootNode = filterTreeBuilder.buildTree();
+                if (rootNode == null) {
+                    throw buildClientError(ErrorMessage.INVALID_FILTER_FORMAT);
+                }
+                ExpressionNode expressionNode;
+                if (!(rootNode instanceof ExpressionNode)) {
+                    throw Utils.buildClientError(INVALID_GROUP_FILTER.getCode(), INVALID_GROUP_FILTER.getMessage(),
+                            INVALID_GROUP_FILTER.getDescription());
+                }
+                expressionNode = (ExpressionNode) rootNode;
+                if (!StringUtils.equals(expressionNode.getAttributeValue(), NAME) || !StringUtils.equals(
+                        expressionNode.getOperation(), FILTER_CO)) {
+                    throw Utils.buildClientError(INVALID_GROUP_FILTER.getCode(), INVALID_GROUP_FILTER.getMessage(),
+                            INVALID_GROUP_FILTER.getDescription());
+                }
+                filterNode = rootNode;
+            } catch (IOException | IdentityException e) {
+                throw buildClientError(ErrorMessage.INVALID_FILTER_FORMAT);
+            }
+        }
+
+        try {
+            List<org.wso2.carbon.identity.application.common.model.GroupBasicInfo> groupBasicInfos =
+                    applicationManagementService.getGroups(
+                            PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(), domain,
+                            filterNode);
+            return groupBasicInfos.stream().map(groupBasicInfo -> new GroupBasicInfo().id(groupBasicInfo.getId())
+                    .name(groupBasicInfo.getName())).collect(Collectors.toList());
+        } catch (IdentityApplicationManagementException e) {
+            throw handleIdentityApplicationManagementException(e, ERROR_RETRIEVING_GROUP_LIST.getMessage());
         }
     }
 
