@@ -51,6 +51,9 @@ paths:
       summary: Retrieve all the available workflows.
       description: |
         Retrieve all the available workflows in the system.
+        
+        <b>Scope required:</b>
+            * internal_workflow_view
 
       operationId: listWorkflows
       parameters:
@@ -98,6 +101,9 @@ paths:
       summary: Create a new workflow.
       description: |
         Create a new workflow using the specified workflow template and execution engine.
+        
+        <b>Scope required:</b>
+            * internal_workflow_create
 
       operationId: createWorkflow
       requestBody:
@@ -135,8 +141,12 @@ paths:
   /workflows/{workflow-id}:
     get:
       summary: Retrieve the workflow by workflow id.
-      description: "Retrieve information about a specific workflow identified by the\
-        \ workflow id.\n  \n  <b>Permission required:</b>\n    * /permission/admin/manage/humantask/viewtasks\n"
+      description: |
+        Retrieve information about a specific workflow identified by the workflow id.
+        
+        <b>Scope required:</b>
+            * internal_workflow_view
+
       operationId: getWorkflowById
       parameters:
         - $ref: '#/components/parameters/workflowIdPathParam'
@@ -186,7 +196,9 @@ paths:
       summary: Update an existing workflow.
       description: |
         Update a workflow identified by workflow-id.
-
+        
+        <b>Scope required:</b>
+                    * internal_workflow_update
       operationId: updateWorkflow
       parameters:
         - $ref: '#/components/parameters/workflowIdPathParam'
@@ -213,8 +225,11 @@ paths:
       x-codegen-request-body-name: Request Body
     delete:
       summary: Delete the workflow by workflow-id.
-      description: "Delete a specific workflow identified by the workflow-id.\n  \n\
-        \  <b>Permission required:</b>\n    * /permission/admin/manage/humantask/viewtasks\n"
+      description: |
+        Delete a specific workflow identified by the workflow-id
+
+          <b>Scope required:</b>
+          * internal_workflow_delete
       operationId: deleteWorkflowById
       parameters:
         - $ref: '#/components/parameters/workflowIdPathParam'
@@ -236,6 +251,9 @@ paths:
       summary: Retrieve all the available workflow associations.
       description: |
         Retrieve all the available workflow associations in the system.
+        
+        <b>Scope required:</b>
+                    * internal_workflow_associations_view
       operationId: listWorkflowAssociations
       parameters:
         - $ref: '#/components/parameters/limitQueryParam'
@@ -283,6 +301,9 @@ paths:
       summary: Create a new workflow association.
       description: |
         Create a new workflow association by assigning a user operation to an existing workflow.
+        
+        <b>Scope required:</b>
+                    * internal_workflow_associations_create
 
       operationId: createWorkflowAssociation
       requestBody:
@@ -315,6 +336,9 @@ paths:
       summary: Delete the workflow association by association id.
       description: |
         Delete a specific workflow association identified by the association.
+        
+        <b>Scope required:</b>
+                            * internal_workflow_associations_view
       operationId: deleteWorkflowAssociationById
       parameters:
         - $ref: '#/components/parameters/associationIdPathParam'
@@ -336,6 +360,9 @@ paths:
       summary: Update the status of a workflow association.
       description: |
         Enable or disable a specific workflow association.
+        
+        <b>Scope required:</b>
+                    * internal_workflow_associations_update
 
       operationId: updateWorkflowAssociationStatus
       parameters:
