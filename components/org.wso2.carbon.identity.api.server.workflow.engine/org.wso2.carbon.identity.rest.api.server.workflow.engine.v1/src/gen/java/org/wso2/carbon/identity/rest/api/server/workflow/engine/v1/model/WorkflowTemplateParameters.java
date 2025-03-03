@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -35,26 +35,26 @@ import javax.xml.bind.annotation.*;
 
 public class WorkflowTemplateParameters  {
   
-    private Integer step;
-    private List<OptionDetails> options = new ArrayList<>();
+    private Integer steps;
+    private List<OptionDetails> options = null;
 
 
     /**
     **/
-    public WorkflowTemplateParameters step(Integer step) {
+    public WorkflowTemplateParameters steps(Integer steps) {
 
-        this.step = step;
+        this.steps = steps;
         return this;
     }
     
     @ApiModelProperty(example = "1", value = "")
-    @JsonProperty("step")
+    @JsonProperty("steps")
     @Valid
-    public Integer getStep() {
-        return step;
+    public Integer getSteps() {
+        return steps;
     }
-    public void setStep(Integer step) {
-        this.step = step;
+    public void setSteps(Integer steps) {
+        this.steps = steps;
     }
 
     /**
@@ -65,11 +65,9 @@ public class WorkflowTemplateParameters  {
         return this;
     }
     
-    @ApiModelProperty(example = "[{\"entity\":\"roles\",\"values\":\"admin\"},{\"entity\":\"users\",\"values\":\"John\"}]", required = true, value = "")
+    @ApiModelProperty(example = "[{\"entity\":\"roles\",\"values\":\"admin\"},{\"entity\":\"users\",\"values\":\"John\"}]", value = "")
     @JsonProperty("options")
-    @Valid
-    @NotNull(message = "Property options cannot be null.")
- @Size(min=2)
+    @Valid @Size(min=2)
     public List<OptionDetails> getOptions() {
         return options;
     }
@@ -78,6 +76,9 @@ public class WorkflowTemplateParameters  {
     }
 
     public WorkflowTemplateParameters addOptionsItem(OptionDetails optionsItem) {
+        if (this.options == null) {
+            this.options = new ArrayList<>();
+        }
         this.options.add(optionsItem);
         return this;
     }
@@ -94,13 +95,13 @@ public class WorkflowTemplateParameters  {
             return false;
         }
         WorkflowTemplateParameters workflowTemplateParameters = (WorkflowTemplateParameters) o;
-        return Objects.equals(this.step, workflowTemplateParameters.step) &&
+        return Objects.equals(this.steps, workflowTemplateParameters.steps) &&
             Objects.equals(this.options, workflowTemplateParameters.options);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(step, options);
+        return Objects.hash(steps, options);
     }
 
     @Override
@@ -109,7 +110,7 @@ public class WorkflowTemplateParameters  {
         StringBuilder sb = new StringBuilder();
         sb.append("class WorkflowTemplateParameters {\n");
         
-        sb.append("    step: ").append(toIndentedString(step)).append("\n");
+        sb.append("    steps: ").append(toIndentedString(steps)).append("\n");
         sb.append("    options: ").append(toIndentedString(options)).append("\n");
         sb.append("}");
         return sb.toString();

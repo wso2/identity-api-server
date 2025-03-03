@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -129,7 +129,7 @@ public class DetailedWorkflow  {
     }
     
     @ApiModelProperty(example = "User Registration Approval", required = true, value = "Approval task subject to display")
-    @JsonProperty("ApprovalTask")
+    @JsonProperty("approvalTask")
     @Valid
     @NotNull(message = "Property approvalTask cannot be null.")
 
@@ -150,7 +150,7 @@ public class DetailedWorkflow  {
     }
     
     @ApiModelProperty(example = "Approval task to validate and approve new user registrations before account activation", value = "Description of the approval task")
-    @JsonProperty("ApprovalTaskDescription")
+    @JsonProperty("approvalTaskDescription")
     @Valid
     public String getApprovalTaskDescription() {
         return approvalTaskDescription;
