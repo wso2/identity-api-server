@@ -137,7 +137,6 @@ paths:
           $ref: '#/components/responses/Conflict'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-codegen-request-body-name: Request Body
   /workflows/{workflow-id}:
     get:
       summary: Retrieve the workflow by workflow id.
@@ -222,7 +221,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-codegen-request-body-name: Request Body
     delete:
       summary: Delete the workflow by workflow-id.
       description: |
@@ -330,7 +328,6 @@ paths:
           $ref: '#/components/responses/Conflict'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-codegen-request-body-name: Request Body
   /workflow-associations/{association-id}:
     delete:
       summary: Delete the workflow association by association id.
@@ -387,7 +384,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-codegen-request-body-name: status
 components:
   schemas:
     WorkflowEngine:
@@ -730,4 +726,3 @@ components:
           authorizationUrl: https://localhost:9443/oauth2/authorize
           tokenUrl: https://localhost:9443/oauth2/token
           scopes: {}
-x-original-swagger-version: "2.0"
