@@ -28,10 +28,10 @@ paths:
 
       operationId: searchWorkFlowEngines
       responses:
-        "200":
+        '200':
           description: search results matching criteria
           content:
-            '*/*':
+            'application/json':
               schema:
                 type: array
                 items:
@@ -61,7 +61,7 @@ paths:
         - $ref: '#/components/parameters/offsetQueryParam'
         - $ref: '#/components/parameters/filterQueryParam'
       responses:
-        "200":
+        '200':
           description: Array of workflows
           content:
             'application/json':
@@ -70,23 +70,23 @@ paths:
                 items:
                   $ref: '#/components/schemas/WorkflowSummary'
               example:
-                - id: "100"
+                - id: 100
                   workflowName: User Registration Approval
                   workflowDescription: Approves new user registrations before account
                     activation
                   workflowTemplate: MultiStepApprovalTemplate
-                  deployment: ApprovalWorkflow
-                - id: "101"
+                  workflowEngine: ApprovalWorkflow
+                - id: 101
                   workflowName: Role Change Request
                   workflowDescription: Approves requests for changing user roles
                   workflowTemplate: MultiStepApprovalTemplate
-                  deployment: ApprovalWorkflow
-                - id: "102"
+                  workflowEngine: ApprovalWorkflow
+                - id: 102
                   workflowName: User Deactivation Workflow
                   workflowDescription: Ensures proper approvals before deactivating
                     a user account
                   workflowTemplate: SingleStepApprovalTemplate
-                  deployment: ApprovalWorkflow
+                  workflowEngine: ApprovalWorkflow
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -107,26 +107,26 @@ paths:
 
       operationId: createWorkflow
       requestBody:
-        description: Contains the details of the newly created workflow.
+        description: Contains the details of the newly created.
         content:
           'application/json':
             schema:
               $ref: '#/components/schemas/WorkflowCreation'
         required: true
       responses:
-        "201":
+        '201':
           description: Item Created
           content:
             'application/json':
               schema:
                 $ref: '#/components/schemas/WorkflowSummary'
               example:
-                id: "100"
+                id: 100
                 workflowName: User Registration Approval
                 workflowDescription: Approves new user registrations before account
                   activation
                 workflowTemplate: MultiStepApprovalTemplate
-                deployment: ApprovalWorkflow
+                workflowEngine: ApprovalWorkflow
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -150,37 +150,12 @@ paths:
       parameters:
         - $ref: '#/components/parameters/workflowIdPathParam'
       responses:
-        "200":
+        '200':
           description: Information about the workflow identified by the workflow-id.
           content:
             'application/json':
               schema:
                 $ref: '#/components/schemas/DetailedWorkflow'
-              example:
-                id: "100"
-                workflowName: User Registration Approval
-                workflowDescription: Approves new user registrations before account
-                  activation
-                workflowTemplate:
-                  name: MultiStepApproval
-                  templateDescription: "The operation should be approved by an authorized\
-                    \ person with given role, to complete."
-                  properties:
-                    - paramName: UserAndRole
-                      paramValue: Internal/admin
-                      qName: UserAndRoles-step-1-roles
-                    - paramName: UserAndRole
-                      paramValue: John
-                      qName: UserAndRoles-step-1-users
-                    - paramName: UserAndRole
-                      paramValue: ""
-                      qName: UserAndRoles-step-2-roles
-                    - paramName: UserAndRole
-                      paramValue: "John,Tom"
-                      qName: UserAndRoles-step-2-users
-                workflowEngine: Simple Workflow Engine
-                ApprovalTask: Sample Approval Task
-                ApprovalTaskDescription: This is an approval task
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -258,7 +233,7 @@ paths:
         - $ref: '#/components/parameters/offsetQueryParam'
         - $ref: '#/components/parameters/filterQueryParam'
       responses:
-        "200":
+        '200':
           description: Array of workflow associations matching the search criteria
           content:
             'application/json':
@@ -267,24 +242,24 @@ paths:
                 items:
                   $ref: '#/components/schemas/WorkflowAssociation'
               example:
-                - id: "500"
+                - id: 500
                   workflowAssociationName: User Registration Workflow Association
                   operation: Add User
                   workflowName: User Registration Approval
-                  associationCondition: "true"
-                  isEnabled: "true"
-                - id: "501"
+                  associationCondition: true
+                  isEnabled: true
+                - id: 501
                   workflowAssociationName: Role Update Workflow Association
                   operation: Update Role
                   workflowName: Role Change Request
-                  associationCondition: "false"
-                  isEnabled: "true"
-                - id: "502"
+                  associationCondition: false
+                  isEnabled: true
+                - id: 502
                   workflowAssociationName: Delete User Workflow Association
                   operation: Delete User
                   workflowName: User Deactivation Workflow
-                  associationCondition: "false"
-                  isEnabled: "false"
+                  associationCondition: false
+                  isEnabled: false
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -329,10 +304,44 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
   /workflow-associations/{association-id}:
+    get:
+      summary: Get the workflow association by association id.
+      description: |
+        Get a specific workflow association identified by the association id.
+        
+        <b>Scope required:</b>
+                            * internal_workflow_associations_view
+      operationId: getWorkflowAssociationById
+      parameters:
+        - $ref: '#/components/parameters/associationIdPathParam'
+      responses:
+        '200':
+          description: Array of workflow associations matching the search criteria
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/WorkflowAssociation'
+              example:
+                id: 500
+                workflowAssociationName: User Registration Workflow Association
+                operation: Add User
+                workflowName: User Registration Approval
+                associationCondition: Role Name equals Manager
+                isEnabled: true
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
     delete:
       summary: Delete the workflow association by association id.
       description: |
-        Delete a specific workflow association identified by the association.
+        Delete a specific workflow association identified by the association ID.
         
         <b>Scope required:</b>
                             * internal_workflow_associations_view
@@ -352,38 +361,58 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-  /workflow-associations/{association-id}/status:
-    put:
-      summary: Update the status of a workflow association.
+    patch:
+      summary: |
+        Partially update association by ID
+      operationId: patchAssociation
       description: |
-        Enable or disable a specific workflow association.
+        Partially update an application by ID.<br>
         
-        <b>Scope required:</b>
-                    * internal_workflow_associations_update
-
-      operationId: updateWorkflowAssociationStatus
+          <b>Scope required:</b> <br>
+              * internal_workflow_associations_update
       parameters:
         - $ref: '#/components/parameters/associationIdPathParam'
       requestBody:
-        description: Status of the workflow association (enable/disable)
+        description: Represents the association details to be updated.
         content:
-          'application/json':
+          application/json:
             schema:
-              $ref: "#/components/schemas/Status"
-        required: false
+              $ref: '#/components/schemas/WorkflowAssociationPatch'
+            example:
+              id: "500"
+              workflowAssociationName: User Registration Workflow Association
+              operation: Add User
+              workflowName: User Registration Approval
+              associationCondition: true
+              associationStatus:
+                action: ENABLE
       responses:
         '200':
-          $ref: '#/components/responses/Updated'
+          description: Successfully Updated
         '400':
-          $ref: '#/components/responses/InvalidInput'
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          description: Unauthorized
         '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+          description: Forbidden
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
-          $ref: '#/components/responses/ServerError'
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+
 components:
   schemas:
     WorkflowEngine:
@@ -411,7 +440,7 @@ components:
     WorkflowTemplateParameters:
       type: object
       properties:
-        step:
+        steps:
           type: integer
           example: 1
         options:
@@ -429,7 +458,6 @@ components:
               "values": "John"
             }
           ]
-      required: ["steps", "options"]
 
     OptionDetails:
       type: object
@@ -460,7 +488,7 @@ components:
           type: string
           example: "MultiStepApprovalTemplate"
           description: "Template defining the approval process for the workflow"
-        deployment:
+        workflowEngine:
           type: string
           example: "ApprovalWorkflow"
           description: "Category in which the workflow is deployed"
@@ -470,7 +498,7 @@ components:
       required:
         - workflowName
         - workflowEngine
-        - ApprovalTask
+        - approvalTask
       properties:
         workflowName:
           type: string
@@ -486,11 +514,11 @@ components:
           type: string
           example: "Simple Workflow Engine"
           description: "Name of the selected workflow engine"
-        ApprovalTask:
+        approvalTask:
           type: string
           example: "User Registration Approval"
           description: "Approval task subject to display"
-        ApprovalTaskDescription:
+        approvalTaskDescription:
           type: string
           example: "Approval task to validate and approve new user registrations before account activation"
           description: "Description of the approval task"
@@ -498,6 +526,8 @@ components:
 
     DetailedWorkflowTemplate:
       type: object
+      required:
+        - name
       properties:
         name:
           type: string
@@ -511,8 +541,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/WorkflowTemplateParameters"
-          required:
-            - name
+
 
 
     WorkflowAssociation:
@@ -545,7 +574,7 @@ components:
         - workflowName
         - workflowTemplate
         - workflowEngine
-        - ApprovalTask
+        - approvalTask
       properties:
         workflowName:
           type: string
@@ -561,11 +590,11 @@ components:
           type: string
           example: "Simple Workflow Engine"
           description: "Name of the selected workflow engine"
-        ApprovalTask:
+        approvalTask:
           type: string
           example: "User Registration Approval"
           description: "Approval task subject to display"
-        ApprovalTaskDescription:
+        approvalTaskDescription:
           type: string
           example: "Approval task to validate and approve new user registrations before account activation"
           description: "Description of the approval task"
@@ -612,6 +641,32 @@ components:
           type: string
           example: "Role Name equals Manager"
           description: "Condition added to the association"
+
+    WorkflowAssociationPatch:
+      type: object
+      properties:
+        associationName:
+          type: string
+          example: "User Registration Workflow Association"
+          description: "Name of the workflow association"
+        operationCategory:
+          type: string
+          example: "User Store Operations"
+          description: "Operation type"
+        operationName:
+          type: string
+          example: "Add User"
+          description: "Name of the user operation"
+        workflowId:
+          type: string
+          example: "456"
+          description: "Id of the assigned workflow"
+        associationCondition:
+          type: string
+          example: "Role Name equals Manager"
+          description: "Condition added to the association"
+        associationStatus:
+          $ref: "#/components/schemas/Status"
 
     Status:
       type: object
