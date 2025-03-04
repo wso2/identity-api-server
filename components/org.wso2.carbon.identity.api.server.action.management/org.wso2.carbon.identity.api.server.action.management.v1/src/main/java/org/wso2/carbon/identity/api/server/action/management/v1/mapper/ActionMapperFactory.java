@@ -42,6 +42,9 @@ public class ActionMapperFactory {
             case PRE_UPDATE_PASSWORD:
                 actionMapper = new PreUpdatePasswordActionMapper();
                 break;
+            case PRE_UPDATE_PROFILE:
+                actionMapper = new PreUpdateProfileActionMapper();
+                break;
             default:
                 break;
         }
