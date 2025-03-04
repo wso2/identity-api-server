@@ -99,5 +99,6 @@ public class UserRegistrationFlowServiceCore {
      * Static inner class for TypeReference.
      */
     private static class MapTypeReference extends TypeReference<Map<String, String>> {
+
     }
 }
