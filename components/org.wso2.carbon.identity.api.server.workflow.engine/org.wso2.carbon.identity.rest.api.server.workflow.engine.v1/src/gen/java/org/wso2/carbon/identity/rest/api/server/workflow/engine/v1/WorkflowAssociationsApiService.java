@@ -18,18 +18,20 @@
 
 package org.wso2.carbon.identity.rest.api.server.workflow.engine.v1;
 
-import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.model.Status;
 import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.model.WorkflowAssociationCreation;
+import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.model.WorkflowAssociationPatch;
 import javax.ws.rs.core.Response;
 
 
 public interface WorkflowAssociationsApiService {
 
-      public Response createWorkflowAssociation(WorkflowAssociationCreation requestBody);
+      public Response createWorkflowAssociation(WorkflowAssociationCreation workflowAssociationCreation);
 
-      public Response deleteWorkflowAssociationById(Integer associationId);
+      public Response deleteWorkflowAssociationById(String associationId);
+
+      public Response getWorkflowAssociationById(String associationId);
 
       public Response listWorkflowAssociations(Integer limit, Integer offset, String filter);
 
-      public Response updateWorkflowAssociationStatus(Integer associationId, Status status);
+      public Response patchAssociation(String associationId, WorkflowAssociationPatch workflowAssociationPatch);
 }

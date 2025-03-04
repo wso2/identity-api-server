@@ -20,9 +20,9 @@ package org.wso2.carbon.identity.rest.api.server.workflow.engine.v1;
 
 import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.factories.WorkflowAssociationsApiServiceFactory;
 import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.model.Error;
-import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.model.Status;
 import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.model.WorkflowAssociation;
 import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.model.WorkflowAssociationCreation;
+import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.model.WorkflowAssociationPatch;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -47,7 +47,7 @@ public class WorkflowAssociationsApi  {
     
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Create a new workflow association.", notes = "Create a new workflow association by assigning a user operation to an existing workflow. ", response = WorkflowAssociation.class, authorizations = {
+    @ApiOperation(value = "Create a new workflow association.", notes = "Create a new workflow association by assigning a user operation to an existing workflow.  <b>Scope required:</b>             * internal_workflow_associations_create ", response = WorkflowAssociation.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -61,9 +61,9 @@ public class WorkflowAssociationsApi  {
         @ApiResponse(code = 409, message = "Item Already Exists", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response createWorkflowAssociation(@ApiParam(value = "Contains the details of the newly created workflow association." ,required=true) @Valid WorkflowAssociationCreation requestBody) {
+    public Response createWorkflowAssociation(@ApiParam(value = "Contains the details of the newly created workflow association." ,required=true) @Valid WorkflowAssociationCreation workflowAssociationCreation) {
 
-        return delegate.createWorkflowAssociation(requestBody );
+        return delegate.createWorkflowAssociation(workflowAssociationCreation );
     }
 
     @Valid
@@ -71,7 +71,7 @@ public class WorkflowAssociationsApi  {
     @Path("/{association-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete the workflow association by association id.", notes = "Delete a specific workflow association identified by the association. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete the workflow association by association id.", notes = "Delete a specific workflow association identified by the association ID.  <b>Scope required:</b>                     * internal_workflow_associations_view ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -85,9 +85,33 @@ public class WorkflowAssociationsApi  {
         @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response deleteWorkflowAssociationById(@ApiParam(value = "Workflow Association ID",required=true) @PathParam("association-id") Integer associationId) {
+    public Response deleteWorkflowAssociationById(@ApiParam(value = "Workflow Association ID",required=true) @PathParam("association-id") String associationId) {
 
         return delegate.deleteWorkflowAssociationById(associationId );
+    }
+
+    @Valid
+    @GET
+    @Path("/{association-id}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Get the workflow association by association id.", notes = "Get a specific workflow association identified by the association id.  <b>Scope required:</b>                     * internal_workflow_associations_view ", response = WorkflowAssociation.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={  })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Array of workflow associations matching the search criteria", response = WorkflowAssociation.class),
+        @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
+    })
+    public Response getWorkflowAssociationById(@ApiParam(value = "Workflow Association ID",required=true) @PathParam("association-id") String associationId) {
+
+        return delegate.getWorkflowAssociationById(associationId );
     }
 
     @Valid
@@ -95,7 +119,7 @@ public class WorkflowAssociationsApi  {
     
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve all the available workflow associations.", notes = "Retrieve all the available workflow associations in the system. ", response = WorkflowAssociation.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Retrieve all the available workflow associations.", notes = "Retrieve all the available workflow associations in the system.  <b>Scope required:</b>             * internal_workflow_associations_view ", response = WorkflowAssociation.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -115,27 +139,27 @@ public class WorkflowAssociationsApi  {
     }
 
     @Valid
-    @PUT
-    @Path("/{association-id}/status")
+    @PATCH
+    @Path("/{association-id}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update the status of a workflow association.", notes = "Enable or disable a specific workflow association. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Partially update association by ID ", notes = "Partially update an association by ID.<br>    <b>Scope required:</b> <br>       * internal_workflow_associations_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={  })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Item Updated", response = Void.class),
-        @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
+        @ApiResponse(code = 200, message = "Successfully Updated", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-        @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class),
-        @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
+        @ApiResponse(code = 409, message = "Conflict", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response updateWorkflowAssociationStatus(@ApiParam(value = "Workflow Association ID",required=true) @PathParam("association-id") Integer associationId, @ApiParam(value = "Status of the workflow association (enable/disable)" ) @Valid Status status) {
+    public Response patchAssociation(@ApiParam(value = "Workflow Association ID",required=true) @PathParam("association-id") String associationId, @ApiParam(value = "Represents the association details to be updated." ) @Valid WorkflowAssociationPatch workflowAssociationPatch) {
 
-        return delegate.updateWorkflowAssociationStatus(associationId,  status );
+        return delegate.patchAssociation(associationId,  workflowAssociationPatch );
     }
 
 }

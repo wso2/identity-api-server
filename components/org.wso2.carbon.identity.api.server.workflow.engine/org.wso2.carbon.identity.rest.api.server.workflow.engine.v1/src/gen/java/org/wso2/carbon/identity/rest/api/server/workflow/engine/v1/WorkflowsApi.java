@@ -47,7 +47,7 @@ public class WorkflowsApi  {
     
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Create a new workflow.", notes = "Create a new workflow using the specified workflow template and execution engine. ", response = WorkflowSummary.class, authorizations = {
+    @ApiOperation(value = "Create a new workflow.", notes = "Create a new workflow using the specified workflow template and execution engine.  <b>Scope required:</b>     * internal_workflow_create ", response = WorkflowSummary.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -61,9 +61,9 @@ public class WorkflowsApi  {
         @ApiResponse(code = 409, message = "Item Already Exists", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response createWorkflow(@ApiParam(value = "Contains the details of the newly created workflow." ,required=true) @Valid WorkflowCreation requestBody) {
+    public Response createWorkflow(@ApiParam(value = "Contains the details of the newly created." ,required=true) @Valid WorkflowCreation workflowCreation) {
 
-        return delegate.createWorkflow(requestBody );
+        return delegate.createWorkflow(workflowCreation );
     }
 
     @Valid
@@ -71,7 +71,7 @@ public class WorkflowsApi  {
     @Path("/{workflow-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete the workflow by workflow-id.", notes = "Delete a specific workflow identified by the workflow-id.      <b>Permission required:</b>     * /permission/admin/manage/humantask/viewtasks ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete the workflow by workflow-id.", notes = "Delete a specific workflow identified by the workflow-id    <b>Scope required:</b>   * internal_workflow_delete ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -95,7 +95,7 @@ public class WorkflowsApi  {
     @Path("/{workflow-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve the workflow by workflow id.", notes = "Retrieve information about a specific workflow identified by the workflow id.      <b>Permission required:</b>     * /permission/admin/manage/humantask/viewtasks ", response = DetailedWorkflow.class, authorizations = {
+    @ApiOperation(value = "Retrieve the workflow by workflow id.", notes = "Retrieve information about a specific workflow identified by the workflow id.  <b>Scope required:</b>     * internal_workflow_view ", response = DetailedWorkflow.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -119,7 +119,7 @@ public class WorkflowsApi  {
     
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve all the available workflows.", notes = "Retrieve all the available workflows in the system. ", response = WorkflowSummary.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Retrieve all the available workflows.", notes = "Retrieve all the available workflows in the system.  <b>Scope required:</b>     * internal_workflow_view ", response = WorkflowSummary.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -143,7 +143,7 @@ public class WorkflowsApi  {
     @Path("/{workflow-id}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update an existing workflow.", notes = "Update a workflow identified by workflow-id. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update an existing workflow.", notes = "Update a workflow identified by workflow-id.  <b>Scope required:</b>             * internal_workflow_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -157,9 +157,9 @@ public class WorkflowsApi  {
         @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response updateWorkflow(@ApiParam(value = "Workflow ID",required=true) @PathParam("workflow-id") String workflowId, @ApiParam(value = "Contains the details of the updated workflow." ) @Valid WorkflowCreation requestBody) {
+    public Response updateWorkflow(@ApiParam(value = "Workflow ID",required=true) @PathParam("workflow-id") String workflowId, @ApiParam(value = "Contains the details of the updated workflow." ) @Valid WorkflowCreation workflowCreation) {
 
-        return delegate.updateWorkflow(workflowId,  requestBody );
+        return delegate.updateWorkflow(workflowId,  workflowCreation );
     }
 
 }

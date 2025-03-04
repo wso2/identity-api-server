@@ -35,8 +35,8 @@ public class WorkflowCreation  {
   
     private String workflowName;
     private String workflowDescription;
-    private WorkflowTemplate workflowTemplate;
     private String workflowEngine;
+    private WorkflowTemplate workflowTemplate;
     private String approvalTask;
     private String approvalTaskDescription;
 
@@ -81,26 +81,6 @@ public class WorkflowCreation  {
     }
 
     /**
-    **/
-    public WorkflowCreation workflowTemplate(WorkflowTemplate workflowTemplate) {
-
-        this.workflowTemplate = workflowTemplate;
-        return this;
-    }
-    
-    @ApiModelProperty(required = true, value = "")
-    @JsonProperty("workflowTemplate")
-    @Valid
-    @NotNull(message = "Property workflowTemplate cannot be null.")
-
-    public WorkflowTemplate getWorkflowTemplate() {
-        return workflowTemplate;
-    }
-    public void setWorkflowTemplate(WorkflowTemplate workflowTemplate) {
-        this.workflowTemplate = workflowTemplate;
-    }
-
-    /**
     * Name of the selected workflow engine
     **/
     public WorkflowCreation workflowEngine(String workflowEngine) {
@@ -119,6 +99,24 @@ public class WorkflowCreation  {
     }
     public void setWorkflowEngine(String workflowEngine) {
         this.workflowEngine = workflowEngine;
+    }
+
+    /**
+    **/
+    public WorkflowCreation workflowTemplate(WorkflowTemplate workflowTemplate) {
+
+        this.workflowTemplate = workflowTemplate;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("workflowTemplate")
+    @Valid
+    public WorkflowTemplate getWorkflowTemplate() {
+        return workflowTemplate;
+    }
+    public void setWorkflowTemplate(WorkflowTemplate workflowTemplate) {
+        this.workflowTemplate = workflowTemplate;
     }
 
     /**
@@ -175,15 +173,15 @@ public class WorkflowCreation  {
         WorkflowCreation workflowCreation = (WorkflowCreation) o;
         return Objects.equals(this.workflowName, workflowCreation.workflowName) &&
             Objects.equals(this.workflowDescription, workflowCreation.workflowDescription) &&
-            Objects.equals(this.workflowTemplate, workflowCreation.workflowTemplate) &&
             Objects.equals(this.workflowEngine, workflowCreation.workflowEngine) &&
+            Objects.equals(this.workflowTemplate, workflowCreation.workflowTemplate) &&
             Objects.equals(this.approvalTask, workflowCreation.approvalTask) &&
             Objects.equals(this.approvalTaskDescription, workflowCreation.approvalTaskDescription);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(workflowName, workflowDescription, workflowTemplate, workflowEngine, approvalTask, approvalTaskDescription);
+        return Objects.hash(workflowName, workflowDescription, workflowEngine, workflowTemplate, approvalTask, approvalTaskDescription);
     }
 
     @Override
@@ -194,8 +192,8 @@ public class WorkflowCreation  {
         
         sb.append("    workflowName: ").append(toIndentedString(workflowName)).append("\n");
         sb.append("    workflowDescription: ").append(toIndentedString(workflowDescription)).append("\n");
-        sb.append("    workflowTemplate: ").append(toIndentedString(workflowTemplate)).append("\n");
         sb.append("    workflowEngine: ").append(toIndentedString(workflowEngine)).append("\n");
+        sb.append("    workflowTemplate: ").append(toIndentedString(workflowTemplate)).append("\n");
         sb.append("    approvalTask: ").append(toIndentedString(approvalTask)).append("\n");
         sb.append("    approvalTaskDescription: ").append(toIndentedString(approvalTaskDescription)).append("\n");
         sb.append("}");

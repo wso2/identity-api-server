@@ -35,8 +35,8 @@ public class DetailedWorkflow  {
   
     private String workflowName;
     private String workflowDescription;
-    private DetailedWorkflowTemplate workflowTemplate;
     private String workflowEngine;
+    private DetailedWorkflowTemplate workflowTemplate;
     private String approvalTask;
     private String approvalTaskDescription;
 
@@ -49,11 +49,9 @@ public class DetailedWorkflow  {
         return this;
     }
     
-    @ApiModelProperty(example = "User Registration Workflow", required = true, value = "Name of the created workflow")
+    @ApiModelProperty(example = "User Registration Workflow", value = "Name of the created workflow")
     @JsonProperty("workflowName")
     @Valid
-    @NotNull(message = "Property workflowName cannot be null.")
-
     public String getWorkflowName() {
         return workflowName;
     }
@@ -81,6 +79,25 @@ public class DetailedWorkflow  {
     }
 
     /**
+    * Name of the selected workflow engine
+    **/
+    public DetailedWorkflow workflowEngine(String workflowEngine) {
+
+        this.workflowEngine = workflowEngine;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "Simple Workflow Engine", value = "Name of the selected workflow engine")
+    @JsonProperty("workflowEngine")
+    @Valid
+    public String getWorkflowEngine() {
+        return workflowEngine;
+    }
+    public void setWorkflowEngine(String workflowEngine) {
+        this.workflowEngine = workflowEngine;
+    }
+
+    /**
     **/
     public DetailedWorkflow workflowTemplate(DetailedWorkflowTemplate workflowTemplate) {
 
@@ -99,27 +116,6 @@ public class DetailedWorkflow  {
     }
 
     /**
-    * Name of the selected workflow engine
-    **/
-    public DetailedWorkflow workflowEngine(String workflowEngine) {
-
-        this.workflowEngine = workflowEngine;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "Simple Workflow Engine", required = true, value = "Name of the selected workflow engine")
-    @JsonProperty("workflowEngine")
-    @Valid
-    @NotNull(message = "Property workflowEngine cannot be null.")
-
-    public String getWorkflowEngine() {
-        return workflowEngine;
-    }
-    public void setWorkflowEngine(String workflowEngine) {
-        this.workflowEngine = workflowEngine;
-    }
-
-    /**
     * Approval task subject to display
     **/
     public DetailedWorkflow approvalTask(String approvalTask) {
@@ -128,11 +124,9 @@ public class DetailedWorkflow  {
         return this;
     }
     
-    @ApiModelProperty(example = "User Registration Approval", required = true, value = "Approval task subject to display")
+    @ApiModelProperty(example = "User Registration Approval", value = "Approval task subject to display")
     @JsonProperty("approvalTask")
     @Valid
-    @NotNull(message = "Property approvalTask cannot be null.")
-
     public String getApprovalTask() {
         return approvalTask;
     }
@@ -173,15 +167,15 @@ public class DetailedWorkflow  {
         DetailedWorkflow detailedWorkflow = (DetailedWorkflow) o;
         return Objects.equals(this.workflowName, detailedWorkflow.workflowName) &&
             Objects.equals(this.workflowDescription, detailedWorkflow.workflowDescription) &&
-            Objects.equals(this.workflowTemplate, detailedWorkflow.workflowTemplate) &&
             Objects.equals(this.workflowEngine, detailedWorkflow.workflowEngine) &&
+            Objects.equals(this.workflowTemplate, detailedWorkflow.workflowTemplate) &&
             Objects.equals(this.approvalTask, detailedWorkflow.approvalTask) &&
             Objects.equals(this.approvalTaskDescription, detailedWorkflow.approvalTaskDescription);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(workflowName, workflowDescription, workflowTemplate, workflowEngine, approvalTask, approvalTaskDescription);
+        return Objects.hash(workflowName, workflowDescription, workflowEngine, workflowTemplate, approvalTask, approvalTaskDescription);
     }
 
     @Override
@@ -192,8 +186,8 @@ public class DetailedWorkflow  {
         
         sb.append("    workflowName: ").append(toIndentedString(workflowName)).append("\n");
         sb.append("    workflowDescription: ").append(toIndentedString(workflowDescription)).append("\n");
-        sb.append("    workflowTemplate: ").append(toIndentedString(workflowTemplate)).append("\n");
         sb.append("    workflowEngine: ").append(toIndentedString(workflowEngine)).append("\n");
+        sb.append("    workflowTemplate: ").append(toIndentedString(workflowTemplate)).append("\n");
         sb.append("    approvalTask: ").append(toIndentedString(approvalTask)).append("\n");
         sb.append("    approvalTaskDescription: ").append(toIndentedString(approvalTaskDescription)).append("\n");
         sb.append("}");

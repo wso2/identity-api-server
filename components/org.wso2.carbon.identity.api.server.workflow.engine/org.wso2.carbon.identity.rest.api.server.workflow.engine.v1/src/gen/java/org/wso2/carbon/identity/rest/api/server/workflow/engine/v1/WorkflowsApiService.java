@@ -24,7 +24,7 @@ import javax.ws.rs.core.Response;
 
 public interface WorkflowsApiService {
 
-      public Response createWorkflow(WorkflowCreation requestBody);
+      public Response createWorkflow(WorkflowCreation workflowCreation);
 
       public Response deleteWorkflowById(String workflowId);
 
@@ -32,5 +32,5 @@ public interface WorkflowsApiService {
 
       public Response listWorkflows(Integer limit, Integer offset, String filter);
 
-      public Response updateWorkflow(String workflowId, WorkflowCreation requestBody);
+      public Response updateWorkflow(String workflowId, WorkflowCreation workflowCreation);
 }
