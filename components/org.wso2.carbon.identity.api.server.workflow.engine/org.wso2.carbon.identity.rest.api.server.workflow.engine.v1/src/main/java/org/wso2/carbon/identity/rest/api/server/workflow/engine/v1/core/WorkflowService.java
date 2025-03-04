@@ -34,6 +34,7 @@ import org.wso2.carbon.identity.workflow.mgt.bean.Workflow;
 import org.wso2.carbon.identity.workflow.mgt.dao.WorkflowDAO;
 import org.wso2.carbon.identity.workflow.mgt.dto.Association;
 import org.wso2.carbon.identity.workflow.mgt.dto.Template;
+import org.wso2.carbon.identity.workflow.mgt.dto.WorkflowEvent;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowClientException;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowException;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowRuntimeException;
@@ -240,11 +241,8 @@ public class WorkflowService {
 //            WorkflowServiceDataHolder.getInstance().getWorkflowService()
 //                    .addWorkflow(workflowBean, parameterList, tenantId);
 
-            try {
-                workflowManagementService.addWorkflow(workflowBean, parameterList, tenantId);
-            } catch (NullPointerException e) {
-                throw new WorkflowException(e.getMessage());
-            }
+
+            workflowManagementService.addWorkflow(workflowBean, parameterList, tenantId);
 
             workflowSummary = getWorkflow(workflowBean);
 
@@ -501,12 +499,24 @@ public class WorkflowService {
         try {
 //            WorkflowServiceDataHolder.getInstance().getWorkflowService()
 //                    .addAssociation(associationName, workflowId, eventId, condition);
+            Workflow workflowBean = workflowManagementService.getWorkflow(workflowId);
+
+            WorkflowEvent event = workflowManagementService.getEvent(eventId);
+
+            if (workflowBean == null) {
+                throw new WorkflowClientException("Invalid workflow ID provided.");
+            }
+
+            if (event == null) {
+                throw new WorkflowClientException("Invalid event ID provided.");
+            }
+
             workflowManagementService.addAssociation(associationName, workflowId, eventId, condition);
             return "Workflow Association successfully added!";
 
-        } catch (WorkflowRuntimeException e) {
-            log.error("Error when adding association " + associationName, e);
-            return "Error when adding association" + associationName;
+        } catch (WorkflowClientException e) {
+
+            throw handleClientError(e.getErrorCode(), e.getMessage(), "", e);
         } catch (WorkflowException e) {
 //            log.error("Server error when adding association of workflow " + workflowId + " with " + eventId, e);
 //            return "Server error when adding association of workflow" + workflowId + " with " + eventId;
