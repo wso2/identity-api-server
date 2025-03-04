@@ -43,9 +43,11 @@ public class OptionDetails  {
         return this;
     }
     
-    @ApiModelProperty(example = "roles", value = "")
+    @ApiModelProperty(example = "roles", required = true, value = "")
     @JsonProperty("entity")
     @Valid
+    @NotNull(message = "Property entity cannot be null.")
+
     public String getEntity() {
         return entity;
     }
@@ -61,9 +63,11 @@ public class OptionDetails  {
         return this;
     }
     
-    @ApiModelProperty(example = "admin", value = "")
+    @ApiModelProperty(example = "admin", required = true, value = "")
     @JsonProperty("values")
     @Valid
+    @NotNull(message = "Property values cannot be null.")
+
     public String getValues() {
         return values;
     }

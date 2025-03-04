@@ -34,8 +34,9 @@ public class WorkflowAssociation  {
   
     private String id;
     private String workflowAssociationName;
-    private String operation;
+    private String operationName;
     private String workflowName;
+    private String associationCondition;
     private Boolean isEnabled;
 
     /**
@@ -79,20 +80,20 @@ public class WorkflowAssociation  {
     /**
     * User Operation
     **/
-    public WorkflowAssociation operation(String operation) {
+    public WorkflowAssociation operationName(String operationName) {
 
-        this.operation = operation;
+        this.operationName = operationName;
         return this;
     }
     
     @ApiModelProperty(example = "Add User", value = "User Operation")
-    @JsonProperty("operation")
+    @JsonProperty("operationName")
     @Valid
-    public String getOperation() {
-        return operation;
+    public String getOperationName() {
+        return operationName;
     }
-    public void setOperation(String operation) {
-        this.operation = operation;
+    public void setOperationName(String operationName) {
+        this.operationName = operationName;
     }
 
     /**
@@ -112,6 +113,25 @@ public class WorkflowAssociation  {
     }
     public void setWorkflowName(String workflowName) {
         this.workflowName = workflowName;
+    }
+
+    /**
+    * Assigned Association Condition
+    **/
+    public WorkflowAssociation associationCondition(String associationCondition) {
+
+        this.associationCondition = associationCondition;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "Role equals Manager", value = "Assigned Association Condition")
+    @JsonProperty("associationCondition")
+    @Valid
+    public String getAssociationCondition() {
+        return associationCondition;
+    }
+    public void setAssociationCondition(String associationCondition) {
+        this.associationCondition = associationCondition;
     }
 
     /**
@@ -147,14 +167,15 @@ public class WorkflowAssociation  {
         WorkflowAssociation workflowAssociation = (WorkflowAssociation) o;
         return Objects.equals(this.id, workflowAssociation.id) &&
             Objects.equals(this.workflowAssociationName, workflowAssociation.workflowAssociationName) &&
-            Objects.equals(this.operation, workflowAssociation.operation) &&
+            Objects.equals(this.operationName, workflowAssociation.operationName) &&
             Objects.equals(this.workflowName, workflowAssociation.workflowName) &&
+            Objects.equals(this.associationCondition, workflowAssociation.associationCondition) &&
             Objects.equals(this.isEnabled, workflowAssociation.isEnabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, workflowAssociationName, operation, workflowName, isEnabled);
+        return Objects.hash(id, workflowAssociationName, operationName, workflowName, associationCondition, isEnabled);
     }
 
     @Override
@@ -165,8 +186,9 @@ public class WorkflowAssociation  {
         
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    workflowAssociationName: ").append(toIndentedString(workflowAssociationName)).append("\n");
-        sb.append("    operation: ").append(toIndentedString(operation)).append("\n");
+        sb.append("    operationName: ").append(toIndentedString(operationName)).append("\n");
         sb.append("    workflowName: ").append(toIndentedString(workflowName)).append("\n");
+        sb.append("    associationCondition: ").append(toIndentedString(associationCondition)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
         sb.append("}");
         return sb.toString();

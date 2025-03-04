@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.rest.api.server.workflow.engine.v1;
 
+import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.factories.WorkflowEnginesApiServiceFactory;
 import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.model.Error;
 import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.model.WorkflowEngine;
 
@@ -32,13 +33,18 @@ import io.swagger.annotations.*;
 
 public class WorkflowEnginesApi  {
 
-    private WorkflowEnginesApiService delegate;
+    private final WorkflowEnginesApiService delegate;
+
+    public WorkflowEnginesApi(){
+
+        this.delegate = WorkflowEnginesApiServiceFactory.getWorkflowEnginesApi();
+    }
 
     @Valid
     @GET
     
     
-    @Produces({ "*/*", "application/json" })
+    @Produces({ "application/json" })
     @ApiOperation(value = "Retrieve all the available workflow engines.", notes = "Retrieve metadata information of all the workflow engines in the system. ", response = WorkflowEngine.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {

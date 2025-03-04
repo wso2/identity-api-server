@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -22,6 +22,7 @@ import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.*;
 import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.core.WorkflowService;
 import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.factories.WorkflowServiceFactory;
 import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.model.*;
+import java.util.List;
 
 import javax.ws.rs.core.Response;
 
@@ -34,14 +35,14 @@ public class WorkflowsApiServiceImpl implements WorkflowsApiService {
         try {
             this.workflowService = WorkflowServiceFactory.getWorkflowService();
         } catch (IllegalStateException e) {
-            throw new RuntimeException("Error occurred while initiating Workflow.", e);
+            throw new RuntimeException("Error occurred while initiating WorkflowService.", e);
         }
     }
 
     @Override
-    public Response createWorkflow(WorkflowCreation requestBody) {
+    public Response createWorkflow(WorkflowCreation workflowCreation) {
 
-        return Response.ok().entity(workflowService.addWorkflow(requestBody, null)).build();
+        return Response.ok().entity(workflowService.addWorkflow(workflowCreation, null)).build();
     }
 
     @Override
@@ -63,8 +64,8 @@ public class WorkflowsApiServiceImpl implements WorkflowsApiService {
     }
 
     @Override
-    public Response updateWorkflow(String workflowId, WorkflowCreation requestBody) {
+    public Response updateWorkflow(String workflowId, WorkflowCreation workflowCreation) {
 
-        return Response.ok().entity(workflowService.addWorkflow(requestBody, workflowId)).build();
+        return Response.ok().entity(workflowService.addWorkflow(workflowCreation, workflowId)).build();
     }
 }

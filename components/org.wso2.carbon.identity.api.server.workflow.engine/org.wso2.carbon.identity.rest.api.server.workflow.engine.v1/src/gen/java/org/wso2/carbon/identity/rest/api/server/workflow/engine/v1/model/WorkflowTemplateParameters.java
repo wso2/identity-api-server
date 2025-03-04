@@ -47,9 +47,11 @@ public class WorkflowTemplateParameters  {
         return this;
     }
     
-    @ApiModelProperty(example = "1", value = "")
+    @ApiModelProperty(example = "1", required = true, value = "")
     @JsonProperty("steps")
     @Valid
+    @NotNull(message = "Property steps cannot be null.")
+
     public Integer getSteps() {
         return steps;
     }
@@ -67,7 +69,7 @@ public class WorkflowTemplateParameters  {
     
     @ApiModelProperty(example = "[{\"entity\":\"roles\",\"values\":\"admin\"},{\"entity\":\"users\",\"values\":\"John\"}]", value = "")
     @JsonProperty("options")
-    @Valid @Size(min=2)
+    @Valid @Size(min=1)
     public List<OptionDetails> getOptions() {
         return options;
     }

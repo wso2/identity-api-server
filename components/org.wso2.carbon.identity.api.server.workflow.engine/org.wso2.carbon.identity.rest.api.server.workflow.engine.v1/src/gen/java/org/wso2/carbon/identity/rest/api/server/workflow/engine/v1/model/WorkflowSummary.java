@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -35,8 +35,8 @@ public class WorkflowSummary  {
     private String id;
     private String workflowName;
     private String workflowDescription;
+    private String workflowEngine;
     private String workflowTemplate;
-    private String deployment;
 
     /**
     * Unique id to represent a workflow
@@ -96,6 +96,25 @@ public class WorkflowSummary  {
     }
 
     /**
+    * Category in which the workflow is deployed
+    **/
+    public WorkflowSummary workflowEngine(String workflowEngine) {
+
+        this.workflowEngine = workflowEngine;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "Simple Workflow Engine", value = "Category in which the workflow is deployed")
+    @JsonProperty("workflowEngine")
+    @Valid
+    public String getWorkflowEngine() {
+        return workflowEngine;
+    }
+    public void setWorkflowEngine(String workflowEngine) {
+        this.workflowEngine = workflowEngine;
+    }
+
+    /**
     * Template defining the approval process for the workflow
     **/
     public WorkflowSummary workflowTemplate(String workflowTemplate) {
@@ -114,25 +133,6 @@ public class WorkflowSummary  {
         this.workflowTemplate = workflowTemplate;
     }
 
-    /**
-    * Category in which the workflow is deployed
-    **/
-    public WorkflowSummary deployment(String deployment) {
-
-        this.deployment = deployment;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "ApprovalWorkflow", value = "Category in which the workflow is deployed")
-    @JsonProperty("deployment")
-    @Valid
-    public String getDeployment() {
-        return deployment;
-    }
-    public void setDeployment(String deployment) {
-        this.deployment = deployment;
-    }
-
 
 
     @Override
@@ -148,13 +148,13 @@ public class WorkflowSummary  {
         return Objects.equals(this.id, workflowSummary.id) &&
             Objects.equals(this.workflowName, workflowSummary.workflowName) &&
             Objects.equals(this.workflowDescription, workflowSummary.workflowDescription) &&
-            Objects.equals(this.workflowTemplate, workflowSummary.workflowTemplate) &&
-            Objects.equals(this.deployment, workflowSummary.deployment);
+            Objects.equals(this.workflowEngine, workflowSummary.workflowEngine) &&
+            Objects.equals(this.workflowTemplate, workflowSummary.workflowTemplate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, workflowName, workflowDescription, workflowTemplate, deployment);
+        return Objects.hash(id, workflowName, workflowDescription, workflowEngine, workflowTemplate);
     }
 
     @Override
@@ -166,8 +166,8 @@ public class WorkflowSummary  {
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    workflowName: ").append(toIndentedString(workflowName)).append("\n");
         sb.append("    workflowDescription: ").append(toIndentedString(workflowDescription)).append("\n");
+        sb.append("    workflowEngine: ").append(toIndentedString(workflowEngine)).append("\n");
         sb.append("    workflowTemplate: ").append(toIndentedString(workflowTemplate)).append("\n");
-        sb.append("    deployment: ").append(toIndentedString(deployment)).append("\n");
         sb.append("}");
         return sb.toString();
     }

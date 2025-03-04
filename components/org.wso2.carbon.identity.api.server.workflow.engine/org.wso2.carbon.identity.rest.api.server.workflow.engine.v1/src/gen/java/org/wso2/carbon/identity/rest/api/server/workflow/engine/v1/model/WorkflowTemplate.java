@@ -48,9 +48,11 @@ public class WorkflowTemplate  {
         return this;
     }
     
-    @ApiModelProperty(example = "MultiStepApproval", value = "Name of the workflow template")
+    @ApiModelProperty(example = "MultiStepApproval", required = true, value = "Name of the workflow template")
     @JsonProperty("name")
     @Valid
+    @NotNull(message = "Property name cannot be null.")
+
     public String getName() {
         return name;
     }
