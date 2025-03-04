@@ -23,6 +23,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.identity.api.server.common.error.APIError;
+import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.model.*;
 import org.wso2.carbon.identity.workflow.mgt.WorkflowManagementAdminService;
 import org.wso2.carbon.identity.workflow.mgt.WorkflowManagementService;
@@ -32,10 +34,13 @@ import org.wso2.carbon.identity.workflow.mgt.bean.Workflow;
 import org.wso2.carbon.identity.workflow.mgt.dao.WorkflowDAO;
 import org.wso2.carbon.identity.workflow.mgt.dto.Association;
 import org.wso2.carbon.identity.workflow.mgt.dto.Template;
+import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowClientException;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowException;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowRuntimeException;
 import org.wso2.carbon.identity.workflow.mgt.internal.WorkflowServiceDataHolder;
+import org.wso2.carbon.identity.workflow.mgt.util.WFConstant;
 
+import javax.ws.rs.core.Response;
 import java.util.*;
 
 
@@ -43,7 +48,6 @@ public class WorkflowService {
 
     private static final Log log = LogFactory.getLog(WorkflowManagementAdminService.class);
     private final WorkflowManagementService workflowManagementService;
-    //WorkflowManagementService worWorkflowServiceHolder.
 
     public WorkflowService(WorkflowManagementService workflowManagementService){
 
@@ -63,7 +67,7 @@ public class WorkflowService {
             workflow.setWorkflowName(workflowBean.getWorkflowName());
             workflow.setWorkflowDescription(workflowBean.getWorkflowDescription());
             workflow.setWorkflowTemplate(workflowBean.getTemplateId());
-            workflow.setDeployment(workflowBean.getWorkflowImplId());
+            workflow.setWorkflowEngine(workflowBean.getWorkflowImplId());
         }
         return workflow;
     }
@@ -78,14 +82,16 @@ public class WorkflowService {
 
             association.setId(associationBean.getWorkflowId());
             association.setWorkflowAssociationName(associationBean.getAssociationName());
-            association.setOperation(associationBean.getEventName());
+            association.setOperationName(associationBean.getEventName());
             association.setWorkflowName(associationBean.getWorkflowName());
+            association.setAssociationCondition(associationBean.getCondition());
             association.setIsEnabled(associationBean.isEnabled());
         }
         return association;
     }
 
     private Parameter setWorkflowImplParameters(String workflowId, String paramName, String paramValue, String qName, String holder){
+
         Parameter parameter = new Parameter();
         parameter.setWorkflowId(workflowId);
         parameter.setParamName(paramName);
@@ -150,18 +156,25 @@ public class WorkflowService {
      * }
      *
      * @param workflow  Workflow details
+     * @param id Workflow ID
      * @throws WorkflowException
      */
-    public WorkflowSummary addWorkflow(WorkflowCreation workflow, String id)  {
+    public WorkflowSummary addWorkflow(WorkflowCreation workflow, String id) {
 
-        if (StringUtils.isBlank(id)) {
-            id = UUID.randomUUID().toString();
-        }
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
-        WorkflowSummary workflowSummary = new WorkflowSummary();
+        WorkflowSummary workflowSummary;
         Workflow workflowBean = new Workflow();
 
         try {
+            if (StringUtils.isBlank(id)) {
+                id = UUID.randomUUID().toString();
+            } else {
+                Workflow existingWorkflow = workflowManagementService.getWorkflow(id);
+
+                if (existingWorkflow == null) {
+                    throw new WorkflowClientException("Invalid workflow ID provided.");
+                }
+            }
             workflowBean.setWorkflowId(id);
             workflowBean.setWorkflowName(workflow.getWorkflowName());
             workflowBean.setWorkflowDescription(workflow.getWorkflowDescription());
@@ -187,9 +200,9 @@ public class WorkflowService {
 
             List<Parameter> parameterList = new ArrayList<>();
 
-            for (WorkflowTemplateParameters properties: templateProperties){
-                for (OptionDetails options: properties.getOptions() ){
-                    Parameter parameter = setWorkflowImplParameters(null, "UserAndRole", options.getValues(), "UserAndRole-step-" + properties.getStep() + "-" + options.getEntity(), "Template");
+            for (WorkflowTemplateParameters properties : templateProperties) {
+                for (OptionDetails options : properties.getOptions()) {
+                    Parameter parameter = setWorkflowImplParameters(null, "UserAndRole", options.getValues(), "UserAndRole-step-" + properties.getSteps() + "-" + options.getEntity(), "Template");
                     parameterList.add(parameter);
                 }
 
@@ -198,21 +211,21 @@ public class WorkflowService {
             // Setting up workflow impl parameter list
             Parameter taskParameterDesc;
             if (StringUtils.isBlank(id)) {
-                taskParameterDesc = setWorkflowImplParameters(null,"HTDescription" , workflow.getApprovalTaskDescription(), "HTDescription", "Workflowimpl" );
+                taskParameterDesc = setWorkflowImplParameters(null, "HTDescription", workflow.getApprovalTaskDescription(), "HTDescription", "Workflowimpl");
             } else {
-                taskParameterDesc = setWorkflowImplParameters(id,"HTDescription" , workflow.getApprovalTaskDescription(), "HTDescription", "Workflowimpl" );
+                taskParameterDesc = setWorkflowImplParameters(id, "HTDescription", workflow.getApprovalTaskDescription(), "HTDescription", "Workflowimpl");
             }
             parameterList.add(taskParameterDesc);
 
             Parameter taskParameterSubject;
             if (StringUtils.isBlank(id)) {
-                taskParameterSubject = setWorkflowImplParameters(null,"HTSubject" , workflow.getApprovalTask(), "HTSubject", "Workflowimpl" );
+                taskParameterSubject = setWorkflowImplParameters(null, "HTSubject", workflow.getApprovalTask(), "HTSubject", "Workflowimpl");
             } else {
-                taskParameterSubject = setWorkflowImplParameters(id,"HTSubject" , workflow.getApprovalTask(), "HTSubject", "Workflowimpl" );
+                taskParameterSubject = setWorkflowImplParameters(id, "HTSubject", workflow.getApprovalTask(), "HTSubject", "Workflowimpl");
             }
             parameterList.add(taskParameterSubject);
 
-            Parameter workflowParameter = setWorkflowImplParameters(id,"WorkflowName" , workflow.getWorkflowName(), "WorkflowName", "Workflowimpl" );
+            Parameter workflowParameter = setWorkflowImplParameters(id, "WorkflowName", workflow.getWorkflowName(), "WorkflowName", "Workflowimpl");
             parameterList.add(workflowParameter);
 
 //
@@ -226,17 +239,27 @@ public class WorkflowService {
 
 //            WorkflowServiceDataHolder.getInstance().getWorkflowService()
 //                    .addWorkflow(workflowBean, parameterList, tenantId);
-            workflowManagementService.addWorkflow(workflowBean, parameterList, tenantId);
+
+            try {
+                workflowManagementService.addWorkflow(workflowBean, parameterList, tenantId);
+            } catch (NullPointerException e) {
+                throw new WorkflowException(e.getMessage());
+            }
+
             workflowSummary = getWorkflow(workflowBean);
-        } catch (WorkflowRuntimeException e) {
-//            throw new WorkflowException(e.getMessage());
+
+        } catch (WorkflowClientException e){
+
+            throw handleClientError(e.getErrorCode(),e.getMessage(), "", e);
 
         } catch (WorkflowException e) {
-//            throw new WorkflowException("Server error occured when adding the workflow");
-        }
-        return getWorkflow(workflowBean);
-    }
 
+//            throw new WorkflowException("Server error occured when adding the workflow");
+            throw handleServerError(e.getErrorCode(),e.getMessage(), "", e);
+
+        }
+        return workflowSummary;
+    }
 
 
     /**
@@ -252,15 +275,23 @@ public class WorkflowService {
 //            Workflow workflowBean =
 //                    WorkflowServiceDataHolder.getInstance().getWorkflowService().getWorkflow(workflowId);
             Workflow workflowBean = workflowManagementService.getWorkflow(workflowId);
+
+            if (workflowBean == null) {
+                throw new WorkflowClientException("Invalid workflow ID provided.");
+            }
             List<Parameter> workflowParameters = workflowManagementService.getWorkflowParameters(workflowId);
 
             return getDetailedWorkflow(workflowBean, workflowParameters);
+        } catch (WorkflowClientException e){
+
+            throw handleClientError(e.getErrorCode(),e.getMessage(), "", e);
+
         } catch (WorkflowException e) {
 
-            log.error("Server error when retrieving workflow by the given id ", e);
+//            throw new WorkflowException("Server error occured when adding the workflow");
+            throw handleServerError(e.getErrorCode(),e.getMessage(), "", e);
 
         }
-        return null;
     }
 
     private DetailedWorkflow getDetailedWorkflow(Workflow workflowBean, List<Parameter> workflowParameters) throws WorkflowException{
@@ -287,7 +318,7 @@ public class WorkflowService {
 
                 // Check if there's already a WorkflowTemplateParameters object for this step
                 WorkflowTemplateParameters templateParameters = templateParamsMap.getOrDefault(stepNumber, new WorkflowTemplateParameters());
-                templateParameters.setStep(stepNumber);
+                templateParameters.setSteps(stepNumber);
 
                 // Create and add new OptionDetails
                 OptionDetails details = new OptionDetails();
@@ -350,12 +381,12 @@ public class WorkflowService {
                 WorkflowSummary workflowTmp = getWorkflow(workflow);
                 workflowSummaryList.add(workflowTmp);
             }
+            return workflowSummaryList.toArray(new WorkflowSummary[workflowSummaryList.size()]);
 
         } catch (WorkflowException e) {
-            log.error("Server error when retrieving available workflows ", e);
+            throw handleServerError(e.getErrorCode(),e.getMessage(), "", e);
 
         }
-        return workflowSummaryList.toArray(new WorkflowSummary[workflowSummaryList.size()]);
 
     }
 
@@ -369,16 +400,22 @@ public class WorkflowService {
     public WorkflowSummary removeWorkflow(String id) {
 
         try {
+
             //WorkflowServiceDataHolder.getInstance().getWorkflowService().removeWorkflow(id);
             WorkflowSummary workflow = getWorkflow(workflowManagementService.getWorkflow(id));
+            if (workflow == null) {
+                throw new WorkflowClientException("Invalid Workflow ID provided.");
+            }
             workflowManagementService.removeWorkflow(id);
 
             return workflow;
-        } catch (WorkflowException e) {
+        } catch (WorkflowClientException e) {
             //throw new WorkflowException("Server error occurred when removing workflow");
-            log.error("Error occurred when removing workflow with ID: " + id, e);
+            throw handleClientError(e.getErrorCode(),e.getMessage(), "", e);
+        } catch (WorkflowException e) {
+
+            throw handleServerError(e.getErrorCode(),e.getMessage(), "", e);
         }
-        return null;
     }
 
     /**
@@ -415,6 +452,7 @@ public class WorkflowService {
         } catch (WorkflowException e) {
 //            throw new WorkflowException(WFConstant.Exceptions.ERROR_LISTING_ASSOCIATIONS, e);
             log.error("Error occurred when retrieving all the available workflow associations", e);
+            throw handleServerError(e.getErrorCode(), e.getMessage(), "", e);
 
         }
         if (CollectionUtils.isEmpty(associations)) {
@@ -429,16 +467,23 @@ public class WorkflowService {
      * @param associationId  ID of association to remove
      * @throws WorkflowException
      */
-    public String removeAssociation(int associationId)  {
+    public String removeAssociation(String associationId) {
 
         try {
 //            WorkflowServiceDataHolder.getInstance().getWorkflowService()
 //                    .removeAssociation(Integer.parseInt(associationId));
-            workflowManagementService.removeAssociation(associationId);
+
+            Association association = workflowManagementService.getAssociation(associationId);
+            if (association == null) {
+                throw new WorkflowClientException("Invalid Association ID provided.");
+            }
+            workflowManagementService.removeAssociation(Integer.parseInt(associationId));
             return "Workflow association successfully removed!";
-        } catch (WorkflowException e) {
-            log.error("Server error when removing association " + associationId, e);
-            return "Server error when removing association" + associationId;
+        } catch (WorkflowClientException e){
+            throw handleClientError(e.getErrorCode(),e.getMessage(), "", e);
+        }catch (WorkflowException e) {
+//            log.error("Server error when removing association " + associationId, e);
+            throw handleServerError(e.getErrorCode(), e.getMessage(), "", e);
         }
     }
 
@@ -463,39 +508,113 @@ public class WorkflowService {
             log.error("Error when adding association " + associationName, e);
             return "Error when adding association" + associationName;
         } catch (WorkflowException e) {
-            log.error("Server error when adding association of workflow " + workflowId + " with " + eventId, e);
-            return "Server error when adding association of workflow" + workflowId + " with " + eventId;
+//            log.error("Server error when adding association of workflow " + workflowId + " with " + eventId, e);
+//            return "Server error when adding association of workflow" + workflowId + " with " + eventId;
+            throw handleServerError(e.getErrorCode(), e.getMessage(), "", e);
         }
     }
 
     public String addAssociation(WorkflowAssociationCreation workflowAssociation){
+
         return addAssociation(workflowAssociation.getAssociationName(), workflowAssociation.getWorkflowId(), workflowAssociation.getOperationName(), workflowAssociation.getAssociationCondition());
     }
 
     /**
-     * Enable or disable association
-     *
+     * Get an association by ID
      * @param associationId  Association ID
-     * @param isEnable  New state
      * @throws WorkflowException
      */
-    private String changeAssociationState(String associationId, boolean isEnable) {
+    public WorkflowAssociation getAssociation(String associationId) {
+
+        WorkflowAssociation workflowAssociation = new WorkflowAssociation();
         try {
-//            WorkflowServiceDataHolder.getInstance().getWorkflowService()
-//                    .changeAssociationState(associationId, isEnable);
-            workflowManagementService.changeAssociationState(associationId, isEnable);
-        } catch (WorkflowRuntimeException e) {
-            log.error("Error when changing an association ", e);
+            Association association = workflowManagementService.getAssociation(associationId);
+            if (association == null) {
+                throw new WorkflowClientException("Invalid workflow association ID provided.");
+            }
+            return getAssociation(association);
+        } catch (WorkflowClientException e) {
+            throw handleClientError(e.getErrorCode(), e.getMessage(), "", e);
         } catch (WorkflowException e) {
-            log.error("Server error when changing state of association ", e);
+            throw handleServerError(e.getErrorCode(), e.getMessage(), "", e);
         }
-        return "Workflow Association Status successfully updated!";
+    }
+
+
+    private boolean getAssociationState(String associationId, Status status){
+
+        boolean isEnable;
+        try {
+
+            if (status == null) {
+
+                isEnable = workflowManagementService.getAssociation(associationId).isEnabled();
+            } else {
+                isEnable = (status.getAction() == ActionStatus.ENABLE);
+            }
+            return isEnable;
+
+        } catch (WorkflowException e) {
+            throw handleServerError(e.getErrorCode(),e.getMessage(), "", e);
+        }
+    }
+
+    /**
+     * Partially update an association
+     *
+     * @param associationId  Association ID
+     * @param workflowAssociation  Association Details
+     * @throws WorkflowException
+     */
+    public String changeAssociation(String associationId, WorkflowAssociationPatch workflowAssociation){
+
+        try {
+            Association association = workflowManagementService.getAssociation(associationId);
+            if (association == null ) {
+                throw new WorkflowClientException("Invalid workflow association ID provided.");
+            }
+            boolean isEnable = getAssociationState(associationId, workflowAssociation.getAssociationStatus());
+            workflowManagementService.changeAssociation(associationId, workflowAssociation.getAssociationName(), workflowAssociation.getWorkflowId(), workflowAssociation.getOperationName(), workflowAssociation.getAssociationCondition(), isEnable);
+            return "Workflow association successfully updated!";
+
+        }  catch (WorkflowClientException e) {
+            throw handleClientError(e.getErrorCode(), e.getMessage(), "", e);
+        } catch (WorkflowException e) {
+            throw handleServerError(e.getErrorCode(), e.getMessage(), "", e);
+        }
+    }
+
+    private ErrorResponse.Builder getErrorBuilder(String errorCode, String errorMsg, String data) {
+
+        return new ErrorResponse.Builder().withCode(errorCode).withMessage(errorMsg)
+                .withDescription(includeData(errorMsg, data));
+    }
+
+    private static String includeData(String errorMsg, String data) {
+
+        String message = errorMsg;
+        if (data != null) {
+            message = String.format(errorMsg, data);
+        }
+        return message;
+    }
+
+    private APIError handleServerError(String errorCode, String errorMsg, String data, Exception e) {
+
+        ErrorResponse errorResponse = getErrorBuilder(errorCode, errorMsg, data).build(log,
+                e, includeData(errorMsg, data));
+
+        return new APIError(Response.Status.INTERNAL_SERVER_ERROR, errorResponse);
 
     }
-    public String changeAssociationState(Integer associationId, Status status){
-        boolean isEnable = (status.getAction() == ActionStatus.ENABLE);
-        String id = Integer.toString(associationId);
-        return changeAssociationState(id, isEnable);
+
+    private APIError handleClientError(String errorCode, String errorMsg, String data, WorkflowClientException e) {
+
+        ErrorResponse errorResponse = getErrorBuilder(errorCode, errorMsg, data).build(log,
+                e, includeData(errorMsg, data));
+
+        return new APIError(Response.Status.BAD_REQUEST, errorResponse);
+
     }
 
 }

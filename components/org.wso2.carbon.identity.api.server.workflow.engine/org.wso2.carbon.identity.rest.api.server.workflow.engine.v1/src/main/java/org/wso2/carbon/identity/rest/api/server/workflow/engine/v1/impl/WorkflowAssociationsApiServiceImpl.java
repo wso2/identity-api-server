@@ -22,7 +22,6 @@ import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.*;
 import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.core.WorkflowService;
 import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.factories.WorkflowServiceFactory;
 import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.model.*;
-import java.util.List;
 
 import javax.ws.rs.core.Response;
 
@@ -35,20 +34,26 @@ public class WorkflowAssociationsApiServiceImpl implements WorkflowAssociationsA
         try {
             this.workflowService = WorkflowServiceFactory.getWorkflowService();
         } catch (IllegalStateException e) {
-            throw new RuntimeException("Error occurred while initiating Workflow Service", e);
+            throw new RuntimeException("Error occurred while initiating WorkflowService.", e);
         }
     }
 
     @Override
-    public Response createWorkflowAssociation(WorkflowAssociationCreation requestBody) {
+    public Response createWorkflowAssociation(WorkflowAssociationCreation workflowAssociationCreation) {
 
-        return Response.ok().entity(workflowService.addAssociation(requestBody)).build();
+        return Response.ok().entity(workflowService.addAssociation(workflowAssociationCreation)).build();
     }
 
     @Override
-    public Response deleteWorkflowAssociationById(Integer associationId) {
+    public Response deleteWorkflowAssociationById(String associationId) {
 
         return Response.ok().entity(workflowService.removeAssociation(associationId)).build();
+    }
+
+    @Override
+    public Response getWorkflowAssociationById(String associationId) {
+
+        return Response.ok().entity(workflowService.getAssociation(associationId)).build();
     }
 
     @Override
@@ -58,8 +63,8 @@ public class WorkflowAssociationsApiServiceImpl implements WorkflowAssociationsA
     }
 
     @Override
-    public Response updateWorkflowAssociationStatus(Integer associationId, Status status) {
+    public Response patchAssociation(String associationId, WorkflowAssociationPatch workflowAssociationPatch) {
 
-        return Response.ok().entity(workflowService.changeAssociationState(associationId, status)).build();
+        return Response.ok().entity(workflowService.changeAssociation(associationId, workflowAssociationPatch)).build();
     }
 }
