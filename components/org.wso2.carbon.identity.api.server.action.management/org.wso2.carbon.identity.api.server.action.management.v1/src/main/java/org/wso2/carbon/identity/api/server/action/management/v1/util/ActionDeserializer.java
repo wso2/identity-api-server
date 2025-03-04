@@ -21,10 +21,7 @@ package org.wso2.carbon.identity.api.server.action.management.v1.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.wso2.carbon.identity.action.management.api.model.Action;
-import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
-import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
-import org.wso2.carbon.identity.api.server.action.management.v1.PreUpdatePasswordActionModel;
-import org.wso2.carbon.identity.api.server.action.management.v1.PreUpdatePasswordActionUpdateModel;
+import org.wso2.carbon.identity.api.server.action.management.v1.*;
 import org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants;
 
 import java.util.Set;
@@ -66,6 +63,13 @@ public class ActionDeserializer {
                     validateActionModel(preUpdatePasswordActionModel, PreUpdatePasswordActionModel.class);
                     actionModel = preUpdatePasswordActionModel;
                     break;
+                case PRE_UPDATE_PROFILE:
+                    PreUpdateProfileActionModel preUpdateProfileActionModel = objectMapper.readValue(jsonBody,
+                            PreUpdateProfileActionModel.class);
+                    // Validate the object
+                    validateActionModel(preUpdateProfileActionModel, PreUpdateProfileActionModel.class);
+                    actionModel = preUpdateProfileActionModel;
+                    break;
                 default:
                     break;
             }
@@ -101,6 +105,13 @@ public class ActionDeserializer {
                     // Validate the object
                     validateActionModel(preUpdatePasswordActionUpdateModel, PreUpdatePasswordActionUpdateModel.class);
                     actionUpdateModel = preUpdatePasswordActionUpdateModel;
+                    break;
+                case PRE_UPDATE_PROFILE:
+                    PreUpdateProfileActionUpdateModel preUpdateProfileActionUpdateModel =
+                            objectMapper.readValue(jsonBody, PreUpdateProfileActionUpdateModel.class);
+                    // Validate the object
+                    validateActionModel(preUpdateProfileActionUpdateModel, PreUpdateProfileActionUpdateModel.class);
+                    actionUpdateModel = preUpdateProfileActionUpdateModel;
                     break;
                 default:
                     break;
