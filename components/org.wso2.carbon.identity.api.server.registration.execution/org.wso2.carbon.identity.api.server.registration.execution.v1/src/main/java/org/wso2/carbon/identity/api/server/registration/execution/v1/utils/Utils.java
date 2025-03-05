@@ -27,9 +27,9 @@ import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
 import org.wso2.carbon.identity.api.server.registration.execution.v1.Component;
 import org.wso2.carbon.identity.api.server.registration.execution.v1.Data;
 import org.wso2.carbon.identity.api.server.registration.execution.v1.constants.RegistrationPortalEndpointConstants;
+import org.wso2.carbon.identity.user.registration.engine.exception.RegistrationEngineClientException;
+import org.wso2.carbon.identity.user.registration.engine.exception.RegistrationEngineException;
 import org.wso2.carbon.identity.user.registration.mgt.Constants;
-import org.wso2.carbon.identity.user.registration.mgt.exception.RegistrationClientException;
-import org.wso2.carbon.identity.user.registration.mgt.exception.RegistrationFrameworkException;
 import org.wso2.carbon.identity.user.registration.mgt.model.ComponentDTO;
 import org.wso2.carbon.identity.user.registration.mgt.model.DataDTO;
 
@@ -72,10 +72,10 @@ public class Utils {
      * @param e RegistrationFrameworkException.
      * @return APIError object.
      */
-    public static APIError handleRegistrationException(RegistrationFrameworkException e) {
+    public static APIError handleRegistrationException(RegistrationEngineException e) {
 
         Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
-        if (e instanceof RegistrationClientException) {
+        if (e instanceof RegistrationEngineClientException) {
             LOG.debug(e.getMessage(), e);
             status = Response.Status.BAD_REQUEST;
         } else {

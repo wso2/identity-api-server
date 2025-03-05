@@ -25,8 +25,8 @@ import org.wso2.carbon.identity.api.server.registration.execution.v1.Registratio
 import org.wso2.carbon.identity.api.server.registration.execution.v1.RegistrationSubmissionResponse;
 import org.wso2.carbon.identity.api.server.registration.execution.v1.utils.Utils;
 import org.wso2.carbon.identity.user.registration.engine.UserRegistrationFlowService;
+import org.wso2.carbon.identity.user.registration.engine.exception.RegistrationEngineException;
 import org.wso2.carbon.identity.user.registration.engine.model.RegistrationStep;
-import org.wso2.carbon.identity.user.registration.mgt.exception.RegistrationFrameworkException;
 
 import java.util.Map;
 
@@ -61,7 +61,7 @@ public class UserRegistrationFlowServiceCore {
                     .flowStatus(registrationStep.getFlowStatus())
                     .type(RegistrationSubmissionResponse.TypeEnum.valueOf(registrationStep.getStepType()))
                     .data(Utils.convertToData(registrationStep.getData(), registrationStep.getStepType()));
-        } catch (RegistrationFrameworkException e) {
+        } catch (RegistrationEngineException e) {
             throw Utils.handleRegistrationException(e);
         }
     }
@@ -90,7 +90,7 @@ public class UserRegistrationFlowServiceCore {
                     .flowStatus(registrationStep.getFlowStatus())
                     .type(RegistrationSubmissionResponse.TypeEnum.valueOf(registrationStep.getStepType()))
                     .data(Utils.convertToData(registrationStep.getData(), registrationStep.getStepType()));
-        } catch (RegistrationFrameworkException e) {
+        } catch (RegistrationEngineException e) {
             throw Utils.handleRegistrationException(e);
         }
     }
