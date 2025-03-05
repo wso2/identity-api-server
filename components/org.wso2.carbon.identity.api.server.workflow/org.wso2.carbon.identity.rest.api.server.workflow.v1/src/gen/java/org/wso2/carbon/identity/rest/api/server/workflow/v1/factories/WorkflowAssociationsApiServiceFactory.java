@@ -16,17 +16,18 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.factories;
+package org.wso2.carbon.identity.rest.api.server.workflow.v1.factories;
 
-import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.WorkflowAssociationsApiService;
-import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.impl.WorkflowAssociationsApiServiceImpl;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.WorkflowAssociationsApiService;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.impl.WorkflowAssociationsApiServiceImpl;
 
 public class WorkflowAssociationsApiServiceFactory {
 
    private final static WorkflowAssociationsApiService service = new WorkflowAssociationsApiServiceImpl();
 
-   public static WorkflowAssociationsApiService getWorkflowAssociationsApi()
-   {
+   public static WorkflowAssociationsApiService getWorkflowAssociationsApi() {
+
       return service;
+
    }
 }
