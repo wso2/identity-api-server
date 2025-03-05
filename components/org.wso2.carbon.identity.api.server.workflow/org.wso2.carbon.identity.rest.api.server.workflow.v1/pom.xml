@@ -19,13 +19,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
-        <artifactId>org.wso2.carbon.identity.api.server.workflow.engine</artifactId>
+        <artifactId>org.wso2.carbon.identity.api.server.workflow</artifactId>
         <relativePath>../pom.xml</relativePath>
         <version>1.3.84-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>org.wso2.carbon.identity.rest.api.server.workflow.engine.v1</artifactId>
+    <artifactId>org.wso2.carbon.identity.rest.api.server.workflow.v1</artifactId>
 
     <build>
         <plugins>
@@ -37,39 +37,39 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.openapitools</groupId>
-                <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>4.1.2</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/workflow-engine.yaml</inputSpec>
-                            <generatorName>org.wso2.carbon.codegen.CxfWso2Generator</generatorName>
-                            <configOptions>
-                                <sourceFolder>src/gen/java</sourceFolder>
-                                <apiPackage>org.wso2.carbon.identity.rest.api.server.workflow.engine.v1</apiPackage>
-                                <modelPackage>org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.model</modelPackage>
-                                <packageName>org.wso2.carbon.identity.rest.api.server.workflow.engine.v1</packageName>
-                                <dateLibrary>java8</dateLibrary>
-                                <hideGenerationTimestamp>true</hideGenerationTimestamp>
-                            </configOptions>
-                            <output>.</output>
-                            <skipOverwrite>false</skipOverwrite>
-                        </configuration>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.openapitools</groupId>
-                        <artifactId>cxf-wso2-openapi-generator</artifactId>
-                        <version>1.0.0</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.openapitools</groupId>-->
+<!--                <artifactId>openapi-generator-maven-plugin</artifactId>-->
+<!--                <version>4.1.2</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <goals>-->
+<!--                            <goal>generate</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <inputSpec>${project.basedir}/src/main/resources/workflow-engine.yaml</inputSpec>-->
+<!--                            <generatorName>org.wso2.carbon.codegen.CxfWso2Generator</generatorName>-->
+<!--                            <configOptions>-->
+<!--                                <sourceFolder>src/gen/java</sourceFolder>-->
+<!--                                <apiPackage>org.wso2.carbon.identity.rest.api.server.workflow.engine.v1</apiPackage>-->
+<!--                                <modelPackage>org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.model</modelPackage>-->
+<!--                                <packageName>org.wso2.carbon.identity.rest.api.server.workflow.engine.v1</packageName>-->
+<!--                                <dateLibrary>java8</dateLibrary>-->
+<!--                                <hideGenerationTimestamp>true</hideGenerationTimestamp>-->
+<!--                            </configOptions>-->
+<!--                            <output>.</output>-->
+<!--                            <skipOverwrite>false</skipOverwrite>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--                <dependencies>-->
+<!--                    <dependency>-->
+<!--                        <groupId>org.openapitools</groupId>-->
+<!--                        <artifactId>cxf-wso2-openapi-generator</artifactId>-->
+<!--                        <version>1.0.0</version>-->
+<!--                    </dependency>-->
+<!--                </dependencies>-->
+<!--            </plugin>-->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
@@ -163,13 +163,7 @@
             <groupId>org.wso2.carbon.identity.server.api</groupId>
             <artifactId>org.wso2.carbon.identity.api.server.common</artifactId>
             <scope>provided</scope>
-            <version>1.2.131</version>
         </dependency>
-        <!--<dependency>-->
-        <!--<groupId>org.wso2.carbon.identity.framework</groupId>-->
-        <!--<artifactId>org.wso2.carbon.identity.base</artifactId>-->
-        <!--<scope>provided</scope>-->
-        <!--</dependency>-->
-    </dependencies>
+        </dependencies>
 
 </project>

@@ -978,7 +978,7 @@
         <module>components/org.wso2.carbon.identity.api.server.rule.metadata</module>
         <module>components/org.wso2.carbon.identity.api.server.registration.management</module>
         <module>components/org.wso2.carbon.identity.api.server.registration.execution</module>
-        <module>components/org.wso2.carbon.identity.api.server.workflow.engine</module>
+        <module>components/org.wso2.carbon.identity.api.server.workflow</module>
     </modules>
 
 </project>
