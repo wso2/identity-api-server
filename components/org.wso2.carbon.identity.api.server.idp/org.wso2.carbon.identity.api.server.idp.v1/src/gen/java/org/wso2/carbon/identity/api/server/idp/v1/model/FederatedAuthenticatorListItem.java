@@ -35,6 +35,7 @@ public class FederatedAuthenticatorListItem  {
     private String authenticatorId;
     private String name;
     private Boolean isEnabled = false;
+    private String amrValue;
 
 @XmlType(name="DefinedByEnum")
 @XmlEnum(String.class)
@@ -152,6 +153,21 @@ public enum DefinedByEnum {
         this.tags = tags;
         return this;
     }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("amrValue")
+    @Valid
+    public String getAmrValue() {
+        return amrValue;
+    }
+    public void setAmrValue(String amrValue) {
+        this.amrValue = amrValue;
+    }
+
+    public FederatedAuthenticatorListItem amrValue(String amrValue) {
+        this.amrValue = amrValue;
+        return this;
+    }
     
     @ApiModelProperty(example = "[\"Social Login\",\"OIDC\"]", value = "")
     @JsonProperty("tags")
@@ -205,13 +221,14 @@ public enum DefinedByEnum {
             Objects.equals(this.name, federatedAuthenticatorListItem.name) &&
             Objects.equals(this.isEnabled, federatedAuthenticatorListItem.isEnabled) &&
             Objects.equals(this.definedBy, federatedAuthenticatorListItem.definedBy) &&
+                Objects.equals(this.amrValue, federatedAuthenticatorListItem.amrValue) &&
             Objects.equals(this.tags, federatedAuthenticatorListItem.tags) &&
             Objects.equals(this.self, federatedAuthenticatorListItem.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authenticatorId, name, isEnabled, definedBy, tags, self);
+        return Objects.hash(authenticatorId, name, isEnabled, definedBy, amrValue, tags, self);
     }
 
     @Override
@@ -224,6 +241,7 @@ public enum DefinedByEnum {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
         sb.append("    definedBy: ").append(toIndentedString(definedBy)).append("\n");
+        sb.append("    amrValue: ").append(toIndentedString(amrValue)).append("\n");
         sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");

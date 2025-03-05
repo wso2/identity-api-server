@@ -31,6 +31,7 @@ import org.wso2.carbon.identity.api.server.authenticators.v1.model.ConnectedApp;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.ConnectedApps;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Link;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.NameFilter;
+import org.wso2.carbon.identity.api.server.authenticators.v1.model.SystemLocalAuthenticatorUpdate;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.UserDefinedLocalAuthenticatorCreation;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.UserDefinedLocalAuthenticatorUpdate;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
@@ -275,6 +276,31 @@ public class ServerAuthenticatorManagementService {
                             LocalAuthenticatorConfigBuilderFactory.build(config, existingAuthenticator),
                             tenantDomain);
             return LocalAuthenticatorConfigBuilderFactory.build(updatedConfig);
+        } catch (AuthenticatorMgtException e) {
+            throw handleAuthenticatorException(e);
+        }
+    }
+
+    public SystemLocalAuthenticatorUpdate updateSystemLocalAuthenticator(String authenticatorId,
+                                                                         SystemLocalAuthenticatorUpdate systemConfig) {
+        try {
+            String authenticatorName = base64URLDecode(authenticatorId);
+            String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            LocalAuthenticatorConfig existingAuthenticator = applicationAuthenticatorService
+                    .getLocalAuthenticatorByName(authenticatorName, tenantDomain);
+            if (existingAuthenticator == null) {
+                AuthenticatorMgtError error = AuthenticatorMgtError.ERROR_CODE_ERROR_AUTHENTICATOR_NOT_FOUND;
+                throw handleAuthenticatorException(new AuthenticatorMgtClientException(error.getCode(),
+                                error.getMessage(), String.format(error.getMessage(), authenticatorName)),
+                        Response.Status.NOT_FOUND);
+            }
+//            existingAuthenticator.setAmrValue(systemConfig.getAmrValue());
+            LocalAuthenticatorConfig localAuthenticatorConfig = new LocalAuthenticatorConfig();
+            localAuthenticatorConfig.setName(systemConfig.getAmrValue());
+            LocalAuthenticatorConfig updatedConfig = applicationAuthenticatorService
+                    .updateAuthenticatorAmrValue(localAuthenticatorConfig, tenantDomain);
+
+            return LocalAuthenticatorConfigBuilderFactory.buildSystemLocalAuthenticator(updatedConfig);
         } catch (AuthenticatorMgtException e) {
             throw handleAuthenticatorException(e);
         }
@@ -628,7 +654,6 @@ public class ServerAuthenticatorManagementService {
         authenticator.setDisplayName(config.getDisplayName());
         authenticator.setIsEnabled(config.isEnabled());
         authenticator.setType(Authenticator.TypeEnum.LOCAL);
-
         authenticator.definedBy(Authenticator.DefinedByEnum.valueOf(config.getDefinedByType().toString()));
         if (AuthenticatorPropertyConstants.DefinedByType.USER.equals(config.getDefinedByType()) && config instanceof
                 UserDefinedLocalAuthenticatorConfig) {
@@ -636,6 +661,7 @@ public class ServerAuthenticatorManagementService {
             authenticator.setImage(userDefinedConfig.getImageUrl());
             authenticator.setDescription(userDefinedConfig.getDescription());
         }
+        authenticator.amrValue(config.getAmrValue());
         String[] tags = config.getTags();
         if (ArrayUtils.isNotEmpty(tags)) {
             authenticator.setTags(Arrays.asList(tags));

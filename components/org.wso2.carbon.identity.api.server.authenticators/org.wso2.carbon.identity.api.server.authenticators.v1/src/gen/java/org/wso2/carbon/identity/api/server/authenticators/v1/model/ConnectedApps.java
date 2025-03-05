@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -104,7 +104,7 @@ public class ConnectedApps  {
         this.links = links;
         return this;
     }
-    
+
     @ApiModelProperty(example = "[{\"href\":\"identity-provider/123e4567-e89b-12d3-a456-556642440000/connected-apps?offset=50&limit=10\",\"rel\":\"next\"},{\"href\":\"identity-provider/123e4567-e89b-12d3-a456-556642440000/connected-apps?offset=30&limit=10\",\"rel\":\"previous\"}]", value = "")
     @JsonProperty("links")
     @Valid
