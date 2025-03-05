@@ -16,18 +16,27 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.api.server.workflow.engine.common;
+package org.wso2.carbon.identity.api.server.workflow.common;
 
+import org.wso2.carbon.identity.workflow.impl.WorkflowImplServiceImpl;
 import org.wso2.carbon.identity.workflow.mgt.WorkflowManagementService;
 import org.wso2.carbon.identity.workflow.mgt.WorkflowManagementServiceImpl;
 
 public class WorkflowServiceHolder {
-    private final static WorkflowManagementService service = new WorkflowManagementServiceImpl();
 
-    public static WorkflowManagementService getWorkflowManagementService()
-    {
+    private final static WorkflowManagementService service = new WorkflowManagementServiceImpl();
+    private final static WorkflowImplServiceImpl implService = new WorkflowImplServiceImpl();
+
+    public static WorkflowManagementService getWorkflowManagementService() {
+
         return service;
+
     }
 
+    public static WorkflowImplServiceImpl getWorkflowImplService() {
+
+        return implService;
+
+    }
 
 }
