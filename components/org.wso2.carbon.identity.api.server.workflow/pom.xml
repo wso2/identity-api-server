@@ -25,12 +25,12 @@
     </parent>
     <packaging>pom</packaging>
     <modules>
-        <module>org.wso2.carbon.identity.api.server.workflow.engine.common</module>
-        <module>org.wso2.carbon.identity.rest.api.server.workflow.engine.v1</module>
+        <module>org.wso2.carbon.identity.api.server.workflow.common</module>
+        <module>org.wso2.carbon.identity.rest.api.server.workflow.v1</module>
     </modules>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>org.wso2.carbon.identity.api.server.workflow.engine</artifactId>
+    <artifactId>org.wso2.carbon.identity.api.server.workflow</artifactId>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>

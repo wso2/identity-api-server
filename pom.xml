@@ -948,7 +948,7 @@
         <module>components/org.wso2.carbon.identity.api.server.action.management</module>
         <module>components/org.wso2.carbon.identity.api.server.notification.template</module>
         <module>components/org.wso2.carbon.identity.api.server.rule.metadata</module>
-        <module>components/org.wso2.carbon.identity.api.server.workflow.engine</module>
+        <module>components/org.wso2.carbon.identity.api.server.workflow</module>
     </modules>
 
 </project>
