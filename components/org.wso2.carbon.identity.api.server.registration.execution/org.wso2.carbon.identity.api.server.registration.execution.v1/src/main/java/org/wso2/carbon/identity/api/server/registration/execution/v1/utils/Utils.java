@@ -148,6 +148,7 @@ public class Utils {
         return new Component()
                 .id(componentDTO.getId())
                 .type(componentDTO.getType())
+                .variant(componentDTO.getVariant())
                 .config(convertToMap(componentDTO.getConfigs()))
                 .components(componentDTO.getComponents() != null ? componentDTO.getComponents().stream()
                         .map(Utils::convertToComponent)

@@ -34,6 +34,7 @@ public class Component {
 
     private String id;
     private String type;
+    private String variant;
     private List<Component> components = null;
 
     private Object config;
@@ -80,6 +81,26 @@ public class Component {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    /**
+     * Specific component variant
+     **/
+    public Component variant(String variant) {
+
+        this.variant = variant;
+        return this;
+    }
+
+    @ApiModelProperty(example = "HEADING1", value = "Specific component variant")
+    @JsonProperty("variant")
+    @Valid
+    public String getVariant() {
+        return variant;
+    }
+
+    public void setVariant(String variant) {
+        this.variant = variant;
     }
 
     /**
@@ -143,13 +164,14 @@ public class Component {
         Component component = (Component) o;
         return Objects.equals(this.id, component.id) &&
                 Objects.equals(this.type, component.type) &&
+                Objects.equals(this.variant, component.variant) &&
                 Objects.equals(this.components, component.components) &&
                 Objects.equals(this.config, component.config);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, type, components, config);
+        return Objects.hash(id, type, variant, components, config);
     }
 
     @Override
@@ -160,6 +182,7 @@ public class Component {
 
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
+        sb.append("    variant: ").append(toIndentedString(variant)).append("\n");
         sb.append("    components: ").append(toIndentedString(components)).append("\n");
         sb.append("    config: ").append(toIndentedString(config)).append("\n");
         sb.append("}");

@@ -146,6 +146,10 @@ components:
           type: string
           description: Specific component type (e.g., INPUT, BUTTON)
           example: INPUT
+        variant:
+          type: string
+          description: Specific component variant
+          example: HEADING1
         components:
           type: array
           items:
