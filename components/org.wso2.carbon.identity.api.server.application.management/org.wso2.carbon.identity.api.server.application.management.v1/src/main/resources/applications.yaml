@@ -4541,21 +4541,6 @@ components:
             - For IN_PROGRESS status, an empty JSON object is returned.
             - For COMPLETED status, the authentication sequence is returned.
             - For FAILED status, an error message is returned.
-    Error:
-      type: object
-      properties:
-        code:
-          type: string
-          example: AAA-00000
-        message:
-          type: string
-          example: Some error message.
-        description:
-          type: string
-          example: Some error description.
-        traceId:
-          type: string
-          example: e0fbcfeb-3617-43c4-8dd0-7b7d38e13047
 servers:
   - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
     variables:
