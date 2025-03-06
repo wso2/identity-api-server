@@ -16,26 +16,26 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.rest.api.server.workflow.v1.impl;
+package org.wso2.carbon.identity.rest.api.server.workflow.v1.factories;
 
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.WorkflowEnginesApiService;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.core.WorkflowEngineService;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.factories.WorkflowEngineServiceFactory;
 
-import javax.ws.rs.core.Response;
+public class WorkflowEngineServiceFactory {
 
-public class WorkflowEnginesApiServiceImpl implements WorkflowEnginesApiService {
+    private static final WorkflowEngineService SERVICE;
 
-    private final WorkflowEngineService workflowEngineService;
-
-    public WorkflowEnginesApiServiceImpl() {
-
-        this.workflowEngineService = WorkflowEngineServiceFactory.getWorkflowEngineService();
+    static {
+        SERVICE = new WorkflowEngineService();
     }
 
-    @Override
-    public Response searchWorkFlowEngines() {
+    /**
+     * Get WorkflowEngineService.
+     *
+     * @return WorkflowEngineService.
+     */
+    public static WorkflowEngineService getWorkflowEngineService() {
 
-        return Response.ok().entity(workflowEngineService.listWorkflowEngines()).build();
+        return SERVICE;
     }
+
 }
