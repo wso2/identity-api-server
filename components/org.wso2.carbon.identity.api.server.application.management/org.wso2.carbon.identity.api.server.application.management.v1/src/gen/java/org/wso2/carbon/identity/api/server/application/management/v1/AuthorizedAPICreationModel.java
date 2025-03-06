@@ -49,7 +49,7 @@ public class AuthorizedAPICreationModel  {
         return this;
     }
     
-    @ApiModelProperty(example = "012df-232gf-545fg-dff23", value = "")
+    @ApiModelProperty(example = "65b52595-9ca1-4539-aca2-56178643c58b", value = "")
     @JsonProperty("id")
     @Valid
     public String getId() {

@@ -161,7 +161,7 @@ public enum AccessEnum {
         return this;
     }
 
-    @ApiModelProperty(example = "This is the application version.", value = "")
+    @ApiModelProperty(example = "v1.0.0", value = "")
     @JsonProperty("applicationVersion")
     @Valid
     public String getApplicationVersion() {

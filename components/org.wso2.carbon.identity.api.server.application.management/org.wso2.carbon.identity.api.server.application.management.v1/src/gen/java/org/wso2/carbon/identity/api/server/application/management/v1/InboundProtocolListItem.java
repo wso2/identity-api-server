@@ -84,7 +84,7 @@ public class InboundProtocolListItem  {
         return this;
     }
     
-    @ApiModelProperty(example = "/t/carbon.super/api/server/v1/applications/29048810-1447-4ea0-a348-30d15ab65fa3/inbound-protocols/saml", required = true, value = "")
+    @ApiModelProperty(example = "/api/server/v1/applications/29048810-1447-4ea0-a348-30d15ab65fa3/inbound-protocols/saml", required = true, value = "")
     @JsonProperty("self")
     @Valid
     @NotNull(message = "Property self cannot be null.")
