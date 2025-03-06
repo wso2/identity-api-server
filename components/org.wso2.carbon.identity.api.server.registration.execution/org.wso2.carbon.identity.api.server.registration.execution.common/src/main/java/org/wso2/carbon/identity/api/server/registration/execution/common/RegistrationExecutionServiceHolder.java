@@ -19,14 +19,15 @@
 package org.wso2.carbon.identity.api.server.registration.execution.common;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.governance.IdentityGovernanceService;
 import org.wso2.carbon.identity.user.registration.engine.UserRegistrationFlowService;
 
 /**
  * Holder class for UserRegistrationMgtService.
  */
-public class UserRegistrationMgtServiceHolder {
+public class RegistrationExecutionServiceHolder {
 
-    private UserRegistrationMgtServiceHolder() {
+    private RegistrationExecutionServiceHolder() {
     }
 
     private static class UserRegistrationMgtServiceHolderInstance {
@@ -34,6 +35,12 @@ public class UserRegistrationMgtServiceHolder {
         private static final UserRegistrationFlowService INSTANCE = (UserRegistrationFlowService)
                 PrivilegedCarbonContext.getThreadLocalCarbonContext()
                         .getOSGiService(UserRegistrationFlowService.class, null);
+    }
+
+    private static class IdentityGovernanceServiceHolder {
+
+        private static final IdentityGovernanceService SERVICE = (IdentityGovernanceService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(IdentityGovernanceService.class, null);
     }
 
     /**
@@ -44,5 +51,15 @@ public class UserRegistrationMgtServiceHolder {
     public static UserRegistrationFlowService getInstance() {
 
         return UserRegistrationMgtServiceHolderInstance.INSTANCE;
+    }
+
+    /**
+     * Get IdentityGovernanceService osgi service.
+     *
+     * @return IdentityGovernanceService
+     */
+    public static IdentityGovernanceService getIdentityGovernanceService() {
+
+        return IdentityGovernanceServiceHolder.SERVICE;
     }
 }

@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.registration.execution.v1.factories;
 
-import org.wso2.carbon.identity.api.server.registration.execution.common.UserRegistrationMgtServiceHolder;
+import org.wso2.carbon.identity.api.server.registration.execution.common.RegistrationExecutionServiceHolder;
 import org.wso2.carbon.identity.api.server.registration.execution.v1.core.UserRegistrationFlowServiceCore;
 import org.wso2.carbon.identity.user.registration.engine.UserRegistrationFlowService;
 
@@ -30,7 +30,7 @@ public class UserRegistrationFlowServiceFactory {
     private static final UserRegistrationFlowServiceCore SERVICE;
 
     static {
-        UserRegistrationFlowService userRegistrationMgtService = UserRegistrationMgtServiceHolder.getInstance();
+        UserRegistrationFlowService userRegistrationMgtService = RegistrationExecutionServiceHolder.getInstance();
         if (userRegistrationMgtService == null) {
             throw new IllegalStateException("UserRegistrationMgtService is not available from OSGi context.");
         }

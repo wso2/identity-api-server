@@ -24,11 +24,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
+import org.wso2.carbon.identity.api.server.registration.execution.common.RegistrationExecutionServiceHolder;
 import org.wso2.carbon.identity.api.server.registration.execution.v1.Component;
 import org.wso2.carbon.identity.api.server.registration.execution.v1.Data;
-import org.wso2.carbon.identity.api.server.registration.execution.v1.constants.RegistrationPortalEndpointConstants;
+import org.wso2.carbon.identity.api.server.registration.execution.v1.constants.RegistrationExecutionEndpointConstants;
+import org.wso2.carbon.identity.application.common.model.Property;
+import org.wso2.carbon.identity.governance.IdentityGovernanceException;
+import org.wso2.carbon.identity.governance.IdentityGovernanceService;
 import org.wso2.carbon.identity.user.registration.engine.exception.RegistrationEngineClientException;
 import org.wso2.carbon.identity.user.registration.engine.exception.RegistrationEngineException;
+import org.wso2.carbon.identity.user.registration.engine.exception.RegistrationEngineServerException;
 import org.wso2.carbon.identity.user.registration.mgt.Constants;
 import org.wso2.carbon.identity.user.registration.mgt.model.ComponentDTO;
 import org.wso2.carbon.identity.user.registration.mgt.model.DataDTO;
@@ -39,6 +44,9 @@ import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER;
+import static org.wso2.carbon.identity.api.server.registration.execution.v1.constants.RegistrationExecutionEndpointConstants.DYNAMIC_REGISTRATION_PORTAL_ENABLED;
+import static org.wso2.carbon.identity.api.server.registration.execution.v1.constants.RegistrationExecutionEndpointConstants.ErrorMessage.ERROR_CODE_DYNAMIC_REGISTRATION_PORTAL_DISABLED;
+import static org.wso2.carbon.identity.api.server.registration.execution.v1.constants.RegistrationExecutionEndpointConstants.ErrorMessage.ERROR_CODE_GET_GOVERNANCE_CONFIG;
 
 /**
  * Utility class for registration execution API.
@@ -83,7 +91,7 @@ public class Utils {
         }
         String errorCode = e.getErrorCode();
         errorCode = errorCode.contains(ERROR_CODE_DELIMITER) ? errorCode :
-                RegistrationPortalEndpointConstants.REGISTRATION_FLOW_PREFIX + errorCode;
+                RegistrationExecutionEndpointConstants.REGISTRATION_FLOW_PREFIX + errorCode;
         return handleException(status, errorCode, e.getMessage(), e.getDescription());
     }
 
@@ -102,6 +110,32 @@ public class Utils {
         error.setMessage(errorMessage);
         error.setDescription(errorDescription);
         return error;
+    }
+
+    /**
+     * Checks whether the dynamic registration portal is enabled.
+     *
+     * @param tenantDomain Tenant domain.
+     */
+    public static void isDynamicRegistrationPortalEnabled(String tenantDomain) {
+
+        try {
+            IdentityGovernanceService identityGovernanceService =
+                    RegistrationExecutionServiceHolder.getIdentityGovernanceService();
+            Property[] connectorConfigs = identityGovernanceService.getConfiguration(
+                    new String[]{DYNAMIC_REGISTRATION_PORTAL_ENABLED}, tenantDomain);
+            if (!Boolean.parseBoolean(connectorConfigs[0].getValue())) {
+                throw handleRegistrationException(new RegistrationEngineClientException(
+                        ERROR_CODE_DYNAMIC_REGISTRATION_PORTAL_DISABLED.getCode(),
+                        ERROR_CODE_DYNAMIC_REGISTRATION_PORTAL_DISABLED.getMessage(),
+                        ERROR_CODE_DYNAMIC_REGISTRATION_PORTAL_DISABLED.getDescription()));
+            }
+        } catch (IdentityGovernanceException e) {
+            throw handleRegistrationException(new RegistrationEngineServerException(
+                    ERROR_CODE_GET_GOVERNANCE_CONFIG.getCode(),
+                    ERROR_CODE_GET_GOVERNANCE_CONFIG.getMessage(),
+                    ERROR_CODE_GET_GOVERNANCE_CONFIG.getDescription(), e));
+        }
     }
 
     /**
