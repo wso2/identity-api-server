@@ -33,11 +33,7 @@ public class WorkflowsApiServiceImpl implements WorkflowsApiService {
 
     public WorkflowsApiServiceImpl() {
 
-        try {
-            this.workflowService = WorkflowServiceFactory.getWorkflowService();
-        } catch (IllegalStateException e) {
-            throw new RuntimeException("Error occurred while initiating WorkflowService.", e);
-        }
+        this.workflowService = WorkflowServiceFactory.getWorkflowService();
     }
 
     @Override
