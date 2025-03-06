@@ -26,7 +26,7 @@ import org.wso2.carbon.identity.api.server.input.validation.v1.impl.ValidationRu
  */
 public class ValidationRulesApiServiceFactory {
 
-   private final static ValidationRulesApiService service = new ValidationRulesApiServiceImpl();
+   private final static ValidationRulesApiService SERVICE = new ValidationRulesApiServiceImpl();
 
    /**
     * Method to get ValidationRulesApiService.
@@ -35,6 +35,6 @@ public class ValidationRulesApiServiceFactory {
     */
    public static ValidationRulesApiService getValidationRulesApi() {
 
-      return service;
+      return SERVICE;
    }
 }

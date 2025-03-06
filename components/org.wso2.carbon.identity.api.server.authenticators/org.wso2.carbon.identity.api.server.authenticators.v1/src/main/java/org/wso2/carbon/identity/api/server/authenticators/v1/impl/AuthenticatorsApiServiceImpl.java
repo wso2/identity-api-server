@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2021, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
+* Copyright (c) 2021, WSO2 LLC. (http://www.wso2.com).
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package org.wso2.carbon.identity.api.server.authenticators.v1.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.authenticators.v1.AuthenticatorsApiService;
 import org.wso2.carbon.identity.api.server.authenticators.v1.core.ServerAuthenticatorManagementService;
+import org.wso2.carbon.identity.api.server.authenticators.v1.factories.ServerAuthenticatorManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.UserDefinedLocalAuthenticatorCreation;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.UserDefinedLocalAuthenticatorUpdate;
@@ -34,8 +34,17 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
  */
 public class AuthenticatorsApiServiceImpl implements AuthenticatorsApiService {
 
-    @Autowired
-    private ServerAuthenticatorManagementService authenticatorManagementService;
+    private final ServerAuthenticatorManagementService authenticatorManagementService;
+
+    public AuthenticatorsApiServiceImpl() {
+
+        try {
+            authenticatorManagementService = ServerAuthenticatorManagementServiceFactory
+                    .getServerAuthenticatorManagementService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating the authenticator management services.", e);
+        }
+    }
 
     @Override
     public Response authenticatorsGet(String filter, Integer limit, Integer offset) {

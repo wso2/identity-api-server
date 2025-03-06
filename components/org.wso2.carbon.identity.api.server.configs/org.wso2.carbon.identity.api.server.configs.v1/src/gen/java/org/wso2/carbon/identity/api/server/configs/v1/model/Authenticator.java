@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorProperty;
+import org.wso2.carbon.identity.api.server.configs.v1.model.Endpoint;
 import javax.validation.constraints.*;
 
 
@@ -36,6 +37,8 @@ public class Authenticator  {
     private String id;
     private String name;
     private String displayName;
+    private String description;
+    private String image;
     private Boolean isEnabled = true;
 
 @XmlType(name="DefinedByEnum")
@@ -109,6 +112,7 @@ public enum TypeEnum {
 
     private List<AuthenticatorProperty> properties = null;
 
+    private Endpoint endpoint;
 
     /**
     **/
@@ -166,6 +170,42 @@ public enum TypeEnum {
     }
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    /**
+    **/
+    public Authenticator description(String description) {
+
+        this.description = description;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "Description for user defined local authenticator configuration.", value = "")
+    @JsonProperty("description")
+    @Valid
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+    **/
+    public Authenticator image(String image) {
+
+        this.image = image;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "https://example.com/logo/my-logo.png", value = "")
+    @JsonProperty("image")
+    @Valid
+    public String getImage() {
+        return image;
+    }
+    public void setImage(String image) {
+        this.image = image;
     }
 
     /**
@@ -274,7 +314,25 @@ public enum TypeEnum {
         return this;
     }
 
+        /**
+    **/
+    public Authenticator endpoint(Endpoint endpoint) {
+
+        this.endpoint = endpoint;
+        return this;
+    }
     
+    @ApiModelProperty(value = "")
+    @JsonProperty("endpoint")
+    @Valid
+    public Endpoint getEndpoint() {
+        return endpoint;
+    }
+    public void setEndpoint(Endpoint endpoint) {
+        this.endpoint = endpoint;
+    }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -289,16 +347,19 @@ public enum TypeEnum {
         return Objects.equals(this.id, authenticator.id) &&
             Objects.equals(this.name, authenticator.name) &&
             Objects.equals(this.displayName, authenticator.displayName) &&
+            Objects.equals(this.description, authenticator.description) &&
+            Objects.equals(this.image, authenticator.image) &&
             Objects.equals(this.isEnabled, authenticator.isEnabled) &&
             Objects.equals(this.definedBy, authenticator.definedBy) &&
             Objects.equals(this.type, authenticator.type) &&
             Objects.equals(this.tags, authenticator.tags) &&
-            Objects.equals(this.properties, authenticator.properties);
+            Objects.equals(this.properties, authenticator.properties) &&
+            Objects.equals(this.endpoint, authenticator.endpoint);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, displayName, isEnabled, definedBy, type, tags, properties);
+        return Objects.hash(id, name, displayName, description, image, isEnabled, definedBy, type, tags, properties, endpoint);
     }
 
     @Override
@@ -310,11 +371,14 @@ public enum TypeEnum {
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
+        sb.append("    description: ").append(toIndentedString(description)).append("\n");
+        sb.append("    image: ").append(toIndentedString(image)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
         sb.append("    definedBy: ").append(toIndentedString(definedBy)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
+        sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
         sb.append("}");
         return sb.toString();
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -27,9 +27,23 @@ import java.util.List;
 import org.wso2.carbon.identity.api.idle.account.identification.v1.model.Error;
 import org.wso2.carbon.identity.api.idle.account.identification.v1.model.InactiveUser;
 import org.wso2.carbon.identity.api.idle.account.identification.v1.model.Unauthorized;
+import org.wso2.carbon.identity.idle.account.identification.exception.IdleAccountIdentificationClientException;
+
 import javax.ws.rs.core.Response;
 
 public interface InactiveUsersApiService {
 
     public Response getInactiveUsers(String inactiveAfter, String excludeBefore);
+
+    /**
+     * Get inactive users list for a specified period.
+     *
+     * @param inactiveAfter The date after which the users are considered as inactive.
+     * @param excludeBefore The date before which the users are considered as inactive. (optional)
+     * @param filter Filter inactive users based isDisabled attribute. (optional)
+     * @return InactiveUser
+     * @throws IdleAccountIdentificationClientException If an error occurs while retrieving inactive users.
+     */
+     Response getInactiveUsers(String inactiveAfter, String excludeBefore, String filter)
+            throws IdleAccountIdentificationClientException;
 }

@@ -21,12 +21,20 @@ package org.wso2.carbon.identity.api.server.tenant.management.v1.factories;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.TenantsApiService;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.impl.TenantsApiServiceImpl;
 
+/**
+ * Factory class for TenantsApiService.
+ */
 public class TenantsApiServiceFactory {
 
-   private final static TenantsApiService service = new TenantsApiServiceImpl();
+   private final static TenantsApiService SERVICE = new TenantsApiServiceImpl();
 
+   /**
+    * Get TenantsApiService.
+    *
+    * @return TenantsApiService.
+    */
    public static TenantsApiService getTenantsApi()
    {
-      return service;
+      return SERVICE;
    }
 }

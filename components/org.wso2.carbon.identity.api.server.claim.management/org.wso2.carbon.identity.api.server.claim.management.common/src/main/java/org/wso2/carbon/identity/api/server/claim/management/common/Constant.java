@@ -16,9 +16,12 @@
 
 package org.wso2.carbon.identity.api.server.claim.management.common;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * Claim Management constant class.
@@ -206,7 +209,16 @@ public class Constant {
                 "allowed for this organization.", "Unable to execute the requested organization claim " +
                 "management task."),
         ERROR_CODE_ERROR_RESOLVING_ORGANIZATION("CMT-60008", "Error resolving organization",
-                "Unable to resolve organization.");
+                "Unable to resolve organization."),
+        ERROR_CODE_UNAUTHORIZED_ORG_FOR_CLAIM_PROPERTY_UPDATE("CMT-60009", "Claim property update is not " +
+                "allowed for this organization.", "Unable to update the claim properties."),
+        ERROR_CODE_UNAUTHORIZED_ORG_FOR_ATTRIBUTE_MAPPING_UPDATE("CMT-60010",
+                "Unable to update attribute mappings.",
+                "Updating the mapped attribute for userstore: %s is not allowed for this organization"),
+        ERROR_CODE_UNAUTHORIZED_ORG_FOR_EXCLUDED_USER_STORES_PROPERTY_UPDATE("CMT-60011",
+                "Unable to update excluded user stores property.",
+                "Updating the excluded user stores property for userstore: %s is not allowed for this " +
+                        "organization");
 
         private final String code;
         private final String message;
@@ -279,4 +291,9 @@ public class Constant {
     public static final String PROP_REQUIRED = "Required";
     public static final String PROP_SUPPORTED_BY_DEFAULT = "SupportedByDefault";
     public static final String PROP_UNIQUENESS_SCOPE = "UniquenessScope";
+    public static final String PROP_PROFILES_PREFIX = "Profiles.";
+    public static final String PROP_EXCLUDED_USER_STORES = "ExcludedUserStores";
+
+    public static final Set<String> ALLOWED_PROPERTY_KEYS_FOR_SUB_ORG_UPDATE = Collections.unmodifiableSet(
+            new HashSet<>(Collections.singletonList(PROP_EXCLUDED_USER_STORES)));
 }

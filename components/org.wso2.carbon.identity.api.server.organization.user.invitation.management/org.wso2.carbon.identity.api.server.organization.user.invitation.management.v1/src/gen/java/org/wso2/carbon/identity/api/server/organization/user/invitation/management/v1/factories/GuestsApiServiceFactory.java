@@ -21,12 +21,20 @@ package org.wso2.carbon.identity.api.server.organization.user.invitation.managem
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.GuestsApiService;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.impl.GuestsApiServiceImpl;
 
+/**
+ * This class is the factory class for GuestsApiService.
+ */
 public class GuestsApiServiceFactory {
 
-   private final static GuestsApiService service = new GuestsApiServiceImpl();
+   private static final GuestsApiService SERVICE = new GuestsApiServiceImpl();
 
-   public static GuestsApiService getGuestsApi()
-   {
-      return service;
+   /**
+    * Get GuestsApiService.
+    *
+    * @return GuestsApiService.
+    */
+   public static GuestsApiService getGuestsApi() {
+
+      return SERVICE;
    }
 }

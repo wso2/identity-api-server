@@ -18,12 +18,12 @@
 
 package org.wso2.carbon.identity.api.server.rule.metadata.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 
+import org.wso2.carbon.identity.api.server.rule.metadata.v1.factories.RulesApiServiceFactory;
 import org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Error;
 import org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition;
 import org.wso2.carbon.identity.api.server.rule.metadata.v1.RulesApiService;
@@ -40,8 +40,12 @@ import javax.validation.constraints.*;
 
 public class RulesApi  {
 
-    @Autowired
-    private RulesApiService delegate;
+    private final RulesApiService delegate;
+
+    public RulesApi() {
+
+        this.delegate = RulesApiServiceFactory.getRulesApi();
+    }
 
     @Valid
     @GET
@@ -60,7 +64,7 @@ public class RulesApi  {
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getExpressionMeta(    @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Specifies the flow to retrieve rule metadata. This ensures that the metadata returned is relevant to the given flow.  Note: At present, only the 'preIssueAccessToken' flow is supported. ",required=true, allowableValues="preIssueAccessToken, prePasswordUpdate, preProfileUpdate, preLogin, postLogin, inLogin, preRegistration, inRegistration, inPasswordExpiry")  @QueryParam("flow") String flow) {
+    public Response getExpressionMeta(    @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Specifies the flow to retrieve rule metadata. This ensures that the metadata returned is relevant to the given flow.  Note: At present, only the 'preIssueAccessToken' and 'preUpdatePassword' flows are supported. ",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preProfileUpdate, preLogin, postLogin, inLogin, preRegistration, inRegistration, inPasswordExpiry")  @QueryParam("flow") String flow) {
 
         return delegate.getExpressionMeta(flow );
     }

@@ -18,13 +18,11 @@
 
 package org.wso2.carbon.identity.api.server.action.management.v1.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
-import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionsApiService;
 import org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants;
 import org.wso2.carbon.identity.api.server.action.management.v1.core.ServerActionManagementService;
+import org.wso2.carbon.identity.api.server.action.management.v1.factories.ActionManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 
 import java.net.URI;
@@ -38,8 +36,16 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
  */
 public class ActionsApiServiceImpl implements ActionsApiService {
 
-    @Autowired
-    ServerActionManagementService serverActionManagementService;
+    private final ServerActionManagementService serverActionManagementService;
+
+    public ActionsApiServiceImpl() {
+
+        try {
+            this.serverActionManagementService = ActionManagementServiceFactory.getActionManagementService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating server action management service.", e);
+        }
+    }
 
     @Override
     public Response activateAction(String actionType, String actionId) {
@@ -48,9 +54,9 @@ public class ActionsApiServiceImpl implements ActionsApiService {
     }
 
     @Override
-    public Response createAction(String actionType, ActionModel actionModel) {
+    public Response createAction(String actionType, String body) {
 
-        ActionResponse actionResponse = serverActionManagementService.createAction(actionType, actionModel);
+        ActionResponse actionResponse = serverActionManagementService.createAction(actionType, body);
         URI location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT +
                 ActionMgtEndpointConstants.ACTION_PATH_COMPONENT + "/" + actionResponse.getId());
         return Response.created(location).entity(actionResponse).build();
@@ -88,9 +94,8 @@ public class ActionsApiServiceImpl implements ActionsApiService {
     }
 
     @Override
-    public Response updateAction(String actionType, String actionId, ActionUpdateModel actionUpdateModel) {
+    public Response updateAction(String actionType, String actionId, String body) {
 
-        return Response.ok().entity(serverActionManagementService.updateAction(actionType, actionId, actionUpdateModel))
-                .build();
+        return Response.ok().entity(serverActionManagementService.updateAction(actionType, actionId, body)).build();
     }
 }

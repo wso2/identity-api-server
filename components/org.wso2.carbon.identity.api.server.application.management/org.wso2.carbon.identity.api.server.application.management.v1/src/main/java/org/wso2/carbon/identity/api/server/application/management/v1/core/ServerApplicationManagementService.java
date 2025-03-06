@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2019-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -32,9 +32,6 @@ import org.apache.cxf.jaxrs.ext.search.ConditionType;
 import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.MediaType;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.resource.mgt.APIResourceMgtException;
@@ -54,10 +51,12 @@ import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtoco
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPICreationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAuthorizationDetailsTypes;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedScope;
 import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticator;
 import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticatorsModal;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.GroupBasicInfo;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.Link;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
@@ -85,6 +84,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.core.functi
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.template.ApplicationTemplateApiModelToTemplate;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.template.TemplateToApplicationTemplate;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.template.TemplateToApplicationTemplateListItem;
+import org.wso2.carbon.identity.api.server.application.management.v1.factories.ServerApplicationMetadataServiceFactory;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.Util;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
@@ -95,6 +95,7 @@ import org.wso2.carbon.identity.application.common.IdentityApplicationManagement
 import org.wso2.carbon.identity.application.common.model.APIResource;
 import org.wso2.carbon.identity.application.common.model.ApplicationBasicInfo;
 import org.wso2.carbon.identity.application.common.model.AuthenticationStep;
+import org.wso2.carbon.identity.application.common.model.AuthorizationDetailsType;
 import org.wso2.carbon.identity.application.common.model.AuthorizedAPI;
 import org.wso2.carbon.identity.application.common.model.FederatedAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
@@ -159,13 +160,18 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -203,6 +209,9 @@ import static org.wso2.carbon.identity.application.authentication.framework.util
 import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.WS_TRUST;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.Error.INVALID_REQUEST;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.Error.UNEXPECTED_SERVER_ERROR;
+import static org.wso2.carbon.identity.application.mgt.ApplicationConstants.ErrorMessage.ERROR_RETRIEVING_GROUP_LIST;
+import static org.wso2.carbon.identity.application.mgt.ApplicationConstants.ErrorMessage.INVALID_GROUP_FILTER;
+import static org.wso2.carbon.identity.application.mgt.ApplicationConstants.FILTER_CO;
 import static org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.PrimitiveOperator.EQUALS;
 import static org.wso2.carbon.identity.cors.mgt.core.constant.ErrorMessages.ERROR_CODE_INVALID_APP_ID;
 import static org.wso2.carbon.identity.organization.management.service.util.Utils.isLegacyAuthzRuntime;
@@ -211,6 +220,21 @@ import static org.wso2.carbon.identity.organization.management.service.util.Util
  * Calls internal osgi services to perform server application management related operations.
  */
 public class ServerApplicationManagementService {
+
+    private final ApplicationManagementService applicationManagementService;
+    private final AuthorizedAPIManagementService authorizedAPIManagementService;
+    private final TemplateManager templateManager;
+    private final ServerApplicationMetadataService applicationMetadataService;
+
+    public ServerApplicationManagementService(ApplicationManagementService applicationManagementService,
+                                              AuthorizedAPIManagementService authorizedAPIManagementService,
+                                              TemplateManager templateManager) {
+
+        this.applicationManagementService = applicationManagementService;
+        this.authorizedAPIManagementService = authorizedAPIManagementService;
+        this.templateManager = templateManager;
+        this.applicationMetadataService = ServerApplicationMetadataServiceFactory.getServerApplicationMetadataService();
+    }
 
     private static final Log log = LogFactory.getLog(ServerApplicationManagementService.class);
 
@@ -248,9 +272,6 @@ public class ServerApplicationManagementService {
         SUPPORTED_REQUIRED_ATTRIBUTES.add(IdentityApplicationConstants.ALLOWED_ROLE_AUDIENCE_REQUEST_ATTRIBUTE_NAME);
     }
 
-    @Autowired
-    private ServerApplicationMetadataService applicationMetadataService;
-
     @Deprecated
     public ApplicationListResponse getAllApplications(Integer limit, Integer offset, String filter, String sortOrder,
                                                       String sortBy, String requiredAttributes) {
@@ -284,11 +305,11 @@ public class ServerApplicationManagementService {
 
         String username = ContextLoader.getUsernameFromContext();
         try {
-            int totalResults = getApplicationManagementService()
-                    .getCountOfApplications(tenantDomain, username, filter, excludeSystemPortals);
+            int totalResults = applicationManagementService.getCountOfApplications(tenantDomain, username, filter,
+                    excludeSystemPortals);
 
-            ApplicationBasicInfo[] filteredAppList = getApplicationManagementService()
-                    .getApplicationBasicInfo(tenantDomain, username, filter, offset, limit, excludeSystemPortals);
+            ApplicationBasicInfo[] filteredAppList = applicationManagementService.getApplicationBasicInfo(tenantDomain,
+            username, filter, offset, limit, excludeSystemPortals);
             int resultsInCurrentPage = filteredAppList.length;
 
             List<String> requestedAttributeList = new ArrayList<>();
@@ -385,8 +406,8 @@ public class ServerApplicationManagementService {
 
         List<ServiceProvider> serviceProviderList = new ArrayList<>();
         for (ApplicationBasicInfo applicationBasicInfo : filteredAppList) {
-            ServiceProvider serviceProvider = getApplicationManagementService().
-                    getApplicationWithRequiredAttributes(applicationBasicInfo.getApplicationId(),
+            ServiceProvider serviceProvider = applicationManagementService
+                    .getApplicationWithRequiredAttributes(applicationBasicInfo.getApplicationId(),
                             requestedAttributeList);
             serviceProviderList.add(serviceProvider);
         }
@@ -435,7 +456,7 @@ public class ServerApplicationManagementService {
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         ArrayList<ConfiguredAuthenticatorsModal> response = new ArrayList<>();
         try {
-            AuthenticationStep[] authenticationSteps = getApplicationManagementService()
+            AuthenticationStep[] authenticationSteps = applicationManagementService
                     .getConfiguredAuthenticators(applicationId, tenantDomain);
 
             if (authenticationSteps == null) {
@@ -486,8 +507,8 @@ public class ServerApplicationManagementService {
 
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            return getApplicationManagementService().exportSPApplicationFromAppID(
-                    applicationId, exportSecrets, tenantDomain);
+            return applicationManagementService.exportSPApplicationFromAppID(applicationId, exportSecrets,
+                    tenantDomain);
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error exporting application with id: " + applicationId;
             throw handleIdentityApplicationManagementException(e, msg);
@@ -515,8 +536,8 @@ public class ServerApplicationManagementService {
         ServiceProvider serviceProvider;
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            serviceProvider = getApplicationManagementService().exportSPFromAppID(
-                    applicationId, exportSecrets, tenantDomain);
+            serviceProvider = applicationManagementService.exportSPFromAppID(applicationId, exportSecrets,
+                    tenantDomain);
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error exporting application with id: " + applicationId;
             throw handleIdentityApplicationManagementException(e, msg);
@@ -556,11 +577,15 @@ public class ServerApplicationManagementService {
                     + Arrays.toString(VALID_MEDIA_TYPES_YAML) + ", " + Arrays.toString(VALID_MEDIA_TYPES_JSON));
         }
 
-        return new TransferResource(
-                fileNameSB.toString(),
-                new ByteArrayResource(fileContent.getBytes(StandardCharsets.UTF_8)),
-                MediaType.APPLICATION_OCTET_STREAM
-        );
+        try {
+            return new TransferResource(
+                    fileNameSB.toString(),
+                    fileContent.getBytes(StandardCharsets.UTF_8),
+                    new MimeType("application/octet-stream")
+            );
+        } catch (MimeTypeParseException e) {
+            throw new RuntimeException("Failed to parse MIME type", e);
+        }
     }
 
     private String parseXmlFromServiceProvider(ServiceProvider serviceProvider) {
@@ -655,8 +680,8 @@ public class ServerApplicationManagementService {
 
             ServiceProvider serviceProvider = parseSP(spFileContent, fileType, tenantDomain);
 
-            ImportResponse importResponse = getApplicationManagementService()
-                    .importSPApplication(serviceProvider, tenantDomain, username, isAppUpdate);
+            ImportResponse importResponse = applicationManagementService.importSPApplication(serviceProvider,
+                    tenantDomain, username, isAppUpdate);
 
             if (importResponse.getResponseCode() == ImportResponse.FAILED) {
                 throw handleErrorResponse(importResponse);
@@ -826,7 +851,7 @@ public class ServerApplicationManagementService {
         String applicationId = null;
         try {
             ApplicationDTO applicationDTO = new ApiModelToServiceProvider().apply(applicationModel);
-            applicationId = getApplicationManagementService().createApplication(applicationDTO, tenantDomain, username);
+            applicationId = applicationManagementService.createApplication(applicationDTO, tenantDomain, username);
 
             // Update owner for B2B Self Service applications.
             if (applicationDTO.getServiceProvider().isB2BSelfServiceApp()) {
@@ -905,8 +930,8 @@ public class ServerApplicationManagementService {
             }
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             String username = ContextLoader.getUsernameFromContext();
-            getApplicationManagementService()
-                    .updateApplicationByResourceId(applicationId, appToUpdate, tenantDomain, username);
+            applicationManagementService.updateApplicationByResourceId(applicationId, appToUpdate,
+                    tenantDomain, username);
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error patching application with id: " + applicationId;
             throw handleIdentityApplicationManagementException(e, msg);
@@ -950,7 +975,7 @@ public class ServerApplicationManagementService {
             }
 
             // Delete Application.
-            getApplicationManagementService().deleteApplicationByResourceId(applicationId, tenantDomain, username);
+            applicationManagementService.deleteApplicationByResourceId(applicationId, tenantDomain, username);
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error deleting application with id: " + applicationId;
             throw handleIdentityApplicationManagementException(e, msg);
@@ -1003,8 +1028,8 @@ public class ServerApplicationManagementService {
 
     private ServiceProvider getResidentSp(String tenantDomain) throws IdentityApplicationManagementException {
 
-        ServiceProvider application =
-                getApplicationManagementService().getServiceProvider(ApplicationConstants.LOCAL_SP, tenantDomain);
+        ServiceProvider application = applicationManagementService.getServiceProvider(ApplicationConstants.LOCAL_SP,
+                tenantDomain);
         if (application == null) {
             throw Utils.buildServerError("Resident application cannot be found for tenantDomain: " + tenantDomain);
         }
@@ -1138,7 +1163,7 @@ public class ServerApplicationManagementService {
         Template template = new ApplicationTemplateApiModelToTemplate().apply(applicationTemplateModel);
 
         try {
-            return getTemplateManager().addTemplate(template);
+            return templateManager.addTemplate(template);
         } catch (TemplateManagementException e) {
             throw handleTemplateManagementException(e, "Error while adding the new application template.");
         }
@@ -1156,7 +1181,7 @@ public class ServerApplicationManagementService {
 
         validatePaginationSupport(limit, offset);
         try {
-            List<Template> templateList = getTemplateManager().listTemplates(TemplateMgtConstants.TemplateType
+            List<Template> templateList = templateManager.listTemplates(TemplateMgtConstants.TemplateType
                     .APPLICATION_TEMPLATE.toString(), null, null, getSearchCondition
                     (TemplateMgtConstants.TemplateType.APPLICATION_TEMPLATE.toString(), ContextLoader
                             .getTenantDomainFromContext(), searchContext));
@@ -1180,8 +1205,7 @@ public class ServerApplicationManagementService {
      */
     private boolean isAllowUpdateSystemApplication(String appName, ApplicationPatchModel applicationPatchModel) {
 
-        Set<String> systemApplications =
-                ApplicationManagementServiceHolder.getApplicationManagementService().getSystemApplications();
+        Set<String> systemApplications = applicationManagementService.getSystemApplications();
         if (systemApplications == null || systemApplications.stream().noneMatch(appName::equalsIgnoreCase)) {
             return false;
         }
@@ -1344,7 +1368,7 @@ public class ServerApplicationManagementService {
     public ApplicationTemplateModel getApplicationTemplateById(String templateId) {
 
         try {
-            return new TemplateToApplicationTemplate().apply(getTemplateManager().getTemplateById(templateId));
+            return new TemplateToApplicationTemplate().apply(templateManager.getTemplateById(templateId));
         } catch (TemplateManagementException e) {
             if (TemplateMgtConstants.ErrorMessages.ERROR_CODE_TEMPLATE_NOT_FOUND.getCode().equals(e.getErrorCode())) {
                 throw handleTemplateNotFoundException(e);
@@ -1362,7 +1386,7 @@ public class ServerApplicationManagementService {
     public void deleteApplicationTemplateById(String templateId) {
 
         try {
-            getTemplateManager().deleteTemplateById(templateId);
+            templateManager.deleteTemplateById(templateId);
         } catch (TemplateManagementException e) {
             if (TemplateMgtConstants.ErrorMessages.ERROR_CODE_TEMPLATE_NOT_FOUND.getCode().equals(e.getErrorCode())) {
                 throw handleTemplateNotFoundException(e);
@@ -1381,7 +1405,7 @@ public class ServerApplicationManagementService {
     public void updateApplicationTemplateById(String templateId, ApplicationTemplateModel model) {
 
         try {
-            getTemplateManager().updateTemplateById(templateId,
+            templateManager.updateTemplateById(templateId,
                     new ApplicationTemplateApiModelToTemplate().apply(model));
         } catch (TemplateManagementException e) {
             if (TemplateMgtConstants.ErrorMessages.ERROR_CODE_TEMPLATE_NOT_FOUND.getCode().equals(e.getErrorCode())) {
@@ -1423,7 +1447,7 @@ public class ServerApplicationManagementService {
         try {
             String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             String authorizedAPIId = authorizedAPICreationModel.getId();
-            AuthorizedAPI authorizedAPI = getAuthorizedAPIManagementService().getAuthorizedAPI(applicationId,
+            AuthorizedAPI authorizedAPI = authorizedAPIManagementService.getAuthorizedAPI(applicationId,
                     authorizedAPIId, tenantDomain);
             if (authorizedAPI != null) {
                 throw handleAuthorizedAPIConflictError(applicationId, authorizedAPIId);
@@ -1436,6 +1460,8 @@ public class ServerApplicationManagementService {
                 throw buildClientError(ErrorMessage.API_RESOURCE_NOT_FOUND, authorizedAPIId, tenantDomain);
             }
             validateAPIResourceScopes(apiResource, authorizedAPICreationModel.getScopes());
+            this.validateAPIResourceAuthorizationDetailsTypes(apiResource,
+                    authorizedAPICreationModel.getAuthorizationDetailsTypes());
 
             // Validate policy identifier.
             String policyIdentifier = validatePolicy(authorizedAPICreationModel.getPolicyIdentifier());
@@ -1447,13 +1473,13 @@ public class ServerApplicationManagementService {
                         policyIdentifier);
             }
 
-            getAuthorizedAPIManagementService().addAuthorizedAPI(applicationId,
+            authorizedAPIManagementService.addAuthorizedAPI(applicationId,
                     new AuthorizedAPI.AuthorizedAPIBuilder()
                             .appId(applicationId)
                             .apiId(authorizedAPIId)
                             .policyId(policyIdentifier)
-                            .scopes(authorizedAPICreationModel.getScopes().stream().map(
-                                    scope -> new Scope.ScopeBuilder().name(scope).build()).collect(Collectors.toList()))
+                            .scopes(getScopes(authorizedAPICreationModel))
+                            .authorizationDetailsTypes(getAuthorizationDetailsTypes(authorizedAPICreationModel))
                             .build(), tenantDomain);
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error adding authorized API with id: " + authorizedAPICreationModel.getId() +
@@ -1474,7 +1500,7 @@ public class ServerApplicationManagementService {
     public void deleteAuthorizedAPI(String applicationId, String apiId) {
 
         try {
-            getAuthorizedAPIManagementService().deleteAuthorizedAPI(applicationId, apiId,
+            authorizedAPIManagementService.deleteAuthorizedAPI(applicationId, apiId,
                     CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error while deleting authorized API with id: " + apiId + " from the application with  id: "
@@ -1497,9 +1523,20 @@ public class ServerApplicationManagementService {
             String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
 
             // Validate added scopes and removed scopes sent in the authorized API patch model.
-            List<String> addedScopes = authorizedAPIPatchModel.getAddedScopes();
-            List<String> removedScopes = authorizedAPIPatchModel.getRemovedScopes();
+            List<String> addedScopes = Optional.ofNullable(authorizedAPIPatchModel.getAddedScopes())
+                    .orElse(Collections.emptyList());
+            List<String> removedScopes = Optional.ofNullable(authorizedAPIPatchModel.getRemovedScopes())
+                    .orElse(Collections.emptyList());
             addedScopes.removeAll(removedScopes);
+
+            // Validate added and removed authorization details types
+            List<String> addedAuthorizationDetailsTypes =
+                    Optional.ofNullable(authorizedAPIPatchModel.getAddedAuthorizationDetailsTypes())
+                            .orElse(Collections.emptyList());
+            List<String> removedAuthorizationDetailsTypes =
+                    Optional.ofNullable(authorizedAPIPatchModel.getRemovedAuthorizationDetailsTypes())
+                            .orElse(Collections.emptyList());
+            addedAuthorizationDetailsTypes.removeAll(removedAuthorizationDetailsTypes);
 
             // Validate authorized API patch model.
             APIResource apiResource = ApplicationManagementServiceHolder.getApiResourceManager()
@@ -1508,9 +1545,10 @@ public class ServerApplicationManagementService {
                 throw buildClientError(ErrorMessage.API_RESOURCE_NOT_FOUND, apiId, tenantDomain);
             }
             validateAPIResourceScopes(apiResource, addedScopes);
+            validateAPIResourceAuthorizationDetailsTypes(apiResource, addedAuthorizationDetailsTypes);
 
             // Remove already authorized scopes from the added scopes list.
-            AuthorizedAPI currentAuthorizedAPI = getAuthorizedAPIManagementService().getAuthorizedAPI(applicationId,
+            AuthorizedAPI currentAuthorizedAPI = authorizedAPIManagementService.getAuthorizedAPI(applicationId,
                     apiId, tenantDomain);
             if (currentAuthorizedAPI == null) {
                 throw buildClientError(ErrorMessage.AUTHORIZED_API_NOT_FOUND, apiId, applicationId);
@@ -1519,9 +1557,15 @@ public class ServerApplicationManagementService {
                 addedScopes.removeIf(scopeName -> currentAuthorizedAPI.getScopes().stream().anyMatch(scope ->
                         scope.getName().equals(scopeName)));
             }
+            if (CollectionUtils.isNotEmpty(currentAuthorizedAPI.getAuthorizationDetailsTypes())) {
 
-            getAuthorizedAPIManagementService().patchAuthorizedAPI(applicationId, apiId, addedScopes, removedScopes,
-                    tenantDomain);
+                Set<String> currentTypes = currentAuthorizedAPI.getAuthorizationDetailsTypes().stream()
+                        .map(AuthorizationDetailsType::getType).collect(Collectors.toSet());
+                addedAuthorizationDetailsTypes.removeIf(currentTypes::contains);
+            }
+
+            authorizedAPIManagementService.patchAuthorizedAPI(applicationId, apiId, addedScopes, removedScopes,
+                    addedAuthorizationDetailsTypes, removedAuthorizationDetailsTypes, tenantDomain);
         } catch (APIResourceMgtException e) {
             String msg = "Error while fetching API resource with id: " + apiId;
             throw Utils.buildServerError(msg, e);
@@ -1542,7 +1586,7 @@ public class ServerApplicationManagementService {
 
         try {
             List<AuthorizedAPIResponse> authorizedAPIResponses = new ArrayList<>();
-            List<AuthorizedAPI> authorizedAPIs = getAuthorizedAPIManagementService().getAuthorizedAPIs(applicationId,
+            List<AuthorizedAPI> authorizedAPIs = authorizedAPIManagementService.getAuthorizedAPIs(applicationId,
                     PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain());
             if (authorizedAPIs == null) {
                 return new ArrayList<>();
@@ -1554,12 +1598,62 @@ public class ServerApplicationManagementService {
                         .displayName(authorizedAPI.getAPIName())
                         .policyId(authorizedAPI.getPolicyId())
                         .type(authorizedAPI.getType())
+                        .authorizedAuthorizationDetailsTypes(
+                                toAuthorizedAuthorizationDetailsTypes(authorizedAPI.getAuthorizationDetailsTypes())
+                        )
                         .authorizedScopes(createAuthorizedScope(authorizedAPI.getScopes())));
             }
             return authorizedAPIResponses;
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error retrieving authorized APIs of application with id: " + applicationId;
             throw handleIdentityApplicationManagementException(e, msg);
+        }
+    }
+
+    /**
+     * Get the list of groups in the user store that match the given filter.
+     *
+     * @param domain The user store domain.
+     * @param filter The filter to be applied.
+     * @return List of groups.
+     */
+    public List<GroupBasicInfo> getGroups(String domain, String filter) {
+
+        Node filterNode = null;
+        // Get the filter tree and validate it before sending the filter to the backend.
+        if (StringUtils.isNotBlank(filter)) {
+            try {
+                FilterTreeBuilder filterTreeBuilder = new FilterTreeBuilder(filter);
+                Node rootNode = filterTreeBuilder.buildTree();
+                if (rootNode == null) {
+                    throw buildClientError(ErrorMessage.INVALID_FILTER_FORMAT);
+                }
+                ExpressionNode expressionNode;
+                if (!(rootNode instanceof ExpressionNode)) {
+                    throw Utils.buildClientError(INVALID_GROUP_FILTER.getCode(), INVALID_GROUP_FILTER.getMessage(),
+                            INVALID_GROUP_FILTER.getDescription());
+                }
+                expressionNode = (ExpressionNode) rootNode;
+                if (!StringUtils.equals(expressionNode.getAttributeValue(), NAME) || !StringUtils.equals(
+                        expressionNode.getOperation(), FILTER_CO)) {
+                    throw Utils.buildClientError(INVALID_GROUP_FILTER.getCode(), INVALID_GROUP_FILTER.getMessage(),
+                            INVALID_GROUP_FILTER.getDescription());
+                }
+                filterNode = rootNode;
+            } catch (IOException | IdentityException e) {
+                throw buildClientError(ErrorMessage.INVALID_FILTER_FORMAT);
+            }
+        }
+
+        try {
+            List<org.wso2.carbon.identity.application.common.model.GroupBasicInfo> groupBasicInfos =
+                    applicationManagementService.getGroups(
+                            PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(), domain,
+                            filterNode);
+            return groupBasicInfos.stream().map(groupBasicInfo -> new GroupBasicInfo().id(groupBasicInfo.getId())
+                    .name(groupBasicInfo.getName())).collect(Collectors.toList());
+        } catch (IdentityApplicationManagementException e) {
+            throw handleIdentityApplicationManagementException(e, ERROR_RETRIEVING_GROUP_LIST.getMessage());
         }
     }
 
@@ -1692,7 +1786,7 @@ public class ServerApplicationManagementService {
         ServiceProvider application;
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            application = getApplicationManagementService().getApplicationByResourceId(applicationId, tenantDomain);
+            application = applicationManagementService.getApplicationByResourceId(applicationId, tenantDomain);
             if (application == null) {
                 throw buildClientError(ErrorMessage.APPLICATION_NOT_FOUND, applicationId, tenantDomain);
             }
@@ -1832,7 +1926,7 @@ public class ServerApplicationManagementService {
 
             // Inbound auth config details are already added to the service provider. Therefore we don't need to pass
             // the inboundDTO information here.
-            getApplicationManagementService().updateApplicationByResourceId(
+            applicationManagementService.updateApplicationByResourceId(
                     applicationId, updatedApplication, null, tenantDomain, username);
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error updating application with id: " + applicationId;
@@ -1847,7 +1941,7 @@ public class ServerApplicationManagementService {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             String username = ContextLoader.getUsernameFromContext();
 
-            getApplicationManagementService().updateApplicationByResourceId(
+            applicationManagementService.updateApplicationByResourceId(
                     applicationId, updatedApplication, inboundDTO, tenantDomain, username);
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error updating application with id: " + applicationId;
@@ -1872,21 +1966,6 @@ public class ServerApplicationManagementService {
             ErrorMessage errorEnum = ErrorMessage.PAGINATED_LISTING_NOT_IMPLEMENTED;
             throw Utils.buildNotImplementedError(errorEnum.getCode(), errorEnum.getDescription());
         }
-    }
-
-    private ApplicationManagementService getApplicationManagementService() {
-
-        return ApplicationManagementServiceHolder.getApplicationManagementService();
-    }
-
-    private AuthorizedAPIManagementService getAuthorizedAPIManagementService() {
-
-        return ApplicationManagementServiceHolder.getAuthorizedAPIManagementService();
-    }
-
-    private TemplateManager getTemplateManager() {
-
-        return ApplicationManagementServiceHolder.getTemplateManager();
     }
 
     private APIError handleIdentityApplicationManagementException(IdentityApplicationManagementException e,
@@ -2069,5 +2148,64 @@ public class ServerApplicationManagementService {
                 !StringUtils.equals(newAppName, oldAppName)) {
             throw buildClientError(BLOCK_RENAME_APP_NAME_TO_RESERVED_APP_NAME, newAppName);
         }
+    }
+
+    private void validateAPIResourceAuthorizationDetailsTypes(APIResource apiResource, List<String> requestedTypes) {
+
+        if (apiResource == null || CollectionUtils.isEmpty(apiResource.getAuthorizationDetailsTypes())
+                || CollectionUtils.isEmpty(requestedTypes)) {
+            return;
+        }
+
+        final Set<String> existingTypes = apiResource.getAuthorizationDetailsTypes().stream()
+                .map(AuthorizationDetailsType::getType)
+                .collect(Collectors.toSet());
+
+        for (String requestedType : requestedTypes) {
+            if (!existingTypes.contains(requestedType)) {
+                throw buildClientError(ErrorMessage.AUTHORIZATION_DETAILS_TYPES_NOT_FOUND, apiResource.getId(),
+                        CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            }
+        }
+    }
+
+    private List<AuthorizationDetailsType> getAuthorizationDetailsTypes(AuthorizedAPICreationModel creationModel) {
+
+        if (CollectionUtils.isEmpty(creationModel.getAuthorizationDetailsTypes())) {
+            return null;
+        }
+
+        return creationModel.getAuthorizationDetailsTypes().stream()
+                .map(type -> new AuthorizationDetailsType.AuthorizationDetailsTypesBuilder().type(type).build())
+                .collect(Collectors.toList());
+    }
+
+    private AuthorizedAuthorizationDetailsTypes toAuthorizedAuthorizationDetailsType(AuthorizationDetailsType type) {
+
+        return (type == null) ? null
+                : new AuthorizedAuthorizationDetailsTypes().id(type.getId()).type(type.getType()).name(type.getName());
+    }
+
+    private List<AuthorizedAuthorizationDetailsTypes> toAuthorizedAuthorizationDetailsTypes(
+            List<AuthorizationDetailsType> authorizationDetailsTypes) {
+
+        if (CollectionUtils.isEmpty(authorizationDetailsTypes)) {
+            return null;
+        }
+
+        return authorizationDetailsTypes.stream()
+                .map(this::toAuthorizedAuthorizationDetailsType)
+                .collect(Collectors.toList());
+    }
+
+    private List<Scope> getScopes(AuthorizedAPICreationModel creationModel) {
+
+        if (CollectionUtils.isEmpty(creationModel.getScopes())) {
+            return null;
+        }
+
+        return creationModel.getScopes().stream()
+                .map(scope -> new Scope.ScopeBuilder().name(scope).build())
+                .collect(Collectors.toList());
     }
 }

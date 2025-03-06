@@ -1,26 +1,25 @@
 /*
- * Copyright (c) 2019, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019-2025, WSO2 LLC. (http://www.wso2.com).
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.wso2.carbon.identity.api.server.application.management.v1.impl;
 
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
@@ -33,6 +32,10 @@ import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedA
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowGenerateRequest;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowGenerateResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowResultResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowStatusResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
@@ -44,6 +47,10 @@ import org.wso2.carbon.identity.api.server.application.management.v1.core.Server
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationMetadataService;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationSharingService;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.TransferResource;
+import org.wso2.carbon.identity.api.server.application.management.v1.factories.LoginFlowAIServiceFactory;
+import org.wso2.carbon.identity.api.server.application.management.v1.factories.ServerApplicationManagementServiceFactory;
+import org.wso2.carbon.identity.api.server.application.management.v1.factories.ServerApplicationMetadataServiceFactory;
+import org.wso2.carbon.identity.api.server.application.management.v1.factories.ServerApplicationSharingServiceFactory;
 import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 
@@ -58,14 +65,23 @@ import javax.ws.rs.core.Response;
  */
 public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
-    @Autowired
-    private ServerApplicationManagementService applicationManagementService;
+    private final ServerApplicationManagementService applicationManagementService;
+    private final ServerApplicationMetadataService applicationMetadataService;
+    private final ServerApplicationSharingService applicationSharingService;
 
-    @Autowired
-    private ServerApplicationMetadataService applicationMetadataService;
+    public ApplicationsApiServiceImpl() {
 
-    @Autowired
-    private ServerApplicationSharingService applicationSharingService;
+        try {
+            this.applicationManagementService = ServerApplicationManagementServiceFactory
+                    .getServerApplicationManagementService();
+            this.applicationMetadataService = ServerApplicationMetadataServiceFactory
+                    .getServerApplicationMetadataService();
+            this.applicationSharingService = ServerApplicationSharingServiceFactory
+                    .getServerApplicationSharingService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating application management services.", e);
+        }
+    }
 
     @Deprecated
     @Override
@@ -188,6 +204,22 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
+    public Response getLoginFlowGenerationResult(String operationId) {
+
+        LoginFlowResultResponse loginFlowAIGenerationResult = LoginFlowAIServiceFactory.getLoginFlowAIService()
+                .getAuthenticationSequenceGenerationResult(operationId);
+        return Response.ok(loginFlowAIGenerationResult).build();
+    }
+
+    @Override
+    public Response getLoginFlowGenerationStatus(String operationId) {
+
+        LoginFlowStatusResponse loginFlowAIStatus = LoginFlowAIServiceFactory.getLoginFlowAIService()
+                .getAuthenticationSequenceGenerationStatus(operationId);
+        return Response.ok(loginFlowAIStatus).build();
+    }
+
+    @Override
     public Response getPassiveStsConfiguration(String applicationId) {
 
         PassiveStsConfiguration passiveStsApp = applicationManagementService.getPassiveStsConfiguration(applicationId);
@@ -261,14 +293,22 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
         );
 
         return Response.ok()
-                .type(MediaType.APPLICATION_OCTET_STREAM_VALUE)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""
+                .type("application/octet-stream")
+                .header("Content-Disposition", "attachment; filename=\""
                         + transferResource.getResourceName() + "\"")
-                .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate")
-                .header(HttpHeaders.PRAGMA, "no-cache")
-                .header(HttpHeaders.EXPIRES, "0")
-                .entity(transferResource.getResource().getByteArray())
+                .header("Cache-Control", "no-cache, no-store, must-revalidate")
+                .header("Pragma", "no-cache")
+                .header("Expires", "0")
+                .entity(transferResource.getResource())
                 .build();
+    }
+
+    @Override
+    public Response generateLoginFlow(LoginFlowGenerateRequest loginFlowGenerateRequest) {
+
+        LoginFlowGenerateResponse loginFlowGenerateResponse = LoginFlowAIServiceFactory.getLoginFlowAIService()
+                .generateAuthenticationSequence(loginFlowGenerateRequest);
+        return Response.accepted(loginFlowGenerateResponse).build();
     }
 
     @Override
@@ -439,6 +479,12 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
         return Response.ok().entity(applicationManagementService.listApplicationTemplates(limit, offset,
                 searchContext)).build();
+    }
+
+    @Override
+    public Response getGroups(String domain, String filter) {
+
+        return Response.ok().entity(applicationManagementService.getGroups(domain, filter)).build();
     }
 
     private URI getResourceLocation(String resourceId) {

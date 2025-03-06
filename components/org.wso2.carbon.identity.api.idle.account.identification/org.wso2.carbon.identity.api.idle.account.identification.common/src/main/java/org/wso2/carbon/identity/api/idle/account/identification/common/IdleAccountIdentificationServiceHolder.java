@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.idle.account.identification.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.idle.account.identification.services.IdleAccountIdentificationService;
 
 /**
@@ -25,7 +26,14 @@ import org.wso2.carbon.identity.idle.account.identification.services.IdleAccount
  */
 public class IdleAccountIdentificationServiceHolder {
 
-    private static IdleAccountIdentificationService idleAccountIdentificationService;
+    private IdleAccountIdentificationServiceHolder() {}
+
+    private static class IdleAccountServiceHolder {
+
+        static final IdleAccountIdentificationService SERVICE =
+                (IdleAccountIdentificationService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(IdleAccountIdentificationService.class, null);
+    }
 
     /**
      * Get IdleAccountIdentificationService OSGi service.
@@ -34,17 +42,6 @@ public class IdleAccountIdentificationServiceHolder {
      */
     public static IdleAccountIdentificationService getIdleAccountIdentificationService() {
 
-        return idleAccountIdentificationService;
-    }
-
-    /**
-     * Set IdleAccountIdentificationService OSGi service.
-     *
-     * @param idleAccountIdentificationService Idle account identification Service.
-     */
-    public static void setIdleAccountIdentificationService(
-            IdleAccountIdentificationService idleAccountIdentificationService) {
-
-        IdleAccountIdentificationServiceHolder.idleAccountIdentificationService = idleAccountIdentificationService;
+        return IdleAccountServiceHolder.SERVICE;
     }
 }

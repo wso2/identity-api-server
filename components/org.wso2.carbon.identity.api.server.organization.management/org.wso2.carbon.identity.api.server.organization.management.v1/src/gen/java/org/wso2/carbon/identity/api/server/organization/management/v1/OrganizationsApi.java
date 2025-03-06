@@ -18,12 +18,12 @@
 
 package org.wso2.carbon.identity.api.server.organization.management.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 
+import org.wso2.carbon.identity.api.server.organization.management.v1.factories.OrganizationsApiServiceFactory;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.ApplicationSharePOSTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.Error;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.GetOrganizationResponse;
@@ -44,7 +44,6 @@ import org.wso2.carbon.identity.api.server.organization.management.v1.model.Orga
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationsResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.SharedApplicationsResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.SharedOrganizationsResponse;
-import org.wso2.carbon.identity.api.server.organization.management.v1.OrganizationsApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -58,8 +57,12 @@ import javax.validation.constraints.*;
 
 public class OrganizationsApi  {
 
-    @Autowired
-    private OrganizationsApiService delegate;
+    private final OrganizationsApiService delegate;
+
+    public OrganizationsApi() {
+
+        this.delegate = OrganizationsApiServiceFactory.getOrganizationsApi();
+    }
 
     @Valid
     @POST
@@ -128,7 +131,7 @@ public class OrganizationsApi  {
         @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
         @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
     })
-    public Response organizationDiscoveryPost(@ApiParam(value = "This represents the organization discovery attributes to be added." ,required=true) @Valid OrganizationDiscoveryPostRequest organizationDiscoveryPostRequest) {
+    public Response organizationDiscoveryPost(@ApiParam(value = "This represents the organization discovery attributes to be added." ,required=true) @Valid @NotNull(message = "Request body organizationDiscoveryPostRequest cannot be null.") OrganizationDiscoveryPostRequest organizationDiscoveryPostRequest) {
 
         return delegate.organizationDiscoveryPost(organizationDiscoveryPostRequest );
     }

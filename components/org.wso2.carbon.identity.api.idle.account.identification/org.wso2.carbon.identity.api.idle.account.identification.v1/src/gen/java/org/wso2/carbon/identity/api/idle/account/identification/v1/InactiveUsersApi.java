@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,31 +18,28 @@
 
 package org.wso2.carbon.identity.api.idle.account.identification.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import java.io.InputStream;
-import java.util.List;
-
+import org.wso2.carbon.identity.api.idle.account.identification.v1.factories.InactiveUsersApiServiceFactory;
 import org.wso2.carbon.identity.api.idle.account.identification.v1.model.Error;
 import org.wso2.carbon.identity.api.idle.account.identification.v1.model.InactiveUser;
 import org.wso2.carbon.identity.api.idle.account.identification.v1.model.Unauthorized;
-import org.wso2.carbon.identity.api.idle.account.identification.v1.InactiveUsersApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
-
-import javax.validation.constraints.*;
+import org.wso2.carbon.identity.idle.account.identification.exception.IdleAccountIdentificationClientException;
 
 @Path("/inactive-users")
 @Api(description = "The inactive-users API")
 
 public class InactiveUsersApi  {
 
-    @Autowired
-    private InactiveUsersApiService delegate;
+    private final InactiveUsersApiService delegate;
+
+    public InactiveUsersApi() {
+
+        this.delegate = InactiveUsersApiServiceFactory.getInactiveUsersApi();
+    }
 
     @Valid
     @GET
@@ -57,8 +54,12 @@ public class InactiveUsersApi  {
             @ApiResponse(code = 403, message = "Resource Forbidden", response = Void.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response getInactiveUsers(    @Valid@ApiParam(value = "Latest active date of login.")  @QueryParam("inactiveAfter") String inactiveAfter,     @Valid@ApiParam(value = "Date to exclude the oldest inactive users.")  @QueryParam("excludeBefore") String excludeBefore) {
+    public Response getInactiveUsers(
+            @Valid @ApiParam(value = "Latest active date of login.") @QueryParam("inactiveAfter") String inactiveAfter,
+            @Valid @ApiParam(value = "Date to exclude the oldest inactive users.") @QueryParam("excludeBefore") String excludeBefore,
+            @Valid @ApiParam(value = "Filter inactive users by account state disabled.") @QueryParam("filter") String filter)
+            throws IdleAccountIdentificationClientException {
 
-        return delegate.getInactiveUsers(inactiveAfter,  excludeBefore );
+        return delegate.getInactiveUsers(inactiveAfter, excludeBefore, filter);
     }
 }

@@ -15,8 +15,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.wso2.carbon.identity.api.server.tenant.management.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.tenant.mgt.services.TenantMgtService;
 import org.wso2.carbon.user.core.service.RealmService;
 
@@ -25,46 +27,39 @@ import org.wso2.carbon.user.core.service.RealmService;
  */
 public class TenantManagementServiceHolder {
 
-    private static TenantMgtService tenantMgtService;
-    private static RealmService realmService;
+    private TenantManagementServiceHolder() {
+
+    }
+
+    private static class TenantMgtServiceHolder {
+
+        static final TenantMgtService SERVICE = (TenantMgtService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(TenantMgtService.class, null);
+    }
+
+    private static class RealmServiceHolder {
+
+        static final RealmService SERVICE = (RealmService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+    }
 
     /**
      * Get TenantMgtService osgi service.
      *
-     * @return TenantMgtService
+     * @return TenantMgtService.
      */
     public static TenantMgtService getTenantMgtService() {
 
-        return tenantMgtService;
-    }
-
-    /**
-     * Set TenantMgtService osgi service.
-     *
-     * @param tenantMgtService TenantMgtService.
-     */
-    public static void setTenantMgtService(TenantMgtService tenantMgtService) {
-
-        TenantManagementServiceHolder.tenantMgtService = tenantMgtService;
+        return TenantMgtServiceHolder.SERVICE;
     }
 
     /**
      * Get RealmService osgi service.
      *
-     * @return RealmService
+     * @return RealmService.
      */
     public static RealmService getRealmService() {
 
-        return realmService;
-    }
-
-    /**
-     * Set RealmService osgi service.
-     *
-     * @param realmService RealmService.
-     */
-    public static void setRealmService(RealmService realmService) {
-
-        TenantManagementServiceHolder.realmService = realmService;
+        return RealmServiceHolder.SERVICE;
     }
 }

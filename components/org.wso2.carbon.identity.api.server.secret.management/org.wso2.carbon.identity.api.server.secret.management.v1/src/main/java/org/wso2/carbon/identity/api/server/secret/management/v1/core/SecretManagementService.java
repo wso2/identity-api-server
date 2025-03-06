@@ -1,17 +1,19 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.com).
+ * Copyright (c) 2021-2025, WSO2 LLC. (http://www.wso2.com).
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.wso2.carbon.identity.api.server.secret.management.v1.core;
@@ -22,11 +24,11 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.secret.management.common.SecretManagementConstants;
-import org.wso2.carbon.identity.api.server.secret.management.common.SecretManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretAddRequest;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretPatchRequest;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretResponse;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretUpdateRequest;
+import org.wso2.carbon.identity.secret.mgt.core.SecretManager;
 import org.wso2.carbon.identity.secret.mgt.core.exception.SecretManagementClientException;
 import org.wso2.carbon.identity.secret.mgt.core.exception.SecretManagementException;
 import org.wso2.carbon.identity.secret.mgt.core.exception.SecretManagementServerException;
@@ -35,6 +37,7 @@ import org.wso2.carbon.identity.secret.mgt.core.model.Secrets;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.secret.mgt.core.constant.SecretConstants.ErrorMessages.ERROR_CODE_SECRET_ALREADY_EXISTS;
@@ -45,7 +48,13 @@ import static org.wso2.carbon.identity.secret.mgt.core.constant.SecretConstants.
  */
 public class SecretManagementService {
 
+    private final SecretManager secretManager;
     private static final Log log = LogFactory.getLog(SecretManagementService.class);
+
+    public SecretManagementService(SecretManager secretManager) {
+
+        this.secretManager = secretManager;
+    }
 
     /**
      * Create a secret.
@@ -60,7 +69,7 @@ public class SecretManagementService {
         Secret requestDTO, responseDTO;
         try {
             requestDTO = buildSecretRequestDTOFromSecretAddRequest(secretAddRequest);
-            responseDTO = SecretManagementServiceHolder.getSecretConfigManager().addSecret(secretType, requestDTO);
+            responseDTO = secretManager.addSecret(secretType, requestDTO);
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.ERROR_CODE_ERROR_ADDING_SECRET,
                     secretAddRequest.getName());
@@ -128,7 +137,7 @@ public class SecretManagementService {
     public void deleteSecret(String secretType, String name) {
 
         try {
-            SecretManagementServiceHolder.getSecretConfigManager().deleteSecret(secretType, name);
+            secretManager.deleteSecret(secretType, name);
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.
                     ERROR_CODE_ERROR_DELETING_SECRET, name);
@@ -145,7 +154,7 @@ public class SecretManagementService {
     public SecretResponse getSecret(String secretType, String name) {
 
         try {
-            Secret responseDTO = SecretManagementServiceHolder.getSecretConfigManager().getSecret(secretType, name);
+            Secret responseDTO = secretManager.getSecret(secretType, name);
             SecretResponse secretResponse = new SecretResponse();
             secretResponse.secretName(responseDTO.getSecretName());
             secretResponse.setCreated(responseDTO.getCreatedTime());
@@ -169,7 +178,7 @@ public class SecretManagementService {
     public List<SecretResponse> getSecretsList(String secretType) {
 
         try {
-            Secrets secrets = SecretManagementServiceHolder.getSecretConfigManager().getSecrets(secretType);
+            Secrets secrets = secretManager.getSecrets(secretType);
             List<Secret> secretsList = secrets.getSecrets();
             return secretsList.stream().map(secret ->
                     buildSecretResponseFromResponseDTO(secret)).collect(Collectors.toList());
@@ -191,7 +200,7 @@ public class SecretManagementService {
 
         Secret secret, responseDTO;
         try {
-            secret = SecretManagementServiceHolder.getSecretConfigManager().getSecret(secretType, name);
+            secret = secretManager.getSecret(secretType, name);
             if (secret == null) {
                 throw handleException(Response.Status.NOT_FOUND, SecretManagementConstants.ErrorMessage.
                         ERROR_CODE_SECRET_NOT_FOUND, name);
@@ -201,11 +210,11 @@ public class SecretManagementService {
             // Only the Replace operation supported with PATCH request.
             if (SecretPatchRequest.OperationEnum.REPLACE.equals(operation)) {
                 if (SecretManagementConstants.VALUE_PATH.equals(path)) {
-                    responseDTO = SecretManagementServiceHolder.getSecretConfigManager().updateSecretValue(secretType,
+                    responseDTO = secretManager.updateSecretValue(secretType,
                             name, secretPatchRequest.getValue());
 
                 } else if (SecretManagementConstants.DESCRIPTION_PATH.equals(path)) {
-                    responseDTO = SecretManagementServiceHolder.getSecretConfigManager().updateSecretDescription
+                    responseDTO = secretManager.updateSecretDescription
                             (secretType, name, secretPatchRequest.getValue());
                 } else {
                     throw handleException(Response.Status.BAD_REQUEST, SecretManagementConstants.ErrorMessage
@@ -238,7 +247,7 @@ public class SecretManagementService {
         SecretAddRequest secretAddRequest = buildSecretAddFromSecretUpdateRequest(name, secretUpdateRequest);
         try {
             requestDTO = buildSecretRequestDTOFromSecretAddRequest(secretAddRequest);
-            responseDTO = SecretManagementServiceHolder.getSecretConfigManager().replaceSecret(secretType, requestDTO);
+            responseDTO = secretManager.replaceSecret(secretType, requestDTO);
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_SECRET,
                     name);

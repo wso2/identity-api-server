@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -40,7 +40,12 @@ import org.wso2.carbon.identity.api.server.application.management.v1.CustomInbou
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.Error;
 import java.io.File;
+import org.wso2.carbon.identity.api.server.application.management.v1.GroupBasicInfo;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowGenerateRequest;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowGenerateResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowResultResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowStatusResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
@@ -84,6 +89,8 @@ public interface ApplicationsApiService {
 
       public Response exportApplicationAsFile(String applicationId, Boolean exportSecrets, String accept);
 
+      public Response generateLoginFlow(LoginFlowGenerateRequest loginFlowGenerateRequest);
+
       public Response getAdaptiveAuthTemplates();
 
       public Response getAllApplicationTemplates(Integer limit, Integer offset, SearchContext searchContext);
@@ -104,6 +111,8 @@ public interface ApplicationsApiService {
 
       public Response getCustomProtocolMetadata(String inboundProtocolId);
 
+      public Response getGroups(String domain, String filter);
+
       public Response getInboundAuthenticationConfigurations(String applicationId);
 
       public Response getInboundOAuthConfiguration(String applicationId);
@@ -111,6 +120,10 @@ public interface ApplicationsApiService {
       public Response getInboundProtocols(Boolean customOnly);
 
       public Response getInboundSAMLConfiguration(String applicationId);
+
+      public Response getLoginFlowGenerationResult(String operationId);
+
+      public Response getLoginFlowGenerationStatus(String operationId);
 
       public Response getOIDCMetadata();
 

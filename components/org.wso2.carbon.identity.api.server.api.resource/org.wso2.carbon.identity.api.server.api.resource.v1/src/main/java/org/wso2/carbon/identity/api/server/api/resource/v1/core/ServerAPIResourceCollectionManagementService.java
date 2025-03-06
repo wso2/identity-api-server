@@ -21,11 +21,11 @@ package org.wso2.carbon.identity.api.server.api.resource.v1.core;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.identity.api.resource.collection.mgt.APIResourceCollectionManager;
 import org.wso2.carbon.identity.api.resource.collection.mgt.constant.APIResourceCollectionManagementConstants;
 import org.wso2.carbon.identity.api.resource.collection.mgt.exception.APIResourceCollectionMgtException;
 import org.wso2.carbon.identity.api.resource.collection.mgt.model.APIResourceCollection;
 import org.wso2.carbon.identity.api.resource.collection.mgt.model.APIResourceCollectionSearchResult;
-import org.wso2.carbon.identity.api.server.api.resource.common.APIResourceManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCollectionItem;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCollectionListItem;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCollectionListResponse;
@@ -42,6 +42,7 @@ import org.wso2.carbon.identity.application.common.model.Scope;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,6 +54,13 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
  * Server API Resource Collection Management Service.
  */
 public class ServerAPIResourceCollectionManagementService {
+
+    private final APIResourceCollectionManager apiResourceCollectionManager;
+
+    public ServerAPIResourceCollectionManagementService(APIResourceCollectionManager apiResourceCollectionManager) {
+
+        this.apiResourceCollectionManager = apiResourceCollectionManager;
+    }
 
     /**
      * Get API Resource Collections List.
@@ -72,10 +80,9 @@ public class ServerAPIResourceCollectionManagementService {
                 validateRequiredAttributes(requestedAttributeList);
             }
 
-            APIResourceCollectionSearchResult apiResourceCollectionSearchResult =
-                    APIResourceManagementServiceHolder.getApiResourceCollectionManager()
-                            .getAPIResourceCollections(filter, requestedAttributeList,
-                                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            APIResourceCollectionSearchResult apiResourceCollectionSearchResult = apiResourceCollectionManager
+                    .getAPIResourceCollections(filter, requestedAttributeList,
+                            CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
             List<APIResourceCollection> apiResourceCollections =
                     apiResourceCollectionSearchResult.getAPIResourceCollections();
             if (CollectionUtils.isEmpty(apiResourceCollections)) {
@@ -85,6 +92,8 @@ public class ServerAPIResourceCollectionManagementService {
             }
             apiResourceCollectionListResponse.setTotalResults(apiResourceCollectionSearchResult.getTotalCount());
             apiResourceCollectionListResponse.setApiResourceCollections(apiResourceCollections.stream()
+                    .sorted(Comparator.comparing(APIResourceCollection::getDisplayName,
+                            Comparator.nullsFirst(String.CASE_INSENSITIVE_ORDER)))
                     .map(apiResourceCollection -> buildAPIResourceCollectionListItem(apiResourceCollection,
                             CollectionUtils.isNotEmpty(requestedAttributeList))).collect(Collectors.toList()));
         } catch (APIResourceCollectionMgtException e) {
@@ -104,8 +113,8 @@ public class ServerAPIResourceCollectionManagementService {
         APIResourceCollectionResponse apiResourceCollectionResponse = new APIResourceCollectionResponse();
 
         try {
-            APIResourceCollection apiResourceCollection = APIResourceManagementServiceHolder
-                    .getApiResourceCollectionManager().getAPIResourceCollectionById(collectionId,
+            APIResourceCollection apiResourceCollection = apiResourceCollectionManager
+                    .getAPIResourceCollectionById(collectionId,
                             CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
             if (apiResourceCollection == null) {
                 throw APIResourceMgtEndpointUtil.handleException(Response.Status.NOT_FOUND,

@@ -22,7 +22,6 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Authenticat
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
-import org.wso2.carbon.identity.application.common.ApplicationAuthenticatorService;
 import org.wso2.carbon.identity.application.common.model.AuthenticationStep;
 import org.wso2.carbon.identity.application.common.model.FederatedAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
@@ -32,7 +31,6 @@ import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticato
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.script.AuthenticationScriptConfig;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
-import org.wso2.carbon.identity.base.AuthenticatorPropertyConstants.DefinedByType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -156,24 +154,21 @@ public class UpdateAuthenticationSequence implements UpdateFunction<ServiceProvi
         List<LocalAuthenticatorConfig> localAuthOptions = new ArrayList<>();
         List<IdentityProvider> federatedAuthOptions = new ArrayList<>();
 
+        /* The defined type of the authenticator (USER or SYSTEM) will not be resolved here. Since this is flow of
+         the authenticator is being configured for application authentication flows, only the type of the authenticator
+         local or federated) is relevant. Therefore, resolving by the defined type is not necessary.
+         */
         stepModel.getOptions().forEach(option -> {
             // TODO : add validations to swagger so that we don't need to check inputs here.
             if (FrameworkConstants.LOCAL_IDP_NAME.equals(option.getIdp())) {
                 LocalAuthenticatorConfig localAuthOption = new LocalAuthenticatorConfig();
                 localAuthOption.setEnabled(true);
                 localAuthOption.setName(option.getAuthenticator());
-                DefinedByType definedByType = ApplicationAuthenticatorService.getInstance()
-                        .getLocalAuthenticatorByName(option.getAuthenticator()).getDefinedByType();
-                localAuthOption.setDefinedByType(definedByType);
                 localAuthOptions.add(localAuthOption);
             } else {
                 FederatedAuthenticatorConfig federatedAuthConfig = new FederatedAuthenticatorConfig();
                 federatedAuthConfig.setEnabled(true);
                 federatedAuthConfig.setName(option.getAuthenticator());
-                DefinedByType definedByType = ApplicationAuthenticatorService.getInstance()
-                        .getFederatedAuthenticatorByName(option.getAuthenticator()).getDefinedByType();
-                federatedAuthConfig.setDefinedByType(definedByType);
-
                 IdentityProvider federatedIdp = new IdentityProvider();
                 federatedIdp.setIdentityProviderName(option.getIdp());
                 federatedIdp.setFederatedAuthenticatorConfigs(new FederatedAuthenticatorConfig[]{federatedAuthConfig});

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesCreationModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeCreationModel;
 import javax.validation.constraints.*;
 
@@ -40,6 +41,8 @@ public class APIResourceCreationModel  {
     private String description;
     private Boolean requiresAuthorization;
     private List<ScopeCreationModel> scopes = null;
+
+    private List<AuthorizationDetailsTypesCreationModel> authorizationDetailsTypes = null;
 
 
     /**
@@ -144,6 +147,32 @@ public class APIResourceCreationModel  {
         return this;
     }
 
+        /**
+    **/
+    public APIResourceCreationModel authorizationDetailsTypes(List<AuthorizationDetailsTypesCreationModel> authorizationDetailsTypes) {
+
+        this.authorizationDetailsTypes = authorizationDetailsTypes;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("authorizationDetailsTypes")
+    @Valid
+    public List<AuthorizationDetailsTypesCreationModel> getAuthorizationDetailsTypes() {
+        return authorizationDetailsTypes;
+    }
+    public void setAuthorizationDetailsTypes(List<AuthorizationDetailsTypesCreationModel> authorizationDetailsTypes) {
+        this.authorizationDetailsTypes = authorizationDetailsTypes;
+    }
+
+    public APIResourceCreationModel addAuthorizationDetailsTypesItem(AuthorizationDetailsTypesCreationModel authorizationDetailsTypesItem) {
+        if (this.authorizationDetailsTypes == null) {
+            this.authorizationDetailsTypes = new ArrayList<AuthorizationDetailsTypesCreationModel>();
+        }
+        this.authorizationDetailsTypes.add(authorizationDetailsTypesItem);
+        return this;
+    }
+
     
 
     @Override
@@ -160,12 +189,13 @@ public class APIResourceCreationModel  {
             Objects.equals(this.identifier, apIResourceCreationModel.identifier) &&
             Objects.equals(this.description, apIResourceCreationModel.description) &&
             Objects.equals(this.requiresAuthorization, apIResourceCreationModel.requiresAuthorization) &&
-            Objects.equals(this.scopes, apIResourceCreationModel.scopes);
+            Objects.equals(this.scopes, apIResourceCreationModel.scopes) &&
+            Objects.equals(this.authorizationDetailsTypes, apIResourceCreationModel.authorizationDetailsTypes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, identifier, description, requiresAuthorization, scopes);
+        return Objects.hash(name, identifier, description, requiresAuthorization, scopes, authorizationDetailsTypes);
     }
 
     @Override
@@ -179,6 +209,7 @@ public class APIResourceCreationModel  {
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    requiresAuthorization: ").append(toIndentedString(requiresAuthorization)).append("\n");
         sb.append("    scopes: ").append(toIndentedString(scopes)).append("\n");
+        sb.append("    authorizationDetailsTypes: ").append(toIndentedString(authorizationDetailsTypes)).append("\n");
         sb.append("}");
         return sb.toString();
     }
