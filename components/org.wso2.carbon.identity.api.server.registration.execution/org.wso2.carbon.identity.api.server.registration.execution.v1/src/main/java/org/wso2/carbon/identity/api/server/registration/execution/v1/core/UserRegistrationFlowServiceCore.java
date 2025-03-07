@@ -50,8 +50,12 @@ public class UserRegistrationFlowServiceCore {
     public RegistrationSubmissionResponse initiateUserRegistration() {
 
         try {
+            // Check whether the dynamic registration portal is enabled.
+            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            Utils.isDynamicRegistrationPortalEnabled(tenantDomain);
+
             RegistrationStep registrationStep = userRegistrationMgtService.initiateDefaultRegistrationFlow(
-                    PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+                    tenantDomain);
             RegistrationSubmissionResponse registrationSubmissionResponse = new RegistrationSubmissionResponse();
             if (registrationStep == null) {
                 return registrationSubmissionResponse;
@@ -76,6 +80,10 @@ public class UserRegistrationFlowServiceCore {
                                                                           registrationSubmissionRequest) {
 
         try {
+            // Check whether the dynamic registration portal is enabled.
+            Utils.isDynamicRegistrationPortalEnabled(PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                    .getTenantDomain());
+
             ObjectMapper objectMapper = new ObjectMapper();
             Map<String, String> inpputMap = objectMapper.convertValue(registrationSubmissionRequest.getInputs(),
                     new MapTypeReference());
