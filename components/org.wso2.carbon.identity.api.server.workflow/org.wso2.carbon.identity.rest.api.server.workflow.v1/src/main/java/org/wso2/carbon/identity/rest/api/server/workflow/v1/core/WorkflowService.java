@@ -31,7 +31,6 @@ import org.wso2.carbon.identity.workflow.mgt.WorkflowManagementService;
 import org.wso2.carbon.identity.workflow.mgt.bean.Parameter;
 import org.wso2.carbon.identity.workflow.mgt.bean.Workflow;
 import org.wso2.carbon.identity.workflow.mgt.dto.Association;
-import org.wso2.carbon.identity.workflow.mgt.dto.Template;
 import org.wso2.carbon.identity.workflow.mgt.dto.WorkflowEvent;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowClientException;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowException;
@@ -100,9 +99,9 @@ public class WorkflowService {
      *
      * @param workflow   Workflow details
      * @param workflowId Workflow ID
-     * @return WorkflowSummary
+     * @return
      */
-    public WorkflowSummary updateWorkflow(WorkflowCreation workflow, String workflowId) {
+    public void updateWorkflow(WorkflowCreation workflow, String workflowId) {
 
         WorkflowSummary workflowSummary;
         Workflow workflowBean;
@@ -110,7 +109,7 @@ public class WorkflowService {
             Workflow existingWorkflow = workflowManagementService.getWorkflow(workflowId);
 
             if (existingWorkflow == null) {
-                throw new WorkflowClientException("Workflow with ID: " + workflowId + "doesn't exist");
+                throw new WorkflowClientException("A workflow with ID: " + workflowId + "doesn't exist.");
             }
             workflowBean = createWorkflow(workflow, workflowId);
             List<WorkflowTemplateParameters> templateProperties = workflow.getTemplate().getSteps();
@@ -136,13 +135,11 @@ public class WorkflowService {
 
             workflowManagementService.addWorkflow(workflowBean, parameterList,
                     CarbonContext.getThreadLocalCarbonContext().getTenantId());
-            workflowSummary = getWorkflow(workflowBean);
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_UPDATING_WORKFLOW, workflowId, e);
         } catch (WorkflowException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_WORKFLOW, workflowId, e);
         }
-        return workflowSummary;
     }
 
 
@@ -150,7 +147,7 @@ public class WorkflowService {
      * Retrieve workflow from workflow ID
      *
      * @param workflowId workflow id
-     * @return DetailedWorkflow
+     * @return WorkflowDetails
      */
     public WorkflowDetails getWorkflow(String workflowId) {
 
@@ -210,13 +207,12 @@ public class WorkflowService {
      * Remove a workflow by a given workflow ID
      *
      * @param workflowId ID of workflow to remove
-     * @return Return Success Message
+     * @return
      */
-    public String removeWorkflow(String workflowId) {
+    public void removeWorkflow(String workflowId) {
 
         try {
             workflowManagementService.removeWorkflow(workflowId);
-            return "Workflow successfully removed!";
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_WORKFLOW_NOT_FOUND, workflowId, e);
         } catch (WorkflowException e) {
@@ -247,8 +243,7 @@ public class WorkflowService {
             associationBeans = workflowManagementService.listPaginatedAssociations(
                     CarbonContext.getThreadLocalCarbonContext().getTenantId(), limit, offset, filter);
             for (Association associationBean : associationBeans) {
-                WorkflowAssociation associationTmp = getAssociation(associationBean);
-                associations.add(associationTmp);
+                associations.add(getAssociation(associationBean));
             }
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_LISTING_ASSOCIATIONS, null, e);
@@ -267,15 +262,15 @@ public class WorkflowService {
      * @param associationId ID of association to remove
      * @return Success message
      */
-    public String removeAssociation(String associationId) {
+    public void removeAssociation(String associationId) {
 
         try {
             Association association = workflowManagementService.getAssociation(associationId);
             if (association == null) {
-                throw new WorkflowClientException("Workflow association with ID: " + associationId + "doesn't exist");
+                throw new WorkflowClientException("A workflow association with ID: " + associationId +
+                        "doesn't exist.");
             }
             workflowManagementService.removeAssociation(Integer.parseInt(associationId));
-            return "Workflow association successfully removed!";
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_ASSOCIATION_NOT_FOUND, associationId, e);
         } catch (WorkflowException e) {
@@ -286,39 +281,34 @@ public class WorkflowService {
     /**
      * Add new workflow association
      *
-     * @param associationName Name for the association
-     * @param workflowId      Workflow to associate
-     * @param eventId         Event to associate
-     * @param condition       Condition to check the event for associating
+     * @param workflowAssociation Workflow association details
      * @return Return success message
      */
-    private String addAssociation(String associationName, String workflowId, String eventId, String condition) {
+    public WorkflowAssociationCreation addAssociation(WorkflowAssociationCreation workflowAssociation) {
 
         try {
-            Workflow workflowBean = workflowManagementService.getWorkflow(workflowId);
-            WorkflowEvent event = workflowManagementService.getEvent(eventId);
+            Workflow workflowBean = workflowManagementService.getWorkflow(workflowAssociation.getWorkflowId());
+            WorkflowEvent event = workflowManagementService.getEvent(workflowAssociation.getOperation().toString());
 
             if (workflowBean == null) {
-                throw new WorkflowClientException("Workflow with ID: " + workflowId + "doesn't exist");
+                throw new WorkflowClientException("A workflow with ID: " +
+                        workflowAssociation.getWorkflowId() + "doesn't exist.");
             }
 
             if (event == null) {
-                throw new WorkflowClientException("Event with ID: " + eventId + "doesn't exist");
+                throw new WorkflowClientException("An event with ID: " +
+                        workflowAssociation.getOperation().toString() + "doesn't exist.");
             }
 
-            workflowManagementService.addAssociation(associationName, workflowId, eventId, condition);
-            return "Workflow Association successfully added!";
+            workflowManagementService.addAssociation(workflowAssociation.getAssociationName(),
+                    workflowAssociation.getWorkflowId(), workflowAssociation.getOperation().toString(),
+                    workflowAssociation.getAssociationCondition());
+            return workflowAssociation;
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_ADDING_ASSOCIATION, null, e);
         } catch (WorkflowException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_ASSOCIATION, null, e);
         }
-    }
-
-    public String addAssociation(WorkflowAssociationCreation workflowAssociation) {
-
-        return addAssociation(workflowAssociation.getAssociationName(), workflowAssociation.getWorkflowId(),
-                workflowAssociation.getOperation().toString(), workflowAssociation.getAssociationCondition());
     }
 
     /**
@@ -349,16 +339,27 @@ public class WorkflowService {
      *
      * @param associationId       Association ID
      * @param workflowAssociation Association Details
-     * @return Success message
+     * @return
      */
-    public String changeAssociation(String associationId, WorkflowAssociationPatch workflowAssociation) {
+    public void changeAssociation(String associationId, WorkflowAssociationPatch workflowAssociation) {
 
+        boolean isEnable;
+        String eventId;
         try {
-            boolean isEnable = workflowAssociation.getIsEnabled();
+            if (workflowAssociation.getIsEnabled() == null) {
+                isEnable = workflowManagementService.getAssociation(associationId).isEnabled();
+            } else {
+                isEnable = workflowAssociation.getIsEnabled();
+            }
+
+            if (workflowAssociation.getOperation() == null) {
+                eventId = null;
+            } else {
+                eventId = workflowAssociation.getOperation().toString();
+            }
             workflowManagementService.changeAssociation(associationId, workflowAssociation.getAssociationName(),
-                    workflowAssociation.getWorkflowId(), workflowAssociation.getOperation().toString(),
+                    workflowAssociation.getWorkflowId(), eventId,
                     workflowAssociation.getAssociationCondition(), isEnable);
-            return "Workflow association successfully updated!";
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_UPDATING_ASSOCIATION, associationId, e);
         } catch (WorkflowException e) {
@@ -417,13 +418,13 @@ public class WorkflowService {
         String templateId = workflow.getTemplate().getName();
 
         if (templateId == null) {
-            throw new WorkflowException("Template id can't be empty");
+            throw new WorkflowException("Template ID can't be empty");
         }
         workflowBean.setTemplateId(templateId);
         String workflowImplId = workflow.getEngine();
 
         if (workflowImplId == null) {
-            throw new WorkflowException("Workflowimpl id can't be empty");
+            throw new WorkflowException("Workflowimpl ID can't be empty");
         }
         workflowBean.setWorkflowImplId(workflowImplId);
         return workflowBean;

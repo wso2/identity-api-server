@@ -32,7 +32,7 @@ public class WorkflowAssociationsApiServiceImpl implements WorkflowAssociationsA
 
     public WorkflowAssociationsApiServiceImpl() {
 
-            this.workflowService = WorkflowServiceFactory.getWorkflowService();
+       this.workflowService = WorkflowServiceFactory.getWorkflowService();
     }
 
     @Override
@@ -44,7 +44,8 @@ public class WorkflowAssociationsApiServiceImpl implements WorkflowAssociationsA
     @Override
     public Response deleteWorkflowAssociationById(String associationId) {
 
-        return Response.ok().entity(workflowService.removeAssociation(associationId)).build();
+        workflowService.removeAssociation(associationId);
+        return Response.ok().build();
     }
 
     @Override
@@ -62,6 +63,7 @@ public class WorkflowAssociationsApiServiceImpl implements WorkflowAssociationsA
     @Override
     public Response patchAssociation(String associationId, WorkflowAssociationPatch workflowAssociation) {
 
-        return Response.ok().entity(workflowService.changeAssociation(associationId, workflowAssociation)).build();
+        workflowService.changeAssociation(associationId, workflowAssociation);
+        return Response.ok().build();
     }
 }
