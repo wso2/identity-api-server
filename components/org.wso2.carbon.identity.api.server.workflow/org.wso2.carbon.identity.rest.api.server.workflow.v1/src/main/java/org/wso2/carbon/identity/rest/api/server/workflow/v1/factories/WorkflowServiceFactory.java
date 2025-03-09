@@ -43,5 +43,4 @@ public class WorkflowServiceFactory {
 
         return SERVICE;
     }
-
 }
