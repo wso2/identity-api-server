@@ -23,7 +23,7 @@ package org.wso2.carbon.identity.rest.api.server.workflow.v1.core;
  */
 public class WorkflowEngineConstants {
 
-    public static final String WORKFLOW_ENGINE_PREFIX = "BPS-";
+    public static final String WORKFLOW_ENGINE_PREFIX = "WE-";
 
     /**
      * Enum for server workflow engine related errors in the format of
@@ -42,27 +42,31 @@ public class WorkflowEngineConstants {
         private final String description;
 
         ErrorMessage(String code, String message, String description) {
+
             this.code = code;
             this.message = message;
             this.description = description;
         }
 
         public String getCode() {
+
             return WorkflowEngineConstants.WORKFLOW_ENGINE_PREFIX + code;
         }
 
         public String getMessage() {
+
             return message;
         }
 
         public String getDescription() {
+
             return description;
         }
 
         @Override
         public String toString() {
+
             return code + " | " + message;
         }
-
-    }
+   }
 }
