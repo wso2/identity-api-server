@@ -19,11 +19,9 @@
 package org.wso2.carbon.identity.rest.api.server.workflow.v1.impl;
 
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.*;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.WorkflowsApiService;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.core.WorkflowService;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.factories.WorkflowServiceFactory;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.*;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowCreation;
 
 import javax.ws.rs.core.Response;
 
@@ -33,7 +31,11 @@ public class WorkflowsApiServiceImpl implements WorkflowsApiService {
 
     public WorkflowsApiServiceImpl() {
 
-        this.workflowService = WorkflowServiceFactory.getWorkflowService();
+        try {
+            this.workflowService = WorkflowServiceFactory.getWorkflowService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating Workflow.", e);
+        }
     }
 
     @Override

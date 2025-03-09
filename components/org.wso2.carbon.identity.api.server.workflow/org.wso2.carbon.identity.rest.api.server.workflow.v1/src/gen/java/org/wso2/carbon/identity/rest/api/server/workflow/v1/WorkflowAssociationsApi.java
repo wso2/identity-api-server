@@ -19,15 +19,15 @@
 package org.wso2.carbon.identity.rest.api.server.workflow.v1;
 
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.factories.WorkflowAssociationsApiServiceFactory;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Error;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociation;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationCreation;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationPatch;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociation;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationCreation;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationPatch;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationSummary;
 
 import javax.validation.constraints.*;
 
@@ -48,14 +48,14 @@ public class WorkflowAssociationsApi  {
     
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Create a new workflow association.", notes = "Create a new workflow association by assigning a user operation to an existing workflow.  <b>Scope required:</b>             * internal_workflow_associations_create ", response = WorkflowAssociation.class, authorizations = {
+    @ApiOperation(value = "Create a new workflow association.", notes = "Create a new workflow association by assigning a user operation to an existing workflow.  <b>Scope required:</b>             * internal_workflow_associations_create ", response = WorkflowAssociationCreation.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={  })
     @ApiResponses(value = { 
-        @ApiResponse(code = 201, message = "Item Created", response = WorkflowAssociation.class),
+        @ApiResponse(code = 201, message = "Item Created", response = WorkflowAssociationCreation.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
@@ -72,7 +72,7 @@ public class WorkflowAssociationsApi  {
     @Path("/{association-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete the workflow association by association id.", notes = "Delete a specific workflow association identified by the association ID.  <b>Scope required:</b>                     * internal_workflow_associations_view ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete the workflow association by association-id.", notes = "Delete a specific workflow association identified by the association ID.  <b>Scope required:</b>                     * internal_workflow_associations_view ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -96,7 +96,7 @@ public class WorkflowAssociationsApi  {
     @Path("/{association-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get the workflow association by association id.", notes = "Get a specific workflow association identified by the association id.  <b>Scope required:</b>                     * internal_workflow_associations_view ", response = WorkflowAssociation.class, authorizations = {
+    @ApiOperation(value = "Get the workflow association by association-id.", notes = "Get a specific workflow association identified by the association id.  <b>Scope required:</b>                     * internal_workflow_associations_view ", response = WorkflowAssociation.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -120,14 +120,14 @@ public class WorkflowAssociationsApi  {
     
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve all the available workflow associations.", notes = "Retrieve all the available workflow associations in the system.  <b>Scope required:</b>             * internal_workflow_associations_view ", response = WorkflowAssociation.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Retrieve all the available workflow associations.", notes = "Retrieve all the available workflow associations in the system.  <b>Scope required:</b>             * internal_workflow_associations_view ", response = WorkflowAssociationSummary.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={  })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Array of workflow associations matching the search criteria", response = WorkflowAssociation.class, responseContainer = "List"),
+        @ApiResponse(code = 200, message = "Array of workflow associations matching the search criteria", response = WorkflowAssociationSummary.class, responseContainer = "List"),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
@@ -144,7 +144,7 @@ public class WorkflowAssociationsApi  {
     @Path("/{association-id}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Partially update association by ID ", notes = "Partially update an association by ID.<br>    <b>Scope required:</b> <br>       * internal_workflow_associations_update ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Partially update association by association-id. ", notes = "Partially update an association by association-id.<br>    <b>Scope required:</b> <br>       * internal_workflow_associations_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
