@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -19,9 +19,9 @@
 package org.wso2.carbon.identity.rest.api.server.workflow.v1;
 
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.factories.WorkflowsApiServiceFactory;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.DetailedWorkflow;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Error;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowCreation;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowDetails;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowSummary;
 
 import javax.validation.Valid;
@@ -38,8 +38,7 @@ public class WorkflowsApi  {
 
     private final WorkflowsApiService delegate;
 
-    public WorkflowsApi() {
-
+    public WorkflowsApi(){
         this.delegate = WorkflowsApiServiceFactory.getWorkflowsApi();
     }
 
@@ -96,14 +95,14 @@ public class WorkflowsApi  {
     @Path("/{workflow-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve the workflow by workflow id.", notes = "Retrieve information about a specific workflow identified by the workflow id.  <b>Scope required:</b>     * internal_workflow_view ", response = DetailedWorkflow.class, authorizations = {
+    @ApiOperation(value = "Retrieve the workflow by workflow id.", notes = "Retrieve information about a specific workflow identified by the workflow id.  <b>Scope required:</b>     * internal_workflow_view ", response = WorkflowDetails.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={  })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Information about the workflow identified by the workflow-id.", response = DetailedWorkflow.class),
+        @ApiResponse(code = 200, message = "Information about the workflow identified by the workflow-id.", response = WorkflowDetails.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),

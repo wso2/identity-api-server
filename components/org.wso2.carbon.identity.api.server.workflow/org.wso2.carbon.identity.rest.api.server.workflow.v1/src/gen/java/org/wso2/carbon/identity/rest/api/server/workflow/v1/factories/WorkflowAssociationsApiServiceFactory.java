@@ -25,9 +25,8 @@ public class WorkflowAssociationsApiServiceFactory {
 
    private final static WorkflowAssociationsApiService service = new WorkflowAssociationsApiServiceImpl();
 
-   public static WorkflowAssociationsApiService getWorkflowAssociationsApi() {
-
+   public static WorkflowAssociationsApiService getWorkflowAssociationsApi()
+   {
       return service;
-
    }
 }

@@ -19,12 +19,10 @@
 package org.wso2.carbon.identity.rest.api.server.workflow.v1.impl;
 
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.*;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.WorkflowAssociationsApiService;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.core.WorkflowService;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.factories.WorkflowServiceFactory;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.*;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationCreation;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationPatch;
+import java.util.List;
 
 import javax.ws.rs.core.Response;
 
@@ -62,8 +60,8 @@ public class WorkflowAssociationsApiServiceImpl implements WorkflowAssociationsA
     }
 
     @Override
-    public Response patchAssociation(String associationId, WorkflowAssociationPatch workflowAssociationPatch) {
+    public Response patchAssociation(String associationId, WorkflowAssociationPatch workflowAssociation) {
 
-        return Response.ok().entity(workflowService.changeAssociation(associationId, workflowAssociationPatch)).build();
+        return Response.ok().entity(workflowService.changeAssociation(associationId, workflowAssociation)).build();
     }
 }
