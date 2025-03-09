@@ -260,7 +260,7 @@ public class Utils {
 
         ExecutorDTO executorDTO = new ExecutorDTO.Builder().name(executor.getName()).build();
         Map<String, Object> meta = convertToMap(executor.getMeta());
-        if (meta != null) {
+        if (meta != null && !meta.isEmpty() && meta.containsKey(RegistrationFlowEndpointConstants.Schema.IDP_NAME)) {
             executorDTO.setIdpName(String.valueOf(meta.get(RegistrationFlowEndpointConstants.Schema.IDP_NAME)));
         }
         return executorDTO;
