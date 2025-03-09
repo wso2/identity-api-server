@@ -47,7 +47,8 @@ public class WorkflowsApiServiceImpl implements WorkflowsApiService {
     @Override
     public Response deleteWorkflowById(String workflowId) {
 
-        return Response.ok().entity(workflowService.removeWorkflow(workflowId)).build();
+        workflowService.removeWorkflow(workflowId);
+        return Response.ok().build();
     }
 
     @Override
@@ -65,6 +66,7 @@ public class WorkflowsApiServiceImpl implements WorkflowsApiService {
     @Override
     public Response updateWorkflow(String workflowId, WorkflowCreation workflowCreation) {
 
-        return Response.ok().entity(workflowService.updateWorkflow(workflowCreation, workflowId)).build();
+        workflowService.updateWorkflow(workflowCreation, workflowId);
+        return Response.ok().build();
     }
 }
