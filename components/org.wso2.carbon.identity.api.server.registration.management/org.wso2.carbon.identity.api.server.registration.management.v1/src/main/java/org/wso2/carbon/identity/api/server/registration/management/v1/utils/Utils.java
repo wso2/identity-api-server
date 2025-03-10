@@ -47,6 +47,7 @@ import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER;
+import static org.wso2.carbon.identity.api.server.registration.management.v1.constants.RegistrationFlowEndpointConstants.Schema.IDP_NAME;
 
 /**
  * Utility class for registration flow management.
@@ -179,7 +180,7 @@ public class Utils {
 
         if (executorDTO.getIdpName() != null) {
             Map<String, String> meta = new java.util.HashMap<>();
-            meta.put(RegistrationFlowEndpointConstants.Schema.IDP_NAME, executorDTO.getIdpName());
+            meta.put(IDP_NAME, executorDTO.getIdpName());
             executor.meta(meta);
         }
         return executor;
@@ -260,8 +261,8 @@ public class Utils {
 
         ExecutorDTO executorDTO = new ExecutorDTO.Builder().name(executor.getName()).build();
         Map<String, Object> meta = convertToMap(executor.getMeta());
-        if (meta != null && !meta.isEmpty() && meta.containsKey(RegistrationFlowEndpointConstants.Schema.IDP_NAME)) {
-            executorDTO.setIdpName(String.valueOf(meta.get(RegistrationFlowEndpointConstants.Schema.IDP_NAME)));
+        if (meta != null && !meta.isEmpty() && meta.containsKey(IDP_NAME)) {
+            executorDTO.setIdpName(String.valueOf(meta.get(IDP_NAME)));
         }
         return executorDTO;
     }
