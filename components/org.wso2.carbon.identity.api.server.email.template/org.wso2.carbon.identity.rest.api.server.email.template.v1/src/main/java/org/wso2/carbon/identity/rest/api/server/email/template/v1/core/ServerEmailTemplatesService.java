@@ -591,7 +591,11 @@ public class ServerEmailTemplatesService {
                 Constants.getMappedErrorMessage(exception.getErrorCode()) != null) {
             // Specific error with code is found.
             Constants.ErrorMessage errorMessage = Constants.getMappedErrorMessage(exception.getErrorCode());
-            errorResponse = getErrorBuilder(errorMessage).build(log, exception, errorEnum.getDescription());
+            if (errorMessage == Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_TYPE_ALREADY_EXISTS) {
+                errorResponse = getErrorBuilder(errorMessage).build(log, errorEnum.getDescription());
+            } else {
+                errorResponse = getErrorBuilder(errorMessage).build(log, exception, errorEnum.getDescription());
+            }
             status = errorMessage.getHttpStatus();
 
         } else if (exception instanceof I18nEmailMgtClientException) {
