@@ -221,7 +221,7 @@ public enum DefinedByEnum {
             Objects.equals(this.name, federatedAuthenticatorListItem.name) &&
             Objects.equals(this.isEnabled, federatedAuthenticatorListItem.isEnabled) &&
             Objects.equals(this.definedBy, federatedAuthenticatorListItem.definedBy) &&
-                Objects.equals(this.amrValue, federatedAuthenticatorListItem.amrValue) &&
+            Objects.equals(this.amrValue, federatedAuthenticatorListItem.amrValue) &&
             Objects.equals(this.tags, federatedAuthenticatorListItem.tags) &&
             Objects.equals(this.self, federatedAuthenticatorListItem.self);
     }

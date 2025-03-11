@@ -148,7 +148,7 @@ public class AuthenticatorsApi  {
     @Path("/system")
 
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get all the system local autheticators ", notes = "Get all the system local autheticators ", response = Authenticator.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Get all the system local authenticators ", notes = "Get all the system local authenticators ", response = Authenticator.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
 
@@ -236,7 +236,7 @@ public class AuthenticatorsApi  {
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response updateSystemLocalAuthenticatorAmrValueById(@ApiParam(value = "ID of an authenticator",required=true) @PathParam("authenticator-id") String authenticatorId, @ApiParam(value = "This represents the user defined local authenticator to be created." ,required=true) @Valid
+    public Response updateSystemLocalAuthenticatorAmrValueById(@ApiParam(value = "ID of an authenticator",required=true) @PathParam("authenticator-id") String authenticatorId, @ApiParam(value = "This represents the system defined local authenticator to be created." ,required=true) @Valid
     SystemLocalAuthenticatorUpdate systemLocalAuthenticatorUpdate) {
 
         return delegate.updateSystemLocalAuthenticatorAmrValueById(authenticatorId,  systemLocalAuthenticatorUpdate );
