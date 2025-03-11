@@ -132,7 +132,7 @@ public class LocalAuthenticatorConfigBuilderFactory {
      * @param config The user defined local authenticator update request.
      * @return The system local authenticator update model.
      */
-    public static SystemLocalAuthenticatorUpdate buildSystemLocalAuthenticator(SystemLocalAuthenticatorUpdate config) {
+    public static SystemLocalAuthenticatorUpdate buildSystemLocalAuthenticator(LocalAuthenticatorConfig config) {
         SystemLocalAuthenticatorUpdate systemConfig = new SystemLocalAuthenticatorUpdate();
         systemConfig.setAmrValue(config.getAmrValue());
         return systemConfig;

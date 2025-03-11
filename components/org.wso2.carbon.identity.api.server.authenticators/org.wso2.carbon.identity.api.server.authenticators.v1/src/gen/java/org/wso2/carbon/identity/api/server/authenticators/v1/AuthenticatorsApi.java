@@ -197,7 +197,7 @@ public class AuthenticatorsApi  {
     @Path("/system/{authenticator-id}")
 
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get the system local autheticator specified by the authenticator-id ", notes = "Get the system local autheticator specified by the authenticator-id ", response = Authenticator.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Get the system local authenticator specified by the authenticator-id ", notes = "Get the system local authenticator specified by the authenticator-id ", response = Authenticator.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
 

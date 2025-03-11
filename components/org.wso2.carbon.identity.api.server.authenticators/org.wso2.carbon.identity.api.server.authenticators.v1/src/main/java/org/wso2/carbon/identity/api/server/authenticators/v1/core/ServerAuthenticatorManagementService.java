@@ -296,7 +296,9 @@ public class ServerAuthenticatorManagementService {
             }
 //            existingAuthenticator.setAmrValue(systemConfig.getAmrValue());
             LocalAuthenticatorConfig localAuthenticatorConfig = new LocalAuthenticatorConfig();
-            localAuthenticatorConfig.setName(systemConfig.getAmrValue());
+            localAuthenticatorConfig.setName(existingAuthenticator.getName());
+            localAuthenticatorConfig.setAmrValue(systemConfig.getAmrValue());
+            log.info("AMR Value: "+ systemConfig.getAmrValue());
             LocalAuthenticatorConfig updatedConfig = applicationAuthenticatorService
                     .updateAuthenticatorAmrValue(localAuthenticatorConfig, tenantDomain);
 
