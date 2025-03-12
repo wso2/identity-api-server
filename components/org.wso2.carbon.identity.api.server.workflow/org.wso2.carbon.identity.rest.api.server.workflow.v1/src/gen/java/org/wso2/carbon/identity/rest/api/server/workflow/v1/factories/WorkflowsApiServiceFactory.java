@@ -25,8 +25,8 @@ public class WorkflowsApiServiceFactory {
 
    private final static WorkflowsApiService service = new WorkflowsApiServiceImpl();
 
-   public static WorkflowsApiService getWorkflowsApi()
-   {
+   public static WorkflowsApiService getWorkflowsApi() {
+
       return service;
    }
 }
