@@ -32,6 +32,7 @@ import org.wso2.carbon.identity.api.server.registration.management.v1.Position;
 import org.wso2.carbon.identity.api.server.registration.management.v1.Size;
 import org.wso2.carbon.identity.api.server.registration.management.v1.Step;
 import org.wso2.carbon.identity.api.server.registration.management.v1.constants.RegistrationFlowEndpointConstants;
+import org.wso2.carbon.identity.user.registration.mgt.Constants;
 import org.wso2.carbon.identity.user.registration.mgt.exception.RegistrationClientException;
 import org.wso2.carbon.identity.user.registration.mgt.exception.RegistrationFrameworkException;
 import org.wso2.carbon.identity.user.registration.mgt.model.ActionDTO;
@@ -134,7 +135,8 @@ public class Utils {
     private static Data convertToData(DataDTO dataDTO) {
 
         return new Data()
-                .components(dataDTO.getComponents().stream()
+                .components(dataDTO.getComponents().isEmpty() ? null :
+                        dataDTO.getComponents().stream()
                         .map(Utils::convertToComponent)
                         .collect(Collectors.toList()))
                 .action(convertToAction(dataDTO.getAction()));
@@ -201,19 +203,19 @@ public class Utils {
                 .coordinateY(step.getPosition().getY().doubleValue())
                 .width(step.getSize().getWidth().doubleValue())
                 .height(step.getSize().getHeight().doubleValue())
-                .data(convertToDataDTO(step.getData()))
+                .data(convertToDataDTO(step.getType(), step.getData()))
                 .build();
     }
 
-    private static DataDTO convertToDataDTO(Data data) {
+    private static DataDTO convertToDataDTO(String type, Data data) {
 
-        if (data.getComponents() != null) {
+        if (Constants.StepTypes.VIEW.equals(type) && data.getComponents() != null) {
             return new DataDTO.Builder()
                     .components(data.getComponents().stream()
                             .map(Utils::convertToComponentDTO)
                             .collect(Collectors.toList()))
                     .build();
-        } else if (data.getAction() != null) {
+        } else if (Constants.StepTypes.REDIRECTION.equals(type) && data.getAction() != null) {
             return new DataDTO.Builder()
                     .action(convertToActionDTO(data.getAction()))
                     .build();
