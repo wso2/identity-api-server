@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -47,14 +47,14 @@ public class WorkflowsApi  {
     
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Create a new workflow.", notes = "Create a new workflow using the specified workflow template and execution engine.  <b>Scope required:</b>     * internal_workflow_create ", response = WorkflowSummary.class, authorizations = {
+    @ApiOperation(value = "Create a new workflow.", notes = "Create a new workflow using the specified workflow template and execution engine.  <b>Scope required:</b>     * internal_workflow_create ", response = WorkflowDetails.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={  })
     @ApiResponses(value = { 
-        @ApiResponse(code = 201, message = "Item Created", response = WorkflowSummary.class),
+        @ApiResponse(code = 201, message = "Item Created", response = WorkflowDetails.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
@@ -143,14 +143,14 @@ public class WorkflowsApi  {
     @Path("/{workflow-id}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update an existing workflow.", notes = "Update a workflow identified by workflow-id.  <b>Scope required:</b>             * internal_workflow_update ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update an existing workflow.", notes = "Update a workflow identified by workflow-id.  <b>Scope required:</b>             * internal_workflow_update ", response = WorkflowDetails.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={  })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Item Updated", response = Void.class),
+        @ApiResponse(code = 200, message = "Information about the workflow identified by the workflow-id.", response = WorkflowDetails.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
