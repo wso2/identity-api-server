@@ -20,6 +20,9 @@ package org.wso2.carbon.identity.rest.api.server.workflow.v1.factories;
 
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.core.WorkflowEngineService;
 
+/**
+ * Factory class for WorkflowEngineService.
+ */
 public class WorkflowEngineServiceFactory {
 
     private static final WorkflowEngineService SERVICE;
