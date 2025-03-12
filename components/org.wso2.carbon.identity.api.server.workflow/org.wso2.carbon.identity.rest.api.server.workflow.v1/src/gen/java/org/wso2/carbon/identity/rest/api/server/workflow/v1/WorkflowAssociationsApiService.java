@@ -33,5 +33,5 @@ public interface WorkflowAssociationsApiService {
 
       public Response listWorkflowAssociations(Integer limit, Integer offset, String filter);
 
-      public Response patchAssociation(String associationId, WorkflowAssociationPatch workflowAssociationPatch);
+      public Response updateAssociation(String associationId, WorkflowAssociationPatch workflowAssociationPatch);
 }
