@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  title: WorkFlow Engine
-  description: This is the RESTful API for managing WorkFlow Engines in WSO2 Identity
+  title: Workflows
+  description: This is the RESTful API for managing workflows in WSO2 Identity
     Server
   contact:
     name: WSO2 Identity Server
@@ -117,13 +117,27 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/WorkflowSummary'
+                $ref: '#/components/schemas/WorkflowDetails'
               example:
                 id: "100"
                 name: User Approval Workflow
                 description: Workflow to approve user role related requests
                 engine: Simple Workflow Engine
-                template: MultiStepApprovalTemplate
+                template:
+                  name: MultiStepApprovalTemplate
+                  steps:
+                    - step: 1
+                      options:
+                        - entity: roles
+                          values:
+                            - admin
+                            - manager
+                        - entity: users
+                          values:
+                            - John
+                            - Tom
+                approvalTask: Approval Required
+                approvalTaskDescription: Your approval is needed to complete this task
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -179,9 +193,50 @@ paths:
           'application/json':
             schema:
               $ref: '#/components/schemas/WorkflowCreation'
+            example:
+              id: "100"
+              name: User Approval Workflow
+              description: Workflow to approve user role related requests
+              engine: Simple Workflow Engine
+              template:
+                name: MultiStepApprovalTemplate
+                steps:
+                  - step: 1
+                    options:
+                      - entity: roles
+                        values:
+                          - admin
+                      - entity: users
+                        values:
+                          - John
+              approvalTask: Approval Required
+              approvalTaskDescription: Your approval is needed to complete this task
+
       responses:
         '200':
-          $ref: '#/components/responses/Updated'
+          description: Information about the workflow identified by the workflow-id.
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/WorkflowDetails'
+              example:
+                id: "100"
+                name: User Approval Workflow
+                description: Workflow to approve user role related requests
+                engine: Simple Workflow Engine
+                template:
+                  name: MultiStepApprovalTemplate
+                  steps:
+                    - step: 1
+                      options:
+                        - entity: roles
+                          values:
+                            - admin
+                        - entity: users
+                          values:
+                            - John
+                approvalTask: Approval Required
+                approvalTaskDescription: Your approval is needed to complete this task
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -236,7 +291,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/WorkflowAssociationSummary'
+                  $ref: '#/components/schemas/WorkflowAssociation'
               example:
                 - id: "500"
                   associationName: User Registration Workflow Association
@@ -313,13 +368,13 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/WorkflowAssociation'
+                $ref: '#/components/schemas/WorkflowAssociationDetails'
               example:
                 id: "500"
                 associationName: User Registration Workflow Association
                 operation: ADD_USER
                 workflowName: User Approval Workflow
-                associationCondition: Username equals John
+                associationCondition: //*[local-name()='parameter'][@name='Username']/*[local-name()='value']/*[local-name()='itemValue']/text()='John'
                 isEnabled: true
         '400':
           $ref: '#/components/responses/InvalidInput'
@@ -357,7 +412,7 @@ paths:
     patch:
       summary: |
         Partially update association by association-id.
-      operationId: patchAssociation
+      operationId: updateAssociation
       description: |
         Partially update an association by association-id.<br>
         
@@ -374,12 +429,23 @@ paths:
             example:
               associationName: User Registration Workflow Association
               operation: ADD_USER
-              workflowId: "500"
-              associationCondition: Role Name equals Employee
+              workflowId: "100"
+              associationCondition: //*[local-name()='parameter'][@name='Rolename']/*[local-name()='value']/*[local-name()='itemValue']/text()='Employee'
               isEnabled: true
       responses:
         '200':
           description: Successfully Updated
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/WorkflowAssociationDetails'
+              example:
+                id: "500"
+                associationName: User Registration Workflow Association
+                operation: ADD_USER
+                workflowName: User Approval Workflow
+                associationCondition: //*[local-name()='parameter'][@name='Username']/*[local-name()='value']/*[local-name()='itemValue']/text()='John'
+                isEnabled: true
         '400':
           description: Bad Request
           content:
@@ -455,6 +521,10 @@ components:
     WorkflowDetails:
       type: object
       properties:
+        id:
+          type: string
+          example: "100"
+          description: "Id of the workflow"
         name:
           type: string
           example: "User Approval Workflow"
@@ -516,7 +586,7 @@ components:
       properties:
         name:
           type: string
-          example: "MultiStepApproval"
+          example: "MultiStepApprovalTemplate"
           description: "Name of the workflow template"
         steps:
           type: array
@@ -621,7 +691,7 @@ components:
           example: true
           description: "Association Status"
 
-    WorkflowAssociationSummary:
+    WorkflowAssociationDetails:
       type: object
       properties:
         id:
@@ -632,10 +702,16 @@ components:
           type: string
           example: "User Registration Workflow Association"
           description: "Name of the workflow association"
+        operation:
+          $ref: "#/components/schemas/Operation"
         workflowName:
           type: string
           example: "User Approval Workflow"
           description: "Assigned Workflow"
+        associationCondition:
+          type: string
+          example: "//*[local-name()='parameter'][@name='Rolename']/*[local-name()='value']/*[local-name()='itemValue']/text()='Employee'"
+          description: "Condition added to the association"
         isEnabled:
           type: boolean
           example: true
@@ -656,11 +732,11 @@ components:
           $ref: "#/components/schemas/Operation"
         workflowId:
           type: string
-          example: "456"
+          example: "100"
           description: "Id of the assigned workflow"
         associationCondition:
           type: string
-          example: "Role Name equals Manager"
+          example: "//*[local-name()='parameter'][@name='Rolename']/*[local-name()='value']/*[local-name()='itemValue']/text()='Employee'"
           description: "Condition added to the association"
         isEnabled:
           type: boolean
@@ -679,11 +755,11 @@ components:
           $ref: "#/components/schemas/Operation"
         workflowId:
           type: string
-          example: "456"
+          example: "100"
           description: "Id of the assigned workflow"
         associationCondition:
           type: string
-          example: "Role Name equals Manager"
+          example: "//*[local-name()='parameter'][@name='Rolename']/*[local-name()='value']/*[local-name()='itemValue']/text()='Employee'"
           description: "Condition added to the association"
         isEnabled:
           type: boolean
