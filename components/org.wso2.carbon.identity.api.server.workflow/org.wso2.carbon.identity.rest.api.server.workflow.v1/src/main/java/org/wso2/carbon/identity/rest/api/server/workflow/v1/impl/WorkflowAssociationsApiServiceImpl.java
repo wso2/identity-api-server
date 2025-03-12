@@ -22,10 +22,12 @@ import org.wso2.carbon.identity.rest.api.server.workflow.v1.*;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.core.WorkflowService;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.factories.WorkflowServiceFactory;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.*;
-import java.util.List;
 
 import javax.ws.rs.core.Response;
 
+/**
+ * Implementation of workflow association management REST API.
+ */
 public class WorkflowAssociationsApiServiceImpl implements WorkflowAssociationsApiService {
 
     private final WorkflowService workflowService;
@@ -61,9 +63,8 @@ public class WorkflowAssociationsApiServiceImpl implements WorkflowAssociationsA
     }
 
     @Override
-    public Response patchAssociation(String associationId, WorkflowAssociationPatch workflowAssociation) {
+    public Response updateAssociation(String associationId, WorkflowAssociationPatch workflowAssociation) {
 
-        workflowService.changeAssociation(associationId, workflowAssociation);
-        return Response.ok().build();
+        return Response.ok().entity(workflowService.changeAssociation(associationId, workflowAssociation)).build();
     }
 }

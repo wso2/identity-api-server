@@ -22,20 +22,20 @@ import org.wso2.carbon.identity.rest.api.server.workflow.v1.*;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.core.WorkflowService;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.factories.WorkflowServiceFactory;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.*;
+import java.util.List;
 
 import javax.ws.rs.core.Response;
 
+/**
+ * Implementation of Workflow Management REST API.
+ */
 public class WorkflowsApiServiceImpl implements WorkflowsApiService {
 
     private final WorkflowService workflowService;
 
     public WorkflowsApiServiceImpl() {
 
-        try {
-            this.workflowService = WorkflowServiceFactory.getWorkflowService();
-        } catch (IllegalStateException e) {
-            throw new RuntimeException("Error occurred while initiating Workflow.", e);
-        }
+        this.workflowService = WorkflowServiceFactory.getWorkflowService();
     }
 
     @Override
@@ -64,9 +64,8 @@ public class WorkflowsApiServiceImpl implements WorkflowsApiService {
     }
 
     @Override
-    public Response updateWorkflow(String workflowId, WorkflowCreation workflowCreation) {
+    public Response updateWorkflow(String workflowId, WorkflowCreation workflow) {
 
-        workflowService.updateWorkflow(workflowCreation, workflowId);
-        return Response.ok().build();
+        return Response.ok().entity(workflowService.updateWorkflow(workflow, workflowId)).build();
     }
 }
