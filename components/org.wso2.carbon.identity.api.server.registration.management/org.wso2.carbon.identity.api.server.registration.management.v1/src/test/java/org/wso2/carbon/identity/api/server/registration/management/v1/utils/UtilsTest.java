@@ -28,6 +28,7 @@ import org.wso2.carbon.identity.api.server.registration.management.v1.Executor;
 import org.wso2.carbon.identity.api.server.registration.management.v1.Position;
 import org.wso2.carbon.identity.api.server.registration.management.v1.Size;
 import org.wso2.carbon.identity.api.server.registration.management.v1.Step;
+import org.wso2.carbon.identity.user.registration.mgt.Constants;
 import org.wso2.carbon.identity.user.registration.mgt.model.ActionDTO;
 import org.wso2.carbon.identity.user.registration.mgt.model.ComponentDTO;
 import org.wso2.carbon.identity.user.registration.mgt.model.DataDTO;
@@ -132,7 +133,7 @@ public class UtilsTest {
                 .config(config));
         return new Step()
                 .id("step1")
-                .type("step1")
+                .type(Constants.StepTypes.VIEW)
                 .size(new Size()
                         .height(BigDecimal.valueOf(10.0))
                         .width(BigDecimal.valueOf(10.0)))
@@ -146,7 +147,7 @@ public class UtilsTest {
 
         return new Step()
                 .id("step2")
-                .type("step2")
+                .type(Constants.StepTypes.REDIRECTION)
                 .size(new Size()
                         .height(BigDecimal.valueOf(10.0))
                         .width(BigDecimal.valueOf(10.0)))
@@ -170,7 +171,7 @@ public class UtilsTest {
         StepDTO componentStepDTO = Utils.convertToStepDTO(buildComponentStep());
         StepDTO actionStepDTO = Utils.convertToStepDTO(buildActionStep());
         assertEquals(componentStepDTO.getId(), "step1");
-        assertEquals(componentStepDTO.getType(), "step1");
+        assertEquals(componentStepDTO.getType(), Constants.StepTypes.VIEW);
         List<ComponentDTO> components = componentStepDTO.getData().getComponents();
         assertEquals(components.size(), 1);
         assertEquals(components.get(0).getId(), "component1");
@@ -179,7 +180,7 @@ public class UtilsTest {
         assertEquals(subComponents.get(0).getId(), "component2");
 
         assertEquals(actionStepDTO.getId(), "step2");
-        assertEquals(actionStepDTO.getType(), "step2");
+        assertEquals(actionStepDTO.getType(), Constants.StepTypes.REDIRECTION);
         assertEquals(actionStepDTO.getData().getAction().getType(), "action1");
         assertEquals(actionStepDTO.getData().getAction().getNextId(), "nextId1");
     }
