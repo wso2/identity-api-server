@@ -394,8 +394,6 @@ public class IdentityProviderResponse  {
         this.implicitAssociation = implicitAssociation;
     }
 
-
-
     @Override
     public boolean equals(java.lang.Object o) {
 
@@ -428,7 +426,8 @@ public class IdentityProviderResponse  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, templateId, isEnabled, isPrimary, image, isFederationHub, homeRealmIdentifier, certificate, alias, idpIssuerName, claims, roles, groups, federatedAuthenticators, provisioning, implicitAssociation);
+        return Objects.hash(id, name, description, templateId, isEnabled, isPrimary, image, isFederationHub,
+                homeRealmIdentifier, certificate, alias, idpIssuerName, claims, roles, groups, federatedAuthenticators, provisioning, implicitAssociation);
     }
 
     @Override

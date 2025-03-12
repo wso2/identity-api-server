@@ -38,6 +38,7 @@ public class FederatedAuthenticatorPUTRequest  {
     private String name;
     private Boolean isEnabled = false;
     private Boolean isDefault = false;
+    private String amrValue;
 
 @XmlType(name="DefinedByEnum")
 @XmlEnum(String.class)
@@ -167,6 +168,23 @@ public enum DefinedByEnum {
     }
 
     /**
+     **/
+    public FederatedAuthenticatorPUTRequest amrValue(String amrValue) {
+        this.amrValue = amrValue;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("amrValue")
+    @Valid
+    public String getAmrValue() {
+        return amrValue;
+    }
+    public void setAmrValue(String amrValue) {
+        this.amrValue = amrValue;
+    }
+
+    /**
     **/
     public FederatedAuthenticatorPUTRequest properties(List<Property> properties) {
 
@@ -227,13 +245,14 @@ public enum DefinedByEnum {
             Objects.equals(this.isEnabled, federatedAuthenticatorPUTRequest.isEnabled) &&
             Objects.equals(this.isDefault, federatedAuthenticatorPUTRequest.isDefault) &&
             Objects.equals(this.definedBy, federatedAuthenticatorPUTRequest.definedBy) &&
+            Objects.equals(this.amrValue, federatedAuthenticatorPUTRequest.amrValue) &&
             Objects.equals(this.properties, federatedAuthenticatorPUTRequest.properties) &&
             Objects.equals(this.endpoint, federatedAuthenticatorPUTRequest.endpoint);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authenticatorId, name, isEnabled, isDefault, definedBy, properties, endpoint);
+        return Objects.hash(authenticatorId, name, isEnabled, isDefault, definedBy, properties, endpoint, amrValue);
     }
 
     @Override
@@ -247,6 +266,7 @@ public enum DefinedByEnum {
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
         sb.append("    isDefault: ").append(toIndentedString(isDefault)).append("\n");
         sb.append("    definedBy: ").append(toIndentedString(definedBy)).append("\n");
+        sb.append("    amrValue: ").append(toIndentedString(amrValue)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
         sb.append("}");
