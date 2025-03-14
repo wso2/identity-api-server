@@ -21,7 +21,12 @@ package org.wso2.carbon.identity.api.server.action.management.v1.mapper;
 import org.wso2.carbon.identity.action.management.api.exception.ActionMgtException;
 import org.wso2.carbon.identity.action.management.api.exception.ActionMgtServerException;
 import org.wso2.carbon.identity.action.management.api.model.Action;
-import org.wso2.carbon.identity.api.server.action.management.v1.*;
+import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
+import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
+import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
+import org.wso2.carbon.identity.api.server.action.management.v1.PreUpdateProfileActionModel;
+import org.wso2.carbon.identity.api.server.action.management.v1.PreUpdateProfileActionResponse;
+import org.wso2.carbon.identity.api.server.action.management.v1.PreUpdateProfileActionUpdateModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.util.ActionMapperUtil;
 import org.wso2.carbon.identity.user.pre.update.profile.action.api.model.PreUpdateProfileAction;
 

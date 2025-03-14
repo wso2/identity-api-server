@@ -21,7 +21,12 @@ package org.wso2.carbon.identity.api.server.action.management.v1.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.wso2.carbon.identity.action.management.api.model.Action;
-import org.wso2.carbon.identity.api.server.action.management.v1.*;
+import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
+import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
+import org.wso2.carbon.identity.api.server.action.management.v1.PreUpdatePasswordActionModel;
+import org.wso2.carbon.identity.api.server.action.management.v1.PreUpdatePasswordActionUpdateModel;
+import org.wso2.carbon.identity.api.server.action.management.v1.PreUpdateProfileActionModel;
+import org.wso2.carbon.identity.api.server.action.management.v1.PreUpdateProfileActionUpdateModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants;
 
 import java.util.Set;

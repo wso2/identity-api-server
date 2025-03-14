@@ -54,7 +54,6 @@ public class PreUpdateProfileActionModel extends ActionModel {
     @ApiModelProperty(required = true)
     @JsonProperty("attributes")
     @Valid
-    @NotNull(message = "Property attributes cannot be null.")
     public List<String> getAttributes() {
 
         return attributes;
