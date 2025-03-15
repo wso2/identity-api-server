@@ -91,7 +91,7 @@ public class PreUpdateProfileActionResponse extends ActionResponse {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class ActionResponse {\n");
+        sb.append("class PreUpdateProfileActionResponse {\n");
         sb.append("    id: ").append(toIndentedString(getId())).append("\n");
         sb.append("    type: ").append(toIndentedString(getType())).append("\n");
         sb.append("    name: ").append(toIndentedString(getName())).append("\n");

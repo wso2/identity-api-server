@@ -71,7 +71,6 @@ public class ActionDeserializer {
                 case PRE_UPDATE_PROFILE:
                     PreUpdateProfileActionModel preUpdateProfileActionModel = objectMapper.readValue(jsonBody,
                             PreUpdateProfileActionModel.class);
-                    // Validate the object
                     validateActionModel(preUpdateProfileActionModel, PreUpdateProfileActionModel.class);
                     actionModel = preUpdateProfileActionModel;
                     break;
@@ -114,7 +113,6 @@ public class ActionDeserializer {
                 case PRE_UPDATE_PROFILE:
                     PreUpdateProfileActionUpdateModel preUpdateProfileActionUpdateModel =
                             objectMapper.readValue(jsonBody, PreUpdateProfileActionUpdateModel.class);
-                    // Validate the object
                     validateActionModel(preUpdateProfileActionUpdateModel, PreUpdateProfileActionUpdateModel.class);
                     actionUpdateModel = preUpdateProfileActionUpdateModel;
                     break;

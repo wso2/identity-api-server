@@ -90,7 +90,7 @@ public class PreUpdateProfileActionModel extends ActionModel {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class PreUpdatePasswordActionModel {\n");
+        sb.append("class PreUpdateProfileActionModel {\n");
         sb.append("    name: ").append(toIndentedString(getName())).append("\n");
         sb.append("    description: ").append(toIndentedString(getDescription())).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(getEndpoint())).append("\n");
