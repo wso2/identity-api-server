@@ -31,7 +31,7 @@ import org.wso2.carbon.identity.api.server.action.management.v1.util.ActionMappe
 import org.wso2.carbon.identity.user.pre.update.profile.action.api.model.PreUpdateProfileAction;
 
 /**
- * Pre Update Profile Action Builder.
+ * Pre Update Profile Action Mapper.
  */
 public class PreUpdateProfileActionMapper implements ActionMapper {
 
@@ -81,5 +81,4 @@ public class PreUpdateProfileActionMapper implements ActionMapper {
         return new PreUpdateProfileActionResponse(actionResponse)
                 .attributes(((PreUpdateProfileAction) action).getAttributes());
     }
-
 }
