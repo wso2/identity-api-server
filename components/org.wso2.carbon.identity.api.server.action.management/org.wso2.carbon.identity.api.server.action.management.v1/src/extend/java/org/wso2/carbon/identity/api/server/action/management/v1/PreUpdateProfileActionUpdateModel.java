@@ -21,10 +21,10 @@ package org.wso2.carbon.identity.api.server.action.management.v1;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
-import javax.validation.Valid;
+import java.util.List;
 import java.util.Objects;
 
-import java.util.List;
+import javax.validation.Valid;
 
 /**
  * Pre update profile action update model.
