@@ -294,7 +294,6 @@ public class ServerAuthenticatorManagementService {
                                 error.getMessage(), String.format(error.getMessage(), authenticatorName)),
                         Response.Status.NOT_FOUND);
             }
-//            existingAuthenticator.setAmrValue(systemConfig.getAmrValue());
             LocalAuthenticatorConfig localAuthenticatorConfig = new LocalAuthenticatorConfig();
             localAuthenticatorConfig.setName(existingAuthenticator.getName());
             localAuthenticatorConfig.setAmrValue(systemConfig.getAmrValue());

@@ -133,6 +133,7 @@ public class LocalAuthenticatorConfigBuilderFactory {
      * @return The system local authenticator update model.
      */
     public static SystemLocalAuthenticatorUpdate buildSystemLocalAuthenticator(LocalAuthenticatorConfig config) {
+
         SystemLocalAuthenticatorUpdate systemConfig = new SystemLocalAuthenticatorUpdate();
         systemConfig.setAmrValue(config.getAmrValue());
         return systemConfig;
