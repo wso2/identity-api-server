@@ -184,9 +184,6 @@ public class WorkflowService {
             if (limit == null || offset == null) {
                 limit = 15;
                 offset = 0;
-            } else {
-                limit = limit.intValue();
-                offset = offset.intValue();
             }
             currentWorkflows = workflowManagementService.listPaginatedWorkflows(tenantId, limit, offset, filter);
             for (Workflow workflow : currentWorkflows) {
@@ -198,9 +195,7 @@ public class WorkflowService {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_LISTING_WORKFLOWS, null, e);
         } catch (WorkflowException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_WORKFLOWS, null, e);
-
         }
-
     }
 
     /**
@@ -236,9 +231,6 @@ public class WorkflowService {
             if (limit == null || offset == null) {
                 limit = 15;
                 offset = 0;
-            } else {
-                limit = limit.intValue();
-                offset = offset.intValue();
             }
             associationBeans = workflowManagementService.listPaginatedAssociations(
                     CarbonContext.getThreadLocalCarbonContext().getTenantId(), limit, offset, filter);
@@ -341,7 +333,7 @@ public class WorkflowService {
      * @param workflowAssociation Association Details
      * @return WorkflowAssociationDetails
      */
-    public WorkflowAssociationDetails changeAssociation(String associationId, WorkflowAssociationPatch workflowAssociation) {
+    public WorkflowAssociationDetails updateAssociation(String associationId, WorkflowAssociationPatch workflowAssociation) {
 
         boolean isEnable;
         String eventId;
@@ -357,7 +349,7 @@ public class WorkflowService {
             } else {
                 eventId = workflowAssociation.getOperation().toString();
             }
-            workflowManagementService.changeAssociation(associationId, workflowAssociation.getAssociationName(),
+            workflowManagementService.updateAssociation(associationId, workflowAssociation.getAssociationName(),
                     workflowAssociation.getWorkflowId(), eventId,
                     workflowAssociation.getAssociationCondition(), isEnable);
             return getAssociation(associationId);
@@ -549,7 +541,6 @@ public class WorkflowService {
 
         ErrorResponse errorResponse = getErrorBuilder(errorEnum, data).build(log, e, includeData(e.getMessage(), data));
         return new APIError(Response.Status.INTERNAL_SERVER_ERROR, errorResponse);
-
     }
 
     private APIError handleClientError(Constants.ErrorMessage errorEnum, String data, WorkflowClientException e) {

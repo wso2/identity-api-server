@@ -65,6 +65,6 @@ public class WorkflowAssociationsApiServiceImpl implements WorkflowAssociationsA
     @Override
     public Response updateAssociation(String associationId, WorkflowAssociationPatch workflowAssociation) {
 
-        return Response.ok().entity(workflowService.changeAssociation(associationId, workflowAssociation)).build();
+        return Response.ok().entity(workflowService.updateAssociation(associationId, workflowAssociation)).build();
     }
 }
