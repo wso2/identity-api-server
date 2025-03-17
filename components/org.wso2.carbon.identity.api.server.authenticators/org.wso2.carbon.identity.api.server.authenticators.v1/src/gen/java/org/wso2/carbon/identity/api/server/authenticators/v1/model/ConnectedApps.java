@@ -104,7 +104,7 @@ public class ConnectedApps  {
         this.links = links;
         return this;
     }
-    
+
     @ApiModelProperty(example = "[{\"href\":\"identity-provider/123e4567-e89b-12d3-a456-556642440000/connected-apps?offset=50&limit=10\",\"rel\":\"next\"},{\"href\":\"identity-provider/123e4567-e89b-12d3-a456-556642440000/connected-apps?offset=30&limit=10\",\"rel\":\"previous\"}]", value = "")
     @JsonProperty("links")
     @Valid
