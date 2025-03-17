@@ -41,11 +41,7 @@ public interface AuthenticatorsApiService {
 
       public Response deleteUserDefinedLocalAuthenticator(String authenticatorId);
 
-      public Response getAllSystemLocalAuthenticators(String filter, Integer limit, Integer offset);
-
       public Response getConnectedAppsOfLocalAuthenticator(String authenticatorId, Integer limit, Integer offset);
-
-      public Response getSystemLocalAuthenticatorById(String authenticatorId, Integer limit, Integer offset);
 
       public Response updateSystemLocalAuthenticatorAmrValueById(String authenticatorId, SystemLocalAuthenticatorUpdate systemLocalAuthenticatorUpdate);
 

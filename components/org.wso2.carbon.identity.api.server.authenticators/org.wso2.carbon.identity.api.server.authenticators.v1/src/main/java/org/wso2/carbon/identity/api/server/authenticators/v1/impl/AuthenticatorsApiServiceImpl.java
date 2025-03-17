@@ -82,22 +82,10 @@ public class AuthenticatorsApiServiceImpl implements AuthenticatorsApiService {
     }
 
     @Override
-    public Response getAllSystemLocalAuthenticators(String filter, Integer limit, Integer offset) {
-
-        return Response.ok().entity("magic!").build();
-    }
-
-    @Override
     public Response getConnectedAppsOfLocalAuthenticator(String authenticatorId, Integer limit, Integer offset) {
 
         return Response.ok().entity(authenticatorManagementService
                 .getConnectedAppsOfLocalAuthenticator(authenticatorId, limit, offset)).build();
-    }
-
-    @Override
-    public Response getSystemLocalAuthenticatorById(String authenticatorId, Integer limit, Integer offset) {
-
-        return Response.ok().entity("magic!").build();
     }
 
     @Override
