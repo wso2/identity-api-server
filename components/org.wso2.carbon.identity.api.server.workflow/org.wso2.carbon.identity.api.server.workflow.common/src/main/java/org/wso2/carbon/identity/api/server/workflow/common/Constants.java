@@ -24,7 +24,6 @@ package org.wso2.carbon.identity.api.server.workflow.common;
 public class Constants {
 
     public static final String WORKFLOW_PREFIX = "WF-";
-
     public static final String APPROVAL_STEPS = "ApprovalSteps";
     public static final String APPROVAL_STEP = "Step-";
     public static final String TEMPLATE = "Template";
@@ -32,7 +31,6 @@ public class Constants {
     public static final String APPROVAL_TASK_DESCRIPTION = "ApprovalTaskDescription";
     public static final String WORKFLOW_IMPLEMENTATION = "Workflowimpl";
     public static final String WORKFLOW_NAME = "WorkflowName";
-
 
     private Constants() {
 
@@ -91,32 +89,35 @@ public class Constants {
                                                       "Server encountered an error while " +
                                                               "updating the workflow association.");
 
-
-
         private final String code;
         private final String message;
         private final String description;
 
         ErrorMessage(String code, String message, String description) {
+
             this.code = code;
             this.message = message;
             this.description = description;
         }
 
         public String getCode() {
+
             return WORKFLOW_PREFIX + code;
         }
 
         public String getMessage() {
+
             return message;
         }
 
         public String getDescription() {
+
             return description;
         }
 
         @Override
         public String toString() {
+
             return code + " | " + message;
         }
     }
