@@ -967,6 +967,7 @@
         <module>components/org.wso2.carbon.identity.api.server.rule.metadata</module>
         <module>components/org.wso2.carbon.identity.api.server.registration.management</module>
         <module>components/org.wso2.carbon.identity.api.server.registration.execution</module>
+        <module>components/org.wso2.carbon.identity.api.server.asynchronous.operation.status.management</module>
     </modules>
 
 </project>
