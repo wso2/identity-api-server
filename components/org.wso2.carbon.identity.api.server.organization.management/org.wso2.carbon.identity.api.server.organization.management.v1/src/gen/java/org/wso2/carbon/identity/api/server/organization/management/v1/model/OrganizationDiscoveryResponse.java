@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -37,6 +37,7 @@ public class OrganizationDiscoveryResponse  {
   
     private String organizationId;
     private String organizationName;
+    private String organizationIdentifier;
     private List<DiscoveryAttribute> attributes = new ArrayList<>();
 
 
@@ -83,6 +84,27 @@ public class OrganizationDiscoveryResponse  {
     }
 
     /**
+    * The handle of the organization.
+    **/
+    public OrganizationDiscoveryResponse organizationIdentifier(String organizationIdentifier) {
+
+        this.organizationIdentifier = organizationIdentifier;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "abcbuilders", required = true, value = "The handle of the organization.")
+    @JsonProperty("organizationIdentifier")
+    @Valid
+    @NotNull(message = "Property organizationIdentifier cannot be null.")
+
+    public String getOrganizationIdentifier() {
+        return organizationIdentifier;
+    }
+    public void setOrganizationIdentifier(String organizationIdentifier) {
+        this.organizationIdentifier = organizationIdentifier;
+    }
+
+    /**
     **/
     public OrganizationDiscoveryResponse attributes(List<DiscoveryAttribute> attributes) {
 
@@ -121,12 +143,13 @@ public class OrganizationDiscoveryResponse  {
         OrganizationDiscoveryResponse organizationDiscoveryResponse = (OrganizationDiscoveryResponse) o;
         return Objects.equals(this.organizationId, organizationDiscoveryResponse.organizationId) &&
             Objects.equals(this.organizationName, organizationDiscoveryResponse.organizationName) &&
+            Objects.equals(this.organizationIdentifier, organizationDiscoveryResponse.organizationIdentifier) &&
             Objects.equals(this.attributes, organizationDiscoveryResponse.attributes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(organizationId, organizationName, attributes);
+        return Objects.hash(organizationId, organizationName, organizationIdentifier, attributes);
     }
 
     @Override
@@ -137,6 +160,7 @@ public class OrganizationDiscoveryResponse  {
         
         sb.append("    organizationId: ").append(toIndentedString(organizationId)).append("\n");
         sb.append("    organizationName: ").append(toIndentedString(organizationName)).append("\n");
+        sb.append("    organizationIdentifier: ").append(toIndentedString(organizationIdentifier)).append("\n");
         sb.append("    attributes: ").append(toIndentedString(attributes)).append("\n");
         sb.append("}");
         return sb.toString();
