@@ -736,6 +736,10 @@ definitions:
         type: boolean
         description: Specifies if the claim will be prompted during user registration and displayed on the user profile.
         example: true
+      multiValued:
+        type: boolean
+        description: Specifies if the claim can hold multiple values or not.
+        example: true
       uniquenessScope:
         type: string
         description: Specifies the scope of uniqueness validation for the claim value.
@@ -813,6 +817,10 @@ definitions:
           supportedByDefault:
             type: boolean
             description: Specifies if the claim will be prompted during user registration and displayed on the user profile.
+            example: true
+          multiValued:
+            type: boolean
+            description: Specifies if the claim can hold multiple values.
             example: true
           uniquenessScope:
             type: string
