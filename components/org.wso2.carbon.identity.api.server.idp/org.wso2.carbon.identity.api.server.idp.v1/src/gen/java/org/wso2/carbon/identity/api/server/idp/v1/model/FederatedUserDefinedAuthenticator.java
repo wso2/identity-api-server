@@ -38,6 +38,7 @@ public class FederatedUserDefinedAuthenticator  {
     private String authenticatorId;
     private String name;
     private Boolean isEnabled = false;
+    private String amrValue;
 
 @XmlType(name="DefinedByEnum")
 @XmlEnum(String.class)
@@ -170,6 +171,24 @@ public enum DefinedByEnum {
     }
 
     /**
+     **/
+    public FederatedUserDefinedAuthenticator amrValue(String amrValue) {
+
+        this.amrValue = amrValue;
+        return this;
+    }
+
+    @ApiModelProperty(example = "totp", value = "")
+    @JsonProperty("amrValue")
+    @Valid
+    public String getAmrValue() {
+        return amrValue;
+    }
+    public void setAmrValue(String amrValue) {
+        this.amrValue = amrValue;
+    }
+
+    /**
     **/
     public FederatedUserDefinedAuthenticator tags(List<String> tags) {
 
@@ -230,13 +249,14 @@ public enum DefinedByEnum {
             Objects.equals(this.isEnabled, federatedUserDefinedAuthenticator.isEnabled) &&
             Objects.equals(this.definedBy, federatedUserDefinedAuthenticator.definedBy) &&
             Objects.equals(this.isDefault, federatedUserDefinedAuthenticator.isDefault) &&
+            Objects.equals(this.amrValue, federatedUserDefinedAuthenticator.amrValue) &&
             Objects.equals(this.tags, federatedUserDefinedAuthenticator.tags) &&
             Objects.equals(this.endpoint, federatedUserDefinedAuthenticator.endpoint);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authenticatorId, name, isEnabled, definedBy, isDefault, tags, endpoint);
+        return Objects.hash(authenticatorId, name, isEnabled, definedBy, isDefault, amrValue, tags, endpoint);
     }
 
     @Override
@@ -250,6 +270,7 @@ public enum DefinedByEnum {
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
         sb.append("    definedBy: ").append(toIndentedString(definedBy)).append("\n");
         sb.append("    isDefault: ").append(toIndentedString(isDefault)).append("\n");
+        sb.append("    amrValue: ").append(toIndentedString(amrValue)).append("\n");
         sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
         sb.append("}");

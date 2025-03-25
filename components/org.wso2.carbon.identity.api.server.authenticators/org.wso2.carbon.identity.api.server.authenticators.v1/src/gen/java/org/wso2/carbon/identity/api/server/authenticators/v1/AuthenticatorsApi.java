@@ -1,18 +1,18 @@
 /*
-* Copyright (c) 2021, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2021-2025, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package org.wso2.carbon.identity.api.server.authenticators.v1;
 
@@ -25,6 +25,7 @@ import org.wso2.carbon.identity.api.server.authenticators.v1.factories.Authentic
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.ConnectedApps;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Error;
+import org.wso2.carbon.identity.api.server.authenticators.v1.model.SystemLocalAuthenticatorUpdate;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.UserDefinedLocalAuthenticatorCreation;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.UserDefinedLocalAuthenticatorUpdate;
 
@@ -164,6 +165,31 @@ public class AuthenticatorsApi  {
     public Response getConnectedAppsOfLocalAuthenticator(@ApiParam(value = "ID of an authenticator",required=true) @PathParam("authenticator-id") String authenticatorId,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to return. _<b>This option is not yet supported.<b>_ ")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination. _<b>This option is not yet supported.<b>_ ")  @QueryParam("offset") Integer offset) {
 
         return delegate.getConnectedAppsOfLocalAuthenticator(authenticatorId,  limit,  offset );
+    }
+
+    @Valid
+    @PATCH
+    @Path("/system/{authenticator-id}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update the system local authenticators ", notes = "Update the system local authenticators." +
+            " Currently only supports updating the AMR value. ", response = Authenticator.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+
+        })
+    }, tags={ "System Local Authenticators", })
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Successful response", response = Authenticator.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response updateSystemLocalAuthenticatorAmrValueById(@ApiParam(value = "ID of an authenticator",required=true) @PathParam("authenticator-id") String authenticatorId, @ApiParam(value = "This represents the system defined local authenticator to be created." ,required=true) @Valid
+    SystemLocalAuthenticatorUpdate systemLocalAuthenticatorUpdate) {
+
+        return delegate.updateSystemLocalAuthenticatorAmrValueById(authenticatorId,  systemLocalAuthenticatorUpdate );
     }
 
     @Valid
