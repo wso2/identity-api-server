@@ -132,11 +132,24 @@ public class LocalAuthenticatorConfigBuilderFactory {
      * @param config The user defined local authenticator update request.
      * @return The system local authenticator update model.
      */
-    public static SystemLocalAuthenticatorUpdate buildSystemLocalAuthenticator(LocalAuthenticatorConfig config) {
+    public static LocalAuthenticatorConfig buildSystemLocalAuthenticator(LocalAuthenticatorConfig config) {
 
-        SystemLocalAuthenticatorUpdate systemConfig = new SystemLocalAuthenticatorUpdate();
+        LocalAuthenticatorConfig systemConfig = new LocalAuthenticatorConfig();
+        systemConfig.setName(config.getName());
+        systemConfig.setDisplayName(config.getDisplayName());
         systemConfig.setAmrValue(config.getAmrValue());
+        systemConfig.setEnabled(config.getEnabled());
         return systemConfig;
+    }
+
+    public static LocalAuthenticatorConfig buildSystemLocalAuthenticator(
+            SystemLocalAuthenticatorUpdate config, LocalAuthenticatorConfig existingConfig) {
+        LocalAuthenticatorConfig authConfig = new LocalAuthenticatorConfig();
+        authConfig.setName(existingConfig.getName());
+        authConfig.setDisplayName(existingConfig.getDisplayName());
+        authConfig.setAmrValue(config.getAmrValue());
+        authConfig.setEnabled(existingConfig.getEnabled());
+        return authConfig;
     }
 
     private static UserDefinedAuthenticatorEndpointConfig buildEndpointConfig(Endpoint endpointConfig)

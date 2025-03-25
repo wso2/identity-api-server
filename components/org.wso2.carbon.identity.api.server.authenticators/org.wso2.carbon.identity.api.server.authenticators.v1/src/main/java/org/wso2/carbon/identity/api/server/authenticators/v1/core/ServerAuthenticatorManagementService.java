@@ -281,7 +281,7 @@ public class ServerAuthenticatorManagementService {
         }
     }
 
-    public SystemLocalAuthenticatorUpdate updateSystemLocalAuthenticator(String authenticatorId,
+    public LocalAuthenticatorConfig updateSystemLocalAuthenticator(String authenticatorId,
                                                                          SystemLocalAuthenticatorUpdate systemConfig) {
         try {
             String authenticatorName = base64URLDecode(authenticatorId);
@@ -297,10 +297,13 @@ public class ServerAuthenticatorManagementService {
             LocalAuthenticatorConfig localAuthenticatorConfig = new LocalAuthenticatorConfig();
             localAuthenticatorConfig.setName(existingAuthenticator.getName());
             localAuthenticatorConfig.setAmrValue(systemConfig.getAmrValue());
-            log.info("AMR Value: " + systemConfig.getAmrValue());
-            LocalAuthenticatorConfig updatedConfig = applicationAuthenticatorService
-                    .updateAuthenticatorAmrValue(localAuthenticatorConfig, tenantDomain);
 
+            LocalAuthenticatorConfig updatedConfig = applicationAuthenticatorService
+                    .updateAuthenticatorAmrValue(
+                            LocalAuthenticatorConfigBuilderFactory.
+                                    buildSystemLocalAuthenticator(systemConfig, existingAuthenticator),
+                            tenantDomain);
+            log.info("AMR Value: " + systemConfig.getAmrValue());
             return LocalAuthenticatorConfigBuilderFactory.buildSystemLocalAuthenticator(updatedConfig);
         } catch (AuthenticatorMgtException e) {
             throw handleAuthenticatorException(e);

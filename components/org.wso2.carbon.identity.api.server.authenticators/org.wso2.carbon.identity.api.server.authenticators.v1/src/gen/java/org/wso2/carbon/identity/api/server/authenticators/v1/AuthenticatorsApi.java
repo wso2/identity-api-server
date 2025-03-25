@@ -178,7 +178,7 @@ public class AuthenticatorsApi  {
         @Authorization(value = "OAuth2", scopes = {
 
         })
-    }, tags={ "System Local Authenticators", })
+    }, tags = { "System Local Authenticators", })
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful response", response = Authenticator.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
@@ -186,10 +186,13 @@ public class AuthenticatorsApi  {
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response updateSystemLocalAuthenticatorAmrValueById(@ApiParam(value = "ID of an authenticator",required=true) @PathParam("authenticator-id") String authenticatorId, @ApiParam(value = "This represents the system defined local authenticator to be created." ,required=true) @Valid
-    SystemLocalAuthenticatorUpdate systemLocalAuthenticatorUpdate) {
+    public Response updateSystemLocalAuthenticatorAmrValueById(
+            @ApiParam(value = "ID of an authenticator", required = true)
+            @PathParam("authenticator-id") String authenticatorId,
+            @ApiParam(value = "This represents the system defined local authenticator to be created." , required = true)
+            @Valid SystemLocalAuthenticatorUpdate systemLocalAuthenticatorUpdate) {
 
-        return delegate.updateSystemLocalAuthenticatorAmrValueById(authenticatorId,  systemLocalAuthenticatorUpdate );
+        return delegate.updateSystemLocalAuthenticatorAmrValueById(authenticatorId,  systemLocalAuthenticatorUpdate);
     }
 
     @Valid
