@@ -37,6 +37,7 @@ public class FederatedAuthenticator  {
     private String authenticatorId;
     private String name;
     private Boolean isEnabled = false;
+    private String amrValue;
 
 @XmlType(name="DefinedByEnum")
 @XmlEnum(String.class)
@@ -152,6 +153,21 @@ public enum DefinedByEnum {
         this.definedBy = definedBy;
     }
 
+    public FederatedAuthenticator amrValue(String amrValue) {
+        this.amrValue = amrValue;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("amrValue")
+    @Valid
+    public String getAmrValue() {
+        return amrValue;
+    }
+    public void setAmrValue(String amrValue) {
+        this.amrValue = amrValue;
+    }
+
     /**
     **/
     public FederatedAuthenticator isDefault(Boolean isDefault) {
@@ -241,7 +257,6 @@ public enum DefinedByEnum {
     }
 
 
-
     @Override
     public boolean equals(java.lang.Object o) {
 
@@ -256,6 +271,7 @@ public enum DefinedByEnum {
             Objects.equals(this.name, federatedAuthenticator.name) &&
             Objects.equals(this.isEnabled, federatedAuthenticator.isEnabled) &&
             Objects.equals(this.definedBy, federatedAuthenticator.definedBy) &&
+            Objects.equals(this.amrValue, federatedAuthenticator.amrValue) &&
             Objects.equals(this.isDefault, federatedAuthenticator.isDefault) &&
             Objects.equals(this.tags, federatedAuthenticator.tags) &&
             Objects.equals(this.properties, federatedAuthenticator.properties) &&
@@ -264,7 +280,8 @@ public enum DefinedByEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(authenticatorId, name, isEnabled, definedBy, isDefault, tags, properties, endpoint);
+        return Objects.hash(authenticatorId, name, isEnabled, definedBy, amrValue, isDefault, tags, properties,
+                endpoint);
     }
 
     @Override
@@ -277,6 +294,7 @@ public enum DefinedByEnum {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
         sb.append("    definedBy: ").append(toIndentedString(definedBy)).append("\n");
+        sb.append("    amrValue: ").append(toIndentedString(amrValue)).append("\n");
         sb.append("    isDefault: ").append(toIndentedString(isDefault)).append("\n");
         sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
