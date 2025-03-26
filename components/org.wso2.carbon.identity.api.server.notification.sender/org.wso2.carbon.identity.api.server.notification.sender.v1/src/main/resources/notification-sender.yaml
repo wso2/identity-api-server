@@ -930,6 +930,9 @@ components:
         password:
           type: string
           example: iam123
+        authType:
+          type: string
+          example: CLIENT_CREDENTIAL
         properties:
           type: array
           example:
@@ -1020,6 +1023,9 @@ components:
         password:
           type: string
           example: iam123
+        authType:
+          type: string
+          example: CLIENT_CREDENTIAL
         properties:
           type: array
           example:
@@ -1107,6 +1113,9 @@ components:
         password:
           type: string
           example: iam123
+        authType:
+          type: string
+          example: CLIENT_CREDENTIAL
         properties:
           type: array
           example:
