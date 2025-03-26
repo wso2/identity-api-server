@@ -289,6 +289,7 @@ public class NotificationSenderManagementService {
         dto.setPassword(emailSenderAdd.getPassword());
         dto.setSmtpPort(emailSenderAdd.getSmtpPort());
         dto.setSmtpServerHost(emailSenderAdd.getSmtpServerHost());
+        dto.setAuthType(emailSenderAdd.getAuthType());
         List<Properties> properties = emailSenderAdd.getProperties();
         properties.forEach((prop) -> dto.getProperties().put(prop.getKey(), prop.getValue()));
         return dto;
@@ -304,6 +305,7 @@ public class NotificationSenderManagementService {
         dto.setPassword(emailSenderUpdateRequest.getPassword());
         dto.setSmtpPort(emailSenderUpdateRequest.getSmtpPort());
         dto.setSmtpServerHost(emailSenderUpdateRequest.getSmtpServerHost());
+        dto.setAuthType(emailSenderUpdateRequest.getAuthType());
         List<Properties> properties = emailSenderUpdateRequest.getProperties();
         properties.forEach((prop) -> dto.getProperties().put(prop.getKey(), prop.getValue()));
         return dto;
@@ -318,6 +320,7 @@ public class NotificationSenderManagementService {
         emailSender.setPassword(dto.getPassword());
         emailSender.setSmtpPort(dto.getSmtpPort());
         emailSender.setSmtpServerHost(dto.getSmtpServerHost());
+        emailSender.setAuthType(dto.getAuthType());
         List<Properties> properties = new ArrayList<>();
         dto.getProperties().forEach((key, value) -> {
             Properties prop = new Properties();
