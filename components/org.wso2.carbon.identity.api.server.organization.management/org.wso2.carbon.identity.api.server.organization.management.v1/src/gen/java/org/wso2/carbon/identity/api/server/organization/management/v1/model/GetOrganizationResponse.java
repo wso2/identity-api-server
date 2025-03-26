@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -38,6 +38,7 @@ public class GetOrganizationResponse  {
   
     private String id;
     private String name;
+    private String organizationHandle;
     private String description;
 
 @XmlType(name="StatusEnum")
@@ -153,6 +154,26 @@ public enum TypeEnum {
     }
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+    **/
+    public GetOrganizationResponse organizationHandle(String organizationHandle) {
+
+        this.organizationHandle = organizationHandle;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "abcbuilders", required = true, value = "")
+    @JsonProperty("organizationHandle")
+    @Valid
+    @NotNull(message = "Property organizationHandle cannot be null.")
+
+    public String getOrganizationHandle() {
+        return organizationHandle;
+    }
+    public void setOrganizationHandle(String organizationHandle) {
+        this.organizationHandle = organizationHandle;
     }
 
     /**
@@ -337,6 +358,7 @@ public enum TypeEnum {
         GetOrganizationResponse getOrganizationResponse = (GetOrganizationResponse) o;
         return Objects.equals(this.id, getOrganizationResponse.id) &&
             Objects.equals(this.name, getOrganizationResponse.name) &&
+            Objects.equals(this.organizationHandle, getOrganizationResponse.organizationHandle) &&
             Objects.equals(this.description, getOrganizationResponse.description) &&
             Objects.equals(this.status, getOrganizationResponse.status) &&
             Objects.equals(this.created, getOrganizationResponse.created) &&
@@ -349,7 +371,7 @@ public enum TypeEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, status, created, lastModified, type, parent, attributes, permissions);
+        return Objects.hash(id, name, organizationHandle, description, status, created, lastModified, type, parent, attributes, permissions);
     }
 
     @Override
@@ -360,6 +382,7 @@ public enum TypeEnum {
         
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    organizationHandle: ").append(toIndentedString(organizationHandle)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("    created: ").append(toIndentedString(created)).append("\n");

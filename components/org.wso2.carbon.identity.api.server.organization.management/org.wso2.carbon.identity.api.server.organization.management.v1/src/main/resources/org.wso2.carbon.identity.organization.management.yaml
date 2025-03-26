@@ -64,7 +64,7 @@ paths:
         This API is used to search and retrieve organizations created for this tenant.
         
         Organizations can be filtered by id, name, description, created, lastModified, status, parentId, and meta attributes. 
-              
+        
         Supported operators: "eq" (equals), "co" (contains), "sw" (starts with), "ew" (ends with), "ge" (greater than or equals), "le" (less than or equals), "gt" (greater than), "lt" (less than)
         
         Multiple attributes can be combined using the "and" operator.
@@ -898,6 +898,9 @@ components:
         name:
           type: string
           example: "ABC Builders"
+        organizationHandle:
+          type: string
+          example: "abcbuilders"
         description:
           type: string
           example: "Building constructions"
@@ -925,6 +928,9 @@ components:
         name:
           type: string
           example: "ABC Builders"
+        organizationHandle:
+          type: string
+          example: "abcbuilders"
         description:
           type: string
           example: "Building constructions"
@@ -983,9 +989,9 @@ components:
                 "href": "/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations?limit=10&filter=name+co+der&next=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
                 "rel": "next",
               },  {
-                "href": "/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations?limit=10&filter=name+co+der&before=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
-                "rel": "previous",
-              }
+              "href": "/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations?limit=10&filter=name+co+der&before=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
+              "rel": "previous",
+            }
             ]
         organizations:
           type: array
@@ -1007,6 +1013,7 @@ components:
       required:
         - id
         - name
+        - organizationHandle
         - status
         - ref
       properties:
@@ -1016,6 +1023,9 @@ components:
         name:
           type: string
           example: 'ABC Builders'
+        organizationHandle:
+          type: string
+          example: "abcbuilders"
         status:
           type: string
           enum: [ ACTIVE, DISABLED ]
@@ -1032,6 +1042,7 @@ components:
       required:
         - id
         - name
+        - organizationHandle
         - status
         - created
         - lastModified
@@ -1043,6 +1054,9 @@ components:
         name:
           type: string
           example: 'ABC Builders'
+        organizationHandle:
+          type: string
+          example: "abcbuilders"
         description:
           type: string
           example: 'Building constructions'
@@ -1073,6 +1087,7 @@ components:
       required:
         - id
         - name
+        - organizationHandle
         - status
         - created
         - lastModified
@@ -1084,6 +1099,9 @@ components:
         name:
           type: string
           example: 'ABC Builders'
+        organizationHandle:
+          type: string
+          example: "abcbuilders"
         description:
           type: string
           example: 'Building constructions'
@@ -1126,9 +1144,9 @@ components:
                 "href": "/o/api/server/v1/organizations/meta-attributes?limit=10&recursive=false&filter=attributes+co+C&after=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
                 "rel": "next",
               },  {
-                "href": "/o/api/server/v1/organizations/meta-attributes?limit=10&recursive=false&filter=attributes+co+C&before=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
-                "rel": "previous",
-              }
+              "href": "/o/api/server/v1/organizations/meta-attributes?limit=10&recursive=false&filter=attributes+co+C&before=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
+              "rel": "previous",
+            }
             ]
         attributes:
           type: array
@@ -1273,9 +1291,9 @@ components:
                 "href": "/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations/discovery?filter=attributes.type+eq+emailDomain&limit=10&offset=50",
                 "rel": "next",
               },  {
-                "href": "/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations/discovery?filter=attributes.type+eq+emailDomain&limit=10&offset=30",
-                "rel": "previous",
-              }
+              "href": "/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations/discovery?filter=attributes.type+eq+emailDomain&limit=10&offset=30",
+              "rel": "previous",
+            }
             ]
         organizations:
           type: array
@@ -1286,6 +1304,7 @@ components:
       required:
         - organizationId
         - organizationName
+        - organizationHandle
         - attributes
       properties:
         organizationId:
@@ -1296,6 +1315,10 @@ components:
           type: string
           description: The name of the organization.
           example: 'ABC Builders'
+        organizationHandle:
+          type: string
+          description: The handle of the organization.
+          example: 'abcbuilders'
         attributes:
           type: array
           items:
@@ -1326,6 +1349,7 @@ components:
       required:
         - id
         - name
+        - organizationHandle
         - status
         - created
         - lastModified
@@ -1337,6 +1361,9 @@ components:
         name:
           type: string
           example: 'ABC Builders'
+        organizationHandle:
+          type: string
+          example: "abcbuilders"
         description:
           type: string
           example: 'Building constructions'
