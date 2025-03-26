@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -66,7 +66,6 @@ import org.wso2.carbon.identity.organization.management.service.model.Organizati
 import org.wso2.carbon.identity.organization.management.service.model.OrganizationAttribute;
 import org.wso2.carbon.identity.organization.management.service.model.ParentOrganizationDO;
 import org.wso2.carbon.identity.organization.management.service.model.PatchOperation;
-import org.wso2.carbon.identity.organization.management.service.model.TenantTypeOrganization;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -164,6 +163,27 @@ public class OrganizationManagementService {
             response.setAvailable(true);
         }
         return Response.ok().entity(response).build();
+    }
+
+
+    /**
+     * Check if organization exist for given organization handle.
+     *
+     * @param orgHandle Organization Handle.
+     * @return Organization handle check response.
+     */
+    public Response checkOrganizationHandle(String orgHandle) {
+
+        try {
+            boolean handleExist = organizationManager.isOrganizationExistByHandle(orgHandle);
+            OrganizationNameCheckPOSTResponse response = new OrganizationNameCheckPOSTResponse().available(false);
+            if (!handleExist) {
+                response.setAvailable(true);
+            }
+            return Response.ok().entity(response).build();
+        } catch (OrganizationManagementException e) {
+            return OrganizationManagementEndpointUtil.handleServerErrorResponse(e, LOG);
+        }
     }
 
     /**
@@ -500,7 +520,8 @@ public class OrganizationManagementService {
             response.setCount(organizationsDiscoveryAttributes.size());
             for (OrganizationDiscovery organizationDiscovery : organizationsDiscoveryAttributes) {
                 OrganizationDiscoveryResponse organizationDiscoveryResponse = new OrganizationDiscoveryResponse();
-                organizationDiscoveryResponse.setOrganizationId(organizationDiscovery.getOrganizationId());
+                String organizationID = organizationDiscovery.getOrganizationId();
+                organizationDiscoveryResponse.setOrganizationId(organizationID);
                 organizationDiscoveryResponse.setOrganizationName(organizationDiscovery.getOrganizationName());
                 organizationDiscovery.getDiscoveryAttributes().forEach(orgDiscoveryAttribute -> {
                     DiscoveryAttribute organizationDiscoveryAttributeResponse = new DiscoveryAttribute();
@@ -508,6 +529,7 @@ public class OrganizationManagementService {
                     organizationDiscoveryAttributeResponse.setValues(orgDiscoveryAttribute.getValues());
                     organizationDiscoveryResponse.addAttributesItem(organizationDiscoveryAttributeResponse);
                 });
+                organizationDiscoveryResponse.setOrgHandle(organizationManager.resolveTenantDomain(organizationID));
                 response.addOrganizationsItem(organizationDiscoveryResponse);
             }
             return Response.ok(response).build();
@@ -593,13 +615,7 @@ public class OrganizationManagementService {
 
         String organizationId = generateUniqueID();
         OrganizationPOSTRequest.TypeEnum type = organizationPOSTRequest.getType();
-        Organization organization;
-        if (OrganizationPOSTRequest.TypeEnum.TENANT.equals(type)) {
-            // Set the organization id as the default domain name of the underlying tenant.
-            organization = new TenantTypeOrganization(organizationId);
-        } else {
-            organization = new Organization();
-        }
+        Organization organization = new Organization();
         organization.setId(organizationId);
         organization.setName(organizationPOSTRequest.getName());
         organization.setDescription(organizationPOSTRequest.getDescription());
@@ -614,6 +630,8 @@ public class OrganizationManagementService {
             organization.setAttributes(organizationAttributes.stream().map(attribute ->
                     new OrganizationAttribute(attribute.getKey(), attribute.getValue())).collect(Collectors.toList()));
         }
+        String orgHandle = organizationPOSTRequest.getOrgHandle();
+        organization.setOrganizationHandle(StringUtils.isNotBlank(orgHandle) ? orgHandle : organizationId);
         return organization;
     }
 
@@ -652,6 +670,9 @@ public class OrganizationManagementService {
         if (!attributeList.isEmpty()) {
             organizationResponse.setAttributes(attributeList);
         }
+        String orgHandle = organization.getOrganizationHandle();
+        organizationResponse.setOrgHandle(orgHandle);
+
         return organizationResponse;
     }
 
@@ -690,6 +711,7 @@ public class OrganizationManagementService {
         if (!attributeList.isEmpty()) {
             organizationResponse.setAttributes(attributeList);
         }
+        organizationResponse.setOrgHandle(organization.getOrganizationHandle());
         return organizationResponse;
     }
 
@@ -805,6 +827,7 @@ public class OrganizationManagementService {
                 if (!attributeList.isEmpty()) {
                     organizationDTO.setAttributes(attributeList);
                 }
+                organizationDTO.setOrgHandle(organization.getOrganizationHandle());
                 organizationDTOs.add(organizationDTO);
             }
             organizationsResponse.setOrganizations(organizationDTOs);
@@ -925,6 +948,7 @@ public class OrganizationManagementService {
         organizationMetadata.setCreated(organization.getCreated().toString());
         organizationMetadata.setLastModified(organization.getLastModified().toString());
         organizationMetadata.setPermissions(organization.getPermissions());
+        organizationMetadata.setOrgHandle(organization.getOrganizationHandle());
 
         OrganizationMetadata.StatusEnum status;
         try {
