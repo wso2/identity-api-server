@@ -9,9 +9,9 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  version: "v1"
+  version: "v2"
 servers:
-  - url: https://localhost:9443/t/{tenant-domain}/api/server/v1
+  - url: https://localhost:9443/t/{tenant-domain}/api/server/v2
     variables:
       tenant-domain:
         default: carbon.super
@@ -84,11 +84,16 @@ paths:
               $ref: '#/components/schemas/EmailSenderAdd'
             example:
               fromAddress: iam@gmail.com
-              userName: iam
-              password: iam123
+              smtpServerHost: smtp.gmail.com
+              smtpPort: 587
+              authType: BASIC
               properties:
                 - key: mail.smtp.starttls.enable
                   value: true
+                - key: userName
+                  value: iam
+                - key: password
+                  value: iam123
       responses:
         "201":
           description: Successful Response
@@ -215,8 +220,6 @@ paths:
               $ref: '#/components/schemas/EmailSenderUpdateRequest'
             example:
               fromAddress: iam@gmail.com
-              userName: iam
-              password: iam123
               properties:
                 - key: mail.smtp.starttls.enable
                   value: true
@@ -924,12 +927,9 @@ components:
         fromAddress:
           type: string
           example: iam@gmail.com
-        userName:
+        authType:
           type: string
-          example: iam
-        password:
-          type: string
-          example: iam123
+          example: BASIC
         properties:
           type: array
           example:
@@ -937,6 +937,10 @@ components:
               value: "true"
             - key: mail.smtp.starttls.enable
               value: true
+            - key: userName
+              value: iam
+            - key: password
+              value: iam123
           items:
             $ref: '#/components/schemas/Properties'
     SMSSenderAdd:
@@ -1014,17 +1018,18 @@ components:
         fromAddress:
           type: string
           example: iam@gmail.com
-        userName:
+        authType:
           type: string
-          example: iam
-        password:
-          type: string
-          example: iam123
+          example: BASIC
         properties:
           type: array
           example:
             - key: mail.smtp.starttls.enable
               value: true
+            - key: userName
+              value: iam
+            - key: password
+              value: iam123
           items:
             $ref: '#/components/schemas/Properties'
     SMSSender:
@@ -1101,12 +1106,9 @@ components:
         fromAddress:
           type: string
           example: iam@gmail.com
-        userName:
+        authType:
           type: string
-          example: iam
-        password:
-          type: string
-          example: iam123
+          example: BASIC
         properties:
           type: array
           example:
@@ -1114,6 +1116,10 @@ components:
               value: "true"
             - key: mail.smtp.starttls.enable
               value: true
+            - key: userName
+              value: iam
+            - key: password
+              value: iam123
           items:
             $ref: '#/components/schemas/Properties'
     SMSSenderUpdateRequest:

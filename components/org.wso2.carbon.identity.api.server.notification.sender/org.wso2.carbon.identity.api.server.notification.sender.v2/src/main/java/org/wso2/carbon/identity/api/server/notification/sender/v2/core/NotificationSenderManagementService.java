@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -16,23 +16,23 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.api.server.notification.sender.v1.core;
+package org.wso2.carbon.identity.api.server.notification.sender.v2.core;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderServiceHolder;
-import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSender;
-import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSenderAdd;
-import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSenderUpdateRequest;
-import org.wso2.carbon.identity.api.server.notification.sender.v1.model.Properties;
-import org.wso2.carbon.identity.api.server.notification.sender.v1.model.PushSender;
-import org.wso2.carbon.identity.api.server.notification.sender.v1.model.PushSenderAdd;
-import org.wso2.carbon.identity.api.server.notification.sender.v1.model.PushSenderUpdateRequest;
-import org.wso2.carbon.identity.api.server.notification.sender.v1.model.SMSSender;
-import org.wso2.carbon.identity.api.server.notification.sender.v1.model.SMSSenderAdd;
-import org.wso2.carbon.identity.api.server.notification.sender.v1.model.SMSSenderUpdateRequest;
+import org.wso2.carbon.identity.api.server.notification.sender.v2.model.EmailSender;
+import org.wso2.carbon.identity.api.server.notification.sender.v2.model.EmailSenderAdd;
+import org.wso2.carbon.identity.api.server.notification.sender.v2.model.EmailSenderUpdateRequest;
+import org.wso2.carbon.identity.api.server.notification.sender.v2.model.Properties;
+import org.wso2.carbon.identity.api.server.notification.sender.v2.model.PushSender;
+import org.wso2.carbon.identity.api.server.notification.sender.v2.model.PushSenderAdd;
+import org.wso2.carbon.identity.api.server.notification.sender.v2.model.PushSenderUpdateRequest;
+import org.wso2.carbon.identity.api.server.notification.sender.v2.model.SMSSender;
+import org.wso2.carbon.identity.api.server.notification.sender.v2.model.SMSSenderAdd;
+import org.wso2.carbon.identity.api.server.notification.sender.v2.model.SMSSenderUpdateRequest;
 import org.wso2.carbon.identity.notification.sender.tenant.config.dto.EmailSenderDTO;
 import org.wso2.carbon.identity.notification.sender.tenant.config.dto.PushSenderDTO;
 import org.wso2.carbon.identity.notification.sender.tenant.config.dto.SMSSenderDTO;
@@ -44,9 +44,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.CLIENT_ID;
+import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.CLIENT_SECRET;
 import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_CONFLICT_PUBLISHER;
 import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_NO_ACTIVE_PUBLISHERS_FOUND;
 import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_PUBLISHER_NOT_EXISTS;
+import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.PASSWORD;
+import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.USERNAME;
 
 /**
  * Invoke internal OSGi service to perform notification sender management operations.
@@ -59,7 +63,7 @@ public class NotificationSenderManagementService {
 
     public NotificationSenderManagementService(
             org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementService
-                                                       notificationSenderManagementService) {
+                    notificationSenderManagementService) {
 
         this.notificationSenderManagementService = notificationSenderManagementService;
     }
@@ -126,7 +130,7 @@ public class NotificationSenderManagementService {
         try {
             notificationSenderManagementService.deleteNotificationSender(notificationSenderName);
         } catch (NotificationSenderManagementException e) {
-                throw handleException(e);
+            throw handleException(e);
         }
     }
 
@@ -285,10 +289,9 @@ public class NotificationSenderManagementService {
         EmailSenderDTO dto = new EmailSenderDTO();
         dto.setName(emailSenderAdd.getName());
         dto.setFromAddress(emailSenderAdd.getFromAddress());
-        dto.setUsername(emailSenderAdd.getUserName());
-        dto.setPassword(emailSenderAdd.getPassword());
         dto.setSmtpPort(emailSenderAdd.getSmtpPort());
         dto.setSmtpServerHost(emailSenderAdd.getSmtpServerHost());
+        dto.setAuthType(emailSenderAdd.getAuthType());
         List<Properties> properties = emailSenderAdd.getProperties();
         properties.forEach((prop) -> dto.getProperties().put(prop.getKey(), prop.getValue()));
         return dto;
@@ -300,10 +303,9 @@ public class NotificationSenderManagementService {
         EmailSenderDTO dto = new EmailSenderDTO();
         dto.setName(senderName);
         dto.setFromAddress(emailSenderUpdateRequest.getFromAddress());
-        dto.setUsername(emailSenderUpdateRequest.getUserName());
-        dto.setPassword(emailSenderUpdateRequest.getPassword());
         dto.setSmtpPort(emailSenderUpdateRequest.getSmtpPort());
         dto.setSmtpServerHost(emailSenderUpdateRequest.getSmtpServerHost());
+        dto.setAuthType(emailSenderUpdateRequest.getAuthType());
         List<Properties> properties = emailSenderUpdateRequest.getProperties();
         properties.forEach((prop) -> dto.getProperties().put(prop.getKey(), prop.getValue()));
         return dto;
@@ -314,12 +316,15 @@ public class NotificationSenderManagementService {
         EmailSender emailSender = new EmailSender();
         emailSender.setName(dto.getName());
         emailSender.setFromAddress(dto.getFromAddress());
-        emailSender.setUserName(dto.getUsername());
-        emailSender.setPassword(dto.getPassword());
         emailSender.setSmtpPort(dto.getSmtpPort());
         emailSender.setSmtpServerHost(dto.getSmtpServerHost());
+        emailSender.setAuthType(dto.getAuthType());
         List<Properties> properties = new ArrayList<>();
         dto.getProperties().forEach((key, value) -> {
+            // Remove credentials from the response.
+            if (key.equals(USERNAME) || key.equals(PASSWORD) || key.equals(CLIENT_ID) || key.equals(CLIENT_SECRET)) {
+                return;
+            }
             Properties prop = new Properties();
             prop.setKey(key);
             prop.setValue(value);

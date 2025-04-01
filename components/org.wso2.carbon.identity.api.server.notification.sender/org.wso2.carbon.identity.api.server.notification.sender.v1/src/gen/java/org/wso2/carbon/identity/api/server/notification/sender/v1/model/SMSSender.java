@@ -1,18 +1,18 @@
 /*
-* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package org.wso2.carbon.identity.api.server.notification.sender.v1.model;
 
@@ -40,37 +40,37 @@ public class SMSSender  {
     private String secret;
     private String sender;
 
-    @XmlType(name="ContentTypeEnum")
-    @XmlEnum(String.class)
-    public enum ContentTypeEnum {
+@XmlType(name="ContentTypeEnum")
+@XmlEnum(String.class)
+public enum ContentTypeEnum {
 
-        @XmlEnumValue("JSON") JSON(String.valueOf("JSON")), @XmlEnumValue("FORM") FORM(String.valueOf("FORM"));
+    @XmlEnumValue("JSON") JSON(String.valueOf("JSON")), @XmlEnumValue("FORM") FORM(String.valueOf("FORM"));
 
 
-        private String value;
+    private String value;
 
-        ContentTypeEnum(String v) {
-            value = v;
-        }
-
-        public String value() {
-            return value;
-        }
-
-        @Override
-        public String toString() {
-            return String.valueOf(value);
-        }
-
-        public static ContentTypeEnum fromValue(String value) {
-            for (ContentTypeEnum b : ContentTypeEnum.values()) {
-                if (b.value.equals(value)) {
-                    return b;
-                }
-            }
-            throw new IllegalArgumentException("Unexpected value '" + value + "'");
-        }
+    ContentTypeEnum(String v) {
+        value = v;
     }
+
+    public String value() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    public static ContentTypeEnum fromValue(String value) {
+        for (ContentTypeEnum b : ContentTypeEnum.values()) {
+            if (b.value.equals(value)) {
+                return b;
+            }
+        }
+        throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+}
 
     private ContentTypeEnum contentType;
     private List<Properties> properties = null;
@@ -197,7 +197,7 @@ public class SMSSender  {
         this.contentType = contentType;
         return this;
     }
-
+    
     @ApiModelProperty(required = true, value = "")
     @JsonProperty("contentType")
     @Valid
