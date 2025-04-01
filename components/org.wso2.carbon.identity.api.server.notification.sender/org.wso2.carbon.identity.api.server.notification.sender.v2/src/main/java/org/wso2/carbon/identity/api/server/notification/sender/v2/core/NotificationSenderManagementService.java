@@ -33,7 +33,6 @@ import org.wso2.carbon.identity.api.server.notification.sender.v2.model.PushSend
 import org.wso2.carbon.identity.api.server.notification.sender.v2.model.SMSSender;
 import org.wso2.carbon.identity.api.server.notification.sender.v2.model.SMSSenderAdd;
 import org.wso2.carbon.identity.api.server.notification.sender.v2.model.SMSSenderUpdateRequest;
-import org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants;
 import org.wso2.carbon.identity.notification.sender.tenant.config.dto.EmailSenderDTO;
 import org.wso2.carbon.identity.notification.sender.tenant.config.dto.PushSenderDTO;
 import org.wso2.carbon.identity.notification.sender.tenant.config.dto.SMSSenderDTO;
@@ -46,6 +45,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.CLIENT_ID;
@@ -325,6 +325,7 @@ public class NotificationSenderManagementService {
         emailSender.setAuthType(dto.getAuthType());
         List<Properties> properties = new ArrayList<>();
 
+        // Exclude credentials from the response.
         Set<String> excludedKeys = new HashSet<>(Arrays.asList(PASSWORD, USERNAME, CLIENT_SECRET, CLIENT_ID));
 
         dto.getProperties().forEach((key, value) -> {
