@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.notification.sender.v2.core;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
@@ -297,7 +298,14 @@ public class NotificationSenderManagementService {
         dto.setAuthType(emailSenderAdd.getAuthType());
         dto.setSmtpServerHost(emailSenderAdd.getSmtpServerHost());
         List<Properties> properties = emailSenderAdd.getProperties();
-        properties.forEach((prop) -> dto.getProperties().put(prop.getKey(), prop.getValue()));
+        if (properties == null) {
+            return dto;
+        }
+        properties.forEach((prop) -> {
+            if (StringUtils.isNotBlank(prop.getKey()) && StringUtils.isNotBlank(prop.getValue())) {
+                dto.getProperties().put(prop.getKey(), prop.getValue());
+            }
+        });
         return dto;
     }
 
@@ -311,7 +319,14 @@ public class NotificationSenderManagementService {
         dto.setSmtpServerHost(emailSenderUpdateRequest.getSmtpServerHost());
         dto.setAuthType(emailSenderUpdateRequest.getAuthType());
         List<Properties> properties = emailSenderUpdateRequest.getProperties();
-        properties.forEach((prop) -> dto.getProperties().put(prop.getKey(), prop.getValue()));
+        if (properties == null) {
+            return dto;
+        }
+        properties.forEach((prop) -> {
+            if (StringUtils.isNotBlank(prop.getKey()) && StringUtils.isNotBlank(prop.getValue())) {
+                dto.getProperties().put(prop.getKey(), prop.getValue());
+            }
+        });
         return dto;
     }
 
@@ -328,8 +343,11 @@ public class NotificationSenderManagementService {
         // Exclude credentials from the response.
         Set<String> excludedKeys = new HashSet<>(Arrays.asList(PASSWORD, USERNAME, CLIENT_SECRET, CLIENT_ID));
 
+        if (dto.getProperties() == null) {
+            return emailSender;
+        }
         dto.getProperties().forEach((key, value) -> {
-            if (excludedKeys.contains(key)) {
+            if (StringUtils.isBlank(key) || StringUtils.isBlank(value) || excludedKeys.contains(key)) {
                 return;
             }
             Properties prop = new Properties();
