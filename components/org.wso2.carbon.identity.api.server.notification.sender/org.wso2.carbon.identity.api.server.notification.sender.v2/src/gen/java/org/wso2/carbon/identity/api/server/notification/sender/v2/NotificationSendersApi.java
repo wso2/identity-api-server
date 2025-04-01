@@ -60,7 +60,7 @@ public class NotificationSendersApi  {
     @Path("/email")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Create an email sender", notes = "This API provides the capability to create an email sender.\\n\\nIf the 'name' is not not defined, 'EmailPublisher' is taken as the default name. <br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/configmgt/add <br>   <b>Scope required:</b> <br>     * internal_config_mgt_add ", response = EmailSender.class, authorizations = {
+    @ApiOperation(value = "Create an email sender", notes = "This API provides the capability to create an email sender.\\n\\nIf 'name' is not defined, 'EmailPublisher' is used as the default name. <br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/configmgt/add <br>   <b>Scope required:</b> <br>     * internal_config_mgt_add ", response = EmailSender.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
