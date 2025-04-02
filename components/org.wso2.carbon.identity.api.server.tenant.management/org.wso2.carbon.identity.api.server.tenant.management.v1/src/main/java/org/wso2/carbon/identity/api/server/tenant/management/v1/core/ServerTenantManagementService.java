@@ -354,6 +354,7 @@ public class ServerTenantManagementService {
         TenantResponseModel tenantResponseModel = new TenantResponseModel();
         tenantResponseModel.setCreatedDate(getISOFormatDate(tenant.getCreatedDate()));
         tenantResponseModel.setDomain(tenant.getDomain());
+        tenantResponseModel.setName(tenant.getName());
         tenantResponseModel.setId(tenant.getTenantUniqueID());
         tenantResponseModel.setLifecycleStatus(getLifeCycleStatus(tenant.isActive()));
         tenantResponseModel.setOwners(getOwnerResponses(tenant));
@@ -365,6 +366,7 @@ public class ServerTenantManagementService {
         Tenant tenant = new Tenant();
         tenant.setActive(true);
         tenant.setDomain(tenantModel.getDomain());
+        tenant.setName(tenantModel.getName());
         if (tenantModel.getOwners() != null) {
             tenant.setAdminName(tenantModel.getOwners().get(0).getUsername());
             tenant.setAdminFirstName(tenantModel.getOwners().get(0).getFirstname());
@@ -430,6 +432,7 @@ public class ServerTenantManagementService {
             listItem.setLifecycleStatus(getLifeCycleStatus(tenant.isActive()));
             listItem.setCreatedDate(getISOFormatDate(tenant.getCreatedDate()));
             listItem.setDomain(tenant.getDomain());
+            listItem.setName(tenant.getName());
             listItem.setId(tenant.getTenantUniqueID());
             listItem.setOwners(getOwnerResponses(tenant));
 
@@ -667,6 +670,7 @@ public class ServerTenantManagementService {
 
         tenant.setActive(true);
         tenant.setDomain(StringUtils.lowerCase(channelVerifiedTenantModel.getDomain()));
+        tenant.setName(channelVerifiedTenantModel.getName());
         if (channelVerifiedTenantModel.getOwners() != null && channelVerifiedTenantModel.getOwners().size() > 0
                 && channelVerifiedTenantModel.getOwners().get(0) != null) {
             tenant.setAdminName(channelVerifiedTenantModel.getOwners().get(0).getEmail());
