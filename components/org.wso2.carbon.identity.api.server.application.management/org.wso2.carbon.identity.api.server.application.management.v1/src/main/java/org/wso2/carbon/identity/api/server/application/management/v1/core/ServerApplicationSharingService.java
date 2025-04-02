@@ -178,6 +178,7 @@ public class ServerApplicationSharingService {
         for (BasicOrganization org : organizations) {
             BasicOrganizationResponse basicOrganizationResponse =
                     new BasicOrganizationResponse().id(org.getId()).name(org.getName())
+                            .orgHandle(org.getOrganizationHandle())
                             .ref(buildOrganizationURL(org.getId()).toString());
             response.addOrganizationsItem(basicOrganizationResponse);
         }
