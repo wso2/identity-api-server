@@ -4,7 +4,6 @@ import org.wso2.carbon.identity.framework.async.status.mgt.AsyncStatusMgtService
 import org.wso2.carbon.identity.framework.async.status.mgt.models.dos.ResponseOperationRecord;
 
 import java.util.List;
-import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
@@ -20,17 +19,16 @@ public class AsyncOperationStatusApiServiceCore {
         this.asyncStatusMgtService = asyncStatusMgtService;
     }
 
-    public Response getAsyncOperationStatus(String operationSubjectType, String operationSubjectId,
-                                            String operationType) {
+    public Response getOperations(String operationSubjectType, String operationSubjectId, String operationType,
+                                  String after, String before, Integer limit, String filter) {
 
-        if (operationSubjectType == null | operationSubjectId == null | operationType == null) {
+        if (operationSubjectType == null || operationSubjectId == null || operationType == null) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-
         try {
             List<ResponseOperationRecord> records =
-                    asyncStatusMgtService.getAsyncOperationStatusWithoutCurser(operationSubjectType, operationSubjectId,
-                            operationType);
+                    asyncStatusMgtService.getOperationStatusRecords(operationSubjectType, operationSubjectId,
+                            operationType, after, before, limit, filter);
             return Response.ok().entity(records).build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
