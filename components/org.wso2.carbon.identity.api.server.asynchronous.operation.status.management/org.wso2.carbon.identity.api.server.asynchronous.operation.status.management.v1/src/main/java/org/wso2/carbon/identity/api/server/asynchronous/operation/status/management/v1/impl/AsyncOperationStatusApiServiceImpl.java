@@ -81,6 +81,4 @@ public class AsyncOperationStatusApiServiceImpl implements AsyncOperationStatusA
         return asyncOperationStatusApiServiceCore.getOperations(operationSubjectType, operationSubjectId,
                 operationType, after, before, limit, filter);
     }
-
-    private
 }
