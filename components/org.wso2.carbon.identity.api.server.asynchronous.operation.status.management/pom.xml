@@ -14,7 +14,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1</module>
-        <module>org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1</module>
         <module>org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.common</module>
     </modules>
 
