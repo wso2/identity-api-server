@@ -36,7 +36,6 @@ import javax.xml.bind.annotation.*;
 public class OrganizationPUTRequest  {
   
     private String name;
-    private String organizationHandle;
     private String description;
 
 @XmlType(name="StatusEnum")
@@ -93,24 +92,6 @@ public enum StatusEnum {
     }
     public void setName(String name) {
         this.name = name;
-    }
-
-    /**
-    **/
-    public OrganizationPUTRequest organizationHandle(String organizationHandle) {
-
-        this.organizationHandle = organizationHandle;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "abcbuilders", value = "")
-    @JsonProperty("organizationHandle")
-    @Valid
-    public String getOrganizationHandle() {
-        return organizationHandle;
-    }
-    public void setOrganizationHandle(String organizationHandle) {
-        this.organizationHandle = organizationHandle;
     }
 
     /**
@@ -190,7 +171,6 @@ public enum StatusEnum {
         }
         OrganizationPUTRequest organizationPUTRequest = (OrganizationPUTRequest) o;
         return Objects.equals(this.name, organizationPUTRequest.name) &&
-            Objects.equals(this.organizationHandle, organizationPUTRequest.organizationHandle) &&
             Objects.equals(this.description, organizationPUTRequest.description) &&
             Objects.equals(this.status, organizationPUTRequest.status) &&
             Objects.equals(this.attributes, organizationPUTRequest.attributes);
@@ -198,7 +178,7 @@ public enum StatusEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, organizationHandle, description, status, attributes);
+        return Objects.hash(name, description, status, attributes);
     }
 
     @Override
@@ -208,7 +188,6 @@ public enum StatusEnum {
         sb.append("class OrganizationPUTRequest {\n");
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
-        sb.append("    organizationHandle: ").append(toIndentedString(organizationHandle)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("    attributes: ").append(toIndentedString(attributes)).append("\n");
