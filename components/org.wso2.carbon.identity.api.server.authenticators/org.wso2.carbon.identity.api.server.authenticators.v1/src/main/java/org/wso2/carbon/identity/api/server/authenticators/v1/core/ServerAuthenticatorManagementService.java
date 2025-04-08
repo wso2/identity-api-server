@@ -303,7 +303,8 @@ public class ServerAuthenticatorManagementService {
                             LocalAuthenticatorConfigBuilderFactory.
                                     buildSystemLocalAuthenticator(systemConfig, existingAuthenticator),
                             tenantDomain);
-            log.info("AMR Value: " + systemConfig.getAmrValue());
+            log.info("On Tenant " + tenantDomain + "AMR Value update to " + systemConfig.getAmrValue() +
+                    " for the authenticator " + authenticatorName);
             return LocalAuthenticatorConfigBuilderFactory.buildSystemLocalAuthenticator(updatedConfig);
         } catch (AuthenticatorMgtException e) {
             throw handleAuthenticatorException(e);
