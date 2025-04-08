@@ -144,6 +144,7 @@ public class LocalAuthenticatorConfigBuilderFactory {
 
     public static LocalAuthenticatorConfig buildSystemLocalAuthenticator(
             SystemLocalAuthenticatorUpdate config, LocalAuthenticatorConfig existingConfig) {
+
         LocalAuthenticatorConfig authConfig = new LocalAuthenticatorConfig();
         authConfig.setName(existingConfig.getName());
         authConfig.setDisplayName(existingConfig.getDisplayName());

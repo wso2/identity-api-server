@@ -164,6 +164,7 @@ public enum DefinedByEnum {
     public String getAmrValue() {
         return amrValue;
     }
+
     public void setAmrValue(String amrValue) {
         this.amrValue = amrValue;
     }
@@ -255,7 +256,6 @@ public enum DefinedByEnum {
     public void setEndpoint(Endpoint endpoint) {
         this.endpoint = endpoint;
     }
-
 
     @Override
     public boolean equals(java.lang.Object o) {
