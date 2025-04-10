@@ -136,7 +136,8 @@ public class WorkflowAssociationsApi  {
         @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response listWorkflowAssociations(    @Valid @Min(15)@ApiParam(value = "Maximum number of records to return")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Records, filtered by their name")  @QueryParam("filter") String filter) {
+    public Response listWorkflowAssociations(    @Valid @Min(10)@ApiParam(value = "Maximum number of records to " +
+            "return")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Records, filtered by their name")  @QueryParam("filter") String filter) {
 
         return delegate.listWorkflowAssociations(limit,  offset,  filter );
     }
