@@ -182,7 +182,7 @@ public class WorkflowService {
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
         try {
             if (limit == null || offset == null) {
-                limit = 15;
+                limit = 10;
                 offset = 0;
             }
             currentWorkflows = workflowManagementService.listPaginatedWorkflows(tenantId, limit, offset, filter);
@@ -229,7 +229,7 @@ public class WorkflowService {
         List<Association> associationBeans;
         try {
             if (limit == null || offset == null) {
-                limit = 15;
+                limit = 10;
                 offset = 0;
             }
             associationBeans = workflowManagementService.listPaginatedAssociations(
