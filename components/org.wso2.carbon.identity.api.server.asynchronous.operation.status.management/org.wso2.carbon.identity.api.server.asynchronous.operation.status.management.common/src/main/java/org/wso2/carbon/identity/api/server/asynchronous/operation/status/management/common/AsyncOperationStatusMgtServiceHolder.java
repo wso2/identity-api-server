@@ -1,7 +1,7 @@
 package org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.common;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.framework.async.status.mgt.AsyncStatusMgtService;
+import org.wso2.carbon.identity.framework.async.status.mgt.api.service.AsyncStatusMgtService;
 
 /**
  * Holds the services which the async operation status management API component is using.

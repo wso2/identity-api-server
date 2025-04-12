@@ -18,21 +18,17 @@
 
 package org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1;
 
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import java.io.InputStream;
-import java.util.List;
-
 import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.model.Error;
-import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.model.OperationRecordsInner;
-import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.model.UnitOperationRecordsInner;
-import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.AsyncOperationStatusApiService;
+import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.model.OperationRecordsResponse;
+import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.model.UnitOperationRecordsResponse;
 import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.factories.AsyncOperationStatusApiServiceFactory;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
+
+import javax.validation.constraints.*;
 
 @Path("/async-operation-status")
 @Api(description = "The async-operation-status API")
@@ -51,14 +47,16 @@ public class AsyncOperationStatusApi  {
     @Path("/{correlationId}/operations")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "", notes = "Retrieve a list of operation statuses for a given correlation ID.", response = OperationRecordsInner.class, responseContainer = "List", tags={  })
+    @ApiOperation(value = "", notes = "Retrieve a list of operation statuses for a given correlation ID.", response = OperationRecordsResponse.class, tags={  })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = OperationRecordsInner.class, responseContainer = "List"),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+        @ApiResponse(code = 200, message = "OK", response = OperationRecordsResponse.class),
+        @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
+        @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
+        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class),
+        @ApiResponse(code = 501, message = "Not Implemented.", response = Error.class)
     })
-    public Response asyncOperationStatusCorrelationIdOperationsGet(@ApiParam(value = "The unique identifier of the operation.",required=true) @PathParam("correlationId") String correlationId,     @Valid@ApiParam(value = "Cursor for pagination, pointing to the item after which the next page of results should be returned.")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Cursor for pagination, pointing to the item before which the previous page of results should be returned.")  @QueryParam("before") String before,     @Valid@ApiParam(value = "The maximum number of results to return per page.")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "A filter to apply to the results, such as by unit operation status or other criteria.")  @QueryParam("filter") String filter) {
+    public Response asyncOperationStatusCorrelationIdOperationsGet(@ApiParam(value = "The unique identifier of the operation.",required=true) @PathParam("correlationId") String correlationId,     @Valid@ApiParam(value = "Points to the next range of data to be returned.")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Points to the previous range of data that can be retrieved.")  @QueryParam("before") String before,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to be returned. (Should be greater than 0)")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Condition to filter the retrieval of records.")  @QueryParam("filter") String filter) {
 
         return delegate.asyncOperationStatusCorrelationIdOperationsGet(correlationId,  after,  before,  limit,  filter );
     }
@@ -68,14 +66,16 @@ public class AsyncOperationStatusApi  {
     @Path("/operations/{operationId}/unit-operations")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "", notes = "Retrieve a list of unit operation statuses for a given operation ID.", response = UnitOperationRecordsInner.class, responseContainer = "List", tags={  })
+    @ApiOperation(value = "", notes = "Retrieve a list of unit operation statuses for a given operation ID.", response = UnitOperationRecordsResponse.class, tags={  })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = UnitOperationRecordsInner.class, responseContainer = "List"),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+        @ApiResponse(code = 200, message = "OK", response = UnitOperationRecordsResponse.class),
+        @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
+        @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
+        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class),
+        @ApiResponse(code = 501, message = "Not Implemented.", response = Error.class)
     })
-    public Response asyncOperationStatusOperationsOperationIdUnitOperationsGet(@ApiParam(value = "The unique identifier of the operation.",required=true) @PathParam("operationId") String operationId,     @Valid@ApiParam(value = "Cursor for pagination, pointing to the item after which the next page of results should be returned.")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Cursor for pagination, pointing to the item before which the previous page of results should be returned.")  @QueryParam("before") String before,     @Valid@ApiParam(value = "The maximum number of results to return per page.")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "A filter to apply to the results, such as by unit operation status or other criteria.")  @QueryParam("filter") String filter) {
+    public Response asyncOperationStatusOperationsOperationIdUnitOperationsGet(@ApiParam(value = "The unique identifier of the operation.",required=true) @PathParam("operationId") String operationId,     @Valid@ApiParam(value = "Points to the next range of data to be returned.")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Points to the previous range of data that can be retrieved.")  @QueryParam("before") String before,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to be returned. (Should be greater than 0)")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Condition to filter the retrieval of records.")  @QueryParam("filter") String filter) {
 
         return delegate.asyncOperationStatusOperationsOperationIdUnitOperationsGet(operationId,  after,  before,  limit,  filter );
     }
@@ -85,14 +85,16 @@ public class AsyncOperationStatusApi  {
     @Path("/subject-types/{operationSubjectType}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "", notes = "Retrieve a list of asynchronous operations based on the subject type.", response = OperationRecordsInner.class, responseContainer = "List", tags={  })
+    @ApiOperation(value = "", notes = "Retrieve a list of asynchronous operations based on the subject type.", response = OperationRecordsResponse.class, tags={  })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = OperationRecordsInner.class, responseContainer = "List"),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+        @ApiResponse(code = 200, message = "Successful response", response = OperationRecordsResponse.class),
+        @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
+        @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
+        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class),
+        @ApiResponse(code = 501, message = "Not Implemented.", response = Error.class)
     })
-    public Response asyncOperationStatusSubjectTypesOperationSubjectTypeGet(@ApiParam(value = "The type of subject the operation pertains to (e.g., APPLICATION, USER).",required=true) @PathParam("operationSubjectType") String operationSubjectType,     @Valid@ApiParam(value = "Cursor for pagination, pointing to the item after which the next page of results should be returned.")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Cursor for pagination, pointing to the item before which the previous page of results should be returned.")  @QueryParam("before") String before,     @Valid@ApiParam(value = "The maximum number of results to return per page.")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "A filter to apply to the results, such as by organization name or other criteria.")  @QueryParam("filter") String filter) {
+    public Response asyncOperationStatusSubjectTypesOperationSubjectTypeGet(@ApiParam(value = "The type of subject the operation pertains to (e.g., APPLICATION, USER).",required=true) @PathParam("operationSubjectType") String operationSubjectType,     @Valid@ApiParam(value = "Points to the next range of data to be returned.")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Points to the previous range of data that can be retrieved.")  @QueryParam("before") String before,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to be returned. (Should be greater than 0)")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Condition to filter the retrieval of records.")  @QueryParam("filter") String filter) {
 
         return delegate.asyncOperationStatusSubjectTypesOperationSubjectTypeGet(operationSubjectType,  after,  before,  limit,  filter );
     }
@@ -102,14 +104,16 @@ public class AsyncOperationStatusApi  {
     @Path("/subject-types/{operationSubjectType}/subject/{operationSubjectId}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "", notes = "Retrieve a list of asynchronous operations based on the subject type and subject ID.", response = OperationRecordsInner.class, responseContainer = "List", tags={  })
+    @ApiOperation(value = "", notes = "Retrieve a list of asynchronous operations based on the subject type and subject ID.", response = OperationRecordsResponse.class, tags={  })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = OperationRecordsInner.class, responseContainer = "List"),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+        @ApiResponse(code = 200, message = "OK", response = OperationRecordsResponse.class),
+        @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
+        @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
+        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class),
+        @ApiResponse(code = 501, message = "Not Implemented.", response = Error.class)
     })
-    public Response asyncOperationStatusSubjectTypesOperationSubjectTypeSubjectOperationSubjectIdGet(@ApiParam(value = "The type of subject the operation pertains to (e.g., APPLICATION, USER).",required=true) @PathParam("operationSubjectType") String operationSubjectType, @ApiParam(value = "The unique identifier of the subject.",required=true) @PathParam("operationSubjectId") String operationSubjectId,     @Valid@ApiParam(value = "Cursor for pagination, pointing to the item after which the next page of results should be returned.")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Cursor for pagination, pointing to the item before which the previous page of results should be returned.")  @QueryParam("before") String before,     @Valid@ApiParam(value = "The maximum number of results to return per page.")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "A filter to apply to the results, such as by organization name or other criteria.")  @QueryParam("filter") String filter) {
+    public Response asyncOperationStatusSubjectTypesOperationSubjectTypeSubjectOperationSubjectIdGet(@ApiParam(value = "The type of subject the operation pertains to (e.g., APPLICATION, USER).",required=true) @PathParam("operationSubjectType") String operationSubjectType, @ApiParam(value = "The unique identifier of the subject.",required=true) @PathParam("operationSubjectId") String operationSubjectId,     @Valid@ApiParam(value = "Points to the next range of data to be returned.")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Points to the previous range of data that can be retrieved.")  @QueryParam("before") String before,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to be returned. (Should be greater than 0)")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Condition to filter the retrieval of records.")  @QueryParam("filter") String filter) {
 
         return delegate.asyncOperationStatusSubjectTypesOperationSubjectTypeSubjectOperationSubjectIdGet(operationSubjectType,  operationSubjectId,  after,  before,  limit,  filter );
     }
@@ -119,14 +123,16 @@ public class AsyncOperationStatusApi  {
     @Path("/subject-types/{operationSubjectType}/subject/{operationSubjectId}/operation-type/{operationType}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "", notes = "Retrieve a list of asynchronous operations based on the subject type, subject ID, and operation type.", response = OperationRecordsInner.class, responseContainer = "List", tags={  })
+    @ApiOperation(value = "", notes = "Retrieve a list of asynchronous operations based on the subject type, subject ID, and operation type.", response = OperationRecordsResponse.class, tags={  })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = OperationRecordsInner.class, responseContainer = "List"),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+        @ApiResponse(code = 200, message = "OK", response = OperationRecordsResponse.class),
+        @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
+        @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
+        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class),
+        @ApiResponse(code = 501, message = "Not Implemented.", response = Error.class)
     })
-    public Response asyncOperationStatusSubjectTypesOperationSubjectTypeSubjectOperationSubjectIdOperationTypeOperationTypeGet(@ApiParam(value = "The type of subject the operation pertains to (e.g., APPLICATION, USER).",required=true) @PathParam("operationSubjectType") String operationSubjectType, @ApiParam(value = "The unique identifier of the subject.",required=true) @PathParam("operationSubjectId") String operationSubjectId, @ApiParam(value = "The specific type of asynchronous operation (e.g., B2B_APPLICATION_SHARE).",required=true) @PathParam("operationType") String operationType,     @Valid@ApiParam(value = "Cursor for pagination, pointing to the item after which the next page of results should be returned.")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Cursor for pagination, pointing to the item before which the previous page of results should be returned.")  @QueryParam("before") String before,     @Valid@ApiParam(value = "The maximum number of results to return per page.")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "A filter to apply to the results, such as by operation status or other criteria.")  @QueryParam("filter") String filter) {
+    public Response asyncOperationStatusSubjectTypesOperationSubjectTypeSubjectOperationSubjectIdOperationTypeOperationTypeGet(@ApiParam(value = "The type of subject the operation pertains to (e.g., APPLICATION, USER).",required=true) @PathParam("operationSubjectType") String operationSubjectType, @ApiParam(value = "The unique identifier of the subject.",required=true) @PathParam("operationSubjectId") String operationSubjectId, @ApiParam(value = "The specific type of asynchronous operation (e.g., B2B_APPLICATION_SHARE).",required=true) @PathParam("operationType") String operationType,     @Valid@ApiParam(value = "Points to the next range of data to be returned.")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Points to the previous range of data that can be retrieved.")  @QueryParam("before") String before,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to be returned. (Should be greater than 0)")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Condition to filter the retrieval of records.")  @QueryParam("filter") String filter) {
 
         return delegate.asyncOperationStatusSubjectTypesOperationSubjectTypeSubjectOperationSubjectIdOperationTypeOperationTypeGet(operationSubjectType,  operationSubjectId,  operationType,  after,  before,  limit,  filter );
     }

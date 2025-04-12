@@ -2,7 +2,7 @@ package org.wso2.carbon.identity.api.server.asynchronous.operation.status.manage
 
 import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.common.AsyncOperationStatusMgtServiceHolder;
 import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.core.AsyncOperationStatusApiServiceCore;
-import org.wso2.carbon.identity.framework.async.status.mgt.AsyncStatusMgtService;
+import org.wso2.carbon.identity.framework.async.status.mgt.api.service.AsyncStatusMgtService;
 
 /**
  * Factory class for AsyncOperationStatusApiService.

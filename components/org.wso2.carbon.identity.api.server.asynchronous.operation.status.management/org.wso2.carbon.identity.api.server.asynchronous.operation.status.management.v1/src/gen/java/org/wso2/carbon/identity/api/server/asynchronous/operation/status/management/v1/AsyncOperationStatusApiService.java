@@ -25,8 +25,8 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.model.Error;
-import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.model.OperationRecordsInner;
-import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.model.UnitOperationRecordsInner;
+import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.model.OperationRecordsResponse;
+import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.model.UnitOperationRecordsResponse;
 import javax.ws.rs.core.Response;
 
 
