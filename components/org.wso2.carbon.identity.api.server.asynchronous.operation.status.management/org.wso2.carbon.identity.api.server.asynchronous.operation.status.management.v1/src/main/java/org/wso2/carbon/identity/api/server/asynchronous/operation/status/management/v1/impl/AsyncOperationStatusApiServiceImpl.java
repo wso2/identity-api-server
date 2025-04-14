@@ -19,66 +19,46 @@
 package org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.impl;
 
 import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.AsyncOperationStatusApiService;
-import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.core
-        .AsyncOperationStatusApiServiceCore;
+import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.core.AsyncOperationStatusApiServiceCore;
 import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.factories.AsyncOperationStatusApiServiceCoreFactory;
 
 import javax.ws.rs.core.Response;
 
 /**
- * Implementation for AsyncOperationStatusApiService
+ * Implementation of AsyncOperationStatusApiService.
  */
 public class AsyncOperationStatusApiServiceImpl implements AsyncOperationStatusApiService {
+
     private AsyncOperationStatusApiServiceCore asyncOperationStatusApiServiceCore;
 
     public AsyncOperationStatusApiServiceImpl() {
-
         this.asyncOperationStatusApiServiceCore = AsyncOperationStatusApiServiceCoreFactory
                 .getAsyncOperationStatusApiServiceCore();
     }
 
     @Override
-    public Response asyncOperationStatusCorrelationIdOperationsGet(String correlationId, String after, String before,
-                                                                   Integer limit, String filter) {
+    public Response asyncOperationStatusGet(String after, String before, Integer limit, String filter) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        return asyncOperationStatusApiServiceCore.getOperations(after, before, limit, filter);
     }
 
     @Override
-    public Response asyncOperationStatusOperationsOperationIdUnitOperationsGet(String operationId, String after,
-                                                                               String before, Integer limit,
-                                                                               String filter) {
+    public Response asyncOperationStatusOperationIdGet(String operationId) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        return asyncOperationStatusApiServiceCore.getOperation(operationId);
     }
 
     @Override
-    public Response asyncOperationStatusSubjectTypesOperationSubjectTypeGet(String operationSubjectType, String after,
-                                                                            String before, Integer limit,
-                                                                            String filter) {
+    public Response asyncOperationStatusOperationIdUnitOperationsGet(String operationId, String after, String before,
+                                                                     Integer limit, String filter) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        return asyncOperationStatusApiServiceCore.getUnitOperations(operationId, after, before, limit, filter);
     }
 
     @Override
-    public Response asyncOperationStatusSubjectTypesOperationSubjectTypeSubjectOperationSubjectIdGet(
-            String operationSubjectType, String operationSubjectId, String after, String before,
-            Integer limit, String filter) {
+    public Response asyncOperationStatusOperationIdUnitOperationsUnitOperationIdGet(String operationId,
+                                                                                    String unitOperationId) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
-    }
-
-    @Override
-    public Response
-    asyncOperationStatusSubjectTypesOperationSubjectTypeSubjectOperationSubjectIdOperationTypeOperationTypeGet(
-            String operationSubjectType, String operationSubjectId, String operationType, String after, String before,
-            Integer limit, String filter) {
-
-        return asyncOperationStatusApiServiceCore.getOperations(operationSubjectType, operationSubjectId,
-                operationType, after, before, limit, filter);
+        return asyncOperationStatusApiServiceCore.getUnitOperation(unitOperationId);
     }
 }
