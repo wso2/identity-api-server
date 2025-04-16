@@ -1041,6 +1041,11 @@ public class ServerClaimManagementService {
 
         addAttributeProfilesToLocalClaimResponse(claimProperties, localClaimResDTO);
 
+        String flowInitiatorClaim = claimProperties.remove(ClaimConstants.FLOW_INITIATOR);
+        if (StringUtils.isNotBlank(flowInitiatorClaim)) {
+            localClaimResDTO.setFlowInitiator(Boolean.parseBoolean(flowInitiatorClaim));
+        }
+
         String sharedProfileValueResolvingMethod =
                 claimProperties.remove(ClaimConstants.SHARED_PROFILE_VALUE_RESOLVING_METHOD);
         if (StringUtils.isNotBlank(sharedProfileValueResolvingMethod)) {

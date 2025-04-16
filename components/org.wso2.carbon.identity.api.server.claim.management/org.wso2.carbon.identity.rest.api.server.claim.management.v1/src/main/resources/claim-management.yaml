@@ -752,6 +752,10 @@ definitions:
           - FromSharedProfile
           - FromFirstFoundInHierarchy
         example: "FromOrigin"
+      flowInitiator:
+        type: boolean
+        description: Specifies the flow initiator property of the claim.
+        example: true
       attributeMapping:
         type: array
         description: Userstore attribute mappings.
@@ -830,6 +834,10 @@ definitions:
               - FromSharedProfile
               - FromFirstFoundInHierarchy
             example: "FromOrigin"
+          flowInitiator:
+            type: boolean
+            description: Specifies the flow initiator property of the claim.
+            example: true
           attributeMapping:
             type: array
             description: Userstore attribute mappings.
