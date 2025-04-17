@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) (2019-2023), WSO2 LLC. (http://www.wso2.org).
+ *  Copyright (c) (2019-2025), WSO2 LLC. (http://www.wso2.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -136,6 +136,7 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DESCRIPTION;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DISPLAY_NAME;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DISPLAY_ORDER;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_MULTI_VALUED;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_PROFILES_PREFIX;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_READ_ONLY;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_REG_EX;
@@ -1029,6 +1030,7 @@ public class ServerClaimManagementService {
         }
         localClaimResDTO.setRequired(Boolean.valueOf(claimProperties.remove(PROP_REQUIRED)));
         localClaimResDTO.setSupportedByDefault(Boolean.valueOf(claimProperties.remove(PROP_SUPPORTED_BY_DEFAULT)));
+        localClaimResDTO.setMultiValued(Boolean.valueOf(claimProperties.remove(PROP_MULTI_VALUED)));
 
         String uniquenessScope = claimProperties.remove(PROP_UNIQUENESS_SCOPE);
         if (StringUtils.isNotBlank(uniquenessScope)) {
@@ -1172,6 +1174,9 @@ public class ServerClaimManagementService {
         claimProperties.put(PROP_READ_ONLY, String.valueOf(localClaimReqDTO.getReadOnly()));
         claimProperties.put(PROP_REQUIRED, String.valueOf(localClaimReqDTO.getRequired()));
         claimProperties.put(PROP_SUPPORTED_BY_DEFAULT, String.valueOf(localClaimReqDTO.getSupportedByDefault()));
+        claimProperties.put(PROP_MULTI_VALUED, localClaimReqDTO.getMultiValued() == null ? FALSE :
+                String.valueOf(localClaimReqDTO.getMultiValued()));
+
         claimProperties.putAll(propertiesToMap(localClaimReqDTO.getProperties()));
 
         List<AttributeMapping> attributeMappings = new ArrayList<>();
@@ -1741,5 +1746,6 @@ public class ServerClaimManagementService {
         localClaim.getClaimProperties().putIfAbsent(PROP_READ_ONLY, FALSE);
         localClaim.getClaimProperties().putIfAbsent(PROP_REQUIRED, FALSE);
         localClaim.getClaimProperties().putIfAbsent(PROP_SUPPORTED_BY_DEFAULT, FALSE);
+        localClaim.getClaimProperties().putIfAbsent(PROP_MULTI_VALUED, FALSE);
     }
 }

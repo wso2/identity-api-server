@@ -1,5 +1,5 @@
 /*
- * Copyright (c) (2019-2023), WSO2 LLC. (http://www.wso2.org).
+ * Copyright (c) (2019-2025), WSO2 LLC. (http://www.wso2.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -290,6 +290,7 @@ public class Constant {
     public static final String PROP_REG_EX = "RegEx";
     public static final String PROP_REQUIRED = "Required";
     public static final String PROP_SUPPORTED_BY_DEFAULT = "SupportedByDefault";
+    public static final String PROP_MULTI_VALUED = "multiValued";
     public static final String PROP_UNIQUENESS_SCOPE = "UniquenessScope";
     public static final String PROP_PROFILES_PREFIX = "Profiles.";
     public static final String PROP_EXCLUDED_USER_STORES = "ExcludedUserStores";
