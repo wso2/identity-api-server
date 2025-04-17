@@ -1174,7 +1174,8 @@ public class ServerClaimManagementService {
         claimProperties.put(PROP_READ_ONLY, String.valueOf(localClaimReqDTO.getReadOnly()));
         claimProperties.put(PROP_REQUIRED, String.valueOf(localClaimReqDTO.getRequired()));
         claimProperties.put(PROP_SUPPORTED_BY_DEFAULT, String.valueOf(localClaimReqDTO.getSupportedByDefault()));
-        claimProperties.put(PROP_MULTI_VALUED, String.valueOf(localClaimReqDTO.getMultiValued()));
+        claimProperties.put(PROP_MULTI_VALUED, localClaimReqDTO.getMultiValued() == null ? FALSE :
+                String.valueOf(localClaimReqDTO.getMultiValued()));
 
         claimProperties.putAll(propertiesToMap(localClaimReqDTO.getProperties()));
 
@@ -1745,5 +1746,6 @@ public class ServerClaimManagementService {
         localClaim.getClaimProperties().putIfAbsent(PROP_READ_ONLY, FALSE);
         localClaim.getClaimProperties().putIfAbsent(PROP_REQUIRED, FALSE);
         localClaim.getClaimProperties().putIfAbsent(PROP_SUPPORTED_BY_DEFAULT, FALSE);
+        localClaim.getClaimProperties().putIfAbsent(PROP_MULTI_VALUED, FALSE);
     }
 }
