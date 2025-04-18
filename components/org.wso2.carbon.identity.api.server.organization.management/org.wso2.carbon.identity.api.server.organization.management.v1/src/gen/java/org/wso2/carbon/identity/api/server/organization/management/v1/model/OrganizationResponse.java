@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -38,6 +38,7 @@ public class OrganizationResponse  {
   
     private String id;
     private String name;
+    private String orgHandle;
     private String description;
 
 @XmlType(name="StatusEnum")
@@ -151,6 +152,26 @@ public enum TypeEnum {
     }
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+    **/
+    public OrganizationResponse orgHandle(String orgHandle) {
+
+        this.orgHandle = orgHandle;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "abcbuilders", required = true, value = "")
+    @JsonProperty("orgHandle")
+    @Valid
+    @NotNull(message = "Property orgHandle cannot be null.")
+
+    public String getOrgHandle() {
+        return orgHandle;
+    }
+    public void setOrgHandle(String orgHandle) {
+        this.orgHandle = orgHandle;
     }
 
     /**
@@ -309,6 +330,7 @@ public enum TypeEnum {
         OrganizationResponse organizationResponse = (OrganizationResponse) o;
         return Objects.equals(this.id, organizationResponse.id) &&
             Objects.equals(this.name, organizationResponse.name) &&
+            Objects.equals(this.orgHandle, organizationResponse.orgHandle) &&
             Objects.equals(this.description, organizationResponse.description) &&
             Objects.equals(this.status, organizationResponse.status) &&
             Objects.equals(this.created, organizationResponse.created) &&
@@ -320,7 +342,7 @@ public enum TypeEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, status, created, lastModified, type, parent, attributes);
+        return Objects.hash(id, name, orgHandle, description, status, created, lastModified, type, parent, attributes);
     }
 
     @Override
@@ -331,6 +353,7 @@ public enum TypeEnum {
         
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    orgHandle: ").append(toIndentedString(orgHandle)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("    created: ").append(toIndentedString(created)).append("\n");

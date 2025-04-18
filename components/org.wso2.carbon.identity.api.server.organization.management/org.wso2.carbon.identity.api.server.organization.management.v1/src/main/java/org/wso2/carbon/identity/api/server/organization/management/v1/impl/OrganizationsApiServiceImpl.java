@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -24,6 +24,7 @@ import org.wso2.carbon.identity.api.server.organization.management.v1.model.Appl
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryAttributes;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryCheckPOSTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryPostRequest;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationHandleCheckPOSTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationNameCheckPOSTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationPOSTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationPUTRequest;
@@ -184,6 +185,13 @@ public class OrganizationsApiServiceImpl implements OrganizationsApiService {
     public Response organizationsCheckNamePost(OrganizationNameCheckPOSTRequest organizationNameCheckPOSTRequest) {
 
         return organizationManagementService.checkOrganizationName(organizationNameCheckPOSTRequest.getName());
+    }
+
+    @Override
+    public Response organizationsCheckHandlePost(
+            OrganizationHandleCheckPOSTRequest organizationHandleCheckPOSTRequest) {
+
+        return organizationManagementService.checkOrganizationHandle(organizationHandleCheckPOSTRequest.getOrgHandle());
     }
 
     @Override
