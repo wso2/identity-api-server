@@ -347,7 +347,7 @@ public class NotificationSenderManagementService {
             return emailSender;
         }
         dto.getProperties().forEach((key, value) -> {
-            if (StringUtils.isBlank(key) || StringUtils.isBlank(value) || excludedKeys.contains(key)) {
+            if (excludedKeys.contains(key) || StringUtils.isBlank(key) || StringUtils.isBlank(value)) {
                 return;
             }
             Properties prop = new Properties();
