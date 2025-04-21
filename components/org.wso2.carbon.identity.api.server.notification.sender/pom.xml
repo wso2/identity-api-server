@@ -31,7 +31,7 @@
 
     <modules>
         <module>org.wso2.carbon.identity.api.server.notification.sender.v1</module>
-        <module>org.wso2.carbon.identity.api.server.notification.sender.common</module>
         <module>org.wso2.carbon.identity.api.server.notification.sender.v2</module>
+        <module>org.wso2.carbon.identity.api.server.notification.sender.common</module>
     </modules>
 </project>
