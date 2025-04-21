@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -27,10 +27,12 @@ import org.wso2.carbon.identity.api.server.branding.preference.management.v1.mod
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationResponseModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationResultModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationStatusModel;
-import org.wso2.carbon.identity.api.server.branding.preference.management.v1.factories.BrandingPreferenceApiServiceFactory;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingPreferenceModel;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingPreferenceWithResolveModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.CustomTextModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.Error;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.BrandingPreferenceApiService;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.factories.BrandingPreferenceApiServiceFactory;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -270,14 +272,14 @@ public class BrandingPreferenceApi  {
     @Path("/resolve")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Resolve branding preference of an organization.", notes = "This API provides the capability to retrieve the branding preference of an organization/specific application.<br> If there is no branding preference available for the requested locale, API will check for the default locale('en-US') and return it.<br> If there is no branding preference available for the requested application, API will check for the organization's branding preference and return it.<br>   <b>Permission required:</b> <br>     * None <br>   <b>Scope required:</b> <br>     * None ", response = BrandingPreferenceModel.class, authorizations = {
+    @ApiOperation(value = "Resolve branding preference of an organization.", notes = "This API provides the capability to retrieve the branding preference of an organization/specific application.<br> If there is no branding preference available for the requested locale, API will check for the default locale('en-US') and return it.<br> If there is no branding preference available for the requested application, API will check for the organization's branding preference and return it.<br>   <b>Permission required:</b> <br>     * None <br>   <b>Scope required:</b> <br>     * None ", response = BrandingPreferenceWithResolveModel.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Branding Preference", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = BrandingPreferenceModel.class),
+        @ApiResponse(code = 200, message = "OK", response = BrandingPreferenceWithResolveModel.class),
         @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
         @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
         @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),

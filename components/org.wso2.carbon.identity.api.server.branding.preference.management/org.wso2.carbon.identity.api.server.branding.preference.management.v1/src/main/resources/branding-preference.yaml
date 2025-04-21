@@ -188,7 +188,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/BrandingPreferenceModel'
+                $ref: '#/components/schemas/BrandingPreferenceWithResolveModel'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -556,6 +556,76 @@ components:
           type: string
           example: "en-US"
           default: "en-US"
+        preference:
+          type: object
+          description: "This is the JSON structured branding preference"
+          example: {
+            "organizationDetails": {
+              "displayName": "Ballerina.io",
+              "siteTitle": "Login - Ballerina",
+              "copyrightText": "© 2021 WSO2",
+              "supportEmail": "support@ballerina.io"
+            },
+            "images": {
+              "logo": {
+                "imgURL": "https://ballerina.io/img/ballerina-logo.svg",
+                "altText": "Ballerina.io Logo"
+              },
+              "favicon": {
+                "imgURL": "https://central.ballerina.io/favicon.ico"
+              }
+            },
+            "urls": {
+              "privacyPolicyURL": "https://ballerina.io/privacy-policy",
+              "termsOfUseURL": "https://ballerina.io/terms-of-service/",
+              "cookiePolicyURL": "https://ballerina.io/privacy-policy/#cookie-policy"
+            },
+            "stylesheets": {
+              "accountApp": "https://firebasestorage.googleapis.com/v0/b/asgardeo-branding.appspot.com/o/ballerina%2Flogin-portal.overrides.css?alt=media&token=0315462e-534e-4f33-83f9-e4c092d0273d",
+              "myAccountApp": "https://asgardeo-branding/user-portal.css"
+            },
+            "configs": {
+              "isBrandingEnabled": true,
+              "removeDefaultBranding": false,
+              "selfSignUpEnabled": true
+            }
+          }
+    BrandingPreferenceWithResolveModel:
+      required:
+        - type
+        - preference
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - ORG
+            - APP
+            - CUSTOM
+          example: "ORG"
+        name:
+          type: string
+          example: "WSO2"
+        locale:
+          type: string
+          example: "en-US"
+          default: "en-US"
+        resolvedFrom:
+          type: object
+          required:
+            - type
+            - name
+          properties:
+            type:
+              type: string
+              enum:
+                - ORG
+                - APP
+                - CUSTOM
+              example: "ORG"
+            name:
+              type: string
+              example: "WSO2"
         preference:
           type: object
           description: "This is the JSON structured branding preference"

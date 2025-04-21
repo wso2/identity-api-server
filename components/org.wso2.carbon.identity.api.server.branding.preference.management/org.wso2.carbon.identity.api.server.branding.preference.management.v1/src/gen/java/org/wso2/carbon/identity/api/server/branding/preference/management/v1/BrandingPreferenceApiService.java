@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -29,6 +29,7 @@ import org.wso2.carbon.identity.api.server.branding.preference.management.v1.mod
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationResultModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationStatusModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingPreferenceModel;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingPreferenceWithResolveModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.CustomTextModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.Error;
 import javax.ws.rs.core.Response;

@@ -172,7 +172,7 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
         } else if (!(ORGANIZATION_TYPE.equals(type) || APPLICATION_TYPE.equals(type) || CUSTOM_TYPE.equals(type))) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         } else if (!ORGANIZATION_TYPE.equals(type)) {
-                return Response.status(Response.Status.NOT_FOUND).build();
+            return Response.status(Response.Status.NOT_FOUND).build();
         }
 
         if (StringUtils.isBlank(screen)) {

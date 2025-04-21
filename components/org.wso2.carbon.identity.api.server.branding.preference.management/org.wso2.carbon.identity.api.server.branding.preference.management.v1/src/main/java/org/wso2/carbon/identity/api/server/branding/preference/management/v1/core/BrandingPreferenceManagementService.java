@@ -26,6 +26,8 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.core.utils.BrandingPreferenceUtils;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingPreferenceModel;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingPreferenceWithResolveModel;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingPreferenceWithResolveModelResolvedFrom;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.CustomTextModel;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
@@ -193,7 +195,7 @@ public class BrandingPreferenceManagementService {
      * @param locale Language preference.
      * @return The resolved branding preference resource. If not exists return the default preferences.
      */
-    public BrandingPreferenceModel resolveBrandingPreference(String type, String name, String locale) {
+    public BrandingPreferenceWithResolveModel resolveBrandingPreference(String type, String name, String locale) {
 
         return resolveBrandingPreference(type, name, locale, false);
     }
@@ -207,7 +209,7 @@ public class BrandingPreferenceManagementService {
      * @param restrictToPublished Whether to resolve using only published branding preferences.
      * @return The resolved branding preference resource. If not exists return the default preferences.
      */
-    public BrandingPreferenceModel resolveBrandingPreference(String type, String name, String locale,
+    public BrandingPreferenceWithResolveModel resolveBrandingPreference(String type, String name, String locale,
                                                              boolean restrictToPublished) {
 
         /*
@@ -228,7 +230,7 @@ public class BrandingPreferenceManagementService {
                         DEFAULT_LOCALE, restrictToPublished);
             }
 
-            return buildBrandingResponseFromResponseDTO(responseDTO);
+            return buildResolvedBrandingResponseFromResponseDTO(responseDTO);
         } catch (BrandingPreferenceMgtException e) {
             if (BRANDING_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
                 if (log.isDebugEnabled()) {
@@ -518,10 +520,34 @@ public class BrandingPreferenceManagementService {
      */
     private BrandingPreferenceModel buildBrandingResponseFromResponseDTO(BrandingPreference responseDTO) {
 
+
         BrandingPreferenceModel brandingPreferenceResponse = new BrandingPreferenceModel();
         brandingPreferenceResponse.setType(BrandingPreferenceModel.TypeEnum.valueOf(responseDTO.getType()));
         brandingPreferenceResponse.setName(responseDTO.getName());
         brandingPreferenceResponse.setLocale(responseDTO.getLocale());
+        brandingPreferenceResponse.setPreference(responseDTO.getPreference());
+        return brandingPreferenceResponse;
+    }
+
+    /**
+     * Build branding preference response object from the responseDTO.
+     *
+     * @param responseDTO Branding preference responseDTO object.
+     * @return Branding preference response object{@link BrandingPreferenceModel}.
+     */
+    private BrandingPreferenceWithResolveModel buildResolvedBrandingResponseFromResponseDTO(
+            BrandingPreference responseDTO) {
+
+        BrandingPreferenceWithResolveModelResolvedFrom resolvedFrom =
+                new BrandingPreferenceWithResolveModelResolvedFrom();
+        resolvedFrom.setType(BrandingPreferenceWithResolveModelResolvedFrom.TypeEnum.valueOf(
+                responseDTO.getResolvedFrom().getType()));
+        resolvedFrom.setName(responseDTO.getResolvedFrom().getName());
+        BrandingPreferenceWithResolveModel brandingPreferenceResponse = new BrandingPreferenceWithResolveModel();
+        brandingPreferenceResponse.setType(BrandingPreferenceWithResolveModel.TypeEnum.valueOf(responseDTO.getType()));
+        brandingPreferenceResponse.setName(responseDTO.getName());
+        brandingPreferenceResponse.setLocale(responseDTO.getLocale());
+        brandingPreferenceResponse.setResolvedFrom(resolvedFrom);
         brandingPreferenceResponse.setPreference(responseDTO.getPreference());
         return brandingPreferenceResponse;
     }

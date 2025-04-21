@@ -30,19 +30,19 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class BrandingGenerationResultModel  {
+public class BrandingPreferenceWithResolveModelResolvedFrom  {
   
 
-@XmlType(name="StatusEnum")
+@XmlType(name="TypeEnum")
 @XmlEnum(String.class)
-public enum StatusEnum {
+public enum TypeEnum {
 
-    @XmlEnumValue("IN_PROGRESS") IN_PROGRESS(String.valueOf("IN_PROGRESS")), @XmlEnumValue("COMPLETED") COMPLETED(String.valueOf("COMPLETED")), @XmlEnumValue("FAILED") FAILED(String.valueOf("FAILED"));
+    @XmlEnumValue("ORG") ORG(String.valueOf("ORG")), @XmlEnumValue("APP") APP(String.valueOf("APP")), @XmlEnumValue("CUSTOM") CUSTOM(String.valueOf("CUSTOM"));
 
 
     private String value;
 
-    StatusEnum(String v) {
+    TypeEnum(String v) {
         value = v;
     }
 
@@ -55,8 +55,8 @@ public enum StatusEnum {
         return String.valueOf(value);
     }
 
-    public static StatusEnum fromValue(String value) {
-        for (StatusEnum b : StatusEnum.values()) {
+    public static TypeEnum fromValue(String value) {
+        for (TypeEnum b : TypeEnum.values()) {
             if (b.value.equals(value)) {
                 return b;
             }
@@ -65,45 +65,47 @@ public enum StatusEnum {
     }
 }
 
-    private StatusEnum status;
-    private Object data;
+    private TypeEnum type;
+    private String name;
 
     /**
-    * The current result of the AI branding operation.
     **/
-    public BrandingGenerationResultModel status(StatusEnum status) {
+    public BrandingPreferenceWithResolveModelResolvedFrom type(TypeEnum type) {
 
-        this.status = status;
+        this.type = type;
         return this;
     }
     
-    @ApiModelProperty(value = "The current result of the AI branding operation.")
-    @JsonProperty("status")
+    @ApiModelProperty(example = "ORG", required = true, value = "")
+    @JsonProperty("type")
     @Valid
-    public StatusEnum getStatus() {
-        return status;
+    @NotNull(message = "Property type cannot be null.")
+
+    public TypeEnum getType() {
+        return type;
     }
-    public void setStatus(StatusEnum status) {
-        this.status = status;
+    public void setType(TypeEnum type) {
+        this.type = type;
     }
 
     /**
-    * The payload of the response, which varies based on the operation status. - For IN_PROGRESS status, an empty JSON object is returned. - For COMPLETED status, the &#x60;BrandingPreferenceModel&#x60; is returned. - For FAILED status, an error message is returned. 
     **/
-    public BrandingGenerationResultModel data(Object data) {
+    public BrandingPreferenceWithResolveModelResolvedFrom name(String name) {
 
-        this.data = data;
+        this.name = name;
         return this;
     }
     
-    @ApiModelProperty(value = "The payload of the response, which varies based on the operation status. - For IN_PROGRESS status, an empty JSON object is returned. - For COMPLETED status, the `BrandingPreferenceModel` is returned. - For FAILED status, an error message is returned. ")
-    @JsonProperty("data")
+    @ApiModelProperty(example = "WSO2", required = true, value = "")
+    @JsonProperty("name")
     @Valid
-    public Object getData() {
-        return data;
+    @NotNull(message = "Property name cannot be null.")
+
+    public String getName() {
+        return name;
     }
-    public void setData(Object data) {
-        this.data = data;
+    public void setName(String name) {
+        this.name = name;
     }
 
 
@@ -117,24 +119,24 @@ public enum StatusEnum {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        BrandingGenerationResultModel brandingGenerationResultModel = (BrandingGenerationResultModel) o;
-        return Objects.equals(this.status, brandingGenerationResultModel.status) &&
-            Objects.equals(this.data, brandingGenerationResultModel.data);
+        BrandingPreferenceWithResolveModelResolvedFrom brandingPreferenceWithResolveModelResolvedFrom = (BrandingPreferenceWithResolveModelResolvedFrom) o;
+        return Objects.equals(this.type, brandingPreferenceWithResolveModelResolvedFrom.type) &&
+            Objects.equals(this.name, brandingPreferenceWithResolveModelResolvedFrom.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(status, data);
+        return Objects.hash(type, name);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class BrandingGenerationResultModel {\n");
+        sb.append("class BrandingPreferenceWithResolveModelResolvedFrom {\n");
         
-        sb.append("    status: ").append(toIndentedString(status)).append("\n");
-        sb.append("    data: ").append(toIndentedString(data)).append("\n");
+        sb.append("    type: ").append(toIndentedString(type)).append("\n");
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("}");
         return sb.toString();
     }
