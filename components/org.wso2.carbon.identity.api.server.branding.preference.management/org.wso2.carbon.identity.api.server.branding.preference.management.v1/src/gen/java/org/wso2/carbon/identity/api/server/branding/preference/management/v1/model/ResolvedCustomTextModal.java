@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingPreferenceWithResolveModelResolvedFrom;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.ResolvedBrandingPreferenceModelResolvedFrom;
 import javax.validation.constraints.*;
 
 
@@ -31,7 +31,7 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class BrandingPreferenceWithResolveModel  {
+public class ResolvedCustomTextModal  {
   
 
 @XmlType(name="TypeEnum")
@@ -69,12 +69,13 @@ public enum TypeEnum {
     private TypeEnum type;
     private String name;
     private String locale = "en-US";
-    private BrandingPreferenceWithResolveModelResolvedFrom resolvedFrom;
+    private String screen;
+    private ResolvedBrandingPreferenceModelResolvedFrom resolvedFrom;
     private Object preference;
 
     /**
     **/
-    public BrandingPreferenceWithResolveModel type(TypeEnum type) {
+    public ResolvedCustomTextModal type(TypeEnum type) {
 
         this.type = type;
         return this;
@@ -94,7 +95,7 @@ public enum TypeEnum {
 
     /**
     **/
-    public BrandingPreferenceWithResolveModel name(String name) {
+    public ResolvedCustomTextModal name(String name) {
 
         this.name = name;
         return this;
@@ -112,7 +113,7 @@ public enum TypeEnum {
 
     /**
     **/
-    public BrandingPreferenceWithResolveModel locale(String locale) {
+    public ResolvedCustomTextModal locale(String locale) {
 
         this.locale = locale;
         return this;
@@ -130,7 +131,27 @@ public enum TypeEnum {
 
     /**
     **/
-    public BrandingPreferenceWithResolveModel resolvedFrom(BrandingPreferenceWithResolveModelResolvedFrom resolvedFrom) {
+    public ResolvedCustomTextModal screen(String screen) {
+
+        this.screen = screen;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "login", required = true, value = "")
+    @JsonProperty("screen")
+    @Valid
+    @NotNull(message = "Property screen cannot be null.")
+
+    public String getScreen() {
+        return screen;
+    }
+    public void setScreen(String screen) {
+        this.screen = screen;
+    }
+
+    /**
+    **/
+    public ResolvedCustomTextModal resolvedFrom(ResolvedBrandingPreferenceModelResolvedFrom resolvedFrom) {
 
         this.resolvedFrom = resolvedFrom;
         return this;
@@ -139,23 +160,23 @@ public enum TypeEnum {
     @ApiModelProperty(value = "")
     @JsonProperty("resolvedFrom")
     @Valid
-    public BrandingPreferenceWithResolveModelResolvedFrom getResolvedFrom() {
+    public ResolvedBrandingPreferenceModelResolvedFrom getResolvedFrom() {
         return resolvedFrom;
     }
-    public void setResolvedFrom(BrandingPreferenceWithResolveModelResolvedFrom resolvedFrom) {
+    public void setResolvedFrom(ResolvedBrandingPreferenceModelResolvedFrom resolvedFrom) {
         this.resolvedFrom = resolvedFrom;
     }
 
     /**
     * This is the JSON structured branding preference
     **/
-    public BrandingPreferenceWithResolveModel preference(Object preference) {
+    public ResolvedCustomTextModal preference(Object preference) {
 
         this.preference = preference;
         return this;
     }
     
-    @ApiModelProperty(example = "{\"organizationDetails\":{\"displayName\":\"Ballerina.io\",\"siteTitle\":\"Login - Ballerina\",\"copyrightText\":\"© 2021 WSO2\",\"supportEmail\":\"support@ballerina.io\"},\"images\":{\"logo\":{\"imgURL\":\"https://ballerina.io/img/ballerina-logo.svg\",\"altText\":\"Ballerina.io Logo\"},\"favicon\":{\"imgURL\":\"https://central.ballerina.io/favicon.ico\"}},\"urls\":{\"privacyPolicyURL\":\"https://ballerina.io/privacy-policy\",\"termsOfUseURL\":\"https://ballerina.io/terms-of-service/\",\"cookiePolicyURL\":\"https://ballerina.io/privacy-policy/#cookie-policy\"},\"stylesheets\":{\"accountApp\":\"https://firebasestorage.googleapis.com/v0/b/asgardeo-branding.appspot.com/o/ballerina%2Flogin-portal.overrides.css?alt=media&token=0315462e-534e-4f33-83f9-e4c092d0273d\",\"myAccountApp\":\"https://asgardeo-branding/user-portal.css\"},\"configs\":{\"isBrandingEnabled\":true,\"removeDefaultBranding\":false,\"selfSignUpEnabled\":true}}", required = true, value = "This is the JSON structured branding preference")
+    @ApiModelProperty(example = "{\"login\":\"Sign In\",\"welcome\":\"Welcome\",\"account.linking\":\"Account Linking\",\"username\":\"Username\",\"email.username\":\"Email address\",\"back.to.sign.in\":\"Back to Sign In\",\"or\":\"Or\",\"dont.have.an.account\":\"Don't have an account?\"}", required = true, value = "This is the JSON structured branding preference")
     @JsonProperty("preference")
     @Valid
     @NotNull(message = "Property preference cannot be null.")
@@ -178,28 +199,30 @@ public enum TypeEnum {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        BrandingPreferenceWithResolveModel brandingPreferenceWithResolveModel = (BrandingPreferenceWithResolveModel) o;
-        return Objects.equals(this.type, brandingPreferenceWithResolveModel.type) &&
-            Objects.equals(this.name, brandingPreferenceWithResolveModel.name) &&
-            Objects.equals(this.locale, brandingPreferenceWithResolveModel.locale) &&
-            Objects.equals(this.resolvedFrom, brandingPreferenceWithResolveModel.resolvedFrom) &&
-            Objects.equals(this.preference, brandingPreferenceWithResolveModel.preference);
+        ResolvedCustomTextModal resolvedCustomTextModal = (ResolvedCustomTextModal) o;
+        return Objects.equals(this.type, resolvedCustomTextModal.type) &&
+            Objects.equals(this.name, resolvedCustomTextModal.name) &&
+            Objects.equals(this.locale, resolvedCustomTextModal.locale) &&
+            Objects.equals(this.screen, resolvedCustomTextModal.screen) &&
+            Objects.equals(this.resolvedFrom, resolvedCustomTextModal.resolvedFrom) &&
+            Objects.equals(this.preference, resolvedCustomTextModal.preference);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, name, locale, resolvedFrom, preference);
+        return Objects.hash(type, name, locale, screen, resolvedFrom, preference);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class BrandingPreferenceWithResolveModel {\n");
+        sb.append("class ResolvedCustomTextModal {\n");
         
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    locale: ").append(toIndentedString(locale)).append("\n");
+        sb.append("    screen: ").append(toIndentedString(screen)).append("\n");
         sb.append("    resolvedFrom: ").append(toIndentedString(resolvedFrom)).append("\n");
         sb.append("    preference: ").append(toIndentedString(preference)).append("\n");
         sb.append("}");

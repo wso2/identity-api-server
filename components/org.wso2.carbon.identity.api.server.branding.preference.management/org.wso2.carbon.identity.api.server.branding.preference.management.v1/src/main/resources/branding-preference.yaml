@@ -188,7 +188,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/BrandingPreferenceWithResolveModel'
+                $ref: '#/components/schemas/ResolvedBrandingPreferenceModel'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -468,7 +468,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/CustomTextModel'
+                $ref: '#/components/schemas/ResolvedCustomTextModal'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -590,7 +590,7 @@ components:
               "selfSignUpEnabled": true
             }
           }
-    BrandingPreferenceWithResolveModel:
+    ResolvedBrandingPreferenceModel:
       required:
         - type
         - preference
@@ -749,7 +749,59 @@ components:
             "or": "Or",
             "dont.have.an.account": "Don't have an account?"
           }
-
+    ResolvedCustomTextModal:
+      required:
+        - type
+        - screen
+        - preference
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - ORG
+            - APP
+            - CUSTOM
+          example: "ORG"
+        name:
+          type: string
+          example: "WSO2"
+        locale:
+          type: string
+          example: "en-US"
+          default: "en-US"
+        screen:
+          type: string
+          example: "login"
+        resolvedFrom:
+          type: object
+          required:
+            - type
+            - name
+          properties:
+            type:
+              type: string
+              enum:
+                - ORG
+                - APP
+                - CUSTOM
+              example: "ORG"
+            name:
+              type: string
+              example: "WSO2"
+        preference:
+          type: object
+          description: "This is the JSON structured branding preference"
+          example: {
+            "login": "Sign In",
+            "welcome": "Welcome",
+            "account.linking": "Account Linking",
+            "username": "Username",
+            "email.username": "Email address",
+            "back.to.sign.in": "Back to Sign In",
+            "or": "Or",
+            "dont.have.an.account": "Don't have an account?"
+          }
     Error:
       type: object
       required:

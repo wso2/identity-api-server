@@ -30,7 +30,7 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class BrandingPreferenceWithResolveModelResolvedFrom  {
+public class ResolvedBrandingPreferenceModelResolvedFrom  {
   
 
 @XmlType(name="TypeEnum")
@@ -70,7 +70,7 @@ public enum TypeEnum {
 
     /**
     **/
-    public BrandingPreferenceWithResolveModelResolvedFrom type(TypeEnum type) {
+    public ResolvedBrandingPreferenceModelResolvedFrom type(TypeEnum type) {
 
         this.type = type;
         return this;
@@ -90,7 +90,7 @@ public enum TypeEnum {
 
     /**
     **/
-    public BrandingPreferenceWithResolveModelResolvedFrom name(String name) {
+    public ResolvedBrandingPreferenceModelResolvedFrom name(String name) {
 
         this.name = name;
         return this;
@@ -119,9 +119,9 @@ public enum TypeEnum {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        BrandingPreferenceWithResolveModelResolvedFrom brandingPreferenceWithResolveModelResolvedFrom = (BrandingPreferenceWithResolveModelResolvedFrom) o;
-        return Objects.equals(this.type, brandingPreferenceWithResolveModelResolvedFrom.type) &&
-            Objects.equals(this.name, brandingPreferenceWithResolveModelResolvedFrom.name);
+        ResolvedBrandingPreferenceModelResolvedFrom resolvedBrandingPreferenceModelResolvedFrom = (ResolvedBrandingPreferenceModelResolvedFrom) o;
+        return Objects.equals(this.type, resolvedBrandingPreferenceModelResolvedFrom.type) &&
+            Objects.equals(this.name, resolvedBrandingPreferenceModelResolvedFrom.name);
     }
 
     @Override
@@ -133,7 +133,7 @@ public enum TypeEnum {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class BrandingPreferenceWithResolveModelResolvedFrom {\n");
+        sb.append("class ResolvedBrandingPreferenceModelResolvedFrom {\n");
         
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
