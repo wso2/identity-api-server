@@ -69,6 +69,9 @@ public class LocalClaimResDTO extends ClaimResDTO {
     private Boolean supportedByDefault = null;
 
     @Valid
+    private DataTypeEnum dataType = null;
+
+    @Valid
     private Boolean multiValued = null;
 
     public enum UniquenessScopeEnum {
@@ -213,6 +216,18 @@ public class LocalClaimResDTO extends ClaimResDTO {
     }
 
     /**
+     * Specifies the type of data which the claim holds.
+     **/
+    @ApiModelProperty(value = "Specifies the type of data stored in the corresponding claim value.")
+    @JsonProperty("dataType")
+    public DataTypeEnum getDataType() {
+        return dataType;
+    }
+    public void setDataType(DataTypeEnum dataType) {
+        this.dataType = dataType;
+    }
+
+    /**
      * Specifies if the claim can hold multiple values.
      **/
     @ApiModelProperty(value = "Specifies if the claim can hold multiple values.")
@@ -303,6 +318,7 @@ public class LocalClaimResDTO extends ClaimResDTO {
         sb.append("    regEx: ").append(regEx).append("\n");
         sb.append("    required: ").append(required).append("\n");
         sb.append("    supportedByDefault: ").append(supportedByDefault).append("\n");
+        sb.append("    dataType: ").append(dataType).append("\n");
         sb.append("    multiValued: ").append(multiValued).append("\n");
         sb.append("    uniquenessScope: ").append(uniquenessScope).append("\n");
         sb.append("    sharedProfileValueResolvingMethod: ").append(sharedProfileValueResolvingMethod).append("\n");
