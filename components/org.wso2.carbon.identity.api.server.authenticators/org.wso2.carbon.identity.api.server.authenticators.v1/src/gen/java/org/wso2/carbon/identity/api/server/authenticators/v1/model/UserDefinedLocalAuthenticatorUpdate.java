@@ -41,6 +41,7 @@ public class UserDefinedLocalAuthenticatorUpdate  {
     private String image;
     private String description;
     private Endpoint endpoint;
+    private String amrValue;
 
     /**
     **/
@@ -138,6 +139,24 @@ public class UserDefinedLocalAuthenticatorUpdate  {
         this.endpoint = endpoint;
     }
 
+    /**
+    **/
+    public UserDefinedLocalAuthenticatorUpdate amrValue(String amrValue) {
+
+        this.amrValue = amrValue;
+        return this;
+    }
+
+    @ApiModelProperty(example = "basic", required = true, value = "")
+    @JsonProperty("amrValue")
+    @Valid
+
+    public String getAmrValue() {
+        return amrValue;
+    }
+    public void setAmrValue(String amrValue) {
+        this.amrValue = amrValue;
+    }
 
 
     @Override
@@ -154,12 +173,13 @@ public class UserDefinedLocalAuthenticatorUpdate  {
             Objects.equals(this.isEnabled, userDefinedLocalAuthenticatorUpdate.isEnabled) &&
             Objects.equals(this.image, userDefinedLocalAuthenticatorUpdate.image) &&
             Objects.equals(this.description, userDefinedLocalAuthenticatorUpdate.description) &&
-            Objects.equals(this.endpoint, userDefinedLocalAuthenticatorUpdate.endpoint);
+            Objects.equals(this.endpoint, userDefinedLocalAuthenticatorUpdate.endpoint) &&
+            Objects.equals(this.amrValue, userDefinedLocalAuthenticatorUpdate.amrValue);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(displayName, isEnabled, image, description, endpoint);
+        return Objects.hash(displayName, isEnabled, image, description, endpoint, amrValue);
     }
 
     @Override
@@ -173,6 +193,7 @@ public class UserDefinedLocalAuthenticatorUpdate  {
         sb.append("    image: ").append(toIndentedString(image)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
+        sb.append("    amrValue: ").append(toIndentedString(amrValue)).append("\n");
         sb.append("}");
         return sb.toString();
     }

@@ -21,6 +21,7 @@ package org.wso2.carbon.identity.api.server.authenticators.v1.impl;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.AuthenticationType;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Endpoint;
+import org.wso2.carbon.identity.api.server.authenticators.v1.model.SystemLocalAuthenticatorUpdate;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.UserDefinedLocalAuthenticatorCreation;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.UserDefinedLocalAuthenticatorUpdate;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
@@ -62,6 +63,7 @@ public class LocalAuthenticatorConfigBuilderFactory {
         authenticator.setDisplayName(config.getDisplayName());
         authenticator.setImage(config.getImageUrl());
         authenticator.description(config.getDescription());
+        authenticator.setAmrValue(config.getAmrValue());
         authenticator.setIsEnabled(config.isEnabled());
         authenticator.setDefinedBy(Authenticator.DefinedByEnum.USER);
         authenticator.setType(Authenticator.TypeEnum.LOCAL);
@@ -93,6 +95,7 @@ public class LocalAuthenticatorConfigBuilderFactory {
         authConfig.setDisplayName(config.getDisplayName());
         authConfig.setImageUrl(config.getImage());
         authConfig.setDescription(config.getDescription());
+        authConfig.setAmrValue(config.getAmrValue());
         authConfig.setEnabled(config.getIsEnabled());
         authConfig.setEndpointConfig(buildEndpointConfig(config.getEndpoint()));
 
@@ -116,9 +119,37 @@ public class LocalAuthenticatorConfigBuilderFactory {
         authConfig.setDisplayName(config.getDisplayName());
         authConfig.setImageUrl(config.getImage());
         authConfig.setDescription(config.getDescription());
+        authConfig.setAmrValue(config.getAmrValue());
         authConfig.setEnabled(config.getIsEnabled());
         authConfig.setEndpointConfig(buildEndpointConfig(config.getEndpoint()));
 
+        return authConfig;
+    }
+
+    /**
+     * Builds the SystemLocalAuthenticatorUpdate from the user defined local authenticator update request.
+     *
+     * @param config The user defined local authenticator update request.
+     * @return The system local authenticator update model.
+     */
+    public static LocalAuthenticatorConfig buildSystemLocalAuthenticator(LocalAuthenticatorConfig config) {
+
+        LocalAuthenticatorConfig systemConfig = new LocalAuthenticatorConfig();
+        systemConfig.setName(config.getName());
+        systemConfig.setDisplayName(config.getDisplayName());
+        systemConfig.setAmrValue(config.getAmrValue());
+        systemConfig.setEnabled(config.getEnabled());
+        return systemConfig;
+    }
+
+    public static LocalAuthenticatorConfig buildSystemLocalAuthenticator(
+            SystemLocalAuthenticatorUpdate config, LocalAuthenticatorConfig existingConfig) {
+
+        LocalAuthenticatorConfig authConfig = new LocalAuthenticatorConfig();
+        authConfig.setName(existingConfig.getName());
+        authConfig.setDisplayName(existingConfig.getDisplayName());
+        authConfig.setAmrValue(config.getAmrValue());
+        authConfig.setEnabled(existingConfig.getEnabled());
         return authConfig;
     }
 

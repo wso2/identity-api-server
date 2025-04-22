@@ -76,6 +76,7 @@ public enum AuthenticationTypeEnum {
     private AuthenticationTypeEnum authenticationType;
     private String image;
     private String description;
+    private String amrValue;
     private Endpoint endpoint;
 
     /**
@@ -212,6 +213,26 @@ public enum AuthenticationTypeEnum {
 
     /**
     **/
+    public UserDefinedLocalAuthenticatorCreation amrValue(String amrValue) {
+
+        this.amrValue = amrValue;
+        return this;
+    }
+
+    @ApiModelProperty(example = "basic", required = true, value = "")
+    @JsonProperty("amrValue")
+    @Valid
+    @NotNull(message = "Property amrValue cannot be null.")
+
+    public String getAmrValue() {
+        return amrValue;
+    }
+    public void setAmrValue(String amrValue) {
+        this.amrValue = amrValue;
+    }
+
+    /**
+    **/
     public UserDefinedLocalAuthenticatorCreation endpoint(Endpoint endpoint) {
 
         this.endpoint = endpoint;
@@ -249,12 +270,13 @@ public enum AuthenticationTypeEnum {
             Objects.equals(this.authenticationType, userDefinedLocalAuthenticatorCreation.authenticationType) &&
             Objects.equals(this.image, userDefinedLocalAuthenticatorCreation.image) &&
             Objects.equals(this.description, userDefinedLocalAuthenticatorCreation.description) &&
+            Objects.equals(this.amrValue, userDefinedLocalAuthenticatorCreation.amrValue) &&
             Objects.equals(this.endpoint, userDefinedLocalAuthenticatorCreation.endpoint);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, id, displayName, isEnabled, authenticationType, image, description, endpoint);
+        return Objects.hash(name, id, displayName, isEnabled, authenticationType, image, description, amrValue, endpoint);
     }
 
     @Override
@@ -270,6 +292,7 @@ public enum AuthenticationTypeEnum {
         sb.append("    authenticationType: ").append(toIndentedString(authenticationType)).append("\n");
         sb.append("    image: ").append(toIndentedString(image)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
+        sb.append("    amrValue: ").append(toIndentedString(amrValue)).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
         sb.append("}");
         return sb.toString();
