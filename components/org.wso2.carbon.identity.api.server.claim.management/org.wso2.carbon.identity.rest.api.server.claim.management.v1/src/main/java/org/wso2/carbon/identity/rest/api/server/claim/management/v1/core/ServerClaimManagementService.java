@@ -86,6 +86,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -1036,7 +1037,7 @@ public class ServerClaimManagementService {
         String dataType = claimProperties.remove(PROP_DATA_TYPE);
         if (StringUtils.isNotBlank(dataType)) {
             try {
-                localClaimResDTO.setDataType(DataTypeEnum.valueOf(dataType.toUpperCase()));
+                localClaimResDTO.setDataType(DataTypeEnum.valueOf(dataType.toUpperCase(Locale.ENGLISH)));
             } catch (IllegalArgumentException e) {
                 localClaimResDTO.setDataType(DataTypeEnum.STRING);
             }
