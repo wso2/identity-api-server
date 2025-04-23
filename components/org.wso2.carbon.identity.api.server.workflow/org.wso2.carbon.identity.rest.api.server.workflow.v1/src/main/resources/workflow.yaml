@@ -860,7 +860,6 @@ components:
       in: query
       description: Maximum number of records to return
       schema:
-        minimum: 15
         type: integer
         format: int32
     filterQueryParam:
