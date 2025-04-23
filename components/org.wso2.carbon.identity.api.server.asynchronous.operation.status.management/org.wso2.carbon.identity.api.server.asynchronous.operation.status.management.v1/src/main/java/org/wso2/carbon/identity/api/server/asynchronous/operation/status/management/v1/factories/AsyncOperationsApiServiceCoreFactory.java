@@ -19,15 +19,15 @@
 package org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.factories;
 
 import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.common.AsyncOperationStatusMgtServiceHolder;
-import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.core.AsyncOperationStatusApiServiceCore;
+import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.core.AsyncOperationsApiServiceCore;
 import org.wso2.carbon.identity.framework.async.status.mgt.api.service.AsyncStatusMgtService;
 
 /**
- * Factory class for AsyncOperationStatusApiService.
+ * Factory class for AsyncOperationsApiService.
  */
-public class AsyncOperationStatusApiServiceCoreFactory {
+public class AsyncOperationsApiServiceCoreFactory {
 
-    private static final AsyncOperationStatusApiServiceCore SERVICE;
+    private static final AsyncOperationsApiServiceCore SERVICE;
 
     static {
         AsyncStatusMgtService asyncStatusMgtService =
@@ -35,15 +35,15 @@ public class AsyncOperationStatusApiServiceCoreFactory {
         if (asyncStatusMgtService == null) {
             throw new IllegalStateException("AsyncStatusMgtService is not available from the OSGi context.");
         }
-        SERVICE = new AsyncOperationStatusApiServiceCore(asyncStatusMgtService);
+        SERVICE = new AsyncOperationsApiServiceCore(asyncStatusMgtService);
     }
 
     /**
-     * Get UsersApiServiceCore.
+     * Get AsyncOperationsApiServiceCore.
      *
-     * @return UsersApiServiceCore.
+     * @return AsyncOperationsApiServiceCore.
      */
-    public static AsyncOperationStatusApiServiceCore getAsyncOperationStatusApiServiceCore() {
+    public static AsyncOperationsApiServiceCore getAsyncOperationsApiServiceCore() {
 
         return SERVICE;
     }

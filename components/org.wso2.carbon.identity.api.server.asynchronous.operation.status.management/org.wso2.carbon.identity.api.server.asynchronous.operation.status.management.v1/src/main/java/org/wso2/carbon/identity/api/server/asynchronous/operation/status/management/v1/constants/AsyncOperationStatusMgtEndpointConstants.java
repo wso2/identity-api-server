@@ -34,7 +34,7 @@ public class AsyncOperationStatusMgtEndpointConstants {
     public static final String ASYNC_OPERATION_STATUS_PATH = "async-operation-status";
     public static final String PAGINATION_AFTER = "after";
     public static final String PAGINATION_BEFORE = "before";
-    public static final String ASYNC_STATUS_PREFIX = "ASYNC_STATUS-";
+    public static final String ASYNC_STATUS_PREFIX = "ASYNC-STATUS-";
 
     /**
      * Enum for error messages.
