@@ -151,6 +151,7 @@ public class AsyncOperationsApiServiceCore {
         unitOperationRecord.setOperationId(record.getOperationId());
         unitOperationRecord.setResidentResourceId(record.getOperationInitiatedResourceId());
         unitOperationRecord.setTargetOrgId(record.getTargetOrgId());
+        unitOperationRecord.setTargetOrgName(record.getTargetOrgName());
         unitOperationRecord.setStatus(UnitOperation.StatusEnum.valueOf(record.getUnitOperationStatus()));
         unitOperationRecord.setStatusMessage(record.getStatusMessage());
         unitOperationRecord.setCreatedTime(String.valueOf(record.getCreatedTime()));
@@ -318,6 +319,7 @@ public class AsyncOperationsApiServiceCore {
                 unitOperation.setOperationId(dto.getOperationId());
                 unitOperation.setResidentResourceId(dto.getOperationInitiatedResourceId());
                 unitOperation.setTargetOrgId(dto.getTargetOrgId());
+                unitOperation.setTargetOrgName(dto.getTargetOrgName());
                 unitOperation.setStatus(UnitOperation.StatusEnum.valueOf(dto.getUnitOperationStatus()));
                 unitOperation.setStatusMessage(dto.getStatusMessage());
                 unitOperation.setCreatedTime(String.valueOf(dto.getCreatedTime()));

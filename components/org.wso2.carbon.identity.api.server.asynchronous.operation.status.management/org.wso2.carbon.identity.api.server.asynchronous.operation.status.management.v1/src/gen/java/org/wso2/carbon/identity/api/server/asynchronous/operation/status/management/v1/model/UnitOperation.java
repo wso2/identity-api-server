@@ -36,6 +36,7 @@ public class UnitOperation  {
     private String operationId;
     private String residentResourceId;
     private String targetOrgId;
+    private String targetOrgName;
 
 @XmlType(name="StatusEnum")
 @XmlEnum(String.class)
@@ -155,6 +156,24 @@ public enum StatusEnum {
 
     /**
     **/
+    public UnitOperation targetOrgName(String targetOrgName) {
+
+        this.targetOrgName = targetOrgName;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "org-1", value = "")
+    @JsonProperty("targetOrgName")
+    @Valid
+    public String getTargetOrgName() {
+        return targetOrgName;
+    }
+    public void setTargetOrgName(String targetOrgName) {
+        this.targetOrgName = targetOrgName;
+    }
+
+    /**
+    **/
     public UnitOperation status(StatusEnum status) {
 
         this.status = status;
@@ -223,6 +242,7 @@ public enum StatusEnum {
             Objects.equals(this.operationId, unitOperation.operationId) &&
             Objects.equals(this.residentResourceId, unitOperation.residentResourceId) &&
             Objects.equals(this.targetOrgId, unitOperation.targetOrgId) &&
+            Objects.equals(this.targetOrgName, unitOperation.targetOrgName) &&
             Objects.equals(this.status, unitOperation.status) &&
             Objects.equals(this.statusMessage, unitOperation.statusMessage) &&
             Objects.equals(this.createdTime, unitOperation.createdTime);
@@ -230,7 +250,7 @@ public enum StatusEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(unitOperationId, operationId, residentResourceId, targetOrgId, status, statusMessage, createdTime);
+        return Objects.hash(unitOperationId, operationId, residentResourceId, targetOrgId, targetOrgName, status, statusMessage, createdTime);
     }
 
     @Override
@@ -243,6 +263,7 @@ public enum StatusEnum {
         sb.append("    operationId: ").append(toIndentedString(operationId)).append("\n");
         sb.append("    residentResourceId: ").append(toIndentedString(residentResourceId)).append("\n");
         sb.append("    targetOrgId: ").append(toIndentedString(targetOrgId)).append("\n");
+        sb.append("    targetOrgName: ").append(toIndentedString(targetOrgName)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("    statusMessage: ").append(toIndentedString(statusMessage)).append("\n");
         sb.append("    createdTime: ").append(toIndentedString(createdTime)).append("\n");
