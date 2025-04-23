@@ -31,6 +31,8 @@ import org.wso2.carbon.identity.api.server.branding.preference.management.v1.mod
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingPreferenceModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.CustomTextModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.Error;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.ResolvedBrandingPreferenceModel;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.ResolvedCustomTextModal;
 import javax.ws.rs.core.Response;
 
 

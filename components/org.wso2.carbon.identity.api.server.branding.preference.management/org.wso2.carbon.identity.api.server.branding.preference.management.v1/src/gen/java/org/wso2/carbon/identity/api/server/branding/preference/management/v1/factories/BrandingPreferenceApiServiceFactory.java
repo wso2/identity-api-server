@@ -21,20 +21,12 @@ package org.wso2.carbon.identity.api.server.branding.preference.management.v1.fa
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.BrandingPreferenceApiService;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.impl.BrandingPreferenceApiServiceImpl;
 
-/**
- * Factory class for Branding Preference API Service.
- */
 public class BrandingPreferenceApiServiceFactory {
 
    private final static BrandingPreferenceApiService SERVICE = new BrandingPreferenceApiServiceImpl();
 
-   /**
-    * Get Branding Preference API Service.
-    *
-    * @return BrandingPreferenceApiService.
-    */
-   public static BrandingPreferenceApiService getBrandingPreferenceApi()
-   {
+   public static BrandingPreferenceApiService getBrandingPreferenceApi() {
+
       return SERVICE;
    }
 }
