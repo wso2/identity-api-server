@@ -37,6 +37,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveST
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTValidatorConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.FineGrainedApiAuthorizationConfiguration;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfig;
@@ -280,6 +281,30 @@ public class ConfigsApi  {
     public Response getDCRConfiguration() {
 
         return delegate.getDCRConfiguration();
+    }
+
+    @Valid
+    @GET
+    @Path("/fine-grained-api-authorization")
+
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve the tenant fine-grained API authorization configuration.", notes = "Retrieve the tenant fine-grained API authorization configuration.", response = FineGrainedApiAuthorizationConfiguration.class, authorizations = {
+            @Authorization(value = "BasicAuth"),
+            @Authorization(value = "OAuth2", scopes = {
+
+            })
+    }, tags={ "Fine-grained API authorization Configurations", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful Response", response = FineGrainedApiAuthorizationConfiguration.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+            @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getFineGrainedApiAuthorizationConfiguration() {
+
+        return delegate.getFineGrainedApiAuthorizationConfiguration();
     }
 
     @Valid
@@ -545,6 +570,30 @@ public class ConfigsApi  {
     public Response patchDCRConfiguration(@ApiParam(value = "" ,required=true) @Valid List<DCRPatch> dcrPatch) {
 
         return delegate.patchDCRConfiguration(dcrPatch );
+    }
+
+    @Valid
+    @PATCH
+    @Path("/fine-grained-api-authorization")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Patch the tenant fine-grained API authorization configuration.", notes = "Patch the tenant fine-grained API authorization configuration.", response = Void.class, authorizations = {
+            @Authorization(value = "BasicAuth"),
+            @Authorization(value = "OAuth2", scopes = {
+
+            })
+    }, tags={ "Fine-grained API authorization Configurations", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful Response", response = Void.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+            @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response patchFineGrainedApiAuthorizationConfiguration(@ApiParam(value = "" ,required=true) @Valid FineGrainedApiAuthorizationConfiguration fineGrainedApiAuthorizationConfiguration) {
+
+        return delegate.patchFineGrainedApiAuthorizationConfiguration(fineGrainedApiAuthorizationConfiguration );
     }
 
     @Valid

@@ -47,6 +47,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Endpoint;
+import org.wso2.carbon.identity.api.server.configs.v1.model.FineGrainedApiAuthorizationConfiguration;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationConfiguration;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
@@ -90,6 +91,9 @@ import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceSer
 import org.wso2.carbon.identity.cors.mgt.core.model.CORSConfiguration;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
 import org.wso2.carbon.identity.oauth.dcr.exception.DCRMException;
+import org.wso2.carbon.identity.oauth2.finegrainedauthz.exceptions.FineGrainedAuthzConfigMgtException;
+import org.wso2.carbon.identity.oauth2.finegrainedauthz.models.FineGrainedAuthzConfig;
+import org.wso2.carbon.identity.oauth2.finegrainedauthz.services.FineGrainedAuthzConfigMgtService;
 import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationConfigMgtClientException;
 import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationConfigMgtException;
 import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationConfigMgtServerException;
@@ -138,6 +142,7 @@ public class ServerConfigManagementService {
     private final CORSManagementService corsManagementService;
     private final RemoteLoggingConfigService remoteLoggingConfigService;
     private final ImpersonationConfigMgtService impersonationConfigMgtService;
+    private final FineGrainedAuthzConfigMgtService fineGrainedAuthzConfigMgtService;
     private final JWTClientAuthenticatorMgtService jwtClientAuthenticatorMgtService;
     private final DCRConfigurationMgtService dcrConfigurationMgtService;
 
@@ -148,6 +153,7 @@ public class ServerConfigManagementService {
                                          CORSManagementService corsManagementService,
                                          RemoteLoggingConfigService remoteLoggingConfigService,
                                          ImpersonationConfigMgtService impersonationConfigMgtService,
+                                         FineGrainedAuthzConfigMgtService fineGrainedAuthzConfigMgtService,
                                          DCRConfigurationMgtService dcrConfigurationMgtService,
                                          JWTClientAuthenticatorMgtService jwtClientAuthenticatorMgtService) {
 
@@ -156,6 +162,7 @@ public class ServerConfigManagementService {
         this.corsManagementService = corsManagementService;
         this.remoteLoggingConfigService = remoteLoggingConfigService;
         this.impersonationConfigMgtService = impersonationConfigMgtService;
+        this.fineGrainedAuthzConfigMgtService = fineGrainedAuthzConfigMgtService;
         this.dcrConfigurationMgtService = dcrConfigurationMgtService;
         this.jwtClientAuthenticatorMgtService = jwtClientAuthenticatorMgtService;
     }
@@ -422,6 +429,41 @@ public class ServerConfigManagementService {
         }
     }
 
+    public FineGrainedApiAuthorizationConfiguration getFineGrainedApiAuthorizationConfiguration() {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        FineGrainedApiAuthorizationConfiguration fineGrainedApiAuthorizationConfiguration =
+                new FineGrainedApiAuthorizationConfiguration();
+        try {
+            FineGrainedAuthzConfig fineGrainedAuthzConfig = fineGrainedAuthzConfigMgtService
+                    .getFineGrainedAuthzConfig(tenantDomain);
+
+            //Enable fine-grained API authorization based on the retrieved configuration
+            return fineGrainedApiAuthorizationConfiguration
+                    .enableFineGrainedApiAuthorization(fineGrainedAuthzConfig.isEnableFineGrainedAuthz());
+        } catch (FineGrainedAuthzConfigMgtException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_FINE_GRAINED_AUTHZ_CONFIG_RETRIEVE, null);
+        }
+    }
+
+    public void patchFineGrainedApiAuthorizationConfiguration(
+            FineGrainedApiAuthorizationConfiguration fineGrainedApiAuthorizationConfiguration) {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        FineGrainedAuthzConfig fineGrainedAuthzConfig;
+        try {
+            fineGrainedAuthzConfig = fineGrainedAuthzConfigMgtService
+                    .getFineGrainedAuthzConfig(tenantDomain);
+            boolean value = fineGrainedApiAuthorizationConfiguration.getEnableFineGrainedApiAuthorization();
+            fineGrainedAuthzConfig.setEnableFineGrainedAuthz(value);
+
+            fineGrainedAuthzConfigMgtService.setFineGrainedAuthzConfig(fineGrainedAuthzConfig, tenantDomain);
+        } catch (FineGrainedAuthzConfigMgtException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_FINE_GRAINED_AUTHZ_CONFIG_RETRIEVE, null);
+        }
+    }
 
     /**
      * Get the CORS config for a tenant.

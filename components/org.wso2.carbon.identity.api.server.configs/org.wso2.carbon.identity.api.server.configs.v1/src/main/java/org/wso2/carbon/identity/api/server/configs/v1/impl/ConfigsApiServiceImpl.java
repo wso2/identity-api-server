@@ -23,6 +23,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.core.ServerConfigManagemen
 import org.wso2.carbon.identity.api.server.configs.v1.factories.ServerConfigManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.FineGrainedApiAuthorizationConfiguration;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
@@ -110,6 +111,12 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     }
 
     @Override
+    public Response getFineGrainedApiAuthorizationConfiguration() {
+
+        return Response.ok().entity(configManagementService.getFineGrainedApiAuthorizationConfiguration()).build();
+    }
+
+    @Override
     public Response getRemoteLoggingConfig(String logType) {
 
         RemoteServerLoggerData remoteServerLoggerResponseData =
@@ -142,6 +149,14 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     public Response patchDCRConfiguration(List<DCRPatch> dcrPatch) {
 
         configManagementService.patchDCRConfig(dcrPatch);
+        return Response.ok().build();
+    }
+
+    @Override
+    public Response patchFineGrainedApiAuthorizationConfiguration(
+            FineGrainedApiAuthorizationConfiguration fineGrainedApiAuthorizationConfiguration) {
+
+        configManagementService.patchFineGrainedApiAuthorizationConfiguration(fineGrainedApiAuthorizationConfiguration);
         return Response.ok().build();
     }
 

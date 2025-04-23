@@ -196,7 +196,15 @@ public class Constants {
                 "Server encountered an error while retrieving the Impersonation configuration of %s."),
         ERROR_CODE_IMP_CONFIG_UPDATE("65019",
                 "Unable to update Impersonation configuration.",
-                "Server encountered an error while updating the Impersonation configuration of %s.");
+                "Server encountered an error while updating the Impersonation configuration of %s."),
+        ERROR_CODE_FINE_GRAINED_AUTHZ_CONFIG_RETRIEVE("65020",
+                "Unable to retrieve Fine Grained Authorization configuration.",
+                "Server encountered an error while retrieving the Fine Grained Authorization " +
+                        "configuration of %s."),
+        ERROR_CODE_FINE_GRAINED_AUTHZ_CONFIG_UPDATE("65021",
+                "Unable to update Fine Grained Authorization configuration.",
+                "Server encountered an error while updating the Fine Grained Authorization " +
+                        "configuration of %s.");
 
         private final String code;
         private final String message;
