@@ -6,7 +6,6 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.constants.AsyncOperationStatusMgtEndpointConstants;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
-import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.framework.async.status.mgt.api.exception.AsyncStatusMgtClientException;
 import org.wso2.carbon.identity.framework.async.status.mgt.api.exception.AsyncStatusMgtException;
 import org.wso2.carbon.identity.framework.async.status.mgt.api.exception.AsyncStatusMgtServerException;
@@ -15,7 +14,6 @@ import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.constants.AsyncOperationStatusMgtEndpointConstants.ASYNC_OPERATION_STATUS_PATH;
 import static org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.constants.AsyncOperationStatusMgtEndpointConstants.ASYNC_STATUS_PREFIX;
-import static org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.constants.AsyncOperationStatusMgtEndpointConstants.ErrorMessage.ERROR_CODE_INVALID_PAGINATION_PARAMETER_NEGATIVE_LIMIT;
 import static org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.constants.AsyncOperationStatusMgtEndpointConstants.ErrorMessage.ERROR_NO_ASYNC_STATUS_ON_GIVEN_ID;
 import static org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.constants.AsyncOperationStatusMgtEndpointConstants.PATH_SEPARATOR;
 import static org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.constants.AsyncOperationStatusMgtEndpointConstants.V1_API_PATH_COMPONENT;
@@ -35,7 +33,8 @@ public class AsyncOperationStatusEndpointUtil {
                 + ASYNC_OPERATION_STATUS_PATH + resourcePath + paginationURL).toString();
     }
 
-    public static APIError handleException(Response.Status status,AsyncOperationStatusMgtEndpointConstants.ErrorMessage error) {
+    public static APIError handleException(Response.Status status,
+                                           AsyncOperationStatusMgtEndpointConstants.ErrorMessage error) {
 
         return new APIError(status, getError(error.getCode(), error.getMessage(),
                 error.getDescription()));
@@ -86,7 +85,8 @@ public class AsyncOperationStatusEndpointUtil {
         return new AsyncStatusMgtServerException(error.getMessage(), description, error.getCode(), e);
     }
 
-    public static AsyncStatusMgtClientException buildAsyncStatusMgtClientException(AsyncOperationStatusMgtEndpointConstants.ErrorMessage error, String... data) {
+    public static AsyncStatusMgtClientException buildAsyncStatusMgtClientException(
+            AsyncOperationStatusMgtEndpointConstants.ErrorMessage error, String... data) {
 
         String description = error.getDescription();
         if (ArrayUtils.isNotEmpty(data)) {

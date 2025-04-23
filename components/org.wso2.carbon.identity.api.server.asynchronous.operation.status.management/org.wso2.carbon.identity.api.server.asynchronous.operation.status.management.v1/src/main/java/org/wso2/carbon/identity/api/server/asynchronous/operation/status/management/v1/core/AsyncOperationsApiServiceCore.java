@@ -24,19 +24,17 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.model.Link;
-import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.model.OperationRecord;
-import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.model.OperationRecordResponse;
-import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.model.OperationRecordsResponse;
-import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.model.UnitOperationRecord;
-import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.model.UnitOperationRecordsLink;
-import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.model.UnitOperationRecordsResponse;
+import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.model.Operation;
+import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.model.Operations;
+import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.model.UnitOperation;
+import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.model.UnitOperations;
 import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.util.AsyncOperationStatusEndpointUtil;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.framework.async.status.mgt.api.exception.AsyncStatusMgtClientException;
 import org.wso2.carbon.identity.framework.async.status.mgt.api.exception.AsyncStatusMgtException;
 import org.wso2.carbon.identity.framework.async.status.mgt.api.exception.AsyncStatusMgtServerException;
-import org.wso2.carbon.identity.framework.async.status.mgt.api.models.ResponseOperationRecord;
-import org.wso2.carbon.identity.framework.async.status.mgt.api.models.ResponseUnitOperationRecord;
+import org.wso2.carbon.identity.framework.async.status.mgt.api.models.OperationResponseDTO;
+import org.wso2.carbon.identity.framework.async.status.mgt.api.models.UnitOperationResponseDTO;
 import org.wso2.carbon.identity.framework.async.status.mgt.api.service.AsyncStatusMgtService;
 
 import java.io.UnsupportedEncodingException;
@@ -65,13 +63,13 @@ import static org.wso2.carbon.identity.api.server.asynchronous.operation.status.
 /**
  * Core service class for handling asynchronous operation status management APIs.
  */
-public class AsyncOperationStatusApiServiceCore {
+public class AsyncOperationsApiServiceCore {
 
     private final AsyncStatusMgtService asyncStatusMgtService;
 
-    private static final Log LOG = LogFactory.getLog(AsyncOperationStatusApiServiceCore.class);
+    private static final Log LOG = LogFactory.getLog(AsyncOperationsApiServiceCore.class);
 
-    public AsyncOperationStatusApiServiceCore(AsyncStatusMgtService asyncStatusMgtService) {
+    public AsyncOperationsApiServiceCore(AsyncStatusMgtService asyncStatusMgtService) {
 
         this.asyncStatusMgtService = asyncStatusMgtService;
     }
@@ -83,7 +81,7 @@ public class AsyncOperationStatusApiServiceCore {
 
         try {
             limit = validateLimit(limit);
-            List<ResponseOperationRecord> records =
+            List<OperationResponseDTO> records =
                     asyncStatusMgtService.getOperations(after, before, limit + 1, filter);
             return Response.ok().entity(getOperationsResponse(limit, after, before, filter, records)).build();
         } catch (AsyncStatusMgtException e) {
@@ -100,7 +98,7 @@ public class AsyncOperationStatusApiServiceCore {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         try {
-            ResponseOperationRecord record = asyncStatusMgtService.getOperation(operationId);
+            OperationResponseDTO record = asyncStatusMgtService.getOperation(operationId);
             if (record == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
@@ -119,7 +117,7 @@ public class AsyncOperationStatusApiServiceCore {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         try {
-            ResponseUnitOperationRecord record = asyncStatusMgtService.getUnitOperation(unitOperationId);
+            UnitOperationResponseDTO record = asyncStatusMgtService.getUnitOperation(unitOperationId);
             if (record == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
@@ -136,8 +134,9 @@ public class AsyncOperationStatusApiServiceCore {
         }
         try {
             limit = validateLimit(limit);
-            List<ResponseUnitOperationRecord> records =
-                    asyncStatusMgtService.getUnitOperationStatusRecords(operationId, after, before, limit + 1, filter);
+            List<UnitOperationResponseDTO> records =
+                    asyncStatusMgtService.getUnitOperationStatusRecords(operationId, after, before, limit + 1,
+                            filter);
             return Response.ok().entity(
                     getUnitOperationsResponse(limit, after, before, filter, records, operationId)).build();
         } catch (AsyncStatusMgtException e) {
@@ -145,53 +144,48 @@ public class AsyncOperationStatusApiServiceCore {
         }
     }
 
-    private UnitOperationRecord getUnitOperationResponse(ResponseUnitOperationRecord record) {
+    private UnitOperation getUnitOperationResponse(UnitOperationResponseDTO record) {
 
-        UnitOperationRecord unitOperationRecord = new UnitOperationRecord();
+        UnitOperation unitOperationRecord = new UnitOperation();
         unitOperationRecord.setUnitOperationId(record.getUnitOperationId());
         unitOperationRecord.setOperationId(record.getOperationId());
         unitOperationRecord.setResidentResourceId(record.getOperationInitiatedResourceId());
         unitOperationRecord.setTargetOrgId(record.getTargetOrgId());
-        unitOperationRecord.setStatus(UnitOperationRecord.StatusEnum.valueOf(record.getUnitOperationStatus()));
+        unitOperationRecord.setStatus(UnitOperation.StatusEnum.valueOf(record.getUnitOperationStatus()));
         unitOperationRecord.setStatusMessage(record.getStatusMessage());
         unitOperationRecord.setCreatedTime(String.valueOf(record.getCreatedTime()));
         return unitOperationRecord;
     }
 
-    private OperationRecordResponse getOperationResponse(String operationId, ResponseOperationRecord record) {
+    private Operation getOperationResponse(String operationId, OperationResponseDTO dto) {
 
-        OperationRecordResponse operationRecordResponse = new OperationRecordResponse();
-        UnitOperationRecordsLink link = new UnitOperationRecordsLink();
         String resourcePath = PATH_SEPARATOR + operationId + PATH_SEPARATOR + "unit-operations";
         String url = "?" + LIMIT_PARAM + "=" + "10";
-        link.setHref(URI.create(buildURIForPagination(url, resourcePath)));
 
-        OperationRecord operationRecordDTO = new OperationRecord();
-        operationRecordDTO.setOperationId(record.getOperationId());
-        operationRecordDTO.setCorrelationId(record.getCorrelationId());
-        operationRecordDTO.setOperationType(record.getOperationType());
-        operationRecordDTO.setSubjectType(record.getOperationSubjectType());
-        operationRecordDTO.setSubjectId(record.getOperationSubjectId());
-        operationRecordDTO.setInitiatedOrgId(record.getResidentOrgId());
-        operationRecordDTO.setInitiatedUserId(record.getInitiatorId());
-        operationRecordDTO.setStatus(OperationRecord.StatusEnum.valueOf(record.getOperationStatus()));
-        operationRecordDTO.setPolicy(record.getOperationPolicy());
-        operationRecordDTO.setCreatedTime(String.valueOf(record.getCreatedTime()));
-        operationRecordDTO.setModifiedTime(String.valueOf(record.getModifiedTime()));
-
-        operationRecordResponse.setOperationRecord(operationRecordDTO);
-        operationRecordResponse.setUnitOperations(link);
-        return operationRecordResponse;
+        Operation operation = new Operation();
+        operation.setOperationId(dto.getOperationId());
+        operation.setCorrelationId(dto.getCorrelationId());
+        operation.setOperationType(dto.getOperationType());
+        operation.setSubjectType(dto.getOperationSubjectType());
+        operation.setSubjectId(dto.getOperationSubjectId());
+        operation.setInitiatedOrgId(dto.getResidentOrgId());
+        operation.setInitiatedUserId(dto.getInitiatorId());
+        operation.setStatus(Operation.StatusEnum.valueOf(dto.getOperationStatus()));
+        operation.setPolicy(dto.getOperationPolicy());
+        operation.setCreatedTime(String.valueOf(dto.getCreatedTime()));
+        operation.setModifiedTime(String.valueOf(dto.getModifiedTime()));
+        operation.setUnitOperationRef(URI.create(buildURIForPagination(url, resourcePath)));
+        return operation;
     }
 
-    private OperationRecordsResponse getOperationsResponse(Integer limit, String after, String before, String filter,
-                                                           List<ResponseOperationRecord> operations)
+    private Operations getOperationsResponse(Integer limit, String after, String before, String filter,
+                                             List<OperationResponseDTO> operationsDTO)
             throws AsyncStatusMgtServerException {
 
-        OperationRecordsResponse operationsResponse = new OperationRecordsResponse();
+        Operations operationsResponse = new Operations();
 
-        if (limit != 0 && CollectionUtils.isNotEmpty(operations)) {
-            boolean hasMoreItems = operations.size() > limit;
+        if (limit != 0 && CollectionUtils.isNotEmpty(operationsDTO)) {
+            boolean hasMoreItems = operationsDTO.size() > limit;
             boolean needsReverse = StringUtils.isNotBlank(before);
             boolean isFirstPage = (StringUtils.isBlank(before) && StringUtils.isBlank(after)) ||
                     (StringUtils.isNotBlank(before) && !hasMoreItems);
@@ -207,13 +201,13 @@ public class AsyncOperationStatusApiServiceCore {
             }
 
             if (hasMoreItems) {
-                operations.remove(operations.size() - 1);
+                operationsDTO.remove(operationsDTO.size() - 1);
             }
             if (needsReverse) {
-                Collections.reverse(operations);
+                Collections.reverse(operationsDTO);
             }
             if (!isFirstPage) {
-                Timestamp createdTimestamp = operations.get(0).getCreatedTime();
+                Timestamp createdTimestamp = operationsDTO.get(0).getCreatedTime();
                 String encodedString = Base64.getEncoder().encodeToString(createdTimestamp.toString()
                         .getBytes(StandardCharsets.UTF_8));
                 String resourcePath = PATH_SEPARATOR;
@@ -225,7 +219,7 @@ public class AsyncOperationStatusApiServiceCore {
                 operationsResponse.addLinksItem(link);
             }
             if (!isLastPage) {
-                Timestamp createdTimestamp = operations.get(operations.size() - 1).getCreatedTime();
+                Timestamp createdTimestamp = operationsDTO.get(operationsDTO.size() - 1).getCreatedTime();
                 String encodedString = Base64.getEncoder().encodeToString(createdTimestamp.toString()
                         .getBytes(StandardCharsets.UTF_8));
                 String resourcePath = PATH_SEPARATOR;
@@ -237,34 +231,38 @@ public class AsyncOperationStatusApiServiceCore {
                 operationsResponse.addLinksItem(link);
             }
 
-            List<OperationRecord> operationRecordsDTO = new ArrayList<>();
-            for (ResponseOperationRecord record : operations) {
-                OperationRecord operationRecordDTO = new OperationRecord();
-                operationRecordDTO.setOperationId(record.getOperationId());
-                operationRecordDTO.setCorrelationId(record.getCorrelationId());
-                operationRecordDTO.setOperationType(record.getOperationType());
-                operationRecordDTO.setSubjectType(record.getOperationSubjectType());
-                operationRecordDTO.setSubjectId(record.getOperationSubjectId());
-                operationRecordDTO.setInitiatedOrgId(record.getResidentOrgId());
-                operationRecordDTO.setInitiatedUserId(record.getInitiatorId());
-                operationRecordDTO.setStatus(OperationRecord.StatusEnum.valueOf(record.getOperationStatus()));
-                operationRecordDTO.setPolicy(record.getOperationPolicy());
-                operationRecordDTO.setCreatedTime(String.valueOf(record.getCreatedTime()));
-                operationRecordDTO.setModifiedTime(String.valueOf(record.getModifiedTime()));
-                operationRecordsDTO.add(operationRecordDTO);
+            List<Operation> operations = new ArrayList<>();
+
+            for (OperationResponseDTO dto : operationsDTO) {
+                Operation operation = new Operation();
+                operation.setOperationId(dto.getOperationId());
+                operation.setCorrelationId(dto.getCorrelationId());
+                operation.setOperationType(dto.getOperationType());
+                operation.setSubjectType(dto.getOperationSubjectType());
+                operation.setSubjectId(dto.getOperationSubjectId());
+                operation.setInitiatedOrgId(dto.getResidentOrgId());
+                operation.setInitiatedUserId(dto.getInitiatorId());
+                operation.setStatus(Operation.StatusEnum.valueOf(dto.getOperationStatus()));
+                operation.setPolicy(dto.getOperationPolicy());
+                operation.setCreatedTime(String.valueOf(dto.getCreatedTime()));
+                operation.setModifiedTime(String.valueOf(dto.getModifiedTime()));
+
+                String resourcePath = PATH_SEPARATOR + dto.getOperationId() + PATH_SEPARATOR + "unit-operations";
+                String uri = "?" + LIMIT_PARAM + "=" + "10";
+                operation.setUnitOperationRef(URI.create(buildURIForPagination(uri, resourcePath)));
+                operations.add(operation);
             }
-            operationsResponse.setOperationRecords(operationRecordsDTO);
+            operationsResponse.setOperations(operations);
         }
         return operationsResponse;
     }
 
-    private UnitOperationRecordsResponse getUnitOperationsResponse(Integer limit, String after, String before,
-                                                                   String filter,
-                                                                   List<ResponseUnitOperationRecord> unitOperations,
-                                                                   String operationId)
+    private UnitOperations getUnitOperationsResponse(Integer limit, String after, String before, String filter,
+                                                     List<UnitOperationResponseDTO> unitOperations,
+                                                     String operationId)
             throws AsyncStatusMgtServerException {
 
-        UnitOperationRecordsResponse unitOperationsResponse = new UnitOperationRecordsResponse();
+        UnitOperations unitOperationsResponse = new UnitOperations();
 
         if (limit != 0 && CollectionUtils.isNotEmpty(unitOperations)) {
             boolean hasMoreItems = unitOperations.size() > limit;
@@ -313,19 +311,19 @@ public class AsyncOperationStatusApiServiceCore {
                 unitOperationsResponse.addLinksItem(link);
             }
 
-            List<UnitOperationRecord> unitOperationRecordsDTO = new ArrayList<>();
-            for (ResponseUnitOperationRecord record : unitOperations) {
-                UnitOperationRecord operationRecordDTO = new UnitOperationRecord();
-                operationRecordDTO.setUnitOperationId(record.getUnitOperationId());
-                operationRecordDTO.setOperationId(record.getOperationId());
-                operationRecordDTO.setResidentResourceId(record.getOperationInitiatedResourceId());
-                operationRecordDTO.setTargetOrgId(record.getTargetOrgId());
-                operationRecordDTO.setStatus(UnitOperationRecord.StatusEnum.valueOf(record.getUnitOperationStatus()));
-                operationRecordDTO.setStatusMessage(record.getStatusMessage());
-                operationRecordDTO.setCreatedTime(String.valueOf(record.getCreatedTime()));
-                unitOperationRecordsDTO.add(operationRecordDTO);
+            List<UnitOperation> unitOperationList = new ArrayList<>();
+            for (UnitOperationResponseDTO dto : unitOperations) {
+                UnitOperation unitOperation = new UnitOperation();
+                unitOperation.setUnitOperationId(dto.getUnitOperationId());
+                unitOperation.setOperationId(dto.getOperationId());
+                unitOperation.setResidentResourceId(dto.getOperationInitiatedResourceId());
+                unitOperation.setTargetOrgId(dto.getTargetOrgId());
+                unitOperation.setStatus(UnitOperation.StatusEnum.valueOf(dto.getUnitOperationStatus()));
+                unitOperation.setStatusMessage(dto.getStatusMessage());
+                unitOperation.setCreatedTime(String.valueOf(dto.getCreatedTime()));
+                unitOperationList.add(unitOperation);
             }
-            unitOperationsResponse.setUnitOperationRecords(unitOperationRecordsDTO);
+            unitOperationsResponse.setUnitOperations(unitOperationList);
         }
         return unitOperationsResponse;
     }

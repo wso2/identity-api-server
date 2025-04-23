@@ -1,381 +1,329 @@
 openapi: 3.0.0
 info:
+  version: v1
   title: Asynchronous Operation Status API Definition
-  description: This API provides administrators with the ability to get the completion status of asynchronous operations.
+  description: >-
+    This API provides administrators with the ability to get the completion
+    status of asynchronous operations.
+  termsOfService: 'http://swagger.io/terms/'
   contact:
     name: WSO2
-    url: http://wso2.com/products/identity-server/
-    email: iam-dev@wso2.org
+    url: 'http://wso2.com/products/identity-server/'
+    email: architecture@wso2.org
   license:
     name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  version: 1.0.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+    
 servers:
-- url: "https://{server-url}/t/{tenant-domain}/api/server/v1"
-  variables:
-    tenant-domain:
-      default: carbon.super
-    server-url:
-      default: localhost:9443
+  - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
+    variables:
+      server-url:
+        default: "localhost:9443"
+      tenant-domain:
+        default: carbon.super
+
+security:
+  - BasicAuth: []
+  - OAuth2: []
+  
 paths:
-  /async-operation-status/subject-types/{operationSubjectType}:
+  /async-operations:
     description: Asynchronous Operation Details by Subject Type
     get:
-      description: Retrieve a list of asynchronous operations based on the subject type.
+      tags:
+        - Asynchronous Operations
+      summary: List Asynchronous Operations
+      description: |
+        This API returns the list of asynchronous operations.
+        Asynchronous operations can be filtered by correlationId, operationType, subjectType, initiatedOrgId, and initiatedUserId.
+        
+        Supported operators: "eq"(equals), "sw"(starts with), "ge"(greater than or equals), "le"(less than or equals), "gt"(greater than), "lt"(less than)
+        
+        Multiple attributes can be combined using the "and" operator.
+
+        Examples:
+          - filter=operationType+eq+B2B_APPLICATION_SHARE
+          - filter=subjectId+eq+23d7ab3f-023e-43ba-980b-c0fd59aeacf9
+        
+        <b>Scope(Permission) required:</b> `internal_async_operation_status_view`
       parameters:
-      - name: operationSubjectType
-        in: path
-        description: "The type of subject the operation pertains to (e.g., APPLICATION, USER)."
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          example: APPLICATION
-      - name: after
-        in: query
-        description: "Cursor for pagination, pointing to the item after which the next page of results should be returned."
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: before
-        in: query
-        description: "Cursor for pagination, pointing to the item before which the previous page of results should be returned."
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: limit
-        in: query
-        description: The maximum number of results to return per page.
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: integer
-      - name: filter
-        in: query
-        description: "A filter to apply to the results, such as by organization name or other criteria."
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
+        - $ref: '#/components/parameters/afterQueryParam'
+        - $ref: '#/components/parameters/beforeQueryParam'
+        - $ref: '#/components/parameters/limitQueryParam'
+        - $ref: '#/components/parameters/filterQueryParam'
       responses:
-        "200":
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operations'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /async-operations/{operationId}:
+    description: Unit Operation Statuses by Operation ID
+    get:
+      tags:
+        - Asynchronous Operations
+      summary: Retrieve Asynchronous Operation by unique ID
+      description: "This API returns the list of unit operation statuses for a given unique ID.\n\n
+        <b>Scope (Permission) required:</b> ``internal_async_operation_status_view``\n\n"
+      parameters:
+        - in: path
+          name: operationId
+          required: true
+          schema:
+            type: string
+            example: b60dd1f8-b774-49ee-94e2-55008d31a64b
+          description: The unique identifier of the operation.
+      responses:
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OperationRecords'
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden
-        "500":
-          description: Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /async-operation-status/subject-types/{operationSubjectType}/subject/{operationSubjectId}:
-    description: Asynchronous Operation Details by Subject ID
+                $ref: '#/components/schemas/Operation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /async-operations/{operationId}/unit-operations:
+    description: Unit Operation Statuses by Operation ID
     get:
-      description: Retrieve a list of asynchronous operations based on the subject type and subject ID.
+      tags:
+        - Asynchronous Unit Operations
+      summary: List Asynchronous Unit Operations by unique ID
+      description: |
+        This API returns the list of unit operation statuses for a given operation ID.
+        Asynchronous operations can be filtered by residentResourceId, targetOrgId, and status.
+        
+        Supported operators: "eq"(equals), "sw"(starts with), "ge"(greater than or equals), "le"(less than or equals), "gt"(greater than), "lt"(less than)
+        
+        Multiple attributes can be combined using the "and" operator.
+
+        Examples:
+          - filter=status+eq+FAIL
+          - filter=targetOrgId+eq+c87d873c-fe76-42a2-b1ce-c90475e13b82
+        
+        <b>Scope(Permission) required:</b> `internal_async_operation_status_view`
       parameters:
-      - name: operationSubjectType
-        in: path
-        description: "The type of subject the operation pertains to (e.g., APPLICATION, USER)."
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          example: APPLICATION
-      - name: operationSubjectId
-        in: path
-        description: The unique identifier of the subject.
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          example: 23d7ab3f-023e-43ba-980b-c0fd59aeacf9
-      - name: after
-        in: query
-        description: "Cursor for pagination, pointing to the item after which the next page of results should be returned."
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: before
-        in: query
-        description: "Cursor for pagination, pointing to the item before which the previous page of results should be returned."
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: limit
-        in: query
-        description: The maximum number of results to return per page.
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: integer
-      - name: filter
-        in: query
-        description: "A filter to apply to the results, such as by organization name or other criteria."
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
+        - in: path
+          name: operationId
+          required: true
+          schema:
+            type: string
+            example: b60dd1f8-b774-49ee-94e2-55008d31a64b
+          description: The unique identifier of the operation.
+        - $ref: '#/components/parameters/afterQueryParam'
+        - $ref: '#/components/parameters/beforeQueryParam'
+        - $ref: '#/components/parameters/limitQueryParam'
+        - $ref: '#/components/parameters/filterQueryParam'
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OperationRecords'
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden
-        "500":
-          description: Server Error
+                $ref: '#/components/schemas/UnitOperations'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /async-operations/{operationId}/unit-operations/{unitOperationId}:
+    description: Unit Operation Statuses by Operation ID
+    get:
+      tags:
+        - Asynchronous Unit Operations
+      summary: Retrieve Asynchronous Unit Operation by unique ID
+      description: "This API returns the unit operation status for a given unit operation ID..\n\n
+        <b>Scope (Permission) required:</b> ``internal_async_operation_status_view``\n\n"
+      parameters:
+        - in: path
+          name: operationId
+          required: true
+          schema:
+            type: string
+            example: b60dd1f8-b774-49ee-94e2-55008d31a64b
+          description: The unique identifier of the operation.
+        - in: path
+          name: unitOperationId
+          required: true
+          schema:
+            type: string
+            example: b60dd1f8-b774-49ee-94e2-55008d31a64b
+          description: The unique identifier of the unit operation.
+      responses:
+        '200':
+          description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-  /async-operation-status/subject-types/{operationSubjectType}/subject/{operationSubjectId}/operation-type/{operationType}:
-    description: Asynchronous Operation Details by Subject ID and Operation Type
-    get:
-      description: "Retrieve a list of asynchronous operations based on the subject type, subject ID, and operation type."
-      parameters:
-      - name: operationSubjectType
-        in: path
-        description: "The type of subject the operation pertains to (e.g., APPLICATION, USER)."
-        required: true
-        style: simple
-        explode: false
-        schema:
+                $ref: '#/components/schemas/UnitOperation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+components:
+  securitySchemes:
+      BasicAuth:
+        type: http
+        scheme: basic
+      OAuth2:
+        type: oauth2
+        flows:
+          authorizationCode:
+            authorizationUrl: 'https://localhost:9443/oauth2/authorize'
+            tokenUrl: 'http://localhost:9443/oauth2/token'
+            scopes:
+              read: internal_async_operation_status_view
+  parameters:
+    filterQueryParam:
+      in: query
+      name: filter
+      required: false
+      description: Condition to filter the retrieval of records.
+      schema:
+        type: string
+    limitQueryParam:
+      in: query
+      name: limit
+      required: false
+      description: Maximum number of records to be returned. (Should be greater than 0)
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+    beforeQueryParam:
+      in: query
+      name: before
+      required: false
+      description: Points to the previous range of data that can be retrieved.
+      schema:
+        type: string
+    afterQueryParam:
+      in: query
+      name: after
+      required: false
+      description: Points to the next range of data to be returned.
+      schema:
+        type: string
+  schemas:
+    Operation:
+      type: object
+      required:
+        - operationId
+        - correlationId
+        - operationType
+        - subjectType
+        - subjectId
+        - initiatedOrgId
+        - initiatedUserId
+        - status
+        - createdTime
+      properties:
+        operationId:
           type: string
-          example: APPLICATION
-      - name: operationSubjectId
-        in: path
-        description: The unique identifier of the subject.
-        required: true
-        style: simple
-        explode: false
-        schema:
+          example: b60dd1f8-b774-49ee-94e2-55008d31a64b
+        correlationId:
           type: string
-          example: 23d7ab3f-023e-43ba-980b-c0fd59aeacf9
-      - name: operationType
-        in: path
-        description: "The specific type of asynchronous operation (e.g., B2B_APPLICATION_SHARE)."
-        required: true
-        style: simple
-        explode: false
-        schema:
+          example: 241f4aa0-86bc-44e4-a5de-af7eded9f176
+        operationType:
           type: string
           example: B2B_APPLICATION_SHARE
-      - name: after
-        in: query
-        description: "Cursor for pagination, pointing to the item after which the next page of results should be returned."
-        required: false
-        style: form
-        explode: true
-        schema:
+        subjectType:
           type: string
-      - name: before
-        in: query
-        description: "Cursor for pagination, pointing to the item before which the previous page of results should be returned."
-        required: false
-        style: form
-        explode: true
-        schema:
+          example: B2B_APPLICATION
+        subjectId:
           type: string
-      - name: limit
-        in: query
-        description: The maximum number of results to return per page.
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: integer
-      - name: filter
-        in: query
-        description: "A filter to apply to the results, such as by operation status or other criteria."
-        required: false
-        style: form
-        explode: true
-        schema:
+          example: 23d7ab3f-023e-43ba-980b-c0fd59aeacf9
+        initiatedOrgId:
           type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OperationRecords'
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden
-        "500":
-          description: Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /async-operation-status/operations/{operationId}/unit-operations:
-    description: Unit Operation Statuses by Operation ID
-    get:
-      description: Retrieve a list of unit operation statuses for a given operation ID.
-      parameters:
-      - name: operationId
-        in: path
-        description: The unique identifier of the operation.
-        required: true
-        style: simple
-        explode: false
-        schema:
+          example: 10084a8d-113f-4211-a0d5-efe36b082211
+        initiatedUserId:
           type: string
-          example: "565"
-      - name: after
-        in: query
-        description: "Cursor for pagination, pointing to the item after which the next page of results should be returned."
-        required: false
-        style: form
-        explode: true
-        schema:
+          example: 53c191dd-3f9f-454b-8a56-9ad72b5e4f30
+        status:
           type: string
-      - name: before
-        in: query
-        description: "Cursor for pagination, pointing to the item before which the previous page of results should be returned."
-        required: false
-        style: form
-        explode: true
-        schema:
+          enum:
+            - SUCCESS
+            - FAIL
+            - PARTIAL
+            - ONGOING
+          example: SUCCESS
+        policy:
           type: string
-      - name: limit
-        in: query
-        description: The maximum number of results to return per page.
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: integer
-      - name: filter
-        in: query
-        description: "A filter to apply to the results, such as by unit operation status or other criteria."
-        required: false
-        style: form
-        explode: true
-        schema:
+          example: SHARE_WITH_ALL
+        createdTime:
           type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnitOperationRecords'
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden
-        "500":
-          description: Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /async-operation-status/{correlationId}/operations:
-    description: Unit Operation Statuses by Operation ID
-    get:
-      description: Retrieve a list of operation statuses for a given correlation ID.
-      parameters:
-      - name: correlationId
-        in: path
-        description: The unique identifier of the operation.
-        required: true
-        style: simple
-        explode: false
-        schema:
+          example: '2021-10-25T12:31:53.406Z'
+        modifiedTime:
           type: string
-          example: "565"
-      - name: after
-        in: query
-        description: "Cursor for pagination, pointing to the item after which the next page of results should be returned."
-        required: false
-        style: form
-        explode: true
-        schema:
+          example: '2021-10-25T12:33:53.406Z'
+        unitOperationRef:
           type: string
-      - name: before
-        in: query
-        description: "Cursor for pagination, pointing to the item before which the previous page of results should be returned."
-        required: false
-        style: form
-        explode: true
-        schema:
+          format: uri
+          description: Reference that will return the corresponsing unitoperations.
+          example: /api/server/v1/async-operation-status/8a92bb92-c754-4dfe-8563-15ba930de75e/unit-operations?limit=10
+    UnitOperation:
+      required:
+        - unitOperationId
+        - operationId
+        - residentResourceId
+        - targetOrgId
+        - unitOperationStatus
+        - unitOperationStatusMessage
+        - createdAt
+      type: object
+      properties:
+        unitOperationId:
           type: string
-      - name: limit
-        in: query
-        description: The maximum number of results to return per page.
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: integer
-      - name: filter
-        in: query
-        description: "A filter to apply to the results, such as by unit operation status or other criteria."
-        required: false
-        style: form
-        explode: true
-        schema:
+          example: '0cad98fa-16a7-430f-9e94-763bb57bbfbc'
+        operationId:
           type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OperationRecords'
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden
-        "500":
-          description: Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-components:
-  schemas:
-    OperationRecords:
-      type: array
-      items:
-        $ref: '#/components/schemas/OperationRecords_inner'
-    UnitOperationRecords:
-      type: array
-      items:
-        $ref: '#/components/schemas/UnitOperationRecords_inner'
+          example: 'f0880ebf-9634-498f-9213-614953563aa9'
+        residentResourceId:
+          type: string
+          example: '9e810e28-b9cd-4ae2-bdb2-4de95846c46e'
+        targetOrgId:
+          type: string
+          example: 'c87d873c-fe76-42a2-b1ce-c90475e13b82'
+        status:
+          type: string
+          enum:
+            - SUCCESS
+            - FAIL
+            - PARTIAL
+          example: SUCCESS
+        statusMessage:
+          type: string
+          example: Unit operation is pending execution.
+        createdTime:
+          type: string
+          example: '2024-10-27T10:00:00Z'
     Error:
       type: object
       properties:
         code:
           type: string
-          example: AAA-00000
+          example: ASYNC-STATUS-00000
         message:
           type: string
           example: Some error message.
@@ -385,56 +333,81 @@ components:
         traceId:
           type: string
           example: e0fbcfeb-3617-43c4-8dd0-7b7d38e13047
-    OperationRecords_inner:
+    Link:
+      type: object
       properties:
-        operationId:
+        href:
           type: string
-          example: "56"
-        correlationId:
+          format: uri
+          description: Endpoint that will return the next or previous page of data.
+        rel:
           type: string
-          example: 241f4aa0-86bc-44e4-a5de-af7eded9f176
-        operationType:
-          type: string
-          example: B2B_APPLICATION_SHARE
-        operationSubjectType:
-          type: string
-          example: B2B_APPLICATION
-        operationSubjectId:
-          type: string
-          example: 23d7ab3f-023e-43ba-980b-c0fd59aeacf9
-        residentOrgId:
-          type: string
-          example: 10084a8d-113f-4211-a0d5-efe36b082211
-        initiatorId:
-          type: string
-          example: 53c191dd-3f9f-454b-8a56-9ad72b5e4f30
-        operationStatus:
-          type: string
-          example: SUCCESS
-        operationPolicy:
-          type: string
-          example: SHARE_WITH_ALL
-    UnitOperationRecords_inner:
+          description: >-
+            Describes whether the provided link is to access the next or
+            previous page of data.
+      readOnly: true
+    Operations:
+      type: object
       properties:
-        unitOperationId:
-          type: string
-          example: "123"
-        operationId:
-          type: string
-          example: "56"
-        residentResourceId:
-          type: string
-          example: resource-123
-        targetOrgId:
-          type: string
-          example: org-456
-        unitOperationStatus:
-          type: string
-          example: PENDING
-        unitOperationStatusMessage:
-          type: string
-          example: Unit operation is pending execution.
-        createdAt:
-          type: string
-          format: date-time
-          example: 2024-10-27T10:00:00Z
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+          example:
+            - href: >-
+                /api/server/v1/async-operation-status/?limit=1&after=MjAyNS0wNC0yMSAxMDo1MDoxOC40NDc=
+              rel: next
+            - href: >-
+                /api/server/v1/async-operation-status/?limit=1&before=MjAyNS0wNC0xMiAxOTozNzo1OS4zODU=
+              rel: previous
+        operations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Operation'
+    UnitOperations:
+      type: object
+      properties:
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+          example:
+            - href: >-
+                /api/server/v1/async-operation-status/f4485783-20c9-4acb-9598-a61d5206ece7/unit-operations?limit=1&after=MjAyNS0wNC0yMSAxMDo1MDoyMi41MTU=
+              rel: next
+            - href: >-
+                /api/server/v1/async-operation-status/f4485783-20c9-4acb-9598-a61d5206ece7/unit-operations?limit=1&after=MjAyNS0wNC0yMSAxMDo1MDoyMi41MTU=
+              rel: previous
+        unitOperations:
+          type: array
+          items:
+            $ref: '#/components/schemas/UnitOperation'
+  responses:
+    BadRequest:
+      description: Invalid input in the request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Requested resource is not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Authentication information is missing or invalid.
+    Forbidden:
+      description: Access forbidden.
+    ServerError:
+      description: Internal server error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotImplemented:
+      description: Not Implemented.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
