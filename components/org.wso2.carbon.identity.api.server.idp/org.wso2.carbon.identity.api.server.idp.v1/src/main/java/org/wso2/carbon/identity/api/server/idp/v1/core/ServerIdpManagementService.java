@@ -1663,6 +1663,7 @@ public class ServerIdpManagementService {
         metaFederatedAuthenticator.setName(authenticatorConfig.getName());
         metaFederatedAuthenticator.setAuthenticatorId(base64URLEncode(authenticatorConfig.getName()));
         metaFederatedAuthenticator.setDisplayName(authenticatorConfig.getDisplayName());
+        metaFederatedAuthenticator.setAmrValue(authenticatorConfig.getAmrValue());
         FederatedAuthenticatorConfig federatedAuthenticatorConfig = ApplicationAuthenticatorService.getInstance()
                 .getFederatedAuthenticatorByName(authenticatorConfig.getName());
         if (federatedAuthenticatorConfig != null) {

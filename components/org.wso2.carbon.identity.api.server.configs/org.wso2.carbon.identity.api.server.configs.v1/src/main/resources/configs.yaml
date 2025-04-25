@@ -1225,6 +1225,9 @@ components:
         displayName:
           type: string
           example: basic
+        amrValue:
+          type: string
+          example: basic
         description:
           type: string
           example: "Description for user defined local authenticator configuration."

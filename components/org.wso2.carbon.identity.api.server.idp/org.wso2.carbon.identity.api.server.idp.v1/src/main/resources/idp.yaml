@@ -2814,6 +2814,9 @@ components:
           enum:
             - SYSTEM
             - USER
+        amrValue:
+          type: string
+          example: basic_amr
         tags:
           type: array
           items:

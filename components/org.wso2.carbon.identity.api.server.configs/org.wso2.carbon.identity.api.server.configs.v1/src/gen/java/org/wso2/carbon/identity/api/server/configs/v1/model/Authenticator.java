@@ -37,6 +37,7 @@ public class Authenticator  {
     private String id;
     private String name;
     private String displayName;
+    private String amrValue;
     private String description;
     private String image;
     private Boolean isEnabled = true;
@@ -170,6 +171,27 @@ public enum TypeEnum {
     }
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    /**
+     **/
+    public Authenticator amrValue(String amrValue) {
+
+        this.amrValue = amrValue;
+        return this;
+    }
+
+    @ApiModelProperty(example = "basic", value = "")
+    @JsonProperty("amrValue")
+    @Valid
+    public String getAmrValue() {
+
+        return amrValue;
+    }
+
+    public void setAmrValue(String amrValue) {
+
+        this.amrValue = amrValue;
     }
 
     /**
@@ -347,6 +369,7 @@ public enum TypeEnum {
         return Objects.equals(this.id, authenticator.id) &&
             Objects.equals(this.name, authenticator.name) &&
             Objects.equals(this.displayName, authenticator.displayName) &&
+            Objects.equals(this.amrValue, authenticator.amrValue) &&
             Objects.equals(this.description, authenticator.description) &&
             Objects.equals(this.image, authenticator.image) &&
             Objects.equals(this.isEnabled, authenticator.isEnabled) &&
@@ -359,7 +382,7 @@ public enum TypeEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, displayName, description, image, isEnabled, definedBy, type, tags, properties, endpoint);
+        return Objects.hash(id, name, displayName, amrValue, description, image, isEnabled, definedBy, type, tags, properties, endpoint);
     }
 
     @Override
@@ -371,6 +394,7 @@ public enum TypeEnum {
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
+        sb.append("    amrValue: ").append(toIndentedString(amrValue)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    image: ").append(toIndentedString(image)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");

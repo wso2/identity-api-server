@@ -726,6 +726,7 @@ public class ServerConfigManagementService {
                 authenticatorListItem.setId(authenticatorId);
                 authenticatorListItem.setName(config.getName());
                 authenticatorListItem.setDisplayName(config.getDisplayName());
+                authenticatorListItem.setAmrValue(config.getAmrValue());
                 authenticatorListItem.setIsEnabled(config.isEnabled());
                 authenticatorListItem.setType(AuthenticatorListItem.TypeEnum.LOCAL);
                 authenticatorListItem.setDefinedBy(
@@ -751,6 +752,7 @@ public class ServerConfigManagementService {
                 authenticatorListItem.setId(authenticatorId);
                 authenticatorListItem.setName(config.getName());
                 authenticatorListItem.setDisplayName(config.getDisplayName());
+                authenticatorListItem.setAmrValue(config.getAmrValue());
                 authenticatorListItem.setIsEnabled(config.isEnabled());
                 authenticatorListItem.setType(AuthenticatorListItem.TypeEnum.REQUEST_PATH);
                 authenticatorListItem.setDefinedBy(AuthenticatorListItem.DefinedByEnum.SYSTEM);
@@ -803,6 +805,7 @@ public class ServerConfigManagementService {
         authenticator.setId(base64URLEncode(config.getName()));
         authenticator.setName(config.getName());
         authenticator.setDisplayName(config.getDisplayName());
+        authenticator.setAmrValue(config.getAmrValue());
         authenticator.setIsEnabled(config.isEnabled());
         if (config instanceof RequestPathAuthenticatorConfig) {
             authenticator.setType(Authenticator.TypeEnum.REQUEST_PATH);

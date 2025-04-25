@@ -110,8 +110,7 @@ public class FederatedAuthenticatorConfigBuilderFactory {
                 .authenticatorName(authenticatorName)
                 .endpoint(authenticator.getEndpoint())
                 .properties(authenticator.getProperties())
-                .isEnabled(authenticator.getIsEnabled())
-                .amrValue(authenticator.getAmrValue());;
+                .isEnabled(authenticator.getIsEnabled());
 
         FederatedAuthenticatorConfig federatedAuthenticatorConfig =
                 getFederatedAuthenticatorConfigCreateModel(fedAuthConfigDTO);
@@ -515,6 +514,7 @@ public class FederatedAuthenticatorConfigBuilderFactory {
 
             this.authenticatorName = authenticatorName;
             this.displayName = getDisplayNameOfAuthenticator(authenticatorName);
+            this.amrValue = getAmrValueOfAuthenticator(authenticatorName);
             return this;
         }
 
@@ -556,6 +556,27 @@ public class FederatedAuthenticatorConfigBuilderFactory {
 
                     if (StringUtils.equals(config.getName(), authenticatorName)) {
                         return config.getDisplayName();
+                    }
+                }
+            } catch (IdentityProviderManagementException e) {
+                Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_IDP;
+                throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
+                        error.getDescription());
+            }
+            return null;
+        }
+
+        private String getAmrValueOfAuthenticator(String authenticatorName)
+                throws IdentityProviderManagementClientException {
+
+            try {
+                FederatedAuthenticatorConfig[] authenticatorConfigs =
+                        IdentityProviderServiceHolder.getIdentityProviderManager()
+                                .getAllFederatedAuthenticators();
+                for (FederatedAuthenticatorConfig config : authenticatorConfigs) {
+
+                    if (StringUtils.equals(config.getName(), authenticatorName)) {
+                        return config.getAmrValue();
                     }
                 }
             } catch (IdentityProviderManagementException e) {

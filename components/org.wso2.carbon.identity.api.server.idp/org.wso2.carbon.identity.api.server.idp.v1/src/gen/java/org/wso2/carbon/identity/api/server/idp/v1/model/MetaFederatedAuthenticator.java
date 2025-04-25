@@ -70,6 +70,7 @@ public enum DefinedByEnum {
 }
 
     private DefinedByEnum definedBy;
+    private String amrValue;
     private List<String> tags = null;
 
     private List<MetaProperty> properties = null;
@@ -145,6 +146,26 @@ public enum DefinedByEnum {
     }
     public void setDefinedBy(DefinedByEnum definedBy) {
         this.definedBy = definedBy;
+    }
+
+    /**
+     **/
+    public MetaFederatedAuthenticator amrValue(String amrValue) {
+
+        this.amrValue = amrValue;
+        return this;
+    }
+
+    @ApiModelProperty(example = "basic_amr", value = "")
+    @JsonProperty("amrValue")
+    @Valid
+    public String getAmrValue() {
+
+        return amrValue;
+    }
+    public void setAmrValue(String amrValue) {
+
+        this.amrValue = amrValue;
     }
 
     /**
