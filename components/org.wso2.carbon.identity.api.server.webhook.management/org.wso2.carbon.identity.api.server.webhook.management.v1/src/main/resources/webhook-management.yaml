@@ -10,11 +10,13 @@ info:
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+
 servers:
   - url: 'https://localhost:9443/t/{tenant-domain}/api/server/v1'
     variables:
       tenant-domain:
         default: carbon.super
+
 security:
   - OAuth2: []
   - BasicAuth: []
@@ -245,6 +247,16 @@ components:
           items:
             type: string
           example: ['logins.loginSuccess', 'user-operations.updateUserGroup']
+        subscribe_to_all_suborgs:
+          type: boolean
+          description: Whether webhook should receive events from all sub-organizations
+          example: false
+        suborg_ids:
+          type: array
+          items:
+            type: string
+          description: Specific sub-organization IDs to receive events from
+          example: ['suborg-001', 'suborg-002']
         active:
           type: boolean
           example: True
@@ -272,11 +284,6 @@ components:
             event_schema:
               type: string
               example: 'WSO2'
-            events_requested:
-              type: array
-              items:
-                type: string
-              example: ['logins.loginSuccess', 'user-operations.updateUserGroup']
             events_supported:
               type: array
               items:
@@ -287,6 +294,9 @@ components:
               items:
                 type: string
               example: ['logins.loginSuccess']
+            subscribe_to_all_suborgs:
+              type: boolean
+              example: false
             active:
               type: boolean
               example: True
