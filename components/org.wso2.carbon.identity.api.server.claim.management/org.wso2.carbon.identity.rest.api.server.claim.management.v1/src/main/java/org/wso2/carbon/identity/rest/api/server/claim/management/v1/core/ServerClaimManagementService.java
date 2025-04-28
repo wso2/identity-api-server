@@ -166,6 +166,7 @@ public class ServerClaimManagementService {
     private static final Log LOG = LogFactory.getLog(ServerClaimManagementService.class);
     private static final String REL_CLAIMS = "claims";
     private static final String IDENTITY_CLAIM_URI = "http://wso2.org/claims/identity/";
+    private static final String HIDDEN_CLAIMS_IDENTITY_CONFIG = "HiddenClaims.HiddenClaim";
     private static final List<String> conflictErrorScenarios = Arrays.asList(
             ClaimConstants.ErrorMessage.ERROR_CODE_EXISTING_CLAIM_DIALECT.getCode(),
             ClaimConstants.ErrorMessage.ERROR_CODE_EXISTING_EXTERNAL_CLAIM_URI.getCode(),
@@ -436,6 +437,25 @@ public class ServerClaimManagementService {
     public List<LocalClaimResDTO> getLocalClaims(Boolean excludeIdentityClaims, String attributes, Integer limit,
                                                  Integer offset, String filter, String sort) {
 
+        return getLocalClaims(excludeIdentityClaims, attributes, limit, offset, filter, sort, false);
+    }
+
+    /**
+     * Retrieve all claims belonging to the local dialect.
+     *
+     * @param excludeIdentityClaims     Exclude identity claims in the local dialect if this is set to true.
+     * @param attributes                attributes filter (optional).
+     * @param limit                     limit (optional).
+     * @param offset                    offset (optional).
+     * @param filter                    filter (optional).
+     * @param sort                      sort (optional).
+     * @param excludeHiddenClaims   Exclude hidden claims in the local dialect if this is set to true.
+     * @return List of local claims.
+     */
+    public List<LocalClaimResDTO> getLocalClaims(Boolean excludeIdentityClaims, String attributes, Integer limit,
+                                                 Integer offset, String filter, String sort,
+                                                 Boolean excludeHiddenClaims) {
+
         handleNotImplementedCapabilities(attributes, limit, offset, filter, sort);
 
         try {
@@ -445,6 +465,13 @@ public class ServerClaimManagementService {
             if (excludeIdentityClaims != null && excludeIdentityClaims) {
                 localClaimList = localClaimList.stream()
                         .filter(claim -> !claim.getClaimURI().startsWith(IDENTITY_CLAIM_URI))
+                        .collect(Collectors.toList());
+            }
+
+            if (excludeHiddenClaims != null && excludeHiddenClaims) {
+                List<String> hiddenClaims = IdentityUtil.getPropertyAsList(HIDDEN_CLAIMS_IDENTITY_CONFIG);
+                localClaimList = localClaimList.stream()
+                        .filter(claim -> !hiddenClaims.contains(claim.getClaimURI()))
                         .collect(Collectors.toList());
             }
 
