@@ -43,8 +43,10 @@ public interface AuthenticatorsApiService {
 
       public Response getConnectedAppsOfLocalAuthenticator(String authenticatorId, Integer limit, Integer offset);
 
-      public Response updateSystemLocalAuthenticatorAmrValueById(
-              String authenticatorId, SystemLocalAuthenticatorUpdate systemLocalAuthenticatorUpdate);
+      public Response getSystemLocalAuthenticator(String authenticatorId, String filter, Integer limit, Integer offset);
+
+      public Response updateSystemLocalAuthenticatorAmrValueById(String authenticatorId
+              , SystemLocalAuthenticatorUpdate systemLocalAuthenticatorUpdate);
 
       public Response updateUserDefinedLocalAuthenticator(String authenticatorId, UserDefinedLocalAuthenticatorUpdate userDefinedLocalAuthenticatorUpdate);
 

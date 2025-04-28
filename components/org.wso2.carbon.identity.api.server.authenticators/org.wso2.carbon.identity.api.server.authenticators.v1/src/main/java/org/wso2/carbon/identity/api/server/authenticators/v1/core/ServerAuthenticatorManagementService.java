@@ -298,14 +298,32 @@ public class ServerAuthenticatorManagementService {
             localAuthenticatorConfig.setName(existingAuthenticator.getName());
             localAuthenticatorConfig.setAmrValue(systemConfig.getAmrValue());
 
-            LocalAuthenticatorConfig updatedConfig = applicationAuthenticatorService
-                    .updateAuthenticatorAmrValue(
-                            LocalAuthenticatorConfigBuilderFactory.
-                                    buildSystemLocalAuthenticator(systemConfig, existingAuthenticator),
-                            tenantDomain);
-            log.info("On Tenant " + tenantDomain + "AMR Value update to " + systemConfig.getAmrValue() +
+            applicationAuthenticatorService.updateAuthenticatorAmrValue(LocalAuthenticatorConfigBuilderFactory.
+                                    buildSystemLocalAuthenticator(systemConfig, existingAuthenticator), tenantDomain);
+            log.info("On Tenant " + tenantDomain + " AMR Value update to " + systemConfig.getAmrValue() +
                     " for the authenticator " + authenticatorName);
+            LocalAuthenticatorConfig updatedConfig = applicationAuthenticatorService
+                    .getSystemLocalAuthenticator(authenticatorName, tenantDomain);
             return LocalAuthenticatorConfigBuilderFactory.buildSystemLocalAuthenticator(updatedConfig);
+        } catch (AuthenticatorMgtException e) {
+            throw handleAuthenticatorException(e);
+        }
+    }
+
+    public LocalAuthenticatorConfig getSystemLocalAuthenticator(String authenticatorId) {
+
+        try {
+            String authenticatorName = base64URLDecode(authenticatorId);
+            String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            LocalAuthenticatorConfig existingAuthenticator = applicationAuthenticatorService
+                    .getSystemLocalAuthenticator(authenticatorName, tenantDomain);
+            if (existingAuthenticator == null) {
+                AuthenticatorMgtError error = AuthenticatorMgtError.ERROR_CODE_ERROR_AUTHENTICATOR_NOT_FOUND;
+                throw handleAuthenticatorException(new AuthenticatorMgtClientException(error.getCode(),
+                                error.getMessage(), String.format(error.getMessage(), authenticatorName)),
+                        Response.Status.NOT_FOUND);
+            }
+            return LocalAuthenticatorConfigBuilderFactory.buildSystemLocalAuthenticator(existingAuthenticator);
         } catch (AuthenticatorMgtException e) {
             throw handleAuthenticatorException(e);
         }

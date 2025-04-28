@@ -250,6 +250,43 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
   /authenticators/system/{authenticator-id} :
+    get:
+      tags:
+        - System Local Authenticators
+      summary: |
+        Get the system local authenticator by Id
+      description: |
+        Get the system local authenticator by Id
+      operationId: getSystemLocalAuthenticator
+      parameters:
+        - name: authenticator-id
+          in: path
+          description: ID of an authenticator
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/filterQueryParam'
+        - $ref: '#/components/parameters/limitQueryParam'
+        - $ref: '#/components/parameters/offsetQueryParam'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Authenticator'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '501':
+          $ref: '#/components/responses/NotImplemented'
     patch:
       tags:
         - System Local Authenticators

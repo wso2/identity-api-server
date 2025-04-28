@@ -87,18 +87,25 @@ public class AuthenticatorsApiServiceImpl implements AuthenticatorsApiService {
     }
 
     @Override
-    public Response updateSystemLocalAuthenticatorAmrValueById(String authenticatorId,
-            SystemLocalAuthenticatorUpdate systemLocalAuthenticatorUpdate) {
-
-        return Response.ok().entity(authenticatorManagementService.updateSystemLocalAuthenticator(
-                authenticatorId, systemLocalAuthenticatorUpdate)).build();
-    }
-
-    @Override
     public Response updateUserDefinedLocalAuthenticator(
             String authenticatorId, UserDefinedLocalAuthenticatorUpdate userDefinedLocalAuthenticatorUpdate) {
 
         return Response.ok().entity(authenticatorManagementService
                 .updateUserDefinedLocalAuthenticator(authenticatorId, userDefinedLocalAuthenticatorUpdate)).build();
+    }
+
+    @Override
+    public Response getSystemLocalAuthenticator(String authenticatorId, String filter, Integer limit, Integer offset) {
+
+        return Response.ok().entity(authenticatorManagementService
+                .getSystemLocalAuthenticator(authenticatorId)).build();
+    }
+
+    @Override
+    public Response updateSystemLocalAuthenticatorAmrValueById(
+            String authenticatorId, SystemLocalAuthenticatorUpdate systemLocalAuthenticatorUpdate) {
+
+        return Response.ok().entity(authenticatorManagementService.updateSystemLocalAuthenticator(
+                authenticatorId, systemLocalAuthenticatorUpdate)).build();
     }
 }
