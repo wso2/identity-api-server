@@ -3,150 +3,175 @@ info:
   version: "v1"
   title: 'WSO2 Identity Server - Webhook Management API Definition'
   description: 'This document specifies a **RESTful API** for **WSO2 Identity Server Webhook Subscription Management**'
-  contact:
-    name: WSO2
-    url: 'http://wso2.com/products/identity-server/'
-    email: iam-dev@wso2.org
-  license:
-    name: Apache 2.0
-    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
-
 servers:
-  - url: 'https://localhost:9443/t/{tenant-domain}/api/server/v1'
+  - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
     variables:
+      server-url:
+        default: localhost:9443
       tenant-domain:
         default: carbon.super
 
 security:
-  - OAuth2: []
   - BasicAuth: []
+  - OAuth2: []
 
 paths:
   /webhooks:
     get:
-      summary: Retrieve all webhook subscriptions
-      description: 'List all webhook subscriptions. \n\n <b>Scope(Permission) required:</b> `internal_webhook_view` \n\n'
+      summary: List webhooks
+      description: 'List all webhooks. \n\n <b>Scope(Permission) required:</b> `internal_webhook_view` \n\n'
       operationId: getWebhooks
       tags:
-        - Webhook Subscriptions
+        - Webhooks
       responses:
         '200':
-          description: Successful response
+          description: OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/WebhookList'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          description: Unauthorized
         '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+          description: Forbidden
         '500':
-          $ref: '#/components/responses/ServerError'
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '501':
-          $ref: '#/components/responses/NotImplemented'
-      x-codeSamples:
-        - lang: Curl
-          source: |
-            curl --location 'https://localhost:9443/t/carbon.super/api/server/v1/webhooks' \
-            -H 'Accept: application/json' \
-            -H 'Authorization: Basic YWRtaW46YWRtaW4='
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        x-codeSamples:
+          - lang: Curl
+            source: |
+              curl --location 'https://localhost:9443/t/carbon.super/api/server/v1/webhooks' -H 'Authorization: Basic YWRtaW46YWRtaW4='
 
     post:
-      summary: Add a new webhook subscription
+      summary: Add webhook
       description: 'Create a new webhook subscription. \n\n <b>Scope(Permission) required:</b> `internal_webhook_create` \n\n'
       operationId: createWebhook
       tags:
-        - Webhook Subscriptions
+        - Webhooks
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/WebhookRequest"
+              $ref: '#/components/schemas/WebhookRequest'
       responses:
         '201':
-          description: Webhook subscription created successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/WebhookResponse"
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      x-codeSamples:
-        - lang: Curl
-          source: |
-            curl --location --request POST 'https://localhost:9443/t/carbon.super/api/server/v1/webhooks' \
-            -H 'Authorization: Basic YWRtaW46YWRtaW4=' \
-            -H 'Content-Type: application/json' \
-            -d '{
-                  "endpoint": "https://example.com/webhook",
-                  "description": "Webhook to capture login related events",
-                  "secret": "123e4567-e89b-12d3-a456-426614174000",
-                  "event_schema": "WSO2",
-                  "events_requested": [
-                    "logins.loginSuccess",
-                    "user-operations.updateUserGroup"
-                  ],
-                  "active": true
-                }'
-
-  /webhooks/{webhook-id}:
-    get:
-      summary: Retrieve a webhook subscription by ID
-      description: 'Get a webhook subscription specified by webhook ID. \n\n <b>Scope(Permission) required:</b> `internal_webhook_view` \n\n'
-      operationId: getWebhook
-      tags:
-        - Webhook Subscriptions
-      parameters:
-        - name: webhook-id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Successful response
+          description: Webhook Created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/WebhookResponse'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          description: Unauthorized
         '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+          description: Forbidden
         '500':
-          $ref: '#/components/responses/ServerError'
-      x-codeSamples:
-        - lang: Curl
-          source: |
-            curl --location 'https://localhost:9443/t/carbon.super/api/server/v1/webhooks/{webhook-id}' \
-            -H 'Accept: application/json' \
-            -H 'Authorization: Basic YWRtaW46YWRtaW4='
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        x-codeSamples:
+          - lang: Curl
+            source: |
+              curl --location --request POST 'https://localhost:9443/t/carbon.super/api/server/v1/webhooks' \
+              -H 'Authorization: Basic YWRtaW46YWRtaW4=' \
+              -H 'Content-Type: application/json' \
+              -d '{
+                "endpoint": "https://example.com/webhook",
+                "description": "Webhook for login events",
+                "secret": "my-secret",
+                "events_requested": ["schemas.identity.wso2.org/events/logins/event-type/loginSuccess", "schemas.identity.wso2.org/events/logins/event-type/loginFailed"]
+              }'
+
+  /webhooks/{webhookId}:
+    get:
+      summary: Retrieve a webhook by ID
+      description: 'Get a webhook specified by webhook ID. \n\n <b>Scope(Permission) required:</b> `internal_webhook_view` \n\n'
+      operationId: getWebhook
+      tags:
+        - Webhooks
+      parameters:
+        - name: webhookId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Webhook not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        x-codeSamples:
+          - lang: Curl
+            source: |
+              curl --location 'https://localhost:9443/t/carbon.super/api/server/v1/webhooks/101' -H 'Authorization: Basic YWRtaW46YWRtaW4='
 
     put:
-      summary: Update a webhook subscription
-      description: 'Update a webhook subscription by webhook ID. \n\n <b>Scope(Permission) required:</b> `internal_webhook_update` \n\n'
+      summary: Update a webhook
+      description: 'Update a webhook by webhook ID. \n\n <b>Scope(Permission) required:</b> `internal_webhook_update` \n\n'
       operationId: updateWebhook
       tags:
-        - Webhook Subscriptions
+        - Webhooks
       parameters:
-        - name: webhook-id
+        - name: webhookId
           in: path
           required: true
           schema:
@@ -156,158 +181,183 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/WebhookRequest"
+              $ref: '#/components/schemas/WebhookRequest'
       responses:
         '200':
-          description: Webhook updated successfully
+          description: Webhook Updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/WebhookResponse"
+                $ref: '#/components/schemas/WebhookResponse'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          description: Unauthorized
         '403':
-          $ref: '#/components/responses/Forbidden'
+          description: Forbidden
+        '404':
+          description: Webhook not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
-          $ref: '#/components/responses/ServerError'
-      x-codeSamples:
-        - lang: Curl
-          source: |
-            curl --location --request PUT 'https://localhost:9443/t/carbon.super/api/server/v1/webhooks/{webhook-id}' \
-            -H 'Authorization: Basic YWRtaW46YWRtaW4=' \
-            -H 'Content-Type: application/json' \
-            -d '{
-                  "endpoint": "https://example.com/webhook",
-                  "description": "Webhook to capture login related events",
-                  "secret": "123e4567-e89b-12d3-a456-426614174000",
-                  "event_schema": "WSO2",
-                  "events_requested": [
-                    "logins.loginSuccess",
-                    "user-operations.updateUserGroup"
-                  ],
-                  "active": true
-                }'
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        x-codeSamples:
+          - lang: Curl
+            source: |
+              curl --location --request PUT 'https://localhost:9443/t/carbon.super/api/server/v1/webhooks/101' \
+              -H 'Authorization: Basic YWRtaW46YWRtaW4=' \
+              -H 'Content-Type: application/json' \
+              -d '{
+                "endpoint": "https://example.com/webhook",
+                "description": "Webhook for login events",
+                "secret": "my-secret",
+                "events_requested": ["schemas.identity.wso2.org/events/logins/event-type/loginSuccess", "schemas.identity.wso2.org/events/logins/event-type/loginFailed"]
+              }'
 
     delete:
-      summary: Delete a webhook subscription
-      description: 'Delete a webhook subscription by webhook ID. \n\n <b>Scope(Permission) required:</b> `internal_webhook_delete` \n\n'
+      summary: Delete a webhook
+      description: 'Delete a webhook by webhook ID. \n\n <b>Scope(Permission) required:</b> `internal_webhook_delete` \n\n'
       operationId: deleteWebhook
       tags:
-        - Webhook Subscriptions
+        - Webhooks
       parameters:
-        - name: webhook-id
+        - name: webhookId
           in: path
           required: true
           schema:
             type: integer
       responses:
         '204':
-          description: Successfully Deleted
+          description: Webhook Deleted
         '400':
-          $ref: '#/components/responses/BadRequest'
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          description: Unauthorized
         '403':
-          $ref: '#/components/responses/Forbidden'
+          description: Forbidden
+        '404':
+          description: Webhook not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
-          $ref: '#/components/responses/ServerError'
-      x-codeSamples:
-        - lang: Curl
-          source: |
-            curl --location --request DELETE 'https://localhost:9443/t/carbon.super/api/server/v1/webhooks/{webhook-id}' \
-            -H 'Authorization: Basic YWRtaW46YWRtaW4='
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        x-codeSamples:
+          - lang: Curl
+            source: |
+              curl --location --request DELETE 'https://localhost:9443/t/carbon.super/api/server/v1/webhooks/101' -H 'Authorization: Basic YWRtaW46YWRtaW4='
 
 components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://localhost:9443/oauth2/authorize'
+          tokenUrl: 'https://localhost:9443/oauth2/token'
+          scopes:
+            internal_webhook_view: View webhooks
+            internal_webhook_create: Create webhooks
+            internal_webhook_update: Update webhooks
+            internal_webhook_delete: Delete webhooks
+
   schemas:
     WebhookRequest:
       type: object
       required:
         - endpoint
-        - secret
-        - event_schema
-        - events_requested
-        - active
+        - eventSchema
+        - description
+        - eventsRequested
       properties:
         endpoint:
           type: string
-          example: 'https://example.com/webhook'
-        description:
-          type: string
-          example: 'Webhook to capture login related events'
-        secret:
-          type: string
-          example: '123e4567-e89b-12d3-a456-426614174000'
-        event_schema:
+          description: Webhook URL.
+          example: https://example.com/webhook
+        eventSchema:
           type: string
           example: 'WSO2'
-        events_requested:
+        description:
+          type: string
+          description: Webhook description.
+          example: A webhook for user events.
+        secret:
+          type: string
+          description: Secret for validating webhook payloads.
+          example: my-secret
+        eventsRequested:
           type: array
           items:
             type: string
-          example: ['logins.loginSuccess', 'user-operations.updateUserGroup']
-        subscribe_to_all_suborgs:
-          type: boolean
-          description: Whether webhook should receive events from all sub-organizations
-          example: false
-        suborg_ids:
-          type: array
-          items:
-            type: string
-          description: Specific sub-organization IDs to receive events from
-          example: ['suborg-001', 'suborg-002']
-        active:
-          type: boolean
-          example: True
+          description: List of events to subscribe to.
+          example: ["schemas.identity.wso2.org/events/logins/event-type/loginSuccess", "schemas.identity.wso2.org/events/logins/event-type/loginFailed"]
 
     WebhookResponse:
       allOf:
-        - $ref: '#/components/schemas/WebhookRequest'
         - type: object
           properties:
             id:
               type: integer
-              example: 1001
-            iss:
-              type: string
-              example: 'https://api.asg.io/t/testasgardeo1'
-            secret:
-              type: string
-              example: 'WEBHOOK:SECRET:93451'
-            endpoint:
-              type: string
-              example: 'https://example.com/webhook'
-            description:
-              type: string
-              example: 'Webhook to capture login related events'
-            event_schema:
-              type: string
-              example: 'WSO2'
-            events_supported:
-              type: array
-              items:
-                type: string
-              example: ['logins.loginSuccess', 'logins.loginFailed', 'registrations.addUser']
-            events_delivered:
-              type: array
-              items:
-                type: string
-              example: ['logins.loginSuccess']
-            subscribe_to_all_suborgs:
-              type: boolean
-              example: false
-            active:
-              type: boolean
-              example: True
+              example: 101
             createdAt:
               type: string
               format: date-time
-              example: '2024-07-10T12:34:56Z'
+              example: '2024-05-01T12:00:00Z'
             updatedAt:
               type: string
               format: date-time
-              example: '2024-07-10T13:00:00Z'
+              example: '2024-05-02T12:00:00Z'
+            endpoint:
+              type: string
+              description: Webhook URL.
+              example: https://example.com/webhook
+            eventSchema:
+              type: string
+              example: 'WSO2'
+            description:
+              type: string
+              description: Webhook description.
+              example: A webhook for user events.
+            eventsRequested:
+              type: array
+              items:
+                type: string
+              description: List of events to subscribe to.
+              example: ["schemas.identity.wso2.org/events/logins/event-type/loginSuccess", "schemas.identity.wso2.org/events/logins/event-type/loginFailed"]
 
     WebhookList:
       type: object
@@ -319,67 +369,16 @@ components:
 
     Error:
       type: object
-      required:
-        - code
-        - message
       properties:
         code:
           type: string
-          example: WEBHOOK-00000
+          example: WEBHOOK-00001
         message:
           type: string
-          example: Some Error Message
+          example: Some error message.
         description:
           type: string
-          example: Some Error Description
+          example: Some error description.
         traceId:
           type: string
           example: e0fbcfeb-3617-43c4-8dd0-7b7d38e13047
-
-  responses:
-    BadRequest:
-      description: Invalid input in the request.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Authentication information is missing or invalid.
-    Forbidden:
-      description: Access forbidden.
-    NotFound:
-      description: Requested resource is not found.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    ServerError:
-      description: Internal server error.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Conflict:
-      description: Resource already exists.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    NotImplemented:
-      description: Not Implemented.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-
-  securitySchemes:
-    BasicAuth:
-      type: http
-      scheme: basic
-    OAuth2:
-      type: oauth2
-      flows:
-        authorizationCode:
-          authorizationUrl: 'https://localhost:9443/oauth2/authorize'
-          tokenUrl: 'https://localhost:9443/oauth2/token'
-          scopes: {}
