@@ -49,6 +49,7 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.BASIC;
 import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.CLIENT_ID;
 import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.CLIENT_SECRET;
 import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_CONFLICT_PUBLISHER;
@@ -337,7 +338,7 @@ public class NotificationSenderManagementService {
         emailSender.setFromAddress(dto.getFromAddress());
         emailSender.setSmtpPort(dto.getSmtpPort());
         emailSender.setSmtpServerHost(dto.getSmtpServerHost());
-        emailSender.setAuthType(dto.getAuthType());
+        emailSender.setAuthType(StringUtils.isBlank(dto.getAuthType()) ? BASIC : dto.getAuthType());
         List<Properties> properties = new ArrayList<>();
 
         // Exclude credentials from the response.
