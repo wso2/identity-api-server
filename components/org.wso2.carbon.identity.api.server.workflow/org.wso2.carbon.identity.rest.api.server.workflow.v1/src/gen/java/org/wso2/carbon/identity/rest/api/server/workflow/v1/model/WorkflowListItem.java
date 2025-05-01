@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowTemplateBase;
 import javax.validation.constraints.*;
 
 
@@ -31,26 +30,24 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class WorkflowDetails  {
+public class WorkflowListItem  {
   
     private String id;
     private String name;
     private String description;
     private String engine;
-    private WorkflowTemplateBase template;
-    private String approvalTask;
-    private String approvalTaskDescription;
+    private String template;
 
     /**
-    * Id of the workflow
+    * Unique id to represent a workflow
     **/
-    public WorkflowDetails id(String id) {
+    public WorkflowListItem id(String id) {
 
         this.id = id;
         return this;
     }
     
-    @ApiModelProperty(example = "100", value = "Id of the workflow")
+    @ApiModelProperty(example = "100", value = "Unique id to represent a workflow")
     @JsonProperty("id")
     @Valid
     public String getId() {
@@ -61,15 +58,15 @@ public class WorkflowDetails  {
     }
 
     /**
-    * Name of the created workflow
+    * Display name of the workflow
     **/
-    public WorkflowDetails name(String name) {
+    public WorkflowListItem name(String name) {
 
         this.name = name;
         return this;
     }
     
-    @ApiModelProperty(example = "User Approval Workflow", value = "Name of the created workflow")
+    @ApiModelProperty(example = "User Role Approval", value = "Display name of the workflow")
     @JsonProperty("name")
     @Valid
     public String getName() {
@@ -80,15 +77,15 @@ public class WorkflowDetails  {
     }
 
     /**
-    * Description of the created workflow
+    * Detailed description of the workflow
     **/
-    public WorkflowDetails description(String description) {
+    public WorkflowListItem description(String description) {
 
         this.description = description;
         return this;
     }
     
-    @ApiModelProperty(example = "Workflow to approve user role related requests", value = "Description of the created workflow")
+    @ApiModelProperty(example = "Workflow to approve user role related requests", value = "Detailed description of the workflow")
     @JsonProperty("description")
     @Valid
     public String getDescription() {
@@ -99,15 +96,15 @@ public class WorkflowDetails  {
     }
 
     /**
-    * Name of the selected workflow engine
+    * Category in which the workflow is deployed
     **/
-    public WorkflowDetails engine(String engine) {
+    public WorkflowListItem engine(String engine) {
 
         this.engine = engine;
         return this;
     }
     
-    @ApiModelProperty(example = "Simple Workflow Engine", value = "Name of the selected workflow engine")
+    @ApiModelProperty(example = "Simple Workflow Engine", value = "Category in which the workflow is deployed")
     @JsonProperty("engine")
     @Valid
     public String getEngine() {
@@ -118,59 +115,22 @@ public class WorkflowDetails  {
     }
 
     /**
+    * Template defining the approval process for the workflow
     **/
-    public WorkflowDetails template(WorkflowTemplateBase template) {
+    public WorkflowListItem template(String template) {
 
         this.template = template;
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(example = "MultiStepApprovalTemplate", value = "Template defining the approval process for the workflow")
     @JsonProperty("template")
     @Valid
-    public WorkflowTemplateBase getTemplate() {
+    public String getTemplate() {
         return template;
     }
-    public void setTemplate(WorkflowTemplateBase template) {
+    public void setTemplate(String template) {
         this.template = template;
-    }
-
-    /**
-    * Approval task subject to display
-    **/
-    public WorkflowDetails approvalTask(String approvalTask) {
-
-        this.approvalTask = approvalTask;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "Approval Required", value = "Approval task subject to display")
-    @JsonProperty("approvalTask")
-    @Valid
-    public String getApprovalTask() {
-        return approvalTask;
-    }
-    public void setApprovalTask(String approvalTask) {
-        this.approvalTask = approvalTask;
-    }
-
-    /**
-    * Description of the approval task
-    **/
-    public WorkflowDetails approvalTaskDescription(String approvalTaskDescription) {
-
-        this.approvalTaskDescription = approvalTaskDescription;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "Your approval is needed to complete this task", value = "Description of the approval task")
-    @JsonProperty("approvalTaskDescription")
-    @Valid
-    public String getApprovalTaskDescription() {
-        return approvalTaskDescription;
-    }
-    public void setApprovalTaskDescription(String approvalTaskDescription) {
-        this.approvalTaskDescription = approvalTaskDescription;
     }
 
 
@@ -184,34 +144,30 @@ public class WorkflowDetails  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        WorkflowDetails workflowDetails = (WorkflowDetails) o;
-        return Objects.equals(this.id, workflowDetails.id) &&
-            Objects.equals(this.name, workflowDetails.name) &&
-            Objects.equals(this.description, workflowDetails.description) &&
-            Objects.equals(this.engine, workflowDetails.engine) &&
-            Objects.equals(this.template, workflowDetails.template) &&
-            Objects.equals(this.approvalTask, workflowDetails.approvalTask) &&
-            Objects.equals(this.approvalTaskDescription, workflowDetails.approvalTaskDescription);
+        WorkflowListItem workflowListItem = (WorkflowListItem) o;
+        return Objects.equals(this.id, workflowListItem.id) &&
+            Objects.equals(this.name, workflowListItem.name) &&
+            Objects.equals(this.description, workflowListItem.description) &&
+            Objects.equals(this.engine, workflowListItem.engine) &&
+            Objects.equals(this.template, workflowListItem.template);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, engine, template, approvalTask, approvalTaskDescription);
+        return Objects.hash(id, name, description, engine, template);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class WorkflowDetails {\n");
+        sb.append("class WorkflowListItem {\n");
         
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    engine: ").append(toIndentedString(engine)).append("\n");
         sb.append("    template: ").append(toIndentedString(template)).append("\n");
-        sb.append("    approvalTask: ").append(toIndentedString(approvalTask)).append("\n");
-        sb.append("    approvalTaskDescription: ").append(toIndentedString(approvalTaskDescription)).append("\n");
         sb.append("}");
         return sb.toString();
     }

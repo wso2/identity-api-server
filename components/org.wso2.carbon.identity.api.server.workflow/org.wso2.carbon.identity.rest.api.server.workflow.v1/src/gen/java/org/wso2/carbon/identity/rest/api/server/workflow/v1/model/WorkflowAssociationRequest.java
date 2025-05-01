@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -31,7 +31,7 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class WorkflowAssociationCreation  {
+public class WorkflowAssociationRequest  {
   
     private String associationName;
     private Operation operation;
@@ -42,7 +42,7 @@ public class WorkflowAssociationCreation  {
     /**
     * Name of the workflow association
     **/
-    public WorkflowAssociationCreation associationName(String associationName) {
+    public WorkflowAssociationRequest associationName(String associationName) {
 
         this.associationName = associationName;
         return this;
@@ -62,7 +62,7 @@ public class WorkflowAssociationCreation  {
 
     /**
     **/
-    public WorkflowAssociationCreation operation(Operation operation) {
+    public WorkflowAssociationRequest operation(Operation operation) {
 
         this.operation = operation;
         return this;
@@ -83,7 +83,7 @@ public class WorkflowAssociationCreation  {
     /**
     * Id of the assigned workflow
     **/
-    public WorkflowAssociationCreation workflowId(String workflowId) {
+    public WorkflowAssociationRequest workflowId(String workflowId) {
 
         this.workflowId = workflowId;
         return this;
@@ -104,7 +104,7 @@ public class WorkflowAssociationCreation  {
     /**
     * Condition added to the association
     **/
-    public WorkflowAssociationCreation associationCondition(String associationCondition) {
+    public WorkflowAssociationRequest associationCondition(String associationCondition) {
 
         this.associationCondition = associationCondition;
         return this;
@@ -123,7 +123,7 @@ public class WorkflowAssociationCreation  {
     /**
     * Association Status
     **/
-    public WorkflowAssociationCreation isEnabled(Boolean isEnabled) {
+    public WorkflowAssociationRequest isEnabled(Boolean isEnabled) {
 
         this.isEnabled = isEnabled;
         return this;
@@ -150,12 +150,12 @@ public class WorkflowAssociationCreation  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        WorkflowAssociationCreation workflowAssociationCreation = (WorkflowAssociationCreation) o;
-        return Objects.equals(this.associationName, workflowAssociationCreation.associationName) &&
-            Objects.equals(this.operation, workflowAssociationCreation.operation) &&
-            Objects.equals(this.workflowId, workflowAssociationCreation.workflowId) &&
-            Objects.equals(this.associationCondition, workflowAssociationCreation.associationCondition) &&
-            Objects.equals(this.isEnabled, workflowAssociationCreation.isEnabled);
+        WorkflowAssociationRequest workflowAssociationRequest = (WorkflowAssociationRequest) o;
+        return Objects.equals(this.associationName, workflowAssociationRequest.associationName) &&
+            Objects.equals(this.operation, workflowAssociationRequest.operation) &&
+            Objects.equals(this.workflowId, workflowAssociationRequest.workflowId) &&
+            Objects.equals(this.associationCondition, workflowAssociationRequest.associationCondition) &&
+            Objects.equals(this.isEnabled, workflowAssociationRequest.isEnabled);
     }
 
     @Override
@@ -167,7 +167,7 @@ public class WorkflowAssociationCreation  {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class WorkflowAssociationCreation {\n");
+        sb.append("class WorkflowAssociationRequest {\n");
         
         sb.append("    associationName: ").append(toIndentedString(associationName)).append("\n");
         sb.append("    operation: ").append(toIndentedString(operation)).append("\n");

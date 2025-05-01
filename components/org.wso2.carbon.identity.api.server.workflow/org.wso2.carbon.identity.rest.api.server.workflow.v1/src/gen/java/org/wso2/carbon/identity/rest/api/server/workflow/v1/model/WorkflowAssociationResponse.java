@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -19,25 +19,31 @@
 package org.wso2.carbon.identity.rest.api.server.workflow.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Operation;
+import javax.validation.constraints.*;
 
 
+import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
+import javax.xml.bind.annotation.*;
 
-public class WorkflowAssociationDetails {
-
+public class WorkflowAssociationResponse  {
+  
     private String id;
     private String associationName;
     private Operation operation;
     private String workflowName;
     private String associationCondition;
-    private Boolean isEnabled = true;
+    private Boolean isEnabled;
 
     /**
     * Unique id to represent a workflow association
     **/
-    public WorkflowAssociationDetails id(String id) {
+    public WorkflowAssociationResponse id(String id) {
 
         this.id = id;
         return this;
@@ -56,7 +62,7 @@ public class WorkflowAssociationDetails {
     /**
     * Name of the workflow association
     **/
-    public WorkflowAssociationDetails associationName(String associationName) {
+    public WorkflowAssociationResponse associationName(String associationName) {
 
         this.associationName = associationName;
         return this;
@@ -73,9 +79,27 @@ public class WorkflowAssociationDetails {
     }
 
     /**
+    **/
+    public WorkflowAssociationResponse operation(Operation operation) {
+
+        this.operation = operation;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("operation")
+    @Valid
+    public Operation getOperation() {
+        return operation;
+    }
+    public void setOperation(Operation operation) {
+        this.operation = operation;
+    }
+
+    /**
     * Assigned Workflow
     **/
-    public WorkflowAssociationDetails workflowName(String workflowName) {
+    public WorkflowAssociationResponse workflowName(String workflowName) {
 
         this.workflowName = workflowName;
         return this;
@@ -92,9 +116,28 @@ public class WorkflowAssociationDetails {
     }
 
     /**
+    * Condition added to the association
+    **/
+    public WorkflowAssociationResponse associationCondition(String associationCondition) {
+
+        this.associationCondition = associationCondition;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "//_*[local-name()='parameter'][@name='Rolename']/_*[local-name()='value']/_*[local-name()='itemValue']/text()='Employee'", value = "Condition added to the association")
+    @JsonProperty("associationCondition")
+    @Valid
+    public String getAssociationCondition() {
+        return associationCondition;
+    }
+    public void setAssociationCondition(String associationCondition) {
+        this.associationCondition = associationCondition;
+    }
+
+    /**
     * Association Status
     **/
-    public WorkflowAssociationDetails isEnabled(Boolean isEnabled) {
+    public WorkflowAssociationResponse isEnabled(Boolean isEnabled) {
 
         this.isEnabled = isEnabled;
         return this;
@@ -121,46 +164,34 @@ public class WorkflowAssociationDetails {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        WorkflowAssociationDetails workflowAssociationSummary = (WorkflowAssociationDetails) o;
-        return Objects.equals(this.id, workflowAssociationSummary.id) &&
-            Objects.equals(this.associationName, workflowAssociationSummary.associationName) &&
-            Objects.equals(this.workflowName, workflowAssociationSummary.workflowName) &&
-            Objects.equals(this.isEnabled, workflowAssociationSummary.isEnabled);
+        WorkflowAssociationResponse workflowAssociationResponse = (WorkflowAssociationResponse) o;
+        return Objects.equals(this.id, workflowAssociationResponse.id) &&
+            Objects.equals(this.associationName, workflowAssociationResponse.associationName) &&
+            Objects.equals(this.operation, workflowAssociationResponse.operation) &&
+            Objects.equals(this.workflowName, workflowAssociationResponse.workflowName) &&
+            Objects.equals(this.associationCondition, workflowAssociationResponse.associationCondition) &&
+            Objects.equals(this.isEnabled, workflowAssociationResponse.isEnabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, associationName, workflowName, isEnabled);
+        return Objects.hash(id, associationName, operation, workflowName, associationCondition, isEnabled);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class WorkflowAssociationSummary {\n");
+        sb.append("class WorkflowAssociationResponse {\n");
         
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    associationName: ").append(toIndentedString(associationName)).append("\n");
+        sb.append("    operation: ").append(toIndentedString(operation)).append("\n");
         sb.append("    workflowName: ").append(toIndentedString(workflowName)).append("\n");
+        sb.append("    associationCondition: ").append(toIndentedString(associationCondition)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
         sb.append("}");
         return sb.toString();
-    }
-
-    public Operation getOperation() {
-        return operation;
-    }
-
-    public void setOperation(Operation operation) {
-        this.operation = operation;
-    }
-
-    public String getAssociationCondition() {
-        return associationCondition;
-    }
-
-    public void setAssociationCondition(String associationCondition) {
-        this.associationCondition = associationCondition;
     }
 
     /**

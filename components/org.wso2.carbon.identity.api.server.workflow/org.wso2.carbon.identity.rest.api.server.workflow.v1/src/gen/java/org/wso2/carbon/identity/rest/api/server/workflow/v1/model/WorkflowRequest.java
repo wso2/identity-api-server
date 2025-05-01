@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -31,19 +31,17 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class WorkflowCreation  {
+public class WorkflowRequest  {
   
     private String name;
     private String description;
     private String engine;
     private WorkflowTemplate template;
-    private String approvalTask;
-    private String approvalTaskDescription;
 
     /**
     * Name of the created workflow
     **/
-    public WorkflowCreation name(String name) {
+    public WorkflowRequest name(String name) {
 
         this.name = name;
         return this;
@@ -64,7 +62,7 @@ public class WorkflowCreation  {
     /**
     * Description of the created workflow
     **/
-    public WorkflowCreation description(String description) {
+    public WorkflowRequest description(String description) {
 
         this.description = description;
         return this;
@@ -83,7 +81,7 @@ public class WorkflowCreation  {
     /**
     * Name of the selected workflow engine
     **/
-    public WorkflowCreation engine(String engine) {
+    public WorkflowRequest engine(String engine) {
 
         this.engine = engine;
         return this;
@@ -103,7 +101,7 @@ public class WorkflowCreation  {
 
     /**
     **/
-    public WorkflowCreation template(WorkflowTemplate template) {
+    public WorkflowRequest template(WorkflowTemplate template) {
 
         this.template = template;
         return this;
@@ -119,46 +117,6 @@ public class WorkflowCreation  {
         this.template = template;
     }
 
-    /**
-    * Approval task subject to display
-    **/
-    public WorkflowCreation approvalTask(String approvalTask) {
-
-        this.approvalTask = approvalTask;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "Approval Required", required = true, value = "Approval task subject to display")
-    @JsonProperty("approvalTask")
-    @Valid
-    @NotNull(message = "Property approvalTask cannot be null.")
-
-    public String getApprovalTask() {
-        return approvalTask;
-    }
-    public void setApprovalTask(String approvalTask) {
-        this.approvalTask = approvalTask;
-    }
-
-    /**
-    * Description of the approval task
-    **/
-    public WorkflowCreation approvalTaskDescription(String approvalTaskDescription) {
-
-        this.approvalTaskDescription = approvalTaskDescription;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "Your approval is needed to complete this task", value = "Description of the approval task")
-    @JsonProperty("approvalTaskDescription")
-    @Valid
-    public String getApprovalTaskDescription() {
-        return approvalTaskDescription;
-    }
-    public void setApprovalTaskDescription(String approvalTaskDescription) {
-        this.approvalTaskDescription = approvalTaskDescription;
-    }
-
 
 
     @Override
@@ -170,32 +128,28 @@ public class WorkflowCreation  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        WorkflowCreation workflowCreation = (WorkflowCreation) o;
-        return Objects.equals(this.name, workflowCreation.name) &&
-            Objects.equals(this.description, workflowCreation.description) &&
-            Objects.equals(this.engine, workflowCreation.engine) &&
-            Objects.equals(this.template, workflowCreation.template) &&
-            Objects.equals(this.approvalTask, workflowCreation.approvalTask) &&
-            Objects.equals(this.approvalTaskDescription, workflowCreation.approvalTaskDescription);
+        WorkflowRequest workflowRequest = (WorkflowRequest) o;
+        return Objects.equals(this.name, workflowRequest.name) &&
+            Objects.equals(this.description, workflowRequest.description) &&
+            Objects.equals(this.engine, workflowRequest.engine) &&
+            Objects.equals(this.template, workflowRequest.template);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, engine, template, approvalTask, approvalTaskDescription);
+        return Objects.hash(name, description, engine, template);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class WorkflowCreation {\n");
+        sb.append("class WorkflowRequest {\n");
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    engine: ").append(toIndentedString(engine)).append("\n");
         sb.append("    template: ").append(toIndentedString(template)).append("\n");
-        sb.append("    approvalTask: ").append(toIndentedString(approvalTask)).append("\n");
-        sb.append("    approvalTaskDescription: ").append(toIndentedString(approvalTaskDescription)).append("\n");
         sb.append("}");
         return sb.toString();
     }

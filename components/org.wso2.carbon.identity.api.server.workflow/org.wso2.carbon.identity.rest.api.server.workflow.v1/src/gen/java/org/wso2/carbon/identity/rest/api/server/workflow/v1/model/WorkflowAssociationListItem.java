@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -31,18 +31,37 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class WorkflowAssociationPatch  {
+public class WorkflowAssociationListItem  {
   
+    private String id;
     private String associationName;
     private Operation operation;
-    private String workflowId;
-    private String associationCondition;
+    private String workflowName;
     private Boolean isEnabled;
+
+    /**
+    * Unique id to represent a workflow association
+    **/
+    public WorkflowAssociationListItem id(String id) {
+
+        this.id = id;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "500", value = "Unique id to represent a workflow association")
+    @JsonProperty("id")
+    @Valid
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
+    }
 
     /**
     * Name of the workflow association
     **/
-    public WorkflowAssociationPatch associationName(String associationName) {
+    public WorkflowAssociationListItem associationName(String associationName) {
 
         this.associationName = associationName;
         return this;
@@ -60,7 +79,7 @@ public class WorkflowAssociationPatch  {
 
     /**
     **/
-    public WorkflowAssociationPatch operation(Operation operation) {
+    public WorkflowAssociationListItem operation(Operation operation) {
 
         this.operation = operation;
         return this;
@@ -77,47 +96,28 @@ public class WorkflowAssociationPatch  {
     }
 
     /**
-    * Id of the assigned workflow
+    * Assigned Workflow
     **/
-    public WorkflowAssociationPatch workflowId(String workflowId) {
+    public WorkflowAssociationListItem workflowName(String workflowName) {
 
-        this.workflowId = workflowId;
+        this.workflowName = workflowName;
         return this;
     }
     
-    @ApiModelProperty(example = "100", value = "Id of the assigned workflow")
-    @JsonProperty("workflowId")
+    @ApiModelProperty(example = "User Approval Workflow", value = "Assigned Workflow")
+    @JsonProperty("workflowName")
     @Valid
-    public String getWorkflowId() {
-        return workflowId;
+    public String getWorkflowName() {
+        return workflowName;
     }
-    public void setWorkflowId(String workflowId) {
-        this.workflowId = workflowId;
-    }
-
-    /**
-    * Condition added to the association
-    **/
-    public WorkflowAssociationPatch associationCondition(String associationCondition) {
-
-        this.associationCondition = associationCondition;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "//_*[local-name()='parameter'][@name='Rolename']/_*[local-name()='value']/_*[local-name()='itemValue']/text()='Employee'", value = "Condition added to the association")
-    @JsonProperty("associationCondition")
-    @Valid
-    public String getAssociationCondition() {
-        return associationCondition;
-    }
-    public void setAssociationCondition(String associationCondition) {
-        this.associationCondition = associationCondition;
+    public void setWorkflowName(String workflowName) {
+        this.workflowName = workflowName;
     }
 
     /**
     * Association Status
     **/
-    public WorkflowAssociationPatch isEnabled(Boolean isEnabled) {
+    public WorkflowAssociationListItem isEnabled(Boolean isEnabled) {
 
         this.isEnabled = isEnabled;
         return this;
@@ -144,29 +144,29 @@ public class WorkflowAssociationPatch  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        WorkflowAssociationPatch workflowAssociationPatch = (WorkflowAssociationPatch) o;
-        return Objects.equals(this.associationName, workflowAssociationPatch.associationName) &&
-            Objects.equals(this.operation, workflowAssociationPatch.operation) &&
-            Objects.equals(this.workflowId, workflowAssociationPatch.workflowId) &&
-            Objects.equals(this.associationCondition, workflowAssociationPatch.associationCondition) &&
-            Objects.equals(this.isEnabled, workflowAssociationPatch.isEnabled);
+        WorkflowAssociationListItem workflowAssociationListItem = (WorkflowAssociationListItem) o;
+        return Objects.equals(this.id, workflowAssociationListItem.id) &&
+            Objects.equals(this.associationName, workflowAssociationListItem.associationName) &&
+            Objects.equals(this.operation, workflowAssociationListItem.operation) &&
+            Objects.equals(this.workflowName, workflowAssociationListItem.workflowName) &&
+            Objects.equals(this.isEnabled, workflowAssociationListItem.isEnabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(associationName, operation, workflowId, associationCondition, isEnabled);
+        return Objects.hash(id, associationName, operation, workflowName, isEnabled);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class WorkflowAssociationPatch {\n");
+        sb.append("class WorkflowAssociationListItem {\n");
         
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    associationName: ").append(toIndentedString(associationName)).append("\n");
         sb.append("    operation: ").append(toIndentedString(operation)).append("\n");
-        sb.append("    workflowId: ").append(toIndentedString(workflowId)).append("\n");
-        sb.append("    associationCondition: ").append(toIndentedString(associationCondition)).append("\n");
+        sb.append("    workflowName: ").append(toIndentedString(workflowName)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
         sb.append("}");
         return sb.toString();
