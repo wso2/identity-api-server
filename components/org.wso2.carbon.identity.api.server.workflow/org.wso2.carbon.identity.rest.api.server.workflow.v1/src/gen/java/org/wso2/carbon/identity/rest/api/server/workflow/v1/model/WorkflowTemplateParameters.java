@@ -65,7 +65,7 @@ public class WorkflowTemplateParameters  {
         return this;
     }
     
-    @ApiModelProperty(example = "[{\"entity\":\"roles\",\"values\":[\"admin\",\"manager\"]},{\"entity\":\"users\",\"values\":[\"John\",\"Tom\"]}]", value = "")
+    @ApiModelProperty(example = "[{\"entity\":\"roles\",\"values\":[\"301\",\"302\"]},{\"entity\":\"users\",\"values\":[\"501\",\"502\"]}]", value = "")
     @JsonProperty("options")
     @Valid @Size(min=1)
     public List<OptionDetails> getOptions() {
