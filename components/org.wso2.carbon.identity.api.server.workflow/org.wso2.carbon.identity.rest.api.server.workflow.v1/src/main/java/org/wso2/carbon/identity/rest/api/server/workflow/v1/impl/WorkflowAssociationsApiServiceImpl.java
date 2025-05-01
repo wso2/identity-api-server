@@ -38,9 +38,9 @@ public class WorkflowAssociationsApiServiceImpl implements WorkflowAssociationsA
     }
 
     @Override
-    public Response createWorkflowAssociation(WorkflowAssociationCreation workflowAssociationCreation) {
+    public Response addWorkflowAssociation(WorkflowAssociationRequest workflowAssociationRequest) {
 
-        return Response.ok().entity(workflowService.addAssociation(workflowAssociationCreation)).build();
+        return Response.ok().entity(workflowService.addAssociation(workflowAssociationRequest)).build();
     }
 
     @Override
@@ -57,14 +57,14 @@ public class WorkflowAssociationsApiServiceImpl implements WorkflowAssociationsA
     }
 
     @Override
-    public Response listWorkflowAssociations(Integer limit, Integer offset, String filter) {
+    public Response getWorkflowAssociations(Integer limit, Integer offset, String filter) {
 
         return Response.ok().entity(workflowService.listPaginatedAssociations(limit, offset, filter)).build();
     }
 
     @Override
-    public Response updateAssociation(String associationId, WorkflowAssociationPatch workflowAssociation) {
+    public Response updateAssociation(String associationId, WorkflowAssociationPatchRequest workflowAssociationPatchRequest) {
 
-        return Response.ok().entity(workflowService.updateAssociation(associationId, workflowAssociation)).build();
+        return Response.ok().entity(workflowService.updateAssociation(associationId, workflowAssociationPatchRequest)).build();
     }
 }

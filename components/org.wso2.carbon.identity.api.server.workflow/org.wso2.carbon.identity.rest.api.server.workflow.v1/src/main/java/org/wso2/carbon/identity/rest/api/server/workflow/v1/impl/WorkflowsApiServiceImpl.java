@@ -22,7 +22,6 @@ import org.wso2.carbon.identity.rest.api.server.workflow.v1.*;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.core.WorkflowService;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.factories.WorkflowServiceFactory;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.*;
-import java.util.List;
 
 import javax.ws.rs.core.Response;
 
@@ -39,9 +38,9 @@ public class WorkflowsApiServiceImpl implements WorkflowsApiService {
     }
 
     @Override
-    public Response createWorkflow(WorkflowCreation workflowCreation) {
+    public Response addWorkflow(WorkflowRequest workflowRequest) {
 
-        return Response.ok().entity(workflowService.addWorkflow(workflowCreation)).build();
+        return Response.ok().entity(workflowService.addWorkflow(workflowRequest)).build();
     }
 
     @Override
@@ -58,14 +57,14 @@ public class WorkflowsApiServiceImpl implements WorkflowsApiService {
     }
 
     @Override
-    public Response listWorkflows(Integer limit, Integer offset, String filter) {
+    public Response getWorkflows(Integer limit, Integer offset, String filter) {
 
         return Response.ok().entity(workflowService.listPaginatedWorkflows(limit, offset, filter)).build();
     }
 
     @Override
-    public Response updateWorkflow(String workflowId, WorkflowCreation workflow) {
+    public Response updateWorkflow(String workflowId, WorkflowRequest workflowRequest) {
 
-        return Response.ok().entity(workflowService.updateWorkflow(workflow, workflowId)).build();
+        return Response.ok().entity(workflowService.updateWorkflow(workflowRequest, workflowId)).build();
     }
 }

@@ -18,19 +18,19 @@
 
 package org.wso2.carbon.identity.rest.api.server.workflow.v1;
 
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowCreation;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowRequest;
 import javax.ws.rs.core.Response;
 
 
 public interface WorkflowsApiService {
 
-      public Response createWorkflow(WorkflowCreation workflowCreation);
+      public Response addWorkflow(WorkflowRequest workflowRequest);
 
       public Response deleteWorkflowById(String workflowId);
 
       public Response getWorkflowById(String workflowId);
 
-      public Response listWorkflows(Integer limit, Integer offset, String filter);
+      public Response getWorkflows(Integer limit, Integer offset, String filter);
 
-      public Response updateWorkflow(String workflowId, WorkflowCreation workflowCreation);
+      public Response updateWorkflow(String workflowId, WorkflowRequest workflowRequest);
 }

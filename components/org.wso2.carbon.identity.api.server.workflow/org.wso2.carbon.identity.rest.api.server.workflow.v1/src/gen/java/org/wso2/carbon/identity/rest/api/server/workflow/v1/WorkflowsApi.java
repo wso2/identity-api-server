@@ -20,19 +20,17 @@ package org.wso2.carbon.identity.rest.api.server.workflow.v1;
 
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.factories.WorkflowsApiServiceFactory;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Error;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowCreation;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowDetails;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowSummary;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowListResponse;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowRequest;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowResponse;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
 
-import javax.validation.constraints.*;
-
 @Path("/workflows")
-@Api(description = "The workflows API")
+@Api
 
 public class WorkflowsApi  {
 
@@ -47,23 +45,23 @@ public class WorkflowsApi  {
     
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Create a new workflow.", notes = "Create a new workflow using the specified workflow template and execution engine.  <b>Scope required:</b>     * internal_workflow_create ", response = WorkflowDetails.class, authorizations = {
+    @ApiOperation(value = "Add a new workflow.", notes = "Create a new workflow using the specified workflow template and execution engine.  <b>Scope required:</b>     * internal_workflow_create ", response = WorkflowResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={  })
     @ApiResponses(value = { 
-        @ApiResponse(code = 201, message = "Item Created", response = WorkflowDetails.class),
+        @ApiResponse(code = 201, message = "Successful response", response = WorkflowResponse.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 409, message = "Item Already Exists", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response createWorkflow(@ApiParam(value = "Contains the details of the newly created." ,required=true) @Valid WorkflowCreation workflowCreation) {
+    public Response addWorkflow(@ApiParam(value = "This represents the workflow to be created." ,required=true) @Valid WorkflowRequest workflowRequest) {
 
-        return delegate.createWorkflow(workflowCreation );
+        return delegate.addWorkflow(workflowRequest );
     }
 
     @Valid
@@ -95,14 +93,14 @@ public class WorkflowsApi  {
     @Path("/{workflow-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve the workflow by workflow id.", notes = "Retrieve information about a specific workflow identified by the workflow id.  <b>Scope required:</b>     * internal_workflow_view ", response = WorkflowDetails.class, authorizations = {
+    @ApiOperation(value = "Retrieve the workflow by workflow id.", notes = "Retrieve information about a specific workflow identified by the workflow id.  <b>Scope required:</b>     * internal_workflow_view ", response = WorkflowResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={  })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Information about the workflow identified by the workflow-id.", response = WorkflowDetails.class),
+        @ApiResponse(code = 200, message = "Successful response", response = WorkflowResponse.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
@@ -119,23 +117,23 @@ public class WorkflowsApi  {
     
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve all the available workflows.", notes = "Retrieve all the available workflows in the system.  <b>Scope required:</b>     * internal_workflow_view ", response = WorkflowSummary.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Retrieve all the available workflows.", notes = "Retrieve all the available workflows in the system.  <b>Scope required:</b>     * internal_workflow_view ", response = WorkflowListResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={  })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Array of workflows", response = WorkflowSummary.class, responseContainer = "List"),
+        @ApiResponse(code = 200, message = "Successful response", response = WorkflowListResponse.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response listWorkflows(    @Valid @ApiParam(value = "Maximum number of records to return")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Records, filtered by their name")  @QueryParam("filter") String filter) {
+    public Response getWorkflows(    @Valid@ApiParam(value = "Maximum number of records to return")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Number of records to skip for pagination")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Records, filtered by their name")  @QueryParam("filter") String filter) {
 
-        return delegate.listWorkflows(limit,  offset,  filter );
+        return delegate.getWorkflows(limit,  offset,  filter );
     }
 
     @Valid
@@ -143,23 +141,23 @@ public class WorkflowsApi  {
     @Path("/{workflow-id}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update an existing workflow.", notes = "Update a workflow identified by workflow-id.  <b>Scope required:</b>             * internal_workflow_update ", response = WorkflowDetails.class, authorizations = {
+    @ApiOperation(value = "Update an existing workflow.", notes = "Update a workflow identified by workflow-id.  <b>Scope required:</b>             * internal_workflow_update ", response = WorkflowResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={  })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Information about the workflow identified by the workflow-id.", response = WorkflowDetails.class),
+        @ApiResponse(code = 200, message = "Successful response", response = WorkflowResponse.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response updateWorkflow(@ApiParam(value = "Workflow ID",required=true) @PathParam("workflow-id") String workflowId, @ApiParam(value = "Contains the details of the updated workflow." ) @Valid WorkflowCreation workflowCreation) {
+    public Response updateWorkflow(@ApiParam(value = "Workflow ID",required=true) @PathParam("workflow-id") String workflowId, @ApiParam(value = "Contains the details of the updated workflow." ) @Valid WorkflowRequest workflowRequest) {
 
-        return delegate.updateWorkflow(workflowId,  workflowCreation );
+        return delegate.updateWorkflow(workflowId,  workflowRequest );
     }
 
 }
