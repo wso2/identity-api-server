@@ -780,6 +780,12 @@
                 <artifactId>org.wso2.carbon.identity.api.server.registration.execution.common</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.webhook.metadata.common</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -967,6 +973,7 @@
         <module>components/org.wso2.carbon.identity.api.server.rule.metadata</module>
         <module>components/org.wso2.carbon.identity.api.server.registration.management</module>
         <module>components/org.wso2.carbon.identity.api.server.registration.execution</module>
+        <module>components/org.wso2.carbon.identity.api.server.webhook.metadata</module>
     </modules>
 
 </project>

@@ -1,0 +1,158 @@
+openapi: 3.0.0
+info:
+  version: v1
+  title: WSO2 Identity Server - Webhook Event Metadata Rest API
+  description: >
+    The Webhook Event Metadata REST API provides a standardized interface to retrieve
+    supported event schemas and the associated events within WSO2 Identity Server. This API
+    enables clients to dynamically fetch available events for webhook subscription based on the
+    selected event schema, improving flexibility and schema-awareness in integrations.
+servers:
+  - url: "https://{server-url}/t/{tenant-domain}/api/server/v1"
+    variables:
+      server-url:
+        default: "localhost:9443"
+      tenant-domain:
+        default: carbon.super
+
+security:
+  - BasicAuth: []
+  - OAuth2: []
+
+paths:
+  /webhooks/metadata:
+    get:
+      summary: List Event Schemas
+      description: "This API returns the list of event schemas supported by WSO2 Identity Server.\n\n <b>Scope(Permission) required:</b> `internal_webhook_metadata_view` \n\n"
+      operationId: getEventSchemas
+      tags:
+        - Webhooks
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookMetadata'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        x-codeSamples:
+          - lang: Curl
+            source: |
+              curl --location 'https://localhost:9443/t/carbon.super/api/server/v1/webhooks/event-schemas' -H 'Authorization: Basic YWRtaW46YWRtaW4='
+
+  /webhooks/metadata/event-schemas/{schemaName}/events:
+    get:
+      summary: List Events of Schema
+      description: "This API returns the list of events under the given event schema.\n\n <b>Scope(Permission) required:</b> `internal_webhook_metadata_view` \n\n"
+      operationId: getEventsBySchema
+      tags:
+        - Webhooks
+      parameters:
+        - name: schemaName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventMetadata'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Schema not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        x-codeSamples:
+          - lang: Curl
+            source: |
+              curl --location 'https://localhost:9443/t/carbon.super/api/server/v1/webhooks/event-schemas/WSO2/events' -H 'Authorization: Basic YWRtaW46YWRtaW4='
+
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://localhost:9443/oauth2/authorize'
+          tokenUrl: 'https://localhost:9443/oauth2/token'
+          scopes:
+            internal_webhook_view: View webhook metadata
+
+  schemas:
+    EventSchema:
+      type: object
+      properties:
+        name:
+          type: string
+          example: WSO2
+        uri:
+          type: string
+          example: https://schemas.identity.wso2.org/events
+
+    EventMetadata:
+      type: object
+      properties:
+        id:
+          type: string
+          example: schemas.identity.wso2.org/events/logins/event-type/loginSuccess
+        name:
+          type: string
+          example: Login Success
+        description:
+          type: string
+          example: Triggered when a user successfully logs in.
+
+    WebhookMetadata:
+      type: object
+      properties:
+        EventSchema:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventSchema'
+          description: List of events schemas.
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          example: WEBHOOK-META-00001
+        message:
+          type: string
+          example: Some error message.
+        description:
+          type: string
+          example: Some error description.
+        traceId:
+          type: string
+          example: e0fbcfeb-3617-43c4-8dd0-7b7d38e13047
