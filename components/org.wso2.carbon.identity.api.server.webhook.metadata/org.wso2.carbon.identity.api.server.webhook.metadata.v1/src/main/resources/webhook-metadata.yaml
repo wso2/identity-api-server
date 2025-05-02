@@ -1,9 +1,9 @@
 openapi: 3.0.0
 info:
   version: v1
-  title: WSO2 Identity Server - Webhook Event Metadata Rest API
+  title: WSO2 Identity Server - Webhook Metadata Rest API
   description: >
-    The Webhook Event Metadata REST API provides a standardized interface to retrieve
+    The Webhook Metadata REST API provides a standardized interface to retrieve
     supported event schemas and the associated events within WSO2 Identity Server. This API
     enables clients to dynamically fetch available events for webhook subscription based on the
     selected event schema, improving flexibility and schema-awareness in integrations.
@@ -135,7 +135,7 @@ components:
     WebhookMetadata:
       type: object
       properties:
-        EventSchema:
+        eventSchemas:
           type: array
           items:
             $ref: '#/components/schemas/EventSchema'
