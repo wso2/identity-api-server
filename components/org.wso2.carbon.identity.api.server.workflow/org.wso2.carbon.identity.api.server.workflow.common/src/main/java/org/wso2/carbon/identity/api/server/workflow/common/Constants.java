@@ -27,8 +27,8 @@ public class Constants {
     public static final String APPROVAL_STEPS = "ApprovalSteps";
     public static final String APPROVAL_STEP = "Step-";
     public static final String TEMPLATE = "Template";
-    public static final String APPROVAL_TASK_SUBJECT = "ApprovalTaskSubject";
-    public static final String APPROVAL_TASK_DESCRIPTION = "ApprovalTaskDescription";
+    public static final String STEP_NAME_DELIMITER = "-";
+    public static final String PARAMETER_VALUE_SEPARATOR = ",";
     public static final String WORKFLOW_IMPLEMENTATION = "Workflowimpl";
     public static final String WORKFLOW_NAME = "WorkflowName";
 
