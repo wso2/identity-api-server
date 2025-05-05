@@ -31,6 +31,7 @@ public class Constants {
     public static final String PARAMETER_VALUE_SEPARATOR = ",";
     public static final String WORKFLOW_IMPLEMENTATION = "Workflowimpl";
     public static final String WORKFLOW_NAME = "WorkflowName";
+    public static final String DEFAULT_ASSOCIATION_CONDITION = "boolean(1)";
 
     private Constants() {
 

@@ -330,7 +330,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/WorkflowAssociationRequest'
+                $ref: '#/components/schemas/WorkflowAssociationResponse'
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -371,7 +371,6 @@ paths:
                 associationName: User Registration Workflow Association
                 operation: ADD_USER
                 workflowName: User Approval Workflow
-                associationCondition: //*[local-name()='parameter'][@name='Username']/*[local-name()='value']/*[local-name()='itemValue']/text()='John'
                 isEnabled: true
         '400':
           $ref: '#/components/responses/InvalidInput'
@@ -427,7 +426,6 @@ paths:
               associationName: User Registration Workflow Association
               operation: ADD_USER
               workflowId: "100"
-              associationCondition: //*[local-name()='parameter'][@name='Rolename']/*[local-name()='value']/*[local-name()='itemValue']/text()='Employee'
               isEnabled: true
       responses:
         '200':
@@ -441,7 +439,6 @@ paths:
                 associationName: User Registration Workflow Association
                 operation: ADD_USER
                 workflowName: User Approval Workflow
-                associationCondition: //*[local-name()='parameter'][@name='Username']/*[local-name()='value']/*[local-name()='itemValue']/text()='John'
                 isEnabled: true
         '400':
           description: Bad Request
@@ -722,10 +719,6 @@ components:
           type: string
           example: "User Approval Workflow"
           description: "Assigned Workflow"
-        associationCondition:
-          type: string
-          example: "//*[local-name()='parameter'][@name='Rolename']/*[local-name()='value']/*[local-name()='itemValue']/text()='Employee'"
-          description: "Condition added to the association"
         isEnabled:
           type: boolean
           example: true
@@ -748,10 +741,6 @@ components:
           type: string
           example: "100"
           description: "Id of the assigned workflow"
-        associationCondition:
-          type: string
-          example: "//*[local-name()='parameter'][@name='Rolename']/*[local-name()='value']/*[local-name()='itemValue']/text()='Employee'"
-          description: "Condition added to the association"
         isEnabled:
           type: boolean
           example: true
@@ -771,10 +760,6 @@ components:
           type: string
           example: "100"
           description: "Id of the assigned workflow"
-        associationCondition:
-          type: string
-          example: "//*[local-name()='parameter'][@name='Rolename']/*[local-name()='value']/*[local-name()='itemValue']/text()='Employee'"
-          description: "Condition added to the association"
         isEnabled:
           type: boolean
           example: true

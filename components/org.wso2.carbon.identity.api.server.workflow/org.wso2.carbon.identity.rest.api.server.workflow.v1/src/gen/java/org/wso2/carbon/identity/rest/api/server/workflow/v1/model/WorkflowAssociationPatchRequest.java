@@ -36,7 +36,6 @@ public class WorkflowAssociationPatchRequest  {
     private String associationName;
     private Operation operation;
     private String workflowId;
-    private String associationCondition;
     private Boolean isEnabled;
 
     /**
@@ -96,25 +95,6 @@ public class WorkflowAssociationPatchRequest  {
     }
 
     /**
-    * Condition added to the association
-    **/
-    public WorkflowAssociationPatchRequest associationCondition(String associationCondition) {
-
-        this.associationCondition = associationCondition;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "//_*[local-name()='parameter'][@name='Rolename']/_*[local-name()='value']/_*[local-name()='itemValue']/text()='Employee'", value = "Condition added to the association")
-    @JsonProperty("associationCondition")
-    @Valid
-    public String getAssociationCondition() {
-        return associationCondition;
-    }
-    public void setAssociationCondition(String associationCondition) {
-        this.associationCondition = associationCondition;
-    }
-
-    /**
     * Association Status
     **/
     public WorkflowAssociationPatchRequest isEnabled(Boolean isEnabled) {
@@ -148,13 +128,12 @@ public class WorkflowAssociationPatchRequest  {
         return Objects.equals(this.associationName, workflowAssociationPatchRequest.associationName) &&
             Objects.equals(this.operation, workflowAssociationPatchRequest.operation) &&
             Objects.equals(this.workflowId, workflowAssociationPatchRequest.workflowId) &&
-            Objects.equals(this.associationCondition, workflowAssociationPatchRequest.associationCondition) &&
             Objects.equals(this.isEnabled, workflowAssociationPatchRequest.isEnabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(associationName, operation, workflowId, associationCondition, isEnabled);
+        return Objects.hash(associationName, operation, workflowId, isEnabled);
     }
 
     @Override
@@ -166,7 +145,6 @@ public class WorkflowAssociationPatchRequest  {
         sb.append("    associationName: ").append(toIndentedString(associationName)).append("\n");
         sb.append("    operation: ").append(toIndentedString(operation)).append("\n");
         sb.append("    workflowId: ").append(toIndentedString(workflowId)).append("\n");
-        sb.append("    associationCondition: ").append(toIndentedString(associationCondition)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
         sb.append("}");
         return sb.toString();

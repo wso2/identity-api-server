@@ -48,7 +48,7 @@ public class WorkflowAssociationListResponse  {
         this.totalResults = totalResults;
         return this;
     }
-
+    
     @ApiModelProperty(example = "10", value = "")
     @JsonProperty("totalResults")
     @Valid
@@ -66,7 +66,7 @@ public class WorkflowAssociationListResponse  {
         this.startIndex = startIndex;
         return this;
     }
-
+    
     @ApiModelProperty(example = "1", value = "")
     @JsonProperty("startIndex")
     @Valid
@@ -84,7 +84,7 @@ public class WorkflowAssociationListResponse  {
         this.count = count;
         return this;
     }
-
+    
     @ApiModelProperty(example = "10", value = "")
     @JsonProperty("count")
     @Valid
@@ -102,7 +102,7 @@ public class WorkflowAssociationListResponse  {
         this.workflowAssociations = workflowAssociations;
         return this;
     }
-
+    
     @ApiModelProperty(value = "")
     @JsonProperty("workflowAssociations")
     @Valid
@@ -113,7 +113,7 @@ public class WorkflowAssociationListResponse  {
         this.workflowAssociations = workflowAssociations;
     }
 
-    public WorkflowAssociationListResponse addWorkflowsItem(WorkflowAssociationListItem workflowAssociationsItem) {
+    public WorkflowAssociationListResponse addWorkflowAssociationsItem(WorkflowAssociationListItem workflowAssociationsItem) {
         if (this.workflowAssociations == null) {
             this.workflowAssociations = new ArrayList<>();
         }
@@ -121,7 +121,7 @@ public class WorkflowAssociationListResponse  {
         return this;
     }
 
-
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -149,7 +149,7 @@ public class WorkflowAssociationListResponse  {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class WorkflowAssociationListResponse {\n");
-
+        
         sb.append("    totalResults: ").append(toIndentedString(totalResults)).append("\n");
         sb.append("    startIndex: ").append(toIndentedString(startIndex)).append("\n");
         sb.append("    count: ").append(toIndentedString(count)).append("\n");

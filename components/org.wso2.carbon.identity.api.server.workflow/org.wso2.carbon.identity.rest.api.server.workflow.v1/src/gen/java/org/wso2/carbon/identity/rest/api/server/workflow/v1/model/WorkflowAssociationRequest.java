@@ -36,7 +36,6 @@ public class WorkflowAssociationRequest  {
     private String associationName;
     private Operation operation;
     private String workflowId;
-    private String associationCondition;
     private Boolean isEnabled = true;
 
     /**
@@ -102,25 +101,6 @@ public class WorkflowAssociationRequest  {
     }
 
     /**
-    * Condition added to the association
-    **/
-    public WorkflowAssociationRequest associationCondition(String associationCondition) {
-
-        this.associationCondition = associationCondition;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "//_*[local-name()='parameter'][@name='Rolename']/_*[local-name()='value']/_*[local-name()='itemValue']/text()='Employee'", value = "Condition added to the association")
-    @JsonProperty("associationCondition")
-    @Valid
-    public String getAssociationCondition() {
-        return associationCondition;
-    }
-    public void setAssociationCondition(String associationCondition) {
-        this.associationCondition = associationCondition;
-    }
-
-    /**
     * Association Status
     **/
     public WorkflowAssociationRequest isEnabled(Boolean isEnabled) {
@@ -154,13 +134,12 @@ public class WorkflowAssociationRequest  {
         return Objects.equals(this.associationName, workflowAssociationRequest.associationName) &&
             Objects.equals(this.operation, workflowAssociationRequest.operation) &&
             Objects.equals(this.workflowId, workflowAssociationRequest.workflowId) &&
-            Objects.equals(this.associationCondition, workflowAssociationRequest.associationCondition) &&
             Objects.equals(this.isEnabled, workflowAssociationRequest.isEnabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(associationName, operation, workflowId, associationCondition, isEnabled);
+        return Objects.hash(associationName, operation, workflowId, isEnabled);
     }
 
     @Override
@@ -172,7 +151,6 @@ public class WorkflowAssociationRequest  {
         sb.append("    associationName: ").append(toIndentedString(associationName)).append("\n");
         sb.append("    operation: ").append(toIndentedString(operation)).append("\n");
         sb.append("    workflowId: ").append(toIndentedString(workflowId)).append("\n");
-        sb.append("    associationCondition: ").append(toIndentedString(associationCondition)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
         sb.append("}");
         return sb.toString();
