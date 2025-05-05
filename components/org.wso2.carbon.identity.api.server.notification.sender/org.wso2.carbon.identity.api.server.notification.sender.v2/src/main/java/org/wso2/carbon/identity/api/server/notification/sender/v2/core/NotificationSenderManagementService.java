@@ -50,7 +50,6 @@ import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.BASIC;
-import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.CLIENT_ID;
 import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.CLIENT_SECRET;
 import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_CONFLICT_PUBLISHER;
 import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_NO_ACTIVE_PUBLISHERS_FOUND;
@@ -274,7 +273,7 @@ public class NotificationSenderManagementService {
     /**
      * Update push sender details by name.
      *
-     * @param senderName               Push sender's name.
+     * @param senderName              Push sender's name.
      * @param pushSenderUpdateRequest Push sender's updated configurations.
      * @return Updated push sender.
      */
