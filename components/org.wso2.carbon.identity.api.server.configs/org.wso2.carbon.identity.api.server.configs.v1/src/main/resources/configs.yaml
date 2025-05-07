@@ -546,6 +546,79 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /configs/fine-grained-api-authorization:
+    get:
+      tags:
+        - Fine-grained API authorization Configurations
+      summary: Retrieve the tenant fine-grained API authorization configuration.
+      operationId: getFineGrainedApiAuthorizationConfiguration
+      description: Retrieve the tenant fine-grained API authorization configuration.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FineGrainedApiAuthorizationConfiguration'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - Fine-grained API authorization Configurations
+      summary: Patch the tenant fine-grained API authorization configuration.
+      operationId: patchFineGrainedApiAuthorizationConfiguration
+      description: Patch the tenant fine-grained API authorization configuration.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FineGrainedApiAuthorizationConfiguration'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /configs/home-realm-identifiers:
     get:
       tags:
@@ -1428,6 +1501,13 @@ components:
           type: boolean
           description: If true, then email notification will sent to user when impersonation starts.
           example: true
+    FineGrainedApiAuthorizationConfiguration:
+      type: object
+      properties:
+        enableFineGrainedApiAuthorization:
+          type: boolean
+          description: "Enable fine-grained Api Authorization"
+          example: false
     CORSPatchRequest:
       type: array
       items:

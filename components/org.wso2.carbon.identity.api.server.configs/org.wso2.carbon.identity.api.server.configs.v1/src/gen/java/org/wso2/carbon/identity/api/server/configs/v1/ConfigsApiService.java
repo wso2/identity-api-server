@@ -53,6 +53,8 @@ public interface ConfigsApiService {
 
       public Response getConfigs();
 
+      public Response getFineGrainedApiAuthorizationConfiguration();
+
       public Response getHomeRealmIdentifiers();
 
       public Response getImpersonationConfiguration();
@@ -79,6 +81,8 @@ public interface ConfigsApiService {
       public Response patchCORSConfiguration(List<CORSPatch> coRSPatch);
 
       public Response patchConfigs(List<Patch> patch);
+
+      public Response patchFineGrainedApiAuthorizationConfiguration(FineGrainedApiAuthorizationConfiguration fineGrainedApiAuthorizationConfiguration);
 
       public Response patchImpersonationConfiguration(List<ImpersonationPatch> impersonationPatch);
 

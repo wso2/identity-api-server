@@ -22,6 +22,7 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
+import org.wso2.carbon.identity.oauth2.finegrainedauthz.services.FineGrainedAuthzConfigMgtService;
 import org.wso2.carbon.identity.oauth2.impersonation.services.ImpersonationConfigMgtService;
 import org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.core.JWTClientAuthenticatorMgtService;
 import org.wso2.carbon.idp.mgt.IdentityProviderManager;
@@ -69,6 +70,13 @@ public class ConfigsServiceHolder {
 
         static final DCRConfigurationMgtService SERVICE = (DCRConfigurationMgtService) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(DCRConfigurationMgtService.class, null);
+    }
+
+    private static class FineGrainedAuthzMgtServiceHolder {
+
+        static final FineGrainedAuthzConfigMgtService SERVICE = (FineGrainedAuthzConfigMgtService)
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().
+                        getOSGiService(FineGrainedAuthzConfigMgtService.class, null);
     }
 
     private static class JWTClientAuthenticatorMgtServiceHolder {
@@ -136,6 +144,11 @@ public class ConfigsServiceHolder {
     public static DCRConfigurationMgtService getDcrConfigurationMgtService() {
 
         return DCRConfigurationMgtServiceHolder.SERVICE;
+    }
+
+    public static FineGrainedAuthzConfigMgtService getFineGrainedAuthzConfigMgtService() {
+
+        return FineGrainedAuthzMgtServiceHolder.SERVICE;
     }
 
     /**

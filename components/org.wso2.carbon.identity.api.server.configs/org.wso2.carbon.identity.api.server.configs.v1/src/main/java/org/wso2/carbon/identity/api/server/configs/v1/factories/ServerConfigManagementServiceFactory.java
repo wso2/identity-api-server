@@ -5,6 +5,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.core.ServerConfigManagemen
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
+import org.wso2.carbon.identity.oauth2.finegrainedauthz.services.FineGrainedAuthzConfigMgtService;
 import org.wso2.carbon.identity.oauth2.impersonation.services.ImpersonationConfigMgtService;
 import org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.core.JWTClientAuthenticatorMgtService;
 import org.wso2.carbon.idp.mgt.IdentityProviderManager;
@@ -29,6 +30,8 @@ public class ServerConfigManagementServiceFactory {
                 .getImpersonationConfigMgtService();
         JWTClientAuthenticatorMgtService jwtClientAuthenticatorMgtService = ConfigsServiceHolder
                 .getJWTClientAuthenticatorMgtService();
+        FineGrainedAuthzConfigMgtService fineGrainedAuthzConfigMgtService = ConfigsServiceHolder
+                .getFineGrainedAuthzConfigMgtService();
         DCRConfigurationMgtService dcrConfigurationMgtService = ConfigsServiceHolder.getDcrConfigurationMgtService();
 
         if (applicationManagementService == null) {
@@ -59,10 +62,15 @@ public class ServerConfigManagementServiceFactory {
             throw new IllegalStateException("DCRConfigurationMgtService is not available from OSGi context.");
         }
 
+        if (fineGrainedAuthzConfigMgtService == null) {
+            throw new IllegalStateException("FineGrainedAuthzConfigMgtService is not available from OSGi context.");
+        }
+
         SERVICE = new ServerConfigManagementService(applicationManagementService, identityProviderManager,
                 corsManagementService,
                 remoteLoggingConfigService,
                 impersonationConfigMgtService,
+                fineGrainedAuthzConfigMgtService,
                 dcrConfigurationMgtService,
                 jwtClientAuthenticatorMgtService);
     }
