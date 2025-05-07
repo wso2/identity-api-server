@@ -25,7 +25,6 @@ import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.api.server.workflow.common.Constants;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
-import org.wso2.carbon.identity.api.server.workflow.common.WorkflowServiceHolder;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.*;
 import org.wso2.carbon.identity.workflow.mgt.WorkflowManagementService;
 import org.wso2.carbon.identity.workflow.mgt.bean.Parameter;
@@ -46,9 +45,9 @@ public class WorkflowService {
     private static final Log log = LogFactory.getLog(WorkflowService.class);
     private final WorkflowManagementService workflowManagementService;
 
-    public WorkflowService() {
+    public WorkflowService(WorkflowManagementService workflowManagementService) {
 
-        this.workflowManagementService = WorkflowServiceHolder.getWorkflowManagementService();
+        this.workflowManagementService = workflowManagementService;
     }
 
     /**
@@ -116,10 +115,6 @@ public class WorkflowService {
             Workflow currentWorkflow = workflowManagementService.getWorkflow(workflowId);
             List<Parameter> workflowParameters = workflowManagementService.getWorkflowParameters(workflowId);
 
-            if (currentWorkflow == null || workflowParameters == null) {
-                throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_WORKFLOW_NOT_FOUND,
-                        workflowId);
-            }
             return getWorkflowDetails(currentWorkflow, workflowParameters);
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_WORKFLOW_NOT_FOUND, workflowId, e);
@@ -254,11 +249,6 @@ public class WorkflowService {
 
         try {
             Association association = workflowManagementService.getAssociation(associationId);
-            if (association == null) {
-                throw handleException(Response.Status.NOT_FOUND,
-                        Constants.ErrorMessage.ERROR_CODE_ASSOCIATION_NOT_FOUND,
-                        associationId);
-            }
             return getAssociationDetails(association);
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_ASSOCIATION_NOT_FOUND, associationId, e);
@@ -539,18 +529,6 @@ public class WorkflowService {
             message = String.format(error.getDescription(), "");
         }
         return message;
-    }
-
-    /**
-     * Handle exceptions generated in API.
-     *
-     * @param status HTTP Status.
-     * @param error  Error Message information.
-     * @return APIError.
-     */
-    private APIError handleException(Response.Status status, Constants.ErrorMessage error, String data) {
-
-        return new APIError(status, getErrorBuilder(error, data).build());
     }
 
     private APIError handleServerError(Constants.ErrorMessage errorEnum, String data, Exception e) {
