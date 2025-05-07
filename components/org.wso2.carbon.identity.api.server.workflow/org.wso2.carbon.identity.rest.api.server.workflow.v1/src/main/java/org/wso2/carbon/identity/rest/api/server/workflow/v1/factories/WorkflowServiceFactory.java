@@ -30,8 +30,7 @@ public class WorkflowServiceFactory {
     private static final WorkflowService SERVICE;
 
     static {
-        WorkflowManagementService workflowManagementService = new WorkflowManagementServiceImpl();
-        SERVICE = new WorkflowService(workflowManagementService);
+        SERVICE = new WorkflowService();
     }
 
     /**

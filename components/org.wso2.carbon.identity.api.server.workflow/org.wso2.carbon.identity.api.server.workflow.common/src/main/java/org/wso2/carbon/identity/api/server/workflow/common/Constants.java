@@ -45,14 +45,14 @@ public class Constants {
         // Client errors starting from 510xx.
         ERROR_CODE_WORKFLOW_NOT_FOUND("51001", "Resource not found.",
                 "Unable to find a resource matching the provided workflow identifier %s."),
-        ERROR_CODE_ASSOCIATION_NOT_FOUND("51002", "Resource not found.",
-                "Unable to find a resource matching the provided workflow association identifier %s."),
+        ERROR_CODE_CLIENT_ERROR_LISTING_WORKFLOWS("51002", "Unable to list existing workflows",
+                "Encountered an error while listing the workflows."),
         ERROR_CODE_CLIENT_ERROR_ADDING_WORKFLOW("51003", "Unable to add workflow",
                 "Encountered an error while adding the workflow."),
         ERROR_CODE_CLIENT_ERROR_UPDATING_WORKFLOW("51004", "Unable to update workflow",
                 "Encountered an error while updating the workflow for identifier %s."),
-        ERROR_CODE_CLIENT_ERROR_LISTING_WORKFLOWS("51005", "Unable to list existing workflows",
-                "Encountered an error while listing the workflows."),
+        ERROR_CODE_ASSOCIATION_NOT_FOUND("51005", "Resource not found.",
+                "Unable to find a resource matching the provided workflow association identifier %s."),
         ERROR_CODE_CLIENT_ERROR_LISTING_ASSOCIATIONS("51006", "Unable to list existing workflow " +
                 "associations", "Encountered an error while listing the workflow associations."),
         ERROR_CODE_CLIENT_ERROR_ADDING_ASSOCIATION("51007", "Unable to add workflow association",
@@ -66,27 +66,27 @@ public class Constants {
         ERROR_CODE_ERROR_REMOVING_WORKFLOW("50021", "Unable to delete the workflow",
                                                    "Server encountered an error while deleting " +
                                                            "the workflow for the identifier %s."),
-        ERROR_CODE_ERROR_RETRIEVING_WORKFLOW("50023", "Unable to retrieve workflow.",
+        ERROR_CODE_ERROR_RETRIEVING_WORKFLOW("50022", "Unable to retrieve workflow.",
                                                      "Server encountered an error while " +
                                                              "retrieving the workflow for identifier %s."),
-        ERROR_CODE_ERROR_ADDING_WORKFLOW("50024", "Unable to add workflow",
+        ERROR_CODE_ERROR_ADDING_WORKFLOW("50023", "Unable to add workflow",
                                                  "Server encountered an error while adding the workflow."),
-        ERROR_CODE_ERROR_UPDATING_WORKFLOW("50025", "Unable to update workflow",
+        ERROR_CODE_ERROR_UPDATING_WORKFLOW("50024", "Unable to update workflow",
                                                    "Server encountered an error while updating the " +
                                                            "workflow for identifier %s."),
-        ERROR_CODE_ERROR_ADDING_ASSOCIATION("50026", "Unable to add workflow association",
+        ERROR_CODE_ERROR_ADDING_ASSOCIATION("50025", "Unable to add workflow association",
                                                     "Server encountered an error while adding " +
                                                             "the workflow association."),
-        ERROR_CODE_ERROR_LISTING_ASSOCIATIONS("50027", "Unable to list existing workflow associations",
+        ERROR_CODE_ERROR_LISTING_ASSOCIATIONS("50026", "Unable to list existing workflow associations",
                                                       "Server encountered an error while " +
                                                               "listing the workflow associations."),
-        ERROR_CODE_ERROR_REMOVING_ASSOCIATION("50028", "Unable to delete the workflow association",
+        ERROR_CODE_ERROR_REMOVING_ASSOCIATION("50027", "Unable to delete the workflow association",
                                                       "Server encountered an error while deleting " +
                                                               "the workflow association."),
-        ERROR_CODE_ERROR_RETRIEVING_ASSOCIATION("50029", "Unable to retrieve workflow association.",
+        ERROR_CODE_ERROR_RETRIEVING_ASSOCIATION("50028", "Unable to retrieve workflow association.",
                                                         "Server encountered an error while retrieving " +
                                                                 "the workflow association for identifier %s."),
-        ERROR_CODE_ERROR_UPDATING_ASSOCIATION("50030", "Unable to update workflow association",
+        ERROR_CODE_ERROR_UPDATING_ASSOCIATION("50029", "Unable to update workflow association",
                                                       "Server encountered an error while " +
                                                               "updating the workflow association.");
 

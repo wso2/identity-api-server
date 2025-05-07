@@ -25,6 +25,7 @@ import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.api.server.workflow.common.Constants;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.api.server.workflow.common.WorkflowServiceHolder;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.*;
 import org.wso2.carbon.identity.workflow.mgt.WorkflowManagementService;
 import org.wso2.carbon.identity.workflow.mgt.bean.Parameter;
@@ -45,9 +46,9 @@ public class WorkflowService {
     private static final Log log = LogFactory.getLog(WorkflowService.class);
     private final WorkflowManagementService workflowManagementService;
 
-    public WorkflowService(WorkflowManagementService workflowManagementService) {
+    public WorkflowService() {
 
-        this.workflowManagementService = workflowManagementService;
+        this.workflowManagementService = WorkflowServiceHolder.getWorkflowManagementService();
     }
 
     /**
@@ -176,6 +177,97 @@ public class WorkflowService {
     }
 
     /**
+     * Add new workflow association
+     *
+     * @param workflowAssociation Workflow association details
+     * @return Return WorkflowAssociationRequest
+     */
+    public WorkflowAssociationRequest addAssociation(WorkflowAssociationRequest workflowAssociation) {
+
+        try {
+            Workflow currentWorkflow = workflowManagementService.getWorkflow(workflowAssociation.getWorkflowId());
+            WorkflowEvent event = workflowManagementService.getEvent(workflowAssociation.getOperation().toString());
+
+            if (currentWorkflow == null) {
+                throw new WorkflowClientException("A workflow with ID: " +
+                        workflowAssociation.getWorkflowId() + "doesn't exist.");
+            }
+
+            if (event == null) {
+                throw new WorkflowClientException("An event with ID: " +
+                        workflowAssociation.getOperation().toString() + "doesn't exist.");
+            }
+
+            workflowManagementService.addAssociation(workflowAssociation.getAssociationName(),
+                    workflowAssociation.getWorkflowId(), workflowAssociation.getOperation().toString(),
+                    Constants.DEFAULT_ASSOCIATION_CONDITION);
+            return workflowAssociation;
+        } catch (WorkflowClientException e) {
+            throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_ADDING_ASSOCIATION, null, e);
+        } catch (WorkflowException e) {
+            throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_ASSOCIATION, null, e);
+        }
+    }
+
+    /**
+     * Partially update an association
+     *
+     * @param associationId       Association ID
+     * @param workflowAssociation Association Details
+     * @return WorkflowAssociationResponse
+     */
+    public WorkflowAssociationResponse updateAssociation(String associationId,
+                                                         WorkflowAssociationPatchRequest workflowAssociation) {
+
+        boolean isEnable;
+        String eventId;
+        try {
+            if (workflowAssociation.getIsEnabled() == null) {
+                isEnable = workflowManagementService.getAssociation(associationId).isEnabled();
+            } else {
+                isEnable = workflowAssociation.getIsEnabled();
+            }
+
+            if (workflowAssociation.getOperation() == null) {
+                eventId = null;
+            } else {
+                eventId = workflowAssociation.getOperation().toString();
+            }
+            workflowManagementService.updateAssociation(associationId, workflowAssociation.getAssociationName(),
+                    workflowAssociation.getWorkflowId(), eventId,
+                    Constants.DEFAULT_ASSOCIATION_CONDITION, isEnable);
+            return getAssociation(associationId);
+        } catch (WorkflowClientException e) {
+            throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_UPDATING_ASSOCIATION, associationId, e);
+        } catch (WorkflowException e) {
+            throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_ASSOCIATION, associationId, e);
+        }
+    }
+
+    /**
+     * Get an association by ID
+     *
+     * @param associationId Association ID
+     * @return WorkflowAssociationResponse
+     */
+    public WorkflowAssociationResponse getAssociation(String associationId) {
+
+        try {
+            Association association = workflowManagementService.getAssociation(associationId);
+            if (association == null) {
+                throw handleException(Response.Status.NOT_FOUND,
+                        Constants.ErrorMessage.ERROR_CODE_ASSOCIATION_NOT_FOUND,
+                        associationId);
+            }
+            return getAssociationDetails(association);
+        } catch (WorkflowClientException e) {
+            throw handleClientError(Constants.ErrorMessage.ERROR_CODE_ASSOCIATION_NOT_FOUND, associationId, e);
+        } catch (WorkflowException e) {
+            throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_ASSOCIATION, associationId, e);
+        }
+    }
+
+    /**
      * List paginated associations of a tenant.
      *
      * @param limit  Items per page
@@ -228,116 +320,6 @@ public class WorkflowService {
         }
     }
 
-    /**
-     * Add new workflow association
-     *
-     * @param workflowAssociation Workflow association details
-     * @return Return success message
-     */
-    public WorkflowAssociationRequest addAssociation(WorkflowAssociationRequest workflowAssociation) {
-
-        try {
-            Workflow currentWorkflow = workflowManagementService.getWorkflow(workflowAssociation.getWorkflowId());
-            WorkflowEvent event = workflowManagementService.getEvent(workflowAssociation.getOperation().toString());
-
-            if (currentWorkflow == null) {
-                throw new WorkflowClientException("A workflow with ID: " +
-                        workflowAssociation.getWorkflowId() + "doesn't exist.");
-            }
-
-            if (event == null) {
-                throw new WorkflowClientException("An event with ID: " +
-                        workflowAssociation.getOperation().toString() + "doesn't exist.");
-            }
-
-            workflowManagementService.addAssociation(workflowAssociation.getAssociationName(),
-                    workflowAssociation.getWorkflowId(), workflowAssociation.getOperation().toString(),
-                    Constants.DEFAULT_ASSOCIATION_CONDITION);
-            return workflowAssociation;
-        } catch (WorkflowClientException e) {
-            throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_ADDING_ASSOCIATION, null, e);
-        } catch (WorkflowException e) {
-            throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_ASSOCIATION, null, e);
-        }
-    }
-
-    /**
-     * Get an association by ID
-     *
-     * @param associationId Association ID
-     * @return WorkflowAssociationResponse
-     */
-    public WorkflowAssociationResponse getAssociation(String associationId) {
-
-        try {
-            Association association = workflowManagementService.getAssociation(associationId);
-            if (association == null) {
-                throw handleException(Response.Status.NOT_FOUND,
-                        Constants.ErrorMessage.ERROR_CODE_ASSOCIATION_NOT_FOUND,
-                        associationId);
-            }
-            return getAssociationDetails(association);
-        } catch (WorkflowClientException e) {
-            throw handleClientError(Constants.ErrorMessage.ERROR_CODE_ASSOCIATION_NOT_FOUND, associationId, e);
-        } catch (WorkflowException e) {
-            throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_ASSOCIATION, associationId, e);
-        }
-    }
-
-    /**
-     * Partially update an association
-     *
-     * @param associationId       Association ID
-     * @param workflowAssociation Association Details
-     * @return WorkflowAssociationResponse
-     */
-    public WorkflowAssociationResponse updateAssociation(String associationId,
-                                                        WorkflowAssociationPatchRequest workflowAssociation) {
-
-        boolean isEnable;
-        String eventId;
-        try {
-            if (workflowAssociation.getIsEnabled() == null) {
-                isEnable = workflowManagementService.getAssociation(associationId).isEnabled();
-            } else {
-                isEnable = workflowAssociation.getIsEnabled();
-            }
-
-            if (workflowAssociation.getOperation() == null) {
-                eventId = null;
-            } else {
-                eventId = workflowAssociation.getOperation().toString();
-            }
-            workflowManagementService.updateAssociation(associationId, workflowAssociation.getAssociationName(),
-                    workflowAssociation.getWorkflowId(), eventId,
-                    Constants.DEFAULT_ASSOCIATION_CONDITION, isEnable);
-            return getAssociation(associationId);
-        } catch (WorkflowClientException e) {
-            throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_UPDATING_ASSOCIATION, associationId, e);
-        } catch (WorkflowException e) {
-            throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_ASSOCIATION, associationId, e);
-        }
-    }
-
-    private WorkflowAssociationListResponse createAssociationListResponse(int tenantId,
-                                                                          WorkflowAssociationListItem[]
-                                                                                  workflowAssociationListItems,
-                                                                          Integer offset,
-                                                                          String filter) throws WorkflowException {
-
-        WorkflowAssociationListResponse workflowAssociationListResponse = new WorkflowAssociationListResponse();
-        workflowAssociationListResponse.setTotalResults(workflowManagementService.getAssociationsCount(tenantId, filter));
-        if (workflowAssociationListItems != null && workflowAssociationListItems.length > 0) {
-            workflowAssociationListResponse.setWorkflowAssociations(Arrays.asList(workflowAssociationListItems));
-            workflowAssociationListResponse.setCount(workflowAssociationListItems.length);
-        } else {
-            workflowAssociationListResponse.setWorkflowAssociations(Collections.emptyList());
-            workflowAssociationListResponse.setCount(0);
-        }
-        workflowAssociationListResponse.setStartIndex(offset != null ? offset + 1 : 1);
-        return workflowAssociationListResponse;
-    }
-
     private WorkflowListResponse createWorkflowResponse(int tenantId, WorkflowListItem[] workflowListItems,
                                                         Integer offset,
                                                         String filter) throws WorkflowException {
@@ -369,21 +351,27 @@ public class WorkflowService {
         return workflow;
     }
 
-    private WorkflowAssociationListItem getAssociation(Association association) {
-
-        WorkflowAssociationListItem associationListItem = null;
-
-        if (association != null) {
-            associationListItem = new WorkflowAssociationListItem();
-            associationListItem.setId(association.getAssociationId());
-            associationListItem.setAssociationName(association.getAssociationName());
-            associationListItem.setOperation(Operation.valueOf(association.getEventId()));
-            associationListItem.setWorkflowName(association.getWorkflowName());
-            associationListItem.setIsEnabled(association.isEnabled());
-        }
-        return associationListItem;
-    }
-
+    /**
+     * Converts a list of `WorkflowTemplateParameters` into a list of `Parameter` objects.
+     * Example:
+     *  * Given the following inputs:
+     *  * - workflowId = "wf123"
+     *  * - templateProperties = steps = [
+     *  *         {step: 1, options: [
+     *  *             {entity: "roles", values: ["123", "124"]},
+     *  *             {entity: "users", values: ["234", "235"]}
+     *  *         ]},
+     *  *         {step: 2, options: [
+     *  *             {entity: "roles", values: ["345"]}
+     *  *         ]}
+     *  *
+     *  * The output `parameterList` will contain the following list of `Parameter` objects:
+     *  * - parameterList = [
+     *     {paramName = "ApprovalSteps", paramValue = "123,124", qName = "Step-1-roles", holder = "TEMPLATE"},
+     *     {paramName = "ApprovalSteps", paramValue = "234,235", qName = "Step-1-users", holder = "TEMPLATE"},
+     *     {paramName = "ApprovalSteps", paramValue = "345", qName = "Step-2-roles", holder = "TEMPLATE"}
+     * ]
+     */
     private List<Parameter> createParameterList(String workflowId,
                                                 List<WorkflowTemplateParameters> templateProperties) {
 
@@ -398,21 +386,6 @@ public class WorkflowService {
             }
         }
         return parameterList;
-    }
-
-    private WorkflowAssociationResponse getAssociationDetails(Association association) {
-
-        WorkflowAssociationResponse associationResponse = null;
-
-        if (association != null) {
-            associationResponse = new WorkflowAssociationResponse();
-            associationResponse.setId(association.getAssociationId());
-            associationResponse.setAssociationName(association.getAssociationName());
-            associationResponse.setOperation(Operation.valueOf(association.getEventId()));
-            associationResponse.setWorkflowName(association.getWorkflowName());
-            associationResponse.setIsEnabled(association.isEnabled());
-        }
-        return associationResponse;
     }
 
     private Parameter setWorkflowImplParameters(String workflowId, String paramName, String paramValue, String qName,
@@ -493,15 +466,58 @@ public class WorkflowService {
         return detailedWorkflow;
     }
 
+    private WorkflowAssociationListResponse createAssociationListResponse(int tenantId,
+                                                                          WorkflowAssociationListItem[]
+                                                                                  workflowAssociationListItems,
+                                                                          Integer offset,
+                                                                          String filter) throws WorkflowException {
+
+        WorkflowAssociationListResponse workflowAssociationListResponse = new WorkflowAssociationListResponse();
+        workflowAssociationListResponse.setTotalResults(workflowManagementService.getAssociationsCount(tenantId, filter));
+        if (workflowAssociationListItems != null && workflowAssociationListItems.length > 0) {
+            workflowAssociationListResponse.setWorkflowAssociations(Arrays.asList(workflowAssociationListItems));
+            workflowAssociationListResponse.setCount(workflowAssociationListItems.length);
+        } else {
+            workflowAssociationListResponse.setWorkflowAssociations(Collections.emptyList());
+            workflowAssociationListResponse.setCount(0);
+        }
+        workflowAssociationListResponse.setStartIndex(offset != null ? offset + 1 : 1);
+        return workflowAssociationListResponse;
+    }
+
+    private WorkflowAssociationListItem getAssociation(Association association) {
+
+        WorkflowAssociationListItem associationListItem = null;
+
+        if (association != null) {
+            associationListItem = new WorkflowAssociationListItem();
+            associationListItem.setId(association.getAssociationId());
+            associationListItem.setAssociationName(association.getAssociationName());
+            associationListItem.setOperation(Operation.valueOf(association.getEventId()));
+            associationListItem.setWorkflowName(association.getWorkflowName());
+            associationListItem.setIsEnabled(association.isEnabled());
+        }
+        return associationListItem;
+    }
+
+    private WorkflowAssociationResponse getAssociationDetails(Association association) {
+
+        WorkflowAssociationResponse associationResponse = null;
+
+        if (association != null) {
+            associationResponse = new WorkflowAssociationResponse();
+            associationResponse.setId(association.getAssociationId());
+            associationResponse.setAssociationName(association.getAssociationName());
+            associationResponse.setOperation(Operation.valueOf(association.getEventId()));
+            associationResponse.setWorkflowName(association.getWorkflowName());
+            associationResponse.setIsEnabled(association.isEnabled());
+        }
+        return associationResponse;
+    }
+
     private ErrorResponse.Builder getErrorBuilder(Constants.ErrorMessage errorMsg, String data) {
 
         return new ErrorResponse.Builder().withCode(errorMsg.getCode()).withMessage(errorMsg.getMessage())
-                .withDescription(includeData(errorMsg, data));
-    }
-
-    private ErrorResponse.Builder getErrorBuilder(String errorCode, String errorMsg, String data) {
-
-        return new ErrorResponse.Builder().withCode(errorCode).withMessage(errorMsg)
                 .withDescription(includeData(errorMsg, data));
     }
 
