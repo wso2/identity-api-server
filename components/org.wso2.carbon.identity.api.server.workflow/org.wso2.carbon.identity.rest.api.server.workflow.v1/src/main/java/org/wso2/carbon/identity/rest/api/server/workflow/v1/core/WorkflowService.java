@@ -357,9 +357,12 @@ public class WorkflowService {
      *  *
      *  * The output `parameterList` will contain the following list of `Parameter` objects:
      *  * - parameterList = [
-     *     {paramName = "ApprovalSteps", paramValue = "123,124", qName = "Step-1-roles", holder = "TEMPLATE"},
-     *     {paramName = "ApprovalSteps", paramValue = "234,235", qName = "Step-1-users", holder = "TEMPLATE"},
-     *     {paramName = "ApprovalSteps", paramValue = "345", qName = "Step-2-roles", holder = "TEMPLATE"}
+     *     {workflowId = "wf123", paramName = "ApprovalSteps", paramValue = "123,124", qName = "Step-1-roles", holder =
+     *     "TEMPLATE"},
+     *     {workflowId = "wf123", paramName = "ApprovalSteps", paramValue = "234,235", qName = "Step-1-users", holder
+     *     = "TEMPLATE"},
+     *     {workflowId = "wf123", paramName = "ApprovalSteps", paramValue = "345", qName = "Step-2-roles", holder =
+     *     "TEMPLATE"}
      * ]
      */
     private List<Parameter> createParameterList(String workflowId,

@@ -125,12 +125,12 @@ paths:
                       options:
                         - entity: roles
                           values:
-                            - admin
-                            - manager
+                            - 123
+                            - 124
                         - entity: users
                           values:
-                            - John
-                            - Tom
+                            - 234
+                            - 235
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -206,10 +206,10 @@ paths:
                       options:
                         - entity: roles
                           values:
-                            - admin
+                            - 123
                         - entity: users
                           values:
-                            - John
+                            - 234
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -238,10 +238,10 @@ paths:
                     options:
                       - entity: roles
                         values:
-                          - admin
+                          - 123
                       - entity: users
                         values:
-                          - John
+                          - 234
     delete:
       summary: Delete the workflow by workflow-id.
       description: |
@@ -661,7 +661,8 @@ components:
           type: array
           items:
             type: string
-            example: "admin"
+            example: "123"
+            description: "Identifier of the selected entity"
 
     WorkflowAssociationListResponse:
       type: object
