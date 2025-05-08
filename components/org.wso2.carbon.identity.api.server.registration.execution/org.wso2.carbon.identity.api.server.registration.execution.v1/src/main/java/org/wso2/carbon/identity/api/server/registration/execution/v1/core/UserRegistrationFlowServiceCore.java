@@ -21,6 +21,7 @@ package org.wso2.carbon.identity.api.server.registration.execution.v1.core;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.api.server.registration.execution.v1.RegistrationInitiationRequest;
 import org.wso2.carbon.identity.api.server.registration.execution.v1.RegistrationSubmissionRequest;
 import org.wso2.carbon.identity.api.server.registration.execution.v1.RegistrationSubmissionResponse;
 import org.wso2.carbon.identity.api.server.registration.execution.v1.utils.Utils;
@@ -47,7 +48,8 @@ public class UserRegistrationFlowServiceCore {
      *
      * @return RegistrationSubmissionResponse.
      */
-    public RegistrationSubmissionResponse initiateUserRegistration() {
+    public RegistrationSubmissionResponse initiateUserRegistration(
+            RegistrationInitiationRequest registrationInitRequest) {
 
         try {
             // Check whether the dynamic registration portal is enabled.
@@ -55,7 +57,7 @@ public class UserRegistrationFlowServiceCore {
             Utils.isDynamicRegistrationPortalEnabled(tenantDomain);
 
             RegistrationStep registrationStep = userRegistrationMgtService.initiateDefaultRegistrationFlow(
-                    tenantDomain);
+                    tenantDomain, registrationInitRequest.getApplicationId(), registrationInitRequest.getCallbackUrl());
             RegistrationSubmissionResponse registrationSubmissionResponse = new RegistrationSubmissionResponse();
             if (registrationStep == null) {
                 return registrationSubmissionResponse;

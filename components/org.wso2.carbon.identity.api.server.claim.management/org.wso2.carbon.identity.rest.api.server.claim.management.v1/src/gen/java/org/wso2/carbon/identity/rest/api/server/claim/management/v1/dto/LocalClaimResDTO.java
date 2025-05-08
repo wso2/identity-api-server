@@ -68,6 +68,9 @@ public class LocalClaimResDTO extends ClaimResDTO {
     @Valid 
     private Boolean supportedByDefault = null;
 
+    @Valid
+    private Boolean multiValued = null;
+
     public enum UniquenessScopeEnum {
          NONE,  WITHIN_USERSTORE,  ACROSS_USERSTORES, 
     };
@@ -213,6 +216,18 @@ public class LocalClaimResDTO extends ClaimResDTO {
     }
 
     /**
+     * Specifies if the claim can hold multiple values.
+     **/
+    @ApiModelProperty(value = "Specifies if the claim can hold multiple values.")
+    @JsonProperty("multiValued")
+    public Boolean getMultiValued() {
+        return multiValued;
+    }
+    public void setMultiValued(Boolean multiValued) {
+        this.multiValued = multiValued;
+    }
+
+    /**
     * Specifies the scope of uniqueness validation for the claim value.
     **/
     @ApiModelProperty(value = "Specifies the scope of uniqueness validation for the claim value.")
@@ -304,6 +319,7 @@ public class LocalClaimResDTO extends ClaimResDTO {
         sb.append("    regEx: ").append(regEx).append("\n");
         sb.append("    required: ").append(required).append("\n");
         sb.append("    supportedByDefault: ").append(supportedByDefault).append("\n");
+        sb.append("    multiValued: ").append(multiValued).append("\n");
         sb.append("    uniquenessScope: ").append(uniquenessScope).append("\n");
         sb.append("    flowInitiator: ").append(flowInitiator).append("\n");
         sb.append("    sharedProfileValueResolvingMethod: ").append(sharedProfileValueResolvingMethod).append("\n");

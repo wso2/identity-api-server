@@ -370,9 +370,10 @@ public class ClaimManagementApi  {
     @ApiParam(value = "Number of records to skip for pagination.") @QueryParam("offset")  Integer offset,
     @ApiParam(value = "Condition to filter the retrieval of records.") @QueryParam("filter")  String filter,
     @ApiParam(value = "Define the order by which the retrieved records should be sorted.") @QueryParam("sort")  String sort,
-    @ApiParam(value = "Exclude identity claims when listing local claims.") @QueryParam("exclude-identity-claims")  Boolean excludeIdentityClaims) {
+    @ApiParam(value = "Exclude identity claims when listing local claims.") @QueryParam("exclude-identity-claims")  Boolean excludeIdentityClaims,
+    @ApiParam(value = "Exclude hidden claims when listing local claims.") @QueryParam("exclude-hidden-claims") Boolean excludeHiddenClaims) {
 
-        return delegate.getLocalClaims(attributes,limit,offset,filter,sort,excludeIdentityClaims);
+        return delegate.getLocalClaims(attributes,limit,offset,filter,sort,excludeIdentityClaims,excludeHiddenClaims);
     }
 
     @Valid
