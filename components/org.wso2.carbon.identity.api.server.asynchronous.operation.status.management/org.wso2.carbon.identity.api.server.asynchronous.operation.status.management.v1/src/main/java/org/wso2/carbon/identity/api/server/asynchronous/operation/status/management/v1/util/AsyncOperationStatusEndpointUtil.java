@@ -6,9 +6,9 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.constants.AsyncOperationStatusMgtEndpointConstants;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
-import org.wso2.carbon.identity.framework.async.status.mgt.api.exception.AsyncStatusMgtClientException;
-import org.wso2.carbon.identity.framework.async.status.mgt.api.exception.AsyncStatusMgtException;
-import org.wso2.carbon.identity.framework.async.status.mgt.api.exception.AsyncStatusMgtServerException;
+import org.wso2.carbon.identity.framework.async.operation.status.mgt.api.exception.AsyncOperationStatusMgtClientException;
+import org.wso2.carbon.identity.framework.async.operation.status.mgt.api.exception.AsyncOperationStatusMgtException;
+import org.wso2.carbon.identity.framework.async.operation.status.mgt.api.exception.AsyncOperationStatusMgtServerException;
 
 import javax.ws.rs.core.Response;
 
@@ -54,10 +54,10 @@ public class AsyncOperationStatusEndpointUtil {
         return new APIError(status, getError(errorCode, message, description));
     }
 
-    public static APIError handleAsyncStatusMgtException(AsyncStatusMgtException e) {
+    public static APIError handleAsyncOperationStatusMgtException(AsyncOperationStatusMgtException e) {
 
         Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
-        if (e instanceof AsyncStatusMgtClientException) {
+        if (e instanceof AsyncOperationStatusMgtClientException) {
             LOG.debug(e.getMessage(), e);
             if (ERROR_NO_ASYNC_STATUS_ON_GIVEN_ID.getCode().equals(e.getErrorCode())) {
                 status = Response.Status.NOT_FOUND;
@@ -73,7 +73,7 @@ public class AsyncOperationStatusEndpointUtil {
         return handleException(status, errorCode, e.getMessage(), e.getDescription());
     }
 
-    public static AsyncStatusMgtServerException buildAsyncStatusMgtServerException(
+    public static AsyncOperationStatusMgtServerException buildAsyncStatusMgtServerException(
             AsyncOperationStatusMgtEndpointConstants.ErrorMessage error,
             Throwable e, String... data) {
 
@@ -82,10 +82,10 @@ public class AsyncOperationStatusEndpointUtil {
             description = String.format(description, data);
         }
 
-        return new AsyncStatusMgtServerException(error.getMessage(), description, error.getCode(), e);
+        return new AsyncOperationStatusMgtServerException(error.getMessage(), description, error.getCode(), e);
     }
 
-    public static AsyncStatusMgtClientException buildAsyncStatusMgtClientException(
+    public static AsyncOperationStatusMgtClientException buildAsyncStatusMgtClientException(
             AsyncOperationStatusMgtEndpointConstants.ErrorMessage error, String... data) {
 
         String description = error.getDescription();
@@ -93,7 +93,7 @@ public class AsyncOperationStatusEndpointUtil {
             description = String.format(description, data);
         }
 
-        return new AsyncStatusMgtClientException(error.getMessage(), description, error.getCode());
+        return new AsyncOperationStatusMgtClientException(error.getMessage(), description, error.getCode());
     }
 
     /**
