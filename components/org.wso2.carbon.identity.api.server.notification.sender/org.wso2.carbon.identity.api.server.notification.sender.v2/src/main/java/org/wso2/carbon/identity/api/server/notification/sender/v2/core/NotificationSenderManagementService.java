@@ -355,9 +355,9 @@ public class NotificationSenderManagementService {
             prop.setValue(value);
             properties.add(prop);
         });
-        // In case where the email provider is configured via V1 API, the username is not set in the properties, but as
-        // a first class attribute. As V2 doesn't support credentials as first class attributes username needs to be
-        // set as a property.
+        /* In case where the email provider is configured via V1 API, the username is not set in the properties, but as
+        a first class attribute. As V2 doesn't support credentials as first class attributes username needs to be
+        set as a property. */
         if (StringUtils.isNotBlank(dto.getUsername())) {
             Properties prop = new Properties();
             prop.setKey(USERNAME);
