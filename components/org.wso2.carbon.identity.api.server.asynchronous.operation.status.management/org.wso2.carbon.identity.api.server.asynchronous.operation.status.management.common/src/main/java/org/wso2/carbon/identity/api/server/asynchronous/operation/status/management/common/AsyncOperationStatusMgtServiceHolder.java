@@ -1,7 +1,7 @@
 package org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.common;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.framework.async.status.mgt.api.service.AsyncStatusMgtService;
+import org.wso2.carbon.identity.framework.async.operation.status.mgt.api.service.AsyncOperationStatusMgtService;
 
 /**
  * Holds the services which the async operation status management API component is using.
@@ -12,20 +12,20 @@ public class AsyncOperationStatusMgtServiceHolder {
 
     }
 
-    private static class AsyncStatusMgtServiceHolder {
+    private static class ServiceHolder {
 
-        private static final AsyncStatusMgtService SERVICE =
-                (AsyncStatusMgtService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                        .getOSGiService(AsyncStatusMgtService.class, null);
+        private static final AsyncOperationStatusMgtService SERVICE =
+                (AsyncOperationStatusMgtService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(AsyncOperationStatusMgtService.class, null);
     }
 
     /**
-     * Get AsyncStatusMgtService service.
+     * Get AsyncOperationStatusMgtService service.
      *
-     * @return AsyncStatusMgtService.
+     * @return AsyncOperationStatusMgtService.
      */
-    public static AsyncStatusMgtService getAsyncStatusMgtService() {
+    public static AsyncOperationStatusMgtService getAsyncOperationStatusMgtService() {
 
-        return AsyncOperationStatusMgtServiceHolder.AsyncStatusMgtServiceHolder.SERVICE;
+        return ServiceHolder.SERVICE;
     }
 }

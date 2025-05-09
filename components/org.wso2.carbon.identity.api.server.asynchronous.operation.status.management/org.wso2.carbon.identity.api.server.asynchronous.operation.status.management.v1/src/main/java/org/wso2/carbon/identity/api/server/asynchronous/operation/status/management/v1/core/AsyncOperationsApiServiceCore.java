@@ -22,7 +22,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.model.Link;
 import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.model.Operation;
 import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.model.Operations;
@@ -30,12 +30,12 @@ import org.wso2.carbon.identity.api.server.asynchronous.operation.status.managem
 import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.model.UnitOperations;
 import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.util.AsyncOperationStatusEndpointUtil;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
-import org.wso2.carbon.identity.framework.async.status.mgt.api.exception.AsyncStatusMgtClientException;
-import org.wso2.carbon.identity.framework.async.status.mgt.api.exception.AsyncStatusMgtException;
-import org.wso2.carbon.identity.framework.async.status.mgt.api.exception.AsyncStatusMgtServerException;
-import org.wso2.carbon.identity.framework.async.status.mgt.api.models.OperationResponseDTO;
-import org.wso2.carbon.identity.framework.async.status.mgt.api.models.UnitOperationResponseDTO;
-import org.wso2.carbon.identity.framework.async.status.mgt.api.service.AsyncStatusMgtService;
+import org.wso2.carbon.identity.framework.async.operation.status.mgt.api.exception.AsyncOperationStatusMgtClientException;
+import org.wso2.carbon.identity.framework.async.operation.status.mgt.api.exception.AsyncOperationStatusMgtException;
+import org.wso2.carbon.identity.framework.async.operation.status.mgt.api.exception.AsyncOperationStatusMgtServerException;
+import org.wso2.carbon.identity.framework.async.operation.status.mgt.api.models.OperationResponseDTO;
+import org.wso2.carbon.identity.framework.async.operation.status.mgt.api.models.UnitOperationResponseDTO;
+import org.wso2.carbon.identity.framework.async.operation.status.mgt.api.service.AsyncOperationStatusMgtService;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -65,82 +65,81 @@ import static org.wso2.carbon.identity.api.server.asynchronous.operation.status.
  */
 public class AsyncOperationsApiServiceCore {
 
-    private final AsyncStatusMgtService asyncStatusMgtService;
+    private final AsyncOperationStatusMgtService asyncOperationStatusMgtService;
 
     private static final Log LOG = LogFactory.getLog(AsyncOperationsApiServiceCore.class);
 
-    public AsyncOperationsApiServiceCore(AsyncStatusMgtService asyncStatusMgtService) {
+    public AsyncOperationsApiServiceCore(AsyncOperationStatusMgtService asyncOperationStatusMgtService) {
 
-        this.asyncStatusMgtService = asyncStatusMgtService;
+        this.asyncOperationStatusMgtService = asyncOperationStatusMgtService;
     }
 
     public Response getOperations(String after, String before, Integer limit, String filter) {
 
-        PrivilegedCarbonContext context = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-        context.getUserId(); //todo: complete operateInitiatorId
-
+        String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         try {
             limit = validateLimit(limit);
             List<OperationResponseDTO> records =
-                    asyncStatusMgtService.getOperations(after, before, limit + 1, filter);
+                    asyncOperationStatusMgtService.getOperations(tenantDomain, after, before, limit + 1, filter);
             return Response.ok().entity(getOperationsResponse(limit, after, before, filter, records)).build();
-        } catch (AsyncStatusMgtException e) {
-            throw AsyncOperationStatusEndpointUtil.handleAsyncStatusMgtException(e);
+        } catch (AsyncOperationStatusMgtException e) {
+            throw AsyncOperationStatusEndpointUtil.handleAsyncOperationStatusMgtException(e);
         }
     }
 
     public Response getOperation(String operationId) {
 
-        PrivilegedCarbonContext context = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-        context.getUserId(); //todo: complete operateInitiatorId
-
-        if (operationId == null) {
+        String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        if (StringUtils.isBlank(operationId)) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         try {
-            OperationResponseDTO record = asyncStatusMgtService.getOperation(operationId);
+            OperationResponseDTO record = asyncOperationStatusMgtService.getOperation(operationId, tenantDomain);
             if (record == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
             return Response.ok().entity(getOperationResponse(operationId, record)).build();
-        } catch (AsyncStatusMgtException e) {
-            throw AsyncOperationStatusEndpointUtil.handleAsyncStatusMgtException(e);
+        } catch (AsyncOperationStatusMgtException e) {
+            throw AsyncOperationStatusEndpointUtil.handleAsyncOperationStatusMgtException(e);
         }
     }
 
     public Response getUnitOperation(String unitOperationId) {
 
-        PrivilegedCarbonContext context = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-        context.getUserId(); //todo: complete operateInitiatorId
+        String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
 
-        if (unitOperationId == null) {
+        if (StringUtils.isBlank(unitOperationId)) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         try {
-            UnitOperationResponseDTO record = asyncStatusMgtService.getUnitOperation(unitOperationId);
+            UnitOperationResponseDTO record = asyncOperationStatusMgtService.getUnitOperation(unitOperationId,
+                    tenantDomain);
             if (record == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
             return Response.ok().entity(getUnitOperationResponse(record)).build();
-        } catch (AsyncStatusMgtException e) {
-            throw AsyncOperationStatusEndpointUtil.handleAsyncStatusMgtException(e);
+        } catch (AsyncOperationStatusMgtException e) {
+            throw AsyncOperationStatusEndpointUtil.handleAsyncOperationStatusMgtException(e);
         }
     }
 
     public Response getUnitOperations(String operationId, String after, String before,
                                       Integer limit, String filter) {
-        if (operationId == null) {
+
+        String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+
+        if (StringUtils.isBlank(operationId)) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         try {
             limit = validateLimit(limit);
             List<UnitOperationResponseDTO> records =
-                    asyncStatusMgtService.getUnitOperationStatusRecords(operationId, after, before, limit + 1,
-                            filter);
+                    asyncOperationStatusMgtService.getUnitOperationStatusRecords(operationId, tenantDomain, after,
+                            before, limit + 1, filter);
             return Response.ok().entity(
                     getUnitOperationsResponse(limit, after, before, filter, records, operationId)).build();
-        } catch (AsyncStatusMgtException e) {
-            throw AsyncOperationStatusEndpointUtil.handleAsyncStatusMgtException(e);
+        } catch (AsyncOperationStatusMgtException e) {
+            throw AsyncOperationStatusEndpointUtil.handleAsyncOperationStatusMgtException(e);
         }
     }
 
@@ -181,7 +180,7 @@ public class AsyncOperationsApiServiceCore {
 
     private Operations getOperationsResponse(Integer limit, String after, String before, String filter,
                                              List<OperationResponseDTO> operationsDTO)
-            throws AsyncStatusMgtServerException {
+            throws AsyncOperationStatusMgtServerException {
 
         Operations operationsResponse = new Operations();
 
@@ -197,7 +196,7 @@ public class AsyncOperationsApiServiceCore {
                 try {
                     url += "&" + FILTER_PARAM + "=" + URLEncoder.encode(filter, StandardCharsets.UTF_8.name());
                 } catch (UnsupportedEncodingException e) {
-                    throw new AsyncStatusMgtServerException("Error");
+                    throw new AsyncOperationStatusMgtServerException("Error");
                 }
             }
 
@@ -261,7 +260,7 @@ public class AsyncOperationsApiServiceCore {
     private UnitOperations getUnitOperationsResponse(Integer limit, String after, String before, String filter,
                                                      List<UnitOperationResponseDTO> unitOperations,
                                                      String operationId)
-            throws AsyncStatusMgtServerException {
+            throws AsyncOperationStatusMgtServerException {
 
         UnitOperations unitOperationsResponse = new UnitOperations();
 
@@ -277,7 +276,7 @@ public class AsyncOperationsApiServiceCore {
                 try {
                     url += "&" + FILTER_PARAM + "=" + URLEncoder.encode(filter, StandardCharsets.UTF_8.name());
                 } catch (UnsupportedEncodingException e) {
-                    throw new AsyncStatusMgtServerException("Error");
+                    throw new AsyncOperationStatusMgtServerException("Error");
                 }
             }
 
@@ -330,7 +329,7 @@ public class AsyncOperationsApiServiceCore {
         return unitOperationsResponse;
     }
 
-    private int validateLimit(Integer limit) throws AsyncStatusMgtClientException {
+    private int validateLimit(Integer limit) throws AsyncOperationStatusMgtClientException {
 
         if (limit == null) {
             int defaultItemsPerPage = IdentityUtil.getDefaultItemsPerPage();

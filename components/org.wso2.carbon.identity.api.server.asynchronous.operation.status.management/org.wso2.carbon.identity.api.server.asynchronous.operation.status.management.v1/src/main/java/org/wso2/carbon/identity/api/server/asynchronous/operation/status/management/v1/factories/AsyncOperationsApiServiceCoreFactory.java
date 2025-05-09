@@ -20,7 +20,7 @@ package org.wso2.carbon.identity.api.server.asynchronous.operation.status.manage
 
 import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.common.AsyncOperationStatusMgtServiceHolder;
 import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.core.AsyncOperationsApiServiceCore;
-import org.wso2.carbon.identity.framework.async.status.mgt.api.service.AsyncStatusMgtService;
+import org.wso2.carbon.identity.framework.async.operation.status.mgt.api.service.AsyncOperationStatusMgtService;
 
 /**
  * Factory class for AsyncOperationsApiService.
@@ -30,12 +30,12 @@ public class AsyncOperationsApiServiceCoreFactory {
     private static final AsyncOperationsApiServiceCore SERVICE;
 
     static {
-        AsyncStatusMgtService asyncStatusMgtService =
-                AsyncOperationStatusMgtServiceHolder.getAsyncStatusMgtService();
-        if (asyncStatusMgtService == null) {
-            throw new IllegalStateException("AsyncStatusMgtService is not available from the OSGi context.");
+        AsyncOperationStatusMgtService asyncOperationStatusMgtService =
+                AsyncOperationStatusMgtServiceHolder.getAsyncOperationStatusMgtService();
+        if (asyncOperationStatusMgtService == null) {
+            throw new IllegalStateException("AsyncOperationStatusMgtService is not available from the OSGi context.");
         }
-        SERVICE = new AsyncOperationsApiServiceCore(asyncStatusMgtService);
+        SERVICE = new AsyncOperationsApiServiceCore(asyncOperationStatusMgtService);
     }
 
     /**

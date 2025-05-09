@@ -31,7 +31,7 @@ public class AsyncOperationStatusMgtEndpointConstants {
 
     public static final String PATH_SEPARATOR = "/";
     public static final String V1_API_PATH_COMPONENT = "v1";
-    public static final String ASYNC_OPERATION_STATUS_PATH = "async-operation-status";
+    public static final String ASYNC_OPERATION_STATUS_PATH = "async-operations";
     public static final String PAGINATION_AFTER = "after";
     public static final String PAGINATION_BEFORE = "before";
     public static final String ASYNC_STATUS_PREFIX = "ASYNC-STATUS-";
