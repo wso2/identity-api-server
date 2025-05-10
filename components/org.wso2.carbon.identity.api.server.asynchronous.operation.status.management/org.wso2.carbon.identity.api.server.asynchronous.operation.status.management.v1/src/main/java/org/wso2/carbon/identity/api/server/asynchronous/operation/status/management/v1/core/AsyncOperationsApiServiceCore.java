@@ -236,7 +236,7 @@ public class AsyncOperationsApiServiceCore {
         OperationUnitOperationDetailSummary summary = new OperationUnitOperationDetailSummary();
         summary.setSuccess(dto.getUnitStatusCount().getSuccess());
         summary.setFailed(dto.getUnitStatusCount().getFailed());
-        summary.setPartiallySuccessful(dto.getUnitStatusCount().getPartiallyCompleted());
+        summary.setPartiallyCompleted(dto.getUnitStatusCount().getPartiallyCompleted());
         return summary;
     }
 
