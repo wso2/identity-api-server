@@ -25,6 +25,7 @@ import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.api.server.workflow.common.Constants;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.*;
 import org.wso2.carbon.identity.workflow.mgt.WorkflowManagementService;
 import org.wso2.carbon.identity.workflow.mgt.bean.Parameter;
@@ -133,21 +134,19 @@ public class WorkflowService {
      */
     public WorkflowListResponse listPaginatedWorkflows(Integer limit, Integer offset, String filter) {
 
-        List<WorkflowListItem> workflowSummaryList = new ArrayList<>();
+        List<WorkflowListItem> workflowBasicInfoList = new ArrayList<>();
         List<Workflow> currentWorkflows;
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
         try {
-            if (limit == null || offset == null) {
-                limit = 10;
-                offset = 0;
-            }
+            limit = validateLimit(limit);
+            offset = validateOffset(offset);
             currentWorkflows = workflowManagementService.listPaginatedWorkflows(tenantId, limit, offset, filter);
             for (Workflow workflow : currentWorkflows) {
                 WorkflowListItem workflowTmp = getWorkflow(workflow);
-                workflowSummaryList.add(workflowTmp);
+                workflowBasicInfoList.add(workflowTmp);
             }
             return createWorkflowResponse(tenantId,
-                    workflowSummaryList.toArray(new WorkflowListItem[workflowSummaryList.size()]), offset, filter);
+                    workflowBasicInfoList.toArray(new WorkflowListItem[workflowBasicInfoList.size()]), offset, filter);
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_LISTING_WORKFLOWS, null, e);
         } catch (WorkflowException e) {
@@ -198,9 +197,9 @@ public class WorkflowService {
                     Constants.DEFAULT_ASSOCIATION_CONDITION);
             return workflowAssociation;
         } catch (WorkflowClientException e) {
-            throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_ADDING_ASSOCIATION, null, e);
+            throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_ADDING_ASSOCIATION, workflowAssociation.getAssociationName(), e);
         } catch (WorkflowException e) {
-            throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_ASSOCIATION, null, e);
+            throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_ASSOCIATION, workflowAssociation.getAssociationName(), e);
         }
     }
 
@@ -270,10 +269,8 @@ public class WorkflowService {
         List<WorkflowAssociationListItem> associations = new ArrayList<>();
         List<Association> associationList;
         try {
-            if (limit == null || offset == null) {
-                limit = 10;
-                offset = 0;
-            }
+            limit = validateLimit(limit);
+            offset = validateOffset(offset);
             associationList = workflowManagementService.listPaginatedAssociations(
                     CarbonContext.getThreadLocalCarbonContext().getTenantId(), limit, offset, filter);
             for (Association association : associationList) {
@@ -286,7 +283,6 @@ public class WorkflowService {
         } catch (WorkflowException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_ASSOCIATIONS, null, e);
         }
-
     }
 
     /**
@@ -309,6 +305,40 @@ public class WorkflowService {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_REMOVING_ASSOCIATION, associationId, e);
         }
     }
+
+    /**
+     * Validate the offset.
+     *
+     * @param offset Offset value
+     * @return Validated offset.
+     */
+    private int validateOffset(Integer offset) {
+
+        if (offset != null && offset >= 0) {
+            return offset;
+        } else {
+            return Constants.DEFAULT_OFFSET;
+        }
+    }
+
+    /**
+     * Validate the limit.
+     *
+     * @param limit Limit value.
+     * @return Validated limit.
+     */
+    private int validateLimit(Integer limit) {
+
+        final int maximumItemPerPage = IdentityUtil.getMaximumItemPerPage();
+        if (limit == null) {
+            return IdentityUtil.getDefaultItemsPerPage();
+        } else if (limit <= maximumItemPerPage) {
+            return limit;
+        } else {
+            return maximumItemPerPage;
+        }
+    }
+
 
     private WorkflowListResponse createWorkflowResponse(int tenantId, WorkflowListItem[] workflowListItems,
                                                         Integer offset,
