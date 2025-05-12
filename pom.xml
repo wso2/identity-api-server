@@ -898,7 +898,7 @@
         <identity.x509Certificate.validation.version>1.1.19</identity.x509Certificate.validation.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <mavan.findbugsplugin.exclude.file>findbugs-exclude-filter.xml</mavan.findbugsplugin.exclude.file>
-        <carbon.kernel.version>4.10.25</carbon.kernel.version>
+        <carbon.kernel.version>4.10.48</carbon.kernel.version>
         <carbon.multitenancy.version>4.11.31</carbon.multitenancy.version>
         <org.wso2.carbon.identity.remotefetch.version>0.7.12</org.wso2.carbon.identity.remotefetch.version>
         <org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>2.5.18</org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>
@@ -913,13 +913,13 @@
         <identity.verification.version>1.0.15</identity.verification.version>
 
         <!-- Organization management core Version -->
-        <org.wso2.carbon.identity.organization.management.core.version>1.1.20
+        <org.wso2.carbon.identity.organization.management.core.version>1.1.29
         </org.wso2.carbon.identity.organization.management.core.version>
         <org.wso2.carbon.identity.organization.management.core.version.range>[1.0.0, 2.0.0)
         </org.wso2.carbon.identity.organization.management.core.version.range>
 
         <!-- Organization management service Version -->
-        <org.wso2.carbon.identity.organization.management.version>1.4.87
+        <org.wso2.carbon.identity.organization.management.version>1.4.137
         </org.wso2.carbon.identity.organization.management.version>
 
         <!-- Unit test versions -->
