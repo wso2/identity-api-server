@@ -21,8 +21,7 @@ package org.wso2.carbon.identity.rest.api.server.workflow.v1.impl;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.WorkflowsApiService;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.core.WorkflowService;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.factories.WorkflowServiceFactory;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.*;
-
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowRequest;
 import javax.ws.rs.core.Response;
 
 /**
