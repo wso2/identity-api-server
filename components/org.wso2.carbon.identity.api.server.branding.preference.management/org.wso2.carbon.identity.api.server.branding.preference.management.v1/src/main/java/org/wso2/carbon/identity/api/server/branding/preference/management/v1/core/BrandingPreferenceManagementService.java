@@ -27,6 +27,9 @@ import org.wso2.carbon.identity.api.server.branding.preference.management.common
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.core.utils.BrandingPreferenceUtils;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingPreferenceModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.CustomTextModel;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.ResolvedBrandingPreferenceModel;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.ResolvedBrandingPreferenceModelResolvedFrom;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.ResolvedCustomTextModal;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.branding.preference.management.core.BrandingPreferenceManager;
@@ -193,7 +196,7 @@ public class BrandingPreferenceManagementService {
      * @param locale Language preference.
      * @return The resolved branding preference resource. If not exists return the default preferences.
      */
-    public BrandingPreferenceModel resolveBrandingPreference(String type, String name, String locale) {
+    public ResolvedBrandingPreferenceModel resolveBrandingPreference(String type, String name, String locale) {
 
         return resolveBrandingPreference(type, name, locale, false);
     }
@@ -207,7 +210,7 @@ public class BrandingPreferenceManagementService {
      * @param restrictToPublished Whether to resolve using only published branding preferences.
      * @return The resolved branding preference resource. If not exists return the default preferences.
      */
-    public BrandingPreferenceModel resolveBrandingPreference(String type, String name, String locale,
+    public ResolvedBrandingPreferenceModel resolveBrandingPreference(String type, String name, String locale,
                                                              boolean restrictToPublished) {
 
         /*
@@ -228,7 +231,7 @@ public class BrandingPreferenceManagementService {
                         DEFAULT_LOCALE, restrictToPublished);
             }
 
-            return buildBrandingResponseFromResponseDTO(responseDTO);
+            return buildResolvedBrandingResponseFromResponseDTO(responseDTO);
         } catch (BrandingPreferenceMgtException e) {
             if (BRANDING_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
                 if (log.isDebugEnabled()) {
@@ -403,7 +406,7 @@ public class BrandingPreferenceManagementService {
      * @param locale Language preference.
      * @return The resolved custom text preference resource. If not exists return the default preferences.
      */
-    public CustomTextModel resolveCustomTextPreference(String type, String name, String screen, String locale) {
+    public ResolvedCustomTextModal resolveCustomTextPreference(String type, String name, String screen, String locale) {
 
         String tenantDomain = getTenantDomainFromContext();
         if (ORGANIZATION_TYPE.equals(type) || StringUtils.isBlank(name)) {
@@ -414,7 +417,7 @@ public class BrandingPreferenceManagementService {
         }
         try {
             CustomText responseDTO = brandingPreferenceManager.resolveCustomText(type, name, screen, locale);
-            return buildCustomTextResponseFromResponseDTO(responseDTO);
+            return buildResolvedCustomTextResponseFromResponseDTO(responseDTO);
         } catch (BrandingPreferenceMgtException e) {
             if (CUSTOM_TEXT_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
                 if (log.isDebugEnabled()) {
@@ -518,10 +521,34 @@ public class BrandingPreferenceManagementService {
      */
     private BrandingPreferenceModel buildBrandingResponseFromResponseDTO(BrandingPreference responseDTO) {
 
+
         BrandingPreferenceModel brandingPreferenceResponse = new BrandingPreferenceModel();
         brandingPreferenceResponse.setType(BrandingPreferenceModel.TypeEnum.valueOf(responseDTO.getType()));
         brandingPreferenceResponse.setName(responseDTO.getName());
         brandingPreferenceResponse.setLocale(responseDTO.getLocale());
+        brandingPreferenceResponse.setPreference(responseDTO.getPreference());
+        return brandingPreferenceResponse;
+    }
+
+    /**
+     * Build branding preference response object from the responseDTO.
+     *
+     * @param responseDTO Branding preference responseDTO object.
+     * @return Branding preference response object{@link BrandingPreferenceModel}.
+     */
+    private ResolvedBrandingPreferenceModel buildResolvedBrandingResponseFromResponseDTO(
+            BrandingPreference responseDTO) {
+
+        ResolvedBrandingPreferenceModelResolvedFrom resolvedFrom =
+                new ResolvedBrandingPreferenceModelResolvedFrom();
+        resolvedFrom.setType(ResolvedBrandingPreferenceModelResolvedFrom.TypeEnum.valueOf(
+                responseDTO.getResolvedFrom().getType()));
+        resolvedFrom.setName(responseDTO.getResolvedFrom().getName());
+        ResolvedBrandingPreferenceModel brandingPreferenceResponse = new ResolvedBrandingPreferenceModel();
+        brandingPreferenceResponse.setType(ResolvedBrandingPreferenceModel.TypeEnum.valueOf(responseDTO.getType()));
+        brandingPreferenceResponse.setName(responseDTO.getName());
+        brandingPreferenceResponse.setLocale(responseDTO.getLocale());
+        brandingPreferenceResponse.setResolvedFrom(resolvedFrom);
         brandingPreferenceResponse.setPreference(responseDTO.getPreference());
         return brandingPreferenceResponse;
     }
@@ -539,6 +566,29 @@ public class BrandingPreferenceManagementService {
         customTextModel.setName(responseDTO.getName());
         customTextModel.setLocale(responseDTO.getLocale());
         customTextModel.setScreen(responseDTO.getScreen());
+        customTextModel.setPreference(responseDTO.getPreference());
+        return customTextModel;
+    }
+
+    /**
+     * Build custom text preference response object from the responseDTO.
+     *
+     * @param responseDTO Custom Text preference responseDTO object.
+     * @return Custom Text preference response object{@link CustomTextModel}.
+     */
+    private ResolvedCustomTextModal buildResolvedCustomTextResponseFromResponseDTO(CustomText responseDTO) {
+
+        ResolvedBrandingPreferenceModelResolvedFrom resolvedFrom =
+                new ResolvedBrandingPreferenceModelResolvedFrom();
+        resolvedFrom.setType(ResolvedBrandingPreferenceModelResolvedFrom.TypeEnum.valueOf(
+                responseDTO.getResolvedFrom().getType()));
+        resolvedFrom.setName(responseDTO.getResolvedFrom().getName());
+        ResolvedCustomTextModal customTextModel = new ResolvedCustomTextModal();
+        customTextModel.setType(ResolvedCustomTextModal.TypeEnum.valueOf(responseDTO.getType()));
+        customTextModel.setName(responseDTO.getName());
+        customTextModel.setLocale(responseDTO.getLocale());
+        customTextModel.setScreen(responseDTO.getScreen());
+        customTextModel.setResolvedFrom(resolvedFrom);
         customTextModel.setPreference(responseDTO.getPreference());
         return customTextModel;
     }

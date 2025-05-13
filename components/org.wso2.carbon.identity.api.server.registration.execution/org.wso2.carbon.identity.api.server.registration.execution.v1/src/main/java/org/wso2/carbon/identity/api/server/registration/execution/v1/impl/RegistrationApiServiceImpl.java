@@ -41,7 +41,8 @@ public class RegistrationApiServiceImpl implements RegistrationApiService {
     @Override
     public Response registrationInitiatePost(RegistrationInitiationRequest registrationInitiationRequest) {
 
-        return Response.ok().entity(userRegistrationFlowServiceCore.initiateUserRegistration())
+        return Response.ok()
+                .entity(userRegistrationFlowServiceCore.initiateUserRegistration(registrationInitiationRequest))
                 .build();
     }
 

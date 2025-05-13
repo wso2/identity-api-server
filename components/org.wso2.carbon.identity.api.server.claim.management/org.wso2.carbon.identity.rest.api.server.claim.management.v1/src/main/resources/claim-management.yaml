@@ -79,6 +79,7 @@ paths:
       - $ref : '#/parameters/filterQueryParam'
       - $ref : '#/parameters/sortQueryParam'
       - $ref : '#/parameters/excludeIdentityClaimsQueryParam'
+      - $ref : '#/parameters/excludeHiddenClaimsQueryParam'
       x-wso2-curl: |
       responses:
         200:
@@ -647,6 +648,12 @@ parameters:
     required: false
     type: boolean
     description: Exclude identity claims when listing local claims.
+  excludeHiddenClaimsQueryParam:
+    in: query
+    name: exclude-hidden-claims
+    required: false
+    type: boolean
+    description: Exclude hidden claims when listing local claims.
   dialectIdPathParam:
     in: path
     name: dialect-id
@@ -736,6 +743,10 @@ definitions:
         type: boolean
         description: Specifies if the claim will be prompted during user registration and displayed on the user profile.
         example: true
+      multiValued:
+        type: boolean
+        description: Specifies if the claim can hold multiple values or not.
+        example: true
       uniquenessScope:
         type: string
         description: Specifies the scope of uniqueness validation for the claim value.
@@ -813,6 +824,10 @@ definitions:
           supportedByDefault:
             type: boolean
             description: Specifies if the claim will be prompted during user registration and displayed on the user profile.
+            example: true
+          multiValued:
+            type: boolean
+            description: Specifies if the claim can hold multiple values.
             example: true
           uniquenessScope:
             type: string
