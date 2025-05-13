@@ -32,6 +32,7 @@ public class Constants {
     public static final String WORKFLOW_IMPLEMENTATION = "Workflowimpl";
     public static final String WORKFLOW_NAME = "WorkflowName";
     public static final String DEFAULT_ASSOCIATION_CONDITION = "boolean(1)";
+    public static final int DEFAULT_OFFSET = 0;
 
     private Constants() {
 
@@ -56,9 +57,12 @@ public class Constants {
         ERROR_CODE_CLIENT_ERROR_LISTING_ASSOCIATIONS("51006", "Unable to list existing workflow " +
                 "associations", "Encountered an error while listing the workflow associations."),
         ERROR_CODE_CLIENT_ERROR_ADDING_ASSOCIATION("51007", "Unable to add workflow association",
-                "Encountered an error while adding the workflow association."),
+                "Encountered an error while adding the workflow association with the name %s."),
         ERROR_CODE_CLIENT_ERROR_UPDATING_ASSOCIATION("51008", "Unable to update workflow association",
                 "Encountered an error while updating the workflow association."),
+        ERROR_CODE_INVALID_PAGINATION_PARAMETER_NEGATIVE_LIMIT("51009", "Invalid pagination parameters.", "'limit' " +
+                "shouldn't be negative."),
+
 
         // Server Errors starting from 500xx.
         ERROR_CODE_ERROR_LISTING_WORKFLOWS("50020", "Unable to list existing workflows",
@@ -76,7 +80,7 @@ public class Constants {
                                                            "workflow for identifier %s."),
         ERROR_CODE_ERROR_ADDING_ASSOCIATION("50025", "Unable to add workflow association",
                                                     "Server encountered an error while adding " +
-                                                            "the workflow association."),
+                                                            "the workflow association with the name %s."),
         ERROR_CODE_ERROR_LISTING_ASSOCIATIONS("50026", "Unable to list existing workflow associations",
                                                       "Server encountered an error while " +
                                                               "listing the workflow associations."),
