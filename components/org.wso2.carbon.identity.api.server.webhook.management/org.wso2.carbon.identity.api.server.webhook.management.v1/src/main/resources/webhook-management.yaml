@@ -250,6 +250,95 @@ paths:
           - lang: Curl
             source: |
               curl --location --request DELETE 'https://localhost:9443/t/carbon.super/api/server/v1/webhooks/101' -H 'Authorization: Basic YWRtaW46YWRtaW4='
+  
+
+  /webhooks/{webhookId}/activate:
+    post:
+      summary: Activate Webhook
+      description: "Activate a webhook by its unique ID.\n\n <b>Scope(Permission) required:</b> `internal_webhook_update` \n\n"
+      operationId: activateWebhook
+      tags:
+        - Webhooks
+      parameters:
+        - name: webhookId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Webhook Activated
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Webhook not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        x-codeSamples:
+          - lang: Curl
+            source: |
+              curl --location --request POST 'https://localhost:9443/t/carbon.super/api/server/v1/webhooks/{webhookId}/activate' \
+              -H 'Authorization: Basic YWRtaW46YWRtaW4='
+
+  /webhooks/{webhookId}/deactivate:
+    post:
+      summary: Deactivate Webhook
+      description: "Deactivate a webhook by its unique ID.\n\n <b>Scope(Permission) required:</b> `internal_webhook_update` \n\n"
+      operationId: deactivateWebhook
+      tags:
+        - Webhooks
+      parameters:
+        - name: webhookId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Webhook Deactivated
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Webhook not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        x-codeSamples:
+          - lang: Curl
+            source: |
+              curl --location --request POST 'https://localhost:9443/t/carbon.super/api/server/v1/webhooks/{webhookId}/deactivate' \
+              -H 'Authorization: Basic YWRtaW46YWRtaW4='
 
 components:
   securitySchemes:
@@ -282,8 +371,19 @@ components:
           description: Webhook URL.
           example: https://example.com/webhook
         eventSchema:
-          type: string
-          example: 'WSO2'
+          type: object
+          required:
+            - name
+            - uri
+          properties:
+            name:
+              type: string
+              description: Webhook Event Schema.
+              example: WSO2
+            uri:
+              type: string
+              description: Webhook Event Schema URI.
+              example: schemas.identity.wso2.org
         description:
           type: string
           description: Webhook description.
@@ -300,37 +400,47 @@ components:
           example: ["schemas.identity.wso2.org/events/logins/event-type/loginSuccess", "schemas.identity.wso2.org/events/logins/event-type/loginFailed"]
 
     WebhookResponse:
-      allOf:
-        - type: object
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 101
+        createdAt:
+          type: string
+          format: date-time
+          example: '2024-05-01T12:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2024-05-02T12:00:00Z'
+        endpoint:
+          type: string
+          description: Webhook URL.
+          example: https://example.com/webhook
+        eventSchema:
+          type: object
+          required:
+            - name
+            - uri
           properties:
-            id:
-              type: integer
-              example: 101
-            createdAt:
+            name:
               type: string
-              format: date-time
-              example: '2024-05-01T12:00:00Z'
-            updatedAt:
+              description: Webhook Event Schema.
+              example: WSO2
+            uri:
               type: string
-              format: date-time
-              example: '2024-05-02T12:00:00Z'
-            endpoint:
-              type: string
-              description: Webhook URL.
-              example: https://example.com/webhook
-            eventSchema:
-              type: string
-              example: 'WSO2'
-            description:
-              type: string
-              description: Webhook description.
-              example: A webhook for user events.
-            eventsSubscribed:
-              type: array
-              items:
-                type: string
-              description: List of events to subscribe to.
-              example: ["schemas.identity.wso2.org/events/logins/event-type/loginSuccess", "schemas.identity.wso2.org/events/logins/event-type/loginFailed"]
+              description: Webhook Event Schema URI.
+              example: schemas.identity.wso2.org
+        description:
+          type: string
+          description: Webhook description.
+          example: A webhook for user events.
+        eventsSubscribed:
+          type: array
+          items:
+            type: string
+          description: List of events to subscribe to.
+          example: ["schemas.identity.wso2.org/events/logins/event-type/loginSuccess", "schemas.identity.wso2.org/events/logins/event-type/loginFailed"]
 
     WebhookList:
       type: object
