@@ -64,7 +64,7 @@ paths:
         This API is used to search and retrieve organizations created for this tenant.
         
         Organizations can be filtered by id, name, description, created, lastModified, status, parentId, and meta attributes. 
-              
+        
         Supported operators: "eq" (equals), "co" (contains), "sw" (starts with), "ew" (ends with), "ge" (greater than or equals), "le" (less than or equals), "gt" (greater than), "lt" (less than)
         
         Multiple attributes can be combined using the "and" operator.
@@ -121,6 +121,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrganizationNameCheckPOSTResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      tags:
+        - Organization
+  /organizations/check-handle:
+    post:
+      summary: Check organization with given handle exist among the organizations hierarchy.
+      description: This API is used to check whether organization with particular handle exist or not.
+      operationId: organizationsCheckHandlePost
+      requestBody:
+        description: OrganizationHandleCheckPOSTRequest object containing the organization handle.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationHandleCheckPOSTRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationCheckResponse'
         '404':
           $ref: '#/components/responses/NotFound'
         '400':
@@ -898,6 +929,9 @@ components:
         name:
           type: string
           example: "ABC Builders"
+        orgHandle:
+          type: string
+          example: "abcbuilders"
         description:
           type: string
           example: "Building constructions"
@@ -952,7 +986,19 @@ components:
         name:
           type: string
           example: "ABC Builders"
+    OrganizationHandleCheckPOSTRequest:
+      type: object
+      properties:
+        orgHandle:
+          type: string
+          example: "abcbuilders"
     OrganizationNameCheckPOSTResponse:
+      type: object
+      properties:
+        available:
+          type: boolean
+          example: true
+    OrganizationCheckResponse:
       type: object
       properties:
         available:
@@ -983,9 +1029,9 @@ components:
                 "href": "/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations?limit=10&filter=name+co+der&next=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
                 "rel": "next",
               },  {
-                "href": "/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations?limit=10&filter=name+co+der&before=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
-                "rel": "previous",
-              }
+              "href": "/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations?limit=10&filter=name+co+der&before=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
+              "rel": "previous",
+            }
             ]
         organizations:
           type: array
@@ -1007,6 +1053,7 @@ components:
       required:
         - id
         - name
+        - orgHandle
         - status
         - ref
       properties:
@@ -1016,6 +1063,9 @@ components:
         name:
           type: string
           example: 'ABC Builders'
+        orgHandle:
+          type: string
+          example: 'abcbuilders'
         status:
           type: string
           enum: [ ACTIVE, DISABLED ]
@@ -1032,6 +1082,7 @@ components:
       required:
         - id
         - name
+        - orgHandle
         - status
         - created
         - lastModified
@@ -1043,6 +1094,9 @@ components:
         name:
           type: string
           example: 'ABC Builders'
+        orgHandle:
+          type: string
+          example: 'abcbuilders'
         description:
           type: string
           example: 'Building constructions'
@@ -1073,6 +1127,7 @@ components:
       required:
         - id
         - name
+        - orgHandle
         - status
         - created
         - lastModified
@@ -1084,6 +1139,9 @@ components:
         name:
           type: string
           example: 'ABC Builders'
+        orgHandle:
+          type: string
+          example: 'abcbuilders'
         description:
           type: string
           example: 'Building constructions'
@@ -1126,9 +1184,9 @@ components:
                 "href": "/o/api/server/v1/organizations/meta-attributes?limit=10&recursive=false&filter=attributes+co+C&after=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
                 "rel": "next",
               },  {
-                "href": "/o/api/server/v1/organizations/meta-attributes?limit=10&recursive=false&filter=attributes+co+C&before=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
-                "rel": "previous",
-              }
+              "href": "/o/api/server/v1/organizations/meta-attributes?limit=10&recursive=false&filter=attributes+co+C&before=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
+              "rel": "previous",
+            }
             ]
         attributes:
           type: array
@@ -1273,9 +1331,9 @@ components:
                 "href": "/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations/discovery?filter=attributes.type+eq+emailDomain&limit=10&offset=50",
                 "rel": "next",
               },  {
-                "href": "/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations/discovery?filter=attributes.type+eq+emailDomain&limit=10&offset=30",
-                "rel": "previous",
-              }
+              "href": "/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations/discovery?filter=attributes.type+eq+emailDomain&limit=10&offset=30",
+              "rel": "previous",
+            }
             ]
         organizations:
           type: array
@@ -1286,6 +1344,7 @@ components:
       required:
         - organizationId
         - organizationName
+        - orgHandle
         - attributes
       properties:
         organizationId:
@@ -1296,6 +1355,10 @@ components:
           type: string
           description: The name of the organization.
           example: 'ABC Builders'
+        orgHandle:
+          type: string
+          description: The handle of the organization.
+          example: 'abcbuilders'
         attributes:
           type: array
           items:
@@ -1326,6 +1389,7 @@ components:
       required:
         - id
         - name
+        - orgHandle
         - status
         - created
         - lastModified
@@ -1337,6 +1401,9 @@ components:
         name:
           type: string
           example: 'ABC Builders'
+        orgHandle:
+          type: string
+          example: 'abcbuilders'
         description:
           type: string
           example: 'Building constructions'
