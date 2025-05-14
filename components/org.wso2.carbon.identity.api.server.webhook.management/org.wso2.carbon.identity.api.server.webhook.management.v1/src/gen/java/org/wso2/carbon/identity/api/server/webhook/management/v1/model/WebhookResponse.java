@@ -71,7 +71,7 @@ public class WebhookResponse  {
         return this;
     }
     
-    @ApiModelProperty(example = "2024-05-01T12:00Z", value = "")
+    @ApiModelProperty(example = "2025-05-01T12:00Z", value = "")
     @JsonProperty("createdAt")
     @Valid
     public String getCreatedAt() {
@@ -89,7 +89,7 @@ public class WebhookResponse  {
         return this;
     }
     
-    @ApiModelProperty(example = "2024-05-02T12:00Z", value = "")
+    @ApiModelProperty(example = "2025-05-02T12:00Z", value = "")
     @JsonProperty("updatedAt")
     @Valid
     public String getUpdatedAt() {
