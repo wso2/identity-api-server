@@ -93,9 +93,7 @@ public class AsyncOperationsApiServiceCore {
     public Response getOperation(String operationId) {
 
         String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-        if (StringUtils.isBlank(operationId)) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
+
         try {
             OperationResponseDTO record = asyncOperationStatusMgtService.getOperation(operationId, tenantDomain);
             if (record == null) {
@@ -111,9 +109,6 @@ public class AsyncOperationsApiServiceCore {
 
         String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
 
-        if (StringUtils.isBlank(unitOperationId)) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
         try {
             UnitOperationResponseDTO record = asyncOperationStatusMgtService.getUnitOperation(unitOperationId,
                     tenantDomain);
@@ -131,9 +126,6 @@ public class AsyncOperationsApiServiceCore {
 
         String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
 
-        if (StringUtils.isBlank(operationId)) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
         try {
             limit = validateLimit(limit);
             List<UnitOperationResponseDTO> records =
