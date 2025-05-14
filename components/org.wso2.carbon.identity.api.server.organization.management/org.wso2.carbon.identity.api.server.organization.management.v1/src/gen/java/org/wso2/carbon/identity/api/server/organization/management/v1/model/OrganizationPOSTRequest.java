@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -36,7 +36,6 @@ import javax.xml.bind.annotation.*;
 public class OrganizationPOSTRequest  {
   
     private String name;
-    private String orgHandle;
     private String description;
 
 @XmlType(name="TypeEnum")
@@ -94,24 +93,6 @@ public enum TypeEnum {
     }
     public void setName(String name) {
         this.name = name;
-    }
-
-    /**
-    **/
-    public OrganizationPOSTRequest orgHandle(String orgHandle) {
-
-        this.orgHandle = orgHandle;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "abcbuilders", value = "")
-    @JsonProperty("orgHandle")
-    @Valid
-    public String getOrgHandle() {
-        return orgHandle;
-    }
-    public void setOrgHandle(String orgHandle) {
-        this.orgHandle = orgHandle;
     }
 
     /**
@@ -208,7 +189,6 @@ public enum TypeEnum {
         }
         OrganizationPOSTRequest organizationPOSTRequest = (OrganizationPOSTRequest) o;
         return Objects.equals(this.name, organizationPOSTRequest.name) &&
-            Objects.equals(this.orgHandle, organizationPOSTRequest.orgHandle) &&
             Objects.equals(this.description, organizationPOSTRequest.description) &&
             Objects.equals(this.type, organizationPOSTRequest.type) &&
             Objects.equals(this.parentId, organizationPOSTRequest.parentId) &&
@@ -217,7 +197,7 @@ public enum TypeEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, orgHandle, description, type, parentId, attributes);
+        return Objects.hash(name, description, type, parentId, attributes);
     }
 
     @Override
@@ -227,7 +207,6 @@ public enum TypeEnum {
         sb.append("class OrganizationPOSTRequest {\n");
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
-        sb.append("    orgHandle: ").append(toIndentedString(orgHandle)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    parentId: ").append(toIndentedString(parentId)).append("\n");

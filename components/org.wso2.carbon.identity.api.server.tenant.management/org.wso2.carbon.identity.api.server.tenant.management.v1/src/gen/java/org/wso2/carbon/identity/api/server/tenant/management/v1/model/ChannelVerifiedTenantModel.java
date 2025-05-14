@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -36,31 +36,11 @@ import javax.xml.bind.annotation.*;
 
 public class ChannelVerifiedTenantModel  {
   
-    private String name;
     private String domain;
     private String code;
     private Purpose purpose;
     private List<Owner> owners = new ArrayList<>();
 
-
-    /**
-    * Name of the tenant.
-    **/
-    public ChannelVerifiedTenantModel name(String name) {
-
-        this.name = name;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "ABC Builders", value = "Name of the tenant.")
-    @JsonProperty("name")
-    @Valid
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
 
     /**
     * Tenant domain of the tenant.
@@ -71,7 +51,7 @@ public class ChannelVerifiedTenantModel  {
         return this;
     }
     
-    @ApiModelProperty(example = "abc.com", required = true, value = "Tenant domain of the tenant.")
+    @ApiModelProperty(example = "wso2.com", required = true, value = "Tenant domain of the tenant.")
     @JsonProperty("domain")
     @Valid
     @NotNull(message = "Property domain cannot be null.")
@@ -159,8 +139,7 @@ public class ChannelVerifiedTenantModel  {
             return false;
         }
         ChannelVerifiedTenantModel channelVerifiedTenantModel = (ChannelVerifiedTenantModel) o;
-        return Objects.equals(this.name, channelVerifiedTenantModel.name) &&
-            Objects.equals(this.domain, channelVerifiedTenantModel.domain) &&
+        return Objects.equals(this.domain, channelVerifiedTenantModel.domain) &&
             Objects.equals(this.code, channelVerifiedTenantModel.code) &&
             Objects.equals(this.purpose, channelVerifiedTenantModel.purpose) &&
             Objects.equals(this.owners, channelVerifiedTenantModel.owners);
@@ -168,7 +147,7 @@ public class ChannelVerifiedTenantModel  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, domain, code, purpose, owners);
+        return Objects.hash(domain, code, purpose, owners);
     }
 
     @Override
@@ -177,7 +156,6 @@ public class ChannelVerifiedTenantModel  {
         StringBuilder sb = new StringBuilder();
         sb.append("class ChannelVerifiedTenantModel {\n");
         
-        sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    domain: ").append(toIndentedString(domain)).append("\n");
         sb.append("    code: ").append(toIndentedString(code)).append("\n");
         sb.append("    purpose: ").append(toIndentedString(purpose)).append("\n");

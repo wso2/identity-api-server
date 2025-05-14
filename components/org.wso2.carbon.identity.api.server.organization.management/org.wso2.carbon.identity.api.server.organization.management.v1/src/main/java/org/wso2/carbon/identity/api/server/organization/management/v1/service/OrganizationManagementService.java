@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -31,7 +31,6 @@ import org.wso2.carbon.identity.api.server.organization.management.v1.model.Disc
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.GetOrganizationResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.Link;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.MetaAttributesResponse;
-import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationCheckResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryAttributes;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryCheckPOSTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryCheckPOSTResponse;
@@ -165,23 +164,6 @@ public class OrganizationManagementService {
             response.setAvailable(true);
         }
         return Response.ok().entity(response).build();
-    }
-
-    /**
-     * Check if organization exist for given organization handle.
-     *
-     * @param orgHandle Organization Handle.
-     * @return Organization handle check response.
-     */
-    public Response checkOrganizationHandle(String orgHandle) {
-
-        try {
-            boolean isOrgHandleAvailable = !organizationManager.isOrganizationExistByHandle(orgHandle);
-            OrganizationCheckResponse response = new OrganizationCheckResponse().available(isOrgHandleAvailable);
-            return Response.ok().entity(response).build();
-        } catch (OrganizationManagementException e) {
-            return OrganizationManagementEndpointUtil.handleServerErrorResponse(e, LOG);
-        }
     }
 
     /**
@@ -518,10 +500,8 @@ public class OrganizationManagementService {
             response.setCount(organizationsDiscoveryAttributes.size());
             for (OrganizationDiscovery organizationDiscovery : organizationsDiscoveryAttributes) {
                 OrganizationDiscoveryResponse organizationDiscoveryResponse = new OrganizationDiscoveryResponse();
-                String organizationID = organizationDiscovery.getOrganizationId();
-                organizationDiscoveryResponse.setOrganizationId(organizationID);
+                organizationDiscoveryResponse.setOrganizationId(organizationDiscovery.getOrganizationId());
                 organizationDiscoveryResponse.setOrganizationName(organizationDiscovery.getOrganizationName());
-                organizationDiscoveryResponse.setOrgHandle(organizationDiscovery.getOrganizationHandle());
                 organizationDiscovery.getDiscoveryAttributes().forEach(orgDiscoveryAttribute -> {
                     DiscoveryAttribute organizationDiscoveryAttributeResponse = new DiscoveryAttribute();
                     organizationDiscoveryAttributeResponse.setType(orgDiscoveryAttribute.getType());
@@ -614,18 +594,14 @@ public class OrganizationManagementService {
         String organizationId = generateUniqueID();
         OrganizationPOSTRequest.TypeEnum type = organizationPOSTRequest.getType();
         Organization organization;
-        String orgHandle = organizationPOSTRequest.getOrgHandle();
         if (OrganizationPOSTRequest.TypeEnum.TENANT.equals(type)) {
-
             // Set the organization id as the default domain name of the underlying tenant.
-            String domain = StringUtils.isNotBlank(orgHandle) ? orgHandle : organizationId;
-            organization = new TenantTypeOrganization(domain);
+            organization = new TenantTypeOrganization(organizationId);
         } else {
             organization = new Organization();
         }
         organization.setId(organizationId);
         organization.setName(organizationPOSTRequest.getName());
-        organization.setOrganizationHandle(orgHandle);
         organization.setDescription(organizationPOSTRequest.getDescription());
         organization.setStatus(OrganizationManagementConstants.OrganizationStatus.ACTIVE.toString());
         organization.setType(type != null ? type.toString() : null);
@@ -646,7 +622,6 @@ public class OrganizationManagementService {
         OrganizationResponse organizationResponse = new OrganizationResponse();
         organizationResponse.setId(organization.getId());
         organizationResponse.setName(organization.getName());
-        organizationResponse.setOrgHandle(organization.getOrganizationHandle());
         organizationResponse.setDescription(organization.getDescription());
 
         OrganizationResponse.StatusEnum status;
@@ -685,7 +660,6 @@ public class OrganizationManagementService {
         GetOrganizationResponse organizationResponse = new GetOrganizationResponse();
         organizationResponse.setId(organization.getId());
         organizationResponse.setName(organization.getName());
-        organizationResponse.setOrgHandle(organization.getOrganizationHandle());
         organizationResponse.setDescription(organization.getDescription());
         organizationResponse.setCreated(organization.getCreated().toString());
         organizationResponse.setLastModified(organization.getLastModified().toString());
@@ -825,7 +799,6 @@ public class OrganizationManagementService {
                 BasicOrganizationResponse organizationDTO = new BasicOrganizationResponse();
                 organizationDTO.setId(organization.getId());
                 organizationDTO.setName(organization.getName());
-                organizationDTO.setOrgHandle(organization.getOrganizationHandle());
                 organizationDTO.setStatus(BasicOrganizationResponse.StatusEnum.valueOf(organization.getStatus()));
                 organizationDTO.setRef(buildOrganizationURL(organization.getId()).toString());
                 List<Attribute> attributeList = getOrganizationAttributes(organization);
@@ -948,7 +921,6 @@ public class OrganizationManagementService {
         OrganizationMetadata organizationMetadata = new OrganizationMetadata();
         organizationMetadata.setId(organization.getId());
         organizationMetadata.setName(organization.getName());
-        organizationMetadata.setOrgHandle(organization.getOrganizationHandle());
         organizationMetadata.setDescription(organization.getDescription());
         organizationMetadata.setCreated(organization.getCreated().toString());
         organizationMetadata.setLastModified(organization.getLastModified().toString());

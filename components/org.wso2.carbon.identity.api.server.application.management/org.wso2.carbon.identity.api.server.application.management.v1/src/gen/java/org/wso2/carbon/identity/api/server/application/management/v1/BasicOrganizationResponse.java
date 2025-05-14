@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -34,7 +34,6 @@ public class BasicOrganizationResponse  {
   
     private String id;
     private String name;
-    private String orgHandle;
 
 @XmlType(name="StatusEnum")
 @XmlEnum(String.class)
@@ -113,26 +112,6 @@ public enum StatusEnum {
 
     /**
     **/
-    public BasicOrganizationResponse orgHandle(String orgHandle) {
-
-        this.orgHandle = orgHandle;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "abcbuilders", required = true, value = "")
-    @JsonProperty("orgHandle")
-    @Valid
-    @NotNull(message = "Property orgHandle cannot be null.")
-
-    public String getOrgHandle() {
-        return orgHandle;
-    }
-    public void setOrgHandle(String orgHandle) {
-        this.orgHandle = orgHandle;
-    }
-
-    /**
-    **/
     public BasicOrganizationResponse status(StatusEnum status) {
 
         this.status = status;
@@ -185,14 +164,13 @@ public enum StatusEnum {
         BasicOrganizationResponse basicOrganizationResponse = (BasicOrganizationResponse) o;
         return Objects.equals(this.id, basicOrganizationResponse.id) &&
             Objects.equals(this.name, basicOrganizationResponse.name) &&
-            Objects.equals(this.orgHandle, basicOrganizationResponse.orgHandle) &&
             Objects.equals(this.status, basicOrganizationResponse.status) &&
             Objects.equals(this.ref, basicOrganizationResponse.ref);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, orgHandle, status, ref);
+        return Objects.hash(id, name, status, ref);
     }
 
     @Override
@@ -203,7 +181,6 @@ public enum StatusEnum {
         
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
-        sb.append("    orgHandle: ").append(toIndentedString(orgHandle)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("    ref: ").append(toIndentedString(ref)).append("\n");
         sb.append("}");

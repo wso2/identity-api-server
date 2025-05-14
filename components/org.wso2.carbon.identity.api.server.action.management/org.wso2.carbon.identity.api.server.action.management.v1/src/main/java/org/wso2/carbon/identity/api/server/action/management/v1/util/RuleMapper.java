@@ -137,8 +137,6 @@ public class RuleMapper {
                 return FlowType.PRE_ISSUE_ACCESS_TOKEN;
             case PRE_UPDATE_PASSWORD:
                 return FlowType.PRE_UPDATE_PASSWORD;
-            case PRE_UPDATE_PROFILE:
-                return FlowType.PRE_UPDATE_PROFILE;
             default:
                 throw ActionMgtEndpointUtil.handleException(Response.Status.NOT_IMPLEMENTED,
                         ActionMgtEndpointConstants.ErrorMessage.ERROR_NOT_IMPLEMENTED_ACTION_RULE_FLOW_TYPE);

@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.BASIC;
+import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.CLIENT_ID;
 import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.CLIENT_SECRET;
 import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_CONFLICT_PUBLISHER;
 import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_NO_ACTIVE_PUBLISHERS_FOUND;
@@ -273,7 +273,7 @@ public class NotificationSenderManagementService {
     /**
      * Update push sender details by name.
      *
-     * @param senderName              Push sender's name.
+     * @param senderName               Push sender's name.
      * @param pushSenderUpdateRequest Push sender's updated configurations.
      * @return Updated push sender.
      */
@@ -337,11 +337,11 @@ public class NotificationSenderManagementService {
         emailSender.setFromAddress(dto.getFromAddress());
         emailSender.setSmtpPort(dto.getSmtpPort());
         emailSender.setSmtpServerHost(dto.getSmtpServerHost());
-        emailSender.setAuthType(StringUtils.isBlank(dto.getAuthType()) ? BASIC : dto.getAuthType());
+        emailSender.setAuthType(dto.getAuthType());
         List<Properties> properties = new ArrayList<>();
 
         // Exclude credentials from the response.
-        Set<String> excludedKeys = new HashSet<>(Arrays.asList(PASSWORD, CLIENT_SECRET));
+        Set<String> excludedKeys = new HashSet<>(Arrays.asList(PASSWORD, USERNAME, CLIENT_SECRET, CLIENT_ID));
 
         if (dto.getProperties() == null) {
             return emailSender;
@@ -355,15 +355,6 @@ public class NotificationSenderManagementService {
             prop.setValue(value);
             properties.add(prop);
         });
-        /* In case where the email provider is configured via V1 API, the username is not set in the properties, but as
-        a first class attribute. As V2 doesn't support credentials as first class attributes username needs to be
-        set as a property. */
-        if (StringUtils.isNotBlank(dto.getUsername())) {
-            Properties prop = new Properties();
-            prop.setKey(USERNAME);
-            prop.setValue(dto.getUsername());
-            properties.add(prop);
-        }
         emailSender.setProperties(properties);
         return emailSender;
     }
