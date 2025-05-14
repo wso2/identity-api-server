@@ -68,9 +68,9 @@ public class WebhooksApi  {
         @ApiResponse(code = 404, message = "Webhook not found", response = Error.class),
         @ApiResponse(code = 500, message = "Internal server error", response = Error.class)
     })
-    public Response activateWebhook(@ApiParam(value = "",required=true) @PathParam("webhookId") Integer webhookId) {
+    public Response activateWebhook(@ApiParam(value = "",required=true) @PathParam("webhookId") String webhookId) {
 
-        return delegate.activateWebhook(webhookId );
+        return delegate.activateWebhook(webhookId);
     }
 
     @Valid
@@ -115,7 +115,7 @@ public class WebhooksApi  {
         @ApiResponse(code = 404, message = "Webhook not found", response = Error.class),
         @ApiResponse(code = 500, message = "Internal server error", response = Error.class)
     })
-    public Response deactivateWebhook(@ApiParam(value = "",required=true) @PathParam("webhookId") Integer webhookId) {
+    public Response deactivateWebhook(@ApiParam(value = "",required=true) @PathParam("webhookId") String webhookId) {
 
         return delegate.deactivateWebhook(webhookId );
     }
@@ -139,7 +139,7 @@ public class WebhooksApi  {
         @ApiResponse(code = 404, message = "Webhook not found", response = Error.class),
         @ApiResponse(code = 500, message = "Internal server error", response = Error.class)
     })
-    public Response deleteWebhook(@ApiParam(value = "",required=true) @PathParam("webhookId") Integer webhookId) {
+    public Response deleteWebhook(@ApiParam(value = "",required=true) @PathParam("webhookId") String webhookId) {
 
         return delegate.deleteWebhook(webhookId );
     }
@@ -163,7 +163,7 @@ public class WebhooksApi  {
         @ApiResponse(code = 404, message = "Webhook not found", response = Error.class),
         @ApiResponse(code = 500, message = "Internal server error", response = Error.class)
     })
-    public Response getWebhookByWebhookId(@ApiParam(value = "",required=true) @PathParam("webhookId") Integer webhookId) {
+    public Response getWebhookByWebhookId(@ApiParam(value = "",required=true) @PathParam("webhookId") String webhookId) {
 
         return delegate.getWebhookByWebhookId(webhookId );
     }
@@ -210,7 +210,7 @@ public class WebhooksApi  {
         @ApiResponse(code = 404, message = "Webhook not found", response = Error.class),
         @ApiResponse(code = 500, message = "Internal server error", response = Error.class)
     })
-    public Response updateWebhook(@ApiParam(value = "",required=true) @PathParam("webhookId") Integer webhookId, @ApiParam(value = "" ,required=true) @Valid WebhookRequest webhookRequest) {
+    public Response updateWebhook(@ApiParam(value = "",required=true) @PathParam("webhookId") String webhookId, @ApiParam(value = "" ,required=true) @Valid WebhookRequest webhookRequest) {
 
         return delegate.updateWebhook(webhookId,  webhookRequest );
     }
