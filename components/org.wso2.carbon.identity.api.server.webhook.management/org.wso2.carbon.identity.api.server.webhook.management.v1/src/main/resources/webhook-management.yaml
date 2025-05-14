@@ -114,7 +114,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            type: string
       responses:
         '200':
           description: OK
@@ -160,7 +160,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            type: string
       requestBody:
         required: true
         content:
@@ -220,7 +220,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            type: string
       responses:
         '204':
           description: Webhook Deleted
@@ -264,7 +264,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            type: string
       responses:
         '204':
           description: Webhook Activated
@@ -308,7 +308,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            type: string
       responses:
         '204':
           description: Webhook Deactivated
@@ -403,15 +403,13 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          example: 101
+          type: string
+          example: 'eeb8c1a2-3f4d-4e5b-8c6f-7d8e9f0a1b2c'
         createdAt:
           type: string
-          format: date-time
           example: '2024-05-01T12:00:00Z'
         updatedAt:
           type: string
-          format: date-time
           example: '2024-05-02T12:00:00Z'
         endpoint:
           type: string
