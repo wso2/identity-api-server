@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -23,16 +23,17 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 
-import org.wso2.carbon.identity.api.server.organization.management.v1.factories.OrganizationsApiServiceFactory;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.ApplicationSharePOSTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.Error;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.GetOrganizationResponse;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.MetaAttributesResponse;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationCheckResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryAttributes;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryCheckPOSTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryCheckPOSTResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryPostRequest;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationHandleCheckPOSTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationMetadata;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationNameCheckPOSTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationNameCheckPOSTResponse;
@@ -44,6 +45,8 @@ import org.wso2.carbon.identity.api.server.organization.management.v1.model.Orga
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationsResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.SharedApplicationsResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.SharedOrganizationsResponse;
+import org.wso2.carbon.identity.api.server.organization.management.v1.OrganizationsApiService;
+import org.wso2.carbon.identity.api.server.organization.management.v1.factories.OrganizationsApiServiceFactory;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -131,7 +134,7 @@ public class OrganizationsApi  {
         @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
         @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
     })
-    public Response organizationDiscoveryPost(@ApiParam(value = "This represents the organization discovery attributes to be added." ,required=true) @Valid @NotNull(message = "Request body organizationDiscoveryPostRequest cannot be null.") OrganizationDiscoveryPostRequest organizationDiscoveryPostRequest) {
+    public Response organizationDiscoveryPost(@ApiParam(value = "This represents the organization discovery attributes to be added." ,required=true) @Valid OrganizationDiscoveryPostRequest organizationDiscoveryPostRequest) {
 
         return delegate.organizationDiscoveryPost(organizationDiscoveryPostRequest );
     }
@@ -179,6 +182,30 @@ public class OrganizationsApi  {
     public Response organizationPost(@ApiParam(value = "This represents the organization to be added." ,required=true) @Valid OrganizationPOSTRequest organizationPOSTRequest) {
 
         return delegate.organizationPost(organizationPOSTRequest );
+    }
+
+    @Valid
+    @POST
+    @Path("/check-handle")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Check organization with given handle exist among the organizations hierarchy.", notes = "This API is used to check whether organization with particular handle exist or not.", response = OrganizationCheckResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Organization", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = OrganizationCheckResponse.class),
+        @ApiResponse(code = 404, message = "Requested resource is not found.", response = Error.class),
+        @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
+        @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
+        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
+    })
+    public Response organizationsCheckHandlePost(@ApiParam(value = "OrganizationHandleCheckPOSTRequest object containing the organization handle." ,required=true) @Valid OrganizationHandleCheckPOSTRequest organizationHandleCheckPOSTRequest) {
+
+        return delegate.organizationsCheckHandlePost(organizationHandleCheckPOSTRequest );
     }
 
     @Valid
@@ -234,7 +261,7 @@ public class OrganizationsApi  {
     
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve organizations created for this tenant which matches the defined search criteria, if any.", notes = "This API is used to search and retrieve organizations created for this tenant.  Organizations can be filtered by id, name, description, created, lastModified, status, parentId, and meta attributes.         Supported operators: \"eq\" (equals), \"co\" (contains), \"sw\" (starts with), \"ew\" (ends with), \"ge\" (greater than or equals), \"le\" (less than or equals), \"gt\" (greater than), \"lt\" (less than)  Multiple attributes can be combined using the \"and\" operator.  Examples:   - filter=name+eq+ABC Builders   - filter=attributes.Country+eq+Sri Lanka  <b>Scope(Permission) required:</b> `internal_organization_view` ", response = OrganizationsResponse.class, authorizations = {
+    @ApiOperation(value = "Retrieve organizations created for this tenant which matches the defined search criteria, if any.", notes = "This API is used to search and retrieve organizations created for this tenant.  Organizations can be filtered by id, name, description, created, lastModified, status, parentId, and meta attributes.   Supported operators: \"eq\" (equals), \"co\" (contains), \"sw\" (starts with), \"ew\" (ends with), \"ge\" (greater than or equals), \"le\" (less than or equals), \"gt\" (greater than), \"lt\" (less than)  Multiple attributes can be combined using the \"and\" operator.  Examples:   - filter=name+eq+ABC Builders   - filter=attributes.Country+eq+Sri Lanka  <b>Scope(Permission) required:</b> `internal_organization_view` ", response = OrganizationsResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
