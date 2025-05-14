@@ -211,8 +211,7 @@ public class AsyncOperationsApiServiceCore {
         return response;
     }
 
-    private Link createLink(Timestamp timestamp, String paginationOrder, String rel, String resourcePath,
-                            String url) {
+    private Link createLink(Timestamp timestamp, String paginationOrder, String rel, String resourcePath, String url) {
 
         String encodedString = Base64.getEncoder().encodeToString(timestamp.toString()
                 .getBytes(StandardCharsets.UTF_8));

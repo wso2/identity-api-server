@@ -54,13 +54,11 @@ public class AsyncOperationStatusEndpointUtil {
     public static APIError handleException(Response.Status status,
                                            AsyncOperationStatusMgtEndpointConstants.ErrorMessage error) {
 
-        return new APIError(status, getError(error.getCode(), error.getMessage(),
-                error.getDescription()));
+        return new APIError(status, getError(error.getCode(), error.getMessage(), error.getDescription()));
     }
 
     public static APIError handleException(Response.Status status,
-                                           AsyncOperationStatusMgtEndpointConstants.ErrorMessage error,
-                                           String data) {
+                                           AsyncOperationStatusMgtEndpointConstants.ErrorMessage error, String data) {
 
         return new APIError(status, getError(error.getCode(), error.getMessage(),
                 String.format(error.getDescription(), data)));
@@ -92,8 +90,7 @@ public class AsyncOperationStatusEndpointUtil {
     }
 
     public static AsyncOperationStatusMgtServerException buildAsyncStatusMgtServerException(
-            AsyncOperationStatusMgtEndpointConstants.ErrorMessage error,
-            Throwable e, String... data) {
+            AsyncOperationStatusMgtEndpointConstants.ErrorMessage error, Throwable e, String... data) {
 
         String description = error.getDescription();
         if (ArrayUtils.isNotEmpty(data)) {
