@@ -59,6 +59,7 @@ import static org.wso2.carbon.identity.api.server.asynchronous.operation.status.
 import static org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.constants.AsyncOperationStatusMgtEndpointConstants.PAGINATION_BEFORE;
 import static org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.constants.AsyncOperationStatusMgtEndpointConstants.PATH_SEPARATOR;
 import static org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.constants.AsyncOperationStatusMgtEndpointConstants.PREVIOUS;
+import static org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.constants.AsyncOperationStatusMgtEndpointConstants.UNIT_OPERATIONS;
 import static org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.util.AsyncOperationStatusEndpointUtil.buildAsyncStatusMgtClientException;
 import static org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.util.AsyncOperationStatusEndpointUtil.buildURIForPagination;
 
@@ -147,7 +148,7 @@ public class AsyncOperationsApiServiceCore {
 
     private Operation getOperationResponse(OperationResponseDTO dto) {
 
-        String resourcePath = PATH_SEPARATOR + dto.getOperationId() + PATH_SEPARATOR + "unit-operations";
+        String resourcePath = PATH_SEPARATOR + dto.getOperationId() + PATH_SEPARATOR + UNIT_OPERATIONS;
         String url = "?" + LIMIT_PARAM + "=" + "10";
 
         Operation operation = new Operation();
