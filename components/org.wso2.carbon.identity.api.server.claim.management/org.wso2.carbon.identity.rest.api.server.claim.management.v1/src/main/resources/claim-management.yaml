@@ -743,6 +743,10 @@ definitions:
         type: boolean
         description: Specifies if the claim will be prompted during user registration and displayed on the user profile.
         example: true
+      dataType:
+        type: string
+        description: Specifies if the type of the data stored in the claim should be considered.
+        example: complex
       multiValued:
         type: boolean
         description: Specifies if the claim can hold multiple values or not.
@@ -825,6 +829,10 @@ definitions:
             type: boolean
             description: Specifies if the claim will be prompted during user registration and displayed on the user profile.
             example: true
+          dataType:
+            type: string
+            description: Specifies the type of the data stored in the claim.
+            example: complex
           multiValued:
             type: boolean
             description: Specifies if the claim can hold multiple values.
