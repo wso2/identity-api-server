@@ -51,6 +51,7 @@ import java.util.List;
 
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.constants.AsyncOperationStatusMgtEndpointConstants.DEFAULT_LIMIT;
 import static org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.constants.AsyncOperationStatusMgtEndpointConstants.ErrorMessage.ERROR_CODE_INVALID_PAGINATION_PARAMETER_NEGATIVE_LIMIT;
 import static org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.constants.AsyncOperationStatusMgtEndpointConstants.FILTER_PARAM;
 import static org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.constants.AsyncOperationStatusMgtEndpointConstants.LIMIT_PARAM;
@@ -141,7 +142,7 @@ public class AsyncOperationsApiServiceCore {
     private Operation getOperationResponse(OperationResponseDTO dto) {
 
         String resourcePath = PATH_SEPARATOR + dto.getOperationId() + PATH_SEPARATOR + UNIT_OPERATIONS;
-        String url = "?" + LIMIT_PARAM + "=" + "10";
+        String url = "?" + LIMIT_PARAM + "=" + DEFAULT_LIMIT;
 
         Operation operation = new Operation();
         operation.setOperationId(dto.getOperationId());

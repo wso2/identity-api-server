@@ -162,9 +162,11 @@ public enum StatusEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "org-1", value = "")
+    @ApiModelProperty(example = "org-1", required = true, value = "")
     @JsonProperty("targetOrgName")
     @Valid
+    @NotNull(message = "Property targetOrgName cannot be null.")
+
     public String getTargetOrgName() {
         return targetOrgName;
     }
@@ -180,9 +182,11 @@ public enum StatusEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "SUCCESS", value = "")
+    @ApiModelProperty(example = "SUCCESS", required = true, value = "")
     @JsonProperty("status")
     @Valid
+    @NotNull(message = "Property status cannot be null.")
+
     public StatusEnum getStatus() {
         return status;
     }
@@ -198,9 +202,11 @@ public enum StatusEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "Unit operation is pending execution.", value = "")
+    @ApiModelProperty(example = "Unit operation is pending execution.", required = true, value = "")
     @JsonProperty("statusMessage")
     @Valid
+    @NotNull(message = "Property statusMessage cannot be null.")
+
     public String getStatusMessage() {
         return statusMessage;
     }
@@ -216,9 +222,11 @@ public enum StatusEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "2024-10-27T10:00:00Z", value = "")
+    @ApiModelProperty(example = "2024-10-27T10:00:00Z", required = true, value = "")
     @JsonProperty("createdTime")
     @Valid
+    @NotNull(message = "Property createdTime cannot be null.")
+
     public String getCreatedTime() {
         return createdTime;
     }
