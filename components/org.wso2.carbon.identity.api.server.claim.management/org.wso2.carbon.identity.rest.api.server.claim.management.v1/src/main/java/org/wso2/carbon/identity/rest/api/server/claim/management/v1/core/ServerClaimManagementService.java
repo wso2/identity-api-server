@@ -42,6 +42,7 @@ import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementServic
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataClientException;
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
 import org.wso2.carbon.identity.claim.metadata.mgt.model.AttributeMapping;
+import org.wso2.carbon.identity.claim.metadata.mgt.model.Claim;
 import org.wso2.carbon.identity.claim.metadata.mgt.model.ClaimDialect;
 import org.wso2.carbon.identity.claim.metadata.mgt.model.ExternalClaim;
 import org.wso2.carbon.identity.claim.metadata.mgt.model.LocalClaim;
@@ -55,8 +56,10 @@ import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.Attribut
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ClaimDialectReqDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ClaimDialectResDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ClaimResDTO;
+import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.DataTypeEnum;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ExternalClaimReqDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ExternalClaimResDTO;
+import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.LabelValueDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.LinkDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.LocalClaimReqDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.LocalClaimResDTO;
@@ -64,6 +67,7 @@ import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.Profiles
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.PropertyDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.model.ClaimDialectConfiguration;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.model.ClaimErrorDTO;
+import org.wso2.carbon.identity.scim2.common.utils.SCIMCommonUtils;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.core.UserStoreManager;
 import org.yaml.snakeyaml.DumperOptions;
@@ -85,6 +89,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -133,6 +138,8 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_USERSTORE_NOT_SPECIFIED_IN_MAPPINGS;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.LOCAL_DIALECT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.LOCAL_DIALECT_PATH;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_CANONICAL_VALUES;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DATA_TYPE;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DESCRIPTION;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DISPLAY_NAME;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DISPLAY_ORDER;
@@ -141,6 +148,7 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_READ_ONLY;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_REG_EX;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_REQUIRED;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_SUB_ATTRIBUTES;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_SUPPORTED_BY_DEFAULT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_UNIQUENESS_SCOPE;
 import static org.wso2.carbon.identity.api.server.common.Constants.JSON_FILE_EXTENSION;
@@ -151,6 +159,7 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
 import static org.wso2.carbon.identity.api.server.common.Constants.XML_FILE_EXTENSION;
 import static org.wso2.carbon.identity.api.server.common.Constants.YAML_FILE_EXTENSION;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIForBody;
+import static org.wso2.carbon.identity.claim.metadata.mgt.util.ClaimConstants.IS_SYSTEM_CLAIM;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_ORGANIZATION_NOT_FOUND_FOR_TENANT;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
@@ -509,6 +518,9 @@ public class ServerClaimManagementService {
                         BAD_REQUEST);
             }
             validateAttributeMappings(localClaimReqDTO.getAttributeMapping());
+            validateSubAttributeUpdate(localClaimReqDTO);
+            validateSystemClaimUpdate(localClaimReqDTO, claimId);
+
             claimMetadataManagementService.updateLocalClaim(createLocalClaim(localClaimReqDTO),
                     ContextLoader.getTenantDomainFromContext());
         } catch (ClaimMetadataException e) {
@@ -1057,6 +1069,44 @@ public class ServerClaimManagementService {
         }
         localClaimResDTO.setRequired(Boolean.valueOf(claimProperties.remove(PROP_REQUIRED)));
         localClaimResDTO.setSupportedByDefault(Boolean.valueOf(claimProperties.remove(PROP_SUPPORTED_BY_DEFAULT)));
+
+        String dataType = claimProperties.remove(PROP_DATA_TYPE);
+        if (StringUtils.isNotBlank(dataType)) {
+            try {
+                localClaimResDTO.setDataType(DataTypeEnum.valueOf(dataType.toUpperCase(Locale.ENGLISH)));
+            } catch (IllegalArgumentException e) {
+                localClaimResDTO.setDataType(DataTypeEnum.STRING);
+            }
+        } else {
+            localClaimResDTO.setDataType(DataTypeEnum.STRING);
+        }
+
+        String subAttributes = claimProperties.remove(PROP_SUB_ATTRIBUTES);
+        if (StringUtils.isNotBlank(subAttributes)) {
+            localClaimResDTO.setSubAttributes(subAttributes.split(" "));
+        }
+
+        String canonicalValues = claimProperties.remove(PROP_CANONICAL_VALUES);
+        if (StringUtils.isNotEmpty(canonicalValues)) {
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                List<LabelValueDTO> list = mapper.readValue(canonicalValues, mapper.getTypeFactory()
+                                .constructCollectionType(List.class, LabelValueDTO.class));
+                LabelValueDTO[] canonicalValuesList = new LabelValueDTO[list.size()];
+                for (int i = 0; i < list.size(); i++) {
+                    LabelValueDTO canonicalValue = new LabelValueDTO();
+                    canonicalValue.setLabel(list.get(i).getLabel());
+                    canonicalValue.setValue(list.get(i).getValue());
+                    canonicalValuesList[i] = canonicalValue;
+                }
+                if (canonicalValuesList.length > 0) {
+                    localClaimResDTO.setCanonicalValues(canonicalValuesList);
+                }
+            } catch (IOException e) {
+                LOG.error("Error while parsing canonical values.");
+            }
+        }
+
         localClaimResDTO.setMultiValued(Boolean.valueOf(claimProperties.remove(PROP_MULTI_VALUED)));
 
         String uniquenessScope = claimProperties.remove(PROP_UNIQUENESS_SCOPE);
@@ -1201,8 +1251,28 @@ public class ServerClaimManagementService {
         claimProperties.put(PROP_READ_ONLY, String.valueOf(localClaimReqDTO.getReadOnly()));
         claimProperties.put(PROP_REQUIRED, String.valueOf(localClaimReqDTO.getRequired()));
         claimProperties.put(PROP_SUPPORTED_BY_DEFAULT, String.valueOf(localClaimReqDTO.getSupportedByDefault()));
-        claimProperties.put(PROP_MULTI_VALUED, localClaimReqDTO.getMultiValued() == null ? FALSE :
-                String.valueOf(localClaimReqDTO.getMultiValued()));
+        if (localClaimReqDTO.getDataType() != null) {
+            claimProperties.put(PROP_DATA_TYPE, String.valueOf(localClaimReqDTO.getDataType()));
+        }
+
+        if (DataTypeEnum.COMPLEX.equals(localClaimReqDTO.getDataType())
+                && ArrayUtils.isNotEmpty(localClaimReqDTO.getSubAttributes())) {
+            claimProperties.put(PROP_SUB_ATTRIBUTES, String.join(" ", localClaimReqDTO.getSubAttributes()));
+        }
+
+        if (ArrayUtils.isNotEmpty(localClaimReqDTO.getCanonicalValues())) {
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                String jsonString = mapper.writeValueAsString(localClaimReqDTO.getCanonicalValues());
+                claimProperties.put(PROP_CANONICAL_VALUES, jsonString);
+            } catch (JsonProcessingException e) {
+                LOG.error("Error while parsing canonical values.", e);
+            }
+        }
+
+        if (localClaimReqDTO.getMultiValued() != null) {
+            claimProperties.put(PROP_MULTI_VALUED, String.valueOf(localClaimReqDTO.getMultiValued()));
+        }
 
         claimProperties.putAll(propertiesToMap(localClaimReqDTO.getProperties()));
 
@@ -1683,6 +1753,101 @@ public class ServerClaimManagementService {
 
     }
 
+    private void validateSystemClaimUpdate(LocalClaimReqDTO localClaimReqDTO, String claimId)
+            throws ClaimMetadataClientException {
+
+        boolean isSystemClaim = localClaimReqDTO.getProperties().stream()
+                .anyMatch(property -> IS_SYSTEM_CLAIM.equals(property.getKey()) &&
+                        Boolean.parseBoolean(property.getValue()));
+        if (!isSystemClaim) {
+            return;
+        }
+
+        LocalClaimResDTO existingClaim = getLocalClaim(claimId);
+
+        // Validate the multivalued property is updated.
+        if (Boolean.TRUE.equals(existingClaim.getMultiValued()) !=
+                Boolean.TRUE.equals(localClaimReqDTO.getMultiValued())) {
+            throw new ClaimMetadataClientException(Constant.ErrorMessage
+                    .ERROR_CODE_SYSTEM_ATTRIBUTE_MULTIVALUED_STATE_UPDATE.getCode(),
+                    Constant.ErrorMessage.ERROR_CODE_SYSTEM_ATTRIBUTE_MULTIVALUED_STATE_UPDATE.getDescription());
+        }
+
+
+        // Validate the dataType property is updated.
+        DataTypeEnum requestedDataType = localClaimReqDTO.getDataType();
+        if (requestedDataType == null) {
+            requestedDataType = DataTypeEnum.STRING;
+        }
+        if (existingClaim.getDataType() != requestedDataType) {
+            throw new ClaimMetadataClientException(Constant.ErrorMessage.ERROR_CODE_SYSTEM_ATTRIBUTE_DATA_TYPE_UPDATE
+                    .getCode(), Constant.ErrorMessage.ERROR_CODE_SYSTEM_ATTRIBUTE_DATA_TYPE_UPDATE.getDescription());
+        }
+    }
+
+    private void validateSubAttributeUpdate(LocalClaimReqDTO localClaimReqDTO) throws ClaimMetadataException {
+
+        if (!DataTypeEnum.COMPLEX.equals(localClaimReqDTO.getDataType())) {
+            return;
+        }
+        if (ArrayUtils.isEmpty(localClaimReqDTO.getSubAttributes())) {
+            throw new ClaimMetadataClientException(Constant.ErrorMessage.ERROR_CODE_SUB_ATTRIBUTES_NOT_SPECIFIED.
+                    getCode(), Constant.ErrorMessage.ERROR_CODE_SUB_ATTRIBUTES_NOT_SPECIFIED.getDescription());
+        }
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+
+        validateAttributeIsSubAttributeOfAnotherAttribute(localClaimReqDTO.getClaimURI(), tenantDomain);
+
+        String customSchemaURI = SCIMCommonUtils.getCustomSchemaURI();
+        String mappedSCIMClaim = getMappedScimClaim(localClaimReqDTO.getClaimURI(), tenantDomain)
+                .replace(customSchemaURI, StringUtils.EMPTY);
+        for (String subAttribute : localClaimReqDTO.getSubAttributes()) {
+            String mappedSCIMSubClaim = getMappedScimClaim(subAttribute, tenantDomain).replace(customSchemaURI,
+                    StringUtils.EMPTY);
+            if (!mappedSCIMSubClaim.startsWith(mappedSCIMClaim + ".")) {
+                String subAttributeName = subAttribute.replace(LOCAL_DIALECT + "/", StringUtils.EMPTY);
+                String errorDescription = String.format(Constant.ErrorMessage
+                        .ERROR_CODE_SUB_ATTRIBUTES_NOT_SCIM_COMPLIANT.getDescription(), subAttributeName);
+                throw new ClaimMetadataClientException(Constant.ErrorMessage
+                        .ERROR_CODE_SUB_ATTRIBUTES_NOT_SCIM_COMPLIANT.getCode(), errorDescription);
+            }
+
+        }
+    }
+
+    private String getMappedScimClaim(String claimURI, String tenantDomain) throws ClaimMetadataException {
+
+        String customSchemaURI = SCIMCommonUtils.getCustomSchemaURI();
+        List<Claim> mappedClaims = claimMetadataManagementService.getMappedExternalClaimsForLocalClaim(claimURI,
+                tenantDomain);
+        Optional<Claim> customSCIMMappedClaim = mappedClaims.stream()
+                .filter(mappedClaim -> customSchemaURI.equals(mappedClaim.getClaimDialectURI())).findFirst();
+        if (customSCIMMappedClaim.isPresent()) {
+            return customSCIMMappedClaim.get().getClaimURI();
+        }
+        return StringUtils.EMPTY;
+    }
+
+    private void validateAttributeIsSubAttributeOfAnotherAttribute(String claimURI, String tenantDomain)
+            throws ClaimMetadataException {
+
+        for (LocalClaim localClaim : claimMetadataManagementService.getLocalClaims(tenantDomain)) {
+            String subAttributes = localClaim.getClaimProperty(PROP_SUB_ATTRIBUTES);
+            if (StringUtils.isEmpty(subAttributes)) {
+                continue;
+            }
+            if (Arrays.stream(subAttributes.split(" "))
+                    .anyMatch(subAttribute -> StringUtils.equals(subAttribute, claimURI))) {
+                String errorDescription = String.format(Constant.ErrorMessage
+                                .ERROR_CODE_ATTRIBUTES_MARKED_AS_SUB_ATTRIBUTES_NOT_ALLOWED_TO_HAVE_SUB_ATTRIBUTES
+                                .getDescription(), localClaim.getClaimURI());
+                throw new ClaimMetadataClientException(Constant.ErrorMessage
+                        .ERROR_CODE_ATTRIBUTES_MARKED_AS_SUB_ATTRIBUTES_NOT_ALLOWED_TO_HAVE_SUB_ATTRIBUTES.getCode(),
+                        errorDescription);
+            }
+        }
+    }
+
     private boolean isSubOrganizationContext() throws ClaimMetadataClientException {
 
         try {
@@ -1774,5 +1939,6 @@ public class ServerClaimManagementService {
         localClaim.getClaimProperties().putIfAbsent(PROP_REQUIRED, FALSE);
         localClaim.getClaimProperties().putIfAbsent(PROP_SUPPORTED_BY_DEFAULT, FALSE);
         localClaim.getClaimProperties().putIfAbsent(PROP_MULTI_VALUED, FALSE);
+        localClaim.getClaimProperties().putIfAbsent(PROP_DATA_TYPE, DataTypeEnum.STRING.toString());
     }
 }

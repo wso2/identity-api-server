@@ -107,6 +107,8 @@ public class ClaimDialectConfiguration extends ClaimDialectResDTO {
                 localClaimReqDTO.setRegEx(localClaimResDTO.getRegEx());
                 localClaimReqDTO.setRequired(localClaimResDTO.getRequired());
                 localClaimReqDTO.setSupportedByDefault(localClaimResDTO.getSupportedByDefault());
+                localClaimReqDTO.setDataType(localClaimResDTO.getDataType());
+                localClaimReqDTO.setCanonicalValues(localClaimResDTO.getCanonicalValues());
                 localClaimReqDTO.setMultiValued(localClaimResDTO.getMultiValued());
                 localClaimReqDTO.setAttributeMapping(localClaimResDTO.getAttributeMapping());
                 localClaimReqDTO.setProperties(localClaimResDTO.getProperties());
