@@ -24,11 +24,10 @@
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.asynchronous.operation.status.management</artifactId>
-        <version>1.3.94-SNAPSHOT</version>
+        <version>1.3.104-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.common</groupId>
     <artifactId>org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.common</artifactId>
     <packaging>jar</packaging>
 
@@ -36,7 +35,6 @@
         <dependency>
             <groupId>org.wso2.carbon.identity.framework</groupId>
             <artifactId>org.wso2.carbon.identity.framework.async.operation.status.mgt</artifactId>
-            <version>7.8.68</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
