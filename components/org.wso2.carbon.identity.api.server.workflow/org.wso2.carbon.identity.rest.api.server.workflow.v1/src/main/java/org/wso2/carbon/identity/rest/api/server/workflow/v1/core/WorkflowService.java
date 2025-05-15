@@ -21,25 +21,26 @@ package org.wso2.carbon.identity.rest.api.server.workflow.v1.core;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.wso2.carbon.context.CarbonContext;
-import org.wso2.carbon.identity.api.server.workflow.common.Constants;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.api.server.workflow.common.Constants;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationPatchRequest;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationResponse;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowRequest;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowListItem;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowResponse;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationListItem;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowTemplateParametersBase;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowTemplateBase;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowTemplateParameters;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowListResponse;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationRequest;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationListResponse;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Operation;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.OptionDetails;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationListItem;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationListResponse;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationPatchRequest;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationRequest;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationResponse;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowListItem;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowListResponse;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowRequest;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowResponse;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowTemplateBase;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowTemplateParameters;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowTemplateParametersBase;
 import org.wso2.carbon.identity.workflow.mgt.WorkflowManagementService;
 import org.wso2.carbon.identity.workflow.mgt.bean.Parameter;
 import org.wso2.carbon.identity.workflow.mgt.bean.Workflow;
@@ -48,14 +49,14 @@ import org.wso2.carbon.identity.workflow.mgt.dto.WorkflowEvent;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowClientException;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowException;
 
-import javax.ws.rs.core.Response;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.UUID;
-import java.util.Map;
-import java.util.List;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import javax.ws.rs.core.Response;
 
 /**
  * Workflow service class
@@ -216,9 +217,11 @@ public class WorkflowService {
                     null);
             return workflowAssociation;
         } catch (WorkflowClientException e) {
-            throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_ADDING_ASSOCIATION, workflowAssociation.getAssociationName(), e);
+            throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_ADDING_ASSOCIATION,
+                    workflowAssociation.getAssociationName(), e);
         } catch (WorkflowException e) {
-            throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_ASSOCIATION, workflowAssociation.getAssociationName(), e);
+            throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_ASSOCIATION,
+                    workflowAssociation.getAssociationName(), e);
         }
     }
 
@@ -251,7 +254,8 @@ public class WorkflowService {
                     null, isEnable);
             return getAssociation(associationId);
         } catch (WorkflowClientException e) {
-            throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_UPDATING_ASSOCIATION, associationId, e);
+            throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_UPDATING_ASSOCIATION,
+                    associationId, e);
         } catch (WorkflowException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_ASSOCIATION, associationId, e);
         }
@@ -422,7 +426,8 @@ public class WorkflowService {
             for (OptionDetails options : properties.getOptions()) {
                 Parameter parameter = setWorkflowImplParameters(workflowId, Constants.APPROVAL_STEPS,
                         String.join(Constants.PARAMETER_VALUE_SEPARATOR, options.getValues()),
-                        Constants.APPROVAL_STEP + properties.getStep() + Constants.STEP_NAME_DELIMITER + options.getEntity(),
+                        Constants.APPROVAL_STEP + properties.getStep() + Constants.STEP_NAME_DELIMITER +
+                                options.getEntity(),
                         Constants.TEMPLATE);
                 parameterList.add(parameter);
             }
@@ -515,7 +520,8 @@ public class WorkflowService {
                                                                           String filter) throws WorkflowException {
 
         WorkflowAssociationListResponse workflowAssociationListResponse = new WorkflowAssociationListResponse();
-        workflowAssociationListResponse.setTotalResults(workflowManagementService.getAssociationsCount(tenantId, filter));
+        workflowAssociationListResponse.setTotalResults(workflowManagementService.getAssociationsCount(tenantId,
+                filter));
         if (workflowAssociationListItems != null && workflowAssociationListItems.length > 0) {
             workflowAssociationListResponse.setWorkflowAssociations(Arrays.asList(workflowAssociationListItems));
             workflowAssociationListResponse.setCount(workflowAssociationListItems.length);
