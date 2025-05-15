@@ -213,7 +213,7 @@ public class WorkflowService {
 
             workflowManagementService.addAssociation(workflowAssociation.getAssociationName(),
                     workflowAssociation.getWorkflowId(), workflowAssociation.getOperation().toString(),
-                    Constants.DEFAULT_ASSOCIATION_CONDITION);
+                    null);
             return workflowAssociation;
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_ADDING_ASSOCIATION, workflowAssociation.getAssociationName(), e);
@@ -248,7 +248,7 @@ public class WorkflowService {
             }
             workflowManagementService.updateAssociation(associationId, workflowAssociation.getAssociationName(),
                     workflowAssociation.getWorkflowId(), eventId,
-                    Constants.DEFAULT_ASSOCIATION_CONDITION, isEnable);
+                    null, isEnable);
             return getAssociation(associationId);
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_UPDATING_ASSOCIATION, associationId, e);
