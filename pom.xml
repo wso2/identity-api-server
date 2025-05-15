@@ -606,6 +606,12 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.identity.inbound.provisioning.scim2</groupId>
+                <artifactId>org.wso2.carbon.identity.scim2.common</artifactId>
+                <scope>provided</scope>
+                <version>3.4.143-SNAPSHOT</version>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.identity.organization.management</groupId>
                 <artifactId>org.wso2.carbon.identity.organization.management.application</artifactId>
                 <version>${org.wso2.carbon.identity.organization.management.version}</version>
