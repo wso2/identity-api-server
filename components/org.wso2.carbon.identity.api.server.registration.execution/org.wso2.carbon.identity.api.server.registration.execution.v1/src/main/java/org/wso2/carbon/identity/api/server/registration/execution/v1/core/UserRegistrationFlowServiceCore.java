@@ -52,8 +52,9 @@ public class UserRegistrationFlowServiceCore {
             RegistrationInitiationRequest registrationInitRequest) {
 
         try {
-            // Check whether the dynamic registration portal is enabled.
+            // Check whether the self registration and dynamic registration portal is enabled.
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            Utils.isSelfRegistrationEnabled(tenantDomain);
             Utils.isDynamicRegistrationPortalEnabled(tenantDomain);
 
             RegistrationStep registrationStep = userRegistrationMgtService.initiateDefaultRegistrationFlow(
@@ -82,9 +83,10 @@ public class UserRegistrationFlowServiceCore {
                                                                           registrationSubmissionRequest) {
 
         try {
-            // Check whether the dynamic registration portal is enabled.
-            Utils.isDynamicRegistrationPortalEnabled(PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                    .getTenantDomain());
+            // Check whether the self registration and dynamic registration portal is enabled.
+            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            Utils.isSelfRegistrationEnabled(tenantDomain);
+            Utils.isDynamicRegistrationPortalEnabled(tenantDomain);
 
             ObjectMapper objectMapper = new ObjectMapper();
             Map<String, String> inpputMap = objectMapper.convertValue(registrationSubmissionRequest.getInputs(),
