@@ -24,6 +24,7 @@
         <relativePath>../pom.xml</relativePath>
         <version>1.3.100-SNAPSHOT</version>
     </parent>
+    <version>1.3.100</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.identity.api.server.registration.execution.v1</artifactId>
     <packaging>jar</packaging>
