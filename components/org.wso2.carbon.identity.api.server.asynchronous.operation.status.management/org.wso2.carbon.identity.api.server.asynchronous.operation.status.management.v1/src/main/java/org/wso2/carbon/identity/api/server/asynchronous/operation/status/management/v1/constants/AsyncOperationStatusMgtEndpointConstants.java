@@ -29,7 +29,7 @@ public class AsyncOperationStatusMgtEndpointConstants {
     public static final String PREVIOUS = "previous";
     public static final String FILTER_PARAM = "filter";
     public static final String LIMIT_PARAM = "limit";
-    public static final Integer DEFAULT_LIMIT = 10;
+    public static final int DEFAULT_LIMIT = 10;
 
     public static final String PATH_SEPARATOR = "/";
     public static final String V1_API_PATH_COMPONENT = "v1";

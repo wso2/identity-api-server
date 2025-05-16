@@ -22,7 +22,7 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.framework.async.operation.status.mgt.api.service.AsyncOperationStatusMgtService;
 
 /**
- * Holds the services which the async operation status management API component is using.
+ * Service holder for the async operation status management API component.
  */
 public class AsyncOperationStatusMgtServiceHolder {
 

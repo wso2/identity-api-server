@@ -43,7 +43,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
@@ -94,7 +93,6 @@ public class AsyncOperationsApiServiceCore {
     public Response getOperation(String operationId) {
 
         String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-
         try {
             OperationResponseDTO record = asyncOperationStatusMgtService.getOperation(operationId, tenantDomain);
             if (record == null) {
@@ -109,7 +107,6 @@ public class AsyncOperationsApiServiceCore {
     public Response getUnitOperation(String unitOperationId) {
 
         String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-
         try {
             UnitOperationResponseDTO record = asyncOperationStatusMgtService.getUnitOperation(unitOperationId,
                     tenantDomain);
@@ -126,7 +123,6 @@ public class AsyncOperationsApiServiceCore {
                                       Integer limit, String filter) {
 
         String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-
         try {
             limit = validateLimit(limit);
             List<UnitOperationResponseDTO> records =
@@ -170,7 +166,6 @@ public class AsyncOperationsApiServiceCore {
             throws AsyncOperationStatusMgtServerException {
 
         Operations response = new Operations();
-
         if (CollectionUtils.isNotEmpty(operationsDTO)) {
             boolean hasMoreItems = operationsDTO.size() > limit;
             boolean needsReverse = StringUtils.isNotBlank(before);
@@ -215,7 +210,6 @@ public class AsyncOperationsApiServiceCore {
     private Link createLink(Integer cursor, String paginationOrder, String rel, String resourcePath, String url) {
 
         String encodedString = Base64.getEncoder().encodeToString(cursor.toString().getBytes(StandardCharsets.UTF_8));
-
         Link link = new Link();
         link.setHref(URI.create(
                 buildURIForPagination(url, resourcePath) + "&" + paginationOrder + "="
@@ -252,7 +246,6 @@ public class AsyncOperationsApiServiceCore {
             throws AsyncOperationStatusMgtServerException {
 
         UnitOperations response = new UnitOperations();
-
         if (limit != 0 && CollectionUtils.isNotEmpty(unitOperations)) {
             boolean hasMoreItems = unitOperations.size() > limit;
             boolean needsReverse = StringUtils.isNotBlank(before);
