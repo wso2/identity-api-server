@@ -48,10 +48,9 @@ public class AsyncOperationStatusMgtEndpointConstants {
         ERROR_NO_ASYNC_STATUS_ON_GIVEN_ID("60001",
                 "Unable to get async status.",
                 "No async status is configured on the given Id."),
-        ERROR_INVALID_OPERATION_ID("60002", "Operation with ID: %s doesn't exist.", "%s"),
-        ERROR_INVALID_UNIT_OPERATION_ID("60003", "Invalid Unit Operation ID.",
+        ERROR_INVALID_UNIT_OPERATION_ID("60002", "Invalid Unit Operation ID.",
                 "Unit Operation with ID: %s doesn't exist."),
-        ERROR_CODE_INVALID_PAGINATION_PARAMETER_NEGATIVE_LIMIT("60004", "Invalid pagination parameters.",
+        ERROR_CODE_INVALID_PAGINATION_PARAMETER_NEGATIVE_LIMIT("60003", "Invalid pagination parameters.",
                 "'limit' shouldn't be negative.");
 
         private final String code;
