@@ -220,7 +220,7 @@ components:
       description: Maximum number of records to return.
       schema:
         type: integer
-        minimum: 0
+        minimum: 1
       example: 10
     beforeQueryParam:
       in: query

@@ -171,7 +171,7 @@ public class AsyncOperationsApiServiceCore {
 
         Operations response = new Operations();
 
-        if (limit != 0 && CollectionUtils.isNotEmpty(operationsDTO)) {
+        if (CollectionUtils.isNotEmpty(operationsDTO)) {
             boolean hasMoreItems = operationsDTO.size() > limit;
             boolean needsReverse = StringUtils.isNotBlank(before);
             boolean isFirstPage = (StringUtils.isBlank(before) && StringUtils.isBlank(after)) ||
@@ -195,12 +195,12 @@ public class AsyncOperationsApiServiceCore {
             }
             String resourcePath = PATH_SEPARATOR;
             if (!isFirstPage) {
-                Timestamp timestamp = operationsDTO.get(0).getCreatedTime();
-                response.addLinksItem(createLink(timestamp, PAGINATION_BEFORE, PREVIOUS, resourcePath, url));
+                response.addLinksItem(createLink(operationsDTO.get(0).getCursorKey(), PAGINATION_BEFORE, PREVIOUS,
+                        resourcePath, url));
             }
             if (!isLastPage) {
-                Timestamp timestamp = operationsDTO.get(operationsDTO.size() - 1).getCreatedTime();
-                response.addLinksItem(createLink(timestamp, PAGINATION_AFTER, NEXT, resourcePath, url));
+                response.addLinksItem(createLink(operationsDTO.get(operationsDTO.size() - 1).getCursorKey(),
+                        PAGINATION_AFTER, NEXT, resourcePath, url));
             }
 
             List<Operation> operations = new ArrayList<>();
@@ -212,10 +212,10 @@ public class AsyncOperationsApiServiceCore {
         return response;
     }
 
-    private Link createLink(Timestamp timestamp, String paginationOrder, String rel, String resourcePath, String url) {
+    private Link createLink(Integer cursor, String paginationOrder, String rel, String resourcePath, String url) {
 
-        String encodedString = Base64.getEncoder().encodeToString(timestamp.toString()
-                .getBytes(StandardCharsets.UTF_8));
+        String encodedString = Base64.getEncoder().encodeToString(cursor.toString().getBytes(StandardCharsets.UTF_8));
+
         Link link = new Link();
         link.setHref(URI.create(
                 buildURIForPagination(url, resourcePath) + "&" + paginationOrder + "="
@@ -277,12 +277,12 @@ public class AsyncOperationsApiServiceCore {
             }
             String resourcePath = PATH_SEPARATOR + operationId + PATH_SEPARATOR + "unit-operations";
             if (!isFirstPage) {
-                Timestamp timestamp = unitOperations.get(0).getCreatedTime();
-                response.addLinksItem(createLink(timestamp, PAGINATION_BEFORE, PREVIOUS, resourcePath, url));
+                response.addLinksItem(createLink(unitOperations.get(0).getCursorKey(), PAGINATION_BEFORE, PREVIOUS,
+                        resourcePath, url));
             }
             if (!isLastPage) {
-                Timestamp timestamp = unitOperations.get(unitOperations.size() - 1).getCreatedTime();
-                response.addLinksItem(createLink(timestamp, PAGINATION_AFTER, NEXT, resourcePath, url));
+                response.addLinksItem(createLink(unitOperations.get(unitOperations.size() - 1).getCursorKey(),
+                        PAGINATION_AFTER, NEXT, resourcePath, url));
             }
 
             List<UnitOperation> unitOperationList = new ArrayList<>();
@@ -305,7 +305,7 @@ public class AsyncOperationsApiServiceCore {
             return defaultItemsPerPage;
         }
 
-        if (limit < 0) {
+        if (limit <= 0) {
             throw buildAsyncStatusMgtClientException(ERROR_CODE_INVALID_PAGINATION_PARAMETER_NEGATIVE_LIMIT);
         }
 
