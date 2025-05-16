@@ -51,7 +51,7 @@ import java.util.List;
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.constants.AsyncOperationStatusMgtEndpointConstants.DEFAULT_LIMIT;
-import static org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.constants.AsyncOperationStatusMgtEndpointConstants.ErrorMessage.ERROR_CODE_INVALID_PAGINATION_PARAMETER_NEGATIVE_LIMIT;
+import static org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.constants.AsyncOperationStatusMgtEndpointConstants.ErrorMessage.ERROR_CODE_INVALID_PAGINATION_LIMIT_PARAMETER;
 import static org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.constants.AsyncOperationStatusMgtEndpointConstants.FILTER_PARAM;
 import static org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.constants.AsyncOperationStatusMgtEndpointConstants.LIMIT_PARAM;
 import static org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.constants.AsyncOperationStatusMgtEndpointConstants.NEXT;
@@ -299,7 +299,7 @@ public class AsyncOperationsApiServiceCore {
         }
 
         if (limit <= 0) {
-            throw buildAsyncStatusMgtClientException(ERROR_CODE_INVALID_PAGINATION_PARAMETER_NEGATIVE_LIMIT);
+            throw buildAsyncStatusMgtClientException(ERROR_CODE_INVALID_PAGINATION_LIMIT_PARAMETER);
         }
 
         int maximumItemsPerPage = IdentityUtil.getMaximumItemPerPage();

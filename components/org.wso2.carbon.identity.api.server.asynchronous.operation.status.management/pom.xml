@@ -24,7 +24,7 @@
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>identity-api-server</artifactId>
-        <version>1.3.104-SNAPSHOT</version>
+        <version>1.3.105-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -34,11 +34,4 @@
         <module>org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1</module>
         <module>org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.common</module>
     </modules>
-
-    <properties>
-        <maven.compiler.source>23</maven.compiler.source>
-        <maven.compiler.target>23</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
 </project>
