@@ -52,6 +52,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
@@ -60,6 +61,7 @@ import static org.wso2.carbon.identity.api.server.identity.governance.common.Gov
 import static org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstants.ErrorMessage.ERROR_CODE_PAGINATION_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstants.ErrorMessage.ERROR_CODE_SORTING_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstants.IDENTITY_GOVERNANCE_PATH_COMPONENT;
+import static org.wso2.carbon.identity.input.validation.mgt.utils.Constants.PW_POLICY_PATTERN;
 import static org.wso2.carbon.identity.password.expiry.constants.PasswordPolicyConstants.PASSWORD_EXPIRY_RULES_PREFIX;
 
 /**
@@ -306,6 +308,12 @@ public class ServerIdentityGovernanceService {
                             GovernanceConstants.ErrorMessage.ERROR_CODE_INVALID_PASSWORD_EXPIRY_RULE,
                             propertyReqDTO.getValue());
                 }
+                if (StringUtils.equals(propertyReqDTO.getName(), PW_POLICY_PATTERN) &&
+                        StringUtils.isNotBlank(propertyReqDTO.getValue()) &&
+                        !isValidPasswordPatternRegex(propertyReqDTO.getValue())) {
+                    throw handleBadRequestError(
+                            GovernanceConstants.ErrorMessage.ERROR_CODE_INVALID_PASSWORD_PATTERN_REGEX);
+                }
             }
             identityGovernanceService.updateConfiguration(tenantDomain, configurationDetails);
         } catch (IdentityGovernanceClientException e) {
@@ -359,6 +367,12 @@ public class ServerIdentityGovernanceService {
                         throw handleBadRequestError(
                                 GovernanceConstants.ErrorMessage.ERROR_CODE_INVALID_PASSWORD_EXPIRY_RULE,
                                 propertyReqDTO.getValue());
+                    }
+                    if (StringUtils.equals(propertyReqDTO.getName(), PW_POLICY_PATTERN) &&
+                            StringUtils.isNotBlank(propertyReqDTO.getValue()) &&
+                            !isValidPasswordPatternRegex(propertyReqDTO.getValue())) {
+                        throw handleBadRequestError(
+                                GovernanceConstants.ErrorMessage.ERROR_CODE_INVALID_PASSWORD_PATTERN_REGEX);
                     }
                     configurationDetails.put(propertyReqDTO.getName(), propertyReqDTO.getValue());
                 }
@@ -540,6 +554,22 @@ public class ServerIdentityGovernanceService {
             new PasswordExpiryRule(rule);
             return true;
         } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Validate the password pattern regex.
+     *
+     * @param passwordPatternRegex Password pattern regex.
+     * @return true if the regex is valid, false otherwise.
+     */
+    private boolean isValidPasswordPatternRegex(String passwordPatternRegex) {
+
+        try {
+            Pattern.compile(passwordPatternRegex);
+            return true;
+        } catch (Exception e) {
             return false;
         }
     }
