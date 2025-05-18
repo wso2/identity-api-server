@@ -45,6 +45,41 @@ public class WebhookResponse  {
     private List<String> eventsSubscribed = null;
 
 
+@XmlType(name="StatusEnum")
+@XmlEnum(String.class)
+public enum StatusEnum {
+
+    @XmlEnumValue("ACTIVE") ACTIVE(String.valueOf("ACTIVE")), @XmlEnumValue("INACTIVE") INACTIVE(String.valueOf("INACTIVE"));
+
+
+    private String value;
+
+    StatusEnum(String v) {
+        value = v;
+    }
+
+    @JsonValue
+    public String value() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    public static StatusEnum fromValue(String value) {
+        for (StatusEnum b : StatusEnum.values()) {
+            if (b.value.equals(value)) {
+                return b;
+            }
+        }
+        throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+}
+
+    private StatusEnum status;
+
     /**
     **/
     public WebhookResponse id(String id) {
@@ -53,7 +88,7 @@ public class WebhookResponse  {
         return this;
     }
     
-    @ApiModelProperty(example = "101", value = "")
+    @ApiModelProperty(example = "eeb8c1a2-3f4d-4e5b-8c6f-7d8e9f0a1b2c", value = "")
     @JsonProperty("id")
     @Valid
     public String getId() {
@@ -71,7 +106,7 @@ public class WebhookResponse  {
         return this;
     }
     
-    @ApiModelProperty(example = "2025-05-01T12:00Z", value = "")
+    @ApiModelProperty(example = "2024-05-01T12:00:00Z", value = "")
     @JsonProperty("createdAt")
     @Valid
     public String getCreatedAt() {
@@ -89,7 +124,7 @@ public class WebhookResponse  {
         return this;
     }
     
-    @ApiModelProperty(example = "2025-05-02T12:00Z", value = "")
+    @ApiModelProperty(example = "2024-05-02T12:00:00Z", value = "")
     @JsonProperty("updatedAt")
     @Valid
     public String getUpdatedAt() {
@@ -182,7 +217,26 @@ public class WebhookResponse  {
         return this;
     }
 
+        /**
+    * Webhook Status.
+    **/
+    public WebhookResponse status(StatusEnum status) {
+
+        this.status = status;
+        return this;
+    }
     
+    @ApiModelProperty(example = "ACTIVE", value = "Webhook Status.")
+    @JsonProperty("status")
+    @Valid
+    public StatusEnum getStatus() {
+        return status;
+    }
+    public void setStatus(StatusEnum status) {
+        this.status = status;
+    }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -200,12 +254,13 @@ public class WebhookResponse  {
             Objects.equals(this.endpoint, webhookResponse.endpoint) &&
             Objects.equals(this.eventSchema, webhookResponse.eventSchema) &&
             Objects.equals(this.description, webhookResponse.description) &&
-            Objects.equals(this.eventsSubscribed, webhookResponse.eventsSubscribed);
+            Objects.equals(this.eventsSubscribed, webhookResponse.eventsSubscribed) &&
+            Objects.equals(this.status, webhookResponse.status);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, createdAt, updatedAt, endpoint, eventSchema, description, eventsSubscribed);
+        return Objects.hash(id, createdAt, updatedAt, endpoint, eventSchema, description, eventsSubscribed, status);
     }
 
     @Override
@@ -221,6 +276,7 @@ public class WebhookResponse  {
         sb.append("    eventSchema: ").append(toIndentedString(eventSchema)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    eventsSubscribed: ").append(toIndentedString(eventsSubscribed)).append("\n");
+        sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("}");
         return sb.toString();
     }

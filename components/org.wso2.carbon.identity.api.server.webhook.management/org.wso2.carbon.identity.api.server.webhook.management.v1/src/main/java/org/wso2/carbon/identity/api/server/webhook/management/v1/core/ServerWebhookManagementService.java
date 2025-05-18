@@ -18,29 +18,24 @@
 
 package org.wso2.carbon.identity.api.server.webhook.management.v1.core;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookList;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookRequest;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookRequestEventSchema;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookResponse;
-import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookList;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.util.WebhookManagementAPIErrorBuilder;
 import org.wso2.carbon.identity.webhook.management.api.exception.WebhookMgtException;
 import org.wso2.carbon.identity.webhook.management.api.model.Webhook;
 import org.wso2.carbon.identity.webhook.management.api.model.WebhookDTO;
-import org.wso2.carbon.identity.webhook.management.api.model.WebhookSearchResultDTO;
 import org.wso2.carbon.identity.webhook.management.api.service.WebhookManagementService;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * Call internal osgi services to perform webhook management operations.
  */
 public class ServerWebhookManagementService {
-
-    private static final String WEBHOOK_SCHEMA_VERSION = "1.0.0";
-    private static final String WEBHOOK_VERSION = "1.0.0";
 
     private final WebhookManagementService webhookManagementService;
 
@@ -57,9 +52,9 @@ public class ServerWebhookManagementService {
     public WebhookList getWebhooks() {
 
         try {
-            WebhookSearchResultDTO webhooks = webhookManagementService.listWebhooks("ACTIVE", 1, 1,
-                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
-            return new WebhookList().webhooks(webhooks.getWebhooks().stream()
+            List<WebhookDTO> webhooks =
+                    webhookManagementService.getWebhooks(CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            return new WebhookList().webhooks(webhooks.stream()
                     .map(this::getWebhookResponse)
                     .collect(Collectors.toList()));
         } catch (WebhookMgtException e) {
@@ -180,8 +175,6 @@ public class ServerWebhookManagementService {
         webhook.setSecret(webhookRequest.getSecret());
         webhook.setEventSchemaName(webhookRequest.getEventSchema().getName());
         webhook.setEventSchemaUri(webhookRequest.getEventSchema().getUri());
-        webhook.setEventSchemaVersion(WEBHOOK_SCHEMA_VERSION);
-        webhook.setVersion(WEBHOOK_VERSION);
         webhook.setEventsSubscribed(webhookRequest.getEventsSubscribed());
 
         return webhook;

@@ -99,7 +99,12 @@ paths:
                 "endpoint": "https://example.com/webhook",
                 "description": "Webhook for login events",
                 "secret": "my-secret",
-                "events_requested": ["schemas.identity.wso2.org/events/logins/event-type/loginSuccess", "schemas.identity.wso2.org/events/logins/event-type/loginFailed"]
+                "events_requested": ["schemas.identity.wso2.org/events/logins/event-type/loginSuccess", "schemas.identity.wso2.org/events/logins/event-type/loginFailed"],
+                "eventSchema": {
+                  "name": "WSO2",
+                  "uri": "schemas.identity.wso2.org"
+                },
+                "status": "ACTIVE"
               }'
 
   /webhooks/{webhookId}:
@@ -398,6 +403,13 @@ components:
             type: string
           description: List of events to subscribe to.
           example: ["schemas.identity.wso2.org/events/logins/event-type/loginSuccess", "schemas.identity.wso2.org/events/logins/event-type/loginFailed"]
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - INACTIVE
+          description: Webhook Status.
+          example: "ACTIVE"
 
     WebhookResponse:
       type: object
@@ -439,6 +451,13 @@ components:
             type: string
           description: List of events to subscribe to.
           example: ["schemas.identity.wso2.org/events/logins/event-type/loginSuccess", "schemas.identity.wso2.org/events/logins/event-type/loginFailed"]
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - INACTIVE
+          description: Webhook Status.
+          example: "ACTIVE"
 
     WebhookList:
       type: object

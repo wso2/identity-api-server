@@ -43,6 +43,41 @@ public class WebhookRequest  {
     private List<String> eventsSubscribed = new ArrayList<String>();
 
 
+@XmlType(name="StatusEnum")
+@XmlEnum(String.class)
+public enum StatusEnum {
+
+    @XmlEnumValue("ACTIVE") ACTIVE(String.valueOf("ACTIVE")), @XmlEnumValue("INACTIVE") INACTIVE(String.valueOf("INACTIVE"));
+
+
+    private String value;
+
+    StatusEnum(String v) {
+        value = v;
+    }
+
+    @JsonValue
+    public String value() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    public static StatusEnum fromValue(String value) {
+        for (StatusEnum b : StatusEnum.values()) {
+            if (b.value.equals(value)) {
+                return b;
+            }
+        }
+        throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+}
+
+    private StatusEnum status;
+
     /**
     * Webhook URL.
     **/
@@ -150,7 +185,26 @@ public class WebhookRequest  {
         return this;
     }
 
+        /**
+    * Webhook Status.
+    **/
+    public WebhookRequest status(StatusEnum status) {
+
+        this.status = status;
+        return this;
+    }
     
+    @ApiModelProperty(example = "ACTIVE", value = "Webhook Status.")
+    @JsonProperty("status")
+    @Valid
+    public StatusEnum getStatus() {
+        return status;
+    }
+    public void setStatus(StatusEnum status) {
+        this.status = status;
+    }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -166,12 +220,13 @@ public class WebhookRequest  {
             Objects.equals(this.eventSchema, webhookRequest.eventSchema) &&
             Objects.equals(this.description, webhookRequest.description) &&
             Objects.equals(this.secret, webhookRequest.secret) &&
-            Objects.equals(this.eventsSubscribed, webhookRequest.eventsSubscribed);
+            Objects.equals(this.eventsSubscribed, webhookRequest.eventsSubscribed) &&
+            Objects.equals(this.status, webhookRequest.status);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(endpoint, eventSchema, description, secret, eventsSubscribed);
+        return Objects.hash(endpoint, eventSchema, description, secret, eventsSubscribed, status);
     }
 
     @Override
@@ -185,6 +240,7 @@ public class WebhookRequest  {
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    secret: ").append(toIndentedString(secret)).append("\n");
         sb.append("    eventsSubscribed: ").append(toIndentedString(eventsSubscribed)).append("\n");
+        sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("}");
         return sb.toString();
     }

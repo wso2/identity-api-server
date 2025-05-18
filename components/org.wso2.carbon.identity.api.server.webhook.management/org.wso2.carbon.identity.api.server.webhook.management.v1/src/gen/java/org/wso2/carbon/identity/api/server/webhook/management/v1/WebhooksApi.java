@@ -70,7 +70,7 @@ public class WebhooksApi  {
     })
     public Response activateWebhook(@ApiParam(value = "",required=true) @PathParam("webhookId") String webhookId) {
 
-        return delegate.activateWebhook(webhookId);
+        return delegate.activateWebhook(webhookId );
     }
 
     @Valid

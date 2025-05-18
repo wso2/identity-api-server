@@ -23,13 +23,14 @@ import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.WebhooksApiService;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.core.ServerWebhookManagementService;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.factories.ServerWebhookManagementServiceFactory;
+import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookList;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookRequest;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookResponse;
-import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookList;
+
+import java.net.URI;
 
 import javax.ws.rs.core.Response;
 
-import java.net.URI;
 
 /**
  * Implementation of the WebhooksApiService.
@@ -66,7 +67,7 @@ public class WebhooksApiServiceImpl implements WebhooksApiService {
 
         WebhookResponse createdWebhook = serverWebhookManagementService.createWebhook(webhookRequest);
         URI location = ContextLoader.buildURIForBody(String.format(Constants.V1_API_PATH_COMPONENT +
-                "/webhooks/%d", createdWebhook.getId()));
+                "/webhooks/%s", createdWebhook.getId()));
         return Response.created(location).entity(createdWebhook).build();
     }
 
