@@ -1266,7 +1266,7 @@ public class ServerClaimManagementService {
                 String jsonString = mapper.writeValueAsString(localClaimReqDTO.getCanonicalValues());
                 claimProperties.put(PROP_CANONICAL_VALUES, jsonString);
             } catch (JsonProcessingException e) {
-                // TODO
+                LOG.error("Error while parsing canonical values.", e);
             }
         }
 
