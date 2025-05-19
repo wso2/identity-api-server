@@ -27,45 +27,27 @@ servers:
         default: "localhost:9443"
 
 paths:
-  /registration/initiate:
+  /registration/execute:
     post:
-      summary: Initiate a registration flow
+      summary: Execute a registration step
       tags:
-        - Initiate Registration
+        - Execute Registration Step
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RegistrationInitiationRequest"
+              $ref: "#/components/schemas/RegistrationExecutionRequest"
       responses:
         '200':
-          description: Successfully initiated registration flow
+          description: Successfully executed registration step
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RegistrationSubmissionResponse"
-  /registration/submit:
-    post:
-      summary: Submit a registration step
-      tags:
-        - Submit Registration Step
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/RegistrationSubmissionRequest"
-      responses:
-        '200':
-          description: Successfully submitted registration step
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RegistrationSubmissionResponse"
+                $ref: "#/components/schemas/RegistrationExecutionResponse"
 components:
   schemas:
-    RegistrationInitiationRequest:
+    RegistrationExecutionRequest:
       type: object
       properties:
         applicationId:
@@ -76,12 +58,6 @@ components:
           type: string
           description: URL to redirect during registration if required
           example: 'https://localhost:3000/myRegistrationPortal'
-
-    RegistrationSubmissionRequest:
-      type: object
-      required:
-        - flowId
-      properties:
         flowId:
           type: string
           description: Unique identifier for the registration flow
@@ -97,7 +73,7 @@ components:
             "username": "johnw"
           }
 
-    RegistrationSubmissionResponse:
+    RegistrationExecutionResponse:
       type: object
       required:
         - flowId
