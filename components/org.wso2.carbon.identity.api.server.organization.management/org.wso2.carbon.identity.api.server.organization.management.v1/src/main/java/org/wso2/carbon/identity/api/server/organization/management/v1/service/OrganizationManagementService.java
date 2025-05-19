@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.organization.management.v1.service;
 
-import com.google.gson.Gson;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -815,10 +814,8 @@ public class OrganizationManagementService {
     private Organization getUpdatedOrganization(String organizationId, OrganizationPUTRequest organizationPUTRequest)
             throws OrganizationManagementException {
 
-        Organization oldOrganization = organizationManager.getOrganization(organizationId, false, false);
-        String currentOrganizationName = oldOrganization.getName();
-        Organization organization = createOrganizationClone(oldOrganization);
-
+        Organization organization = organizationManager.getOrganization(organizationId, false, false);
+        String currentOrganizationName = organization.getName();
         organization.setName(organizationPUTRequest.getName());
         organization.setDescription(organizationPUTRequest.getDescription());
 
@@ -840,12 +837,6 @@ public class OrganizationManagementService {
             organization.setAttributes(null);
         }
         return organizationManager.updateOrganization(organizationId, currentOrganizationName, organization);
-    }
-
-    private Organization createOrganizationClone(Organization organization) {
-
-        Gson gson = new Gson();
-        return gson.fromJson(gson.toJson(organization), Organization.class);
     }
 
     private SharedOrganizationsResponse createSharedOrgResponse(List<BasicOrganization> organizations)
