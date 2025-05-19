@@ -26,7 +26,6 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1</groupId>
     <artifactId>org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1</artifactId>
     <packaging>jar</packaging>
 
