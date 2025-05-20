@@ -32,8 +32,6 @@ import javax.ws.rs.core.Response;
  */
 public class WebhookManagementAPIErrorBuilder {
 
-    private static final String ERROR_CODE_DELIMITER = "-";
-    private static final String ERROR_CODE_PREFIX = "WEBHOOK" + ERROR_CODE_DELIMITER;
     private static final Log LOG = LogFactory.getLog(WebhookManagementAPIErrorBuilder.class);
 
     private WebhookManagementAPIErrorBuilder() {
@@ -51,8 +49,6 @@ public class WebhookManagementAPIErrorBuilder {
         }
 
         String errorCode = exception.getErrorCode();
-        errorCode = errorCode.contains(ERROR_CODE_DELIMITER) ? errorCode :
-                ERROR_CODE_PREFIX + errorCode;
         return buildAPIError(status, errorCode, exception.getMessage(), exception.getDescription());
     }
 

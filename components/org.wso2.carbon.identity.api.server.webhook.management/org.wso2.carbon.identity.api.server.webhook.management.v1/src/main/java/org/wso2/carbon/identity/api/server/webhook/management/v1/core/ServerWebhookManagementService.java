@@ -27,6 +27,7 @@ import org.wso2.carbon.identity.api.server.webhook.management.v1.util.WebhookMan
 import org.wso2.carbon.identity.webhook.management.api.exception.WebhookMgtException;
 import org.wso2.carbon.identity.webhook.management.api.model.Webhook;
 import org.wso2.carbon.identity.webhook.management.api.model.WebhookDTO;
+import org.wso2.carbon.identity.webhook.management.api.model.WebhookSummaryDTO;
 import org.wso2.carbon.identity.webhook.management.api.service.WebhookManagementService;
 
 import java.util.List;
@@ -52,7 +53,7 @@ public class ServerWebhookManagementService {
     public WebhookList getWebhooks() {
 
         try {
-            List<WebhookDTO> webhooks =
+            List<WebhookSummaryDTO> webhooks =
                     webhookManagementService.getWebhooks(CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
             return new WebhookList().webhooks(webhooks.stream()
                     .map(this::getWebhookResponse)
@@ -108,7 +109,7 @@ public class ServerWebhookManagementService {
 
         try {
             Webhook webhook = buildWebhook(webhookRequest);
-            WebhookDTO webhookDTO = webhookManagementService.updateWebhook(webhookId, webhook,
+            WebhookDTO webhookDTO = webhookManagementService.updateWebhook(webhook,
                     CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
             return getWebhookResponse(webhookDTO);
         } catch (WebhookMgtException e) {
@@ -178,6 +179,28 @@ public class ServerWebhookManagementService {
         webhook.setEventsSubscribed(webhookRequest.getEventsSubscribed());
 
         return webhook;
+    }
+
+    /**
+     * Get webhook response from webhook model.
+     *
+     * @param webhookSummaryDTO WebhookDTO model.
+     * @return Webhook response.
+     */
+    private WebhookResponse getWebhookResponse(WebhookSummaryDTO webhookSummaryDTO) {
+
+        WebhookResponse webhookResponse = new WebhookResponse();
+        webhookResponse.setId(webhookSummaryDTO.getId());
+        webhookResponse.setCreatedAt(webhookSummaryDTO.getCreatedAt());
+        webhookResponse.setUpdatedAt(webhookSummaryDTO.getUpdatedAt());
+        webhookResponse.setEndpoint(webhookSummaryDTO.getEndpoint());
+        webhookResponse.setDescription(webhookSummaryDTO.getDescription());
+        WebhookRequestEventSchema eventSchema = new WebhookRequestEventSchema();
+        eventSchema.setName(webhookSummaryDTO.getEventSchemaName());
+        eventSchema.setUri(webhookSummaryDTO.getEventSchemaUri());
+        webhookResponse.setEventSchema(eventSchema);
+
+        return webhookResponse;
     }
 
     /**
