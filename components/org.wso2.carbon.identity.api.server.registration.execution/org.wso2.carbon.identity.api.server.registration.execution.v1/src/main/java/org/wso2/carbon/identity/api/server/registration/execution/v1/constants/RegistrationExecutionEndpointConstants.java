@@ -27,6 +27,7 @@ public class RegistrationExecutionEndpointConstants {
     }
 
     public static final String REGISTRATION_FLOW_PREFIX = "RFM-";
+    public static final String SELF_REGISTRATION_ENABLED = "SelfRegistration.Enable";
     public static final String DYNAMIC_REGISTRATION_PORTAL_ENABLED = "SelfRegistration.EnableDynamicPortal";
 
     /**
@@ -37,6 +38,12 @@ public class RegistrationExecutionEndpointConstants {
         ERROR_CODE_DYNAMIC_REGISTRATION_PORTAL_DISABLED("60101",
                 "Dynamic registration portal is not enabled.",
                 "Dynamic registration portal is not enabled. Please contact your administrator."
+        ),
+
+        ERROR_CODE_SELF_REGISTRATION_DISABLED("60102",
+                                                        "Self registration is not enabled.",
+                                                        "Self registration is not enabled. Please contact your " +
+                                                      "administrator."
         ),
 
         ERROR_CODE_GET_GOVERNANCE_CONFIG("65101",

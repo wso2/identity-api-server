@@ -47,6 +47,8 @@ import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DE
 import static org.wso2.carbon.identity.api.server.registration.execution.v1.constants.RegistrationExecutionEndpointConstants.DYNAMIC_REGISTRATION_PORTAL_ENABLED;
 import static org.wso2.carbon.identity.api.server.registration.execution.v1.constants.RegistrationExecutionEndpointConstants.ErrorMessage.ERROR_CODE_DYNAMIC_REGISTRATION_PORTAL_DISABLED;
 import static org.wso2.carbon.identity.api.server.registration.execution.v1.constants.RegistrationExecutionEndpointConstants.ErrorMessage.ERROR_CODE_GET_GOVERNANCE_CONFIG;
+import static org.wso2.carbon.identity.api.server.registration.execution.v1.constants.RegistrationExecutionEndpointConstants.ErrorMessage.ERROR_CODE_SELF_REGISTRATION_DISABLED;
+import static org.wso2.carbon.identity.api.server.registration.execution.v1.constants.RegistrationExecutionEndpointConstants.SELF_REGISTRATION_ENABLED;
 
 /**
  * Utility class for registration execution API.
@@ -110,6 +112,32 @@ public class Utils {
         error.setMessage(errorMessage);
         error.setDescription(errorDescription);
         return error;
+    }
+
+    /**
+     * Checks whether self registration is enabled.
+     *
+     * @param tenantDomain Tenant domain.
+     */
+    public static void isSelfRegistrationEnabled(String tenantDomain) {
+
+        try {
+            IdentityGovernanceService identityGovernanceService =
+                    RegistrationExecutionServiceHolder.getIdentityGovernanceService();
+            Property[] connectorConfigs = identityGovernanceService.getConfiguration(
+                    new String[] {SELF_REGISTRATION_ENABLED}, tenantDomain);
+            if (!Boolean.parseBoolean(connectorConfigs[0].getValue())) {
+                throw handleRegistrationException(new RegistrationEngineClientException(
+                        ERROR_CODE_SELF_REGISTRATION_DISABLED.getCode(),
+                        ERROR_CODE_SELF_REGISTRATION_DISABLED.getMessage(),
+                        ERROR_CODE_SELF_REGISTRATION_DISABLED.getDescription()));
+            }
+        } catch (IdentityGovernanceException e) {
+            throw handleRegistrationException(new RegistrationEngineServerException(
+                    ERROR_CODE_GET_GOVERNANCE_CONFIG.getCode(),
+                    ERROR_CODE_GET_GOVERNANCE_CONFIG.getMessage(),
+                    ERROR_CODE_GET_GOVERNANCE_CONFIG.getDescription(), e));
+        }
     }
 
     /**

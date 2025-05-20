@@ -22,11 +22,10 @@
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.asynchronous.operation.status.management</artifactId>
-        <version>1.3.106-SNAPSHOT</version>
+        <version>1.3.109-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1</groupId>
     <artifactId>org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1</artifactId>
     <packaging>jar</packaging>
 
