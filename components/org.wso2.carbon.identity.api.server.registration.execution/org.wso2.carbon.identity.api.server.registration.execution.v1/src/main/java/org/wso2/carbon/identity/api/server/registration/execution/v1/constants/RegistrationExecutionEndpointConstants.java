@@ -29,6 +29,7 @@ public class RegistrationExecutionEndpointConstants {
     public static final String REGISTRATION_FLOW_PREFIX = "RFM-";
     public static final String SELF_REGISTRATION_ENABLED = "SelfRegistration.Enable";
     public static final String DYNAMIC_REGISTRATION_PORTAL_ENABLED = "SelfRegistration.EnableDynamicPortal";
+    public static final String SHOW_USERNAME_UNAVAILABILITY = "SelfRegistration.ShowUsernameUnavailability";
 
     /**
      * Error messages related to registration flow management.
