@@ -191,8 +191,6 @@ public class ServerWebhookManagementService {
 
         WebhookResponse webhookResponse = new WebhookResponse();
         webhookResponse.setId(webhookSummaryDTO.getId());
-        webhookResponse.setCreatedAt(webhookSummaryDTO.getCreatedAt());
-        webhookResponse.setUpdatedAt(webhookSummaryDTO.getUpdatedAt());
         webhookResponse.setEndpoint(webhookSummaryDTO.getEndpoint());
         webhookResponse.setDescription(webhookSummaryDTO.getDescription());
         WebhookRequestEventSchema eventSchema = new WebhookRequestEventSchema();
