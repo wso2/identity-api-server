@@ -109,7 +109,7 @@ public class ServerWebhookManagementService {
 
         try {
             Webhook webhook = buildWebhook(webhookRequest);
-            WebhookDTO webhookDTO = webhookManagementService.updateWebhook(webhook,
+            WebhookDTO webhookDTO = webhookManagementService.updateWebhook(webhookId, webhook,
                     CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
             return getWebhookResponse(webhookDTO);
         } catch (WebhookMgtException e) {
