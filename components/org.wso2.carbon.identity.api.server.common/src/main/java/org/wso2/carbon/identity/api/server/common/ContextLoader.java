@@ -26,7 +26,6 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.core.ServiceURLBuilder;
 import org.wso2.carbon.identity.core.URLBuilderException;
-import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 
 import java.net.URI;
@@ -34,7 +33,6 @@ import java.net.URI;
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.SERVER_API_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.common.Constants.TENANT_CONTEXT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.Constants.TENANT_NAME_FROM_CONTEXT;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.Error.UNEXPECTED_SERVER_ERROR;
 
@@ -125,14 +123,7 @@ public class ContextLoader {
      */
     private static String getContext(String endpoint) {
 
-        String context;
-        if (IdentityTenantUtil.isTenantQualifiedUrlsEnabled()) {
-            context = SERVER_API_PATH_COMPONENT + endpoint;
-        } else {
-            context = String.format(TENANT_CONTEXT_PATH_COMPONENT, getTenantDomainFromContext()) +
-                    SERVER_API_PATH_COMPONENT + endpoint;
-        }
-        return context;
+        return SERVER_API_PATH_COMPONENT + endpoint; // todo update comment and test org paths
     }
 
     /**
