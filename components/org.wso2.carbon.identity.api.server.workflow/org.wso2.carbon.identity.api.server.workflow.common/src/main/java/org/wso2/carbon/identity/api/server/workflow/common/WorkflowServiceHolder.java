@@ -28,15 +28,15 @@ import org.wso2.carbon.identity.workflow.mgt.WorkflowManagementServiceImpl;
 public class WorkflowServiceHolder {
 
     private static final WorkflowManagementService service = new WorkflowManagementServiceImpl();
-    private static final WorkflowImplServiceImpl implService = new WorkflowImplServiceImpl();
 
     public static WorkflowManagementService getWorkflowManagementService() {
 
         return service;
     }
 
+    // This is a placeholder for the actual implementation of WorkflowImplServiceImpl.
     public static WorkflowImplServiceImpl getWorkflowImplService() {
 
-        return implService;
+        return null;
     }
 }
