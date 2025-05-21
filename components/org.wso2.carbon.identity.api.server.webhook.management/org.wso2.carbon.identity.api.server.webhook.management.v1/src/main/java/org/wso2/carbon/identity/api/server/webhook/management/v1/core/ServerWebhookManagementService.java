@@ -26,8 +26,6 @@ import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookRe
 import org.wso2.carbon.identity.api.server.webhook.management.v1.util.WebhookManagementAPIErrorBuilder;
 import org.wso2.carbon.identity.webhook.management.api.exception.WebhookMgtException;
 import org.wso2.carbon.identity.webhook.management.api.model.Webhook;
-import org.wso2.carbon.identity.webhook.management.api.model.WebhookDTO;
-import org.wso2.carbon.identity.webhook.management.api.model.WebhookSummaryDTO;
 import org.wso2.carbon.identity.webhook.management.api.service.WebhookManagementService;
 
 import java.util.List;
@@ -53,10 +51,10 @@ public class ServerWebhookManagementService {
     public WebhookList getWebhooks() {
 
         try {
-            List<WebhookSummaryDTO> webhooks =
+            List<Webhook> webhooks =
                     webhookManagementService.getWebhooks(CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
             return new WebhookList().webhooks(webhooks.stream()
-                    .map(this::getWebhookResponse)
+                    .map(this::toWebhookResponse)
                     .collect(Collectors.toList()));
         } catch (WebhookMgtException e) {
             throw WebhookManagementAPIErrorBuilder.buildAPIError(e);
@@ -72,9 +70,9 @@ public class ServerWebhookManagementService {
     public WebhookResponse getWebhook(String webhookId) {
 
         try {
-            WebhookDTO webhookDTO = webhookManagementService.getWebhook(webhookId,
+            Webhook webhook = webhookManagementService.getWebhook(webhookId,
                     CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
-            return getWebhookResponse(webhookDTO);
+            return getWebhookResponse(webhook);
         } catch (WebhookMgtException e) {
             throw WebhookManagementAPIErrorBuilder.buildAPIError(e);
         }
@@ -90,9 +88,8 @@ public class ServerWebhookManagementService {
 
         try {
             Webhook webhook = buildWebhook(webhookRequest);
-            WebhookDTO webhookDTO = webhookManagementService.createWebhook(webhook,
-                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
-            return getWebhookResponse(webhookDTO);
+            return getWebhookResponse(webhookManagementService.createWebhook(webhook,
+                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
         } catch (WebhookMgtException e) {
             throw WebhookManagementAPIErrorBuilder.buildAPIError(e);
         }
@@ -109,9 +106,8 @@ public class ServerWebhookManagementService {
 
         try {
             Webhook webhook = buildWebhook(webhookRequest);
-            WebhookDTO webhookDTO = webhookManagementService.updateWebhook(webhookId, webhook,
-                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
-            return getWebhookResponse(webhookDTO);
+            return getWebhookResponse(webhookManagementService.updateWebhook(webhookId, webhook,
+                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
         } catch (WebhookMgtException e) {
             throw WebhookManagementAPIErrorBuilder.buildAPIError(e);
         }
@@ -162,65 +158,66 @@ public class ServerWebhookManagementService {
         }
     }
 
-    /**
-     * Build webhook model from webhook request.
-     *
-     * @param webhookRequest Webhook request.
-     * @return Webhook model.
-     */
     private Webhook buildWebhook(WebhookRequest webhookRequest) {
 
-        Webhook webhook = new Webhook();
-        webhook.setEndpoint(webhookRequest.getEndpoint());
-        webhook.setDescription(webhookRequest.getDescription());
-        webhook.setSecret(webhookRequest.getSecret());
-        webhook.setEventSchemaName(webhookRequest.getEventSchema().getName());
-        webhook.setEventSchemaUri(webhookRequest.getEventSchema().getUri());
-        webhook.setEventsSubscribed(webhookRequest.getEventsSubscribed());
-
-        return webhook;
+        return new Webhook.Builder()
+                .endpoint(webhookRequest.getEndpoint())
+                .description(webhookRequest.getDescription())
+                .secret(webhookRequest.getSecret())
+                .eventSchemaName(
+                        webhookRequest.getEventSchema() != null ? webhookRequest.getEventSchema().getName() : null)
+                .eventSchemaUri(
+                        webhookRequest.getEventSchema() != null ? webhookRequest.getEventSchema().getUri() : null)
+                .eventsSubscribed(webhookRequest.getEventsSubscribed())
+                .build();
     }
 
-    /**
-     * Get webhook response from webhook model.
-     *
-     * @param webhookSummaryDTO WebhookDTO model.
-     * @return Webhook response.
-     */
-    private WebhookResponse getWebhookResponse(WebhookSummaryDTO webhookSummaryDTO) {
+    private WebhookResponse toWebhookResponse(Webhook webhook) {
 
-        WebhookResponse webhookResponse = new WebhookResponse();
-        webhookResponse.setId(webhookSummaryDTO.getId());
-        webhookResponse.setEndpoint(webhookSummaryDTO.getEndpoint());
-        webhookResponse.setDescription(webhookSummaryDTO.getDescription());
+        WebhookResponse response = new WebhookResponse();
+        response.setId(webhook.getUuid());
+        response.setEndpoint(webhook.getEndpoint());
+        response.setDescription(webhook.getDescription());
+
+        // Convert event schema
         WebhookRequestEventSchema eventSchema = new WebhookRequestEventSchema();
-        eventSchema.setName(webhookSummaryDTO.getEventSchemaName());
-        eventSchema.setUri(webhookSummaryDTO.getEventSchemaUri());
-        webhookResponse.setEventSchema(eventSchema);
+        eventSchema.setName(webhook.getEventSchemaName());
+        eventSchema.setUri(webhook.getEventSchemaUri());
+        response.setEventSchema(eventSchema);
 
-        return webhookResponse;
+        // Convert timestamps to ISO 8601 string
+        if (webhook.getCreatedAt() != null) {
+            response.setCreatedAt(webhook.getCreatedAt().toInstant().toString());
+        }
+        if (webhook.getUpdatedAt() != null) {
+            response.setUpdatedAt(webhook.getUpdatedAt().toInstant().toString());
+        }
+
+        // Map status
+        if (webhook.getStatus() != null) {
+            response.setStatus(WebhookResponse.StatusEnum.fromValue(webhook.getStatus().name()));
+        }
+
+        return response;
     }
 
-    /**
-     * Get webhook response from webhook model.
-     *
-     * @param webhookDTO WebhookDTO model.
-     * @return Webhook response.
-     */
-    private WebhookResponse getWebhookResponse(WebhookDTO webhookDTO) {
+    private WebhookResponse getWebhookResponse(Webhook webhook) {
 
         WebhookResponse webhookResponse = new WebhookResponse();
-        webhookResponse.setId(webhookDTO.getId());
-        webhookResponse.setCreatedAt(webhookDTO.getCreatedAt());
-        webhookResponse.setUpdatedAt(webhookDTO.getUpdatedAt());
-        webhookResponse.setEndpoint(webhookDTO.getEndpoint());
-        webhookResponse.setDescription(webhookDTO.getDescription());
+        webhookResponse.setId(webhook.getUuid());
+        webhookResponse.setCreatedAt(String.valueOf(webhook.getCreatedAt()));
+        webhookResponse.setUpdatedAt(String.valueOf(webhook.getUpdatedAt()));
+        webhookResponse.setEndpoint(webhook.getEndpoint());
+        webhookResponse.setDescription(webhook.getDescription());
         WebhookRequestEventSchema eventSchema = new WebhookRequestEventSchema();
-        eventSchema.setName(webhookDTO.getEventSchemaName());
-        eventSchema.setUri(webhookDTO.getEventSchemaUri());
+        eventSchema.setName(webhook.getEventSchemaName());
+        eventSchema.setUri(webhook.getEventSchemaUri());
         webhookResponse.setEventSchema(eventSchema);
-        webhookResponse.setEventsSubscribed(webhookDTO.getEventsSubscribed());
-
+        try {
+            webhookResponse.setEventsSubscribed(webhook.getEventsSubscribed());
+        } catch (WebhookMgtException e) {
+            webhookResponse.setEventsSubscribed(null);
+        }
         return webhookResponse;
     }
 }
