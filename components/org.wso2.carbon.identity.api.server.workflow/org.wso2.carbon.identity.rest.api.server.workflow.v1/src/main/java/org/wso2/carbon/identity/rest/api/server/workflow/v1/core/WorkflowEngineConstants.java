@@ -19,7 +19,7 @@
 package org.wso2.carbon.identity.rest.api.server.workflow.v1.core;
 
 /**
- * Workflow engine constants class
+ * Workflow engine constants class.
  */
 public class WorkflowEngineConstants {
 
@@ -68,5 +68,5 @@ public class WorkflowEngineConstants {
 
             return code + " | " + message;
         }
-   }
+    }
 }
