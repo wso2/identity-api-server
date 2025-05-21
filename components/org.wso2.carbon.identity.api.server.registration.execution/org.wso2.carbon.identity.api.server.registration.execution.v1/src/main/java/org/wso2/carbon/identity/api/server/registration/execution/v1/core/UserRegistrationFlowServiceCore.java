@@ -51,9 +51,9 @@ public class UserRegistrationFlowServiceCore {
     public RegistrationSubmissionResponse initiateUserRegistration(
             RegistrationInitiationRequest registrationInitRequest) {
 
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         try {
             // Check whether the self registration and dynamic registration portal is enabled.
-            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             Utils.isSelfRegistrationEnabled(tenantDomain);
             Utils.isDynamicRegistrationPortalEnabled(tenantDomain);
 
@@ -69,7 +69,7 @@ public class UserRegistrationFlowServiceCore {
                     .type(RegistrationSubmissionResponse.TypeEnum.valueOf(registrationStep.getStepType()))
                     .data(Utils.convertToData(registrationStep.getData(), registrationStep.getStepType()));
         } catch (RegistrationEngineException e) {
-            throw Utils.handleRegistrationException(e);
+            throw Utils.handleRegistrationException(e, tenantDomain);
         }
     }
 
@@ -82,9 +82,9 @@ public class UserRegistrationFlowServiceCore {
     public RegistrationSubmissionResponse processUserRegistration(RegistrationSubmissionRequest
                                                                           registrationSubmissionRequest) {
 
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         try {
             // Check whether the self registration and dynamic registration portal is enabled.
-            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             Utils.isSelfRegistrationEnabled(tenantDomain);
             Utils.isDynamicRegistrationPortalEnabled(tenantDomain);
 
@@ -103,7 +103,7 @@ public class UserRegistrationFlowServiceCore {
                     .type(RegistrationSubmissionResponse.TypeEnum.valueOf(registrationStep.getStepType()))
                     .data(Utils.convertToData(registrationStep.getData(), registrationStep.getStepType()));
         } catch (RegistrationEngineException e) {
-            throw Utils.handleRegistrationException(e);
+            throw Utils.handleRegistrationException(e, tenantDomain);
         }
     }
 
