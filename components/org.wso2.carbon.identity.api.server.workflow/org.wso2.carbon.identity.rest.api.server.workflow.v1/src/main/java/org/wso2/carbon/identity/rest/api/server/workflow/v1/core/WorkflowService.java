@@ -56,6 +56,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
 import javax.ws.rs.core.Response;
 
 /**
@@ -191,7 +192,7 @@ public class WorkflowService {
     }
 
     /**
-     * Add new workflow association
+     * Add new workflow association.
      *
      * @param workflowAssociation Workflow association details
      * @return Return WorkflowAssociationRequest
@@ -201,17 +202,14 @@ public class WorkflowService {
         try {
             Workflow currentWorkflow = workflowManagementService.getWorkflow(workflowAssociation.getWorkflowId());
             WorkflowEvent event = workflowManagementService.getEvent(workflowAssociation.getOperation().toString());
-
             if (currentWorkflow == null) {
-                throw new WorkflowClientException("A workflow with ID: " +
-                        workflowAssociation.getWorkflowId() + "doesn't exist.");
+                throw new WorkflowClientException("A workflow with ID: " + workflowAssociation.getWorkflowId() +
+                        " doesn't exist.");
             }
-
             if (event == null) {
-                throw new WorkflowClientException("An event with ID: " +
-                        workflowAssociation.getOperation().toString() + "doesn't exist.");
+                throw new WorkflowClientException("An event with ID: " + workflowAssociation.getOperation().toString() +
+                        " doesn't exist.");
             }
-
             workflowManagementService.addAssociation(workflowAssociation.getAssociationName(),
                     workflowAssociation.getWorkflowId(), workflowAssociation.getOperation().toString(),
                     null);
@@ -362,7 +360,6 @@ public class WorkflowService {
         }
     }
 
-
     private WorkflowListResponse createWorkflowResponse(int tenantId, WorkflowListItem[] workflowListItems,
                                                         Integer offset,
                                                         String filter) throws WorkflowException {
@@ -397,25 +394,25 @@ public class WorkflowService {
     /**
      * Converts a list of `WorkflowTemplateParameters` into a list of `Parameter` objects.
      * Example:
-     *  * Given the following inputs:
-     *  * - workflowId = "wf123"
-     *  * - templateProperties = steps = [
-     *  *         {step: 1, options: [
-     *  *             {entity: "roles", values: ["123", "124"]},
-     *  *             {entity: "users", values: ["234", "235"]}
-     *  *         ]},
-     *  *         {step: 2, options: [
-     *  *             {entity: "roles", values: ["345"]}
-     *  *         ]}
-     *  *
-     *  * The output `parameterList` will contain the following list of `Parameter` objects:
-     *  * - parameterList = [
-     *     {workflowId = "wf123", paramName = "ApprovalSteps", paramValue = "123,124", qName = "Step-1-roles", holder =
-     *     "TEMPLATE"},
-     *     {workflowId = "wf123", paramName = "ApprovalSteps", paramValue = "234,235", qName = "Step-1-users", holder
-     *     = "TEMPLATE"},
-     *     {workflowId = "wf123", paramName = "ApprovalSteps", paramValue = "345", qName = "Step-2-roles", holder =
-     *     "TEMPLATE"}
+     * * Given the following inputs:
+     * * - workflowId = "wf123"
+     * * - templateProperties = steps = [
+     * *         {step: 1, options: [
+     * *             {entity: "roles", values: ["123", "124"]},
+     * *             {entity: "users", values: ["234", "235"]}
+     * *         ]},
+     * *         {step: 2, options: [
+     * *             {entity: "roles", values: ["345"]}
+     * *         ]}
+     * *
+     * * The output `parameterList` will contain the following list of `Parameter` objects:
+     * * - parameterList = [
+     * {workflowId = "wf123", paramName = "ApprovalSteps", paramValue = "123,124", qName = "Step-1-roles", holder =
+     * "TEMPLATE"},
+     * {workflowId = "wf123", paramName = "ApprovalSteps", paramValue = "234,235", qName = "Step-1-users", holder
+     * = "TEMPLATE"},
+     * {workflowId = "wf123", paramName = "ApprovalSteps", paramValue = "345", qName = "Step-2-roles", holder =
+     * "TEMPLATE"}
      * ]
      */
     private List<Parameter> createParameterList(String workflowId,
