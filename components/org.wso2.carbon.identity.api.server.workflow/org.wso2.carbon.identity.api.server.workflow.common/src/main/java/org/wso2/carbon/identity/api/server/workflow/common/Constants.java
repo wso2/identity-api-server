@@ -34,7 +34,6 @@ public class Constants {
     public static final int DEFAULT_OFFSET = 0;
     public static final String WORKFLOW_PATH_COMPONENT = "/workflows";
 
-
     private Constants() {
 
     }
