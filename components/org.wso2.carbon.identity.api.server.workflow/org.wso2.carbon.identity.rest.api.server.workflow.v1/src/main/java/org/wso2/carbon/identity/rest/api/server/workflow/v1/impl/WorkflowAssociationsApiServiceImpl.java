@@ -18,12 +18,20 @@
 
 package org.wso2.carbon.identity.rest.api.server.workflow.v1.impl;
 
+import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.WorkflowAssociationsApiService;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.core.WorkflowService;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.factories.WorkflowServiceFactory;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationPatchRequest;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationRequest;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowResponse;
+
+import java.net.URI;
+
 import javax.ws.rs.core.Response;
+
+import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.workflow.common.Constants.WORKFLOW_PATH_COMPONENT;
 
 /**
  * Implementation of workflow association management REST API.
@@ -47,7 +55,7 @@ public class WorkflowAssociationsApiServiceImpl implements WorkflowAssociationsA
     public Response deleteWorkflowAssociationById(String associationId) {
 
         workflowService.removeAssociation(associationId);
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     @Override
