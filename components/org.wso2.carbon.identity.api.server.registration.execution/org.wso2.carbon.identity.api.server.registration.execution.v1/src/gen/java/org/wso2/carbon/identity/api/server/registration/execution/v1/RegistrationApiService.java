@@ -23,7 +23,5 @@ import javax.ws.rs.core.Response;
 
 public interface RegistrationApiService {
 
-    public Response registrationInitiatePost(RegistrationInitiationRequest registrationInitiationRequest);
-
-    public Response registrationSubmitPost(RegistrationSubmissionRequest registrationSubmissionRequest);
+      public Response registrationExecutePost(RegistrationExecutionRequest registrationExecutionRequest);
 }

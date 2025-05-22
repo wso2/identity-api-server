@@ -19,8 +19,7 @@
 package org.wso2.carbon.identity.api.server.registration.execution.v1.impl;
 
 import org.wso2.carbon.identity.api.server.registration.execution.v1.RegistrationApiService;
-import org.wso2.carbon.identity.api.server.registration.execution.v1.RegistrationInitiationRequest;
-import org.wso2.carbon.identity.api.server.registration.execution.v1.RegistrationSubmissionRequest;
+import org.wso2.carbon.identity.api.server.registration.execution.v1.RegistrationExecutionRequest;
 import org.wso2.carbon.identity.api.server.registration.execution.v1.core.UserRegistrationFlowServiceCore;
 import org.wso2.carbon.identity.api.server.registration.execution.v1.factories.UserRegistrationFlowServiceFactory;
 
@@ -39,17 +38,10 @@ public class RegistrationApiServiceImpl implements RegistrationApiService {
     }
 
     @Override
-    public Response registrationInitiatePost(RegistrationInitiationRequest registrationInitiationRequest) {
+    public Response registrationExecutePost(RegistrationExecutionRequest registrationExecutionRequest) {
 
         return Response.ok()
-                .entity(userRegistrationFlowServiceCore.initiateUserRegistration(registrationInitiationRequest))
+                .entity(userRegistrationFlowServiceCore.processUserRegistrationExecution(registrationExecutionRequest))
                 .build();
-    }
-
-    @Override
-    public Response registrationSubmitPost(RegistrationSubmissionRequest registrationSubmissionRequest) {
-
-        return Response.ok().entity(userRegistrationFlowServiceCore
-                .processUserRegistration(registrationSubmissionRequest)).build();
     }
 }
