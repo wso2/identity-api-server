@@ -32,6 +32,7 @@ public class Constants {
     public static final String WORKFLOW_IMPLEMENTATION = "Workflowimpl";
     public static final String WORKFLOW_NAME = "WorkflowName";
     public static final int DEFAULT_OFFSET = 0;
+    public static final String WORKFLOW_PATH_COMPONENT = "/workflows";
 
     private Constants() {
 
