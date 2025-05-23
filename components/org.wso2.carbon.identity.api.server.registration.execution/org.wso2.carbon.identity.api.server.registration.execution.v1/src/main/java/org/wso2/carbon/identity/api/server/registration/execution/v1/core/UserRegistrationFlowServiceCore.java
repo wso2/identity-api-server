@@ -21,15 +21,16 @@ package org.wso2.carbon.identity.api.server.registration.execution.v1.core;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.api.server.registration.execution.v1.RegistrationInitiationRequest;
-import org.wso2.carbon.identity.api.server.registration.execution.v1.RegistrationSubmissionRequest;
-import org.wso2.carbon.identity.api.server.registration.execution.v1.RegistrationSubmissionResponse;
+import org.wso2.carbon.identity.api.server.registration.execution.v1.RegistrationExecutionRequest;
+import org.wso2.carbon.identity.api.server.registration.execution.v1.RegistrationExecutionResponse;
 import org.wso2.carbon.identity.api.server.registration.execution.v1.utils.Utils;
 import org.wso2.carbon.identity.user.registration.engine.UserRegistrationFlowService;
 import org.wso2.carbon.identity.user.registration.engine.exception.RegistrationEngineException;
 import org.wso2.carbon.identity.user.registration.engine.model.RegistrationStep;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Service class for registration management.
@@ -44,64 +45,40 @@ public class UserRegistrationFlowServiceCore {
     }
 
     /**
-     * Initiate user registration.
+     * Process user registration execution.
      *
-     * @return RegistrationSubmissionResponse.
+     * @param registrationExecutionRequest RegistrationExecutionRequest.
+     * @return RegistrationExecutionResponse.
      */
-    public RegistrationSubmissionResponse initiateUserRegistration(
-            RegistrationInitiationRequest registrationInitRequest) {
+    public RegistrationExecutionResponse processUserRegistrationExecution(RegistrationExecutionRequest
+                                                                                  registrationExecutionRequest) {
 
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         try {
-            // Check whether the dynamic registration portal is enabled.
-            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            // Check whether the self registration and dynamic registration portal is enabled.
+            Utils.isSelfRegistrationEnabled(tenantDomain);
             Utils.isDynamicRegistrationPortalEnabled(tenantDomain);
+            ObjectMapper objectMapper = new ObjectMapper();
 
-            RegistrationStep registrationStep = userRegistrationMgtService.initiateDefaultRegistrationFlow(
-                    tenantDomain, registrationInitRequest.getApplicationId(), registrationInitRequest.getCallbackUrl());
-            RegistrationSubmissionResponse registrationSubmissionResponse = new RegistrationSubmissionResponse();
+            Map<String, String> inputMap = Optional.ofNullable(registrationExecutionRequest.getInputs())
+                    .map(inputs -> objectMapper.convertValue(inputs, new MapTypeReference()))
+                    .orElse(Collections.emptyMap());
+            RegistrationStep registrationStep = userRegistrationMgtService.handleRegistration(tenantDomain,
+                    registrationExecutionRequest.getApplicationId(), registrationExecutionRequest.getCallbackUrl(),
+                    registrationExecutionRequest.getFlowId(), registrationExecutionRequest.getActionId(), inputMap);
+            RegistrationExecutionResponse registrationExecutionResponse = new RegistrationExecutionResponse();
+
             if (registrationStep == null) {
-                return registrationSubmissionResponse;
+                return registrationExecutionResponse;
             }
-            return registrationSubmissionResponse
+
+            return registrationExecutionResponse
                     .flowId(registrationStep.getFlowId())
                     .flowStatus(registrationStep.getFlowStatus())
-                    .type(RegistrationSubmissionResponse.TypeEnum.valueOf(registrationStep.getStepType()))
+                    .type(RegistrationExecutionResponse.TypeEnum.valueOf(registrationStep.getStepType()))
                     .data(Utils.convertToData(registrationStep.getData(), registrationStep.getStepType()));
         } catch (RegistrationEngineException e) {
-            throw Utils.handleRegistrationException(e);
-        }
-    }
-
-    /**
-     * Process user registration.
-     *
-     * @param registrationSubmissionRequest RegistrationSubmissionRequest.
-     * @return RegistrationSubmissionResponse.
-     */
-    public RegistrationSubmissionResponse processUserRegistration(RegistrationSubmissionRequest
-                                                                          registrationSubmissionRequest) {
-
-        try {
-            // Check whether the dynamic registration portal is enabled.
-            Utils.isDynamicRegistrationPortalEnabled(PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                    .getTenantDomain());
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            Map<String, String> inpputMap = objectMapper.convertValue(registrationSubmissionRequest.getInputs(),
-                    new MapTypeReference());
-            RegistrationStep registrationStep = userRegistrationMgtService
-                    .continueFlow(registrationSubmissionRequest.getFlowId(),
-                            registrationSubmissionRequest.getActionId(), inpputMap);
-            RegistrationSubmissionResponse registrationSubmissionResponse = new RegistrationSubmissionResponse();
-            if (registrationStep == null) {
-                return registrationSubmissionResponse;
-            }
-            return registrationSubmissionResponse.flowId(registrationStep.getFlowId())
-                    .flowStatus(registrationStep.getFlowStatus())
-                    .type(RegistrationSubmissionResponse.TypeEnum.valueOf(registrationStep.getStepType()))
-                    .data(Utils.convertToData(registrationStep.getData(), registrationStep.getStepType()));
-        } catch (RegistrationEngineException e) {
-            throw Utils.handleRegistrationException(e);
+            throw Utils.handleRegistrationException(e, tenantDomain);
         }
     }
 

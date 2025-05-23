@@ -47,40 +47,21 @@ public class RegistrationApi {
 
     @Valid
     @POST
-    @Path("/initiate")
-    @Consumes({"application/json"})
-    @Produces({"application/json"})
-    @ApiOperation(value = "Initiate a registration flow", notes = "", response = RegistrationSubmissionResponse.class, authorizations = {
-            @Authorization(value = "BasicAuth"),
-            @Authorization(value = "OAuth2", scopes = {
-
-            })
-    }, tags = {"Initiate Registration",})
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully initiated registration flow", response = RegistrationSubmissionResponse.class)
+    @Path("/execute")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Execute a registration step", notes = "", response = RegistrationExecutionResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Execute Registration Step" })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successfully executed registration step", response = RegistrationExecutionResponse.class)
     })
-    public Response registrationInitiatePost(@ApiParam(value = "", required = true) @Valid RegistrationInitiationRequest registrationInitiationRequest) {
+    public Response registrationExecutePost(@ApiParam(value = "" ,required=true) @Valid RegistrationExecutionRequest registrationExecutionRequest) {
 
-        return delegate.registrationInitiatePost(registrationInitiationRequest);
-    }
-
-    @Valid
-    @POST
-    @Path("/submit")
-    @Consumes({"application/json"})
-    @Produces({"application/json"})
-    @ApiOperation(value = "Submit a registration step", notes = "", response = RegistrationSubmissionResponse.class, authorizations = {
-            @Authorization(value = "BasicAuth"),
-            @Authorization(value = "OAuth2", scopes = {
-
-            })
-    }, tags = {"Submit Registration Step"})
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully submitted registration step", response = RegistrationSubmissionResponse.class)
-    })
-    public Response registrationSubmitPost(@ApiParam(value = "", required = true) @Valid RegistrationSubmissionRequest registrationSubmissionRequest) {
-
-        return delegate.registrationSubmitPost(registrationSubmissionRequest);
+        return delegate.registrationExecutePost(registrationExecutionRequest );
     }
 
 }

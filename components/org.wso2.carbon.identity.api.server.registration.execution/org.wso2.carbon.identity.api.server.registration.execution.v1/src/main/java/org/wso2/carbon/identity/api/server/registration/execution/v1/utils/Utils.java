@@ -47,6 +47,11 @@ import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DE
 import static org.wso2.carbon.identity.api.server.registration.execution.v1.constants.RegistrationExecutionEndpointConstants.DYNAMIC_REGISTRATION_PORTAL_ENABLED;
 import static org.wso2.carbon.identity.api.server.registration.execution.v1.constants.RegistrationExecutionEndpointConstants.ErrorMessage.ERROR_CODE_DYNAMIC_REGISTRATION_PORTAL_DISABLED;
 import static org.wso2.carbon.identity.api.server.registration.execution.v1.constants.RegistrationExecutionEndpointConstants.ErrorMessage.ERROR_CODE_GET_GOVERNANCE_CONFIG;
+import static org.wso2.carbon.identity.api.server.registration.execution.v1.constants.RegistrationExecutionEndpointConstants.ErrorMessage.ERROR_CODE_SELF_REGISTRATION_DISABLED;
+import static org.wso2.carbon.identity.api.server.registration.execution.v1.constants.RegistrationExecutionEndpointConstants.SELF_REGISTRATION_ENABLED;
+import static org.wso2.carbon.identity.api.server.registration.execution.v1.constants.RegistrationExecutionEndpointConstants.SHOW_USERNAME_UNAVAILABILITY;
+import static org.wso2.carbon.identity.user.registration.engine.Constants.ErrorMessages.ERROR_CODE_INVALID_USER_INPUT;
+import static org.wso2.carbon.identity.user.registration.engine.Constants.ErrorMessages.ERROR_CODE_USERNAME_ALREADY_EXISTS;
 
 /**
  * Utility class for registration execution API.
@@ -96,6 +101,34 @@ public class Utils {
     }
 
     /**
+     * Handles RegistrationFrameworkException and returns an APIError object.
+     *
+     * @param e            RegistrationFrameworkException.
+     * @param tenantDomain Tenant domain.
+     * @return APIError object.
+     */
+    public static APIError handleRegistrationException(RegistrationEngineException e, String tenantDomain) {
+
+        Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+        String errorCode = e.getErrorCode();
+        if (e instanceof RegistrationEngineClientException) {
+            LOG.debug(e.getMessage(), e);
+            status = Response.Status.BAD_REQUEST;
+            if (ERROR_CODE_USERNAME_ALREADY_EXISTS.getCode().equals(errorCode) &&
+                    !isShowUsernameUnavailabilityEnabled(tenantDomain)) {
+                return handleException(status, ERROR_CODE_INVALID_USER_INPUT.getCode(),
+                                       ERROR_CODE_INVALID_USER_INPUT.getMessage(),
+                                       ERROR_CODE_INVALID_USER_INPUT.getDescription());
+            }
+        } else {
+            LOG.error(e.getMessage(), e);
+        }
+        errorCode = errorCode.contains(ERROR_CODE_DELIMITER) ? errorCode :
+                RegistrationExecutionEndpointConstants.REGISTRATION_FLOW_PREFIX + errorCode;
+        return handleException(status, errorCode, e.getMessage(), e.getDescription());
+    }
+
+    /**
      * Returns a generic error object.
      *
      * @param errorCode        Error code.
@@ -110,6 +143,32 @@ public class Utils {
         error.setMessage(errorMessage);
         error.setDescription(errorDescription);
         return error;
+    }
+
+    /**
+     * Checks whether self registration is enabled.
+     *
+     * @param tenantDomain Tenant domain.
+     */
+    public static void isSelfRegistrationEnabled(String tenantDomain) {
+
+        try {
+            IdentityGovernanceService identityGovernanceService =
+                    RegistrationExecutionServiceHolder.getIdentityGovernanceService();
+            Property[] connectorConfigs = identityGovernanceService.getConfiguration(
+                    new String[] {SELF_REGISTRATION_ENABLED}, tenantDomain);
+            if (!Boolean.parseBoolean(connectorConfigs[0].getValue())) {
+                throw handleRegistrationException(new RegistrationEngineClientException(
+                        ERROR_CODE_SELF_REGISTRATION_DISABLED.getCode(),
+                        ERROR_CODE_SELF_REGISTRATION_DISABLED.getMessage(),
+                        ERROR_CODE_SELF_REGISTRATION_DISABLED.getDescription()));
+            }
+        } catch (IdentityGovernanceException e) {
+            throw handleRegistrationException(new RegistrationEngineServerException(
+                    ERROR_CODE_GET_GOVERNANCE_CONFIG.getCode(),
+                    ERROR_CODE_GET_GOVERNANCE_CONFIG.getMessage(),
+                    ERROR_CODE_GET_GOVERNANCE_CONFIG.getDescription(), e));
+        }
     }
 
     /**
@@ -130,6 +189,27 @@ public class Utils {
                         ERROR_CODE_DYNAMIC_REGISTRATION_PORTAL_DISABLED.getMessage(),
                         ERROR_CODE_DYNAMIC_REGISTRATION_PORTAL_DISABLED.getDescription()));
             }
+        } catch (IdentityGovernanceException e) {
+            throw handleRegistrationException(new RegistrationEngineServerException(
+                    ERROR_CODE_GET_GOVERNANCE_CONFIG.getCode(),
+                    ERROR_CODE_GET_GOVERNANCE_CONFIG.getMessage(),
+                    ERROR_CODE_GET_GOVERNANCE_CONFIG.getDescription(), e));
+        }
+    }
+
+    /**
+     * Checks whether the show username unavailability is enabled.
+     *
+     * @param tenantDomain Tenant domain.
+     */
+    public static boolean isShowUsernameUnavailabilityEnabled(String tenantDomain) {
+
+        try {
+            IdentityGovernanceService identityGovernanceService =
+                    RegistrationExecutionServiceHolder.getIdentityGovernanceService();
+            Property[] connectorConfigs = identityGovernanceService.getConfiguration(
+                    new String[] {SHOW_USERNAME_UNAVAILABILITY}, tenantDomain);
+            return Boolean.parseBoolean(connectorConfigs[0].getValue());
         } catch (IdentityGovernanceException e) {
             throw handleRegistrationException(new RegistrationEngineServerException(
                     ERROR_CODE_GET_GOVERNANCE_CONFIG.getCode(),

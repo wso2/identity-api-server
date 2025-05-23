@@ -71,7 +71,9 @@ public class GovernanceConstants {
         ERROR_CODE_INVALID_CONNECTOR_CONFIGURATION("50013", "Connector update failed.",
                 "Unable to update the identity governance connector %s."),
         ERROR_CODE_INVALID_PASSWORD_EXPIRY_RULE("50014", "Connector update failed.",
-                "Password expiry rule: %s is invalid.");
+                "Password expiry rule: %s is invalid."),
+        ERROR_CODE_INVALID_PASSWORD_PATTERN_REGEX("50015", "Connector update failed.",
+                "Password pattern regex is invalid.");
 
         private final String code;
         private final String message;
