@@ -32,7 +32,7 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 public class RegistrationExecutionResponse  {
-  
+
     private String flowId;
     private String flowStatus;
 
@@ -40,7 +40,8 @@ public class RegistrationExecutionResponse  {
 @XmlEnum(String.class)
 public enum TypeEnum {
 
-    @XmlEnumValue("VIEW") VIEW(String.valueOf("VIEW")), @XmlEnumValue("REDIRECTION") REDIRECTION(String.valueOf("REDIRECTION"));
+        @XmlEnumValue("VIEW") VIEW(String.valueOf("VIEW")), @XmlEnumValue("REDIRECTION") REDIRECTION(String.valueOf("REDIRECTION")),
+        @XmlEnumValue("INTERACT") INTERACT(String.valueOf("INTERACT")), @XmlEnumValue("INTERNAL_PROMPT") INTERNAL_PROMPT("INTERNAL_PROMPT");
 
 
     private String value;
@@ -79,7 +80,7 @@ public enum TypeEnum {
         this.flowId = flowId;
         return this;
     }
-    
+
     @ApiModelProperty(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6", required = true, value = "Unique identifier for the registration flow")
     @JsonProperty("flowId")
     @Valid
@@ -99,7 +100,7 @@ public enum TypeEnum {
         this.flowStatus = flowStatus;
         return this;
     }
-    
+
     @ApiModelProperty(example = "INCOMPLETE", required = true, value = "")
     @JsonProperty("flowStatus")
     @Valid
@@ -119,7 +120,7 @@ public enum TypeEnum {
         this.type = type;
         return this;
     }
-    
+
     @ApiModelProperty(example = "VIEW", required = true, value = "")
     @JsonProperty("type")
     @Valid
@@ -139,7 +140,7 @@ public enum TypeEnum {
         this.data = data;
         return this;
     }
-    
+
     @ApiModelProperty(value = "")
     @JsonProperty("data")
     @Valid
@@ -178,7 +179,7 @@ public enum TypeEnum {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class RegistrationExecutionResponse {\n");
-        
+
         sb.append("    flowId: ").append(toIndentedString(flowId)).append("\n");
         sb.append("    flowStatus: ").append(toIndentedString(flowStatus)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
