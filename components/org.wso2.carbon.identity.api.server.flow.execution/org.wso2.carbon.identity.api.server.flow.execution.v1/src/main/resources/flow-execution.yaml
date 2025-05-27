@@ -29,9 +29,9 @@ servers:
 paths:
   /registration/execute:
     post:
-      summary: Execute a specific flow's step
+      summary: Execute a flow step
       tags:
-        - Execute a specific flow's Step
+        - Execute a flow step
       requestBody:
         required: true
         content:
@@ -40,7 +40,7 @@ paths:
               $ref: "#/components/schemas/FlowExecutionRequest"
       responses:
         '200':
-          description: Successfully executed the specified flow's step
+          description: Successfully executed the flow step
           content:
             application/json:
               schema:

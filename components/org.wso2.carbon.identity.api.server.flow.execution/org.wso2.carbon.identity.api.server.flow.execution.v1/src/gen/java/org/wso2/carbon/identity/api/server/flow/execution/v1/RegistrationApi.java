@@ -52,14 +52,14 @@ public class RegistrationApi  {
     @Path("/execute")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Execute a specific flow's step", notes = "", response = FlowExecutionResponse.class, authorizations = {
+    @ApiOperation(value = "Execute a flow step", notes = "", response = FlowExecutionResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Execute a specific flow&#39;s Step" })
+    }, tags={ "Execute a flow step" })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successfully executed the specified flow's step", response = FlowExecutionResponse.class)
+        @ApiResponse(code = 200, message = "Successfully executed the flow step", response = FlowExecutionResponse.class)
     })
     public Response registrationExecutePost(@ApiParam(value = "" ,required=true) @Valid FlowExecutionRequest flowExecutionRequest) {
 

@@ -40,8 +40,7 @@ public class FlowExecutionResponse  {
 @XmlEnum(String.class)
 public enum TypeEnum {
 
-        @XmlEnumValue("VIEW") VIEW(String.valueOf("VIEW")), @XmlEnumValue("REDIRECTION") REDIRECTION(String.valueOf("REDIRECTION")),
-        @XmlEnumValue("INTERACT") INTERACT(String.valueOf("INTERACT")), @XmlEnumValue("INTERNAL_PROMPT") INTERNAL_PROMPT("INTERNAL_PROMPT");
+    @XmlEnumValue("VIEW") VIEW(String.valueOf("VIEW")), @XmlEnumValue("REDIRECTION") REDIRECTION(String.valueOf("REDIRECTION")), @XmlEnumValue("INTERACT") INTERACT(String.valueOf("INTERACT")), @XmlEnumValue("INTERNAL_PROMPT") INTERNAL_PROMPT(String.valueOf("INTERNAL_PROMPT"));
 
 
     private String value;
@@ -120,7 +119,7 @@ public enum TypeEnum {
         this.type = type;
         return this;
     }
-
+    
     @ApiModelProperty(example = "VIEW", required = true, value = "")
     @JsonProperty("type")
     @Valid
@@ -140,7 +139,7 @@ public enum TypeEnum {
         this.data = data;
         return this;
     }
-
+    
     @ApiModelProperty(value = "")
     @JsonProperty("data")
     @Valid
