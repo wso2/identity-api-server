@@ -54,26 +54,32 @@ public class UserRegistrationFlowServiceCore {
                                                                                   registrationExecutionRequest) {
 
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-        // Check whether the self registration and dynamic registration portal is enabled.
-        Utils.isSelfRegistrationEnabled(tenantDomain);
-        Utils.isDynamicRegistrationPortalEnabled(tenantDomain);
-        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            // Check whether the self registration and dynamic registration portal is enabled.
+            Utils.isSelfRegistrationEnabled(tenantDomain);
+            Utils.isDynamicRegistrationPortalEnabled(tenantDomain);
+            ObjectMapper objectMapper = new ObjectMapper();
 
-        Map<String, String> inputMap = Optional.ofNullable(registrationExecutionRequest.getInputs())
-                .map(inputs -> objectMapper.convertValue(inputs, new MapTypeReference()))
-                .orElse(Collections.emptyMap());
-        RegistrationStep registrationStep = null;
-        RegistrationExecutionResponse registrationExecutionResponse = new RegistrationExecutionResponse();
+            Map<String, String> inputMap = Optional.ofNullable(registrationExecutionRequest.getInputs())
+                    .map(inputs -> objectMapper.convertValue(inputs, new MapTypeReference()))
+                    .orElse(Collections.emptyMap());
+            RegistrationStep registrationStep = userRegistrationMgtService.handleRegistration(tenantDomain,
+                    registrationExecutionRequest.getApplicationId(), registrationExecutionRequest.getCallbackUrl(),
+                    registrationExecutionRequest.getFlowId(), registrationExecutionRequest.getActionId(), inputMap);
+            RegistrationExecutionResponse registrationExecutionResponse = new RegistrationExecutionResponse();
 
-        if (registrationStep == null) {
-            return registrationExecutionResponse;
+            if (registrationStep == null) {
+                return registrationExecutionResponse;
+            }
+
+            return registrationExecutionResponse
+                    .flowId(registrationStep.getFlowId())
+                    .flowStatus(registrationStep.getFlowStatus())
+                    .type(RegistrationExecutionResponse.TypeEnum.valueOf(registrationStep.getStepType()))
+                    .data(Utils.convertToData(registrationStep.getData(), registrationStep.getStepType()));
+        } catch (RegistrationEngineException e) {
+            throw Utils.handleRegistrationException(e, tenantDomain);
         }
-
-        return registrationExecutionResponse
-                .flowId(registrationStep.getFlowId())
-                .flowStatus(registrationStep.getFlowStatus())
-                .type(RegistrationExecutionResponse.TypeEnum.valueOf(registrationStep.getStepType()))
-                .data(Utils.convertToData(registrationStep.getData(), registrationStep.getStepType()));
     }
 
     /**
