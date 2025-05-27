@@ -32,7 +32,6 @@ import org.wso2.carbon.identity.api.server.registration.management.v1.Position;
 import org.wso2.carbon.identity.api.server.registration.management.v1.Size;
 import org.wso2.carbon.identity.api.server.registration.management.v1.Step;
 import org.wso2.carbon.identity.api.server.registration.management.v1.constants.RegistrationFlowEndpointConstants;
-import org.wso2.carbon.identity.user.registration.mgt.Constants;
 import org.wso2.carbon.identity.user.registration.mgt.exception.RegistrationClientException;
 import org.wso2.carbon.identity.user.registration.mgt.exception.RegistrationFrameworkException;
 import org.wso2.carbon.identity.user.registration.mgt.model.ActionDTO;
