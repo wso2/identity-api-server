@@ -807,7 +807,7 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
-                <artifactId>org.wso2.carbon.identity.api.server.registration.execution.common</artifactId>
+                <artifactId>org.wso2.carbon.identity.api.server.flow.execution.common</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -1008,7 +1008,7 @@
         <module>components/org.wso2.carbon.identity.api.server.notification.template</module>
         <module>components/org.wso2.carbon.identity.api.server.rule.metadata</module>
         <module>components/org.wso2.carbon.identity.api.server.registration.management</module>
-        <module>components/org.wso2.carbon.identity.api.server.registration.execution</module>
+        <module>components/org.wso2.carbon.identity.api.server.flow.execution</module>
         <module>components/org.wso2.carbon.identity.api.server.webhook.management</module>
         <module>components/org.wso2.carbon.identity.api.server.workflow</module>
         <module>components/org.wso2.carbon.identity.api.server.asynchronous.operation.status.management</module>
