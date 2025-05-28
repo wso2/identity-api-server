@@ -25,7 +25,6 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.Error;
-import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.EventMetadata;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.EventProfile;
 import javax.ws.rs.core.Response;
 
@@ -35,6 +34,4 @@ public interface WebhooksApiService {
       public Response getEventProfile(String profileName);
 
       public Response getEventProfiles();
-
-      public Response getEventsByProfile(String profileName);
 }

@@ -21,12 +21,10 @@ package org.wso2.carbon.identity.api.server.webhook.metadata.v1.core;
 import org.wso2.carbon.identity.api.server.webhook.metadata.common.WebhookMetadataServiceHolder;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.Channel;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.Event;
-import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.EventMetadata;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.EventProfile;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.util.WebhookMetadataAPIErrorBuilder;
 import org.wso2.carbon.identity.webhook.metadata.api.exception.WebhookMetadataException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,34 +45,6 @@ public class ServerWebhookMetadataService {
             org.wso2.carbon.identity.webhook.metadata.api.model.EventProfile eventProfile =
                     WebhookMetadataServiceHolder.getWebhookMetadataService().getEventProfile(profileName);
             return mapEventProfile(eventProfile);
-        } catch (WebhookMetadataException e) {
-            throw WebhookMetadataAPIErrorBuilder.buildAPIError(e);
-        }
-    }
-
-    /**
-     * Get events for a specific profile.
-     *
-     * @param profileName Name of the event profile
-     * @return List of events
-     */
-    public List<EventMetadata> getEvents(String profileName) {
-
-        try {
-            org.wso2.carbon.identity.webhook.metadata.api.model.EventProfile eventProfile =
-                    WebhookMetadataServiceHolder.getWebhookMetadataService().getEventProfile(profileName);
-
-            List<EventMetadata> events = new ArrayList<>();
-            eventProfile.getChannels().forEach(channel -> {
-                channel.getEvents().forEach(event -> {
-                    EventMetadata eventMetadata = new EventMetadata();
-                    eventMetadata.setId(event.getEventUri());
-                    eventMetadata.setName(event.getEventName());
-                    eventMetadata.setDescription(event.getEventDescription());
-                    events.add(eventMetadata);
-                });
-            });
-            return events;
         } catch (WebhookMetadataException e) {
             throw WebhookMetadataAPIErrorBuilder.buildAPIError(e);
         }

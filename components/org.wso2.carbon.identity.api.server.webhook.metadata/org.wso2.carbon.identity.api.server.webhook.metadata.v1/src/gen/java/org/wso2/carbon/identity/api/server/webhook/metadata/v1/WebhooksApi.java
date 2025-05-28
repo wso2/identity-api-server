@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.Error;
-import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.EventMetadata;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.EventProfile;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.WebhooksApiService;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.factories.WebhooksApiServiceFactory;
@@ -81,7 +80,7 @@ public class WebhooksApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Webhooks", })
+    }, tags={ "Webhooks" })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = String.class, responseContainer = "List"),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -91,30 +90,6 @@ public class WebhooksApi  {
     public Response getEventProfiles() {
 
         return delegate.getEventProfiles();
-    }
-
-    @Valid
-    @GET
-    @Path("/metadata/event-profiles/{profileName}/events")
-    
-    @Produces({ "application/json" })
-    @ApiOperation(value = "List Events of Profile", notes = "This API returns the list of events under the given event profile.   <b>Scope(Permission) required:</b> `internal_webhook_metadata_view`   ", response = EventMetadata.class, responseContainer = "List", authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Webhooks" })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = EventMetadata.class, responseContainer = "List"),
-        @ApiResponse(code = 400, message = "Bad Request", response = Void.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-        @ApiResponse(code = 404, message = "Profile not found", response = Error.class),
-        @ApiResponse(code = 500, message = "Internal server error", response = Error.class)
-    })
-    public Response getEventsByProfile(@ApiParam(value = "",required=true) @PathParam("profileName") String profileName) {
-
-        return delegate.getEventsByProfile(profileName );
     }
 
 }
