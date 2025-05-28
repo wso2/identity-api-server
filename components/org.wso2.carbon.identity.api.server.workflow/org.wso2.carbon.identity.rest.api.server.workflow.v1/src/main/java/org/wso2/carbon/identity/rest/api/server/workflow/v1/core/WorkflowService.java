@@ -82,6 +82,9 @@ public class WorkflowService {
 
         Workflow currentWorkflow;
         try {
+            if (workflowManagementService.isWorkflowExistByName(workflow.getName())) {
+                throw new WorkflowClientException("A workflow with name: " + workflow.getName() + " already exists.");
+            }
             String workflowId = UUID.randomUUID().toString();
             currentWorkflow = createWorkflow(workflow, workflowId);
             List<WorkflowTemplateParameters> templateProperties = workflow.getTemplate().getSteps();
