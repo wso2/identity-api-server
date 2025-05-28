@@ -937,7 +937,7 @@
         <identity.inbound.oauth2.version>7.0.224</identity.inbound.oauth2.version>
         <identity.inbound.saml2.version>5.11.51</identity.inbound.saml2.version>
         <identity.x509Certificate.validation.version>1.1.19</identity.x509Certificate.validation.version>
-        <commons.beanutils.version>1.9.4</commons.beanutils.version>
+        <commons.beanutils.version>1.11.0</commons.beanutils.version>
         <mavan.findbugsplugin.exclude.file>findbugs-exclude-filter.xml</mavan.findbugsplugin.exclude.file>
         <carbon.kernel.version>4.10.48</carbon.kernel.version>
         <carbon.multitenancy.version>4.11.31</carbon.multitenancy.version>
