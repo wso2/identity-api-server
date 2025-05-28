@@ -26,7 +26,7 @@ paths:
       description: "This API returns the list of event profiles supported by WSO2 Identity Server.\n\n <b>Scope(Permission) required:</b> `internal_webhook_metadata_view` \n\n"
       operationId: getEventProfiles
       tags:
-        - Webhooks
+        - Webhook Metadata
       responses:
         '200':
           description: OK
@@ -61,7 +61,7 @@ paths:
         <b>Scope(Permission) required:</b> `internal_webhook_metadata_view`
       operationId: getEventProfile
       tags:
-        - Webhooks
+        - Webhook Metadata
       parameters:
         - name: profileName
           in: path

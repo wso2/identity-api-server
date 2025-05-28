@@ -57,7 +57,7 @@ public class WebhooksApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Webhooks", })
+    }, tags={ "Webhook Metadata", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = EventProfile.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -80,7 +80,7 @@ public class WebhooksApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Webhooks" })
+    }, tags={ "Webhook Metadata" })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = String.class, responseContainer = "List"),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
