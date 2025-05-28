@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.3.113-SNAPSHOT</version>
+    <version>1.3.115-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -813,7 +813,7 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
-                <artifactId>org.wso2.carbon.identity.api.server.registration.execution.common</artifactId>
+                <artifactId>org.wso2.carbon.identity.api.server.flow.execution.common</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -1020,7 +1020,7 @@
         <module>components/org.wso2.carbon.identity.api.server.notification.template</module>
         <module>components/org.wso2.carbon.identity.api.server.rule.metadata</module>
         <module>components/org.wso2.carbon.identity.api.server.registration.management</module>
-        <module>components/org.wso2.carbon.identity.api.server.registration.execution</module>
+        <module>components/org.wso2.carbon.identity.api.server.flow.execution</module>
         <module>components/org.wso2.carbon.identity.api.server.webhook.management</module>
         <module>components/org.wso2.carbon.identity.api.server.webhook.metadata</module>
         <module>components/org.wso2.carbon.identity.api.server.workflow</module>

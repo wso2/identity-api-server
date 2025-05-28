@@ -32,7 +32,6 @@ import org.wso2.carbon.identity.api.server.registration.management.v1.Position;
 import org.wso2.carbon.identity.api.server.registration.management.v1.Size;
 import org.wso2.carbon.identity.api.server.registration.management.v1.Step;
 import org.wso2.carbon.identity.api.server.registration.management.v1.constants.RegistrationFlowEndpointConstants;
-import org.wso2.carbon.identity.user.registration.mgt.Constants;
 import org.wso2.carbon.identity.user.registration.mgt.exception.RegistrationClientException;
 import org.wso2.carbon.identity.user.registration.mgt.exception.RegistrationFrameworkException;
 import org.wso2.carbon.identity.user.registration.mgt.model.ActionDTO;
@@ -209,18 +208,16 @@ public class Utils {
 
     private static DataDTO convertToDataDTO(String type, Data data) {
 
-        if (Constants.StepTypes.VIEW.equals(type) && data.getComponents() != null) {
-            return new DataDTO.Builder()
-                    .components(data.getComponents().stream()
-                            .map(Utils::convertToComponentDTO)
-                            .collect(Collectors.toList()))
-                    .build();
-        } else if (Constants.StepTypes.REDIRECTION.equals(type) && data.getAction() != null) {
-            return new DataDTO.Builder()
-                    .action(convertToActionDTO(data.getAction()))
-                    .build();
+        DataDTO.Builder dataDTOBuilder = new DataDTO.Builder();
+        if (data.getComponents() != null && !data.getComponents().isEmpty()) {
+            dataDTOBuilder.components(data.getComponents().stream()
+                    .map(Utils::convertToComponentDTO)
+                    .collect(Collectors.toList()));
         }
-        return new DataDTO.Builder().build();
+        if (data.getAction() != null) {
+            dataDTOBuilder.action(convertToActionDTO(data.getAction()));
+        }
+        return dataDTOBuilder.build();
     }
 
     private static ComponentDTO convertToComponentDTO(Component component) {
