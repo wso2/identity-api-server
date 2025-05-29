@@ -218,7 +218,21 @@ public class Constant {
         ERROR_CODE_UNAUTHORIZED_ORG_FOR_EXCLUDED_USER_STORES_PROPERTY_UPDATE("CMT-60011",
                 "Unable to update excluded user stores property.",
                 "Updating the excluded user stores property for userstore: %s is not allowed for this " +
-                        "organization");
+                        "organization"),
+        ERROR_CODE_SYSTEM_ATTRIBUTE_MULTIVALUED_STATE_UPDATE("CMT-60012", "Cannot update the multi-valued " +
+                "state of system attributes.", "The multi-valued attribute metadata is not allowed to be " +
+                "modified for system attributes."),
+        ERROR_CODE_SYSTEM_ATTRIBUTE_DATA_TYPE_UPDATE("CMT-60013", "Cannot update the data type of system " +
+                "attributes.", "The data type attribute metadata is not allowed to be modified for system " +
+                "attributes."),
+        ERROR_CODE_SUB_ATTRIBUTES_NOT_SPECIFIED("CMT-60014", "Sub attributes not specified.",
+                "Sub attributes cannot be empty when the data type is complex."),
+        ERROR_CODE_SUB_ATTRIBUTES_NOT_SCIM_COMPLIANT("CMT-60015", "Sub attributes SCIM mappings are not " +
+                "compatible with the attribute.", "Sub attribute %s SCIM mapping should be in the " +
+                "form of attribute + '.' + sub attribute"),
+        ERROR_CODE_ATTRIBUTES_MARKED_AS_SUB_ATTRIBUTES_NOT_ALLOWED_TO_HAVE_SUB_ATTRIBUTES("CMT-60016",
+                "The attributes marked as sub attribute of another attribute can't have sub attributes.",
+                "This attribute is marked as sub attribute of the attribute %s");
 
         private final String code;
         private final String message;
@@ -290,6 +304,10 @@ public class Constant {
     public static final String PROP_REG_EX = "RegEx";
     public static final String PROP_REQUIRED = "Required";
     public static final String PROP_SUPPORTED_BY_DEFAULT = "SupportedByDefault";
+    public static final String PROP_DATA_TYPE = "dataType";
+    public static final String PROP_SUB_ATTRIBUTES = "subAttributes";
+    public static final String PROP_CANONICAL_VALUES = "canonicalValues";
+
     public static final String PROP_MULTI_VALUED = "multiValued";
     public static final String PROP_UNIQUENESS_SCOPE = "UniquenessScope";
     public static final String PROP_PROFILES_PREFIX = "Profiles.";
