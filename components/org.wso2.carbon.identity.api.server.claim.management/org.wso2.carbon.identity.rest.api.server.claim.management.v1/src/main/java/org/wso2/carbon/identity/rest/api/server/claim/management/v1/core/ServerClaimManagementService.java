@@ -1797,25 +1797,11 @@ public class ServerClaimManagementService {
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
 
         validateAttributeIsSubAttributeOfAnotherAttribute(localClaimReqDTO.getClaimURI(), tenantDomain);
-
-        String customSchemaURI = SCIMCommonUtils.getCustomSchemaURI();
-        String mappedSCIMClaim = getMappedScimClaim(localClaimReqDTO.getClaimURI(), tenantDomain)
-                .replace(customSchemaURI, StringUtils.EMPTY);
-        for (String subAttribute : localClaimReqDTO.getSubAttributes()) {
-            String mappedSCIMSubClaim = getMappedScimClaim(subAttribute, tenantDomain).replace(customSchemaURI,
-                    StringUtils.EMPTY);
-            if (!mappedSCIMSubClaim.startsWith(mappedSCIMClaim + ".")) {
-                String subAttributeName = subAttribute.replace(LOCAL_DIALECT + "/", StringUtils.EMPTY);
-                String errorDescription = String.format(Constant.ErrorMessage
-                        .ERROR_CODE_SUB_ATTRIBUTES_NOT_SCIM_COMPLIANT.getDescription(), subAttributeName);
-                throw new ClaimMetadataClientException(Constant.ErrorMessage
-                        .ERROR_CODE_SUB_ATTRIBUTES_NOT_SCIM_COMPLIANT.getCode(), errorDescription);
-            }
-
-        }
+        validateSubAttributeSCIMMappingPattern(localClaimReqDTO.getClaimURI(), tenantDomain,
+                localClaimReqDTO.getSubAttributes());
     }
 
-    private String getMappedScimClaim(String claimURI, String tenantDomain) throws ClaimMetadataException {
+    private String getMappedSCIMClaim(String claimURI, String tenantDomain) throws ClaimMetadataException {
 
         String customSchemaURI = SCIMCommonUtils.getCustomSchemaURI();
         List<Claim> mappedClaims = claimMetadataManagementService.getMappedExternalClaimsForLocalClaim(claimURI,
@@ -1826,6 +1812,25 @@ public class ServerClaimManagementService {
             return customSCIMMappedClaim.get().getClaimURI();
         }
         return StringUtils.EMPTY;
+    }
+
+    private void validateSubAttributeSCIMMappingPattern(String claimURI, String tenantDomain, String[] subAttributes)
+            throws ClaimMetadataException {
+
+        String customSchemaURI = SCIMCommonUtils.getCustomSchemaURI();
+        String attributeSCIMMapping = getMappedSCIMClaim(claimURI, tenantDomain)
+                .replace(customSchemaURI, StringUtils.EMPTY);
+        for (String subAttribute : subAttributes) {
+            String subAttributeSCIMMapping = getMappedSCIMClaim(subAttribute, tenantDomain)
+                    .replace(customSchemaURI, StringUtils.EMPTY);
+            if (!subAttributeSCIMMapping.startsWith(attributeSCIMMapping + ".")) {
+                String subAttributeName = subAttribute.replace(LOCAL_DIALECT + "/", StringUtils.EMPTY);
+                String errorDescription = String.format(Constant.ErrorMessage
+                        .ERROR_CODE_SUB_ATTRIBUTES_NOT_SCIM_COMPLIANT.getDescription(), subAttributeName);
+                throw new ClaimMetadataClientException(Constant.ErrorMessage
+                        .ERROR_CODE_SUB_ATTRIBUTES_NOT_SCIM_COMPLIANT.getCode(), errorDescription);
+            }
+        }
     }
 
     private void validateAttributeIsSubAttributeOfAnotherAttribute(String claimURI, String tenantDomain)
