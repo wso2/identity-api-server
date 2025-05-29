@@ -20,7 +20,6 @@ package org.wso2.carbon.identity.api.server.flow.management.v1.constants;
 
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
-import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtFrameworkException;
 
 /**
  * Constants related to the flow endpoint.
@@ -33,6 +32,9 @@ public class FlowEndpointConstants {
 
     public static final String FLOW_PREFIX = "FM-";
 
+    /**
+     * Error messages related to flow management.
+     */
     public enum ErrorMessages {
 
         ERROR_CODE_INVALID_FLOW_TYPE("10001", "Invalid action type.",
@@ -71,9 +73,9 @@ public class FlowEndpointConstants {
      */
     public enum FlowType {
 
-        SELF_REGISTRATION,
+        REGISTRATION,
         PASSWORD_RECOVERY,
-        ASK_PASSWORD,;
+        ASK_PASSWORD;
 
         /**
          * Check if a given string is a valid flow type.
@@ -87,7 +89,8 @@ public class FlowEndpointConstants {
                     return;
                 }
             }
-            throw Utils.handleFlowMgtException(new FlowMgtClientException(ErrorMessages.ERROR_CODE_INVALID_FLOW_TYPE.getCode(),
+            throw Utils.handleFlowMgtException(new FlowMgtClientException(
+                    ErrorMessages.ERROR_CODE_INVALID_FLOW_TYPE.getCode(),
                     ErrorMessages.ERROR_CODE_INVALID_FLOW_TYPE.getMessage(),
                     ErrorMessages.ERROR_CODE_INVALID_FLOW_TYPE.getDescription()));
         }

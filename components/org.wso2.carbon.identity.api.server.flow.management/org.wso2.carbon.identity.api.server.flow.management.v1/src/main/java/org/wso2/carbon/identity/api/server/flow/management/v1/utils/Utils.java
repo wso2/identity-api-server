@@ -33,18 +33,19 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.Size;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Step;
 import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
 import org.wso2.carbon.identity.flow.mgt.Constants;
-import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtFrameworkException;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
+import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtFrameworkException;
 import org.wso2.carbon.identity.flow.mgt.model.ActionDTO;
 import org.wso2.carbon.identity.flow.mgt.model.ComponentDTO;
 import org.wso2.carbon.identity.flow.mgt.model.DataDTO;
 import org.wso2.carbon.identity.flow.mgt.model.ExecutorDTO;
 import org.wso2.carbon.identity.flow.mgt.model.StepDTO;
 
-import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Schema.IDP_NAME;
@@ -136,8 +137,8 @@ public class Utils {
         return new Data()
                 .components(dataDTO.getComponents().isEmpty() ? null :
                         dataDTO.getComponents().stream()
-                        .map(Utils::convertToComponent)
-                        .collect(Collectors.toList()))
+                                .map(Utils::convertToComponent)
+                                .collect(Collectors.toList()))
                 .action(convertToAction(dataDTO.getAction()));
     }
 
