@@ -743,6 +743,20 @@ definitions:
         type: boolean
         description: Specifies if the claim will be prompted during user registration and displayed on the user profile.
         example: true
+      dataType:
+        type: string
+        description: The data type of the attribute.
+        example: complex
+      subAttributes:
+        type: array
+        description: The sub attributes of the complex attribute.
+        items:
+          type: string
+      canonicalValues:
+        type: array
+        description: The possible values for the attribute.
+        items:
+          $ref: '#/definitions/LabelValue'
       multiValued:
         type: boolean
         description: Specifies if the claim can hold multiple values or not.
@@ -825,6 +839,20 @@ definitions:
             type: boolean
             description: Specifies if the claim will be prompted during user registration and displayed on the user profile.
             example: true
+          dataType:
+            type: string
+            description: The data type of the attribute.
+            example: complex
+          subAttributes:
+            type: array
+            description: The sub attributes of the complex attribute.
+            items:
+              type: string
+          canonicalValues:
+            type: array
+            description: The possible values for the attribute.
+            items:
+              $ref: '#/definitions/LabelValue'
           multiValued:
             type: boolean
             description: Specifies if the claim can hold multiple values.
@@ -1030,6 +1058,20 @@ definitions:
         type: string
         description: Describes how the current context is related to the target resource.
         example: "claims"
+
+  #-----------------------------------------------------
+  # LabelValue Object
+  #-----------------------------------------------------
+  LabelValue:
+    type: object
+    required:
+      - label
+      - value
+    properties:
+      label:
+        type: string
+      value:
+        type: string
 
   #-----------------------------------------------------
   # The Error  object
