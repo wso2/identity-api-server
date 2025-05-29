@@ -198,6 +198,61 @@ paths:
             schema:
               $ref: '#/components/schemas/ConnectorsPatchReq'
         description: governance-connector to update
+  '/identity-governance/{category-id}/connectors/{connector-id}/revert':
+    patch:
+      tags:
+        - Management
+      summary: Remove governance connector properties.
+      operationId: revertConnectorProperties
+      description: |
+        Remove given governance connector properties of an organization.<br>
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/idpmgt/update <br>
+        <b>Scope required:</b> <br>
+            * internal_idp_update
+      parameters:
+        - $ref: '#/components/parameters/categoryIdPathParam'
+        - $ref: '#/components/parameters/connectorIdPathParam'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PropertyRevertReq'
+        description: Array of properties to delete.
+    delete:
+      tags:
+        - Management
+      summary: Remove all governance connector properties.
+      operationId: revertAllConnectorProperties
+      description: |
+        Remove all governance connector properties of an organization.<br>
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/idpmgt/update <br>
+        <b>Scope required:</b> <br>
+            * internal_idp_update
+      parameters:
+        - $ref: '#/components/parameters/categoryIdPathParam'
+        - $ref: '#/components/parameters/connectorIdPathParam'
+      responses:
+        '204':
+          description: Deleted governance connector properties.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
   /identity-governance/preferences:
     post:
       tags:
@@ -836,6 +891,17 @@ components:
           type: string
           description: Property value.
           example: 'false'
+    PropertyRevertReq:
+      type: object
+      description: Governance connector properties to delete.
+      required:
+        - properties
+      properties:
+        properties:
+          type: array
+          minItems: 1
+          items:
+            type: string
     PreferenceSearchAttribute:
       type: object
       description: Governance connector details.

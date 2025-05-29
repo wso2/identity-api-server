@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -33,6 +33,7 @@ import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PropertyRevertReq;
 
 import javax.validation.constraints.*;
 
@@ -51,15 +52,15 @@ public class IdentityGovernanceApi  {
     @Valid
     @GET
     @Path("/")
-    
+
     @Produces({ "application/json", "*/*" })
     @ApiOperation(value = "Retrieve governance connector categories.", notes = "Retrieve governance connector categories.  <b>Permission required:</b> <br>   * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = CategoriesRes.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Management", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Governance connector categories.", response = CategoriesRes.class, responseContainer = "List"),
         @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class),
@@ -73,15 +74,15 @@ public class IdentityGovernanceApi  {
     @Valid
     @GET
     @Path("/{category-id}/connectors/{connector-id}")
-    
+
     @Produces({ "application/json", "*/*" })
     @ApiOperation(value = "Retrieve governance connector.", notes = "Retrieve governance connector.<br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = ConnectorRes.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Management", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Requested governance connector.", response = ConnectorRes.class),
         @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found.", response = Error.class),
@@ -95,15 +96,15 @@ public class IdentityGovernanceApi  {
     @Valid
     @GET
     @Path("/{category-id}")
-    
+
     @Produces({ "application/json", "*/*" })
     @ApiOperation(value = "Retrieve governance connectors of a category.", notes = "Retrieve governance connectors of a category. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = CategoryRes.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Management", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Requested governance connector category.", response = CategoryRes.class),
         @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found.", response = Error.class),
@@ -117,15 +118,15 @@ public class IdentityGovernanceApi  {
     @Valid
     @GET
     @Path("/{category-id}/connectors")
-    
+
     @Produces({ "application/json", "*/*" })
     @ApiOperation(value = "Retrieve governance connectors of a category.", notes = "Retrieve governance connectors of a category.<br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = ConnectorRes.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Management", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Requested governance connector category.", response = ConnectorRes.class, responseContainer = "List"),
         @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found.", response = Error.class),
@@ -169,7 +170,7 @@ public class IdentityGovernanceApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Management" })
+    }, tags={ "Management", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK.", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request.", response = Error.class),
@@ -192,7 +193,7 @@ public class IdentityGovernanceApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Management" })
+    }, tags={ "Management", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK.", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request.", response = Error.class),
@@ -203,6 +204,51 @@ public class IdentityGovernanceApi  {
     public Response patchConnectorsOfCategory(@ApiParam(value = "Id of the connector category.",required=true) @PathParam("category-id") String categoryId, @ApiParam(value = "Governance connectors and properties to update" ,required=true) @Valid MultipleConnectorsPatchReq multipleConnectorsPatchReq) {
 
         return delegate.patchConnectorsOfCategory(categoryId,  multipleConnectorsPatchReq );
+    }
+
+    @Valid
+    @DELETE
+    @Path("/{category-id}/connectors/{connector-id}/revert")
+    
+    @Produces({ "*/*" })
+    @ApiOperation(value = "Remove all governance connector properties.", notes = "Remove all governance connector properties of an organization.<br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/update <br> <b>Scope required:</b> <br>     * internal_idp_update ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Management", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "Deleted governance connector properties.", response = Void.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
+    })
+    public Response revertAllConnectorProperties(@ApiParam(value = "Id of the connector category.",required=true) @PathParam("category-id") String categoryId, @ApiParam(value = "Id of the connector.",required=true) @PathParam("connector-id") String connectorId) {
+
+        return delegate.revertAllConnectorProperties(categoryId,  connectorId );
+    }
+
+    @Valid
+    @PATCH
+    @Path("/{category-id}/connectors/{connector-id}/revert")
+    @Consumes({ "application/json" })
+    @Produces({ "*/*" })
+    @ApiOperation(value = "Remove governance connector properties.", notes = "Remove given governance connector properties of an organization.<br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/update <br> <b>Scope required:</b> <br>     * internal_idp_update ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Management" })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK.", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
+    })
+    public Response revertConnectorProperties(@ApiParam(value = "Id of the connector category.",required=true) @PathParam("category-id") String categoryId, @ApiParam(value = "Id of the connector.",required=true) @PathParam("connector-id") String connectorId, @ApiParam(value = "Array of properties to delete." ) @Valid PropertyRevertReq propertyRevertReq) {
+
+        return delegate.revertConnectorProperties(categoryId,  connectorId,  propertyRevertReq );
     }
 
 }

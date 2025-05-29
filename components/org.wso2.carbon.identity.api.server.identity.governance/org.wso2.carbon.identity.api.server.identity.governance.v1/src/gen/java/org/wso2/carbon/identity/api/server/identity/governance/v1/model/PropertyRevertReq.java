@@ -24,64 +24,43 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PropertyReq;
 import javax.validation.constraints.*;
 
 /**
- * Governance connector property values.
+ * Governance connector properties to delete.
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "Governance connector property values.")
-public class PreferenceResp  {
+@ApiModel(description = "Governance connector properties to delete.")
+public class PropertyRevertReq  {
   
-    private String connectorName;
-    private List<PropertyReq> properties = null;
+    private List<String> properties = new ArrayList<>();
 
 
     /**
     **/
-    public PreferenceResp connectorName(String connectorName) {
-
-        this.connectorName = connectorName;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "")
-    @JsonProperty("connector-name")
-    @Valid
-    public String getConnectorName() {
-        return connectorName;
-    }
-    public void setConnectorName(String connectorName) {
-        this.connectorName = connectorName;
-    }
-
-    /**
-    **/
-    public PreferenceResp properties(List<PropertyReq> properties) {
+    public PropertyRevertReq properties(List<String> properties) {
 
         this.properties = properties;
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(required = true, value = "")
     @JsonProperty("properties")
     @Valid
-    public List<PropertyReq> getProperties() {
+    @NotNull(message = "Property properties cannot be null.")
+ @Size(min=1)
+    public List<String> getProperties() {
         return properties;
     }
-    public void setProperties(List<PropertyReq> properties) {
+    public void setProperties(List<String> properties) {
         this.properties = properties;
     }
 
-    public PreferenceResp addPropertiesItem(PropertyReq propertiesItem) {
-        if (this.properties == null) {
-            this.properties = new ArrayList<>();
-        }
+    public PropertyRevertReq addPropertiesItem(String propertiesItem) {
         this.properties.add(propertiesItem);
         return this;
     }
@@ -97,23 +76,21 @@ public class PreferenceResp  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        PreferenceResp preferenceResp = (PreferenceResp) o;
-        return Objects.equals(this.connectorName, preferenceResp.connectorName) &&
-            Objects.equals(this.properties, preferenceResp.properties);
+        PropertyRevertReq propertyRevertReq = (PropertyRevertReq) o;
+        return Objects.equals(this.properties, propertyRevertReq.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(connectorName, properties);
+        return Objects.hash(properties);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class PreferenceResp {\n");
+        sb.append("class PropertyRevertReq {\n");
         
-        sb.append("    connectorName: ").append(toIndentedString(connectorName)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");
         return sb.toString();
