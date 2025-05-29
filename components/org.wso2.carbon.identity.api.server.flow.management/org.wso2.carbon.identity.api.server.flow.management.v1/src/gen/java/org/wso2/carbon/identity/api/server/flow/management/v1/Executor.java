@@ -19,34 +19,28 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import javax.validation.constraints.*;
-
-/**
- * Represents the execution that an action is going to perform
- **/
-
-import io.swagger.annotations.*;
 import java.util.Objects;
+
 import javax.validation.Valid;
-import javax.xml.bind.annotation.*;
+import javax.validation.constraints.NotNull;
+
 @ApiModel(description = "Represents the execution that an action is going to perform")
-public class Executor  {
-  
+public class Executor {
+
     private String name;
     private Object meta;
 
     /**
-    * Name of the executor
-    **/
+     * Name of the executor
+     **/
     public Executor name(String name) {
 
         this.name = name;
         return this;
     }
-    
+
     @ApiModelProperty(example = "GoogleSignUpExecutor", required = true, value = "Name of the executor")
     @JsonProperty("name")
     @Valid
@@ -55,29 +49,30 @@ public class Executor  {
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
 
     /**
-    * Contains metadata related to the executor
-    **/
+     * Contains metadata related to the executor
+     **/
     public Executor meta(Object meta) {
 
         this.meta = meta;
         return this;
     }
-    
+
     @ApiModelProperty(example = "{\"idp\":\"google1\"}", value = "Contains metadata related to the executor")
     @JsonProperty("meta")
     @Valid
     public Object getMeta() {
         return meta;
     }
+
     public void setMeta(Object meta) {
         this.meta = meta;
     }
-
 
 
     @Override
@@ -91,7 +86,7 @@ public class Executor  {
         }
         Executor executor = (Executor) o;
         return Objects.equals(this.name, executor.name) &&
-            Objects.equals(this.meta, executor.meta);
+                Objects.equals(this.meta, executor.meta);
     }
 
     @Override
@@ -104,7 +99,7 @@ public class Executor  {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class Executor {\n");
-        
+
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    meta: ").append(toIndentedString(meta)).append("\n");
         sb.append("}");
@@ -112,9 +107,9 @@ public class Executor  {
     }
 
     /**
-    * Convert the given object to string with each line indented by 4 spaces
-    * (except the first line).
-    */
+     * Convert the given object to string with each line indented by 4 spaces
+     * (except the first line).
+     */
     private String toIndentedString(java.lang.Object o) {
 
         if (o == null) {

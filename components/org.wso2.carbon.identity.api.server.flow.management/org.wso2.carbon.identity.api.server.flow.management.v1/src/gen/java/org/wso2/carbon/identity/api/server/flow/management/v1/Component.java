@@ -19,25 +19,18 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.flow.management.v1.Action;
-import javax.validation.constraints.*;
-
-/**
- * Represents individual UI components in the flow
- **/
-
-import io.swagger.annotations.*;
 import java.util.Objects;
+
 import javax.validation.Valid;
-import javax.xml.bind.annotation.*;
+import javax.validation.constraints.NotNull;
+
 @ApiModel(description = "Represents individual UI components in the flow")
-public class Component  {
-  
+public class Component {
+
     private String id;
     private String category;
     private String type;
@@ -50,14 +43,14 @@ public class Component  {
     private Object config;
 
     /**
-    * Unique identifier of the component
-    **/
+     * Unique identifier of the component
+     **/
     public Component id(String id) {
 
         this.id = id;
         return this;
     }
-    
+
     @ApiModelProperty(example = "dnd-component-210e95c0-c580-40b0-9646-7054bb340f64", required = true, value = "Unique identifier of the component")
     @JsonProperty("id")
     @Valid
@@ -66,19 +59,20 @@ public class Component  {
     public String getId() {
         return id;
     }
+
     public void setId(String id) {
         this.id = id;
     }
 
     /**
-    * Type of component
-    **/
+     * Type of component
+     **/
     public Component category(String category) {
 
         this.category = category;
         return this;
     }
-    
+
     @ApiModelProperty(example = "FIELD", required = true, value = "Type of component")
     @JsonProperty("category")
     @Valid
@@ -87,19 +81,20 @@ public class Component  {
     public String getCategory() {
         return category;
     }
+
     public void setCategory(String category) {
         this.category = category;
     }
 
     /**
-    * Specific component type (e.g., INPUT, BUTTON)
-    **/
+     * Specific component type (e.g., INPUT, BUTTON)
+     **/
     public Component type(String type) {
 
         this.type = type;
         return this;
     }
-    
+
     @ApiModelProperty(example = "INPUT", required = true, value = "Specific component type (e.g., INPUT, BUTTON)")
     @JsonProperty("type")
     @Valid
@@ -108,81 +103,87 @@ public class Component  {
     public String getType() {
         return type;
     }
+
     public void setType(String type) {
         this.type = type;
     }
 
     /**
-    * Variant of the component (e.g., PRIMARY, TEXT)
-    **/
+     * Variant of the component (e.g., PRIMARY, TEXT)
+     **/
     public Component variant(String variant) {
 
         this.variant = variant;
         return this;
     }
-    
+
     @ApiModelProperty(example = "PASSWORD", value = "Variant of the component (e.g., PRIMARY, TEXT)")
     @JsonProperty("variant")
     @Valid
     public String getVariant() {
         return variant;
     }
+
     public void setVariant(String variant) {
         this.variant = variant;
     }
 
     /**
-    * Version of the component
-    **/
+     * Version of the component
+     **/
     public Component version(String version) {
 
         this.version = version;
         return this;
     }
-    
+
     @ApiModelProperty(example = "1.0.0", value = "Version of the component")
     @JsonProperty("version")
     @Valid
     public String getVersion() {
         return version;
     }
+
     public void setVersion(String version) {
         this.version = version;
     }
 
     /**
-    * Indicates whether the component is deprecated
-    **/
+     * Indicates whether the component is deprecated
+     **/
     public Component deprecated(Boolean deprecated) {
 
         this.deprecated = deprecated;
         return this;
     }
-    
+
     @ApiModelProperty(example = "false", value = "Indicates whether the component is deprecated")
     @JsonProperty("deprecated")
     @Valid
     public Boolean getDeprecated() {
         return deprecated;
     }
+
     public void setDeprecated(Boolean deprecated) {
         this.deprecated = deprecated;
     }
 
     /**
-    **/
+     *
+     **/
     public Component components(List<Component> components) {
 
         this.components = components;
         return this;
     }
-    
+
     @ApiModelProperty(value = "")
     @JsonProperty("components")
     @Valid
     public List<Component> getComponents() {
         return components;
     }
+
     public void setComponents(List<Component> components) {
         this.components = components;
     }
@@ -195,43 +196,45 @@ public class Component  {
         return this;
     }
 
-        /**
-    **/
+    /**
+     *
+     **/
     public Component action(Action action) {
 
         this.action = action;
         return this;
     }
-    
+
     @ApiModelProperty(value = "")
     @JsonProperty("action")
     @Valid
     public Action getAction() {
         return action;
     }
+
     public void setAction(Action action) {
         this.action = action;
     }
 
     /**
-    * Configuration details of the component
-    **/
+     * Configuration details of the component
+     **/
     public Component config(Object config) {
 
         this.config = config;
         return this;
     }
-    
+
     @ApiModelProperty(value = "Configuration details of the component")
     @JsonProperty("config")
     @Valid
     public Object getConfig() {
         return config;
     }
+
     public void setConfig(Object config) {
         this.config = config;
     }
-
 
 
     @Override
@@ -245,14 +248,14 @@ public class Component  {
         }
         Component component = (Component) o;
         return Objects.equals(this.id, component.id) &&
-            Objects.equals(this.category, component.category) &&
-            Objects.equals(this.type, component.type) &&
-            Objects.equals(this.variant, component.variant) &&
-            Objects.equals(this.version, component.version) &&
-            Objects.equals(this.deprecated, component.deprecated) &&
-            Objects.equals(this.components, component.components) &&
-            Objects.equals(this.action, component.action) &&
-            Objects.equals(this.config, component.config);
+                Objects.equals(this.category, component.category) &&
+                Objects.equals(this.type, component.type) &&
+                Objects.equals(this.variant, component.variant) &&
+                Objects.equals(this.version, component.version) &&
+                Objects.equals(this.deprecated, component.deprecated) &&
+                Objects.equals(this.components, component.components) &&
+                Objects.equals(this.action, component.action) &&
+                Objects.equals(this.config, component.config);
     }
 
     @Override
@@ -265,7 +268,7 @@ public class Component  {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class Component {\n");
-        
+
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    category: ").append(toIndentedString(category)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
@@ -280,9 +283,9 @@ public class Component  {
     }
 
     /**
-    * Convert the given object to string with each line indented by 4 spaces
-    * (except the first line).
-    */
+     * Convert the given object to string with each line indented by 4 spaces
+     * (except the first line).
+     */
     private String toIndentedString(java.lang.Object o) {
 
         if (o == null) {

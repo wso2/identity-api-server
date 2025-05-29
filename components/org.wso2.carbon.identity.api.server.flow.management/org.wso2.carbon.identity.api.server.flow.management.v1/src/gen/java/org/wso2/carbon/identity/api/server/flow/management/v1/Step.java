@@ -19,25 +19,16 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.wso2.carbon.identity.api.server.flow.management.v1.Data;
-import org.wso2.carbon.identity.api.server.flow.management.v1.Position;
-import org.wso2.carbon.identity.api.server.flow.management.v1.Size;
-import javax.validation.constraints.*;
-
-/**
- * Represents a single step in the flow process
- **/
-
-import io.swagger.annotations.*;
 import java.util.Objects;
+
 import javax.validation.Valid;
-import javax.xml.bind.annotation.*;
+import javax.validation.constraints.NotNull;
+
 @ApiModel(description = "Represents a single step in the flow process")
-public class Step  {
-  
+public class Step {
+
     private String id;
     private String type;
     private Data data;
@@ -45,14 +36,14 @@ public class Step  {
     private Position position;
 
     /**
-    * Unique identifier of the step
-    **/
+     * Unique identifier of the step
+     **/
     public Step id(String id) {
 
         this.id = id;
         return this;
     }
-    
+
     @ApiModelProperty(example = "dnd-step-3fa85f64-5717-4562-b3fc-2c963f66afa6", required = true, value = "Unique identifier of the step")
     @JsonProperty("id")
     @Valid
@@ -61,19 +52,20 @@ public class Step  {
     public String getId() {
         return id;
     }
+
     public void setId(String id) {
         this.id = id;
     }
 
     /**
-    * Type of the step
-    **/
+     * Type of the step
+     **/
     public Step type(String type) {
 
         this.type = type;
         return this;
     }
-    
+
     @ApiModelProperty(example = "VIEW", required = true, value = "Type of the step")
     @JsonProperty("type")
     @Valid
@@ -82,18 +74,20 @@ public class Step  {
     public String getType() {
         return type;
     }
+
     public void setType(String type) {
         this.type = type;
     }
 
     /**
-    **/
+     *
+     **/
     public Step data(Data data) {
 
         this.data = data;
         return this;
     }
-    
+
     @ApiModelProperty(required = true, value = "")
     @JsonProperty("data")
     @Valid
@@ -102,18 +96,20 @@ public class Step  {
     public Data getData() {
         return data;
     }
+
     public void setData(Data data) {
         this.data = data;
     }
 
     /**
-    **/
+     *
+     **/
     public Step size(Size size) {
 
         this.size = size;
         return this;
     }
-    
+
     @ApiModelProperty(required = true, value = "")
     @JsonProperty("size")
     @Valid
@@ -122,18 +118,20 @@ public class Step  {
     public Size getSize() {
         return size;
     }
+
     public void setSize(Size size) {
         this.size = size;
     }
 
     /**
-    **/
+     *
+     **/
     public Step position(Position position) {
 
         this.position = position;
         return this;
     }
-    
+
     @ApiModelProperty(required = true, value = "")
     @JsonProperty("position")
     @Valid
@@ -142,10 +140,10 @@ public class Step  {
     public Position getPosition() {
         return position;
     }
+
     public void setPosition(Position position) {
         this.position = position;
     }
-
 
 
     @Override
@@ -159,10 +157,10 @@ public class Step  {
         }
         Step step = (Step) o;
         return Objects.equals(this.id, step.id) &&
-            Objects.equals(this.type, step.type) &&
-            Objects.equals(this.data, step.data) &&
-            Objects.equals(this.size, step.size) &&
-            Objects.equals(this.position, step.position);
+                Objects.equals(this.type, step.type) &&
+                Objects.equals(this.data, step.data) &&
+                Objects.equals(this.size, step.size) &&
+                Objects.equals(this.position, step.position);
     }
 
     @Override
@@ -175,7 +173,7 @@ public class Step  {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class Step {\n");
-        
+
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    data: ").append(toIndentedString(data)).append("\n");
@@ -186,9 +184,9 @@ public class Step  {
     }
 
     /**
-    * Convert the given object to string with each line indented by 4 spaces
-    * (except the first line).
-    */
+     * Convert the given object to string with each line indented by 4 spaces
+     * (except the first line).
+     */
     private String toIndentedString(java.lang.Object o) {
 
         if (o == null) {

@@ -18,21 +18,12 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1;
 
-import org.wso2.carbon.identity.api.server.flow.management.v1.*;
-import org.wso2.carbon.identity.api.server.flow.management.v1.*;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import java.io.InputStream;
-import java.util.List;
-import org.wso2.carbon.identity.api.server.flow.management.v1.Error;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRequest;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowResponse;
 import javax.ws.rs.core.Response;
 
 
 public interface FlowApiService {
 
-      public Response getFlow(String flowType);
+    public Response getFlow(String flowType);
 
-      public Response updateFlow(FlowRequest flowRequest);
+    public Response updateFlow(FlowRequest flowRequest);
 }

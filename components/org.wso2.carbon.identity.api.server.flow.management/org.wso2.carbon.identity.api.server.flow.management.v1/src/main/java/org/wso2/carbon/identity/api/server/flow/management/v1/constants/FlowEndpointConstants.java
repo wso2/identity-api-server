@@ -32,10 +32,39 @@ public class FlowEndpointConstants {
     }
 
     public static final String FLOW_PREFIX = "FM-";
-    public static final String ERROR_CODE_INVALID_FLOW_TYPE = "60013";
-    public static final String ERROR_MESSAGE_INVALID_FLOW_TYPE = "Invalid action type.";
-    public static final String ERROR_DESCRIPTION_INVALID_FLOW_TYPE =
-            "The provided flow type is not supported.";
+
+    public enum ErrorMessages {
+
+        ERROR_CODE_INVALID_FLOW_TYPE("10001", "Invalid action type.",
+                "The provided flow type is not supported.");
+
+        private final String code;
+        private final String message;
+        private final String description;
+
+        ErrorMessages(String code, String message, String description) {
+
+            this.code = code;
+            this.message = message;
+            this.description = description;
+        }
+
+        public String getCode() {
+
+            return code;
+        }
+
+        public String getMessage() {
+
+            return message;
+        }
+
+        public String getDescription() {
+
+            return description;
+        }
+
+    }
 
     /**
      * Supported flow types.
@@ -58,8 +87,9 @@ public class FlowEndpointConstants {
                     return;
                 }
             }
-            throw Utils.handleFlowMgtException(new FlowMgtClientException(ERROR_CODE_INVALID_FLOW_TYPE,
-                    ERROR_MESSAGE_INVALID_FLOW_TYPE, ERROR_DESCRIPTION_INVALID_FLOW_TYPE));
+            throw Utils.handleFlowMgtException(new FlowMgtClientException(ErrorMessages.ERROR_CODE_INVALID_FLOW_TYPE.getCode(),
+                    ErrorMessages.ERROR_CODE_INVALID_FLOW_TYPE.getMessage(),
+                    ErrorMessages.ERROR_CODE_INVALID_FLOW_TYPE.getDescription()));
         }
     }
 

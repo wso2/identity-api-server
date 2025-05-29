@@ -23,10 +23,10 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.impl.FlowApiServic
 
 public class FlowApiServiceFactory {
 
-   private final static FlowApiService SERVICE = new FlowApiServiceImpl();
+    private final static FlowApiService SERVICE = new FlowApiServiceImpl();
 
-   public static FlowApiService getFlowApi() {
+    public static FlowApiService getFlowApi() {
 
-      return SERVICE;
-   }
+        return SERVICE;
+    }
 }

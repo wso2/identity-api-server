@@ -19,34 +19,29 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.math.BigDecimal;
-import javax.validation.constraints.*;
-
-/**
- * Represents the dimensions of a step
- **/
-
-import io.swagger.annotations.*;
 import java.util.Objects;
+
 import javax.validation.Valid;
-import javax.xml.bind.annotation.*;
+import javax.validation.constraints.NotNull;
+
 @ApiModel(description = "Represents the dimensions of a step")
-public class Size  {
-  
+public class Size {
+
     private BigDecimal height;
     private BigDecimal width;
 
     /**
-    **/
+     *
+     **/
     public Size height(BigDecimal height) {
 
         this.height = height;
         return this;
     }
-    
+
     @ApiModelProperty(example = "200", required = true, value = "")
     @JsonProperty("height")
     @Valid
@@ -55,18 +50,20 @@ public class Size  {
     public BigDecimal getHeight() {
         return height;
     }
+
     public void setHeight(BigDecimal height) {
         this.height = height;
     }
 
     /**
-    **/
+     *
+     **/
     public Size width(BigDecimal width) {
 
         this.width = width;
         return this;
     }
-    
+
     @ApiModelProperty(example = "160", required = true, value = "")
     @JsonProperty("width")
     @Valid
@@ -75,10 +72,10 @@ public class Size  {
     public BigDecimal getWidth() {
         return width;
     }
+
     public void setWidth(BigDecimal width) {
         this.width = width;
     }
-
 
 
     @Override
@@ -92,7 +89,7 @@ public class Size  {
         }
         Size size = (Size) o;
         return Objects.equals(this.height, size.height) &&
-            Objects.equals(this.width, size.width);
+                Objects.equals(this.width, size.width);
     }
 
     @Override
@@ -105,7 +102,7 @@ public class Size  {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class Size {\n");
-        
+
         sb.append("    height: ").append(toIndentedString(height)).append("\n");
         sb.append("    width: ").append(toIndentedString(width)).append("\n");
         sb.append("}");
@@ -113,9 +110,9 @@ public class Size  {
     }
 
     /**
-    * Convert the given object to string with each line indented by 4 spaces
-    * (except the first line).
-    */
+     * Convert the given object to string with each line indented by 4 spaces
+     * (except the first line).
+     */
     private String toIndentedString(java.lang.Object o) {
 
         if (o == null) {

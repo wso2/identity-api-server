@@ -50,13 +50,13 @@ public class ServerFlowMgtService {
 
         FlowDTO flowDTO;
         try {
+            validateFlowType(flowType);
             flowDTO = flowMgtService
                     .getFlow(flowType, PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
             FlowResponse flowResponse = new FlowResponse();
             if (flowDTO == null) {
                 return flowResponse;
             }
-            validateFlowType(flowType);
             flowResponse.steps(flowDTO.getSteps().stream().map(Utils::convertToStep)
                     .collect(Collectors.toList()));
             return flowResponse;
@@ -73,10 +73,10 @@ public class ServerFlowMgtService {
     public void updateFlow(FlowRequest flowRequest) {
 
         try {
+            validateFlowType(flowRequest.getFlowType());
             FlowDTO flowDTO = new FlowDTO();
             flowDTO.setSteps(flowRequest.getSteps().stream().map(Utils::convertToStepDTO)
                     .collect(Collectors.toList()));
-            validateFlowType(flowRequest.getFlowType());
             flowDTO.setFlowType(flowRequest.getFlowType());
             flowMgtService.updateFlow(flowDTO,
                     PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());

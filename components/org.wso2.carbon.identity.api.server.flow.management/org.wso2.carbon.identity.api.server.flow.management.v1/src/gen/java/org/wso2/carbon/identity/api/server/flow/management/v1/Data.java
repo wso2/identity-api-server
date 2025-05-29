@@ -19,41 +19,35 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.flow.management.v1.Action;
-import org.wso2.carbon.identity.api.server.flow.management.v1.Component;
-import javax.validation.constraints.*;
-
-
-import io.swagger.annotations.*;
 import java.util.Objects;
-import javax.validation.Valid;
-import javax.xml.bind.annotation.*;
 
-public class Data  {
-  
+import javax.validation.Valid;
+
+public class Data {
+
     private List<Component> components = null;
 
     private Action action;
 
     /**
-    **/
+     *
+     **/
     public Data components(List<Component> components) {
 
         this.components = components;
         return this;
     }
-    
+
     @ApiModelProperty(value = "")
     @JsonProperty("components")
     @Valid
     public List<Component> getComponents() {
         return components;
     }
+
     public void setComponents(List<Component> components) {
         this.components = components;
     }
@@ -66,24 +60,25 @@ public class Data  {
         return this;
     }
 
-        /**
-    **/
+    /**
+     *
+     **/
     public Data action(Action action) {
 
         this.action = action;
         return this;
     }
-    
+
     @ApiModelProperty(value = "")
     @JsonProperty("action")
     @Valid
     public Action getAction() {
         return action;
     }
+
     public void setAction(Action action) {
         this.action = action;
     }
-
 
 
     @Override
@@ -97,7 +92,7 @@ public class Data  {
         }
         Data data = (Data) o;
         return Objects.equals(this.components, data.components) &&
-            Objects.equals(this.action, data.action);
+                Objects.equals(this.action, data.action);
     }
 
     @Override
@@ -110,7 +105,7 @@ public class Data  {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class Data {\n");
-        
+
         sb.append("    components: ").append(toIndentedString(components)).append("\n");
         sb.append("    action: ").append(toIndentedString(action)).append("\n");
         sb.append("}");
@@ -118,9 +113,9 @@ public class Data  {
     }
 
     /**
-    * Convert the given object to string with each line indented by 4 spaces
-    * (except the first line).
-    */
+     * Convert the given object to string with each line indented by 4 spaces
+     * (except the first line).
+     */
     private String toIndentedString(java.lang.Object o) {
 
         if (o == null) {

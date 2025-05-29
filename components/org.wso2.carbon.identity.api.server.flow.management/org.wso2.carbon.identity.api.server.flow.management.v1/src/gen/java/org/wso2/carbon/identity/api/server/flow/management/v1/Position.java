@@ -19,34 +19,29 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.math.BigDecimal;
-import javax.validation.constraints.*;
-
-/**
- * Represents the coordinates of a step in the composer canvas
- **/
-
-import io.swagger.annotations.*;
 import java.util.Objects;
+
 import javax.validation.Valid;
-import javax.xml.bind.annotation.*;
+import javax.validation.constraints.NotNull;
+
 @ApiModel(description = "Represents the coordinates of a step in the composer canvas")
-public class Position  {
-  
+public class Position {
+
     private BigDecimal x;
     private BigDecimal y;
 
     /**
-    **/
+     *
+     **/
     public Position x(BigDecimal x) {
 
         this.x = x;
         return this;
     }
-    
+
     @ApiModelProperty(example = "120.12", required = true, value = "")
     @JsonProperty("x")
     @Valid
@@ -55,18 +50,20 @@ public class Position  {
     public BigDecimal getX() {
         return x;
     }
+
     public void setX(BigDecimal x) {
         this.x = x;
     }
 
     /**
-    **/
+     *
+     **/
     public Position y(BigDecimal y) {
 
         this.y = y;
         return this;
     }
-    
+
     @ApiModelProperty(example = "200.22", required = true, value = "")
     @JsonProperty("y")
     @Valid
@@ -75,10 +72,10 @@ public class Position  {
     public BigDecimal getY() {
         return y;
     }
+
     public void setY(BigDecimal y) {
         this.y = y;
     }
-
 
 
     @Override
@@ -92,7 +89,7 @@ public class Position  {
         }
         Position position = (Position) o;
         return Objects.equals(this.x, position.x) &&
-            Objects.equals(this.y, position.y);
+                Objects.equals(this.y, position.y);
     }
 
     @Override
@@ -105,7 +102,7 @@ public class Position  {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class Position {\n");
-        
+
         sb.append("    x: ").append(toIndentedString(x)).append("\n");
         sb.append("    y: ").append(toIndentedString(y)).append("\n");
         sb.append("}");
@@ -113,9 +110,9 @@ public class Position  {
     }
 
     /**
-    * Convert the given object to string with each line indented by 4 spaces
-    * (except the first line).
-    */
+     * Convert the given object to string with each line indented by 4 spaces
+     * (except the first line).
+     */
     private String toIndentedString(java.lang.Object o) {
 
         if (o == null) {
