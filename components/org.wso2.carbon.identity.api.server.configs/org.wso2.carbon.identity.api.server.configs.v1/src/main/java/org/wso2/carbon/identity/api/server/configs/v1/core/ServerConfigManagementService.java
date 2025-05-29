@@ -97,6 +97,8 @@ import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationCon
 import org.wso2.carbon.identity.oauth2.impersonation.models.ImpersonationConfig;
 import org.wso2.carbon.identity.oauth2.impersonation.services.ImpersonationConfigMgtService;
 import org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.core.JWTClientAuthenticatorMgtService;
+import org.wso2.carbon.identity.organization.management.service.exception.OrganizationManagementException;
+import org.wso2.carbon.identity.organization.management.service.util.OrganizationManagementUtil;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
@@ -936,6 +938,10 @@ public class ServerConfigManagementService {
         if (CollectionUtils.isEmpty(patchRequest)) {
             return;
         }
+
+        // Extract the existing idp property list and set it to an empty array.
+        IdentityProviderProperty[] existingIdpProperties = idpToUpdate.getIdpProperties();
+        idpToUpdate.setIdpProperties(new IdentityProviderProperty[0]);
         for (Patch patch : patchRequest) {
             String path = patch.getPath();
             Patch.OperationEnum operation = patch.getOperation();
@@ -958,10 +964,12 @@ public class ServerConfigManagementService {
                 } else {
                     switch (path) {
                         case Constants.IDLE_SESSION_PATH:
-                            updateIdPProperty(idpToUpdate, IdentityApplicationConstants.SESSION_IDLE_TIME_OUT, value);
+                            updateIdPProperty(idpToUpdate, existingIdpProperties,
+                                    IdentityApplicationConstants.SESSION_IDLE_TIME_OUT, value);
                             break;
                         case Constants.REMEMBER_ME_PATH:
-                            updateIdPProperty(idpToUpdate, IdentityApplicationConstants.REMEMBER_ME_TIME_OUT, value);
+                            updateIdPProperty(idpToUpdate, existingIdpProperties,
+                                    IdentityApplicationConstants.REMEMBER_ME_TIME_OUT, value);
                             break;
                         default:
                             throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
@@ -1005,32 +1013,49 @@ public class ServerConfigManagementService {
         }
     }
 
-    private void updateIdPProperty(IdentityProvider identityProvider, String key, String value) {
+    /**
+     * Build the IDP property list of the IDP to update by adding or updating the given key and value.
+     *
+     * @param identityProvider      Identity Provider to be updated.
+     * @param existingIdpProperties Existing Identity Provider properties.
+     * @param key                   Key of the property to be updated.
+     * @param value                 Value of the property to be updated.
+     */
+    private void updateIdPProperty(IdentityProvider identityProvider, IdentityProviderProperty[] existingIdpProperties,
+                                   String key, String value) {
 
-        List<IdentityProviderProperty> idPProperties = new ArrayList<>(Arrays.asList(identityProvider
-                .getIdpProperties()));
+        List<IdentityProviderProperty> updatedIdpProperties = new ArrayList<>();
         if (StringUtils.isBlank(value) || !StringUtils.isNumeric(value) || Integer.parseInt(value) <= 0) {
             String message = "Value should be numeric and positive";
             throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT,
                     message);
         }
         boolean isPropertyFound = false;
-        if (CollectionUtils.isNotEmpty(idPProperties)) {
-            for (IdentityProviderProperty property : idPProperties) {
-                if (StringUtils.equals(key, property.getName())) {
-                    isPropertyFound = true;
-                    property.setValue(value);
-                }
+
+        for (IdentityProviderProperty property : existingIdpProperties) {
+            if (StringUtils.equals(key, property.getName())) {
+                isPropertyFound = true;
+                property.setValue(value);
+                updatedIdpProperties.add(property);
+
             }
         }
+
         if (!isPropertyFound) {
             IdentityProviderProperty property = new IdentityProviderProperty();
             property.setName(key);
             property.setDisplayName(key);
             property.setValue(value);
-            idPProperties.add(property);
+            updatedIdpProperties.add(property);
         }
-        identityProvider.setIdpProperties(idPProperties.toArray(new IdentityProviderProperty[0]));
+
+        for (IdentityProviderProperty property : identityProvider.getIdpProperties()) {
+            if (!updatedIdpProperties.contains(property)) {
+                updatedIdpProperties.add(property);
+            }
+        }
+
+        identityProvider.setIdpProperties(updatedIdpProperties.toArray(new IdentityProviderProperty[0]));
     }
 
     private IdentityProvider getResidentIdP() {
@@ -1644,6 +1669,13 @@ public class ServerConfigManagementService {
                         authConfigToUpdate);
                 federatedAuthConfig.setProperties(updatedIdpProperties);
                 residentIdp.setFederatedAuthenticatorConfigs(new FederatedAuthenticatorConfig[]{federatedAuthConfig});
+                if (OrganizationManagementUtil.isOrganization(tenantDomain)) {
+                    /* Not sending existing resident IDP properties to update since only SAML inbound auth configs
+                     * are updated.
+                     */
+                    residentIdp.setIdpProperties(new IdentityProviderProperty[0]);
+                }
+
                 idpManager.updateResidentIdP(residentIdp, tenantDomain);
             } else {
                 throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
@@ -1651,6 +1683,11 @@ public class ServerConfigManagementService {
             }
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_SAML_INBOUND_AUTH_CONFIG_UPDATE, null);
+        } catch (OrganizationManagementException e) {
+            log.error("Server encountered an error while updating the SAML " +
+                    "inbound authentication configuration for the tenant: " + tenantDomain, e);
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     Constants.ErrorMessage.ERROR_CODE_ERROR_SAML_INBOUND_AUTH_CONFIG_UPDATE, null);
         }
     }
@@ -1799,6 +1836,13 @@ public class ServerConfigManagementService {
                     }
                 }
                 residentIdp.setFederatedAuthenticatorConfigs(new FederatedAuthenticatorConfig[]{federatedAuthConfig});
+                if (OrganizationManagementUtil.isOrganization(tenantDomain)) {
+                    /* Not sending existing resident IDP properties to update since only passive STS configs
+                     * are updated.
+                     */
+                    residentIdp.setIdpProperties(new IdentityProviderProperty[0]);
+                }
+
                 idpManager.updateResidentIdP(residentIdp, tenantDomain);
             } else {
                 throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
@@ -1806,6 +1850,11 @@ public class ServerConfigManagementService {
             }
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_PASSIVE_STS_INBOUND_AUTH_CONFIG_UPDATE, null);
+        } catch (OrganizationManagementException e) {
+            log.error("Server encountered an error while updating the passive STS " +
+                    "inbound authentication configuration for the tenant: " + tenantDomain, e);
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     Constants.ErrorMessage.ERROR_CODE_ERROR_PASSIVE_STS_INBOUND_AUTH_CONFIG_UPDATE, null);
         }
     }
