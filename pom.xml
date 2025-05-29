@@ -608,6 +608,12 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.identity.flow.mgt</artifactId>
+                <version>${carbon.identity.framework.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
                 <artifactId>org.wso2.carbon.identity.user.registration.engine</artifactId>
                 <version>${carbon.identity.framework.version}</version>
                 <scope>provided</scope>
@@ -819,6 +825,11 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.flow.management.common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
                 <artifactId>org.wso2.carbon.identity.api.server.flow.execution.common</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -947,7 +958,7 @@
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
         <identity.governance.version>1.11.27</identity.governance.version>
-        <carbon.identity.framework.version>7.8.180</carbon.identity.framework.version>
+        <carbon.identity.framework.version>7.8.182</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
         <findsecbugs-plugin.version>1.12.0</findsecbugs-plugin.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
@@ -1030,6 +1041,7 @@
         <module>components/org.wso2.carbon.identity.api.server.rule.metadata</module>
         <module>components/org.wso2.carbon.identity.api.server.registration.management</module>
         <module>components/org.wso2.carbon.identity.api.server.flow.execution</module>
+        <module>components/org.wso2.carbon.identity.api.server.flow.management</module>
         <module>components/org.wso2.carbon.identity.api.server.webhook.management</module>
         <module>components/org.wso2.carbon.identity.api.server.webhook.metadata</module>
         <module>components/org.wso2.carbon.identity.api.server.workflow</module>

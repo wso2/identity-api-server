@@ -1,0 +1,317 @@
+openapi: 3.0.0
+info:
+  description: >
+    This document specifies a **Flow Composer RESTful API** for **WSO2
+    Identity Server**.
+  version: '2'
+  title: WSO2 Identity Server - Flow Management Rest API
+  termsOfService: http://swagger.io/terms/
+  contact:
+    name: WSO2
+    url: http://wso2.com/identity-server/
+    email: architecture@wso2.org
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+
+security:
+  - OAuth2: []
+  - BasicAuth: []
+
+servers:
+  - url: https://{server-url}/t/{tenant-domain}/api/server/v1
+    variables:
+      tenant-domain:
+        default: carbon.super
+      server-url:
+        default: localhost:9443
+
+paths:
+  /flow:
+    put:
+      summary: Create or update the complete flow
+      operationId: updateFlow
+      tags:
+        - Flow Composer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowRequest'
+      responses:
+        '200':
+          description: Flow successfully updated
+        '201':
+          description: Flow successfully created
+        '400':
+          description: Invalid request body or unsupported flow type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Flow type not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Encountered a server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    get:
+      summary: Retrieve the complete flow
+      operationId: getFlow
+      tags:
+        - Flow Composer
+      parameters:
+        - in: query
+          name: flowType
+          required: true
+          schema:
+            type: string
+            enum: [SELF_REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
+          description: Type of the flow to retrieve
+      responses:
+        '200':
+          description: Successfully retrieved the flow
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlowResponse'
+        '400':
+          description: Invalid flow type specified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Flow of specified type not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    FlowRequest:
+      type: object
+      description: Request payload for creating or updating a flow
+      required:
+        - flowType
+        - steps
+      properties:
+        flowType:
+          type: string
+          description: Type of the flow being updated
+          example: SELF_REGISTRATION
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/Step'
+
+    FlowResponse:
+      type: object
+      description: Response payload for retrieving a flow
+      properties:
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/Step'
+
+    Step:
+      type: object
+      description: Represents a single step in the flow process
+      required:
+        - id
+        - type
+        - data
+        - size
+        - position
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the step
+          example: dnd-step-3fa85f64-5717-4562-b3fc-2c963f66afa6
+        type:
+          type: string
+          description: Type of the step
+          example: VIEW
+        data:
+          $ref: '#/components/schemas/Data'
+        size:
+          $ref: '#/components/schemas/Size'
+        position:
+          $ref: '#/components/schemas/Position'
+
+    Data:
+      type: object
+      properties:
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/Component'
+        action:
+          $ref: '#/components/schemas/Action'
+
+    Component:
+      type: object
+      description: Represents individual UI components in the flow
+      required:
+        - id
+        - category
+        - type
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the component
+          example: dnd-component-210e95c0-c580-40b0-9646-7054bb340f64
+        category:
+          type: string
+          description: Type of component
+          example: FIELD
+        type:
+          type: string
+          description: Specific component type (e.g., INPUT, BUTTON)
+          example: INPUT
+        variant:
+          type: string
+          description: Variant of the component (e.g., PRIMARY, TEXT)
+          example: PASSWORD
+        version:
+          type: string
+          description: Version of the component
+          example: "1.0.0"
+        deprecated:
+          type: boolean
+          description: Indicates whether the component is deprecated
+          example: false
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/Component'
+        action:
+          $ref: '#/components/schemas/Action'
+        config:
+          type: object
+          description: Configuration details of the component
+
+    Action:
+      type: object
+      description: Represents an action which controls the flow
+      required:
+        - type
+        - next
+      properties:
+        type:
+          type: string
+          description: Type of action
+          example: EXECUTOR
+        executor:
+          $ref: '#/components/schemas/Executor'
+        next:
+          type: string
+          description: ID of the next step. For the last step, value will be "COMPLETE"
+          example: dnd-step-asd85f64-5717-4562-b3fc-2234f66afa6
+
+    Executor:
+      type: object
+      description: Represents the execution that an action is going to perform
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Name of the executor
+          example: GoogleSignUpExecutor
+        meta:
+          type: object
+          description: Contains metadata related to the executor
+          example:
+            idp: google1
+
+    Size:
+      type: object
+      description: Represents the dimensions of a step
+      required:
+        - height
+        - width
+      properties:
+        height:
+          type: number
+          example: 200
+        width:
+          type: number
+          example: 160
+
+    Position:
+      type: object
+      description: Represents the coordinates of a step in the composer canvas
+      required:
+        - x
+        - y
+      properties:
+        x:
+          type: number
+          example: 120.12
+        y:
+          type: number
+          example: 200.22
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          example: AAA-00000
+        message:
+          type: string
+          example: Some Error Message
+        description:
+          type: string
+          example: Some Error Description
+        traceId:
+          type: string
+          example: e0fbcfeb-3617-43c4-8dd0-7b7d38e13047
+
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://localhost:9443/oauth2/authorize
+          tokenUrl: https://localhost:9443/oauth2/token
+          scopes:
+            read: internal_flow_mgt_view
+            write: internal_flow_mgt_update
