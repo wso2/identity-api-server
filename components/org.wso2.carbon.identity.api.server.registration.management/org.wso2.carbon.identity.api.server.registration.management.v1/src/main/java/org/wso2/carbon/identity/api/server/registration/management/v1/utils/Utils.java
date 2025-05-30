@@ -138,7 +138,7 @@ public class Utils {
                         dataDTO.getComponents().stream()
                         .map(Utils::convertToComponent)
                         .collect(Collectors.toList()))
-                .action(convertToAction(dataDTO.getAction()));
+                .action(convertToAction(dataDTO == null ? null : dataDTO.getAction()));
     }
 
     private static Component convertToComponent(ComponentDTO componentDTO) {
