@@ -21,11 +21,11 @@ package org.wso2.carbon.identity.rest.api.server.workflow.v1.core;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
-import org.wso2.carbon.identity.api.server.workflow.common.WorkflowServiceHolder;
 import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.core.function.BPSProfilesToExternal;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.dto.WorkFlowEngineDTO;
 import org.wso2.carbon.identity.workflow.impl.WorkflowImplException;
+import org.wso2.carbon.identity.workflow.impl.WorkflowImplServiceImpl;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,12 +38,19 @@ import static org.wso2.carbon.identity.rest.api.server.workflow.v1.core.Workflow
  */
 public class WorkflowEngineService {
 
+    private final WorkflowImplServiceImpl workflowImplService;
+
+    public WorkflowEngineService(WorkflowImplServiceImpl workflowImplService) {
+
+        this.workflowImplService = workflowImplService;
+    }
+
     public List<WorkFlowEngineDTO> listWorkflowEngines() {
 
         try {
-            return WorkflowServiceHolder.getWorkflowImplService()
-                    .listBPSProfiles(IdentityTenantUtil.getTenantId(ContextLoader.getTenantDomainFromContext()))
-                    .stream().map(new BPSProfilesToExternal()).collect(Collectors.toList());
+            int tenantId = IdentityTenantUtil.getTenantId(ContextLoader.getTenantDomainFromContext());
+            return workflowImplService.listBPSProfiles(tenantId).stream().map(new BPSProfilesToExternal())
+                    .collect(Collectors.toList());
         } catch (WorkflowImplException e) {
             throw handleError(Response.Status.INTERNAL_SERVER_ERROR, ERROR_CODE_ERROR_RETRIEVING_BPS_PROFILES);
         }

@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.rest.api.server.workflow.v1.factories;
 
+import org.wso2.carbon.identity.api.server.workflow.common.WorkflowServiceHolder;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.core.WorkflowEngineService;
 
 /**
@@ -28,7 +29,7 @@ public class WorkflowEngineServiceFactory {
     private static final WorkflowEngineService SERVICE;
 
     static {
-        SERVICE = new WorkflowEngineService();
+        SERVICE = new WorkflowEngineService(WorkflowServiceHolder.getWorkflowImplService());
     }
 
     /**

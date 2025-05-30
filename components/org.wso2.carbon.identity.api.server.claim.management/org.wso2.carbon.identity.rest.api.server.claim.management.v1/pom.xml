@@ -22,7 +22,7 @@
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.claim.management</artifactId>
         <relativePath>../pom.xml</relativePath>
-        <version>1.3.108-SNAPSHOT</version>
+        <version>1.3.119-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.identity.rest.api.server.claim.management.v1</artifactId>
@@ -140,6 +140,11 @@
         <dependency>
             <groupId>org.wso2.carbon.identity.organization.management.core</groupId>
             <artifactId>org.wso2.carbon.identity.organization.management.service</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.inbound.provisioning.scim2</groupId>
+            <artifactId>org.wso2.carbon.identity.scim2.common</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>
