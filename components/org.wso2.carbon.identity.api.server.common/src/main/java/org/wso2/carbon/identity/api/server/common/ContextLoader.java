@@ -114,16 +114,12 @@ public class ContextLoader {
     /**
      * Builds the API context based on whether it is an organization specific or tenant specific path.
      *
-     * For a tenant specific path, builds the API context on whether the tenant qualified url is enabled or not.
-     * In tenant qualified mode the ServiceURLBuilder appends the tenant domain to the URI as a path param
-     * automatically. But in non tenant qualified mode, we need to append the tenant domain to the path manually.
-     *
      * @param endpoint Relative endpoint path.
      * @return Context of the API.
      */
     private static String getContext(String endpoint) {
 
-        return SERVER_API_PATH_COMPONENT + endpoint; // todo update comment and test org paths
+        return SERVER_API_PATH_COMPONENT + endpoint;
     }
 
     /**
