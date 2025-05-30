@@ -133,12 +133,15 @@ public class Utils {
 
     private static Data convertToData(DataDTO dataDTO) {
 
+        if (dataDTO == null) {
+            return null;
+        }
         return new Data()
-                .components((dataDTO == null || dataDTO.getComponents().isEmpty()) ? null :
+                .components((dataDTO.getComponents() == null || dataDTO.getComponents().isEmpty()) ? null :
                         dataDTO.getComponents().stream()
                         .map(Utils::convertToComponent)
                         .collect(Collectors.toList()))
-                .action(convertToAction(dataDTO == null ? null : dataDTO.getAction()));
+                .action(convertToAction(dataDTO.getAction()));
     }
 
     private static Component convertToComponent(ComponentDTO componentDTO) {
