@@ -134,7 +134,7 @@ public class Utils {
     private static Data convertToData(DataDTO dataDTO) {
 
         return new Data()
-                .components(dataDTO.getComponents().isEmpty() ? null :
+                .components((dataDTO == null || dataDTO.getComponents().isEmpty()) ? null :
                         dataDTO.getComponents().stream()
                         .map(Utils::convertToComponent)
                         .collect(Collectors.toList()))
