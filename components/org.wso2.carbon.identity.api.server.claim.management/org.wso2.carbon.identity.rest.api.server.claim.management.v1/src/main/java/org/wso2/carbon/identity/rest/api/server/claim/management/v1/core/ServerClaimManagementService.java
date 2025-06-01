@@ -1947,7 +1947,8 @@ public class ServerClaimManagementService {
         localClaim.getClaimProperties().putIfAbsent(PROP_REQUIRED, FALSE);
         localClaim.getClaimProperties().putIfAbsent(PROP_SUPPORTED_BY_DEFAULT, FALSE);
         localClaim.getClaimProperties().putIfAbsent(PROP_MULTI_VALUED, FALSE);
-        localClaim.getClaimProperties().putIfAbsent(PROP_DATA_TYPE, DataTypeEnum.STRING.toString());
+        localClaim.getClaimProperties().putIfAbsent(PROP_DATA_TYPE, DataTypeEnum.STRING.toString()
+                .toLowerCase(Locale.ROOT));
     }
 
     private String handleAdditionalProperties(Map<String, String> claimProperties, String propertyName) {
