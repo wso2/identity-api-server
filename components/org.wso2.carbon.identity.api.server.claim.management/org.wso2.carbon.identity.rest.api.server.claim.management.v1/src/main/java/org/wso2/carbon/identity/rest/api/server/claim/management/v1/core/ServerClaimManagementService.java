@@ -1111,7 +1111,7 @@ public class ServerClaimManagementService {
         String multiValued = handleAdditionalProperties(claimProperties, PROP_MULTI_VALUED);
         localClaimResDTO.setMultiValued(Boolean.valueOf(multiValued));
 
-        String uniquenessScope = handleAdditionalProperties(claimProperties, PROP_UNIQUENESS_SCOPE);
+        String uniquenessScope = claimProperties.remove(PROP_UNIQUENESS_SCOPE);
         if (StringUtils.isNotBlank(uniquenessScope)) {
             try {
                 localClaimResDTO.setUniquenessScope(LocalClaimResDTO.UniquenessScopeEnum.valueOf(uniquenessScope));
