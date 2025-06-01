@@ -151,6 +151,7 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_SUB_ATTRIBUTES;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_SUPPORTED_BY_DEFAULT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_UNIQUENESS_SCOPE;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.RETURN_PREVIOUS_ADDITIONAL_PROPERTIES;
 import static org.wso2.carbon.identity.api.server.common.Constants.JSON_FILE_EXTENSION;
 import static org.wso2.carbon.identity.api.server.common.Constants.MEDIA_TYPE_JSON;
 import static org.wso2.carbon.identity.api.server.common.Constants.MEDIA_TYPE_XML;
@@ -1070,7 +1071,7 @@ public class ServerClaimManagementService {
         localClaimResDTO.setRequired(Boolean.valueOf(claimProperties.remove(PROP_REQUIRED)));
         localClaimResDTO.setSupportedByDefault(Boolean.valueOf(claimProperties.remove(PROP_SUPPORTED_BY_DEFAULT)));
 
-        String dataType = claimProperties.remove(PROP_DATA_TYPE);
+        String dataType = handleAdditionalProperties(claimProperties, PROP_DATA_TYPE);
         if (StringUtils.isNotBlank(dataType)) {
             try {
                 localClaimResDTO.setDataType(DataTypeEnum.valueOf(dataType.toUpperCase(Locale.ENGLISH)));
@@ -1081,12 +1082,12 @@ public class ServerClaimManagementService {
             localClaimResDTO.setDataType(DataTypeEnum.STRING);
         }
 
-        String subAttributes = claimProperties.remove(PROP_SUB_ATTRIBUTES);
+        String subAttributes = handleAdditionalProperties(claimProperties, PROP_SUB_ATTRIBUTES);
         if (StringUtils.isNotBlank(subAttributes)) {
             localClaimResDTO.setSubAttributes(subAttributes.split(" "));
         }
 
-        String canonicalValues = claimProperties.remove(PROP_CANONICAL_VALUES);
+        String canonicalValues = handleAdditionalProperties(claimProperties, PROP_CANONICAL_VALUES);
         if (StringUtils.isNotEmpty(canonicalValues)) {
             ObjectMapper mapper = new ObjectMapper();
             try {
@@ -1107,9 +1108,10 @@ public class ServerClaimManagementService {
             }
         }
 
-        localClaimResDTO.setMultiValued(Boolean.valueOf(claimProperties.remove(PROP_MULTI_VALUED)));
+        String multiValued = handleAdditionalProperties(claimProperties, PROP_MULTI_VALUED);
+        localClaimResDTO.setMultiValued(Boolean.valueOf(multiValued));
 
-        String uniquenessScope = claimProperties.remove(PROP_UNIQUENESS_SCOPE);
+        String uniquenessScope = handleAdditionalProperties(claimProperties, PROP_UNIQUENESS_SCOPE);
         if (StringUtils.isNotBlank(uniquenessScope)) {
             try {
                 localClaimResDTO.setUniquenessScope(LocalClaimResDTO.UniquenessScopeEnum.valueOf(uniquenessScope));
@@ -1252,7 +1254,8 @@ public class ServerClaimManagementService {
         claimProperties.put(PROP_REQUIRED, String.valueOf(localClaimReqDTO.getRequired()));
         claimProperties.put(PROP_SUPPORTED_BY_DEFAULT, String.valueOf(localClaimReqDTO.getSupportedByDefault()));
         if (localClaimReqDTO.getDataType() != null) {
-            claimProperties.put(PROP_DATA_TYPE, String.valueOf(localClaimReqDTO.getDataType()));
+            claimProperties.put(PROP_DATA_TYPE, String.valueOf(localClaimReqDTO.getDataType())
+                    .toLowerCase(Locale.ROOT));
         }
 
         if (DataTypeEnum.COMPLEX.equals(localClaimReqDTO.getDataType())
@@ -1945,5 +1948,13 @@ public class ServerClaimManagementService {
         localClaim.getClaimProperties().putIfAbsent(PROP_SUPPORTED_BY_DEFAULT, FALSE);
         localClaim.getClaimProperties().putIfAbsent(PROP_MULTI_VALUED, FALSE);
         localClaim.getClaimProperties().putIfAbsent(PROP_DATA_TYPE, DataTypeEnum.STRING.toString());
+    }
+
+    private String handleAdditionalProperties(Map<String, String> claimProperties, String propertyName) {
+
+        if (Boolean.parseBoolean(IdentityUtil.getProperty(RETURN_PREVIOUS_ADDITIONAL_PROPERTIES))) {
+            return claimProperties.get(propertyName);
+        }
+        return claimProperties.remove(propertyName);
     }
 }

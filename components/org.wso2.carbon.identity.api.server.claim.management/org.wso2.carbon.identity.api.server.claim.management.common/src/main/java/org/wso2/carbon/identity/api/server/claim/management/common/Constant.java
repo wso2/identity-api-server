@@ -312,6 +312,7 @@ public class Constant {
     public static final String PROP_UNIQUENESS_SCOPE = "UniquenessScope";
     public static final String PROP_PROFILES_PREFIX = "Profiles.";
     public static final String PROP_EXCLUDED_USER_STORES = "ExcludedUserStores";
+    public static final String RETURN_PREVIOUS_ADDITIONAL_PROPERTIES = "Attribute.ReturnPreviousAdditionalProperties";
 
     public static final Set<String> ALLOWED_PROPERTY_KEYS_FOR_SUB_ORG_UPDATE = Collections.unmodifiableSet(
             new HashSet<>(Collections.singletonList(PROP_EXCLUDED_USER_STORES)));
