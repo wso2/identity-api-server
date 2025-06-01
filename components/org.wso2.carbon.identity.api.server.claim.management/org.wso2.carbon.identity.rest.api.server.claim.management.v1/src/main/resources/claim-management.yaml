@@ -747,6 +747,13 @@ definitions:
         type: string
         description: The data type of the attribute.
         example: complex
+        enum:
+          - string
+          - boolean
+          - data_time
+          - integer
+          - complex
+          - decimal
       subAttributes:
         type: array
         description: The sub attributes of the complex attribute.
