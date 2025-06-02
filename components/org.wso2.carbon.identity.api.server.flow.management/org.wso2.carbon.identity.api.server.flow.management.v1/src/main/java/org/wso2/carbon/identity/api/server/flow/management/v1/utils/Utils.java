@@ -20,6 +20,7 @@ package org.wso2.carbon.identity.api.server.flow.management.v1.utils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
@@ -135,7 +136,7 @@ public class Utils {
     private static Data convertToData(DataDTO dataDTO) {
 
         return new Data()
-                .components(dataDTO.getComponents().isEmpty() ? null :
+                .components(CollectionUtils.isEmpty(dataDTO.getComponents()) ? null :
                         dataDTO.getComponents().stream()
                                 .map(Utils::convertToComponent)
                                 .collect(Collectors.toList()))
