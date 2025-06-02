@@ -38,9 +38,9 @@ import org.wso2.carbon.identity.flow.mgt.model.DataDTO;
 import org.wso2.carbon.identity.governance.IdentityGovernanceException;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
 
+import javax.ws.rs.core.Response;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER;
 import static org.wso2.carbon.identity.api.server.flow.execution.v1.constants.FlowExecutionEndpointConstants.DYNAMIC_REGISTRATION_PORTAL_ENABLED;
@@ -49,7 +49,6 @@ import static org.wso2.carbon.identity.api.server.flow.execution.v1.constants.Fl
 import static org.wso2.carbon.identity.api.server.flow.execution.v1.constants.FlowExecutionEndpointConstants.ErrorMessage.ERROR_CODE_SELF_REGISTRATION_DISABLED;
 import static org.wso2.carbon.identity.api.server.flow.execution.v1.constants.FlowExecutionEndpointConstants.SELF_REGISTRATION_ENABLED;
 import static org.wso2.carbon.identity.api.server.flow.execution.v1.constants.FlowExecutionEndpointConstants.SHOW_USERNAME_UNAVAILABILITY;
-import static org.wso2.carbon.identity.flow.engine.Constants.ErrorMessages.ERROR_CODE_INVALID_USER_INPUT;
 import static org.wso2.carbon.identity.flow.engine.Constants.ErrorMessages.ERROR_CODE_INVALID_USER_INPUT;
 import static org.wso2.carbon.identity.flow.engine.Constants.ErrorMessages.ERROR_CODE_USERNAME_ALREADY_EXISTS;
 
@@ -117,8 +116,8 @@ public class Utils {
             if (ERROR_CODE_USERNAME_ALREADY_EXISTS.getCode().equals(errorCode) &&
                     !isShowUsernameUnavailabilityEnabled(tenantDomain)) {
                 return handleException(status, ERROR_CODE_INVALID_USER_INPUT.getCode(),
-                                       ERROR_CODE_INVALID_USER_INPUT.getMessage(),
-                                       ERROR_CODE_INVALID_USER_INPUT.getDescription());
+                        ERROR_CODE_INVALID_USER_INPUT.getMessage(),
+                        ERROR_CODE_INVALID_USER_INPUT.getDescription());
             }
         } else {
             LOG.error(e.getMessage(), e);
@@ -156,7 +155,7 @@ public class Utils {
             IdentityGovernanceService identityGovernanceService =
                     FlowExecutionServiceHolder.getIdentityGovernanceService();
             Property[] connectorConfigs = identityGovernanceService.getConfiguration(
-                    new String[] {SELF_REGISTRATION_ENABLED}, tenantDomain);
+                    new String[]{SELF_REGISTRATION_ENABLED}, tenantDomain);
             if (!Boolean.parseBoolean(connectorConfigs[0].getValue())) {
                 throw handleFlowException(new FlowEngineClientException(
                         ERROR_CODE_SELF_REGISTRATION_DISABLED.getCode(),
@@ -208,7 +207,7 @@ public class Utils {
             IdentityGovernanceService identityGovernanceService =
                     FlowExecutionServiceHolder.getIdentityGovernanceService();
             Property[] connectorConfigs = identityGovernanceService.getConfiguration(
-                    new String[] {SHOW_USERNAME_UNAVAILABILITY}, tenantDomain);
+                    new String[]{SHOW_USERNAME_UNAVAILABILITY}, tenantDomain);
             return Boolean.parseBoolean(connectorConfigs[0].getValue());
         } catch (IdentityGovernanceException e) {
             throw handleFlowException(new FlowEngineServerException(
