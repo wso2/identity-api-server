@@ -28,6 +28,7 @@ import org.wso2.carbon.identity.governance.IdentityGovernanceService;
 public class FlowExecutionServiceHolder {
 
     private FlowExecutionServiceHolder() {
+
     }
 
     private static class FlowExecutionServiceHolderInstance {
@@ -41,7 +42,7 @@ public class FlowExecutionServiceHolder {
 
         private static final IdentityGovernanceService SERVICE =
                 (IdentityGovernanceService) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext().getOSGiService(IdentityGovernanceService.class, null);
+                        .getThreadLocalCarbonContext().getOSGiService(IdentityGovernanceService.class, null);
     }
 
     /**

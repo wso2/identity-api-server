@@ -204,24 +204,22 @@ public class Utils {
                 .coordinateY(step.getPosition().getY().doubleValue())
                 .width(step.getSize().getWidth().doubleValue())
                 .height(step.getSize().getHeight().doubleValue())
-                .data(convertToDataDTO(step.getType(), step.getData()))
+                .data(convertToDataDTO(step.getData()))
                 .build();
     }
 
-    private static DataDTO convertToDataDTO(String type, Data data) {
+    private static DataDTO convertToDataDTO(Data data) {
 
-        if (Constants.StepTypes.VIEW.equals(type) && data.getComponents() != null) {
-            return new DataDTO.Builder()
-                    .components(data.getComponents().stream()
-                            .map(Utils::convertToComponentDTO)
-                            .collect(Collectors.toList()))
-                    .build();
-        } else if (Constants.StepTypes.REDIRECTION.equals(type) && data.getAction() != null) {
-            return new DataDTO.Builder()
-                    .action(convertToActionDTO(data.getAction()))
-                    .build();
+        DataDTO.Builder dataDTOBuilder = new DataDTO.Builder();
+        if (data.getComponents() != null && !data.getComponents().isEmpty()) {
+            dataDTOBuilder.components(data.getComponents().stream()
+                    .map(Utils::convertToComponentDTO)
+                    .collect(Collectors.toList()));
         }
-        return new DataDTO.Builder().build();
+        if (data.getAction() != null) {
+            dataDTOBuilder.action(convertToActionDTO(data.getAction()));
+        }
+        return dataDTOBuilder.build();
     }
 
     private static ComponentDTO convertToComponentDTO(Component component) {
