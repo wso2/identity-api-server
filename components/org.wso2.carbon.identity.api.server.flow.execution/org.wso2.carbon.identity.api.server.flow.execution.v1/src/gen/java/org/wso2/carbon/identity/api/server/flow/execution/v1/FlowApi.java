@@ -25,8 +25,8 @@ import java.util.List;
 
 import org.wso2.carbon.identity.api.server.flow.execution.v1.FlowExecutionRequest;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.FlowExecutionResponse;
-import org.wso2.carbon.identity.api.server.flow.execution.v1.RegistrationApiService;
-import org.wso2.carbon.identity.api.server.flow.execution.v1.factories.RegistrationApiServiceFactory;
+import org.wso2.carbon.identity.api.server.flow.execution.v1.FlowApiService;
+import org.wso2.carbon.identity.api.server.flow.execution.v1.factories.FlowApiServiceFactory;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -35,16 +35,16 @@ import io.swagger.annotations.*;
 
 import javax.validation.constraints.*;
 
-@Path("/registration")
-@Api(description = "The registration API")
+@Path("/flow")
+@Api(description = "The flow API")
 
-public class RegistrationApi  {
+public class FlowApi  {
 
-    private final RegistrationApiService delegate;
+    private final FlowApiService delegate;
 
-    public RegistrationApi() {
+    public FlowApi() {
 
-        this.delegate = RegistrationApiServiceFactory.getRegistrationApi();
+        this.delegate = FlowApiServiceFactory.getFlowApi();
     }
 
     @Valid
@@ -61,9 +61,9 @@ public class RegistrationApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successfully executed the flow step", response = FlowExecutionResponse.class)
     })
-    public Response registrationExecutePost(@ApiParam(value = "" ,required=true) @Valid FlowExecutionRequest flowExecutionRequest) {
+    public Response flowExecutePost(@ApiParam(value = "" ,required=true) @Valid FlowExecutionRequest flowExecutionRequest) {
 
-        return delegate.registrationExecutePost(flowExecutionRequest );
+        return delegate.flowExecutePost(flowExecutionRequest );
     }
 
 }

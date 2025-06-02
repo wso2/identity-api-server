@@ -29,7 +29,7 @@ import org.wso2.carbon.identity.api.server.flow.execution.v1.FlowExecutionRespon
 import javax.ws.rs.core.Response;
 
 
-public interface RegistrationApiService {
+public interface FlowApiService {
 
-      public Response registrationExecutePost(FlowExecutionRequest flowExecutionRequest);
+      public Response flowExecutePost(FlowExecutionRequest flowExecutionRequest);
 }

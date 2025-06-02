@@ -32,11 +32,31 @@ import javax.xml.bind.annotation.*;
 
 public class FlowExecutionRequest  {
   
+    private String flowType;
     private String applicationId;
     private String callbackUrl;
     private String flowId;
     private String actionId;
     private Object inputs;
+
+    /**
+    * Unique identifier to identify the flow type
+    **/
+    public FlowExecutionRequest flowType(String flowType) {
+
+        this.flowType = flowType;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "REGISTRATION", value = "Unique identifier to identify the flow type")
+    @JsonProperty("flowType")
+    @Valid
+    public String getFlowType() {
+        return flowType;
+    }
+    public void setFlowType(String flowType) {
+        this.flowType = flowType;
+    }
 
     /**
     * Unique identifier for the application
@@ -145,7 +165,8 @@ public class FlowExecutionRequest  {
             return false;
         }
         FlowExecutionRequest flowExecutionRequest = (FlowExecutionRequest) o;
-        return Objects.equals(this.applicationId, flowExecutionRequest.applicationId) &&
+        return Objects.equals(this.flowType, flowExecutionRequest.flowType) &&
+            Objects.equals(this.applicationId, flowExecutionRequest.applicationId) &&
             Objects.equals(this.callbackUrl, flowExecutionRequest.callbackUrl) &&
             Objects.equals(this.flowId, flowExecutionRequest.flowId) &&
             Objects.equals(this.actionId, flowExecutionRequest.actionId) &&
@@ -154,7 +175,7 @@ public class FlowExecutionRequest  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(applicationId, callbackUrl, flowId, actionId, inputs);
+        return Objects.hash(flowType, applicationId, callbackUrl, flowId, actionId, inputs);
     }
 
     @Override
@@ -163,6 +184,7 @@ public class FlowExecutionRequest  {
         StringBuilder sb = new StringBuilder();
         sb.append("class FlowExecutionRequest {\n");
         
+        sb.append("    flowType: ").append(toIndentedString(flowType)).append("\n");
         sb.append("    applicationId: ").append(toIndentedString(applicationId)).append("\n");
         sb.append("    callbackUrl: ").append(toIndentedString(callbackUrl)).append("\n");
         sb.append("    flowId: ").append(toIndentedString(flowId)).append("\n");
