@@ -19,22 +19,22 @@
 package org.wso2.carbon.identity.api.server.flow.execution.common;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.flow.engine.FlowService;
+import org.wso2.carbon.identity.flow.execution.engine.FlowExecutionService;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
 
 /**
- * Holder class for UserRegistrationMgtService.
+ * Holder class for FlowExecutionService.
  */
 public class FlowExecutionServiceHolder {
 
     private FlowExecutionServiceHolder() {
     }
 
-    private static class FlowServiceHolderInstance {
+    private static class FlowExecutionServiceHolderInstance {
 
-        private static final FlowService INSTANCE = (FlowService)
+        private static final FlowExecutionService INSTANCE = (FlowExecutionService)
                 PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                        .getOSGiService(FlowService.class, null);
+                        .getOSGiService(FlowExecutionService.class, null);
     }
 
     private static class IdentityGovernanceServiceHolder {
@@ -45,13 +45,13 @@ public class FlowExecutionServiceHolder {
     }
 
     /**
-     * Get FlowService instance.
+     * Get FlowExecutionService instance.
      *
-     * @return FlowService instance
+     * @return FlowExecutionService instance
      */
-    public static FlowService getInstance() {
+    public static FlowExecutionService getInstance() {
 
-        return FlowServiceHolderInstance.INSTANCE;
+        return FlowExecutionServiceHolderInstance.INSTANCE;
     }
 
     /**

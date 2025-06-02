@@ -23,6 +23,7 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 
+import org.wso2.carbon.identity.api.server.flow.execution.v1.ErrorResponse;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.FlowExecutionRequest;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.FlowExecutionResponse;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.FlowApiService;
@@ -59,7 +60,9 @@ public class FlowApi  {
         })
     }, tags={ "Execute a flow step" })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successfully executed the flow step", response = FlowExecutionResponse.class)
+        @ApiResponse(code = 200, message = "Successfully executed the flow step", response = FlowExecutionResponse.class),
+        @ApiResponse(code = 400, message = "Bad request - invalid input or missing required fields", response = ErrorResponse.class),
+        @ApiResponse(code = 500, message = "Internal server error - unexpected failure during flow execution", response = ErrorResponse.class)
     })
     public Response flowExecutePost(@ApiParam(value = "" ,required=true) @Valid FlowExecutionRequest flowExecutionRequest) {
 

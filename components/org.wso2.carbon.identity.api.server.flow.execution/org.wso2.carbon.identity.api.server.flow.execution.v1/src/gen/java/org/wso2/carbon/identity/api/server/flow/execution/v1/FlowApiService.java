@@ -24,6 +24,7 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.flow.execution.v1.ErrorResponse;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.FlowExecutionRequest;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.FlowExecutionResponse;
 import javax.ws.rs.core.Response;

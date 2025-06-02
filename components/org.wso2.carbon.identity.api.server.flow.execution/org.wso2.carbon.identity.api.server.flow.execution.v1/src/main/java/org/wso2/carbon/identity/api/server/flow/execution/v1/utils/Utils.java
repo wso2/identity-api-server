@@ -29,9 +29,9 @@ import org.wso2.carbon.identity.api.server.flow.execution.v1.Component;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.Data;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.constants.FlowExecutionEndpointConstants;
 import org.wso2.carbon.identity.application.common.model.Property;
-import org.wso2.carbon.identity.flow.engine.exception.FlowEngineClientException;
-import org.wso2.carbon.identity.flow.engine.exception.FlowEngineException;
-import org.wso2.carbon.identity.flow.engine.exception.FlowEngineServerException;
+import org.wso2.carbon.identity.flow.execution.engine.exception.FlowEngineClientException;
+import org.wso2.carbon.identity.flow.execution.engine.exception.FlowEngineException;
+import org.wso2.carbon.identity.flow.execution.engine.exception.FlowEngineServerException;
 import org.wso2.carbon.identity.flow.mgt.Constants;
 import org.wso2.carbon.identity.flow.mgt.model.ComponentDTO;
 import org.wso2.carbon.identity.flow.mgt.model.DataDTO;
@@ -49,9 +49,8 @@ import static org.wso2.carbon.identity.api.server.flow.execution.v1.constants.Fl
 import static org.wso2.carbon.identity.api.server.flow.execution.v1.constants.FlowExecutionEndpointConstants.ErrorMessage.ERROR_CODE_SELF_REGISTRATION_DISABLED;
 import static org.wso2.carbon.identity.api.server.flow.execution.v1.constants.FlowExecutionEndpointConstants.SELF_REGISTRATION_ENABLED;
 import static org.wso2.carbon.identity.api.server.flow.execution.v1.constants.FlowExecutionEndpointConstants.SHOW_USERNAME_UNAVAILABILITY;
-import static org.wso2.carbon.identity.flow.engine.Constants.ErrorMessages.ERROR_CODE_INVALID_USER_INPUT;
-import static org.wso2.carbon.identity.flow.engine.Constants.ErrorMessages.ERROR_CODE_INVALID_USER_INPUT;
-import static org.wso2.carbon.identity.flow.engine.Constants.ErrorMessages.ERROR_CODE_USERNAME_ALREADY_EXISTS;
+import static org.wso2.carbon.identity.flow.execution.engine.Constants.ErrorMessages.ERROR_CODE_INVALID_USER_INPUT;
+import static org.wso2.carbon.identity.flow.execution.engine.Constants.ErrorMessages.ERROR_CODE_USERNAME_ALREADY_EXISTS;
 
 /**
  * Utility class for flow execution API.
@@ -117,12 +116,13 @@ public class Utils {
             if (ERROR_CODE_USERNAME_ALREADY_EXISTS.getCode().equals(errorCode) &&
                     !isShowUsernameUnavailabilityEnabled(tenantDomain)) {
                 return handleException(status, ERROR_CODE_INVALID_USER_INPUT.getCode(),
-                                       ERROR_CODE_INVALID_USER_INPUT.getMessage(),
-                                       ERROR_CODE_INVALID_USER_INPUT.getDescription());
+                        ERROR_CODE_INVALID_USER_INPUT.getMessage(),
+                        ERROR_CODE_INVALID_USER_INPUT.getDescription());
             }
         } else {
             LOG.error(e.getMessage(), e);
         }
+        // handle NPE when confirmation code expired
         errorCode = errorCode.contains(ERROR_CODE_DELIMITER) ? errorCode :
                 FlowExecutionEndpointConstants.REGISTRATION_FLOW_PREFIX + errorCode;
         return handleException(status, errorCode, e.getMessage(), e.getDescription());
@@ -156,7 +156,7 @@ public class Utils {
             IdentityGovernanceService identityGovernanceService =
                     FlowExecutionServiceHolder.getIdentityGovernanceService();
             Property[] connectorConfigs = identityGovernanceService.getConfiguration(
-                    new String[] {SELF_REGISTRATION_ENABLED}, tenantDomain);
+                    new String[]{SELF_REGISTRATION_ENABLED}, tenantDomain);
             if (!Boolean.parseBoolean(connectorConfigs[0].getValue())) {
                 throw handleFlowException(new FlowEngineClientException(
                         ERROR_CODE_SELF_REGISTRATION_DISABLED.getCode(),
@@ -208,7 +208,7 @@ public class Utils {
             IdentityGovernanceService identityGovernanceService =
                     FlowExecutionServiceHolder.getIdentityGovernanceService();
             Property[] connectorConfigs = identityGovernanceService.getConfiguration(
-                    new String[] {SHOW_USERNAME_UNAVAILABILITY}, tenantDomain);
+                    new String[]{SHOW_USERNAME_UNAVAILABILITY}, tenantDomain);
             return Boolean.parseBoolean(connectorConfigs[0].getValue());
         } catch (IdentityGovernanceException e) {
             throw handleFlowException(new FlowEngineServerException(

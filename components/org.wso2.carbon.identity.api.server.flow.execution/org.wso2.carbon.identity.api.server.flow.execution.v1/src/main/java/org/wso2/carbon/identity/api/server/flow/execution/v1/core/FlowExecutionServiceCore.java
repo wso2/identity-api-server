@@ -24,9 +24,9 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.FlowExecutionRequest;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.FlowExecutionResponse;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.utils.Utils;
-import org.wso2.carbon.identity.flow.engine.FlowService;
-import org.wso2.carbon.identity.flow.engine.exception.FlowEngineException;
-import org.wso2.carbon.identity.flow.engine.model.FlowStep;
+import org.wso2.carbon.identity.flow.execution.engine.FlowExecutionService;
+import org.wso2.carbon.identity.flow.execution.engine.exception.FlowEngineException;
+import org.wso2.carbon.identity.flow.execution.engine.model.FlowExecutionStep;
 
 import java.util.Collections;
 import java.util.Map;
@@ -37,11 +37,11 @@ import java.util.Optional;
  */
 public class FlowExecutionServiceCore {
 
-    private final FlowService flowService;
+    private final FlowExecutionService flowExecutionService;
 
-    public FlowExecutionServiceCore(FlowService flowService) {
+    public FlowExecutionServiceCore(FlowExecutionService flowExecutionService) {
 
-        this.flowService = flowService;
+        this.flowExecutionService = flowExecutionService;
     }
 
     /**
@@ -62,21 +62,20 @@ public class FlowExecutionServiceCore {
             Map<String, String> inputMap = Optional.ofNullable(flowExecutionRequest.getInputs())
                     .map(inputs -> objectMapper.convertValue(inputs, new MapTypeReference()))
                     .orElse(Collections.emptyMap());
-            FlowStep flowStep = flowService.executeFlow(tenantDomain,
-                    flowExecutionRequest.getApplicationId(), flowExecutionRequest.getCallbackUrl(),
-                    flowExecutionRequest.getFlowId(), flowExecutionRequest.getActionId(),
-                    flowExecutionRequest.getFlowType(), inputMap);
+            FlowExecutionStep flowExecutionStep = flowExecutionService.executeFlow(tenantDomain,
+                    flowExecutionRequest.getApplicationId(), flowExecutionRequest.getFlowId(),
+                    flowExecutionRequest.getActionId(), flowExecutionRequest.getFlowType(), inputMap);
             FlowExecutionResponse flowExecutionResponse = new FlowExecutionResponse();
 
-            if (flowStep == null) {
+            if (flowExecutionStep == null) {
                 return flowExecutionResponse;
             }
 
             return flowExecutionResponse
-                    .flowId(flowStep.getFlowId())
-                    .flowStatus(flowStep.getFlowStatus())
-                    .type(FlowExecutionResponse.TypeEnum.valueOf(flowStep.getStepType()))
-                    .data(Utils.convertToData(flowStep.getData(), flowStep.getStepType()));
+                    .flowId(flowExecutionStep.getFlowId())
+                    .flowStatus(flowExecutionStep.getFlowStatus())
+                    .type(FlowExecutionResponse.TypeEnum.valueOf(flowExecutionStep.getStepType()))
+                    .data(Utils.convertToData(flowExecutionStep.getData(), flowExecutionStep.getStepType()));
         } catch (FlowEngineException e) {
             throw Utils.handleFlowException(e, tenantDomain);
         }

@@ -18,30 +18,18 @@
 
 package org.wso2.carbon.identity.api.server.flow.execution.v1.impl;
 
-import org.wso2.carbon.identity.api.server.flow.execution.v1.FlowApiService;
-import org.wso2.carbon.identity.api.server.flow.execution.v1.FlowExecutionRequest;
-import org.wso2.carbon.identity.api.server.flow.execution.v1.core.FlowExecutionServiceCore;
-import org.wso2.carbon.identity.api.server.flow.execution.v1.factories.FlowExecutionServiceFactory;
+import org.wso2.carbon.identity.api.server.flow.execution.v1.*;
+import org.wso2.carbon.identity.api.server.flow.execution.v1.*;
+import java.util.List;
 
 import javax.ws.rs.core.Response;
 
-/**
- * Implementation of the FlowApiService interface.
- */
 public class FlowApiServiceImpl implements FlowApiService {
-
-    private final FlowExecutionServiceCore flowExecutionServiceCore;
-
-    public FlowApiServiceImpl() {
-
-        this.flowExecutionServiceCore = FlowExecutionServiceFactory.getFlowExecutionService();
-    }
 
     @Override
     public Response flowExecutePost(FlowExecutionRequest flowExecutionRequest) {
 
-        return Response.ok()
-                .entity(flowExecutionServiceCore.processFlowExecution((flowExecutionRequest)))
-                .build();
+        // do some magic!
+        return Response.ok().entity("magic!").build();
     }
 }
