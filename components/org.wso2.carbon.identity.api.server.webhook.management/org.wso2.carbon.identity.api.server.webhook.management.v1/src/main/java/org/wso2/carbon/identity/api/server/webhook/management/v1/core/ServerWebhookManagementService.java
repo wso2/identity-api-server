@@ -26,6 +26,7 @@ import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookRe
 import org.wso2.carbon.identity.api.server.webhook.management.v1.util.WebhookManagementAPIErrorBuilder;
 import org.wso2.carbon.identity.webhook.management.api.exception.WebhookMgtException;
 import org.wso2.carbon.identity.webhook.management.api.model.Webhook;
+import org.wso2.carbon.identity.webhook.management.api.model.WebhookStatus;
 import org.wso2.carbon.identity.webhook.management.api.service.WebhookManagementService;
 
 import java.util.List;
@@ -87,7 +88,7 @@ public class ServerWebhookManagementService {
     public WebhookResponse createWebhook(WebhookRequest webhookRequest) {
 
         try {
-            Webhook webhook = buildWebhook(webhookRequest);
+            Webhook webhook = buildWebhook(null, webhookRequest);
             return getWebhookResponse(webhookManagementService.createWebhook(webhook,
                     CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
         } catch (WebhookMgtException e) {
@@ -105,7 +106,7 @@ public class ServerWebhookManagementService {
     public WebhookResponse updateWebhook(String webhookId, WebhookRequest webhookRequest) {
 
         try {
-            Webhook webhook = buildWebhook(webhookRequest);
+            Webhook webhook = buildWebhook(webhookId, webhookRequest);
             return getWebhookResponse(webhookManagementService.updateWebhook(webhookId, webhook,
                     CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
         } catch (WebhookMgtException e) {
@@ -158,9 +159,11 @@ public class ServerWebhookManagementService {
         }
     }
 
-    private Webhook buildWebhook(WebhookRequest webhookRequest) {
+    private Webhook buildWebhook(String webhookId, WebhookRequest webhookRequest) {
 
         return new Webhook.Builder()
+                .uuid(webhookId)
+                .status(WebhookStatus.valueOf(webhookRequest.getStatus().name()))
                 .endpoint(webhookRequest.getEndpoint())
                 .description(webhookRequest.getDescription())
                 .secret(webhookRequest.getSecret())
