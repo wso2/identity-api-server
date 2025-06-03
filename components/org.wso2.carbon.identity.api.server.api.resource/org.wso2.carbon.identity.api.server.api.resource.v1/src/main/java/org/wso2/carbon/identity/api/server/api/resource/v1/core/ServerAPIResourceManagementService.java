@@ -58,9 +58,7 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants.ASC_SORT_ORDER;
-import static org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants.DEFAULT_LIMIT;
-import static org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants.DESC_SORT_ORDER;
+import static org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants.*;
 import static org.wso2.carbon.identity.api.server.api.resource.v1.util.AuthorizationDetailsTypeMgtUtil.toAuthorizationDetailsGetModels;
 import static org.wso2.carbon.identity.api.server.api.resource.v1.util.AuthorizationDetailsTypeMgtUtil.toAuthorizationDetailsTypes;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
@@ -492,8 +490,17 @@ public class ServerAPIResourceManagementService {
                 .requiresAuthorization(apIResourceCreationModel.getRequiresAuthorization() != null ?
                         apIResourceCreationModel.getRequiresAuthorization() : true)
                 .authorizationDetailsTypes(
-                        toAuthorizationDetailsTypes(apIResourceCreationModel.getAuthorizationDetailsTypes()))
-                .type(APIResourceMgtEndpointConstants.BUSINESS_API_RESOURCE_TYPE);
+                        toAuthorizationDetailsTypes(apIResourceCreationModel.getAuthorizationDetailsTypes()));
+
+        if (apIResourceCreationModel.getResourceType() != null &&
+                Arrays.asList(ALLOWED_API_RESOURCE_TYPES).contains(apIResourceCreationModel.getResourceType())
+        ) {
+            apiResourceBuilder.type(apIResourceCreationModel.getResourceType());
+        } else {
+            apiResourceBuilder.type(APIResourceMgtEndpointConstants.BUSINESS_API_RESOURCE_TYPE);
+        }
+
+
         return apiResourceBuilder.build();
     }
 
@@ -602,7 +609,8 @@ public class ServerAPIResourceManagementService {
     private void handleSystemAPI(APIResource apiResource) {
 
         if (apiResource.getType() != null &&
-                !apiResource.getType().startsWith(APIResourceMgtEndpointConstants.BUSINESS_API_RESOURCE_TYPE)) {
+                (!apiResource.getType().startsWith(APIResourceMgtEndpointConstants.BUSINESS_API_RESOURCE_TYPE) ||
+                        !apiResource.getType().startsWith(MCP_SERVER_RESOURCE_TYPE))) {
             throw APIResourceMgtEndpointUtil.handleException(Response.Status.FORBIDDEN,
                     ErrorMessage.ERROR_CODE_SYSTEM_API_RESOURCE_NOT_MODIFIABLE);
         }
