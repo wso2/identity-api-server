@@ -89,7 +89,7 @@ components:
           example: INCOMPLETE
         type:
           type: string
-          enum: [VIEW, REDIRECTION, INTERNAL_PROMPT, PASSKEY]
+          enum: [VIEW, REDIRECTION, INTERNAL_PROMPT, WEBAUTHN]
           example: VIEW
         data:
           $ref: "#/components/schemas/Data"
