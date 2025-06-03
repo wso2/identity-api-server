@@ -33,10 +33,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: string
-                  example: WSO2
+                $ref: '#/components/schemas/EventProfileList'
         '401':
           description: Unauthorized
         '403':
@@ -147,6 +144,24 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Channel'
+
+    EventProfileList:
+      type: object
+      properties:
+        profiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventProfileMetadata'
+
+    EventProfileMetadata:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "WSO2"
+        uri:
+          type: string
+          example: "https://schemas.identity.wso2.org"
 
     Error:
       type: object
