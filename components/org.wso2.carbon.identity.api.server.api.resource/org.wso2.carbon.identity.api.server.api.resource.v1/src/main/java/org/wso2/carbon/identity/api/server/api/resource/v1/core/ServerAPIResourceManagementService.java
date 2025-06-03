@@ -500,7 +500,6 @@ public class ServerAPIResourceManagementService {
             apiResourceBuilder.type(APIResourceMgtEndpointConstants.BUSINESS_API_RESOURCE_TYPE);
         }
 
-
         return apiResourceBuilder.build();
     }
 
