@@ -721,10 +721,38 @@ public class ServerUserStoreService {
                 if (path.startsWith(UserStoreConstants.USER_STORE_PROPERTIES)) {
                     String propName = extractPropertyName(path);
                     if (StringUtils.isNotEmpty(propName)) {
+                        boolean isPropertyExists = false;
                         for (PropertyDTO propertyDTO : propertyDTOS) {
                             if (propName.equals(propertyDTO.getName())) {
                                 propertyDTO.setValue(value);
+                                isPropertyExists = true;
+                                break;
                             }
+                        }
+                        if (!isPropertyExists) {
+                            Properties defaultProperties =
+                                    UserStoreManagerRegistry.getUserStoreProperties(userStoreDTO.getClassName());
+
+                            if (defaultProperties != null) {
+                                // Check if the property exists in the optional or advanced properties of the
+                                // user store.
+                                isPropertyExists = Arrays.stream(defaultProperties.getOptionalProperties())
+                                        .anyMatch(optionalProperty -> propName.equals(optionalProperty.getName())) ||
+                                        Arrays.stream(defaultProperties.getAdvancedProperties())
+                                                .anyMatch(advancedProperty -> propName.equals(
+                                                        advancedProperty.getName()));
+                            }
+
+                            if (!isPropertyExists) {
+                                throw handleException(Response.Status.BAD_REQUEST, UserStoreConstants.ErrorMessage
+                                        .ERROR_CODE_INVALID_INPUT);
+                            }
+
+                            PropertyDTO newPropertyDTO = new PropertyDTO();
+                            newPropertyDTO.setName(propName);
+                            newPropertyDTO.setValue(value);
+                            propertyDTOS = Arrays.copyOf(propertyDTOS, propertyDTOS.length + 1);
+                            propertyDTOS[propertyDTOS.length - 1] = newPropertyDTO;
                         }
                     }
                 } else if (path.equals(UserStoreConstants.USER_STORE_DESCRIPTION)) {
