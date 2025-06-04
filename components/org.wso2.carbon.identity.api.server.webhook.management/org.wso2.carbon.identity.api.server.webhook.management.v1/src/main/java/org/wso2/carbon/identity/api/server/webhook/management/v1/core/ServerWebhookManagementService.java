@@ -19,10 +19,12 @@
 package org.wso2.carbon.identity.api.server.webhook.management.v1.core;
 
 import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookList;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookRequest;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookRequestEventSchema;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookResponse;
+import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookSummary;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.util.WebhookManagementAPIErrorBuilder;
 import org.wso2.carbon.identity.webhook.management.api.exception.WebhookMgtException;
 import org.wso2.carbon.identity.webhook.management.api.model.Webhook;
@@ -31,6 +33,9 @@ import org.wso2.carbon.identity.webhook.management.api.service.WebhookManagement
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.webhook.management.v1.constants.WebhookMgtEndpointConstants.WEBHOOK_PATH_COMPONENT;
 
 /**
  * Call internal osgi services to perform webhook management operations.
@@ -55,7 +60,7 @@ public class ServerWebhookManagementService {
             List<Webhook> webhooks =
                     webhookManagementService.getWebhooks(CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
             return new WebhookList().webhooks(webhooks.stream()
-                    .map(this::toWebhookResponse)
+                    .map(this::toWebhookSummary)
                     .collect(Collectors.toList()));
         } catch (WebhookMgtException e) {
             throw WebhookManagementAPIErrorBuilder.buildAPIError(e);
@@ -165,7 +170,7 @@ public class ServerWebhookManagementService {
                 .uuid(webhookId)
                 .status(WebhookStatus.valueOf(webhookRequest.getStatus().name()))
                 .endpoint(webhookRequest.getEndpoint())
-                .description(webhookRequest.getDescription())
+                .name(webhookRequest.getName())
                 .secret(webhookRequest.getSecret())
                 .eventSchemaName(
                         webhookRequest.getEventSchema() != null ? webhookRequest.getEventSchema().getName() : null)
@@ -175,18 +180,12 @@ public class ServerWebhookManagementService {
                 .build();
     }
 
-    private WebhookResponse toWebhookResponse(Webhook webhook) {
+    private WebhookSummary toWebhookSummary(Webhook webhook) {
 
-        WebhookResponse response = new WebhookResponse();
+        WebhookSummary response = new WebhookSummary();
         response.setId(webhook.getUuid());
         response.setEndpoint(webhook.getEndpoint());
-        response.setDescription(webhook.getDescription());
-
-        // Convert event schema
-        WebhookRequestEventSchema eventSchema = new WebhookRequestEventSchema();
-        eventSchema.setName(webhook.getEventSchemaName());
-        eventSchema.setUri(webhook.getEventSchemaUri());
-        response.setEventSchema(eventSchema);
+        response.setName(webhook.getName());
 
         // Convert timestamps to ISO 8601 string
         if (webhook.getCreatedAt() != null) {
@@ -198,8 +197,13 @@ public class ServerWebhookManagementService {
 
         // Map status
         if (webhook.getStatus() != null) {
-            response.setStatus(WebhookResponse.StatusEnum.fromValue(webhook.getStatus().name()));
+            response.setStatus(WebhookSummary.StatusEnum.fromValue(webhook.getStatus().name()));
         }
+
+        response.setSelf(
+                ContextLoader.buildURIForBody(
+                        String.format(V1_API_PATH_COMPONENT + WEBHOOK_PATH_COMPONENT + "/%s",
+                                webhook.getUuid())).toString());
 
         return response;
     }
@@ -211,11 +215,12 @@ public class ServerWebhookManagementService {
         webhookResponse.setCreatedAt(String.valueOf(webhook.getCreatedAt()));
         webhookResponse.setUpdatedAt(String.valueOf(webhook.getUpdatedAt()));
         webhookResponse.setEndpoint(webhook.getEndpoint());
-        webhookResponse.setDescription(webhook.getDescription());
+        webhookResponse.setName(webhook.getName());
         WebhookRequestEventSchema eventSchema = new WebhookRequestEventSchema();
         eventSchema.setName(webhook.getEventSchemaName());
         eventSchema.setUri(webhook.getEventSchemaUri());
         webhookResponse.setEventSchema(eventSchema);
+        webhookResponse.setStatus(WebhookResponse.StatusEnum.fromValue(webhook.getStatus().name()));
         try {
             webhookResponse.setEventsSubscribed(webhook.getEventsSubscribed());
         } catch (WebhookMgtException e) {

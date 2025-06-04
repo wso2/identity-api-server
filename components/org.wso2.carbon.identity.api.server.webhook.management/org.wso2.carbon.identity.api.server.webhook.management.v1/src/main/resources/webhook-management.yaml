@@ -368,7 +368,7 @@ components:
       required:
         - endpoint
         - eventSchema
-        - description
+        - name
         - eventsSubscribed
       properties:
         endpoint:
@@ -389,10 +389,10 @@ components:
               type: string
               description: Webhook Event Schema URI.
               example: schemas.identity.wso2.org
-        description:
+        name:
           type: string
-          description: Webhook description.
-          example: A webhook for user events.
+          description: Webhook name.
+          example: Login Webhook.
         secret:
           type: string
           description: Secret for validating webhook payloads.
@@ -441,10 +441,10 @@ components:
               type: string
               description: Webhook Event Schema URI.
               example: schemas.identity.wso2.org
-        description:
+        name:
           type: string
-          description: Webhook description.
-          example: A webhook for user events.
+          description: Webhook name.
+          example: Login webhook.
         eventsSubscribed:
           type: array
           items:
@@ -459,13 +459,50 @@ components:
           description: Webhook Status.
           example: "ACTIVE"
 
+    WebhookSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 'eeb8c1a2-3f4d-4e5b-8c6f-7d8e9f0a1b2c'
+        createdAt:
+          type: string
+          example: '2024-05-01T12:00:00Z'
+        updatedAt:
+          type: string
+          example: '2024-05-02T12:00:00Z'
+        endpoint:
+          type: string
+          description: Webhook URL.
+          example: https://example.com/webhook
+        name:
+          type: string
+          description: Webhook name.
+          example: Login webhook.
+        eventsSubscribed:
+          type: array
+          items:
+            type: string
+          description: List of events to subscribe to.
+          example: [ "schemas.identity.wso2.org/events/logins/event-type/loginSuccess", "schemas.identity.wso2.org/events/logins/event-type/loginFailed" ]
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - INACTIVE
+          description: Webhook Status.
+          example: "ACTIVE"
+        self:
+          type: string
+          example: /t/carbon.super/api/server/v1/webhooks/123e4567-e89b-12d3-a456-556642440000
+
     WebhookList:
       type: object
       properties:
         webhooks:
           type: array
           items:
-            $ref: '#/components/schemas/WebhookResponse'
+            $ref: '#/components/schemas/WebhookSummary'
 
     Error:
       type: object

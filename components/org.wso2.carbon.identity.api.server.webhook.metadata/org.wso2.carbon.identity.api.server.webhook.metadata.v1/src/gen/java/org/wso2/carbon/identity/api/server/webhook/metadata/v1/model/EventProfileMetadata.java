@@ -34,6 +34,7 @@ public class EventProfileMetadata  {
   
     private String name;
     private String uri;
+    private String self;
 
     /**
     **/
@@ -71,6 +72,24 @@ public class EventProfileMetadata  {
         this.uri = uri;
     }
 
+    /**
+    **/
+    public EventProfileMetadata self(String self) {
+
+        this.self = self;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "/t/carbon.super/api/server/v1/webhooks/metadata/event-profiles/WSO2", value = "")
+    @JsonProperty("self")
+    @Valid
+    public String getSelf() {
+        return self;
+    }
+    public void setSelf(String self) {
+        this.self = self;
+    }
+
 
 
     @Override
@@ -84,12 +103,13 @@ public class EventProfileMetadata  {
         }
         EventProfileMetadata eventProfileMetadata = (EventProfileMetadata) o;
         return Objects.equals(this.name, eventProfileMetadata.name) &&
-            Objects.equals(this.uri, eventProfileMetadata.uri);
+            Objects.equals(this.uri, eventProfileMetadata.uri) &&
+            Objects.equals(this.self, eventProfileMetadata.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, uri);
+        return Objects.hash(name, uri, self);
     }
 
     @Override
@@ -100,6 +120,7 @@ public class EventProfileMetadata  {
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    uri: ").append(toIndentedString(uri)).append("\n");
+        sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");
         return sb.toString();
     }

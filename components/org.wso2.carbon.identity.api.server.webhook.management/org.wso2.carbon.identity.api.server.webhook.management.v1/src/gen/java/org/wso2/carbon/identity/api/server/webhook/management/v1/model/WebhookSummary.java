@@ -24,7 +24,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookRequestEventSchema;
 import javax.validation.constraints.*;
 
 
@@ -34,13 +33,14 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public class WebhookRequest  {
+public class WebhookSummary  {
   
+    private String id;
+    private String createdAt;
+    private String updatedAt;
     private String endpoint;
-    private WebhookRequestEventSchema eventSchema;
     private String name;
-    private String secret;
-    private List<String> eventsSubscribed = new ArrayList<String>();
+    private List<String> eventsSubscribed = null;
 
 
 @XmlType(name="StatusEnum")
@@ -77,21 +77,74 @@ public enum StatusEnum {
 }
 
     private StatusEnum status;
+    private String self;
+
+    /**
+    **/
+    public WebhookSummary id(String id) {
+
+        this.id = id;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "eeb8c1a2-3f4d-4e5b-8c6f-7d8e9f0a1b2c", value = "")
+    @JsonProperty("id")
+    @Valid
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    /**
+    **/
+    public WebhookSummary createdAt(String createdAt) {
+
+        this.createdAt = createdAt;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "2024-05-01T12:00:00Z", value = "")
+    @JsonProperty("createdAt")
+    @Valid
+    public String getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    /**
+    **/
+    public WebhookSummary updatedAt(String updatedAt) {
+
+        this.updatedAt = updatedAt;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "2024-05-02T12:00:00Z", value = "")
+    @JsonProperty("updatedAt")
+    @Valid
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 
     /**
     * Webhook URL.
     **/
-    public WebhookRequest endpoint(String endpoint) {
+    public WebhookSummary endpoint(String endpoint) {
 
         this.endpoint = endpoint;
         return this;
     }
     
-    @ApiModelProperty(example = "https://example.com/webhook", required = true, value = "Webhook URL.")
+    @ApiModelProperty(example = "https://example.com/webhook", value = "Webhook URL.")
     @JsonProperty("endpoint")
     @Valid
-    @NotNull(message = "Property endpoint cannot be null.")
-
     public String getEndpoint() {
         return endpoint;
     }
@@ -100,39 +153,17 @@ public enum StatusEnum {
     }
 
     /**
-    **/
-    public WebhookRequest eventSchema(WebhookRequestEventSchema eventSchema) {
-
-        this.eventSchema = eventSchema;
-        return this;
-    }
-    
-    @ApiModelProperty(required = true, value = "")
-    @JsonProperty("eventSchema")
-    @Valid
-    @NotNull(message = "Property eventSchema cannot be null.")
-
-    public WebhookRequestEventSchema getEventSchema() {
-        return eventSchema;
-    }
-    public void setEventSchema(WebhookRequestEventSchema eventSchema) {
-        this.eventSchema = eventSchema;
-    }
-
-    /**
     * Webhook name.
     **/
-    public WebhookRequest name(String name) {
+    public WebhookSummary name(String name) {
 
         this.name = name;
         return this;
     }
     
-    @ApiModelProperty(example = "Login Webhook.", required = true, value = "Webhook name.")
+    @ApiModelProperty(example = "Login webhook.", value = "Webhook name.")
     @JsonProperty("name")
     @Valid
-    @NotNull(message = "Property name cannot be null.")
-
     public String getName() {
         return name;
     }
@@ -141,38 +172,17 @@ public enum StatusEnum {
     }
 
     /**
-    * Secret for validating webhook payloads.
-    **/
-    public WebhookRequest secret(String secret) {
-
-        this.secret = secret;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "my-secret", value = "Secret for validating webhook payloads.")
-    @JsonProperty("secret")
-    @Valid
-    public String getSecret() {
-        return secret;
-    }
-    public void setSecret(String secret) {
-        this.secret = secret;
-    }
-
-    /**
     * List of events to subscribe to.
     **/
-    public WebhookRequest eventsSubscribed(List<String> eventsSubscribed) {
+    public WebhookSummary eventsSubscribed(List<String> eventsSubscribed) {
 
         this.eventsSubscribed = eventsSubscribed;
         return this;
     }
     
-    @ApiModelProperty(example = "[\"schemas.identity.wso2.org/events/logins/event-type/loginSuccess\",\"schemas.identity.wso2.org/events/logins/event-type/loginFailed\"]", required = true, value = "List of events to subscribe to.")
+    @ApiModelProperty(example = "[\"schemas.identity.wso2.org/events/logins/event-type/loginSuccess\",\"schemas.identity.wso2.org/events/logins/event-type/loginFailed\"]", value = "List of events to subscribe to.")
     @JsonProperty("eventsSubscribed")
     @Valid
-    @NotNull(message = "Property eventsSubscribed cannot be null.")
-
     public List<String> getEventsSubscribed() {
         return eventsSubscribed;
     }
@@ -180,7 +190,10 @@ public enum StatusEnum {
         this.eventsSubscribed = eventsSubscribed;
     }
 
-    public WebhookRequest addEventsSubscribedItem(String eventsSubscribedItem) {
+    public WebhookSummary addEventsSubscribedItem(String eventsSubscribedItem) {
+        if (this.eventsSubscribed == null) {
+            this.eventsSubscribed = new ArrayList<String>();
+        }
         this.eventsSubscribed.add(eventsSubscribedItem);
         return this;
     }
@@ -188,7 +201,7 @@ public enum StatusEnum {
         /**
     * Webhook Status.
     **/
-    public WebhookRequest status(StatusEnum status) {
+    public WebhookSummary status(StatusEnum status) {
 
         this.status = status;
         return this;
@@ -204,6 +217,24 @@ public enum StatusEnum {
         this.status = status;
     }
 
+    /**
+    **/
+    public WebhookSummary self(String self) {
+
+        this.self = self;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "/t/carbon.super/api/server/v1/webhooks/123e4567-e89b-12d3-a456-556642440000", value = "")
+    @JsonProperty("self")
+    @Valid
+    public String getSelf() {
+        return self;
+    }
+    public void setSelf(String self) {
+        this.self = self;
+    }
+
 
 
     @Override
@@ -215,32 +246,36 @@ public enum StatusEnum {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        WebhookRequest webhookRequest = (WebhookRequest) o;
-        return Objects.equals(this.endpoint, webhookRequest.endpoint) &&
-            Objects.equals(this.eventSchema, webhookRequest.eventSchema) &&
-            Objects.equals(this.name, webhookRequest.name) &&
-            Objects.equals(this.secret, webhookRequest.secret) &&
-            Objects.equals(this.eventsSubscribed, webhookRequest.eventsSubscribed) &&
-            Objects.equals(this.status, webhookRequest.status);
+        WebhookSummary webhookSummary = (WebhookSummary) o;
+        return Objects.equals(this.id, webhookSummary.id) &&
+            Objects.equals(this.createdAt, webhookSummary.createdAt) &&
+            Objects.equals(this.updatedAt, webhookSummary.updatedAt) &&
+            Objects.equals(this.endpoint, webhookSummary.endpoint) &&
+            Objects.equals(this.name, webhookSummary.name) &&
+            Objects.equals(this.eventsSubscribed, webhookSummary.eventsSubscribed) &&
+            Objects.equals(this.status, webhookSummary.status) &&
+            Objects.equals(this.self, webhookSummary.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(endpoint, eventSchema, name, secret, eventsSubscribed, status);
+        return Objects.hash(id, createdAt, updatedAt, endpoint, name, eventsSubscribed, status, self);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class WebhookRequest {\n");
+        sb.append("class WebhookSummary {\n");
         
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
+        sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
+        sb.append("    updatedAt: ").append(toIndentedString(updatedAt)).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
-        sb.append("    eventSchema: ").append(toIndentedString(eventSchema)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
-        sb.append("    secret: ").append(toIndentedString(secret)).append("\n");
         sb.append("    eventsSubscribed: ").append(toIndentedString(eventsSubscribed)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
+        sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");
         return sb.toString();
     }

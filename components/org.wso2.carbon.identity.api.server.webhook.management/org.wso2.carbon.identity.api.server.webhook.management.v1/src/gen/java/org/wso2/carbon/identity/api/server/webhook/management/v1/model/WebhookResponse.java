@@ -41,7 +41,7 @@ public class WebhookResponse  {
     private String updatedAt;
     private String endpoint;
     private WebhookRequestEventSchema eventSchema;
-    private String description;
+    private String name;
     private List<String> eventsSubscribed = null;
 
 
@@ -172,22 +172,22 @@ public enum StatusEnum {
     }
 
     /**
-    * Webhook description.
+    * Webhook name.
     **/
-    public WebhookResponse description(String description) {
+    public WebhookResponse name(String name) {
 
-        this.description = description;
+        this.name = name;
         return this;
     }
     
-    @ApiModelProperty(example = "A webhook for user events.", value = "Webhook description.")
-    @JsonProperty("description")
+    @ApiModelProperty(example = "Login webhook.", value = "Webhook name.")
+    @JsonProperty("name")
     @Valid
-    public String getDescription() {
-        return description;
+    public String getName() {
+        return name;
     }
-    public void setDescription(String description) {
-        this.description = description;
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
@@ -253,14 +253,14 @@ public enum StatusEnum {
             Objects.equals(this.updatedAt, webhookResponse.updatedAt) &&
             Objects.equals(this.endpoint, webhookResponse.endpoint) &&
             Objects.equals(this.eventSchema, webhookResponse.eventSchema) &&
-            Objects.equals(this.description, webhookResponse.description) &&
+            Objects.equals(this.name, webhookResponse.name) &&
             Objects.equals(this.eventsSubscribed, webhookResponse.eventsSubscribed) &&
             Objects.equals(this.status, webhookResponse.status);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, createdAt, updatedAt, endpoint, eventSchema, description, eventsSubscribed, status);
+        return Objects.hash(id, createdAt, updatedAt, endpoint, eventSchema, name, eventsSubscribed, status);
     }
 
     @Override
@@ -274,7 +274,7 @@ public enum StatusEnum {
         sb.append("    updatedAt: ").append(toIndentedString(updatedAt)).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
         sb.append("    eventSchema: ").append(toIndentedString(eventSchema)).append("\n");
-        sb.append("    description: ").append(toIndentedString(description)).append("\n");
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    eventsSubscribed: ").append(toIndentedString(eventsSubscribed)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("}");

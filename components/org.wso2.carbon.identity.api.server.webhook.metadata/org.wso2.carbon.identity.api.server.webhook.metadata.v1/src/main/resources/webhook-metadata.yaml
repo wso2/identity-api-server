@@ -140,6 +140,9 @@ components:
         profile:
           type: string
           example: WSO2
+        uri:
+          type: string
+          example: "https://schemas.identity.wso2.org"
         channels:
           type: array
           items:
@@ -162,6 +165,9 @@ components:
         uri:
           type: string
           example: "https://schemas.identity.wso2.org"
+        self:
+          type: string
+          example: /t/carbon.super/api/server/v1/webhooks/metadata/event-profiles/WSO2
 
     Error:
       type: object
