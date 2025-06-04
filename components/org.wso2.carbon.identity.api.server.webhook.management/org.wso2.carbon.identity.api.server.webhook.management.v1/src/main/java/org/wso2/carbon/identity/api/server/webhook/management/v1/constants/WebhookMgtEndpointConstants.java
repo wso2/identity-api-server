@@ -37,7 +37,7 @@ public class WebhookMgtEndpointConstants {
         // Client errors.
         ERROR_NO_WEBHOOK_FOUND_ON_GIVEN_ID("60010",
                 "Webhook is not found.",
-                "No webhook is found for given webhook id: %s"),;
+                "No webhook is found for given webhook id: %s");
 
         private final String code;
         private final String message;

@@ -23,16 +23,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
+import org.wso2.carbon.identity.api.server.webhook.management.v1.constants.WebhookMgtEndpointConstants;
 import org.wso2.carbon.identity.webhook.management.api.exception.WebhookMgtClientException;
 import org.wso2.carbon.identity.webhook.management.api.exception.WebhookMgtException;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.ws.rs.core.Response;
-
-import static org.wso2.carbon.identity.webhook.management.api.constant.ErrorMessage.ERROR_CODE_WEBHOOK_NOT_FOUND;
 
 /**
  * Class that handles exceptions and builds API error object.
@@ -40,10 +35,6 @@ import static org.wso2.carbon.identity.webhook.management.api.constant.ErrorMess
 public class WebhookManagementAPIErrorBuilder {
 
     private static final Log LOG = LogFactory.getLog(WebhookManagementAPIErrorBuilder.class);
-    private static final Set<String> NOT_FOUND_ERRORS = Collections.unmodifiableSet(new HashSet<>(
-            Collections.singletonList(
-                    ERROR_CODE_WEBHOOK_NOT_FOUND.getCode()
-            )));
 
     private WebhookManagementAPIErrorBuilder() {
 
@@ -54,11 +45,7 @@ public class WebhookManagementAPIErrorBuilder {
         Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
         if (exception instanceof WebhookMgtClientException) {
             LOG.debug(exception.getMessage(), exception);
-            if (NOT_FOUND_ERRORS.contains(exception.getErrorCode())) {
-                status = Response.Status.NOT_FOUND;
-            } else {
-                status = Response.Status.BAD_REQUEST;
-            }
+            status = Response.Status.BAD_REQUEST;
         } else {
             LOG.error(exception.getMessage(), exception);
         }
@@ -67,8 +54,7 @@ public class WebhookManagementAPIErrorBuilder {
         return buildAPIError(status, errorCode, exception.getMessage(), exception.getDescription());
     }
 
-    public static APIError buildAPIError(Response.Status status,
-                                         org.wso2.carbon.identity.api.server.webhook.management.v1.constants.WebhookMgtEndpointConstants.ErrorMessage error,
+    public static APIError buildAPIError(Response.Status status, WebhookMgtEndpointConstants.ErrorMessage error,
                                          String... data) {
 
         String description = error.getDescription();
