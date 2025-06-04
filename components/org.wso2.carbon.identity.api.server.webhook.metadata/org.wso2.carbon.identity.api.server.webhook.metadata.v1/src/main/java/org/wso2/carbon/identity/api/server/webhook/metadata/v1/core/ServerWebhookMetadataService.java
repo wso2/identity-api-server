@@ -112,15 +112,15 @@ public class ServerWebhookMetadataService {
     }
 
     private EventProfileMetadata mapEventProfileMetadata(
-            org.wso2.carbon.identity.webhook.metadata.api.model.EventProfileMetadata metadata) {
+            org.wso2.carbon.identity.webhook.metadata.api.model.EventProfile eventProfile) {
 
         EventProfileMetadata mappedMetadata = new EventProfileMetadata();
-        mappedMetadata.setName(metadata.getName());
-        mappedMetadata.setUri(metadata.getUri());
+        mappedMetadata.setName(eventProfile.getProfile());
+        mappedMetadata.setUri(eventProfile.getUri());
         mappedMetadata.setSelf(
                 ContextLoader.buildURIForBody(
                         String.format(V1_API_PATH_COMPONENT + WEBHOOK_METADATA_PATH_COMPONENT +
-                                EVENT_PROFILE_PATH_COMPONENT + "/%s", metadata.getName())).toString());
+                                EVENT_PROFILE_PATH_COMPONENT + "/%s", eventProfile.getProfile())).toString());
         return mappedMetadata;
     }
 }

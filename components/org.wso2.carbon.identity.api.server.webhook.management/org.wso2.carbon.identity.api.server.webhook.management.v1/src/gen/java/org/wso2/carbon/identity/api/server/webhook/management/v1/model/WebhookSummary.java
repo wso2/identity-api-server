@@ -22,8 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
 import javax.validation.constraints.*;
 
 
@@ -40,8 +38,6 @@ public class WebhookSummary  {
     private String updatedAt;
     private String endpoint;
     private String name;
-    private List<String> eventsSubscribed = null;
-
 
 @XmlType(name="StatusEnum")
 @XmlEnum(String.class)
@@ -172,33 +168,6 @@ public enum StatusEnum {
     }
 
     /**
-    * List of events to subscribe to.
-    **/
-    public WebhookSummary eventsSubscribed(List<String> eventsSubscribed) {
-
-        this.eventsSubscribed = eventsSubscribed;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "[\"schemas.identity.wso2.org/events/logins/event-type/loginSuccess\",\"schemas.identity.wso2.org/events/logins/event-type/loginFailed\"]", value = "List of events to subscribe to.")
-    @JsonProperty("eventsSubscribed")
-    @Valid
-    public List<String> getEventsSubscribed() {
-        return eventsSubscribed;
-    }
-    public void setEventsSubscribed(List<String> eventsSubscribed) {
-        this.eventsSubscribed = eventsSubscribed;
-    }
-
-    public WebhookSummary addEventsSubscribedItem(String eventsSubscribedItem) {
-        if (this.eventsSubscribed == null) {
-            this.eventsSubscribed = new ArrayList<String>();
-        }
-        this.eventsSubscribed.add(eventsSubscribedItem);
-        return this;
-    }
-
-        /**
     * Webhook Status.
     **/
     public WebhookSummary status(StatusEnum status) {
@@ -252,14 +221,13 @@ public enum StatusEnum {
             Objects.equals(this.updatedAt, webhookSummary.updatedAt) &&
             Objects.equals(this.endpoint, webhookSummary.endpoint) &&
             Objects.equals(this.name, webhookSummary.name) &&
-            Objects.equals(this.eventsSubscribed, webhookSummary.eventsSubscribed) &&
             Objects.equals(this.status, webhookSummary.status) &&
             Objects.equals(this.self, webhookSummary.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, createdAt, updatedAt, endpoint, name, eventsSubscribed, status, self);
+        return Objects.hash(id, createdAt, updatedAt, endpoint, name, status, self);
     }
 
     @Override
@@ -273,7 +241,6 @@ public enum StatusEnum {
         sb.append("    updatedAt: ").append(toIndentedString(updatedAt)).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
-        sb.append("    eventsSubscribed: ").append(toIndentedString(eventsSubscribed)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");

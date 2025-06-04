@@ -19,33 +19,28 @@
 package org.wso2.carbon.identity.api.server.webhook.management.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import javax.validation.constraints.*;
 
-
-import io.swagger.annotations.*;
 import java.util.Objects;
-import javax.validation.Valid;
-import javax.xml.bind.annotation.*;
-import com.fasterxml.jackson.annotation.JsonValue;
 
-public class WebhookRequestEventSchema  {
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+public class WebhookRequestChannelProfile  {
   
     private String name;
     private String uri;
 
     /**
-    * Webhook Event Schema.
+    * Webhook Event Profile.
     **/
-    public WebhookRequestEventSchema name(String name) {
+    public WebhookRequestChannelProfile name(String name) {
 
         this.name = name;
         return this;
     }
     
-    @ApiModelProperty(example = "WSO2", required = true, value = "Webhook Event Schema.")
+    @ApiModelProperty(example = "WSO2", required = true, value = "Webhook Event Profile.")
     @JsonProperty("name")
     @Valid
     @NotNull(message = "Property name cannot be null.")
@@ -58,15 +53,15 @@ public class WebhookRequestEventSchema  {
     }
 
     /**
-    * Webhook Event Schema URI.
+    * Webhook Event Profile URI.
     **/
-    public WebhookRequestEventSchema uri(String uri) {
+    public WebhookRequestChannelProfile uri(String uri) {
 
         this.uri = uri;
         return this;
     }
     
-    @ApiModelProperty(example = "schemas.identity.wso2.org", required = true, value = "Webhook Event Schema URI.")
+    @ApiModelProperty(example = "schemas.identity.wso2.org", required = true, value = "Webhook Event Profile URI.")
     @JsonProperty("uri")
     @Valid
     @NotNull(message = "Property uri cannot be null.")
@@ -89,9 +84,9 @@ public class WebhookRequestEventSchema  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        WebhookRequestEventSchema webhookRequestEventSchema = (WebhookRequestEventSchema) o;
-        return Objects.equals(this.name, webhookRequestEventSchema.name) &&
-            Objects.equals(this.uri, webhookRequestEventSchema.uri);
+        WebhookRequestChannelProfile webhookRequestChannelProfile = (WebhookRequestChannelProfile) o;
+        return Objects.equals(this.name, webhookRequestChannelProfile.name) &&
+            Objects.equals(this.uri, webhookRequestChannelProfile.uri);
     }
 
     @Override
@@ -103,7 +98,7 @@ public class WebhookRequestEventSchema  {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class WebhookRequestEventSchema {\n");
+        sb.append("class WebhookRequestChannelProfile {\n");
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    uri: ").append(toIndentedString(uri)).append("\n");

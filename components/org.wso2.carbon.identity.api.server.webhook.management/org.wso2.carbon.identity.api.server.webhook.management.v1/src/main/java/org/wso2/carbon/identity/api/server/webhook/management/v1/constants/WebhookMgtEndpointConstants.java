@@ -28,4 +28,47 @@ public class WebhookMgtEndpointConstants {
     private WebhookMgtEndpointConstants() {
 
     }
+
+    /**
+     * Enum for error messages.
+     */
+    public enum ErrorMessage {
+
+        // Client errors.
+        ERROR_NO_WEBHOOK_FOUND_ON_GIVEN_ID("60010",
+                "Webhook is not found.",
+                "No webhook is found for given webhook id: %s"),;
+
+        private final String code;
+        private final String message;
+        private final String description;
+
+        ErrorMessage(String code, String message, String description) {
+
+            this.code = code;
+            this.message = message;
+            this.description = description;
+        }
+
+        public String getCode() {
+
+            return code;
+        }
+
+        public String getMessage() {
+
+            return message;
+        }
+
+        public String getDescription() {
+
+            return description;
+        }
+
+        @Override
+        public String toString() {
+
+            return code + " | " + message;
+        }
+    }
 }

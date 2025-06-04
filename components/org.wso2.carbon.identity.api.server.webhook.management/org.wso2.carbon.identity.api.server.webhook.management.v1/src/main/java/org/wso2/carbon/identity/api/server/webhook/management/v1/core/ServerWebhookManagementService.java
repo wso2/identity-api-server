@@ -22,7 +22,7 @@ import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookList;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookRequest;
-import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookRequestEventSchema;
+import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookRequestEventProfile;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookResponse;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookSummary;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.util.WebhookManagementAPIErrorBuilder;
@@ -34,7 +34,10 @@ import org.wso2.carbon.identity.webhook.management.api.service.WebhookManagement
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.ws.rs.core.Response;
+
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.webhook.management.v1.constants.WebhookMgtEndpointConstants.ErrorMessage.ERROR_NO_WEBHOOK_FOUND_ON_GIVEN_ID;
 import static org.wso2.carbon.identity.api.server.webhook.management.v1.constants.WebhookMgtEndpointConstants.WEBHOOK_PATH_COMPONENT;
 
 /**
@@ -78,6 +81,10 @@ public class ServerWebhookManagementService {
         try {
             Webhook webhook = webhookManagementService.getWebhook(webhookId,
                     CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            if (webhook == null) {
+                throw WebhookManagementAPIErrorBuilder.buildAPIError(Response.Status.NOT_FOUND,
+                        ERROR_NO_WEBHOOK_FOUND_ON_GIVEN_ID, webhookId);
+            }
             return getWebhookResponse(webhook);
         } catch (WebhookMgtException e) {
             throw WebhookManagementAPIErrorBuilder.buildAPIError(e);
@@ -173,10 +180,10 @@ public class ServerWebhookManagementService {
                 .name(webhookRequest.getName())
                 .secret(webhookRequest.getSecret())
                 .eventSchemaName(
-                        webhookRequest.getEventSchema() != null ? webhookRequest.getEventSchema().getName() : null)
+                        webhookRequest.getEventProfile() != null ? webhookRequest.getEventProfile().getName() : null)
                 .eventSchemaUri(
-                        webhookRequest.getEventSchema() != null ? webhookRequest.getEventSchema().getUri() : null)
-                .eventsSubscribed(webhookRequest.getEventsSubscribed())
+                        webhookRequest.getEventProfile() != null ? webhookRequest.getEventProfile().getUri() : null)
+                .eventsSubscribed(webhookRequest.getChannelsSubscribed())
                 .build();
     }
 
@@ -216,15 +223,15 @@ public class ServerWebhookManagementService {
         webhookResponse.setUpdatedAt(String.valueOf(webhook.getUpdatedAt()));
         webhookResponse.setEndpoint(webhook.getEndpoint());
         webhookResponse.setName(webhook.getName());
-        WebhookRequestEventSchema eventSchema = new WebhookRequestEventSchema();
-        eventSchema.setName(webhook.getEventSchemaName());
-        eventSchema.setUri(webhook.getEventSchemaUri());
-        webhookResponse.setEventSchema(eventSchema);
+        WebhookRequestEventProfile eventProfile = new WebhookRequestEventProfile();
+        eventProfile.setName(webhook.getEventSchemaName());
+        eventProfile.setUri(webhook.getEventSchemaUri());
+        webhookResponse.setEventProfile(eventProfile);
         webhookResponse.setStatus(WebhookResponse.StatusEnum.fromValue(webhook.getStatus().name()));
         try {
-            webhookResponse.setEventsSubscribed(webhook.getEventsSubscribed());
+            webhookResponse.setChannelsSubscribed(webhook.getEventsSubscribed());
         } catch (WebhookMgtException e) {
-            webhookResponse.setEventsSubscribed(null);
+            webhookResponse.setChannelsSubscribed(null);
         }
         return webhookResponse;
     }

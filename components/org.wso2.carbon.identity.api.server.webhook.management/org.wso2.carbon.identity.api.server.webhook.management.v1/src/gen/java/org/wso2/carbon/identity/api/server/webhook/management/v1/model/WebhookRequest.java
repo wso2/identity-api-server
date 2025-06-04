@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookRequestEventSchema;
+import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookRequestEventProfile;
 import javax.validation.constraints.*;
 
 
@@ -37,10 +37,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public class WebhookRequest  {
   
     private String endpoint;
-    private WebhookRequestEventSchema eventSchema;
+    private WebhookRequestEventProfile eventProfile;
     private String name;
     private String secret;
-    private List<String> eventsSubscribed = new ArrayList<String>();
+    private List<String> channelsSubscribed = new ArrayList<String>();
 
 
 @XmlType(name="StatusEnum")
@@ -101,22 +101,22 @@ public enum StatusEnum {
 
     /**
     **/
-    public WebhookRequest eventSchema(WebhookRequestEventSchema eventSchema) {
+    public WebhookRequest eventProfile(WebhookRequestEventProfile eventProfile) {
 
-        this.eventSchema = eventSchema;
+        this.eventProfile = eventProfile;
         return this;
     }
     
     @ApiModelProperty(required = true, value = "")
-    @JsonProperty("eventSchema")
+    @JsonProperty("eventProfile")
     @Valid
-    @NotNull(message = "Property eventSchema cannot be null.")
+    @NotNull(message = "Property eventProfile cannot be null.")
 
-    public WebhookRequestEventSchema getEventSchema() {
-        return eventSchema;
+    public WebhookRequestEventProfile getEventProfile() {
+        return eventProfile;
     }
-    public void setEventSchema(WebhookRequestEventSchema eventSchema) {
-        this.eventSchema = eventSchema;
+    public void setEventProfile(WebhookRequestEventProfile eventProfile) {
+        this.eventProfile = eventProfile;
     }
 
     /**
@@ -160,28 +160,28 @@ public enum StatusEnum {
     }
 
     /**
-    * List of events to subscribe to.
+    * List of channels to subscribe to.
     **/
-    public WebhookRequest eventsSubscribed(List<String> eventsSubscribed) {
+    public WebhookRequest channelsSubscribed(List<String> channelsSubscribed) {
 
-        this.eventsSubscribed = eventsSubscribed;
+        this.channelsSubscribed = channelsSubscribed;
         return this;
     }
     
-    @ApiModelProperty(example = "[\"schemas.identity.wso2.org/events/logins/event-type/loginSuccess\",\"schemas.identity.wso2.org/events/logins/event-type/loginFailed\"]", required = true, value = "List of events to subscribe to.")
-    @JsonProperty("eventsSubscribed")
+    @ApiModelProperty(example = "[\"schemas.identity.wso2.org/events/logins/event-type/loginSuccess\",\"schemas.identity.wso2.org/events/logins/event-type/loginFailed\"]", required = true, value = "List of channels to subscribe to.")
+    @JsonProperty("channelsSubscribed")
     @Valid
-    @NotNull(message = "Property eventsSubscribed cannot be null.")
+    @NotNull(message = "Property channelsSubscribed cannot be null.")
 
-    public List<String> getEventsSubscribed() {
-        return eventsSubscribed;
+    public List<String> getChannelsSubscribed() {
+        return channelsSubscribed;
     }
-    public void setEventsSubscribed(List<String> eventsSubscribed) {
-        this.eventsSubscribed = eventsSubscribed;
+    public void setChannelsSubscribed(List<String> channelsSubscribed) {
+        this.channelsSubscribed = channelsSubscribed;
     }
 
-    public WebhookRequest addEventsSubscribedItem(String eventsSubscribedItem) {
-        this.eventsSubscribed.add(eventsSubscribedItem);
+    public WebhookRequest addChannelsSubscribedItem(String channelsSubscribedItem) {
+        this.channelsSubscribed.add(channelsSubscribedItem);
         return this;
     }
 
@@ -217,16 +217,16 @@ public enum StatusEnum {
         }
         WebhookRequest webhookRequest = (WebhookRequest) o;
         return Objects.equals(this.endpoint, webhookRequest.endpoint) &&
-            Objects.equals(this.eventSchema, webhookRequest.eventSchema) &&
+            Objects.equals(this.eventProfile, webhookRequest.eventProfile) &&
             Objects.equals(this.name, webhookRequest.name) &&
             Objects.equals(this.secret, webhookRequest.secret) &&
-            Objects.equals(this.eventsSubscribed, webhookRequest.eventsSubscribed) &&
+            Objects.equals(this.channelsSubscribed, webhookRequest.channelsSubscribed) &&
             Objects.equals(this.status, webhookRequest.status);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(endpoint, eventSchema, name, secret, eventsSubscribed, status);
+        return Objects.hash(endpoint, eventProfile, name, secret, channelsSubscribed, status);
     }
 
     @Override
@@ -236,10 +236,10 @@ public enum StatusEnum {
         sb.append("class WebhookRequest {\n");
         
         sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
-        sb.append("    eventSchema: ").append(toIndentedString(eventSchema)).append("\n");
+        sb.append("    eventProfile: ").append(toIndentedString(eventProfile)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    secret: ").append(toIndentedString(secret)).append("\n");
-        sb.append("    eventsSubscribed: ").append(toIndentedString(eventsSubscribed)).append("\n");
+        sb.append("    channelsSubscribed: ").append(toIndentedString(channelsSubscribed)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("}");
         return sb.toString();
