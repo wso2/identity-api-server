@@ -748,11 +748,13 @@ public class ServerUserStoreService {
                                         .ERROR_CODE_INVALID_INPUT);
                             }
 
+                            // Updating the propertyDTOList with new property.
+                            List<PropertyDTO> propertyDTOList = new ArrayList<>(Arrays.asList(propertyDTOS));
                             PropertyDTO newPropertyDTO = new PropertyDTO();
                             newPropertyDTO.setName(propName);
                             newPropertyDTO.setValue(value);
-                            propertyDTOS = Arrays.copyOf(propertyDTOS, propertyDTOS.length + 1);
-                            propertyDTOS[propertyDTOS.length - 1] = newPropertyDTO;
+                            propertyDTOList.add(newPropertyDTO);
+                            propertyDTOS = propertyDTOList.toArray(new PropertyDTO[0]);
                         }
                     }
                 } else if (path.equals(UserStoreConstants.USER_STORE_DESCRIPTION)) {
