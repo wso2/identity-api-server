@@ -18,9 +18,11 @@
 
 package org.wso2.carbon.identity.api.server.api.resource.v1.constants;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 
 /**
  * Constants related to API resource management.
@@ -35,11 +37,12 @@ public class APIResourceMgtEndpointConstants {
     public static final String API_RESOURCE_MANAGEMENT_PREFIX = "API-RESOURCE-";
     public static final String API_RESOURCE_PATH_COMPONENT = "/api-resources";
     public static final String API_RESOURCE_COLLECTION_PATH_COMPONENT = "/api-resource-collections";
-
-    public static final String[] ALLOWED_API_RESOURCE_TYPES = {
-            BUSINESS_API_RESOURCE_TYPE,
-            MCP_SERVER_RESOURCE_TYPE
-    };
+    public static final List<String> ALLOWED_API_RESOURCE_TYPES = Collections.unmodifiableList(
+            Arrays.asList(
+                    BUSINESS_API_RESOURCE_TYPE,
+                    MCP_SERVER_RESOURCE_TYPE
+            )
+    );
     private static final List<String> allowedAttributeList = new ArrayList<>();
     public static final List<String> ALLOWED_SEARCH_ATTRIBUTES = Collections.unmodifiableList(allowedAttributeList);
 

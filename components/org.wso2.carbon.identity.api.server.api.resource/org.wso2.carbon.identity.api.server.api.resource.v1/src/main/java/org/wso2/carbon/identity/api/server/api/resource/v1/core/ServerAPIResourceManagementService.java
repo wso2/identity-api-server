@@ -499,7 +499,7 @@ public class ServerAPIResourceManagementService {
                         toAuthorizationDetailsTypes(apIResourceCreationModel.getAuthorizationDetailsTypes()));
 
         if (apIResourceCreationModel.getResourceType() != null &&
-                Arrays.asList(ALLOWED_API_RESOURCE_TYPES).contains(apIResourceCreationModel.getResourceType())
+                ALLOWED_API_RESOURCE_TYPES.contains(apIResourceCreationModel.getResourceType())
         ) {
             apiResourceBuilder.type(apIResourceCreationModel.getResourceType());
         } else {
