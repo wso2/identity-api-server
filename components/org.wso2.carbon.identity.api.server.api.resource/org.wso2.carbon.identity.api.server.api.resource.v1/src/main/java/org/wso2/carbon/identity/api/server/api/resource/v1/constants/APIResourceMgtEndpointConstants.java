@@ -18,8 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.api.resource.v1.constants;
 
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
