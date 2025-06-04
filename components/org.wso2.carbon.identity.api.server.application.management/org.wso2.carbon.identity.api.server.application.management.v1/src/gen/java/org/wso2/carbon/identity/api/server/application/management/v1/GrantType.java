@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -31,9 +31,10 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 public class GrantType  {
-  
+
     private String name;
     private String displayName;
+    private Boolean publicClientAllowed;
 
     /**
     **/
@@ -42,7 +43,7 @@ public class GrantType  {
         this.name = name;
         return this;
     }
-    
+
     @ApiModelProperty(example = "authorization_code", value = "")
     @JsonProperty("name")
     @Valid
@@ -60,7 +61,7 @@ public class GrantType  {
         this.displayName = displayName;
         return this;
     }
-    
+
     @ApiModelProperty(example = "Code", value = "")
     @JsonProperty("displayName")
     @Valid
@@ -69,6 +70,24 @@ public class GrantType  {
     }
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    /**
+     **/
+    public GrantType publicClientAllowed(Boolean publicClientAllowed) {
+
+        this.publicClientAllowed = publicClientAllowed;
+        return this;
+    }
+
+    @ApiModelProperty(example = "false", value = "")
+    @JsonProperty("publicClientAllowed")
+    @Valid
+    public Boolean getPublicClientAllowed() {
+        return publicClientAllowed;
+    }
+    public void setPublicClientAllowed(Boolean publicClientAllowed) {
+        this.publicClientAllowed = publicClientAllowed;
     }
 
 
@@ -84,12 +103,13 @@ public class GrantType  {
         }
         GrantType grantType = (GrantType) o;
         return Objects.equals(this.name, grantType.name) &&
-            Objects.equals(this.displayName, grantType.displayName);
+            Objects.equals(this.displayName, grantType.displayName) &&
+            Objects.equals(this.publicClientAllowed, grantType.publicClientAllowed);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, displayName);
+        return Objects.hash(name, displayName, publicClientAllowed);
     }
 
     @Override
@@ -97,9 +117,10 @@ public class GrantType  {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class GrantType {\n");
-        
+
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
+        sb.append("    publicClientAllowed: ").append(toIndentedString(publicClientAllowed)).append("\n");
         sb.append("}");
         return sb.toString();
     }
