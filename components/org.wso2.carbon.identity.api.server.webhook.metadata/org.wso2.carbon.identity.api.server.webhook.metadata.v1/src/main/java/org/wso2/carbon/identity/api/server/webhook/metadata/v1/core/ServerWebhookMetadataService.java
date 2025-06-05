@@ -18,15 +18,21 @@
 
 package org.wso2.carbon.identity.api.server.webhook.metadata.v1.core;
 
+import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.webhook.metadata.common.WebhookMetadataServiceHolder;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.Channel;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.Event;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.EventProfile;
+import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.EventProfileMetadata;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.util.WebhookMetadataAPIErrorBuilder;
 import org.wso2.carbon.identity.webhook.metadata.api.exception.WebhookMetadataException;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.webhook.metadata.v1.constants.WebhookMetadataEndpointConstants.EVENT_PROFILE_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.webhook.metadata.v1.constants.WebhookMetadataEndpointConstants.WEBHOOK_METADATA_PATH_COMPONENT;
 
 /**
  * Calls internal services to perform webhook metadata related operations.
@@ -55,10 +61,13 @@ public class ServerWebhookMetadataService {
      *
      * @return List of event profile names
      */
-    public List<String> getEventProfileNames() {
+    public List<EventProfileMetadata> getEventProfileNames() {
 
         try {
-            return WebhookMetadataServiceHolder.getWebhookMetadataService().getSupportedEventProfiles();
+            return WebhookMetadataServiceHolder.getWebhookMetadataService().getSupportedEventProfiles()
+                    .stream()
+                    .map(this::mapEventProfileMetadata)
+                    .collect(Collectors.toList());
         } catch (WebhookMetadataException e) {
             throw WebhookMetadataAPIErrorBuilder.buildAPIError(e);
         }
@@ -68,6 +77,7 @@ public class ServerWebhookMetadataService {
 
         EventProfile eventProfile = new EventProfile();
         eventProfile.setProfile(profile.getProfile());
+        eventProfile.setUri(profile.getUri());
 
         List<Channel> channels = profile.getChannels().stream()
                 .map(this::mapChannel)
@@ -99,5 +109,18 @@ public class ServerWebhookMetadataService {
         mappedEvent.setEventDescription(event.getEventDescription());
         mappedEvent.setEventUri(event.getEventUri());
         return mappedEvent;
+    }
+
+    private EventProfileMetadata mapEventProfileMetadata(
+            org.wso2.carbon.identity.webhook.metadata.api.model.EventProfile eventProfile) {
+
+        EventProfileMetadata mappedMetadata = new EventProfileMetadata();
+        mappedMetadata.setName(eventProfile.getProfile());
+        mappedMetadata.setUri(eventProfile.getUri());
+        mappedMetadata.setSelf(
+                ContextLoader.buildURIForBody(
+                        String.format(V1_API_PATH_COMPONENT + WEBHOOK_METADATA_PATH_COMPONENT +
+                                EVENT_PROFILE_PATH_COMPONENT + "/%s", eventProfile.getProfile())).toString());
+        return mappedMetadata;
     }
 }

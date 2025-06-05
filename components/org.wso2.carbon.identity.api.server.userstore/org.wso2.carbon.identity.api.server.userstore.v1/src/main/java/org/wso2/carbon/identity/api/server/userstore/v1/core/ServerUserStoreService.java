@@ -721,10 +721,40 @@ public class ServerUserStoreService {
                 if (path.startsWith(UserStoreConstants.USER_STORE_PROPERTIES)) {
                     String propName = extractPropertyName(path);
                     if (StringUtils.isNotEmpty(propName)) {
+                        boolean isPropertyExists = false;
                         for (PropertyDTO propertyDTO : propertyDTOS) {
                             if (propName.equals(propertyDTO.getName())) {
                                 propertyDTO.setValue(value);
+                                isPropertyExists = true;
+                                break;
                             }
+                        }
+                        if (!isPropertyExists) {
+                            Properties defaultProperties =
+                                    UserStoreManagerRegistry.getUserStoreProperties(userStoreDTO.getClassName());
+
+                            if (defaultProperties != null) {
+                                // Check if the property exists in the optional or advanced properties of the
+                                // user store.
+                                isPropertyExists = Arrays.stream(defaultProperties.getOptionalProperties())
+                                        .anyMatch(optionalProperty -> propName.equals(optionalProperty.getName())) ||
+                                        Arrays.stream(defaultProperties.getAdvancedProperties())
+                                                .anyMatch(advancedProperty -> propName.equals(
+                                                        advancedProperty.getName()));
+                            }
+
+                            if (!isPropertyExists) {
+                                throw handleException(Response.Status.BAD_REQUEST, UserStoreConstants.ErrorMessage
+                                        .ERROR_CODE_INVALID_INPUT);
+                            }
+
+                            // Updating the propertyDTOList with new property.
+                            List<PropertyDTO> propertyDTOList = new ArrayList<>(Arrays.asList(propertyDTOS));
+                            PropertyDTO newPropertyDTO = new PropertyDTO();
+                            newPropertyDTO.setName(propName);
+                            newPropertyDTO.setValue(value);
+                            propertyDTOList.add(newPropertyDTO);
+                            propertyDTOS = propertyDTOList.toArray(new PropertyDTO[0]);
                         }
                     }
                 } else if (path.equals(UserStoreConstants.USER_STORE_DESCRIPTION)) {

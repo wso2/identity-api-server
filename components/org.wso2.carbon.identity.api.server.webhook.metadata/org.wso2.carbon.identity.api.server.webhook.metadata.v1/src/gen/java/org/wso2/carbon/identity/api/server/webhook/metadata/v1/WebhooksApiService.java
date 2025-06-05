@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.Error;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.EventProfile;
+import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.EventProfileList;
 import javax.ws.rs.core.Response;
 
 

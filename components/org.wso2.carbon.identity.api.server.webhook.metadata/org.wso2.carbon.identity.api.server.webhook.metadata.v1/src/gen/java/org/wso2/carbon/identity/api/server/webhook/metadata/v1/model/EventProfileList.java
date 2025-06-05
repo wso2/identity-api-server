@@ -16,12 +16,15 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.api.server.webhook.management.v1.model;
+package org.wso2.carbon.identity.api.server.webhook.metadata.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.EventProfileMetadata;
 import javax.validation.constraints.*;
 
 
@@ -29,56 +32,39 @@ import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-import com.fasterxml.jackson.annotation.JsonValue;
 
-public class WebhookRequestEventSchema  {
+public class EventProfileList  {
   
-    private String name;
-    private String uri;
+    private List<EventProfileMetadata> profiles = null;
+
 
     /**
-    * Webhook Event Schema.
     **/
-    public WebhookRequestEventSchema name(String name) {
+    public EventProfileList profiles(List<EventProfileMetadata> profiles) {
 
-        this.name = name;
+        this.profiles = profiles;
         return this;
     }
     
-    @ApiModelProperty(example = "WSO2", required = true, value = "Webhook Event Schema.")
-    @JsonProperty("name")
+    @ApiModelProperty(value = "")
+    @JsonProperty("profiles")
     @Valid
-    @NotNull(message = "Property name cannot be null.")
-
-    public String getName() {
-        return name;
+    public List<EventProfileMetadata> getProfiles() {
+        return profiles;
     }
-    public void setName(String name) {
-        this.name = name;
+    public void setProfiles(List<EventProfileMetadata> profiles) {
+        this.profiles = profiles;
     }
 
-    /**
-    * Webhook Event Schema URI.
-    **/
-    public WebhookRequestEventSchema uri(String uri) {
-
-        this.uri = uri;
+    public EventProfileList addProfilesItem(EventProfileMetadata profilesItem) {
+        if (this.profiles == null) {
+            this.profiles = new ArrayList<EventProfileMetadata>();
+        }
+        this.profiles.add(profilesItem);
         return this;
     }
+
     
-    @ApiModelProperty(example = "schemas.identity.wso2.org", required = true, value = "Webhook Event Schema URI.")
-    @JsonProperty("uri")
-    @Valid
-    @NotNull(message = "Property uri cannot be null.")
-
-    public String getUri() {
-        return uri;
-    }
-    public void setUri(String uri) {
-        this.uri = uri;
-    }
-
-
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -89,24 +75,22 @@ public class WebhookRequestEventSchema  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        WebhookRequestEventSchema webhookRequestEventSchema = (WebhookRequestEventSchema) o;
-        return Objects.equals(this.name, webhookRequestEventSchema.name) &&
-            Objects.equals(this.uri, webhookRequestEventSchema.uri);
+        EventProfileList eventProfileList = (EventProfileList) o;
+        return Objects.equals(this.profiles, eventProfileList.profiles);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, uri);
+        return Objects.hash(profiles);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class WebhookRequestEventSchema {\n");
+        sb.append("class EventProfileList {\n");
         
-        sb.append("    name: ").append(toIndentedString(name)).append("\n");
-        sb.append("    uri: ").append(toIndentedString(uri)).append("\n");
+        sb.append("    profiles: ").append(toIndentedString(profiles)).append("\n");
         sb.append("}");
         return sb.toString();
     }

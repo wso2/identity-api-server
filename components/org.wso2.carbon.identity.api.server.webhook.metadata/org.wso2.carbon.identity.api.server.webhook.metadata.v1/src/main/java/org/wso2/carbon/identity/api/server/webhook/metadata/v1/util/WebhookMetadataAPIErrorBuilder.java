@@ -25,7 +25,13 @@ import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
 import org.wso2.carbon.identity.webhook.metadata.api.exception.WebhookMetadataClientException;
 import org.wso2.carbon.identity.webhook.metadata.api.exception.WebhookMetadataException;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.ws.rs.core.Response;
+
+import static org.wso2.carbon.identity.webhook.metadata.api.constant.ErrorMessage.ERROR_CODE_PROFILE_NOT_FOUND;
 
 /**
  * Class that handles exceptions and builds API error object.
@@ -33,6 +39,10 @@ import javax.ws.rs.core.Response;
 public class WebhookMetadataAPIErrorBuilder {
 
     private static final Log LOG = LogFactory.getLog(WebhookMetadataAPIErrorBuilder.class);
+    private static final Set<String> NOT_FOUND_ERRORS = Collections.unmodifiableSet(new HashSet<>(
+            Collections.singletonList(
+                    ERROR_CODE_PROFILE_NOT_FOUND.getCode()
+            )));
 
     private WebhookMetadataAPIErrorBuilder() {
 
@@ -43,7 +53,11 @@ public class WebhookMetadataAPIErrorBuilder {
         Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
         if (exception instanceof WebhookMetadataClientException) {
             LOG.debug(exception.getMessage(), exception);
-            status = Response.Status.BAD_REQUEST;
+            if (NOT_FOUND_ERRORS.contains(exception.getErrorCode())) {
+                status = Response.Status.NOT_FOUND;
+            } else {
+                status = Response.Status.BAD_REQUEST;
+            }
         } else {
             LOG.error(exception.getMessage(), exception);
         }
