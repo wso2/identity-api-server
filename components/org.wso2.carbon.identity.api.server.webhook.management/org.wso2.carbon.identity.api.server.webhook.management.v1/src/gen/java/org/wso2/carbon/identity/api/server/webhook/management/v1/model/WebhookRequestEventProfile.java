@@ -22,9 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
-import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookSummary;
 import javax.validation.constraints.*;
 
 
@@ -34,38 +31,54 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public class WebhookList  {
+public class WebhookRequestEventProfile  {
   
-    private List<WebhookSummary> webhooks = null;
-
+    private String name;
+    private String uri;
 
     /**
+    * Webhook Event Profile.
     **/
-    public WebhookList webhooks(List<WebhookSummary> webhooks) {
+    public WebhookRequestEventProfile name(String name) {
 
-        this.webhooks = webhooks;
+        this.name = name;
         return this;
     }
     
-    @ApiModelProperty(value = "")
-    @JsonProperty("webhooks")
+    @ApiModelProperty(example = "WSO2", required = true, value = "Webhook Event Profile.")
+    @JsonProperty("name")
     @Valid
-    public List<WebhookSummary> getWebhooks() {
-        return webhooks;
+    @NotNull(message = "Property name cannot be null.")
+
+    public String getName() {
+        return name;
     }
-    public void setWebhooks(List<WebhookSummary> webhooks) {
-        this.webhooks = webhooks;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public WebhookList addWebhooksItem(WebhookSummary webhooksItem) {
-        if (this.webhooks == null) {
-            this.webhooks = new ArrayList<WebhookSummary>();
-        }
-        this.webhooks.add(webhooksItem);
+    /**
+    * Webhook Event Profile URI.
+    **/
+    public WebhookRequestEventProfile uri(String uri) {
+
+        this.uri = uri;
         return this;
     }
-
     
+    @ApiModelProperty(example = "schemas.identity.wso2.org", required = true, value = "Webhook Event Profile URI.")
+    @JsonProperty("uri")
+    @Valid
+    @NotNull(message = "Property uri cannot be null.")
+
+    public String getUri() {
+        return uri;
+    }
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -76,22 +89,24 @@ public class WebhookList  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        WebhookList webhookList = (WebhookList) o;
-        return Objects.equals(this.webhooks, webhookList.webhooks);
+        WebhookRequestEventProfile webhookRequestEventProfile = (WebhookRequestEventProfile) o;
+        return Objects.equals(this.name, webhookRequestEventProfile.name) &&
+            Objects.equals(this.uri, webhookRequestEventProfile.uri);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(webhooks);
+        return Objects.hash(name, uri);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class WebhookList {\n");
+        sb.append("class WebhookRequestEventProfile {\n");
         
-        sb.append("    webhooks: ").append(toIndentedString(webhooks)).append("\n");
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    uri: ").append(toIndentedString(uri)).append("\n");
         sb.append("}");
         return sb.toString();
     }

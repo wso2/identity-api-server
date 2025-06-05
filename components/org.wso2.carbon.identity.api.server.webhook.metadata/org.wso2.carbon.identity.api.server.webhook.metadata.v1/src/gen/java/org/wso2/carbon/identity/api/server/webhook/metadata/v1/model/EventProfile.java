@@ -36,6 +36,7 @@ import javax.xml.bind.annotation.*;
 public class EventProfile  {
   
     private String profile;
+    private String uri;
     private List<Channel> channels = null;
 
 
@@ -55,6 +56,24 @@ public class EventProfile  {
     }
     public void setProfile(String profile) {
         this.profile = profile;
+    }
+
+    /**
+    **/
+    public EventProfile uri(String uri) {
+
+        this.uri = uri;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "https://schemas.identity.wso2.org", value = "")
+    @JsonProperty("uri")
+    @Valid
+    public String getUri() {
+        return uri;
+    }
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 
     /**
@@ -96,12 +115,13 @@ public class EventProfile  {
         }
         EventProfile eventProfile = (EventProfile) o;
         return Objects.equals(this.profile, eventProfile.profile) &&
+            Objects.equals(this.uri, eventProfile.uri) &&
             Objects.equals(this.channels, eventProfile.channels);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(profile, channels);
+        return Objects.hash(profile, uri, channels);
     }
 
     @Override
@@ -111,6 +131,7 @@ public class EventProfile  {
         sb.append("class EventProfile {\n");
         
         sb.append("    profile: ").append(toIndentedString(profile)).append("\n");
+        sb.append("    uri: ").append(toIndentedString(uri)).append("\n");
         sb.append("    channels: ").append(toIndentedString(channels)).append("\n");
         sb.append("}");
         return sb.toString();

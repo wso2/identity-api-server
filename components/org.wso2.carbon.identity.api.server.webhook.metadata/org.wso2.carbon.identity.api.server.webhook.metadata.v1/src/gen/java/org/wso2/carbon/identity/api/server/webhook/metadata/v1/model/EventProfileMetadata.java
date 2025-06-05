@@ -16,15 +16,12 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.api.server.webhook.management.v1.model;
+package org.wso2.carbon.identity.api.server.webhook.metadata.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
-import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookSummary;
 import javax.validation.constraints.*;
 
 
@@ -32,40 +29,68 @@ import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-import com.fasterxml.jackson.annotation.JsonValue;
 
-public class WebhookList  {
+public class EventProfileMetadata  {
   
-    private List<WebhookSummary> webhooks = null;
-
+    private String name;
+    private String uri;
+    private String self;
 
     /**
     **/
-    public WebhookList webhooks(List<WebhookSummary> webhooks) {
+    public EventProfileMetadata name(String name) {
 
-        this.webhooks = webhooks;
+        this.name = name;
         return this;
     }
     
-    @ApiModelProperty(value = "")
-    @JsonProperty("webhooks")
+    @ApiModelProperty(example = "WSO2", value = "")
+    @JsonProperty("name")
     @Valid
-    public List<WebhookSummary> getWebhooks() {
-        return webhooks;
+    public String getName() {
+        return name;
     }
-    public void setWebhooks(List<WebhookSummary> webhooks) {
-        this.webhooks = webhooks;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public WebhookList addWebhooksItem(WebhookSummary webhooksItem) {
-        if (this.webhooks == null) {
-            this.webhooks = new ArrayList<WebhookSummary>();
-        }
-        this.webhooks.add(webhooksItem);
+    /**
+    **/
+    public EventProfileMetadata uri(String uri) {
+
+        this.uri = uri;
         return this;
     }
-
     
+    @ApiModelProperty(example = "https://schemas.identity.wso2.org", value = "")
+    @JsonProperty("uri")
+    @Valid
+    public String getUri() {
+        return uri;
+    }
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
+    /**
+    **/
+    public EventProfileMetadata self(String self) {
+
+        this.self = self;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "/t/carbon.super/api/server/v1/webhooks/metadata/event-profiles/WSO2", value = "")
+    @JsonProperty("self")
+    @Valid
+    public String getSelf() {
+        return self;
+    }
+    public void setSelf(String self) {
+        this.self = self;
+    }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -76,22 +101,26 @@ public class WebhookList  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        WebhookList webhookList = (WebhookList) o;
-        return Objects.equals(this.webhooks, webhookList.webhooks);
+        EventProfileMetadata eventProfileMetadata = (EventProfileMetadata) o;
+        return Objects.equals(this.name, eventProfileMetadata.name) &&
+            Objects.equals(this.uri, eventProfileMetadata.uri) &&
+            Objects.equals(this.self, eventProfileMetadata.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(webhooks);
+        return Objects.hash(name, uri, self);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class WebhookList {\n");
+        sb.append("class EventProfileMetadata {\n");
         
-        sb.append("    webhooks: ").append(toIndentedString(webhooks)).append("\n");
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    uri: ").append(toIndentedString(uri)).append("\n");
+        sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");
         return sb.toString();
     }

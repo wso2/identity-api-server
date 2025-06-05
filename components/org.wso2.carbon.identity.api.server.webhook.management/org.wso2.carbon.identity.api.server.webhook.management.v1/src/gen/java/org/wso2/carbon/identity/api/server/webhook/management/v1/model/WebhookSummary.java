@@ -22,9 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
-import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookRequestEventProfile;
 import javax.validation.constraints.*;
 
 
@@ -34,16 +31,13 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public class WebhookResponse  {
+public class WebhookSummary  {
   
     private String id;
     private String createdAt;
     private String updatedAt;
     private String endpoint;
-    private WebhookRequestEventProfile eventProfile;
     private String name;
-    private List<String> channelsSubscribed = null;
-
 
 @XmlType(name="StatusEnum")
 @XmlEnum(String.class)
@@ -79,10 +73,11 @@ public enum StatusEnum {
 }
 
     private StatusEnum status;
+    private String self;
 
     /**
     **/
-    public WebhookResponse id(String id) {
+    public WebhookSummary id(String id) {
 
         this.id = id;
         return this;
@@ -100,7 +95,7 @@ public enum StatusEnum {
 
     /**
     **/
-    public WebhookResponse createdAt(String createdAt) {
+    public WebhookSummary createdAt(String createdAt) {
 
         this.createdAt = createdAt;
         return this;
@@ -118,7 +113,7 @@ public enum StatusEnum {
 
     /**
     **/
-    public WebhookResponse updatedAt(String updatedAt) {
+    public WebhookSummary updatedAt(String updatedAt) {
 
         this.updatedAt = updatedAt;
         return this;
@@ -137,7 +132,7 @@ public enum StatusEnum {
     /**
     * Webhook URL.
     **/
-    public WebhookResponse endpoint(String endpoint) {
+    public WebhookSummary endpoint(String endpoint) {
 
         this.endpoint = endpoint;
         return this;
@@ -154,27 +149,9 @@ public enum StatusEnum {
     }
 
     /**
-    **/
-    public WebhookResponse eventProfile(WebhookRequestEventProfile eventProfile) {
-
-        this.eventProfile = eventProfile;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "")
-    @JsonProperty("eventProfile")
-    @Valid
-    public WebhookRequestEventProfile getEventProfile() {
-        return eventProfile;
-    }
-    public void setEventProfile(WebhookRequestEventProfile eventProfile) {
-        this.eventProfile = eventProfile;
-    }
-
-    /**
     * Webhook name.
     **/
-    public WebhookResponse name(String name) {
+    public WebhookSummary name(String name) {
 
         this.name = name;
         return this;
@@ -191,36 +168,9 @@ public enum StatusEnum {
     }
 
     /**
-    * List of channels to subscribe to.
-    **/
-    public WebhookResponse channelsSubscribed(List<String> channelsSubscribed) {
-
-        this.channelsSubscribed = channelsSubscribed;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "[\"schemas.identity.wso2.org/events/logins/event-type/loginSuccess\",\"schemas.identity.wso2.org/events/logins/event-type/loginFailed\"]", value = "List of channels to subscribe to.")
-    @JsonProperty("channelsSubscribed")
-    @Valid
-    public List<String> getChannelsSubscribed() {
-        return channelsSubscribed;
-    }
-    public void setChannelsSubscribed(List<String> channelsSubscribed) {
-        this.channelsSubscribed = channelsSubscribed;
-    }
-
-    public WebhookResponse addChannelsSubscribedItem(String channelsSubscribedItem) {
-        if (this.channelsSubscribed == null) {
-            this.channelsSubscribed = new ArrayList<String>();
-        }
-        this.channelsSubscribed.add(channelsSubscribedItem);
-        return this;
-    }
-
-        /**
     * Webhook Status.
     **/
-    public WebhookResponse status(StatusEnum status) {
+    public WebhookSummary status(StatusEnum status) {
 
         this.status = status;
         return this;
@@ -236,6 +186,24 @@ public enum StatusEnum {
         this.status = status;
     }
 
+    /**
+    **/
+    public WebhookSummary self(String self) {
+
+        this.self = self;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "/t/carbon.super/api/server/v1/webhooks/123e4567-e89b-12d3-a456-556642440000", value = "")
+    @JsonProperty("self")
+    @Valid
+    public String getSelf() {
+        return self;
+    }
+    public void setSelf(String self) {
+        this.self = self;
+    }
+
 
 
     @Override
@@ -247,36 +215,34 @@ public enum StatusEnum {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        WebhookResponse webhookResponse = (WebhookResponse) o;
-        return Objects.equals(this.id, webhookResponse.id) &&
-            Objects.equals(this.createdAt, webhookResponse.createdAt) &&
-            Objects.equals(this.updatedAt, webhookResponse.updatedAt) &&
-            Objects.equals(this.endpoint, webhookResponse.endpoint) &&
-            Objects.equals(this.eventProfile, webhookResponse.eventProfile) &&
-            Objects.equals(this.name, webhookResponse.name) &&
-            Objects.equals(this.channelsSubscribed, webhookResponse.channelsSubscribed) &&
-            Objects.equals(this.status, webhookResponse.status);
+        WebhookSummary webhookSummary = (WebhookSummary) o;
+        return Objects.equals(this.id, webhookSummary.id) &&
+            Objects.equals(this.createdAt, webhookSummary.createdAt) &&
+            Objects.equals(this.updatedAt, webhookSummary.updatedAt) &&
+            Objects.equals(this.endpoint, webhookSummary.endpoint) &&
+            Objects.equals(this.name, webhookSummary.name) &&
+            Objects.equals(this.status, webhookSummary.status) &&
+            Objects.equals(this.self, webhookSummary.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, createdAt, updatedAt, endpoint, eventProfile, name, channelsSubscribed, status);
+        return Objects.hash(id, createdAt, updatedAt, endpoint, name, status, self);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class WebhookResponse {\n");
+        sb.append("class WebhookSummary {\n");
         
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
         sb.append("    updatedAt: ").append(toIndentedString(updatedAt)).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
-        sb.append("    eventProfile: ").append(toIndentedString(eventProfile)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
-        sb.append("    channelsSubscribed: ").append(toIndentedString(channelsSubscribed)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
+        sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");
         return sb.toString();
     }
