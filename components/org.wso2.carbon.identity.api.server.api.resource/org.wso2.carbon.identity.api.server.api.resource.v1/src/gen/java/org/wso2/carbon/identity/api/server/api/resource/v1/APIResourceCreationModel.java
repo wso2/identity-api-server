@@ -44,6 +44,7 @@ public class APIResourceCreationModel  {
 
     private List<AuthorizationDetailsTypesCreationModel> authorizationDetailsTypes = null;
 
+    private String resourceType;
 
     /**
     **/
@@ -173,7 +174,25 @@ public class APIResourceCreationModel  {
         return this;
     }
 
+        /**
+    **/
+    public APIResourceCreationModel resourceType(String resourceType) {
+
+        this.resourceType = resourceType;
+        return this;
+    }
     
+    @ApiModelProperty(example = "MCP", value = "")
+    @JsonProperty("resourceType")
+    @Valid
+    public String getResourceType() {
+        return resourceType;
+    }
+    public void setResourceType(String resourceType) {
+        this.resourceType = resourceType;
+    }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -190,12 +209,13 @@ public class APIResourceCreationModel  {
             Objects.equals(this.description, apIResourceCreationModel.description) &&
             Objects.equals(this.requiresAuthorization, apIResourceCreationModel.requiresAuthorization) &&
             Objects.equals(this.scopes, apIResourceCreationModel.scopes) &&
-            Objects.equals(this.authorizationDetailsTypes, apIResourceCreationModel.authorizationDetailsTypes);
+            Objects.equals(this.authorizationDetailsTypes, apIResourceCreationModel.authorizationDetailsTypes) &&
+            Objects.equals(this.resourceType, apIResourceCreationModel.resourceType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, identifier, description, requiresAuthorization, scopes, authorizationDetailsTypes);
+        return Objects.hash(name, identifier, description, requiresAuthorization, scopes, authorizationDetailsTypes, resourceType);
     }
 
     @Override
@@ -210,6 +230,7 @@ public class APIResourceCreationModel  {
         sb.append("    requiresAuthorization: ").append(toIndentedString(requiresAuthorization)).append("\n");
         sb.append("    scopes: ").append(toIndentedString(scopes)).append("\n");
         sb.append("    authorizationDetailsTypes: ").append(toIndentedString(authorizationDetailsTypes)).append("\n");
+        sb.append("    resourceType: ").append(toIndentedString(resourceType)).append("\n");
         sb.append("}");
         return sb.toString();
     }
