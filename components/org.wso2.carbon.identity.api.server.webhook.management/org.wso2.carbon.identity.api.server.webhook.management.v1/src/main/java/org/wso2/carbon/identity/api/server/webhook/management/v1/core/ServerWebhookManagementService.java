@@ -147,10 +147,10 @@ public class ServerWebhookManagementService {
      * @param webhookId Webhook ID.
      * @return Activated webhook.
      */
-    public WebhookResponse activateWebhook(String webhookId) {
+    public WebhookSummary activateWebhook(String webhookId) {
 
         try {
-            return getWebhookResponse(webhookManagementService.activateWebhook(webhookId,
+            return toWebhookSummary(webhookManagementService.activateWebhook(webhookId,
                     CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
         } catch (WebhookMgtException e) {
             throw WebhookManagementAPIErrorBuilder.buildAPIError(e);
@@ -163,10 +163,10 @@ public class ServerWebhookManagementService {
      * @param webhookId Webhook ID.
      * @return Deactivated webhook.
      */
-    public WebhookResponse deactivateWebhook(String webhookId) {
+    public WebhookSummary deactivateWebhook(String webhookId) {
 
         try {
-            return getWebhookResponse(webhookManagementService.deactivateWebhook(webhookId,
+            return toWebhookSummary(webhookManagementService.deactivateWebhook(webhookId,
                     CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
         } catch (WebhookMgtException e) {
             throw WebhookManagementAPIErrorBuilder.buildAPIError(e);
