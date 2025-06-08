@@ -61,7 +61,7 @@ public class WebhooksApi  {
         })
     }, tags={ "Webhooks", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "Webhook Activated", response = Void.class),
+        @ApiResponse(code = 200, message = "Webhook Activated", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
@@ -108,7 +108,7 @@ public class WebhooksApi  {
         })
     }, tags={ "Webhooks", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "Webhook Deactivated", response = Void.class),
+        @ApiResponse(code = 200, message = "Webhook Deactivated", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
