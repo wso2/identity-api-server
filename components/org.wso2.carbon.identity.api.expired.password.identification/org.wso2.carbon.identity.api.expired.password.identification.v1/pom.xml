@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.expired.password.identification</artifactId>
-        <version>1.3.127-SNAPSHOT</version>
+        <version>1.3.127</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
