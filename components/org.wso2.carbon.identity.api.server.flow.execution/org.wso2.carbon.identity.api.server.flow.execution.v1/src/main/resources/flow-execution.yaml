@@ -27,7 +27,7 @@ servers:
         default: "localhost:9443"
 
 paths:
-  /registration/execute:
+  /flow/execute:
     post:
       summary: Execute a flow step
       tags:
@@ -45,19 +45,31 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/FlowExecutionResponse"
+        '400':
+          description: Bad request - invalid input or missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        '500':
+          description: Internal server error - unexpected failure during flow execution
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     FlowExecutionRequest:
       type: object
       properties:
+        flowType:
+          type: string
+          description: Unique identifier to identify the flow type
+          example: REGISTRATION
         applicationId:
           type: string
           description: Unique identifier for the application
           example: 01afc2d2-f7b8-46db-95a9-c17336e7a1c6
-        callbackUrl:
-          type: string
-          description: URL to redirect during the flow execution if required
-          example: 'https://localhost:3000/myRegistrationPortal'
         flowId:
           type: string
           description: Unique identifier for the flow execution
@@ -137,6 +149,19 @@ components:
         config:
           type: object
           description: Configuration details of the component
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          example: FE-60008
+        message:
+          type: string
+          example: Invalid user inputs.
+        description:
+          type: string
+          example: Invalid user inputs provided for the ASK_PASSWORD request
 
   securitySchemes:
     BasicAuth:
