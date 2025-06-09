@@ -33,7 +33,6 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.Position;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Size;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Step;
 import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
-import org.wso2.carbon.identity.flow.mgt.Constants;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtFrameworkException;
 import org.wso2.carbon.identity.flow.mgt.model.ActionDTO;
