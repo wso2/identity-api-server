@@ -101,7 +101,7 @@ components:
           example: INCOMPLETE
         type:
           type: string
-          enum: [VIEW, REDIRECTION, INTERACT, INTERNAL_PROMPT]
+          enum: [VIEW, REDIRECTION, INTERNAL_PROMPT, WEBAUTHN]
           example: VIEW
         data:
           $ref: "#/components/schemas/Data"
@@ -119,6 +119,10 @@ components:
           type: array
           items:
             type: string
+        webAuthnData:
+          type: object
+          description: Data related to WebAuthn operations
+          additionalProperties: true
         additionalData:
           type: object
           additionalProperties: true

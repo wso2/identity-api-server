@@ -37,7 +37,7 @@ public class FlowEndpointConstants {
      */
     public enum ErrorMessages {
 
-        ERROR_CODE_INVALID_FLOW_TYPE("10001", "Invalid action type.",
+        ERROR_CODE_INVALID_FLOW_TYPE("10001", "Invalid flow type.",
                 "The provided flow type is not supported.");
 
         private final String code;

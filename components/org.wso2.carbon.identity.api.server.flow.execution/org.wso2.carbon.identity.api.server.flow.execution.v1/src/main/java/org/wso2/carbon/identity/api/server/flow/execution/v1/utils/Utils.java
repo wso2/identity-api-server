@@ -40,6 +40,7 @@ import org.wso2.carbon.identity.governance.IdentityGovernanceService;
 
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER;
@@ -247,7 +248,9 @@ public class Utils {
                         .map(Utils::convertToComponent)
                         .collect(Collectors.toList()));
             case Constants.StepTypes.REDIRECTION:
-                return data.redirectURL(dataDTO.getUrl());
+                return data.redirectURL(dataDTO.getRedirectURL());
+            case Constants.StepTypes.WEBAUTHN:
+                return data.webAuthnData(dataDTO.getWebAuthnData());
             default:
                 return data;
         }
