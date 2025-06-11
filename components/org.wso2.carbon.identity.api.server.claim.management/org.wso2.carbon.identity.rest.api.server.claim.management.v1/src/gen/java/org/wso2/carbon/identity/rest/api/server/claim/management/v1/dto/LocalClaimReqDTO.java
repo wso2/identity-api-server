@@ -82,6 +82,9 @@ public class LocalClaimReqDTO {
     @Valid 
     private UniquenessScopeEnum uniquenessScope = null;
 
+    @Valid
+    private boolean flowInitiator = false;
+
     public enum SharedProfileValueResolvingMethodEnum {
         FromOrigin, FromSharedProfile, FromFirstFoundInHierarchy,
     };
@@ -262,6 +265,19 @@ public class LocalClaimReqDTO {
     }
 
     /**
+     * Specifies claim property for FlowInitiator.
+     **/
+    @ApiModelProperty(value = "Specifies claim property for FlowInitiator.")
+    @JsonProperty("flowInitiator")
+    public boolean getFlowInitiator() {
+        return flowInitiator;
+    }
+
+    public void setFlowInitiator(boolean flowInitiator) {
+        this.flowInitiator = flowInitiator;
+    }
+
+    /**
      * Specifies claim value resolving method for shared user profile.
      **/
     @ApiModelProperty(value = "Specifies claim value resolving method for shared user profile.")
@@ -329,6 +345,7 @@ public class LocalClaimReqDTO {
         sb.append("    canonicalValues: ").append(Arrays.toString(canonicalValues)).append("\n");
         sb.append("    multiValued: ").append(multiValued).append("\n");
         sb.append("    uniquenessScope: ").append(uniquenessScope).append("\n");
+        sb.append("    flowInitiator: ").append(flowInitiator).append("\n");
         sb.append("    sharedProfileValueResolvingMethod: ").append(sharedProfileValueResolvingMethod).append("\n");
         sb.append("    attributeMapping: ").append(attributeMapping).append("\n");
         sb.append("    properties: ").append(properties).append("\n");
