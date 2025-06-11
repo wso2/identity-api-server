@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -22,6 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.application.management.v1.RoleShareConfig;
 import javax.validation.constraints.*;
 
 
@@ -35,6 +38,7 @@ public class BasicOrganizationResponse  {
     private String id;
     private String name;
     private String orgHandle;
+    private String parentId;
 
 @XmlType(name="StatusEnum")
 @XmlEnum(String.class)
@@ -70,6 +74,10 @@ public enum StatusEnum {
 
     private StatusEnum status;
     private String ref;
+    private Boolean hasChildren;
+    private Integer depthFromRoot;
+    private List<RoleShareConfig> roles = new ArrayList<>();
+
 
     /**
     **/
@@ -132,6 +140,27 @@ public enum StatusEnum {
     }
 
     /**
+    * The parent organization ID. 
+    **/
+    public BasicOrganizationResponse parentId(String parentId) {
+
+        this.parentId = parentId;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "08f8c1d2-4b3e-4c5a-9f6b-7d8e9f0a1b2c", required = true, value = "The parent organization ID. ")
+    @JsonProperty("parentId")
+    @Valid
+    @NotNull(message = "Property parentId cannot be null.")
+
+    public String getParentId() {
+        return parentId;
+    }
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
+    }
+
+    /**
     **/
     public BasicOrganizationResponse status(StatusEnum status) {
 
@@ -171,7 +200,73 @@ public enum StatusEnum {
         this.ref = ref;
     }
 
+    /**
+    **/
+    public BasicOrganizationResponse hasChildren(Boolean hasChildren) {
 
+        this.hasChildren = hasChildren;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "true", required = true, value = "")
+    @JsonProperty("hasChildren")
+    @Valid
+    @NotNull(message = "Property hasChildren cannot be null.")
+
+    public Boolean getHasChildren() {
+        return hasChildren;
+    }
+    public void setHasChildren(Boolean hasChildren) {
+        this.hasChildren = hasChildren;
+    }
+
+    /**
+    **/
+    public BasicOrganizationResponse depthFromRoot(Integer depthFromRoot) {
+
+        this.depthFromRoot = depthFromRoot;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "1", required = true, value = "")
+    @JsonProperty("depthFromRoot")
+    @Valid
+    @NotNull(message = "Property depthFromRoot cannot be null.")
+
+    public Integer getDepthFromRoot() {
+        return depthFromRoot;
+    }
+    public void setDepthFromRoot(Integer depthFromRoot) {
+        this.depthFromRoot = depthFromRoot;
+    }
+
+    /**
+    * List of roles that are shared with the application in this organization.
+    **/
+    public BasicOrganizationResponse roles(List<RoleShareConfig> roles) {
+
+        this.roles = roles;
+        return this;
+    }
+    
+    @ApiModelProperty(required = true, value = "List of roles that are shared with the application in this organization.")
+    @JsonProperty("roles")
+    @Valid
+    @NotNull(message = "Property roles cannot be null.")
+
+    public List<RoleShareConfig> getRoles() {
+        return roles;
+    }
+    public void setRoles(List<RoleShareConfig> roles) {
+        this.roles = roles;
+    }
+
+    public BasicOrganizationResponse addRolesItem(RoleShareConfig rolesItem) {
+        this.roles.add(rolesItem);
+        return this;
+    }
+
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -186,13 +281,17 @@ public enum StatusEnum {
         return Objects.equals(this.id, basicOrganizationResponse.id) &&
             Objects.equals(this.name, basicOrganizationResponse.name) &&
             Objects.equals(this.orgHandle, basicOrganizationResponse.orgHandle) &&
+            Objects.equals(this.parentId, basicOrganizationResponse.parentId) &&
             Objects.equals(this.status, basicOrganizationResponse.status) &&
-            Objects.equals(this.ref, basicOrganizationResponse.ref);
+            Objects.equals(this.ref, basicOrganizationResponse.ref) &&
+            Objects.equals(this.hasChildren, basicOrganizationResponse.hasChildren) &&
+            Objects.equals(this.depthFromRoot, basicOrganizationResponse.depthFromRoot) &&
+            Objects.equals(this.roles, basicOrganizationResponse.roles);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, orgHandle, status, ref);
+        return Objects.hash(id, name, orgHandle, parentId, status, ref, hasChildren, depthFromRoot, roles);
     }
 
     @Override
@@ -204,8 +303,12 @@ public enum StatusEnum {
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    orgHandle: ").append(toIndentedString(orgHandle)).append("\n");
+        sb.append("    parentId: ").append(toIndentedString(parentId)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("    ref: ").append(toIndentedString(ref)).append("\n");
+        sb.append("    hasChildren: ").append(toIndentedString(hasChildren)).append("\n");
+        sb.append("    depthFromRoot: ").append(toIndentedString(depthFromRoot)).append("\n");
+        sb.append("    roles: ").append(toIndentedString(roles)).append("\n");
         sb.append("}");
         return sb.toString();
     }
