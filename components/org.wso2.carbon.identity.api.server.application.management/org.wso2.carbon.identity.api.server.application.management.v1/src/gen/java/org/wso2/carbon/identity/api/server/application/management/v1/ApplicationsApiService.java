@@ -32,9 +32,18 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Application
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationOwner;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationShareAllRequestBody;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationSharePOSTRequest;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationShareSelectedRequestBody;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationSharingPatchRequest;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplateModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesList;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationUnshareAllRequestBody;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationUnshareSelectedRequestBody;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPICreationModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIPatchModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticatorsModal;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
@@ -49,11 +58,14 @@ import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowSt
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.ProcessSuccessResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
+import org.wso2.carbon.identity.api.server.application.management.v1.SharedApplicationsResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.SharedOrganizationsResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustMetaData;
 import javax.ws.rs.core.Response;
@@ -143,21 +155,31 @@ public interface ApplicationsApiService {
 
       public Response patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel);
 
+      public Response patchApplicationSharing(ApplicationSharingPatchRequest applicationSharingPatchRequest);
+
       public Response patchAuthorizedAPI(String applicationId, String apiId, AuthorizedAPIPatchModel authorizedAPIPatchModel);
 
       public Response regenerateOAuthClientSecret(String applicationId);
 
       public Response revokeOAuthClient(String applicationId);
 
+      public Response shareApplicationWithAll(ApplicationShareAllRequestBody applicationShareAllRequestBody);
+
+      public Response shareApplicationWithSelected(ApplicationShareSelectedRequestBody applicationShareSelectedRequestBody);
+
       public Response shareOrgApplication(String applicationId, ApplicationSharePOSTRequest applicationSharePOSTRequest);
 
       public Response shareOrgApplicationDelete(String applicationId, String sharedOrganizationId);
 
-      public Response shareOrgApplicationGet(String applicationId);
+      public Response shareOrgApplicationGet(String applicationId, String before, String after, String filter, Integer limit, Boolean recursive, String excludedAttributes);
 
       public Response sharedApplicationsAllDelete(String applicationId);
 
       public Response sharedApplicationsGet(String applicationId);
+
+      public Response unshareApplicationFromAll(ApplicationUnshareAllRequestBody applicationUnshareAllRequestBody);
+
+      public Response unshareApplicationFromSelected(ApplicationUnshareSelectedRequestBody applicationUnshareSelectedRequestBody);
 
       public Response updateApplicationTemplate(String templateId, ApplicationTemplateModel applicationTemplateModel);
 
