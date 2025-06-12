@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2022-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.Error;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.RevertFields;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidationConfigModel;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidationConfigModelForField;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidatorModel;
@@ -73,4 +74,18 @@ public interface ValidationRulesApiService {
        */
       public Response updateValidationRulesForField(String field,
                                                     ValidationConfigModelForField validationConfigModelForField);
+
+      /**
+       * Method to remove all configured validation rules.
+       * @return Response indicating the success or failure of the operation.
+       */
+      public Response revertValidationRules();
+
+      /**
+       * Method to remove configured validation rules for a list of fields.
+       *
+       * @param revertFields   List of fields that validation configurations need to be reverted.
+       * @return  Response indicating the success or failure of the operation.
+       */
+      public Response revertValidationRulesForFields(RevertFields revertFields);
 }

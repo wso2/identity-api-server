@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2022-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -21,10 +21,12 @@ package org.wso2.carbon.identity.api.server.input.validation.v1.impl;
 import org.wso2.carbon.identity.api.server.input.validation.v1.ValidationRulesApiService;
 import org.wso2.carbon.identity.api.server.input.validation.v1.core.ValidationRulesManagementApiService;
 import org.wso2.carbon.identity.api.server.input.validation.v1.factories.ValidationRulesManagementApiServiceFactory;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.RevertFields;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidationConfigModel;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidationConfigModelForField;
 
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenantDomainFromContext;
+import static org.wso2.carbon.identity.input.validation.mgt.utils.Constants.SUPPORTED_PARAMS;
 
 import java.util.List;
 import javax.ws.rs.core.Response;
@@ -102,5 +104,23 @@ public class ValidationRulesApiServiceImpl implements ValidationRulesApiService 
         validationConfigModel.setRegEx(validationConfigModelForField.getRegEx());
         return Response.ok().entity(validationRulesManagementApiService
                 .updateInputValidationConfigurationForField(validationConfigModel, tenantDomain)).build();
+    }
+
+    @Override
+    public Response revertValidationRules() {
+
+        String tenantDomain = getTenantDomainFromContext();
+        validationRulesManagementApiService.revertInputValidationConfigurationForFields(SUPPORTED_PARAMS, tenantDomain);
+        return Response.noContent().build();
+    }
+
+    @Override
+    public Response revertValidationRulesForFields(RevertFields revertFields) {
+
+        String tenantDomain = getTenantDomainFromContext();
+        validationRulesManagementApiService.revertInputValidationConfigurationForFields(revertFields.getFields(),
+                tenantDomain);
+        return Response.ok().build();
+
     }
 }
