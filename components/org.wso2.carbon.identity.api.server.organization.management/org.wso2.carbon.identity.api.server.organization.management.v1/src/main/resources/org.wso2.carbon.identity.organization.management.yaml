@@ -303,6 +303,62 @@ paths:
           $ref: '#/components/responses/ServerError'
       tags:
         - Organization
+  /organizations/self:
+    get:
+      tags:
+        - Organization
+      description: |
+        This API retrieves the organization information associated with the currently logged-in user.
+        
+        <b>Scopes (Permissions) required:</b> `internal_organization_view`
+      summary: Get organization of the logged-in user.
+      operationId: getSelfOrganization
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    patch:
+      tags:
+        - Organization
+      description: |
+        This API updates the editable fields of the organization associated with the currently logged-in user. 
+        Currently only the organization name can be updated using this API.
+        
+        <b>Scopes (Permissions) required:</b> `internal_organization_update`
+      summary: Update the logged-in user's organization.
+      operationId: patchSelfOrganization
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationPatchRequest'
+        description: Partial update payload for the organization.
+        required: true
+      responses:
+        '200':
+          description: Successfully updated organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /organizations/{organization-id}/applications/{application-id}/share:
     post:
       deprecated: true

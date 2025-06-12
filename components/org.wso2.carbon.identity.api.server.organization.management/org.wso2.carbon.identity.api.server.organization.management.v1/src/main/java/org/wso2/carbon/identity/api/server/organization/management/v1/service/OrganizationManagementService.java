@@ -608,6 +608,44 @@ public class OrganizationManagementService {
         }
     }
 
+    /**
+     * Patch the organization associated with the currently logged-in user.
+     *
+     * @param organizationPatchRequestItem The list of organization details to be patched.
+     * @return The patched organization.
+     */
+    public Response patchSelfOrganization(List<OrganizationPatchRequestItem> organizationPatchRequestItem) {
+
+        try {
+            Organization organization = organizationManager.patchSelfOrganization(
+                    organizationPatchRequestItem.stream().map(op ->
+                            new PatchOperation(op.getOperation() == null ? null : op.getOperation().toString(),
+                                    op.getPath(), op.getValue())).collect(Collectors.toList()));
+            return Response.ok().entity(getOrganizationResponse(organization)).build();
+        } catch (OrganizationManagementClientException e) {
+            return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);
+        } catch (OrganizationManagementException e) {
+            return OrganizationManagementEndpointUtil.handleServerErrorResponse(e, LOG);
+        }
+    }
+
+    /**
+     * Fetch the organization associated with the currently logged-in user.
+     *
+     * @return Requested organization details.
+     */
+    public Response getSelfOrganization() {
+
+        try {
+            Organization organization = organizationManager.getSelfOrganization();
+            return Response.ok().entity(getOrganizationResponseWithPermission(organization)).build();
+        } catch (OrganizationManagementClientException e) {
+            return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);
+        } catch (OrganizationManagementException e) {
+            return OrganizationManagementEndpointUtil.handleServerErrorResponse(e, LOG);
+        }
+    }
+
     private Organization getOrganizationFromPostRequest(OrganizationPOSTRequest organizationPOSTRequest) {
 
         String organizationId = generateUniqueID();
