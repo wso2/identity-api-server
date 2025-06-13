@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -237,6 +237,30 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
 
         configManagementService.updatePassiveSTSInboundAuthConfig(inboundAuthPassiveSTSConfig);
         return Response.ok().build();
+    }
+
+    /**
+     * Deletes the passive STS inbound authentication configuration of an organization.
+     *
+     * @return Response indicating the result of the operation.
+     */
+    @Override
+    public Response deletePassiveSTSInboundAuthConfig() {
+
+        configManagementService.deletePassiveSTSInboundAuthConfig();
+        return Response.noContent().build();
+    }
+
+    /**
+     * Deletes the SAML inbound authentication configuration of an organization.
+     *
+     * @return Response indicating the result of the operation.
+     */
+    @Override
+    public Response deleteSAMLInboundAuthConfig() {
+
+        configManagementService.deleteSAMLInboundAuthConfig();
+        return Response.noContent().build();
     }
     
     private RemoteLoggingConfigListItem createRemoteLoggingConfigListItem(
