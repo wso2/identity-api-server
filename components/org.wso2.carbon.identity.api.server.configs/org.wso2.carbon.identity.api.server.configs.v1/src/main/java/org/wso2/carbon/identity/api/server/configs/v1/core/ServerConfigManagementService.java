@@ -103,6 +103,7 @@ import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
 import org.wso2.carbon.idp.mgt.IdpManager;
+import org.wso2.carbon.idp.mgt.util.IdPManagementConstants;
 import org.wso2.carbon.logging.service.LoggingConstants;
 import org.wso2.carbon.logging.service.RemoteLoggingConfigService;
 import org.wso2.carbon.logging.service.data.RemoteServerLoggerData;
@@ -1692,6 +1693,63 @@ public class ServerConfigManagementService {
         }
     }
 
+    /**
+     * Delete the SAML inbound authentication configuration of an organization.
+     */
+    public void deleteSAMLInboundAuthConfig() {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            IdentityProvider residentIdp = idpManager.getResidentIdP(tenantDomain);
+            if (residentIdp == null) {
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                        Constants.ErrorMessage.ERROR_CODE_RESIDENT_IDP_NOT_FOUND, tenantDomain);
+            }
+
+            IdentityProvider idpToUpdate = createIdPClone(residentIdp);
+            FederatedAuthenticatorConfig federatedAuthConfig = IdentityApplicationManagementUtil
+                    .getFederatedAuthenticator(idpToUpdate.getFederatedAuthenticatorConfigs(),
+                            IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
+            if (federatedAuthConfig == null) {
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                        Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_CONFIG_NOT_FOUND,
+                        IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
+            }
+
+            Property[] authenticatorProperties = federatedAuthConfig.getProperties();
+            if (authenticatorProperties == null) {
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                        Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_PROPERTIES_NOT_FOUND,
+                        IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
+            }
+
+            // Filter out the inherited properties so that they would be deleted.
+            List<Property> filteredProperties = new ArrayList<>();
+            for (Property property : authenticatorProperties) {
+                if (!IdPManagementConstants.INHERITED_FEDERATED_AUTHENTICATOR_PROPERTIES.contains(property.getName())) {
+                    filteredProperties.add(property);
+                }
+            }
+
+            federatedAuthConfig.setProperties(filteredProperties.toArray(new Property[0]));
+            idpToUpdate.setFederatedAuthenticatorConfigs(new FederatedAuthenticatorConfig[]{federatedAuthConfig});
+            if (OrganizationManagementUtil.isOrganization(tenantDomain)) {
+                // To make sure that no resident IDP properties are sent to update.
+                idpToUpdate.setIdpProperties(new IdentityProviderProperty[0]);
+            }
+
+            idpManager.updateResidentIdP(idpToUpdate, tenantDomain);
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_SAML_INBOUND_AUTH_CONFIG_DELETE, null);
+        } catch (OrganizationManagementException e) {
+            log.error("Server encountered an error while deleting the SAML inbound authentication " +
+                    "configuration for the tenant: " + tenantDomain, e);
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                Constants.ErrorMessage.ERROR_CODE_ERROR_SAML_INBOUND_AUTH_CONFIG_DELETE, null);
+        }
+    }
+
     private Property[] getUpdatedSAMLFederatedAuthConfigProperties(Property[] properties,
                                                                    InboundAuthSAML2Config authConfigToUpdate) {
 
@@ -1856,6 +1914,64 @@ public class ServerConfigManagementService {
                     "inbound authentication configuration for the tenant: " + tenantDomain, e);
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     Constants.ErrorMessage.ERROR_CODE_ERROR_PASSIVE_STS_INBOUND_AUTH_CONFIG_UPDATE, null);
+        }
+    }
+
+    /**
+     * Delete the Passive STS inbound authentication configuration of an organization.
+     */
+    public void deletePassiveSTSInboundAuthConfig() {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            IdentityProvider residentIdp = idpManager.getResidentIdP(tenantDomain);
+            if (residentIdp == null) {
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                        Constants.ErrorMessage.ERROR_CODE_RESIDENT_IDP_NOT_FOUND, tenantDomain);
+            }
+
+            IdentityProvider idpToUpdate = createIdPClone(residentIdp);
+            /*
+             * The Passive STS authenticator uses the `samlAuthnRequestsSigningEnabled` property of the
+             * SAML SSO authenticator.
+             * This is the only property in the STS authenticator that supports inheritance.
+             * Therefore, when processing delete requests of STS authenticator, the `samlAuthnRequestsSigningEnabled`
+             * property of the SAML SSO authenticator is removed.
+             */
+            FederatedAuthenticatorConfig federatedAuthConfig = IdentityApplicationManagementUtil
+                    .getFederatedAuthenticator(idpToUpdate.getFederatedAuthenticatorConfigs(),
+                            IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
+            if (federatedAuthConfig == null) {
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                        Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_CONFIG_NOT_FOUND,
+                        IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
+            }
+
+            Property[] authenticatorProperties = federatedAuthConfig.getProperties();
+            if (authenticatorProperties == null) {
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                        Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_PROPERTIES_NOT_FOUND,
+                        IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
+            }
+
+            federatedAuthConfig.setProperties(Arrays.stream(authenticatorProperties).filter(property ->
+                    !property.getName().equals(IdentityApplicationConstants.Authenticator
+                            .SAML2SSO.SAML_METADATA_AUTHN_REQUESTS_SIGNING_ENABLED)).toArray(Property[]::new));
+            idpToUpdate.setFederatedAuthenticatorConfigs(new FederatedAuthenticatorConfig[]{federatedAuthConfig});
+            if (OrganizationManagementUtil.isOrganization(tenantDomain)) {
+                // To make sure that no resident IDP properties are sent to update.
+                idpToUpdate.setIdpProperties(new IdentityProviderProperty[0]);
+            }
+
+            idpManager.updateResidentIdP(idpToUpdate, tenantDomain);
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_PASSIVE_STS_INBOUND_AUTH_CONFIG_DELETE, null);
+        } catch (OrganizationManagementException e) {
+            log.error("Server encountered an error while deleting the Passive STS inbound authentication " +
+                    "configuration for the tenant: " + tenantDomain, e);
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_PASSIVE_STS_INBOUND_AUTH_CONFIG_DELETE, null);
         }
     }
 }
