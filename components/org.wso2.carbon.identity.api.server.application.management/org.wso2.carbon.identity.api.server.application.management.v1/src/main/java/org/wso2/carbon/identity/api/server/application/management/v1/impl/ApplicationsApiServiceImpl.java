@@ -25,8 +25,13 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Application
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationOwner;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationShareAllRequestBody;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationSharePOSTRequest;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationShareSelectedRequestBody;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationSharingPatchRequest;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplateModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationUnshareAllRequestBody;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationUnshareSelectedRequestBody;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationsApiService;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPICreationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIPatchModel;
@@ -179,6 +184,12 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
         applicationManagementService.patchApplication(applicationId, applicationPatchModel);
         return Response.ok().build();
+    }
+
+    @Override
+    public Response patchApplicationSharing(ApplicationSharingPatchRequest applicationSharingPatchRequest) {
+
+        return applicationSharingService.updateSharedApplication(applicationSharingPatchRequest);
     }
 
     @Override
@@ -363,6 +374,19 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
+    public Response shareApplicationWithAll(ApplicationShareAllRequestBody applicationShareAllRequestBody) {
+
+        return applicationSharingService.shareApplicationToAllOrganizations(applicationShareAllRequestBody);
+    }
+
+    @Override
+    public Response shareApplicationWithSelected(
+            ApplicationShareSelectedRequestBody applicationShareSelectedRequestBody) {
+
+        return applicationSharingService.shareOrganizationApplication(applicationShareSelectedRequestBody);
+    }
+
+    @Override
     public Response shareOrgApplication(String applicationId, ApplicationSharePOSTRequest applicationSharePOSTRequest) {
 
         return applicationSharingService.shareOrganizationApplication(applicationId, applicationSharePOSTRequest);
@@ -375,9 +399,11 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
-    public Response shareOrgApplicationGet(String applicationId) {
+    public Response shareOrgApplicationGet(String applicationId, String before, String after, String filter,
+                                           Integer limit, Boolean recursive, String excludedAttributes) {
 
-        return applicationSharingService.getApplicationSharedOrganizations(applicationId);
+        return applicationSharingService.getApplicationSharedOrganizations(applicationId, before, after, filter,
+                limit, recursive, excludedAttributes);
     }
 
     @Override
@@ -390,6 +416,20 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     public Response sharedApplicationsGet(String applicationId) {
 
         return applicationSharingService.getSharedApplications(applicationId);
+    }
+
+    @Override
+    public Response unshareApplicationFromAll(ApplicationUnshareAllRequestBody applicationUnshareAllRequestBody) {
+
+        return applicationSharingService.unshareApplicationFromAllOrganizations(applicationUnshareAllRequestBody);
+    }
+
+    @Override
+    public Response unshareApplicationFromSelected(
+            ApplicationUnshareSelectedRequestBody applicationUnshareSelectedRequestBody) {
+
+        return applicationSharingService.unshareApplicationFromSelectedOrganizations(
+                applicationUnshareSelectedRequestBody);
     }
 
     @Override
