@@ -18,30 +18,31 @@
 
 package org.wso2.carbon.identity.api.server.flow.execution.v1.impl;
 
+import org.wso2.carbon.identity.api.server.flow.execution.v1.FlowApiService;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.FlowExecutionRequest;
-import org.wso2.carbon.identity.api.server.flow.execution.v1.RegistrationApiService;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.core.FlowExecutionServiceCore;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.factories.FlowExecutionServiceFactory;
 
 import javax.ws.rs.core.Response;
 
 /**
- * Implementation of the Registration API.
+ * Implementation of the FlowApiService interface.
  */
-public class RegistrationApiServiceImpl implements RegistrationApiService {
+public class FlowApiServiceImpl implements FlowApiService {
 
     private final FlowExecutionServiceCore flowExecutionServiceCore;
 
-    public RegistrationApiServiceImpl() {
+    public FlowApiServiceImpl() {
 
         this.flowExecutionServiceCore = FlowExecutionServiceFactory.getFlowExecutionService();
     }
 
     @Override
-    public Response registrationExecutePost(FlowExecutionRequest flowExecutionRequest) {
+    public Response flowExecutePost(FlowExecutionRequest flowExecutionRequest) {
 
         return Response.ok()
                 .entity(flowExecutionServiceCore.processFlowExecution((flowExecutionRequest)))
                 .build();
     }
 }
+

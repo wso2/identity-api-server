@@ -271,7 +271,7 @@ paths:
           schema:
             type: string
       responses:
-        '204':
+        '200':
           description: Webhook Activated
         '400':
           description: Bad Request
@@ -315,7 +315,7 @@ paths:
           schema:
             type: string
       responses:
-        '204':
+        '200':
           description: Webhook Deactivated
         '400':
           description: Bad Request

@@ -18,14 +18,14 @@
 
 package org.wso2.carbon.identity.api.server.flow.execution.v1.factories;
 
-import org.wso2.carbon.identity.api.server.flow.execution.v1.RegistrationApiService;
-import org.wso2.carbon.identity.api.server.flow.execution.v1.impl.RegistrationApiServiceImpl;
+import org.wso2.carbon.identity.api.server.flow.execution.v1.FlowApiService;
+import org.wso2.carbon.identity.api.server.flow.execution.v1.impl.FlowApiServiceImpl;
 
-public class RegistrationApiServiceFactory {
+public class FlowApiServiceFactory {
 
-   private final static RegistrationApiService SERVICE = new RegistrationApiServiceImpl();
+   private final static FlowApiService SERVICE = new FlowApiServiceImpl();
 
-   public static RegistrationApiService getRegistrationApi() {
+   public static FlowApiService getFlowApi() {
 
       return SERVICE;
    }

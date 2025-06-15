@@ -145,12 +145,13 @@ public class ServerWebhookManagementService {
      * Activate webhook.
      *
      * @param webhookId Webhook ID.
+     * @return Activated webhook.
      */
-    public void activateWebhook(String webhookId) {
+    public WebhookSummary activateWebhook(String webhookId) {
 
         try {
-            webhookManagementService.activateWebhook(webhookId,
-                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            return toWebhookSummary(webhookManagementService.activateWebhook(webhookId,
+                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
         } catch (WebhookMgtException e) {
             throw WebhookManagementAPIErrorBuilder.buildAPIError(e);
         }
@@ -160,12 +161,13 @@ public class ServerWebhookManagementService {
      * Deactivate webhook.
      *
      * @param webhookId Webhook ID.
+     * @return Deactivated webhook.
      */
-    public void deactivateWebhook(String webhookId) {
+    public WebhookSummary deactivateWebhook(String webhookId) {
 
         try {
-            webhookManagementService.deactivateWebhook(webhookId,
-                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            return toWebhookSummary(webhookManagementService.deactivateWebhook(webhookId,
+                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
         } catch (WebhookMgtException e) {
             throw WebhookManagementAPIErrorBuilder.buildAPIError(e);
         }
@@ -179,9 +181,9 @@ public class ServerWebhookManagementService {
                 .endpoint(webhookRequest.getEndpoint())
                 .name(webhookRequest.getName())
                 .secret(webhookRequest.getSecret())
-                .eventSchemaName(
+                .eventProfileName(
                         webhookRequest.getEventProfile() != null ? webhookRequest.getEventProfile().getName() : null)
-                .eventSchemaUri(
+                .eventProfileUri(
                         webhookRequest.getEventProfile() != null ? webhookRequest.getEventProfile().getUri() : null)
                 .eventsSubscribed(webhookRequest.getChannelsSubscribed())
                 .build();
@@ -224,8 +226,8 @@ public class ServerWebhookManagementService {
         webhookResponse.setEndpoint(webhook.getEndpoint());
         webhookResponse.setName(webhook.getName());
         WebhookRequestEventProfile eventProfile = new WebhookRequestEventProfile();
-        eventProfile.setName(webhook.getEventSchemaName());
-        eventProfile.setUri(webhook.getEventSchemaUri());
+        eventProfile.setName(webhook.getEventProfileName());
+        eventProfile.setUri(webhook.getEventProfileUri());
         webhookResponse.setEventProfile(eventProfile);
         webhookResponse.setStatus(WebhookResponse.StatusEnum.fromValue(webhook.getStatus().name()));
         try {

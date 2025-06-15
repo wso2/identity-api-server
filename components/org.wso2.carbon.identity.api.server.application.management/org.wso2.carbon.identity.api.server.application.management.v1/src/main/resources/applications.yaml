@@ -4048,6 +4048,9 @@ components:
         displayName:
           type: string
           example: Code
+        publicClientAllowed:
+          type: boolean
+          example: false
     SAMLMetaData:
       type: object
       properties:

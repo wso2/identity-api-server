@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.3.125-SNAPSHOT</version>
+    <version>1.3.131-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -608,13 +608,13 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.framework</groupId>
-                <artifactId>org.wso2.carbon.identity.flow.mgt</artifactId>
+                <artifactId>org.wso2.carbon.identity.flow.execution.engine</artifactId>
                 <version>${carbon.identity.framework.version}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.framework</groupId>
-                <artifactId>org.wso2.carbon.identity.user.registration.engine</artifactId>
+                <artifactId>org.wso2.carbon.identity.flow.mgt</artifactId>
                 <version>${carbon.identity.framework.version}</version>
                 <scope>provided</scope>
             </dependency>
@@ -958,12 +958,12 @@
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
         <identity.governance.version>1.11.27</identity.governance.version>
-        <carbon.identity.framework.version>7.8.203</carbon.identity.framework.version>
+        <carbon.identity.framework.version>7.8.224</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
         <findsecbugs-plugin.version>1.12.0</findsecbugs-plugin.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
         <identity.event.handler.version>1.9.48</identity.event.handler.version>
-        <identity.inbound.oauth2.version>7.0.224</identity.inbound.oauth2.version>
+        <identity.inbound.oauth2.version>7.0.302</identity.inbound.oauth2.version>
         <identity.inbound.saml2.version>5.11.51</identity.inbound.saml2.version>
         <identity.x509Certificate.validation.version>1.1.19</identity.x509Certificate.validation.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
