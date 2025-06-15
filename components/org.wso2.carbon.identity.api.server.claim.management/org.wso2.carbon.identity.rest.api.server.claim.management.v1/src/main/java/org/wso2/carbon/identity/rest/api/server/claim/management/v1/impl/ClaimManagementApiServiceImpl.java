@@ -150,10 +150,11 @@ public class ClaimManagementApiServiceImpl extends ClaimManagementApiService {
 
     @Override
     public Response getLocalClaims(String attributes, Integer limit, Integer offset, String filter,
-                                   String sort, Boolean excludeIdentityClaims, Boolean excludeHiddenClaims) {
+                                   String sort, Boolean excludeIdentityClaims, Boolean excludeHiddenClaims,
+                                   String profile) {
 
         return Response.ok().entity(claimManagementService.getLocalClaims(
-                excludeIdentityClaims, attributes, limit, offset, filter, sort, excludeHiddenClaims)).build();
+                excludeIdentityClaims, attributes, limit, offset, filter, sort, excludeHiddenClaims, profile)).build();
     }
 
     @Override

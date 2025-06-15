@@ -60,7 +60,7 @@ public abstract class ClaimManagementApiService {
 
     public abstract Response getLocalClaim(String claimId);
 
-    public abstract Response getLocalClaims(String attributes, Integer limit, Integer offset, String filter, String sort, Boolean excludeIdentityClaims, Boolean excludeHiddenClaims);
+    public abstract Response getLocalClaims(String attributes, Integer limit, Integer offset, String filter, String sort, Boolean excludeIdentityClaims, Boolean excludeHiddenClaims, String profile);
 
     public abstract Response importClaimDialectFromFile(InputStream fileInputStream,Attachment fileDetail);
 
