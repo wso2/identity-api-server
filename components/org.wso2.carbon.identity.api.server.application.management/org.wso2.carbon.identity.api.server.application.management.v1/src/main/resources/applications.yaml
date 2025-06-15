@@ -2273,6 +2273,7 @@ paths:
                 $ref: '#/components/schemas/Error'
   /applications/{applicationId}/share:
     post:
+      deprecated: true
       summary: |
         Share the application from the root organization to the given organization(s).
       description: |
@@ -2337,7 +2338,7 @@ paths:
         - $ref: '#/components/parameters/before'
         - $ref: '#/components/parameters/after'
         - $ref: '#/components/parameters/filter'
-        - $ref: '#/components/parameters/applicationShareLimit'
+        - $ref: '#/components/parameters/sharedOrganizationsLimit'
         - $ref: '#/components/parameters/recursiveQueryParam'
         - $ref: '#/components/parameters/applicationShareExcludedQueryParam'
       responses:
@@ -2461,6 +2462,7 @@ paths:
         - Application Sharing
   /applications/{applicationId}/share/{shared-organization-id}:
     delete:
+      deprecated: true
       description: |
         This API provides the capability to stop sharing an application to an organization by providing its ID. <br>
           <b>Scope(Permission) required:</b> `internal_shared_application_delete`
@@ -2527,7 +2529,7 @@ paths:
                 $ref: "#/components/schemas/ProcessSuccessResponse"
     patch:
       tags: [ Application Sharing ]
-      summary: Perform incremental sharing operations on an already shared application (SCIM-style patch)
+      summary: Perform incremental sharing operations on an already shared application.
       operationId: patchApplicationSharing
       requestBody:
         required: true
@@ -2555,7 +2557,6 @@ paths:
               removeRolesFromOrg:
                 summary: Remove roles from an organization
                 value:
-                  schemas: [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]
                   applicationId: "app-123"
                   Operations:
                     - op: "remove"
@@ -2959,16 +2960,7 @@ components:
       schema:
         type: string
       example: identifier+eq+greetings
-    collectionFilter:
-      name: filter
-      in: query
-      required: false
-      description: |
-        Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations.
-      schema:
-        type: string
-      example: type+eq+tenant
-    applicationShareLimit:
+    sharedOrganizationsLimit:
       name: limit
       in: query
       required: false
@@ -4607,7 +4599,7 @@ components:
                 "rel": "next",
               },
               {
-                "href": "/api/server/v1/applications/67f5a202-48c4-4313-9327-016da5f08f17/share?limit=10&recursive=false&after=MTA=",
+                "href": "/api/server/v1/applications/67f5a202-48c4-4313-9327-016da5f08f17/share?limit=10&recursive=false&before=MTA=",
                 "rel": "previous",
               }
             ]

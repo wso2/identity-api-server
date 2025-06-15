@@ -28,4 +28,11 @@ public class ApplicationManagementEndpointConstants {
     public static final String FILTER_PARAM = "filter";
     public static final String LIMIT_PARAM = "limit";
     public static final String RECURSIVE_PARAM = "recursive";
+
+    public static final String ASYNC_OPERATION_RESPONSE_STATUS = "Processing";
+
+    public static final String ROLE_AUDIENCE_KEY = "audience";
+    public static final String ROLE_DISPLAY_NAME_KEY = "displayName";
+    public static final String ROLE_AUDIENCE_DISPLAY_KEY = "display";
+    public static final String ROLE_AUDIENCE_TYPE_KEY = "type";
 }

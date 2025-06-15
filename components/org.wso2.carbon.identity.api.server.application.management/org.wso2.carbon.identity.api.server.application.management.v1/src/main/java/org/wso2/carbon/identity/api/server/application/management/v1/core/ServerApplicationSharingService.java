@@ -63,11 +63,16 @@ import java.util.List;
 
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.api.server.application.management.v1.constants.ApplicationManagementEndpointConstants.ASYNC_OPERATION_RESPONSE_STATUS;
 import static org.wso2.carbon.identity.api.server.application.management.v1.constants.ApplicationManagementEndpointConstants.FILTER_PARAM;
 import static org.wso2.carbon.identity.api.server.application.management.v1.constants.ApplicationManagementEndpointConstants.LIMIT_PARAM;
 import static org.wso2.carbon.identity.api.server.application.management.v1.constants.ApplicationManagementEndpointConstants.NEXT;
 import static org.wso2.carbon.identity.api.server.application.management.v1.constants.ApplicationManagementEndpointConstants.PREVIOUS;
 import static org.wso2.carbon.identity.api.server.application.management.v1.constants.ApplicationManagementEndpointConstants.RECURSIVE_PARAM;
+import static org.wso2.carbon.identity.api.server.application.management.v1.constants.ApplicationManagementEndpointConstants.ROLE_AUDIENCE_DISPLAY_KEY;
+import static org.wso2.carbon.identity.api.server.application.management.v1.constants.ApplicationManagementEndpointConstants.ROLE_AUDIENCE_KEY;
+import static org.wso2.carbon.identity.api.server.application.management.v1.constants.ApplicationManagementEndpointConstants.ROLE_AUDIENCE_TYPE_KEY;
+import static org.wso2.carbon.identity.api.server.application.management.v1.constants.ApplicationManagementEndpointConstants.ROLE_DISPLAY_NAME_KEY;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIForBody;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_INVALID_SHARE_APPLICATION_EMPTY_REQUEST_BODY;
@@ -131,6 +136,18 @@ public class ServerApplicationSharingService {
         }
     }
 
+    /**
+     * Returns the shared organizations of a given main application.
+     *
+     * @param applicationId        ID of the primary application.
+     * @param before               Cursor for pagination before.
+     * @param after                Cursor for pagination after.
+     * @param filter               Filter to apply on the organizations.
+     * @param limit                Limit for the number of organizations to return.
+     * @param recursive            Whether to return all child organizations recursively.
+     * @param excludedAttributes   Attributes to exclude from the response.
+     * @return Shared organizations of a given primary application.
+     */
     public Response getApplicationSharedOrganizations(String applicationId, String before, String after, String filter,
                                                       Integer limit, Boolean recursive, String excludedAttributes) {
 
@@ -142,13 +159,13 @@ public class ServerApplicationSharingService {
             String organizationId = getOrganizationId();
             int afterCursor = after == null ? 0 : Integer.parseInt(new String(Base64.getDecoder().decode(after),
                     StandardCharsets.UTF_8));
-            int beforeToken = before == null ? 0 : Integer.parseInt(new String(Base64.getDecoder().decode(before),
+            int beforeCursor = before == null ? 0 : Integer.parseInt(new String(Base64.getDecoder().decode(before),
                     StandardCharsets.UTF_8));
             // To return all organizations if recursive flag was not provided. This is to keep the backward
             // compatibility.
             boolean recursiveFlag = recursive == null || recursive;
             SharedApplicationOrganizationNodePage sharedApplicationOrganizationNodePage = orgApplicationManager
-                    .getApplicationSharedOrganizations(organizationId, applicationId, filter, beforeToken, afterCursor,
+                    .getApplicationSharedOrganizations(organizationId, applicationId, filter, beforeCursor, afterCursor,
                             excludedAttributes, limit, recursiveFlag);
             StringBuilder urlStringBuilder = new StringBuilder();
             urlStringBuilder.append("?");
@@ -156,7 +173,7 @@ public class ServerApplicationSharingService {
                 urlStringBuilder.append(LIMIT_PARAM).append("=").append(limit);
             }
             urlStringBuilder.append("&").append(RECURSIVE_PARAM).append("=").append(recursive);
-        if (StringUtils.isNotBlank(filter)) {
+            if (StringUtils.isNotBlank(filter)) {
                 try {
                     urlStringBuilder.append("&").append(FILTER_PARAM)
                             .append("=").append(URLEncoder.encode(filter, StandardCharsets.UTF_8.name()));
@@ -200,6 +217,12 @@ public class ServerApplicationSharingService {
         }
     }
 
+    /**
+     * Share an application with selected organizations.
+     *
+     * @param applicationShareSelectedRequestBody Request body of the share request.
+     * @return The status of the operation.
+     */
     public Response shareOrganizationApplication(ApplicationShareSelectedRequestBody
                                                          applicationShareSelectedRequestBody) {
 
@@ -213,21 +236,20 @@ public class ServerApplicationSharingService {
         }
         List<SelectiveShareApplicationOperation> selectiveApplicationShareList = new ArrayList<>();
         for (OrgShareConfig orgShareConfig : organizations) {
-
-            ApplicationShareRolePolicy shareRolePolicy = getRoleSharingConfig(orgShareConfig.getRoleSharing());
+            ApplicationShareRolePolicy roleSharingPolicy = getRoleSharingPolicy(orgShareConfig.getRoleSharing());
             PolicyEnum policyEnum = getPolicyEnum(orgShareConfig.getPolicy().value());
             String organizationId = orgShareConfig.getOrgId();
             SelectiveShareApplicationOperation selectiveApplicationShare = new SelectiveShareApplicationOperation(
                     organizationId, policyEnum,
-                    shareRolePolicy);
+                    roleSharingPolicy);
             selectiveApplicationShareList.add(selectiveApplicationShare);
         }
         try {
             orgApplicationManager.shareApplicationWithSelectedOrganizations(ownerOrganizationId, applicationId,
                     selectiveApplicationShareList);
             return Response.accepted()
-                    .entity(createProcessSuccessResponse("Processing", "Application sharing process " +
-                            "triggered successfully."))
+                    .entity(createProcessSuccessResponse(ASYNC_OPERATION_RESPONSE_STATUS,
+                            "Application sharing process triggered successfully."))
                     .build();
         } catch (OrganizationManagementClientException e) {
             throw Utils.buildClientError(e.getErrorCode(), e.getMessage(), e.getDescription());
@@ -236,6 +258,12 @@ public class ServerApplicationSharingService {
         }
     }
 
+    /**
+     * Share an application to all organizations.
+     *
+     * @param requestBody Request body of the share request.
+     * @return The status of the operation.
+     */
     public Response shareApplicationToAllOrganizations(ApplicationShareAllRequestBody requestBody) {
 
         try {
@@ -257,15 +285,15 @@ public class ServerApplicationSharingService {
                     ERROR_CODE_INVALID_SHARE_APPLICATION_REQUEST_BODY.getMessage(), "Policy " + policyEnum +
                             " is not supported.");
         }
-        ApplicationShareRolePolicy roleSharePolicy = getRoleSharingConfig(requestBody.getRoleSharing());
+        ApplicationShareRolePolicy roleSharePolicy = getRoleSharingPolicy(requestBody.getRoleSharing());
         GeneralApplicationShareOperation generalApplicationShare = new GeneralApplicationShareOperation(policyEnum,
                 roleSharePolicy);
         try {
             orgApplicationManager.shareApplicationWithAllOrganizations(organizationId, applicationId,
                     generalApplicationShare);
             return Response.accepted()
-                    .entity(createProcessSuccessResponse("Processing", "Application sharing process " +
-                            "triggered successfully."))
+                    .entity(createProcessSuccessResponse(ASYNC_OPERATION_RESPONSE_STATUS,
+                            "Application sharing process triggered successfully."))
                     .build();
         } catch (OrganizationManagementClientException e) {
             throw Utils.buildClientError(e.getErrorCode(), e.getMessage(), e.getDescription());
@@ -274,9 +302,16 @@ public class ServerApplicationSharingService {
         }
     }
 
+    /**
+     * Update the shared application with the given operations.
+     *
+     * @param applicationSharingPatchRequest Request body of the patch request.
+     * @return The status of the operation.
+     */
     public Response updateSharedApplication(
             ApplicationSharingPatchRequest applicationSharingPatchRequest) {
 
+        String organizationId = getOrganizationId();
         String applicationId = applicationSharingPatchRequest.getApplicationId();
         List<ApplicationSharingPatchOperation> operations = applicationSharingPatchRequest.getOperations();
         if (CollectionUtils.isEmpty(operations)) {
@@ -287,26 +322,32 @@ public class ServerApplicationSharingService {
         for (ApplicationSharingPatchOperation operation : operations) {
             String path = operation.getPath();
             String op = operation.getOp();
-            List<RoleWithAudienceDO> roleSharingDoFromUpdateObjectList = getRoleSharingDoFromUpdateObjectList(
+            List<RoleWithAudienceDO> roleSharingDOFromUpdateObjectList = getRoleSharingDOFromUpdateObjectList(
                     operation.getValue());
             ApplicationShareUpdateOperation applicationShareUpdateOperation =
                     new ApplicationShareUpdateOperation(ApplicationShareUpdateOperation.Operation.fromValue(op),
-                            path, roleSharingDoFromUpdateObjectList);
+                            path, roleSharingDOFromUpdateObjectList);
             updateOperationList.add(applicationShareUpdateOperation);
         }
         try {
-            orgApplicationManager.updateSharedApplication(applicationId, updateOperationList);
+            orgApplicationManager.updateSharedApplication(organizationId, applicationId, updateOperationList);
         } catch (OrganizationManagementClientException e) {
             throw Utils.buildClientError(e.getErrorCode(), e.getMessage(), e.getDescription());
         } catch (OrganizationManagementException e) {
             throw Utils.buildServerError(e.getErrorCode(), e.getMessage(), e.getDescription(), e);
         }
         return Response.accepted()
-                .entity(createProcessSuccessResponse("Processing", "Application sharing update process " +
-                        "triggered successfully."))
+                .entity(createProcessSuccessResponse(ASYNC_OPERATION_RESPONSE_STATUS,
+                        "Application sharing update process triggered successfully."))
                 .build();
     }
 
+    /**
+     * Un share an application from selected organizations.
+     *
+     * @param applicationUnshareSelectedRequestBody Request body of the unshare request.
+     * @return The status of the operation.
+     */
     public Response unshareApplicationFromSelectedOrganizations(ApplicationUnshareSelectedRequestBody
                                                                         applicationUnshareSelectedRequestBody) {
 
@@ -316,24 +357,9 @@ public class ServerApplicationSharingService {
         try {
             orgApplicationManager.unshareApplicationFromSelectedOrganizations(organizationId, applicationId,
                     orgsToUnshare);
-            return Response.accepted().build();
-        } catch (OrganizationManagementClientException e) {
-            throw Utils.buildClientError(e.getErrorCode(), e.getMessage(), e.getDescription());
-        } catch (OrganizationManagementException e) {
-            throw Utils.buildServerError(e.getErrorCode(), e.getMessage(), e.getDescription(), e);
-        }
-    }
-
-    public Response unshareApplicationFromAllOrganizations(ApplicationUnshareAllRequestBody
-                                                                   applicationUnshareAllRequestBody) {
-
-        String applicationId = applicationUnshareAllRequestBody.getApplicationId();
-        String organizationId = getOrganizationId();
-        try {
-            orgApplicationManager.unshareAllApplicationFromAllOrganizations(organizationId, applicationId);
             return Response.accepted()
-                    .entity(createProcessSuccessResponse("Processing", "Application unsharing process " +
-                            "triggered successfully."))
+                    .entity(createProcessSuccessResponse(ASYNC_OPERATION_RESPONSE_STATUS,
+                            "Application unsharing process triggered successfully."))
                     .build();
         } catch (OrganizationManagementClientException e) {
             throw Utils.buildClientError(e.getErrorCode(), e.getMessage(), e.getDescription());
@@ -342,6 +368,29 @@ public class ServerApplicationSharingService {
         }
     }
 
+    /**
+     * Un share an application from all organizations.
+     *
+     * @param applicationUnshareAllRequestBody Request body of the unshare request.
+     * @return The status of the operation.
+     */
+    public Response unshareApplicationFromAllOrganizations(ApplicationUnshareAllRequestBody
+                                                                   applicationUnshareAllRequestBody) {
+
+        String applicationId = applicationUnshareAllRequestBody.getApplicationId();
+        String organizationId = getOrganizationId();
+        try {
+            orgApplicationManager.unshareAllApplicationFromAllOrganizations(organizationId, applicationId);
+            return Response.accepted()
+                    .entity(createProcessSuccessResponse(ASYNC_OPERATION_RESPONSE_STATUS,
+                            "Application unsharing process triggered successfully."))
+                    .build();
+        } catch (OrganizationManagementClientException e) {
+            throw Utils.buildClientError(e.getErrorCode(), e.getMessage(), e.getDescription());
+        } catch (OrganizationManagementException e) {
+            throw Utils.buildServerError(e.getErrorCode(), e.getMessage(), e.getDescription(), e);
+        }
+    }
 
     /**
      * Stop application sharing to all organizations by removing the fragment applications from the given organization.
@@ -395,7 +444,6 @@ public class ServerApplicationSharingService {
                     .parentId(organizationNode.getParentOrganizationId())
                     .depthFromRoot(organizationNode.getDepthFromRoot())
                     .orgHandle(organizationNode.getOrganizationHandle())
-
                     .ref(buildOrganizationURL(organizationNode.getOrganizationId()).toString())
                     .hasChildren(organizationNode.hasChildren());
             List<RoleWithAudienceDO> roleWithAudienceDOList = organizationNode.getRoleWithAudienceDOList();
@@ -464,14 +512,12 @@ public class ServerApplicationSharingService {
             return PolicyEnum.SELECTED_ORG_ONLY;
         } else if (PolicyEnum.SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN.getValue().equals(policy)) {
             return PolicyEnum.SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN;
-        } else {
-            throw Utils.buildClientError(ERROR_CODE_INVALID_SHARE_APPLICATION_REQUEST_BODY.getCode(),
-                    ERROR_CODE_INVALID_SHARE_APPLICATION_REQUEST_BODY.getMessage(), "Unsupported policy: " + policy);
         }
+        throw Utils.buildClientError(ERROR_CODE_INVALID_SHARE_APPLICATION_REQUEST_BODY.getCode(),
+                ERROR_CODE_INVALID_SHARE_APPLICATION_REQUEST_BODY.getMessage(), "Unsupported policy: " + policy);
     }
 
     private List<RoleWithAudienceDO> getRoleSharingConfigList(List<RoleShareConfig> roleShareConfigs) {
-
 
         List<RoleWithAudienceDO> roleWithAudienceDOList = new ArrayList<>();
         if (CollectionUtils.isEmpty(roleShareConfigs)) {
@@ -506,7 +552,7 @@ public class ServerApplicationSharingService {
         return roleShareConfigs;
     }
 
-    private List<RoleWithAudienceDO> getRoleSharingDoFromUpdateObjectList(List<Object> values) {
+    private List<RoleWithAudienceDO> getRoleSharingDOFromUpdateObjectList(List<Object> values) {
 
         List<RoleWithAudienceDO> roleWithAudienceDOList = new ArrayList<>();
         for (Object value : values) {
@@ -517,34 +563,34 @@ public class ServerApplicationSharingService {
 
     private RoleWithAudienceDO getRoleSharingDoFromUpdateObjectValue(Object value) {
 
-        boolean isAudienceAvailable = ((LinkedHashMap<String, Object>) value).containsKey("audience");
+        boolean isAudienceAvailable = ((LinkedHashMap<String, Object>) value).containsKey(ROLE_AUDIENCE_KEY);
         if (!isAudienceAvailable) {
             throw Utils.buildClientError(ERROR_CODE_INVALID_SHARE_APPLICATION_REQUEST_BODY.getCode(),
-                    ERROR_CODE_INVALID_SHARE_APPLICATION_REQUEST_BODY.getMessage(), "No audience found.");
+                    ERROR_CODE_INVALID_SHARE_APPLICATION_REQUEST_BODY.getMessage(), "No role audience found.");
         }
-        boolean isDisplayNameAvailable = ((LinkedHashMap<String, String>) value).containsKey("displayName");
+        boolean isDisplayNameAvailable = ((LinkedHashMap<String, String>) value).containsKey(ROLE_DISPLAY_NAME_KEY);
         if (!isDisplayNameAvailable) {
             throw Utils.buildClientError(ERROR_CODE_INVALID_SHARE_APPLICATION_REQUEST_BODY.getCode(),
-                    ERROR_CODE_INVALID_SHARE_APPLICATION_REQUEST_BODY.getMessage(), "No display name found.");
+                    ERROR_CODE_INVALID_SHARE_APPLICATION_REQUEST_BODY.getMessage(), "No role display name found.");
         }
-        String displayName = ((LinkedHashMap<String, String>) value).get("displayName");
+        String displayName = ((LinkedHashMap<String, String>) value).get(ROLE_DISPLAY_NAME_KEY);
 
         LinkedHashMap<String, String> audience = (LinkedHashMap<String, String>) ((LinkedHashMap) value)
-                .get("audience");
-        boolean isAudienceTypeAvailable = audience.containsKey("type");
+                .get(ROLE_AUDIENCE_KEY);
+        boolean isAudienceTypeAvailable = audience.containsKey(ROLE_AUDIENCE_TYPE_KEY);
         if (!isAudienceTypeAvailable) {
             throw Utils.buildClientError(ERROR_CODE_INVALID_SHARE_APPLICATION_REQUEST_BODY.getCode(),
-                    ERROR_CODE_INVALID_SHARE_APPLICATION_REQUEST_BODY.getMessage(), "No audience type found.");
+                    ERROR_CODE_INVALID_SHARE_APPLICATION_REQUEST_BODY.getMessage(), "No role audience type found.");
         }
-        boolean isDisplayAvailable = audience.containsKey("display");
+        boolean isDisplayAvailable = audience.containsKey(ROLE_AUDIENCE_DISPLAY_KEY);
         if (!isDisplayAvailable) {
             throw Utils.buildClientError(ERROR_CODE_INVALID_SHARE_APPLICATION_REQUEST_BODY.getCode(),
-                    ERROR_CODE_INVALID_SHARE_APPLICATION_REQUEST_BODY.getMessage(), "No audience display found.");
+                    ERROR_CODE_INVALID_SHARE_APPLICATION_REQUEST_BODY.getMessage(), "No role audience display found.");
         }
-        String audienceDisplay = audience.get("display");
-        RoleWithAudienceDO.AudienceType audienceType = RoleWithAudienceDO.AudienceType.fromValue(audience.get("type"));
+        String audienceDisplay = audience.get(ROLE_AUDIENCE_DISPLAY_KEY);
+        RoleWithAudienceDO.AudienceType audienceType = RoleWithAudienceDO.AudienceType.fromValue(audience.get(
+                ROLE_AUDIENCE_TYPE_KEY));
         return new RoleWithAudienceDO(displayName, audienceDisplay, audienceType);
-        // ((LinkedHashMap)((LinkedHashMap) operation.getValue().get(0)).get("audience")).get("display");
     }
 
     private ApplicationShareRolePolicy.Mode getRoleSharingMode(RoleSharing.ModeEnum mode) {
@@ -565,7 +611,7 @@ public class ServerApplicationSharingService {
         }
     }
 
-    private ApplicationShareRolePolicy getRoleSharingConfig(RoleSharing roleSharing) {
+    private ApplicationShareRolePolicy getRoleSharingPolicy(RoleSharing roleSharing) {
 
         if (roleSharing == null) {
             return null;
@@ -579,9 +625,7 @@ public class ServerApplicationSharingService {
                         ERROR_CODE_INVALID_SHARE_APPLICATION_REQUEST_BODY.getMessage(), "No roles found.");
             }
             roleSharingBuilder.roleWithAudienceDOList(getRoleSharingConfigList(roleSharing.getRoles()));
-        }
-        if (ApplicationShareRolePolicy.Mode.SELECTED.ordinal() != roleSharingMode.ordinal()
-                && CollectionUtils.isNotEmpty(roleSharing.getRoles())) {
+        } else if (CollectionUtils.isNotEmpty(roleSharing.getRoles())) {
             throw Utils.buildClientError(ERROR_CODE_INVALID_SHARE_APPLICATION_REQUEST_BODY.getCode(),
                     ERROR_CODE_INVALID_SHARE_APPLICATION_REQUEST_BODY.getMessage(), "Role sharing should " +
                             "only be set when mode is SELECTED.");
