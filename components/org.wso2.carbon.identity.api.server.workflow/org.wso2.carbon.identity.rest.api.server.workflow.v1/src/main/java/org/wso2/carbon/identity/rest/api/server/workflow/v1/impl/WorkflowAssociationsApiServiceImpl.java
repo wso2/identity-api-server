@@ -23,6 +23,7 @@ import org.wso2.carbon.identity.rest.api.server.workflow.v1.core.WorkflowService
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.factories.WorkflowServiceFactory;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationPatchRequest;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationRequest;
+
 import javax.ws.rs.core.Response;
 
 /**
@@ -47,7 +48,7 @@ public class WorkflowAssociationsApiServiceImpl implements WorkflowAssociationsA
     public Response deleteWorkflowAssociationById(String associationId) {
 
         workflowService.removeAssociation(associationId);
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     @Override
