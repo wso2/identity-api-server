@@ -447,7 +447,7 @@ public class ServerClaimManagementService {
     public List<LocalClaimResDTO> getLocalClaims(Boolean excludeIdentityClaims, String attributes, Integer limit,
                                                  Integer offset, String filter, String sort) {
 
-        return getLocalClaims(excludeIdentityClaims, attributes, limit, offset, filter, sort, false);
+        return getLocalClaims(excludeIdentityClaims, attributes, limit, offset, filter, sort, false, null);
     }
 
     /**
@@ -464,13 +464,19 @@ public class ServerClaimManagementService {
      */
     public List<LocalClaimResDTO> getLocalClaims(Boolean excludeIdentityClaims, String attributes, Integer limit,
                                                  Integer offset, String filter, String sort,
-                                                 Boolean excludeHiddenClaims) {
+                                                 Boolean excludeHiddenClaims, String profile) {
 
         handleNotImplementedCapabilities(attributes, limit, offset, filter, sort);
 
         try {
-            List<LocalClaim> localClaimList = claimMetadataManagementService.getLocalClaims(ContextLoader
-                    .getTenantDomainFromContext());
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            List<LocalClaim> localClaimList;
+            if (StringUtils.isEmpty(profile)) {
+                localClaimList = claimMetadataManagementService.getLocalClaims(tenantDomain);
+            } else {
+                localClaimList = claimMetadataManagementService.getSupportedLocalClaimsForProfile(tenantDomain,
+                        profile);
+            }
 
             if (excludeIdentityClaims != null && excludeIdentityClaims) {
                 localClaimList = localClaimList.stream()

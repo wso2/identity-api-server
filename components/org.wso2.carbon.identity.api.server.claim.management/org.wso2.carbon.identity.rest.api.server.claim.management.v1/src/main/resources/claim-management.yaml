@@ -80,6 +80,7 @@ paths:
       - $ref : '#/parameters/sortQueryParam'
       - $ref : '#/parameters/excludeIdentityClaimsQueryParam'
       - $ref : '#/parameters/excludeHiddenClaimsQueryParam'
+      - $ref : '#/parameters/profileQueryParam'
       x-wso2-curl: |
       responses:
         200:
@@ -654,6 +655,19 @@ parameters:
     required: false
     type: boolean
     description: Exclude hidden claims when listing local claims.
+  profileQueryParam:
+    in: query
+    name: profile
+    required: false
+    type: string
+    description: |
+      The claims belongs to given profile. This is used to filter claims based on the profile.
+      <br>Available profiles:
+      <ul>
+        <li>console</li>
+        <li>endUser</li>
+        <li>selfRegistration</li>
+      </ul>
   dialectIdPathParam:
     in: path
     name: dialect-id
