@@ -609,7 +609,7 @@ public class OrganizationManagementService {
     }
 
     /**
-     * Patch the organization associated with the currently logged-in user.
+     * Patch the organization details of the currently accessing organization.
      *
      * @param organizationPatchRequestItem The list of organization details to be patched.
      * @return The patched organization.
@@ -630,7 +630,7 @@ public class OrganizationManagementService {
     }
 
     /**
-     * Fetch the organization associated with the currently logged-in user.
+     * Get the organization details of the currently accessing organization.
      *
      * @return Requested organization details.
      */

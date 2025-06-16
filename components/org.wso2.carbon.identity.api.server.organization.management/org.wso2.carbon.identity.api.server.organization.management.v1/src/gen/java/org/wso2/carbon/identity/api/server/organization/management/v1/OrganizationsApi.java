@@ -72,7 +72,7 @@ public class OrganizationsApi  {
     @Path("/self")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get organization of the logged-in user.", notes = "This API retrieves the organization information associated with the currently logged-in user.  <b>Scopes (Permissions) required:</b> `internal_organization_view` ", response = OrganizationResponse.class, authorizations = {
+    @ApiOperation(value = "Get organization details of the currently accessing organization.", notes = "This API retrieves the organization information associated with the currently accessing organization.  <b>Scopes (Permissions) required:</b> `internal_organization_view` ", response = OrganizationResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -474,7 +474,7 @@ public class OrganizationsApi  {
     @Path("/self")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update the logged-in user's organization.", notes = "This API updates the editable fields of the organization associated with the currently logged-in user.  Currently only the organization name can be updated using this API.  <b>Scopes (Permissions) required:</b> `internal_organization_update` ", response = OrganizationResponse.class, authorizations = {
+    @ApiOperation(value = "Update organization details of the currently accessing organization.", notes = "This API updates the editable fields of the organization associated with the currently accessing organization. Currently only the organization name can be updated using this API.  <b>Scopes (Permissions) required:</b> `internal_organization_update` ", response = OrganizationResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
