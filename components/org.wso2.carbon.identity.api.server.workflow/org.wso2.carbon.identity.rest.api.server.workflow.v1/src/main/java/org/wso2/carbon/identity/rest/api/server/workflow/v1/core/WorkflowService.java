@@ -197,10 +197,10 @@ public class WorkflowService {
     /**
      * Add new workflow association.
      *
-     * @param workflowAssociation Workflow association details
-     * @return Return WorkflowAssociationRequest
+     * @param workflowAssociation Workflow association details.
+     * @return Return WorkflowAssociationResponse.
      */
-    public WorkflowAssociationRequest addAssociation(WorkflowAssociationRequest workflowAssociation) {
+    public WorkflowAssociationResponse addAssociation(WorkflowAssociationRequest workflowAssociation) {
 
         try {
             Workflow currentWorkflow = workflowManagementService.getWorkflow(workflowAssociation.getWorkflowId());
@@ -216,7 +216,17 @@ public class WorkflowService {
             workflowManagementService.addAssociation(workflowAssociation.getAssociationName(),
                     workflowAssociation.getWorkflowId(), workflowAssociation.getOperation().toString(),
                     null);
-            return workflowAssociation;
+            Association createdAssociations = workflowManagementService
+                    .getAssociationsForWorkflow(workflowAssociation.getWorkflowId()).stream()
+                    .filter(association -> association.getAssociationName()
+                            .equals(workflowAssociation.getAssociationName()) &&
+                            association.getEventId().equals(workflowAssociation.getOperation().value()))
+                    .findFirst()
+                    .orElseThrow(() -> new WorkflowClientException("Failed to find the created association for " +
+                            "workflow ID: " + workflowAssociation.getWorkflowId() + ", association name: "
+                            + workflowAssociation.getAssociationName() + ", event: "
+                            + workflowAssociation.getOperation().value()));
+            return getAssociationDetails(createdAssociations);
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_ADDING_ASSOCIATION,
                     workflowAssociation.getAssociationName(), e);

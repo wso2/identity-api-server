@@ -21,15 +21,12 @@ package org.wso2.carbon.identity.rest.api.server.workflow.v1.factories;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.WorkflowAssociationsApiService;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.impl.WorkflowAssociationsApiServiceImpl;
 
-/**
- * Implementation of Workflow Association Management REST API.
- */
 public class WorkflowAssociationsApiServiceFactory {
 
-   private final static WorkflowAssociationsApiService service = new WorkflowAssociationsApiServiceImpl();
+   private final static WorkflowAssociationsApiService SERVICE = new WorkflowAssociationsApiServiceImpl();
 
    public static WorkflowAssociationsApiService getWorkflowAssociationsApi() {
 
-      return service;
+      return SERVICE;
    }
 }

@@ -18,25 +18,34 @@
 
 package org.wso2.carbon.identity.rest.api.server.workflow.v1;
 
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.factories.WorkflowsApiServiceFactory;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import java.io.InputStream;
+import java.util.List;
+
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Error;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowListResponse;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowRequest;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowResponse;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.WorkflowsApiService;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.factories.WorkflowsApiServiceFactory;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
 
+import javax.validation.constraints.*;
+
 @Path("/workflows")
-@Api
+@Api(description = "The workflows API")
 
 public class WorkflowsApi  {
 
     private final WorkflowsApiService delegate;
 
-    public WorkflowsApi(){
+    public WorkflowsApi() {
+
         this.delegate = WorkflowsApiServiceFactory.getWorkflowsApi();
     }
 
