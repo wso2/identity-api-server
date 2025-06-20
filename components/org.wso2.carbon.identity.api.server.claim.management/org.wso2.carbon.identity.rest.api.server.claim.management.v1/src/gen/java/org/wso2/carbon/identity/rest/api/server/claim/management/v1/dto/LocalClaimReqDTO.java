@@ -99,6 +99,9 @@ public class LocalClaimReqDTO {
     @Valid 
     private ProfilesDTO profiles = null;
 
+    @Valid
+    private InputFormatDTO inputFormat = null;
+
     /**
     * A unique URI specific to the claim.
     **/
@@ -310,6 +313,15 @@ public class LocalClaimReqDTO {
         this.profiles = profiles;
     }
 
+    @ApiModelProperty(value = "The input format of the attribute.")
+    @JsonProperty("inputFormat")
+    public InputFormatDTO getInputFormat() {
+        return inputFormat;
+    }
+    public void setInputFormat(InputFormatDTO inputFormat) {
+        this.inputFormat = inputFormat;
+    }
+
     @Override
     public String toString() {
 
@@ -333,6 +345,7 @@ public class LocalClaimReqDTO {
         sb.append("    attributeMapping: ").append(attributeMapping).append("\n");
         sb.append("    properties: ").append(properties).append("\n");
         sb.append("    profiles: ").append(profiles).append("\n");
+        sb.append("    inputFormat: ").append(inputFormat).append("\n");
         
         sb.append("}\n");
         return sb.toString();
