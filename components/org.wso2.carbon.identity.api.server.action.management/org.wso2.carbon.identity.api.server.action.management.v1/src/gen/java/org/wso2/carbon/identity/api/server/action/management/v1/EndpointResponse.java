@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -22,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
 import org.wso2.carbon.identity.api.server.action.management.v1.AuthenticationTypeResponse;
 import javax.validation.constraints.*;
 
@@ -38,6 +40,10 @@ public class EndpointResponse  {
   
     private String uri;
     private AuthenticationTypeResponse authentication;
+    private List<String> allowedHeaders = new ArrayList<String>();
+
+    private List<String> allowedParameters = new ArrayList<String>();
+
 
     /**
     * HTTPS URI of the endpoint.
@@ -80,7 +86,59 @@ public class EndpointResponse  {
         this.authentication = authentication;
     }
 
+    /**
+    * List of HTTP headers to forward to the extension.
+    **/
+    public EndpointResponse allowedHeaders(List<String> allowedHeaders) {
 
+        this.allowedHeaders = allowedHeaders;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "[\"x-geo-location\",\"host\"]", required = true, value = "List of HTTP headers to forward to the extension.")
+    @JsonProperty("allowedHeaders")
+    @Valid
+    @NotNull(message = "Property allowedHeaders cannot be null.")
+
+    public List<String> getAllowedHeaders() {
+        return allowedHeaders;
+    }
+    public void setAllowedHeaders(List<String> allowedHeaders) {
+        this.allowedHeaders = allowedHeaders;
+    }
+
+    public EndpointResponse addAllowedHeadersItem(String allowedHeadersItem) {
+        this.allowedHeaders.add(allowedHeadersItem);
+        return this;
+    }
+
+        /**
+    * List of parameters to forward to the extension.
+    **/
+    public EndpointResponse allowedParameters(List<String> allowedParameters) {
+
+        this.allowedParameters = allowedParameters;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "[\"device-id\"]", required = true, value = "List of parameters to forward to the extension.")
+    @JsonProperty("allowedParameters")
+    @Valid
+    @NotNull(message = "Property allowedParameters cannot be null.")
+
+    public List<String> getAllowedParameters() {
+        return allowedParameters;
+    }
+    public void setAllowedParameters(List<String> allowedParameters) {
+        this.allowedParameters = allowedParameters;
+    }
+
+    public EndpointResponse addAllowedParametersItem(String allowedParametersItem) {
+        this.allowedParameters.add(allowedParametersItem);
+        return this;
+    }
+
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -93,12 +151,14 @@ public class EndpointResponse  {
         }
         EndpointResponse endpointResponse = (EndpointResponse) o;
         return Objects.equals(this.uri, endpointResponse.uri) &&
-            Objects.equals(this.authentication, endpointResponse.authentication);
+            Objects.equals(this.authentication, endpointResponse.authentication) &&
+            Objects.equals(this.allowedHeaders, endpointResponse.allowedHeaders) &&
+            Objects.equals(this.allowedParameters, endpointResponse.allowedParameters);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uri, authentication);
+        return Objects.hash(uri, authentication, allowedHeaders, allowedParameters);
     }
 
     @Override
@@ -109,6 +169,8 @@ public class EndpointResponse  {
         
         sb.append("    uri: ").append(toIndentedString(uri)).append("\n");
         sb.append("    authentication: ").append(toIndentedString(authentication)).append("\n");
+        sb.append("    allowedHeaders: ").append(toIndentedString(allowedHeaders)).append("\n");
+        sb.append("    allowedParameters: ").append(toIndentedString(allowedParameters)).append("\n");
         sb.append("}");
         return sb.toString();
     }
