@@ -232,7 +232,16 @@ public class Constant {
                 "form of attribute + '.' + sub attribute"),
         ERROR_CODE_ATTRIBUTES_MARKED_AS_SUB_ATTRIBUTES_NOT_ALLOWED_TO_HAVE_SUB_ATTRIBUTES("CMT-60016",
                 "The attributes marked as sub attribute of another attribute can't have sub attributes.",
-                "This attribute is marked as sub attribute of the attribute %s");
+                "This attribute is marked as sub attribute of the attribute %s"),
+        ERROR_CODE_UNSUPPORTED_INPUT_TYPE("CMT-60017",
+                "The provided input type doesn't match with the configured attribute meta data.",
+                "The provided input type %s doesn't match with the configured attribute meta data."),
+        ERROR_CODE_BOOLEAN_ATTRIBUTE_CANNOT_BE_MULTI_VALUED("CMT-60018",
+                "Boolean attributes cannot be multi-valued.",
+                "The attribute %s is a boolean attribute and cannot be multi-valued."),
+        ERROR_CODE_CANONICAL_VALUES_NOT_SUPPORTED_FOR_NON_STRING_DATA_TYPES("CMT-60019",
+                "Canonical values are not supported for non-string data types.",
+                "The attribute %s is not a string data type and canonical values are not supported.");
 
         private final String code;
         private final String message;
@@ -307,6 +316,7 @@ public class Constant {
     public static final String PROP_DATA_TYPE = "dataType";
     public static final String PROP_SUB_ATTRIBUTES = "subAttributes";
     public static final String PROP_CANONICAL_VALUES = "canonicalValues";
+    public static final String PROP_INPUT_TYPE = "inputFormat";
 
     public static final String PROP_MULTI_VALUED = "multiValued";
     public static final String PROP_UNIQUENESS_SCOPE = "UniquenessScope";

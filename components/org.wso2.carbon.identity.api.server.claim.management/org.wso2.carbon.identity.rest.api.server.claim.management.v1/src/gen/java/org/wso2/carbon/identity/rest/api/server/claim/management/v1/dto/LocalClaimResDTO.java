@@ -102,6 +102,9 @@ public class LocalClaimResDTO extends ClaimResDTO {
     @Valid 
     private ProfilesDTO profiles = null;
 
+    @Valid
+    private InputFormatDTO inputFormat = null;
+
     /**
     * claim ID.
     **/
@@ -338,6 +341,15 @@ public class LocalClaimResDTO extends ClaimResDTO {
         this.profiles = profiles;
     }
 
+    @ApiModelProperty(value = "The input format of the attribute.")
+    @JsonProperty("inputFormat")
+    public InputFormatDTO getInputFormat() {
+        return inputFormat;
+    }
+    public void setInputFormat(InputFormatDTO inputFormat) {
+        this.inputFormat = inputFormat;
+    }
+
     @Override
     public String toString() {
 
@@ -364,6 +376,7 @@ public class LocalClaimResDTO extends ClaimResDTO {
         sb.append("    attributeMapping: ").append(attributeMapping).append("\n");
         sb.append("    properties: ").append(properties).append("\n");
         sb.append("    profiles: ").append(profiles).append("\n");
+        sb.append("    inputFormat: ").append(inputFormat).append("\n");
         
         sb.append("}\n");
         return sb.toString();
