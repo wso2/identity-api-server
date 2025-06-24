@@ -1897,16 +1897,13 @@ public class ServerClaimManagementService {
                             "to be defined.");
                 }
                 boolean isMultiValued = Boolean.TRUE.equals(localClaimReqDTO.getMultiValued());
-                if (inputType == InputType.DROPDOWN || inputType == InputType.RADIO_GROUP) {
-                    if (isMultiValued) {
-                        handleInputFormatClientException("Input format: " + inputTypeName + " requires multi valued " +
-                                "property to be false.");
-                    }
-                } else {
-                    if (!isMultiValued) {
-                        handleInputFormatClientException("Input format: " + inputTypeName + " requires multi valued " +
-                                "property to be enabled.");
-                    }
+                if (isMultiValued && (inputType == InputType.DROPDOWN || inputType == InputType.RADIO_GROUP)) {
+                    handleInputFormatClientException("Input format: " + inputTypeName + " requires multi valued " +
+                            "property to be false.");
+                } else if (!isMultiValued && (inputType == InputType.MULTI_SELECT_DROPDOWN
+                        || inputType == InputType.CHECKBOX_GROUP)) {
+                    handleInputFormatClientException("Input format: " + inputTypeName + " requires multi valued " +
+                            "property to be enabled.");
                 }
                 break;
             }
