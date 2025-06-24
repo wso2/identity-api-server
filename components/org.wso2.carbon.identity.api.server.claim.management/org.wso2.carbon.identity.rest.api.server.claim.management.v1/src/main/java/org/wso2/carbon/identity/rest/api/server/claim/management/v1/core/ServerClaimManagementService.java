@@ -1947,7 +1947,6 @@ public class ServerClaimManagementService {
 
     private void populateDefaultProperties(LocalClaim localClaim) {
 
-        localClaim.getClaimProperties().putIfAbsent(PROP_DESCRIPTION, StringUtils.EMPTY);
         localClaim.getClaimProperties().putIfAbsent(PROP_DISPLAY_ORDER, "0");
         localClaim.getClaimProperties().putIfAbsent(PROP_READ_ONLY, FALSE);
         localClaim.getClaimProperties().putIfAbsent(PROP_REQUIRED, FALSE);
