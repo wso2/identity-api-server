@@ -72,6 +72,7 @@ public enum StatusEnum {
 }
 
     private StatusEnum status;
+    private String version;
     private String ref;
     private List<Attribute> attributes = null;
 
@@ -158,6 +159,26 @@ public enum StatusEnum {
 
     /**
     **/
+    public BasicOrganizationResponse version(String version) {
+
+        this.version = version;
+        return this;
+    }
+
+    @ApiModelProperty(example = "V1.0.0", required = true, value = "")
+    @JsonProperty("version")
+    @Valid
+    @NotNull(message = "Property version cannot be null.")
+
+    public String getVersion() {
+        return version;
+    }
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    /**
+    **/
     public BasicOrganizationResponse ref(String ref) {
 
         this.ref = ref;
@@ -218,13 +239,14 @@ public enum StatusEnum {
             Objects.equals(this.name, basicOrganizationResponse.name) &&
             Objects.equals(this.orgHandle, basicOrganizationResponse.orgHandle) &&
             Objects.equals(this.status, basicOrganizationResponse.status) &&
+            Objects.equals(this.version, basicOrganizationResponse.version) &&
             Objects.equals(this.ref, basicOrganizationResponse.ref) &&
             Objects.equals(this.attributes, basicOrganizationResponse.attributes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, orgHandle, status, ref, attributes);
+        return Objects.hash(id, name, orgHandle, status, version, ref, attributes);
     }
 
     @Override
@@ -237,6 +259,7 @@ public enum StatusEnum {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    orgHandle: ").append(toIndentedString(orgHandle)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
+        sb.append("    version: ").append(toIndentedString(version)).append("\n");
         sb.append("    ref: ").append(toIndentedString(ref)).append("\n");
         sb.append("    attributes: ").append(toIndentedString(attributes)).append("\n");
         sb.append("}");
