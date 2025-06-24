@@ -43,7 +43,7 @@ public class WebhookSummary  {
 @XmlEnum(String.class)
 public enum StatusEnum {
 
-    @XmlEnumValue("ACTIVE") ACTIVE(String.valueOf("ACTIVE")), @XmlEnumValue("INACTIVE") INACTIVE(String.valueOf("INACTIVE"));
+    @XmlEnumValue("ACTIVE") ACTIVE(String.valueOf("ACTIVE")), @XmlEnumValue("PENDING_ACTIVATION") PENDING_ACTIVATION(String.valueOf("PENDING_ACTIVATION")), @XmlEnumValue("INACTIVE") INACTIVE(String.valueOf("INACTIVE")), @XmlEnumValue("PENDING_DEACTIVATION") PENDING_DEACTIVATION(String.valueOf("PENDING_DEACTIVATION"));
 
 
     private String value;

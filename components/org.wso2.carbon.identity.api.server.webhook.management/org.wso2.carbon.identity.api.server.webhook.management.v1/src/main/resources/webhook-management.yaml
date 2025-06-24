@@ -99,10 +99,10 @@ paths:
                 "endpoint": "https://example.com/webhook",
                 "name": "Login Webhook",
                 "secret": "my-secret",
-                "channelsSubscribed": ["schemas.identity.wso2.org/events/logins/event-type/loginSuccess", "schemas.identity.wso2.org/events/logins/event-type/loginFailed"],
+                "channelsSubscribed": ["https://schemas.identity.wso2.org/events/login", "https://schemas.identity.wso2.org/events/registration"],
                 "eventProfile": {
                   "name": "WSO2",
-                  "uri": "schemas.identity.wso2.org"
+                  "uri": "https://schemas.identity.wso2.org/events"
                 },
                 "status": "ACTIVE"
               }'
@@ -211,7 +211,7 @@ paths:
                 "endpoint": "https://example.com/webhook",
                 "name": "Login webhook",
                 "secret": "my-secret",
-                "channelsSubscribed": ["schemas.identity.wso2.org/events/logins/event-type/loginSuccess", "schemas.identity.wso2.org/events/logins/event-type/loginFailed"]
+                "channelsSubscribed": ["https://schemas.identity.wso2.org/events/login", "https://schemas.identity.wso2.org/events/registration"]
               }'
 
     delete:
@@ -273,6 +273,10 @@ paths:
       responses:
         '200':
           description: Webhook Activated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResponse'
         '400':
           description: Bad Request
           content:
@@ -317,6 +321,10 @@ paths:
       responses:
         '200':
           description: Webhook Deactivated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResponse'
         '400':
           description: Bad Request
           content:
@@ -343,6 +351,54 @@ paths:
           - lang: Curl
             source: |
               curl --location --request POST 'https://localhost:9443/t/carbon.super/api/server/v1/webhooks/{webhookId}/deactivate' \
+              -H 'Authorization: Basic YWRtaW46YWRtaW4='
+
+  /webhooks/{webhookId}/retry:
+    post:
+      summary: Retry Webhook Subscription or Unsubscription
+      description: "Retry a webhook subscription or unsubscription by its unique ID.\n\n <b>Scope(Permission) required:</b> `internal_webhook_update` \n\n"
+      operationId: retryWebhook
+      tags:
+        - Webhooks
+      parameters:
+        - name: webhookId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Webhook Retried
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Webhook not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        x-codeSamples:
+          - lang: Curl
+            source: |
+              curl --location --request POST 'https://localhost:9443/t/carbon.super/api/server/v1/webhooks/{webhookId}/retry' \
               -H 'Authorization: Basic YWRtaW46YWRtaW4='
 
 components:
@@ -388,7 +444,7 @@ components:
             uri:
               type: string
               description: Webhook Event Profile URI.
-              example: schemas.identity.wso2.org
+              example: https://schemas.identity.wso2.org/events
         name:
           type: string
           description: Webhook name.
@@ -402,7 +458,7 @@ components:
           items:
             type: string
           description: List of channels to subscribe to.
-          example: ["schemas.identity.wso2.org/events/logins/event-type/loginSuccess", "schemas.identity.wso2.org/events/logins/event-type/loginFailed"]
+          example: ["https://schemas.identity.wso2.org/events/login", "https://schemas.identity.wso2.org/events/registration"]
         status:
           type: string
           enum:
@@ -410,6 +466,25 @@ components:
             - INACTIVE
           description: Webhook Status.
           example: "ACTIVE"
+
+    WebhookSubscription:
+      type: object
+      properties:
+        channelUri:
+          type: string
+          description: Channel URI to subscribe to.
+          example: https://schemas.identity.wso2.org/events/login
+        status:
+          type: string
+          enum:
+            - SUBSCRIPTION_ACCEPTED
+            - SUBSCRIPTION_PENDING
+            - SUBSCRIPTION_ERROR
+            - UNSUBSCRIPTION_ACCEPTED
+            - UNSUBSCRIPTION_PENDING
+            - UNSUBSCRIPTION_ERROR
+          description: Status of the subscription.
+          example: SUBSCRIPTION_PENDING
 
     WebhookResponse:
       type: object
@@ -440,22 +515,28 @@ components:
             uri:
               type: string
               description: Webhook Event Profile URI.
-              example: schemas.identity.wso2.org
+              example: https://schemas.identity.wso2.org/events
         name:
           type: string
           description: Webhook name.
           example: Login webhook.
         channelsSubscribed:
           type: array
+          description: List of channel subscriptions with status.
           items:
-            type: string
-          description: List of channels to subscribe to.
-          example: ["schemas.identity.wso2.org/events/logins/event-type/loginSuccess", "schemas.identity.wso2.org/events/logins/event-type/loginFailed"]
+            $ref: '#/components/schemas/WebhookSubscription'
+          example:
+            - channelUri: https://schemas.identity.wso2.org/events/login
+              status: SUBSCRIPTION_ACCEPTED
+            - channelUri: https://schemas.identity.wso2.org/events/registration
+              status: SUBSCRIPTION_ERROR
         status:
           type: string
           enum:
             - ACTIVE
+            - PENDING_ACTIVATION
             - INACTIVE
+            - PENDING_DEACTIVATION
           description: Webhook Status.
           example: "ACTIVE"
 
@@ -483,7 +564,9 @@ components:
           type: string
           enum:
             - ACTIVE
+            - PENDING_ACTIVATION
             - INACTIVE
+            - PENDING_DEACTIVATION
           description: Webhook Status.
           example: "ACTIVE"
         self:
