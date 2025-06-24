@@ -1107,19 +1107,10 @@ public class ServerClaimManagementService {
             } catch (IOException e) {
                 LOG.error("Error while parsing inputFormat.");
             }
-        } else {
-            InputFormatDTO inputFormatDTO = new InputFormatDTO();
-            if (localClaimResDTO.getDataType() == DataType.BOOLEAN) {
+        } else if (localClaimResDTO.getDataType() == DataType.BOOLEAN) {
+                InputFormatDTO inputFormatDTO = new InputFormatDTO();
                 inputFormatDTO.setInputType(InputType.CHECKBOX);
-            } else if (localClaimResDTO.getDataType() == DataType.STRING
-                    && ArrayUtils.isNotEmpty(localClaimResDTO.getCanonicalValues())) {
-                if (Boolean.TRUE.equals(localClaimResDTO.getMultiValued())) {
-                    inputFormatDTO.setInputType(InputType.MULTI_SELECT_DROPDOWN);
-                } else {
-                    inputFormatDTO.setInputType(InputType.DROPDOWN);
-                }
-            }
-            localClaimResDTO.setInputFormat(inputFormatDTO);
+                localClaimResDTO.setInputFormat(inputFormatDTO);
         }
 
         String canonicalValues = handleAdditionalProperties(claimProperties, PROP_CANONICAL_VALUES);
