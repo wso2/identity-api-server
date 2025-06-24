@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 /**
  * Enum representing the input types for user attributes in a UI form.
  */
-public enum InputTypeEnum {
+public enum InputType {
 
     DROPDOWN("dropdown"),
     RADIO_GROUP("radio_group"),
@@ -32,7 +32,6 @@ public enum InputTypeEnum {
     CHECKBOX_GROUP("checkbox_group"),
 
     TEXT_INPUT("text_input"),
-    TEXTAREA("textarea"),
 
     DATE_PICKER("date_picker"),
     NUMBER_INPUT("number_input"),
@@ -42,7 +41,7 @@ public enum InputTypeEnum {
 
     private final String value;
 
-    InputTypeEnum(String value) {
+    InputType(String value) {
 
         this.value = value;
     }

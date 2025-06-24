@@ -28,7 +28,7 @@ import javax.validation.Valid;
 public class InputFormatDTO {
 
     @Valid 
-    private InputTypeEnum inputType = null;
+    private InputType inputType = null;
 
     /**
      * Specifies the format of the input type.
@@ -36,12 +36,12 @@ public class InputFormatDTO {
      */
     @ApiModelProperty(value = "The format of the input type.")
     @JsonProperty("inputType")
-    public InputTypeEnum getInputType() {
+    public InputType getInputType() {
 
         return inputType;
     }
 
-    public void setInputType(InputTypeEnum inputType) {
+    public void setInputType(InputType inputType) {
 
         this.inputType = inputType;
     }
