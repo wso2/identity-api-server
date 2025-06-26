@@ -82,6 +82,9 @@ public class WorkflowService {
 
         Workflow currentWorkflow;
         try {
+            if (workflowManagementService.isWorkflowExistByName(workflow.getName())) {
+                throw new WorkflowClientException("A workflow with name: " + workflow.getName() + " already exists.");
+            }
             String workflowId = UUID.randomUUID().toString();
             currentWorkflow = createWorkflow(workflow, workflowId);
             List<WorkflowTemplateParameters> templateProperties = workflow.getTemplate().getSteps();
@@ -139,7 +142,8 @@ public class WorkflowService {
 
             return getWorkflowDetails(currentWorkflow, workflowParameters);
         } catch (WorkflowClientException e) {
-            throw handleClientError(Constants.ErrorMessage.ERROR_CODE_WORKFLOW_NOT_FOUND, workflowId, e);
+            throw handleClientError(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_WORKFLOW_NOT_FOUND,
+                    workflowId, e);
         } catch (WorkflowException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_WORKFLOW, workflowId, e);
         }
@@ -194,10 +198,10 @@ public class WorkflowService {
     /**
      * Add new workflow association.
      *
-     * @param workflowAssociation Workflow association details
-     * @return Return WorkflowAssociationRequest
+     * @param workflowAssociation Workflow association details.
+     * @return Return WorkflowAssociationResponse.
      */
-    public WorkflowAssociationRequest addAssociation(WorkflowAssociationRequest workflowAssociation) {
+    public WorkflowAssociationResponse addAssociation(WorkflowAssociationRequest workflowAssociation) {
 
         try {
             Workflow currentWorkflow = workflowManagementService.getWorkflow(workflowAssociation.getWorkflowId());
@@ -213,7 +217,17 @@ public class WorkflowService {
             workflowManagementService.addAssociation(workflowAssociation.getAssociationName(),
                     workflowAssociation.getWorkflowId(), workflowAssociation.getOperation().toString(),
                     null);
-            return workflowAssociation;
+            Association createdAssociations = workflowManagementService
+                    .getAssociationsForWorkflow(workflowAssociation.getWorkflowId()).stream()
+                    .filter(association -> association.getAssociationName()
+                            .equals(workflowAssociation.getAssociationName()) &&
+                            association.getEventId().equals(workflowAssociation.getOperation().value()))
+                    .findFirst()
+                    .orElseThrow(() -> new WorkflowClientException("Failed to find the created association for " +
+                            "workflow ID: " + workflowAssociation.getWorkflowId() + ", association name: "
+                            + workflowAssociation.getAssociationName() + ", event: "
+                            + workflowAssociation.getOperation().value()));
+            return getAssociationDetails(createdAssociations);
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_ADDING_ASSOCIATION,
                     workflowAssociation.getAssociationName(), e);
@@ -271,7 +285,8 @@ public class WorkflowService {
             Association association = workflowManagementService.getAssociation(associationId);
             return getAssociationDetails(association);
         } catch (WorkflowClientException e) {
-            throw handleClientError(Constants.ErrorMessage.ERROR_CODE_ASSOCIATION_NOT_FOUND, associationId, e);
+            throw handleClientError(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_ASSOCIATION_NOT_FOUND,
+                    associationId, e);
         } catch (WorkflowException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_ASSOCIATION, associationId, e);
         }
@@ -592,7 +607,8 @@ public class WorkflowService {
         return new APIError(Response.Status.INTERNAL_SERVER_ERROR, errorResponse);
     }
 
-    private APIError handleClientError(Constants.ErrorMessage errorEnum, String data, WorkflowClientException e) {
+    private APIError handleClientError(Response.Status status, Constants.ErrorMessage errorEnum, String data,
+                                       WorkflowClientException e) {
 
         ErrorResponse errorResponse;
 
@@ -603,6 +619,11 @@ public class WorkflowService {
         } else {
             errorResponse = getErrorBuilder(errorEnum, data).build(log, e, includeData(e.getMessage(), data));
         }
-        return new APIError(Response.Status.BAD_REQUEST, errorResponse);
+        return new APIError(status, errorResponse);
+    }
+
+    private APIError handleClientError(Constants.ErrorMessage errorEnum, String data, WorkflowClientException e) {
+
+        throw handleClientError(Response.Status.BAD_REQUEST, errorEnum, data, e);
     }
 }

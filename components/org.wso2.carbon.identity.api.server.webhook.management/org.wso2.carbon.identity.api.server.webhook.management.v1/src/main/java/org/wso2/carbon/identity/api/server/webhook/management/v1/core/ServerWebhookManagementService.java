@@ -181,9 +181,9 @@ public class ServerWebhookManagementService {
                 .endpoint(webhookRequest.getEndpoint())
                 .name(webhookRequest.getName())
                 .secret(webhookRequest.getSecret())
-                .eventSchemaName(
+                .eventProfileName(
                         webhookRequest.getEventProfile() != null ? webhookRequest.getEventProfile().getName() : null)
-                .eventSchemaUri(
+                .eventProfileUri(
                         webhookRequest.getEventProfile() != null ? webhookRequest.getEventProfile().getUri() : null)
                 .eventsSubscribed(webhookRequest.getChannelsSubscribed())
                 .build();
@@ -226,8 +226,8 @@ public class ServerWebhookManagementService {
         webhookResponse.setEndpoint(webhook.getEndpoint());
         webhookResponse.setName(webhook.getName());
         WebhookRequestEventProfile eventProfile = new WebhookRequestEventProfile();
-        eventProfile.setName(webhook.getEventSchemaName());
-        eventProfile.setUri(webhook.getEventSchemaUri());
+        eventProfile.setName(webhook.getEventProfileName());
+        eventProfile.setUri(webhook.getEventProfileUri());
         webhookResponse.setEventProfile(eventProfile);
         webhookResponse.setStatus(WebhookResponse.StatusEnum.fromValue(webhook.getStatus().name()));
         try {
