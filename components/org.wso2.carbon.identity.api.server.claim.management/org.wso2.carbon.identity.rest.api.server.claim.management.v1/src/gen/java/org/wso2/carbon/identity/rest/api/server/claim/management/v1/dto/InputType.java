@@ -21,42 +21,39 @@ package org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * Enum representing the data types for claims.
+ * Enum representing the input types for user attributes in a UI form.
  */
-public enum DataTypeEnum {
-    /**
-     * String data type.
-     */
-    STRING("string"),
-    /**
-     * Integer data type.
-     */
-    INTEGER("integer"),
-    /**
-     * Decimal data type.
-     */
-    DECIMAL("decimal"),
-    /**
-     * Boolean data type.
-     */
-    BOOLEAN("boolean"),
-    /**
-     * Date time data type.
-     */
-    DATE_TIME("date_time"),
-    /**
-     * Complex data type.
-     */
-    COMPLEX("complex");
+public enum InputType {
+
+    DROPDOWN("dropdown"),
+    RADIO_GROUP("radio_group"),
+
+    MULTI_SELECT_DROPDOWN("multi_select_dropdown"),
+    CHECKBOX_GROUP("checkbox_group"),
+
+    TEXT_INPUT("text_input"),
+
+    DATE_PICKER("date_picker"),
+    NUMBER_INPUT("number_input"),
+
+    CHECKBOX("checkbox"),
+    TOGGLE("toggle");
 
     private final String value;
 
-    DataTypeEnum(String value) {
+    InputType(String value) {
+
         this.value = value;
+    }
+
+    public String getInputTypeName() {
+
+        return value;
     }
 
     @JsonValue
     public String getValue() {
+
         return value;
     }
 }

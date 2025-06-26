@@ -56,9 +56,11 @@ import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.Attribut
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ClaimDialectReqDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ClaimDialectResDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ClaimResDTO;
-import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.DataTypeEnum;
+import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.DataType;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ExternalClaimReqDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ExternalClaimResDTO;
+import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.InputFormatDTO;
+import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.InputType;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.LabelValueDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.LinkDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.LocalClaimReqDTO;
@@ -143,6 +145,7 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DESCRIPTION;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DISPLAY_NAME;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DISPLAY_ORDER;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_INPUT_FORMAT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_MULTI_VALUED;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_PROFILES_PREFIX;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_READ_ONLY;
@@ -527,6 +530,8 @@ public class ServerClaimManagementService {
             validateAttributeMappings(localClaimReqDTO.getAttributeMapping());
             validateSubAttributeUpdate(localClaimReqDTO);
             validateSystemClaimUpdate(localClaimReqDTO, claimId);
+            validateDataTypeUpdates(localClaimReqDTO);
+            validateAttributeInputFormat(localClaimReqDTO);
 
             claimMetadataManagementService.updateLocalClaim(createLocalClaim(localClaimReqDTO),
                     ContextLoader.getTenantDomainFromContext());
@@ -1080,17 +1085,32 @@ public class ServerClaimManagementService {
         String dataType = handleAdditionalProperties(claimProperties, PROP_DATA_TYPE);
         if (StringUtils.isNotBlank(dataType)) {
             try {
-                localClaimResDTO.setDataType(DataTypeEnum.valueOf(dataType.toUpperCase(Locale.ENGLISH)));
+                localClaimResDTO.setDataType(DataType.valueOf(dataType.toUpperCase(Locale.ENGLISH)));
             } catch (IllegalArgumentException e) {
-                localClaimResDTO.setDataType(DataTypeEnum.STRING);
+                localClaimResDTO.setDataType(DataType.STRING);
             }
         } else {
-            localClaimResDTO.setDataType(DataTypeEnum.STRING);
+            localClaimResDTO.setDataType(DataType.STRING);
         }
 
         String subAttributes = handleAdditionalProperties(claimProperties, PROP_SUB_ATTRIBUTES);
         if (StringUtils.isNotBlank(subAttributes)) {
             localClaimResDTO.setSubAttributes(subAttributes.split(" "));
+        }
+
+        String inputFormat = handleAdditionalProperties(claimProperties, PROP_INPUT_FORMAT);
+        if (StringUtils.isNotEmpty(inputFormat)) {
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                InputFormatDTO inputFormatDTO = mapper.readValue(inputFormat, InputFormatDTO.class);
+                localClaimResDTO.setInputFormat(inputFormatDTO);
+            } catch (IOException e) {
+                LOG.error("Error while parsing inputFormat.");
+            }
+        } else if (localClaimResDTO.getDataType() == DataType.BOOLEAN) {
+                InputFormatDTO inputFormatDTO = new InputFormatDTO();
+                inputFormatDTO.setInputType(InputType.CHECKBOX);
+                localClaimResDTO.setInputFormat(inputFormatDTO);
         }
 
         String canonicalValues = handleAdditionalProperties(claimProperties, PROP_CANONICAL_VALUES);
@@ -1264,7 +1284,7 @@ public class ServerClaimManagementService {
                     .toLowerCase(Locale.ROOT));
         }
 
-        if (DataTypeEnum.COMPLEX.equals(localClaimReqDTO.getDataType())
+        if (DataType.COMPLEX.equals(localClaimReqDTO.getDataType())
                 && ArrayUtils.isNotEmpty(localClaimReqDTO.getSubAttributes())) {
             claimProperties.put(PROP_SUB_ATTRIBUTES, String.join(" ", localClaimReqDTO.getSubAttributes()));
         }
@@ -1274,6 +1294,16 @@ public class ServerClaimManagementService {
                 ObjectMapper mapper = new ObjectMapper();
                 String jsonString = mapper.writeValueAsString(localClaimReqDTO.getCanonicalValues());
                 claimProperties.put(PROP_CANONICAL_VALUES, jsonString);
+            } catch (JsonProcessingException e) {
+                LOG.error("Error while parsing canonical values.", e);
+            }
+        }
+
+        if (localClaimReqDTO.getInputFormat() != null) {
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                String jsonString = mapper.writeValueAsString(localClaimReqDTO.getInputFormat());
+                claimProperties.put(PROP_INPUT_FORMAT, jsonString);
             } catch (JsonProcessingException e) {
                 LOG.error("Error while parsing canonical values.", e);
             }
@@ -1784,9 +1814,9 @@ public class ServerClaimManagementService {
 
 
         // Validate the dataType property is updated.
-        DataTypeEnum requestedDataType = localClaimReqDTO.getDataType();
+        DataType requestedDataType = localClaimReqDTO.getDataType();
         if (requestedDataType == null) {
-            requestedDataType = DataTypeEnum.STRING;
+            requestedDataType = DataType.STRING;
         }
         if (existingClaim.getDataType() != requestedDataType) {
             throw new ClaimMetadataClientException(Constant.ErrorMessage.ERROR_CODE_SYSTEM_ATTRIBUTE_DATA_TYPE_UPDATE
@@ -1796,7 +1826,7 @@ public class ServerClaimManagementService {
 
     private void validateSubAttributeUpdate(LocalClaimReqDTO localClaimReqDTO) throws ClaimMetadataException {
 
-        if (!DataTypeEnum.COMPLEX.equals(localClaimReqDTO.getDataType())) {
+        if (!DataType.COMPLEX.equals(localClaimReqDTO.getDataType())) {
             return;
         }
         if (ArrayUtils.isEmpty(localClaimReqDTO.getSubAttributes())) {
@@ -1808,6 +1838,90 @@ public class ServerClaimManagementService {
         validateAttributeIsSubAttributeOfAnotherAttribute(localClaimReqDTO.getClaimURI(), tenantDomain);
         validateSubAttributeSCIMMappingPattern(localClaimReqDTO.getClaimURI(), tenantDomain,
                 localClaimReqDTO.getSubAttributes());
+    }
+
+    private void validateDataTypeUpdates(LocalClaimReqDTO localClaimReqDTO) throws ClaimMetadataClientException {
+
+        if (localClaimReqDTO.getDataType() == null) {
+            return;
+        }
+        if (DataType.BOOLEAN.equals(localClaimReqDTO.getDataType())
+                && Boolean.TRUE.equals(localClaimReqDTO.getMultiValued())) {
+            String errorDescription = String.format(Constant.ErrorMessage
+                    .ERROR_CODE_BOOLEAN_ATTRIBUTE_CANNOT_BE_MULTI_VALUED.getDescription(),
+                    localClaimReqDTO.getClaimURI());
+            throw new ClaimMetadataClientException(Constant.ErrorMessage
+                    .ERROR_CODE_BOOLEAN_ATTRIBUTE_CANNOT_BE_MULTI_VALUED.getCode(), errorDescription);
+        }
+        if (ArrayUtils.isNotEmpty(localClaimReqDTO.getCanonicalValues()) &&
+                !DataType.STRING.equals(localClaimReqDTO.getDataType())) {
+            String errorDescription = String.format(Constant.ErrorMessage
+                    .ERROR_CODE_CANONICAL_VALUES_NOT_SUPPORTED_FOR_NON_STRING_DATA_TYPES.getDescription(),
+                    localClaimReqDTO.getClaimURI(), localClaimReqDTO.getDataType());
+            throw new ClaimMetadataClientException(Constant.ErrorMessage
+                    .ERROR_CODE_CANONICAL_VALUES_NOT_SUPPORTED_FOR_NON_STRING_DATA_TYPES.getCode(), errorDescription);
+        }
+    }
+
+    private void validateAttributeInputFormat(LocalClaimReqDTO localClaimReqDTO) throws ClaimMetadataClientException {
+
+        if (localClaimReqDTO.getInputFormat() == null || localClaimReqDTO.getInputFormat().getInputType() == null) {
+            return; // No input format specified, no validation needed.
+        }
+        InputType inputType = localClaimReqDTO.getInputFormat().getInputType();
+        DataType dataType = localClaimReqDTO.getDataType();
+
+        switch (inputType) {
+            case TEXT_INPUT:
+                break;
+            case DROPDOWN:
+            case RADIO_GROUP:
+            case MULTI_SELECT_DROPDOWN:
+            case CHECKBOX_GROUP: {
+                String inputTypeName = inputType.getInputTypeName();
+                if (!DataType.STRING.equals(dataType)) {
+                    handleInputFormatClientException("Input format: " + inputTypeName + " not aligned with string " +
+                            "data type.");
+                }
+                if (ArrayUtils.isEmpty(localClaimReqDTO.getCanonicalValues())) {
+                    handleInputFormatClientException("Input format: " + inputTypeName + " requires multiple options " +
+                            "to be defined.");
+                }
+                boolean isMultiValued = Boolean.TRUE.equals(localClaimReqDTO.getMultiValued());
+                if (isMultiValued && (inputType == InputType.DROPDOWN || inputType == InputType.RADIO_GROUP)) {
+                    handleInputFormatClientException("Input format: " + inputTypeName + " requires multi valued " +
+                            "property to be false.");
+                } else if (!isMultiValued && (inputType == InputType.MULTI_SELECT_DROPDOWN
+                        || inputType == InputType.CHECKBOX_GROUP)) {
+                    handleInputFormatClientException("Input format: " + inputTypeName + " requires multi valued " +
+                            "property to be enabled.");
+                }
+                break;
+            }
+            case DATE_PICKER:
+                if (!DataType.DATE_TIME.equals(dataType)) {
+                    handleInputFormatClientException("Input format: date_picker can be used with date data type.");
+                }
+                break;
+            case NUMBER_INPUT:
+                if (!DataType.INTEGER.equals(dataType)) {
+                    handleInputFormatClientException("Input format: number_input can be used with integer data type.");
+                }
+                break;
+            case CHECKBOX:
+            case TOGGLE:
+                if (!DataType.BOOLEAN.equals(dataType)) {
+                    handleInputFormatClientException("Input format: " + inputType.getInputTypeName() +
+                            "should be boolean data type.");
+                }
+                break;
+        }
+    }
+
+    private void handleInputFormatClientException(String errorDescription) throws ClaimMetadataClientException {
+
+        throw new ClaimMetadataClientException(Constant.ErrorMessage.ERROR_CODE_UNSUPPORTED_INPUT_TYPE.getCode(),
+                errorDescription);
     }
 
     private String getMappedSCIMClaim(String claimURI, String tenantDomain) throws ClaimMetadataException {
@@ -1947,13 +2061,12 @@ public class ServerClaimManagementService {
 
     private void populateDefaultProperties(LocalClaim localClaim) {
 
-        localClaim.getClaimProperties().putIfAbsent(PROP_DESCRIPTION, StringUtils.EMPTY);
         localClaim.getClaimProperties().putIfAbsent(PROP_DISPLAY_ORDER, "0");
         localClaim.getClaimProperties().putIfAbsent(PROP_READ_ONLY, FALSE);
         localClaim.getClaimProperties().putIfAbsent(PROP_REQUIRED, FALSE);
         localClaim.getClaimProperties().putIfAbsent(PROP_SUPPORTED_BY_DEFAULT, FALSE);
         localClaim.getClaimProperties().putIfAbsent(PROP_MULTI_VALUED, FALSE);
-        localClaim.getClaimProperties().putIfAbsent(PROP_DATA_TYPE, DataTypeEnum.STRING.toString()
+        localClaim.getClaimProperties().putIfAbsent(PROP_DATA_TYPE, DataType.STRING.toString()
                 .toLowerCase(Locale.ROOT));
     }
 
