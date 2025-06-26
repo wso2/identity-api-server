@@ -28,23 +28,19 @@ import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookSu
 import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookSummary;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.util.WebhookManagementAPIErrorBuilder;
 import org.wso2.carbon.identity.webhook.management.api.exception.WebhookMgtException;
-import org.wso2.carbon.identity.webhook.management.api.model.subscription.Subscription;
-import org.wso2.carbon.identity.webhook.management.api.model.subscription.SubscriptionStatus;
-import org.wso2.carbon.identity.webhook.management.api.model.webhook.Webhook;
-import org.wso2.carbon.identity.webhook.management.api.model.webhook.WebhookStatus;
+import org.wso2.carbon.identity.webhook.management.api.model.Subscription;
+import org.wso2.carbon.identity.webhook.management.api.model.SubscriptionStatus;
+import org.wso2.carbon.identity.webhook.management.api.model.Webhook;
+import org.wso2.carbon.identity.webhook.management.api.model.WebhookStatus;
 import org.wso2.carbon.identity.webhook.management.api.service.WebhookManagementService;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.webhook.management.v1.constants.WebhookMgtEndpointConstants.ErrorMessage.ERROR_NO_WEBHOOK_FOUND_ON_GIVEN_ID;
-import static org.wso2.carbon.identity.api.server.webhook.management.v1.constants.WebhookMgtEndpointConstants.ErrorMessage.ERROR_RETRY_OPERATION_NOT_SUPPORTED;
-import static org.wso2.carbon.identity.api.server.webhook.management.v1.constants.WebhookMgtEndpointConstants.ErrorMessage.ERROR_UPDATE_OPERATION_NOT_SUPPORTED;
 import static org.wso2.carbon.identity.api.server.webhook.management.v1.constants.WebhookMgtEndpointConstants.WEBHOOK_PATH_COMPONENT;
 
 /**
@@ -53,19 +49,10 @@ import static org.wso2.carbon.identity.api.server.webhook.management.v1.constant
 public class ServerWebhookManagementService {
 
     private final WebhookManagementService webhookManagementService;
-    private static final Set<String> UPDATE_NOT_IMPLEMENTED_ADAPTORS = new HashSet<>();
-    private static final Set<String> RETRY_NOT_IMPLEMENTED_ADAPTORS = new HashSet<>();
-    private static final String WEBSUBHUB_ADAPTOR = "webSubHubAdapter";
-    private static final String HTTP_ADAPTOR = "httpAdapter";
 
     public ServerWebhookManagementService(WebhookManagementService webhookManagementService) {
 
         this.webhookManagementService = webhookManagementService;
-    }
-
-    static {
-        UPDATE_NOT_IMPLEMENTED_ADAPTORS.add(WEBSUBHUB_ADAPTOR);
-        RETRY_NOT_IMPLEMENTED_ADAPTORS.add(HTTP_ADAPTOR);
     }
 
     /**
@@ -134,7 +121,6 @@ public class ServerWebhookManagementService {
     public WebhookResponse updateWebhook(String webhookId, WebhookRequest webhookRequest) {
 
         try {
-            validateUpdateOperationSupported(WEBSUBHUB_ADAPTOR);
             Webhook webhook = buildWebhook(webhookId, webhookRequest);
             return getWebhookResponse(webhookManagementService.updateWebhook(webhookId, webhook,
                     CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
@@ -199,7 +185,6 @@ public class ServerWebhookManagementService {
     public WebhookResponse retryWebhook(String webhookId) {
 
         try {
-            validateRetryOperationSupported(WEBSUBHUB_ADAPTOR);
             return getWebhookResponse(webhookManagementService.retryWebhook(webhookId,
                     CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
         } catch (WebhookMgtException e) {
@@ -291,21 +276,5 @@ public class ServerWebhookManagementService {
             webhookResponse.setChannelsSubscribed(null);
         }
         return webhookResponse;
-    }
-
-    private void validateUpdateOperationSupported(String adaptor) {
-
-        if (UPDATE_NOT_IMPLEMENTED_ADAPTORS.contains(adaptor)) {
-            throw WebhookManagementAPIErrorBuilder.buildAPIError(Response.Status.NOT_IMPLEMENTED,
-                    ERROR_UPDATE_OPERATION_NOT_SUPPORTED);
-        }
-    }
-
-    private void validateRetryOperationSupported(String adaptor) {
-
-        if (RETRY_NOT_IMPLEMENTED_ADAPTORS.contains(adaptor)) {
-            throw WebhookManagementAPIErrorBuilder.buildAPIError(Response.Status.NOT_IMPLEMENTED,
-                    ERROR_RETRY_OPERATION_NOT_SUPPORTED);
-        }
     }
 }

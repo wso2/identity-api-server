@@ -37,15 +37,7 @@ public class WebhookMgtEndpointConstants {
         // Client errors.
         ERROR_NO_WEBHOOK_FOUND_ON_GIVEN_ID("60010",
                 "Webhook is not found.",
-                "No webhook is found for given webhook id: %s"),
-
-        // Server errors.
-        ERROR_UPDATE_OPERATION_NOT_SUPPORTED("65027",
-                "Unable to perform the update operation.",
-                "Update operation is not supported for webhooks."),
-        ERROR_RETRY_OPERATION_NOT_SUPPORTED("65028",
-                "Unable to perform the retry operation.",
-                "Retry operation is not supported for webhooks.");
+                "No webhook is found for given webhook id: %s");
 
         private final String code;
         private final String message;
