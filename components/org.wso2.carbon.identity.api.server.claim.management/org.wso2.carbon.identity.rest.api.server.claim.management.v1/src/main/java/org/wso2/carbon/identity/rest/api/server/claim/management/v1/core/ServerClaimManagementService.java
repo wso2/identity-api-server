@@ -60,7 +60,6 @@ import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.DataType
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ExternalClaimReqDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ExternalClaimResDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.InputFormatDTO;
-import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.InputType;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.LabelValueDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.LinkDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.LocalClaimReqDTO;
@@ -138,6 +137,15 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_UNAUTHORIZED_ORG_FOR_CLAIM_PROPERTY_UPDATE;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_UNAUTHORIZED_ORG_FOR_EXCLUDED_USER_STORES_PROPERTY_UPDATE;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_USERSTORE_NOT_SPECIFIED_IN_MAPPINGS;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.INPUT_TYPE_CHECKBOX;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.INPUT_TYPE_CHECKBOX_GROUP;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.INPUT_TYPE_DATE_PICKER;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.INPUT_TYPE_DROPDOWN;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.INPUT_TYPE_MULTI_SELECT_DROPDOWN;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.INPUT_TYPE_NUMBER_INPUT;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.INPUT_TYPE_RADIO_GROUP;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.INPUT_TYPE_TEXT_INPUT;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.INPUT_TYPE_TOGGLE;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.LOCAL_DIALECT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.LOCAL_DIALECT_PATH;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_CANONICAL_VALUES;
@@ -1109,7 +1117,7 @@ public class ServerClaimManagementService {
             }
         } else if (localClaimResDTO.getDataType() == DataType.BOOLEAN) {
                 InputFormatDTO inputFormatDTO = new InputFormatDTO();
-                inputFormatDTO.setInputType(InputType.CHECKBOX);
+                inputFormatDTO.setInputType(INPUT_TYPE_CHECKBOX);
                 localClaimResDTO.setInputFormat(inputFormatDTO);
         }
 
@@ -1868,52 +1876,58 @@ public class ServerClaimManagementService {
         if (localClaimReqDTO.getInputFormat() == null || localClaimReqDTO.getInputFormat().getInputType() == null) {
             return; // No input format specified, no validation needed.
         }
-        InputType inputType = localClaimReqDTO.getInputFormat().getInputType();
+
+        String inputType = localClaimReqDTO.getInputFormat().getInputType();
         DataType dataType = localClaimReqDTO.getDataType();
+        if (!Constant.ALLOWED_INPUT_TYPES.contains(inputType)) {
+            // The provided input type is not system defined type. Hence, validations are skipped.
+            return;
+        }
 
         switch (inputType) {
-            case TEXT_INPUT:
+            case INPUT_TYPE_TEXT_INPUT:
                 break;
-            case DROPDOWN:
-            case RADIO_GROUP:
-            case MULTI_SELECT_DROPDOWN:
-            case CHECKBOX_GROUP: {
-                String inputTypeName = inputType.getInputTypeName();
+            case INPUT_TYPE_DROPDOWN:
+            case INPUT_TYPE_RADIO_GROUP:
+            case INPUT_TYPE_MULTI_SELECT_DROPDOWN:
+            case INPUT_TYPE_CHECKBOX_GROUP: {
                 if (!DataType.STRING.equals(dataType)) {
-                    handleInputFormatClientException("Input format: " + inputTypeName + " not aligned with string " +
+                    handleInputFormatClientException("Input format: " + inputType + " not aligned with string " +
                             "data type.");
                 }
                 if (ArrayUtils.isEmpty(localClaimReqDTO.getCanonicalValues())) {
-                    handleInputFormatClientException("Input format: " + inputTypeName + " requires multiple options " +
+                    handleInputFormatClientException("Input format: " + inputType + " requires multiple options " +
                             "to be defined.");
                 }
                 boolean isMultiValued = Boolean.TRUE.equals(localClaimReqDTO.getMultiValued());
-                if (isMultiValued && (inputType == InputType.DROPDOWN || inputType == InputType.RADIO_GROUP)) {
-                    handleInputFormatClientException("Input format: " + inputTypeName + " requires multi valued " +
+                if (isMultiValued && (INPUT_TYPE_DROPDOWN.equals(inputType)
+                        || INPUT_TYPE_RADIO_GROUP.equals(inputType))) {
+                    handleInputFormatClientException("Input format: " + inputType + " requires multi valued " +
                             "property to be false.");
-                } else if (!isMultiValued && (inputType == InputType.MULTI_SELECT_DROPDOWN
-                        || inputType == InputType.CHECKBOX_GROUP)) {
-                    handleInputFormatClientException("Input format: " + inputTypeName + " requires multi valued " +
+                } else if (!isMultiValued && (INPUT_TYPE_MULTI_SELECT_DROPDOWN.equals(inputType)
+                        || INPUT_TYPE_CHECKBOX_GROUP.equals(inputType))) {
+                    handleInputFormatClientException("Input format: " + inputType + " requires multi valued " +
                             "property to be enabled.");
                 }
                 break;
             }
-            case DATE_PICKER:
+            case INPUT_TYPE_DATE_PICKER:
                 if (!DataType.DATE_TIME.equals(dataType)) {
                     handleInputFormatClientException("Input format: date_picker can be used with date data type.");
                 }
                 break;
-            case NUMBER_INPUT:
+            case INPUT_TYPE_NUMBER_INPUT:
                 if (!DataType.INTEGER.equals(dataType)) {
                     handleInputFormatClientException("Input format: number_input can be used with integer data type.");
                 }
                 break;
-            case CHECKBOX:
-            case TOGGLE:
+            case INPUT_TYPE_CHECKBOX:
+            case INPUT_TYPE_TOGGLE:
                 if (!DataType.BOOLEAN.equals(dataType)) {
-                    handleInputFormatClientException("Input format: " + inputType.getInputTypeName() +
-                            "should be boolean data type.");
+                    handleInputFormatClientException("Input format: " + inputType + "should be boolean data type.");
                 }
+                break;
+            default:
                 break;
         }
     }

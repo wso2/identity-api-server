@@ -327,4 +327,25 @@ public class Constant {
 
     public static final Set<String> ALLOWED_PROPERTY_KEYS_FOR_SUB_ORG_UPDATE = Collections.unmodifiableSet(
             new HashSet<>(Collections.singletonList(PROP_EXCLUDED_USER_STORES)));
+
+    public static final String INPUT_TYPE_DROPDOWN = "dropdown";
+    public static final String INPUT_TYPE_RADIO_GROUP = "radio_group";
+    public static final String INPUT_TYPE_MULTI_SELECT_DROPDOWN = "multi_select_dropdown";
+    public static final String INPUT_TYPE_CHECKBOX_GROUP = "checkbox_group";
+    public static final String INPUT_TYPE_TEXT_INPUT = "text_input";
+    public static final String INPUT_TYPE_DATE_PICKER = "date_picker";
+    public static final String INPUT_TYPE_NUMBER_INPUT = "number_input";
+    public static final String INPUT_TYPE_CHECKBOX = "checkbox";
+    public static final String INPUT_TYPE_TOGGLE = "toggle";
+    public static final Set<String> ALLOWED_INPUT_TYPES = Collections.unmodifiableSet(
+            new HashSet<>(Set.of(
+                    INPUT_TYPE_DROPDOWN,
+                    INPUT_TYPE_RADIO_GROUP,
+                    INPUT_TYPE_MULTI_SELECT_DROPDOWN,
+                    INPUT_TYPE_CHECKBOX_GROUP,
+                    INPUT_TYPE_TEXT_INPUT,
+                    INPUT_TYPE_DATE_PICKER,
+                    INPUT_TYPE_NUMBER_INPUT,
+                    INPUT_TYPE_CHECKBOX,
+                    INPUT_TYPE_TOGGLE)));
 }
