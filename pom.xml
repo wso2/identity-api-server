@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.3.140-SNAPSHOT</version>
+    <version>1.3.138-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -947,7 +947,7 @@
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
         <identity.governance.version>1.11.27</identity.governance.version>
-        <carbon.identity.framework.version>7.8.251</carbon.identity.framework.version>
+        <carbon.identity.framework.version>7.8.224</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
         <findsecbugs-plugin.version>1.12.0</findsecbugs-plugin.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
@@ -973,7 +973,7 @@
         <identity.verification.version>1.0.15</identity.verification.version>
 
         <!-- Organization management core Version -->
-        <org.wso2.carbon.identity.organization.management.core.version>1.1.37
+        <org.wso2.carbon.identity.organization.management.core.version>1.1.29
         </org.wso2.carbon.identity.organization.management.core.version>
         <org.wso2.carbon.identity.organization.management.core.version.range>[1.0.0, 2.0.0)
         </org.wso2.carbon.identity.organization.management.core.version.range>

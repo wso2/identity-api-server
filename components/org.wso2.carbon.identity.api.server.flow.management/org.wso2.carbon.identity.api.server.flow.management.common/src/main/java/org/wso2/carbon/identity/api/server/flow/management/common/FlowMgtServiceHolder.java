@@ -19,7 +19,9 @@
 package org.wso2.carbon.identity.api.server.flow.management.common;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.flow.mgt.FlowMgtService;
+import org.wso2.carbon.identity.governance.IdentityGovernanceService;
 
 /**
  * This class is used to hold the FlowMgtService instance.
@@ -35,6 +37,20 @@ public class FlowMgtServiceHolder {
                 .getThreadLocalCarbonContext().getOSGiService(FlowMgtService.class, null);
     }
 
+    private static class IdentityGovernanceServiceHolder {
+
+        private static final IdentityGovernanceService SERVICE =
+                (IdentityGovernanceService) PrivilegedCarbonContext
+                        .getThreadLocalCarbonContext().getOSGiService(IdentityGovernanceService.class, null);
+    }
+
+    private static class ApplicationManagementServiceHolder {
+
+        private static final ApplicationManagementService SERVICE =
+                (ApplicationManagementService) PrivilegedCarbonContext
+                        .getThreadLocalCarbonContext().getOSGiService(ApplicationManagementService.class, null);
+    }
+
     /**
      * Get FlowMgtService OSGi service.
      *
@@ -43,5 +59,25 @@ public class FlowMgtServiceHolder {
     public static FlowMgtService getMgtService() {
 
         return FlowMgtServiceHolderInstance.SERVICE;
+    }
+
+    /**
+     * Get IdentityGovernanceService osgi service.
+     *
+     * @return IdentityGovernanceService
+     */
+    public static IdentityGovernanceService getIdentityGovernanceService() {
+
+        return IdentityGovernanceServiceHolder.SERVICE;
+    }
+
+    /**
+     * Get ApplicationManagementService osgi service.
+     *
+     * @return ApplicationManagementService
+     */
+    public static ApplicationManagementService getApplicationManagementService() {
+
+        return ApplicationManagementServiceHolder.SERVICE;
     }
 }

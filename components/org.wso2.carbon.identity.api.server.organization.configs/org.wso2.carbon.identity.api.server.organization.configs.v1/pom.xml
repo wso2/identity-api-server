@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.organization.configs</artifactId>
-        <version>1.3.140-SNAPSHOT</version>
+        <version>1.3.138-SNAPSHOT</version>
     </parent>
 
     <artifactId>org.wso2.carbon.identity.api.server.organization.configs.v1</artifactId>

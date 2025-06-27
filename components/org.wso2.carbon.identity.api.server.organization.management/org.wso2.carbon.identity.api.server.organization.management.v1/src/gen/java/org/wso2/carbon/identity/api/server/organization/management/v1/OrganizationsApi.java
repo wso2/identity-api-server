@@ -68,28 +68,6 @@ public class OrganizationsApi  {
     }
 
     @Valid
-    @GET
-    @Path("/self")
-    
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Get organization details of the currently accessing organization.", notes = "This API retrieves the organization information associated with the currently accessing organization.  <b>Scopes (Permissions) required:</b> `internal_organization_view` ", response = OrganizationResponse.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Organization", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful response", response = OrganizationResponse.class),
-        @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
-        @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
-        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
-    })
-    public Response getSelfOrganization() {
-
-        return delegate.getSelfOrganization();
-    }
-
-    @Valid
     @POST
     @Path("/check-discovery")
     @Consumes({ "application/json" })
@@ -467,29 +445,6 @@ public class OrganizationsApi  {
     public Response organizationsOrganizationIdPut(@ApiParam(value = "ID of the organization to be updated.",required=true) @PathParam("organization-id") String organizationId, @ApiParam(value = "" ,required=true) @Valid OrganizationPUTRequest organizationPUTRequest) {
 
         return delegate.organizationsOrganizationIdPut(organizationId,  organizationPUTRequest );
-    }
-
-    @Valid
-    @PATCH
-    @Path("/self")
-    @Consumes({ "application/json" })
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Update organization details of the currently accessing organization.", notes = "This API updates the editable fields of the organization associated with the currently accessing organization. Currently only the organization name can be updated using this API.  <b>Scopes (Permissions) required:</b> `internal_organization_update` ", response = OrganizationResponse.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Organization", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successfully updated organization.", response = OrganizationResponse.class),
-        @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
-        @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
-        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
-    })
-    public Response patchSelfOrganization(@ApiParam(value = "Partial update payload for the organization." ,required=true) @Valid List<OrganizationPatchRequestItem> organizationPatchRequestItem) {
-
-        return delegate.patchSelfOrganization(organizationPatchRequestItem );
     }
 
     @Valid

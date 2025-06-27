@@ -99,18 +99,6 @@ public class OrganizationsApiServiceImpl implements OrganizationsApiService {
     }
 
     @Override
-    public Response patchSelfOrganization(List<OrganizationPatchRequestItem> organizationPatchRequestItem) {
-
-        return organizationManagementService.patchSelfOrganization(organizationPatchRequestItem);
-    }
-
-    @Override
-    public Response getSelfOrganization() {
-
-        return organizationManagementService.getSelfOrganization();
-    }
-
-    @Override
     public Response organizationCheckDiscovery(
             OrganizationDiscoveryCheckPOSTRequest organizationDiscoveryCheckPOSTRequest) {
 

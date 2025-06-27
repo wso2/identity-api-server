@@ -23,8 +23,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
+import org.wso2.carbon.identity.api.server.flow.management.common.FlowMgtServiceHolder;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Action;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Component;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Data;
@@ -33,6 +35,10 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.Position;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Size;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Step;
 import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
+import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
+import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
+import org.wso2.carbon.identity.application.common.model.Property;
+import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtFrameworkException;
 import org.wso2.carbon.identity.flow.mgt.model.ActionDTO;
@@ -40,6 +46,8 @@ import org.wso2.carbon.identity.flow.mgt.model.ComponentDTO;
 import org.wso2.carbon.identity.flow.mgt.model.DataDTO;
 import org.wso2.carbon.identity.flow.mgt.model.ExecutorDTO;
 import org.wso2.carbon.identity.flow.mgt.model.StepDTO;
+import org.wso2.carbon.identity.governance.IdentityGovernanceException;
+import org.wso2.carbon.identity.governance.IdentityGovernanceService;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -48,6 +56,8 @@ import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_GET_GOVERNANCE_CONFIG;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_GET_LOCAL_AUTHENTICATORS;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Schema.IDP_NAME;
 
 /**
@@ -275,5 +285,49 @@ public class Utils {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.convertValue(map, new TypeReference<Map<String, Object>>() {
         });
+    }
+
+    /**
+     * Checks whether a connector config is enabled.
+     *
+     * @param tenantDomain Tenant domain.
+     */
+    public boolean isFlowConfigEnabled(String tenantDomain, String connectorConfig) {
+
+        try {
+            IdentityGovernanceService identityGovernanceService =
+                    FlowMgtServiceHolder.getIdentityGovernanceService();
+            Property[] connectorConfigs = identityGovernanceService.getConfiguration(
+                    new String[]{connectorConfig}, tenantDomain);
+
+            if (connectorConfigs == null || connectorConfigs.length == 0) {
+                return false;
+            }
+
+            return Boolean.parseBoolean(connectorConfigs[0].getValue());
+
+        } catch (IdentityGovernanceException e) {
+            throw handleFlowMgtException(new FlowMgtFrameworkException(
+                    ERROR_CODE_GET_GOVERNANCE_CONFIG.getCode(),
+                    ERROR_CODE_GET_GOVERNANCE_CONFIG.getMessage(),
+                    ERROR_CODE_GET_GOVERNANCE_CONFIG.getDescription(), e));
+        }
+    }
+
+    public LocalAuthenticatorConfig[] getConnections() {
+
+        try {
+
+            ApplicationManagementService applicationManagementServiceHolder =
+                    FlowMgtServiceHolder.getApplicationManagementService();
+            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            return applicationManagementServiceHolder.getAllLocalAuthenticators(tenantDomain);
+
+        } catch (IdentityApplicationManagementException e) {
+            throw handleFlowMgtException(new FlowMgtFrameworkException(
+                    ERROR_CODE_GET_LOCAL_AUTHENTICATORS.getCode(),
+                    ERROR_CODE_GET_LOCAL_AUTHENTICATORS.getMessage(),
+                    ERROR_CODE_GET_LOCAL_AUTHENTICATORS.getDescription(), e));
+        }
     }
 }
