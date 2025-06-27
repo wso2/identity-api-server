@@ -45,6 +45,9 @@ public class FlowEndpointConstants {
     public static final String END_USER_ATTRIBUTE_PROFILE = "End-User-Profile";
     public static final String SELF_REGISTRATION_ATTRIBUTE_PROFILE = "Self-Registration";
 
+    public static final String USERNAME_IDENTIFIER = "http://wso2.org/claims/username";
+    public static final String PASSWORD_IDENTIFIER = "password";
+
     /**
      * Error messages related to flow management.
      */
@@ -60,7 +63,19 @@ public class FlowEndpointConstants {
 
         ERROR_CODE_GET_LOCAL_AUTHENTICATORS("10003",
                 "Error occurred while retrieving local authenticators.",
-                "Server encountered an error while retrieving the local authenticators.");
+                "Server encountered an error while retrieving the local authenticators."),
+
+        ERROR_CODE_UNSUPPORTED_EXECUTOR("10004",
+                "Unsupported executor used in the flow.",
+                "The provided executor is not supported for the flow type. Please use a supported executor."),
+
+        ERROR_CODE_MISSING_IDENTIFIER("10005",
+                "Missing required identifier in flow.",
+                "The flow must contain a FIELD component with the required identifier."),
+
+        ERROR_CODE_DUPLICATE_COMPONENT_ID("10006",
+                "Duplicate component ID found in the flow.",
+                "All component IDs must be unique across the entire flow.");
 
         private final String code;
         private final String message;

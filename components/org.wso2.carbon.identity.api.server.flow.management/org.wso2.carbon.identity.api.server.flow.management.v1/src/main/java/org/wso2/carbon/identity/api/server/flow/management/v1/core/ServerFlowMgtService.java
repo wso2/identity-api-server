@@ -22,6 +22,7 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRequest;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.Step;
 import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.AbstractMetaResponseHandler;
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.PasswordRecoveryFlowMetaHandler;
@@ -31,9 +32,15 @@ import org.wso2.carbon.identity.flow.mgt.FlowMgtService;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtFrameworkException;
 import org.wso2.carbon.identity.flow.mgt.model.FlowDTO;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FlowType.validateFlowType;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils.collectFlowData;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils.validateExecutors;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils.validateIdentifiers;
 
 /**
  * Service class for flow management.
@@ -101,6 +108,7 @@ public class ServerFlowMgtService {
 
         try {
             validateFlowType(flowRequest.getFlowType());
+            validateFlow(flowRequest.getFlowType(), flowRequest.getSteps());
             FlowDTO flowDTO = new FlowDTO();
             flowDTO.setSteps(flowRequest.getSteps().stream().map(Utils::convertToStepDTO)
                     .collect(Collectors.toList()));
@@ -112,6 +120,29 @@ public class ServerFlowMgtService {
         }
     }
 
+    /**
+     * Validate the flow type and steps.
+     *
+     * @param flowType Type of the flow.
+     * @param flowSteps    List of steps in the flow.
+     */
+    private void validateFlow(String flowType, List<Step> flowSteps) {
+
+        AbstractMetaResponseHandler metaResponseHandler = resolveHandler(flowType);
+        Set<String> flowExecutorNames = new HashSet<>();
+        Set<String> flowFieldIdentifiers = new HashSet<>();
+        Set<String> flowComponentIds = new HashSet<>();
+        collectFlowData(flowSteps, flowExecutorNames, flowFieldIdentifiers, flowComponentIds);
+        validateExecutors(metaResponseHandler, flowExecutorNames);
+        validateIdentifiers(metaResponseHandler, flowFieldIdentifiers);
+    }
+
+    /**
+     * Resolve the appropriate handler based on the flow type.
+     *
+     * @param flowType Type of the flow.
+     * @return An instance of AbstractMetaResponseHandler.
+     */
     private AbstractMetaResponseHandler resolveHandler(String flowType) {
 
         switch (FlowEndpointConstants.FlowType.valueOf(flowType)) {
