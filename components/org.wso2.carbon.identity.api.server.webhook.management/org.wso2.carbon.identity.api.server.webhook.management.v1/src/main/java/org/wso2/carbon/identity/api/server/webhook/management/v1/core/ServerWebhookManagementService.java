@@ -221,7 +221,7 @@ public class ServerWebhookManagementService {
     private WebhookSummary toWebhookSummary(Webhook webhook) {
 
         WebhookSummary response = new WebhookSummary();
-        response.setId(webhook.getUuid());
+        response.setId(webhook.getId());
         response.setEndpoint(webhook.getEndpoint());
         response.setName(webhook.getName());
 
@@ -241,7 +241,7 @@ public class ServerWebhookManagementService {
         response.setSelf(
                 ContextLoader.buildURIForBody(
                         String.format(V1_API_PATH_COMPONENT + WEBHOOK_PATH_COMPONENT + "/%s",
-                                webhook.getUuid())).toString());
+                                webhook.getId())).toString());
 
         return response;
     }
@@ -249,7 +249,7 @@ public class ServerWebhookManagementService {
     private WebhookResponse getWebhookResponse(Webhook webhook) {
 
         WebhookResponse webhookResponse = new WebhookResponse();
-        webhookResponse.setId(webhook.getUuid());
+        webhookResponse.setId(webhook.getId());
         webhookResponse.setCreatedAt(String.valueOf(webhook.getCreatedAt()));
         webhookResponse.setUpdatedAt(String.valueOf(webhook.getUpdatedAt()));
         webhookResponse.setEndpoint(webhook.getEndpoint());

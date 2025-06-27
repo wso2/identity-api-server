@@ -534,9 +534,9 @@ components:
           type: string
           enum:
             - ACTIVE
-            - PENDING_ACTIVATION
+            - PARTIALLY_ACTIVE
             - INACTIVE
-            - PENDING_DEACTIVATION
+            - PARTIALLY_INACTIVE
           description: Webhook Status.
           example: "ACTIVE"
 
@@ -564,9 +564,9 @@ components:
           type: string
           enum:
             - ACTIVE
-            - PENDING_ACTIVATION
+            - PARTIALLY_ACTIVE
             - INACTIVE
-            - PENDING_DEACTIVATION
+            - PARTIALLY_INACTIVE
           description: Webhook Status.
           example: "ACTIVE"
         self:
