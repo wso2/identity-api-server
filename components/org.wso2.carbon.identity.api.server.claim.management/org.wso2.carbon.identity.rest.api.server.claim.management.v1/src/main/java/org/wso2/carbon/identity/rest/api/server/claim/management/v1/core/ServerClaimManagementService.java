@@ -1924,7 +1924,7 @@ public class ServerClaimManagementService {
             case INPUT_TYPE_CHECKBOX:
             case INPUT_TYPE_TOGGLE:
                 if (!DataType.BOOLEAN.equals(dataType)) {
-                    handleInputFormatClientException("Input format: " + inputType + "should be boolean data type.");
+                    handleInputFormatClientException("Input format: " + inputType + " should be boolean data type.");
                 }
                 break;
             default:
