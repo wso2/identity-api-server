@@ -103,12 +103,18 @@ public class ActionMapperUtil {
                                 .getAuthentication().getType().toString()),
                         actionUpdateModel.getEndpoint().getAuthentication().getProperties());
             }
-            endpointConfig = new EndpointConfig.EndpointConfigBuilder()
+            EndpointConfig.EndpointConfigBuilder builder = new EndpointConfig.EndpointConfigBuilder()
                     .uri(actionUpdateModel.getEndpoint().getUri())
-                    .authentication(authentication)
-                    .allowedHeaders(actionUpdateModel.getEndpoint().getAllowedHeaders())
-                    .allowedParameters(actionUpdateModel.getEndpoint().getAllowedParameters())
-                    .build();
+                    .authentication(authentication);
+
+            if (actionUpdateModel.getEndpoint().getAllowedHeaders() != null) {
+                builder.allowedHeaders(actionUpdateModel.getEndpoint().getAllowedHeaders());
+            }
+            if (actionUpdateModel.getEndpoint().getAllowedParameters() != null) {
+                builder.allowedParameters(actionUpdateModel.getEndpoint().getAllowedParameters());
+            }
+
+            endpointConfig = builder.build();
         }
 
         ActionRule actionRule = null;
