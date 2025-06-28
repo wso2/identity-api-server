@@ -338,14 +338,15 @@ public class Constant {
     public static final String INPUT_TYPE_CHECKBOX = "checkbox";
     public static final String INPUT_TYPE_TOGGLE = "toggle";
     public static final Set<String> ALLOWED_INPUT_TYPES = Collections.unmodifiableSet(
-            new HashSet<>(Set.of(
-                    INPUT_TYPE_DROPDOWN,
-                    INPUT_TYPE_RADIO_GROUP,
-                    INPUT_TYPE_MULTI_SELECT_DROPDOWN,
-                    INPUT_TYPE_CHECKBOX_GROUP,
-                    INPUT_TYPE_TEXT_INPUT,
-                    INPUT_TYPE_DATE_PICKER,
-                    INPUT_TYPE_NUMBER_INPUT,
-                    INPUT_TYPE_CHECKBOX,
-                    INPUT_TYPE_TOGGLE)));
+            new HashSet<String>() {{
+                add(INPUT_TYPE_DROPDOWN);
+                add(INPUT_TYPE_RADIO_GROUP);
+                add(INPUT_TYPE_MULTI_SELECT_DROPDOWN);
+                add(INPUT_TYPE_CHECKBOX_GROUP);
+                add(INPUT_TYPE_TEXT_INPUT);
+                add(INPUT_TYPE_DATE_PICKER);
+                add(INPUT_TYPE_NUMBER_INPUT);
+                add(INPUT_TYPE_CHECKBOX);
+                add(INPUT_TYPE_TOGGLE);
+            }});
 }
