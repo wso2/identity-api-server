@@ -168,7 +168,7 @@ public enum StatusEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "[\"schemas.identity.wso2.org/events/logins/event-type/loginSuccess\",\"schemas.identity.wso2.org/events/logins/event-type/loginFailed\"]", required = true, value = "List of channels to subscribe to.")
+    @ApiModelProperty(example = "[\"https://schemas.identity.wso2.org/events/login\",\"https://schemas.identity.wso2.org/events/registration\"]", required = true, value = "List of channels to subscribe to.")
     @JsonProperty("channelsSubscribed")
     @Valid
     @NotNull(message = "Property channelsSubscribed cannot be null.")

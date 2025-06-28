@@ -96,4 +96,10 @@ public class WebhooksApiServiceImpl implements WebhooksApiService {
 
         return Response.ok().entity(serverWebhookManagementService.deactivateWebhook(webhookId)).build();
     }
+
+    @Override
+    public Response retryWebhook(String webhookId) {
+
+        return Response.ok().entity(serverWebhookManagementService.retryWebhook(webhookId)).build();
+    }
 }

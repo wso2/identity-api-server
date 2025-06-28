@@ -54,14 +54,14 @@ public class WebhooksApi  {
     @Path("/{webhookId}/activate")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Activate Webhook", notes = "Activate a webhook by its unique ID.   <b>Scope(Permission) required:</b> `internal_webhook_update`   ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Activate Webhook", notes = "Activate a webhook by its unique ID.   <b>Scope(Permission) required:</b> `internal_webhook_update`   ", response = WebhookResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Webhooks", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Webhook Activated", response = Void.class),
+        @ApiResponse(code = 200, message = "Webhook Activated", response = WebhookResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
@@ -101,14 +101,14 @@ public class WebhooksApi  {
     @Path("/{webhookId}/deactivate")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Deactivate Webhook", notes = "Deactivate a webhook by its unique ID.   <b>Scope(Permission) required:</b> `internal_webhook_update`   ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Deactivate Webhook", notes = "Deactivate a webhook by its unique ID.   <b>Scope(Permission) required:</b> `internal_webhook_update`   ", response = WebhookResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Webhooks", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Webhook Deactivated", response = Void.class),
+        @ApiResponse(code = 200, message = "Webhook Deactivated", response = WebhookResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
@@ -189,6 +189,30 @@ public class WebhooksApi  {
     public Response getWebhooks() {
 
         return delegate.getWebhooks();
+    }
+
+    @Valid
+    @POST
+    @Path("/{webhookId}/retry")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retry Webhook Subscription or Unsubscription", notes = "Retry a webhook subscription or unsubscription by its unique ID.   <b>Scope(Permission) required:</b> `internal_webhook_update`   ", response = WebhookResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Webhooks", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Webhook Retried", response = WebhookResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Webhook not found", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal server error", response = Error.class)
+    })
+    public Response retryWebhook(@ApiParam(value = "",required=true) @PathParam("webhookId") String webhookId) {
+
+        return delegate.retryWebhook(webhookId );
     }
 
     @Valid

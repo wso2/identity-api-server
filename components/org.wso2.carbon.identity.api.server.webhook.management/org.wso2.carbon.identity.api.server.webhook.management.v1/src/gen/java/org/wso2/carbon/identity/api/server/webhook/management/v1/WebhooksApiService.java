@@ -45,5 +45,7 @@ public interface WebhooksApiService {
 
       public Response getWebhooks();
 
+      public Response retryWebhook(String webhookId);
+
       public Response updateWebhook(String webhookId, WebhookRequest webhookRequest);
 }

@@ -25,6 +25,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookRequestEventProfile;
+import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookSubscription;
 import javax.validation.constraints.*;
 
 
@@ -42,14 +43,14 @@ public class WebhookResponse  {
     private String endpoint;
     private WebhookRequestEventProfile eventProfile;
     private String name;
-    private List<String> channelsSubscribed = null;
+    private List<WebhookSubscription> channelsSubscribed = null;
 
 
 @XmlType(name="StatusEnum")
 @XmlEnum(String.class)
 public enum StatusEnum {
 
-    @XmlEnumValue("ACTIVE") ACTIVE(String.valueOf("ACTIVE")), @XmlEnumValue("INACTIVE") INACTIVE(String.valueOf("INACTIVE"));
+    @XmlEnumValue("ACTIVE") ACTIVE(String.valueOf("ACTIVE")), @XmlEnumValue("PARTIALLY_ACTIVE") PARTIALLY_ACTIVE(String.valueOf("PARTIALLY_ACTIVE")), @XmlEnumValue("INACTIVE") INACTIVE(String.valueOf("INACTIVE")), @XmlEnumValue("PARTIALLY_INACTIVE") PARTIALLY_INACTIVE(String.valueOf("PARTIALLY_INACTIVE"));
 
 
     private String value;
@@ -191,27 +192,27 @@ public enum StatusEnum {
     }
 
     /**
-    * List of channels to subscribe to.
+    * List of channel subscriptions with status.
     **/
-    public WebhookResponse channelsSubscribed(List<String> channelsSubscribed) {
+    public WebhookResponse channelsSubscribed(List<WebhookSubscription> channelsSubscribed) {
 
         this.channelsSubscribed = channelsSubscribed;
         return this;
     }
     
-    @ApiModelProperty(example = "[\"schemas.identity.wso2.org/events/logins/event-type/loginSuccess\",\"schemas.identity.wso2.org/events/logins/event-type/loginFailed\"]", value = "List of channels to subscribe to.")
+    @ApiModelProperty(example = "[{\"channelUri\":\"https://schemas.identity.wso2.org/events/login\",\"status\":\"SUBSCRIPTION_ACCEPTED\"},{\"channelUri\":\"https://schemas.identity.wso2.org/events/registration\",\"status\":\"SUBSCRIPTION_ERROR\"}]", value = "List of channel subscriptions with status.")
     @JsonProperty("channelsSubscribed")
     @Valid
-    public List<String> getChannelsSubscribed() {
+    public List<WebhookSubscription> getChannelsSubscribed() {
         return channelsSubscribed;
     }
-    public void setChannelsSubscribed(List<String> channelsSubscribed) {
+    public void setChannelsSubscribed(List<WebhookSubscription> channelsSubscribed) {
         this.channelsSubscribed = channelsSubscribed;
     }
 
-    public WebhookResponse addChannelsSubscribedItem(String channelsSubscribedItem) {
+    public WebhookResponse addChannelsSubscribedItem(WebhookSubscription channelsSubscribedItem) {
         if (this.channelsSubscribed == null) {
-            this.channelsSubscribed = new ArrayList<String>();
+            this.channelsSubscribed = new ArrayList<WebhookSubscription>();
         }
         this.channelsSubscribed.add(channelsSubscribedItem);
         return this;
