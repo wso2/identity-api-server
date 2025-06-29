@@ -25,5 +25,7 @@ public interface FlowApiService {
 
     public Response getFlow(String flowType);
 
+    public Response getFlowMeta(String flowType);
+
     public Response updateFlow(FlowRequest flowRequest);
 }

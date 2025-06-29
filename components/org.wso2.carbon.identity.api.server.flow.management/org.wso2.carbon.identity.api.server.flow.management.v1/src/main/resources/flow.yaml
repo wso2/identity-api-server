@@ -120,6 +120,52 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /flow/meta:
+    get:
+      summary: Retrieve metadata related to a flow type
+      operationId: getFlowMeta
+      tags:
+        - Flow Composer
+      parameters:
+        - in: query
+          name: flowType
+          required: true
+          schema:
+            type: string
+            enum: [SELF_REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
+          description: Type of the flow to get metadata for
+      responses:
+        '200':
+          description: Successfully retrieved flow metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlowMetaResponse'
+        '400':
+          description: Invalid flow type specified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Metadata for specified flow type not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 components:
   schemas:
     FlowRequest:
@@ -146,6 +192,49 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Step'
+
+    FlowMetaResponse:
+      type: object
+      description: Metadata for a given flow type
+      properties:
+        flowType:
+          type: string
+          example: PASSWORD_RECOVERY
+        supportedExecutors:
+          type: array
+          items:
+            type: string
+          example:
+            - UserResolveExecutor
+            - PasswordProvisioningExecutor
+            - EmailOTPExecutor
+        connectorConfig:
+          type: object
+          properties:
+            passwordRecoveryEnabled:
+              type: boolean
+              example: true
+            multiAttributeLoginEnabled:
+              type: boolean
+              example: false
+            selfRegistrationEnabled:
+              type: boolean
+              example: false
+        connectionMeta:
+          type: object
+          properties:
+            supportedConnections:
+              type: array
+              items:
+                type: string
+              example:
+                - Email OTP
+                - SMS OTP
+                - Passkey
+                - LinkedIn
+        AttributeProfile:
+          type: string
+          example: End-User-Profile
 
     Step:
       type: object
