@@ -42,6 +42,7 @@ public class FlowEndpointConstants {
 
     public static final String USERNAME_IDENTIFIER = "http://wso2.org/claims/username";
     public static final String PASSWORD_IDENTIFIER = "password";
+    public static final String USER_IDENTIFIER = "userIdentifier";
 
     /**
      * Error messages related to flow management.

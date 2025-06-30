@@ -33,8 +33,9 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.F
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.SELF_REGISTRATION_ATTRIBUTE_PROFILE;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.SMS_OTP_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USERNAME_IDENTIFIER;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USER_IDENTIFIER;
+import static org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants.MULTI_ATTRIBUTE_LOGIN_PROPERTY;
 import static org.wso2.carbon.identity.recovery.IdentityRecoveryConstants.ConnectorConfig.ENABLE_SELF_SIGNUP;
-import static org.wso2.carbon.identity.recovery.IdentityRecoveryConstants.ConnectorConfig.PASSWORD_RECOVERY_EMAIL_LINK_ENABLE;
 
 /**
  * Handler for managing the registration flow meta information.
@@ -64,7 +65,7 @@ public class RegistrationFlowMetaHandler extends AbstractMetaResponseHandler {
         connectorConfigs.setSelfRegistrationEnabled(
                     utils.isFlowConfigEnabled(tenantDomain, ENABLE_SELF_SIGNUP));
         connectorConfigs.setMultiAttributeLoginEnabled(
-                utils.isFlowConfigEnabled(tenantDomain, PASSWORD_RECOVERY_EMAIL_LINK_ENABLE));
+                utils.isFlowConfigEnabled(tenantDomain, MULTI_ATTRIBUTE_LOGIN_PROPERTY));
 
         return connectorConfigs;
     }
@@ -72,8 +73,14 @@ public class RegistrationFlowMetaHandler extends AbstractMetaResponseHandler {
     @Override
     public List<String> getRequiredInputFields() {
 
+        Utils utils = new Utils();
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         ArrayList<String> requiredInputFields = new ArrayList<>();
-        requiredInputFields.add(USERNAME_IDENTIFIER);
+        if (utils.isFlowConfigEnabled(tenantDomain, MULTI_ATTRIBUTE_LOGIN_PROPERTY)) {
+            requiredInputFields.add(USER_IDENTIFIER);
+        } else {
+            requiredInputFields.add(USERNAME_IDENTIFIER);
+        }
         requiredInputFields.add(PASSWORD_IDENTIFIER);
         return requiredInputFields;
     }
