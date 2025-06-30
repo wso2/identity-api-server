@@ -31,16 +31,11 @@ public class FlowEndpointConstants {
     }
 
     public static final String FLOW_PREFIX = "FM-";
-    public static final String SELF_REGISTRATION_ENABLED = "SelfRegistration.Enable";
-    public static final String MULTI_ATTRIBUTE_LOGIN_ENABLE = "account.multiattributelogin.handler.enable";
-    public static final String PASSWORD_RECOVERY_EMAIL_LINK_ENABLE = "Recovery.Notification.Password.emailLink.Enable";
-    public static final String PASSWORD_RECOVERY_EMAIL_OTP_ENABLE = "Recovery.Notification.Password.OTP.SendOTPInEmail";
-    public static final String PASSWORD_RECOVERY_SMS_OTP_ENABLE = "Recovery.Notification.Password.smsOtp.Enable";
-
     public static final String USER_RESOLVE_EXECUTOR = "UserResolveExecutor";
     public static final String PASSWORD_PROVISIONING_EXECUTOR = "PasswordProvisioningExecutor";
     public static final String EMAIL_OTP_EXECUTOR = "EmailOTPExecutor";
     public static final String SMS_OTP_EXECUTOR = "SmsOTPExecutor";
+    public static final String PASSWORD_ONBOARD_EXECUTOR = "PasswordOnboardExecutor";
 
     public static final String END_USER_ATTRIBUTE_PROFILE = "End-User-Profile";
     public static final String SELF_REGISTRATION_ATTRIBUTE_PROFILE = "Self-Registration";

@@ -27,11 +27,14 @@ import java.util.List;
 
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.EMAIL_OTP_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FlowType.REGISTRATION;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.MULTI_ATTRIBUTE_LOGIN_ENABLE;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.PASSWORD_IDENTIFIER;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.PASSWORD_ONBOARD_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.PASSWORD_PROVISIONING_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.SELF_REGISTRATION_ATTRIBUTE_PROFILE;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.SELF_REGISTRATION_ENABLED;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.SMS_OTP_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USERNAME_IDENTIFIER;
+import static org.wso2.carbon.identity.recovery.IdentityRecoveryConstants.ConnectorConfig.ENABLE_SELF_SIGNUP;
+import static org.wso2.carbon.identity.recovery.IdentityRecoveryConstants.ConnectorConfig.PASSWORD_RECOVERY_EMAIL_LINK_ENABLE;
 
 /**
  * Handler for managing the registration flow meta information.
@@ -59,17 +62,27 @@ public class RegistrationFlowMetaHandler extends AbstractMetaResponseHandler {
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         FlowMetaResponseConnectorConfigs connectorConfigs = new FlowMetaResponseConnectorConfigs();
         connectorConfigs.setSelfRegistrationEnabled(
-                    utils.isFlowConfigEnabled(tenantDomain, SELF_REGISTRATION_ENABLED));
+                    utils.isFlowConfigEnabled(tenantDomain, ENABLE_SELF_SIGNUP));
         connectorConfigs.setMultiAttributeLoginEnabled(
-                utils.isFlowConfigEnabled(tenantDomain, MULTI_ATTRIBUTE_LOGIN_ENABLE));
+                utils.isFlowConfigEnabled(tenantDomain, PASSWORD_RECOVERY_EMAIL_LINK_ENABLE));
 
         return connectorConfigs;
+    }
+
+    @Override
+    public List<String> getRequiredInputFields() {
+
+        ArrayList<String> requiredInputFields = new ArrayList<>();
+        requiredInputFields.add(USERNAME_IDENTIFIER);
+        requiredInputFields.add(PASSWORD_IDENTIFIER);
+        return requiredInputFields;
     }
 
     public List<String> getSupportedExecutors() {
 
         ArrayList<String> supportedExecutors = new ArrayList<>();
         supportedExecutors.add(PASSWORD_PROVISIONING_EXECUTOR);
+        supportedExecutors.add(PASSWORD_ONBOARD_EXECUTOR);
         supportedExecutors.add(EMAIL_OTP_EXECUTOR);
         supportedExecutors.add(SMS_OTP_EXECUTOR);
         return supportedExecutors;

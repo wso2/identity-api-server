@@ -313,7 +313,7 @@ public class Utils {
             return Boolean.parseBoolean(connectorConfigs[0].getValue());
 
         } catch (IdentityGovernanceException e) {
-            throw handleFlowMgtException(new FlowMgtFrameworkException(
+            throw handleFlowMgtException(new FlowMgtClientException(
                     ERROR_CODE_GET_GOVERNANCE_CONFIG.getCode(),
                     ERROR_CODE_GET_GOVERNANCE_CONFIG.getMessage(),
                     ERROR_CODE_GET_GOVERNANCE_CONFIG.getDescription(), e));
@@ -330,7 +330,7 @@ public class Utils {
             return applicationManagementServiceHolder.getAllLocalAuthenticators(tenantDomain);
 
         } catch (IdentityApplicationManagementException e) {
-            throw handleFlowMgtException(new FlowMgtFrameworkException(
+            throw handleFlowMgtException(new FlowMgtClientException(
                     ERROR_CODE_GET_LOCAL_AUTHENTICATORS.getCode(),
                     ERROR_CODE_GET_LOCAL_AUTHENTICATORS.getMessage(),
                     ERROR_CODE_GET_LOCAL_AUTHENTICATORS.getDescription(), e));
@@ -362,7 +362,7 @@ public class Utils {
         for (Component component : components) {
             if (ids != null && component.getId() != null && !component.getId().isEmpty()) {
                 if (!ids.add(component.getId())) {
-                    throw handleFlowMgtException(new FlowMgtFrameworkException(
+                    throw handleFlowMgtException(new FlowMgtClientException(
                             ERROR_CODE_DUPLICATE_COMPONENT_ID.getCode(),
                             ERROR_CODE_DUPLICATE_COMPONENT_ID.getMessage(),
                             ERROR_CODE_DUPLICATE_COMPONENT_ID.getDescription()));
@@ -399,11 +399,10 @@ public class Utils {
 
     public static void validateIdentifiers(AbstractMetaResponseHandler metaResponseHandler, Set<String> identifiers) {
 
-        String flowType = metaResponseHandler.getFlowType();
-        Set<String> required = (Set<String>) metaResponseHandler.getRequiredInputFields(flowType);
+        List<String> required = metaResponseHandler.getRequiredInputFields();
 
         if (!identifiers.containsAll(required)) {
-            throw handleFlowMgtException(new FlowMgtFrameworkException(
+            throw handleFlowMgtException(new FlowMgtClientException(
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_MISSING_IDENTIFIER.getCode(),
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_MISSING_IDENTIFIER.getMessage(),
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_MISSING_IDENTIFIER.getDescription()));
@@ -413,7 +412,7 @@ public class Utils {
     public static void validateExecutors(AbstractMetaResponseHandler metaResponseHandler, Set<String> executors) {
 
         if (!new HashSet<>(metaResponseHandler.getSupportedExecutors()).containsAll(executors)) {
-            throw handleFlowMgtException(new FlowMgtFrameworkException(
+            throw handleFlowMgtException(new FlowMgtClientException(
                     ERROR_CODE_UNSUPPORTED_EXECUTOR.getCode(),
                     ERROR_CODE_UNSUPPORTED_EXECUTOR.getMessage(),
                     ERROR_CODE_UNSUPPORTED_EXECUTOR.getDescription()));

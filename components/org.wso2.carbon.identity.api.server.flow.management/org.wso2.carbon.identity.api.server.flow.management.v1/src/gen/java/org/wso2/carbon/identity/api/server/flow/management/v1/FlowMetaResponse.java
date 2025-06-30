@@ -43,7 +43,7 @@ public class FlowMetaResponse  {
     private List<String> supportedExecutors = null;
 
     private FlowMetaResponseConnectorConfigs connectorConfigs;
-    private FlowMetaResponseConnectionMeta connectionMeta;
+    private FlowMetaResponseConnectionMeta connections;
     private String attributeProfile;
 
     /**
@@ -110,20 +110,20 @@ public class FlowMetaResponse  {
 
     /**
     **/
-    public FlowMetaResponse connectionMeta(FlowMetaResponseConnectionMeta connectionMeta) {
+    public FlowMetaResponse connections(FlowMetaResponseConnectionMeta connections) {
 
-        this.connectionMeta = connectionMeta;
+        this.connections = connections;
         return this;
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("connectionMeta")
+    @JsonProperty("connections")
     @Valid
     public FlowMetaResponseConnectionMeta getConnectionMeta() {
-        return connectionMeta;
+        return connections;
     }
-    public void setConnectionMeta(FlowMetaResponseConnectionMeta connectionMeta) {
-        this.connectionMeta = connectionMeta;
+    public void setConnectionMeta(FlowMetaResponseConnectionMeta connections) {
+        this.connections = connections;
     }
 
     /**
@@ -159,13 +159,13 @@ public class FlowMetaResponse  {
         return Objects.equals(this.flowType, flowMetaResponse.flowType) &&
             Objects.equals(this.supportedExecutors, flowMetaResponse.supportedExecutors) &&
             Objects.equals(this.connectorConfigs, flowMetaResponse.connectorConfigs) &&
-            Objects.equals(this.connectionMeta, flowMetaResponse.connectionMeta) &&
+            Objects.equals(this.connections, flowMetaResponse.connections) &&
             Objects.equals(this.attributeProfile, flowMetaResponse.attributeProfile);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(flowType, supportedExecutors, connectorConfigs, connectionMeta, attributeProfile);
+        return Objects.hash(flowType, supportedExecutors, connectorConfigs, connections, attributeProfile);
     }
 
     @Override
@@ -177,7 +177,7 @@ public class FlowMetaResponse  {
         sb.append("    flowType: ").append(toIndentedString(flowType)).append("\n");
         sb.append("    supportedExecutors: ").append(toIndentedString(supportedExecutors)).append("\n");
         sb.append("    connectorConfigs: ").append(toIndentedString(connectorConfigs)).append("\n");
-        sb.append("    connectionMeta: ").append(toIndentedString(connectionMeta)).append("\n");
+        sb.append("    connections: ").append(toIndentedString(connections)).append("\n");
         sb.append("    attributeProfile: ").append(toIndentedString(attributeProfile)).append("\n");
         sb.append("}");
         return sb.toString();

@@ -22,38 +22,35 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponseConnectorConfigs;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
 import org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants;
+import org.wso2.carbon.identity.recovery.IdentityRecoveryConstants;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.EMAIL_OTP_EXECUTOR;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.END_USER_ATTRIBUTE_PROFILE;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FlowType.PASSWORD_RECOVERY;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FlowType.ASK_PASSWORD;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.PASSWORD_IDENTIFIER;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.PASSWORD_PROVISIONING_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.SELF_REGISTRATION_ATTRIBUTE_PROFILE;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.SMS_OTP_EXECUTOR;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USERNAME_IDENTIFIER;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USER_RESOLVE_EXECUTOR;
-import static org.wso2.carbon.identity.recovery.IdentityRecoveryConstants.ConnectorConfig.PASSWORD_RECOVERY_EMAIL_LINK_ENABLE;
-import static org.wso2.carbon.identity.recovery.IdentityRecoveryConstants.ConnectorConfig.PASSWORD_RECOVERY_SEND_OTP_IN_EMAIL;
-import static org.wso2.carbon.identity.recovery.IdentityRecoveryConstants.ConnectorConfig.PASSWORD_RECOVERY_SMS_OTP_ENABLE;
 
 /**
- * Handler for managing the password recovery flow meta information.
+ * Handler for managing the ask password flow meta information.
  * This class extends the AbstractMetaResponseHandler to provide specific
- * implementations for password recovery flow.
+ * implementations for ask password flow.
  */
-public class PasswordRecoveryFlowMetaHandler extends AbstractMetaResponseHandler {
+public class AskPasswordFlowMetaHandler extends AbstractMetaResponseHandler {
 
     @Override
     public String getFlowType() {
 
-        return String.valueOf(PASSWORD_RECOVERY);
+        return String.valueOf(ASK_PASSWORD);
     }
 
     @Override
     public String getAttributeProfile() {
 
-        return END_USER_ATTRIBUTE_PROFILE;
+        return SELF_REGISTRATION_ATTRIBUTE_PROFILE;
     }
 
     @Override
@@ -62,16 +59,10 @@ public class PasswordRecoveryFlowMetaHandler extends AbstractMetaResponseHandler
         Utils utils = new Utils();
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         FlowMetaResponseConnectorConfigs connectorConfigs = new FlowMetaResponseConnectorConfigs();
-        connectorConfigs.setMultiAttributeLoginEnabled(
-                utils.isFlowConfigEnabled(tenantDomain,
+        connectorConfigs.setSelfRegistrationEnabled(utils.isFlowConfigEnabled(tenantDomain,
+                            IdentityRecoveryConstants.ConnectorConfig.ENABLE_SELF_SIGNUP));
+        connectorConfigs.setMultiAttributeLoginEnabled(utils.isFlowConfigEnabled(tenantDomain,
                         MultiAttributeLoginConstants.MULTI_ATTRIBUTE_LOGIN_PROPERTY));
-        connectorConfigs.setPasswordRecoveryEnabled(
-                utils.isFlowConfigEnabled(tenantDomain,
-                        PASSWORD_RECOVERY_EMAIL_LINK_ENABLE) ||
-                utils.isFlowConfigEnabled(tenantDomain,
-                        PASSWORD_RECOVERY_SMS_OTP_ENABLE) ||
-                utils.isFlowConfigEnabled(tenantDomain,
-                        PASSWORD_RECOVERY_SEND_OTP_IN_EMAIL));
 
         return connectorConfigs;
     }
@@ -80,17 +71,17 @@ public class PasswordRecoveryFlowMetaHandler extends AbstractMetaResponseHandler
     public List<String> getRequiredInputFields() {
 
         ArrayList<String> requiredInputFields = new ArrayList<>();
-        requiredInputFields.add(USERNAME_IDENTIFIER);
+        requiredInputFields.add(PASSWORD_IDENTIFIER);
         return requiredInputFields;
     }
 
     public List<String> getSupportedExecutors() {
 
         ArrayList<String> supportedExecutors = new ArrayList<>();
-        supportedExecutors.add(USER_RESOLVE_EXECUTOR);
         supportedExecutors.add(PASSWORD_PROVISIONING_EXECUTOR);
         supportedExecutors.add(EMAIL_OTP_EXECUTOR);
         supportedExecutors.add(SMS_OTP_EXECUTOR);
         return supportedExecutors;
     }
+
 }

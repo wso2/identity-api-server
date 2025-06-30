@@ -220,7 +220,7 @@ components:
             selfRegistrationEnabled:
               type: boolean
               example: false
-        connectionMeta:
+        connections:
           type: object
           properties:
             supportedConnections:

@@ -20,19 +20,14 @@ package org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers
 
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponseConnectionMeta;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponseConnectorConfigs;
-import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
 import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.PASSWORD_IDENTIFIER;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USERNAME_IDENTIFIER;
 
 /**
  * Abstract class for handling meta responses for different flows.
@@ -72,26 +67,9 @@ public abstract class AbstractMetaResponseHandler {
     /**
      * Get the required input fields for the flow.
      *
-     * @param flowType Type of the flow.
      * @return List of required input fields.
      */
-    public List<String> getRequiredInputFields(String flowType) {
-
-        ArrayList<String> requiredInputFields = new ArrayList<>();
-        if (FlowEndpointConstants.FlowType.REGISTRATION.toString().equals(flowType)) {
-            requiredInputFields.add(USERNAME_IDENTIFIER);
-            requiredInputFields.add(PASSWORD_IDENTIFIER);
-        }
-        if (FlowEndpointConstants.FlowType.PASSWORD_RECOVERY.toString().equals(flowType)) {
-            requiredInputFields.add(USERNAME_IDENTIFIER);
-            return requiredInputFields;
-        }
-        if (FlowEndpointConstants.FlowType.ASK_PASSWORD.toString().equals(flowType)) {
-            requiredInputFields.add(PASSWORD_IDENTIFIER);
-            return requiredInputFields;
-        }
-        return new ArrayList<>();
-    };
+    public abstract List<String> getRequiredInputFields();
 
     /**
      * Get the connection meta information for the flow.
@@ -116,8 +94,8 @@ public abstract class AbstractMetaResponseHandler {
                 })
                 .collect(Collectors.toList());
 
-        FlowMetaResponseConnectionMeta connectionMeta = new FlowMetaResponseConnectionMeta();
-        connectionMeta.setSupportedConnections(supportedConnections);
-        return connectionMeta;
+        FlowMetaResponseConnectionMeta connections = new FlowMetaResponseConnectionMeta();
+        connections.setSupportedConnections(supportedConnections);
+        return connections;
     }
 }

@@ -25,6 +25,7 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.FlowResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Step;
 import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.AbstractMetaResponseHandler;
+import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.AskPasswordFlowMetaHandler;
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.PasswordRecoveryFlowMetaHandler;
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.RegistrationFlowMetaHandler;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
@@ -150,8 +151,9 @@ public class ServerFlowMgtService {
                 return new RegistrationFlowMetaHandler();
             case PASSWORD_RECOVERY:
                 return new PasswordRecoveryFlowMetaHandler();
+            case ASK_PASSWORD:
+                return new AskPasswordFlowMetaHandler();
             default:
-                // Should not happen due to validateFlowType().
                 throw new IllegalStateException("Unhandled flow type: " + flowType);
         }
     }
