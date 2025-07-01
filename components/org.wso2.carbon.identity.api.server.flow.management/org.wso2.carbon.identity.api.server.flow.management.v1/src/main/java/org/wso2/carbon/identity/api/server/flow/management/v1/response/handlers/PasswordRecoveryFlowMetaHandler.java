@@ -85,6 +85,7 @@ public class PasswordRecoveryFlowMetaHandler extends AbstractMetaResponseHandler
         ArrayList<String> requiredInputFields = new ArrayList<>();
         if (utils.isFlowConfigEnabled(tenantDomain, MultiAttributeLoginConstants.MULTI_ATTRIBUTE_LOGIN_PROPERTY)) {
             requiredInputFields.add(USER_IDENTIFIER);
+            requiredInputFields.add(USERNAME_IDENTIFIER);
         } else {
             requiredInputFields.add(USERNAME_IDENTIFIER);
         }

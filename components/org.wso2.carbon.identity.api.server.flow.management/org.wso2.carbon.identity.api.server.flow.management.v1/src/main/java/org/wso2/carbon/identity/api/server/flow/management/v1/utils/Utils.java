@@ -49,8 +49,12 @@ import org.wso2.carbon.identity.flow.mgt.model.ExecutorDTO;
 import org.wso2.carbon.identity.flow.mgt.model.StepDTO;
 import org.wso2.carbon.identity.governance.IdentityGovernanceException;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
+import org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +69,8 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.F
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_GET_LOCAL_AUTHENTICATORS;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Schema.IDP_NAME;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USERNAME_IDENTIFIER;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USER_IDENTIFIER;
 
 /**
  * Utility class for flow management.
@@ -400,8 +406,33 @@ public class Utils {
     public static void validateIdentifiers(AbstractMetaResponseHandler metaResponseHandler, Set<String> identifiers) {
 
         List<String> required = metaResponseHandler.getRequiredInputFields();
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        boolean alternativeLoginStatus = new Utils().isFlowConfigEnabled(tenantDomain,
+                MultiAttributeLoginConstants.MULTI_ATTRIBUTE_LOGIN_PROPERTY);
 
-        if (!identifiers.containsAll(required)) {
+        // Determine which identifiers are acceptable for "identity"
+        List<String> identityIdentifiers = alternativeLoginStatus ?
+                Arrays.asList(USER_IDENTIFIER, USERNAME_IDENTIFIER) :
+                Collections.singletonList(USERNAME_IDENTIFIER);
+
+        // Check if at least one required identity identifier is present
+        boolean needsIdentity = required.stream().anyMatch(identityIdentifiers::contains);
+        boolean hasIdentity = identifiers.stream().anyMatch(identityIdentifiers::contains);
+
+        if (needsIdentity && !hasIdentity) {
+            throw handleFlowMgtException(new FlowMgtClientException(
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_MISSING_IDENTIFIER.getCode(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_MISSING_IDENTIFIER.getMessage(),
+                    alternativeLoginStatus
+                            ? "Either user identifier or username identifier must be provided."
+                            : "Username identifier must be provided."));
+        }
+
+        // Check remaining required identifiers (excluding identity identifiers)
+        List<String> remainingRequired = new ArrayList<>(required);
+        remainingRequired.removeAll(identityIdentifiers);
+
+        if (!identifiers.containsAll(remainingRequired)) {
             throw handleFlowMgtException(new FlowMgtClientException(
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_MISSING_IDENTIFIER.getCode(),
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_MISSING_IDENTIFIER.getMessage(),
