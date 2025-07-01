@@ -27,6 +27,7 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.workflow.common.Constants;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.InstanceStatus;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Operation;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.OptionDetails;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationListItem;
@@ -34,6 +35,9 @@ import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssoci
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationPatchRequest;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationRequest;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationResponse;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowInstanceListItem;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowInstanceListResponse;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowInstanceResponse;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowListItem;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowListResponse;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowRequest;
@@ -49,15 +53,18 @@ import org.wso2.carbon.identity.workflow.mgt.dto.WorkflowEvent;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowClientException;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowException;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.ws.rs.core.Response;
+
+import java.time.LocalDateTime;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Workflow service class
@@ -66,6 +73,8 @@ public class WorkflowService {
 
     private static final Log log = LogFactory.getLog(WorkflowService.class);
     private final WorkflowManagementService workflowManagementService;
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = 
+    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
     public WorkflowService(WorkflowManagementService workflowManagementService) {
 
@@ -618,4 +627,179 @@ public class WorkflowService {
         }
         return new APIError(Response.Status.BAD_REQUEST, errorResponse);
     }
+
+    public void deleteWorkflowInstance(String instanceId) {
+
+        try {
+            if (StringUtils.isBlank(instanceId)) {
+                throw new WorkflowClientException("Workflow instance ID cannot be null or empty.");
+            }
+            workflowManagementService.deleteWorkflowRequestCreatedByAnyUser(instanceId);
+        } catch (WorkflowClientException e) {
+            throw handleClientError(Constants.ErrorMessage.ERROR_CODE_WORKFLOW_INSTANCE_NOT_FOUND, instanceId, e);
+        } catch (WorkflowException e) {
+            throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_DELETING_WORKFLOW_INSTANCE, instanceId, e);
+        }
+    }
+    
+    //getWorkflowsOfRequest
+
+    public WorkflowInstanceResponse getWorkflowInstanceById(String instanceId) {
+        try {
+            if (StringUtils.isBlank(instanceId)) {
+                throw new WorkflowClientException("Workflow instance ID cannot be null or empty.");
+            }
+            org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest workflowRequest = workflowManagementService.getWorkflowRequest(instanceId);
+            if (workflowRequest == null) {
+                throw new WorkflowClientException("Workflow instance with ID: " + instanceId + " does not exist.");
+            }
+            return mapWorkflowRequestToWorkflowRequestResponse(workflowRequest);
+        } catch (WorkflowClientException e) {
+            throw handleClientError(Constants.ErrorMessage.ERROR_CODE_WORKFLOW_INSTANCE_NOT_FOUND, instanceId, e);
+        } catch (WorkflowException e) {
+            throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_WORKFLOW_INSTANCE, instanceId, e);
+        }
+    }
+
+        private WorkflowInstanceResponse mapWorkflowRequestToWorkflowRequestResponse(org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest workflowRequest) {
+    if (workflowRequest == null) {
+        return null;
+    }
+
+    WorkflowInstanceResponse response = new WorkflowInstanceResponse();
+    response.setEventType(Operation.fromValue(workflowRequest.getEventType()));
+    response.setCreatedAt(LocalDateTime.parse(workflowRequest.getCreatedAt()));
+    response.setUpdatedAt(LocalDateTime.parse(workflowRequest.getUpdatedAt()));
+    response.setStatus(InstanceStatus.fromValue(workflowRequest.getStatus()));
+    return response;
+}
+
+    private WorkflowInstanceListItem mapWorkflowRequestToListItem(org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest workflowRequest) {
+    if (workflowRequest == null) {
+        return null;
+    }
+
+    WorkflowInstanceListItem item = new WorkflowInstanceListItem();
+    
+    if (workflowRequest.getEventType() != null) {
+        item.setEventType(Operation.fromValue(workflowRequest.getEventType()));
+    }
+    
+    if (workflowRequest.getCreatedAt() != null) {
+        try {
+            item.setCreatedAt(LocalDateTime.parse(workflowRequest.getCreatedAt()));
+        } catch (DateTimeParseException e) {
+            item.setCreatedAt(null);
+        }
+    }
+    if (workflowRequest.getUpdatedAt() != null) {
+        try {
+            item.setUpdatedAt(LocalDateTime.parse(workflowRequest.getUpdatedAt()));
+        } catch (DateTimeParseException e) {
+            item.setUpdatedAt(null);
+        }
+    }
+    
+    if (workflowRequest.getStatus() != null) {
+        item.setStatus(InstanceStatus.fromValue(workflowRequest.getStatus()));
+    }
+
+    return item;
+}
+
+    public WorkflowInstanceListResponse getWorkflowInstances(Integer limit, Integer offset, String filter) {
+        try {
+            limit = validateLimit(limit);
+            offset = validateOffset(offset);
+            return getPaginatedWorkflowInstances(limit, offset, filter);
+        } catch (WorkflowClientException e) {
+            throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_LISTING_WORKFLOW_INSTANCES, null, e);
+        } catch (WorkflowException e) {
+            throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_WORKFLOW_INSTANCES, null, e);
+        }
+    }
+
+    private WorkflowInstanceListResponse getPaginatedWorkflowInstances(Integer limit, Integer offset, String filter) throws WorkflowException {
+        try {
+            String user = CarbonContext.getThreadLocalCarbonContext().getUsername();
+            int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+            Map<String, String> filterMap = parseWorkflowFilter(filter);
+
+    String requestType = filterMap.get("requestType");
+    String beginDate = filterMap.get("beginDate");
+    String endDate = filterMap.get("endDate");
+    String dateCategory = filterMap.get("dateCategory");
+    String status = filterMap.get("status");
+
+    if (requestType == null || beginDate == null || endDate == null || dateCategory == null || status == null) {
+        throw new WorkflowClientException("Invalid filter parameters. Required parameters: requestType, beginDate, endDate, dateCategory, status.");
+    }
+    org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest[] response;
+    if (requestType == "ALL_TASKS"){
+                    response = workflowManagementService.getRequestsFromFilter(
+                    "", beginDate, endDate, dateCategory, tenantId, status);
+    }else if (requestType == "MY_TASKS") {
+                response = workflowManagementService.getRequestsFromFilter(
+                    user, beginDate, endDate, dateCategory, tenantId, status);
+    } else {
+        throw new WorkflowClientException("Invalid request type: " + requestType + ". Valid types are 'ALL_TASKS' and 'MY_TASKS'.");
+    }
+        WorkflowInstanceListResponse workflowInstanceListResponse = new WorkflowInstanceListResponse();
+        for (org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest workflowRequest : response) {
+            WorkflowInstanceListItem item = mapWorkflowRequestToListItem(workflowRequest);
+            if (item != null) {
+                workflowInstanceListResponse.getInstances().add(item);
+            }
+        }
+        return workflowInstanceListResponse;
+        } catch (WorkflowException e) {
+            throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_WORKFLOW_INSTANCES, null, e);
+        }
+    }
+
+    public Map<String, String> parseWorkflowFilter(String filter) {
+    Map<String, String> result = new HashMap<>();
+
+    if (StringUtils.isBlank(filter)) {
+        return result;
+    }
+
+    String[] conditions = filter.split("(?i)\\s+and\\s+");
+    Pattern pattern = Pattern.compile("(\\w+)\\s+(eq|ge|le)\\s+'([^']*)'");
+
+    for (String condition : conditions) {
+        Matcher matcher = pattern.matcher(condition.trim());
+        if (matcher.matches()) {
+            String field = matcher.group(1);
+            String operator = matcher.group(2);
+            String value = matcher.group(3);
+
+            switch (field) {
+                case "requestType":
+                case "status":
+                case "dateCategory":
+                    if ("eq".equals(operator)) {
+                        result.put(field, value);
+                    }
+                    break;
+                case "beginDate":
+                    if ("ge".equals(operator)) {
+                        result.put("beginDate", value);
+                    }
+                    break;
+                case "endDate":
+                    if ("le".equals(operator)) {
+                        result.put("endDate", value);
+                    }
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown field in filter: " + field);
+            }
+        } else {
+            throw new IllegalArgumentException("Invalid filter format: " + condition);
+        }
+    }
+
+    return result;
+}
 }

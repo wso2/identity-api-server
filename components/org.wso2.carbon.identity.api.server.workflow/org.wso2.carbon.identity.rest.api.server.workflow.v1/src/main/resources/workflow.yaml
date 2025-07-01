@@ -462,8 +462,102 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+                
+  /workflow-instances:
+    get:
+      summary: Get workflow instances for a tenant
+      description: |
+        Retrieve workflow instances filtered by various parameters.
+        
+        <b>Scope required:</b> internal_workflow_instances_view
+      operationId: getWorkflowInstances
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 25
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: filter
+          in: query
+          description: |
+            Filter conditions using logical expressions. Supported operators: `eq`, `le`, `ge`.
+            
+            Combine multiple conditions with `and`.
+            
+            Example:
+            
+                `requestType eq 'APPROVAL' and beginDate ge '2024-01-01' and endDate le '2024-12-31' and dateCategory eq 'CREATED' and status eq 'PENDING'`
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Workflow instances retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowInstanceListResponse'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+                       
+                
+                
+  /workflow-instances/{instance_id}:
+    get:
+      summary: Get workflow instance by ID
+      description: |
+        Retrieve a specific workflow instance by providing its unique ID.
 
+        <b>Scope required:</b> internal_workflow_instances_view
+      operationId: getWorkflowInstanceById
+      parameters:
+        - name: instance_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Workflow instance retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowInstanceResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
 
+    delete:
+      summary: Delete workflow instance by ID
+      description: |
+        Delete a workflow instance by providing the instance ID.
+        
+        <b>Scope required:</b> internal_workflow_instances_delete
+      operationId: deleteWorkflowInstance
+      parameters:
+        - name: instance_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successfully deleted the workflow instance
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    
 components:
   schemas:
     WorkflowEngine:
@@ -765,6 +859,53 @@ components:
           type: boolean
           example: true
           description: "Association Status"
+    WorkflowInstanceListResponse:
+      type: object
+      properties:
+        totalResults:
+          type: integer
+        startIndex:
+          type: integer
+        count:
+          type: integer
+        instances:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowInstanceListItem'
+
+    WorkflowInstanceListItem:
+      type: object
+      properties:
+        eventType:
+          $ref: '#/components/schemas/Operation'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/InstanceStatus'
+          
+    WorkflowInstanceResponse:
+      type: object
+      properties:
+        eventType:
+          $ref: '#/components/schemas/Operation'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/InstanceStatus'
+        requestParameters:
+          type: object
+
+    InstanceStatus:
+      type: string
+      enum: [ALL_TASKS, PENDING, APPROVED, REJECTED, FAILED]
 
     Operation:
       type: string

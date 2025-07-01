@@ -64,6 +64,11 @@ public class Constants {
         ERROR_CODE_INVALID_PAGINATION_PARAMETER_NEGATIVE_LIMIT("51009", "Invalid pagination parameters.", "'limit' " +
                 "shouldn't be negative."),
 
+        // Workflow Instance client errors
+        ERROR_CODE_WORKFLOW_INSTANCE_NOT_FOUND("51010", "Resource not found.",
+                "Unable to find a resource matching the provided workflow instance identifier %s."),
+        ERROR_CODE_CLIENT_ERROR_LISTING_WORKFLOW_INSTANCES("51011", "Unable to list existing workflow instances",
+                "Encountered an error while listing the workflow instances."),
 
         // Server Errors starting from 500xx.
         ERROR_CODE_ERROR_LISTING_WORKFLOWS("50020", "Unable to list existing workflows",
@@ -93,7 +98,14 @@ public class Constants {
                                                                 "the workflow association for identifier %s."),
         ERROR_CODE_ERROR_UPDATING_ASSOCIATION("50029", "Unable to update workflow association",
                                                       "Server encountered an error while " +
-                                                              "updating the workflow association.");
+                                                              "updating the workflow association."),
+        // Workflow Instance server errors
+        ERROR_CODE_ERROR_DELETING_WORKFLOW_INSTANCE("50030", "Unable to delete workflow instance",
+                "Server encountered an error while deleting the workflow instance for identifier %s."),
+        ERROR_CODE_ERROR_RETRIEVING_WORKFLOW_INSTANCE("50031", "Unable to retrieve workflow instance.",
+                "Server encountered an error while retrieving the workflow instance for identifier %s."),
+        ERROR_CODE_ERROR_LISTING_WORKFLOW_INSTANCES("50032", "Unable to list existing workflow instances",
+                "Server encountered an error while listing the workflow instances.");
 
         private final String code;
         private final String message;
