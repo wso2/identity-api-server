@@ -28,20 +28,20 @@ import javax.validation.Valid;
 public class InputFormatDTO {
 
     @Valid 
-    private InputType inputType = null;
+    private String inputType = null;
 
     /**
      * Specifies the format of the input type.
-     * @return
+     * @return inputType
      */
     @ApiModelProperty(value = "The format of the input type.")
     @JsonProperty("inputType")
-    public InputType getInputType() {
+    public String getInputType() {
 
         return inputType;
     }
 
-    public void setInputType(InputType inputType) {
+    public void setInputType(String inputType) {
 
         this.inputType = inputType;
     }
