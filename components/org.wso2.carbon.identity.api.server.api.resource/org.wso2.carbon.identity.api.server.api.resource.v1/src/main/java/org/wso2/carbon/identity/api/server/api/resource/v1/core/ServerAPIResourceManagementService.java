@@ -45,6 +45,7 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.application.common.model.APIResource;
 import org.wso2.carbon.identity.application.common.model.APIResourceProperty;
 import org.wso2.carbon.identity.application.common.model.Scope;
+import org.wso2.carbon.identity.core.util.IdentityUtil;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -161,6 +162,13 @@ public class ServerAPIResourceManagementService {
                 boolean isLastPage = !hasMoreItems && (StringUtils.isNotBlank(after) || StringUtils.isBlank(before));
 
                 String url = "?limit=" + limit;
+
+                // Remove SCIM2 Roles V3 api-resource if Scim2RolesV3ApiEnabled config is disabled
+                apiResources.removeIf(resource -> (
+                        APIResourceMgtEndpointConstants.SCIM2_ROLES_V3_API_PATH.equals(resource.getIdentifier()) ||
+                        APIResourceMgtEndpointConstants.SCIM2_ROLES_V3_ORG_API.equals(resource.getIdentifier()))
+                        && !isScim2RolesV3ApiEnabled()
+                );
 
                 if (StringUtils.isNotBlank(filter)) {
                     try {
@@ -619,5 +627,11 @@ public class ServerAPIResourceManagementService {
             throw APIResourceMgtEndpointUtil.handleException(Response.Status.FORBIDDEN,
                     ErrorMessage.ERROR_CODE_SYSTEM_API_RESOURCE_NOT_MODIFIABLE);
         }
+    }
+
+    private boolean isScim2RolesV3ApiEnabled() {
+
+        return Boolean.parseBoolean(IdentityUtil.getProperty(
+                APIResourceMgtEndpointConstants.ENABLE_SCIM2_ROLES_V3_API));
     }
 }

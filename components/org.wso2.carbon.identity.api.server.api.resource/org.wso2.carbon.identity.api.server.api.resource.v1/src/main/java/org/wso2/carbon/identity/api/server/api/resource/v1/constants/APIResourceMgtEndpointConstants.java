@@ -37,6 +37,9 @@ public class APIResourceMgtEndpointConstants {
     public static final String API_RESOURCE_MANAGEMENT_PREFIX = "API-RESOURCE-";
     public static final String API_RESOURCE_PATH_COMPONENT = "/api-resources";
     public static final String API_RESOURCE_COLLECTION_PATH_COMPONENT = "/api-resource-collections";
+    public static final String ENABLE_SCIM2_ROLES_V3_API = "SCIM2.EnableScim2RolesV3Api";
+    public static final String SCIM2_ROLES_V3_API_PATH = "/scim2/v3/Roles";
+    public static final String SCIM2_ROLES_V3_ORG_API = "/o/scim2/v3/Roles";
     public static final List<String> ALLOWED_API_RESOURCE_TYPES = Collections.unmodifiableList(
             Arrays.asList(
                     BUSINESS_API_RESOURCE_TYPE,
