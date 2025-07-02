@@ -24,8 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.application.management.v1.BasicOrganizationResponse;
-import org.wso2.carbon.identity.api.server.application.management.v1.Link;
+import org.wso2.carbon.identity.api.server.application.management.v1.OrgShareConfig;
 import javax.validation.constraints.*;
 
 
@@ -34,61 +33,53 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class SharedOrganizationsResponse  {
+public class ApplicationShareSelectedRequestBody  {
   
-    private List<Link> links = null;
-
-    private List<BasicOrganizationResponse> organizations = null;
+    private String applicationId;
+    private List<OrgShareConfig> organizations = new ArrayList<>();
 
 
     /**
     **/
-    public SharedOrganizationsResponse links(List<Link> links) {
+    public ApplicationShareSelectedRequestBody applicationId(String applicationId) {
 
-        this.links = links;
+        this.applicationId = applicationId;
         return this;
     }
     
-    @ApiModelProperty(example = "[{\"href\":\"/api/server/v1/applications/67f5a202-48c4-4313-9327-016da5f08f17/share?limit=10&recursive=false&next=MTA=\",\"rel\":\"next\"},{\"href\":\"/api/server/v1/applications/67f5a202-48c4-4313-9327-016da5f08f17/share?limit=10&recursive=false&before=MTA=\",\"rel\":\"previous\"}]", value = "")
-    @JsonProperty("links")
+    @ApiModelProperty(required = true, value = "")
+    @JsonProperty("applicationId")
     @Valid
-    public List<Link> getLinks() {
-        return links;
+    @NotNull(message = "Property applicationId cannot be null.")
+
+    public String getApplicationId() {
+        return applicationId;
     }
-    public void setLinks(List<Link> links) {
-        this.links = links;
+    public void setApplicationId(String applicationId) {
+        this.applicationId = applicationId;
     }
 
-    public SharedOrganizationsResponse addLinksItem(Link linksItem) {
-        if (this.links == null) {
-            this.links = new ArrayList<>();
-        }
-        this.links.add(linksItem);
-        return this;
-    }
-
-        /**
+    /**
     **/
-    public SharedOrganizationsResponse organizations(List<BasicOrganizationResponse> organizations) {
+    public ApplicationShareSelectedRequestBody organizations(List<OrgShareConfig> organizations) {
 
         this.organizations = organizations;
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(required = true, value = "")
     @JsonProperty("organizations")
     @Valid
-    public List<BasicOrganizationResponse> getOrganizations() {
+    @NotNull(message = "Property organizations cannot be null.")
+
+    public List<OrgShareConfig> getOrganizations() {
         return organizations;
     }
-    public void setOrganizations(List<BasicOrganizationResponse> organizations) {
+    public void setOrganizations(List<OrgShareConfig> organizations) {
         this.organizations = organizations;
     }
 
-    public SharedOrganizationsResponse addOrganizationsItem(BasicOrganizationResponse organizationsItem) {
-        if (this.organizations == null) {
-            this.organizations = new ArrayList<>();
-        }
+    public ApplicationShareSelectedRequestBody addOrganizationsItem(OrgShareConfig organizationsItem) {
         this.organizations.add(organizationsItem);
         return this;
     }
@@ -104,23 +95,23 @@ public class SharedOrganizationsResponse  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        SharedOrganizationsResponse sharedOrganizationsResponse = (SharedOrganizationsResponse) o;
-        return Objects.equals(this.links, sharedOrganizationsResponse.links) &&
-            Objects.equals(this.organizations, sharedOrganizationsResponse.organizations);
+        ApplicationShareSelectedRequestBody applicationShareSelectedRequestBody = (ApplicationShareSelectedRequestBody) o;
+        return Objects.equals(this.applicationId, applicationShareSelectedRequestBody.applicationId) &&
+            Objects.equals(this.organizations, applicationShareSelectedRequestBody.organizations);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(links, organizations);
+        return Objects.hash(applicationId, organizations);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class SharedOrganizationsResponse {\n");
+        sb.append("class ApplicationShareSelectedRequestBody {\n");
         
-        sb.append("    links: ").append(toIndentedString(links)).append("\n");
+        sb.append("    applicationId: ").append(toIndentedString(applicationId)).append("\n");
         sb.append("    organizations: ").append(toIndentedString(organizations)).append("\n");
         sb.append("}");
         return sb.toString();
