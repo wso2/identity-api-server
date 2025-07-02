@@ -99,6 +99,7 @@ import org.wso2.carbon.identity.application.common.model.ApplicationBasicInfo;
 import org.wso2.carbon.identity.application.common.model.AuthenticationStep;
 import org.wso2.carbon.identity.application.common.model.AuthorizationDetailsType;
 import org.wso2.carbon.identity.application.common.model.AuthorizedAPI;
+import org.wso2.carbon.identity.application.common.model.ClaimConfig;
 import org.wso2.carbon.identity.application.common.model.FederatedAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.application.common.model.ImportResponse;
@@ -198,6 +199,7 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.TEMPLATE_VERSION;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotImplementedError;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.getInboundAuthKey;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.getInboundAuthenticationRequestConfig;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.rollbackInbound;
@@ -918,16 +920,14 @@ public class ServerApplicationManagementService {
                     UNSUPPORTED_OUTBOUND_PROVISIONING_CONFIGURATION.getDescription());
         }
 
-        // Preserve the claim dialect enum value of the application before applying the changes to the application.
-        String previousClaimDialect = appToUpdate.getClaimConfig().isLocalClaimDialect() ?
-                ClaimConfiguration.DialectEnum.LOCAL.value() : ClaimConfiguration.DialectEnum.CUSTOM.value();
+        ServiceProvider previousApplication = Utils.deepCopyApplication(appToUpdate);
 
         if (applicationPatchModel != null) {
             new UpdateServiceProvider().apply(appToUpdate, applicationPatchModel);
         }
 
-        boolean isAllowUpdateSystemApps = isAllowUpdateSystemApplication(appToUpdate.getApplicationName(),
-                applicationPatchModel, previousClaimDialect);
+        boolean isAllowUpdateSystemApps = isAllowUpdateSystemApplication(appToUpdate,
+                applicationPatchModel, previousApplication);
 
         try {
             if (isAllowUpdateSystemApps) {
@@ -1204,14 +1204,16 @@ public class ServerApplicationManagementService {
     /**
      * Check updating system application allowed or not.
      *
-     * @param appName               application name
+     * @param updatedApplication    updated application
      * @param applicationPatchModel application patch model
-     * @param previousClaimDialect  previous claim dialect
+     * @param previousApplication   previous application
      * @return true if allowed
      */
-    private boolean isAllowUpdateSystemApplication(String appName, ApplicationPatchModel applicationPatchModel,
-                                                   String previousClaimDialect) {
+    private boolean isAllowUpdateSystemApplication(ServiceProvider updatedApplication,
+                                                   ApplicationPatchModel applicationPatchModel,
+                                                   ServiceProvider previousApplication) {
 
+        String appName = updatedApplication.getApplicationName();
         Set<String> systemApplications = applicationManagementService.getSystemApplications();
         if (systemApplications == null || systemApplications.stream().noneMatch(appName::equalsIgnoreCase)) {
             return false;
@@ -1226,7 +1228,7 @@ public class ServerApplicationManagementService {
                     && applicationPatchModel.getTemplateId() == null
                     && applicationPatchModel.getTemplateVersion() == null
                     && validateClaimConfigurationOnSystemAppUpdate(
-                            applicationPatchModel.getClaimConfiguration(), previousClaimDialect)
+                        applicationPatchModel.getClaimConfiguration(), updatedApplication, previousApplication)
                     && applicationPatchModel.getAdvancedConfigurations() == null
                     && applicationPatchModel.getProvisioningConfigurations() == null;
         }
@@ -1236,17 +1238,22 @@ public class ServerApplicationManagementService {
     /**
      * Validate claim configuration on system application update.
      *
-     * @param claimConfiguration  claim configuration
-     * @param previousClaimDialect previous claim dialect
+     * @param claimConfiguration   claim configuration
+     * @param updatedApplication   updated application
+     * @param previousApplication  previous application
      * @return true if allowed
      */
     private boolean validateClaimConfigurationOnSystemAppUpdate(ClaimConfiguration claimConfiguration,
-                                                                String previousClaimDialect) {
+                                                                ServiceProvider updatedApplication,
+                                                                ServiceProvider previousApplication) {
 
-        // claimConfiguration is not getting patched at all.
+        // ClaimConfiguration is not getting patched at all.
         if (claimConfiguration == null) {
             return true;
         }
+
+        String previousClaimDialect = previousApplication.getClaimConfig().isLocalClaimDialect() ?
+                ClaimConfiguration.DialectEnum.LOCAL.value() : ClaimConfiguration.DialectEnum.CUSTOM.value();
 
         // If here, claimConfiguration is getting patched.
         boolean isClaimConfigValid = claimConfiguration.getClaimMappings() == null
@@ -1260,7 +1267,7 @@ public class ServerApplicationManagementService {
 
         // If here, claimConfiguration is getting patched with subject attributes.
         SubjectConfig subjectConfig = claimConfiguration.getSubject();
-        // subjectConfig is not getting patched at all.
+        // SubjectConfig is not getting patched at all.
         if (subjectConfig == null) {
             return true;
         }
@@ -1269,9 +1276,21 @@ public class ServerApplicationManagementService {
                 && subjectConfig.getIncludeUserDomain() == null
                 && subjectConfig.getMappedLocalSubjectMandatory() == null;
 
-        // True if the subjectConfig is getting patched with only useMappedLocalSubject attribute.
-        // False if the subjectConfig is getting patched with unintended attributes.
-        return isSubjectClaimConfigValid;
+        if (isSubjectClaimConfigValid) {
+
+            /* True if the subjectConfig is getting patched with only useMappedLocalSubject attribute.
+            Since we only allow to update the useMappedLocalSubject attribute for system applications,
+            change only that property value in the ClaimConfig object and keep others as same. */
+
+            ClaimConfig previousClaimConfig = previousApplication.getClaimConfig();
+            setIfNotNull(subjectConfig.getUseMappedLocalSubject(),
+                    previousClaimConfig::setAlwaysSendMappedLocalSubjectId);
+            updatedApplication.setClaimConfig(previousClaimConfig);
+            return true;
+        }
+
+        // If here, subjectConfig is getting patched with unintended attributes.
+        return false;
     }
 
     /**
