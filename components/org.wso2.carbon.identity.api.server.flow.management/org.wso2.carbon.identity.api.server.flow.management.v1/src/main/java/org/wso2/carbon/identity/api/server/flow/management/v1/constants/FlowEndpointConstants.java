@@ -31,14 +31,47 @@ public class FlowEndpointConstants {
     }
 
     public static final String FLOW_PREFIX = "FM-";
+    public static final String USER_RESOLVE_EXECUTOR = "UserResolveExecutor";
+    public static final String PASSWORD_PROVISIONING_EXECUTOR = "PasswordProvisioningExecutor";
+    public static final String EMAIL_OTP_EXECUTOR = "EmailOTPExecutor";
+    public static final String SMS_OTP_EXECUTOR = "SmsOTPExecutor";
+    public static final String PASSWORD_ONBOARD_EXECUTOR = "PasswordOnboardExecutor";
+
+    public static final String END_USER_ATTRIBUTE_PROFILE = "End-User-Profile";
+    public static final String SELF_REGISTRATION_ATTRIBUTE_PROFILE = "Self-Registration";
+
+    public static final String USERNAME_IDENTIFIER = "http://wso2.org/claims/username";
+    public static final String PASSWORD_IDENTIFIER = "password";
+    public static final String USER_IDENTIFIER = "userIdentifier";
 
     /**
      * Error messages related to flow management.
      */
     public enum ErrorMessages {
 
-        ERROR_CODE_INVALID_FLOW_TYPE("10001", "Invalid flow type.",
-                "The provided flow type is not supported.");
+        ERROR_CODE_INVALID_FLOW_TYPE("10001",
+                "Invalid flow type.",
+                "The provided flow type is not supported."),
+
+        ERROR_CODE_GET_GOVERNANCE_CONFIG("10002",
+                "Error occurred while retrieving the governance configuration.",
+                "Server encountered an error while retrieving the governance configuration."),
+
+        ERROR_CODE_GET_LOCAL_AUTHENTICATORS("10003",
+                "Error occurred while retrieving local authenticators.",
+                "Server encountered an error while retrieving the local authenticators."),
+
+        ERROR_CODE_UNSUPPORTED_EXECUTOR("10004",
+                "Unsupported executor used in the flow.",
+                "The provided executor is not supported for the flow type. Please use a supported executor."),
+
+        ERROR_CODE_MISSING_IDENTIFIER("10005",
+                "Missing required identifier in flow.",
+                "The flow must contain a FIELD component with the required identifier."),
+
+        ERROR_CODE_DUPLICATE_COMPONENT_ID("10006",
+                "Duplicate component ID found in the flow.",
+                "All component IDs must be unique across the entire flow.");
 
         private final String code;
         private final String message;
