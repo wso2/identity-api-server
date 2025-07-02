@@ -73,9 +73,10 @@ public class FlowEndpointConstants {
      */
     public enum FlowType {
 
+        USER_REGISTRATION,
         REGISTRATION,
-        PASSWORD_RECOVERY,
-        ASK_PASSWORD;
+        PASSWORD_RESET,
+        INVITED_USER_REGISTRATION;
 
         /**
          * Check if a given string is a valid flow type.
