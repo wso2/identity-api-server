@@ -74,6 +74,7 @@ public enum StatusEnum {
 }
 
     private StatusEnum status;
+    private String version;
     private String created;
     private String lastModified;
 
@@ -212,6 +213,26 @@ public enum TypeEnum {
     }
     public void setStatus(StatusEnum status) {
         this.status = status;
+    }
+
+    /**
+    **/
+    public GetOrganizationResponse version(String version) {
+
+        this.version = version;
+        return this;
+    }
+
+    @ApiModelProperty(example = "v1.0.0", required = true, value = "")
+    @JsonProperty("version")
+    @Valid
+    @NotNull(message = "Property version cannot be null.")
+
+    public String getVersion() {
+        return version;
+    }
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     /**
@@ -361,6 +382,7 @@ public enum TypeEnum {
             Objects.equals(this.orgHandle, getOrganizationResponse.orgHandle) &&
             Objects.equals(this.description, getOrganizationResponse.description) &&
             Objects.equals(this.status, getOrganizationResponse.status) &&
+            Objects.equals(this.version, getOrganizationResponse.version) &&
             Objects.equals(this.created, getOrganizationResponse.created) &&
             Objects.equals(this.lastModified, getOrganizationResponse.lastModified) &&
             Objects.equals(this.type, getOrganizationResponse.type) &&
@@ -371,7 +393,7 @@ public enum TypeEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, orgHandle, description, status, created, lastModified, type, parent, attributes, permissions);
+        return Objects.hash(id, name, orgHandle, description, status, version, created, lastModified, type, parent, attributes, permissions);
     }
 
     @Override
@@ -385,6 +407,7 @@ public enum TypeEnum {
         sb.append("    orgHandle: ").append(toIndentedString(orgHandle)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
+        sb.append("    version: ").append(toIndentedString(version)).append("\n");
         sb.append("    created: ").append(toIndentedString(created)).append("\n");
         sb.append("    lastModified: ").append(toIndentedString(lastModified)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
