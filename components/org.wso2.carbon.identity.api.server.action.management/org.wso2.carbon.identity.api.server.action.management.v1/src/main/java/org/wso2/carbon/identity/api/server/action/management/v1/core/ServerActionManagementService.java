@@ -106,8 +106,7 @@ public class ServerActionManagementService {
                 throw ActionMgtEndpointUtil.handleException(Response.Status.NOT_FOUND,
                         ERROR_NO_ACTION_FOUND_ON_GIVEN_ACTION_TYPE_AND_ID);
             }
-            return buildActionResponse(actionManagementService.getActionByActionId(actionType, actionId,
-                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
+            return buildActionResponse(action);
         } catch (ActionMgtException e) {
             throw ActionMgtEndpointUtil.handleActionMgtException(e);
         }
