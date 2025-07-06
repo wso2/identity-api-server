@@ -217,8 +217,12 @@ public enum StateEnum {
     @JsonProperty("allowedOrigins")
     @Valid
     public List<String> getAllowedOrigins() {
+        if (this.allowedOrigins == null) {
+            this.allowedOrigins = new ArrayList<>();
+        }
         return allowedOrigins;
     }
+
     public void setAllowedOrigins(List<String> allowedOrigins) {
         this.allowedOrigins = allowedOrigins;
     }
