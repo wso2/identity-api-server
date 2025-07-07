@@ -30,8 +30,11 @@ import org.wso2.carbon.identity.webhook.metadata.api.exception.WebhookMetadataEx
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.ws.rs.core.Response;
+
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.webhook.metadata.v1.constants.WebhookMetadataEndpointConstants.EVENT_PROFILE_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.webhook.metadata.v1.constants.WebhookMetadataEndpointConstants.ErrorMessage.ERROR_CODE_PROFILE_NOT_FOUND;
 import static org.wso2.carbon.identity.api.server.webhook.metadata.v1.constants.WebhookMetadataEndpointConstants.WEBHOOK_METADATA_PATH_COMPONENT;
 
 /**
@@ -50,6 +53,10 @@ public class ServerWebhookMetadataService {
         try {
             org.wso2.carbon.identity.webhook.metadata.api.model.EventProfile eventProfile =
                     WebhookMetadataServiceHolder.getWebhookMetadataService().getEventProfile(profileName);
+            if (eventProfile == null) {
+                throw WebhookMetadataAPIErrorBuilder.buildAPIError(Response.Status.NOT_FOUND,
+                        ERROR_CODE_PROFILE_NOT_FOUND, profileName);
+            }
             return mapEventProfile(eventProfile);
         } catch (WebhookMetadataException e) {
             throw WebhookMetadataAPIErrorBuilder.buildAPIError(e);
