@@ -13,6 +13,10 @@ info:
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 servers:
   - url: "https://localhost:9443/t/{tenant-domain}/api/server/v1"
+    variables:
+      tenant-domain:
+        description: Enter the tenant domain (e.g., `carbon.super`, `example.com`, or a custom tenant)
+        default: carbon.super 
 security:
   - OAuth2: []
   - BasicAuth: []
@@ -878,6 +882,8 @@ components:
       properties:
         eventType:
           $ref: '#/components/schemas/Operation'
+        requestInitiator:
+          type: string
         createdAt:
           type: string
           format: date-time
@@ -895,6 +901,8 @@ components:
         createdAt:
           type: string
           format: date-time
+        requestInitiator:
+          type: string
         updatedAt:
           type: string
           format: date-time
@@ -905,7 +913,7 @@ components:
 
     InstanceStatus:
       type: string
-      enum: [ALL_TASKS, PENDING, APPROVED, REJECTED, FAILED]
+      enum: [ALL_TASKS, PENDING, APPROVED, REJECTED, FAILED ,DELETED]
 
     Operation:
       type: string

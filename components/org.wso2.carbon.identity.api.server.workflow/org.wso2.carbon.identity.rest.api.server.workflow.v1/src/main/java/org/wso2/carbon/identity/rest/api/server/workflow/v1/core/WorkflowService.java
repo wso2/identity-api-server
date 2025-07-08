@@ -53,28 +53,27 @@ import org.wso2.carbon.identity.workflow.mgt.dto.WorkflowEvent;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowClientException;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import javax.ws.rs.core.Response;
-
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.ws.rs.core.Response;
 
 /**
- * Workflow service class
+ * Workflow service class.
  */
 public class WorkflowService {
 
     private static final Log log = LogFactory.getLog(WorkflowService.class);
     private final WorkflowManagementService workflowManagementService;
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = 
-    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
     public WorkflowService(WorkflowManagementService workflowManagementService) {
 
@@ -82,7 +81,7 @@ public class WorkflowService {
     }
 
     /**
-     * Add new workflow
+     * Add new workflow.
      *
      * @param workflow Workflow details
      * @return WorkflowResponse
@@ -109,7 +108,7 @@ public class WorkflowService {
     }
 
     /**
-     * Update an existing workflow
+     * Update an existing workflow.
      *
      * @param workflow   Workflow details
      * @param workflowId Workflow ID
@@ -138,7 +137,7 @@ public class WorkflowService {
     }
 
     /**
-     * Retrieve workflow from workflow ID
+     * Retrieve workflow from workflow ID.
      *
      * @param workflowId workflow id
      * @return WorkflowResponse
@@ -188,7 +187,7 @@ public class WorkflowService {
     }
 
     /**
-     * Remove a workflow by a given workflow ID
+     * Remove a workflow by a given workflow ID.
      *
      * @param workflowId ID of workflow to remove
      */
@@ -246,14 +245,14 @@ public class WorkflowService {
     }
 
     /**
-     * Partially update an association
+     * Partially update an association.
      *
      * @param associationId       Association ID
      * @param workflowAssociation Association Details
      * @return WorkflowAssociationResponse
      */
     public WorkflowAssociationResponse updateAssociation(String associationId,
-                                                         WorkflowAssociationPatchRequest workflowAssociation) {
+            WorkflowAssociationPatchRequest workflowAssociation) {
 
         boolean isEnable;
         String eventId;
@@ -282,7 +281,7 @@ public class WorkflowService {
     }
 
     /**
-     * Get an association by ID
+     * Get an association by ID.
      *
      * @param associationId Association ID
      * @return WorkflowAssociationResponse
@@ -329,7 +328,7 @@ public class WorkflowService {
     }
 
     /**
-     * Remove association
+     * Remove association.
      *
      * @param associationId ID of association to remove
      */
@@ -383,8 +382,8 @@ public class WorkflowService {
     }
 
     private WorkflowListResponse createWorkflowResponse(int tenantId, WorkflowListItem[] workflowListItems,
-                                                        Integer offset,
-                                                        String filter) throws WorkflowException {
+            Integer offset,
+            String filter) throws WorkflowException {
 
         WorkflowListResponse workflowListResponse = new WorkflowListResponse();
         workflowListResponse.setTotalResults(workflowManagementService.getWorkflowsCount(tenantId, filter));
@@ -414,31 +413,36 @@ public class WorkflowService {
     }
 
     /**
-     * Converts a list of `WorkflowTemplateParameters` into a list of `Parameter` objects.
+     * Converts a list of `WorkflowTemplateParameters` into a list of `Parameter`
+     * objects.
      * Example:
      * * Given the following inputs:
      * * - workflowId = "wf123"
      * * - templateProperties = steps = [
-     * *         {step: 1, options: [
-     * *             {entity: "roles", values: ["123", "124"]},
-     * *             {entity: "users", values: ["234", "235"]}
-     * *         ]},
-     * *         {step: 2, options: [
-     * *             {entity: "roles", values: ["345"]}
-     * *         ]}
+     * * {step: 1, options: [
+     * * {entity: "roles", values: ["123", "124"]},
+     * * {entity: "users", values: ["234", "235"]}
+     * * ]},
+     * * {step: 2, options: [
+     * * {entity: "roles", values: ["345"]}
+     * * ]}
      * *
-     * * The output `parameterList` will contain the following list of `Parameter` objects:
+     * * The output `parameterList` will contain the following list of `Parameter`
+     * objects:
      * * - parameterList = [
-     * {workflowId = "wf123", paramName = "ApprovalSteps", paramValue = "123,124", qName = "Step-1-roles", holder =
+     * {workflowId = "wf123", paramName = "ApprovalSteps", paramValue = "123,124",
+     * qName = "Step-1-roles", holder =
      * "TEMPLATE"},
-     * {workflowId = "wf123", paramName = "ApprovalSteps", paramValue = "234,235", qName = "Step-1-users", holder
+     * {workflowId = "wf123", paramName = "ApprovalSteps", paramValue = "234,235",
+     * qName = "Step-1-users", holder
      * = "TEMPLATE"},
-     * {workflowId = "wf123", paramName = "ApprovalSteps", paramValue = "345", qName = "Step-2-roles", holder =
+     * {workflowId = "wf123", paramName = "ApprovalSteps", paramValue = "345", qName
+     * = "Step-2-roles", holder =
      * "TEMPLATE"}
      * ]
      */
     private List<Parameter> createParameterList(String workflowId,
-                                                List<WorkflowTemplateParameters> templateProperties) {
+            List<WorkflowTemplateParameters> templateProperties) {
 
         List<Parameter> parameterList = new ArrayList<>();
         for (WorkflowTemplateParameters properties : templateProperties) {
@@ -455,7 +459,7 @@ public class WorkflowService {
     }
 
     private Parameter setWorkflowImplParameters(String workflowId, String paramName, String paramValue, String qName,
-                                                String holder) {
+            String holder) {
 
         Parameter parameter = new Parameter();
         parameter.setWorkflowId(workflowId);
@@ -533,10 +537,9 @@ public class WorkflowService {
     }
 
     private WorkflowAssociationListResponse createAssociationListResponse(int tenantId,
-                                                                          WorkflowAssociationListItem[]
-                                                                                  workflowAssociationListItems,
-                                                                          Integer offset,
-                                                                          String filter) throws WorkflowException {
+            WorkflowAssociationListItem[] workflowAssociationListItems,
+            Integer offset,
+            String filter) throws WorkflowException {
 
         WorkflowAssociationListResponse workflowAssociationListResponse = new WorkflowAssociationListResponse();
         workflowAssociationListResponse.setTotalResults(workflowManagementService.getAssociationsCount(tenantId,
@@ -641,15 +644,16 @@ public class WorkflowService {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_DELETING_WORKFLOW_INSTANCE, instanceId, e);
         }
     }
-    
-    //getWorkflowsOfRequest
+
+    // getWorkflowsOfRequest
 
     public WorkflowInstanceResponse getWorkflowInstanceById(String instanceId) {
         try {
             if (StringUtils.isBlank(instanceId)) {
                 throw new WorkflowClientException("Workflow instance ID cannot be null or empty.");
             }
-            org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest workflowRequest = workflowManagementService.getWorkflowRequest(instanceId);
+            org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest workflowRequest = workflowManagementService
+                    .getWorkflowRequest(instanceId);
             if (workflowRequest == null) {
                 throw new WorkflowClientException("Workflow instance with ID: " + instanceId + " does not exist.");
             }
@@ -657,55 +661,73 @@ public class WorkflowService {
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_WORKFLOW_INSTANCE_NOT_FOUND, instanceId, e);
         } catch (WorkflowException e) {
-            throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_WORKFLOW_INSTANCE, instanceId, e);
+            throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_WORKFLOW_INSTANCE, instanceId,
+                    e);
         }
     }
 
-        private WorkflowInstanceResponse mapWorkflowRequestToWorkflowRequestResponse(org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest workflowRequest) {
-    if (workflowRequest == null) {
-        return null;
-    }
+    private WorkflowInstanceResponse mapWorkflowRequestToWorkflowRequestResponse(
+            org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest workflowRequest)
+            throws WorkflowException {
 
-    WorkflowInstanceResponse response = new WorkflowInstanceResponse();
-    response.setEventType(Operation.fromValue(workflowRequest.getEventType()));
-    response.setCreatedAt(LocalDateTime.parse(workflowRequest.getCreatedAt()));
-    response.setUpdatedAt(LocalDateTime.parse(workflowRequest.getUpdatedAt()));
-    response.setStatus(InstanceStatus.fromValue(workflowRequest.getStatus()));
-    return response;
-}
+        if (workflowRequest == null) {
+            return null;
+        }
 
-    private WorkflowInstanceListItem mapWorkflowRequestToListItem(org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest workflowRequest) {
-    if (workflowRequest == null) {
-        return null;
-    }
-
-    WorkflowInstanceListItem item = new WorkflowInstanceListItem();
-    
-    if (workflowRequest.getEventType() != null) {
-        item.setEventType(Operation.fromValue(workflowRequest.getEventType()));
-    }
-    
-    if (workflowRequest.getCreatedAt() != null) {
+        WorkflowInstanceResponse response = new WorkflowInstanceResponse();
+        response.setEventType(Operation.fromValue(workflowRequest.getEventType()));
+        response.setRequestInitiator(workflowRequest.getCreatedBy());
         try {
-            item.setCreatedAt(LocalDateTime.parse(workflowRequest.getCreatedAt()));
+            if (workflowRequest.getCreatedAt() != null) {
+                response.setCreatedAt(workflowRequest.getCreatedAt());
+            }
+            if (workflowRequest.getUpdatedAt() != null) {
+                response.setUpdatedAt(workflowRequest.getUpdatedAt());
+            }
         } catch (DateTimeParseException e) {
-            item.setCreatedAt(null);
+            throw new WorkflowClientException("Invalid date format from database. Expected: yyyy-MM-dd HH:mm:ss.SSS");
         }
-    }
-    if (workflowRequest.getUpdatedAt() != null) {
-        try {
-            item.setUpdatedAt(LocalDateTime.parse(workflowRequest.getUpdatedAt()));
-        } catch (DateTimeParseException e) {
-            item.setUpdatedAt(null);
-        }
-    }
-    
-    if (workflowRequest.getStatus() != null) {
-        item.setStatus(InstanceStatus.fromValue(workflowRequest.getStatus()));
+
+        response.setStatus(InstanceStatus.fromValue(workflowRequest.getStatus()));
+        response.setRequestParameters(workflowRequest.getRequestParams());
+        return response;
     }
 
-    return item;
-}
+    private WorkflowInstanceListItem mapWorkflowRequestToListItem(
+            org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest workflowRequest) throws WorkflowException {
+        if (workflowRequest == null) {
+            return null;
+        }
+
+        WorkflowInstanceListItem item = new WorkflowInstanceListItem();
+
+        if (workflowRequest.getEventType() != null) {
+            item.setEventType(Operation.fromValue(workflowRequest.getEventType()));
+        }
+        if (workflowRequest.getCreatedBy() != null) {
+            item.setRequestInitiator(workflowRequest.getCreatedBy());
+        }
+
+        try {
+            if (workflowRequest.getCreatedAt() != null) {
+                item.setCreatedAt(workflowRequest.getCreatedAt());
+            }
+            if (workflowRequest.getUpdatedAt() != null) {
+                item.setUpdatedAt(workflowRequest.getUpdatedAt());
+            }
+        } catch (DateTimeParseException e) {
+            log.error("Failed to parse date in workflow request: " + e.getMessage());
+            throw new WorkflowClientException(
+                    "Invalid date format in workflow request. Expected format: yyyy-MM-dd HH:mm:ss.SSS");
+
+        }
+
+        if (workflowRequest.getStatus() != null) {
+            item.setStatus(InstanceStatus.fromValue(workflowRequest.getStatus()));
+        }
+
+        return item;
+    }
 
     public WorkflowInstanceListResponse getWorkflowInstances(Integer limit, Integer offset, String filter) {
         try {
@@ -719,87 +741,127 @@ public class WorkflowService {
         }
     }
 
-    private WorkflowInstanceListResponse getPaginatedWorkflowInstances(Integer limit, Integer offset, String filter) throws WorkflowException {
+    private WorkflowInstanceListResponse getPaginatedWorkflowInstances(Integer limit, Integer offset, String filter)
+            throws WorkflowException {
+
         try {
             String user = CarbonContext.getThreadLocalCarbonContext().getUsername();
             int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+
+            WorkflowInstanceListResponse workflowInstanceListResponse = new WorkflowInstanceListResponse();
+            workflowInstanceListResponse.setInstances(new ArrayList<>());
+
             Map<String, String> filterMap = parseWorkflowFilter(filter);
 
-    String requestType = filterMap.get("requestType");
-    String beginDate = filterMap.get("beginDate");
-    String endDate = filterMap.get("endDate");
-    String dateCategory = filterMap.get("dateCategory");
-    String status = filterMap.get("status");
+            String requestType = "ALL_TASKS";
+            String beginDate = null;
+            String endDate = null;
+            String dateCategory = null;
+            String status = null;
 
-    if (requestType == null || beginDate == null || endDate == null || dateCategory == null || status == null) {
-        throw new WorkflowClientException("Invalid filter parameters. Required parameters: requestType, beginDate, endDate, dateCategory, status.");
-    }
-    org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest[] response;
-    if (requestType == "ALL_TASKS"){
-                    response = workflowManagementService.getRequestsFromFilter(
-                    "", beginDate, endDate, dateCategory, tenantId, status);
-    }else if (requestType == "MY_TASKS") {
-                response = workflowManagementService.getRequestsFromFilter(
-                    user, beginDate, endDate, dateCategory, tenantId, status);
-    } else {
-        throw new WorkflowClientException("Invalid request type: " + requestType + ". Valid types are 'ALL_TASKS' and 'MY_TASKS'.");
-    }
-        WorkflowInstanceListResponse workflowInstanceListResponse = new WorkflowInstanceListResponse();
-        for (org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest workflowRequest : response) {
-            WorkflowInstanceListItem item = mapWorkflowRequestToListItem(workflowRequest);
-            if (item != null) {
-                workflowInstanceListResponse.getInstances().add(item);
+            if (filterMap != null && !filterMap.isEmpty()) {
+                // Use filter values if provided
+                requestType = blankToNull(filterMap.get("requestType"));
+                if (requestType == null) {
+                    requestType = "ALL_TASKS";
+                }
+                beginDate = blankToNull(filterMap.get("beginDate"));
+                endDate = blankToNull(filterMap.get("endDate"));
+                dateCategory = blankToNull(filterMap.get("dateCategory"));
+                status = blankToNull(filterMap.get("status"));
             }
-        }
-        return workflowInstanceListResponse;
+
+            String normalizedRequestType = requestType.toUpperCase();
+            if (!"ALL_TASKS".equals(normalizedRequestType) && !"MY_TASKS".equals(normalizedRequestType)) {
+                throw new WorkflowClientException("Invalid request type: " + requestType +
+                        ". Valid types are 'ALL_TASKS' and 'MY_TASKS'.");
+            }
+
+            org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest[] response = workflowManagementService
+                    .getRequestsFromFilter(
+                            "MY_TASKS".equals(normalizedRequestType) ? user : null,
+                            beginDate,
+                            endDate,
+                            dateCategory,
+                            tenantId,
+                            status, limit, offset);
+
+            List<WorkflowInstanceListItem> allItems = new ArrayList<>();
+            if (response != null) {
+                for (org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest workflowRequest : response) {
+                    if (workflowRequest != null) {
+                        WorkflowInstanceListItem item = mapWorkflowRequestToListItem(workflowRequest);
+                        if (item != null) {
+                            allItems.add(item);
+                        }
+                    }
+                }
+            }
+
+            int totalCount = allItems.size();
+            int startIndex = offset != null ? offset : 0;
+
+            workflowInstanceListResponse.setInstances(allItems);
+            workflowInstanceListResponse.setCount(totalCount);
+            workflowInstanceListResponse.setStartIndex(startIndex + 1);
+            workflowInstanceListResponse.setTotalResults(totalCount);
+
+            return workflowInstanceListResponse;
         } catch (WorkflowException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_WORKFLOW_INSTANCES, null, e);
+        } catch (Exception e) {
+            throw new WorkflowException("Unexpected error while listing workflow instances", e);
         }
+    }
+
+    private String blankToNull(String value) {
+        return StringUtils.isBlank(value) ? null : value;
     }
 
     public Map<String, String> parseWorkflowFilter(String filter) {
-    Map<String, String> result = new HashMap<>();
 
-    if (StringUtils.isBlank(filter)) {
+        Map<String, String> result = new HashMap<>();
+
+        if (StringUtils.isBlank(filter)) {
+            return result;
+        }
+
+        String[] conditions = filter.split("(?i)\\s+and\\s+");
+        Pattern pattern = Pattern.compile("(\\w+)\\s+(eq|ge|le)\\s+'([^']*)'");
+
+        for (String condition : conditions) {
+            Matcher matcher = pattern.matcher(condition.trim());
+            if (matcher.matches()) {
+                String field = matcher.group(1);
+                String operator = matcher.group(2);
+                String value = matcher.group(3);
+
+                switch (field) {
+                    case "requestType":
+                    case "status":
+                    case "dateCategory":
+                        if ("eq".equals(operator)) {
+                            result.put(field, value);
+                        }
+                        break;
+                    case "beginDate":
+                        if ("ge".equals(operator)) {
+                            result.put("beginDate", value);
+                        }
+                        break;
+                    case "endDate":
+                        if ("le".equals(operator)) {
+                            result.put("endDate", value);
+                        }
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Unknown field in filter: " + field);
+                }
+            } else {
+                throw new IllegalArgumentException("Invalid filter format: " + condition);
+            }
+        }
+
         return result;
     }
-
-    String[] conditions = filter.split("(?i)\\s+and\\s+");
-    Pattern pattern = Pattern.compile("(\\w+)\\s+(eq|ge|le)\\s+'([^']*)'");
-
-    for (String condition : conditions) {
-        Matcher matcher = pattern.matcher(condition.trim());
-        if (matcher.matches()) {
-            String field = matcher.group(1);
-            String operator = matcher.group(2);
-            String value = matcher.group(3);
-
-            switch (field) {
-                case "requestType":
-                case "status":
-                case "dateCategory":
-                    if ("eq".equals(operator)) {
-                        result.put(field, value);
-                    }
-                    break;
-                case "beginDate":
-                    if ("ge".equals(operator)) {
-                        result.put("beginDate", value);
-                    }
-                    break;
-                case "endDate":
-                    if ("le".equals(operator)) {
-                        result.put("endDate", value);
-                    }
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unknown field in filter: " + field);
-            }
-        } else {
-            throw new IllegalArgumentException("Invalid filter format: " + condition);
-        }
-    }
-
-    return result;
-}
 }

@@ -36,8 +36,9 @@ import javax.xml.bind.annotation.*;
 public class WorkflowInstanceResponse {
   
     private Operation eventType;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private String requestInitiator;
+    private String createdAt;
+    private String updatedAt;
     private InstanceStatus status;
     private Object requestParameters;
 
@@ -61,7 +62,7 @@ public class WorkflowInstanceResponse {
 
     /**
     **/
-    public WorkflowInstanceResponse createdAt(LocalDateTime createdAt) {
+    public WorkflowInstanceResponse createdAt(String createdAt) {
 
         this.createdAt = createdAt;
         return this;
@@ -69,17 +70,16 @@ public class WorkflowInstanceResponse {
     
     @ApiModelProperty(value = "")
     @JsonProperty("createdAt")
-    @Valid
-    public LocalDateTime getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
 
     /**
     **/
-    public WorkflowInstanceResponse updatedAt(LocalDateTime updatedAt) {
+    public WorkflowInstanceResponse updatedAt(String updatedAt) {
 
         this.updatedAt = updatedAt;
         return this;
@@ -87,11 +87,10 @@ public class WorkflowInstanceResponse {
     
     @ApiModelProperty(value = "")
     @JsonProperty("updatedAt")
-    @Valid
-    public LocalDateTime getUpdatedAt() {
+    public String getUpdatedAt() {
         return updatedAt;
     }
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
     }
 
@@ -131,6 +130,22 @@ public class WorkflowInstanceResponse {
         this.requestParameters = requestParameters;
     }
 
+    /**
+    **/
+    public WorkflowInstanceResponse requestInitiator(String requestInitiator) {
+
+        this.requestInitiator = requestInitiator;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("requestInitiator")
+    public String getRequestInitiator() {
+        return requestInitiator;
+    }
+    public void setRequestInitiator(String requestInitiator) {
+        this.requestInitiator = requestInitiator;
+    }
 
     @Override
     public boolean equals(java.lang.Object o) {

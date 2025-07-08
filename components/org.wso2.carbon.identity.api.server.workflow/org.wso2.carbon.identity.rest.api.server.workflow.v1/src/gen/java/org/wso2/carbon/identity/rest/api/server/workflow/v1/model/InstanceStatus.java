@@ -28,7 +28,7 @@ import javax.xml.bind.annotation.XmlEnumValue;
 @XmlEnum(String.class)
 public enum InstanceStatus {
 
-    @XmlEnumValue("ALL_TASKS") ALL_TASKS(String.valueOf("ALL_TASKS")), @XmlEnumValue("PENDING") PENDING(String.valueOf("PENDING")), @XmlEnumValue("APPROVED") APPROVED(String.valueOf("APPROVED")), @XmlEnumValue("REJECTED") REJECTED(String.valueOf("REJECTED")), @XmlEnumValue("FAILED") FAILED(String.valueOf("FAILED"));
+    @XmlEnumValue("ALL_TASKS") ALL_TASKS(String.valueOf("ALL_TASKS")), @XmlEnumValue("PENDING") PENDING(String.valueOf("PENDING")), @XmlEnumValue("APPROVED") APPROVED(String.valueOf("APPROVED")), @XmlEnumValue("REJECTED") REJECTED(String.valueOf("REJECTED")), @XmlEnumValue("FAILED") FAILED(String.valueOf("FAILED")), @XmlEnumValue("DELETED") DELETED(String.valueOf("DELETED"));
 
 
     private String value;

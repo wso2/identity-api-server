@@ -36,5 +36,9 @@ public interface WorkflowInstancesApiService {
 
       public Response getWorkflowInstanceById(String instanceId);
 
-      public Response getWorkflowInstances(Integer limit, Integer offset, String filter, String sortBy, String sortOrder);
+      public Response getWorkflowInstances(Integer limit,
+                                           Integer offset,
+                                           String filter,
+                                           String sortBy,
+                                           String sortOrder);
 }

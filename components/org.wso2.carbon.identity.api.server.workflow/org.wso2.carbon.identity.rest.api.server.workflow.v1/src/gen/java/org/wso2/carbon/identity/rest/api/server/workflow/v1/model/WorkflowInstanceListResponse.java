@@ -37,6 +37,10 @@ public class WorkflowInstanceListResponse  {
   
     private Integer totalResults;
     private Integer startIndex;
+    public Integer getStartIndex() {
+        return startIndex;
+    }
+
     private Integer count;
     private List<WorkflowInstanceListItem> instances = null;
 

@@ -36,11 +36,11 @@ import javax.xml.bind.annotation.*;
 public class WorkflowInstanceListItem  {
   
     private Operation eventType;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private String requestInitiator;
+    private String createdAt;
+    private String updatedAt;
     private InstanceStatus status;
-    /**
-    **/
+
     public WorkflowInstanceListItem eventType(Operation eventType) {
 
         this.eventType = eventType;
@@ -59,7 +59,7 @@ public class WorkflowInstanceListItem  {
 
     /**
     **/
-    public WorkflowInstanceListItem createdAt(LocalDateTime createdAt) {
+    public WorkflowInstanceListItem createdAt(String createdAt) {
 
         this.createdAt = createdAt;
         return this;
@@ -67,17 +67,16 @@ public class WorkflowInstanceListItem  {
     
     @ApiModelProperty(value = "")
     @JsonProperty("createdAt")
-    @Valid
-    public LocalDateTime getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
 
     /**
     **/
-    public WorkflowInstanceListItem updatedAt(LocalDateTime updatedAt) {
+    public WorkflowInstanceListItem updatedAt(String updatedAt) {
 
         this.updatedAt = updatedAt;
         return this;
@@ -85,11 +84,10 @@ public class WorkflowInstanceListItem  {
     
     @ApiModelProperty(value = "")
     @JsonProperty("updatedAt")
-    @Valid
-    public LocalDateTime getUpdatedAt() {
+    public String getUpdatedAt() {
         return updatedAt;
     }
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
     }
 
@@ -107,8 +105,25 @@ public class WorkflowInstanceListItem  {
     public InstanceStatus getStatus() {
         return status;
     }
+
     public void setStatus(InstanceStatus status) {
         this.status = status;
+    }
+
+    public WorkflowInstanceListItem requestInitiator(String requestInitiator) {
+
+        this.requestInitiator = requestInitiator;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("requestInitiator")
+    public String getRequestInitiator() {
+        return requestInitiator;
+    }
+
+    public void setRequestInitiator(String requestInitiator) {
+        this.requestInitiator = requestInitiator;
     }
 
     @Override

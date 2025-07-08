@@ -18,15 +18,15 @@
 
 package org.wso2.carbon.identity.rest.api.server.workflow.v1.impl;
 
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.*;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.*;
-import java.util.List;
-
-import javax.ws.rs.core.Response;
-
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.WorkflowInstancesApiService;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.core.WorkflowService;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.factories.WorkflowServiceFactory;
 
+import javax.ws.rs.core.Response;
+
+/**
+ * Implementation of the WorkflowInstancesApiService interface.
+ */
 public class WorkflowInstancesApiServiceImpl implements WorkflowInstancesApiService {
 
     private final WorkflowService workflowService;
@@ -47,6 +47,9 @@ public class WorkflowInstancesApiServiceImpl implements WorkflowInstancesApiServ
     }
 
     @Override
-    public Response getWorkflowInstances(Integer limit, Integer offset, String filter, String sortBy, String sortOrder) {
-        return Response.ok().entity(workflowService.getWorkflowInstances(limit, offset, filter)).build();    }
+    public Response getWorkflowInstances
+            (Integer limit, Integer offset, String filter, String sortBy, String sortOrder) {
+        return Response.ok().entity(workflowService.getWorkflowInstances(limit, offset, filter)).build();
+    }
 }
+
