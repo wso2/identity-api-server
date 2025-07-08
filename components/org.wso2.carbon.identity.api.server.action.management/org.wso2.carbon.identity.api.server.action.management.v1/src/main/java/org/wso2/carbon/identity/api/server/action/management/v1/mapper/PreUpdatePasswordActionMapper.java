@@ -53,6 +53,7 @@ public class PreUpdatePasswordActionMapper implements ActionMapper {
         Action basicAction = ActionMapperUtil.buildActionRequest(getSupportedActionType(), actionModel);
         return new PreUpdatePasswordAction.RequestBuilder(basicAction)
                 .passwordSharing(buildPasswordSharingRequest((PreUpdatePasswordActionModel) actionModel))
+                .attributes(((PreUpdatePasswordActionModel) actionModel).getAttributes())
                 .build();
     }
 
@@ -69,6 +70,7 @@ public class PreUpdatePasswordActionMapper implements ActionMapper {
         return new PreUpdatePasswordAction.RequestBuilder(basicUpdatingAction)
                 .passwordSharing(
                         buildPasswordSharingUpdateRequest((PreUpdatePasswordActionUpdateModel) actionUpdateModel))
+                .attributes(((PreUpdatePasswordActionUpdateModel) actionUpdateModel).getAttributes())
                 .build();
     }
 
@@ -82,7 +84,9 @@ public class PreUpdatePasswordActionMapper implements ActionMapper {
 
         ActionResponse actionResponse = ActionMapperUtil.buildActionResponse(action);
         return new PreUpdatePasswordActionResponse(actionResponse)
-                .passwordSharing(buildPasswordSharingResponse((PreUpdatePasswordAction) action));
+                .passwordSharing(buildPasswordSharingResponse((PreUpdatePasswordAction) action))
+                .attributes(((PreUpdatePasswordAction) action).getAttributes());
+
     }
 
     private PasswordSharing buildPasswordSharingRequest(PreUpdatePasswordActionModel actionModel) {
