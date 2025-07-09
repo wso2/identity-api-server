@@ -37,12 +37,14 @@ import org.wso2.carbon.identity.api.server.application.management.v1.RoleSharing
 import org.wso2.carbon.identity.api.server.application.management.v1.SharedApplicationResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.SharedApplicationsResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.SharedOrganizationsResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.SharingInitiationMode;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.organization.management.application.OrgApplicationManager;
 import org.wso2.carbon.identity.organization.management.application.model.RoleWithAudienceDO;
 import org.wso2.carbon.identity.organization.management.application.model.SharedApplication;
 import org.wso2.carbon.identity.organization.management.application.model.SharedApplicationOrganizationNode;
 import org.wso2.carbon.identity.organization.management.application.model.SharedApplicationOrganizationNodePage;
+import org.wso2.carbon.identity.organization.management.application.model.SharingInitiationModeDO;
 import org.wso2.carbon.identity.organization.management.application.model.operation.ApplicationShareRolePolicy;
 import org.wso2.carbon.identity.organization.management.application.model.operation.ApplicationShareUpdateOperation;
 import org.wso2.carbon.identity.organization.management.application.model.operation.GeneralApplicationShareOperation;
@@ -447,13 +449,13 @@ public class ServerApplicationSharingService {
                     .ref(buildOrganizationURL(organizationNode.getOrganizationId()).toString())
                     .hasChildren(organizationNode.hasChildren());
             List<RoleWithAudienceDO> roleWithAudienceDOList = organizationNode.getRoleWithAudienceDOList();
-            if (roleWithAudienceDOList != null) {
-                basicOrganizationResponse.roles(convertRoleSharingConfigListToResponseType(roleWithAudienceDOList));
-            } else {
-                basicOrganizationResponse.roles(null);
-            }
+            basicOrganizationResponse.roles(convertRoleSharingConfigListToResponseType(roleWithAudienceDOList));
+            basicOrganizationResponse.setSharingInitiationMode(
+                    convertSharingInitiationModeToResponseType(organizationNode.getSharingInitiationModeDO()));
             response.addOrganizationsItem(basicOrganizationResponse);
         }
+        response.setSharingInitiationMode(convertSharingInitiationModeToResponseType(
+                sharedApplicationOrganizationNodePage.getSharingInitiationModeDO()));
         if (sharedApplicationOrganizationNodePage.getNextPageCursor() != 0) {
             Link nextLink = new Link();
             String base64EncodedCursor = Base64.getEncoder().encodeToString(
@@ -536,6 +538,9 @@ public class ServerApplicationSharingService {
     private List<RoleShareConfig> convertRoleSharingConfigListToResponseType(
             List<RoleWithAudienceDO> roleWithAudienceDOList) {
 
+        if (roleWithAudienceDOList == null) {
+            return null;
+        }
         List<RoleShareConfig> roleShareConfigs = new ArrayList<>();
         if (CollectionUtils.isEmpty(roleWithAudienceDOList)) {
             return roleShareConfigs;
@@ -550,6 +555,25 @@ public class ServerApplicationSharingService {
             roleShareConfigs.add(roleShareConfig);
         }
         return roleShareConfigs;
+    }
+
+    private SharingInitiationMode convertSharingInitiationModeToResponseType(
+            SharingInitiationModeDO sharingInitiationModeDO) {
+
+        if (sharingInitiationModeDO == null) {
+            return null;
+        }
+        SharingInitiationMode sharingInitiationMode = new SharingInitiationMode();
+        PolicyEnum policy = sharingInitiationModeDO.getPolicy();
+        sharingInitiationMode.setPolicy(SharingInitiationMode.PolicyEnum.fromValue(policy.name()));
+
+        ApplicationShareRolePolicy rolePolicy = sharingInitiationModeDO.getApplicationShareRolePolicy();
+        RoleSharing roleSharing = new RoleSharing();
+        roleSharing.setMode(RoleSharing.ModeEnum.fromValue(rolePolicy.getMode().name()));
+        roleSharing.setRoles(convertRoleSharingConfigListToResponseType(rolePolicy.getRoleWithAudienceDOList()));
+        sharingInitiationMode.setRoleSharing(roleSharing);
+
+        return sharingInitiationMode;
     }
 
     private List<RoleWithAudienceDO> getRoleSharingDOFromUpdateObjectList(List<Object> values) {

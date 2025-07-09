@@ -1051,7 +1051,7 @@ public class ApplicationsApi  {
     @Path("/share")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Perform incremental sharing operations on an already shared application (SCIM-style patch)", notes = "", response = ProcessSuccessResponse.class, authorizations = {
+    @ApiOperation(value = "Perform incremental sharing operations on an already shared application.", notes = "", response = ProcessSuccessResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
