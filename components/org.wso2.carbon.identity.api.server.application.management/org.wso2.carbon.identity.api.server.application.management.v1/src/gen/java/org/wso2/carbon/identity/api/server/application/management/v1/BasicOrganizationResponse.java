@@ -25,6 +25,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.application.management.v1.RoleShareConfig;
+import org.wso2.carbon.identity.api.server.application.management.v1.SharingMode;
 import javax.validation.constraints.*;
 
 
@@ -76,6 +77,7 @@ public enum StatusEnum {
     private String ref;
     private Boolean hasChildren;
     private Integer depthFromRoot;
+    private SharingMode sharingMode;
     private List<RoleShareConfig> roles = new ArrayList<>();
 
 
@@ -241,6 +243,24 @@ public enum StatusEnum {
     }
 
     /**
+    **/
+    public BasicOrganizationResponse sharingMode(SharingMode sharingMode) {
+
+        this.sharingMode = sharingMode;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("sharingMode")
+    @Valid
+    public SharingMode getSharingMode() {
+        return sharingMode;
+    }
+    public void setSharingMode(SharingMode sharingMode) {
+        this.sharingMode = sharingMode;
+    }
+
+    /**
     * List of roles that are shared with the application in this organization.
     **/
     public BasicOrganizationResponse roles(List<RoleShareConfig> roles) {
@@ -286,12 +306,13 @@ public enum StatusEnum {
             Objects.equals(this.ref, basicOrganizationResponse.ref) &&
             Objects.equals(this.hasChildren, basicOrganizationResponse.hasChildren) &&
             Objects.equals(this.depthFromRoot, basicOrganizationResponse.depthFromRoot) &&
+            Objects.equals(this.sharingMode, basicOrganizationResponse.sharingMode) &&
             Objects.equals(this.roles, basicOrganizationResponse.roles);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, orgHandle, parentId, status, ref, hasChildren, depthFromRoot, roles);
+        return Objects.hash(id, name, orgHandle, parentId, status, ref, hasChildren, depthFromRoot, sharingMode, roles);
     }
 
     @Override
@@ -308,6 +329,7 @@ public enum StatusEnum {
         sb.append("    ref: ").append(toIndentedString(ref)).append("\n");
         sb.append("    hasChildren: ").append(toIndentedString(hasChildren)).append("\n");
         sb.append("    depthFromRoot: ").append(toIndentedString(depthFromRoot)).append("\n");
+        sb.append("    sharingMode: ").append(toIndentedString(sharingMode)).append("\n");
         sb.append("    roles: ").append(toIndentedString(roles)).append("\n");
         sb.append("}");
         return sb.toString();

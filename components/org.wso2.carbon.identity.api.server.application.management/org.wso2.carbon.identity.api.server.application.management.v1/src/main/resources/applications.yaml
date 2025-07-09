@@ -2341,6 +2341,7 @@ paths:
         - $ref: '#/components/parameters/sharedOrganizationsLimit'
         - $ref: '#/components/parameters/recursiveQueryParam'
         - $ref: '#/components/parameters/applicationShareExcludedQueryParam'
+        - $ref: '#/components/parameters/applicationShareAttributesQueryParam'
       responses:
         '200':
           description: Successful response
@@ -2984,6 +2985,17 @@ components:
       description: | 
         excludedAttribute parameter.
       required: false
+      schema:
+        type: string
+    applicationShareAttributesQueryParam:
+      in: query
+      name: attributes
+      required: false
+      description: |
+        Specifies the required parameters in the response.
+        Only 'sharingMode' attribute is currently supported.
+
+        /applications/{applicationId}/share?attributes=sharingMode
       schema:
         type: string
 
@@ -4232,6 +4244,9 @@ components:
         displayName:
           type: string
           example: Code
+        publicClientAllowed:
+          type: boolean
+          example: false
     SAMLMetaData:
       type: object
       properties:
@@ -4603,6 +4618,8 @@ components:
                 "rel": "previous",
               }
             ]
+        sharingMode:
+          $ref: '#/components/schemas/SharingMode'
         organizations:
           type: array
           items:
@@ -4625,6 +4642,18 @@ components:
           type: string
           description: Shared application residing organization id.
           example: '682edf68-4835-4bb8-961f-0a16bc6cc866'
+    SharingMode:
+      type: object
+      required: [ policy, roleSharing ]
+      properties:
+        policy:
+          type: string
+          enum: [ "ALL_EXISTING_AND_FUTURE_ORGS", "SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN" ]
+          description: |
+            - ALL_EXISTING_AND_FUTURE_ORGS: Share with all current and any newly created organizations in future.
+            - SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN: Share with this organization and its current & future children.
+        roleSharing:
+          $ref: "#/components/schemas/RoleSharing"
     BasicOrganizationResponse:
       type: object
       required:
@@ -4665,6 +4694,8 @@ components:
         depthFromRoot:
           type: integer
           example: 1
+        sharingMode:
+          $ref: '#/components/schemas/SharingMode'
         roles:
           type: array
           items:

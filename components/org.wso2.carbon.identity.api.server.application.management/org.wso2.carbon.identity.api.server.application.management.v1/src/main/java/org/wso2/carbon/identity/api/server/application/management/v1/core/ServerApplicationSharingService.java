@@ -37,12 +37,15 @@ import org.wso2.carbon.identity.api.server.application.management.v1.RoleSharing
 import org.wso2.carbon.identity.api.server.application.management.v1.SharedApplicationResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.SharedApplicationsResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.SharedOrganizationsResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.SharingMode;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
+import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.organization.management.application.OrgApplicationManager;
 import org.wso2.carbon.identity.organization.management.application.model.RoleWithAudienceDO;
 import org.wso2.carbon.identity.organization.management.application.model.SharedApplication;
 import org.wso2.carbon.identity.organization.management.application.model.SharedApplicationOrganizationNode;
 import org.wso2.carbon.identity.organization.management.application.model.SharedApplicationOrganizationNodePage;
+import org.wso2.carbon.identity.organization.management.application.model.SharingModeDO;
 import org.wso2.carbon.identity.organization.management.application.model.operation.ApplicationShareRolePolicy;
 import org.wso2.carbon.identity.organization.management.application.model.operation.ApplicationShareUpdateOperation;
 import org.wso2.carbon.identity.organization.management.application.model.operation.GeneralApplicationShareOperation;
@@ -63,8 +66,12 @@ import java.util.List;
 
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_MANAGEMENT_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_SHARE_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.application.management.v1.constants.ApplicationManagementEndpointConstants.ASYNC_OPERATION_RESPONSE_STATUS;
+import static org.wso2.carbon.identity.api.server.application.management.v1.constants.ApplicationManagementEndpointConstants.EXCLUDED_ATTRIBUTES_PARAM;
 import static org.wso2.carbon.identity.api.server.application.management.v1.constants.ApplicationManagementEndpointConstants.FILTER_PARAM;
+import static org.wso2.carbon.identity.api.server.application.management.v1.constants.ApplicationManagementEndpointConstants.INCLUDED_ATTRIBUTES_PARAM;
 import static org.wso2.carbon.identity.api.server.application.management.v1.constants.ApplicationManagementEndpointConstants.LIMIT_PARAM;
 import static org.wso2.carbon.identity.api.server.application.management.v1.constants.ApplicationManagementEndpointConstants.NEXT;
 import static org.wso2.carbon.identity.api.server.application.management.v1.constants.ApplicationManagementEndpointConstants.PREVIOUS;
@@ -146,10 +153,12 @@ public class ServerApplicationSharingService {
      * @param limit                Limit for the number of organizations to return.
      * @param recursive            Whether to return all child organizations recursively.
      * @param excludedAttributes   Attributes to exclude from the response.
+     * @param attributes           Attributes to include in the response.
      * @return Shared organizations of a given primary application.
      */
     public Response getApplicationSharedOrganizations(String applicationId, String before, String after, String filter,
-                                                      Integer limit, Boolean recursive, String excludedAttributes) {
+                                                      Integer limit, Boolean recursive, String excludedAttributes,
+                                                      String attributes) {
 
         try {
             if (limit == null) {
@@ -166,13 +175,15 @@ public class ServerApplicationSharingService {
             boolean recursiveFlag = recursive == null || recursive;
             SharedApplicationOrganizationNodePage sharedApplicationOrganizationNodePage = orgApplicationManager
                     .getApplicationSharedOrganizations(organizationId, applicationId, filter, beforeCursor, afterCursor,
-                            excludedAttributes, limit, recursiveFlag);
+                            excludedAttributes, attributes, limit, recursiveFlag);
             StringBuilder urlStringBuilder = new StringBuilder();
             urlStringBuilder.append("?");
             if (limit != 0) {
                 urlStringBuilder.append(LIMIT_PARAM).append("=").append(limit);
             }
-            urlStringBuilder.append("&").append(RECURSIVE_PARAM).append("=").append(recursive);
+            if (recursive != null) {
+                urlStringBuilder.append("&").append(RECURSIVE_PARAM).append("=").append(recursive);
+            }
             if (StringUtils.isNotBlank(filter)) {
                 try {
                     urlStringBuilder.append("&").append(FILTER_PARAM)
@@ -184,8 +195,14 @@ public class ServerApplicationSharingService {
                             ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL.getCode(), e);
                 }
             }
+            if (StringUtils.isNotBlank(excludedAttributes)) {
+                urlStringBuilder.append("&").append(EXCLUDED_ATTRIBUTES_PARAM).append("=").append(excludedAttributes);
+            }
+            if (StringUtils.isNotBlank(attributes)) {
+                urlStringBuilder.append("&").append(INCLUDED_ATTRIBUTES_PARAM).append("=").append(attributes);
+            }
             return Response.ok(createSharedOrgResponse(sharedApplicationOrganizationNodePage,
-                    urlStringBuilder.toString())).build();
+                    urlStringBuilder.toString(), applicationId)).build();
         } catch (OrganizationManagementClientException e) {
             throw Utils.buildClientError(e.getErrorCode(), e.getMessage(), e.getDescription());
         } catch (OrganizationManagementException e) {
@@ -431,7 +448,8 @@ public class ServerApplicationSharingService {
     }
 
     private SharedOrganizationsResponse createSharedOrgResponse(
-            SharedApplicationOrganizationNodePage sharedApplicationOrganizationNodePage, String url)
+            SharedApplicationOrganizationNodePage sharedApplicationOrganizationNodePage, String url,
+            String applicationId)
             throws OrganizationManagementServerException {
 
         SharedOrganizationsResponse response = new SharedOrganizationsResponse();
@@ -447,20 +465,20 @@ public class ServerApplicationSharingService {
                     .ref(buildOrganizationURL(organizationNode.getOrganizationId()).toString())
                     .hasChildren(organizationNode.hasChildren());
             List<RoleWithAudienceDO> roleWithAudienceDOList = organizationNode.getRoleWithAudienceDOList();
-            if (roleWithAudienceDOList != null) {
-                basicOrganizationResponse.roles(convertRoleSharingConfigListToResponseType(roleWithAudienceDOList));
-            } else {
-                basicOrganizationResponse.roles(null);
-            }
+            basicOrganizationResponse.roles(convertRoleSharingConfigListToResponseType(roleWithAudienceDOList));
+            basicOrganizationResponse.setSharingMode(
+                    convertSharingModeToResponseType(organizationNode.getSharingModeDO()));
             response.addOrganizationsItem(basicOrganizationResponse);
         }
+        response.setSharingMode(convertSharingModeToResponseType(
+                sharedApplicationOrganizationNodePage.getSharingModeDO()));
         if (sharedApplicationOrganizationNodePage.getNextPageCursor() != 0) {
             Link nextLink = new Link();
             String base64EncodedCursor = Base64.getEncoder().encodeToString(
                     String.valueOf(sharedApplicationOrganizationNodePage.getNextPageCursor())
                             .getBytes(StandardCharsets.UTF_8));
-            nextLink.setHref(URI.create(
-                    buildURIForPagination(url) + "&" + PAGINATION_AFTER + "=" + base64EncodedCursor).toString());
+            nextLink.setHref(URI.create(buildURIForPagination(url, applicationId) + "&" + PAGINATION_AFTER + "="
+                    + base64EncodedCursor).toString());
             nextLink.setRel(NEXT);
             response.addLinksItem(nextLink);
         }
@@ -469,8 +487,8 @@ public class ServerApplicationSharingService {
             String base64EncodedCursor = Base64.getEncoder().encodeToString(
                     String.valueOf(sharedApplicationOrganizationNodePage.getPreviousPageCursor())
                             .getBytes(StandardCharsets.UTF_8));
-            previousLink.setHref(URI.create(
-                    buildURIForPagination(url) + "&" + PAGINATION_BEFORE + "=" + base64EncodedCursor).toString());
+            previousLink.setHref(URI.create(buildURIForPagination(url, applicationId) + "&" + PAGINATION_BEFORE + "="
+                    + base64EncodedCursor).toString());
             previousLink.setRel(PREVIOUS);
             response.addLinksItem(previousLink);
         }
@@ -536,6 +554,9 @@ public class ServerApplicationSharingService {
     private List<RoleShareConfig> convertRoleSharingConfigListToResponseType(
             List<RoleWithAudienceDO> roleWithAudienceDOList) {
 
+        if (roleWithAudienceDOList == null) {
+            return null;
+        }
         List<RoleShareConfig> roleShareConfigs = new ArrayList<>();
         if (CollectionUtils.isEmpty(roleWithAudienceDOList)) {
             return roleShareConfigs;
@@ -550,6 +571,24 @@ public class ServerApplicationSharingService {
             roleShareConfigs.add(roleShareConfig);
         }
         return roleShareConfigs;
+    }
+
+    private SharingMode convertSharingModeToResponseType(SharingModeDO sharingModeDO) {
+
+        if (sharingModeDO == null) {
+            return null;
+        }
+        SharingMode sharingInitiationMode = new SharingMode();
+        PolicyEnum policy = sharingModeDO.getPolicy();
+        sharingInitiationMode.setPolicy(SharingMode.PolicyEnum.fromValue(policy.name()));
+
+        ApplicationShareRolePolicy rolePolicy = sharingModeDO.getApplicationShareRolePolicy();
+        RoleSharing roleSharing = new RoleSharing();
+        roleSharing.setMode(RoleSharing.ModeEnum.fromValue(rolePolicy.getMode().name()));
+        roleSharing.setRoles(convertRoleSharingConfigListToResponseType(rolePolicy.getRoleWithAudienceDOList()));
+        sharingInitiationMode.setRoleSharing(roleSharing);
+
+        return sharingInitiationMode;
     }
 
     private List<RoleWithAudienceDO> getRoleSharingDOFromUpdateObjectList(List<Object> values) {
@@ -633,9 +672,9 @@ public class ServerApplicationSharingService {
         return roleSharingBuilder.build();
     }
 
-    private static String buildURIForPagination(String paginationURL) {
+    private static String buildURIForPagination(String paginationURL, String applicationId) {
 
-        return buildURIForBody(PATH_SEPARATOR + V1_API_PATH_COMPONENT + PATH_SEPARATOR
-                + ORGANIZATION_PATH + paginationURL).toString();
+        return buildURIForBody(Constants.V1_API_PATH_COMPONENT + APPLICATION_MANAGEMENT_PATH_COMPONENT
+                + PATH_SEPARATOR + applicationId + APPLICATION_SHARE_PATH_COMPONENT + paginationURL).toString();
     }
 }

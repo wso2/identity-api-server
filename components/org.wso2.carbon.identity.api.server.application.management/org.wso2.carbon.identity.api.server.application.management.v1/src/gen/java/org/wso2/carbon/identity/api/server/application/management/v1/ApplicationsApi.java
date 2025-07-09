@@ -1051,7 +1051,7 @@ public class ApplicationsApi  {
     @Path("/share")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Perform incremental sharing operations on an already shared application (SCIM-style patch)", notes = "", response = ProcessSuccessResponse.class, authorizations = {
+    @ApiOperation(value = "Perform incremental sharing operations on an already shared application.", notes = "", response = ProcessSuccessResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -1242,9 +1242,9 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response shareOrgApplicationGet(@ApiParam(value = "ID of the application which is shared to organizations.",required=true) @PathParam("applicationId") String applicationId,     @Valid@ApiParam(value = "Base64 encoded cursor value for backward pagination. ")  @QueryParam("before") String before,     @Valid@ApiParam(value = "Base64 encoded cursor value for forward pagination. ")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations. ")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Maximum number of records to return. ")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Determines whether a recursive search should happen. If set to true, will include shared organizations in all levels of the hierarchy; If set to false, includes only shared organizations in the next level of the hierarchy. ")  @QueryParam("recursive") Boolean recursive,     @Valid@ApiParam(value = "excludedAttribute parameter. ")  @QueryParam("excludedAttributes") String excludedAttributes) {
+    public Response shareOrgApplicationGet(@ApiParam(value = "ID of the application which is shared to organizations.",required=true) @PathParam("applicationId") String applicationId,     @Valid@ApiParam(value = "Base64 encoded cursor value for backward pagination. ")  @QueryParam("before") String before,     @Valid@ApiParam(value = "Base64 encoded cursor value for forward pagination. ")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations. ")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Maximum number of records to return. ")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Determines whether a recursive search should happen. If set to true, will include shared organizations in all levels of the hierarchy; If set to false, includes only shared organizations in the next level of the hierarchy. ")  @QueryParam("recursive") Boolean recursive,     @Valid@ApiParam(value = "excludedAttribute parameter. ")  @QueryParam("excludedAttributes") String excludedAttributes,     @Valid@ApiParam(value = "Specifies the required parameters in the response. Only 'sharingMode' attribute is currently supported.  /applications/{applicationId}/share?attributes=sharingMode ")  @QueryParam("attributes") String attributes) {
 
-        return delegate.shareOrgApplicationGet(applicationId,  before,  after,  filter,  limit,  recursive,  excludedAttributes );
+        return delegate.shareOrgApplicationGet(applicationId,  before,  after,  filter,  limit,  recursive,  excludedAttributes,  attributes );
     }
 
     @Valid

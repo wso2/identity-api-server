@@ -400,10 +400,11 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
     @Override
     public Response shareOrgApplicationGet(String applicationId, String before, String after, String filter,
-                                           Integer limit, Boolean recursive, String excludedAttributes) {
+                                           Integer limit, Boolean recursive, String excludedAttributes,
+                                           String attributes) {
 
         return applicationSharingService.getApplicationSharedOrganizations(applicationId, before, after, filter,
-                limit, recursive, excludedAttributes);
+                limit, recursive, excludedAttributes, attributes);
     }
 
     @Override

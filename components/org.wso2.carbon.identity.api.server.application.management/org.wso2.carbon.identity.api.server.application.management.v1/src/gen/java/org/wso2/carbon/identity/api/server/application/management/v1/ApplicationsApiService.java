@@ -171,7 +171,7 @@ public interface ApplicationsApiService {
 
       public Response shareOrgApplicationDelete(String applicationId, String sharedOrganizationId);
 
-      public Response shareOrgApplicationGet(String applicationId, String before, String after, String filter, Integer limit, Boolean recursive, String excludedAttributes);
+      public Response shareOrgApplicationGet(String applicationId, String before, String after, String filter, Integer limit, Boolean recursive, String excludedAttributes, String attributes);
 
       public Response sharedApplicationsAllDelete(String applicationId);
 

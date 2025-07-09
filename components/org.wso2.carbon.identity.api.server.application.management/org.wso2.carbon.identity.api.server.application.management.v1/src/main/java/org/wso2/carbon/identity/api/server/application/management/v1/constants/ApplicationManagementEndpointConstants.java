@@ -28,6 +28,8 @@ public class ApplicationManagementEndpointConstants {
     public static final String FILTER_PARAM = "filter";
     public static final String LIMIT_PARAM = "limit";
     public static final String RECURSIVE_PARAM = "recursive";
+    public static final String EXCLUDED_ATTRIBUTES_PARAM = "excludedAttributes";
+    public static final String INCLUDED_ATTRIBUTES_PARAM = "attributes";
 
     public static final String ASYNC_OPERATION_RESPONSE_STATUS = "Processing";
 

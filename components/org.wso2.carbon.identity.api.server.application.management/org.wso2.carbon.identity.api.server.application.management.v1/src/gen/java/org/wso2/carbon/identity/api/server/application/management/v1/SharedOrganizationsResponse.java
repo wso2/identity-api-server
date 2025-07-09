@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.application.management.v1.BasicOrganizationResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.Link;
+import org.wso2.carbon.identity.api.server.application.management.v1.SharingMode;
 import javax.validation.constraints.*;
 
 
@@ -38,6 +39,7 @@ public class SharedOrganizationsResponse  {
   
     private List<Link> links = null;
 
+    private SharingMode sharingMode;
     private List<BasicOrganizationResponse> organizations = null;
 
 
@@ -68,6 +70,24 @@ public class SharedOrganizationsResponse  {
     }
 
         /**
+    **/
+    public SharedOrganizationsResponse sharingMode(SharingMode sharingMode) {
+
+        this.sharingMode = sharingMode;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("sharingMode")
+    @Valid
+    public SharingMode getSharingMode() {
+        return sharingMode;
+    }
+    public void setSharingMode(SharingMode sharingMode) {
+        this.sharingMode = sharingMode;
+    }
+
+    /**
     **/
     public SharedOrganizationsResponse organizations(List<BasicOrganizationResponse> organizations) {
 
@@ -106,12 +126,13 @@ public class SharedOrganizationsResponse  {
         }
         SharedOrganizationsResponse sharedOrganizationsResponse = (SharedOrganizationsResponse) o;
         return Objects.equals(this.links, sharedOrganizationsResponse.links) &&
+            Objects.equals(this.sharingMode, sharedOrganizationsResponse.sharingMode) &&
             Objects.equals(this.organizations, sharedOrganizationsResponse.organizations);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(links, organizations);
+        return Objects.hash(links, sharingMode, organizations);
     }
 
     @Override
@@ -121,6 +142,7 @@ public class SharedOrganizationsResponse  {
         sb.append("class SharedOrganizationsResponse {\n");
         
         sb.append("    links: ").append(toIndentedString(links)).append("\n");
+        sb.append("    sharingMode: ").append(toIndentedString(sharingMode)).append("\n");
         sb.append("    organizations: ").append(toIndentedString(organizations)).append("\n");
         sb.append("}");
         return sb.toString();
