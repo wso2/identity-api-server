@@ -330,8 +330,9 @@ paths:
       tags:
         - Organization
       description: |
-        This API updates the editable fields of the organization associated with the currently accessing organization.
-        Currently only the organization name can be updated using this API.
+        This API updates the editable fields of the organization associated with the currently accessing organization. 
+        Using this API, the organization's name can be updated. For root organizations, the organization version can 
+        also be updated.
         
         <b>Scopes (Permissions) required:</b> `internal_organization_update`
       summary: Update organization details of the currently accessing organization.
