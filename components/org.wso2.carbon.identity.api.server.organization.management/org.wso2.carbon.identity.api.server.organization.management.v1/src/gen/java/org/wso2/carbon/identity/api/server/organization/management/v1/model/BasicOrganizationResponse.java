@@ -185,12 +185,10 @@ public enum StatusEnum {
         this.hasChildren = hasChildren;
         return this;
     }
-
-    @ApiModelProperty(example = "true", required = true, value = "")
+    
+    @ApiModelProperty(example = "true", value = "")
     @JsonProperty("hasChildren")
     @Valid
-    @NotNull(message = "Property hasChildren cannot be null.")
-
     public Boolean getHasChildren() {
         return hasChildren;
     }
