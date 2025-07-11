@@ -22,7 +22,7 @@
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.idv.provider</artifactId>
         <relativePath>../pom.xml</relativePath>
-        <version>1.3.145-SNAPSHOT</version>
+        <version>1.3.145</version>
     </parent>
 
     <artifactId>org.wso2.carbon.identity.api.server.idv.provider.common</artifactId>
