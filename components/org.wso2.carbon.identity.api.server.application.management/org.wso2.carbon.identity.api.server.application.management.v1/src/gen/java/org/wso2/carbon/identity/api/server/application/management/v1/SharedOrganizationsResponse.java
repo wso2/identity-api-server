@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -25,6 +25,8 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.application.management.v1.BasicOrganizationResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.Link;
+import org.wso2.carbon.identity.api.server.application.management.v1.SharingInitiationMode;
 import javax.validation.constraints.*;
 
 
@@ -35,8 +37,55 @@ import javax.xml.bind.annotation.*;
 
 public class SharedOrganizationsResponse  {
   
+    private List<Link> links = null;
+
+    private SharingInitiationMode sharingInitiationMode;
     private List<BasicOrganizationResponse> organizations = null;
 
+
+    /**
+    **/
+    public SharedOrganizationsResponse links(List<Link> links) {
+
+        this.links = links;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "[{\"href\":\"/api/server/v1/applications/67f5a202-48c4-4313-9327-016da5f08f17/share?limit=10&recursive=false&next=MTA=\",\"rel\":\"next\"},{\"href\":\"/api/server/v1/applications/67f5a202-48c4-4313-9327-016da5f08f17/share?limit=10&recursive=false&before=MTA=\",\"rel\":\"previous\"}]", value = "")
+    @JsonProperty("links")
+    @Valid
+    public List<Link> getLinks() {
+        return links;
+    }
+    public void setLinks(List<Link> links) {
+        this.links = links;
+    }
+
+    public SharedOrganizationsResponse addLinksItem(Link linksItem) {
+        if (this.links == null) {
+            this.links = new ArrayList<>();
+        }
+        this.links.add(linksItem);
+        return this;
+    }
+
+        /**
+    **/
+    public SharedOrganizationsResponse sharingInitiationMode(SharingInitiationMode sharingInitiationMode) {
+
+        this.sharingInitiationMode = sharingInitiationMode;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("sharingInitiationMode")
+    @Valid
+    public SharingInitiationMode getSharingInitiationMode() {
+        return sharingInitiationMode;
+    }
+    public void setSharingInitiationMode(SharingInitiationMode sharingInitiationMode) {
+        this.sharingInitiationMode = sharingInitiationMode;
+    }
 
     /**
     **/
@@ -76,12 +125,14 @@ public class SharedOrganizationsResponse  {
             return false;
         }
         SharedOrganizationsResponse sharedOrganizationsResponse = (SharedOrganizationsResponse) o;
-        return Objects.equals(this.organizations, sharedOrganizationsResponse.organizations);
+        return Objects.equals(this.links, sharedOrganizationsResponse.links) &&
+            Objects.equals(this.sharingInitiationMode, sharedOrganizationsResponse.sharingInitiationMode) &&
+            Objects.equals(this.organizations, sharedOrganizationsResponse.organizations);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(organizations);
+        return Objects.hash(links, sharingInitiationMode, organizations);
     }
 
     @Override
@@ -90,6 +141,8 @@ public class SharedOrganizationsResponse  {
         StringBuilder sb = new StringBuilder();
         sb.append("class SharedOrganizationsResponse {\n");
         
+        sb.append("    links: ").append(toIndentedString(links)).append("\n");
+        sb.append("    sharingInitiationMode: ").append(toIndentedString(sharingInitiationMode)).append("\n");
         sb.append("    organizations: ").append(toIndentedString(organizations)).append("\n");
         sb.append("}");
         return sb.toString();
