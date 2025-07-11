@@ -1086,10 +1086,10 @@ components:
           example:
             [
               {
-                "href": "/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations?limit=10&filter=name+co+der&next=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
+                "href": "/api/server/v1/organizations?limit=10&filter=name+co+der&next=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
                 "rel": "next",
               },  {
-              "href": "/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations?limit=10&filter=name+co+der&before=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
+              "href": "/api/server/v1/organizations?limit=10&filter=name+co+der&before=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
               "rel": "previous",
             }
             ]
@@ -1134,9 +1134,12 @@ components:
         version:
           type: string
           example: 'V1.0.0'
+        hasChildren:
+          type: boolean
+          example: true
         ref:
           type: string
-          example: 'o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations/b4526d91-a8bf-43d2-8b14-c548cf73065b'
+          example: '/api/server/v1/organizations/b4526d91-a8bf-43d2-8b14-c548cf73065b'
         attributes:
           type: array
           items:
@@ -1186,6 +1189,9 @@ components:
             - STRUCTURAL
         parent:
           $ref: '#/components/schemas/ParentOrganization'
+        hasChildren:
+          type: boolean
+          example: true
         attributes:
           type: array
           items:
@@ -1233,6 +1239,9 @@ components:
           enum:
             - TENANT
             - STRUCTURAL
+        hasChildren:
+          type: boolean
+          example: true
         parent:
           $ref: '#/components/schemas/ParentOrganization'
         attributes:
@@ -1243,6 +1252,31 @@ components:
           type: array
           items:
             type: string
+        ancestorPath:
+          type: array
+          description: 'Ancestors up to the request initiated organization'
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              depth:
+                type: integer
+          example:
+            [
+              {
+                "id": "10084a8d-113f-4211-a0d5-efe36b082211",
+                "name": "Global Holding Corp",
+                "depth": 0
+              },
+              {
+                "id": "b4526d91-a8bf-43d2-8b14-c548cf73065b",
+                "name": "South Asia Division",
+                "depth": 1
+              }
+            ]
     MetaAttributesResponse:
       type: object
       properties:
@@ -1253,10 +1287,10 @@ components:
           example:
             [
               {
-                "href": "/o/api/server/v1/organizations/meta-attributes?limit=10&recursive=false&filter=attributes+co+C&after=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
+                "href": "/api/server/v1/organizations/meta-attributes?limit=10&recursive=false&filter=attributes+co+C&after=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
                 "rel": "next",
               },  {
-              "href": "/o/api/server/v1/organizations/meta-attributes?limit=10&recursive=false&filter=attributes+co+C&before=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
+              "href": "/api/server/v1/organizations/meta-attributes?limit=10&recursive=false&filter=attributes+co+C&before=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
               "rel": "previous",
             }
             ]
@@ -1281,7 +1315,7 @@ components:
           example: 'b4526d91-a8bf-43d2-8b14-c548cf73065b'
         ref:
           type: string
-          example: 'o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations/b4526d91-a8bf-43d2-8b14-c548cf73065b'
+          example: '/api/server/v1/organizations/b4526d91-a8bf-43d2-8b14-c548cf73065b'
 
     #-----------------------------------------------------
     # Organization Patch Operation Object
@@ -1400,10 +1434,10 @@ components:
           example:
             [
               {
-                "href": "/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations/discovery?filter=attributes.type+eq+emailDomain&limit=10&offset=50",
+                "href": "/api/server/v1/organizations/discovery?filter=attributes.type+eq+emailDomain&limit=10&offset=50",
                 "rel": "next",
               },  {
-              "href": "/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations/discovery?filter=attributes.type+eq+emailDomain&limit=10&offset=30",
+              "href": "/api/server/v1/organizations/discovery?filter=attributes.type+eq+emailDomain&limit=10&offset=30",
               "rel": "previous",
             }
             ]

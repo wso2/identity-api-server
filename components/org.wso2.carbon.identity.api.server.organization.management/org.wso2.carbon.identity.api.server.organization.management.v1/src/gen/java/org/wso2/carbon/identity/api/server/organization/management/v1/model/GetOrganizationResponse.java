@@ -25,6 +25,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.Attribute;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.GetOrganizationResponseAncestorPath;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.ParentOrganization;
 import javax.validation.constraints.*;
 
@@ -111,10 +112,13 @@ public enum TypeEnum {
 }
 
     private TypeEnum type;
+    private Boolean hasChildren;
     private ParentOrganization parent;
     private List<Attribute> attributes = null;
 
     private List<String> permissions = null;
+
+    private List<GetOrganizationResponseAncestorPath> ancestorPath = null;
 
 
     /**
@@ -297,6 +301,26 @@ public enum TypeEnum {
 
     /**
     **/
+    public GetOrganizationResponse hasChildren(Boolean hasChildren) {
+
+        this.hasChildren = hasChildren;
+        return this;
+    }
+
+    @ApiModelProperty(example = "true", required = true, value = "")
+    @JsonProperty("hasChildren")
+    @Valid
+    @NotNull(message = "Property hasChildren cannot be null.")
+
+    public Boolean getHasChildren() {
+        return hasChildren;
+    }
+    public void setHasChildren(Boolean hasChildren) {
+        this.hasChildren = hasChildren;
+    }
+
+    /**
+    **/
     public GetOrganizationResponse parent(ParentOrganization parent) {
 
         this.parent = parent;
@@ -365,7 +389,33 @@ public enum TypeEnum {
         return this;
     }
 
-    
+        /**
+    **/
+    public GetOrganizationResponse ancestorPath(List<GetOrganizationResponseAncestorPath> ancestorPath) {
+
+        this.ancestorPath = ancestorPath;
+        return this;
+    }
+
+    @ApiModelProperty(example = "[{\"id\":\"10084a8d-113f-4211-a0d5-efe36b082211\",\"name\":\"Global Holding Corp\",\"depth\":0},{\"id\":\"b4526d91-a8bf-43d2-8b14-c548cf73065b\",\"name\":\"South Asia Division\",\"depth\":1}]", value = "")
+    @JsonProperty("ancestorPath")
+    @Valid
+    public List<GetOrganizationResponseAncestorPath> getAncestorPath() {
+        return ancestorPath;
+    }
+    public void setAncestorPath(List<GetOrganizationResponseAncestorPath> ancestorPath) {
+        this.ancestorPath = ancestorPath;
+    }
+
+    public GetOrganizationResponse addAncestorPathItem(GetOrganizationResponseAncestorPath ancestorPathItem) {
+        if (this.ancestorPath == null) {
+            this.ancestorPath = new ArrayList<>();
+        }
+        this.ancestorPath.add(ancestorPathItem);
+        return this;
+    }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -386,14 +436,16 @@ public enum TypeEnum {
             Objects.equals(this.created, getOrganizationResponse.created) &&
             Objects.equals(this.lastModified, getOrganizationResponse.lastModified) &&
             Objects.equals(this.type, getOrganizationResponse.type) &&
+            Objects.equals(this.hasChildren, getOrganizationResponse.hasChildren) &&
             Objects.equals(this.parent, getOrganizationResponse.parent) &&
             Objects.equals(this.attributes, getOrganizationResponse.attributes) &&
-            Objects.equals(this.permissions, getOrganizationResponse.permissions);
+            Objects.equals(this.permissions, getOrganizationResponse.permissions) &&
+            Objects.equals(this.ancestorPath, getOrganizationResponse.ancestorPath);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, orgHandle, description, status, version, created, lastModified, type, parent, attributes, permissions);
+        return Objects.hash(id, name, orgHandle, description, status, version, created, lastModified, type, hasChildren, parent, attributes, permissions);
     }
 
     @Override
@@ -411,9 +463,11 @@ public enum TypeEnum {
         sb.append("    created: ").append(toIndentedString(created)).append("\n");
         sb.append("    lastModified: ").append(toIndentedString(lastModified)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
+        sb.append("    hasChildren: ").append(toIndentedString(hasChildren)).append("\n");
         sb.append("    parent: ").append(toIndentedString(parent)).append("\n");
         sb.append("    attributes: ").append(toIndentedString(attributes)).append("\n");
         sb.append("    permissions: ").append(toIndentedString(permissions)).append("\n");
+        sb.append("    ancestorPath: ").append(toIndentedString(ancestorPath)).append("\n");
         sb.append("}");
         return sb.toString();
     }

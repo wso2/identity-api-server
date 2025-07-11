@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -30,24 +30,23 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class ParentOrganization  {
+public class GetOrganizationResponseAncestorPath  {
   
     private String id;
-    private String ref;
+    private String name;
+    private Integer depth;
 
     /**
     **/
-    public ParentOrganization id(String id) {
+    public GetOrganizationResponseAncestorPath id(String id) {
 
         this.id = id;
         return this;
     }
     
-    @ApiModelProperty(example = "b4526d91-a8bf-43d2-8b14-c548cf73065b", required = true, value = "")
+    @ApiModelProperty(value = "")
     @JsonProperty("id")
     @Valid
-    @NotNull(message = "Property id cannot be null.")
-
     public String getId() {
         return id;
     }
@@ -57,22 +56,38 @@ public class ParentOrganization  {
 
     /**
     **/
-    public ParentOrganization ref(String ref) {
+    public GetOrganizationResponseAncestorPath name(String name) {
 
-        this.ref = ref;
+        this.name = name;
         return this;
     }
     
-    @ApiModelProperty(example = "/api/server/v1/organizations/b4526d91-a8bf-43d2-8b14-c548cf73065b", required = true, value = "")
-    @JsonProperty("ref")
+    @ApiModelProperty(value = "")
+    @JsonProperty("name")
     @Valid
-    @NotNull(message = "Property ref cannot be null.")
-
-    public String getRef() {
-        return ref;
+    public String getName() {
+        return name;
     }
-    public void setRef(String ref) {
-        this.ref = ref;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+    **/
+    public GetOrganizationResponseAncestorPath depth(Integer depth) {
+
+        this.depth = depth;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("depth")
+    @Valid
+    public Integer getDepth() {
+        return depth;
+    }
+    public void setDepth(Integer depth) {
+        this.depth = depth;
     }
 
 
@@ -86,24 +101,26 @@ public class ParentOrganization  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ParentOrganization parentOrganization = (ParentOrganization) o;
-        return Objects.equals(this.id, parentOrganization.id) &&
-            Objects.equals(this.ref, parentOrganization.ref);
+        GetOrganizationResponseAncestorPath getOrganizationResponseAncestorPath = (GetOrganizationResponseAncestorPath) o;
+        return Objects.equals(this.id, getOrganizationResponseAncestorPath.id) &&
+            Objects.equals(this.name, getOrganizationResponseAncestorPath.name) &&
+            Objects.equals(this.depth, getOrganizationResponseAncestorPath.depth);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, ref);
+        return Objects.hash(id, name, depth);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class ParentOrganization {\n");
+        sb.append("class GetOrganizationResponseAncestorPath {\n");
         
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
-        sb.append("    ref: ").append(toIndentedString(ref)).append("\n");
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    depth: ").append(toIndentedString(depth)).append("\n");
         sb.append("}");
         return sb.toString();
     }

@@ -48,7 +48,7 @@ public class MetaAttributesResponse  {
         return this;
     }
     
-    @ApiModelProperty(example = "[{\"href\":\"/o/api/server/v1/organizations/meta-attributes?limit=10&recursive=false&filter=attributes+co+C&after=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=\",\"rel\":\"next\"},{\"href\":\"/o/api/server/v1/organizations/meta-attributes?limit=10&recursive=false&filter=attributes+co+C&before=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=\",\"rel\":\"previous\"}]", value = "")
+    @ApiModelProperty(example = "[{\"href\":\"/api/server/v1/organizations/meta-attributes?limit=10&recursive=false&filter=attributes+co+C&after=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=\",\"rel\":\"next\"},{\"href\":\"/api/server/v1/organizations/meta-attributes?limit=10&recursive=false&filter=attributes+co+C&before=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=\",\"rel\":\"previous\"}]", value = "")
     @JsonProperty("links")
     @Valid
     public List<Link> getLinks() {
