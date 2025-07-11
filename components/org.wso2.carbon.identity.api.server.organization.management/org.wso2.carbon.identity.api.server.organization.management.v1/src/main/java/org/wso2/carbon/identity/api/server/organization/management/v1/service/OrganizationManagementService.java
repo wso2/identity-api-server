@@ -685,6 +685,7 @@ public class OrganizationManagementService {
         organizationResponse.setName(organization.getName());
         organizationResponse.setOrgHandle(organization.getOrganizationHandle());
         organizationResponse.setDescription(organization.getDescription());
+        organizationResponse.setVersion(organization.getVersion());
 
         OrganizationResponse.StatusEnum status;
         try {
@@ -727,6 +728,7 @@ public class OrganizationManagementService {
         organizationResponse.setCreated(organization.getCreated().toString());
         organizationResponse.setLastModified(organization.getLastModified().toString());
         organizationResponse.setPermissions(organization.getPermissions());
+        organizationResponse.setVersion(organization.getVersion());
 
         GetOrganizationResponse.StatusEnum status;
         try {
@@ -864,6 +866,7 @@ public class OrganizationManagementService {
                 organizationDTO.setName(organization.getName());
                 organizationDTO.setOrgHandle(organization.getOrganizationHandle());
                 organizationDTO.setStatus(BasicOrganizationResponse.StatusEnum.valueOf(organization.getStatus()));
+                organizationDTO.setVersion(organization.getVersion());
                 organizationDTO.setRef(buildOrganizationURL(organization.getId()).toString());
                 List<Attribute> attributeList = getOrganizationAttributes(organization);
                 if (!attributeList.isEmpty()) {
@@ -883,6 +886,7 @@ public class OrganizationManagementService {
         String currentOrganizationName = organization.getName();
         organization.setName(organizationPUTRequest.getName());
         organization.setDescription(organizationPUTRequest.getDescription());
+        organization.setVersion(organizationPUTRequest.getVersion());
 
         OrganizationPUTRequest.StatusEnum statusEnum = organizationPUTRequest.getStatus();
         if (statusEnum != null) {
@@ -979,6 +983,7 @@ public class OrganizationManagementService {
         organizationMetadata.setName(organization.getName());
         organizationMetadata.setOrgHandle(organization.getOrganizationHandle());
         organizationMetadata.setDescription(organization.getDescription());
+        organizationMetadata.setVersion(organization.getVersion());
         organizationMetadata.setCreated(organization.getCreated().toString());
         organizationMetadata.setLastModified(organization.getLastModified().toString());
         organizationMetadata.setPermissions(organization.getPermissions());

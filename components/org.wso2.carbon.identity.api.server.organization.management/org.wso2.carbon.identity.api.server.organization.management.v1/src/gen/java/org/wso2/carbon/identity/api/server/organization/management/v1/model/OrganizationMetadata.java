@@ -75,6 +75,7 @@ public enum StatusEnum {
 }
 
     private StatusEnum status;
+    private String version;
     private String created;
     private String lastModified;
 
@@ -166,7 +167,7 @@ public enum TypeEnum {
         this.orgHandle = orgHandle;
         return this;
     }
-    
+
     @ApiModelProperty(example = "abcbuilders", required = true, value = "")
     @JsonProperty("orgHandle")
     @Valid
@@ -215,6 +216,26 @@ public enum TypeEnum {
     }
     public void setStatus(StatusEnum status) {
         this.status = status;
+    }
+
+    /**
+    **/
+    public OrganizationMetadata version(String version) {
+
+        this.version = version;
+        return this;
+    }
+
+    @ApiModelProperty(example = "v1.0.0", required = true, value = "")
+    @JsonProperty("version")
+    @Valid
+    @NotNull(message = "Property version cannot be null.")
+
+    public String getVersion() {
+        return version;
+    }
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     /**
@@ -390,6 +411,7 @@ public enum TypeEnum {
             Objects.equals(this.orgHandle, organizationMetadata.orgHandle) &&
             Objects.equals(this.description, organizationMetadata.description) &&
             Objects.equals(this.status, organizationMetadata.status) &&
+            Objects.equals(this.version, organizationMetadata.version) &&
             Objects.equals(this.created, organizationMetadata.created) &&
             Objects.equals(this.lastModified, organizationMetadata.lastModified) &&
             Objects.equals(this.type, organizationMetadata.type) &&
@@ -401,7 +423,7 @@ public enum TypeEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, orgHandle, description, status, created, lastModified, type, parent, attributes, permissions, discoveryAttributes);
+        return Objects.hash(id, name, orgHandle, description, status, version, created, lastModified, type, parent, attributes, permissions, discoveryAttributes);
     }
 
     @Override
@@ -415,6 +437,7 @@ public enum TypeEnum {
         sb.append("    orgHandle: ").append(toIndentedString(orgHandle)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
+        sb.append("    version: ").append(toIndentedString(version)).append("\n");
         sb.append("    created: ").append(toIndentedString(created)).append("\n");
         sb.append("    lastModified: ").append(toIndentedString(lastModified)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
