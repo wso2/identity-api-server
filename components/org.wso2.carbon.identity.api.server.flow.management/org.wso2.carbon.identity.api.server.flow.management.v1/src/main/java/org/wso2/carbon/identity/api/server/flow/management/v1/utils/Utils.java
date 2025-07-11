@@ -36,10 +36,8 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.Size;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Step;
 import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.AbstractMetaResponseHandler;
-import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
-import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
+import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.application.common.model.Property;
-import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtFrameworkException;
 import org.wso2.carbon.identity.flow.mgt.model.ActionDTO;
@@ -50,6 +48,8 @@ import org.wso2.carbon.identity.flow.mgt.model.StepDTO;
 import org.wso2.carbon.identity.governance.IdentityGovernanceException;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
 import org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants;
+import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
+import org.wso2.carbon.idp.mgt.IdpManager;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -326,16 +326,16 @@ public class Utils {
         }
     }
 
-    public LocalAuthenticatorConfig[] getConnections() {
+    public List<IdentityProvider> getConnections() {
 
         try {
 
-            ApplicationManagementService applicationManagementServiceHolder =
-                    FlowMgtServiceHolder.getApplicationManagementService();
+            IdpManager idpManager =
+                    FlowMgtServiceHolder.getIdpManager();
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-            return applicationManagementServiceHolder.getAllLocalAuthenticators(tenantDomain);
+            return idpManager.getIdPs(tenantDomain);
 
-        } catch (IdentityApplicationManagementException e) {
+        } catch (IdentityProviderManagementException e) {
             throw handleFlowMgtException(new FlowMgtClientException(
                     ERROR_CODE_GET_LOCAL_AUTHENTICATORS.getCode(),
                     ERROR_CODE_GET_LOCAL_AUTHENTICATORS.getMessage(),

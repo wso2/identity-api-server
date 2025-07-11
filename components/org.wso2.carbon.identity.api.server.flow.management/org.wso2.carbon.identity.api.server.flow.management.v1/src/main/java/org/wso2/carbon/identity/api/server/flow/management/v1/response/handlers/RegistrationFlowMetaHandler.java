@@ -25,8 +25,16 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ABSTRACT_OTP_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.APPLE_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.EMAIL_OTP_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FACEBOOK_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FIDO2_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FlowType.REGISTRATION;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.GOOGLE_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.MAGIC_LINK_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.OFFICE365_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.OPENID_CONNECT_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.PASSWORD_IDENTIFIER;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.PASSWORD_ONBOARD_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.PASSWORD_PROVISIONING_EXECUTOR;
@@ -34,6 +42,7 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.F
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.SMS_OTP_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USERNAME_IDENTIFIER;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USER_IDENTIFIER;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USER_RESOLVE_EXECUTOR;
 import static org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants.MULTI_ATTRIBUTE_LOGIN_PROPERTY;
 import static org.wso2.carbon.identity.recovery.IdentityRecoveryConstants.ConnectorConfig.ENABLE_SELF_SIGNUP;
 
@@ -89,10 +98,19 @@ public class RegistrationFlowMetaHandler extends AbstractMetaResponseHandler {
     public List<String> getSupportedExecutors() {
 
         ArrayList<String> supportedExecutors = new ArrayList<>();
+        supportedExecutors.add(OPENID_CONNECT_EXECUTOR);
+        supportedExecutors.add(GOOGLE_EXECUTOR);
+        supportedExecutors.add(FACEBOOK_EXECUTOR);
+        supportedExecutors.add(OFFICE365_EXECUTOR);
+        supportedExecutors.add(APPLE_EXECUTOR);
+        supportedExecutors.add(FIDO2_EXECUTOR);
+        supportedExecutors.add(USER_RESOLVE_EXECUTOR);
         supportedExecutors.add(PASSWORD_PROVISIONING_EXECUTOR);
         supportedExecutors.add(PASSWORD_ONBOARD_EXECUTOR);
+        supportedExecutors.add(ABSTRACT_OTP_EXECUTOR);
         supportedExecutors.add(EMAIL_OTP_EXECUTOR);
         supportedExecutors.add(SMS_OTP_EXECUTOR);
+        supportedExecutors.add(MAGIC_LINK_EXECUTOR);
         return supportedExecutors;
     }
 

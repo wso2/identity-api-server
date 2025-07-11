@@ -29,6 +29,7 @@ import java.util.List;
 
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.EMAIL_OTP_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FlowType.ASK_PASSWORD;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.MAGIC_LINK_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.PASSWORD_IDENTIFIER;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.PASSWORD_PROVISIONING_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.SELF_REGISTRATION_ATTRIBUTE_PROFILE;
@@ -80,6 +81,7 @@ public class AskPasswordFlowMetaHandler extends AbstractMetaResponseHandler {
         ArrayList<String> supportedExecutors = new ArrayList<>();
         supportedExecutors.add(PASSWORD_PROVISIONING_EXECUTOR);
         supportedExecutors.add(EMAIL_OTP_EXECUTOR);
+        supportedExecutors.add(MAGIC_LINK_EXECUTOR);
         supportedExecutors.add(SMS_OTP_EXECUTOR);
         return supportedExecutors;
     }

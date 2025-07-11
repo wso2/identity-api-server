@@ -19,9 +19,9 @@
 package org.wso2.carbon.identity.api.server.flow.management.common;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.flow.mgt.FlowMgtService;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
+import org.wso2.carbon.idp.mgt.IdpManager;
 
 /**
  * This class is used to hold the FlowMgtService instance.
@@ -44,11 +44,11 @@ public class FlowMgtServiceHolder {
                         .getThreadLocalCarbonContext().getOSGiService(IdentityGovernanceService.class, null);
     }
 
-    private static class ApplicationManagementServiceHolder {
+    private static class IdpManagerHolder {
 
-        private static final ApplicationManagementService SERVICE =
-                (ApplicationManagementService) PrivilegedCarbonContext
-                        .getThreadLocalCarbonContext().getOSGiService(ApplicationManagementService.class, null);
+        private static final IdpManager SERVICE =
+                (IdpManager) PrivilegedCarbonContext
+                        .getThreadLocalCarbonContext().getOSGiService(IdpManager.class, null);
     }
 
     /**
@@ -72,12 +72,12 @@ public class FlowMgtServiceHolder {
     }
 
     /**
-     * Get ApplicationManagementService osgi service.
+     * Get IdpManager osgi service.
      *
-     * @return ApplicationManagementService
+     * @return IdpManager
      */
-    public static ApplicationManagementService getApplicationManagementService() {
+    public static IdpManager getIdpManager() {
 
-        return ApplicationManagementServiceHolder.SERVICE;
+        return IdpManagerHolder.SERVICE;
     }
 }

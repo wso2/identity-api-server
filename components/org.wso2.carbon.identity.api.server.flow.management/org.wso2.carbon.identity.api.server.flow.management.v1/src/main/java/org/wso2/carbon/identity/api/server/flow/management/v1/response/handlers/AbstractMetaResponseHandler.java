@@ -21,9 +21,8 @@ package org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponseConnectionMeta;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponseConnectorConfigs;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
-import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
+import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,17 +78,14 @@ public abstract class AbstractMetaResponseHandler {
     public FlowMetaResponseConnectionMeta getConnectionMeta() {
 
         Utils utils = new Utils();
-        LocalAuthenticatorConfig[] localAuthenticators = utils.getConnections();
+        List<IdentityProvider> identityProviders = utils.getConnections();
 
-        List<Map<String, Object>> supportedConnections = Arrays.stream(localAuthenticators)
+        List<Map<String, Object>> supportedConnections = identityProviders.stream()
                 .map(config -> {
                     Map<String, Object> map = new HashMap<>();
-                    map.put("name", config.getName());
-                    map.put("displayName", config.getDisplayName());
-                    map.put("enabled", config.isEnabled());
-                    map.put("properties", config.getProperties()); // Already public array of Property[]
-                    map.put("tags", config.getTags());
-                    map.put("definedByType", config.getDefinedByType().toString());
+                    map.put("name", config.getIdentityProviderName());
+                    map.put("enabled", config.isEnable());
+                    map.put("image", config.getImageUrl());
                     return map;
                 })
                 .collect(Collectors.toList());

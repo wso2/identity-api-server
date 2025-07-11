@@ -31,14 +31,24 @@ public class FlowEndpointConstants {
     }
 
     public static final String FLOW_PREFIX = "FM-";
+
+    // Executor constants
+    public static final String OPENID_CONNECT_EXECUTOR = "OpenIDConnectExecutor";
+    public static final String GOOGLE_EXECUTOR = "GoogleExecutor";
+    public static final String FACEBOOK_EXECUTOR = "FacebookExecutor";
+    public static final String OFFICE365_EXECUTOR = "Office365Executor";
+    public static final String APPLE_EXECUTOR = "AppleExecutor";
+    public static final String FIDO2_EXECUTOR = "FIDO2Executor";
     public static final String USER_RESOLVE_EXECUTOR = "UserResolveExecutor";
     public static final String PASSWORD_PROVISIONING_EXECUTOR = "PasswordProvisioningExecutor";
+    public static final String ABSTRACT_OTP_EXECUTOR = "AbstractOTPExecutor";
     public static final String EMAIL_OTP_EXECUTOR = "EmailOTPExecutor";
-    public static final String SMS_OTP_EXECUTOR = "SmsOTPExecutor";
+    public static final String SMS_OTP_EXECUTOR = "SMSOTPExecutor";
+    public static final String MAGIC_LINK_EXECUTOR = "MagicLinkExecutor";
     public static final String PASSWORD_ONBOARD_EXECUTOR = "PasswordOnboardExecutor";
 
-    public static final String END_USER_ATTRIBUTE_PROFILE = "End-User-Profile";
-    public static final String SELF_REGISTRATION_ATTRIBUTE_PROFILE = "Self-Registration";
+    public static final String END_USER_ATTRIBUTE_PROFILE = "endUser";
+    public static final String SELF_REGISTRATION_ATTRIBUTE_PROFILE = "selfRegistration";
 
     public static final String USERNAME_IDENTIFIER = "http://wso2.org/claims/username";
     public static final String PASSWORD_IDENTIFIER = "password";
