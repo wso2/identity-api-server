@@ -35,12 +35,34 @@ import javax.xml.bind.annotation.*;
 
 public class WorkflowInstanceResponse {
   
+    private String workflowInstanceId;
     private Operation eventType;
     private String requestInitiator;
     private String createdAt;
     private String updatedAt;
     private InstanceStatus status;
     private Object requestParameters;
+
+    /**
+    **/
+    public WorkflowInstanceResponse workflowInstanceId(String workflowInstanceId) {
+
+        this.workflowInstanceId = workflowInstanceId;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("workflowInstanceId")
+    @Valid
+    public String getWorkflowInstanceId() {
+
+        return workflowInstanceId;
+    }
+
+    public void setWorkflowInstanceId(String workflowInstanceId) {
+
+        this.workflowInstanceId = workflowInstanceId;
+    }
 
     /**
     **/
@@ -54,9 +76,12 @@ public class WorkflowInstanceResponse {
     @JsonProperty("eventType")
     @Valid
     public Operation getEventType() {
+
         return eventType;
     }
+
     public void setEventType(Operation eventType) {
+
         this.eventType = eventType;
     }
 
@@ -71,9 +96,12 @@ public class WorkflowInstanceResponse {
     @ApiModelProperty(value = "")
     @JsonProperty("createdAt")
     public String getCreatedAt() {
+
         return createdAt;
     }
+
     public void setCreatedAt(String createdAt) {
+
         this.createdAt = createdAt;
     }
 
@@ -88,9 +116,11 @@ public class WorkflowInstanceResponse {
     @ApiModelProperty(value = "")
     @JsonProperty("updatedAt")
     public String getUpdatedAt() {
+
         return updatedAt;
     }
     public void setUpdatedAt(String updatedAt) {
+
         this.updatedAt = updatedAt;
     }
 
@@ -106,9 +136,12 @@ public class WorkflowInstanceResponse {
     @JsonProperty("status")
     @Valid
     public InstanceStatus getStatus() {
+
         return status;
     }
+
     public void setStatus(InstanceStatus status) {
+
         this.status = status;
     }
 
@@ -124,9 +157,12 @@ public class WorkflowInstanceResponse {
     @JsonProperty("requestParameters")
     @Valid
     public Object getRequestParameters() {
+
         return requestParameters;
     }
+
     public void setRequestParameters(Object requestParameters) {
+
         this.requestParameters = requestParameters;
     }
 
@@ -141,9 +177,12 @@ public class WorkflowInstanceResponse {
     @ApiModelProperty(value = "")
     @JsonProperty("requestInitiator")
     public String getRequestInitiator() {
+
         return requestInitiator;
     }
+
     public void setRequestInitiator(String requestInitiator) {
+
         this.requestInitiator = requestInitiator;
     }
 
@@ -166,6 +205,7 @@ public class WorkflowInstanceResponse {
 
     @Override
     public int hashCode() {
+        
         return Objects.hash(eventType, createdAt, updatedAt, status, requestParameters);
     }
 

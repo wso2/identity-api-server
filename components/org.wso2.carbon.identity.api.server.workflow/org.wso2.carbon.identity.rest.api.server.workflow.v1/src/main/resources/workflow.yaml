@@ -495,7 +495,7 @@ paths:
             
             Example:
             
-                `requestType eq 'APPROVAL' and beginDate ge '2024-01-01' and endDate le '2024-12-31' and dateCategory eq 'CREATED' and status eq 'PENDING'`
+                `beginDate+ge+'2024-01-01'+and+endDate+le+'2024-12-31'+and+dateCategory+eq+'CREATED'+and+status+eq+'PENDING'+and+requestType+eq+'ALL_TASKS'`
           schema:
             type: string
       responses:
@@ -863,15 +863,19 @@ components:
           type: boolean
           example: true
           description: "Association Status"
+          
     WorkflowInstanceListResponse:
       type: object
       properties:
         totalResults:
           type: integer
+          example: 10
         startIndex:
           type: integer
+          example: 3
         count:
           type: integer
+          example: 10
         instances:
           type: array
           items:
@@ -880,6 +884,10 @@ components:
     WorkflowInstanceListItem:
       type: object
       properties:
+        id:
+          type: string
+          example: "500"
+          description: "Unique id to represent a workflow instance"
         eventType:
           $ref: '#/components/schemas/Operation'
         requestInitiator:
@@ -896,6 +904,10 @@ components:
     WorkflowInstanceResponse:
       type: object
       properties:
+        id:
+          type: string
+          example: "500"
+          description: "Unique id to represent a workflow instance"
         eventType:
           $ref: '#/components/schemas/Operation'
         createdAt:

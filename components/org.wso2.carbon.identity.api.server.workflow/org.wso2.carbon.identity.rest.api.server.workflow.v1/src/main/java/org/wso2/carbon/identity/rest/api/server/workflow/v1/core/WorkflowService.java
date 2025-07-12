@@ -673,8 +673,8 @@ public class WorkflowService {
         if (workflowRequest == null) {
             return null;
         }
-
         WorkflowInstanceResponse response = new WorkflowInstanceResponse();
+        response.setWorkflowInstanceId(workflowRequest.getRequestId());
         response.setEventType(Operation.fromValue(workflowRequest.getEventType()));
         response.setRequestInitiator(workflowRequest.getCreatedBy());
         try {
@@ -700,6 +700,12 @@ public class WorkflowService {
         }
 
         WorkflowInstanceListItem item = new WorkflowInstanceListItem();
+        
+        if (workflowRequest.getRequestId() != null) {
+            item.setWorkflowInstanceId(workflowRequest.getRequestId());
+        } else {
+            throw new WorkflowClientException("Workflow request ID cannot be null.");
+        }
 
         if (workflowRequest.getEventType() != null) {
             item.setEventType(Operation.fromValue(workflowRequest.getEventType()));
