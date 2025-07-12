@@ -28,6 +28,7 @@ import org.wso2.carbon.identity.api.server.organization.management.v1.model.Attr
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.BasicOrganizationResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.DiscoveryAttribute;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.GetOrganizationResponse;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.GetOrganizationResponseAncestorPath;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.Link;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.MetaAttributesResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationCheckResponse;
@@ -61,6 +62,7 @@ import org.wso2.carbon.identity.organization.management.service.constant.Organiz
 import org.wso2.carbon.identity.organization.management.service.exception.OrganizationManagementClientException;
 import org.wso2.carbon.identity.organization.management.service.exception.OrganizationManagementException;
 import org.wso2.carbon.identity.organization.management.service.exception.OrganizationManagementServerException;
+import org.wso2.carbon.identity.organization.management.service.model.AncestorOrganizationDO;
 import org.wso2.carbon.identity.organization.management.service.model.BasicOrganization;
 import org.wso2.carbon.identity.organization.management.service.model.Organization;
 import org.wso2.carbon.identity.organization.management.service.model.OrganizationAttribute;
@@ -211,7 +213,7 @@ public class OrganizationManagementService {
 
         try {
             Organization organization = organizationManager.getOrganization(organizationId,
-                    false, Boolean.TRUE.equals(includePermissions));
+                    false, Boolean.TRUE.equals(includePermissions), true);
             return Response.ok().entity(getOrganizationResponseWithPermission(organization)).build();
         } catch (OrganizationManagementClientException e) {
             return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);
@@ -686,6 +688,7 @@ public class OrganizationManagementService {
         organizationResponse.setOrgHandle(organization.getOrganizationHandle());
         organizationResponse.setDescription(organization.getDescription());
         organizationResponse.setVersion(organization.getVersion());
+        organizationResponse.setHasChildren(organization.hasChildren());
 
         OrganizationResponse.StatusEnum status;
         try {
@@ -727,8 +730,17 @@ public class OrganizationManagementService {
         organizationResponse.setDescription(organization.getDescription());
         organizationResponse.setCreated(organization.getCreated().toString());
         organizationResponse.setLastModified(organization.getLastModified().toString());
+        organizationResponse.setHasChildren(organization.hasChildren());
         organizationResponse.setPermissions(organization.getPermissions());
         organizationResponse.setVersion(organization.getVersion());
+        List<AncestorOrganizationDO> ancestors = organization.getAncestors();
+        if (CollectionUtils.isNotEmpty(ancestors)) {
+            organizationResponse.setAncestorPath(ancestors.stream().map(ancestor ->
+                    new GetOrganizationResponseAncestorPath()
+                            .id(ancestor.getId())
+                            .name(ancestor.getName())
+                            .depth(ancestor.getDepth())).collect(Collectors.toList()));
+        }
 
         GetOrganizationResponse.StatusEnum status;
         try {
@@ -867,6 +879,7 @@ public class OrganizationManagementService {
                 organizationDTO.setOrgHandle(organization.getOrganizationHandle());
                 organizationDTO.setStatus(BasicOrganizationResponse.StatusEnum.valueOf(organization.getStatus()));
                 organizationDTO.setVersion(organization.getVersion());
+                organizationDTO.setHasChildren(organization.hasChildren());
                 organizationDTO.setRef(buildOrganizationURL(organization.getId()).toString());
                 List<Attribute> attributeList = getOrganizationAttributes(organization);
                 if (!attributeList.isEmpty()) {

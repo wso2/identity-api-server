@@ -112,6 +112,7 @@ public enum TypeEnum {
 
     private TypeEnum type;
     private ParentOrganization parent;
+    private Boolean hasChildren;
     private List<Attribute> attributes = null;
 
 
@@ -313,6 +314,24 @@ public enum TypeEnum {
 
     /**
     **/
+    public OrganizationResponse hasChildren(Boolean hasChildren) {
+
+        this.hasChildren = hasChildren;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "true", value = "")
+    @JsonProperty("hasChildren")
+    @Valid
+    public Boolean getHasChildren() {
+        return hasChildren;
+    }
+    public void setHasChildren(Boolean hasChildren) {
+        this.hasChildren = hasChildren;
+    }
+
+    /**
+    **/
     public OrganizationResponse attributes(List<Attribute> attributes) {
 
         this.attributes = attributes;
@@ -359,12 +378,13 @@ public enum TypeEnum {
             Objects.equals(this.lastModified, organizationResponse.lastModified) &&
             Objects.equals(this.type, organizationResponse.type) &&
             Objects.equals(this.parent, organizationResponse.parent) &&
+            Objects.equals(this.hasChildren, organizationResponse.hasChildren) &&
             Objects.equals(this.attributes, organizationResponse.attributes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, orgHandle, description, status, version, created, lastModified, type, parent, attributes);
+        return Objects.hash(id, name, orgHandle, description, status, version, created, lastModified, type, parent, hasChildren, attributes);
     }
 
     @Override
@@ -383,6 +403,7 @@ public enum TypeEnum {
         sb.append("    lastModified: ").append(toIndentedString(lastModified)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    parent: ").append(toIndentedString(parent)).append("\n");
+        sb.append("    hasChildren: ").append(toIndentedString(hasChildren)).append("\n");
         sb.append("    attributes: ").append(toIndentedString(attributes)).append("\n");
         sb.append("}");
         return sb.toString();

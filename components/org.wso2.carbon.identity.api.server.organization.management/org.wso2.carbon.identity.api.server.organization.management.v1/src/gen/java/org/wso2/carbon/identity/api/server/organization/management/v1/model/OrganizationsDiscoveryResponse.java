@@ -106,7 +106,7 @@ public class OrganizationsDiscoveryResponse  {
         return this;
     }
     
-    @ApiModelProperty(example = "[{\"href\":\"/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations/discovery?filter=attributes.type+eq+emailDomain&limit=10&offset=50\",\"rel\":\"next\"},{\"href\":\"/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations/discovery?filter=attributes.type+eq+emailDomain&limit=10&offset=30\",\"rel\":\"previous\"}]", value = "")
+    @ApiModelProperty(example = "[{\"href\":\"/api/server/v1/organizations/discovery?filter=attributes.type+eq+emailDomain&limit=10&offset=50\",\"rel\":\"next\"},{\"href\":\"/api/server/v1/organizations/discovery?filter=attributes.type+eq+emailDomain&limit=10&offset=30\",\"rel\":\"previous\"}]", value = "")
     @JsonProperty("links")
     @Valid
     public List<Link> getLinks() {
