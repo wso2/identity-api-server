@@ -75,7 +75,7 @@ public class FlowEndpointConstants {
 
         REGISTRATION,
         PASSWORD_RECOVERY,
-        ASK_PASSWORD;
+        INVITED_USER_REGISTRATION;
 
         /**
          * Check if a given string is a valid flow type.
