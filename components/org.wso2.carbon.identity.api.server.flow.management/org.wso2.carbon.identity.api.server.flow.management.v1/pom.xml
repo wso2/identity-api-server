@@ -109,6 +109,18 @@
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.governance</groupId>
+            <artifactId>org.wso2.carbon.identity.governance</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.governance</groupId>
+            <artifactId>org.wso2.carbon.identity.recovery</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <artifactId>org.wso2.carbon.identity.application.mgt</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

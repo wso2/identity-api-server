@@ -23,8 +23,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
+import org.wso2.carbon.identity.api.server.flow.management.common.FlowMgtServiceHolder;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Action;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Component;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Data;
@@ -33,6 +35,9 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.Position;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Size;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Step;
 import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
+import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.AbstractMetaResponseHandler;
+import org.wso2.carbon.identity.application.common.model.IdentityProvider;
+import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtFrameworkException;
 import org.wso2.carbon.identity.flow.mgt.model.ActionDTO;
@@ -40,15 +45,32 @@ import org.wso2.carbon.identity.flow.mgt.model.ComponentDTO;
 import org.wso2.carbon.identity.flow.mgt.model.DataDTO;
 import org.wso2.carbon.identity.flow.mgt.model.ExecutorDTO;
 import org.wso2.carbon.identity.flow.mgt.model.StepDTO;
+import org.wso2.carbon.identity.governance.IdentityGovernanceException;
+import org.wso2.carbon.identity.governance.IdentityGovernanceService;
+import org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants;
+import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
+import org.wso2.carbon.idp.mgt.IdpManager;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_DUPLICATE_COMPONENT_ID;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_GET_GOVERNANCE_CONFIG;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_GET_LOCAL_AUTHENTICATORS;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Schema.IDP_NAME;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USERNAME_IDENTIFIER;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USER_IDENTIFIER;
 
 /**
  * Utility class for flow management.
@@ -275,5 +297,174 @@ public class Utils {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.convertValue(map, new TypeReference<Map<String, Object>>() {
         });
+    }
+
+    /**
+     * Checks whether a connector config is enabled.
+     *
+     * @param tenantDomain Tenant domain.
+     */
+    public boolean isFlowConfigEnabled(String tenantDomain, String connectorConfig) {
+
+        try {
+            IdentityGovernanceService identityGovernanceService =
+                    FlowMgtServiceHolder.getIdentityGovernanceService();
+            Property[] connectorConfigs = identityGovernanceService.getConfiguration(
+                    new String[]{connectorConfig}, tenantDomain);
+
+            if (connectorConfigs == null || connectorConfigs.length == 0) {
+                return false;
+            }
+
+            return Boolean.parseBoolean(connectorConfigs[0].getValue());
+
+        } catch (IdentityGovernanceException e) {
+            throw handleFlowMgtException(new FlowMgtClientException(
+                    ERROR_CODE_GET_GOVERNANCE_CONFIG.getCode(),
+                    ERROR_CODE_GET_GOVERNANCE_CONFIG.getMessage(),
+                    ERROR_CODE_GET_GOVERNANCE_CONFIG.getDescription(), e));
+        }
+    }
+
+    /**
+     * Retrieves the list of identity providers configured in the system.
+     *
+     * @return List of IdentityProvider objects.
+     */
+    public List<IdentityProvider> getConnections() {
+
+        try {
+            IdpManager idpManager =
+                    FlowMgtServiceHolder.getIdpManager();
+            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            return idpManager.getIdPs(tenantDomain);
+
+        } catch (IdentityProviderManagementException e) {
+            throw handleFlowMgtException(new FlowMgtClientException(
+                    ERROR_CODE_GET_LOCAL_AUTHENTICATORS.getCode(),
+                    ERROR_CODE_GET_LOCAL_AUTHENTICATORS.getMessage(),
+                    ERROR_CODE_GET_LOCAL_AUTHENTICATORS.getDescription(), e));
+        }
+    }
+
+    /**
+     * Collects flow data from the provided steps.
+     *
+     * @param steps       List of steps to collect data from.
+     * @param executors   Set to collect executor names.
+     * @param identifiers Set to collect identifiers.
+     * @param ids         Set to collect component IDs.
+     */
+    public static void collectFlowData(List<Step> steps, Set<String> executors, Set<String> identifiers,
+                                       Set<String> ids) {
+
+        for (Step step : steps) {
+            if (step.getId() != null && !step.getId().isEmpty()) {
+                ids.add(step.getId());
+            }
+            if (step.getData() != null && step.getData().getComponents() != null) {
+                traverseComponents(step.getData().getComponents(), executors, identifiers, ids);
+            }
+        }
+    }
+
+    private static void traverseComponents(List<Component> components, Set<String> executors, Set<String> identifiers,
+                                           Set<String> ids) {
+
+        for (Component component : components) {
+            if (ids != null && component.getId() != null && !component.getId().isEmpty()) {
+                if (!ids.add(component.getId())) {
+                    throw handleFlowMgtException(new FlowMgtClientException(
+                            ERROR_CODE_DUPLICATE_COMPONENT_ID.getCode(),
+                            ERROR_CODE_DUPLICATE_COMPONENT_ID.getMessage(),
+                            ERROR_CODE_DUPLICATE_COMPONENT_ID.getDescription()));
+                }
+            }
+
+            if (executors != null && component.getAction() != null
+                    && "EXECUTOR".equals(component.getAction().getType())) {
+                Executor executor = component.getAction().getExecutor();
+                if (executor != null && executor.getName() != null) {
+                    executors.add(executor.getName());
+                }
+            }
+
+            if (identifiers != null && "FIELD".equals(component.getCategory())
+                    && "INPUT".equals(component.getType())) {
+                if (component.getConfig() instanceof Map) {
+                    Map<String, Object> configMap = (Map<String, Object>) component.getConfig();
+                    Object identifierObj = configMap.get("identifier");
+                    if (identifierObj != null) {
+                        String identifier = identifierObj.toString();
+                        if (!identifier.isEmpty()) {
+                            identifiers.add(identifier);
+                        }
+                    }
+                }
+            }
+
+            if (component.getComponents() != null && !component.getComponents().isEmpty()) {
+                traverseComponents(component.getComponents(), executors, identifiers, ids);
+            }
+        }
+    }
+
+    /**
+     * Validates the identifiers provided in the flow.
+     *
+     * @param metaResponseHandler The handler for the flow metadata response.
+     * @param identifiers          Set of identifiers to validate.
+     */
+    public static void validateIdentifiers(AbstractMetaResponseHandler metaResponseHandler, Set<String> identifiers) {
+
+        List<String> required = metaResponseHandler.getRequiredInputFields();
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        boolean alternativeLoginStatus = new Utils().isFlowConfigEnabled(tenantDomain,
+                MultiAttributeLoginConstants.MULTI_ATTRIBUTE_LOGIN_PROPERTY);
+
+        // Determine which identifiers are acceptable for "identity"
+        List<String> identityIdentifiers = alternativeLoginStatus ?
+                Arrays.asList(USER_IDENTIFIER, USERNAME_IDENTIFIER) :
+                Collections.singletonList(USERNAME_IDENTIFIER);
+
+        // Check if at least one required identity identifier is present
+        boolean needsIdentity = required.stream().anyMatch(identityIdentifiers::contains);
+        boolean hasIdentity = identifiers.stream().anyMatch(identityIdentifiers::contains);
+
+        if (needsIdentity && !hasIdentity) {
+            throw handleFlowMgtException(new FlowMgtClientException(
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_MISSING_IDENTIFIER.getCode(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_MISSING_IDENTIFIER.getMessage(),
+                    alternativeLoginStatus
+                            ? "Either user identifier or username identifier must be provided."
+                            : "Username identifier must be provided."));
+        }
+
+        // Check remaining required identifiers (excluding identity identifiers)
+        List<String> remainingRequired = new ArrayList<>(required);
+        remainingRequired.removeAll(identityIdentifiers);
+
+        if (!identifiers.containsAll(remainingRequired)) {
+            throw handleFlowMgtException(new FlowMgtClientException(
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_MISSING_IDENTIFIER.getCode(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_MISSING_IDENTIFIER.getMessage(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_MISSING_IDENTIFIER.getDescription()));
+        }
+    }
+
+    /**
+     * Validates the executors provided in the flow.
+     *
+     * @param metaResponseHandler The handler for the flow metadata response.
+     * @param executors           Set of executors to validate.
+     */
+    public static void validateExecutors(AbstractMetaResponseHandler metaResponseHandler, Set<String> executors) {
+
+        if (!new HashSet<>(metaResponseHandler.getSupportedExecutors()).containsAll(executors)) {
+            throw handleFlowMgtException(new FlowMgtClientException(
+                    ERROR_CODE_UNSUPPORTED_EXECUTOR.getCode(),
+                    ERROR_CODE_UNSUPPORTED_EXECUTOR.getMessage(),
+                    ERROR_CODE_UNSUPPORTED_EXECUTOR.getDescription()));
+        }
     }
 }
