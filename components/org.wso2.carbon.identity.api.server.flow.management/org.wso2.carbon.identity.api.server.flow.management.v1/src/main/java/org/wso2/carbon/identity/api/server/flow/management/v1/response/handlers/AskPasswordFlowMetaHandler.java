@@ -19,9 +19,9 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.api.server.flow.management.v1.BaseConnectorConfigs;
 import org.wso2.carbon.identity.api.server.flow.management.v1.SelfRegistrationConnectorConfigs;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
-import org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants;
 import org.wso2.carbon.identity.recovery.IdentityRecoveryConstants;
 
 import java.util.ArrayList;
@@ -60,11 +60,10 @@ public class AskPasswordFlowMetaHandler extends AbstractMetaResponseHandler {
         Utils utils = new Utils();
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         SelfRegistrationConnectorConfigs connectorConfigs = new SelfRegistrationConnectorConfigs();
+        BaseConnectorConfigs baseConfigs = super.getConnectorConfigs();
+        connectorConfigs.setMultiAttributeLoginEnabled(baseConfigs.getMultiAttributeLoginEnabled());
         connectorConfigs.setSelfRegistrationEnabled(utils.isFlowConfigEnabled(tenantDomain,
                             IdentityRecoveryConstants.ConnectorConfig.ENABLE_SELF_SIGNUP));
-        connectorConfigs.setMultiAttributeLoginEnabled(utils.isFlowConfigEnabled(tenantDomain,
-                        MultiAttributeLoginConstants.MULTI_ATTRIBUTE_LOGIN_PROPERTY));
-
         return connectorConfigs;
     }
 
@@ -76,6 +75,7 @@ public class AskPasswordFlowMetaHandler extends AbstractMetaResponseHandler {
         return requiredInputFields;
     }
 
+    @Override
     public List<String> getSupportedExecutors() {
 
         ArrayList<String> supportedExecutors = new ArrayList<>();

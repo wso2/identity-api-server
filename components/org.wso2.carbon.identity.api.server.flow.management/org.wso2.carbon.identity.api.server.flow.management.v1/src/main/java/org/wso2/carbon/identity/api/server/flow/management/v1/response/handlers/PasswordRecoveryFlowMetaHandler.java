@@ -19,10 +19,9 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.api.server.flow.management.v1.BaseConnectorConfigs;
 import org.wso2.carbon.identity.api.server.flow.management.v1.PasswordRecoveryConnectorConfigs;
-import org.wso2.carbon.identity.api.server.flow.management.v1.PasswordRecoveryFlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
-import org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,9 +62,8 @@ public class PasswordRecoveryFlowMetaHandler extends AbstractMetaResponseHandler
         Utils utils = new Utils();
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         PasswordRecoveryConnectorConfigs connectorConfigs = new PasswordRecoveryConnectorConfigs();
-        connectorConfigs.setMultiAttributeLoginEnabled(
-                utils.isFlowConfigEnabled(tenantDomain,
-                        MultiAttributeLoginConstants.MULTI_ATTRIBUTE_LOGIN_PROPERTY));
+        BaseConnectorConfigs baseConfigs = super.getConnectorConfigs();
+        connectorConfigs.setMultiAttributeLoginEnabled(baseConfigs.getMultiAttributeLoginEnabled());
         connectorConfigs.setPasswordRecoveryEnabled(
                 utils.isFlowConfigEnabled(tenantDomain,
                         PASSWORD_RECOVERY_EMAIL_LINK_ENABLE) ||
@@ -73,7 +71,6 @@ public class PasswordRecoveryFlowMetaHandler extends AbstractMetaResponseHandler
                         PASSWORD_RECOVERY_SMS_OTP_ENABLE) ||
                 utils.isFlowConfigEnabled(tenantDomain,
                         PASSWORD_RECOVERY_SEND_OTP_IN_EMAIL));
-
         return connectorConfigs;
     }
 
@@ -84,16 +81,6 @@ public class PasswordRecoveryFlowMetaHandler extends AbstractMetaResponseHandler
     }
 
     @Override
-    public PasswordRecoveryFlowMetaResponse createResponse() {
-
-        PasswordRecoveryFlowMetaResponse response = new PasswordRecoveryFlowMetaResponse();
-        response.setFlowType(getFlowType());
-        response.setAttributeProfile(getAttributeProfile());
-        response.setSupportedExecutors(getSupportedExecutors());
-        response.setConnectorConfigs(getConnectorConfigs());
-        return response;
-    }
-
     public List<String> getSupportedExecutors() {
 
         ArrayList<String> supportedExecutors = new ArrayList<>();

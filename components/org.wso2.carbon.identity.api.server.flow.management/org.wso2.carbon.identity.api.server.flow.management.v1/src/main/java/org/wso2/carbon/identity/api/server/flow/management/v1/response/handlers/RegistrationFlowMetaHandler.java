@@ -19,12 +19,18 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.api.server.flow.management.v1.BaseConnectorConfigs;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponseConnectionMeta;
 import org.wso2.carbon.identity.api.server.flow.management.v1.RegistrationFlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.SelfRegistrationConnectorConfigs;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
+import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ABSTRACT_OTP_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.APPLE_EXECUTOR;
@@ -41,7 +47,6 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.F
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.SELF_REGISTRATION_ATTRIBUTE_PROFILE;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.SMS_OTP_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USER_RESOLVE_EXECUTOR;
-import static org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants.MULTI_ATTRIBUTE_LOGIN_PROPERTY;
 import static org.wso2.carbon.identity.recovery.IdentityRecoveryConstants.ConnectorConfig.ENABLE_SELF_SIGNUP;
 
 /**
@@ -69,11 +74,10 @@ public class RegistrationFlowMetaHandler extends AbstractMetaResponseHandler {
         Utils utils = new Utils();
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         SelfRegistrationConnectorConfigs connectorConfigs = new SelfRegistrationConnectorConfigs();
+        BaseConnectorConfigs baseConfigs = super.getConnectorConfigs();
+        connectorConfigs.setMultiAttributeLoginEnabled(baseConfigs.getMultiAttributeLoginEnabled());
         connectorConfigs.setSelfRegistrationEnabled(
                     utils.isFlowConfigEnabled(tenantDomain, ENABLE_SELF_SIGNUP));
-        connectorConfigs.setMultiAttributeLoginEnabled(
-                utils.isFlowConfigEnabled(tenantDomain, MULTI_ATTRIBUTE_LOGIN_PROPERTY));
-
         return connectorConfigs;
     }
 
@@ -95,6 +99,32 @@ public class RegistrationFlowMetaHandler extends AbstractMetaResponseHandler {
         return response;
     }
 
+    /**
+     * Get the connection meta information for the flow.
+     *
+     * @return Connection meta information.
+     */
+    private FlowMetaResponseConnectionMeta getConnectionMeta() {
+
+        Utils utils = new Utils();
+        List<IdentityProvider> identityProviders = utils.getConnections();
+
+        List<Map<String, Object>> supportedConnections = identityProviders.stream()
+                .map(config -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("name", config.getIdentityProviderName());
+                    map.put("enabled", config.isEnable());
+                    map.put("image", config.getImageUrl());
+                    return map;
+                })
+                .collect(Collectors.toList());
+
+        FlowMetaResponseConnectionMeta connections = new FlowMetaResponseConnectionMeta();
+        connections.setSupportedConnections(supportedConnections);
+        return connections;
+    }
+
+    @Override
     public List<String> getSupportedExecutors() {
 
         ArrayList<String> supportedExecutors = new ArrayList<>();

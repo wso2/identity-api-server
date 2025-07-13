@@ -21,16 +21,11 @@ package org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.flow.management.v1.BaseConnectorConfigs;
 import org.wso2.carbon.identity.api.server.flow.management.v1.BaseFlowMetaResponse;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponseConnectionMeta;
 import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
-import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Abstract class for handling meta responses for different flows.
@@ -65,7 +60,15 @@ public abstract class AbstractMetaResponseHandler {
      *
      * @return Connector configurations.
      */
-    public abstract BaseConnectorConfigs getConnectorConfigs();
+    public BaseConnectorConfigs getConnectorConfigs() {
+
+        Utils utils = new Utils();
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        BaseConnectorConfigs connectorConfigs = new BaseConnectorConfigs();
+        connectorConfigs.setMultiAttributeLoginEnabled(
+                utils.isFlowConfigEnabled(tenantDomain, MultiAttributeLoginConstants.MULTI_ATTRIBUTE_LOGIN_PROPERTY));
+        return connectorConfigs;
+    }
 
     /**
      * Get the required input fields for the flow.
@@ -104,30 +107,5 @@ public abstract class AbstractMetaResponseHandler {
             fields.add(FlowEndpointConstants.USERNAME_IDENTIFIER);
         }
         return fields;
-    }
-
-    /**
-     * Get the connection meta information for the flow.
-     *
-     * @return Connection meta information.
-     */
-    public FlowMetaResponseConnectionMeta getConnectionMeta() {
-
-        Utils utils = new Utils();
-        List<IdentityProvider> identityProviders = utils.getConnections();
-
-        List<Map<String, Object>> supportedConnections = identityProviders.stream()
-                .map(config -> {
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("name", config.getIdentityProviderName());
-                    map.put("enabled", config.isEnable());
-                    map.put("image", config.getImageUrl());
-                    return map;
-                })
-                .collect(Collectors.toList());
-
-        FlowMetaResponseConnectionMeta connections = new FlowMetaResponseConnectionMeta();
-        connections.setSupportedConnections(supportedConnections);
-        return connections;
     }
 }

@@ -326,10 +326,14 @@ public class Utils {
         }
     }
 
+    /**
+     * Retrieves the list of identity providers configured in the system.
+     *
+     * @return List of IdentityProvider objects.
+     */
     public List<IdentityProvider> getConnections() {
 
         try {
-
             IdpManager idpManager =
                     FlowMgtServiceHolder.getIdpManager();
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
@@ -343,12 +347,17 @@ public class Utils {
         }
     }
 
-    public static void collectFlowData(
-            List<Step> steps,
-            Set<String> executors,
-            Set<String> identifiers,
-            Set<String> ids
-    ) {
+    /**
+     * Collects flow data from the provided steps.
+     *
+     * @param steps       List of steps to collect data from.
+     * @param executors   Set to collect executor names.
+     * @param identifiers Set to collect identifiers.
+     * @param ids         Set to collect component IDs.
+     */
+    public static void collectFlowData(List<Step> steps, Set<String> executors, Set<String> identifiers,
+                                       Set<String> ids) {
+
         for (Step step : steps) {
             if (step.getId() != null && !step.getId().isEmpty()) {
                 ids.add(step.getId());
@@ -359,12 +368,9 @@ public class Utils {
         }
     }
 
-    private static void traverseComponents(
-            List<Component> components,
-            Set<String> executors,
-            Set<String> identifiers,
-            Set<String> ids
-    ) {
+    private static void traverseComponents(List<Component> components, Set<String> executors, Set<String> identifiers,
+                                           Set<String> ids) {
+
         for (Component component : components) {
             if (ids != null && component.getId() != null && !component.getId().isEmpty()) {
                 if (!ids.add(component.getId())) {
@@ -403,6 +409,12 @@ public class Utils {
         }
     }
 
+    /**
+     * Validates the identifiers provided in the flow.
+     *
+     * @param metaResponseHandler The handler for the flow metadata response.
+     * @param identifiers          Set of identifiers to validate.
+     */
     public static void validateIdentifiers(AbstractMetaResponseHandler metaResponseHandler, Set<String> identifiers) {
 
         List<String> required = metaResponseHandler.getRequiredInputFields();
@@ -440,6 +452,12 @@ public class Utils {
         }
     }
 
+    /**
+     * Validates the executors provided in the flow.
+     *
+     * @param metaResponseHandler The handler for the flow metadata response.
+     * @param executors           Set of executors to validate.
+     */
     public static void validateExecutors(AbstractMetaResponseHandler metaResponseHandler, Set<String> executors) {
 
         if (!new HashSet<>(metaResponseHandler.getSupportedExecutors()).containsAll(executors)) {

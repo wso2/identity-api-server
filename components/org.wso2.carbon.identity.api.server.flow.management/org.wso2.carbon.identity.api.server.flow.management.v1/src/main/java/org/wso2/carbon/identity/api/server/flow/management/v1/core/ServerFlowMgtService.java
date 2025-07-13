@@ -89,10 +89,7 @@ public class ServerFlowMgtService {
 
         validateFlowType(flowType);
         AbstractMetaResponseHandler metaResponseHandler = resolveHandler(flowType);
-
-        BaseFlowMetaResponse flowMetaResponse = metaResponseHandler.createResponse();
-
-        return flowMetaResponse;
+        return metaResponseHandler.createResponse();
     }
 
     /**
