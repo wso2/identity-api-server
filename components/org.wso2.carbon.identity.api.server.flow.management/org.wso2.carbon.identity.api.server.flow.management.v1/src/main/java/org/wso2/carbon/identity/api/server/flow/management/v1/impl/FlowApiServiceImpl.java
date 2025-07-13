@@ -18,13 +18,12 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.impl;
 
+import org.wso2.carbon.identity.api.server.flow.management.v1.BaseFlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowApiService;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRequest;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.core.ServerFlowMgtService;
 import org.wso2.carbon.identity.api.server.flow.management.v1.factories.ServerFlowMgtServiceFactory;
-
 
 import javax.ws.rs.core.Response;
 
@@ -54,7 +53,7 @@ public class FlowApiServiceImpl implements FlowApiService {
     @Override
     public Response getFlowMeta(String flowType) {
 
-        FlowMetaResponse flowMeta = flowMgtService.getFlowMeta(flowType);
+        BaseFlowMetaResponse flowMeta = flowMgtService.getFlowMeta(flowType);
         return Response.ok().entity(flowMeta).build();
     }
 

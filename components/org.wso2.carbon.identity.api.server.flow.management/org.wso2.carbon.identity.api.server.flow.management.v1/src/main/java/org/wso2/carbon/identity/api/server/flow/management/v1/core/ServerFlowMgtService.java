@@ -19,7 +19,7 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1.core;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.BaseFlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRequest;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Step;
@@ -83,19 +83,14 @@ public class ServerFlowMgtService {
      * Retrieve flow metadata based on the flow type.
      *
      * @param flowType Type of the flow.
-     * @return FlowMetaResponse containing metadata.
+     * @return BaseFlowMetaResponse containing metadata.
      */
-    public FlowMetaResponse getFlowMeta(String flowType) {
+    public BaseFlowMetaResponse getFlowMeta(String flowType) {
 
         validateFlowType(flowType);
         AbstractMetaResponseHandler metaResponseHandler = resolveHandler(flowType);
 
-        FlowMetaResponse flowMetaResponse = new FlowMetaResponse();
-        flowMetaResponse.setFlowType(metaResponseHandler.getFlowType());
-        flowMetaResponse.setAttributeProfile(metaResponseHandler.getAttributeProfile());
-        flowMetaResponse.setSupportedExecutors(metaResponseHandler.getSupportedExecutors());
-        flowMetaResponse.setConnectionMeta(metaResponseHandler.getConnectionMeta());
-        flowMetaResponse.setConnectorConfigs(metaResponseHandler.getConnectorConfigs());
+        BaseFlowMetaResponse flowMetaResponse = metaResponseHandler.createResponse();
 
         return flowMetaResponse;
     }

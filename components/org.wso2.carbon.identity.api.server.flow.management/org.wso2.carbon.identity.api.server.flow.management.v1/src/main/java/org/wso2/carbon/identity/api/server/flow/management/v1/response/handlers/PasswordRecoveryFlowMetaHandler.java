@@ -19,7 +19,8 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponseConnectorConfigs;
+import org.wso2.carbon.identity.api.server.flow.management.v1.PasswordRecoveryConnectorConfigs;
+import org.wso2.carbon.identity.api.server.flow.management.v1.PasswordRecoveryFlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
 import org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants;
 
@@ -32,8 +33,6 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.F
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.MAGIC_LINK_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.PASSWORD_PROVISIONING_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.SMS_OTP_EXECUTOR;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USERNAME_IDENTIFIER;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USER_IDENTIFIER;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USER_RESOLVE_EXECUTOR;
 import static org.wso2.carbon.identity.recovery.IdentityRecoveryConstants.ConnectorConfig.PASSWORD_RECOVERY_EMAIL_LINK_ENABLE;
 import static org.wso2.carbon.identity.recovery.IdentityRecoveryConstants.ConnectorConfig.PASSWORD_RECOVERY_SEND_OTP_IN_EMAIL;
@@ -59,11 +58,11 @@ public class PasswordRecoveryFlowMetaHandler extends AbstractMetaResponseHandler
     }
 
     @Override
-    public FlowMetaResponseConnectorConfigs getConnectorConfigs() {
+    public PasswordRecoveryConnectorConfigs getConnectorConfigs() {
 
         Utils utils = new Utils();
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-        FlowMetaResponseConnectorConfigs connectorConfigs = new FlowMetaResponseConnectorConfigs();
+        PasswordRecoveryConnectorConfigs connectorConfigs = new PasswordRecoveryConnectorConfigs();
         connectorConfigs.setMultiAttributeLoginEnabled(
                 utils.isFlowConfigEnabled(tenantDomain,
                         MultiAttributeLoginConstants.MULTI_ATTRIBUTE_LOGIN_PROPERTY));
@@ -81,16 +80,18 @@ public class PasswordRecoveryFlowMetaHandler extends AbstractMetaResponseHandler
     @Override
     public List<String> getRequiredInputFields() {
 
-        Utils utils = new Utils();
-        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-        ArrayList<String> requiredInputFields = new ArrayList<>();
-        if (utils.isFlowConfigEnabled(tenantDomain, MultiAttributeLoginConstants.MULTI_ATTRIBUTE_LOGIN_PROPERTY)) {
-            requiredInputFields.add(USER_IDENTIFIER);
-            requiredInputFields.add(USERNAME_IDENTIFIER);
-        } else {
-            requiredInputFields.add(USERNAME_IDENTIFIER);
-        }
-        return requiredInputFields;
+        return new ArrayList<>(getLoginInputFields());
+    }
+
+    @Override
+    public PasswordRecoveryFlowMetaResponse createResponse() {
+
+        PasswordRecoveryFlowMetaResponse response = new PasswordRecoveryFlowMetaResponse();
+        response.setFlowType(getFlowType());
+        response.setAttributeProfile(getAttributeProfile());
+        response.setSupportedExecutors(getSupportedExecutors());
+        response.setConnectorConfigs(getConnectorConfigs());
+        return response;
     }
 
     public List<String> getSupportedExecutors() {

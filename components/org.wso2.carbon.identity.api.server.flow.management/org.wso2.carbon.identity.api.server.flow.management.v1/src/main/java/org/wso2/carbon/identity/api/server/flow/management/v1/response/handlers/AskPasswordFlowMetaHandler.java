@@ -19,7 +19,7 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponseConnectorConfigs;
+import org.wso2.carbon.identity.api.server.flow.management.v1.SelfRegistrationConnectorConfigs;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
 import org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants;
 import org.wso2.carbon.identity.recovery.IdentityRecoveryConstants;
@@ -55,11 +55,11 @@ public class AskPasswordFlowMetaHandler extends AbstractMetaResponseHandler {
     }
 
     @Override
-    public FlowMetaResponseConnectorConfigs getConnectorConfigs() {
+    public SelfRegistrationConnectorConfigs getConnectorConfigs() {
 
         Utils utils = new Utils();
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-        FlowMetaResponseConnectorConfigs connectorConfigs = new FlowMetaResponseConnectorConfigs();
+        SelfRegistrationConnectorConfigs connectorConfigs = new SelfRegistrationConnectorConfigs();
         connectorConfigs.setSelfRegistrationEnabled(utils.isFlowConfigEnabled(tenantDomain,
                             IdentityRecoveryConstants.ConnectorConfig.ENABLE_SELF_SIGNUP));
         connectorConfigs.setMultiAttributeLoginEnabled(utils.isFlowConfigEnabled(tenantDomain,

@@ -140,7 +140,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FlowMetaResponse'
+                $ref: '#/components/schemas/BaseFlowMetaResponse'
         '400':
           description: Invalid flow type specified
           content:
@@ -193,9 +193,47 @@ components:
           items:
             $ref: '#/components/schemas/Step'
 
-    FlowMetaResponse:
+    BaseConnectorConfigs:
       type: object
-      description: Metadata for a given flow type
+      properties:
+        multiAttributeLoginEnabled:
+          type: boolean
+          example: false
+
+    SelfRegistrationConnectorConfigs:
+      allOf:
+        - $ref: '#/components/schemas/BaseConnectorConfigs'
+        - type: object
+          properties:
+            selfRegistrationEnabled:
+              type: boolean
+              example: false
+
+    PasswordRecoveryConnectorConfigs:
+      allOf:
+        - $ref: '#/components/schemas/BaseConnectorConfigs'
+        - type: object
+          properties:
+            passwordRecoveryEnabled:
+              type: boolean
+              example: true
+
+    FlowMetaResponseConnectionMeta:
+      type: object
+      properties:
+        supportedConnections:
+          type: array
+          items:
+            type: string
+          example:
+            - Email OTP
+            - SMS OTP
+            - Passkey
+            - LinkedIn
+
+    BaseFlowMetaResponse:
+      type: object
+      description: General metadata for a flow type
       properties:
         flowType:
           type: string
@@ -204,37 +242,29 @@ components:
           type: array
           items:
             type: string
-          example:
-            - UserResolveExecutor
-            - PasswordProvisioningExecutor
-            - EmailOTPExecutor
-        connectorConfig:
-          type: object
-          properties:
-            passwordRecoveryEnabled:
-              type: boolean
-              example: true
-            multiAttributeLoginEnabled:
-              type: boolean
-              example: false
-            selfRegistrationEnabled:
-              type: boolean
-              example: false
-        connections:
-          type: object
-          properties:
-            supportedConnections:
-              type: array
-              items:
-                type: string
-              example:
-                - Email OTP
-                - SMS OTP
-                - Passkey
-                - LinkedIn
-        AttributeProfile:
+        connectorConfigs:
+          $ref: '#/components/schemas/BaseConnectorConfigs'
+        attributeProfile:
           type: string
           example: End-User-Profile
+
+    RegistrationFlowMetaResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseFlowMetaResponse'
+        - type: object
+          properties:
+            connections:
+              $ref: '#/components/schemas/FlowMetaResponseConnectionMeta'
+            connectorConfigs:
+              $ref: '#/components/schemas/SelfRegistrationConnectorConfigs'
+
+    PasswordRecoveryFlowMetaResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseFlowMetaResponse'
+        - type: object
+          properties:
+            connectorConfigs:
+              $ref: '#/components/schemas/PasswordRecoveryConnectorConfigs'
 
     Step:
       type: object

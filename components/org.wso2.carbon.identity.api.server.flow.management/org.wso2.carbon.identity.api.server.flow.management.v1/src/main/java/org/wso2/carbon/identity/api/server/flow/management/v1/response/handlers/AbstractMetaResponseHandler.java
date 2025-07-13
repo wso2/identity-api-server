@@ -18,10 +18,14 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.api.server.flow.management.v1.BaseConnectorConfigs;
+import org.wso2.carbon.identity.api.server.flow.management.v1.BaseFlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponseConnectionMeta;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponseConnectorConfigs;
+import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
+import org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants;
 
 import java.util.HashMap;
 import java.util.List;
@@ -61,7 +65,7 @@ public abstract class AbstractMetaResponseHandler {
      *
      * @return Connector configurations.
      */
-    public abstract FlowMetaResponseConnectorConfigs getConnectorConfigs();
+    public abstract BaseConnectorConfigs getConnectorConfigs();
 
     /**
      * Get the required input fields for the flow.
@@ -69,6 +73,38 @@ public abstract class AbstractMetaResponseHandler {
      * @return List of required input fields.
      */
     public abstract List<String> getRequiredInputFields();
+
+    /**
+     * Create the meta response object populated with common values.
+     *
+     * @return BaseFlowMetaResponse instance.
+     */
+    public BaseFlowMetaResponse createResponse() {
+
+        BaseFlowMetaResponse response = new BaseFlowMetaResponse();
+        response.setFlowType(getFlowType());
+        response.setAttributeProfile(getAttributeProfile());
+        response.setSupportedExecutors(getSupportedExecutors());
+        response.setConnectorConfigs(getConnectorConfigs());
+        return response;
+    }
+
+    /**
+     * Return login related input fields common across flows.
+     */
+    protected List<String> getLoginInputFields() {
+
+        Utils utils = new Utils();
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        List<String> fields = new java.util.ArrayList<>();
+        if (utils.isFlowConfigEnabled(tenantDomain, MultiAttributeLoginConstants.MULTI_ATTRIBUTE_LOGIN_PROPERTY)) {
+            fields.add(FlowEndpointConstants.USER_IDENTIFIER);
+            fields.add(FlowEndpointConstants.USERNAME_IDENTIFIER);
+        } else {
+            fields.add(FlowEndpointConstants.USERNAME_IDENTIFIER);
+        }
+        return fields;
+    }
 
     /**
      * Get the connection meta information for the flow.

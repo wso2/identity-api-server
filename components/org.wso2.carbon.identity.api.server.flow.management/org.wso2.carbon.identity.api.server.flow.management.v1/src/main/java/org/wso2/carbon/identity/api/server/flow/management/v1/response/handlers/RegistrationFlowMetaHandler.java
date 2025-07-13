@@ -19,7 +19,8 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponseConnectorConfigs;
+import org.wso2.carbon.identity.api.server.flow.management.v1.RegistrationFlowMetaResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.SelfRegistrationConnectorConfigs;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
 
 import java.util.ArrayList;
@@ -35,13 +36,10 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.F
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.MAGIC_LINK_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.OFFICE365_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.OPENID_CONNECT_EXECUTOR;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.PASSWORD_IDENTIFIER;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.PASSWORD_ONBOARD_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.PASSWORD_PROVISIONING_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.SELF_REGISTRATION_ATTRIBUTE_PROFILE;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.SMS_OTP_EXECUTOR;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USERNAME_IDENTIFIER;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USER_IDENTIFIER;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USER_RESOLVE_EXECUTOR;
 import static org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants.MULTI_ATTRIBUTE_LOGIN_PROPERTY;
 import static org.wso2.carbon.identity.recovery.IdentityRecoveryConstants.ConnectorConfig.ENABLE_SELF_SIGNUP;
@@ -66,11 +64,11 @@ public class RegistrationFlowMetaHandler extends AbstractMetaResponseHandler {
     }
 
     @Override
-    public FlowMetaResponseConnectorConfigs getConnectorConfigs() {
+    public SelfRegistrationConnectorConfigs getConnectorConfigs() {
 
         Utils utils = new Utils();
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-        FlowMetaResponseConnectorConfigs connectorConfigs = new FlowMetaResponseConnectorConfigs();
+        SelfRegistrationConnectorConfigs connectorConfigs = new SelfRegistrationConnectorConfigs();
         connectorConfigs.setSelfRegistrationEnabled(
                     utils.isFlowConfigEnabled(tenantDomain, ENABLE_SELF_SIGNUP));
         connectorConfigs.setMultiAttributeLoginEnabled(
@@ -82,17 +80,19 @@ public class RegistrationFlowMetaHandler extends AbstractMetaResponseHandler {
     @Override
     public List<String> getRequiredInputFields() {
 
-        Utils utils = new Utils();
-        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-        ArrayList<String> requiredInputFields = new ArrayList<>();
-        if (utils.isFlowConfigEnabled(tenantDomain, MULTI_ATTRIBUTE_LOGIN_PROPERTY)) {
-            requiredInputFields.add(USER_IDENTIFIER);
-            requiredInputFields.add(USERNAME_IDENTIFIER);
-        } else {
-            requiredInputFields.add(USERNAME_IDENTIFIER);
-        }
-        requiredInputFields.add(PASSWORD_IDENTIFIER);
-        return requiredInputFields;
+        return new ArrayList<>(getLoginInputFields());
+    }
+
+    @Override
+    public RegistrationFlowMetaResponse createResponse() {
+
+        RegistrationFlowMetaResponse response = new RegistrationFlowMetaResponse();
+        response.setFlowType(getFlowType());
+        response.setAttributeProfile(getAttributeProfile());
+        response.setSupportedExecutors(getSupportedExecutors());
+        response.setConnectorConfigs(getConnectorConfigs());
+        response.setConnectionMeta(getConnectionMeta());
+        return response;
     }
 
     public List<String> getSupportedExecutors() {
