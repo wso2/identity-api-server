@@ -86,7 +86,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [SELF_REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
+            enum: [SELF_REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION]
           description: Type of the flow to retrieve
       responses:
         '200':
@@ -132,7 +132,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [SELF_REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
+            enum: [SELF_REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION]
           description: Type of the flow to get metadata for
       responses:
         '200':

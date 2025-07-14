@@ -80,7 +80,7 @@ public class ErrorResponse  {
         return this;
     }
     
-    @ApiModelProperty(example = "Invalid user inputs provided for the ASK_PASSWORD request", value = "")
+    @ApiModelProperty(example = "Invalid user inputs provided for the INVITED_USER_REGISTRATION request", value = "")
     @JsonProperty("description")
     @Valid
     public String getDescription() {

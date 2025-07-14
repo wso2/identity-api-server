@@ -165,7 +165,7 @@ components:
           example: Invalid user inputs.
         description:
           type: string
-          example: Invalid user inputs provided for the ASK_PASSWORD request
+          example: Invalid user inputs provided for the INVITED_USER_REGISTRATION request
 
   securitySchemes:
     BasicAuth:
