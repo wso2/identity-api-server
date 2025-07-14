@@ -80,6 +80,7 @@ paths:
       - $ref : '#/parameters/sortQueryParam'
       - $ref : '#/parameters/excludeIdentityClaimsQueryParam'
       - $ref : '#/parameters/excludeHiddenClaimsQueryParam'
+      - $ref : '#/parameters/profileQueryParam'
       x-wso2-curl: |
       responses:
         200:
@@ -654,6 +655,19 @@ parameters:
     required: false
     type: boolean
     description: Exclude hidden claims when listing local claims.
+  profileQueryParam:
+    in: query
+    name: profile
+    required: false
+    type: string
+    description: |
+      The claims belongs to given profile. This is used to filter claims based on the profile.
+      <br>Available profiles:
+      <ul>
+        <li>console</li>
+        <li>endUser</li>
+        <li>selfRegistration</li>
+      </ul>
   dialectIdPathParam:
     in: path
     name: dialect-id
@@ -768,6 +782,8 @@ definitions:
         type: boolean
         description: Specifies if the claim can hold multiple values or not.
         example: true
+      inputFormat:
+        $ref: '#/definitions/InputFormat'
       uniquenessScope:
         type: string
         description: Specifies the scope of uniqueness validation for the claim value.
@@ -864,6 +880,8 @@ definitions:
             type: boolean
             description: Specifies if the claim can hold multiple values.
             example: true
+          inputFormat:
+            $ref: '#/definitions/InputFormat'
           uniquenessScope:
             type: string
             description: Specifies the scope of uniqueness validation for the claim value.
@@ -1077,8 +1095,29 @@ definitions:
     properties:
       label:
         type: string
+        description: The display name shown to the user.
+        example: Work Account
       value:
         type: string
+        description: The internal value used in processing.
+        example: WorkAccount
+    example:
+      label: Work Account
+      value: WorkAccount
+
+  #-----------------------------------------------------
+  # InputFormat Object
+  #-----------------------------------------------------
+  InputFormat:
+    type: object
+    description: The input formatting of the attribute.
+    properties:
+      inputType:
+        type: string
+        description: Type of the input format (e.g., dropdown, checkbox, etc.)
+        example: dropdown
+    example:
+      inputType: dropdown
 
   #-----------------------------------------------------
   # The Error  object

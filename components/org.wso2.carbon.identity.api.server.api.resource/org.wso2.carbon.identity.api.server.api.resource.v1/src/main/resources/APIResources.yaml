@@ -1043,6 +1043,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AuthorizationDetailsTypesCreationModel'
+        resourceType:
+          type: string
+          example: MCP
 
     APIResourcePatchModel:
       type: object

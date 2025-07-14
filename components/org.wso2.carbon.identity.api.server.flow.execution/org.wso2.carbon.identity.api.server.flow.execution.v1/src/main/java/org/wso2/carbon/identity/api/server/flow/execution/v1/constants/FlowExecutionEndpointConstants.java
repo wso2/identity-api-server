@@ -23,13 +23,12 @@ package org.wso2.carbon.identity.api.server.flow.execution.v1.constants;
  */
 public class FlowExecutionEndpointConstants {
 
-    private FlowExecutionEndpointConstants() {
-    }
-
     public static final String REGISTRATION_FLOW_PREFIX = "RFM-";
     public static final String SELF_REGISTRATION_ENABLED = "SelfRegistration.Enable";
     public static final String DYNAMIC_REGISTRATION_PORTAL_ENABLED = "SelfRegistration.EnableDynamicPortal";
     public static final String SHOW_USERNAME_UNAVAILABILITY = "SelfRegistration.ShowUsernameUnavailability";
+    private FlowExecutionEndpointConstants() {
+    }
 
     /**
      * Error messages related to flow management.
@@ -42,9 +41,9 @@ public class FlowExecutionEndpointConstants {
         ),
 
         ERROR_CODE_SELF_REGISTRATION_DISABLED("60102",
-                                                        "Self registration is not enabled.",
-                                                        "Self registration is not enabled. Please contact your " +
-                                                      "administrator."
+                "Self registration is not enabled.",
+                "Self registration is not enabled. Please contact your " +
+                        "administrator."
         ),
 
         ERROR_CODE_GET_GOVERNANCE_CONFIG("65101",

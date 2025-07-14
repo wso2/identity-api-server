@@ -72,6 +72,29 @@ public class FlowApi {
     }
 
     @Valid
+    @GET
+    @Path("/meta")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve metadata related to a flow type", notes = "", response = BaseFlowMetaResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Flow Composer", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successfully retrieved flow metadata", response = BaseFlowMetaResponse.class),
+        @ApiResponse(code = 400, message = "Invalid flow type specified", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 404, message = "Metadata for specified flow type not found", response = Error.class)
+    })
+    public Response getFlowMeta(    @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Type of the flow to get metadata for",required=true, allowableValues="SELF_REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD")  @QueryParam("flowType") String flowType) {
+
+        return delegate.getFlowMeta(flowType );
+    }
+
+    @Valid
     @PUT
 
     @Consumes({"application/json"})

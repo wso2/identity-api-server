@@ -71,6 +71,7 @@ public enum StatusEnum {
 }
 
     private StatusEnum status;
+    private String version;
     private List<Attribute> attributes = null;
 
 
@@ -134,6 +135,24 @@ public enum StatusEnum {
 
     /**
     **/
+    public OrganizationPUTRequest version(String version) {
+
+        this.version = version;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "V1.0.0", value = "")
+    @JsonProperty("version")
+    @Valid
+    public String getVersion() {
+        return version;
+    }
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    /**
+    **/
     public OrganizationPUTRequest attributes(List<Attribute> attributes) {
 
         this.attributes = attributes;
@@ -173,12 +192,13 @@ public enum StatusEnum {
         return Objects.equals(this.name, organizationPUTRequest.name) &&
             Objects.equals(this.description, organizationPUTRequest.description) &&
             Objects.equals(this.status, organizationPUTRequest.status) &&
+            Objects.equals(this.version, organizationPUTRequest.version) &&
             Objects.equals(this.attributes, organizationPUTRequest.attributes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, status, attributes);
+        return Objects.hash(name, description, status, version, attributes);
     }
 
     @Override
@@ -190,6 +210,7 @@ public enum StatusEnum {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
+        sb.append("    version: ").append(toIndentedString(version)).append("\n");
         sb.append("    attributes: ").append(toIndentedString(attributes)).append("\n");
         sb.append("}");
         return sb.toString();

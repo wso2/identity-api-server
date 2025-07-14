@@ -24,8 +24,11 @@ import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookLi
 import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookRequest;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookRequestEventProfile;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookResponse;
+import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookSubscription;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookSummary;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.util.WebhookManagementAPIErrorBuilder;
+import org.wso2.carbon.identity.subscription.management.api.model.Subscription;
+import org.wso2.carbon.identity.subscription.management.api.model.SubscriptionStatus;
 import org.wso2.carbon.identity.webhook.management.api.exception.WebhookMgtException;
 import org.wso2.carbon.identity.webhook.management.api.model.Webhook;
 import org.wso2.carbon.identity.webhook.management.api.model.WebhookStatus;
@@ -145,12 +148,13 @@ public class ServerWebhookManagementService {
      * Activate webhook.
      *
      * @param webhookId Webhook ID.
+     * @return Activated webhook.
      */
-    public void activateWebhook(String webhookId) {
+    public WebhookResponse activateWebhook(String webhookId) {
 
         try {
-            webhookManagementService.activateWebhook(webhookId,
-                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            return getWebhookResponse(webhookManagementService.activateWebhook(webhookId,
+                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
         } catch (WebhookMgtException e) {
             throw WebhookManagementAPIErrorBuilder.buildAPIError(e);
         }
@@ -160,12 +164,29 @@ public class ServerWebhookManagementService {
      * Deactivate webhook.
      *
      * @param webhookId Webhook ID.
+     * @return Deactivated webhook.
      */
-    public void deactivateWebhook(String webhookId) {
+    public WebhookResponse deactivateWebhook(String webhookId) {
 
         try {
-            webhookManagementService.deactivateWebhook(webhookId,
-                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            return getWebhookResponse(webhookManagementService.deactivateWebhook(webhookId,
+                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
+        } catch (WebhookMgtException e) {
+            throw WebhookManagementAPIErrorBuilder.buildAPIError(e);
+        }
+    }
+
+    /**
+     * Retry webhook.
+     *
+     * @param webhookId Webhook ID.
+     * @return Retried webhook.
+     */
+    public WebhookResponse retryWebhook(String webhookId) {
+
+        try {
+            return getWebhookResponse(webhookManagementService.retryWebhook(webhookId,
+                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
         } catch (WebhookMgtException e) {
             throw WebhookManagementAPIErrorBuilder.buildAPIError(e);
         }
@@ -173,24 +194,34 @@ public class ServerWebhookManagementService {
 
     private Webhook buildWebhook(String webhookId, WebhookRequest webhookRequest) {
 
+        List<Subscription> subscriptions = null;
+        if (webhookRequest.getChannelsSubscribed() != null) {
+            subscriptions = webhookRequest.getChannelsSubscribed().stream()
+                    .map(channelUri -> Subscription.builder()
+                            .channelUri(channelUri)
+                            .status(SubscriptionStatus.SUBSCRIPTION_PENDING)
+                            .build())
+                    .collect(Collectors.toList());
+        }
+
         return new Webhook.Builder()
                 .uuid(webhookId)
                 .status(WebhookStatus.valueOf(webhookRequest.getStatus().name()))
                 .endpoint(webhookRequest.getEndpoint())
                 .name(webhookRequest.getName())
                 .secret(webhookRequest.getSecret())
-                .eventSchemaName(
+                .eventProfileName(
                         webhookRequest.getEventProfile() != null ? webhookRequest.getEventProfile().getName() : null)
-                .eventSchemaUri(
+                .eventProfileUri(
                         webhookRequest.getEventProfile() != null ? webhookRequest.getEventProfile().getUri() : null)
-                .eventsSubscribed(webhookRequest.getChannelsSubscribed())
+                .eventsSubscribed(subscriptions)
                 .build();
     }
 
     private WebhookSummary toWebhookSummary(Webhook webhook) {
 
         WebhookSummary response = new WebhookSummary();
-        response.setId(webhook.getUuid());
+        response.setId(webhook.getId());
         response.setEndpoint(webhook.getEndpoint());
         response.setName(webhook.getName());
 
@@ -210,7 +241,7 @@ public class ServerWebhookManagementService {
         response.setSelf(
                 ContextLoader.buildURIForBody(
                         String.format(V1_API_PATH_COMPONENT + WEBHOOK_PATH_COMPONENT + "/%s",
-                                webhook.getUuid())).toString());
+                                webhook.getId())).toString());
 
         return response;
     }
@@ -218,18 +249,29 @@ public class ServerWebhookManagementService {
     private WebhookResponse getWebhookResponse(Webhook webhook) {
 
         WebhookResponse webhookResponse = new WebhookResponse();
-        webhookResponse.setId(webhook.getUuid());
+        webhookResponse.setId(webhook.getId());
         webhookResponse.setCreatedAt(String.valueOf(webhook.getCreatedAt()));
         webhookResponse.setUpdatedAt(String.valueOf(webhook.getUpdatedAt()));
         webhookResponse.setEndpoint(webhook.getEndpoint());
         webhookResponse.setName(webhook.getName());
         WebhookRequestEventProfile eventProfile = new WebhookRequestEventProfile();
-        eventProfile.setName(webhook.getEventSchemaName());
-        eventProfile.setUri(webhook.getEventSchemaUri());
+        eventProfile.setName(webhook.getEventProfileName());
+        eventProfile.setUri(webhook.getEventProfileUri());
         webhookResponse.setEventProfile(eventProfile);
         webhookResponse.setStatus(WebhookResponse.StatusEnum.fromValue(webhook.getStatus().name()));
         try {
-            webhookResponse.setChannelsSubscribed(webhook.getEventsSubscribed());
+            if (webhook.getEventsSubscribed() != null) {
+                webhookResponse.setChannelsSubscribed(
+                        webhook.getEventsSubscribed().stream()
+                                .map(subscription -> new WebhookSubscription()
+                                        .channelUri(subscription.getChannelUri())
+                                        .status(WebhookSubscription.StatusEnum.fromValue(
+                                                subscription.getStatus().name())))
+                                .collect(Collectors.toList())
+                );
+            } else {
+                webhookResponse.setChannelsSubscribed(null);
+            }
         } catch (WebhookMgtException e) {
             webhookResponse.setChannelsSubscribed(null);
         }

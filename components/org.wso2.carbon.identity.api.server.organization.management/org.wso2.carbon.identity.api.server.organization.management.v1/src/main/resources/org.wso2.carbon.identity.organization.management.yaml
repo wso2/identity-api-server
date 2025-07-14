@@ -303,6 +303,63 @@ paths:
           $ref: '#/components/responses/ServerError'
       tags:
         - Organization
+  /organizations/self:
+    get:
+      tags:
+        - Organization
+      description: |
+        This API retrieves the organization information associated with the currently accessing organization.
+        
+        <b>Scopes (Permissions) required:</b> `internal_organization_view`
+      summary: Get organization details of the currently accessing organization.
+      operationId: getSelfOrganization
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    patch:
+      tags:
+        - Organization
+      description: |
+        This API updates the editable fields of the organization associated with the currently accessing organization. 
+        Using this API, the organization's name can be updated. For root organizations, the organization version can 
+        also be updated.
+        
+        <b>Scopes (Permissions) required:</b> `internal_organization_update`
+      summary: Update organization details of the currently accessing organization.
+      operationId: patchSelfOrganization
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationPatchRequest'
+        description: Partial update payload for the organization.
+        required: true
+      responses:
+        '200':
+          description: Successfully updated organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /organizations/{organization-id}/applications/{application-id}/share:
     post:
       deprecated: true
@@ -966,6 +1023,9 @@ components:
           type: string
           enum: [ACTIVE, DISABLED]
           example: ACTIVE
+        version:
+          type: string
+          example: "V1.0.0"
         attributes:
           type: array
           items:
@@ -1026,10 +1086,10 @@ components:
           example:
             [
               {
-                "href": "/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations?limit=10&filter=name+co+der&next=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
+                "href": "/api/server/v1/organizations?limit=10&filter=name+co+der&next=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
                 "rel": "next",
               },  {
-              "href": "/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations?limit=10&filter=name+co+der&before=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
+              "href": "/api/server/v1/organizations?limit=10&filter=name+co+der&before=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
               "rel": "previous",
             }
             ]
@@ -1055,6 +1115,7 @@ components:
         - name
         - orgHandle
         - status
+        - version
         - ref
       properties:
         id:
@@ -1070,9 +1131,15 @@ components:
           type: string
           enum: [ ACTIVE, DISABLED ]
           example: ACTIVE
+        version:
+          type: string
+          example: 'V1.0.0'
+        hasChildren:
+          type: boolean
+          example: true
         ref:
           type: string
-          example: 'o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations/b4526d91-a8bf-43d2-8b14-c548cf73065b'
+          example: '/api/server/v1/organizations/b4526d91-a8bf-43d2-8b14-c548cf73065b'
         attributes:
           type: array
           items:
@@ -1084,6 +1151,7 @@ components:
         - name
         - orgHandle
         - status
+        - version
         - created
         - lastModified
         - type
@@ -1104,6 +1172,9 @@ components:
           type: string
           enum: [ACTIVE, DISABLED]
           example: ACTIVE
+        version:
+          type: string
+          example: 'V1.0.0'
         created:
           type: string
           example: '2021-10-25T12:31:53.406Z'
@@ -1118,6 +1189,9 @@ components:
             - STRUCTURAL
         parent:
           $ref: '#/components/schemas/ParentOrganization'
+        hasChildren:
+          type: boolean
+          example: true
         attributes:
           type: array
           items:
@@ -1129,6 +1203,7 @@ components:
         - name
         - orgHandle
         - status
+        - version
         - created
         - lastModified
         - type
@@ -1149,6 +1224,9 @@ components:
           type: string
           enum: [ACTIVE, DISABLED]
           example: ACTIVE
+        version:
+          type: string
+          example: 'v1.0.0'
         created:
           type: string
           example: '2021-10-25T12:31:53.406Z'
@@ -1161,6 +1239,9 @@ components:
           enum:
             - TENANT
             - STRUCTURAL
+        hasChildren:
+          type: boolean
+          example: true
         parent:
           $ref: '#/components/schemas/ParentOrganization'
         attributes:
@@ -1171,6 +1252,31 @@ components:
           type: array
           items:
             type: string
+        ancestorPath:
+          type: array
+          description: 'Ancestors up to the request initiated organization'
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              depth:
+                type: integer
+          example:
+            [
+              {
+                "id": "10084a8d-113f-4211-a0d5-efe36b082211",
+                "name": "Global Holding Corp",
+                "depth": 0
+              },
+              {
+                "id": "b4526d91-a8bf-43d2-8b14-c548cf73065b",
+                "name": "South Asia Division",
+                "depth": 1
+              }
+            ]
     MetaAttributesResponse:
       type: object
       properties:
@@ -1181,10 +1287,10 @@ components:
           example:
             [
               {
-                "href": "/o/api/server/v1/organizations/meta-attributes?limit=10&recursive=false&filter=attributes+co+C&after=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
+                "href": "/api/server/v1/organizations/meta-attributes?limit=10&recursive=false&filter=attributes+co+C&after=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
                 "rel": "next",
               },  {
-              "href": "/o/api/server/v1/organizations/meta-attributes?limit=10&recursive=false&filter=attributes+co+C&before=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
+              "href": "/api/server/v1/organizations/meta-attributes?limit=10&recursive=false&filter=attributes+co+C&before=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
               "rel": "previous",
             }
             ]
@@ -1209,7 +1315,7 @@ components:
           example: 'b4526d91-a8bf-43d2-8b14-c548cf73065b'
         ref:
           type: string
-          example: 'o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations/b4526d91-a8bf-43d2-8b14-c548cf73065b'
+          example: '/api/server/v1/organizations/b4526d91-a8bf-43d2-8b14-c548cf73065b'
 
     #-----------------------------------------------------
     # Organization Patch Operation Object
@@ -1328,10 +1434,10 @@ components:
           example:
             [
               {
-                "href": "/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations/discovery?filter=attributes.type+eq+emailDomain&limit=10&offset=50",
+                "href": "/api/server/v1/organizations/discovery?filter=attributes.type+eq+emailDomain&limit=10&offset=50",
                 "rel": "next",
               },  {
-              "href": "/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations/discovery?filter=attributes.type+eq+emailDomain&limit=10&offset=30",
+              "href": "/api/server/v1/organizations/discovery?filter=attributes.type+eq+emailDomain&limit=10&offset=30",
               "rel": "previous",
             }
             ]
@@ -1391,6 +1497,7 @@ components:
         - name
         - orgHandle
         - status
+        - version
         - created
         - lastModified
         - type
@@ -1411,6 +1518,9 @@ components:
           type: string
           enum: [ACTIVE, DISABLED]
           example: ACTIVE
+        version:
+          type: string
+          example: 'v1.0.0'
         created:
           type: string
           example: '2021-10-25T12:31:53.406Z'
