@@ -143,7 +143,7 @@ public class ServerFlowMgtService {
                 return new RegistrationFlowMetaHandler();
             case PASSWORD_RECOVERY:
                 return new PasswordRecoveryFlowMetaHandler();
-            case ASK_PASSWORD:
+            case INVITED_USER_REGISTRATION:
                 return new AskPasswordFlowMetaHandler();
             default:
                 throw new IllegalStateException("Unhandled flow type: " + flowType);
