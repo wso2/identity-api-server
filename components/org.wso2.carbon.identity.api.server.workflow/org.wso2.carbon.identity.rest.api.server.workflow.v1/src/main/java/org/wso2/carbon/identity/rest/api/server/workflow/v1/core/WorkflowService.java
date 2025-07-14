@@ -53,6 +53,9 @@ import org.wso2.carbon.identity.workflow.mgt.dto.WorkflowEvent;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowClientException;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowException;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -821,53 +824,88 @@ public class WorkflowService {
     }
 
     private String blankToNull(String value) {
+
         return StringUtils.isBlank(value) ? null : value;
     }
 
     public Map<String, String> parseWorkflowFilter(String filter) {
+        
+    Map<String, String> result = new HashMap<>();
 
-        Map<String, String> result = new HashMap<>();
+    if (StringUtils.isBlank(filter)) {
+        return result;
+    }
 
-        if (StringUtils.isBlank(filter)) {
-            return result;
-        }
-
-        String[] conditions = filter.split("(?i)\\s+and\\s+");
-        Pattern pattern = Pattern.compile("(\\w+)\\s+(eq|ge|le)\\s+'([^']*)'");
+    try {
+        String decodedFilter = URLDecoder.decode(filter, StandardCharsets.UTF_8.name());
+        
+        decodedFilter = decodedFilter.replace("+", " ");
+        
+        decodedFilter = decodedFilter.replace("%27", "'")
+                                   .replace("%22", "\"");
+        
+        String[] conditions = decodedFilter.split("(?i)\\s+and\\s+");
+        
+        Pattern pattern = Pattern.compile(
+            "(\\w+)\\s+(eq|ge|le)\\s+['\"]([^'\"]*)['\"]",
+            Pattern.CASE_INSENSITIVE
+        );
 
         for (String condition : conditions) {
-            Matcher matcher = pattern.matcher(condition.trim());
+            String trimmedCondition = condition.trim();
+            Matcher matcher = pattern.matcher(trimmedCondition);
+            
             if (matcher.matches()) {
-                String field = matcher.group(1);
-                String operator = matcher.group(2);
+                String field = matcher.group(1).toLowerCase(); // normalize field name
+                String operator = matcher.group(2).toLowerCase(); // normalize operator
                 String value = matcher.group(3);
 
                 switch (field) {
-                    case "requestType":
+                    case "requesttype":
                     case "status":
-                    case "dateCategory":
+                    case "datecategory":
                         if ("eq".equals(operator)) {
                             result.put(field, value);
+                        } else {
+                            throw new IllegalArgumentException(
+                                "Unsupported operator for " + field + ": " + operator
+                            );
                         }
                         break;
-                    case "beginDate":
+                    case "begindate":
                         if ("ge".equals(operator)) {
                             result.put("beginDate", value);
+                        } else {
+                            throw new IllegalArgumentException(
+                                "Only 'ge' operator supported for beginDate"
+                            );
                         }
                         break;
-                    case "endDate":
+                    case "enddate":
                         if ("le".equals(operator)) {
                             result.put("endDate", value);
+                        } else {
+                            throw new IllegalArgumentException(
+                                "Only 'le' operator supported for endDate"
+                            );
                         }
                         break;
                     default:
-                        throw new IllegalArgumentException("Unknown field in filter: " + field);
+                        throw new IllegalArgumentException(
+                            "Unknown field in filter: " + field
+                        );
                 }
             } else {
-                throw new IllegalArgumentException("Invalid filter format: " + condition);
+                throw new IllegalArgumentException(
+                    "Invalid filter format: " + trimmedCondition + 
+                    "\nExpected format: field operator 'value'"
+                );
             }
         }
+    } catch (UnsupportedEncodingException e) {
+        throw new IllegalArgumentException("Failed to decode filter string", e);
+    }
 
-        return result;
+    return result;
     }
 }
