@@ -22,13 +22,13 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.flow.management.v1.BaseConnectorConfigs;
 import org.wso2.carbon.identity.api.server.flow.management.v1.PasswordRecoveryConnectorConfigs;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
+import org.wso2.carbon.identity.flow.mgt.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.EMAIL_OTP_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.END_USER_ATTRIBUTE_PROFILE;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FlowType.PASSWORD_RECOVERY;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.MAGIC_LINK_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.PASSWORD_PROVISIONING_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.SMS_OTP_EXECUTOR;
@@ -47,7 +47,7 @@ public class PasswordRecoveryFlowMetaHandler extends AbstractMetaResponseHandler
     @Override
     public String getFlowType() {
 
-        return String.valueOf(PASSWORD_RECOVERY);
+        return String.valueOf(Constants.FlowTypes.PASSWORD_RECOVERY);
     }
 
     @Override

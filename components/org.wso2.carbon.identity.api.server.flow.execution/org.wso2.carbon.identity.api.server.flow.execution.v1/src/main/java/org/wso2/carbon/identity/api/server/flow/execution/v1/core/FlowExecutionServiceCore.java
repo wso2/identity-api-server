@@ -54,11 +54,11 @@ public class FlowExecutionServiceCore {
 
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         try {
-            // Check whether the self registration and dynamic registration portal is enabled.
-            Utils.isSelfRegistrationEnabled(tenantDomain);
-            Utils.isDynamicRegistrationPortalEnabled(tenantDomain);
-            ObjectMapper objectMapper = new ObjectMapper();
+            if (flowExecutionRequest.getFlowId() == null) {
+                Utils.validateFlowInitiation(flowExecutionRequest);
+            }
 
+            ObjectMapper objectMapper = new ObjectMapper();
             Map<String, String> inputMap = Optional.ofNullable(flowExecutionRequest.getInputs())
                     .map(inputs -> objectMapper.convertValue(inputs, new MapTypeReference()))
                     .orElse(Collections.emptyMap());

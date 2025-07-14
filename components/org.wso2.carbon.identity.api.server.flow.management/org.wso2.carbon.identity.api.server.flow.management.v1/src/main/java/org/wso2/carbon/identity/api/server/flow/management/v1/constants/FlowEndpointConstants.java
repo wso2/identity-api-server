@@ -18,9 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.constants;
 
-import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
-import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
-
 /**
  * Constants related to the flow endpoint.
  */
@@ -109,34 +106,6 @@ public class FlowEndpointConstants {
             return description;
         }
 
-    }
-
-    /**
-     * Supported flow types.
-     */
-    public enum FlowType {
-
-        REGISTRATION,
-        PASSWORD_RECOVERY,
-        INVITED_USER_REGISTRATION;
-
-        /**
-         * Check if a given string is a valid flow type.
-         *
-         * @param value Flow type as string
-         */
-        public static void validateFlowType(String value) {
-
-            for (FlowType type : FlowType.values()) {
-                if (type.name().equals(value)) {
-                    return;
-                }
-            }
-            throw Utils.handleFlowMgtException(new FlowMgtClientException(
-                    ErrorMessages.ERROR_CODE_INVALID_FLOW_TYPE.getCode(),
-                    ErrorMessages.ERROR_CODE_INVALID_FLOW_TYPE.getMessage(),
-                    ErrorMessages.ERROR_CODE_INVALID_FLOW_TYPE.getDescription()));
-        }
     }
 
     /**
