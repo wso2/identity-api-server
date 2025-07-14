@@ -294,11 +294,16 @@ public class ServerConfigManagementService {
                         .ERROR_CODE_ERROR_UPDATING_CONFIGS, null);
             }
             IdentityProvider idpToUpdate = createIdPClone(residentIdP);
-            processPatchRequest(patchRequest, idpToUpdate);
+            List<String> propertiesToRemove = new ArrayList<>();
+            processPatchRequest(patchRequest, idpToUpdate, propertiesToRemove);
             // To avoid updating non-existing authenticators in DB layer.
             idpToUpdate.setFederatedAuthenticatorConfigs(new FederatedAuthenticatorConfig[0]);
             idpManager.updateResidentIdP(idpToUpdate, ContextLoader.getTenantDomainFromContext());
 
+            if (!propertiesToRemove.isEmpty()) {
+                idpManager.deleteResidentIdpProperties(ContextLoader.getTenantDomainFromContext(),
+                        propertiesToRemove);
+            }
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_CONFIGS, null);
         }
@@ -934,7 +939,8 @@ public class ServerConfigManagementService {
      * @param patchRequest List of patch operations.
      * @param idpToUpdate  Resident Identity Provider to be updated.
      */
-    private void processPatchRequest(List<Patch> patchRequest, IdentityProvider idpToUpdate) {
+    private void processPatchRequest(List<Patch> patchRequest, IdentityProvider idpToUpdate,
+                                     List<String> propertiesToRemove) {
 
         if (CollectionUtils.isEmpty(patchRequest)) {
             return;
@@ -993,19 +999,32 @@ public class ServerConfigManagementService {
                             .ERROR_CODE_INVALID_INPUT, "Invalid index in 'path' attribute");
                 }
                 idpToUpdate.setHomeRealmId(StringUtils.join(homeRealmIds, ","));
-            } else if (operation == Patch.OperationEnum.REMOVE && path.matches(Constants.HOME_REALM_PATH_REGEX) &&
-                    path.split(Constants.PATH_SEPERATOR).length == 3) {
-                List<String> homeRealmIds;
-                int index = Integer.parseInt(path.split(Constants.PATH_SEPERATOR)[2]);
-                String[] homeRealmArr = StringUtils.split(idpToUpdate.getHomeRealmId(), ",");
-                if (ArrayUtils.isNotEmpty(homeRealmArr) && (index >= 0) && index < homeRealmArr.length) {
-                    homeRealmIds = new ArrayList<>(Arrays.asList(homeRealmArr));
-                    homeRealmIds.remove(index);
+            } else if (operation == Patch.OperationEnum.REMOVE) {
+                if (path.matches(Constants.HOME_REALM_PATH_REGEX) && path.split(Constants.PATH_SEPERATOR).length == 3) {
+                    List<String> homeRealmIds;
+                    int index = Integer.parseInt(path.split(Constants.PATH_SEPERATOR)[2]);
+                    String[] homeRealmArr = StringUtils.split(idpToUpdate.getHomeRealmId(), ",");
+                    if (ArrayUtils.isNotEmpty(homeRealmArr) && (index >= 0) && index < homeRealmArr.length) {
+                        homeRealmIds = new ArrayList<>(Arrays.asList(homeRealmArr));
+                        homeRealmIds.remove(index);
+                    } else {
+                        throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                                .ERROR_CODE_INVALID_INPUT, "Invalid index in 'path' attribute");
+                    }
+                    idpToUpdate.setHomeRealmId(StringUtils.join(homeRealmIds, ","));
                 } else {
-                    throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
-                            .ERROR_CODE_INVALID_INPUT, "Invalid index in 'path' attribute");
+                    switch (path) {
+                        case Constants.IDLE_SESSION_PATH:
+                            propertiesToRemove.add(IdentityApplicationConstants.SESSION_IDLE_TIME_OUT);
+                            break;
+                        case Constants.REMEMBER_ME_PATH:
+                            propertiesToRemove.add(IdentityApplicationConstants.REMEMBER_ME_TIME_OUT);
+                            break;
+                        default:
+                            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                                    .ERROR_CODE_INVALID_INPUT, "Unsupported value for 'path' attribute");
+                    }
                 }
-                idpToUpdate.setHomeRealmId(StringUtils.join(homeRealmIds, ","));
             } else {
                 // Throw an error if any other patch operations are sent in the request.
                 throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
