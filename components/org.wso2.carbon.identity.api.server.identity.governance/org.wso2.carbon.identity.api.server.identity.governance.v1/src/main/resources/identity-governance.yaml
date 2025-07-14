@@ -139,6 +139,36 @@ paths:
               $ref: '#/components/schemas/MultipleConnectorsPatchReq'
         description: Governance connectors and properties to update
         required: true
+  '/identity-governance/{category-id}/connectors/revert':
+    post:
+      tags:
+        - Management
+      summary: Remove properties of a governance connector
+      operationId: revertConnectorProperties
+      description: |
+        Remove given governance connector properties of a category.<br>
+        <b>Scope (Permission) required:</b> <br>
+                * internal_idp_update
+      parameters:
+        - $ref: '#/components/parameters/categoryIdPathParam'
+        - $ref: "#/components/parameters/connectorIdQueryParam"
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PropertyRevertReq'
+        description: Array of properties to delete.
   '/identity-governance/{category-id}/connectors/{connector-id}':
     get:
       tags:
@@ -593,6 +623,13 @@ components:
       description: Define the order in which the retrieved records should be sorted.
       schema:
         type: string
+    connectorIdQueryParam:
+      in: query
+      name: connectorId
+      required: true
+      description: Id of the governance connector.
+      schema:
+        type: string
     categoryIdPathParam:
       in: path
       name: category-id
@@ -836,6 +873,17 @@ components:
           type: string
           description: Property value.
           example: 'false'
+    PropertyRevertReq:
+      type: object
+      description: Governance connector properties to delete.
+      required:
+        - properties
+      properties:
+        properties:
+          type: array
+          minItems: 1
+          items:
+            type: string
     PreferenceSearchAttribute:
       type: object
       description: Governance connector details.

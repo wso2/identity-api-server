@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -28,6 +28,7 @@ import java.util.List;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.MultipleConnectorsPatchReq;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PreferenceResp;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PreferenceSearchAttribute;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PropertyRevertReq;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -169,7 +170,7 @@ public class IdentityGovernanceApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Management" })
+    }, tags={ "Management", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK.", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request.", response = Error.class),
@@ -192,7 +193,7 @@ public class IdentityGovernanceApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Management" })
+    }, tags={ "Management", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK.", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request.", response = Error.class),
@@ -205,4 +206,26 @@ public class IdentityGovernanceApi  {
         return delegate.patchConnectorsOfCategory(categoryId,  multipleConnectorsPatchReq );
     }
 
+    @Valid
+    @POST
+    @Path("/{category-id}/connectors/revert")
+    @Consumes({ "application/json" })
+    @Produces({ "*/*" })
+    @ApiOperation(value = "Remove properties of a governance connector", notes = "Remove given governance connector properties of a category.<br> <b>Scope (Permission) required:</b> <br>         * internal_idp_update ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Management" })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK.", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
+    })
+    public Response revertConnectorProperties(@ApiParam(value = "Id of the connector category.",required=true) @PathParam("category-id") String categoryId,     @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Id of the governance connector.",required=true)  @QueryParam("connectorId") String connectorId, @ApiParam(value = "Array of properties to delete." ) @Valid PropertyRevertReq propertyRevertReq) {
+
+        return delegate.revertConnectorProperties(categoryId,  connectorId,  propertyRevertReq );
+    }
 }
