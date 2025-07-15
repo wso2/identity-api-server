@@ -20,7 +20,7 @@
     <parent>
         <artifactId>org.wso2.carbon.identity.api.server.script.library</artifactId>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
-        <version>1.3.153</version>
+        <version>1.3.154-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
