@@ -21,6 +21,7 @@ package org.wso2.carbon.identity.api.server.flow.management.v1.utils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -31,6 +32,8 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.Action;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Component;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Data;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Executor;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfig;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfigPatchModel;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Position;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Size;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Step;
@@ -38,12 +41,14 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndp
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.AbstractMetaResponseHandler;
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.application.common.model.Property;
+import org.wso2.carbon.identity.flow.mgt.Constants;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtFrameworkException;
 import org.wso2.carbon.identity.flow.mgt.model.ActionDTO;
 import org.wso2.carbon.identity.flow.mgt.model.ComponentDTO;
 import org.wso2.carbon.identity.flow.mgt.model.DataDTO;
 import org.wso2.carbon.identity.flow.mgt.model.ExecutorDTO;
+import org.wso2.carbon.identity.flow.mgt.model.FlowConfigDTO;
 import org.wso2.carbon.identity.flow.mgt.model.StepDTO;
 import org.wso2.carbon.identity.governance.IdentityGovernanceException;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
@@ -413,7 +418,7 @@ public class Utils {
      * Validates the identifiers provided in the flow.
      *
      * @param metaResponseHandler The handler for the flow metadata response.
-     * @param identifiers          Set of identifiers to validate.
+     * @param identifiers         Set of identifiers to validate.
      */
     public static void validateIdentifiers(AbstractMetaResponseHandler metaResponseHandler, Set<String> identifiers) {
 
@@ -465,6 +470,37 @@ public class Utils {
                     ERROR_CODE_UNSUPPORTED_EXECUTOR.getCode(),
                     ERROR_CODE_UNSUPPORTED_EXECUTOR.getMessage(),
                     ERROR_CODE_UNSUPPORTED_EXECUTOR.getDescription()));
+        }
+    }
+
+    public static FlowConfig convertToFlowConfig(FlowConfigDTO flowConfig) {
+
+        FlowConfig config = new FlowConfig();
+        config.setFlowType(flowConfig.getFlowType());
+        config.setIsEnabled(flowConfig.getIsEnabled() != null && flowConfig.getIsEnabled());
+        config.setIsAutoLoginEnabled(flowConfig.getIsAutoLoginEnabled() != null &&
+                flowConfig.getIsAutoLoginEnabled());
+        return config;
+    }
+
+    public static FlowConfigDTO convertToFlowConfigDTO(FlowConfigPatchModel flowConfig) {
+
+        FlowConfigDTO config = new FlowConfigDTO();
+        config.setFlowType(flowConfig.getFlowType());
+        config.setIsEnabled(flowConfig.getIsEnabled() != null && flowConfig.getIsEnabled());
+        config.setIsAutoLoginEnabled(flowConfig.getIsAutoLoginEnabled() != null &&
+                flowConfig.getIsAutoLoginEnabled());
+        return config;
+    }
+
+    public static void validateFlowType(String value) {
+
+        if (StringUtils.isBlank(value) || Arrays.stream(Constants.FlowTypes.values())
+                .noneMatch(type -> type.name().equals(value))) {
+            throw Utils.handleFlowMgtException(new FlowMgtClientException(
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_FLOW_TYPE.getCode(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_FLOW_TYPE.getMessage(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_FLOW_TYPE.getDescription()));
         }
     }
 }
