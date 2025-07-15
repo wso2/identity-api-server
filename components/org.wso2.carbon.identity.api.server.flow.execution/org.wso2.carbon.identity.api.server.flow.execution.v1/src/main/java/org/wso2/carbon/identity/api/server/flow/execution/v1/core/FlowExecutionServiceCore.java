@@ -20,6 +20,7 @@ package org.wso2.carbon.identity.api.server.flow.execution.v1.core;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.FlowExecutionRequest;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.FlowExecutionResponse;
@@ -54,7 +55,7 @@ public class FlowExecutionServiceCore {
 
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         try {
-            if (flowExecutionRequest.getFlowId() == null) {
+            if (StringUtils.isBlank(flowExecutionRequest.getFlowId())) {
                 Utils.validateFlowInitiation(flowExecutionRequest);
             }
 
