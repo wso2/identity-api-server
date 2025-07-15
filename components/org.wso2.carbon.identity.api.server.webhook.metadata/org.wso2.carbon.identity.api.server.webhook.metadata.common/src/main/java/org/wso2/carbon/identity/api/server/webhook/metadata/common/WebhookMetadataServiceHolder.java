@@ -19,6 +19,7 @@
 package org.wso2.carbon.identity.api.server.webhook.metadata.common;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.webhook.metadata.api.service.EventAdapterMetadataService;
 import org.wso2.carbon.identity.webhook.metadata.api.service.WebhookMetadataService;
 
 /**
@@ -32,8 +33,12 @@ public class WebhookMetadataServiceHolder {
 
     private static class WebhookMetadataServiceHolderInstance {
 
-        static final WebhookMetadataService SERVICE = (WebhookMetadataService) PrivilegedCarbonContext.
+        static final WebhookMetadataService WEBHOOK_METADATA_SERVICE = (WebhookMetadataService) PrivilegedCarbonContext.
                 getThreadLocalCarbonContext().getOSGiService(WebhookMetadataService.class, null);
+
+        static final EventAdapterMetadataService EVENT_ADAPTER_METADATA_SERVICE =
+                (EventAdapterMetadataService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(EventAdapterMetadataService.class, null);
     }
 
     /**
@@ -43,6 +48,16 @@ public class WebhookMetadataServiceHolder {
      */
     public static WebhookMetadataService getWebhookMetadataService() {
 
-        return WebhookMetadataServiceHolderInstance.SERVICE;
+        return WebhookMetadataServiceHolderInstance.WEBHOOK_METADATA_SERVICE;
+    }
+
+    /**
+     * Get Event Adapter Metadata Service osgi service.
+     *
+     * @return EventAdapterMetadataService.
+     */
+    public static EventAdapterMetadataService getEventAdapterMetadataService() {
+
+        return WebhookMetadataServiceHolderInstance.EVENT_ADAPTER_METADATA_SERVICE;
     }
 }
