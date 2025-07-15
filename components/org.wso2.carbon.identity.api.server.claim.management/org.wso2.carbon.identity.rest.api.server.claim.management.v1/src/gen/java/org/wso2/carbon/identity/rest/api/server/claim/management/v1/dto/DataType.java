@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 /**
  * Enum representing the data types for claims.
  */
-public enum DataTypeEnum {
+public enum DataType {
     /**
      * String data type.
      */
@@ -51,7 +51,7 @@ public enum DataTypeEnum {
 
     private final String value;
 
-    DataTypeEnum(String value) {
+    DataType(String value) {
         this.value = value;
     }
 

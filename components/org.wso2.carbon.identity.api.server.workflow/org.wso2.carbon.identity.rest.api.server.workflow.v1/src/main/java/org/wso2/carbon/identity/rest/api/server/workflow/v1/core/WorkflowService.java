@@ -153,7 +153,8 @@ public class WorkflowService {
 
             return getWorkflowDetails(currentWorkflow, workflowParameters);
         } catch (WorkflowClientException e) {
-            throw handleClientError(Constants.ErrorMessage.ERROR_CODE_WORKFLOW_NOT_FOUND, workflowId, e);
+            throw handleClientError(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_WORKFLOW_NOT_FOUND,
+                    workflowId, e);
         } catch (WorkflowException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_WORKFLOW, workflowId, e);
         }
@@ -295,7 +296,8 @@ public class WorkflowService {
             Association association = workflowManagementService.getAssociation(associationId);
             return getAssociationDetails(association);
         } catch (WorkflowClientException e) {
-            throw handleClientError(Constants.ErrorMessage.ERROR_CODE_ASSOCIATION_NOT_FOUND, associationId, e);
+            throw handleClientError(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_ASSOCIATION_NOT_FOUND,
+                    associationId, e);
         } catch (WorkflowException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_ASSOCIATION, associationId, e);
         }
@@ -620,7 +622,8 @@ public class WorkflowService {
         return new APIError(Response.Status.INTERNAL_SERVER_ERROR, errorResponse);
     }
 
-    private APIError handleClientError(Constants.ErrorMessage errorEnum, String data, WorkflowClientException e) {
+    private APIError handleClientError(Response.Status status, Constants.ErrorMessage errorEnum, String data,
+                                       WorkflowClientException e) {
 
         ErrorResponse errorResponse;
 
@@ -631,7 +634,12 @@ public class WorkflowService {
         } else {
             errorResponse = getErrorBuilder(errorEnum, data).build(log, e, includeData(e.getMessage(), data));
         }
-        return new APIError(Response.Status.BAD_REQUEST, errorResponse);
+        return new APIError(status, errorResponse);
+    }
+
+    private APIError handleClientError(Constants.ErrorMessage errorEnum, String data, WorkflowClientException e) {
+
+        throw handleClientError(Response.Status.BAD_REQUEST, errorEnum, data, e);
     }
 
     public void deleteWorkflowInstance(String instanceId) {

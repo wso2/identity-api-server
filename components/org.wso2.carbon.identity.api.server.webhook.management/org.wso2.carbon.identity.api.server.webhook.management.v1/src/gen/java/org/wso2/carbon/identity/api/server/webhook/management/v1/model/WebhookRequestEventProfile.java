@@ -66,7 +66,7 @@ public class WebhookRequestEventProfile  {
         return this;
     }
     
-    @ApiModelProperty(example = "schemas.identity.wso2.org", required = true, value = "Webhook Event Profile URI.")
+    @ApiModelProperty(example = "https://schemas.identity.wso2.org/events", required = true, value = "Webhook Event Profile URI.")
     @JsonProperty("uri")
     @Valid
     @NotNull(message = "Property uri cannot be null.")
