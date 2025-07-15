@@ -648,15 +648,13 @@ public class WorkflowService {
         }
     }
 
-    // getWorkflowsOfRequest
-
     public WorkflowInstanceResponse getWorkflowInstanceById(String instanceId) {
         try {
             if (StringUtils.isBlank(instanceId)) {
                 throw new WorkflowClientException("Workflow instance ID cannot be null or empty.");
             }
             org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest workflowRequest = workflowManagementService
-                    .getWorkflowRequest(instanceId);
+                    .getWorkflowRequestBean(instanceId);
             if (workflowRequest == null) {
                 throw new WorkflowClientException("Workflow instance with ID: " + instanceId + " does not exist.");
             }
@@ -856,8 +854,8 @@ public class WorkflowService {
             Matcher matcher = pattern.matcher(trimmedCondition);
             
             if (matcher.matches()) {
-                String field = matcher.group(1).toLowerCase(); // normalize field name
-                String operator = matcher.group(2).toLowerCase(); // normalize operator
+                String field = matcher.group(1).toLowerCase();
+                String operator = matcher.group(2).toLowerCase();
                 String value = matcher.group(3);
 
                 switch (field) {
