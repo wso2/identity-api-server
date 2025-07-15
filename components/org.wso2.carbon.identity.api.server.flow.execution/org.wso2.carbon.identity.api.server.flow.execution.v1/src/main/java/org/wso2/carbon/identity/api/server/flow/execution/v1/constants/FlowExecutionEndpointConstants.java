@@ -35,6 +35,7 @@ public class FlowExecutionEndpointConstants {
      */
     public enum ErrorMessage {
 
+        // Client error codes.
         ERROR_CODE_DYNAMIC_REGISTRATION_PORTAL_DISABLED("60101",
                 "Dynamic registration portal is not enabled.",
                 "Dynamic registration portal is not enabled. Please contact your administrator."
@@ -46,9 +47,25 @@ public class FlowExecutionEndpointConstants {
                         "administrator."
         ),
 
+        ERROR_CODE_INVALID_FLOW_TYPE("60103",
+                "Invalid flow type.",
+                "The provided flow type is not supported."
+        ),
+
+        ERROR_CODE_FLOW_DISABLED("60104",
+                "Flow is disabled.",
+                "The requested flow %s is disabled. Please contact your administrator."
+        ),
+
+        // Server error codes.
         ERROR_CODE_GET_GOVERNANCE_CONFIG("65101",
                 "Error occurred while retrieving the governance configuration.",
                 "Server encountered an error while retrieving the governance configuration."
+        ),
+
+        ERROR_CODE_GET_FLOW_CONFIG("65102",
+                "Error occurred while retrieving the flow configuration.",
+                "Server encountered an error while retrieving the flow configuration."
         );
 
         private final String code;

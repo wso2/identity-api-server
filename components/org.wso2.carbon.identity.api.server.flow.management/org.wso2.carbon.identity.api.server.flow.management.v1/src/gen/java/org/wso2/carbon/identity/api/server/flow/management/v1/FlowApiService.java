@@ -25,7 +25,13 @@ public interface FlowApiService {
 
     public Response getFlow(String flowType);
 
+    public Response getFlowConfigForFlow(String flowType);
+
+    public Response getFlowConfigs();
+
     public Response getFlowMeta(String flowType);
 
     public Response updateFlow(FlowRequest flowRequest);
+
+    public Response updateFlowConfig(FlowConfigPatchModel flowConfigPatchModel);
 }

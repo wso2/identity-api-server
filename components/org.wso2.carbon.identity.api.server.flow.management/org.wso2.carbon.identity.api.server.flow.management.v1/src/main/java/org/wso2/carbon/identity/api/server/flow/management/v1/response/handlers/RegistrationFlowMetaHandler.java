@@ -25,6 +25,7 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.RegistrationFlowMe
 import org.wso2.carbon.identity.api.server.flow.management.v1.SelfRegistrationConnectorConfigs;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
+import org.wso2.carbon.identity.flow.mgt.Constants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +38,6 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.F
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.EMAIL_OTP_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FACEBOOK_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FIDO2_EXECUTOR;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FlowType.REGISTRATION;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.GOOGLE_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.MAGIC_LINK_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.OFFICE365_EXECUTOR;
@@ -59,7 +59,7 @@ public class RegistrationFlowMetaHandler extends AbstractMetaResponseHandler {
     @Override
     public String getFlowType() {
 
-        return String.valueOf(REGISTRATION);
+        return String.valueOf(Constants.FlowTypes.REGISTRATION);
     }
 
     @Override
