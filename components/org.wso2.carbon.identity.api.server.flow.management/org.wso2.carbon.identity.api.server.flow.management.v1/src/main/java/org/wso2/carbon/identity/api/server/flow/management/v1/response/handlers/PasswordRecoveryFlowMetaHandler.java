@@ -27,11 +27,7 @@ import org.wso2.carbon.identity.flow.mgt.Constants;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.EMAIL_OTP_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.END_USER_ATTRIBUTE_PROFILE;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.MAGIC_LINK_EXECUTOR;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.PASSWORD_PROVISIONING_EXECUTOR;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.SMS_OTP_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USER_RESOLVE_EXECUTOR;
 import static org.wso2.carbon.identity.recovery.IdentityRecoveryConstants.ConnectorConfig.PASSWORD_RECOVERY_EMAIL_LINK_ENABLE;
 import static org.wso2.carbon.identity.recovery.IdentityRecoveryConstants.ConnectorConfig.PASSWORD_RECOVERY_SEND_OTP_IN_EMAIL;
@@ -83,12 +79,8 @@ public class PasswordRecoveryFlowMetaHandler extends AbstractMetaResponseHandler
     @Override
     public List<String> getSupportedExecutors() {
 
-        ArrayList<String> supportedExecutors = new ArrayList<>();
+        List<String> supportedExecutors = new ArrayList<>(super.getSupportedExecutors());
         supportedExecutors.add(USER_RESOLVE_EXECUTOR);
-        supportedExecutors.add(PASSWORD_PROVISIONING_EXECUTOR);
-        supportedExecutors.add(EMAIL_OTP_EXECUTOR);
-        supportedExecutors.add(MAGIC_LINK_EXECUTOR);
-        supportedExecutors.add(SMS_OTP_EXECUTOR);
         return supportedExecutors;
     }
 }

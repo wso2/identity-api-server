@@ -43,6 +43,7 @@ public class FlowEndpointConstants {
     public static final String SMS_OTP_EXECUTOR = "SMSOTPExecutor";
     public static final String MAGIC_LINK_EXECUTOR = "MagicLinkExecutor";
     public static final String PASSWORD_ONBOARD_EXECUTOR = "PasswordOnboardExecutor";
+    public static final String CONFIRMATION_CODE_VALIDATION_EXECUTOR = "ConfirmationCodeValidationExecutor";
 
     public static final String END_USER_ATTRIBUTE_PROFILE = "endUser";
     public static final String SELF_REGISTRATION_ATTRIBUTE_PROFILE = "selfRegistration";
