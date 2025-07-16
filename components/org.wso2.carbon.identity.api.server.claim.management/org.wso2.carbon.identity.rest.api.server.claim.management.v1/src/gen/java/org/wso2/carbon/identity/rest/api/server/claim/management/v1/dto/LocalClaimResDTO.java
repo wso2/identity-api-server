@@ -22,18 +22,13 @@ import io.swagger.annotations.ApiModel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.AttributeMappingDTO;
-import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ClaimResDTO;
-import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ProfilesDTO;
-import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.PropertyDTO;
+
 import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 
-    /**
+/**
     * Local claim response.
     **/
 @ApiModel(description = "Local claim response.")
@@ -70,7 +65,7 @@ public class LocalClaimResDTO extends ClaimResDTO {
     private Boolean supportedByDefault = null;
 
     @Valid
-    private DataTypeEnum dataType = null;
+    private DataType dataType = null;
 
     @Valid
     private String[] subAttributes = null;
@@ -101,6 +96,9 @@ public class LocalClaimResDTO extends ClaimResDTO {
 
     @Valid 
     private ProfilesDTO profiles = null;
+
+    @Valid
+    private InputFormatDTO inputFormat = null;
 
     /**
     * claim ID.
@@ -227,10 +225,10 @@ public class LocalClaimResDTO extends ClaimResDTO {
      **/
     @ApiModelProperty(value = "Specifies the type of data stored in the corresponding claim value.")
     @JsonProperty("dataType")
-    public DataTypeEnum getDataType() {
+    public DataType getDataType() {
         return dataType;
     }
-    public void setDataType(DataTypeEnum dataType) {
+    public void setDataType(DataType dataType) {
         this.dataType = dataType;
     }
 
@@ -338,6 +336,15 @@ public class LocalClaimResDTO extends ClaimResDTO {
         this.profiles = profiles;
     }
 
+    @ApiModelProperty(value = "The input format of the attribute.")
+    @JsonProperty("inputFormat")
+    public InputFormatDTO getInputFormat() {
+        return inputFormat;
+    }
+    public void setInputFormat(InputFormatDTO inputFormat) {
+        this.inputFormat = inputFormat;
+    }
+
     @Override
     public String toString() {
 
@@ -364,6 +371,7 @@ public class LocalClaimResDTO extends ClaimResDTO {
         sb.append("    attributeMapping: ").append(attributeMapping).append("\n");
         sb.append("    properties: ").append(properties).append("\n");
         sb.append("    profiles: ").append(profiles).append("\n");
+        sb.append("    inputFormat: ").append(inputFormat).append("\n");
         
         sb.append("}\n");
         return sb.toString();

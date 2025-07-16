@@ -18,12 +18,16 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.impl;
 
+import org.wso2.carbon.identity.api.server.flow.management.v1.BaseFlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowApiService;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfig;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfigPatchModel;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRequest;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.core.ServerFlowMgtService;
 import org.wso2.carbon.identity.api.server.flow.management.v1.factories.ServerFlowMgtServiceFactory;
 
+import java.util.List;
 
 import javax.ws.rs.core.Response;
 
@@ -51,9 +55,39 @@ public class FlowApiServiceImpl implements FlowApiService {
     }
 
     @Override
+    public Response getFlowConfigForFlow(String flowType) {
+
+        FlowConfig flowConfig = flowMgtService.getFlowConfigForFlow(flowType);
+        return Response.ok().entity(flowConfig).build();
+    }
+
+    @Override
+    public Response getFlowConfigs() {
+
+        List<FlowConfig> flowConfigs = flowMgtService.getFlowConfigs();
+        return Response.ok().entity(flowConfigs).build();
+    }
+
+    @Override
+    public Response getFlowMeta(String flowType) {
+
+        BaseFlowMetaResponse flowMeta = flowMgtService.getFlowMeta(flowType);
+        return Response.ok().entity(flowMeta).build();
+    }
+
+    @Override
     public Response updateFlow(FlowRequest flowRequest) {
 
         flowMgtService.updateFlow(flowRequest);
         return Response.ok().build();
     }
+
+    @Override
+    public Response updateFlowConfig(FlowConfigPatchModel flowConfigPatchModel) {
+
+        FlowConfig flowConfig = flowMgtService.updateFlowConfig(flowConfigPatchModel);
+        return Response.ok().entity(flowConfig).build();
+    }
+
+
 }
