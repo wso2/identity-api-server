@@ -77,8 +77,8 @@ public class WorkflowService {
 
     private static final Log log = LogFactory.getLog(WorkflowService.class);
     private final WorkflowManagementService workflowManagementService;
-    private final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-    private final String DEFAULT_BEGIN_DATE = "1950-01-01 00:00:00.000";
+    private final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd:HH:mm:ss.SSS");
+    private final String DEFAULT_BEGIN_DATE = "1950-01-01:00:00:00.000";
     private final String DEFAULT_END_DATE = LocalDateTime.now().format(DATE_TIME_FORMATTER);
     private final String DEFAULT_REQUEST_TYPE = "ALL_TASKS";
     private final String DEFAULT_DATE_CATEGORY = "";
@@ -634,9 +634,9 @@ public class WorkflowService {
 
     public WorkflowInstanceListResponse getWorkflowInstances(Integer limit, Integer offset, String filter) {
 
+        limit = validateLimit(limit);
+        offset = validateOffset(offset);
         try {
-            limit = validateLimit(limit);
-            offset = validateOffset(offset);
             return getPaginatedWorkflowInstances(limit, offset, filter);
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_LISTING_WORKFLOW_INSTANCES, null, e);
@@ -664,7 +664,7 @@ public class WorkflowService {
                 response.setUpdatedAt(workflowRequest.getUpdatedAt());
             }
         } catch (DateTimeParseException e) {
-            throw new WorkflowClientException("Invalid date format from database. Expected: yyyy-MM-dd HH:mm:ss.SSS");
+            throw new WorkflowClientException("Invalid date format from database. Expected: yyyy-MM-dd:HH:mm:ss.SSS");
         }
 
         response.setStatus(InstanceStatus.fromValue(workflowRequest.getStatus()));
@@ -704,7 +704,7 @@ public class WorkflowService {
         } catch (DateTimeParseException e) {
             log.error("Failed to parse date in workflow request: " + e.getMessage());
             throw new WorkflowClientException(
-                    "Invalid date format in workflow request. Expected format: yyyy-MM-dd HH:mm:ss.SSS");
+                    "Invalid date format in workflow request. Expected format: yyyy-MM-dd:HH:mm:ss.SSS");
 
         }
 
@@ -744,7 +744,7 @@ public class WorkflowService {
                     LocalDateTime.parse(beginDate, DATE_TIME_FORMATTER);
                     LocalDateTime.parse(endDate, DATE_TIME_FORMATTER);
                 } catch (DateTimeParseException e) {
-                    throw new WorkflowClientException("Invalid date format. Expected format: yyyy-MM-dd HH:mm:ss.SSS");
+                    throw new WorkflowClientException("Invalid date format. Expected format: yyyy-MM-dd:HH:mm:ss.SSS");
                 }
                 dateCategory = StringUtils.isBlank(filterMap.get("datecategory")) ? dateCategory
                         : filterMap.get("datecategory");
@@ -796,79 +796,74 @@ public class WorkflowService {
     }
 
     public Map<String, String> parseWorkflowFilter(String filter) throws WorkflowClientException {
+    Map<String, String> result = new HashMap<>();
 
-        Map<String, String> result = new HashMap<>();
-
-        if (StringUtils.isBlank(filter)) {
-            return result;
-        }
-
-        try {
-            String decodedFilter = URLDecoder.decode(filter, StandardCharsets.UTF_8.name());
-
-            decodedFilter = decodedFilter.replace("+", " ");
-
-            decodedFilter = decodedFilter.replace("%27", "'")
-                    .replace("%22", "\"");
-
-            String[] conditions = decodedFilter.split("(?i)\\s+and\\s+");
-
-            Pattern pattern = Pattern.compile(
-                    "(\\w+)\\s+(eq|ge|le)\\s+['\"]([^'\"]*)['\"]",
-                    Pattern.CASE_INSENSITIVE);
-
-            for (String condition : conditions) {
-                String trimmedCondition = condition.trim();
-                Matcher matcher = pattern.matcher(trimmedCondition);
-
-                if (matcher.matches()) {
-                    String field = matcher.group(1).toLowerCase();
-                    String operator = matcher.group(2).toLowerCase();
-                    String value = matcher.group(3);
-
-                    switch (field) {
-                        case "requesttype":
-                        case "status":
-                        case "datecategory":
-                            if ("eq".equals(operator)) {
-                                result.put(field, value != null ? value : "");
-                            } else {
-                                throw new WorkflowClientException(
-                                        "Unsupported operator for " + field + ": " + operator);
-                            }
-                            break;
-                        case "begindate":
-                            if ("ge".equals(operator)) {
-                                result.put("beginDate", value != null ? value : DEFAULT_BEGIN_DATE);
-                            } else {
-                                throw new WorkflowClientException(
-                                        "Only 'ge' operator supported for beginDate");
-                            }
-                            break;
-                        case "enddate":
-                            if ("le".equals(operator)) {
-                                result.put("endDate", value != null ? value : DEFAULT_END_DATE);
-                            } else {
-                                throw new WorkflowClientException(
-                                        "Only 'le' operator supported for endDate");
-                            }
-                            break;
-                        default:
-                            throw new WorkflowClientException(
-                                    "Unknown field in filter: " + field);
-                    }
-                } else {
-                    throw new WorkflowClientException(
-                            "Invalid filter format: " + trimmedCondition +
-                                    "\nExpected format: field operator 'value'");
-                }
-            }
-        } catch (UnsupportedEncodingException e) {
-            throw new WorkflowClientException("Failed to decode filter string", e);
-        }
-
+    if (StringUtils.isBlank(filter)) {
         return result;
     }
+    try {
+        String decodedFilter = URLDecoder.decode(filter, StandardCharsets.UTF_8.name());
+
+        String[] conditions = decodedFilter.split("(?i)\\s+and\\s+");
+
+        Pattern pattern = Pattern.compile(
+                "(\\w+)\\s+(eq|ge|le)\\s+['\"]?([^'\"\\s]+)['\"]?",
+                Pattern.CASE_INSENSITIVE);
+
+        for (String condition : conditions) {
+            String trimmedCondition = condition.trim();
+            Matcher matcher = pattern.matcher(trimmedCondition);
+
+            if (matcher.matches()) {
+                String field = matcher.group(1).toLowerCase();
+                String operator = matcher.group(2).toLowerCase();
+                String value = matcher.group(3);
+
+                value = value.replaceAll("^['\"]|['\"]$", "");
+
+                switch (field) {
+                    case "requesttype":
+                    case "status":
+                    case "datecategory":
+                        if ("eq".equals(operator)) {
+                            result.put(field, value != null ? value : "");
+                        } else {
+                            throw new WorkflowClientException(
+                                    "Unsupported operator for " + field + ": " + operator);
+                        }
+                        break;
+                    case "begindate":
+                        if ("ge".equals(operator)) {
+                            result.put("beginDate", value != null ? value : DEFAULT_BEGIN_DATE);
+                        } else {
+                            throw new WorkflowClientException(
+                                    "Only 'ge' operator supported for beginDate");
+                        }
+                        break;
+                    case "enddate":
+                        if ("le".equals(operator)) {
+                            result.put("endDate", value != null ? value : DEFAULT_END_DATE);
+                        } else {
+                            throw new WorkflowClientException(
+                                    "Only 'le' operator supported for endDate");
+                        }
+                        break;
+                    default:
+                        throw new WorkflowClientException(
+                                "Unknown field in filter: " + field);
+                }
+            } else {
+                throw new WorkflowClientException(
+                        "Invalid filter format: " + trimmedCondition +
+                                "\nExpected format: field operator 'value'");
+            }
+        }
+    } catch (UnsupportedEncodingException e) {
+        throw new WorkflowClientException("Failed to decode filter string", e);
+    }
+
+    return result;
+}
 
     private ErrorResponse.Builder getErrorBuilder(Constants.ErrorMessage errorMsg, String data) {
 
