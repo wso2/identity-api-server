@@ -151,7 +151,7 @@ public class WorkflowInstanceListResponse  {
         if (o == null) {
             return "null";
         }
-        return o.toString().replace("\n", "\n");
+        return o.toString().replace("\n", "\n   ");
     }
 
     public void setStartIndex(Integer startIndex) {

@@ -32,24 +32,27 @@ public class WorkflowInstancesApiServiceImpl implements WorkflowInstancesApiServ
     private final WorkflowService workflowService;
 
     public WorkflowInstancesApiServiceImpl() {
+        
         this.workflowService = WorkflowServiceFactory.getWorkflowService();
     }
 
     @Override
     public Response deleteWorkflowInstance(String instanceId) {
+
         workflowService.deleteWorkflowInstance(instanceId);
         return Response.noContent().build();
     }
 
     @Override
     public Response getWorkflowInstanceById(String instanceId) {
+
         return Response.ok().entity(workflowService.getWorkflowInstanceById(instanceId)).build();
     }
 
     @Override
-    public Response getWorkflowInstances
-            (Integer limit, Integer offset, String filter, String sortBy, String sortOrder) {
+    public Response getWorkflowInstances(Integer limit, Integer offset, String filter, String sortBy,
+            String sortOrder) {
+
         return Response.ok().entity(workflowService.getWorkflowInstances(limit, offset, filter)).build();
     }
 }
-

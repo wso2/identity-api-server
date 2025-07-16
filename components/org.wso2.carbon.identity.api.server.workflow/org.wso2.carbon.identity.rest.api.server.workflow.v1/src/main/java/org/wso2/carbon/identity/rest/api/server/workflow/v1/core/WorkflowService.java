@@ -78,11 +78,18 @@ public class WorkflowService {
     private static final Log log = LogFactory.getLog(WorkflowService.class);
     private final WorkflowManagementService workflowManagementService;
     private final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd:HH:mm:ss.SSS");
+    private final String ALL_TASKS_REQUEST_TYPE = "ALL_TASKS";
+    private final String MY_TASKS_REQUEST_TYPE = "MY_TASKS";
     private final String DEFAULT_BEGIN_DATE = "1950-01-01:00:00:00.000";
     private final String DEFAULT_END_DATE = LocalDateTime.now().format(DATE_TIME_FORMATTER);
-    private final String DEFAULT_REQUEST_TYPE = "ALL_TASKS";
-    private final String DEFAULT_DATE_CATEGORY = "";
-    private final String DEFAULT_STATUS = "";
+    private final String DEFAULT_REQUEST_TYPE = ALL_TASKS_REQUEST_TYPE;
+    private final String DEFAULT_DATE_CATEGORY = StringUtils.EMPTY;
+    private final String DEFAULT_STATUS = StringUtils.EMPTY;
+    private final String REQUEST_TYPE_KEY = "requesttype";
+    private final String BEGIN_DATE_KEY = "beginDate";
+    private final String END_DATE_KEY = "endDate";
+    private final String DATE_CATEGORY_KEY = "datecategory";
+    private final String STATUS_KEY = "status";
 
     public WorkflowService(WorkflowManagementService workflowManagementService) {
 
@@ -596,6 +603,11 @@ public class WorkflowService {
         return associationResponse;
     }
 
+    /**
+     * Deletes a workflow instance by its ID.
+     *
+     * @param instanceId The ID of the workflow instance to delete.
+     */
     public void deleteWorkflowInstance(String instanceId) {
 
         try {
@@ -611,6 +623,12 @@ public class WorkflowService {
         }
     }
 
+    /**
+     * Retrieves a workflow instance by its ID.
+     *
+     * @param instanceId The ID of the workflow instance to retrieve.
+     * @return WorkflowInstanceResponse containing the workflow instance details.
+     */
     public WorkflowInstanceResponse getWorkflowInstanceById(String instanceId) {
 
         try {
@@ -632,6 +650,14 @@ public class WorkflowService {
         }
     }
 
+    /**
+     * Retrieves a list of workflow instances with pagination and filtering.
+     *
+     * @param limit  Maximum number of instances to return.
+     * @param offset Offset for pagination.
+     * @param filter Filter string to apply on the results.
+     * @return WorkflowInstanceListResponse containing the list of workflow instances.
+     */
     public WorkflowInstanceListResponse getWorkflowInstances(Integer limit, Integer offset, String filter) {
 
         limit = validateLimit(limit);
@@ -645,6 +671,13 @@ public class WorkflowService {
         }
     }
 
+    /**
+     * Maps a WorkflowRequest object to a WorkflowInstanceResponse object.
+     *
+     * @param workflowRequest The WorkflowRequest object to map.
+     * @return WorkflowInstanceResponse object containing the mapped data.
+     * @throws WorkflowException If an error occurs during mapping.
+     */
     private WorkflowInstanceResponse mapWorkflowRequestToWorkflowRequestResponse(
             org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest workflowRequest)
             throws WorkflowException {
@@ -672,6 +705,13 @@ public class WorkflowService {
         return response;
     }
 
+    /**
+     * Maps a WorkflowRequest object to a WorkflowInstanceListItem object.
+     *
+     * @param workflowRequest The WorkflowRequest object to map.
+     * @return WorkflowInstanceListItem object containing the mapped data.
+     * @throws WorkflowException If an error occurs during mapping.
+     */
     private WorkflowInstanceListItem mapWorkflowRequestToListItem(
             org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest workflowRequest) throws WorkflowException {
 
@@ -679,42 +719,50 @@ public class WorkflowService {
             return null;
         }
 
-        WorkflowInstanceListItem item = new WorkflowInstanceListItem();
+        WorkflowInstanceListItem workflowInstanceListItem = new WorkflowInstanceListItem();
 
         if (workflowRequest.getRequestId() != null) {
-            item.setWorkflowInstanceId(workflowRequest.getRequestId());
+            workflowInstanceListItem.setWorkflowInstanceId(workflowRequest.getRequestId());
         } else {
             throw new WorkflowClientException("Workflow request ID cannot be null.");
         }
 
         if (workflowRequest.getEventType() != null) {
-            item.setEventType(Operation.fromValue(workflowRequest.getEventType()));
+            workflowInstanceListItem.setEventType(Operation.fromValue(workflowRequest.getEventType()));
         }
         if (workflowRequest.getCreatedBy() != null) {
-            item.setRequestInitiator(workflowRequest.getCreatedBy());
+            workflowInstanceListItem.setRequestInitiator(workflowRequest.getCreatedBy());
         }
 
         try {
             if (workflowRequest.getCreatedAt() != null) {
-                item.setCreatedAt(workflowRequest.getCreatedAt());
+                workflowInstanceListItem.setCreatedAt(workflowRequest.getCreatedAt());
             }
             if (workflowRequest.getUpdatedAt() != null) {
-                item.setUpdatedAt(workflowRequest.getUpdatedAt());
+                workflowInstanceListItem.setUpdatedAt(workflowRequest.getUpdatedAt());
             }
         } catch (DateTimeParseException e) {
             log.error("Failed to parse date in workflow request: " + e.getMessage());
             throw new WorkflowClientException(
                     "Invalid date format in workflow request. Expected format: yyyy-MM-dd:HH:mm:ss.SSS");
-
         }
 
         if (workflowRequest.getStatus() != null) {
-            item.setStatus(InstanceStatus.fromValue(workflowRequest.getStatus()));
+            workflowInstanceListItem.setStatus(InstanceStatus.fromValue(workflowRequest.getStatus()));
         }
 
-        return item;
+        return workflowInstanceListItem;
     }
 
+    /**
+     * Retrieves paginated workflow instances based on the provided parameters.
+     *
+     * @param limit  Maximum number of instances to return.
+     * @param offset Offset for pagination.
+     * @param filter Filter string to apply on the results.
+     * @return WorkflowInstanceListResponse containing the list of workflow instances.
+     * @throws WorkflowException If an error occurs while retrieving the instances.
+     */
     private WorkflowInstanceListResponse getPaginatedWorkflowInstances(Integer limit, Integer offset, String filter)
             throws WorkflowException {
 
@@ -734,33 +782,33 @@ public class WorkflowService {
             String status = DEFAULT_STATUS;
 
             if (filterMap != null && !filterMap.isEmpty()) {
-                requestType = StringUtils.isBlank(filterMap.get("requesttype")) ? requestType
-                        : filterMap.get("requesttype");
-                beginDate = StringUtils.isBlank(filterMap.get("beginDate")) ? beginDate
-                        : filterMap.get("beginDate");
-                endDate = StringUtils.isBlank(filterMap.get("endDate")) ? endDate
-                        : filterMap.get("endDate");
+                requestType = StringUtils.isBlank(filterMap.get(REQUEST_TYPE_KEY)) ? requestType
+                        : filterMap.get(REQUEST_TYPE_KEY);
+                beginDate = StringUtils.isBlank(filterMap.get(BEGIN_DATE_KEY)) ? beginDate
+                        : filterMap.get(BEGIN_DATE_KEY);
+                endDate = StringUtils.isBlank(filterMap.get(END_DATE_KEY)) ? endDate
+                        : filterMap.get(END_DATE_KEY);
                 try {
                     LocalDateTime.parse(beginDate, DATE_TIME_FORMATTER);
                     LocalDateTime.parse(endDate, DATE_TIME_FORMATTER);
                 } catch (DateTimeParseException e) {
                     throw new WorkflowClientException("Invalid date format. Expected format: yyyy-MM-dd:HH:mm:ss.SSS");
                 }
-                dateCategory = StringUtils.isBlank(filterMap.get("datecategory")) ? dateCategory
-                        : filterMap.get("datecategory");
-                status = StringUtils.isBlank(filterMap.get("status")) ? status
-                        : filterMap.get("status");
+                dateCategory = StringUtils.isBlank(filterMap.get(DATE_CATEGORY_KEY)) ? dateCategory
+                        : filterMap.get(DATE_CATEGORY_KEY);
+                status = StringUtils.isBlank(filterMap.get(STATUS_KEY)) ? status
+                        : filterMap.get(STATUS_KEY);
             }
 
             String normalizedRequestType = requestType.toUpperCase();
-            if (!"ALL_TASKS".equals(normalizedRequestType) && !"MY_TASKS".equals(normalizedRequestType)) {
+            if (!ALL_TASKS_REQUEST_TYPE.equals(normalizedRequestType) && !MY_TASKS_REQUEST_TYPE.equals(normalizedRequestType)) {
                 throw new WorkflowClientException("Invalid request type: " + requestType +
                         ". Valid types are 'ALL_TASKS' and 'MY_TASKS'.");
             }
 
             org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest[] response = workflowManagementService
                     .getRequestsFromFilter(
-                            "MY_TASKS".equals(normalizedRequestType) ? user : "",
+                            MY_TASKS_REQUEST_TYPE.equals(normalizedRequestType) ? user : StringUtils.EMPTY,
                             beginDate,
                             endDate,
                             dateCategory,
@@ -795,21 +843,36 @@ public class WorkflowService {
         }
     }
 
+    /**
+     * Parses the filter string into a map of field-value pairs.
+     * The expected format is: "field operator 'value' and field operator 'value' ..."
+     * Supported fields: requestType, status, dateCategory, beginDate, endDate
+     * Supported operators: eq (equals), ge (greater than or equal), le (less than or equal)
+     *
+     * @param filter Filter string
+     * @return Map of field-value pairs
+     * @throws WorkflowClientException If the filter format is invalid or unsupported
+     */
     public Map<String, String> parseWorkflowFilter(String filter) throws WorkflowClientException {
+
     Map<String, String> result = new HashMap<>();
 
     if (StringUtils.isBlank(filter)) {
         return result;
     }
     try {
+        // Decode the filter string to handle URL encoding
         String decodedFilter = URLDecoder.decode(filter, StandardCharsets.UTF_8.name());
 
+        // Split the filter string by "and" (case-insensitive) to get individual conditions in the form <field> <operator> <value>
         String[] conditions = decodedFilter.split("(?i)\\s+and\\s+");
 
+        // Regular expression to match the expected filter format: <field> <operator> <value> E.g., "requestType eq MY_TASKS"
         Pattern pattern = Pattern.compile(
                 "(\\w+)\\s+(eq|ge|le)\\s+['\"]?([^'\"\\s]+)['\"]?",
                 Pattern.CASE_INSENSITIVE);
-
+        
+        // Iterate through each condition and extract field, operator, and value
         for (String condition : conditions) {
             String trimmedCondition = condition.trim();
             Matcher matcher = pattern.matcher(trimmedCondition);
@@ -819,6 +882,7 @@ public class WorkflowService {
                 String operator = matcher.group(2).toLowerCase();
                 String value = matcher.group(3);
 
+                // Remove surrounding quotes from the value if present
                 value = value.replaceAll("^['\"]|['\"]$", "");
 
                 switch (field) {
@@ -829,7 +893,7 @@ public class WorkflowService {
                             result.put(field, value != null ? value : "");
                         } else {
                             throw new WorkflowClientException(
-                                    "Unsupported operator for " + field + ": " + operator);
+                                    "Only `eq` operator is supported for " + field + ": " + operator);
                         }
                         break;
                     case "begindate":
@@ -863,7 +927,7 @@ public class WorkflowService {
     }
 
     return result;
-}
+    }
 
     private ErrorResponse.Builder getErrorBuilder(Constants.ErrorMessage errorMsg, String data) {
 

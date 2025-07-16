@@ -213,7 +213,7 @@ public class WorkflowInstanceResponse {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class WorkflowInstanceListItem {\n");
+        sb.append("class WorkflowInstanceResponse {\n");
         
         sb.append("    eventType: ").append(toIndentedString(eventType)).append("\n");
         sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
@@ -233,7 +233,7 @@ public class WorkflowInstanceResponse {
         if (o == null) {
             return "null";
         }
-        return o.toString().replace("\n", "\n");
+        return o.toString().replace("\n", "\n    ");
     }
 }
 
