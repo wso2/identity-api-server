@@ -20,7 +20,7 @@ security:
   - OAuth2: []
 
 paths:
-  /webhooks/metadata/event-profiles:
+  /webhooks/metadata:
     get:
       summary: List Event Profiles
       description: "This API returns the list of event profiles supported by WSO2 Identity Server.\n\n <b>Scope(Permission) required:</b> `internal_webhook_metadata_view` \n\n"
@@ -33,7 +33,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EventProfileList'
+                $ref: '#/components/schemas/WebhookMetadata'
         '401':
           description: Unauthorized
         '403':
@@ -148,13 +148,22 @@ components:
           items:
             $ref: '#/components/schemas/Channel'
 
-    EventProfileList:
+    WebhookMetadata:
       type: object
       properties:
         profiles:
           type: array
           items:
             $ref: '#/components/schemas/EventProfileMetadata'
+        adapter:
+          type: object
+          properties:
+            name:
+              type: string
+              example: "httppublisher"
+            type:
+              type: string
+              example: "Publisher"
 
     EventProfileMetadata:
       type: object

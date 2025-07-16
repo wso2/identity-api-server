@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.Error;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.EventProfile;
-import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.EventProfileList;
+import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.WebhookMetadata;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.WebhooksApiService;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.factories.WebhooksApiServiceFactory;
 
@@ -73,17 +73,17 @@ public class WebhooksApi  {
 
     @Valid
     @GET
-    @Path("/metadata/event-profiles")
+    @Path("/metadata")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "List Event Profiles", notes = "This API returns the list of event profiles supported by WSO2 Identity Server.   <b>Scope(Permission) required:</b> `internal_webhook_metadata_view`   ", response = EventProfileList.class, authorizations = {
+    @ApiOperation(value = "List Event Profiles", notes = "This API returns the list of event profiles supported by WSO2 Identity Server.   <b>Scope(Permission) required:</b> `internal_webhook_metadata_view`   ", response = WebhookMetadata.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Webhook Metadata" })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = EventProfileList.class),
+        @ApiResponse(code = 200, message = "OK", response = WebhookMetadata.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 500, message = "Internal server error", response = Error.class)

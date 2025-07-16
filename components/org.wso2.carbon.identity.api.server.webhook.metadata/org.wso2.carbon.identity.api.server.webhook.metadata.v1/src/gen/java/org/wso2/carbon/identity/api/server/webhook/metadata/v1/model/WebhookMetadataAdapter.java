@@ -22,9 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
-import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.EventProfileMetadata;
 import javax.validation.constraints.*;
 
 
@@ -33,38 +30,48 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class EventProfileList  {
+public class WebhookMetadataAdapter  {
   
-    private List<EventProfileMetadata> profiles = null;
-
+    private String name;
+    private String type;
 
     /**
     **/
-    public EventProfileList profiles(List<EventProfileMetadata> profiles) {
+    public WebhookMetadataAdapter name(String name) {
 
-        this.profiles = profiles;
+        this.name = name;
         return this;
     }
     
-    @ApiModelProperty(value = "")
-    @JsonProperty("profiles")
+    @ApiModelProperty(example = "httppublisher", value = "")
+    @JsonProperty("name")
     @Valid
-    public List<EventProfileMetadata> getProfiles() {
-        return profiles;
+    public String getName() {
+        return name;
     }
-    public void setProfiles(List<EventProfileMetadata> profiles) {
-        this.profiles = profiles;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public EventProfileList addProfilesItem(EventProfileMetadata profilesItem) {
-        if (this.profiles == null) {
-            this.profiles = new ArrayList<EventProfileMetadata>();
-        }
-        this.profiles.add(profilesItem);
+    /**
+    **/
+    public WebhookMetadataAdapter type(String type) {
+
+        this.type = type;
         return this;
     }
-
     
+    @ApiModelProperty(example = "Publisher", value = "")
+    @JsonProperty("type")
+    @Valid
+    public String getType() {
+        return type;
+    }
+    public void setType(String type) {
+        this.type = type;
+    }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -75,22 +82,24 @@ public class EventProfileList  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        EventProfileList eventProfileList = (EventProfileList) o;
-        return Objects.equals(this.profiles, eventProfileList.profiles);
+        WebhookMetadataAdapter webhookMetadataAdapter = (WebhookMetadataAdapter) o;
+        return Objects.equals(this.name, webhookMetadataAdapter.name) &&
+            Objects.equals(this.type, webhookMetadataAdapter.type);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(profiles);
+        return Objects.hash(name, type);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class EventProfileList {\n");
+        sb.append("class WebhookMetadataAdapter {\n");
         
-        sb.append("    profiles: ").append(toIndentedString(profiles)).append("\n");
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("}");
         return sb.toString();
     }
