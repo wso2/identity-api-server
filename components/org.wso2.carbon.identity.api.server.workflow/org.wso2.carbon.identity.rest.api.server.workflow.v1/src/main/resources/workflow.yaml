@@ -495,7 +495,7 @@ paths:
 
             Example:
 
-                `requestType+eq+'MY_TASK'+and+status+eq+'PENDING'+and+dateCategory+eq+'UPDATED'+and+beginDate+ge+'2025-06-01 09:57:47.000'+and+endDate+le+'2025-07-31 09:57:47.000'`
+                `requestType+eq+MY_TASKS+and+status+eq+PENDING+and+dateCategory+eq+UPDATED+and+beginDate+ge+2025-06-01:09:57:47.000+and+endDate+le+2025-07-31:09:57:47.000`
           schema:
             type: string
       responses:
