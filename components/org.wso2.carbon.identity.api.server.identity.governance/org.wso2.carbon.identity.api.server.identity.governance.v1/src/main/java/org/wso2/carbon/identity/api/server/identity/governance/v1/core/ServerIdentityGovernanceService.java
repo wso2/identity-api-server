@@ -416,7 +416,7 @@ public class ServerIdentityGovernanceService {
                 }
             }
 
-            identityGovernanceService.deleteConfiguration(tenantDomain, propertyRevertReq.getProperties());
+            identityGovernanceService.deleteConfiguration(propertyRevertReq.getProperties(), tenantDomain);
         } catch (IdentityGovernanceException e) {
             GovernanceConstants.ErrorMessage errorEnum =
                     GovernanceConstants.ErrorMessage.ERROR_CODE_ERROR_REVERTING_CONNECTOR_PROPERTY;
