@@ -301,8 +301,7 @@ public class ServerConfigManagementService {
             idpManager.updateResidentIdP(idpToUpdate, ContextLoader.getTenantDomainFromContext());
 
             if (!propertiesToRemove.isEmpty()) {
-                idpManager.deleteResidentIdpProperties(ContextLoader.getTenantDomainFromContext(),
-                        propertiesToRemove);
+                idpManager.deleteResidentIdpProperties(propertiesToRemove, ContextLoader.getTenantDomainFromContext());
             }
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_CONFIGS, null);

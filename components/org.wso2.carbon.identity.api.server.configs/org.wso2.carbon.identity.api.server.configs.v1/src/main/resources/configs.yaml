@@ -986,7 +986,9 @@ paths:
         - Inbound Authentication Configurations
       summary: Delete SAML2 inbound authentication configurations.
       description: |
-        Delete all SAML2 inbound authentication configurations of the tenant.
+        Delete all SAML2 inbound authentication configurations of the tenant.<br><br>
+        <b>Scope (Permission) required:</b> <br>
+          * internal_config_update
       operationId: deleteSAMLInboundAuthConfig
       responses:
         '204':
@@ -1080,7 +1082,9 @@ paths:
         - Inbound Authentication Configurations
       summary: Delete WS Federation (Passive STS) inbound authentication configurations.
       description: |
-        Delete all WS Federation (Passive STS) inbound authentication configurations of the tenant.
+        Delete all WS Federation (Passive STS) inbound authentication configurations of the tenant.<br><br>
+        <b>Scope (Permission) required:</b> <br>
+          * internal_config_update
       operationId: deletePassiveSTSInboundAuthConfig
       responses:
         '204':

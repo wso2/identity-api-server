@@ -221,6 +221,7 @@ public class IdentityGovernanceApi  {
         @ApiResponse(code = 200, message = "OK.", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request.", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
+        @ApiResponse(code = 403, message = "Resource Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })

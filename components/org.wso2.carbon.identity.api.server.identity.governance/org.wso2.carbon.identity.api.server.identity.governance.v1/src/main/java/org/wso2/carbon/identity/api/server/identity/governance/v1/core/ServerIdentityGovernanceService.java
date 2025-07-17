@@ -403,10 +403,6 @@ public class ServerIdentityGovernanceService {
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             ConnectorRes connector = getGovernanceConnector(categoryId, connectorId);
 
-            if (propertyRevertReq.getProperties().isEmpty()) {
-                throw handleBadRequestError(GovernanceConstants.ErrorMessage.ERROR_CODE_NO_PROPERTIES_TO_REVERT);
-            }
-
             // Throw an error if propertyRevertReq contain properties that are not in the connector.
             for (String propertyName : propertyRevertReq.getProperties()) {
                 if (connector.getProperties().stream().noneMatch(
@@ -416,7 +412,7 @@ public class ServerIdentityGovernanceService {
                 }
             }
 
-            identityGovernanceService.deleteConfiguration(tenantDomain, propertyRevertReq.getProperties());
+            identityGovernanceService.deleteConfiguration(propertyRevertReq.getProperties(), tenantDomain);
         } catch (IdentityGovernanceException e) {
             GovernanceConstants.ErrorMessage errorEnum =
                     GovernanceConstants.ErrorMessage.ERROR_CODE_ERROR_REVERTING_CONNECTOR_PROPERTY;
