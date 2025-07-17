@@ -90,6 +90,7 @@ public class WorkflowService {
     private final String END_DATE_KEY = "endDate";
     private final String DATE_CATEGORY_KEY = "datecategory";
     private final String STATUS_KEY = "status";
+    private final int MAX_RESULTS = 1000;
 
     public WorkflowService(WorkflowManagementService workflowManagementService) {
 
@@ -764,83 +765,87 @@ public class WorkflowService {
      * @throws WorkflowException If an error occurs while retrieving the instances.
      */
     private WorkflowInstanceListResponse getPaginatedWorkflowInstances(Integer limit, Integer offset, String filter)
-            throws WorkflowException {
+            throws WorkflowException , WorkflowClientException {
 
-        try {
-            String user = CarbonContext.getThreadLocalCarbonContext().getUsername();
-            int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+        String user = CarbonContext.getThreadLocalCarbonContext().getUsername();
+        int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
 
-            WorkflowInstanceListResponse workflowInstanceListResponse = new WorkflowInstanceListResponse();
-            workflowInstanceListResponse.setInstances(new ArrayList<>());
+        WorkflowInstanceListResponse workflowInstanceListResponse = new WorkflowInstanceListResponse();
+        workflowInstanceListResponse.setInstances(new ArrayList<>());
 
-            Map<String, String> filterMap = parseWorkflowFilter(filter);
+        Map<String, String> filterMap = parseWorkflowFilter(filter);
 
-            String requestType = DEFAULT_REQUEST_TYPE;
-            String beginDate = DEFAULT_BEGIN_DATE;
-            String endDate = DEFAULT_END_DATE;
-            String dateCategory = DEFAULT_DATE_CATEGORY;
-            String status = DEFAULT_STATUS;
+        String requestType = DEFAULT_REQUEST_TYPE;
+        String beginDate = DEFAULT_BEGIN_DATE;
+        String endDate = DEFAULT_END_DATE;
+        String dateCategory = DEFAULT_DATE_CATEGORY;
+        String status = DEFAULT_STATUS;
 
-            if (filterMap != null && !filterMap.isEmpty()) {
-                requestType = StringUtils.isBlank(filterMap.get(REQUEST_TYPE_KEY)) ? requestType
-                        : filterMap.get(REQUEST_TYPE_KEY);
-                beginDate = StringUtils.isBlank(filterMap.get(BEGIN_DATE_KEY)) ? beginDate
-                        : filterMap.get(BEGIN_DATE_KEY);
-                endDate = StringUtils.isBlank(filterMap.get(END_DATE_KEY)) ? endDate
-                        : filterMap.get(END_DATE_KEY);
-                try {
-                    LocalDateTime.parse(beginDate, DATE_TIME_FORMATTER);
-                    LocalDateTime.parse(endDate, DATE_TIME_FORMATTER);
-                } catch (DateTimeParseException e) {
-                    throw new WorkflowClientException("Invalid date format. Expected format: yyyy-MM-dd:HH:mm:ss.SSS");
-                }
-                dateCategory = StringUtils.isBlank(filterMap.get(DATE_CATEGORY_KEY)) ? dateCategory
-                        : filterMap.get(DATE_CATEGORY_KEY);
-                status = StringUtils.isBlank(filterMap.get(STATUS_KEY)) ? status
-                        : filterMap.get(STATUS_KEY);
+        if (filterMap != null && !filterMap.isEmpty()) {
+            requestType = StringUtils.isBlank(filterMap.get(REQUEST_TYPE_KEY)) ? requestType
+                    : filterMap.get(REQUEST_TYPE_KEY);
+            beginDate = StringUtils.isBlank(filterMap.get(BEGIN_DATE_KEY)) ? beginDate
+                    : filterMap.get(BEGIN_DATE_KEY);
+            endDate = StringUtils.isBlank(filterMap.get(END_DATE_KEY)) ? endDate
+                    : filterMap.get(END_DATE_KEY);
+            try {
+                LocalDateTime.parse(beginDate, DATE_TIME_FORMATTER);
+                LocalDateTime.parse(endDate, DATE_TIME_FORMATTER);
+            } catch (DateTimeParseException e) {
+                throw new WorkflowClientException("Invalid date format. Expected format: yyyy-MM-dd:HH:mm:ss.SSS");
             }
+            dateCategory = StringUtils.isBlank(filterMap.get(DATE_CATEGORY_KEY)) ? dateCategory
+                    : filterMap.get(DATE_CATEGORY_KEY);
+            status = StringUtils.isBlank(filterMap.get(STATUS_KEY)) ? status
+                    : filterMap.get(STATUS_KEY);
+        }
 
-            String normalizedRequestType = requestType.toUpperCase();
-            if (!ALL_TASKS_REQUEST_TYPE.equals(normalizedRequestType) && !MY_TASKS_REQUEST_TYPE.equals(normalizedRequestType)) {
-                throw new WorkflowClientException("Invalid request type: " + requestType +
-                        ". Valid types are 'ALL_TASKS' and 'MY_TASKS'.");
-            }
+        String normalizedRequestType = requestType.toUpperCase();
+        if (!ALL_TASKS_REQUEST_TYPE.equals(normalizedRequestType) && !MY_TASKS_REQUEST_TYPE.equals(normalizedRequestType)) {
+            throw new WorkflowClientException("Invalid request type: " + requestType +
+                    ". Valid types are 'ALL_TASKS' and 'MY_TASKS'.");
+        }
 
-            org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest[] response = workflowManagementService
-                    .getRequestsFromFilter(
-                            MY_TASKS_REQUEST_TYPE.equals(normalizedRequestType) ? user : StringUtils.EMPTY,
-                            beginDate,
-                            endDate,
-                            dateCategory,
-                            tenantId,
-                            status, limit, offset);
+        org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest[] response = workflowManagementService
+                .getRequestsFromFilter(
+                        MY_TASKS_REQUEST_TYPE.equals(normalizedRequestType) ? user : StringUtils.EMPTY,
+                        beginDate,
+                        endDate,
+                        dateCategory,
+                        tenantId,
+                        status, limit, offset);
 
-            List<WorkflowInstanceListItem> allItems = new ArrayList<>();
-            if (response != null) {
-                for (org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest workflowRequest : response) {
-                    if (workflowRequest != null) {
-                        WorkflowInstanceListItem item = mapWorkflowRequestToListItem(workflowRequest);
-                        if (item != null) {
-                            allItems.add(item);
-                        }
+        org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest[] fullResponse = workflowManagementService
+                .getRequestsFromFilter(
+                        MY_TASKS_REQUEST_TYPE.equals(normalizedRequestType) ? user : StringUtils.EMPTY,
+                        beginDate,
+                        endDate,
+                        dateCategory,
+                        tenantId,
+                        status, MAX_RESULTS, 0);
+
+        List<WorkflowInstanceListItem> allItems = new ArrayList<>();
+        if (response != null) {
+            for (org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest workflowRequest : response) {
+                if (workflowRequest != null) {
+                    WorkflowInstanceListItem item = mapWorkflowRequestToListItem(workflowRequest);
+                    if (item != null) {
+                        allItems.add(item);
                     }
                 }
             }
-
-            int totalCount = allItems.size();
-            int startIndex = offset != null ? offset : 0;
-
-            workflowInstanceListResponse.setInstances(allItems);
-            workflowInstanceListResponse.setCount(totalCount);
-            workflowInstanceListResponse.setStartIndex(startIndex + 1);
-            workflowInstanceListResponse.setTotalResults(totalCount);
-
-            return workflowInstanceListResponse;
-        } catch (WorkflowException e) {
-            throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_WORKFLOW_INSTANCES, null, e);
-        } catch (Exception e) {
-            throw new WorkflowException("Unexpected error while listing workflow instances", e);
         }
+
+        int totalCount = allItems.size();
+        int startIndex = offset != null ? offset : 0;
+        int totalResult = fullResponse.length;
+
+        workflowInstanceListResponse.setInstances(allItems);
+        workflowInstanceListResponse.setCount(totalCount);
+        workflowInstanceListResponse.setStartIndex(startIndex + 1);
+        workflowInstanceListResponse.setTotalResults(totalResult);
+
+        return workflowInstanceListResponse;
     }
 
     /**
@@ -919,7 +924,7 @@ public class WorkflowService {
             } else {
                 throw new WorkflowClientException(
                         "Invalid filter format: " + trimmedCondition +
-                                "\nExpected format: field operator 'value'");
+                                "\nExpected format: field operator value, e.g., requestType eq MY_TASKS");
             }
         }
     } catch (UnsupportedEncodingException e) {
