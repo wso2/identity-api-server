@@ -90,7 +90,6 @@ public class WorkflowService {
     private final String END_DATE_KEY = "endDate";
     private final String DATE_CATEGORY_KEY = "datecategory";
     private final String STATUS_KEY = "status";
-    private final int MAX_RESULTS = 1000;
 
     public WorkflowService(WorkflowManagementService workflowManagementService) {
 
@@ -806,7 +805,7 @@ public class WorkflowService {
                     ". Valid types are 'ALL_TASKS' and 'MY_TASKS'.");
         }
 
-        org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest[] response = workflowManagementService
+        org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequestFilterResponse response = workflowManagementService
                 .getRequestsFromFilter(
                         MY_TASKS_REQUEST_TYPE.equals(normalizedRequestType) ? user : StringUtils.EMPTY,
                         beginDate,
@@ -815,18 +814,11 @@ public class WorkflowService {
                         tenantId,
                         status, limit, offset);
 
-        org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest[] fullResponse = workflowManagementService
-                .getRequestsFromFilter(
-                        MY_TASKS_REQUEST_TYPE.equals(normalizedRequestType) ? user : StringUtils.EMPTY,
-                        beginDate,
-                        endDate,
-                        dateCategory,
-                        tenantId,
-                        status, MAX_RESULTS, 0);
+        org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest[] requests = response.getRequests();
 
         List<WorkflowInstanceListItem> allItems = new ArrayList<>();
-        if (response != null) {
-            for (org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest workflowRequest : response) {
+        if (requests != null) {
+            for (org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest workflowRequest : requests) {
                 if (workflowRequest != null) {
                     WorkflowInstanceListItem item = mapWorkflowRequestToListItem(workflowRequest);
                     if (item != null) {
@@ -838,7 +830,7 @@ public class WorkflowService {
 
         int totalCount = allItems.size();
         int startIndex = offset != null ? offset : 0;
-        int totalResult = fullResponse.length;
+        int totalResult = response.getTotalCount();
 
         workflowInstanceListResponse.setInstances(allItems);
         workflowInstanceListResponse.setCount(totalCount);
@@ -850,7 +842,7 @@ public class WorkflowService {
 
     /**
      * Parses the filter string into a map of field-value pairs.
-     * The expected format is: "field operator 'value' and field operator 'value' ..."
+     * The expected format is: "field operator value and field operator value ..."
      * Supported fields: requestType, status, dateCategory, beginDate, endDate
      * Supported operators: eq (equals), ge (greater than or equal), le (less than or equal)
      *
@@ -866,18 +858,20 @@ public class WorkflowService {
         return result;
     }
     try {
-        // Decode the filter string to handle URL encoding
+        // Decode the filter string to handle URL encoding.
         String decodedFilter = URLDecoder.decode(filter, StandardCharsets.UTF_8.name());
 
-        // Split the filter string by "and" (case-insensitive) to get individual conditions in the form <field> <operator> <value>
+        // Split the filter string by "and" (case-insensitive) to get individual conditions in the form 
+        // <field> <operator> <value>.
         String[] conditions = decodedFilter.split("(?i)\\s+and\\s+");
 
-        // Regular expression to match the expected filter format: <field> <operator> <value> E.g., "requestType eq MY_TASKS"
+        // Regular expression to match the expected filter format: <field> <operator> <value>
+        // E.g., "requestType eq MY_TASKS".
         Pattern pattern = Pattern.compile(
                 "(\\w+)\\s+(eq|ge|le)\\s+['\"]?([^'\"\\s]+)['\"]?",
                 Pattern.CASE_INSENSITIVE);
         
-        // Iterate through each condition and extract field, operator, and value
+        // Iterate through each condition and extract field, operator, and value.
         for (String condition : conditions) {
             String trimmedCondition = condition.trim();
             Matcher matcher = pattern.matcher(trimmedCondition);
@@ -887,7 +881,7 @@ public class WorkflowService {
                 String operator = matcher.group(2).toLowerCase();
                 String value = matcher.group(3);
 
-                // Remove surrounding quotes from the value if present
+                // Remove surrounding quotes from the value if present.
                 value = value.replaceAll("^['\"]|['\"]$", "");
 
                 switch (field) {
