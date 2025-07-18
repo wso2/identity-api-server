@@ -30,9 +30,14 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Application
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationOwner;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationShareAllRequestBody;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationSharePOSTRequest;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationShareSelectedRequestBody;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationSharingPatchRequest;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplateModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesList;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationUnshareAllRequestBody;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationUnshareSelectedRequestBody;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPICreationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIPatchModel;
@@ -42,6 +47,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.CustomInbou
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.Error;
 import java.io.File;
+import org.wso2.carbon.identity.api.server.application.management.v1.GroupBasicInfo;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowGenerateRequest;
 import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowGenerateResponse;
@@ -50,6 +56,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowSt
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.ProcessSuccessResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
@@ -1041,6 +1048,25 @@ public class ApplicationsApi  {
 
     @Valid
     @PATCH
+    @Path("/share")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Perform incremental sharing operations on an already shared application.", notes = "", response = ProcessSuccessResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Sharing", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 202, message = "Operation processed successfully", response = ProcessSuccessResponse.class)
+    })
+    public Response patchApplicationSharing(@ApiParam(value = "" ,required=true) @Valid ApplicationSharingPatchRequest applicationSharingPatchRequest) {
+
+        return delegate.patchApplicationSharing(applicationSharingPatchRequest );
+    }
+
+    @Valid
+    @PATCH
     @Path("/{applicationId}/authorized-apis/{apiId}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
@@ -1092,7 +1118,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/oidc/revoke")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Revoke the OAuth2/OIDC client of application. ", notes = "This API revokes the OAuth2/OIDC client secret.  To re-activate the client, the client secret needs to be regenerated. <br>   <b>Scope(Permission) required:</b> `internal_application_mgt_create` ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Revoke the OAuth2/OIDC client of application. ", notes = "This API revokes the OAuth2/OIDC client secret. To re-activate the client, the client secret needs to be regenerated. <br>   <b>Scope(Permission) required:</b> `internal_application_mgt_create` ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -1109,6 +1135,44 @@ public class ApplicationsApi  {
     public Response revokeOAuthClient(@ApiParam(value = "ID of the application",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.revokeOAuthClient(applicationId );
+    }
+
+    @Valid
+    @POST
+    @Path("/share-with-all")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Share a single application with all organizations", notes = "", response = ProcessSuccessResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Sharing", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 202, message = "Sharing process triggered successfully", response = ProcessSuccessResponse.class)
+    })
+    public Response shareApplicationWithAll(@ApiParam(value = "" ,required=true) @Valid ApplicationShareAllRequestBody applicationShareAllRequestBody) {
+
+        return delegate.shareApplicationWithAll(applicationShareAllRequestBody );
+    }
+
+    @Valid
+    @POST
+    @Path("/share")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Share a single application with specific organizations", notes = "", response = ProcessSuccessResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Sharing", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 202, message = "Sharing process triggered successfully", response = ProcessSuccessResponse.class)
+    })
+    public Response shareApplicationWithSelected(@ApiParam(value = "" ,required=true) @Valid ApplicationShareSelectedRequestBody applicationShareSelectedRequestBody) {
+
+        return delegate.shareApplicationWithSelected(applicationShareSelectedRequestBody );
     }
 
     @Valid
@@ -1145,7 +1209,7 @@ public class ApplicationsApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Application Sharing", })
+    }, tags={ "Organization Application Sharing", })
     @ApiResponses(value = { 
         @ApiResponse(code = 204, message = "Successfully deleted", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
@@ -1178,9 +1242,9 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response shareOrgApplicationGet(@ApiParam(value = "ID of the application which is shared to organizations.",required=true) @PathParam("applicationId") String applicationId) {
+    public Response shareOrgApplicationGet(@ApiParam(value = "ID of the application which is shared to organizations.",required=true) @PathParam("applicationId") String applicationId,     @Valid@ApiParam(value = "Base64 encoded cursor value for backward pagination. ")  @QueryParam("before") String before,     @Valid@ApiParam(value = "Base64 encoded cursor value for forward pagination. ")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations. ")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Maximum number of records to return. ")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Determines whether a recursive search should happen. If set to true, will include shared organizations in all levels of the hierarchy; If set to false, includes only shared organizations in the next level of the hierarchy. ")  @QueryParam("recursive") Boolean recursive,     @Valid@ApiParam(value = "excludedAttribute parameter. ")  @QueryParam("excludedAttributes") String excludedAttributes,     @Valid@ApiParam(value = "Specifies the required parameters in the response. Only 'sharingMode' attribute is currently supported.  /applications/{applicationId}/share?attributes=sharingMode ")  @QueryParam("attributes") String attributes) {
 
-        return delegate.shareOrgApplicationGet(applicationId );
+        return delegate.shareOrgApplicationGet(applicationId,  before,  after,  filter,  limit,  recursive,  excludedAttributes,  attributes );
     }
 
     @Valid
@@ -1188,7 +1252,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/shared-apps")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Stop sharing an application with all organizations. ", notes = "This API provides the capability to stop sharing an application to all organizations  the application is shared to. <br>   <b>Scope(Permission) required:</b> `internal_shared_application_delete` ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Stop sharing an application with all organizations. ", notes = "This API provides the capability to stop sharing an application to all organizations the application is shared to. <br>   <b>Scope(Permission) required:</b> `internal_shared_application_delete` ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -1232,6 +1296,44 @@ public class ApplicationsApi  {
     }
 
     @Valid
+    @POST
+    @Path("/unshare-with-all")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Unshare an application from all organizations", notes = "", response = ProcessSuccessResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Sharing", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 202, message = "Unsharing process triggered successfully", response = ProcessSuccessResponse.class)
+    })
+    public Response unshareApplicationFromAll(@ApiParam(value = "" ,required=true) @Valid ApplicationUnshareAllRequestBody applicationUnshareAllRequestBody) {
+
+        return delegate.unshareApplicationFromAll(applicationUnshareAllRequestBody );
+    }
+
+    @Valid
+    @POST
+    @Path("/unshare")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Unshare an application from specific orgs", notes = "", response = ProcessSuccessResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Sharing", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 202, message = "Unsharing process triggered successfully", response = ProcessSuccessResponse.class)
+    })
+    public Response unshareApplicationFromSelected(@ApiParam(value = "" ,required=true) @Valid ApplicationUnshareSelectedRequestBody applicationUnshareSelectedRequestBody) {
+
+        return delegate.unshareApplicationFromSelected(applicationUnshareSelectedRequestBody );
+    }
+
+    @Valid
     @PUT
     @Path("/templates/{template-id}")
     @Consumes({ "application/json" })
@@ -1261,7 +1363,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/{inboundProtocolId}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update the custom inbound authentication protocol parameters. ", notes = "This API provides the capability to store custom inbound authentication  protocol parameters of an application. <br>   <b>Scope(Permission) required:</b> `internal_application_mgt_update` ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update the custom inbound authentication protocol parameters. ", notes = "This API provides the capability to store custom inbound authentication protocol parameters of an application. <br>   <b>Scope(Permission) required:</b> `internal_application_mgt_update` ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
