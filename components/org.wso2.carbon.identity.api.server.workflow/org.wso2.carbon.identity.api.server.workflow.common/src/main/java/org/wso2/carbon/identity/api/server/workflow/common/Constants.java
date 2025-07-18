@@ -61,13 +61,17 @@ public class Constants {
                 "Encountered an error while adding the workflow association with the name %s."),
         ERROR_CODE_CLIENT_ERROR_UPDATING_ASSOCIATION("51008", "Unable to update workflow association",
                 "Encountered an error while updating the workflow association."),
-        ERROR_CODE_INVALID_PAGINATION_PARAMETER_NEGATIVE_LIMIT("51009", "Invalid pagination parameters.", "'limit' " +
-                "shouldn't be negative."),
-
-
+        ERROR_CODE_INVALID_PAGINATION_PARAMETER_NEGATIVE_LIMIT("51009", "Invalid pagination parameters.",
+                "'limit' shouldn't be negative."),
+        ERROR_CODE_CLIENT_ERROR_WORKFLOW_INSTANCE_NOT_FOUND("51010", "Workflow log not found.",
+                "Unable to find a resource matching the provided workflow log identifier %s."),
+        ERROR_CODE_CLIENT_ERROR_LISTING_WORKFLOW_INSTANCES("51011", "Unable to list existing workflow " +
+                "logs.", "Encountered an error while listing the workflow logs."),
+        ERROR_CODE_CLIENT_ERROR_DELETING_WORKFLOW_INSTANCE("51012", "Unable to delete workflow log.",
+                "Encountered an error while deleting the workflow log identifier %s."),
         // Server Errors starting from 500xx.
         ERROR_CODE_ERROR_LISTING_WORKFLOWS("50020", "Unable to list existing workflows",
-                                                   "Server encountered an error while listing the workflows."),
+                "Server encountered an error while listing the workflows."),
         ERROR_CODE_ERROR_REMOVING_WORKFLOW("50021", "Unable to delete the workflow",
                                                    "Server encountered an error while deleting " +
                                                            "the workflow for the identifier %s."),
@@ -93,7 +97,13 @@ public class Constants {
                                                                 "the workflow association for identifier %s."),
         ERROR_CODE_ERROR_UPDATING_ASSOCIATION("50029", "Unable to update workflow association",
                                                       "Server encountered an error while " +
-                                                              "updating the workflow association.");
+                                                              "updating the workflow association."),
+        ERROR_CODE_ERROR_DELETING_WORKFLOW_INSTANCE("50030", "Unable to delete workflow log.",
+                "Server encountered an error while deleting the workflow log for identifier %s."),
+        ERROR_CODE_ERROR_RETRIEVING_WORKFLOW_INSTANCE("50031", "Unable to retrieve workflow log.",
+                "Server encountered an error while retrieving the workflow log for identifier %s."),
+        ERROR_CODE_ERROR_LISTING_WORKFLOW_INSTANCES("50032", "Unable to list existing workflow logs.",
+                "Server encountered an error while listing the workflow logs.");
 
         private final String code;
         private final String message;
