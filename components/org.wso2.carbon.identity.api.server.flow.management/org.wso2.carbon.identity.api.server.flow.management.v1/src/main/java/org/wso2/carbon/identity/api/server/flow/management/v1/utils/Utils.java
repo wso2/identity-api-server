@@ -41,6 +41,7 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndp
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.AbstractMetaResponseHandler;
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.application.common.model.Property;
+import org.wso2.carbon.identity.core.util.LambdaExceptionUtils;
 import org.wso2.carbon.identity.flow.mgt.Constants;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtFrameworkException;
@@ -73,7 +74,6 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.F
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_GET_GOVERNANCE_CONFIG;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_GET_LOCAL_AUTHENTICATORS;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_EXECUTOR;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Schema.IDP_NAME;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USERNAME_IDENTIFIER;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USER_IDENTIFIER;
 
@@ -204,15 +204,9 @@ public class Utils {
             return null;
         }
 
-        Executor executor = new Executor()
-                .name(executorDTO.getName());
-
-        if (executorDTO.getIdpName() != null) {
-            Map<String, String> meta = new java.util.HashMap<>();
-            meta.put(IDP_NAME, executorDTO.getIdpName());
-            executor.meta(meta);
-        }
-        return executor;
+        return new Executor()
+                .name(executorDTO.getName())
+                .meta(convertToMap(executorDTO.getMetadata()));
     }
 
     /**
@@ -288,8 +282,20 @@ public class Utils {
 
         ExecutorDTO executorDTO = new ExecutorDTO.Builder().name(executor.getName()).build();
         Map<String, Object> meta = convertToMap(executor.getMeta());
-        if (meta != null && !meta.isEmpty() && meta.containsKey(IDP_NAME)) {
-            executorDTO.setIdpName(String.valueOf(meta.get(IDP_NAME)));
+        if (meta != null && !meta.isEmpty()) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                meta.forEach(LambdaExceptionUtils.rethrowBiConsumer((name, value) -> {
+                    executorDTO.addMetadata(name, value instanceof String
+                            ? (String) value
+                            : objectMapper.writeValueAsString(value));
+                }));
+            } catch (Exception e) {
+                throw handleFlowMgtException(new FlowMgtClientException(
+                        FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_METADATA.getCode(),
+                        FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_METADATA.getMessage(),
+                        FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_METADATA.getDescription(), e));
+            }
         }
         return executorDTO;
     }
