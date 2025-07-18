@@ -90,6 +90,9 @@ public class WorkflowService {
     private final String END_DATE_KEY = "endDate";
     private final String DATE_CATEGORY_KEY = "datecategory";
     private final String STATUS_KEY = "status";
+    private final String FILTER_PATTERN_REGEX = "(\\w+)\\s+(eq|ge|le)\\s+['\"]?([^'\"\\s]+)['\"]?";
+    private final String AND_REGEX = "(?i)\\s+and\\s+";
+    private final String NO_QUOTE_REGEX = "^['\"]|['\"]$";
 
     public WorkflowService(WorkflowManagementService workflowManagementService) {
 
@@ -863,12 +866,12 @@ public class WorkflowService {
 
         // Split the filter string by "and" (case-insensitive) to get individual conditions in the form 
         // <field> <operator> <value>.
-        String[] conditions = decodedFilter.split("(?i)\\s+and\\s+");
+        String[] conditions = decodedFilter.split(AND_REGEX);
 
         // Regular expression to match the expected filter format: <field> <operator> <value>
         // E.g., "requestType eq MY_TASKS".
         Pattern pattern = Pattern.compile(
-                "(\\w+)\\s+(eq|ge|le)\\s+['\"]?([^'\"\\s]+)['\"]?",
+                FILTER_PATTERN_REGEX,
                 Pattern.CASE_INSENSITIVE);
         
         // Iterate through each condition and extract field, operator, and value.
@@ -882,7 +885,7 @@ public class WorkflowService {
                 String value = matcher.group(3);
 
                 // Remove surrounding quotes from the value if present.
-                value = value.replaceAll("^['\"]|['\"]$", "");
+                value = value.replaceAll(NO_QUOTE_REGEX, "");
 
                 switch (field) {
                     case "requesttype":
