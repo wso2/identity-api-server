@@ -2034,10 +2034,11 @@ public class ServerClaimManagementService {
      * @param existingLocalClaim the existing local claim.
      * @param incomingLocalClaim the incoming local claim with updated properties.
      */
-    private void validateLocalClaimProperties(LocalClaim existingLocalClaim, LocalClaim incomingLocalClaim) {
+    private void validateLocalClaimProperties(LocalClaim existingLocalClaim, LocalClaim incomingLocalClaim)
+            throws ClaimMetadataException {
 
         // Populate default properties on the existing claim.
-        populateDefaultProperties(existingLocalClaim);
+        populateDefaultProperties(existingLocalClaim, incomingLocalClaim);
 
         // Filter out allowed keys from both existing and incoming claim properties.
         Map<String, String> filteredExistingProperties = existingLocalClaim.getClaimProperties().entrySet().stream()
@@ -2073,7 +2074,8 @@ public class ServerClaimManagementService {
         }
     }
 
-    private void populateDefaultProperties(LocalClaim localClaim) {
+    private void populateDefaultProperties(LocalClaim localClaim, LocalClaim incomingLocalClaim)
+            throws ClaimMetadataException {
 
         localClaim.getClaimProperties().putIfAbsent(PROP_DISPLAY_ORDER, "0");
         localClaim.getClaimProperties().putIfAbsent(PROP_READ_ONLY, FALSE);
@@ -2082,6 +2084,19 @@ public class ServerClaimManagementService {
         localClaim.getClaimProperties().putIfAbsent(PROP_MULTI_VALUED, FALSE);
         localClaim.getClaimProperties().putIfAbsent(PROP_DATA_TYPE, DataType.STRING.toString()
                 .toLowerCase(Locale.ROOT));
+        // The input type of the boolean data type is defined as checkbox by default.
+        if (DataType.BOOLEAN.getValue().equals(incomingLocalClaim.getClaimProperties().get(PROP_DATA_TYPE))) {
+            InputFormatDTO inputFormat = new InputFormatDTO();
+            inputFormat.setInputType(INPUT_TYPE_CHECKBOX);
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                String inputFormatPayload = mapper.writeValueAsString(inputFormat);
+                localClaim.getClaimProperties().putIfAbsent(PROP_INPUT_FORMAT, inputFormatPayload);
+            } catch (JsonProcessingException e) {
+                throw new ClaimMetadataException(String.valueOf(Constant.ErrorMessage
+                        .ERROR_CODE_ERROR_SERIALIZING_INPUT_FORMAT), e);
+            }
+        }
     }
 
     private String handleAdditionalProperties(Map<String, String> claimProperties, String propertyName) {
