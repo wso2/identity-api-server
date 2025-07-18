@@ -177,15 +177,17 @@ public class ServerActionManagementService {
             List<ActionTypesResponseItem> actionTypesResponseItems = new ArrayList<>();
             for (Action.ActionTypes actionType : Action.ActionTypes.filterByCategory(
                     Action.ActionTypes.Category.PRE_POST)) {
-
-                if (!NOT_IMPLEMENTED_ACTION_TYPES.contains(actionType.getPathParam())) {
-                    actionTypesResponseItems.add(new ActionTypesResponseItem()
-                            .type(ActionType.valueOf(actionType.getActionType()))
-                            .displayName(actionType.getDisplayName())
-                            .description(actionType.getDescription())
-                            .count(actionsCountPerType.getOrDefault(actionType.getActionType(), 0))
-                            .self(ActionMgtEndpointUtil.buildURIForActionType(actionType.getActionType())));
+                if (NOT_IMPLEMENTED_ACTION_TYPES.contains(actionType.getPathParam()) || (isOrganization() &&
+                        NOT_ALLOWED_ACTION_TYPES_IN_ORG_LEVEL.contains(actionType.getPathParam()))) {
+                    continue;
                 }
+
+                actionTypesResponseItems.add(new ActionTypesResponseItem()
+                        .type(ActionType.valueOf(actionType.getActionType()))
+                        .displayName(actionType.getDisplayName())
+                        .description(actionType.getDescription())
+                        .count(actionsCountPerType.getOrDefault(actionType.getActionType(), 0))
+                        .self(ActionMgtEndpointUtil.buildURIForActionType(actionType.getActionType())));
             }
 
             return actionTypesResponseItems;
@@ -260,7 +262,7 @@ public class ServerActionManagementService {
             throw ActionMgtEndpointUtil.handleException(Response.Status.NOT_IMPLEMENTED,
                     ERROR_NOT_IMPLEMENTED_ACTION_TYPE);
         }
-        if ((isOrganization() && NOT_ALLOWED_ACTION_TYPES_IN_ORG_LEVEL.contains(actionTypeEnum.getPathParam()))) {
+        if (isOrganization() && NOT_ALLOWED_ACTION_TYPES_IN_ORG_LEVEL.contains(actionTypeEnum.getPathParam())) {
                 throw ActionMgtEndpointUtil.handleException(Response.Status.FORBIDDEN,
                         ERROR_NOT_ALLOWED_ACTION_TYPE_IN_ORG_LEVEL, actionTypeEnum.getActionType());
         }
