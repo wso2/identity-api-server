@@ -196,7 +196,13 @@ public class Constants {
                 "Server encountered an error while retrieving the Impersonation configuration of %s."),
         ERROR_CODE_IMP_CONFIG_UPDATE("65019",
                 "Unable to update Impersonation configuration.",
-                "Server encountered an error while updating the Impersonation configuration of %s.");
+                "Server encountered an error while updating the Impersonation configuration of %s."),
+        ERROR_CODE_ERROR_SAML_INBOUND_AUTH_CONFIG_DELETE("65020",
+                "Unable to delete SAML inbound auth configs.",
+                "Server encountered an error while deleting the SAML inbound auth configs."),
+        ERROR_CODE_ERROR_PASSIVE_STS_INBOUND_AUTH_CONFIG_DELETE("65021",
+                "Unable to delete Passive STS inbound auth configs.",
+                "Server encountered an error while deleting the Passive STS inbound auth configs.");
 
         private final String code;
         private final String message;

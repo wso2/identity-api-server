@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2022-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -52,6 +52,7 @@ import javax.ws.rs.core.Response;
 import static org.wso2.carbon.identity.api.server.input.validation.common.util.Utils.getCorrelation;
 import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_VALIDATION_CONFIG;
 import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_VALIDATORS;
+import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.ErrorMessage.ERROR_CODE_ERROR_REVERTING_VALIDATION_CONFIG;
 import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_VALIDATION_CONFIG;
 import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.ErrorMessage.ERROR_CODE_FIELD_NOT_EXISTS;
 import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.ErrorMessage.ERROR_CODE_INPUT_VALIDATION_NOT_EXISTS;
@@ -152,6 +153,25 @@ public class ValidationRulesManagementApiService {
             return buildResponse(configurations);
         } catch (InputValidationMgtException e) {
             throw handleInputValidationMgtException(e, ERROR_CODE_ERROR_UPDATING_VALIDATION_CONFIG, tenantDomain);
+        }
+    }
+
+    /**
+     * Method to revert input validation configuration for given fields.
+     *
+     * @param fields        List of fields to revert validation configurations.
+     * @param tenantDomain  Tenant domain name.
+     */
+    public void revertInputValidationConfigurationForFields(List<String> fields, String tenantDomain) {
+
+        try {
+            for (String field : fields) {
+                isFieldSupported(field);
+            }
+
+            inputValidationManagementService.revertInputValidationConfiguration(fields, tenantDomain);
+        } catch (InputValidationMgtException e) {
+            throw handleInputValidationMgtException(e, ERROR_CODE_ERROR_REVERTING_VALIDATION_CONFIG, tenantDomain);
         }
     }
 

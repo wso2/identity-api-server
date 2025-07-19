@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -26,6 +26,7 @@ import java.util.List;
 import org.wso2.carbon.identity.api.server.input.validation.v1.factories.ValidationRulesApiServiceFactory;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.Error;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.RevertFields;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidationConfigModel;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidationConfigModelForField;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidatorModel;
@@ -102,6 +103,25 @@ public class ValidationRulesApi  {
     public Response getValidators() {
 
         return delegate.getValidators();
+    }
+
+    @Valid
+    @POST
+    @Path("/revert")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "", notes = "Revert validation rules of given fields to the default configuration.", response = Void.class, tags={ "Revert Validation Rules", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK.", response = Void.class),
+        @ApiResponse(code = 400, message = "Invalid Input Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Resource Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Field not found", response = Void.class),
+        @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
+    })
+    public Response revertValidationRulesForFields(@ApiParam(value = "Represents the fields to revert." ,required=true) @Valid RevertFields revertFields) {
+
+        return delegate.revertValidationRulesForFields(revertFields );
     }
 
     @Valid

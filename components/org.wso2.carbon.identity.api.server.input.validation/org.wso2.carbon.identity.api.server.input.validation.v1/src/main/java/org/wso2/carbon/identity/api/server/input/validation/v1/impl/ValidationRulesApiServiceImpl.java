@@ -21,6 +21,7 @@ package org.wso2.carbon.identity.api.server.input.validation.v1.impl;
 import org.wso2.carbon.identity.api.server.input.validation.v1.ValidationRulesApiService;
 import org.wso2.carbon.identity.api.server.input.validation.v1.core.ValidationRulesManagementApiService;
 import org.wso2.carbon.identity.api.server.input.validation.v1.factories.ValidationRulesManagementApiServiceFactory;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.RevertFields;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidationConfigModel;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidationConfigModelForField;
 
@@ -82,6 +83,21 @@ public class ValidationRulesApiServiceImpl implements ValidationRulesApiService 
         String tenantDomain = getTenantDomainFromContext();
         return Response.ok().entity(validationRulesManagementApiService
                 .updateInputValidationConfiguration(validationConfigModels, tenantDomain)).build();
+    }
+
+    /**
+     * Method to revert validation rules for fields.
+     *
+     * @param revertFields   List of fields that validation rules need to be reverted.
+     * @return  Response indicating the success or failure of the operation.
+     */
+    @Override
+    public Response revertValidationRulesForFields(RevertFields revertFields) {
+
+        String tenantDomain = getTenantDomainFromContext();
+        validationRulesManagementApiService.revertInputValidationConfigurationForFields(revertFields.getFields(),
+                tenantDomain);
+        return Response.ok().build();
     }
 
     /**
