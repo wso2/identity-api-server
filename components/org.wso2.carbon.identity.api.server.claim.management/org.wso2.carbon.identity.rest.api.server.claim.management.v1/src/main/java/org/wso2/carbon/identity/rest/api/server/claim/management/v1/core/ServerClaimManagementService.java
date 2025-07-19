@@ -2080,8 +2080,7 @@ public class ServerClaimManagementService {
         localClaim.getClaimProperties().putIfAbsent(PROP_REQUIRED, FALSE);
         localClaim.getClaimProperties().putIfAbsent(PROP_SUPPORTED_BY_DEFAULT, FALSE);
         localClaim.getClaimProperties().putIfAbsent(PROP_MULTI_VALUED, FALSE);
-        localClaim.getClaimProperties().putIfAbsent(PROP_DATA_TYPE, DataType.STRING.toString()
-                .toLowerCase(Locale.ROOT));
+        localClaim.getClaimProperties().putIfAbsent(PROP_DATA_TYPE, DataType.STRING.getValue());
         // The input type of the boolean data type is defined as checkbox by default.
         if (DataType.BOOLEAN.getValue().equals(incomingLocalClaim.getClaimProperties().get(PROP_DATA_TYPE))) {
             InputFormatDTO inputFormat = new InputFormatDTO();
