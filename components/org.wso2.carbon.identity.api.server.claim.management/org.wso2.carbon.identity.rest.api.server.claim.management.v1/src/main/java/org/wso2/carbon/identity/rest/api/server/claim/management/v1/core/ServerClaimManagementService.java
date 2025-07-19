@@ -205,6 +205,8 @@ public class ServerClaimManagementService {
     private final ClaimMetadataManagementService claimMetadataManagementService;
     private final OrganizationManager organizationManager;
 
+    private static final ObjectMapper mapper = new ObjectMapper();
+
     public ServerClaimManagementService(ClaimMetadataManagementService claimMetadataManagementService,
                                         OrganizationManager organizationManager) {
 
@@ -1108,7 +1110,6 @@ public class ServerClaimManagementService {
 
         String inputFormat = handleAdditionalProperties(claimProperties, PROP_INPUT_FORMAT);
         if (StringUtils.isNotEmpty(inputFormat)) {
-            ObjectMapper mapper = new ObjectMapper();
             try {
                 InputFormatDTO inputFormatDTO = mapper.readValue(inputFormat, InputFormatDTO.class);
                 localClaimResDTO.setInputFormat(inputFormatDTO);
@@ -1123,7 +1124,6 @@ public class ServerClaimManagementService {
 
         String canonicalValues = handleAdditionalProperties(claimProperties, PROP_CANONICAL_VALUES);
         if (StringUtils.isNotEmpty(canonicalValues)) {
-            ObjectMapper mapper = new ObjectMapper();
             try {
                 List<LabelValueDTO> list = mapper.readValue(canonicalValues, mapper.getTypeFactory()
                                 .constructCollectionType(List.class, LabelValueDTO.class));
@@ -1299,7 +1299,6 @@ public class ServerClaimManagementService {
 
         if (ArrayUtils.isNotEmpty(localClaimReqDTO.getCanonicalValues())) {
             try {
-                ObjectMapper mapper = new ObjectMapper();
                 String jsonString = mapper.writeValueAsString(localClaimReqDTO.getCanonicalValues());
                 claimProperties.put(PROP_CANONICAL_VALUES, jsonString);
             } catch (JsonProcessingException e) {
@@ -1309,7 +1308,6 @@ public class ServerClaimManagementService {
 
         if (localClaimReqDTO.getInputFormat() != null) {
             try {
-                ObjectMapper mapper = new ObjectMapper();
                 String jsonString = mapper.writeValueAsString(localClaimReqDTO.getInputFormat());
                 claimProperties.put(PROP_INPUT_FORMAT, jsonString);
             } catch (JsonProcessingException e) {
@@ -1470,7 +1468,7 @@ public class ServerClaimManagementService {
     private ClaimDialectConfiguration parseClaimDialectFromJson(FileContent fileContent) throws ClaimMetadataException {
 
         try {
-            return new ObjectMapper().readValue(fileContent.getContent(), ClaimDialectConfiguration.class);
+            return mapper.readValue(fileContent.getContent(), ClaimDialectConfiguration.class);
         } catch (JsonProcessingException e) {
             throw new ClaimMetadataException(String.format(
                       Constant.ErrorMessage.ERROR_CODE_ERROR_READING_FILE_CONTENT.toString(), MEDIA_TYPE_JSON), e);
@@ -2088,7 +2086,6 @@ public class ServerClaimManagementService {
         if (DataType.BOOLEAN.getValue().equals(incomingLocalClaim.getClaimProperties().get(PROP_DATA_TYPE))) {
             InputFormatDTO inputFormat = new InputFormatDTO();
             inputFormat.setInputType(INPUT_TYPE_CHECKBOX);
-            ObjectMapper mapper = new ObjectMapper();
             try {
                 String inputFormatPayload = mapper.writeValueAsString(inputFormat);
                 localClaim.getClaimProperties().putIfAbsent(PROP_INPUT_FORMAT, inputFormatPayload);
