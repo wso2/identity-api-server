@@ -37,4 +37,11 @@ public class ApplicationManagementEndpointConstants {
     public static final String ROLE_DISPLAY_NAME_KEY = "displayName";
     public static final String ROLE_AUDIENCE_DISPLAY_KEY = "display";
     public static final String ROLE_AUDIENCE_TYPE_KEY = "type";
+
+    public static final String APPLICATION_SHARE_TRIGGER_SUCCESS =
+            "Application sharing process triggered successfully.";
+    public static final String APPLICATION_SHARE_UPDATE_TRIGGER_SUCCESS
+            = "Application sharing update process triggered successfully.";
+    public static final String APPLICATION_UNSHARE_TRIGGER_SUCCESS
+            = "Application unsharing process triggered successfully.";
 }

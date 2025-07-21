@@ -2960,7 +2960,7 @@ components:
         Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations.
       schema:
         type: string
-      example: identifier+eq+greetings
+      example: id+eq+088fb49c-46fa-48c1-a0a8-5538ee4b7ec5
     sharedOrganizationsLimit:
       name: limit
       in: query
@@ -4644,7 +4644,7 @@ components:
           example: '682edf68-4835-4bb8-961f-0a16bc6cc866'
     SharingMode:
       type: object
-      required: [ policy, roleSharing ]
+      required: [ roleSharing ]
       properties:
         policy:
           type: string
