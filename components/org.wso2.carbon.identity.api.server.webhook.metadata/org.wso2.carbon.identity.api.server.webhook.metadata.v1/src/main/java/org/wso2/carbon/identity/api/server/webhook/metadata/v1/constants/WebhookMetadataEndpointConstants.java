@@ -29,4 +29,46 @@ public class WebhookMetadataEndpointConstants {
     private WebhookMetadataEndpointConstants() {
 
     }
+
+    /**
+     * Enum for error messages.
+     */
+    public enum ErrorMessage {
+
+        // Client errors.
+        ERROR_CODE_PROFILE_NOT_FOUND("WEBHOOKMETA-61001", "Profile not found",
+                "The requested event profile %s could not be found.");
+
+        private final String code;
+        private final String message;
+        private final String description;
+
+        ErrorMessage(String code, String message, String description) {
+
+            this.code = code;
+            this.message = message;
+            this.description = description;
+        }
+
+        public String getCode() {
+
+            return code;
+        }
+
+        public String getMessage() {
+
+            return message;
+        }
+
+        public String getDescription() {
+
+            return description;
+        }
+
+        @Override
+        public String toString() {
+
+            return code + " | " + message;
+        }
+    }
 }

@@ -72,6 +72,8 @@ public enum StatusEnum {
 }
 
     private StatusEnum status;
+    private String version;
+    private Boolean hasChildren;
     private String ref;
     private List<Attribute> attributes = null;
 
@@ -158,13 +160,51 @@ public enum StatusEnum {
 
     /**
     **/
+    public BasicOrganizationResponse version(String version) {
+
+        this.version = version;
+        return this;
+    }
+
+    @ApiModelProperty(example = "V1.0.0", required = true, value = "")
+    @JsonProperty("version")
+    @Valid
+    @NotNull(message = "Property version cannot be null.")
+
+    public String getVersion() {
+        return version;
+    }
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    /**
+    **/
+    public BasicOrganizationResponse hasChildren(Boolean hasChildren) {
+
+        this.hasChildren = hasChildren;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "true", value = "")
+    @JsonProperty("hasChildren")
+    @Valid
+    public Boolean getHasChildren() {
+        return hasChildren;
+    }
+    public void setHasChildren(Boolean hasChildren) {
+        this.hasChildren = hasChildren;
+    }
+
+    /**
+    **/
     public BasicOrganizationResponse ref(String ref) {
 
         this.ref = ref;
         return this;
     }
     
-    @ApiModelProperty(example = "o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations/b4526d91-a8bf-43d2-8b14-c548cf73065b", required = true, value = "")
+    @ApiModelProperty(example = "/api/server/v1/organizations/b4526d91-a8bf-43d2-8b14-c548cf73065b", required = true, value = "")
     @JsonProperty("ref")
     @Valid
     @NotNull(message = "Property ref cannot be null.")
@@ -218,13 +258,15 @@ public enum StatusEnum {
             Objects.equals(this.name, basicOrganizationResponse.name) &&
             Objects.equals(this.orgHandle, basicOrganizationResponse.orgHandle) &&
             Objects.equals(this.status, basicOrganizationResponse.status) &&
+            Objects.equals(this.version, basicOrganizationResponse.version) &&
+            Objects.equals(this.hasChildren, basicOrganizationResponse.hasChildren) &&
             Objects.equals(this.ref, basicOrganizationResponse.ref) &&
             Objects.equals(this.attributes, basicOrganizationResponse.attributes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, orgHandle, status, ref, attributes);
+        return Objects.hash(id, name, orgHandle, status, version, hasChildren, ref, attributes);
     }
 
     @Override
@@ -237,6 +279,8 @@ public enum StatusEnum {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    orgHandle: ").append(toIndentedString(orgHandle)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
+        sb.append("    version: ").append(toIndentedString(version)).append("\n");
+        sb.append("    hasChildren: ").append(toIndentedString(hasChildren)).append("\n");
         sb.append("    ref: ").append(toIndentedString(ref)).append("\n");
         sb.append("    attributes: ").append(toIndentedString(attributes)).append("\n");
         sb.append("}");

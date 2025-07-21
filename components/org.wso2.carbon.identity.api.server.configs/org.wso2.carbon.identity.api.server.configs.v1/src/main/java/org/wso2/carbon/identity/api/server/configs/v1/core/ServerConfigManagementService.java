@@ -32,6 +32,7 @@ import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.api.server.configs.common.ConfigsServiceHolder;
 import org.wso2.carbon.identity.api.server.configs.common.Constants;
 import org.wso2.carbon.identity.api.server.configs.common.SchemaConfigParser;
 import org.wso2.carbon.identity.api.server.configs.v1.exception.JWTClientAuthenticatorException;
@@ -100,6 +101,7 @@ import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
 import org.wso2.carbon.idp.mgt.IdpManager;
+import org.wso2.carbon.logging.service.LoggingConstants;
 import org.wso2.carbon.logging.service.RemoteLoggingConfigService;
 import org.wso2.carbon.logging.service.data.RemoteServerLoggerData;
 import org.wso2.carbon.user.api.UserRealm;
@@ -115,6 +117,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -684,8 +687,27 @@ public class ServerConfigManagementService {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         validateTenantDomain(tenantDomain, "Resetting remote server configuration service is not available for %s");
+        boolean includeSecrets = !Boolean.parseBoolean(ConfigsServiceHolder.getServerConfigurationService()
+                .getFirstProperty(LoggingConstants.REMOTE_LOGGING_HIDE_SECRETS));
 
-        RemoteServerLoggerData remoteServerLoggerData = getRemoteServerLoggerData(remoteLoggingConfig);
+        RemoteServerLoggerData remoteServerLoggerData;
+        if (includeSecrets) {
+            remoteServerLoggerData = getRemoteServerLoggerData(remoteLoggingConfig);
+        } else {
+            // If the secrets are not included, fetch the existing configuration from the database.
+            try {
+                remoteServerLoggerData = ConfigsServiceHolder.getRemoteLoggingConfigService()
+                        .getRemoteServerConfig(logType.toUpperCase(Locale.ENGLISH), true);
+                if (remoteServerLoggerData == null) {
+                    remoteServerLoggerData = new RemoteServerLoggerData();
+                }
+                patchRemoteServerLoggerData(remoteServerLoggerData, remoteLoggingConfig);
+            } catch (ConfigurationException e) {
+                log.error("Error while updating remote server configuration.", e);
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
+                        .ERROR_CODE_ERROR_UPDATING_REMOTE_LOGGING_CONFIGS, null);
+            }
+        }
         validateLogType(logType);
         // Backend logic only supports logType in Uppercase.
         remoteServerLoggerData.setLogType(logType.toUpperCase(Locale.ENGLISH));
@@ -696,6 +718,26 @@ public class ServerConfigManagementService {
             log.error("Error while updating remote server configuration.", e);
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
                     .ERROR_CODE_ERROR_UPDATING_REMOTE_LOGGING_CONFIGS, null);
+        }
+    }
+
+    private void patchRemoteServerLoggerData(RemoteServerLoggerData remoteServerLoggerData,
+                                             RemoteLoggingConfig remoteLoggingConfig) {
+
+        remoteServerLoggerData.setUrl(remoteLoggingConfig.getRemoteUrl());
+        remoteServerLoggerData.setConnectTimeoutMillis(remoteLoggingConfig.getConnectTimeoutMillis());
+        remoteServerLoggerData.setVerifyHostname(remoteLoggingConfig.getVerifyHostname());
+        setIfNotNull(remoteServerLoggerData::setUsername, remoteLoggingConfig.getUsername());
+        setIfNotNull(remoteServerLoggerData::setPassword, remoteLoggingConfig.getPassword());
+        setIfNotNull(remoteServerLoggerData::setKeystoreLocation, remoteLoggingConfig.getKeystoreLocation());
+        setIfNotNull(remoteServerLoggerData::setKeystorePassword, remoteLoggingConfig.getKeystorePassword());
+        setIfNotNull(remoteServerLoggerData::setTruststoreLocation, remoteLoggingConfig.getTruststoreLocation());
+        setIfNotNull(remoteServerLoggerData::setTruststorePassword, remoteLoggingConfig.getTruststorePassword());
+    }
+
+    private <T> void setIfNotNull(Consumer<T> setter, T value) {
+        if (value != null) {
+            setter.accept(value);
         }
     }
 
@@ -1479,9 +1521,12 @@ public class ServerConfigManagementService {
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         validateTenantDomain(tenantDomain, "Getting remote server configuration service is not available for %s");
         validateLogType(logType);
+        boolean includeSecrets = !Boolean.parseBoolean(ConfigsServiceHolder.getServerConfigurationService()
+                .getFirstProperty(LoggingConstants.REMOTE_LOGGING_HIDE_SECRETS));
         try {
             // Backend logic only supports logType in Uppercase.
-            return remoteLoggingConfigService.getRemoteServerConfig(logType.toUpperCase(Locale.ENGLISH));
+            return remoteLoggingConfigService.getRemoteServerConfig(logType.toUpperCase(Locale.ENGLISH),
+                    includeSecrets);
         } catch (ConfigurationException e) {
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     Constants.ErrorMessage.ERROR_CODE_ERROR_GETTING_REMOTE_LOGGING_CONFIGS, null);
@@ -1492,8 +1537,10 @@ public class ServerConfigManagementService {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         validateTenantDomain(tenantDomain, "Listing remote server configuration service is not available for %s");
+        boolean includeSecrets = !Boolean.parseBoolean(ConfigsServiceHolder.getServerConfigurationService()
+                .getFirstProperty(LoggingConstants.REMOTE_LOGGING_HIDE_SECRETS));
         try {
-            return remoteLoggingConfigService.getRemoteServerConfigs();
+            return remoteLoggingConfigService.getRemoteServerConfigs(includeSecrets);
         } catch (ConfigurationException e) {
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     Constants.ErrorMessage.ERROR_CODE_ERROR_GETTING_REMOTE_LOGGING_CONFIGS, null);

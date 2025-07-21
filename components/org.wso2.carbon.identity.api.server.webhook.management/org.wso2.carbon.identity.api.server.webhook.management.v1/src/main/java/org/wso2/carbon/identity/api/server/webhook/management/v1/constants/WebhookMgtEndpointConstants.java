@@ -35,7 +35,7 @@ public class WebhookMgtEndpointConstants {
     public enum ErrorMessage {
 
         // Client errors.
-        ERROR_NO_WEBHOOK_FOUND_ON_GIVEN_ID("60010",
+        ERROR_NO_WEBHOOK_FOUND_ON_GIVEN_ID("WEBHOOKMGT-60010",
                 "Webhook is not found.",
                 "No webhook is found for given webhook id: %s");
 

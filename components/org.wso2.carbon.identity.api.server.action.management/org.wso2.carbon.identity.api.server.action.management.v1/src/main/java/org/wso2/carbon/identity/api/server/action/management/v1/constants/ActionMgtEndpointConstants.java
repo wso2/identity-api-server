@@ -51,6 +51,8 @@ public class ActionMgtEndpointConstants {
         ERROR_INVALID_RULE("60013", "Invalid rule.", "%s"),
         ERROR_INVALID_PAYLOAD("60014", "Invalid Request body.",
                 "Provided request body content is not in the expected format."),
+        ERROR_NOT_ALLOWED_ACTION_TYPE_IN_ORG_LEVEL("60015", "Action type is not allowed.",
+                "The requested action type: %s is not allowed at the organization level."),
 
         // Server errors.
         ERROR_NOT_IMPLEMENTED_ACTION_TYPE("650015",

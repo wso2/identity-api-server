@@ -19,15 +19,31 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1.core;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.api.server.flow.management.v1.BaseFlowMetaResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfig;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfigPatchModel;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRequest;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.Step;
+import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.AbstractMetaResponseHandler;
+import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.AskPasswordFlowMetaHandler;
+import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.PasswordRecoveryFlowMetaHandler;
+import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.RegistrationFlowMetaHandler;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
+import org.wso2.carbon.identity.flow.mgt.Constants;
 import org.wso2.carbon.identity.flow.mgt.FlowMgtService;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtFrameworkException;
+import org.wso2.carbon.identity.flow.mgt.model.FlowConfigDTO;
 import org.wso2.carbon.identity.flow.mgt.model.FlowDTO;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FlowType.validateFlowType;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils.collectFlowData;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils.validateExecutors;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils.validateIdentifiers;
 
 /**
  * Service class for flow management.
@@ -50,7 +66,7 @@ public class ServerFlowMgtService {
 
         FlowDTO flowDTO;
         try {
-            validateFlowType(flowType);
+            Utils.validateFlowType(flowType);
             flowDTO = flowMgtService
                     .getFlow(flowType, PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
             FlowResponse flowResponse = new FlowResponse();
@@ -66,6 +82,19 @@ public class ServerFlowMgtService {
     }
 
     /**
+     * Retrieve flow metadata based on the flow type.
+     *
+     * @param flowType Type of the flow.
+     * @return BaseFlowMetaResponse containing metadata.
+     */
+    public BaseFlowMetaResponse getFlowMeta(String flowType) {
+
+        Utils.validateFlowType(flowType);
+        AbstractMetaResponseHandler metaResponseHandler = resolveHandler(flowType);
+        return metaResponseHandler.createResponse();
+    }
+
+    /**
      * Update the flow.
      *
      * @param flowRequest FlowRequest.
@@ -73,7 +102,8 @@ public class ServerFlowMgtService {
     public void updateFlow(FlowRequest flowRequest) {
 
         try {
-            validateFlowType(flowRequest.getFlowType());
+            Utils.validateFlowType(flowRequest.getFlowType());
+            validateFlow(flowRequest.getFlowType(), flowRequest.getSteps());
             FlowDTO flowDTO = new FlowDTO();
             flowDTO.setSteps(flowRequest.getSteps().stream().map(Utils::convertToStepDTO)
                     .collect(Collectors.toList()));
@@ -82,6 +112,110 @@ public class ServerFlowMgtService {
                     PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
         } catch (FlowMgtFrameworkException e) {
             throw Utils.handleFlowMgtException(e);
+        }
+    }
+
+    /**
+     * Retrieve the flow configurations.
+     *
+     * @return List of FlowConfig.
+     */
+    public List<FlowConfig> getFlowConfigs() {
+
+        try {
+            List<FlowConfigDTO> flowMgtConfigs = flowMgtService.getFlowConfigs(
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
+            return flowMgtConfigs.stream()
+                    .map(Utils::convertToFlowConfig)
+                    .collect(Collectors.toList());
+        } catch (FlowMgtFrameworkException e) {
+            throw Utils.handleFlowMgtException(e);
+        }
+    }
+
+    /**
+     * Retrieve the flow configuration for a specific flow type.
+     *
+     * @param flowType Type of the flow.
+     * @return FlowConfig for the specified flow type.
+     */
+    public FlowConfig getFlowConfigForFlow(String flowType) {
+
+        try {
+            Utils.validateFlowType(flowType);
+            FlowConfigDTO flowConfig = flowMgtService.getFlowConfig(flowType,
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
+            return Utils.convertToFlowConfig(flowConfig);
+        } catch (FlowMgtFrameworkException e) {
+            throw Utils.handleFlowMgtException(e);
+        }
+    }
+
+    /**
+     * Update the flow configuration for a specific flow type.
+     *
+     * @param flowConfigPatchModel FlowConfigPatchModel containing the updated configuration.
+     */
+    public FlowConfig updateFlowConfig(FlowConfigPatchModel flowConfigPatchModel) {
+
+        try {
+            Utils.validateFlowType(flowConfigPatchModel.getFlowType());
+            FlowConfigDTO existingFlowConfig = flowMgtService.getFlowConfig(
+                    flowConfigPatchModel.getFlowType(),
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
+            // If the patch model does not contain values for isEnabled or isAutoLoginEnabled,
+            // retain the existing values from the flow configuration.
+            if (existingFlowConfig != null) {
+                if (flowConfigPatchModel.getIsEnabled() == null) {
+                    flowConfigPatchModel.setIsEnabled(existingFlowConfig.getIsEnabled());
+                }
+                if (flowConfigPatchModel.getIsAutoLoginEnabled() == null) {
+                    flowConfigPatchModel.setIsAutoLoginEnabled(existingFlowConfig.getIsAutoLoginEnabled());
+                }
+            }
+            FlowConfigDTO updatedFlowConfig =
+                    flowMgtService.updateFlowConfig(Utils.convertToFlowConfigDTO(flowConfigPatchModel),
+                            PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
+            return Utils.convertToFlowConfig(updatedFlowConfig);
+        } catch (FlowMgtFrameworkException e) {
+            throw Utils.handleFlowMgtException(e);
+        }
+    }
+
+    /**
+     * Validate the flow type and steps.
+     *
+     * @param flowType  Type of the flow.
+     * @param flowSteps List of steps in the flow.
+     */
+    private void validateFlow(String flowType, List<Step> flowSteps) {
+
+        AbstractMetaResponseHandler metaResponseHandler = resolveHandler(flowType);
+        Set<String> flowExecutorNames = new HashSet<>();
+        Set<String> flowFieldIdentifiers = new HashSet<>();
+        Set<String> flowComponentIds = new HashSet<>();
+        collectFlowData(flowSteps, flowExecutorNames, flowFieldIdentifiers, flowComponentIds);
+        validateExecutors(metaResponseHandler, flowExecutorNames);
+        validateIdentifiers(metaResponseHandler, flowFieldIdentifiers);
+    }
+
+    /**
+     * Resolve the appropriate handler based on the flow type.
+     *
+     * @param flowType Type of the flow.
+     * @return An instance of AbstractMetaResponseHandler.
+     */
+    private AbstractMetaResponseHandler resolveHandler(String flowType) {
+
+        switch (Constants.FlowTypes.valueOf(flowType)) {
+            case REGISTRATION:
+                return new RegistrationFlowMetaHandler();
+            case PASSWORD_RECOVERY:
+                return new PasswordRecoveryFlowMetaHandler();
+            case INVITED_USER_REGISTRATION:
+                return new AskPasswordFlowMetaHandler();
+            default:
+                throw new IllegalStateException("Unhandled flow type: " + flowType);
         }
     }
 }

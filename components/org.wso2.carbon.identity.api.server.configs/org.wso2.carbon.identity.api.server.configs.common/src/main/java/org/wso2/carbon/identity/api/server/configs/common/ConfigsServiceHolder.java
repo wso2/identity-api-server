@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.configs.common;
 
+import org.wso2.carbon.base.api.ServerConfigurationService;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
@@ -76,6 +77,13 @@ public class ConfigsServiceHolder {
         static final JWTClientAuthenticatorMgtService SERVICE =
                 (JWTClientAuthenticatorMgtService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                         .getOSGiService(JWTClientAuthenticatorMgtService.class, null);
+    }
+
+    private static class ServerConfigurationServiceHolder {
+
+        static final ServerConfigurationService SERVICE =
+                (ServerConfigurationService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(ServerConfigurationService.class, null);
     }
 
     /**
@@ -146,5 +154,15 @@ public class ConfigsServiceHolder {
     public static JWTClientAuthenticatorMgtService getJWTClientAuthenticatorMgtService() {
 
         return JWTClientAuthenticatorMgtServiceHolder.SERVICE;
+    }
+
+    /**
+     * Get ServerConfigurationService osgi service.
+     *
+     * @return ServerConfigurationService
+     */
+    public static ServerConfigurationService getServerConfigurationService() {
+
+        return ServerConfigurationServiceHolder.SERVICE;
     }
 }

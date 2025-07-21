@@ -16,15 +16,12 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.api.server.webhook.metadata.v1.model;
+package org.wso2.carbon.identity.api.server.organization.management.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
-import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.EventProfileMetadata;
 import javax.validation.constraints.*;
 
 
@@ -33,38 +30,67 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class EventProfileList  {
+public class GetOrganizationResponseAncestorPath  {
   
-    private List<EventProfileMetadata> profiles = null;
-
+    private String id;
+    private String name;
+    private Integer depth;
 
     /**
     **/
-    public EventProfileList profiles(List<EventProfileMetadata> profiles) {
+    public GetOrganizationResponseAncestorPath id(String id) {
 
-        this.profiles = profiles;
+        this.id = id;
         return this;
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("profiles")
+    @JsonProperty("id")
     @Valid
-    public List<EventProfileMetadata> getProfiles() {
-        return profiles;
+    public String getId() {
+        return id;
     }
-    public void setProfiles(List<EventProfileMetadata> profiles) {
-        this.profiles = profiles;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public EventProfileList addProfilesItem(EventProfileMetadata profilesItem) {
-        if (this.profiles == null) {
-            this.profiles = new ArrayList<EventProfileMetadata>();
-        }
-        this.profiles.add(profilesItem);
+    /**
+    **/
+    public GetOrganizationResponseAncestorPath name(String name) {
+
+        this.name = name;
         return this;
     }
-
     
+    @ApiModelProperty(value = "")
+    @JsonProperty("name")
+    @Valid
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+    **/
+    public GetOrganizationResponseAncestorPath depth(Integer depth) {
+
+        this.depth = depth;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("depth")
+    @Valid
+    public Integer getDepth() {
+        return depth;
+    }
+    public void setDepth(Integer depth) {
+        this.depth = depth;
+    }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -75,22 +101,26 @@ public class EventProfileList  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        EventProfileList eventProfileList = (EventProfileList) o;
-        return Objects.equals(this.profiles, eventProfileList.profiles);
+        GetOrganizationResponseAncestorPath getOrganizationResponseAncestorPath = (GetOrganizationResponseAncestorPath) o;
+        return Objects.equals(this.id, getOrganizationResponseAncestorPath.id) &&
+            Objects.equals(this.name, getOrganizationResponseAncestorPath.name) &&
+            Objects.equals(this.depth, getOrganizationResponseAncestorPath.depth);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(profiles);
+        return Objects.hash(id, name, depth);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class EventProfileList {\n");
+        sb.append("class GetOrganizationResponseAncestorPath {\n");
         
-        sb.append("    profiles: ").append(toIndentedString(profiles)).append("\n");
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    depth: ").append(toIndentedString(depth)).append("\n");
         sb.append("}");
         return sb.toString();
     }

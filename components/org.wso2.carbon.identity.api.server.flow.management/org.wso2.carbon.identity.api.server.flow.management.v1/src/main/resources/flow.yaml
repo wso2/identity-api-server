@@ -120,6 +120,167 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /flow/meta:
+    get:
+      summary: Retrieve metadata related to a flow type
+      operationId: getFlowMeta
+      tags:
+        - Flow Composer
+      parameters:
+        - in: query
+          name: flowType
+          required: true
+          schema:
+            type: string
+            enum: [SELF_REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
+          description: Type of the flow to get metadata for
+      responses:
+        '200':
+          description: Successfully retrieved flow metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseFlowMetaResponse'
+        '400':
+          description: Invalid flow type specified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Metadata for specified flow type not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /flow/configs:
+    get:
+      summary: Retrieve flow management configuration
+      operationId: getFlowConfigs
+      tags:
+        - Flow Configuration
+      responses:
+        '200':
+          description: Successfully retrieved flow configurations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FlowConfig'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /flow/config:
+    get:
+      summary: Retrieve metadata related to a flow type
+      operationId: getFlowConfigForFlow
+      tags:
+        - Flow Configuration
+      parameters:
+        - in: query
+          name: flowType
+          required: true
+          schema:
+            type: string
+            enum: [SELF_REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
+          description: Type of the flow to get configurations for
+      responses:
+        '200':
+          description: Successfully retrieved flow configurations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlowConfig'
+        '400':
+          description: Invalid flow type specified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      summary: Update the flow configuration
+      operationId: updateFlowConfig
+      tags:
+        - Flow Configuration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowConfigPatchModel'
+      responses:
+        '200':
+          description: Flow successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlowConfig'
+        '400':
+          description: Invalid request body or unsupported flow type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Flow type not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Encountered a server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
     FlowRequest:
@@ -146,6 +307,115 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Step'
+
+    BaseConnectorConfigs:
+      type: object
+      properties:
+        multiAttributeLoginEnabled:
+          type: boolean
+          example: false
+
+    SelfRegistrationConnectorConfigs:
+      allOf:
+        - $ref: '#/components/schemas/BaseConnectorConfigs'
+        - type: object
+          properties:
+            selfRegistrationEnabled:
+              type: boolean
+              example: false
+
+    PasswordRecoveryConnectorConfigs:
+      allOf:
+        - $ref: '#/components/schemas/BaseConnectorConfigs'
+        - type: object
+          properties:
+            passwordRecoveryEnabled:
+              type: boolean
+              example: true
+
+    FlowMetaResponseConnectionMeta:
+      type: object
+      properties:
+        supportedConnections:
+          type: array
+          items:
+            type: string
+          example:
+            - Email OTP
+            - SMS OTP
+            - Passkey
+            - LinkedIn
+
+    BaseFlowMetaResponse:
+      type: object
+      description: General metadata for a flow type
+      properties:
+        flowType:
+          type: string
+          example: PASSWORD_RECOVERY
+        supportedExecutors:
+          type: array
+          items:
+            type: string
+        connectorConfigs:
+          $ref: '#/components/schemas/BaseConnectorConfigs'
+        attributeProfile:
+          type: string
+          example: End-User-Profile
+
+    RegistrationFlowMetaResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseFlowMetaResponse'
+        - type: object
+          properties:
+            connections:
+              $ref: '#/components/schemas/FlowMetaResponseConnectionMeta'
+            connectorConfigs:
+              $ref: '#/components/schemas/SelfRegistrationConnectorConfigs'
+
+    PasswordRecoveryFlowMetaResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseFlowMetaResponse'
+        - type: object
+          properties:
+            connectorConfigs:
+              $ref: '#/components/schemas/PasswordRecoveryConnectorConfigs'
+
+    FlowConfig:
+      type: object
+      description: Flow configurations for a flow type
+      properties:
+        flowType:
+          type: string
+          description: Flow type
+          example: REGISTRATION
+        isEnabled:
+          type: boolean
+          description: Indicate whether the orchestration is enabled for the flow
+          example: true
+        isAutoLoginEnabled:
+          type: boolean
+          description: Indicate whether the auto login is enabled for the flow
+          example: true
+
+    FlowConfigPatchModel:
+      type: object
+      description: Patch model for configurations of a flow type
+      required:
+        - flowType
+      properties:
+        flowType:
+          type: string
+          description: Flow type
+          example: REGISTRATION
+        isEnabled:
+          type: boolean
+          description: Indicate whether the orchestration is enabled for the flow
+          example: true
+        isAutoLoginEnabled:
+          type: boolean
+          description: Indicate whether the auto login is enabled for the flow
+          example: true
 
     Step:
       type: object

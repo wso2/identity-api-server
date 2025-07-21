@@ -474,7 +474,7 @@ public class OrganizationsApi  {
     @Path("/self")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update organization details of the currently accessing organization.", notes = "This API updates the editable fields of the organization associated with the currently accessing organization. Currently only the organization name can be updated using this API.  <b>Scopes (Permissions) required:</b> `internal_organization_update` ", response = OrganizationResponse.class, authorizations = {
+    @ApiOperation(value = "Update organization details of the currently accessing organization.", notes = "This API updates the editable fields of the organization associated with the currently accessing organization. Using this API, the organization's name can be updated. For root organizations, the organization version can also be updated.  <b>Scopes (Permissions) required:</b> `internal_organization_update` ", response = OrganizationResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             

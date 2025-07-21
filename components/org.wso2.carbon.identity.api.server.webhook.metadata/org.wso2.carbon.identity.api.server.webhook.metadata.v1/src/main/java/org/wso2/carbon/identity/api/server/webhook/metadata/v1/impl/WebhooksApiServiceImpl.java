@@ -22,9 +22,7 @@ import org.wso2.carbon.identity.api.server.webhook.metadata.v1.WebhooksApiServic
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.core.ServerWebhookMetadataService;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.factories.ServerWebhookMetadataServiceFactory;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.EventProfile;
-import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.EventProfileMetadata;
-
-import java.util.List;
+import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.WebhookMetadata;
 
 import javax.ws.rs.core.Response;
 
@@ -47,7 +45,7 @@ public class WebhooksApiServiceImpl implements WebhooksApiService {
 
         ServerWebhookMetadataService webhookMetadataService =
                 ServerWebhookMetadataServiceFactory.getServerWebhookMetadataService();
-        List<EventProfileMetadata> eventProfiles = webhookMetadataService.getEventProfileNames();
-        return Response.ok().entity(eventProfiles).build();
+        WebhookMetadata webhookMetadata = webhookMetadataService.getWebhookMetadata();
+        return Response.ok().entity(webhookMetadata).build();
     }
 }
