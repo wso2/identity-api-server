@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -46,6 +46,10 @@ import javax.ws.rs.core.Response;
 
 
 public interface ConfigsApiService {
+
+      public Response deletePassiveSTSInboundAuthConfig();
+
+      public Response deleteSAMLInboundAuthConfig();
 
       public Response getAuthenticator(String authenticatorId);
 

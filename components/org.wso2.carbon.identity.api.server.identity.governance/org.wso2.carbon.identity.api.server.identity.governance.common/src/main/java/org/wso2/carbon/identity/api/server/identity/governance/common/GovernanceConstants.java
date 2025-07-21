@@ -73,7 +73,14 @@ public class GovernanceConstants {
         ERROR_CODE_INVALID_PASSWORD_EXPIRY_RULE("50014", "Connector update failed.",
                 "Password expiry rule: %s is invalid."),
         ERROR_CODE_INVALID_PASSWORD_PATTERN_REGEX("50015", "Connector update failed.",
-                "Password pattern regex is invalid.");
+                "Password pattern regex is invalid."),
+        ERROR_CODE_NO_PROPERTIES_TO_REVERT("50016", "No properties to revert.",
+                "No properties were provided to revert."),
+        ERROR_CODE_PROPERTY_NOT_FOUND("50017", "Property not found.",
+                "The property: %s is not found in the connector: %s."),
+        ERROR_CODE_ERROR_REVERTING_CONNECTOR_PROPERTY("50018",
+                "Unable to revert the identity governance connector properties.",
+                "Server Encountered an error while reverting identity governance connector properties.");
 
         private final String code;
         private final String message;
