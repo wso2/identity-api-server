@@ -31,6 +31,8 @@ public class UserSharingMgtConstants {
     public static final String RESPONSE_DETAIL_USER_SHARE = "User sharing process triggered successfully.";
     public static final String RESPONSE_DETAIL_USER_UNSHARE = "User unsharing process triggered successfully.";
 
+    public static final String IS_AGENT_SHARING = "isAgentSharing";
+
     /**
      * Enum for user sharing management related errors.
      * Error Code - code to identify the error.
