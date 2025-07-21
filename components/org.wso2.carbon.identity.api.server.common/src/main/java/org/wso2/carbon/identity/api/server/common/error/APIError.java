@@ -20,7 +20,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 /**
- * Common Exception for all the server API related errors
+ * Common Exception for all the server API related errors.
  */
 public class APIError extends WebApplicationException {
 

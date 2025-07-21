@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Common util class
+ * Common util class.
  */
 public class Util {
 
@@ -36,9 +36,9 @@ public class Util {
             + "%s?offset=%d&limit=%d";
 
     /**
-     * Get correlation id of current thread
+     * Get correlation id of current thread.
      *
-     * @return correlation-id
+     * @return correlation-id.
      */
     public static String getCorrelation() {
         String ref;
@@ -52,9 +52,9 @@ public class Util {
     }
 
     /**
-     * Check whether correlation id present in the log MDC
+     * Check whether correlation id present in the log MDC.
      *
-     * @return whether the correlation id is present
+     * @return whether the correlation id is present.
      */
     public static boolean isCorrelationIDPresent() {
         return MDC.get(Constants.CORRELATION_ID_MDC) != null;
