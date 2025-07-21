@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -64,6 +64,50 @@ public class ConfigsApi  {
     public ConfigsApi() {
 
         this.delegate = ConfigsApiServiceFactory.getConfigsApi();
+    }
+
+    @Valid
+    @DELETE
+    @Path("/authentication/inbound/passivests")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Delete WS Federation (Passive STS) inbound authentication configurations.", notes = "Delete all WS Federation (Passive STS) inbound authentication configurations of the tenant. ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Inbound Authentication Configurations", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "Successful deletion", response = Void.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response deletePassiveSTSInboundAuthConfig() {
+
+        return delegate.deletePassiveSTSInboundAuthConfig();
+    }
+
+    @Valid
+    @DELETE
+    @Path("/authentication/inbound/saml2")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Delete SAML2 inbound authentication configurations.", notes = "Delete all SAML2 inbound authentication configurations of the tenant. ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Inbound Authentication Configurations", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "Successful deletion", response = Void.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response deleteSAMLInboundAuthConfig() {
+
+        return delegate.deleteSAMLInboundAuthConfig();
     }
 
     @Valid
