@@ -291,7 +291,6 @@ public class Utils {
 
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         if (REGISTRATION.getType().equals(flowType)) {
-            Utils.isSelfRegistrationEnabled(tenantDomain);
             Utils.isDynamicRegistrationPortalEnabled(tenantDomain);
         } else if (PASSWORD_RECOVERY.getType().equals(flowType) ||
                 INVITED_USER_REGISTRATION.getType().equals(flowType)) {
