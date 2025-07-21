@@ -79,7 +79,11 @@ public class FlowEndpointConstants {
 
         ERROR_CODE_DUPLICATE_COMPONENT_ID("10006",
                 "Duplicate component ID found in the flow.",
-                "All component IDs must be unique across the entire flow.");
+                "All component IDs must be unique across the entire flow."),
+
+        ERROR_CODE_INVALID_METADATA("10007",
+                "Invalid metadata provided for the executor.",
+                "The metadata provided for the executor is invalid.");
 
         private final String code;
         private final String message;
