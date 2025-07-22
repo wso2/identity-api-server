@@ -3,7 +3,7 @@ name: Notify Merged PR to AI Log Agent
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   find-pr-details:
