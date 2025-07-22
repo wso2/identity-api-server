@@ -186,13 +186,10 @@ public class ServerApplicationSharingService {
             // To return all organizations if recursive flag was not provided. This is to keep the backward
             // compatibility.
             boolean recursiveFlag = recursive == null || recursive;
-
             SharedApplicationOrganizationNodePage sharedApplicationOrganizationNodePage = orgApplicationManager
                     .getApplicationSharedOrganizations(organizationId, applicationId, filter, beforeCursor, afterCursor,
                             excludedAttributes, attributes, limit, recursiveFlag);
-
             String url = buildPaginationQueryParams(filter, limit, recursive, excludedAttributes, attributes);
-
             return Response.ok(createSharedOrgResponse(sharedApplicationOrganizationNodePage, url, applicationId))
                     .build();
         } catch (OrganizationManagementClientException e) {
