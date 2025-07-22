@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2019-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -44,6 +44,7 @@ public class ApplicationManagementConstants {
     public static final String INBOUND_PROTOCOL_SAML_PATH_COMPONENT = "/saml";
     public static final String INBOUND_PROTOCOL_PASSIVE_STS_PATH_COMPONENT = "/passive-sts";
     public static final String INBOUND_PROTOCOL_WS_TRUST_PATH_COMPONENT = "/ws-trust";
+    public static final String APPLICATION_SHARE_PATH_COMPONENT = "/share";
 
     private static final Map<String, String> OAUTH_GRANT_TYPE_NAMES = new LinkedHashMap<>();
     public static final String DEFAULT_NAME_ID_FORMAT = "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified";

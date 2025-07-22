@@ -979,13 +979,13 @@
         <identity.verification.version>1.0.15</identity.verification.version>
 
         <!-- Organization management core Version -->
-        <org.wso2.carbon.identity.organization.management.core.version>1.1.39
+        <org.wso2.carbon.identity.organization.management.core.version>1.1.41
         </org.wso2.carbon.identity.organization.management.core.version>
         <org.wso2.carbon.identity.organization.management.core.version.range>[1.0.0, 2.0.0)
         </org.wso2.carbon.identity.organization.management.core.version.range>
 
         <!-- Organization management service Version -->
-        <org.wso2.carbon.identity.organization.management.version>1.4.137
+        <org.wso2.carbon.identity.organization.management.version>2.0.8
         </org.wso2.carbon.identity.organization.management.version>
 
         <org.wso2.carbon.identity.inbound.provisioning.scim2.version>3.4.146
