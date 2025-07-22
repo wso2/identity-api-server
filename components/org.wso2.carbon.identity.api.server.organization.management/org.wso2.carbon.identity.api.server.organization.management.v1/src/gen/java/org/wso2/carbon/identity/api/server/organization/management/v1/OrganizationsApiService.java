@@ -51,6 +51,8 @@ import javax.ws.rs.core.Response;
 
 public interface OrganizationsApiService {
 
+      public Response getSelfOrganization();
+
       public Response organizationCheckDiscovery(OrganizationDiscoveryCheckPOSTRequest organizationDiscoveryCheckPOSTRequest);
 
       public Response organizationDiscoveryGet(String organizationId);
@@ -82,6 +84,8 @@ public interface OrganizationsApiService {
       public Response organizationsOrganizationIdPatch(String organizationId, List<OrganizationPatchRequestItem> organizationPatchRequestItem);
 
       public Response organizationsOrganizationIdPut(String organizationId, OrganizationPUTRequest organizationPUTRequest);
+
+      public Response patchSelfOrganization(List<OrganizationPatchRequestItem> organizationPatchRequestItem);
 
       public Response shareOrgApplication(String organizationId, String applicationId, ApplicationSharePOSTRequest applicationSharePOSTRequest);
 

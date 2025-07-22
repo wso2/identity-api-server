@@ -23,33 +23,49 @@ package org.wso2.carbon.identity.api.server.flow.execution.v1.constants;
  */
 public class FlowExecutionEndpointConstants {
 
-    private FlowExecutionEndpointConstants() {
-    }
-
-    public static final String REGISTRATION_FLOW_PREFIX = "RFM-";
+    public static final String REGISTRATION_FLOW_PREFIX = "FE-";
     public static final String SELF_REGISTRATION_ENABLED = "SelfRegistration.Enable";
     public static final String DYNAMIC_REGISTRATION_PORTAL_ENABLED = "SelfRegistration.EnableDynamicPortal";
     public static final String SHOW_USERNAME_UNAVAILABILITY = "SelfRegistration.ShowUsernameUnavailability";
+    private FlowExecutionEndpointConstants() {
+    }
 
     /**
      * Error messages related to flow management.
      */
     public enum ErrorMessage {
 
+        // Client error codes.
         ERROR_CODE_DYNAMIC_REGISTRATION_PORTAL_DISABLED("60101",
                 "Dynamic registration portal is not enabled.",
                 "Dynamic registration portal is not enabled. Please contact your administrator."
         ),
 
         ERROR_CODE_SELF_REGISTRATION_DISABLED("60102",
-                                                        "Self registration is not enabled.",
-                                                        "Self registration is not enabled. Please contact your " +
-                                                      "administrator."
+                "Self registration is not enabled.",
+                "Self registration is not enabled. Please contact your " +
+                        "administrator."
         ),
 
+        ERROR_CODE_INVALID_FLOW_TYPE("60103",
+                "Invalid flow type.",
+                "The provided flow type is not supported."
+        ),
+
+        ERROR_CODE_FLOW_DISABLED("60104",
+                "Flow is disabled.",
+                "The requested flow %s is disabled. Please contact your administrator."
+        ),
+
+        // Server error codes.
         ERROR_CODE_GET_GOVERNANCE_CONFIG("65101",
                 "Error occurred while retrieving the governance configuration.",
                 "Server encountered an error while retrieving the governance configuration."
+        ),
+
+        ERROR_CODE_GET_FLOW_CONFIG("65102",
+                "Error occurred while retrieving the flow configuration.",
+                "Server encountered an error while retrieving the flow configuration."
         );
 
         private final String code;

@@ -40,7 +40,7 @@ public class FlowExecutionResponse  {
 @XmlEnum(String.class)
 public enum TypeEnum {
 
-    @XmlEnumValue("VIEW") VIEW(String.valueOf("VIEW")), @XmlEnumValue("REDIRECTION") REDIRECTION(String.valueOf("REDIRECTION")), @XmlEnumValue("INTERACT") INTERACT(String.valueOf("INTERACT")), @XmlEnumValue("INTERNAL_PROMPT") INTERNAL_PROMPT(String.valueOf("INTERNAL_PROMPT"));
+    @XmlEnumValue("VIEW") VIEW(String.valueOf("VIEW")), @XmlEnumValue("REDIRECTION") REDIRECTION(String.valueOf("REDIRECTION")), @XmlEnumValue("INTERNAL_PROMPT") INTERNAL_PROMPT(String.valueOf("INTERNAL_PROMPT")), @XmlEnumValue("WEBAUTHN") WEBAUTHN(String.valueOf("WEBAUTHN"));
 
 
     private String value;

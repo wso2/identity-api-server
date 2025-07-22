@@ -48,7 +48,10 @@ public class ValidationManagementConstants {
                 "Error while updating input validation configurations for organization: %s."),
         ERROR_CODE_ERROR_GETTING_VALIDATORS("65003",
                 "Unable to retrieve existing validators.",
-                "Error while retrieving validators for organization: %s.");
+                "Error while retrieving validators for organization: %s."),
+        ERROR_CODE_ERROR_REVERTING_VALIDATION_CONFIG("65004",
+                "Unable to revert input validation configurations.",
+                "Error while reverting input validation configurations for organization: %s.");
 
         private final String code;
         private final String message;

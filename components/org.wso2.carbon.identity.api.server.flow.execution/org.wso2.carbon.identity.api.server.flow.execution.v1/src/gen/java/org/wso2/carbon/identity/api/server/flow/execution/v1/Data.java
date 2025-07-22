@@ -42,6 +42,8 @@ public class Data  {
     private String redirectURL;
     private List<String> requiredParams = null;
 
+    private Map<String, Object> webAuthnData = null;
+
     private Map<String, Object> additionalData = null;
 
 
@@ -116,6 +118,34 @@ public class Data  {
     }
 
         /**
+    * Data related to WebAuthn operations
+    **/
+    public Data webAuthnData(Map<String, Object> webAuthnData) {
+
+        this.webAuthnData = webAuthnData;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "Data related to WebAuthn operations")
+    @JsonProperty("webAuthnData")
+    @Valid
+    public Map<String, Object> getWebAuthnData() {
+        return webAuthnData;
+    }
+    public void setWebAuthnData(Map<String, Object> webAuthnData) {
+        this.webAuthnData = webAuthnData;
+    }
+
+
+    public Data putWebAuthnDataItem(String key, Object webAuthnDataItem) {
+        if (this.webAuthnData == null) {
+            this.webAuthnData = new HashMap<String, Object>();
+        }
+        this.webAuthnData.put(key, webAuthnDataItem);
+        return this;
+    }
+
+        /**
     **/
     public Data additionalData(Map<String, Object> additionalData) {
 
@@ -157,12 +187,13 @@ public class Data  {
         return Objects.equals(this.components, data.components) &&
             Objects.equals(this.redirectURL, data.redirectURL) &&
             Objects.equals(this.requiredParams, data.requiredParams) &&
+            Objects.equals(this.webAuthnData, data.webAuthnData) &&
             Objects.equals(this.additionalData, data.additionalData);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(components, redirectURL, requiredParams, additionalData);
+        return Objects.hash(components, redirectURL, requiredParams, webAuthnData, additionalData);
     }
 
     @Override
@@ -174,6 +205,7 @@ public class Data  {
         sb.append("    components: ").append(toIndentedString(components)).append("\n");
         sb.append("    redirectURL: ").append(toIndentedString(redirectURL)).append("\n");
         sb.append("    requiredParams: ").append(toIndentedString(requiredParams)).append("\n");
+        sb.append("    webAuthnData: ").append(toIndentedString(webAuthnData)).append("\n");
         sb.append("    additionalData: ").append(toIndentedString(additionalData)).append("\n");
         sb.append("}");
         return sb.toString();

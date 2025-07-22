@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.configs</artifactId>
-        <version>1.3.124-SNAPSHOT</version>
+        <version>1.3.160-SNAPSHOT</version>
     </parent>
 
     <artifactId>org.wso2.carbon.identity.api.server.configs.v1</artifactId>
@@ -173,6 +173,11 @@
         <dependency>
             <groupId>org.wso2.carbon.identity.inbound.auth.oauth2</groupId>
             <artifactId>org.wso2.carbon.identity.oauth.dcr</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.organization.management.core</groupId>
+            <artifactId>org.wso2.carbon.identity.organization.management.service</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

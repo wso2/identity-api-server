@@ -193,6 +193,9 @@ public class Constant {
         ERROR_CODE_UPDATING_LOCAL_CLAIMS("50051",
                 "Some local claims were not updated.",
                 "%s out of %s local claims could not be updated."),
+        ERROR_CODE_ERROR_SERIALIZING_INPUT_FORMAT("50052",
+                "Unable to serialize input format.",
+                "A server error occurred while serializing the input format property."),
         ERROR_CODE_INVALID_IDENTIFIER("CMT-60001", "Invalid identifier",
                 "Invalid Identifier: %s"),
         ERROR_CODE_CLAIM_URI_NOT_SPECIFIED("CMT-60002", "Empty claim URI", "Claim URI is " +
@@ -232,7 +235,17 @@ public class Constant {
                 "form of attribute + '.' + sub attribute"),
         ERROR_CODE_ATTRIBUTES_MARKED_AS_SUB_ATTRIBUTES_NOT_ALLOWED_TO_HAVE_SUB_ATTRIBUTES("CMT-60016",
                 "The attributes marked as sub attribute of another attribute can't have sub attributes.",
-                "This attribute is marked as sub attribute of the attribute %s");
+                "This attribute is marked as sub attribute of the attribute %s"),
+        ERROR_CODE_UNSUPPORTED_INPUT_TYPE("CMT-60017",
+                "The provided input type doesn't match with the configured attribute meta data.",
+                "The provided input type: %s doesn't match with the configured attribute meta data."),
+        ERROR_CODE_BOOLEAN_ATTRIBUTE_CANNOT_BE_MULTI_VALUED("CMT-60018",
+                "Boolean attributes cannot be multi-valued.",
+                "The attribute: %s is a boolean attribute and cannot be multi-valued."),
+        ERROR_CODE_CANONICAL_VALUES_NOT_SUPPORTED_FOR_NON_STRING_DATA_TYPES("CMT-60019",
+                "Canonical values are only supported for string data type.",
+                "The attribute: %s is not a string data type and canonical values are only supported for " +
+                        "string data type.");
 
         private final String code;
         private final String message;
@@ -307,6 +320,7 @@ public class Constant {
     public static final String PROP_DATA_TYPE = "dataType";
     public static final String PROP_SUB_ATTRIBUTES = "subAttributes";
     public static final String PROP_CANONICAL_VALUES = "canonicalValues";
+    public static final String PROP_INPUT_FORMAT = "inputFormat";
 
     public static final String PROP_MULTI_VALUED = "multiValued";
     public static final String PROP_UNIQUENESS_SCOPE = "UniquenessScope";
@@ -316,4 +330,26 @@ public class Constant {
 
     public static final Set<String> ALLOWED_PROPERTY_KEYS_FOR_SUB_ORG_UPDATE = Collections.unmodifiableSet(
             new HashSet<>(Collections.singletonList(PROP_EXCLUDED_USER_STORES)));
+
+    public static final String INPUT_TYPE_DROPDOWN = "dropdown";
+    public static final String INPUT_TYPE_RADIO_GROUP = "radio_group";
+    public static final String INPUT_TYPE_MULTI_SELECT_DROPDOWN = "multi_select_dropdown";
+    public static final String INPUT_TYPE_CHECKBOX_GROUP = "checkbox_group";
+    public static final String INPUT_TYPE_TEXT_INPUT = "text_input";
+    public static final String INPUT_TYPE_DATE_PICKER = "date_picker";
+    public static final String INPUT_TYPE_NUMBER_INPUT = "number_input";
+    public static final String INPUT_TYPE_CHECKBOX = "checkbox";
+    public static final String INPUT_TYPE_TOGGLE = "toggle";
+    public static final Set<String> ALLOWED_INPUT_TYPES = Collections.unmodifiableSet(
+            new HashSet<String>() { {
+                add(INPUT_TYPE_DROPDOWN);
+                add(INPUT_TYPE_RADIO_GROUP);
+                add(INPUT_TYPE_MULTI_SELECT_DROPDOWN);
+                add(INPUT_TYPE_CHECKBOX_GROUP);
+                add(INPUT_TYPE_TEXT_INPUT);
+                add(INPUT_TYPE_DATE_PICKER);
+                add(INPUT_TYPE_NUMBER_INPUT);
+                add(INPUT_TYPE_CHECKBOX);
+                add(INPUT_TYPE_TOGGLE);
+            } });
 }

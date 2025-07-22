@@ -21,6 +21,7 @@ package org.wso2.carbon.identity.api.server.action.management.v1;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.util.List;
 import java.util.Objects;
 
 import javax.validation.Valid;
@@ -31,6 +32,7 @@ import javax.validation.Valid;
 public class PreUpdatePasswordActionResponse extends ActionResponse {
 
     private PasswordSharing passwordSharing;
+    private List<String> attributes;
 
     public PreUpdatePasswordActionResponse(ActionResponse actionResponse) {
 
@@ -62,6 +64,25 @@ public class PreUpdatePasswordActionResponse extends ActionResponse {
         this.passwordSharing = passwordSharing;
     }
 
+    public PreUpdatePasswordActionResponse attributes(List<String> attributes) {
+
+        this.attributes = attributes;
+        return this;
+    }
+
+    @ApiModelProperty()
+    @JsonProperty("attributes")
+    @Valid
+    public List<String> getAttributes() {
+
+        return attributes;
+    }
+
+    public void setAttributes(List<String> attributes) {
+
+        this.attributes = attributes;
+    }
+
     @Override
     public boolean equals(java.lang.Object o) {
 
@@ -79,12 +100,14 @@ public class PreUpdatePasswordActionResponse extends ActionResponse {
                 Objects.equals(this.getStatus(), actionResponse.getStatus()) &&
                 Objects.equals(this.getEndpoint(), actionResponse.getEndpoint()) &&
                 Objects.equals(this.passwordSharing, actionResponse.passwordSharing) &&
+                Objects.equals(this.attributes, actionResponse.attributes) &&
                 Objects.equals(this.getRule(), actionResponse.getRule());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getType(), getName(), getDescription(), getStatus(), getEndpoint(), getRule());
+        return Objects.hash(getId(), getType(), getName(), getDescription(), getStatus(), getEndpoint(),
+                passwordSharing, attributes, getRule());
     }
 
     @Override
@@ -99,6 +122,7 @@ public class PreUpdatePasswordActionResponse extends ActionResponse {
         sb.append("    status: ").append(toIndentedString(getStatus())).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(getEndpoint())).append("\n");
         sb.append("    passwordSharing: ").append(toIndentedString(passwordSharing)).append("\n");
+        sb.append("    attributes: ").append(toIndentedString(attributes)).append("\n");
         sb.append("    rule: ").append(toIndentedString(getRule())).append("\n");
         sb.append("}");
         return sb.toString();

@@ -32,6 +32,7 @@ import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.api.server.configs.common.ConfigsServiceHolder;
 import org.wso2.carbon.identity.api.server.configs.common.Constants;
 import org.wso2.carbon.identity.api.server.configs.common.SchemaConfigParser;
 import org.wso2.carbon.identity.api.server.configs.v1.exception.JWTClientAuthenticatorException;
@@ -96,10 +97,14 @@ import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationCon
 import org.wso2.carbon.identity.oauth2.impersonation.models.ImpersonationConfig;
 import org.wso2.carbon.identity.oauth2.impersonation.services.ImpersonationConfigMgtService;
 import org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.core.JWTClientAuthenticatorMgtService;
+import org.wso2.carbon.identity.organization.management.service.exception.OrganizationManagementException;
+import org.wso2.carbon.identity.organization.management.service.util.OrganizationManagementUtil;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
 import org.wso2.carbon.idp.mgt.IdpManager;
+import org.wso2.carbon.idp.mgt.util.IdPManagementConstants;
+import org.wso2.carbon.logging.service.LoggingConstants;
 import org.wso2.carbon.logging.service.RemoteLoggingConfigService;
 import org.wso2.carbon.logging.service.data.RemoteServerLoggerData;
 import org.wso2.carbon.user.api.UserRealm;
@@ -115,6 +120,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -288,11 +294,15 @@ public class ServerConfigManagementService {
                         .ERROR_CODE_ERROR_UPDATING_CONFIGS, null);
             }
             IdentityProvider idpToUpdate = createIdPClone(residentIdP);
-            processPatchRequest(patchRequest, idpToUpdate);
+            List<String> propertiesToRemove = new ArrayList<>();
+            processPatchRequest(patchRequest, idpToUpdate, propertiesToRemove);
             // To avoid updating non-existing authenticators in DB layer.
             idpToUpdate.setFederatedAuthenticatorConfigs(new FederatedAuthenticatorConfig[0]);
             idpManager.updateResidentIdP(idpToUpdate, ContextLoader.getTenantDomainFromContext());
 
+            if (!propertiesToRemove.isEmpty()) {
+                idpManager.deleteResidentIdpProperties(propertiesToRemove, ContextLoader.getTenantDomainFromContext());
+            }
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_CONFIGS, null);
         }
@@ -684,8 +694,27 @@ public class ServerConfigManagementService {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         validateTenantDomain(tenantDomain, "Resetting remote server configuration service is not available for %s");
+        boolean includeSecrets = !Boolean.parseBoolean(ConfigsServiceHolder.getServerConfigurationService()
+                .getFirstProperty(LoggingConstants.REMOTE_LOGGING_HIDE_SECRETS));
 
-        RemoteServerLoggerData remoteServerLoggerData = getRemoteServerLoggerData(remoteLoggingConfig);
+        RemoteServerLoggerData remoteServerLoggerData;
+        if (includeSecrets) {
+            remoteServerLoggerData = getRemoteServerLoggerData(remoteLoggingConfig);
+        } else {
+            // If the secrets are not included, fetch the existing configuration from the database.
+            try {
+                remoteServerLoggerData = ConfigsServiceHolder.getRemoteLoggingConfigService()
+                        .getRemoteServerConfig(logType.toUpperCase(Locale.ENGLISH), true);
+                if (remoteServerLoggerData == null) {
+                    remoteServerLoggerData = new RemoteServerLoggerData();
+                }
+                patchRemoteServerLoggerData(remoteServerLoggerData, remoteLoggingConfig);
+            } catch (ConfigurationException e) {
+                log.error("Error while updating remote server configuration.", e);
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
+                        .ERROR_CODE_ERROR_UPDATING_REMOTE_LOGGING_CONFIGS, null);
+            }
+        }
         validateLogType(logType);
         // Backend logic only supports logType in Uppercase.
         remoteServerLoggerData.setLogType(logType.toUpperCase(Locale.ENGLISH));
@@ -696,6 +725,26 @@ public class ServerConfigManagementService {
             log.error("Error while updating remote server configuration.", e);
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
                     .ERROR_CODE_ERROR_UPDATING_REMOTE_LOGGING_CONFIGS, null);
+        }
+    }
+
+    private void patchRemoteServerLoggerData(RemoteServerLoggerData remoteServerLoggerData,
+                                             RemoteLoggingConfig remoteLoggingConfig) {
+
+        remoteServerLoggerData.setUrl(remoteLoggingConfig.getRemoteUrl());
+        remoteServerLoggerData.setConnectTimeoutMillis(remoteLoggingConfig.getConnectTimeoutMillis());
+        remoteServerLoggerData.setVerifyHostname(remoteLoggingConfig.getVerifyHostname());
+        setIfNotNull(remoteServerLoggerData::setUsername, remoteLoggingConfig.getUsername());
+        setIfNotNull(remoteServerLoggerData::setPassword, remoteLoggingConfig.getPassword());
+        setIfNotNull(remoteServerLoggerData::setKeystoreLocation, remoteLoggingConfig.getKeystoreLocation());
+        setIfNotNull(remoteServerLoggerData::setKeystorePassword, remoteLoggingConfig.getKeystorePassword());
+        setIfNotNull(remoteServerLoggerData::setTruststoreLocation, remoteLoggingConfig.getTruststoreLocation());
+        setIfNotNull(remoteServerLoggerData::setTruststorePassword, remoteLoggingConfig.getTruststorePassword());
+    }
+
+    private <T> void setIfNotNull(Consumer<T> setter, T value) {
+        if (value != null) {
+            setter.accept(value);
         }
     }
 
@@ -889,11 +938,16 @@ public class ServerConfigManagementService {
      * @param patchRequest List of patch operations.
      * @param idpToUpdate  Resident Identity Provider to be updated.
      */
-    private void processPatchRequest(List<Patch> patchRequest, IdentityProvider idpToUpdate) {
+    private void processPatchRequest(List<Patch> patchRequest, IdentityProvider idpToUpdate,
+                                     List<String> propertiesToRemove) {
 
         if (CollectionUtils.isEmpty(patchRequest)) {
             return;
         }
+
+        // Extract the existing idp property list and set it to an empty array.
+        IdentityProviderProperty[] existingIdpProperties = idpToUpdate.getIdpProperties();
+        idpToUpdate.setIdpProperties(new IdentityProviderProperty[0]);
         for (Patch patch : patchRequest) {
             String path = patch.getPath();
             Patch.OperationEnum operation = patch.getOperation();
@@ -916,10 +970,12 @@ public class ServerConfigManagementService {
                 } else {
                     switch (path) {
                         case Constants.IDLE_SESSION_PATH:
-                            updateIdPProperty(idpToUpdate, IdentityApplicationConstants.SESSION_IDLE_TIME_OUT, value);
+                            updateIdPProperty(idpToUpdate, existingIdpProperties,
+                                    IdentityApplicationConstants.SESSION_IDLE_TIME_OUT, value);
                             break;
                         case Constants.REMEMBER_ME_PATH:
-                            updateIdPProperty(idpToUpdate, IdentityApplicationConstants.REMEMBER_ME_TIME_OUT, value);
+                            updateIdPProperty(idpToUpdate, existingIdpProperties,
+                                    IdentityApplicationConstants.REMEMBER_ME_TIME_OUT, value);
                             break;
                         default:
                             throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
@@ -942,19 +998,32 @@ public class ServerConfigManagementService {
                             .ERROR_CODE_INVALID_INPUT, "Invalid index in 'path' attribute");
                 }
                 idpToUpdate.setHomeRealmId(StringUtils.join(homeRealmIds, ","));
-            } else if (operation == Patch.OperationEnum.REMOVE && path.matches(Constants.HOME_REALM_PATH_REGEX) &&
-                    path.split(Constants.PATH_SEPERATOR).length == 3) {
-                List<String> homeRealmIds;
-                int index = Integer.parseInt(path.split(Constants.PATH_SEPERATOR)[2]);
-                String[] homeRealmArr = StringUtils.split(idpToUpdate.getHomeRealmId(), ",");
-                if (ArrayUtils.isNotEmpty(homeRealmArr) && (index >= 0) && index < homeRealmArr.length) {
-                    homeRealmIds = new ArrayList<>(Arrays.asList(homeRealmArr));
-                    homeRealmIds.remove(index);
+            } else if (operation == Patch.OperationEnum.REMOVE) {
+                if (path.matches(Constants.HOME_REALM_PATH_REGEX) && path.split(Constants.PATH_SEPERATOR).length == 3) {
+                    List<String> homeRealmIds;
+                    int index = Integer.parseInt(path.split(Constants.PATH_SEPERATOR)[2]);
+                    String[] homeRealmArr = StringUtils.split(idpToUpdate.getHomeRealmId(), ",");
+                    if (ArrayUtils.isNotEmpty(homeRealmArr) && (index >= 0) && index < homeRealmArr.length) {
+                        homeRealmIds = new ArrayList<>(Arrays.asList(homeRealmArr));
+                        homeRealmIds.remove(index);
+                    } else {
+                        throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                                .ERROR_CODE_INVALID_INPUT, "Invalid index in 'path' attribute");
+                    }
+                    idpToUpdate.setHomeRealmId(StringUtils.join(homeRealmIds, ","));
                 } else {
-                    throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
-                            .ERROR_CODE_INVALID_INPUT, "Invalid index in 'path' attribute");
+                    switch (path) {
+                        case Constants.IDLE_SESSION_PATH:
+                            propertiesToRemove.add(IdentityApplicationConstants.SESSION_IDLE_TIME_OUT);
+                            break;
+                        case Constants.REMEMBER_ME_PATH:
+                            propertiesToRemove.add(IdentityApplicationConstants.REMEMBER_ME_TIME_OUT);
+                            break;
+                        default:
+                            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                                    .ERROR_CODE_INVALID_INPUT, "Unsupported value for 'path' attribute");
+                    }
                 }
-                idpToUpdate.setHomeRealmId(StringUtils.join(homeRealmIds, ","));
             } else {
                 // Throw an error if any other patch operations are sent in the request.
                 throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
@@ -963,32 +1032,49 @@ public class ServerConfigManagementService {
         }
     }
 
-    private void updateIdPProperty(IdentityProvider identityProvider, String key, String value) {
+    /**
+     * Build the IDP property list of the IDP to update by adding or updating the given key and value.
+     *
+     * @param identityProvider      Identity Provider to be updated.
+     * @param existingIdpProperties Existing Identity Provider properties.
+     * @param key                   Key of the property to be updated.
+     * @param value                 Value of the property to be updated.
+     */
+    private void updateIdPProperty(IdentityProvider identityProvider, IdentityProviderProperty[] existingIdpProperties,
+                                   String key, String value) {
 
-        List<IdentityProviderProperty> idPProperties = new ArrayList<>(Arrays.asList(identityProvider
-                .getIdpProperties()));
+        List<IdentityProviderProperty> updatedIdpProperties = new ArrayList<>();
         if (StringUtils.isBlank(value) || !StringUtils.isNumeric(value) || Integer.parseInt(value) <= 0) {
             String message = "Value should be numeric and positive";
             throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT,
                     message);
         }
         boolean isPropertyFound = false;
-        if (CollectionUtils.isNotEmpty(idPProperties)) {
-            for (IdentityProviderProperty property : idPProperties) {
-                if (StringUtils.equals(key, property.getName())) {
-                    isPropertyFound = true;
-                    property.setValue(value);
-                }
+
+        for (IdentityProviderProperty property : existingIdpProperties) {
+            if (StringUtils.equals(key, property.getName())) {
+                isPropertyFound = true;
+                property.setValue(value);
+                updatedIdpProperties.add(property);
+
             }
         }
+
         if (!isPropertyFound) {
             IdentityProviderProperty property = new IdentityProviderProperty();
             property.setName(key);
             property.setDisplayName(key);
             property.setValue(value);
-            idPProperties.add(property);
+            updatedIdpProperties.add(property);
         }
-        identityProvider.setIdpProperties(idPProperties.toArray(new IdentityProviderProperty[0]));
+
+        for (IdentityProviderProperty property : identityProvider.getIdpProperties()) {
+            if (!updatedIdpProperties.contains(property)) {
+                updatedIdpProperties.add(property);
+            }
+        }
+
+        identityProvider.setIdpProperties(updatedIdpProperties.toArray(new IdentityProviderProperty[0]));
     }
 
     private IdentityProvider getResidentIdP() {
@@ -1479,9 +1565,12 @@ public class ServerConfigManagementService {
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         validateTenantDomain(tenantDomain, "Getting remote server configuration service is not available for %s");
         validateLogType(logType);
+        boolean includeSecrets = !Boolean.parseBoolean(ConfigsServiceHolder.getServerConfigurationService()
+                .getFirstProperty(LoggingConstants.REMOTE_LOGGING_HIDE_SECRETS));
         try {
             // Backend logic only supports logType in Uppercase.
-            return remoteLoggingConfigService.getRemoteServerConfig(logType.toUpperCase(Locale.ENGLISH));
+            return remoteLoggingConfigService.getRemoteServerConfig(logType.toUpperCase(Locale.ENGLISH),
+                    includeSecrets);
         } catch (ConfigurationException e) {
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     Constants.ErrorMessage.ERROR_CODE_ERROR_GETTING_REMOTE_LOGGING_CONFIGS, null);
@@ -1492,8 +1581,10 @@ public class ServerConfigManagementService {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         validateTenantDomain(tenantDomain, "Listing remote server configuration service is not available for %s");
+        boolean includeSecrets = !Boolean.parseBoolean(ConfigsServiceHolder.getServerConfigurationService()
+                .getFirstProperty(LoggingConstants.REMOTE_LOGGING_HIDE_SECRETS));
         try {
-            return remoteLoggingConfigService.getRemoteServerConfigs();
+            return remoteLoggingConfigService.getRemoteServerConfigs(includeSecrets);
         } catch (ConfigurationException e) {
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     Constants.ErrorMessage.ERROR_CODE_ERROR_GETTING_REMOTE_LOGGING_CONFIGS, null);
@@ -1597,6 +1688,13 @@ public class ServerConfigManagementService {
                         authConfigToUpdate);
                 federatedAuthConfig.setProperties(updatedIdpProperties);
                 residentIdp.setFederatedAuthenticatorConfigs(new FederatedAuthenticatorConfig[]{federatedAuthConfig});
+                if (OrganizationManagementUtil.isOrganization(tenantDomain)) {
+                    /* Not sending existing resident IDP properties to update since only SAML inbound auth configs
+                     * are updated.
+                     */
+                    residentIdp.setIdpProperties(new IdentityProviderProperty[0]);
+                }
+
                 idpManager.updateResidentIdP(residentIdp, tenantDomain);
             } else {
                 throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
@@ -1605,6 +1703,68 @@ public class ServerConfigManagementService {
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e,
                     Constants.ErrorMessage.ERROR_CODE_ERROR_SAML_INBOUND_AUTH_CONFIG_UPDATE, null);
+        } catch (OrganizationManagementException e) {
+            log.error("Server encountered an error while updating the SAML " +
+                    "inbound authentication configuration for the tenant: " + tenantDomain, e);
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_SAML_INBOUND_AUTH_CONFIG_UPDATE, null);
+        }
+    }
+
+    /**
+     * Delete the SAML inbound authentication configuration of an organization.
+     */
+    public void deleteSAMLInboundAuthConfig() {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            IdentityProvider residentIdp = idpManager.getResidentIdP(tenantDomain);
+            if (residentIdp == null) {
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                        Constants.ErrorMessage.ERROR_CODE_RESIDENT_IDP_NOT_FOUND, tenantDomain);
+            }
+
+            IdentityProvider idpToUpdate = createIdPClone(residentIdp);
+            FederatedAuthenticatorConfig federatedAuthConfig = IdentityApplicationManagementUtil
+                    .getFederatedAuthenticator(idpToUpdate.getFederatedAuthenticatorConfigs(),
+                            IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
+            if (federatedAuthConfig == null) {
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                        Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_CONFIG_NOT_FOUND,
+                        IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
+            }
+
+            Property[] authenticatorProperties = federatedAuthConfig.getProperties();
+            if (authenticatorProperties == null) {
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                        Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_PROPERTIES_NOT_FOUND,
+                        IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
+            }
+
+            // Filter out the inherited properties so that they would be deleted.
+            List<Property> filteredProperties = new ArrayList<>();
+            for (Property property : authenticatorProperties) {
+                if (!IdPManagementConstants.INHERITED_FEDERATED_AUTHENTICATOR_PROPERTIES.contains(property.getName())) {
+                    filteredProperties.add(property);
+                }
+            }
+
+            federatedAuthConfig.setProperties(filteredProperties.toArray(new Property[0]));
+            idpToUpdate.setFederatedAuthenticatorConfigs(new FederatedAuthenticatorConfig[]{federatedAuthConfig});
+            if (OrganizationManagementUtil.isOrganization(tenantDomain)) {
+                // To make sure that no resident IDP properties are sent to update.
+                idpToUpdate.setIdpProperties(new IdentityProviderProperty[0]);
+            }
+
+            idpManager.updateResidentIdP(idpToUpdate, tenantDomain);
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_SAML_INBOUND_AUTH_CONFIG_DELETE, null);
+        } catch (OrganizationManagementException e) {
+            log.error("Server encountered an error while deleting the SAML inbound authentication " +
+                    "configuration for the tenant: " + tenantDomain, e);
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                Constants.ErrorMessage.ERROR_CODE_ERROR_SAML_INBOUND_AUTH_CONFIG_DELETE, null);
         }
     }
 
@@ -1752,6 +1912,13 @@ public class ServerConfigManagementService {
                     }
                 }
                 residentIdp.setFederatedAuthenticatorConfigs(new FederatedAuthenticatorConfig[]{federatedAuthConfig});
+                if (OrganizationManagementUtil.isOrganization(tenantDomain)) {
+                    /* Not sending existing resident IDP properties to update since only passive STS configs
+                     * are updated.
+                     */
+                    residentIdp.setIdpProperties(new IdentityProviderProperty[0]);
+                }
+
                 idpManager.updateResidentIdP(residentIdp, tenantDomain);
             } else {
                 throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
@@ -1760,6 +1927,69 @@ public class ServerConfigManagementService {
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e,
                     Constants.ErrorMessage.ERROR_CODE_ERROR_PASSIVE_STS_INBOUND_AUTH_CONFIG_UPDATE, null);
+        } catch (OrganizationManagementException e) {
+            log.error("Server encountered an error while updating the passive STS " +
+                    "inbound authentication configuration for the tenant: " + tenantDomain, e);
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_PASSIVE_STS_INBOUND_AUTH_CONFIG_UPDATE, null);
+        }
+    }
+
+    /**
+     * Delete the Passive STS inbound authentication configuration of an organization.
+     */
+    public void deletePassiveSTSInboundAuthConfig() {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            IdentityProvider residentIdp = idpManager.getResidentIdP(tenantDomain);
+            if (residentIdp == null) {
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                        Constants.ErrorMessage.ERROR_CODE_RESIDENT_IDP_NOT_FOUND, tenantDomain);
+            }
+
+            IdentityProvider idpToUpdate = createIdPClone(residentIdp);
+            /*
+             * The Passive STS authenticator uses the `samlAuthnRequestsSigningEnabled` property of the
+             * SAML SSO authenticator.
+             * This is the only property in the STS authenticator that supports inheritance.
+             * Therefore, when processing delete requests of STS authenticator, the `samlAuthnRequestsSigningEnabled`
+             * property of the SAML SSO authenticator is removed.
+             */
+            FederatedAuthenticatorConfig federatedAuthConfig = IdentityApplicationManagementUtil
+                    .getFederatedAuthenticator(idpToUpdate.getFederatedAuthenticatorConfigs(),
+                            IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
+            if (federatedAuthConfig == null) {
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                        Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_CONFIG_NOT_FOUND,
+                        IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
+            }
+
+            Property[] authenticatorProperties = federatedAuthConfig.getProperties();
+            if (authenticatorProperties == null) {
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                        Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_PROPERTIES_NOT_FOUND,
+                        IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
+            }
+
+            federatedAuthConfig.setProperties(Arrays.stream(authenticatorProperties).filter(property ->
+                    !property.getName().equals(IdentityApplicationConstants.Authenticator
+                            .SAML2SSO.SAML_METADATA_AUTHN_REQUESTS_SIGNING_ENABLED)).toArray(Property[]::new));
+            idpToUpdate.setFederatedAuthenticatorConfigs(new FederatedAuthenticatorConfig[]{federatedAuthConfig});
+            if (OrganizationManagementUtil.isOrganization(tenantDomain)) {
+                // To make sure that no resident IDP properties are sent to update.
+                idpToUpdate.setIdpProperties(new IdentityProviderProperty[0]);
+            }
+
+            idpManager.updateResidentIdP(idpToUpdate, tenantDomain);
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_PASSIVE_STS_INBOUND_AUTH_CONFIG_DELETE, null);
+        } catch (OrganizationManagementException e) {
+            log.error("Server encountered an error while deleting the Passive STS inbound authentication " +
+                    "configuration for the tenant: " + tenantDomain, e);
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_PASSIVE_STS_INBOUND_AUTH_CONFIG_DELETE, null);
         }
     }
 }

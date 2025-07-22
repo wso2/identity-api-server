@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookResponse;
+import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookSummary;
 import javax.validation.constraints.*;
 
 
@@ -36,12 +36,12 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public class WebhookList  {
   
-    private List<WebhookResponse> webhooks = null;
+    private List<WebhookSummary> webhooks = null;
 
 
     /**
     **/
-    public WebhookList webhooks(List<WebhookResponse> webhooks) {
+    public WebhookList webhooks(List<WebhookSummary> webhooks) {
 
         this.webhooks = webhooks;
         return this;
@@ -50,16 +50,16 @@ public class WebhookList  {
     @ApiModelProperty(value = "")
     @JsonProperty("webhooks")
     @Valid
-    public List<WebhookResponse> getWebhooks() {
+    public List<WebhookSummary> getWebhooks() {
         return webhooks;
     }
-    public void setWebhooks(List<WebhookResponse> webhooks) {
+    public void setWebhooks(List<WebhookSummary> webhooks) {
         this.webhooks = webhooks;
     }
 
-    public WebhookList addWebhooksItem(WebhookResponse webhooksItem) {
+    public WebhookList addWebhooksItem(WebhookSummary webhooksItem) {
         if (this.webhooks == null) {
-            this.webhooks = new ArrayList<WebhookResponse>();
+            this.webhooks = new ArrayList<WebhookSummary>();
         }
         this.webhooks.add(webhooksItem);
         return this;

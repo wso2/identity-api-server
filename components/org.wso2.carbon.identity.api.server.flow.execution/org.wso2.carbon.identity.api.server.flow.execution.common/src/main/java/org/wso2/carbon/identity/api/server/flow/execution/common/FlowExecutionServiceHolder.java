@@ -19,39 +19,58 @@
 package org.wso2.carbon.identity.api.server.flow.execution.common;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.flow.execution.engine.FlowExecutionService;
+import org.wso2.carbon.identity.flow.mgt.FlowMgtService;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
-import org.wso2.carbon.identity.user.registration.engine.UserRegistrationFlowService;
 
 /**
- * Holder class for UserRegistrationMgtService.
+ * Holder class for FlowExecutionService.
  */
 public class FlowExecutionServiceHolder {
 
     private FlowExecutionServiceHolder() {
+
     }
 
-    private static class UserRegistrationMgtServiceHolderInstance {
+    private static class FlowExecutionServiceHolderInstance {
 
-        private static final UserRegistrationFlowService INSTANCE = (UserRegistrationFlowService)
+        private static final FlowExecutionService INSTANCE = (FlowExecutionService)
                 PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                        .getOSGiService(UserRegistrationFlowService.class, null);
+                        .getOSGiService(FlowExecutionService.class, null);
+    }
+
+    private static class FlowMgtServiceHolderInstance {
+
+        private static final FlowMgtService INSTANCE = (FlowMgtService)
+                PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(FlowMgtService.class, null);
     }
 
     private static class IdentityGovernanceServiceHolder {
 
         private static final IdentityGovernanceService SERVICE =
                 (IdentityGovernanceService) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext().getOSGiService(IdentityGovernanceService.class, null);
+                        .getThreadLocalCarbonContext().getOSGiService(IdentityGovernanceService.class, null);
     }
 
     /**
-     * Get UserRegistrationMgtService instance.
+     * Get FlowExecutionService instance.
      *
-     * @return UserRegistrationMgtService instance
+     * @return FlowExecutionService instance
      */
-    public static UserRegistrationFlowService getInstance() {
+    public static FlowExecutionService getInstance() {
 
-        return UserRegistrationMgtServiceHolderInstance.INSTANCE;
+        return FlowExecutionServiceHolderInstance.INSTANCE;
+    }
+
+    /**
+     * Get FlowMgtService instance.
+     *
+     * @return FlowMgtService instance
+     */
+    public static FlowMgtService getFlowMgtService() {
+
+        return FlowMgtServiceHolderInstance.INSTANCE;
     }
 
     /**

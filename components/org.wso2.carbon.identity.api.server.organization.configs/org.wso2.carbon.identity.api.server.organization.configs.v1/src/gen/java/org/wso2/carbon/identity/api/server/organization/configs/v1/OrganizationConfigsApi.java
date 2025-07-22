@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -51,7 +51,7 @@ public class OrganizationConfigsApi  {
     @Path("/discovery")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Add organization discovery configuration.", notes = "This API provides the capability to add discovery configuration for the primary organization. <br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/configmgt/add <br>   <b>Scope required:</b> <br>     * internal_config_mgt_add ", response = Config.class, authorizations = {
+    @ApiOperation(value = "Add organization discovery configuration.", notes = "This API provides the capability to add discovery configuration for the primary organization. <br>  The `defaultParam` attribute sets the discovery parameter used to resolve the organization. (e.g., `orgHandle`, `orgName`) <br>    <b>Scope(Permission) required:</b> <br>     * internal_config_mgt_add ", response = Config.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -120,7 +120,7 @@ public class OrganizationConfigsApi  {
     @Path("/discovery")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update organization discovery configuration.", notes = "This API provides the capability to update discovery configuration of the primary organization. <br>     <b>Scope(Permission) required:</b> <br>     * internal_config_mgt_update ", response = Config.class, authorizations = {
+    @ApiOperation(value = "Update organization discovery configuration.", notes = "This API provides the capability to update discovery configuration of the primary organization. <br>  The `defaultParam` attribute sets the discovery parameter used to resolve the organization. (e.g., `orgHandle`, `orgName`) <br>    <b>Scope(Permission) required:</b> <br>     * internal_config_mgt_update ", response = Config.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
 

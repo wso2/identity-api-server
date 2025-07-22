@@ -88,14 +88,18 @@ public class WebhooksApiServiceImpl implements WebhooksApiService {
     @Override
     public Response activateWebhook(String webhookId) {
 
-        serverWebhookManagementService.activateWebhook(webhookId);
-        return Response.noContent().build();
+        return Response.ok().entity(serverWebhookManagementService.activateWebhook(webhookId)).build();
     }
 
     @Override
     public Response deactivateWebhook(String webhookId) {
 
-        serverWebhookManagementService.deactivateWebhook(webhookId);
-        return Response.noContent().build();
+        return Response.ok().entity(serverWebhookManagementService.deactivateWebhook(webhookId)).build();
+    }
+
+    @Override
+    public Response retryWebhook(String webhookId) {
+
+        return Response.ok().entity(serverWebhookManagementService.retryWebhook(webhookId)).build();
     }
 }

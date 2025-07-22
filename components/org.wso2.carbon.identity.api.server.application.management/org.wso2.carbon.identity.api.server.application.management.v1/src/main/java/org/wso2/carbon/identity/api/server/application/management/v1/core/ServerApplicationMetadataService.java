@@ -242,6 +242,8 @@ public class ServerApplicationMetadataService {
                 .options(supportedFapiClientAuthenticationMethods));
         oidcMetaData.setFapiMetadata(fapiMetadata);
         List<String> supportedGrantTypes = new LinkedList<>(Arrays.asList(oAuthAdminService.getAllowedGrantTypes()));
+        List<String> publicClientSupportedGrantTypes = Arrays.asList(
+                oAuthAdminService.getPublicClientSupportedGrantTypes());
         List<GrantType> supportedGrantTypeNames = new ArrayList<>();
         // Iterate through the standard grant type names and add matching elements.
         for (String supportedGrantTypeName : supportedGrantTypes) {
@@ -253,6 +255,8 @@ public class ServerApplicationMetadataService {
                 grantType.setName(supportedGrantTypeName);
                 grantType.setDisplayName(supportedGrantTypeName);
             }
+            // If the grant type is public client supported, set it as such.
+            grantType.setPublicClientAllowed(publicClientSupportedGrantTypes.contains(supportedGrantTypeName));
             supportedGrantTypeNames.add(grantType);
         }
         // Set extracted grant types.

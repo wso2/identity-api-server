@@ -18,11 +18,19 @@
 
 package org.wso2.carbon.identity.rest.api.server.workflow.v1.impl;
 
+import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.WorkflowsApiService;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.core.WorkflowService;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.factories.WorkflowServiceFactory;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowRequest;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowResponse;
+
+import java.net.URI;
+
 import javax.ws.rs.core.Response;
+
+import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.workflow.common.Constants.WORKFLOW_PATH_COMPONENT;
 
 /**
  * Implementation of Workflow Management REST API.
@@ -39,14 +47,17 @@ public class WorkflowsApiServiceImpl implements WorkflowsApiService {
     @Override
     public Response addWorkflow(WorkflowRequest workflowRequest) {
 
-        return Response.ok().entity(workflowService.addWorkflow(workflowRequest)).build();
+        WorkflowResponse workflowResponse = workflowService.addWorkflow(workflowRequest);
+        URI location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + WORKFLOW_PATH_COMPONENT + "/" +
+                workflowResponse.getId());
+        return Response.created(location).entity(workflowResponse).build();
     }
 
     @Override
     public Response deleteWorkflowById(String workflowId) {
 
         workflowService.removeWorkflow(workflowId);
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     @Override

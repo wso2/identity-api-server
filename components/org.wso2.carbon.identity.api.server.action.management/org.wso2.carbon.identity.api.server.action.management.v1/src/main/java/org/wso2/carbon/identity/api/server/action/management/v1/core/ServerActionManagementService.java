@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.action.management.api.exception.ActionMgtException;
+import org.wso2.carbon.identity.action.management.api.exception.ActionMgtServerException;
 import org.wso2.carbon.identity.action.management.api.model.Action;
 import org.wso2.carbon.identity.action.management.api.service.ActionManagementService;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionBasicResponse;
@@ -34,6 +35,8 @@ import org.wso2.carbon.identity.api.server.action.management.v1.mapper.ActionMap
 import org.wso2.carbon.identity.api.server.action.management.v1.mapper.ActionMapperFactory;
 import org.wso2.carbon.identity.api.server.action.management.v1.util.ActionDeserializer;
 import org.wso2.carbon.identity.api.server.action.management.v1.util.ActionMgtEndpointUtil;
+import org.wso2.carbon.identity.organization.management.service.exception.OrganizationManagementException;
+import org.wso2.carbon.identity.organization.management.service.util.OrganizationManagementUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,6 +48,7 @@ import java.util.Set;
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_INVALID_ACTION_TYPE;
+import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_NOT_ALLOWED_ACTION_TYPE_IN_ORG_LEVEL;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_NOT_IMPLEMENTED_ACTION_TYPE;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_NO_ACTION_FOUND_ON_GIVEN_ACTION_TYPE_AND_ID;
 
@@ -56,6 +60,7 @@ public class ServerActionManagementService {
     private final ActionManagementService actionManagementService;
     private static final Log LOG = LogFactory.getLog(ServerActionManagementService.class);
     private static final Set<String> NOT_IMPLEMENTED_ACTION_TYPES = new HashSet<>();
+    private static final Set<String> NOT_ALLOWED_ACTION_TYPES_IN_ORG_LEVEL = new HashSet<>();
 
     public ServerActionManagementService(ActionManagementService actionManagementService) {
 
@@ -65,6 +70,8 @@ public class ServerActionManagementService {
     static {
         NOT_IMPLEMENTED_ACTION_TYPES.add(Action.ActionTypes.PRE_REGISTRATION.getPathParam());
         NOT_IMPLEMENTED_ACTION_TYPES.add(Action.ActionTypes.AUTHENTICATION.getPathParam());
+
+        NOT_ALLOWED_ACTION_TYPES_IN_ORG_LEVEL.add(Action.ActionTypes.PRE_ISSUE_ACCESS_TOKEN.getPathParam());
     }
 
     public ActionResponse createAction(String actionType, String jsonBody) {
@@ -106,8 +113,7 @@ public class ServerActionManagementService {
                 throw ActionMgtEndpointUtil.handleException(Response.Status.NOT_FOUND,
                         ERROR_NO_ACTION_FOUND_ON_GIVEN_ACTION_TYPE_AND_ID);
             }
-            return buildActionResponse(actionManagementService.getActionByActionId(actionType, actionId,
-                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
+            return buildActionResponse(action);
         } catch (ActionMgtException e) {
             throw ActionMgtEndpointUtil.handleActionMgtException(e);
         }
@@ -171,15 +177,17 @@ public class ServerActionManagementService {
             List<ActionTypesResponseItem> actionTypesResponseItems = new ArrayList<>();
             for (Action.ActionTypes actionType : Action.ActionTypes.filterByCategory(
                     Action.ActionTypes.Category.PRE_POST)) {
-
-                if (!NOT_IMPLEMENTED_ACTION_TYPES.contains(actionType.getPathParam())) {
-                    actionTypesResponseItems.add(new ActionTypesResponseItem()
-                            .type(ActionType.valueOf(actionType.getActionType()))
-                            .displayName(actionType.getDisplayName())
-                            .description(actionType.getDescription())
-                            .count(actionsCountPerType.getOrDefault(actionType.getActionType(), 0))
-                            .self(ActionMgtEndpointUtil.buildURIForActionType(actionType.getActionType())));
+                if (NOT_IMPLEMENTED_ACTION_TYPES.contains(actionType.getPathParam()) || (isOrganization() &&
+                        NOT_ALLOWED_ACTION_TYPES_IN_ORG_LEVEL.contains(actionType.getPathParam()))) {
+                    continue;
                 }
+
+                actionTypesResponseItems.add(new ActionTypesResponseItem()
+                        .type(ActionType.valueOf(actionType.getActionType()))
+                        .displayName(actionType.getDisplayName())
+                        .description(actionType.getDescription())
+                        .count(actionsCountPerType.getOrDefault(actionType.getActionType(), 0))
+                        .self(ActionMgtEndpointUtil.buildURIForActionType(actionType.getActionType())));
             }
 
             return actionTypesResponseItems;
@@ -246,13 +254,17 @@ public class ServerActionManagementService {
         return actionMapper.toAction(actionUpdateModel);
     }
 
-    private Action.ActionTypes validateActionType(String actionType) {
+    private Action.ActionTypes validateActionType(String actionType) throws ActionMgtException {
 
         Action.ActionTypes actionTypeEnum = getActionTypeFromPath(actionType);
 
         if (NOT_IMPLEMENTED_ACTION_TYPES.contains(actionTypeEnum.getPathParam())) {
             throw ActionMgtEndpointUtil.handleException(Response.Status.NOT_IMPLEMENTED,
                     ERROR_NOT_IMPLEMENTED_ACTION_TYPE);
+        }
+        if (isOrganization() && NOT_ALLOWED_ACTION_TYPES_IN_ORG_LEVEL.contains(actionTypeEnum.getPathParam())) {
+                throw ActionMgtEndpointUtil.handleException(Response.Status.FORBIDDEN,
+                        ERROR_NOT_ALLOWED_ACTION_TYPE_IN_ORG_LEVEL, actionTypeEnum.getActionType());
         }
 
         return actionTypeEnum;
@@ -265,5 +277,14 @@ public class ServerActionManagementService {
                 .findFirst()
                 .orElseThrow(() -> ActionMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST,
                         ERROR_INVALID_ACTION_TYPE));
+    }
+
+    private boolean isOrganization() throws ActionMgtException {
+
+        try {
+            return OrganizationManagementUtil.isOrganization(CarbonContext.getThreadLocalCarbonContext().getTenantId());
+        } catch (OrganizationManagementException e) {
+            throw new ActionMgtServerException("Error while checking if the tenant is an organization.", e);
+        }
     }
 }
