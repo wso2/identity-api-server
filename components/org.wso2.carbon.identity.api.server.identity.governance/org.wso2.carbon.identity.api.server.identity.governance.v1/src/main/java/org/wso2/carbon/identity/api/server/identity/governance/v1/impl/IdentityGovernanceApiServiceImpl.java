@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -24,6 +24,8 @@ import org.wso2.carbon.identity.api.server.identity.governance.v1.factories.Serv
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.ConnectorsPatchReq;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.MultipleConnectorsPatchReq;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PreferenceSearchAttribute;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PropertyRevertReq;
+
 import java.util.List;
 
 import javax.ws.rs.core.Response;
@@ -89,5 +91,13 @@ public class IdentityGovernanceApiServiceImpl implements IdentityGovernanceApiSe
     public Response getPreferenceByPost(List<PreferenceSearchAttribute> preferenceSearchAttribute) {
 
         return Response.ok().entity(identityGovernanceService.getConfigPreference(preferenceSearchAttribute)).build();
+    }
+
+    @Override
+    public Response revertConnectorProperties(String categoryId, String connectorId,
+                                              PropertyRevertReq propertyRevertReq) {
+
+        identityGovernanceService.revertGovernanceConnectorProperties(categoryId, connectorId, propertyRevertReq);
+        return Response.ok().build();
     }
 }

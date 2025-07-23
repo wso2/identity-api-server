@@ -205,6 +205,8 @@ public class ServerClaimManagementService {
     private final ClaimMetadataManagementService claimMetadataManagementService;
     private final OrganizationManager organizationManager;
 
+    private static final ObjectMapper mapper = new ObjectMapper();
+
     public ServerClaimManagementService(ClaimMetadataManagementService claimMetadataManagementService,
                                         OrganizationManager organizationManager) {
 
@@ -1108,7 +1110,6 @@ public class ServerClaimManagementService {
 
         String inputFormat = handleAdditionalProperties(claimProperties, PROP_INPUT_FORMAT);
         if (StringUtils.isNotEmpty(inputFormat)) {
-            ObjectMapper mapper = new ObjectMapper();
             try {
                 InputFormatDTO inputFormatDTO = mapper.readValue(inputFormat, InputFormatDTO.class);
                 localClaimResDTO.setInputFormat(inputFormatDTO);
@@ -1123,7 +1124,6 @@ public class ServerClaimManagementService {
 
         String canonicalValues = handleAdditionalProperties(claimProperties, PROP_CANONICAL_VALUES);
         if (StringUtils.isNotEmpty(canonicalValues)) {
-            ObjectMapper mapper = new ObjectMapper();
             try {
                 List<LabelValueDTO> list = mapper.readValue(canonicalValues, mapper.getTypeFactory()
                                 .constructCollectionType(List.class, LabelValueDTO.class));
@@ -1299,7 +1299,6 @@ public class ServerClaimManagementService {
 
         if (ArrayUtils.isNotEmpty(localClaimReqDTO.getCanonicalValues())) {
             try {
-                ObjectMapper mapper = new ObjectMapper();
                 String jsonString = mapper.writeValueAsString(localClaimReqDTO.getCanonicalValues());
                 claimProperties.put(PROP_CANONICAL_VALUES, jsonString);
             } catch (JsonProcessingException e) {
@@ -1309,7 +1308,6 @@ public class ServerClaimManagementService {
 
         if (localClaimReqDTO.getInputFormat() != null) {
             try {
-                ObjectMapper mapper = new ObjectMapper();
                 String jsonString = mapper.writeValueAsString(localClaimReqDTO.getInputFormat());
                 claimProperties.put(PROP_INPUT_FORMAT, jsonString);
             } catch (JsonProcessingException e) {
@@ -1470,7 +1468,7 @@ public class ServerClaimManagementService {
     private ClaimDialectConfiguration parseClaimDialectFromJson(FileContent fileContent) throws ClaimMetadataException {
 
         try {
-            return new ObjectMapper().readValue(fileContent.getContent(), ClaimDialectConfiguration.class);
+            return mapper.readValue(fileContent.getContent(), ClaimDialectConfiguration.class);
         } catch (JsonProcessingException e) {
             throw new ClaimMetadataException(String.format(
                       Constant.ErrorMessage.ERROR_CODE_ERROR_READING_FILE_CONTENT.toString(), MEDIA_TYPE_JSON), e);
@@ -2034,10 +2032,11 @@ public class ServerClaimManagementService {
      * @param existingLocalClaim the existing local claim.
      * @param incomingLocalClaim the incoming local claim with updated properties.
      */
-    private void validateLocalClaimProperties(LocalClaim existingLocalClaim, LocalClaim incomingLocalClaim) {
+    private void validateLocalClaimProperties(LocalClaim existingLocalClaim, LocalClaim incomingLocalClaim)
+            throws ClaimMetadataException {
 
         // Populate default properties on the existing claim.
-        populateDefaultProperties(existingLocalClaim);
+        populateDefaultProperties(existingLocalClaim, incomingLocalClaim);
 
         // Filter out allowed keys from both existing and incoming claim properties.
         Map<String, String> filteredExistingProperties = existingLocalClaim.getClaimProperties().entrySet().stream()
@@ -2073,15 +2072,27 @@ public class ServerClaimManagementService {
         }
     }
 
-    private void populateDefaultProperties(LocalClaim localClaim) {
+    private void populateDefaultProperties(LocalClaim localClaim, LocalClaim incomingLocalClaim)
+            throws ClaimMetadataException {
 
         localClaim.getClaimProperties().putIfAbsent(PROP_DISPLAY_ORDER, "0");
         localClaim.getClaimProperties().putIfAbsent(PROP_READ_ONLY, FALSE);
         localClaim.getClaimProperties().putIfAbsent(PROP_REQUIRED, FALSE);
         localClaim.getClaimProperties().putIfAbsent(PROP_SUPPORTED_BY_DEFAULT, FALSE);
         localClaim.getClaimProperties().putIfAbsent(PROP_MULTI_VALUED, FALSE);
-        localClaim.getClaimProperties().putIfAbsent(PROP_DATA_TYPE, DataType.STRING.toString()
-                .toLowerCase(Locale.ROOT));
+        localClaim.getClaimProperties().putIfAbsent(PROP_DATA_TYPE, DataType.STRING.getValue());
+        // The input type of the boolean data type is defined as checkbox by default.
+        if (DataType.BOOLEAN.getValue().equals(incomingLocalClaim.getClaimProperties().get(PROP_DATA_TYPE))) {
+            InputFormatDTO inputFormat = new InputFormatDTO();
+            inputFormat.setInputType(INPUT_TYPE_CHECKBOX);
+            try {
+                String inputFormatPayload = mapper.writeValueAsString(inputFormat);
+                localClaim.getClaimProperties().putIfAbsent(PROP_INPUT_FORMAT, inputFormatPayload);
+            } catch (JsonProcessingException e) {
+                throw new ClaimMetadataException(String.valueOf(Constant.ErrorMessage
+                        .ERROR_CODE_ERROR_SERIALIZING_INPUT_FORMAT), e);
+            }
+        }
     }
 
     private String handleAdditionalProperties(Map<String, String> claimProperties, String propertyName) {

@@ -193,6 +193,9 @@ public class Constant {
         ERROR_CODE_UPDATING_LOCAL_CLAIMS("50051",
                 "Some local claims were not updated.",
                 "%s out of %s local claims could not be updated."),
+        ERROR_CODE_ERROR_SERIALIZING_INPUT_FORMAT("50052",
+                "Unable to serialize input format.",
+                "A server error occurred while serializing the input format property."),
         ERROR_CODE_INVALID_IDENTIFIER("CMT-60001", "Invalid identifier",
                 "Invalid Identifier: %s"),
         ERROR_CODE_CLAIM_URI_NOT_SPECIFIED("CMT-60002", "Empty claim URI", "Claim URI is " +

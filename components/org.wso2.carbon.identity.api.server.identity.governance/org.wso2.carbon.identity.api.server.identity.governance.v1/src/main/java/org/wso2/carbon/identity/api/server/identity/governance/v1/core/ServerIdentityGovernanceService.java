@@ -38,6 +38,7 @@ import org.wso2.carbon.identity.api.server.identity.governance.v1.model.Preferen
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PreferenceSearchAttribute;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PropertyReq;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PropertyRes;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PropertyRevertReq;
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.governance.IdentityGovernanceException;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
@@ -383,6 +384,38 @@ public class ServerIdentityGovernanceService {
         } catch (IdentityGovernanceException e) {
             GovernanceConstants.ErrorMessage errorEnum =
                     GovernanceConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_CONNECTOR_PROPERTY;
+            Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+            throw handleException(e, errorEnum, status);
+        }
+    }
+
+    /**
+     * Revert provided properties of a governance connector.
+     *
+     * @param categoryId        Governance connector category id.
+     * @param connectorId       Governance connector id.
+     * @param propertyRevertReq Properties to revert.
+     */
+    public void revertGovernanceConnectorProperties(String categoryId, String connectorId,
+                                                    PropertyRevertReq propertyRevertReq) {
+
+        try {
+            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            ConnectorRes connector = getGovernanceConnector(categoryId, connectorId);
+
+            // Throw an error if propertyRevertReq contain properties that are not in the connector.
+            for (String propertyName : propertyRevertReq.getProperties()) {
+                if (connector.getProperties().stream().noneMatch(
+                        property -> property.getName().equals(propertyName))) {
+                    throw handleBadRequestError(GovernanceConstants.ErrorMessage.ERROR_CODE_PROPERTY_NOT_FOUND,
+                            propertyName, connector.getFriendlyName());
+                }
+            }
+
+            identityGovernanceService.deleteConfiguration(propertyRevertReq.getProperties(), tenantDomain);
+        } catch (IdentityGovernanceException e) {
+            GovernanceConstants.ErrorMessage errorEnum =
+                    GovernanceConstants.ErrorMessage.ERROR_CODE_ERROR_REVERTING_CONNECTOR_PROPERTY;
             Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
             throw handleException(e, errorEnum, status);
         }

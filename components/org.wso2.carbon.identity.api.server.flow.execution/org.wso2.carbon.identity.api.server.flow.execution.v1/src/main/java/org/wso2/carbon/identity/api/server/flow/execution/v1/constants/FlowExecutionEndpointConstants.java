@@ -23,7 +23,7 @@ package org.wso2.carbon.identity.api.server.flow.execution.v1.constants;
  */
 public class FlowExecutionEndpointConstants {
 
-    public static final String REGISTRATION_FLOW_PREFIX = "RFM-";
+    public static final String REGISTRATION_FLOW_PREFIX = "FE-";
     public static final String SELF_REGISTRATION_ENABLED = "SelfRegistration.Enable";
     public static final String DYNAMIC_REGISTRATION_PORTAL_ENABLED = "SelfRegistration.EnableDynamicPortal";
     public static final String SHOW_USERNAME_UNAVAILABILITY = "SelfRegistration.ShowUsernameUnavailability";
