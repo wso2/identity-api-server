@@ -85,11 +85,13 @@ public class WorkflowService {
     private final String DEFAULT_REQUEST_TYPE = ALL_TASKS_REQUEST_TYPE;
     private final String DEFAULT_DATE_CATEGORY = StringUtils.EMPTY;
     private final String DEFAULT_STATUS = StringUtils.EMPTY;
+    private final String DEFAULT_OPERATION_TYPE = StringUtils.EMPTY;
     private final String REQUEST_TYPE_KEY = "requesttype";
     private final String BEGIN_DATE_KEY = "beginDate";
     private final String END_DATE_KEY = "endDate";
     private final String DATE_CATEGORY_KEY = "datecategory";
     private final String STATUS_KEY = "status";
+    private final String OPERATION_TYPE_KEY = "operationtype";
     private final String FILTER_PATTERN_REGEX = "(\\w+)\\s+(eq|ge|le)\\s+['\"]?([^'\"\\s]+)['\"]?";
     private final String AND_REGEX = "(?i)\\s+and\\s+";
     private final String NO_QUOTE_REGEX = "^['\"]|['\"]$";
@@ -690,7 +692,7 @@ public class WorkflowService {
         }
         WorkflowInstanceResponse response = new WorkflowInstanceResponse();
         response.setWorkflowInstanceId(workflowRequest.getRequestId());
-        response.setEventType(Operation.fromValue(workflowRequest.getEventType()));
+        response.setEventType(Operation.fromValue(workflowRequest.getOperationType()));
         response.setRequestInitiator(workflowRequest.getCreatedBy());
         try {
             if (workflowRequest.getCreatedAt() != null) {
@@ -730,8 +732,8 @@ public class WorkflowService {
             throw new WorkflowClientException("Workflow request ID cannot be null.");
         }
 
-        if (workflowRequest.getEventType() != null) {
-            workflowInstanceListItem.setEventType(Operation.fromValue(workflowRequest.getEventType()));
+        if (workflowRequest.getOperationType() != null) {
+            workflowInstanceListItem.setEventType(Operation.fromValue(workflowRequest.getOperationType()));
         }
         if (workflowRequest.getCreatedBy() != null) {
             workflowInstanceListItem.setRequestInitiator(workflowRequest.getCreatedBy());
@@ -782,6 +784,7 @@ public class WorkflowService {
         String endDate = DEFAULT_END_DATE;
         String dateCategory = DEFAULT_DATE_CATEGORY;
         String status = DEFAULT_STATUS;
+        String operationType = DEFAULT_OPERATION_TYPE;
 
         if (filterMap != null && !filterMap.isEmpty()) {
             requestType = StringUtils.isBlank(filterMap.get(REQUEST_TYPE_KEY)) ? requestType
@@ -800,6 +803,8 @@ public class WorkflowService {
                     : filterMap.get(DATE_CATEGORY_KEY);
             status = StringUtils.isBlank(filterMap.get(STATUS_KEY)) ? status
                     : filterMap.get(STATUS_KEY);
+            operationType = StringUtils.isBlank(filterMap.get(OPERATION_TYPE_KEY)) ? null
+                    : filterMap.get(OPERATION_TYPE_KEY);
         }
 
         String normalizedRequestType = requestType.toUpperCase();
@@ -811,11 +816,14 @@ public class WorkflowService {
         org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequestFilterResponse response = workflowManagementService
                 .getRequestsFromFilter(
                         MY_TASKS_REQUEST_TYPE.equals(normalizedRequestType) ? user : StringUtils.EMPTY,
+                        operationType,
                         beginDate,
                         endDate,
                         dateCategory,
                         tenantId,
-                        status, limit, offset);
+                        status, 
+                        limit, 
+                        offset);
 
         org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest[] requests = response.getRequests();
 
@@ -891,6 +899,7 @@ public class WorkflowService {
                     case "requesttype":
                     case "status":
                     case "datecategory":
+                    case "operationtype":
                         if ("eq".equals(operator)) {
                             result.put(field, value != null ? value : "");
                         } else {
