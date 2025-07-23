@@ -40,9 +40,9 @@ public class Endpoint  {
   
     private String uri;
     private AuthenticationType authentication;
-    private List<String> allowedHeaders = new ArrayList<String>();
+    private List<String> allowedHeaders = null;
 
-    private List<String> allowedParameters = new ArrayList<String>();
+    private List<String> allowedParameters = null;
 
 
     /**
@@ -95,11 +95,9 @@ public class Endpoint  {
         return this;
     }
     
-    @ApiModelProperty(example = "[\"x-geo-location\",\"host\"]", required = true, value = "List of HTTP headers to forward to the extension.")
+    @ApiModelProperty(example = "[\"x-geo-location\",\"host\"]", value = "List of HTTP headers to forward to the extension.")
     @JsonProperty("allowedHeaders")
     @Valid
-    @NotNull(message = "Property allowedHeaders cannot be null.")
-
     public List<String> getAllowedHeaders() {
         return allowedHeaders;
     }
@@ -108,6 +106,9 @@ public class Endpoint  {
     }
 
     public Endpoint addAllowedHeadersItem(String allowedHeadersItem) {
+        if (this.allowedHeaders == null) {
+            this.allowedHeaders = new ArrayList<String>();
+        }
         this.allowedHeaders.add(allowedHeadersItem);
         return this;
     }
@@ -121,11 +122,9 @@ public class Endpoint  {
         return this;
     }
     
-    @ApiModelProperty(example = "[\"device-id\"]", required = true, value = "List of parameters to forward to the extension.")
+    @ApiModelProperty(example = "[\"device-id\"]", value = "List of parameters to forward to the extension.")
     @JsonProperty("allowedParameters")
     @Valid
-    @NotNull(message = "Property allowedParameters cannot be null.")
-
     public List<String> getAllowedParameters() {
         return allowedParameters;
     }
@@ -134,6 +133,9 @@ public class Endpoint  {
     }
 
     public Endpoint addAllowedParametersItem(String allowedParametersItem) {
+        if (this.allowedParameters == null) {
+            this.allowedParameters = new ArrayList<String>();
+        }
         this.allowedParameters.add(allowedParametersItem);
         return this;
     }
