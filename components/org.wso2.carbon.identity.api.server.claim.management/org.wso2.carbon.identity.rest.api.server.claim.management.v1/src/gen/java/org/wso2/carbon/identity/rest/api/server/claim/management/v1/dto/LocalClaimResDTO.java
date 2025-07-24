@@ -100,6 +100,9 @@ public class LocalClaimResDTO extends ClaimResDTO {
     @Valid
     private InputFormatDTO inputFormat = null;
 
+    @Valid
+    private Boolean skipUserStore = null;
+
     /**
     * claim ID.
     **/
@@ -345,6 +348,19 @@ public class LocalClaimResDTO extends ClaimResDTO {
         this.inputFormat = inputFormat;
     }
 
+    /**
+     * Specifies if the claim value stored in the user store should be skipped.
+     * And retrieve the claim value stored in the identity db.
+     **/
+    @ApiModelProperty(value = "Specifies if the claim value stored in the user store should be skipped.")
+    @JsonProperty("skipUserStore")
+    public Boolean getSkipUserStore() {
+        return skipUserStore;
+    }
+    public void setSkipUserStore(Boolean skipUserStore) {
+        this.skipUserStore = skipUserStore;
+    }
+
     @Override
     public String toString() {
 
@@ -372,6 +388,7 @@ public class LocalClaimResDTO extends ClaimResDTO {
         sb.append("    properties: ").append(properties).append("\n");
         sb.append("    profiles: ").append(profiles).append("\n");
         sb.append("    inputFormat: ").append(inputFormat).append("\n");
+        sb.append("    skipUserStore: ").append(skipUserStore).append("\n");
         
         sb.append("}\n");
         return sb.toString();

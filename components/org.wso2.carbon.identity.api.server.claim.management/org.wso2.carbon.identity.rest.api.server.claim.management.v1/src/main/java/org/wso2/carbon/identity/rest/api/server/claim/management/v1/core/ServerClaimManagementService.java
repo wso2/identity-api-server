@@ -137,6 +137,7 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_UNAUTHORIZED_ORG_FOR_CLAIM_PROPERTY_UPDATE;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_UNAUTHORIZED_ORG_FOR_EXCLUDED_USER_STORES_PROPERTY_UPDATE;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_USERSTORE_NOT_SPECIFIED_IN_MAPPINGS;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_SKIP_USER_STORE_UPDATE_FAILURE;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.INPUT_TYPE_CHECKBOX;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.INPUT_TYPE_CHECKBOX_GROUP;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.INPUT_TYPE_DATE_PICKER;
@@ -154,6 +155,7 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DISPLAY_NAME;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DISPLAY_ORDER;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_INPUT_FORMAT;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_SKIP_USER_STORE;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_MULTI_VALUED;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_PROFILES_PREFIX;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_READ_ONLY;
@@ -1082,6 +1084,7 @@ public class ServerClaimManagementService {
 
         localClaimResDTO.setDisplayName(claimProperties.remove(PROP_DISPLAY_NAME));
         localClaimResDTO.setReadOnly(Boolean.valueOf(claimProperties.remove(PROP_READ_ONLY)));
+        localClaimResDTO.setSkipUserStore(Boolean.valueOf(claimProperties.remove(PROP_SKIP_USER_STORE)));
         String regEx = claimProperties.remove(PROP_REG_EX);
         localClaimResDTO.setRegEx(regEx);
         if (regEx == null) {
@@ -1285,6 +1288,7 @@ public class ServerClaimManagementService {
         addAttributeProfilesToClaimProperties(localClaimReqDTO.getProfiles(), claimProperties);
 
         claimProperties.put(PROP_READ_ONLY, String.valueOf(localClaimReqDTO.getReadOnly()));
+        claimProperties.put(PROP_SKIP_USER_STORE, String.valueOf(localClaimReqDTO.getSkipUserStore()));
         claimProperties.put(PROP_REQUIRED, String.valueOf(localClaimReqDTO.getRequired()));
         claimProperties.put(PROP_SUPPORTED_BY_DEFAULT, String.valueOf(localClaimReqDTO.getSupportedByDefault()));
         if (localClaimReqDTO.getDataType() != null) {
@@ -1829,6 +1833,14 @@ public class ServerClaimManagementService {
         if (existingClaim.getDataType() != requestedDataType) {
             throw new ClaimMetadataClientException(Constant.ErrorMessage.ERROR_CODE_SYSTEM_ATTRIBUTE_DATA_TYPE_UPDATE
                     .getCode(), Constant.ErrorMessage.ERROR_CODE_SYSTEM_ATTRIBUTE_DATA_TYPE_UPDATE.getDescription());
+        }
+
+        //Validate the skipUserStore property is updated.
+        if (Boolean.TRUE.equals(existingClaim.getSkipUserStore()) !=
+                Boolean.TRUE.equals(localClaimReqDTO.getSkipUserStore())) {
+            throw new ClaimMetadataClientException(Constant.ErrorMessage
+                    .ERROR_CODE_SKIP_USER_STORE_UPDATE_FAILURE.getCode(),
+                    Constant.ErrorMessage.ERROR_CODE_SKIP_USER_STORE_UPDATE_FAILURE.getDescription());
         }
     }
 
