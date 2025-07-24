@@ -29,28 +29,15 @@ public class FlowEndpointConstants {
 
     public static final String FLOW_PREFIX = "FM-";
 
-    // Executor constants
-    public static final String OPENID_CONNECT_EXECUTOR = "OpenIDConnectExecutor";
-    public static final String GOOGLE_EXECUTOR = "GoogleExecutor";
-    public static final String FACEBOOK_EXECUTOR = "FacebookExecutor";
-    public static final String OFFICE365_EXECUTOR = "Office365Executor";
-    public static final String APPLE_EXECUTOR = "AppleExecutor";
-    public static final String FIDO2_EXECUTOR = "FIDO2Executor";
-    public static final String USER_RESOLVE_EXECUTOR = "UserResolveExecutor";
-    public static final String PASSWORD_PROVISIONING_EXECUTOR = "PasswordProvisioningExecutor";
-    public static final String ABSTRACT_OTP_EXECUTOR = "AbstractOTPExecutor";
-    public static final String EMAIL_OTP_EXECUTOR = "EmailOTPExecutor";
-    public static final String SMS_OTP_EXECUTOR = "SMSOTPExecutor";
-    public static final String MAGIC_LINK_EXECUTOR = "MagicLinkExecutor";
-    public static final String PASSWORD_ONBOARD_EXECUTOR = "PasswordOnboardExecutor";
-    public static final String CONFIRMATION_CODE_VALIDATION_EXECUTOR = "ConfirmationCodeValidationExecutor";
-
     public static final String END_USER_ATTRIBUTE_PROFILE = "endUser";
     public static final String SELF_REGISTRATION_ATTRIBUTE_PROFILE = "selfRegistration";
 
     public static final String USERNAME_IDENTIFIER = "http://wso2.org/claims/username";
     public static final String PASSWORD_IDENTIFIER = "password";
     public static final String USER_IDENTIFIER = "userIdentifier";
+
+    public static final String IDP_TEMPLATE_ID = "templateId";
+    public static final String MICROSOFT_IDP_TEMPLATE_ID = "microsoft-idp";
 
     /**
      * Error messages related to flow management.
@@ -65,9 +52,9 @@ public class FlowEndpointConstants {
                 "Error occurred while retrieving the governance configuration.",
                 "Server encountered an error while retrieving the governance configuration."),
 
-        ERROR_CODE_GET_LOCAL_AUTHENTICATORS("10003",
-                "Error occurred while retrieving local authenticators.",
-                "Server encountered an error while retrieving the local authenticators."),
+        ERROR_CODE_GET_IDENTITY_PROVIDERS("10003",
+                "Error occurred while retrieving identity providers.",
+                "Server encountered an error while retrieving the identity providers."),
 
         ERROR_CODE_UNSUPPORTED_EXECUTOR("10004",
                 "Unsupported executor used in the flow.",
@@ -119,6 +106,41 @@ public class FlowEndpointConstants {
     public static class Schema {
 
         public static final String IDP_NAME = "idpName";
+    }
+
+    /**
+     * Constants related to executors.
+     */
+    public static class Executors {
+
+        public static final String OPENID_CONNECT_EXECUTOR = "OpenIDConnectExecutor";
+        public static final String GOOGLE_EXECUTOR = "GoogleExecutor";
+        public static final String FACEBOOK_EXECUTOR = "FacebookExecutor";
+        public static final String OFFICE365_EXECUTOR = "Office365Executor";
+        public static final String APPLE_EXECUTOR = "AppleExecutor";
+        public static final String GITHUB_EXECUTOR = "GithubExecutor";
+        public static final String FIDO2_EXECUTOR = "FIDO2Executor";
+        public static final String USER_RESOLVE_EXECUTOR = "UserResolveExecutor";
+        public static final String PASSWORD_PROVISIONING_EXECUTOR = "PasswordProvisioningExecutor";
+        public static final String ABSTRACT_OTP_EXECUTOR = "AbstractOTPExecutor";
+        public static final String EMAIL_OTP_EXECUTOR = "EmailOTPExecutor";
+        public static final String SMS_OTP_EXECUTOR = "SMSOTPExecutor";
+        public static final String MAGIC_LINK_EXECUTOR = "MagicLinkExecutor";
+        public static final String PASSWORD_ONBOARD_EXECUTOR = "PasswordOnboardExecutor";
+        public static final String CONFIRMATION_CODE_VALIDATION_EXECUTOR = "ConfirmationCodeValidationExecutor";
+    }
+
+    /**
+     * Constants related to authenticators.
+     */
+    public static class Authenticators {
+
+        public static final String OPENID_CONNECT_AUTHENTICATOR = "OpenIDConnectAuthenticator";
+        public static final String GOOGLE_AUTHENTICATOR = "GoogleOIDCAuthenticator";
+        public static final String GITHUB_AUTHENTICATOR = "GithubAuthenticator";
+        public static final String FACEBOOK_AUTHENTICATOR = "FacebookAuthenticator";
+        public static final String OFFICE365_AUTHENTICATOR = "Office365Authenticator";
+        public static final String APPLE_AUTHENTICATOR = "AppleOIDCAuthenticator";
     }
 
 }
