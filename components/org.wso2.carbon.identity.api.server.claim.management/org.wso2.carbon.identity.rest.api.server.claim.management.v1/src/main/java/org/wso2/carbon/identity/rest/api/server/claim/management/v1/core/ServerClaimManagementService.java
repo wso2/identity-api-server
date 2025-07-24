@@ -1835,13 +1835,6 @@ public class ServerClaimManagementService {
                     .getCode(), Constant.ErrorMessage.ERROR_CODE_SYSTEM_ATTRIBUTE_DATA_TYPE_UPDATE.getDescription());
         }
 
-        //Validate the skipUserStore property is updated.
-        if (Boolean.TRUE.equals(existingClaim.getSkipUserStore()) !=
-                Boolean.TRUE.equals(localClaimReqDTO.getSkipUserStore())) {
-            throw new ClaimMetadataClientException(Constant.ErrorMessage
-                    .ERROR_CODE_SKIP_USER_STORE_UPDATE_FAILURE.getCode(),
-                    Constant.ErrorMessage.ERROR_CODE_SKIP_USER_STORE_UPDATE_FAILURE.getDescription());
-        }
     }
 
     private void validateSubAttributeUpdate(LocalClaimReqDTO localClaimReqDTO) throws ClaimMetadataException {
