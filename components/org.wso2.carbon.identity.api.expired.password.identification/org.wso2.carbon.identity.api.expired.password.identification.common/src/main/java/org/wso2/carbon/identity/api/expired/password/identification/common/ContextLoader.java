@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.expired.password.identification.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.identity.core.util.IdentityCoreConstants;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
@@ -26,6 +28,8 @@ import org.wso2.carbon.identity.core.util.IdentityUtil;
  * Load information from context.
  */
 public class ContextLoader {
+
+    private static final Log LOG = LogFactory.getLog(ContextLoader.class);
 
     /**
      * Retrieves loaded tenant domain from carbon context.
@@ -38,6 +42,9 @@ public class ContextLoader {
         if (IdentityUtil.threadLocalProperties.get().get(IdentityCoreConstants.TENANT_NAME_FROM_CONTEXT) != null) {
             tenantDomain = (String) IdentityUtil.threadLocalProperties.get()
                     .get(IdentityCoreConstants.TENANT_NAME_FROM_CONTEXT);
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieved tenant domain from context: " + tenantDomain);
         }
         return tenantDomain;
     }

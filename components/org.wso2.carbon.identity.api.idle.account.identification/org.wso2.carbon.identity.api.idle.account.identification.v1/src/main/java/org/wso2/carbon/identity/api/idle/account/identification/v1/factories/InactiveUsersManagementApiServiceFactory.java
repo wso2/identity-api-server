@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.idle.account.identification.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.idle.account.identification.common.IdleAccountIdentificationServiceHolder;
 import org.wso2.carbon.identity.api.idle.account.identification.v1.core.InactiveUsersManagementApiService;
 import org.wso2.carbon.identity.idle.account.identification.services.IdleAccountIdentificationService;
@@ -27,15 +29,19 @@ import org.wso2.carbon.identity.idle.account.identification.services.IdleAccount
  */
 public class InactiveUsersManagementApiServiceFactory {
 
+    private static final Log LOG = LogFactory.getLog(InactiveUsersManagementApiServiceFactory.class);
     private static final InactiveUsersManagementApiService SERVICE;
 
     static {
+        LOG.info("Initializing InactiveUsersManagementApiService");
         IdleAccountIdentificationService idleAccountIdentificationService = IdleAccountIdentificationServiceHolder
                 .getIdleAccountIdentificationService();
         if (idleAccountIdentificationService == null) {
+            LOG.error("IdleAccountIdentificationService is not available from OSGi context");
             throw new IllegalStateException("IdleAccountIdentificationService is not available from OSGi context.");
         }
         SERVICE = new InactiveUsersManagementApiService(idleAccountIdentificationService);
+        LOG.info("InactiveUsersManagementApiService initialized successfully");
     }
 
     /**
@@ -44,6 +50,9 @@ public class InactiveUsersManagementApiServiceFactory {
      * @return InactiveUsersManagementApiService
      */
     public static InactiveUsersManagementApiService getInactiveUsersManagementApiService() {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving InactiveUsersManagementApiService instance");
+        }
         return SERVICE;
     }
 }

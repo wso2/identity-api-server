@@ -19,6 +19,8 @@
 package org.wso2.carbon.identity.api.server.fetch.remote.v1.core;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
@@ -30,6 +32,8 @@ import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
  * Utility functions for remote fetch configuration.
  */
 public class RemoteFetchUtils {
+
+    private static final Log log = LogFactory.getLog(RemoteFetchUtils.class);
 
     private RemoteFetchUtils() {
 
@@ -59,6 +63,9 @@ public class RemoteFetchUtils {
     public static void convertDateToStringIfNotNull(Date value, Consumer<String> consumer) {
 
         if (value != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Converting date to ISO-8601 format: " + value);
+            }
             //ISO-8601 representation of the date.
             ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(value.toInstant(), ZoneId.systemDefault())
                     .withZoneSameInstant(ZoneId.of("UTC"));

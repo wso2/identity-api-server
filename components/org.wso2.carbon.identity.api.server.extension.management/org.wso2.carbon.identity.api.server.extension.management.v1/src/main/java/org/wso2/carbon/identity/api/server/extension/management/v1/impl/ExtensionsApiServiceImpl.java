@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.extension.management.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
 import org.wso2.carbon.identity.api.server.extension.management.common.ExtensionManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.extension.management.common.utils.ExtensionMgtConstants;
@@ -32,13 +34,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.api.server.extension.management.common.utils.ExtensionMgtUtils.validateExtensionType;
+import static org.wso2.carbon.identity.api.server.extension.management.common.utils.ExtensionMgtUtils
+        .validateExtensionType;
 
 
 /**
  * Implementation of the extension management service.
  */
 public class ExtensionsApiServiceImpl implements ExtensionsApiService {
+
+    private static final Log log = LogFactory.getLog(ExtensionsApiServiceImpl.class);
 
     /**
      * Get all the extensions.
@@ -48,8 +53,14 @@ public class ExtensionsApiServiceImpl implements ExtensionsApiService {
     @Override
     public Response listExtensions() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Listing all extensions.");
+        }
         List<ExtensionInfo> extensionInfoList = ExtensionManagementServiceHolder.getExtensionManager()
                 .getExtensions();
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieved " + (extensionInfoList != null ? extensionInfoList.size() : 0) + " extensions.");
+        }
         return Response.ok().entity(extensionInfoList.stream().map(new
                 ExtensionListItemBuilder()).collect(Collectors.toList())).build();
     }
@@ -63,14 +74,22 @@ public class ExtensionsApiServiceImpl implements ExtensionsApiService {
     @Override
     public Response listExtensionsByType(String extensionType) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Listing extensions by type: " + extensionType);
+        }
         // TODO: Add pagination support.
         validateExtensionType(extensionType);
         try {
             List<ExtensionInfo> extensionInfoList = ExtensionManagementServiceHolder.getExtensionManager()
                     .getExtensionsByType(extensionType);
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieved " + (extensionInfoList != null ? extensionInfoList.size() : 0) + 
+                        " extensions for type: " + extensionType);
+            }
             return Response.ok().entity(extensionInfoList.stream().map(new
                     ExtensionListItemBuilder()).collect(Collectors.toList())).build();
         } catch (ExtensionManagementException e) {
+            log.error("Error occurred while retrieving extensions by type: " + extensionType, e);
             throw ExtensionMgtUtils.handleServerException(Response.Status.INTERNAL_SERVER_ERROR,
                     ExtensionMgtConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_EXTENSIONS_BY_TYPE, extensionType);
         }
@@ -86,16 +105,27 @@ public class ExtensionsApiServiceImpl implements ExtensionsApiService {
     @Override
     public Response getExtensionInfoById(String extensionType, String extensionId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving extension info for type: " + extensionType + ", id: " + extensionId);
+        }
         validateExtensionType(extensionType);
         try {
             ExtensionInfo extensionInfo = ExtensionManagementServiceHolder.getExtensionManager()
                     .getExtensionByTypeAndId(extensionType, extensionId);
             if (extensionInfo == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Extension not found for type: " + extensionType + ", id: " + extensionId);
+                }
                 throw ExtensionMgtUtils.handleClientException(Response.Status.NOT_FOUND,
                         ExtensionMgtConstants.ErrorMessage.ERROR_CODE_EXTENSION_NOT_FOUND, extensionId, extensionType);
             }
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully retrieved extension info for type: " + extensionType + ", id: " + extensionId);
+            }
             return Response.ok().entity(new ExtensionResponseModelBuilder().apply(extensionInfo)).build();
         } catch (ExtensionManagementException e) {
+            log.error("Error occurred while retrieving extension info for type: " + extensionType + ", id: " + 
+                    extensionId, e);
             throw ExtensionMgtUtils.handleServerException(Response.Status.INTERNAL_SERVER_ERROR,
                     ExtensionMgtConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_EXTENSION, extensionId, extensionType);
         }
@@ -111,16 +141,28 @@ public class ExtensionsApiServiceImpl implements ExtensionsApiService {
     @Override
     public Response getTemplateById(String extensionType, String extensionId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving template for extension type: " + extensionType + ", id: " + extensionId);
+        }
         validateExtensionType(extensionType);
         try {
             JSONObject template = ExtensionManagementServiceHolder.getExtensionManager()
                     .getExtensionTemplate(extensionType, extensionId);
             if (template == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Template not found for extension type: " + extensionType + ", id: " + extensionId);
+                }
                 throw ExtensionMgtUtils.handleClientException(Response.Status.NOT_FOUND,
                         ExtensionMgtConstants.ErrorMessage.ERROR_CODE_TEMPLATE_NOT_FOUND, extensionId, extensionType);
             }
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully retrieved template for extension type: " + extensionType + ", id: " + 
+                        extensionId);
+            }
             return Response.ok().entity(template.toString()).build();
         } catch (ExtensionManagementException e) {
+            log.error("Error occurred while retrieving template for extension type: " + extensionType + ", id: " + 
+                    extensionId, e);
             throw ExtensionMgtUtils.handleServerException(Response.Status.INTERNAL_SERVER_ERROR,
                     ExtensionMgtConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_TEMPLATE, extensionId, extensionType);
         }
@@ -136,16 +178,28 @@ public class ExtensionsApiServiceImpl implements ExtensionsApiService {
     @Override
     public Response getMetadataById(String extensionType, String extensionId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving metadata for extension type: " + extensionType + ", id: " + extensionId);
+        }
         validateExtensionType(extensionType);
         try {
             JSONObject metadata = ExtensionManagementServiceHolder.getExtensionManager()
                     .getExtensionMetadata(extensionType, extensionId);
             if (metadata == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Metadata not found for extension type: " + extensionType + ", id: " + extensionId);
+                }
                 throw ExtensionMgtUtils.handleClientException(Response.Status.NOT_FOUND,
                         ExtensionMgtConstants.ErrorMessage.ERROR_CODE_METADATA_NOT_FOUND, extensionId, extensionType);
             }
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully retrieved metadata for extension type: " + extensionType + ", id: " + 
+                        extensionId);
+            }
             return Response.ok().entity(metadata.toString()).build();
         } catch (ExtensionManagementException e) {
+            log.error("Error occurred while retrieving metadata for extension type: " + extensionType + ", id: " + 
+                    extensionId, e);
             throw ExtensionMgtUtils.handleServerException(Response.Status.INTERNAL_SERVER_ERROR,
                     ExtensionMgtConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_METADATA, extensionId, extensionType);
         }

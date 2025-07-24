@@ -42,6 +42,14 @@ public class ContextLoader {
         if (IdentityUtil.threadLocalProperties.get().get(IdentityCoreConstants.TENANT_NAME_FROM_CONTEXT) != null) {
             tenantDomain = (String) IdentityUtil.threadLocalProperties.get()
                     .get(IdentityCoreConstants.TENANT_NAME_FROM_CONTEXT);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Retrieved tenant domain from context: " + tenantDomain);
+            }
+        } else {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("No tenant domain found in context, using super tenant domain: " + 
+                        tenantDomain);
+            }
         }
         return tenantDomain;
     }

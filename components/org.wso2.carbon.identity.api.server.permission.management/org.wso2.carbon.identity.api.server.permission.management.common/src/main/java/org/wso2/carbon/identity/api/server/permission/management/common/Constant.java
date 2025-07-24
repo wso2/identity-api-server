@@ -16,6 +16,9 @@
 
 package org.wso2.carbon.identity.api.server.permission.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -38,6 +41,7 @@ public class Constant {
                 "One of the given inputs is invalid.")
         ;
 
+        private static final Log log = LogFactory.getLog(ErrorMessage.class);
         private final String code;
         private final String message;
         private final String description;
@@ -79,10 +83,16 @@ public class Constant {
         public static ErrorMessage getMappedErrorMessage(String serverCode) {
 
             try {
+                if (log.isDebugEnabled()) {
+                    log.debug("Retrieving error message mapping for server code: " + serverCode);
+                }
                 String errorCode = resourceBundle.getString(serverCode);
                 return messageIndex.get(errorCode);
             } catch (Throwable e) {
-                // Ignore if error mapping has invalid input.
+                if (log.isDebugEnabled()) {
+                    log.debug("Error mapping not found for server code: " + serverCode + 
+                            ". Using default error message.", e);
+                }
             }
             return ErrorMessage.ERROR_CODE_INVALID_INPUT;
         }

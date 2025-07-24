@@ -160,10 +160,16 @@ public class OrganizationManagementService {
      */
     public Response checkOrganizationName(String organizationName) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Checking organization name availability: %s", organizationName));
+        }
         boolean nameExist = organizationManager.isOrganizationExistByNameInGivenHierarchy(organizationName);
         OrganizationNameCheckPOSTResponse response = new OrganizationNameCheckPOSTResponse().available(false);
         if (!nameExist) {
             response.setAvailable(true);
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Organization name '%s' availability: %s", organizationName, !nameExist));
         }
         return Response.ok().entity(response).build();
     }
@@ -177,8 +183,14 @@ public class OrganizationManagementService {
     public Response checkOrganizationHandle(String orgHandle) {
 
         try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(String.format("Checking organization handle availability: %s", orgHandle));
+            }
             boolean isOrgHandleAvailable = !organizationManager.isOrganizationExistByHandle(orgHandle);
             OrganizationCheckResponse response = new OrganizationCheckResponse().available(isOrgHandleAvailable);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(String.format("Organization handle '%s' availability: %s", orgHandle, isOrgHandleAvailable));
+            }
             return Response.ok().entity(response).build();
         } catch (OrganizationManagementException e) {
             return OrganizationManagementEndpointUtil.handleServerErrorResponse(e, LOG);
@@ -194,7 +206,9 @@ public class OrganizationManagementService {
     public Response deleteOrganization(String organizationId) {
 
         try {
+            LOG.info(String.format("Deleting organization with ID: %s", organizationId));
             organizationManager.deleteOrganization(organizationId);
+            LOG.info(String.format("Successfully deleted organization with ID: %s", organizationId));
             return Response.noContent().build();
         } catch (OrganizationManagementClientException e) {
             return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);
@@ -273,9 +287,12 @@ public class OrganizationManagementService {
     public Response addOrganization(OrganizationPOSTRequest organizationPOSTRequest) {
 
         try {
+            String orgName = organizationPOSTRequest != null ? organizationPOSTRequest.getName() : null;
+            LOG.info(String.format("Creating new organization with name: %s", orgName));
             Organization organization = organizationManager.addOrganization(getOrganizationFromPostRequest
                     (organizationPOSTRequest));
             String organizationId = organization.getId();
+            LOG.info(String.format("Successfully created organization '%s' with ID: %s", orgName, organizationId));
             return Response.created(OrganizationManagementEndpointUtil.getResourceLocation(organizationId)).entity
                     (getOrganizationResponse(organization)).build();
         } catch (OrganizationManagementClientException e) {
@@ -297,11 +314,17 @@ public class OrganizationManagementService {
                                                  ApplicationSharePOSTRequest requestBody) {
 
         try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(String.format("Sharing application '%s' from organization '%s'", 
+                        applicationId, organizationId));
+            }
             validateApplicationSharePostRequestBody(requestBody);
             boolean shareWithAllChildren = (requestBody.getShareWithAllChildren() != null)
                     ? requestBody.getShareWithAllChildren() : false;
             orgApplicationManager.shareOrganizationApplication(organizationId, applicationId,
                     shareWithAllChildren, requestBody.getSharedOrganizations());
+            LOG.info(String.format("Successfully shared application '%s' from organization '%s'", 
+                    applicationId, organizationId));
             return Response.ok().build();
         } catch (OrganizationManagementClientException e) {
             return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);

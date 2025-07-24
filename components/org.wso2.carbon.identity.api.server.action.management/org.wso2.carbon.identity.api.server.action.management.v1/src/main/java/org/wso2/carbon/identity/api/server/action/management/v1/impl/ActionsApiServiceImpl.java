@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.action.management.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionsApiService;
 import org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants;
@@ -36,13 +38,18 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
  */
 public class ActionsApiServiceImpl implements ActionsApiService {
 
+    private static final Log LOG = LogFactory.getLog(ActionsApiServiceImpl.class);
     private final ServerActionManagementService serverActionManagementService;
 
     public ActionsApiServiceImpl() {
 
         try {
             this.serverActionManagementService = ActionManagementServiceFactory.getActionManagementService();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("ActionsApiService initialized successfully");
+            }
         } catch (IllegalStateException e) {
+            LOG.error("Error occurred while initiating server action management service", e);
             throw new RuntimeException("Error occurred while initiating server action management service.", e);
         }
     }
@@ -50,12 +57,18 @@ public class ActionsApiServiceImpl implements ActionsApiService {
     @Override
     public Response activateAction(String actionType, String actionId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("REST API call to activate action: " + actionId + " of type: " + actionType);
+        }
         return Response.ok().entity(serverActionManagementService.activateAction(actionType, actionId)).build();
     }
 
     @Override
     public Response createAction(String actionType, String body) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("REST API call to create action of type: " + actionType);
+        }
         ActionResponse actionResponse = serverActionManagementService.createAction(actionType, body);
         URI location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT +
                 ActionMgtEndpointConstants.ACTION_PATH_COMPONENT + "/" + actionResponse.getId());
@@ -65,12 +78,18 @@ public class ActionsApiServiceImpl implements ActionsApiService {
     @Override
     public Response deactivateAction(String actionType, String actionId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("REST API call to deactivate action: " + actionId + " of type: " + actionType);
+        }
         return Response.ok().entity(serverActionManagementService.deactivateAction(actionType, actionId)).build();
     }
 
     @Override
     public Response deleteAction(String actionType, String actionId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("REST API call to delete action: " + actionId + " of type: " + actionType);
+        }
         serverActionManagementService.deleteAction(actionType, actionId);
         return Response.noContent().build();
     }
@@ -78,24 +97,36 @@ public class ActionsApiServiceImpl implements ActionsApiService {
     @Override
     public Response getActionByActionId(String actionType, String actionId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("REST API call to get action: " + actionId + " of type: " + actionType);
+        }
         return Response.ok().entity(serverActionManagementService.getActionByActionId(actionType, actionId)).build();
     }
 
     @Override
     public Response getActionTypes() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("REST API call to get action types");
+        }
         return Response.ok().entity(serverActionManagementService.getActionTypes()).build();
     }
 
     @Override
     public Response getActionsByActionType(String actionType) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("REST API call to get actions by type: " + actionType);
+        }
         return Response.ok().entity(serverActionManagementService.getActionsByActionType(actionType)).build();
     }
 
     @Override
     public Response updateAction(String actionType, String actionId, String body) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("REST API call to update action: " + actionId + " of type: " + actionType);
+        }
         return Response.ok().entity(serverActionManagementService.updateAction(actionType, actionId, body)).build();
     }
 }

@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.fetch.remote.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.remotefetch.common.RemoteFetchConfigurationService;
 
@@ -25,6 +27,8 @@ import org.wso2.carbon.identity.remotefetch.common.RemoteFetchConfigurationServi
  * Service holder class for remote fetch configurations.
  */
 public class RemoteFetchServiceHolder {
+
+    private static final Log log = LogFactory.getLog(RemoteFetchServiceHolder.class);
 
     private RemoteFetchServiceHolder() {}
 
@@ -41,6 +45,13 @@ public class RemoteFetchServiceHolder {
      */
     public static RemoteFetchConfigurationService getRemoteFetchConfigurationService() {
 
-        return RemoteFetchConfigurationServiceHolder.SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving RemoteFetchConfigurationService from OSGi context.");
+        }
+        RemoteFetchConfigurationService service = RemoteFetchConfigurationServiceHolder.SERVICE;
+        if (service == null) {
+            log.warn("RemoteFetchConfigurationService is not available in the OSGi context.");
+        }
+        return service;
     }
 }

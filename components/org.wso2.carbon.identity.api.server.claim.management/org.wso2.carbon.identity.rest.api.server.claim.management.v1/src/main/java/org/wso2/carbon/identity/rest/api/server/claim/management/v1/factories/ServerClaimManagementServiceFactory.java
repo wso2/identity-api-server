@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.rest.api.server.claim.management.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.claim.management.common.ClaimManagementDataHolder;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
 import org.wso2.carbon.identity.organization.management.service.OrganizationManager;
@@ -28,22 +30,31 @@ import org.wso2.carbon.identity.rest.api.server.claim.management.v1.core.ServerC
  */
 public class ServerClaimManagementServiceFactory {
 
+    private static final Log LOG = LogFactory.getLog(ServerClaimManagementServiceFactory.class);
     private static final ServerClaimManagementService SERVICE;
 
     static {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Initializing ServerClaimManagementService");
+        }
         ClaimMetadataManagementService claimMetadataManagementService = ClaimManagementDataHolder
                 .getClaimMetadataManagementService();
         OrganizationManager organizationManager = ClaimManagementDataHolder.getOrganizationManager();
 
         if (claimMetadataManagementService == null) {
+            LOG.error("ClaimMetadataManagementService is not available from OSGi context");
             throw new IllegalStateException("ClaimMetadataManagementService is not available from OSGi context.");
         }
 
         if (organizationManager == null) {
+            LOG.error("OrganizationManager is not available from OSGi context");
             throw new IllegalStateException("OrganizationManager is not available from OSGi context.");
         }
 
         SERVICE = new ServerClaimManagementService(claimMetadataManagementService, organizationManager);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("ServerClaimManagementService initialized successfully");
+        }
     }
 
     /**

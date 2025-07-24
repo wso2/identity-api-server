@@ -19,6 +19,8 @@
 package org.wso2.carbon.identity.rest.api.server.notification.template.v1.core;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.notification.template.common.Constants;
 import org.wso2.carbon.identity.governance.exceptions.notiification.NotificationTemplateManagerException;
 import org.wso2.carbon.identity.governance.model.NotificationTemplate;
@@ -39,6 +41,7 @@ import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenant
  */
 public class TemplatesService {
 
+    private static final Log log = LogFactory.getLog(TemplatesService.class);
     private final NotificationTemplateManager notificationTemplateManager;
 
     public TemplatesService(NotificationTemplateManager notificationTemplateManager) {
@@ -68,6 +71,13 @@ public class TemplatesService {
     public SimpleTemplate addEmailTemplate(String templateTypeId, EmailTemplateWithID emailTemplateWithID,
             String applicationUuid) {
 
+        if (log.isDebugEnabled()) {
+            String context = StringUtils.isNotBlank(applicationUuid) ? "application: " + applicationUuid
+                    : "organization";
+            log.debug(String.format("Adding email template for %s, template type: %s, locale: %s in tenant: %s",
+                    context, templateTypeId, emailTemplateWithID != null ? emailTemplateWithID.getLocale() : "null",
+                    getTenantDomainFromContext()));
+        }
         try {
             NotificationTemplate notificationTemplate = Util.buildNotificationTemplateWithEmailTemplateWithID(
                     templateTypeId, emailTemplateWithID);
@@ -84,6 +94,13 @@ public class TemplatesService {
             SimpleTemplate simpleEmailTemplate = new SimpleTemplate();
             simpleEmailTemplate.setSelf(templateLocation);
             simpleEmailTemplate.setLocale(notificationTemplate.getLocale());
+            if (log.isDebugEnabled()) {
+                String context = StringUtils.isNotBlank(applicationUuid) ? "application: " + applicationUuid
+                        : "organization";
+                log.debug(String.format(
+                        "Successfully added email template for %s, template type: %s, locale: %s",
+                        context, templateTypeId, notificationTemplate.getLocale()));
+            }
             return simpleEmailTemplate;
         } catch (NotificationTemplateManagerException e) {
             throw Util.handleNotificationTemplateManagerException(e,
@@ -114,6 +131,13 @@ public class TemplatesService {
     public SimpleTemplate addSMSTemplate(String templateTypeId, SMSTemplateWithID smsTemplateWithID,
             String applicationUuid) {
 
+        if (log.isDebugEnabled()) {
+            String context = StringUtils.isNotBlank(applicationUuid) ? "application: " + applicationUuid
+                    : "organization";
+            log.debug(String.format("Adding SMS template for %s, template type: %s, locale: %s in tenant: %s",
+                    context, templateTypeId, smsTemplateWithID != null ? smsTemplateWithID.getLocale() : "null",
+                    getTenantDomainFromContext()));
+        }
         try {
             NotificationTemplate notificationTemplate = Util.buildNotificationTemplateWithSMSTemplateWithID(
                     templateTypeId, smsTemplateWithID);
@@ -130,6 +154,13 @@ public class TemplatesService {
             SimpleTemplate simpleSMSTemplate = new SimpleTemplate();
             simpleSMSTemplate.setSelf(templateLocation);
             simpleSMSTemplate.setLocale(notificationTemplate.getLocale());
+            if (log.isDebugEnabled()) {
+                String context = StringUtils.isNotBlank(applicationUuid) ? "application: " + applicationUuid
+                        : "organization";
+                log.debug(String.format(
+                        "Successfully added SMS template for %s, template type: %s, locale: %s",
+                        context, templateTypeId, notificationTemplate.getLocale()));
+            }
             return simpleSMSTemplate;
         } catch (NotificationTemplateManagerException e) {
             throw Util.handleNotificationTemplateManagerException(e,
@@ -166,13 +197,28 @@ public class TemplatesService {
                                                               String notificationChannel, boolean resolve) {
 
         String templateTypeDisplayName = Util.decodeTemplateTypeId(templateTypeId);
+        if (log.isDebugEnabled()) {
+            String context = StringUtils.isNotBlank(applicationUuid) ? "application: " + applicationUuid
+                    : "organization";
+            log.debug(String.format(
+                    "Retrieving all templates for %s, template type: %s, channel: %s, resolve: %s in tenant: %s",
+                    context, templateTypeDisplayName, notificationChannel, resolve, getTenantDomainFromContext()));
+        }
         try {
             List<NotificationTemplate> templates = notificationTemplateManager.getNotificationTemplatesOfType(
                     notificationChannel, templateTypeDisplayName, getTenantDomainFromContext(), applicationUuid,
                     resolve);
             String templateOwner = StringUtils.isNotBlank(applicationUuid) ? Constants.NOTIFICATION_TEMPLATE_OWNER_APP :
                     Constants.NOTIFICATION_TEMPLATE_OWNER_ORG;
-            return Util.buildSimpleTemplateList(templates, applicationUuid, templateOwner, notificationChannel);
+            List<SimpleTemplate> result = Util.buildSimpleTemplateList(templates, applicationUuid, templateOwner,
+                    notificationChannel);
+            if (log.isDebugEnabled()) {
+                String context = StringUtils.isNotBlank(applicationUuid) ? "application: " + applicationUuid
+                        : "organization";
+                log.debug(String.format("Retrieved %d templates for %s, template type: %s, channel: %s",
+                        result.size(), context, templateTypeDisplayName, notificationChannel));
+            }
+            return result;
         } catch (NotificationTemplateManagerException e) {
             throw Util.handleNotificationTemplateManagerException(e,
                     Constants.ErrorMessage.ERROR_ERROR_RETRIEVING_TEMPLATES);
@@ -189,11 +235,20 @@ public class TemplatesService {
     public List<SimpleTemplate> getAllSystemTemplatesOfTemplateType(String templateTypeId, String notificationChannel) {
 
         String templateTypeDisplayName = Util.decodeTemplateTypeId(templateTypeId);
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Retrieving all system templates for template type: %s, channel: %s",
+                    templateTypeDisplayName, notificationChannel));
+        }
         try {
             List<NotificationTemplate> templates = notificationTemplateManager.getAllSystemNotificationTemplatesOfType(
                     notificationChannel, templateTypeDisplayName);
-            return Util.buildSimpleTemplateList(templates, null,
+            List<SimpleTemplate> result = Util.buildSimpleTemplateList(templates, null,
                     Constants.NOTIFICATION_TEMPLATE_OWNER_SYSTEM, notificationChannel);
+            if (log.isDebugEnabled()) {
+                log.debug(String.format("Retrieved %d system templates for template type: %s, channel: %s",
+                        result.size(), templateTypeDisplayName, notificationChannel));
+            }
+            return result;
         } catch (NotificationTemplateManagerException e) {
             throw Util.handleNotificationTemplateManagerException(e,
                     Constants.ErrorMessage.ERROR_ERROR_RETRIEVING_TEMPLATES);
@@ -361,6 +416,12 @@ public class TemplatesService {
     public void updateEmailTemplate(String templateTypeId, String templateId, EmailTemplate emailTemplate,
             String applicationUuid) {
 
+        if (log.isDebugEnabled()) {
+            String context = StringUtils.isNotBlank(applicationUuid) ? "application: " + applicationUuid
+                    : "organization";
+            log.debug(String.format("Updating email template for %s, template type: %s, template ID: %s in tenant: %s",
+                    context, templateTypeId, templateId, getTenantDomainFromContext()));
+        }
         EmailTemplateWithID emailTemplateWithID =
                 Util.buildEmailTemplateWithIdUsingEmailTemplate(emailTemplate, templateId);
         try {
@@ -368,6 +429,13 @@ public class TemplatesService {
                     templateTypeId, emailTemplateWithID);
             notificationTemplateManager.updateNotificationTemplate(notificationTemplate, getTenantDomainFromContext(),
                     applicationUuid);
+            if (log.isDebugEnabled()) {
+                String context = StringUtils.isNotBlank(applicationUuid) ? "application: " + applicationUuid
+                        : "organization";
+                log.debug(String.format(
+                        "Successfully updated email template for %s, template type: %s, template ID: %s",
+                        context, templateTypeId, templateId));
+            }
         } catch (NotificationTemplateManagerException e) {
             throw Util.handleNotificationTemplateManagerException(e,
                     Constants.ErrorMessage.ERROR_ERROR_UPDATING_TEMPLATE);
@@ -397,6 +465,12 @@ public class TemplatesService {
     public void updateSMSTemplate(String templateTypeId, String templateId, SMSTemplate smsTemplate,
           String applicationUuid) {
 
+        if (log.isDebugEnabled()) {
+            String context = StringUtils.isNotBlank(applicationUuid) ? "application: " + applicationUuid
+                    : "organization";
+            log.debug(String.format("Updating SMS template for %s, template type: %s, template ID: %s in tenant: %s",
+                    context, templateTypeId, templateId, getTenantDomainFromContext()));
+        }
         SMSTemplateWithID smsTemplateWithID =
                 Util.buildSMSTemplateWithIdUsingSMSTemplate(smsTemplate, templateId);
         try {
@@ -404,6 +478,12 @@ public class TemplatesService {
                     templateTypeId, smsTemplateWithID);
             notificationTemplateManager.updateNotificationTemplate(notificationTemplate, getTenantDomainFromContext(),
                     applicationUuid);
+            if (log.isDebugEnabled()) {
+                String context = StringUtils.isNotBlank(applicationUuid) ? "application: " + applicationUuid
+                        : "organization";
+                log.debug(String.format("Successfully updated SMS template for %s, template type: %s, template ID: %s",
+                        context, templateTypeId, templateId));
+            }
         } catch (NotificationTemplateManagerException e) {
             throw Util.handleNotificationTemplateManagerException(e,
                     Constants.ErrorMessage.ERROR_ERROR_UPDATING_TEMPLATE);
@@ -431,6 +511,12 @@ public class TemplatesService {
     public void deleteEmailTemplate(String templateTypeId, String locale, String applicationUuid) {
 
         String templateTypeDisplayName = Util.decodeTemplateTypeId(templateTypeId);
+        if (log.isDebugEnabled()) {
+            String context = StringUtils.isNotBlank(applicationUuid) ? "application: " + applicationUuid
+                    : "organization";
+            log.debug(String.format("Deleting email template for %s, template type: %s, locale: %s in tenant: %s",
+                    context, templateTypeDisplayName, locale, getTenantDomainFromContext()));
+        }
         try {
             Util.verifyTemplateTypeExists(Constants.NOTIFICATION_CHANNEL_EMAIL, templateTypeDisplayName);
             boolean notificationTemplateExists = notificationTemplateManager.isNotificationTemplateExists(
@@ -439,6 +525,13 @@ public class TemplatesService {
             if (notificationTemplateExists) {
                 notificationTemplateManager.deleteNotificationTemplate(Constants.NOTIFICATION_CHANNEL_EMAIL,
                         templateTypeDisplayName, locale, getTenantDomainFromContext(), applicationUuid);
+                if (log.isDebugEnabled()) {
+                    String context = StringUtils.isNotBlank(applicationUuid) ? "application: " + applicationUuid
+                            : "organization";
+                    log.debug(String.format(
+                            "Successfully deleted email template for %s, template type: %s, locale: %s",
+                            context, templateTypeDisplayName, locale));
+                }
             } else {
                 throw Util.handleError(Constants.ErrorMessage.ERROR_TEMPLATE_NOT_FOUND);
             }
@@ -469,6 +562,12 @@ public class TemplatesService {
     public void deleteSMSTemplate(String templateTypeId, String locale, String applicationUuid) {
 
         String templateTypeDisplayName = Util.decodeTemplateTypeId(templateTypeId);
+        if (log.isDebugEnabled()) {
+            String context = StringUtils.isNotBlank(applicationUuid) ? "application: " + applicationUuid
+                    : "organization";
+            log.debug(String.format("Deleting SMS template for %s, template type: %s, locale: %s in tenant: %s",
+                    context, templateTypeDisplayName, locale, getTenantDomainFromContext()));
+        }
         try {
             Util.verifyTemplateTypeExists(Constants.NOTIFICATION_CHANNEL_SMS, templateTypeDisplayName);
             boolean notificationTemplateExists = notificationTemplateManager.isNotificationTemplateExists(
@@ -477,6 +576,13 @@ public class TemplatesService {
             if (notificationTemplateExists) {
                 notificationTemplateManager.deleteNotificationTemplate(Constants.NOTIFICATION_CHANNEL_SMS,
                         templateTypeDisplayName, locale, getTenantDomainFromContext(), applicationUuid);
+                if (log.isDebugEnabled()) {
+                    String context = StringUtils.isNotBlank(applicationUuid) ? "application: " + applicationUuid
+                            : "organization";
+                    log.debug(String.format(
+                            "Successfully deleted SMS template for %s, template type: %s, locale: %s",
+                            context, templateTypeDisplayName, locale));
+                }
             } else {
                 throw Util.handleError(Constants.ErrorMessage.ERROR_TEMPLATE_NOT_FOUND);
             }

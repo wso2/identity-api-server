@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.webhook.metadata.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.core.ServerWebhookMetadataService;
 
 /**
@@ -25,6 +27,7 @@ import org.wso2.carbon.identity.api.server.webhook.metadata.v1.core.ServerWebhoo
  */
 public class ServerWebhookMetadataServiceFactory {
 
+    private static final Log LOG = LogFactory.getLog(ServerWebhookMetadataServiceFactory.class);
     private static ServerWebhookMetadataService service = new ServerWebhookMetadataService();
 
     /**
@@ -34,6 +37,9 @@ public class ServerWebhookMetadataServiceFactory {
      */
     public static ServerWebhookMetadataService getServerWebhookMetadataService() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Returning ServerWebhookMetadataService instance");
+        }
         return service;
     }
 }

@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.userstore.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.userstore.common.UserStoreConfigServiceHolder;
 import org.wso2.carbon.identity.api.server.userstore.v1.core.ServerUserStoreService;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
@@ -29,27 +31,33 @@ import org.wso2.carbon.user.core.service.RealmService;
  */
 public class ServerUserStoreServiceFactory {
 
+    private static final Log LOG = LogFactory.getLog(ServerUserStoreServiceFactory.class);
     private static final ServerUserStoreService SERVICE;
 
     static {
+        LOG.info("Initializing ServerUserStoreService factory");
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
         RealmService realmService = UserStoreConfigServiceHolder.getRealmService();
         ClaimMetadataManagementService claimMetadataManagementService = UserStoreConfigServiceHolder
                 .getClaimMetadataManagementService();
 
         if (userStoreConfigService == null) {
+            LOG.error("UserStoreConfigService is not available from OSGi context");
             throw new IllegalStateException("UserStoreConfigService is not available from OSGi context.");
         }
 
         if (realmService == null) {
+            LOG.error("RealmService is not available from OSGi context");
             throw new IllegalStateException("RealmService is not available from OSGi context.");
         }
 
         if (claimMetadataManagementService == null) {
+            LOG.error("ClaimMetadataManagementService is not available from OSGi context");
             throw new IllegalStateException("ClaimMetadataManagementService is not available from OSGi context.");
         }
 
         SERVICE = new ServerUserStoreService(userStoreConfigService, realmService, claimMetadataManagementService);
+        LOG.info("ServerUserStoreService factory initialized successfully");
     }
 
     /**

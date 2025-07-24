@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.idp.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
 import org.wso2.carbon.identity.template.mgt.TemplateManager;
@@ -27,6 +29,8 @@ import org.wso2.carbon.idp.mgt.IdentityProviderManager;
  * Service holder class for identity providers.
  */
 public class IdentityProviderServiceHolder {
+
+    private static final Log LOG = LogFactory.getLog(IdentityProviderServiceHolder.class);
 
     private IdentityProviderServiceHolder() {
 
@@ -56,7 +60,14 @@ public class IdentityProviderServiceHolder {
      */
     public static IdentityProviderManager getIdentityProviderManager() {
 
-        return IdentityProviderManagerHolder.SERVICE;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving IdentityProviderManager from OSGi service registry.");
+        }
+        IdentityProviderManager service = IdentityProviderManagerHolder.SERVICE;
+        if (service == null) {
+            LOG.warn("IdentityProviderManager OSGi service is not available.");
+        }
+        return service;
     }
 
     /**
@@ -66,7 +77,14 @@ public class IdentityProviderServiceHolder {
      */
     public static ClaimMetadataManagementService getClaimMetadataManagementService() {
 
-        return ClaimMetadataManagementServiceHolder.SERVICE;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving ClaimMetadataManagementService from OSGi service registry.");
+        }
+        ClaimMetadataManagementService service = ClaimMetadataManagementServiceHolder.SERVICE;
+        if (service == null) {
+            LOG.warn("ClaimMetadataManagementService OSGi service is not available.");
+        }
+        return service;
     }
 
     /**
@@ -76,6 +94,13 @@ public class IdentityProviderServiceHolder {
      */
     public static TemplateManager getTemplateManager() {
 
-        return TemplateManagerHolder.SERVICE;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving TemplateManager from OSGi service registry.");
+        }
+        TemplateManager service = TemplateManagerHolder.SERVICE;
+        if (service == null) {
+            LOG.warn("TemplateManager OSGi service is not available.");
+        }
+        return service;
     }
 }

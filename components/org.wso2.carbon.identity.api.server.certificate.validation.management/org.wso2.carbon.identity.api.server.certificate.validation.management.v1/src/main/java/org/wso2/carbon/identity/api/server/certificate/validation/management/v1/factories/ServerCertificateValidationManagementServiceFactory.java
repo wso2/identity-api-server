@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.certificate.validation.management.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.certificate.validation.management.common.CertificateValidationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.certificate.validation.management.v1.core.ServerCertificateValidationManagementService;
 import org.wso2.carbon.identity.x509Certificate.validation.service.CertificateValidationManagementService;
@@ -27,17 +29,21 @@ import org.wso2.carbon.identity.x509Certificate.validation.service.CertificateVa
  */
 public class ServerCertificateValidationManagementServiceFactory {
 
+    private static final Log LOG = LogFactory.getLog(ServerCertificateValidationManagementServiceFactory.class);
     private static final ServerCertificateValidationManagementService SERVICE;
 
     static {
+        LOG.debug("Initializing ServerCertificateValidationManagementService from OSGi context");
         CertificateValidationManagementService certificateValidationService =
                 CertificateValidationManagementServiceHolder.getCertificateValidationService();
 
         if (certificateValidationService == null) {
+            LOG.error("CertificateValidationManagementService is not available from OSGi context");
             throw new IllegalStateException("certificateValidationService is not available from OSGi context.");
         }
 
         SERVICE = new ServerCertificateValidationManagementService(certificateValidationService);
+        LOG.info("Successfully initialized ServerCertificateValidationManagementService");
     }
 
     /**

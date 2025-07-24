@@ -48,8 +48,13 @@ public class DCRConnectorUtil {
      */
     public static DCRConfig getDCRConfig(DCRConfigurationMgtService dcrConfigurationMgtService) throws DCRMException {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving DCR configuration.");
+        }
         DCRConfiguration dcrConfiguration = dcrConfigurationMgtService.getDCRConfiguration();
-
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Successfully retrieved DCR configuration.");
+        }
         return dcrConfigurationToDCRConfig(dcrConfiguration);
 
     }
@@ -62,7 +67,13 @@ public class DCRConnectorUtil {
     public static void setDCRConfig(DCRConfig dcrConfig, DCRConfigurationMgtService dcrConfigurationMgtService)
             throws DCRMException {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Setting DCR configuration.");
+        }
         dcrConfigurationMgtService.setDCRConfiguration((getDCRConfigurationFromDCRConfig(dcrConfig)));
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Successfully set DCR configuration.");
+        }
     }
 
     private static DCRConfig dcrConfigurationToDCRConfig(DCRConfiguration dcrConfiguration) {
@@ -85,6 +96,10 @@ public class DCRConnectorUtil {
      */
     public static APIError handleDCRConfigException(Exception e, Constants.ErrorMessage errorEnum, String data) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Handling DCR configuration exception: " + e.getClass().getSimpleName());
+        }
+        
         ErrorResponse errorResponse;
 
         Response.Status status;

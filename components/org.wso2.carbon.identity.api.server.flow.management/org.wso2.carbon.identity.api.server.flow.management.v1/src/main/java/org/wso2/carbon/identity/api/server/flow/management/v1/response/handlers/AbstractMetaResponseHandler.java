@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.flow.management.v1.BaseConnectorConfigs;
 import org.wso2.carbon.identity.api.server.flow.management.v1.BaseFlowMetaResponse;
@@ -49,6 +51,8 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.F
  */
 public abstract class AbstractMetaResponseHandler {
 
+    private static final Log LOG = LogFactory.getLog(AbstractMetaResponseHandler.class);
+
     /**
      * Get the flow type.
      *
@@ -70,6 +74,9 @@ public abstract class AbstractMetaResponseHandler {
      */
     public List<String> getSupportedExecutors() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving supported executors for flow type: " + getFlowType());
+        }
         ArrayList<String> supportedExecutors = new ArrayList<>();
         supportedExecutors.add(OPENID_CONNECT_EXECUTOR);
         supportedExecutors.add(GOOGLE_EXECUTOR);
@@ -84,6 +91,10 @@ public abstract class AbstractMetaResponseHandler {
         supportedExecutors.add(SMS_OTP_EXECUTOR);
         supportedExecutors.add(MAGIC_LINK_EXECUTOR);
         supportedExecutors.add(CONFIRMATION_CODE_VALIDATION_EXECUTOR);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieved " + supportedExecutors.size() + " supported executors for flow type: "
+                    + getFlowType());
+        }
         return supportedExecutors;
     };
 
@@ -94,11 +105,19 @@ public abstract class AbstractMetaResponseHandler {
      */
     public BaseConnectorConfigs getConnectorConfigs() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving connector configs for flow type: " + getFlowType());
+        }
         Utils utils = new Utils();
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         BaseConnectorConfigs connectorConfigs = new BaseConnectorConfigs();
-        connectorConfigs.setMultiAttributeLoginEnabled(
-                utils.isFlowConfigEnabled(tenantDomain, MultiAttributeLoginConstants.MULTI_ATTRIBUTE_LOGIN_PROPERTY));
+        boolean multiAttributeLogin = utils.isFlowConfigEnabled(tenantDomain,
+                MultiAttributeLoginConstants.MULTI_ATTRIBUTE_LOGIN_PROPERTY);
+        connectorConfigs.setMultiAttributeLoginEnabled(multiAttributeLogin);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieved connector configs for flow type: " + getFlowType() + " in tenant: " + tenantDomain +
+                    " with multiAttributeLogin: " + multiAttributeLogin);
+        }
         return connectorConfigs;
     }
 
@@ -116,11 +135,17 @@ public abstract class AbstractMetaResponseHandler {
      */
     public BaseFlowMetaResponse createResponse() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Creating meta response for flow type: " + getFlowType());
+        }
         BaseFlowMetaResponse response = new BaseFlowMetaResponse();
         response.setFlowType(getFlowType());
         response.setAttributeProfile(getAttributeProfile());
         response.setSupportedExecutors(getSupportedExecutors());
         response.setConnectorConfigs(getConnectorConfigs());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Successfully created meta response for flow type: " + getFlowType());
+        }
         return response;
     }
 
@@ -129,14 +154,23 @@ public abstract class AbstractMetaResponseHandler {
      */
     protected List<String> getLoginInputFields() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving login input fields for flow type: " + getFlowType());
+        }
         Utils utils = new Utils();
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         List<String> fields = new java.util.ArrayList<>();
-        if (utils.isFlowConfigEnabled(tenantDomain, MultiAttributeLoginConstants.MULTI_ATTRIBUTE_LOGIN_PROPERTY)) {
+        boolean multiAttributeEnabled = utils.isFlowConfigEnabled(tenantDomain,
+                MultiAttributeLoginConstants.MULTI_ATTRIBUTE_LOGIN_PROPERTY);
+        if (multiAttributeEnabled) {
             fields.add(FlowEndpointConstants.USER_IDENTIFIER);
             fields.add(FlowEndpointConstants.USERNAME_IDENTIFIER);
         } else {
             fields.add(FlowEndpointConstants.USERNAME_IDENTIFIER);
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieved " + fields.size() + " login input fields for flow type: " + getFlowType() +
+                    " with multiAttribute: " + multiAttributeEnabled);
         }
         return fields;
     }

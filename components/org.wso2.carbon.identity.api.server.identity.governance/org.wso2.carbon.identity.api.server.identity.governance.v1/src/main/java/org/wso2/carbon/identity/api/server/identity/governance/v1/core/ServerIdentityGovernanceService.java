@@ -58,10 +58,14 @@ import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIForBody;
-import static org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstants.ErrorMessage.ERROR_CODE_FILTERING_NOT_IMPLEMENTED;
-import static org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstants.ErrorMessage.ERROR_CODE_PAGINATION_NOT_IMPLEMENTED;
-import static org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstants.ErrorMessage.ERROR_CODE_SORTING_NOT_IMPLEMENTED;
-import static org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstants.IDENTITY_GOVERNANCE_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstants.ErrorMessage
+        .ERROR_CODE_FILTERING_NOT_IMPLEMENTED;
+import static org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstants.ErrorMessage
+        .ERROR_CODE_PAGINATION_NOT_IMPLEMENTED;
+import static org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstants.ErrorMessage
+        .ERROR_CODE_SORTING_NOT_IMPLEMENTED;
+import static org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstants
+        .IDENTITY_GOVERNANCE_PATH_COMPONENT;
 import static org.wso2.carbon.identity.input.validation.mgt.utils.Constants.PW_POLICY_PATTERN;
 import static org.wso2.carbon.identity.password.expiry.constants.PasswordPolicyConstants.PASSWORD_EXPIRY_RULES_PREFIX;
 
@@ -93,12 +97,16 @@ public class ServerIdentityGovernanceService {
 
         try {
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Retrieving governance connector categories for tenant: " + tenantDomain);
+            }
             Map<String, List<ConnectorConfig>> connectorConfigs =
                     identityGovernanceService.getCategorizedConnectorListWithConfigs(tenantDomain);
 
             return buildConnectorCategoriesResDTOS(connectorConfigs);
 
         } catch (IdentityGovernanceException e) {
+            LOG.error("Error occurred while retrieving governance connector categories.", e);
             GovernanceConstants.ErrorMessage errorEnum =
                     GovernanceConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_CATEGORIES;
             Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
@@ -293,6 +301,10 @@ public class ServerIdentityGovernanceService {
 
         try {
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Updating governance connector property for tenant: " + tenantDomain + 
+                        ", categoryId: " + categoryId + ", connectorId: " + connectorId);
+            }
 
             ConnectorRes connector = getGovernanceConnector(categoryId, connectorId);
             if (connector == null) {
@@ -305,6 +317,7 @@ public class ServerIdentityGovernanceService {
                 if (StringUtils.startsWith(propertyReqDTO.getName(), PASSWORD_EXPIRY_RULES_PREFIX) &&
                         StringUtils.isNotBlank(propertyReqDTO.getValue()) &&
                         !isValidPasswordExpiryRule(propertyReqDTO.getValue())) {
+                    LOG.warn("Invalid password expiry rule provided: " + propertyReqDTO.getValue());
                     throw handleBadRequestError(
                             GovernanceConstants.ErrorMessage.ERROR_CODE_INVALID_PASSWORD_EXPIRY_RULE,
                             propertyReqDTO.getValue());
@@ -312,15 +325,20 @@ public class ServerIdentityGovernanceService {
                 if (StringUtils.equals(propertyReqDTO.getName(), PW_POLICY_PATTERN) &&
                         StringUtils.isNotBlank(propertyReqDTO.getValue()) &&
                         !isValidPasswordPatternRegex(propertyReqDTO.getValue())) {
+                    LOG.warn("Invalid password pattern regex provided for property: " + propertyReqDTO.getName());
                     throw handleBadRequestError(
                             GovernanceConstants.ErrorMessage.ERROR_CODE_INVALID_PASSWORD_PATTERN_REGEX);
                 }
             }
             identityGovernanceService.updateConfiguration(tenantDomain, configurationDetails);
+            LOG.info("Successfully updated governance connector property for tenant: " + tenantDomain + 
+                    ", categoryId: " + categoryId + ", connectorId: " + connectorId);
         } catch (IdentityGovernanceClientException e) {
+            LOG.error("Invalid connector configuration provided.", e);
             throw handleBadRequestError(GovernanceConstants.ErrorMessage.ERROR_CODE_INVALID_CONNECTOR_CONFIGURATION,
                     e.getMessage());
         } catch (IdentityGovernanceException e) {
+            LOG.error("Error occurred while updating governance connector property.", e);
             GovernanceConstants.ErrorMessage errorEnum =
                     GovernanceConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_CONNECTOR_PROPERTY;
             Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
@@ -340,6 +358,10 @@ public class ServerIdentityGovernanceService {
 
         try {
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Updating multiple governance connector properties for tenant: " + tenantDomain + 
+                        ", categoryId: " + categoryId);
+            }
 
             // Check whether the category ID exists.
             CategoryRes category = getGovernanceConnectorCategory(categoryId);
@@ -365,6 +387,7 @@ public class ServerIdentityGovernanceService {
                     if (StringUtils.startsWith(propertyReqDTO.getName(), PASSWORD_EXPIRY_RULES_PREFIX) &&
                             StringUtils.isNotBlank(propertyReqDTO.getValue()) &&
                             !isValidPasswordExpiryRule(propertyReqDTO.getValue())) {
+                        LOG.warn("Invalid password expiry rule provided: " + propertyReqDTO.getValue());
                         throw handleBadRequestError(
                                 GovernanceConstants.ErrorMessage.ERROR_CODE_INVALID_PASSWORD_EXPIRY_RULE,
                                 propertyReqDTO.getValue());
@@ -372,6 +395,7 @@ public class ServerIdentityGovernanceService {
                     if (StringUtils.equals(propertyReqDTO.getName(), PW_POLICY_PATTERN) &&
                             StringUtils.isNotBlank(propertyReqDTO.getValue()) &&
                             !isValidPasswordPatternRegex(propertyReqDTO.getValue())) {
+                        LOG.warn("Invalid password pattern regex provided for property: " + propertyReqDTO.getName());
                         throw handleBadRequestError(
                                 GovernanceConstants.ErrorMessage.ERROR_CODE_INVALID_PASSWORD_PATTERN_REGEX);
                     }
@@ -380,8 +404,11 @@ public class ServerIdentityGovernanceService {
             }
 
             identityGovernanceService.updateConfiguration(tenantDomain, configurationDetails);
+            LOG.info("Successfully updated multiple governance connector properties for tenant: " + tenantDomain + 
+                    ", categoryId: " + categoryId);
 
         } catch (IdentityGovernanceException e) {
+            LOG.error("Error occurred while updating multiple governance connector properties.", e);
             GovernanceConstants.ErrorMessage errorEnum =
                     GovernanceConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_CONNECTOR_PROPERTY;
             Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
@@ -401,19 +428,27 @@ public class ServerIdentityGovernanceService {
 
         try {
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Reverting governance connector properties for tenant: " + tenantDomain + 
+                        ", categoryId: " + categoryId + ", connectorId: " + connectorId);
+            }
             ConnectorRes connector = getGovernanceConnector(categoryId, connectorId);
 
             // Throw an error if propertyRevertReq contain properties that are not in the connector.
             for (String propertyName : propertyRevertReq.getProperties()) {
                 if (connector.getProperties().stream().noneMatch(
                         property -> property.getName().equals(propertyName))) {
+                    LOG.warn("Property not found in connector: " + propertyName);
                     throw handleBadRequestError(GovernanceConstants.ErrorMessage.ERROR_CODE_PROPERTY_NOT_FOUND,
                             propertyName, connector.getFriendlyName());
                 }
             }
 
             identityGovernanceService.deleteConfiguration(propertyRevertReq.getProperties(), tenantDomain);
+            LOG.info("Successfully reverted governance connector properties for tenant: " + tenantDomain + 
+                    ", categoryId: " + categoryId + ", connectorId: " + connectorId);
         } catch (IdentityGovernanceException e) {
+            LOG.error("Error occurred while reverting governance connector properties.", e);
             GovernanceConstants.ErrorMessage errorEnum =
                     GovernanceConstants.ErrorMessage.ERROR_CODE_ERROR_REVERTING_CONNECTOR_PROPERTY;
             Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;

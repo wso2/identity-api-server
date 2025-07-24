@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.authenticators.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.AuthenticationType;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Endpoint;
@@ -45,6 +47,7 @@ import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
  */
 public class LocalAuthenticatorConfigBuilderFactory {
 
+    private static final Log log = LogFactory.getLog(LocalAuthenticatorConfigBuilderFactory.class);
     private static final String TAG_2FA = "2FA";
 
     /**
@@ -82,6 +85,10 @@ public class LocalAuthenticatorConfigBuilderFactory {
     public static UserDefinedLocalAuthenticatorConfig build(UserDefinedLocalAuthenticatorCreation config)
             throws AuthenticatorMgtClientException {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Building UserDefinedLocalAuthenticatorConfig from creation request for: " + 
+                    config.getName());
+        }
         validateUserDefinedLocalAuthenticatorConfig(config);
         String authenticationType = AuthenticatorPropertyConstants.AuthenticationType.IDENTIFICATION.toString();
         if (config.getAuthenticationType() != null) {
@@ -110,6 +117,10 @@ public class LocalAuthenticatorConfigBuilderFactory {
     public static UserDefinedLocalAuthenticatorConfig build(UserDefinedLocalAuthenticatorUpdate config,
                 LocalAuthenticatorConfig existingConfig) throws AuthenticatorMgtClientException {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Building UserDefinedLocalAuthenticatorConfig from update request for: " + 
+                    existingConfig.getName());
+        }
         UserDefinedLocalAuthenticatorConfig authConfig = new UserDefinedLocalAuthenticatorConfig(
                 resolveAuthenticationType(existingConfig));
         authConfig.setName(existingConfig.getName());
@@ -154,11 +165,15 @@ public class LocalAuthenticatorConfigBuilderFactory {
             throws AuthenticatorMgtClientException {
 
         if (config.getEndpoint().getAuthentication().getType() == AuthenticationType.TypeEnum.NONE) {
+            if (log.isDebugEnabled()) {
+                log.debug("No endpoint authentication validation required for: " + config.getName());
+            }
             return;
         }
 
         if (config.getEndpoint().getAuthentication().getProperties() == null ||
                 config.getEndpoint().getAuthentication().getProperties().isEmpty()) {
+            log.warn("Missing authentication properties for authenticator: " + config.getName());
             AuthenticatorMgtError error = AuthenticatorMgtError.ERROR_CODE_INVALID_ENDPOINT_CONFIG;
             throw new AuthenticatorMgtClientException(error.getCode(), error.getMessage(),
                     "Endpoint authentication properties must be provided for user defined local authenticator: "

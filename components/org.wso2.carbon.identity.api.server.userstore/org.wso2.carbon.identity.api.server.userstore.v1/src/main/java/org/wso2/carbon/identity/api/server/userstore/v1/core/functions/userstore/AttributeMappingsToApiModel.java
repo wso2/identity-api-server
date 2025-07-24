@@ -19,6 +19,8 @@
 package org.wso2.carbon.identity.api.server.userstore.v1.core.functions.userstore;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreAttributeResponse;
 import org.wso2.carbon.identity.user.store.configuration.model.UserStoreAttribute;
 
@@ -33,10 +35,15 @@ import java.util.function.Function;
 public class AttributeMappingsToApiModel
         implements Function<List<UserStoreAttribute>, List<UserStoreAttributeResponse>> {
 
+    private static final Log LOG = LogFactory.getLog(AttributeMappingsToApiModel.class);
+
     @Override
     public List<UserStoreAttributeResponse> apply(List<UserStoreAttribute> userStoreAttributeDOs) {
 
         if (CollectionUtils.isNotEmpty(userStoreAttributeDOs)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Converting " + userStoreAttributeDOs.size() + " user store attributes to API model");
+            }
 
             List<UserStoreAttributeResponse> userStoreAttributes = new ArrayList<>();
             userStoreAttributeDOs.stream().forEach(
@@ -48,7 +55,13 @@ public class AttributeMappingsToApiModel
                         userStoreAttributeResponse.displayName(userStoreAttribute.getDisplayName());
                         userStoreAttributes.add(userStoreAttributeResponse);
                     });
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully converted user store attributes to API model");
+            }
             return userStoreAttributes;
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("No user store attributes to convert, returning empty list");
         }
         return Collections.emptyList();
     }

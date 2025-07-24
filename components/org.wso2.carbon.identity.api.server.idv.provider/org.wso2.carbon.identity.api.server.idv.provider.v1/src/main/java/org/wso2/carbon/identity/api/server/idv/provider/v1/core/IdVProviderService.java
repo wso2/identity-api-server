@@ -72,6 +72,9 @@ public class IdVProviderService {
      */
     public IdVProviderResponse addIdVProvider(IdVProviderRequest idVProviderRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Adding identity verification provider: " + idVProviderRequest.getName());
+        }
         IdVProvider idVProvider;
         int tenantId = getTenantId();
         try {
@@ -83,6 +86,7 @@ public class IdVProviderService {
             }
             throw handleIdVException(e, Constants.ErrorMessage.ERROR_ADDING_IDVP, idVProviderRequest.getName());
         }
+        log.info("Identity verification provider added successfully: " + idVProviderRequest.getName());
         return getIdVProviderResponse(idVProvider);
     }
 
@@ -95,6 +99,9 @@ public class IdVProviderService {
      */
     public IdVProviderResponse updateIdVProvider(String idVProviderId, IdVProviderRequest idVProviderRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating identity verification provider with ID: " + idVProviderId);
+        }
         IdVProvider oldIdVProvider;
         IdVProvider newIdVProvider;
         int tenantId = getTenantId();
@@ -119,6 +126,7 @@ public class IdVProviderService {
                 throw handleIdVException(e, Constants.ErrorMessage.ERROR_UPDATING_IDVP, idVProviderId);
             }
         }
+        log.info("Identity verification provider updated successfully with ID: " + idVProviderId);
         return getIdVProviderResponse(newIdVProvider);
     }
 
@@ -130,6 +138,9 @@ public class IdVProviderService {
      */
     public IdVProviderResponse getIdVProvider(String idVProviderId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving identity verification provider with ID: " + idVProviderId);
+        }
         try {
             int tenantId = getTenantId();
             IdVProvider idVProvider = idvProviderManager.getIdVProvider(idVProviderId, tenantId);
@@ -168,6 +179,10 @@ public class IdVProviderService {
      */
     public IdVProviderListResponse getIdVProviders(Integer limit, Integer offset, String filter) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving identity verification providers with limit: " + limit + ", offset: " + offset +
+                    (filter != null ? ", filter: " + filter : ""));
+        }
         int tenantId = getTenantId();
         try {
             int totalResults = idvProviderManager.getCountOfIdVProviders(tenantId, filter);
@@ -208,12 +223,16 @@ public class IdVProviderService {
      */
     public void deleteIdVProvider(String idVProviderId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting identity verification provider with ID: " + idVProviderId);
+        }
         int tenantId = getTenantId();
         try {
             idvProviderManager.deleteIdVProvider(idVProviderId, tenantId);
         } catch (IdVProviderMgtException e) {
             throw handleIdVException(e, Constants.ErrorMessage.ERROR_DELETING_IDVP, idVProviderId);
         }
+        log.info("Identity verification provider deleted successfully with ID: " + idVProviderId);
     }
 
     private List<VerificationClaim> getIdVClaimMappings(IdVProvider idVProvider) {
@@ -404,6 +423,7 @@ public class IdVProviderService {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         if (StringUtils.isBlank(tenantDomain)) {
+            log.warn("Unable to retrieve tenant domain from context");
             throw handleException(
                     Response.Status.INTERNAL_SERVER_ERROR,
                     Constants.ErrorMessage.ERROR_RETRIEVING_TENANT, tenantDomain);

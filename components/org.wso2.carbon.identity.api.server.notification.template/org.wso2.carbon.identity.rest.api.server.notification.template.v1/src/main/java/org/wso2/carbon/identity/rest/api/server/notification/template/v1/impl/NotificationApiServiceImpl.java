@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.rest.api.server.notification.template.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.notification.template.common.Constants;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.NotificationApiService;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.core.TemplateTypeService;
@@ -52,6 +54,7 @@ import static org.wso2.carbon.identity.api.server.notification.template.common.C
  */
 public class NotificationApiServiceImpl implements NotificationApiService {
 
+    private static final Log log = LogFactory.getLog(NotificationApiServiceImpl.class);
     private final TemplatesService templatesService;
     private final TemplateTypeService templateTypeService;
 
@@ -65,6 +68,11 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     public Response addAppEmailTemplate(String templateTypeId, String appUuid,
                                         EmailTemplateWithID emailTemplateWithID) {
 
+        if (log.isDebugEnabled()) {
+            log.debug(String.format(
+                    "API request to add app email template - templateTypeId: %s, appUuid: %s, locale: %s",
+                    templateTypeId, appUuid, emailTemplateWithID != null ? emailTemplateWithID.getLocale() : "null"));
+        }
         SimpleTemplate simpleEmailTemplate = templatesService.addEmailTemplate(templateTypeId,
                 emailTemplateWithID, appUuid);
         URI headerLocation = buildURIForHeader(V1_API_PATH_COMPONENT + NOTIFICATION_TEMPLATES_API_PATH
@@ -89,6 +97,10 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     @Override
     public Response addEmailTemplateType(TemplateTypeOverview templateTypeOverview) {
 
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("API request to add email template type - displayName: %s",
+                    templateTypeOverview != null ? templateTypeOverview.getDisplayName() : "null"));
+        }
         TemplateTypeWithID templateType = templateTypeService
                 .addNotificationTemplateType(Constants.NOTIFICATION_CHANNEL_EMAIL, templateTypeOverview);
         URI headerLocation = buildURIForHeader(
@@ -101,6 +113,10 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     @Override
     public Response addOrgEmailTemplate(String templateTypeId, EmailTemplateWithID emailTemplateWithID) {
 
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("API request to add org email template - templateTypeId: %s, locale: %s",
+                    templateTypeId, emailTemplateWithID != null ? emailTemplateWithID.getLocale() : "null"));
+        }
         SimpleTemplate simpleEmailTemplate = templatesService.addEmailTemplate(templateTypeId,
                 emailTemplateWithID);
         URI headerLocation = buildURIForHeader(
@@ -151,6 +167,9 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     @Override
     public Response deleteEmailTemplateType(String templateTypeId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("API request to delete email template type - templateTypeId: %s", templateTypeId));
+        }
         templateTypeService.deleteNotificationTemplateType(Constants.NOTIFICATION_CHANNEL_EMAIL, templateTypeId);
         return Response.noContent().build();
     }
@@ -289,6 +308,11 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     @Override
     public Response resetTemplateType(SimpleTemplateTypeID simpleTemplateTypeID) {
 
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("API request to reset template type - channel: %s, templateTypeId: %s",
+                    simpleTemplateTypeID != null ? simpleTemplateTypeID.getChannel() : "null",
+                    simpleTemplateTypeID != null ? simpleTemplateTypeID.getTemplateTypeId() : "null"));
+        }
         templateTypeService.resetTemplateType(simpleTemplateTypeID.getChannel(),
                 simpleTemplateTypeID.getTemplateTypeId());
         return Response.noContent().build();

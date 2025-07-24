@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.application.management.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationSharingService;
 import org.wso2.carbon.identity.organization.management.application.OrgApplicationManager;
@@ -27,17 +29,24 @@ import org.wso2.carbon.identity.organization.management.application.OrgApplicati
  */
 public class ServerApplicationSharingServiceFactory {
 
+    private static final Log log = LogFactory.getLog(ServerApplicationSharingServiceFactory.class);
     private static final ServerApplicationSharingService SERVICE;
 
     static {
-
+        if (log.isDebugEnabled()) {
+            log.debug("Initializing ServerApplicationSharingService from OSGi context.");
+        }
         OrgApplicationManager orgApplicationManager = ApplicationManagementServiceHolder.getOrgApplicationManager();
 
         if (orgApplicationManager == null) {
+            log.error("OrgApplicationManager is not available from OSGi context.");
             throw new IllegalStateException("OrgApplicationManager is not available from OSGi context.");
         }
 
         SERVICE = new ServerApplicationSharingService(orgApplicationManager);
+        if (log.isDebugEnabled()) {
+            log.debug("Successfully initialized ServerApplicationSharingService.");
+        }
     }
 
     /**

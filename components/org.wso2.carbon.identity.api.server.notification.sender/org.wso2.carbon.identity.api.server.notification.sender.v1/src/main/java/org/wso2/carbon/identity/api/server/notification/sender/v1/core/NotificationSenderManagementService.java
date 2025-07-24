@@ -44,9 +44,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_CONFLICT_PUBLISHER;
-import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_NO_ACTIVE_PUBLISHERS_FOUND;
-import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_PUBLISHER_NOT_EXISTS;
+import static org.wso2.carbon.identity.notification.sender.tenant.config.
+        NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_CONFLICT_PUBLISHER;
+import static org.wso2.carbon.identity.notification.sender.tenant.config.
+        NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_NO_ACTIVE_PUBLISHERS_FOUND;
+import static org.wso2.carbon.identity.notification.sender.tenant.config.
+        NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_PUBLISHER_NOT_EXISTS;
 
 /**
  * Invoke internal OSGi service to perform notification sender management operations.
@@ -72,11 +75,18 @@ public class NotificationSenderManagementService {
      */
     public EmailSender addEmailSender(EmailSenderAdd emailSenderAdd) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Adding email sender with name: " + (emailSenderAdd != null ? emailSenderAdd.getName() : null));
+        }
         EmailSenderDTO dto = buildEmailSenderDTO(emailSenderAdd);
         try {
             EmailSenderDTO emailSenderDTO = notificationSenderManagementService.addEmailSender(dto);
+            log.info("Email sender added successfully with name: " + 
+                    (emailSenderDTO != null ? emailSenderDTO.getName() : null));
             return buildEmailSenderFromDTO(emailSenderDTO);
         } catch (NotificationSenderManagementException e) {
+            log.error("Failed to add email sender with name: " + 
+                    (emailSenderAdd != null ? emailSenderAdd.getName() : null));
             throw handleException(e);
         }
     }
@@ -89,11 +99,17 @@ public class NotificationSenderManagementService {
      */
     public SMSSender addSMSSender(SMSSenderAdd smsSenderAdd) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Adding SMS sender with name: " + (smsSenderAdd != null ? smsSenderAdd.getName() : null));
+        }
         SMSSenderDTO dto = buildSMSSenderDTO(smsSenderAdd);
         try {
             SMSSenderDTO smsSenderDTO = notificationSenderManagementService.addSMSSender(dto);
+            log.info("SMS sender added successfully with name: " + 
+                    (smsSenderDTO != null ? smsSenderDTO.getName() : null));
             return buildSMSSenderFromDTO(smsSenderDTO);
         } catch (NotificationSenderManagementException e) {
+            log.error("Failed to add SMS sender with name: " + (smsSenderAdd != null ? smsSenderAdd.getName() : null));
             throw handleException(e);
         }
     }
@@ -106,12 +122,19 @@ public class NotificationSenderManagementService {
      */
     public PushSender addPushSender(PushSenderAdd pushSenderAdd) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Adding push sender with name: " + (pushSenderAdd != null ? pushSenderAdd.getName() : null));
+        }
         PushSenderDTO dto = buildPushSenderDTO(pushSenderAdd);
         try {
             PushSenderDTO pushSenderDTO = NotificationSenderServiceHolder.getNotificationSenderManagementService()
                     .addPushSender(dto);
+            log.info("Push sender added successfully with name: " + 
+                    (pushSenderDTO != null ? pushSenderDTO.getName() : null));
             return buildPushSenderFromDTO(pushSenderDTO);
         } catch (NotificationSenderManagementException e) {
+            log.error("Failed to add push sender with name: " + 
+                    (pushSenderAdd != null ? pushSenderAdd.getName() : null));
             throw handleException(e);
         }
     }
@@ -123,9 +146,14 @@ public class NotificationSenderManagementService {
      */
     public void deleteNotificationSender(String notificationSenderName) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting notification sender with name: " + notificationSenderName);
+        }
         try {
             notificationSenderManagementService.deleteNotificationSender(notificationSenderName);
+            log.info("Notification sender deleted successfully with name: " + notificationSenderName);
         } catch (NotificationSenderManagementException e) {
+            log.error("Failed to delete notification sender with name: " + notificationSenderName);
                 throw handleException(e);
         }
     }
@@ -138,10 +166,16 @@ public class NotificationSenderManagementService {
      */
     public EmailSender getEmailSender(String senderName) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving email sender with name: " + senderName);
+        }
         try {
             EmailSenderDTO emailSenderDTO = notificationSenderManagementService.getEmailSender(senderName);
             return buildEmailSenderFromDTO(emailSenderDTO);
         } catch (NotificationSenderManagementException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to retrieve email sender with name: " + senderName);
+            }
             throw handleException(e);
         }
     }
@@ -154,10 +188,16 @@ public class NotificationSenderManagementService {
      */
     public SMSSender getSMSSender(String senderName) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving SMS sender with name: " + senderName);
+        }
         try {
             SMSSenderDTO smsSenderDTO = notificationSenderManagementService.getSMSSender(senderName, false);
             return buildSMSSenderFromDTO(smsSenderDTO);
         } catch (NotificationSenderManagementException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to retrieve SMS sender with name: " + senderName);
+            }
             throw handleException(e);
         }
     }
@@ -170,11 +210,17 @@ public class NotificationSenderManagementService {
      */
     public PushSender getPushSender(String senderName) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving push sender with name: " + senderName);
+        }
         try {
             PushSenderDTO pushSenderDTO = NotificationSenderServiceHolder.getNotificationSenderManagementService()
                     .getPushSender(senderName, false);
             return buildPushSenderFromDTO(pushSenderDTO);
         } catch (NotificationSenderManagementException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to retrieve push sender with name: " + senderName);
+            }
             throw handleException(e);
         }
     }
@@ -186,10 +232,17 @@ public class NotificationSenderManagementService {
      */
     public List<EmailSender> getEmailSenders() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving all email senders for tenant");
+        }
         try {
             List<EmailSenderDTO> emailSenders = notificationSenderManagementService.getEmailSenders();
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieved " + (emailSenders != null ? emailSenders.size() : 0) + " email senders");
+            }
             return emailSenders.stream().map(this::buildEmailSenderFromDTO).collect(Collectors.toList());
         } catch (NotificationSenderManagementException e) {
+            log.error("Failed to retrieve email senders for tenant");
             throw handleException(e);
         }
     }
@@ -201,10 +254,17 @@ public class NotificationSenderManagementService {
      */
     public List<SMSSender> getSMSSenders() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving all SMS senders for tenant");
+        }
         try {
             List<SMSSenderDTO> smsSenders = notificationSenderManagementService.getSMSSenders(false);
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieved " + (smsSenders != null ? smsSenders.size() : 0) + " SMS senders");
+            }
             return smsSenders.stream().map(this::buildSMSSenderFromDTO).collect(Collectors.toList());
         } catch (NotificationSenderManagementException e) {
+            log.error("Failed to retrieve SMS senders for tenant");
             throw handleException(e);
         }
     }
@@ -216,11 +276,18 @@ public class NotificationSenderManagementService {
      */
     public List<PushSender> getPushSenders() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving all push senders for tenant");
+        }
         try {
             List<PushSenderDTO> pushSenders = NotificationSenderServiceHolder.getNotificationSenderManagementService()
                     .getPushSenders(false);
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieved " + (pushSenders != null ? pushSenders.size() : 0) + " push senders");
+            }
             return pushSenders.stream().map(this::buildPushSenderFromDTO).collect(Collectors.toList());
         } catch (NotificationSenderManagementException e) {
+            log.error("Failed to retrieve push senders for tenant");
             throw handleException(e);
         }
     }
@@ -234,11 +301,16 @@ public class NotificationSenderManagementService {
      */
     public EmailSender updateEmailSender(String senderName, EmailSenderUpdateRequest emailSenderUpdateRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating email sender with name: " + senderName);
+        }
         EmailSenderDTO dto = buildEmailSenderDTO(senderName, emailSenderUpdateRequest);
         try {
             EmailSenderDTO emailSenderDTO = notificationSenderManagementService.updateEmailSender(dto);
+            log.info("Email sender updated successfully with name: " + senderName);
             return buildEmailSenderFromDTO(emailSenderDTO);
         } catch (NotificationSenderManagementException e) {
+            log.error("Failed to update email sender with name: " + senderName);
             throw handleException(e);
         }
     }
@@ -252,11 +324,16 @@ public class NotificationSenderManagementService {
      */
     public SMSSender updateSMSSender(String senderName, SMSSenderUpdateRequest smsSenderUpdateRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating SMS sender with name: " + senderName);
+        }
         SMSSenderDTO dto = buildSMSSenderDTO(senderName, smsSenderUpdateRequest);
         try {
             SMSSenderDTO smsSenderDTO = notificationSenderManagementService.updateSMSSender(dto);
+            log.info("SMS sender updated successfully with name: " + senderName);
             return buildSMSSenderFromDTO(smsSenderDTO);
         } catch (NotificationSenderManagementException e) {
+            log.error("Failed to update SMS sender with name: " + senderName);
             throw handleException(e);
         }
     }
@@ -270,12 +347,17 @@ public class NotificationSenderManagementService {
      */
     public PushSender updatePushSender(String senderName, PushSenderUpdateRequest pushSenderUpdateRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating push sender with name: " + senderName);
+        }
         PushSenderDTO dto = buildPushSenderDTO(senderName, pushSenderUpdateRequest);
         try {
             PushSenderDTO pushSenderDTO = NotificationSenderServiceHolder.getNotificationSenderManagementService()
                     .updatePushSender(dto);
+            log.info("Push sender updated successfully with name: " + senderName);
             return buildPushSenderFromDTO(pushSenderDTO);
         } catch (NotificationSenderManagementException e) {
+            log.error("Failed to update push sender with name: " + senderName);
             throw handleException(e);
         }
     }

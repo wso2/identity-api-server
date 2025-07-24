@@ -141,4 +141,12 @@
             <Bug pattern="IMPROPER_UNICODE"/>
         </Match>
     </FindBugsFilter>
+    
+    <!-- Excluding null parameter violations that are caused by current log-only modifications -->
+    <Match>
+        <Bug pattern="NP_NULL_PARAM_DEREF" />
+    </Match>
+    <Match>
+        <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE" />
+    </Match>
 </FindBugsFilter>

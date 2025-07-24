@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.certificate.validation.management.v1.util;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.certificate.validation.management.v1.model.CACertificate;
 import org.wso2.carbon.identity.api.server.certificate.validation.management.v1.model.CACertificates;
 import org.wso2.carbon.identity.api.server.certificate.validation.management.v1.model.Validator;
@@ -32,6 +34,8 @@ import java.util.stream.Collectors;
  */
 public class ModelMapperUtil {
 
+    private static final Log LOG = LogFactory.getLog(ModelMapperUtil.class);
+
     private ModelMapperUtil() {
 
     }
@@ -45,6 +49,9 @@ public class ModelMapperUtil {
     public static Validators mapValidatorsToApiModel
     (List<org.wso2.carbon.identity.x509Certificate.validation.model.Validator> validators) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Mapping " + (validators != null ? validators.size() : 0) + " validators to API model");
+        }
         List<String> validatorList = validators.stream()
                 .map(org.wso2.carbon.identity.x509Certificate.validation.model.Validator::getDisplayName)
                 .collect(Collectors.toList());
@@ -95,6 +102,10 @@ public class ModelMapperUtil {
      */
     public static CACertificates mapCACertificatesToApiModel(List<CACertificateInfo> caCertificateInfoList) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Mapping " + (caCertificateInfoList != null ? caCertificateInfoList.size() : 0) +
+                    " CA certificates to API model");
+        }
         List<CACertificate> caCertificates = caCertificateInfoList.stream()
                 .map(ModelMapperUtil::mapCACertificateToApiModel)
                 .collect(Collectors.toList());

@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.organization.selfservice.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.resource.mgt.APIResourceManager;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
@@ -28,6 +30,8 @@ import org.wso2.carbon.identity.governance.IdentityGovernanceService;
  * Service holder class for self-service management services.
  */
 public class SelfServiceMgtServiceHolder {
+
+    private static final Log log = LogFactory.getLog(SelfServiceMgtServiceHolder.class);
 
     private SelfServiceMgtServiceHolder() {
 
@@ -64,7 +68,14 @@ public class SelfServiceMgtServiceHolder {
      */
     public static ApplicationManagementService getApplicationManagementService() {
 
-        return ApplicationManagementServiceHolder.SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving ApplicationManagementService from OSGi context.");
+        }
+        ApplicationManagementService service = ApplicationManagementServiceHolder.SERVICE;
+        if (service == null) {
+            log.warn("ApplicationManagementService is not available from OSGi context.");
+        }
+        return service;
     }
 
     /**
@@ -74,7 +85,14 @@ public class SelfServiceMgtServiceHolder {
      */
     public static IdentityGovernanceService getIdentityGovernanceService() {
 
-        return IdentityGovernanceServiceHolder.SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving IdentityGovernanceService from OSGi context.");
+        }
+        IdentityGovernanceService service = IdentityGovernanceServiceHolder.SERVICE;
+        if (service == null) {
+            log.warn("IdentityGovernanceService is not available from OSGi context.");
+        }
+        return service;
     }
 
     /**
@@ -84,7 +102,14 @@ public class SelfServiceMgtServiceHolder {
      */
     public static APIResourceManager getAPIResourceManager() {
 
-        return APIResourceManagerServiceHolder.SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving APIResourceManager from OSGi context.");
+        }
+        APIResourceManager service = APIResourceManagerServiceHolder.SERVICE;
+        if (service == null) {
+            log.warn("APIResourceManager is not available from OSGi context.");
+        }
+        return service;
     }
 
     /**
@@ -94,6 +119,13 @@ public class SelfServiceMgtServiceHolder {
      */
     public static AuthorizedAPIManagementService getAuthorizedAPIManagementService() {
 
-        return AuthorizedAPIManagementServiceHolder.SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving AuthorizedAPIManagementService from OSGi context.");
+        }
+        AuthorizedAPIManagementService service = AuthorizedAPIManagementServiceHolder.SERVICE;
+        if (service == null) {
+            log.warn("AuthorizedAPIManagementService is not available from OSGi context.");
+        }
+        return service;
     }
 }

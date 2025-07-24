@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.organization.user.sharing.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.UserSharingPolicyHandlerService;
 
@@ -25,6 +27,8 @@ import org.wso2.carbon.identity.organization.management.organization.user.sharin
  * Holds the services which the shared user sharing management API component is using.
  */
 public class UserSharingMgtServiceHolder {
+
+    private static final Log log = LogFactory.getLog(UserSharingMgtServiceHolder.class);
 
     private UserSharingMgtServiceHolder() {
 
@@ -44,6 +48,15 @@ public class UserSharingMgtServiceHolder {
      */
     public static UserSharingPolicyHandlerService getUserSharingPolicyHandlerService() {
 
-        return UserSharingMgtServiceHolder.UserSharingPolicyHandlerServiceHolder.SERVICE;
+        UserSharingPolicyHandlerService service = 
+                UserSharingMgtServiceHolder.UserSharingPolicyHandlerServiceHolder.SERVICE;
+        if (service == null) {
+            log.warn("UserSharingPolicyHandlerService is not available.");
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("UserSharingPolicyHandlerService obtained successfully.");
+            }
+        }
+        return service;
     }
 }

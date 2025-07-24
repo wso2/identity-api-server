@@ -44,7 +44,7 @@ import static org.wso2.carbon.identity.secret.mgt.core.constant.SecretConstants.
 public class SecretTypeManagementService {
 
     private final SecretManager secretManager;
-    private static final Log log = LogFactory.getLog(SecretManagementService.class);
+    private static final Log log = LogFactory.getLog(SecretTypeManagementService.class);
 
     public SecretTypeManagementService(SecretManager secretManager) {
 
@@ -59,11 +59,15 @@ public class SecretTypeManagementService {
      */
     public SecretTypeResponse addSecretType(SecretTypeAddRequest secretTypeAddRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Adding secret type with name: " + secretTypeAddRequest.getName());
+        }
         validateSecretTypeAddRequest(secretTypeAddRequest);
         SecretType requestDTO, responseDTO;
         try {
             requestDTO = buildSecretTypeRequestDTOFromSecretTypeAddRequest(secretTypeAddRequest);
             responseDTO = secretManager.addSecretType(requestDTO);
+            log.info("Secret type added successfully with name: " + secretTypeAddRequest.getName());
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.ERROR_CODE_ERROR_ADDING_SECRET,
                     secretTypeAddRequest.getName());
@@ -121,8 +125,12 @@ public class SecretTypeManagementService {
      */
     public void deleteSecretType(String secretTypeName) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting secret type with name: " + secretTypeName);
+        }
         try {
             secretManager.deleteSecretType(secretTypeName);
+            log.info("Secret type deleted successfully with name: " + secretTypeName);
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.
                     ERROR_CODE_ERROR_DELETING_SECRET, secretTypeName);
@@ -137,12 +145,18 @@ public class SecretTypeManagementService {
      */
     public SecretTypeResponse getSecretType(String secretTypeName) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving secret type with name: " + secretTypeName);
+        }
         try {
             SecretType responseDTO = secretManager.getSecretType(secretTypeName);
             SecretTypeResponse secretTypeResponse = new SecretTypeResponse();
             secretTypeResponse.setId(responseDTO.getId());
             secretTypeResponse.setName(responseDTO.getName());
             secretTypeResponse.description(responseDTO.getDescription());
+            if (log.isDebugEnabled()) {
+                log.debug("Secret type retrieved successfully with name: " + secretTypeName);
+            }
             return secretTypeResponse;
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.
@@ -159,11 +173,15 @@ public class SecretTypeManagementService {
      */
     public SecretTypeResponse updateTypeSecret(String name, SecretTypeUpdateRequest secretUpdateRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating secret type with name: " + name);
+        }
         SecretType requestDTO, responseDTO;
         SecretTypeAddRequest secretAdd = buildSecretTypeAddFromSecretTypeUpdateRequest(name, secretUpdateRequest);
         try {
             requestDTO = buildSecretTypeRequestDTOFromSecretTypeAddRequest(secretAdd);
             responseDTO = secretManager.replaceSecretType(requestDTO);
+            log.info("Secret type updated successfully with name: " + name);
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_SECRET,
                     name);

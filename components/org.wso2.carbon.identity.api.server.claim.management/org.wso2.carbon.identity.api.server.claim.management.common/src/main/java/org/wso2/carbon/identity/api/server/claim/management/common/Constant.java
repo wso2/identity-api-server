@@ -16,6 +16,9 @@
 
 package org.wso2.carbon.identity.api.server.claim.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -251,6 +254,7 @@ public class Constant {
         private final String message;
         private final String description;
 
+        private static final Log log = LogFactory.getLog(ErrorMessage.class);
         private static final Map<String, ErrorMessage> messageIndex = new HashMap<>(ErrorMessage.values().length);
         static final String BUNDLE = "ServerClientErrorMappings";
         static ResourceBundle resourceBundle = ResourceBundle.getBundle(BUNDLE);
@@ -294,11 +298,21 @@ public class Constant {
          */
         public static ErrorMessage getMappedErrorMessage(String serverCode) {
 
+            if (log.isDebugEnabled()) {
+                log.debug("Attempting to get mapped error message for server code: " + serverCode);
+            }
             try {
                 String errorCode = resourceBundle.getString(serverCode);
-                return messageIndex.get(errorCode);
+                ErrorMessage errorMessage = messageIndex.get(errorCode);
+                if (log.isDebugEnabled()) {
+                    log.debug("Successfully mapped server code: " + serverCode + " to error message: " + 
+                            (errorMessage != null ? errorMessage.getCode() : "null"));
+                }
+                return errorMessage;
             } catch (Throwable e) {
-                // Ignore if error mapping has invalid input.
+                if (log.isDebugEnabled()) {
+                    log.debug("Error mapping failed for server code: " + serverCode + ". Returning default error.", e);
+                }
             }
             return ErrorMessage.ERROR_CODE_INVALID_INPUT;
         }

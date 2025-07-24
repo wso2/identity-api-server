@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.tenant.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.tenant.mgt.services.TenantMgtService;
 import org.wso2.carbon.user.core.service.RealmService;
@@ -26,6 +28,8 @@ import org.wso2.carbon.user.core.service.RealmService;
  * Service holder class for tenant management.
  */
 public class TenantManagementServiceHolder {
+
+    private static final Log log = LogFactory.getLog(TenantManagementServiceHolder.class);
 
     private TenantManagementServiceHolder() {
 
@@ -50,6 +54,12 @@ public class TenantManagementServiceHolder {
      */
     public static TenantMgtService getTenantMgtService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving TenantMgtService from OSGi service registry.");
+        }
+        if (TenantMgtServiceHolder.SERVICE == null) {
+            log.warn("TenantMgtService is not available in the OSGi service registry.");
+        }
         return TenantMgtServiceHolder.SERVICE;
     }
 
@@ -60,6 +70,12 @@ public class TenantManagementServiceHolder {
      */
     public static RealmService getRealmService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving RealmService from OSGi service registry.");
+        }
+        if (RealmServiceHolder.SERVICE == null) {
+            log.warn("RealmService is not available in the OSGi service registry.");
+        }
         return RealmServiceHolder.SERVICE;
     }
 }

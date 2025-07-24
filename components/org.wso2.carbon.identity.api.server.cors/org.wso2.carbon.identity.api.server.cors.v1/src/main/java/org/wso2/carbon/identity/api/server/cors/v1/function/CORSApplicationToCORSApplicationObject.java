@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.cors.v1.function;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.cors.v1.model.CORSApplicationObject;
 import org.wso2.carbon.identity.cors.mgt.core.model.CORSApplication;
 
@@ -28,8 +30,17 @@ import java.util.function.Function;
  */
 public class CORSApplicationToCORSApplicationObject implements Function<CORSApplication, CORSApplicationObject> {
 
+    private static final Log log = LogFactory.getLog(CORSApplicationToCORSApplicationObject.class);
+
     @Override
     public CORSApplicationObject apply(CORSApplication corsApplication) {
+
+        if (corsApplication == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Null CORS application provided for transformation");
+            }
+            return null;
+        }
 
         CORSApplicationObject corsApplicationObject = new CORSApplicationObject();
         corsApplicationObject.setId(corsApplication.getId());

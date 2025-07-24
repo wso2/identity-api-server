@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.oidc.scope.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
 
@@ -25,6 +27,8 @@ import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
  * OIDCScopeManagementService OSGi service holder.
  */
 public class OIDCScopeManagementServiceHolder {
+
+    private static final Log log = LogFactory.getLog(OIDCScopeManagementServiceHolder.class);
 
     private OIDCScopeManagementServiceHolder () {}
 
@@ -41,6 +45,13 @@ public class OIDCScopeManagementServiceHolder {
      */
     public static OAuthAdminServiceImpl getOAuthAdminService() {
 
-        return OAuthAdminServiceImplServiceHolder.SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving OAuthAdminService instance.");
+        }
+        OAuthAdminServiceImpl service = OAuthAdminServiceImplServiceHolder.SERVICE;
+        if (service == null) {
+            log.warn("OAuthAdminService is not available. Service might not be initialized properly.");
+        }
+        return service;
     }
 }

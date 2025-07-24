@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.AsyncOperationsApiService;
 import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.core.AsyncOperationsApiServiceCore;
 import org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.v1.factories.AsyncOperationsApiServiceCoreFactory;
@@ -29,10 +31,14 @@ import javax.ws.rs.core.Response;
  */
 public class AsyncOperationsApiServiceImpl implements AsyncOperationsApiService {
 
+    private static final Log LOG = LogFactory.getLog(AsyncOperationsApiServiceImpl.class);
     private AsyncOperationsApiServiceCore asyncOperationsApiServiceCore;
 
     public AsyncOperationsApiServiceImpl() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Initializing AsyncOperationsApiServiceImpl");
+        }
         this.asyncOperationsApiServiceCore = AsyncOperationsApiServiceCoreFactory
                 .getAsyncOperationsApiServiceCore();
     }
@@ -40,12 +46,19 @@ public class AsyncOperationsApiServiceImpl implements AsyncOperationsApiService 
     @Override
     public Response asyncOperationsGet(String after, String before, Integer limit, String filter) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("REST API call: GET /async-operations with parameters - after: " + after + 
+                    ", before: " + before + ", limit: " + limit + ", filter: " + filter);
+        }
         return asyncOperationsApiServiceCore.getOperations(after, before, limit, filter);
     }
 
     @Override
     public Response asyncOperationsOperationIdGet(String operationId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("REST API call: GET /async-operations/" + operationId);
+        }
         return asyncOperationsApiServiceCore.getOperation(operationId);
     }
 
@@ -53,6 +66,11 @@ public class AsyncOperationsApiServiceImpl implements AsyncOperationsApiService 
     public Response asyncOperationsOperationIdUnitOperationsGet(String operationId, String after, String before,
                                                                 Integer limit, String filter) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("REST API call: GET /async-operations/" + operationId + "/unit-operations with " +
+                    "parameters - after: " + after + ", before: " + before + ", limit: " + limit + 
+                    ", filter: " + filter);
+        }
         return asyncOperationsApiServiceCore.getUnitOperations(operationId, after, before, limit, filter);
     }
 
@@ -60,6 +78,10 @@ public class AsyncOperationsApiServiceImpl implements AsyncOperationsApiService 
     public Response asyncOperationsOperationIdUnitOperationsUnitOperationIdGet(String operationId,
                                                                                String unitOperationId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("REST API call: GET /async-operations/" + operationId + "/unit-operations/" + 
+                    unitOperationId);
+        }
         return asyncOperationsApiServiceCore.getUnitOperation(unitOperationId);
     }
 }

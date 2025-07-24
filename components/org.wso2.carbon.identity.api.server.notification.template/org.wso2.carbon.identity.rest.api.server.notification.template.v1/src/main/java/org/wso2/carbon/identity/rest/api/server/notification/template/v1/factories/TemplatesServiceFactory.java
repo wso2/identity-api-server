@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.rest.api.server.notification.template.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.notification.template.common.TemplatesServiceHolder;
 import org.wso2.carbon.identity.governance.service.notification.NotificationTemplateManager;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.core.TemplatesService;
@@ -27,12 +29,14 @@ import org.wso2.carbon.identity.rest.api.server.notification.template.v1.core.Te
  */
 public class TemplatesServiceFactory {
 
+    private static final Log log = LogFactory.getLog(TemplatesServiceFactory.class);
     private static final TemplatesService SERVICE;
 
     static {
         NotificationTemplateManager notificationTemplateManager = TemplatesServiceHolder
                 .getNotificationTemplateManager();
         if (notificationTemplateManager == null) {
+            log.error("NotificationTemplateManager is not available from OSGi context");
             throw new IllegalStateException("NotificationTemplateManager is not available from OSGi context.");
         }
         SERVICE = new TemplatesService(notificationTemplateManager);

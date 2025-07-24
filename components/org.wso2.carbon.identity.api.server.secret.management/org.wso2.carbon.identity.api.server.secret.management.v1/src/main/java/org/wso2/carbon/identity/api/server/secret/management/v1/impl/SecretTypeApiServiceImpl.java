@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.secret.management.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.secret.management.v1.SecretTypeApiService;
 import org.wso2.carbon.identity.api.server.secret.management.v1.core.SecretTypeManagementService;
@@ -38,13 +40,18 @@ import static org.wso2.carbon.identity.api.server.secret.management.common.Secre
  */
 public class SecretTypeApiServiceImpl implements SecretTypeApiService {
 
+    private static final Log log = LogFactory.getLog(SecretTypeApiServiceImpl.class);
     private final SecretTypeManagementService secretTypeManagementService;
 
     public SecretTypeApiServiceImpl() {
 
         try {
             this.secretTypeManagementService = SecretTypeManagementServiceFactory.getSecretTypeManagementService();
+            if (log.isDebugEnabled()) {
+                log.debug("SecretTypeApiServiceImpl initialized successfully");
+            }
         } catch (IllegalStateException e) {
+            log.error("Error occurred while initiating SecretTypeManagementService", e);
             throw new RuntimeException("Error occurred while initiating SecretTypeManagementService.", e);
         }
     }
@@ -52,6 +59,9 @@ public class SecretTypeApiServiceImpl implements SecretTypeApiService {
     @Override
     public Response createSecretType(SecretTypeAddRequest secretTypeAddRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Create secret type API request received for: " + secretTypeAddRequest.getName());
+        }
         SecretTypeResponse secretType = secretTypeManagementService.addSecretType(secretTypeAddRequest);
         URI location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + SECRET_TYPE_CONTEXT_PATH + "/"
                 + secretType.getName());
@@ -61,6 +71,9 @@ public class SecretTypeApiServiceImpl implements SecretTypeApiService {
     @Override
     public Response deleteSecretType(String name) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Delete secret type API request received for: " + name);
+        }
         secretTypeManagementService.deleteSecretType(name);
         return Response.noContent().build();
     }
@@ -68,12 +81,18 @@ public class SecretTypeApiServiceImpl implements SecretTypeApiService {
     @Override
     public Response getSecretType(String name) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Get secret type API request received for: " + name);
+        }
         return Response.ok().entity(secretTypeManagementService.getSecretType(name)).build();
     }
 
     @Override
     public Response updateSecretType(String name, SecretTypeUpdateRequest secretTypeUpdateRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Update secret type API request received for: " + name);
+        }
         return Response.ok().entity(secretTypeManagementService
                 .updateTypeSecret(name, secretTypeUpdateRequest)).build();
     }

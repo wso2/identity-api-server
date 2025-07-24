@@ -64,18 +64,28 @@ public class CORSService {
     public List<CORSApplicationObject> getAssociatedAppsByCORSOrigin(String corsOriginId) {
 
         try {
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieving associated applications for CORS origin: " + corsOriginId);
+            }
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             List<String> corsOriginIdList = corsManagementService.getTenantCORSOrigins(tenantDomain)
                     .stream().map(CORSOrigin::getId).collect(Collectors.toList());
 
             // Throw an exception if corsOriginId is not valid.
             if (!corsOriginIdList.contains(corsOriginId)) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Invalid CORS origin ID provided: " + corsOriginId + " for tenant: " + tenantDomain);
+                }
                 throw new CORSManagementServiceClientException(String.format(ERROR_CODE_INVALID_CORS_ORIGIN_ID
                         .description(), corsOriginId), ERROR_CODE_INVALID_CORS_ORIGIN_ID.code());
             }
 
             List<CORSApplication> applicationList = corsManagementService
                     .getCORSApplicationsByCORSOriginId(corsOriginId, tenantDomain);
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieved " + (applicationList != null ? applicationList.size() : 0) + 
+                         " applications for CORS origin: " + corsOriginId + " in tenant: " + tenantDomain);
+            }
             return applicationList.stream().map(new CORSApplicationToCORSApplicationObject())
                     .collect(Collectors.toList());
         } catch (CORSManagementServiceException e) {
@@ -92,7 +102,14 @@ public class CORSService {
 
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieving CORS origins for tenant: " + tenantDomain);
+            }
             List<CORSOrigin> corsOriginList = corsManagementService.getTenantCORSOrigins(tenantDomain);
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieved " + (corsOriginList != null ? corsOriginList.size() : 0) + 
+                         " CORS origins for tenant: " + tenantDomain);
+            }
             return corsOriginList.stream().map(new CORSOriginToCORSOriginObject()).collect(Collectors.toList());
         } catch (CORSManagementServiceException e) {
             throw handleCORSException(e, Constants.ErrorMessage.ERROR_CODE_CORS_RETRIEVE, null);

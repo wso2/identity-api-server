@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.rest.api.server.workflow.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.WorkflowEnginesApiService;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.core.WorkflowEngineService;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.factories.WorkflowEngineServiceFactory;
@@ -29,6 +31,7 @@ import javax.ws.rs.core.Response;
  */
 public class WorkflowEnginesApiServiceImpl implements WorkflowEnginesApiService {
 
+    private static final Log log = LogFactory.getLog(WorkflowEnginesApiServiceImpl.class);
     private final WorkflowEngineService workflowEngineService;
 
     public WorkflowEnginesApiServiceImpl() {
@@ -39,6 +42,9 @@ public class WorkflowEnginesApiServiceImpl implements WorkflowEnginesApiService 
     @Override
     public Response searchWorkFlowEngines() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Received request to search workflow engines");
+        }
         return Response.ok().entity(workflowEngineService.listWorkflowEngines()).build();
     }
 }

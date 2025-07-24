@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.rest.api.server.workflow.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.WorkflowAssociationsApiService;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.core.WorkflowService;
@@ -38,6 +40,7 @@ import static org.wso2.carbon.identity.api.server.workflow.common.Constants.WORK
  */
 public class WorkflowAssociationsApiServiceImpl implements WorkflowAssociationsApiService {
 
+    private static final Log log = LogFactory.getLog(WorkflowAssociationsApiServiceImpl.class);
     private final WorkflowService workflowService;
 
     public WorkflowAssociationsApiServiceImpl() {
@@ -48,6 +51,10 @@ public class WorkflowAssociationsApiServiceImpl implements WorkflowAssociationsA
     @Override
     public Response addWorkflowAssociation(WorkflowAssociationRequest workflowAssociationRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Adding workflow association: " + 
+                    (workflowAssociationRequest != null ? workflowAssociationRequest.getAssociationName() : "null"));
+        }
         WorkflowAssociationResponse workflowAssociationResponse =
                 workflowService.addAssociation(workflowAssociationRequest);
         URI location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + WORKFLOW_ASSOCIATION_PATH_COMPONENT
@@ -58,6 +65,9 @@ public class WorkflowAssociationsApiServiceImpl implements WorkflowAssociationsA
     @Override
     public Response deleteWorkflowAssociationById(String associationId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting workflow association with ID: " + associationId);
+        }
         workflowService.removeAssociation(associationId);
         return Response.noContent().build();
     }
@@ -65,12 +75,19 @@ public class WorkflowAssociationsApiServiceImpl implements WorkflowAssociationsA
     @Override
     public Response getWorkflowAssociationById(String associationId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving workflow association with ID: " + associationId);
+        }
         return Response.ok().entity(workflowService.getAssociation(associationId)).build();
     }
 
     @Override
     public Response getWorkflowAssociations(Integer limit, Integer offset, String filter) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Listing workflow associations with limit: " + limit + ", offset: " + offset + 
+                    ", filter: " + filter);
+        }
         return Response.ok().entity(workflowService.listPaginatedAssociations(limit, offset, filter)).build();
     }
 
@@ -78,6 +95,9 @@ public class WorkflowAssociationsApiServiceImpl implements WorkflowAssociationsA
     public Response updateAssociation(String associationId, WorkflowAssociationPatchRequest
             workflowAssociationPatchRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating workflow association with ID: " + associationId);
+        }
         return Response.ok().entity(workflowService.updateAssociation(associationId,
                 workflowAssociationPatchRequest)).build();
     }

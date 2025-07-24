@@ -20,6 +20,8 @@ package org.wso2.carbon.identity.api.server.action.management.v1.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.action.management.api.model.Action;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
@@ -43,6 +45,8 @@ import javax.ws.rs.core.Response;
  */
 public class ActionDeserializer {
 
+    private static final Log LOG = LogFactory.getLog(ActionDeserializer.class);
+
     /**
      * Deserialize the action model.
      *
@@ -52,19 +56,20 @@ public class ActionDeserializer {
      */
     public static ActionModel deserializeActionModel(Action.ActionTypes actionType, String jsonBody) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deserializing action model for type: " + (actionType != null ? actionType : "null"));
+        }
         ActionModel actionModel = null;
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             switch (actionType) {
                 case PRE_ISSUE_ACCESS_TOKEN:
                     actionModel = objectMapper.readValue(jsonBody, ActionModel.class);
-                    // Validate the object
                     validateActionModel(actionModel, ActionModel.class);
                     break;
                 case PRE_UPDATE_PASSWORD:
                     PreUpdatePasswordActionModel preUpdatePasswordActionModel = objectMapper.readValue(jsonBody,
                             PreUpdatePasswordActionModel.class);
-                    // Validate the object
                     validateActionModel(preUpdatePasswordActionModel, PreUpdatePasswordActionModel.class);
                     actionModel = preUpdatePasswordActionModel;
                     break;
@@ -75,9 +80,16 @@ public class ActionDeserializer {
                     actionModel = preUpdateProfileActionModel;
                     break;
                 default:
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("No deserializer found for action type: " + actionType);
+                    }
                     break;
             }
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Action model deserialized successfully for type: " + actionType);
+            }
         } catch (JsonProcessingException e) {
+            LOG.warn("Failed to deserialize action model for type: " + actionType + ". Invalid JSON payload.", e);
             throw ActionMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST,
                     ActionMgtEndpointConstants.ErrorMessage.ERROR_INVALID_PAYLOAD);
         }
@@ -94,19 +106,20 @@ public class ActionDeserializer {
      */
     public static ActionUpdateModel deserializeActionUpdateModel(Action.ActionTypes actionType, String jsonBody) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deserializing action update model for type: " + (actionType != null ? actionType : "null"));
+        }
         ActionUpdateModel actionUpdateModel = null;
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             switch (actionType) {
                 case PRE_ISSUE_ACCESS_TOKEN:
                     actionUpdateModel = objectMapper.readValue(jsonBody, ActionUpdateModel.class);
-                    // Validate the object
                     validateActionModel(actionUpdateModel, ActionUpdateModel.class);
                     break;
                 case PRE_UPDATE_PASSWORD:
                     PreUpdatePasswordActionUpdateModel preUpdatePasswordActionUpdateModel =
                             objectMapper.readValue(jsonBody, PreUpdatePasswordActionUpdateModel.class);
-                    // Validate the object
                     validateActionModel(preUpdatePasswordActionUpdateModel, PreUpdatePasswordActionUpdateModel.class);
                     actionUpdateModel = preUpdatePasswordActionUpdateModel;
                     break;
@@ -117,9 +130,18 @@ public class ActionDeserializer {
                     actionUpdateModel = preUpdateProfileActionUpdateModel;
                     break;
                 default:
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("No update model deserializer found for action type: " + actionType);
+                    }
                     break;
             }
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Action update model deserialized successfully for type: " + actionType);
+            }
         } catch (JsonProcessingException e) {
+            String errorMessage = "Failed to deserialize action update model for type: " + actionType + 
+                    ". Invalid JSON payload.";
+            LOG.warn(errorMessage, e);
             throw ActionMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST,
                     ActionMgtEndpointConstants.ErrorMessage.ERROR_INVALID_PAYLOAD);
         }

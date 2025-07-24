@@ -110,6 +110,9 @@ public class ServerAuthenticatorManagementService {
     public List<Authenticator> getAuthenticators(String filter, Integer limit, Integer offset) {
 
         handleNotImplementedCapabilities(limit, offset);
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving authenticators with filter: " + filter);
+        }
 
         try {
             String filterAuthenticatorName = null;
@@ -159,9 +162,13 @@ public class ServerAuthenticatorManagementService {
                 identityProviders = idpSearchResult.getIdPs();
             }
 
-            return buildAuthenticatorsListResponse(filter, requestedAttributeList, filterAuthenticatorName,
-                    filterOperationForName, filterTagsList, localAuthenticatorConfigs, requestPathAuthenticatorConfigs,
-                    identityProviders);
+            List<Authenticator> result = buildAuthenticatorsListResponse(filter, requestedAttributeList, 
+                    filterAuthenticatorName, filterOperationForName, filterTagsList, localAuthenticatorConfigs, 
+                    requestPathAuthenticatorConfigs, identityProviders);
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieved " + result.size() + " authenticators");
+            }
+            return result;
         } catch (IdentityApplicationManagementException e) {
             throw handleApplicationMgtException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_AUTHENTICATORS,
                     null);
@@ -177,6 +184,9 @@ public class ServerAuthenticatorManagementService {
      */
     public List<String> getTags() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving authenticator tags");
+        }
         try {
             LocalAuthenticatorConfig[] localAuthenticatorConfigs = applicationManagementService
                     .getAllLocalAuthenticators(ContextLoader.getTenantDomainFromContext());
@@ -190,8 +200,12 @@ public class ServerAuthenticatorManagementService {
             List<UserDefinedLocalAuthenticatorConfig> userDefinedLocalAuthConfigs = applicationAuthenticatorService
                     .getAllUserDefinedLocalAuthenticators(ContextLoader.getTenantDomainFromContext());
 
-            return buildTagsListResponse(localAuthenticatorConfigs, requestPathAuthenticatorConfigs,
+            List<String> tags = buildTagsListResponse(localAuthenticatorConfigs, requestPathAuthenticatorConfigs,
                     federatedAuthenticatorConfigs, userDefinedLocalAuthConfigs);
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieved " + tags.size() + " unique tags");
+            }
+            return tags;
         } catch (IdentityApplicationManagementException e) {
             throw handleApplicationMgtException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_AUTHENTICATORS,
                     null);
@@ -204,6 +218,9 @@ public class ServerAuthenticatorManagementService {
 
     public ConnectedApps getConnectedAppsOfLocalAuthenticator(String authenticatorId, Integer limit, Integer offset) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving connected apps for authenticator: " + authenticatorId);
+        }
         try {
             ConnectedAppsResult connectedAppsResult = applicationManagementService
                     .getConnectedAppsForLocalAuthenticator(authenticatorId, ContextLoader.getTenantDomainFromContext(),
@@ -223,12 +240,15 @@ public class ServerAuthenticatorManagementService {
      */
     public Authenticator addUserDefinedLocalAuthenticator(UserDefinedLocalAuthenticatorCreation config) {
 
+        log.info("Adding user defined local authenticator: " + config.getName());
         try {
             UserDefinedLocalAuthenticatorConfig createdConfig = applicationAuthenticatorService
                     .addUserDefinedLocalAuthenticator(
                             LocalAuthenticatorConfigBuilderFactory.build(config),
                             CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
-            return LocalAuthenticatorConfigBuilderFactory.build(createdConfig);
+            Authenticator result = LocalAuthenticatorConfigBuilderFactory.build(createdConfig);
+            log.info("Successfully added user defined local authenticator: " + config.getName());
+            return result;
         } catch (AuthenticatorMgtException e) {
             throw handleAuthenticatorException(e);
         }
@@ -241,9 +261,12 @@ public class ServerAuthenticatorManagementService {
      */
     public void deleteUserDefinedLocalAuthenticator(String authenticatorId) {
 
+        String decodedId = base64URLDecode(authenticatorId);
+        log.info("Deleting user defined local authenticator: " + decodedId);
         try {
-            applicationAuthenticatorService.deleteUserDefinedLocalAuthenticator(base64URLDecode(authenticatorId),
+            applicationAuthenticatorService.deleteUserDefinedLocalAuthenticator(decodedId,
                             CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            log.info("Successfully deleted user defined local authenticator: " + decodedId);
         } catch (AuthenticatorMgtException e) {
             throw handleAuthenticatorException(e);
         }
@@ -262,6 +285,7 @@ public class ServerAuthenticatorManagementService {
         try {
             String authenticatorName = base64URLDecode(authenticatorId);
             String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            log.info("Updating user defined local authenticator: " + authenticatorName);
             LocalAuthenticatorConfig existingAuthenticator = applicationAuthenticatorService
                     .getLocalAuthenticatorByName(authenticatorName, tenantDomain);
             if (existingAuthenticator == null) {
@@ -274,7 +298,9 @@ public class ServerAuthenticatorManagementService {
                     .updateUserDefinedLocalAuthenticator(
                             LocalAuthenticatorConfigBuilderFactory.build(config, existingAuthenticator),
                             tenantDomain);
-            return LocalAuthenticatorConfigBuilderFactory.build(updatedConfig);
+            Authenticator result = LocalAuthenticatorConfigBuilderFactory.build(updatedConfig);
+            log.info("Successfully updated user defined local authenticator: " + authenticatorName);
+            return result;
         } catch (AuthenticatorMgtException e) {
             throw handleAuthenticatorException(e);
         }

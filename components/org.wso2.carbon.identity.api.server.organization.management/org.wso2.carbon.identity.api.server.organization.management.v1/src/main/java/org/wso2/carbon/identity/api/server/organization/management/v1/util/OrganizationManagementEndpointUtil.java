@@ -57,13 +57,22 @@ public class OrganizationManagementEndpointUtil {
     public static Response handleClientErrorResponse(OrganizationManagementClientException e, Log log) {
 
         if (isNotFoundError(e)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Handling client error as NOT_FOUND: " + e.getMessage());
+            }
             throw buildException(Response.Status.NOT_FOUND, log, e);
         }
 
         if (isForbiddenError(e)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Handling client error as FORBIDDEN: " + e.getMessage());
+            }
             throw buildException(Response.Status.FORBIDDEN, log, e);
         }
 
+        if (log.isDebugEnabled()) {
+            log.debug("Handling client error as BAD_REQUEST: " + e.getMessage());
+        }
         throw buildException(Response.Status.BAD_REQUEST, log, e);
     }
 
@@ -76,6 +85,9 @@ public class OrganizationManagementEndpointUtil {
      */
     public static Response handleServerErrorResponse(OrganizationManagementException e, Log log) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Handling server error as INTERNAL_SERVER_ERROR: " + e.getMessage());
+        }
         throw buildException(Response.Status.INTERNAL_SERVER_ERROR, log, e);
     }
 

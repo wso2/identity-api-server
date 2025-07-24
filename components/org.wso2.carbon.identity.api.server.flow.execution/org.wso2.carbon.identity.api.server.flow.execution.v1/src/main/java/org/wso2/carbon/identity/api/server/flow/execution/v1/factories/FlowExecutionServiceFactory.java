@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.flow.execution.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.flow.execution.common.FlowExecutionServiceHolder;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.core.FlowExecutionServiceCore;
 import org.wso2.carbon.identity.flow.execution.engine.FlowExecutionService;
@@ -27,13 +29,16 @@ import org.wso2.carbon.identity.flow.execution.engine.FlowExecutionService;
  */
 public class FlowExecutionServiceFactory {
 
+    private static final Log LOG = LogFactory.getLog(FlowExecutionServiceFactory.class);
     private static final FlowExecutionServiceCore SERVICE;
 
     static {
         FlowExecutionService flowExecutionService = FlowExecutionServiceHolder.getInstance();
         if (flowExecutionService == null) {
+            LOG.error("FlowExecutionService is not available from OSGi context");
             throw new IllegalStateException("UserRegistrationFlowService is not available from OSGi context.");
         }
+        LOG.info("FlowExecutionServiceCore initialized successfully");
         SERVICE = new FlowExecutionServiceCore(flowExecutionService);
     }
 

@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.idv.provider.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.extension.identity.verification.provider.IdVProviderManager;
 import org.wso2.carbon.identity.api.server.idv.provider.common.IdentityVerificationServiceHolder;
 import org.wso2.carbon.identity.api.server.idv.provider.v1.core.IdVProviderService;
@@ -27,16 +29,24 @@ import org.wso2.carbon.identity.api.server.idv.provider.v1.core.IdVProviderServi
  */
 public class IdVProviderServiceFactory {
 
+    private static final Log log = LogFactory.getLog(IdVProviderServiceFactory.class);
     private static final IdVProviderService SERVICE;
 
     static {
+        if (log.isDebugEnabled()) {
+            log.debug("Initializing IdVProviderService factory");
+        }
         IdVProviderManager idvProviderManager = IdentityVerificationServiceHolder.getIdVProviderManager();
 
         if (idvProviderManager == null) {
+            log.error("IdVProviderManager is not available from OSGi context");
             throw new IllegalStateException("IdVProviderManager is not available from OSGi context.");
         }
 
         SERVICE = new IdVProviderService(idvProviderManager);
+        if (log.isDebugEnabled()) {
+            log.debug("IdVProviderService factory initialized successfully");
+        }
     }
 
     /**

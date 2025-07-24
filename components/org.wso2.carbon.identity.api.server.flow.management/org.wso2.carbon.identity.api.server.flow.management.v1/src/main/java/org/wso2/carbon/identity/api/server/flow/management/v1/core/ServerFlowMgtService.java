@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.core;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.flow.management.v1.BaseFlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfig;
@@ -50,11 +52,15 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils
  */
 public class ServerFlowMgtService {
 
+    private static final Log LOG = LogFactory.getLog(ServerFlowMgtService.class);
     private final FlowMgtService flowMgtService;
 
     public ServerFlowMgtService(FlowMgtService flowMgtService) {
 
         this.flowMgtService = flowMgtService;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("ServerFlowMgtService initialized with FlowMgtService.");
+        }
     }
 
     /**
@@ -64,19 +70,30 @@ public class ServerFlowMgtService {
      */
     public FlowResponse getFlow(String flowType) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving flow for type: " + flowType);
+        }
         FlowDTO flowDTO;
         try {
             Utils.validateFlowType(flowType);
-            flowDTO = flowMgtService
-                    .getFlow(flowType, PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            flowDTO = flowMgtService.getFlow(flowType, tenantId);
             FlowResponse flowResponse = new FlowResponse();
             if (flowDTO == null) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("No flow found for type: " + flowType + " in tenant: " + tenantId);
+                }
                 return flowResponse;
             }
             flowResponse.steps(flowDTO.getSteps().stream().map(Utils::convertToStep)
                     .collect(Collectors.toList()));
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully retrieved flow for type: " + flowType + " with " +
+                        (flowDTO.getSteps() != null ? flowDTO.getSteps().size() : 0) + " steps.");
+            }
             return flowResponse;
         } catch (FlowMgtFrameworkException e) {
+            LOG.error("Error retrieving flow for type: " + flowType, e);
             throw Utils.handleFlowMgtException(e);
         }
     }
@@ -89,9 +106,16 @@ public class ServerFlowMgtService {
      */
     public BaseFlowMetaResponse getFlowMeta(String flowType) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving flow meta for type: " + flowType);
+        }
         Utils.validateFlowType(flowType);
         AbstractMetaResponseHandler metaResponseHandler = resolveHandler(flowType);
-        return metaResponseHandler.createResponse();
+        BaseFlowMetaResponse response = metaResponseHandler.createResponse();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Successfully retrieved flow meta for type: " + flowType);
+        }
+        return response;
     }
 
     /**
@@ -101,6 +125,10 @@ public class ServerFlowMgtService {
      */
     public void updateFlow(FlowRequest flowRequest) {
 
+        String flowType = flowRequest != null ? flowRequest.getFlowType() : null;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating flow for type: " + flowType);
+        }
         try {
             Utils.validateFlowType(flowRequest.getFlowType());
             validateFlow(flowRequest.getFlowType(), flowRequest.getSteps());
@@ -108,9 +136,11 @@ public class ServerFlowMgtService {
             flowDTO.setSteps(flowRequest.getSteps().stream().map(Utils::convertToStepDTO)
                     .collect(Collectors.toList()));
             flowDTO.setFlowType(flowRequest.getFlowType());
-            flowMgtService.updateFlow(flowDTO,
-                    PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            flowMgtService.updateFlow(flowDTO, tenantId);
+            LOG.info("Flow updated successfully for type: " + flowType + " in tenant: " + tenantId);
         } catch (FlowMgtFrameworkException e) {
+            LOG.error("Error updating flow for type: " + flowType, e);
             throw Utils.handleFlowMgtException(e);
         }
     }
@@ -122,13 +152,21 @@ public class ServerFlowMgtService {
      */
     public List<FlowConfig> getFlowConfigs() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving all flow configs.");
+        }
         try {
-            List<FlowConfigDTO> flowMgtConfigs = flowMgtService.getFlowConfigs(
-                    PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
-            return flowMgtConfigs.stream()
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            List<FlowConfigDTO> flowMgtConfigs = flowMgtService.getFlowConfigs(tenantId);
+            List<FlowConfig> result = flowMgtConfigs.stream()
                     .map(Utils::convertToFlowConfig)
                     .collect(Collectors.toList());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully retrieved " + result.size() + " flow configs for tenant: " + tenantId);
+            }
+            return result;
         } catch (FlowMgtFrameworkException e) {
+            LOG.error("Error retrieving flow configs.", e);
             throw Utils.handleFlowMgtException(e);
         }
     }
@@ -141,12 +179,20 @@ public class ServerFlowMgtService {
      */
     public FlowConfig getFlowConfigForFlow(String flowType) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving flow config for type: " + flowType);
+        }
         try {
             Utils.validateFlowType(flowType);
-            FlowConfigDTO flowConfig = flowMgtService.getFlowConfig(flowType,
-                    PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
-            return Utils.convertToFlowConfig(flowConfig);
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            FlowConfigDTO flowConfig = flowMgtService.getFlowConfig(flowType, tenantId);
+            FlowConfig result = Utils.convertToFlowConfig(flowConfig);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully retrieved flow config for type: " + flowType + " in tenant: " + tenantId);
+            }
+            return result;
         } catch (FlowMgtFrameworkException e) {
+            LOG.error("Error retrieving flow config for type: " + flowType, e);
             throw Utils.handleFlowMgtException(e);
         }
     }
@@ -158,11 +204,15 @@ public class ServerFlowMgtService {
      */
     public FlowConfig updateFlowConfig(FlowConfigPatchModel flowConfigPatchModel) {
 
+        String flowType = flowConfigPatchModel != null ? flowConfigPatchModel.getFlowType() : null;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating flow config for type: " + flowType);
+        }
         try {
             Utils.validateFlowType(flowConfigPatchModel.getFlowType());
-            FlowConfigDTO existingFlowConfig = flowMgtService.getFlowConfig(
-                    flowConfigPatchModel.getFlowType(),
-                    PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            FlowConfigDTO existingFlowConfig = flowMgtService.getFlowConfig(flowConfigPatchModel.getFlowType(),
+                    tenantId);
             // If the patch model does not contain values for isEnabled or isAutoLoginEnabled,
             // retain the existing values from the flow configuration.
             if (existingFlowConfig != null) {
@@ -174,10 +224,11 @@ public class ServerFlowMgtService {
                 }
             }
             FlowConfigDTO updatedFlowConfig =
-                    flowMgtService.updateFlowConfig(Utils.convertToFlowConfigDTO(flowConfigPatchModel),
-                            PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
+                    flowMgtService.updateFlowConfig(Utils.convertToFlowConfigDTO(flowConfigPatchModel), tenantId);
+            LOG.info("Flow config updated successfully for type: " + flowType + " in tenant: " + tenantId);
             return Utils.convertToFlowConfig(updatedFlowConfig);
         } catch (FlowMgtFrameworkException e) {
+            LOG.error("Error updating flow config for type: " + flowType, e);
             throw Utils.handleFlowMgtException(e);
         }
     }
@@ -190,6 +241,10 @@ public class ServerFlowMgtService {
      */
     private void validateFlow(String flowType, List<Step> flowSteps) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Validating flow for type: " + flowType + " with " +
+                    (flowSteps != null ? flowSteps.size() : 0) + " steps.");
+        }
         AbstractMetaResponseHandler metaResponseHandler = resolveHandler(flowType);
         Set<String> flowExecutorNames = new HashSet<>();
         Set<String> flowFieldIdentifiers = new HashSet<>();
@@ -197,6 +252,9 @@ public class ServerFlowMgtService {
         collectFlowData(flowSteps, flowExecutorNames, flowFieldIdentifiers, flowComponentIds);
         validateExecutors(metaResponseHandler, flowExecutorNames);
         validateIdentifiers(metaResponseHandler, flowFieldIdentifiers);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Flow validation completed successfully for type: " + flowType);
+        }
     }
 
     /**
@@ -207,15 +265,27 @@ public class ServerFlowMgtService {
      */
     private AbstractMetaResponseHandler resolveHandler(String flowType) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Resolving handler for flow type: " + flowType);
+        }
+        AbstractMetaResponseHandler handler;
         switch (Constants.FlowTypes.valueOf(flowType)) {
             case REGISTRATION:
-                return new RegistrationFlowMetaHandler();
+                handler = new RegistrationFlowMetaHandler();
+                break;
             case PASSWORD_RECOVERY:
-                return new PasswordRecoveryFlowMetaHandler();
+                handler = new PasswordRecoveryFlowMetaHandler();
+                break;
             case INVITED_USER_REGISTRATION:
-                return new AskPasswordFlowMetaHandler();
+                handler = new AskPasswordFlowMetaHandler();
+                break;
             default:
+                LOG.error("Unhandled flow type: " + flowType);
                 throw new IllegalStateException("Unhandled flow type: " + flowType);
         }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Resolved handler: " + handler.getClass().getSimpleName() + " for flow type: " + flowType);
+        }
+        return handler;
     }
 }

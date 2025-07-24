@@ -102,6 +102,7 @@ public class ServerAPIResourceManagementService {
                 throw APIResourceMgtEndpointUtil.handleException(Response.Status.INTERNAL_SERVER_ERROR,
                         ErrorMessage.ERROR_CODE_ADD_API_RESOURCE);
             }
+            LOG.info("API resource created successfully with ID: " + createdAPIResource.getId());
             return buildAPIResourceResponse(createdAPIResource);
         } catch (APIResourceMgtException e) {
             throw APIResourceMgtEndpointUtil.handleAPIResourceMgtException(e);
@@ -291,6 +292,7 @@ public class ServerAPIResourceManagementService {
             }
             handleSystemAPI(apiResource);
             apiResourceManager.deleteAPIResourceById(apiResourceID, tenantDomain);
+            LOG.info("API resource deleted successfully with ID: " + apiResourceID);
         } catch (APIResourceMgtException e) {
             throw APIResourceMgtEndpointUtil.handleAPIResourceMgtException(e);
         }
@@ -361,6 +363,7 @@ public class ServerAPIResourceManagementService {
             handleSystemAPI(apiResource);
             apiResourceManager.deleteAPIScopeByScopeName(apiResourceId,
                     scopeName, tenantDomain);
+            LOG.info("Scope deleted successfully: " + scopeName + " from API resource: " + apiResourceId);
         } catch (APIResourceMgtException e) {
             throw APIResourceMgtEndpointUtil.handleAPIResourceMgtException(e);
         }

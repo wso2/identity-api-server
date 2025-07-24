@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.api.resource.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesApiService;
 import org.wso2.carbon.identity.api.server.api.resource.v1.core.AuthorizationDetailsTypeManagementService;
 import org.wso2.carbon.identity.api.server.api.resource.v1.factories.AuthorizationDetailsTypeManagementServiceFactory;
@@ -31,6 +33,7 @@ import static javax.ws.rs.core.Response.Status.NOT_FOUND;
  */
 public class AuthorizationDetailsTypesApiServiceImpl implements AuthorizationDetailsTypesApiService {
 
+    private static final Log LOG = LogFactory.getLog(AuthorizationDetailsTypesApiServiceImpl.class);
     private final AuthorizationDetailsTypeManagementService typeMgtService;
 
     public AuthorizationDetailsTypesApiServiceImpl() {
@@ -39,6 +42,7 @@ public class AuthorizationDetailsTypesApiServiceImpl implements AuthorizationDet
             this.typeMgtService = AuthorizationDetailsTypeManagementServiceFactory
                     .getAuthorizationDetailsTypeManagementService();
         } catch (IllegalStateException e) {
+            LOG.error("Failed to initialize AuthorizationDetailsTypeManagementService", e);
             throw new RuntimeException("Error occurred while initiating AuthorizationDetailsTypeManagementService.", e);
         }
     }
@@ -46,6 +50,9 @@ public class AuthorizationDetailsTypesApiServiceImpl implements AuthorizationDet
     @Override
     public Response authorizationDetailsTypesGet(String filter) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving authorization details types with filter: " + (filter != null ? filter : "none"));
+        }
         return Response.ok().entity(typeMgtService.getAllAuthorizationDetailsTypes(filter)).build();
     }
 

@@ -94,13 +94,20 @@ public class ServerRemoteFetchConfigManagementService {
      */
     public RemoteFetchConfigurationListResponse getRemoteFetchConfigs() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving all remote fetch configurations");
+        }
         OptionalInt optionalIntLimit = OptionalInt.empty();
         OptionalInt optionalIntOffset = OptionalInt.empty();
 
         try {
-            return createRemoteFetchConfigurationListResponse(remoteFetchConfigurationService
-                    .getBasicRemoteFetchConfigurationList(optionalIntLimit, optionalIntOffset));
+            RemoteFetchConfigurationListResponse response = createRemoteFetchConfigurationListResponse(
+                    remoteFetchConfigurationService.getBasicRemoteFetchConfigurationList(optionalIntLimit, 
+                    optionalIntOffset));
+            log.info("Successfully retrieved " + response.getCount() + " remote fetch configurations");
+            return response;
         } catch (RemoteFetchCoreException e) {
+            log.error("Failed to retrieve remote fetch configurations", e);
             throw handleRemoteFetchConfigurationException(e, RemoteFetchConfigurationConstants.
                     ErrorMessage.ERROR_CODE_ERROR_LISTING_RF_CONFIGS, null);
         }
@@ -113,9 +120,14 @@ public class ServerRemoteFetchConfigManagementService {
      */
     public void deleteRemoteFetchConfig(String remoteFetchConfigurationId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting remote fetch configuration with ID: " + remoteFetchConfigurationId);
+        }
         try {
             remoteFetchConfigurationService.deleteRemoteFetchConfiguration(remoteFetchConfigurationId);
+            log.info("Successfully deleted remote fetch configuration with ID: " + remoteFetchConfigurationId);
         } catch (RemoteFetchCoreException e) {
+            log.error("Failed to delete remote fetch configuration with ID: " + remoteFetchConfigurationId, e);
             throw handleRemoteFetchConfigurationException(e, RemoteFetchConfigurationConstants.
                     ErrorMessage.ERROR_CODE_ERROR_DELETING_RF_CONFIGS, remoteFetchConfigurationId);
         }
@@ -129,16 +141,25 @@ public class ServerRemoteFetchConfigManagementService {
      */
     public RemoteFetchConfigurationGetResponse getRemoteFetchConfig(String remoteFetchConfigurationId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving remote fetch configuration with ID: " + remoteFetchConfigurationId);
+        }
         try {
             RemoteFetchConfiguration remoteFetchConfiguration = remoteFetchConfigurationService
                             .getRemoteFetchConfiguration(remoteFetchConfigurationId);
             if (remoteFetchConfiguration == null) {
+                log.warn("Remote fetch configuration not found with ID: " + remoteFetchConfigurationId);
                 throw handleException(Response.Status.NOT_FOUND, RemoteFetchConfigurationConstants.
                                 ErrorMessage.ERROR_CODE_RE_CONFIG_NOT_FOUND,
                         remoteFetchConfigurationId);
             }
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully retrieved remote fetch configuration: " + 
+                        remoteFetchConfiguration.getRemoteFetchName());
+            }
             return createRemoteFetchConfigurationResponse(remoteFetchConfiguration);
         } catch (RemoteFetchCoreException e) {
+            log.error("Failed to retrieve remote fetch configuration with ID: " + remoteFetchConfigurationId, e);
             throw handleRemoteFetchConfigurationException(e, RemoteFetchConfigurationConstants.
                     ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_RF_CONFIG, null);
         }
@@ -153,10 +174,14 @@ public class ServerRemoteFetchConfigManagementService {
     public void updateRemoteFetchConfig(String id,
                                         RemoteFetchConfigurationPatchRequest remoteFetchConfigurationPatchRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating remote fetch configuration with ID: " + id);
+        }
         try {
             RemoteFetchConfiguration remoteFetchConfiguration = remoteFetchConfigurationService
                     .getRemoteFetchConfiguration(id);
             if (remoteFetchConfiguration == null) {
+                log.warn("Remote fetch configuration not found for update with ID: " + id);
                 throw handleException(Response.Status.NOT_FOUND, RemoteFetchConfigurationConstants.
                         ErrorMessage.ERROR_CODE_RE_CONFIG_NOT_FOUND, id);
             }
@@ -170,7 +195,9 @@ public class ServerRemoteFetchConfigManagementService {
                     remoteFetchConfigurationToUpdate::setRemoteFetchName);
 
             remoteFetchConfigurationService.updateRemoteFetchConfiguration(remoteFetchConfigurationToUpdate);
+            log.info("Successfully updated remote fetch configuration with ID: " + id);
         } catch (RemoteFetchCoreException e) {
+            log.error("Failed to update remote fetch configuration with ID: " + id, e);
             throw handleRemoteFetchConfigurationException(e, RemoteFetchConfigurationConstants.ErrorMessage.
                     ERROR_CODE_ERROR_UPDATING_RF_CONFIG, null);
         }
@@ -183,16 +210,20 @@ public class ServerRemoteFetchConfigManagementService {
      */
     public void triggerRemoteFetch(String remoteFetchConfigurationId) {
 
+        log.info("Triggering remote fetch for configuration ID: " + remoteFetchConfigurationId);
         try {
             RemoteFetchConfiguration remoteFetchConfiguration = remoteFetchConfigurationService
                     .getRemoteFetchConfiguration(remoteFetchConfigurationId);
             if (remoteFetchConfiguration != null) {
                 remoteFetchConfigurationService.triggerRemoteFetch(remoteFetchConfiguration);
+                log.info("Successfully triggered remote fetch for configuration ID: " + remoteFetchConfigurationId);
             } else {
+                log.warn("Remote fetch configuration not found for trigger with ID: " + remoteFetchConfigurationId);
                 throw handleException(Response.Status.NOT_FOUND, RemoteFetchConfigurationConstants.
                         ErrorMessage.ERROR_CODE_RE_CONFIG_NOT_FOUND, remoteFetchConfigurationId);
             }
         } catch (RemoteFetchCoreException e) {
+            log.error("Failed to trigger remote fetch for configuration ID: " + remoteFetchConfigurationId, e);
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR, RemoteFetchConfigurationConstants.ErrorMessage
                     .ERROR_CODE_ERROR_TRIGGER_REMOTE_FETCH, remoteFetchConfigurationId);
         }
@@ -206,11 +237,19 @@ public class ServerRemoteFetchConfigManagementService {
      */
     public String addRemoteFetchConfiguration(RemoteFetchConfigurationPOSTRequest remoteFetchConfigurationPOSTRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Adding new remote fetch configuration: " + 
+                    remoteFetchConfigurationPOSTRequest.getRemoteFetchName());
+        }
         try {
             validatePOSTRequest(remoteFetchConfigurationPOSTRequest);
-            return remoteFetchConfigurationService.addRemoteFetchConfiguration(createRemoteFetchConfiguration(
-                    remoteFetchConfigurationPOSTRequest)).getId();
+            String configId = remoteFetchConfigurationService.addRemoteFetchConfiguration(
+                    createRemoteFetchConfiguration(remoteFetchConfigurationPOSTRequest)).getId();
+            log.info("Successfully added remote fetch configuration with ID: " + configId);
+            return configId;
         } catch (RemoteFetchCoreException e) {
+            log.error("Failed to add remote fetch configuration: " + 
+                    remoteFetchConfigurationPOSTRequest.getRemoteFetchName(), e);
             throw handleRemoteFetchConfigurationException(e, RemoteFetchConfigurationConstants.ErrorMessage.
                     ERROR_CODE_ERROR_ADDING_RF_CONFIG, null);
         }
@@ -218,11 +257,16 @@ public class ServerRemoteFetchConfigManagementService {
 
     private void validatePOSTRequest(RemoteFetchConfigurationPOSTRequest remoteFetchConfigurationPOSTRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Validating remote fetch configuration POST request");
+        }
         if (remoteFetchConfigurationPOSTRequest.getIsEnabled() == null) {
+            log.warn("Validation failed: isEnabled field is null");
             throw handleException(Response.Status.BAD_REQUEST, RemoteFetchConfigurationConstants.
                     ErrorMessage.ERROR_CODE_INVALID_RE_CONFIG_INPUT, IS_ENABLED);
         }
         if (StringUtils.isBlank(remoteFetchConfigurationPOSTRequest.getRemoteFetchName())) {
+            log.warn("Validation failed: remoteFetchName is blank");
             throw handleException(Response.Status.BAD_REQUEST, RemoteFetchConfigurationConstants.
                     ErrorMessage.ERROR_CODE_INVALID_RE_CONFIG_INPUT, REMOTE_FETCH_NAME);
         }
@@ -271,19 +315,30 @@ public class ServerRemoteFetchConfigManagementService {
      */
     public StatusListResponse getStatus(String remoteFetchConfigurationId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving status for remote fetch configuration ID: " + remoteFetchConfigurationId);
+        }
         try {
             RemoteFetchConfiguration remoteFetchConfiguration = remoteFetchConfigurationService
                     .getRemoteFetchConfiguration(remoteFetchConfigurationId);
 
             if (remoteFetchConfiguration != null) {
-
-                return createStatusListResponse(remoteFetchConfigurationService
+                StatusListResponse response = createStatusListResponse(remoteFetchConfigurationService
                         .getDeploymentRevisions(remoteFetchConfigurationId));
+                if (log.isDebugEnabled()) {
+                    log.debug("Retrieved status with " + response.getCount() + " deployment revisions for ID: " + 
+                            remoteFetchConfigurationId);
+                }
+                return response;
             } else {
+                log.warn("Remote fetch configuration not found for status retrieval with ID: " + 
+                        remoteFetchConfigurationId);
                 throw handleException(Response.Status.NOT_FOUND, RemoteFetchConfigurationConstants.
                         ErrorMessage.ERROR_CODE_RE_CONFIG_NOT_FOUND, remoteFetchConfigurationId);
             }
         } catch (RemoteFetchCoreException e) {
+            log.error("Failed to retrieve status for remote fetch configuration ID: " + 
+                    remoteFetchConfigurationId, e);
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR, RemoteFetchConfigurationConstants.ErrorMessage
                     .ERROR_CODE_ERROR_STATUS_REMOTE_FETCH, remoteFetchConfigurationId);
         }
@@ -584,13 +639,24 @@ public class ServerRemoteFetchConfigManagementService {
      */
     public void handleWebHook(PushEventWebHookPOSTRequest pushEventWebHookPOSTRequest) {
 
+        if (log.isDebugEnabled()) {
+            String repoUrl = (pushEventWebHookPOSTRequest.getRepository() != null ? 
+                    pushEventWebHookPOSTRequest.getRepository().getCloneUrl() : "null");
+            log.debug("Handling webhook request for repository: " + repoUrl);
+        }
         try {
             validateWebHookRequest(pushEventWebHookPOSTRequest);
             String cloneURL = pushEventWebHookPOSTRequest.getRepository().getCloneUrl();
             String branch = populateBranch(pushEventWebHookPOSTRequest.getRef());
             List<String> modifiedFiles = extractAddedAndModifiedFiles(pushEventWebHookPOSTRequest.getCommits());
+            if (log.isDebugEnabled()) {
+                log.debug("Processing webhook for repository: " + cloneURL + ", branch: " + branch + 
+                        ", modified files count: " + modifiedFiles.size());
+            }
             remoteFetchConfigurationService.handleWebHook(cloneURL, branch, modifiedFiles);
+            log.info("Successfully processed webhook for repository: " + cloneURL + ", branch: " + branch);
         } catch (RemoteFetchCoreException e) {
+            log.error("Failed to handle webhook request", e);
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR, RemoteFetchConfigurationConstants.ErrorMessage
                     .ERROR_CODE_ERROR_WEB_HOOK_REMOTE_FETCH, null);
         }

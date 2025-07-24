@@ -19,6 +19,8 @@
 package org.wso2.carbon.identity.api.server.branding.preference.management.v1.impl;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.BrandingPreferenceApiService;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.core.BrandingPreferenceManagementService;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.factories.BrandingAIPreferenceManagementServiceFactory;
@@ -56,6 +58,7 @@ import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenant
  */
 public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiService {
 
+    private static final Log log = LogFactory.getLog(BrandingPreferenceApiServiceImpl.class);
     private final BrandingPreferenceManagementService brandingPreferenceManagementService;
 
     //TODO: Improve API to manage application level & language level theming resources in addition to the tenant level.
@@ -64,7 +67,11 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
         try {
             brandingPreferenceManagementService = BrandingPreferenceManagementServiceFactory
                     .getBrandingPreferenceManagementService();
+            if (log.isDebugEnabled()) {
+                log.debug("BrandingPreferenceApiServiceImpl initialized successfully");
+            }
         } catch (IllegalStateException e) {
+            log.error("Error occurred while initiating the branding preference service", e);
             throw new RuntimeException("Error occurred while initiating the branding preference service.", e);
         }
     }
@@ -72,6 +79,10 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
     @Override
     public Response addBrandingPreference(BrandingPreferenceModel brandingPreferenceModel) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Received request to add branding preference for type: " + 
+                    (brandingPreferenceModel != null ? brandingPreferenceModel.getType() : "null"));
+        }
         if (StringUtils.isBlank(brandingPreferenceModel.getType().toString())) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
@@ -201,6 +212,10 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
     @Override
     public Response generateBrandingPreference(BrandingGenerationRequestModel brandingGenerationRequestModel) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Received request to generate branding preference via AI for website URL: " + 
+                    (brandingGenerationRequestModel != null ? brandingGenerationRequestModel.getWebsiteUrl() : "null"));
+        }
         BrandingGenerationResponseModel response = BrandingAIPreferenceManagementServiceFactory
                 .getBrandingAIPreferenceManagementService().generateBrandingPreference(
                 brandingGenerationRequestModel);
@@ -211,6 +226,9 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
     @Override
     public Response getBrandingGenerationResult(String operationId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Received request to get branding generation result for operation ID: " + operationId);
+        }
         BrandingGenerationResultModel response = BrandingAIPreferenceManagementServiceFactory
                 .getBrandingAIPreferenceManagementService()
                 .getBrandingPreferenceGenerationResult(operationId);

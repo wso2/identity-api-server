@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.organization.management.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.organization.management.v1.OrganizationsApiService;
 import org.wso2.carbon.identity.api.server.organization.management.v1.factories.OrganizationManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.ApplicationSharePOSTRequest;
@@ -40,14 +42,18 @@ import javax.ws.rs.core.Response;
  */
 public class OrganizationsApiServiceImpl implements OrganizationsApiService {
 
+    private static final Log LOG = LogFactory.getLog(OrganizationsApiServiceImpl.class);
     private final OrganizationManagementService organizationManagementService;
 
     public OrganizationsApiServiceImpl() {
 
         try {
+            LOG.info("Initializing OrganizationsApiServiceImpl.");
             this.organizationManagementService = OrganizationManagementServiceFactory
                     .getOrganizationManagementService();
+            LOG.info("OrganizationsApiServiceImpl initialized successfully.");
         } catch (IllegalStateException e) {
+            LOG.error("Error occurred while initiating organization management service.", e);
             throw new RuntimeException("Error occurred while initiating organization management service.", e);
         }
     }
@@ -55,12 +61,19 @@ public class OrganizationsApiServiceImpl implements OrganizationsApiService {
     @Override
     public Response organizationsGet(String filter, Integer limit, String after, String before, Boolean recursive) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Getting organizations with filter: %s, limit: %s, recursive: %s", 
+                    filter, limit, recursive));
+        }
         return organizationManagementService.getOrganizations(filter, limit, after, before, recursive);
     }
 
     @Override
     public Response organizationsOrganizationIdDelete(String organizationId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Deleting organization with ID: %s", organizationId));
+        }
         return organizationManagementService.deleteOrganization(organizationId);
     }
 
@@ -81,6 +94,10 @@ public class OrganizationsApiServiceImpl implements OrganizationsApiService {
     @Override
     public Response organizationsOrganizationIdGet(String organizationId, Boolean includePermissions) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Getting organization with ID: %s, includePermissions: %s", 
+                    organizationId, includePermissions));
+        }
         return organizationManagementService.getOrganization(organizationId, includePermissions);
     }
 
@@ -145,6 +162,10 @@ public class OrganizationsApiServiceImpl implements OrganizationsApiService {
     @Override
     public Response organizationPost(OrganizationPOSTRequest organizationPOSTRequest) {
 
+        if (LOG.isDebugEnabled()) {
+            String orgName = organizationPOSTRequest != null ? organizationPOSTRequest.getName() : null;
+            LOG.debug(String.format("Creating new organization with name: %s", orgName));
+        }
         return organizationManagementService.addOrganization(organizationPOSTRequest);
     }
 

@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.idp.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.apache.http.HttpHeaders;
@@ -55,13 +57,18 @@ import static org.wso2.carbon.identity.api.server.idp.common.Constants.IDP_TEMPL
  */
 public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiService {
 
+    private static final Log log = LogFactory.getLog(IdentityProvidersApiServiceImpl.class);
     private final ServerIdpManagementService idpManagementService;
 
     public IdentityProvidersApiServiceImpl() {
 
         try {
             this.idpManagementService = ServerIdpManagementServiceFactory.getServerIdpManagementService();
+            if (log.isDebugEnabled()) {
+                log.debug("IdentityProvidersApiServiceImpl initialized successfully.");
+            }
         } catch (IllegalStateException e) {
+            log.error("Error occurred while initiating ServerIdpManagementService.", e);
             throw new RuntimeException("Error occurred while initiating ServerIdpManagementService.", e);
         }
     }

@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.input.validation.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.input.validation.v1.ValidationRulesApiService;
 import org.wso2.carbon.identity.api.server.input.validation.v1.core.ValidationRulesManagementApiService;
 import org.wso2.carbon.identity.api.server.input.validation.v1.factories.ValidationRulesManagementApiServiceFactory;
@@ -35,14 +37,20 @@ import javax.ws.rs.core.Response;
  */
 public class ValidationRulesApiServiceImpl implements ValidationRulesApiService {
 
+    private static final Log LOGGER = LogFactory.getLog(ValidationRulesApiServiceImpl.class);
     private final ValidationRulesManagementApiService validationRulesManagementApiService;
 
     public ValidationRulesApiServiceImpl() {
     
         try {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Initializing ValidationRulesApiServiceImpl.");
+            }
             this.validationRulesManagementApiService = ValidationRulesManagementApiServiceFactory
                     .getValidationRulesManagementApiService();
+            LOGGER.info("ValidationRulesApiServiceImpl initialized successfully.");
         } catch (IllegalStateException e) {
+            LOGGER.error("Error occurred while initiating ValidationRulesManagementApiService.", e);
             throw new RuntimeException("Error occurred while initiating ValidationRulesManagementApiService.", e);
         }
     }
@@ -51,6 +59,9 @@ public class ValidationRulesApiServiceImpl implements ValidationRulesApiService 
     public Response getValidationRules() {
 
         String tenantDomain = getTenantDomainFromContext();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Retrieving validation rules for tenant: " + tenantDomain);
+        }
         return Response.ok().entity(validationRulesManagementApiService
                 .getValidationConfiguration(tenantDomain)).build();
     }
@@ -65,6 +76,9 @@ public class ValidationRulesApiServiceImpl implements ValidationRulesApiService 
     public Response getValidationRulesForField(String field) {
 
         String tenantDomain = getTenantDomainFromContext();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Retrieving validation rules for field: " + field + " in tenant: " + tenantDomain);
+        }
         return Response.ok().entity(validationRulesManagementApiService
                 .getValidationConfigurationForField(tenantDomain, field)).build();
     }
@@ -73,6 +87,9 @@ public class ValidationRulesApiServiceImpl implements ValidationRulesApiService 
     public Response getValidators() {
 
         String tenantDomain = getTenantDomainFromContext();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Retrieving validators for tenant: " + tenantDomain);
+        }
         return Response.ok().entity(validationRulesManagementApiService
                 .getValidators(tenantDomain)).build();
     }
@@ -81,6 +98,9 @@ public class ValidationRulesApiServiceImpl implements ValidationRulesApiService 
     public Response updateValidationRules(List<ValidationConfigModel> validationConfigModels) {
 
         String tenantDomain = getTenantDomainFromContext();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Updating validation rules for tenant: " + tenantDomain);
+        }
         return Response.ok().entity(validationRulesManagementApiService
                 .updateInputValidationConfiguration(validationConfigModels, tenantDomain)).build();
     }
@@ -95,6 +115,9 @@ public class ValidationRulesApiServiceImpl implements ValidationRulesApiService 
     public Response revertValidationRulesForFields(RevertFields revertFields) {
 
         String tenantDomain = getTenantDomainFromContext();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Reverting validation rules for fields in tenant: " + tenantDomain);
+        }
         validationRulesManagementApiService.revertInputValidationConfigurationForFields(revertFields.getFields(),
                 tenantDomain);
         return Response.ok().build();
@@ -112,6 +135,9 @@ public class ValidationRulesApiServiceImpl implements ValidationRulesApiService 
             validationConfigModelForField) {
 
         String tenantDomain = getTenantDomainFromContext();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Updating validation rules for field: " + field + " in tenant: " + tenantDomain);
+        }
         ValidationConfigModel validationConfigModel = new ValidationConfigModel();
         validationConfigModel.setField(field);
         validationConfigModel.setRules(validationConfigModelForField.getRules());

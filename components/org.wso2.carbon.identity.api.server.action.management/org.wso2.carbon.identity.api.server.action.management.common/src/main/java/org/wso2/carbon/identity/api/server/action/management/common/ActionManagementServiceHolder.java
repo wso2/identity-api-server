@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.action.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.action.management.api.service.ActionManagementService;
 
@@ -25,6 +27,8 @@ import org.wso2.carbon.identity.action.management.api.service.ActionManagementSe
  * Service holder class for action management.
  */
 public class ActionManagementServiceHolder {
+
+    private static final Log LOG = LogFactory.getLog(ActionManagementServiceHolder.class);
 
     private ActionManagementServiceHolder() {}
 
@@ -41,6 +45,19 @@ public class ActionManagementServiceHolder {
      */
     public static ActionManagementService getActionManagementService() {
 
-        return ServiceHolder.SERVICE;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving ActionManagementService from OSGi service registry.");
+        }
+        
+        ActionManagementService service = ServiceHolder.SERVICE;
+        if (service == null) {
+            LOG.error("ActionManagementService is not available in the OSGi service registry.");
+        } else {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("ActionManagementService successfully retrieved from OSGi service registry.");
+            }
+        }
+        
+        return service;
     }
 }

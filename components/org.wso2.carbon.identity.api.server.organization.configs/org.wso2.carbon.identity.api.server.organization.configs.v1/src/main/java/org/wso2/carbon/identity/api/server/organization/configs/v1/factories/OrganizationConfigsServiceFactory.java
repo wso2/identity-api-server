@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.organization.configs.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.organization.configs.common.OrganizationConfigsServiceHolder;
 import org.wso2.carbon.identity.api.server.organization.configs.v1.core.OrganizationConfigsService;
 import org.wso2.carbon.identity.organization.config.service.OrganizationConfigManager;
@@ -27,17 +29,25 @@ import org.wso2.carbon.identity.organization.config.service.OrganizationConfigMa
  */
 public class OrganizationConfigsServiceFactory {
 
+    private static final Log LOG = LogFactory.getLog(OrganizationConfigsServiceFactory.class);
     private static final OrganizationConfigsService SERVICE;
 
     static {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Initializing OrganizationConfigsService factory.");
+        }
         OrganizationConfigManager organizationConfigManager = OrganizationConfigsServiceHolder
                 .getOrganizationConfigManager();
 
         if (organizationConfigManager == null) {
+            LOG.error("OrganizationConfigManager service is not available from OSGi context.");
             throw new IllegalStateException("OrganizationConfigManager service is not available from OSGi context.");
         }
 
         SERVICE = new OrganizationConfigsService(organizationConfigManager);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("OrganizationConfigsService factory initialized successfully.");
+        }
     }
 
     /**
@@ -47,6 +57,9 @@ public class OrganizationConfigsServiceFactory {
      */
     public static OrganizationConfigsService getOrganizationConfigsService() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving OrganizationConfigsService instance.");
+        }
         return SERVICE;
     }
 

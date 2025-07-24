@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.flow.mgt.FlowMgtService;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
@@ -27,6 +29,8 @@ import org.wso2.carbon.idp.mgt.IdpManager;
  * This class is used to hold the FlowMgtService instance.
  */
 public class FlowMgtServiceHolder {
+
+    private static final Log log = LogFactory.getLog(FlowMgtServiceHolder.class);
 
     private FlowMgtServiceHolder() {
     }
@@ -58,7 +62,13 @@ public class FlowMgtServiceHolder {
      */
     public static FlowMgtService getMgtService() {
 
-        return FlowMgtServiceHolderInstance.SERVICE;
+        FlowMgtService service = FlowMgtServiceHolderInstance.SERVICE;
+        if (service == null) {
+            log.warn("FlowMgtService is not available. Flow management functionality may not work properly.");
+        } else if (log.isDebugEnabled()) {
+            log.debug("FlowMgtService retrieved successfully.");
+        }
+        return service;
     }
 
     /**
@@ -68,7 +78,14 @@ public class FlowMgtServiceHolder {
      */
     public static IdentityGovernanceService getIdentityGovernanceService() {
 
-        return IdentityGovernanceServiceHolder.SERVICE;
+        IdentityGovernanceService service = IdentityGovernanceServiceHolder.SERVICE;
+        if (service == null) {
+            log.warn("IdentityGovernanceService is not available. Identity governance functionality may not work " +
+                    "properly.");
+        } else if (log.isDebugEnabled()) {
+            log.debug("IdentityGovernanceService retrieved successfully.");
+        }
+        return service;
     }
 
     /**
@@ -78,6 +95,13 @@ public class FlowMgtServiceHolder {
      */
     public static IdpManager getIdpManager() {
 
-        return IdpManagerHolder.SERVICE;
+        IdpManager service = IdpManagerHolder.SERVICE;
+        if (service == null) {
+            log.warn("IdpManager is not available. Identity provider management functionality may not work " +
+                    "properly.");
+        } else if (log.isDebugEnabled()) {
+            log.debug("IdpManager retrieved successfully.");
+        }
+        return service;
     }
 }

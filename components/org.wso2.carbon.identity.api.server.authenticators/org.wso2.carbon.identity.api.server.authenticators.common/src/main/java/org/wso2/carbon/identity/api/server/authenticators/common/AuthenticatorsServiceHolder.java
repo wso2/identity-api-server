@@ -16,6 +16,8 @@
 
 package org.wso2.carbon.identity.api.server.authenticators.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.application.common.ApplicationAuthenticatorService;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
@@ -25,6 +27,8 @@ import org.wso2.carbon.idp.mgt.IdpManager;
  * Service holder class for server configuration related services.
  */
 public class AuthenticatorsServiceHolder {
+
+    private static final Log log = LogFactory.getLog(AuthenticatorsServiceHolder.class);
 
     private AuthenticatorsServiceHolder() {
 
@@ -56,6 +60,9 @@ public class AuthenticatorsServiceHolder {
      */
     public static ApplicationManagementService getApplicationManagementService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving ApplicationManagementService OSGi service.");
+        }
         return ApplicationManagementServiceHolder.SERVICE;
     }
 
@@ -66,6 +73,9 @@ public class AuthenticatorsServiceHolder {
      */
     public static IdpManager getIdentityProviderManager() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving IdpManager OSGi service.");
+        }
         return IdentityProviderManagerHolder.SERVICE;
     }
 
@@ -76,6 +86,9 @@ public class AuthenticatorsServiceHolder {
      */
     public static ApplicationAuthenticatorService getApplicationAuthenticatorService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving ApplicationAuthenticatorService OSGi service.");
+        }
         return ApplicationAuthenticatorServiceHolder.SERVICE;
     }
 }

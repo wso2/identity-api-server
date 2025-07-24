@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.flow.management.v1.BaseConnectorConfigs;
 import org.wso2.carbon.identity.api.server.flow.management.v1.SelfRegistrationConnectorConfigs;
@@ -38,6 +40,8 @@ import static org.wso2.carbon.identity.flow.mgt.Constants.FlowTypes.INVITED_USER
  */
 public class AskPasswordFlowMetaHandler extends AbstractMetaResponseHandler {
 
+    private static final Log LOG = LogFactory.getLog(AskPasswordFlowMetaHandler.class);
+
     @Override
     public String getFlowType() {
 
@@ -53,13 +57,21 @@ public class AskPasswordFlowMetaHandler extends AbstractMetaResponseHandler {
     @Override
     public SelfRegistrationConnectorConfigs getConnectorConfigs() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving connector configs for ask password flow.");
+        }
         Utils utils = new Utils();
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         SelfRegistrationConnectorConfigs connectorConfigs = new SelfRegistrationConnectorConfigs();
         BaseConnectorConfigs baseConfigs = super.getConnectorConfigs();
         connectorConfigs.setMultiAttributeLoginEnabled(baseConfigs.getMultiAttributeLoginEnabled());
-        connectorConfigs.setSelfRegistrationEnabled(utils.isFlowConfigEnabled(tenantDomain,
-                            IdentityRecoveryConstants.ConnectorConfig.ENABLE_SELF_SIGNUP));
+        boolean selfRegEnabled = utils.isFlowConfigEnabled(tenantDomain,
+                IdentityRecoveryConstants.ConnectorConfig.ENABLE_SELF_SIGNUP);
+        connectorConfigs.setSelfRegistrationEnabled(selfRegEnabled);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieved connector configs for ask password flow in tenant: " + tenantDomain +
+                    " with selfRegistration: " + selfRegEnabled);
+        }
         return connectorConfigs;
     }
 

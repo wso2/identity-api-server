@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.userstore.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
 import org.wso2.carbon.identity.user.store.configuration.UserStoreConfigService;
@@ -27,6 +29,8 @@ import org.wso2.carbon.user.core.service.RealmService;
  * Service holder class for User Store.
  */
 public class UserStoreConfigServiceHolder {
+
+    private static final Log log = LogFactory.getLog(UserStoreConfigServiceHolder.class);
 
     private UserStoreConfigServiceHolder() {}
 
@@ -55,6 +59,12 @@ public class UserStoreConfigServiceHolder {
      */
     public static UserStoreConfigService getUserStoreConfigService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving UserStoreConfigService from OSGi service registry.");
+        }
+        if (UserStoreServiceHolder.SERVICE == null && log.isDebugEnabled()) {
+            log.debug("UserStoreConfigService is not available in the OSGi service registry.");
+        }
         return UserStoreServiceHolder.SERVICE;
     }
 
@@ -65,6 +75,12 @@ public class UserStoreConfigServiceHolder {
      */
     public static RealmService getRealmService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving RealmService from OSGi service registry.");
+        }
+        if (RealmServiceHolder.SERVICE == null && log.isDebugEnabled()) {
+            log.debug("RealmService is not available in the OSGi service registry.");
+        }
         return RealmServiceHolder.SERVICE;
     }
 
@@ -75,6 +91,12 @@ public class UserStoreConfigServiceHolder {
      */
     public static ClaimMetadataManagementService getClaimMetadataManagementService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving ClaimMetadataManagementService from OSGi service registry.");
+        }
+        if (ClaimMetadataManagementServiceHolder.SERVICE == null && log.isDebugEnabled()) {
+            log.debug("ClaimMetadataManagementService is not available in the OSGi service registry.");
+        }
         return ClaimMetadataManagementServiceHolder.SERVICE;
     }
 }

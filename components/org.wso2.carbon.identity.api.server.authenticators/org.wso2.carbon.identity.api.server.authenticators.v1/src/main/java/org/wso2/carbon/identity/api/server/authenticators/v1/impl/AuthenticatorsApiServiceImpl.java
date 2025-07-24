@@ -16,6 +16,8 @@
 
 package org.wso2.carbon.identity.api.server.authenticators.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.authenticators.v1.AuthenticatorsApiService;
 import org.wso2.carbon.identity.api.server.authenticators.v1.core.ServerAuthenticatorManagementService;
 import org.wso2.carbon.identity.api.server.authenticators.v1.factories.ServerAuthenticatorManagementServiceFactory;
@@ -34,6 +36,7 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
  */
 public class AuthenticatorsApiServiceImpl implements AuthenticatorsApiService {
 
+    private static final Log log = LogFactory.getLog(AuthenticatorsApiServiceImpl.class);
     private final ServerAuthenticatorManagementService authenticatorManagementService;
 
     public AuthenticatorsApiServiceImpl() {
@@ -41,7 +44,11 @@ public class AuthenticatorsApiServiceImpl implements AuthenticatorsApiService {
         try {
             authenticatorManagementService = ServerAuthenticatorManagementServiceFactory
                     .getServerAuthenticatorManagementService();
+            if (log.isDebugEnabled()) {
+                log.debug("AuthenticatorsApiServiceImpl initialized successfully");
+            }
         } catch (IllegalStateException e) {
+            log.error("Error occurred while initiating the authenticator management services", e);
             throw new RuntimeException("Error occurred while initiating the authenticator management services.", e);
         }
     }
@@ -49,12 +56,18 @@ public class AuthenticatorsApiServiceImpl implements AuthenticatorsApiService {
     @Override
     public Response authenticatorsGet(String filter, Integer limit, Integer offset) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Received request to get authenticators with filter: " + filter);
+        }
         return Response.ok().entity(authenticatorManagementService.getAuthenticators(filter, limit, offset)).build();
     }
 
     @Override
     public Response authenticatorsMetaTagsGet() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Received request to get authenticator tags");
+        }
         return Response.ok().entity(authenticatorManagementService.getTags()).build();
     }
 
@@ -62,6 +75,10 @@ public class AuthenticatorsApiServiceImpl implements AuthenticatorsApiService {
     public Response addUserDefinedLocalAuthenticator(
             UserDefinedLocalAuthenticatorCreation userDefinedLocalAuthenticatorCreation) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Received request to add user defined local authenticator: " + 
+                    userDefinedLocalAuthenticatorCreation.getName());
+        }
         Authenticator response = authenticatorManagementService
                 .addUserDefinedLocalAuthenticator(userDefinedLocalAuthenticatorCreation);
         URI location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT +
@@ -72,6 +89,9 @@ public class AuthenticatorsApiServiceImpl implements AuthenticatorsApiService {
     @Override
     public Response deleteUserDefinedLocalAuthenticator(String authenticatorId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Received request to delete user defined local authenticator: " + authenticatorId);
+        }
         authenticatorManagementService.deleteUserDefinedLocalAuthenticator(authenticatorId);
         return Response.noContent().build();
     }
@@ -79,6 +99,9 @@ public class AuthenticatorsApiServiceImpl implements AuthenticatorsApiService {
     @Override
     public Response getConnectedAppsOfLocalAuthenticator(String authenticatorId, Integer limit, Integer offset) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Received request to get connected apps for authenticator: " + authenticatorId);
+        }
         return Response.ok().entity(authenticatorManagementService
                 .getConnectedAppsOfLocalAuthenticator(authenticatorId, limit, offset)).build();
     }
@@ -87,6 +110,9 @@ public class AuthenticatorsApiServiceImpl implements AuthenticatorsApiService {
     public Response updateUserDefinedLocalAuthenticator(
             String authenticatorId, UserDefinedLocalAuthenticatorUpdate userDefinedLocalAuthenticatorUpdate) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Received request to update user defined local authenticator: " + authenticatorId);
+        }
         return Response.ok().entity(authenticatorManagementService
                 .updateUserDefinedLocalAuthenticator(authenticatorId, userDefinedLocalAuthenticatorUpdate)).build();
     }

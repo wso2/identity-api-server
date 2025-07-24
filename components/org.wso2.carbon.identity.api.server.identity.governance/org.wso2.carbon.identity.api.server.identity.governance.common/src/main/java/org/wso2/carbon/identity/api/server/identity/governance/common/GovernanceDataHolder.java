@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.identity.governance.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
 
@@ -25,6 +27,8 @@ import org.wso2.carbon.identity.governance.IdentityGovernanceService;
  * Service holder class for identity governance.
  */
 public class GovernanceDataHolder {
+
+    private static final Log log = LogFactory.getLog(GovernanceDataHolder.class);
 
     private GovernanceDataHolder() {}
 
@@ -40,6 +44,13 @@ public class GovernanceDataHolder {
      */
     public static IdentityGovernanceService getIdentityGovernanceService() {
 
-        return IdentityGovernanceServiceHolder.SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving IdentityGovernanceService from OSGi service registry.");
+        }
+        IdentityGovernanceService service = IdentityGovernanceServiceHolder.SERVICE;
+        if (service == null) {
+            log.warn("IdentityGovernanceService is not available in the OSGi service registry.");
+        }
+        return service;
     }
 }

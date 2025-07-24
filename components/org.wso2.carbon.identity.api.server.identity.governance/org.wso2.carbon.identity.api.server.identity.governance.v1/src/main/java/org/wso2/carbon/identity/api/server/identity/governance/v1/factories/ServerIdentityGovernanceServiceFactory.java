@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.identity.governance.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceDataHolder;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.core.ServerIdentityGovernanceService;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
@@ -27,16 +29,22 @@ import org.wso2.carbon.identity.governance.IdentityGovernanceService;
  */
 public class ServerIdentityGovernanceServiceFactory {
 
+    private static final Log LOG = LogFactory.getLog(ServerIdentityGovernanceServiceFactory.class);
     private static final ServerIdentityGovernanceService SERVICE;
 
     static {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Initializing ServerIdentityGovernanceServiceFactory.");
+        }
         IdentityGovernanceService identityGovernanceService = GovernanceDataHolder.getIdentityGovernanceService();
 
         if (identityGovernanceService == null) {
+            LOG.error("IdentityGovernanceService is not available from OSGi context.");
             throw new IllegalStateException("RolePermissionManagementService is not available from OSGi context.");
         }
 
         SERVICE = new ServerIdentityGovernanceService(identityGovernanceService);
+        LOG.info("ServerIdentityGovernanceService initialized successfully.");
     }
 
     /**
@@ -46,6 +54,9 @@ public class ServerIdentityGovernanceServiceFactory {
      */
     public static ServerIdentityGovernanceService getServerIdentityGovernanceService() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving ServerIdentityGovernanceService instance.");
+        }
         return SERVICE;
     }
 }

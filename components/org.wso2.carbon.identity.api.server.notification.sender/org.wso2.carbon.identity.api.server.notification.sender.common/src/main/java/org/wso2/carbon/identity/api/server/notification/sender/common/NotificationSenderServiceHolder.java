@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.notification.sender.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementService;
 
@@ -25,6 +27,8 @@ import org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSe
  * Service holder class for notification senders configurations.
  */
 public class NotificationSenderServiceHolder {
+
+    private static final Log LOG = LogFactory.getLog(NotificationSenderServiceHolder.class);
 
     private NotificationSenderServiceHolder() {}
 
@@ -42,6 +46,15 @@ public class NotificationSenderServiceHolder {
      */
     public static NotificationSenderManagementService getNotificationSenderManagementService() {
 
-        return NotificationSenderManagementServiceHolder.SERVICE;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving NotificationSenderManagementService from OSGi service registry.");
+        }
+        NotificationSenderManagementService service = NotificationSenderManagementServiceHolder.SERVICE;
+        if (service == null) {
+            LOG.warn("NotificationSenderManagementService is not available in the OSGi service registry.");
+        } else if (LOG.isDebugEnabled()) {
+            LOG.debug("Successfully retrieved NotificationSenderManagementService from OSGi service registry.");
+        }
+        return service;
     }
 }

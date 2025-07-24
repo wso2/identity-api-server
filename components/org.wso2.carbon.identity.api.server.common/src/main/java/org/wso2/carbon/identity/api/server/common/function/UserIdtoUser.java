@@ -40,17 +40,25 @@ public class UserIdtoUser implements Function<String[], User> {
 
     @Override
     public User apply(String... args) {
+        if (log.isDebugEnabled()) {
+            log.debug("Extracting user from userId and tenant domain");
+        }
         return extractUser(args[0], args[1]);
     }
 
     private User extractUser(String userId, String tenantDomain) {
 
         try {
-            String decodedUsername = new String(Base64.getDecoder().decode(userId), StandardCharsets.UTF_8);
-
             if (StringUtils.isBlank(userId)) {
+                log.warn("UserID is empty or blank");
                 throw new WebApplicationException("UserID is empty.");
             }
+
+            String decodedUsername = new String(Base64.getDecoder().decode(userId), StandardCharsets.UTF_8);
+            if (log.isDebugEnabled()) {
+                log.debug("Decoded username from userId for tenant: " + tenantDomain);
+            }
+
             String[] strComponent = decodedUsername.split("/");
 
             String username;
@@ -62,6 +70,7 @@ public class UserIdtoUser implements Function<String[], User> {
                 realm = strComponent[0];
                 username = strComponent[1];
             } else {
+                log.warn("UserID format is invalid. Expected format: [realm/]username");
                 throw new WebApplicationException("Provided UserID is " + "not in the correct format.");
             }
 
@@ -70,6 +79,9 @@ public class UserIdtoUser implements Function<String[], User> {
             user.setUserStoreDomain(realm);
             user.setTenantDomain(tenantDomain);
 
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully extracted user with realm: " + realm + " and tenant: " + tenantDomain);
+            }
             return user;
         } catch (Exception e) {
             throw new APIError(Response.Status.BAD_REQUEST,

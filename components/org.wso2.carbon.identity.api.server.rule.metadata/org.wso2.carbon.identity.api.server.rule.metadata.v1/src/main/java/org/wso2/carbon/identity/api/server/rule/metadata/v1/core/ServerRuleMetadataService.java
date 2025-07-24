@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.rule.metadata.v1.core;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Field;
 import org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Link;
@@ -41,6 +43,7 @@ import java.util.List;
  */
 public class ServerRuleMetadataService {
 
+    private static final Log LOG = LogFactory.getLog(ServerRuleMetadataService.class);
     private final RuleMetadataService ruleMetadataService;
 
     public ServerRuleMetadataService(RuleMetadataService ruleMetadataService) {
@@ -56,11 +59,15 @@ public class ServerRuleMetadataService {
     public List<org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition> getExpressionMeta(
             String flow) {
 
+        String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving expression metadata for flow: " + flow + " in tenant: " + tenantDomain);
+        }
+
         try {
             FlowType flowType = FlowType.valueOfFlowAlias(flow);
 
-            List<FieldDefinition> fieldDefinitions = ruleMetadataService.getExpressionMeta(flowType,
-                            CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            List<FieldDefinition> fieldDefinitions = ruleMetadataService.getExpressionMeta(flowType, tenantDomain);
 
             List<org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition>
                     fieldDefinitionResponseList = new ArrayList<>();
@@ -68,14 +75,29 @@ public class ServerRuleMetadataService {
                 fieldDefinitionResponseList.add(buildFieldDefinitionResponse(fieldDefinition));
             }
 
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully retrieved " + fieldDefinitionResponseList.size() + 
+                         " field definitions for flow: " + flow + " in tenant: " + tenantDomain);
+            }
             return fieldDefinitionResponseList;
         } catch (RuleMetadataException e) {
+            LOG.error("Error retrieving expression metadata for flow: " + flow + " in tenant: " + tenantDomain, e);
             throw RuleMetadataAPIErrorBuilder.buildAPIError(e);
         }
     }
 
     private org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition buildFieldDefinitionResponse(
             FieldDefinition fieldDefinition) {
+
+        if (fieldDefinition == null) {
+            LOG.warn("Received null field definition while building response");
+            return null;
+        }
+
+        if (LOG.isDebugEnabled()) {
+            String fieldName = fieldDefinition.getField() != null ? fieldDefinition.getField().getName() : "null";
+            LOG.debug("Building field definition response for field: " + fieldName);
+        }
 
         org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition fieldDefinitionResponse =
                 new org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition();

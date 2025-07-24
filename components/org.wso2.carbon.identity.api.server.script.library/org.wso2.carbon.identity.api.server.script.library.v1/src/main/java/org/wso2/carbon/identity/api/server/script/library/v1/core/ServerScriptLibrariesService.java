@@ -63,6 +63,9 @@ public class ServerScriptLibrariesService {
 
     public ServerScriptLibrariesService(FunctionLibraryManagementService functionLibraryManagementService) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Initializing ServerScriptLibrariesService with FunctionLibraryManagementService.");
+        }
         this.functionLibraryManagementService = functionLibraryManagementService;
     }
 
@@ -75,11 +78,23 @@ public class ServerScriptLibrariesService {
      */
     public ScriptLibraryListResponse getScriptLibraries(Integer limit, Integer offset) {
 
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving script libraries for tenant: " + (tenantDomain != null ? tenantDomain : "null") + 
+                     ", limit: " + limit + ", offset: " + offset);
+        }
+        
         List<FunctionLibrary> functionLibraries;
         try {
-            functionLibraries = functionLibraryManagementService.listFunctionLibraries(ContextLoader
-                    .getTenantDomainFromContext());
+            functionLibraries = functionLibraryManagementService.listFunctionLibraries(tenantDomain);
+            if (log.isDebugEnabled()) {
+                int count = functionLibraries != null ? functionLibraries.size() : 0;
+                log.debug("Retrieved " + count + " script libraries from service for tenant: " + 
+                         (tenantDomain != null ? tenantDomain : "null"));
+            }
         } catch (FunctionLibraryManagementException e) {
+            log.error("Error listing script libraries for tenant: " + (tenantDomain != null ? tenantDomain : "null") + 
+                     ", Error: " + e.getMessage());
             throw handleScriptLibraryError(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_SCRIPT_LIBRARIES);
         }
         return createScriptLibrariesList(functionLibraries, validateLimit(limit), validateOffset(offset));
@@ -96,6 +111,9 @@ public class ServerScriptLibrariesService {
         if (offset != null && offset >= 0) {
             return offset;
         } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Invalid offset value provided: " + offset);
+            }
             throw handleScriptLibraryClientError(Constants.ErrorMessage.ERROR_SCRIPT_LIBRARY_OFFSET_VALIDATION,
                     Response.Status.BAD_REQUEST);
         }
@@ -111,10 +129,17 @@ public class ServerScriptLibrariesService {
 
         final int maximumItemPerPage = IdentityUtil.getMaximumItemPerPage();
         if (limit == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("No limit provided, using default items per page: " + IdentityUtil.getDefaultItemsPerPage());
+            }
             return IdentityUtil.getDefaultItemsPerPage();
         } else if (limit <= maximumItemPerPage) {
             return limit;
         } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Provided limit " + limit + " exceeds maximum " + maximumItemPerPage + 
+                         ", using maximum limit.");
+            }
             return maximumItemPerPage;
         }
     }
@@ -127,18 +152,34 @@ public class ServerScriptLibrariesService {
      */
     public ScriptLibraryResponse getScriptLibrary(String scriptLibraryId) {
 
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving script library with ID: " + (scriptLibraryId != null ? scriptLibraryId : "null") + 
+                     " for tenant: " + (tenantDomain != null ? tenantDomain : "null"));
+        }
+        
         if (isScriptLibraryAvailable(scriptLibraryId)) {
             FunctionLibrary functionLibrary;
             try {
-                functionLibrary = functionLibraryManagementService.getFunctionLibrary(scriptLibraryId,
-                        ContextLoader.getTenantDomainFromContext());
+                functionLibrary = functionLibraryManagementService.getFunctionLibrary(scriptLibraryId, tenantDomain);
+                if (log.isDebugEnabled()) {
+                    log.debug("Successfully retrieved script library: " + 
+                             (scriptLibraryId != null ? scriptLibraryId : "null"));
+                }
             } catch (FunctionLibraryManagementException e) {
+                log.error("Error retrieving script library with ID: " + 
+                         (scriptLibraryId != null ? scriptLibraryId : "null") + " for tenant: " + 
+                         (tenantDomain != null ? tenantDomain : "null") + ", Error: " + e.getMessage());
                 throw handleScriptLibraryError(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_SCRIPT_LIBRARY);
             }
             return createScriptLibraryResponse(functionLibrary);
         } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Script library not found with ID: " + (scriptLibraryId != null ? scriptLibraryId : "null") + 
+                         " for tenant: " + (tenantDomain != null ? tenantDomain : "null"));
+            }
             throw handleScriptLibraryClientError(Constants.ErrorMessage.ERROR_SCRIPT_LIBRARY_NOT_FOUND,
-                    Response.Status.NOT_FOUND, scriptLibraryId, ContextLoader.getTenantDomainFromContext());
+                    Response.Status.NOT_FOUND, scriptLibraryId, tenantDomain);
         }
 
     }
@@ -152,6 +193,12 @@ public class ServerScriptLibrariesService {
      */
     public void addScriptLibrary(String name, InputStream contentInputStream, String description) {
 
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (log.isDebugEnabled()) {
+            log.debug("Adding script library with name: " + (name != null ? name : "null") + 
+                     " for tenant: " + (tenantDomain != null ? tenantDomain : "null"));
+        }
+        
         ScriptLibraryPOSTRequest scriptLibraryPOSTRequest = new ScriptLibraryPOSTRequest();
         scriptLibraryPOSTRequest.setName(name);
         scriptLibraryPOSTRequest.setDescription(description);
@@ -159,26 +206,41 @@ public class ServerScriptLibrariesService {
         try {
             scriptLibraryPOSTRequestContent = IOUtils.toString(contentInputStream, StandardCharsets.UTF_8.name());
         } catch (IOException e) {
-            log.error("Error occurred while reading contentInputStream: " + e);
+            log.error("Error occurred while reading contentInputStream for script library: " + 
+                     (name != null ? name : "null") + ", Error: " + e.getMessage());
             throw handleScriptLibraryClientError(Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_SCRIPT_LIBRARY,
                     Response.Status.INTERNAL_SERVER_ERROR);
         }
         if (isScriptLibraryAvailable(scriptLibraryPOSTRequest.getName())) {
+            if (log.isDebugEnabled()) {
+                log.debug("Script library already exists with name: " + 
+                         (scriptLibraryPOSTRequest.getName() != null ? scriptLibraryPOSTRequest.getName() : "null"));
+            }
             throw handleScriptLibraryClientError(Constants.ErrorMessage.ERROR_SCRIPT_LIBRARY_ALREADY_FOUND,
-                    Response.Status.CONFLICT, scriptLibraryPOSTRequest.getName(),
-                    ContextLoader.getTenantDomainFromContext());
+                    Response.Status.CONFLICT, scriptLibraryPOSTRequest.getName(), tenantDomain);
         } else {
             FunctionLibrary functionLibrary = createScriptLibrary(scriptLibraryPOSTRequestContent,
                     scriptLibraryPOSTRequest);
             try {
-                if (scriptLibraryPOSTRequest.getName().contains(Constants.SCRIPT_LIBRARY_EXTENSION)) {
-                    functionLibraryManagementService.createFunctionLibrary(functionLibrary, ContextLoader
-                            .getTenantDomainFromContext());
+                if (scriptLibraryPOSTRequest.getName() != null && 
+                    scriptLibraryPOSTRequest.getName().contains(Constants.SCRIPT_LIBRARY_EXTENSION)) {
+                    functionLibraryManagementService.createFunctionLibrary(functionLibrary, tenantDomain);
+                    log.info("Script library created successfully with name: " + 
+                            (name != null ? name : "null") + " for tenant: " + 
+                            (tenantDomain != null ? tenantDomain : "null"));
                 } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Invalid script library name format: " + 
+                                 (scriptLibraryPOSTRequest.getName() != null ? 
+                                  scriptLibraryPOSTRequest.getName() : "null"));
+                    }
                     throw handleScriptLibraryClientError(Constants.ErrorMessage.ERROR_SCRIPT_LIBRARY_NAME_VALIDATION,
                             Response.Status.BAD_REQUEST);
                 }
             } catch (FunctionLibraryManagementException e) {
+                log.error("Error creating script library with name: " + (name != null ? name : "null") + 
+                         " for tenant: " + (tenantDomain != null ? tenantDomain : "null") + 
+                         ", Error: " + e.getMessage());
                 throw handleScriptLibraryError(e, Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_SCRIPT_LIBRARY);
             }
         }
@@ -195,13 +257,21 @@ public class ServerScriptLibrariesService {
     public void updateScriptLibrary(String scriptLibraryName, InputStream contentInputStream,
                                     String description) {
 
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (log.isDebugEnabled()) {
+            log.debug("Updating script library with name: " + 
+                     (scriptLibraryName != null ? scriptLibraryName : "null") + " for tenant: " + 
+                     (tenantDomain != null ? tenantDomain : "null"));
+        }
+        
         ScriptLibraryPUTRequest scriptLibraryPUTRequest = new ScriptLibraryPUTRequest();
         scriptLibraryPUTRequest.setDescription(description);
         String scriptLibraryPUTRequestContent;
         try {
             scriptLibraryPUTRequestContent = IOUtils.toString(contentInputStream, StandardCharsets.UTF_8.name());
         } catch (IOException e) {
-            log.error("Error occurred while reading contentInputStream: " + e);
+            log.error("Error occurred while reading contentInputStream for script library: " + 
+                     (scriptLibraryName != null ? scriptLibraryName : "null") + ", Error: " + e.getMessage());
             throw handleScriptLibraryClientError(Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_SCRIPT_LIBRARY,
                     Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -210,13 +280,24 @@ public class ServerScriptLibrariesService {
                     scriptLibraryPUTRequest);
             try {
                 functionLibraryManagementService.updateFunctionLibrary(scriptLibraryName, functionLibrary,
-                        ContextLoader.getTenantDomainFromContext());
+                        tenantDomain);
+                log.info("Script library updated successfully with name: " + 
+                        (scriptLibraryName != null ? scriptLibraryName : "null") + " for tenant: " + 
+                        (tenantDomain != null ? tenantDomain : "null"));
             } catch (FunctionLibraryManagementException e) {
+                log.error("Error updating script library with name: " + 
+                         (scriptLibraryName != null ? scriptLibraryName : "null") + " for tenant: " + 
+                         (tenantDomain != null ? tenantDomain : "null") + ", Error: " + e.getMessage());
                 throw handleScriptLibraryError(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_SCRIPT_LIBRARY);
             }
         } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Script library not found for update with name: " + 
+                         (scriptLibraryName != null ? scriptLibraryName : "null") + " for tenant: " + 
+                         (tenantDomain != null ? tenantDomain : "null"));
+            }
             throw handleScriptLibraryClientError(Constants.ErrorMessage.ERROR_SCRIPT_LIBRARY_NOT_FOUND,
-                    Response.Status.NOT_FOUND, scriptLibraryName, ContextLoader.getTenantDomainFromContext());
+                    Response.Status.NOT_FOUND, scriptLibraryName, tenantDomain);
         }
 
     }
@@ -229,17 +310,36 @@ public class ServerScriptLibrariesService {
      */
     public String getScriptLibraryContentByName(String scriptLibraryName) {
 
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving script library content by name: " + 
+                     (scriptLibraryName != null ? scriptLibraryName : "null") + " for tenant: " + 
+                     (tenantDomain != null ? tenantDomain : "null"));
+        }
+        
         if (isScriptLibraryAvailable(scriptLibraryName)) {
             try {
                 FunctionLibrary functionLibrary = functionLibraryManagementService
-                        .getFunctionLibrary(scriptLibraryName, ContextLoader.getTenantDomainFromContext());
+                        .getFunctionLibrary(scriptLibraryName, tenantDomain);
+                if (log.isDebugEnabled()) {
+                    log.debug("Successfully retrieved script library content for: " + 
+                             (scriptLibraryName != null ? scriptLibraryName : "null"));
+                }
                 return functionLibrary.getFunctionLibraryScript();
             } catch (FunctionLibraryManagementException e) {
+                log.error("Error retrieving script library content for name: " + 
+                         (scriptLibraryName != null ? scriptLibraryName : "null") + " for tenant: " + 
+                         (tenantDomain != null ? tenantDomain : "null") + ", Error: " + e.getMessage());
                 throw handleScriptLibraryError(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_SCRIPT_LIBRARY);
             }
         } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Script library not found for content retrieval with name: " + 
+                         (scriptLibraryName != null ? scriptLibraryName : "null") + " for tenant: " + 
+                         (tenantDomain != null ? tenantDomain : "null"));
+            }
             throw handleScriptLibraryClientError(Constants.ErrorMessage.ERROR_SCRIPT_LIBRARY_NOT_FOUND,
-                    Response.Status.NOT_FOUND, scriptLibraryName, ContextLoader.getTenantDomainFromContext());
+                    Response.Status.NOT_FOUND, scriptLibraryName, tenantDomain);
         }
     }
 
@@ -250,12 +350,29 @@ public class ServerScriptLibrariesService {
      */
     public void deleteScriptLibrary(String scriptLibraryId) {
 
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting script library with ID: " + (scriptLibraryId != null ? scriptLibraryId : "null") + 
+                     " for tenant: " + (tenantDomain != null ? tenantDomain : "null"));
+        }
+        
         if (isScriptLibraryAvailable(scriptLibraryId)) {
             try {
-                functionLibraryManagementService.deleteFunctionLibrary(scriptLibraryId,
-                        ContextLoader.getTenantDomainFromContext());
+                functionLibraryManagementService.deleteFunctionLibrary(scriptLibraryId, tenantDomain);
+                log.info("Script library deleted successfully with ID: " + 
+                        (scriptLibraryId != null ? scriptLibraryId : "null") + " for tenant: " + 
+                        (tenantDomain != null ? tenantDomain : "null"));
             } catch (FunctionLibraryManagementException e) {
+                log.error("Error deleting script library with ID: " + 
+                         (scriptLibraryId != null ? scriptLibraryId : "null") + " for tenant: " + 
+                         (tenantDomain != null ? tenantDomain : "null") + ", Error: " + e.getMessage());
                 throw handleScriptLibraryError(e, Constants.ErrorMessage.ERROR_CODE_ERROR_DELETING_SCRIPT_LIBRARY);
+            }
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Script library not found for deletion with ID: " + 
+                         (scriptLibraryId != null ? scriptLibraryId : "null") + " for tenant: " + 
+                         (tenantDomain != null ? tenantDomain : "null"));
             }
         }
     }
@@ -268,11 +385,24 @@ public class ServerScriptLibrariesService {
      */
     public boolean isScriptLibraryAvailable(String scriptLibraryName) {
 
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (log.isDebugEnabled()) {
+            log.debug("Checking script library availability for name: " + 
+                     (scriptLibraryName != null ? scriptLibraryName : "null") + " for tenant: " + 
+                     (tenantDomain != null ? tenantDomain : "null"));
+        }
+        
         boolean isAvailable;
         try {
-            isAvailable = functionLibraryManagementService.isFunctionLibraryExists(scriptLibraryName,
-                    ContextLoader.getTenantDomainFromContext());
+            isAvailable = functionLibraryManagementService.isFunctionLibraryExists(scriptLibraryName, tenantDomain);
+            if (log.isDebugEnabled()) {
+                log.debug("Script library availability check result: " + isAvailable + " for name: " + 
+                         (scriptLibraryName != null ? scriptLibraryName : "null"));
+            }
         } catch (FunctionLibraryManagementException e) {
+            log.error("Error checking script library availability for name: " + 
+                     (scriptLibraryName != null ? scriptLibraryName : "null") + " for tenant: " + 
+                     (tenantDomain != null ? tenantDomain : "null") + ", Error: " + e.getMessage());
             throw handleScriptLibraryError(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_SCRIPT_LIBRARY);
         }
         return isAvailable;

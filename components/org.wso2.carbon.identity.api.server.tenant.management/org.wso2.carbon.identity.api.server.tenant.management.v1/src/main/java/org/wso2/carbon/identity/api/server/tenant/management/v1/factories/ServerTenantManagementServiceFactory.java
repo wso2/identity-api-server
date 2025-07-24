@@ -18,38 +18,71 @@
 
 package org.wso2.carbon.identity.api.server.tenant.management.v1.factories;
 
-import org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementServiceHolder;
-import org.wso2.carbon.identity.api.server.tenant.management.v1.core.ServerTenantManagementService;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.identity.api.server.tenant.management.common.
+        TenantManagementServiceHolder;
+import org.wso2.carbon.identity.api.server.tenant.management.v1.core.
+        ServerTenantManagementService;
 import org.wso2.carbon.tenant.mgt.services.TenantMgtService;
 import org.wso2.carbon.user.core.service.RealmService;
 
 /**
  * Factory class for ServerTenantManagementService.
  */
-public class ServerTenantManagementServiceFactory {
+public final class ServerTenantManagementServiceFactory {
 
+    /**
+     * Logger for ServerTenantManagementServiceFactory.
+     */
+    private static final Log LOG = LogFactory.getLog(
+            ServerTenantManagementServiceFactory.class);
+
+    /**
+     * Singleton instance of ServerTenantManagementService.
+     */
     private static final ServerTenantManagementService SERVICE;
 
     static {
-        TenantMgtService tenantMgtService = TenantManagementServiceHolder.getTenantMgtService();
-        RealmService realmService = TenantManagementServiceHolder.getRealmService();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Initializing ServerTenantManagementService factory.");
+        }
+        TenantMgtService tenantMgtService = TenantManagementServiceHolder
+                .getTenantMgtService();
+        RealmService realmService = TenantManagementServiceHolder
+                .getRealmService();
 
         if (tenantMgtService == null) {
-            throw new IllegalStateException("TenantMgtService is not available from OSGi context.");
+            LOG.error("TenantMgtService is not available from OSGi context.");
+            throw new IllegalStateException(
+                    "TenantMgtService is not available from OSGi context.");
         }
         if (realmService == null) {
-            throw new IllegalStateException("RealmService is not available from OSGi context.");
+            LOG.error("RealmService is not available from OSGi context.");
+            throw new IllegalStateException(
+                    "RealmService is not available from OSGi context.");
         }
 
-        SERVICE = new ServerTenantManagementService(tenantMgtService, realmService);
+        SERVICE = new ServerTenantManagementService(tenantMgtService,
+                realmService);
+        LOG.info("ServerTenantManagementService factory "
+                + "initialized successfully.");
+    }
+
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private ServerTenantManagementServiceFactory() {
+        // Private constructor
     }
 
     /**
      * Get ServerTenantManagementService.
      *
-     * @return ServerTenantManagementService.
+     * @return ServerTenantManagementService instance
      */
-    public static ServerTenantManagementService getServerTenantManagementService() {
+    public static ServerTenantManagementService
+            getServerTenantManagementService() {
 
         return SERVICE;
     }

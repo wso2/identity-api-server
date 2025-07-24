@@ -317,6 +317,10 @@ public class Utils {
      */
     public boolean isFlowConfigEnabled(String tenantDomain, String connectorConfig) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Checking if flow config is enabled for connector: " + connectorConfig + " in tenant: " +
+                    tenantDomain);
+        }
         try {
             IdentityGovernanceService identityGovernanceService =
                     FlowMgtServiceHolder.getIdentityGovernanceService();
@@ -324,12 +328,21 @@ public class Utils {
                     new String[]{connectorConfig}, tenantDomain);
 
             if (connectorConfigs == null || connectorConfigs.length == 0) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("No config found for connector: " + connectorConfig + " in tenant: " + tenantDomain);
+                }
                 return false;
             }
 
-            return Boolean.parseBoolean(connectorConfigs[0].getValue());
+            boolean enabled = Boolean.parseBoolean(connectorConfigs[0].getValue());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Config for connector: " + connectorConfig + " in tenant: " + tenantDomain +
+                        " is " + (enabled ? "enabled" : "disabled"));
+            }
+            return enabled;
 
         } catch (IdentityGovernanceException e) {
+            LOG.error("Error retrieving config for connector: " + connectorConfig + " in tenant: " + tenantDomain, e);
             throw handleFlowMgtException(new FlowMgtClientException(
                     ERROR_CODE_GET_GOVERNANCE_CONFIG.getCode(),
                     ERROR_CODE_GET_GOVERNANCE_CONFIG.getMessage(),
@@ -344,13 +357,21 @@ public class Utils {
      */
     public List<IdentityProvider> getConnections() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving identity provider connections.");
+        }
         try {
-            IdpManager idpManager =
-                    FlowMgtServiceHolder.getIdpManager();
+            IdpManager idpManager = FlowMgtServiceHolder.getIdpManager();
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-            return idpManager.getIdPs(tenantDomain);
+            List<IdentityProvider> providers = idpManager.getIdPs(tenantDomain);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Retrieved " + (providers != null ? providers.size() : 0) +
+                        " identity providers for tenant: " + tenantDomain);
+            }
+            return providers;
 
         } catch (IdentityProviderManagementException e) {
+            LOG.error("Error retrieving identity provider connections.", e);
             throw handleFlowMgtException(new FlowMgtClientException(
                     ERROR_CODE_GET_LOCAL_AUTHENTICATORS.getCode(),
                     ERROR_CODE_GET_LOCAL_AUTHENTICATORS.getMessage(),
@@ -369,6 +390,12 @@ public class Utils {
     public static void collectFlowData(List<Step> steps, Set<String> executors, Set<String> identifiers,
                                        Set<String> ids) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Collecting flow data from " + (steps != null ? steps.size() : 0) + " steps.");
+        }
+        if (steps == null) {
+            return;
+        }
         for (Step step : steps) {
             if (step.getId() != null && !step.getId().isEmpty()) {
                 ids.add(step.getId());
@@ -376,6 +403,11 @@ public class Utils {
             if (step.getData() != null && step.getData().getComponents() != null) {
                 traverseComponents(step.getData().getComponents(), executors, identifiers, ids);
             }
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Collected flow data: " + (executors != null ? executors.size() : 0) + " executors, " +
+                    (identifiers != null ? identifiers.size() : 0) + " identifiers, " +
+                    (ids != null ? ids.size() : 0) + " component IDs.");
         }
     }
 
@@ -471,11 +503,27 @@ public class Utils {
      */
     public static void validateExecutors(AbstractMetaResponseHandler metaResponseHandler, Set<String> executors) {
 
-        if (!new HashSet<>(metaResponseHandler.getSupportedExecutors()).containsAll(executors)) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Validating " + (executors != null ? executors.size() : 0) + " executors.");
+        }
+        if (executors == null || executors.isEmpty()) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("No executors to validate.");
+            }
+            return;
+        }
+        Set<String> supportedExecutors = new HashSet<>(metaResponseHandler.getSupportedExecutors());
+        if (!supportedExecutors.containsAll(executors)) {
+            Set<String> unsupported = new HashSet<>(executors);
+            unsupported.removeAll(supportedExecutors);
+            LOG.warn("Unsupported executors found: " + unsupported);
             throw handleFlowMgtException(new FlowMgtClientException(
                     ERROR_CODE_UNSUPPORTED_EXECUTOR.getCode(),
                     ERROR_CODE_UNSUPPORTED_EXECUTOR.getMessage(),
                     ERROR_CODE_UNSUPPORTED_EXECUTOR.getDescription()));
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("All executors are supported.");
         }
     }
 
@@ -501,12 +549,19 @@ public class Utils {
 
     public static void validateFlowType(String value) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Validating flow type: " + value);
+        }
         if (StringUtils.isBlank(value) || Arrays.stream(Constants.FlowTypes.values())
                 .noneMatch(type -> type.name().equals(value))) {
+            LOG.warn("Invalid flow type provided: " + value);
             throw Utils.handleFlowMgtException(new FlowMgtClientException(
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_FLOW_TYPE.getCode(),
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_FLOW_TYPE.getMessage(),
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_FLOW_TYPE.getDescription()));
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Flow type " + value + " is valid.");
         }
     }
 }

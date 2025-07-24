@@ -52,12 +52,19 @@ public class ServerAdminAdvisoryManagementService {
      */
     public AdminAdvisoryConfig getAdminAdvisoryConfig() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving admin advisory configuration.");
+        }
         try {
             AdminAdvisoryBannerDTO adminAdvisoryBannerDTO = adminAdvisoryManagementService.getAdminAdvisoryConfig();
-
-            return buildAdminAdvisoryConfigResponse(adminAdvisoryBannerDTO);
+            AdminAdvisoryConfig response = buildAdminAdvisoryConfigResponse(adminAdvisoryBannerDTO);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully retrieved admin advisory configuration.");
+            }
+            return response;
 
         } catch (AdminAdvisoryMgtException e) {
+            LOG.error("Error occurred while retrieving admin advisory configuration.", e);
             AdminAdvisoryConstants.ErrorMessage errorEnum =
                     AdminAdvisoryConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_BANNER_CONFIG;
             Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
@@ -72,13 +79,18 @@ public class ServerAdminAdvisoryManagementService {
      */
     public void saveAdminAdvisoryConfig(AdminAdvisoryConfig adminAdvisoryConfig) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating admin advisory configuration.");
+        }
         try {
             AdminAdvisoryBannerDTO modifiedAdminAdvisoryBannerDTO = createModifiedAdminAdvisoryBannerDTO(
                     adminAdvisoryManagementService.getAdminAdvisoryConfig(), adminAdvisoryConfig);
 
             adminAdvisoryManagementService.saveAdminAdvisoryConfig(modifiedAdminAdvisoryBannerDTO);
+            LOG.info("Admin advisory configuration updated successfully.");
 
         } catch (AdminAdvisoryMgtException e) {
+            LOG.error("Error occurred while updating admin advisory configuration.", e);
             AdminAdvisoryConstants.ErrorMessage errorEnum =
                     AdminAdvisoryConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_BANNER_CONFIG;
             Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;

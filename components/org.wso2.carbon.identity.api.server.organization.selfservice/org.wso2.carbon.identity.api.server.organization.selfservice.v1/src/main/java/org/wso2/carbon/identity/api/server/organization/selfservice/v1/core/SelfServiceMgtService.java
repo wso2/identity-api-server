@@ -98,6 +98,9 @@ public class SelfServiceMgtService {
 
         try {
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Retrieving self service governance configs for tenant: " + tenantDomain);
+            }
             ConnectorConfig connectorConfig = identityGovernanceService.getConnectorWithConfigs(tenantDomain,
                     SelfServiceMgtConstants.SELF_SERVICE_GOVERNANCE_CONNECTOR);
             return buildConnectorResDTO(connectorConfig);
@@ -125,6 +128,9 @@ public class SelfServiceMgtService {
             }
             Map<String, String> copiedConfigurationDetails = new HashMap<>(configurationDetails);
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Updating self service governance configs for tenant: " + tenantDomain);
+            }
             identityGovernanceService.updateConfiguration(tenantDomain, configurationDetails);
             if (enablePostListener) {
                 doPostConfigurationUpdate(copiedConfigurationDetails);
@@ -155,8 +161,10 @@ public class SelfServiceMgtService {
         // Create or remove self-service application.
         if (isEnableSelfServiceUpdated) {
             if (enableSelfService) {
+                LOG.info("Creating self-service system application.");
                 createSystemApplication();
             } else {
+                LOG.info("Deleting self-service system application.");
                 deleteSystemApplication();
             }
         }
@@ -197,8 +205,10 @@ public class SelfServiceMgtService {
         }
 
         if (enableOnboardToSubOrganization && enableAdminEmailVerification) {
+            LOG.info("Onboarding lite user store for admin email verification.");
             onboardLiteUserStore();
         } else {
+            LOG.info("Removing lite user store.");
             removeLiteUserStore();
         }
     }
@@ -268,6 +278,9 @@ public class SelfServiceMgtService {
         try {
             // Check if the self-service app already exists, if yes, then return.
             if (isSSAppExists(tenantDomain, userName, appName)) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Self-service application already exists: " + appName);
+                }
                 return;
             }
 
@@ -337,6 +350,9 @@ public class SelfServiceMgtService {
         try {
             // Check if the self-service app exists, if yes, then delete it.
             if (isSSAppExists(tenantDomain, userName, appName)) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Deleting self-service application: " + appName);
+                }
                 applicationManagementService.deleteApplication(appName, tenantDomain, userName);
             }
         } catch (IdentityApplicationManagementException e) {

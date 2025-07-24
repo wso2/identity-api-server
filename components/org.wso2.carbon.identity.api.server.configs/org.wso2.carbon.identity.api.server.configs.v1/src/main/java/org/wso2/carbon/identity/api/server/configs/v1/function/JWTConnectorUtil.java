@@ -54,9 +54,15 @@ public class JWTConnectorUtil {
                                      JWTClientAuthenticatorMgtService jwtClientAuthenticatorMgtService)
             throws Exception {
 
-
-        return new JWTValidatorConfig().enableTokenReuse(jwtClientAuthenticatorMgtService.
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving JWT validator configuration for tenant: " + tenantDomain);
+        }
+        JWTValidatorConfig config = new JWTValidatorConfig().enableTokenReuse(jwtClientAuthenticatorMgtService.
                 getPrivateKeyJWTClientAuthenticatorConfiguration(tenantDomain).isEnableTokenReuse());
+        if (log.isDebugEnabled()) {
+            log.debug("Successfully retrieved JWT validator configuration for tenant: " + tenantDomain);
+        }
+        return config;
     }
 
     /**
@@ -83,6 +89,10 @@ public class JWTConnectorUtil {
     public static APIError handlePrivateKeyJWTValidationException(Exception e,
                                                                   Constants.ErrorMessage errorEnum, String data) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Handling JWT client authenticator exception: " + e.getClass().getSimpleName());
+        }
+        
         ErrorResponse errorResponse;
 
         Response.Status status;

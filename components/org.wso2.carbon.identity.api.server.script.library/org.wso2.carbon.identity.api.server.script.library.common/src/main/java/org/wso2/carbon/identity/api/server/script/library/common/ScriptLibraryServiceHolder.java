@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.script.library.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.functions.library.mgt.FunctionLibraryManagementService;
 
@@ -25,6 +27,8 @@ import org.wso2.carbon.identity.functions.library.mgt.FunctionLibraryManagementS
  * Service holder class for script library management.
  */
 public class ScriptLibraryServiceHolder {
+
+    private static final Log log = LogFactory.getLog(ScriptLibraryServiceHolder.class);
 
     private ScriptLibraryServiceHolder() {
 
@@ -44,6 +48,15 @@ public class ScriptLibraryServiceHolder {
      */
     public static FunctionLibraryManagementService getScriptLibraryManagementService() {
 
-        return FunctionLibraryManagementServiceHolder.SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving FunctionLibraryManagementService from OSGi context.");
+        }
+        
+        FunctionLibraryManagementService service = FunctionLibraryManagementServiceHolder.SERVICE;
+        if (service == null) {
+            log.warn("FunctionLibraryManagementService is not available from OSGi context.");
+        }
+        
+        return service;
     }
 }

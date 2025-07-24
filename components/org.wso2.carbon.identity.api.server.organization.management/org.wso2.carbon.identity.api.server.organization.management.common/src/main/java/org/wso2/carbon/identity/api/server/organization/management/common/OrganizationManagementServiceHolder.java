@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.organization.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.organization.discovery.service.OrganizationDiscoveryManager;
 import org.wso2.carbon.identity.organization.management.application.OrgApplicationManager;
@@ -27,6 +29,8 @@ import org.wso2.carbon.identity.organization.management.service.OrganizationMana
  * Service holder class for organization management related services.
  */
 public class OrganizationManagementServiceHolder {
+
+    private static final Log log = LogFactory.getLog(OrganizationManagementServiceHolder.class);
 
     private OrganizationManagementServiceHolder() {}
 
@@ -55,7 +59,14 @@ public class OrganizationManagementServiceHolder {
      */
     public static OrgApplicationManager getOrgApplicationManager() {
 
-        return OrgApplicationManagerHolder.SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving OrgApplicationManager OSGi service.");
+        }
+        OrgApplicationManager service = OrgApplicationManagerHolder.SERVICE;
+        if (service == null && log.isDebugEnabled()) {
+            log.debug("OrgApplicationManager OSGi service is not available.");
+        }
+        return service;
     }
 
     /**
@@ -65,7 +76,14 @@ public class OrganizationManagementServiceHolder {
      */
     public static OrganizationManager getOrganizationManager() {
 
-        return OrganizationManagerHolder.SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving OrganizationManager OSGi service.");
+        }
+        OrganizationManager service = OrganizationManagerHolder.SERVICE;
+        if (service == null && log.isDebugEnabled()) {
+            log.debug("OrganizationManager OSGi service is not available.");
+        }
+        return service;
     }
 
     /**
@@ -75,6 +93,13 @@ public class OrganizationManagementServiceHolder {
      */
     public static OrganizationDiscoveryManager getOrganizationDiscoveryManager() {
 
-        return OrganizationDiscoveryManagerHolder.SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving OrganizationDiscoveryManager OSGi service.");
+        }
+        OrganizationDiscoveryManager service = OrganizationDiscoveryManagerHolder.SERVICE;
+        if (service == null && log.isDebugEnabled()) {
+            log.debug("OrganizationDiscoveryManager OSGi service is not available.");
+        }
+        return service;
     }
 }

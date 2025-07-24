@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.common.UserInvitationMgtServiceHolder;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.core.GuestApiServiceCore;
 import org.wso2.carbon.identity.organization.user.invitation.management.InvitationCoreService;
@@ -27,16 +29,21 @@ import org.wso2.carbon.identity.organization.user.invitation.management.Invitati
  */
 public class GuestApiServiceCoreFactory {
 
+    private static final Log log = LogFactory.getLog(GuestApiServiceCoreFactory.class);
     private static final GuestApiServiceCore SERVICE;
 
     static {
         InvitationCoreService invitationCoreService = UserInvitationMgtServiceHolder.getInvitationCoreService();
 
         if (invitationCoreService == null) {
+            log.error("InvitationCoreService is not available from OSGi context");
             throw new IllegalStateException("InvitationCoreService is not available from OSGi context.");
         }
 
         SERVICE = new GuestApiServiceCore(invitationCoreService);
+        if (log.isDebugEnabled()) {
+            log.debug("GuestApiServiceCore initialized successfully");
+        }
     }
 
     /**

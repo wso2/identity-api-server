@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.organization.role.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.organization.management.role.management.service.RoleManager;
 import org.wso2.carbon.identity.organization.management.service.OrganizationUserResidentResolverService;
@@ -26,6 +28,8 @@ import org.wso2.carbon.identity.organization.management.service.OrganizationUser
  * Service holder class for role management related services.
  */
 public class OrganizationRoleManagementServiceHolder {
+
+    private static final Log LOG = LogFactory.getLog(OrganizationRoleManagementServiceHolder.class);
 
     private OrganizationRoleManagementServiceHolder() {}
 
@@ -49,6 +53,9 @@ public class OrganizationRoleManagementServiceHolder {
      */
     public static RoleManager getRoleManager() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving RoleManager OSGi service.");
+        }
         return RoleManagerServiceHolder.SERVICE;
     }
 
@@ -59,6 +66,9 @@ public class OrganizationRoleManagementServiceHolder {
      */
     public static OrganizationUserResidentResolverService getOrganizationUserResidentResolverService() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving OrganizationUserResidentResolverService OSGi service.");
+        }
         return OrganizationUserResidentResolverServiceHolder.SERVICE;
     }
 }

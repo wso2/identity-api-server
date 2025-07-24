@@ -17,6 +17,8 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AssociatedRolesConfig;
@@ -38,9 +40,15 @@ import static org.wso2.carbon.identity.api.server.application.management.v1.core
  */
 public class ApiModelToServiceProvider implements ModelToDTO<ApplicationModel, ApplicationDTO> {
 
+    private static final Log log = LogFactory.getLog(ApiModelToServiceProvider.class);
+
     @Override
     public ApplicationDTO apply(ApplicationModel applicationModel) throws IdentityApplicationManagementClientException {
 
+        String applicationName = applicationModel != null ? applicationModel.getName() : null;
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Converting API model to ServiceProvider for application: %s", applicationName));
+        }
         ServiceProvider application = new ServiceProvider();
 
         application.setApplicationName(applicationModel.getName());
@@ -68,6 +76,10 @@ public class ApiModelToServiceProvider implements ModelToDTO<ApplicationModel, A
         // This is to add the inbound authentication protocols to the application that doesn't have inbound auth
         // config handler.
         addInboundAuthenticationProtocolsToApplication(application, applicationModel.getInboundProtocolConfiguration());
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Successfully converted API model to ServiceProvider for application: %s", 
+                    applicationName));
+        }
         return applicationDTOBuilder.build();
     }
 

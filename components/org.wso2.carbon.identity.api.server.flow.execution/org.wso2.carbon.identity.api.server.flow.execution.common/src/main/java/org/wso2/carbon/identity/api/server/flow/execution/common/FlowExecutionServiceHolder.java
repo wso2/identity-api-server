@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.flow.execution.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.flow.execution.engine.FlowExecutionService;
 import org.wso2.carbon.identity.flow.mgt.FlowMgtService;
@@ -27,6 +29,8 @@ import org.wso2.carbon.identity.governance.IdentityGovernanceService;
  * Holder class for FlowExecutionService.
  */
 public class FlowExecutionServiceHolder {
+
+    private static final Log log = LogFactory.getLog(FlowExecutionServiceHolder.class);
 
     private FlowExecutionServiceHolder() {
 
@@ -60,7 +64,13 @@ public class FlowExecutionServiceHolder {
      */
     public static FlowExecutionService getInstance() {
 
-        return FlowExecutionServiceHolderInstance.INSTANCE;
+        FlowExecutionService service = FlowExecutionServiceHolderInstance.INSTANCE;
+        if (service == null) {
+            log.warn("FlowExecutionService is not available");
+        } else if (log.isDebugEnabled()) {
+            log.debug("FlowExecutionService instance retrieved successfully");
+        }
+        return service;
     }
 
     /**
@@ -70,7 +80,13 @@ public class FlowExecutionServiceHolder {
      */
     public static FlowMgtService getFlowMgtService() {
 
-        return FlowMgtServiceHolderInstance.INSTANCE;
+        FlowMgtService service = FlowMgtServiceHolderInstance.INSTANCE;
+        if (service == null) {
+            log.warn("FlowMgtService is not available");
+        } else if (log.isDebugEnabled()) {
+            log.debug("FlowMgtService instance retrieved successfully");
+        }
+        return service;
     }
 
     /**
@@ -80,6 +96,12 @@ public class FlowExecutionServiceHolder {
      */
     public static IdentityGovernanceService getIdentityGovernanceService() {
 
-        return IdentityGovernanceServiceHolder.SERVICE;
+        IdentityGovernanceService service = IdentityGovernanceServiceHolder.SERVICE;
+        if (service == null) {
+            log.warn("IdentityGovernanceService is not available");
+        } else if (log.isDebugEnabled()) {
+            log.debug("IdentityGovernanceService instance retrieved successfully");
+        }
+        return service;
     }
 }

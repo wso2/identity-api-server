@@ -20,6 +20,8 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationShareAllRequestBody;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationSharePOSTRequest;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationShareSelectedRequestBody;
@@ -111,10 +113,14 @@ import static org.wso2.carbon.identity.organization.management.service.util.Util
  */
 public class ServerApplicationSharingService {
 
+    private static final Log log = LogFactory.getLog(ServerApplicationSharingService.class);
     private final OrgApplicationManager orgApplicationManager;
 
     public ServerApplicationSharingService(OrgApplicationManager orgApplicationManager) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Initializing ServerApplicationSharingService.");
+        }
         this.orgApplicationManager = orgApplicationManager;
     }
 
@@ -126,9 +132,16 @@ public class ServerApplicationSharingService {
      */
     public Response getSharedApplications(String applicationId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Retrieving shared applications for application ID: %s", applicationId));
+        }
         try {
             List<SharedApplication> sharedApplications = orgApplicationManager
                     .getSharedApplications(getOrganizationId(), applicationId);
+            if (log.isDebugEnabled()) {
+                int count = sharedApplications != null ? sharedApplications.size() : 0;
+                log.debug(String.format("Found %d shared applications for application ID: %s", count, applicationId));
+            }
             return Response.ok(createSharedApplicationsResponse(sharedApplications)).build();
         } catch (OrganizationManagementClientException e) {
             throw Utils.buildClientError(e.getErrorCode(), e.getMessage(), e.getDescription());
@@ -146,9 +159,17 @@ public class ServerApplicationSharingService {
      */
     public Response deleteSharedApplication(String applicationId, String sharedOrganizationId) {
 
+        if (log.isInfoEnabled()) {
+            log.info(String.format("Deleting shared application for app ID: %s, organization ID: %s", 
+                    applicationId, sharedOrganizationId));
+        }
         try {
             orgApplicationManager.deleteSharedApplication(getOrganizationId(), applicationId,
                     sharedOrganizationId);
+            if (log.isInfoEnabled()) {
+                log.info(String.format("Successfully deleted shared application for app ID: %s, organization ID: %s", 
+                        applicationId, sharedOrganizationId));
+            }
             return Response.noContent().build();
         } catch (OrganizationManagementClientException e) {
             throw Utils.buildClientError(e.getErrorCode(), e.getMessage(), e.getDescription());

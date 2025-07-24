@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.action.management.v1.util;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.action.management.api.exception.ActionMgtException;
 import org.wso2.carbon.identity.action.management.api.model.Action;
 import org.wso2.carbon.identity.action.management.api.model.ActionRule;
@@ -46,6 +48,8 @@ import javax.ws.rs.core.Response;
  */
 public class RuleMapper {
 
+    private static final Log LOG = LogFactory.getLog(RuleMapper.class);
+
     /**
      * Converts an ActionRule object from service model to an ORRuleResponse object from API model.
      *
@@ -55,6 +59,9 @@ public class RuleMapper {
      */
     public static ORRuleResponse toORRuleResponse(ActionRule actionRule) throws ActionMgtException {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Converting ActionRule to ORRuleResponse");
+        }
         ORCombinedRule orCombinedRule = (ORCombinedRule) actionRule.getRule();
         List<ANDCombinedRule> andCombinedRuleList = orCombinedRule.getRules();
 
@@ -74,8 +81,12 @@ public class RuleMapper {
             andRuleResponseList.add(andRuleResponse);
         }
 
-        return new ORRuleResponse().condition(ORRuleResponse.ConditionEnum.OR)
+        ORRuleResponse response = new ORRuleResponse().condition(ORRuleResponse.ConditionEnum.OR)
                 .rules(andRuleResponseList);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("ActionRule converted to ORRuleResponse successfully");
+        }
+        return response;
     }
 
     /**
@@ -90,9 +101,15 @@ public class RuleMapper {
     public static ActionRule toActionRule(ORRule ruleRequest, Action.ActionTypes actionType, String tenantDomain)
             throws ActionMgtException {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Converting ORRule to ActionRule for type: " + (actionType != null ? actionType : "null") + 
+                    " and tenant: " + tenantDomain);
+        }
         List<ANDRule> andRuleList = ruleRequest.getRules();
         if (andRuleList == null || andRuleList.isEmpty()) {
-            // Create an ActionRule object with null Rule to indicate to remove the Rule reference in Action.
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("No rules provided, creating ActionRule with null rule to indicate removal");
+            }
             return ActionRule.create(null);
         }
 
@@ -107,8 +124,14 @@ public class RuleMapper {
         addExpressionsToRuleBuilder(andRuleList, ruleBuilder);
 
         try {
-            return ActionRule.create(ruleBuilder.build());
+            ActionRule actionRule = ActionRule.create(ruleBuilder.build());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("ORRule converted to ActionRule successfully for type: " + actionType);
+            }
+            return actionRule;
         } catch (RuleManagementClientException e) {
+            LOG.warn("Failed to create ActionRule due to invalid rule for type: " + actionType + ". Error: " + 
+                    e.getMessage(), e);
             throw ActionMgtEndpointUtil.buildActionMgtClientException(
                     ActionMgtEndpointConstants.ErrorMessage.ERROR_INVALID_RULE, e, e.getMessage());
         }

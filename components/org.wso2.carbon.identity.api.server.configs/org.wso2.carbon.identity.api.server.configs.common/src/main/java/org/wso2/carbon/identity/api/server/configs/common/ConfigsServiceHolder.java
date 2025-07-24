@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.configs.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.api.ServerConfigurationService;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
@@ -33,6 +35,8 @@ import org.wso2.carbon.logging.service.RemoteLoggingConfigService;
  * Service holder class for server configuration related services.
  */
 public class ConfigsServiceHolder {
+
+    private static final Log log = LogFactory.getLog(ConfigsServiceHolder.class);
 
     private ConfigsServiceHolder() {}
 
@@ -93,6 +97,9 @@ public class ConfigsServiceHolder {
      */
     public static ApplicationManagementService getApplicationManagementService() {
 
+        if (ApplicationManagementServiceHolder.SERVICE == null) {
+            log.warn("ApplicationManagementService is not available.");
+        }
         return ApplicationManagementServiceHolder.SERVICE;
     }
 
@@ -103,6 +110,9 @@ public class ConfigsServiceHolder {
      */
     public static IdentityProviderManager getIdentityProviderManager() {
 
+        if (IdentityProviderManagerHolder.SERVICE == null) {
+            log.warn("IdentityProviderManager is not available.");
+        }
         return IdentityProviderManagerHolder.SERVICE;
     }
 
@@ -113,6 +123,9 @@ public class ConfigsServiceHolder {
      */
     public static CORSManagementService getCorsManagementService() {
 
+        if (CORSManagementServiceHolder.SERVICE == null) {
+            log.warn("CORSManagementService is not available.");
+        }
         return CORSManagementServiceHolder.SERVICE;
     }
 
@@ -123,16 +136,22 @@ public class ConfigsServiceHolder {
      */
     public static RemoteLoggingConfigService getRemoteLoggingConfigService() {
 
+        if (RemoteLoggingConfigServiceHolder.SERVICE == null) {
+            log.warn("RemoteLoggingConfigService is not available.");
+        }
         return RemoteLoggingConfigServiceHolder.SERVICE;
     }
 
     /**
      * Get Impersonation Config Mgt osgi service.
      *
-     * @return RemoteLoggingConfigService
+     * @return ImpersonationConfigMgtService
      */
     public static ImpersonationConfigMgtService getImpersonationConfigMgtService() {
 
+        if (ImpersonationConfigMgtServiceHolder.SERVICE == null) {
+            log.warn("ImpersonationConfigMgtService is not available.");
+        }
         return ImpersonationConfigMgtServiceHolder.SERVICE;
     }
 
@@ -143,6 +162,9 @@ public class ConfigsServiceHolder {
      */
     public static DCRConfigurationMgtService getDcrConfigurationMgtService() {
 
+        if (DCRConfigurationMgtServiceHolder.SERVICE == null) {
+            log.warn("DCRConfigurationMgtService is not available.");
+        }
         return DCRConfigurationMgtServiceHolder.SERVICE;
     }
 
@@ -153,6 +175,9 @@ public class ConfigsServiceHolder {
      */
     public static JWTClientAuthenticatorMgtService getJWTClientAuthenticatorMgtService() {
 
+        if (JWTClientAuthenticatorMgtServiceHolder.SERVICE == null) {
+            log.warn("JWTClientAuthenticatorMgtService is not available.");
+        }
         return JWTClientAuthenticatorMgtServiceHolder.SERVICE;
     }
 
@@ -163,6 +188,9 @@ public class ConfigsServiceHolder {
      */
     public static ServerConfigurationService getServerConfigurationService() {
 
+        if (ServerConfigurationServiceHolder.SERVICE == null) {
+            log.warn("ServerConfigurationService is not available.");
+        }
         return ServerConfigurationServiceHolder.SERVICE;
     }
 }

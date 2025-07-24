@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.flow.management.v1.BaseConnectorConfigs;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponseConnectionMeta;
@@ -43,6 +45,8 @@ import static org.wso2.carbon.identity.recovery.IdentityRecoveryConstants.Connec
  */
 public class RegistrationFlowMetaHandler extends AbstractMetaResponseHandler {
 
+    private static final Log LOG = LogFactory.getLog(RegistrationFlowMetaHandler.class);
+
     @Override
     public String getFlowType() {
 
@@ -58,13 +62,20 @@ public class RegistrationFlowMetaHandler extends AbstractMetaResponseHandler {
     @Override
     public SelfRegistrationConnectorConfigs getConnectorConfigs() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving connector configs for registration flow.");
+        }
         Utils utils = new Utils();
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         SelfRegistrationConnectorConfigs connectorConfigs = new SelfRegistrationConnectorConfigs();
         BaseConnectorConfigs baseConfigs = super.getConnectorConfigs();
         connectorConfigs.setMultiAttributeLoginEnabled(baseConfigs.getMultiAttributeLoginEnabled());
-        connectorConfigs.setSelfRegistrationEnabled(
-                    utils.isFlowConfigEnabled(tenantDomain, ENABLE_SELF_SIGNUP));
+        boolean selfRegEnabled = utils.isFlowConfigEnabled(tenantDomain, ENABLE_SELF_SIGNUP);
+        connectorConfigs.setSelfRegistrationEnabled(selfRegEnabled);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieved connector configs for registration flow in tenant: " + tenantDomain +
+                    " with selfRegistration: " + selfRegEnabled);
+        }
         return connectorConfigs;
     }
 
@@ -77,12 +88,18 @@ public class RegistrationFlowMetaHandler extends AbstractMetaResponseHandler {
     @Override
     public RegistrationFlowMetaResponse createResponse() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Creating registration flow meta response.");
+        }
         RegistrationFlowMetaResponse response = new RegistrationFlowMetaResponse();
         response.setFlowType(getFlowType());
         response.setAttributeProfile(getAttributeProfile());
         response.setSupportedExecutors(getSupportedExecutors());
         response.setConnectorConfigs(getConnectorConfigs());
         response.setConnectionMeta(getConnectionMeta());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Successfully created registration flow meta response.");
+        }
         return response;
     }
 
@@ -93,6 +110,9 @@ public class RegistrationFlowMetaHandler extends AbstractMetaResponseHandler {
      */
     private FlowMetaResponseConnectionMeta getConnectionMeta() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving connection meta information for registration flow.");
+        }
         Utils utils = new Utils();
         List<IdentityProvider> identityProviders = utils.getConnections();
 
@@ -108,6 +128,9 @@ public class RegistrationFlowMetaHandler extends AbstractMetaResponseHandler {
 
         FlowMetaResponseConnectionMeta connections = new FlowMetaResponseConnectionMeta();
         connections.setSupportedConnections(supportedConnections);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieved " + supportedConnections.size() + " connections for registration flow.");
+        }
         return connections;
     }
 

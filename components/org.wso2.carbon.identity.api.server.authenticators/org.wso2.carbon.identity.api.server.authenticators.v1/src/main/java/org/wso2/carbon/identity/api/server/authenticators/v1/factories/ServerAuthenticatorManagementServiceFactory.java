@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.authenticators.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.authenticators.common.AuthenticatorsServiceHolder;
 import org.wso2.carbon.identity.api.server.authenticators.v1.core.ServerAuthenticatorManagementService;
 import org.wso2.carbon.identity.application.common.ApplicationAuthenticatorService;
@@ -29,6 +31,7 @@ import org.wso2.carbon.idp.mgt.IdpManager;
  */
 public class ServerAuthenticatorManagementServiceFactory {
 
+    private static final Log log = LogFactory.getLog(ServerAuthenticatorManagementServiceFactory.class);
     private static final ServerAuthenticatorManagementService SERVICE;
 
     static {
@@ -39,13 +42,18 @@ public class ServerAuthenticatorManagementServiceFactory {
                 .getApplicationAuthenticatorService();
 
         if (applicationManagementService == null) {
+            log.error("ApplicationManagementService is not available from OSGi context");
             throw new IllegalStateException("ApplicationManagementService is not available from OSGi context.");
         }
 
         if (idpManager == null) {
+            log.error("IdpManager is not available from OSGi context");
             throw new IllegalStateException("IdpManager is not available from OSGi context.");
         }
 
+        if (log.isDebugEnabled()) {
+            log.debug("Initializing ServerAuthenticatorManagementService");
+        }
         SERVICE = new ServerAuthenticatorManagementService(applicationManagementService, idpManager,
                 applicationAuthenticatorService);
     }

@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.oidc.scope.management.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.common.OidcScopeConstants;
@@ -36,13 +38,18 @@ import javax.ws.rs.core.Response;
  */
 public class OidcApiServiceImpl implements OidcApiService {
 
+    private static final Log LOG = LogFactory.getLog(OidcApiServiceImpl.class);
     private final OidcScopeManagementService oidcScopeManagementService;
 
     public OidcApiServiceImpl() {
 
         try {
             this.oidcScopeManagementService = OidcScopeManagementServiceFactory.getPermissionManagementService();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("OidcApiServiceImpl initialized successfully");
+            }
         } catch (IllegalStateException e) {
+            LOG.error("Error occurred while initiating OidcScopeManagementService: " + e.getMessage());
             throw new RuntimeException("Error occurred while initiating OidcScopeManagementService.", e);
         }
     }
@@ -50,6 +57,9 @@ public class OidcApiServiceImpl implements OidcApiService {
     @Override
     public Response addScope(Scope scope) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("REST API call to add OIDC scope: " + (scope != null ? scope.getName() : "null"));
+        }
         String resourceId = oidcScopeManagementService.addScope(scope);
         return Response.created(getResourceLocation(resourceId)).build();
     }
@@ -57,6 +67,9 @@ public class OidcApiServiceImpl implements OidcApiService {
     @Override
     public Response deleteScope(String id) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("REST API call to delete OIDC scope: " + id);
+        }
         oidcScopeManagementService.deleteScope(id);
         return Response.noContent().build();
     }
@@ -64,18 +77,27 @@ public class OidcApiServiceImpl implements OidcApiService {
     @Override
     public Response getScope(String id) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("REST API call to get OIDC scope: " + id);
+        }
         return Response.ok().entity(oidcScopeManagementService.getScope(id)).build();
     }
 
     @Override
     public Response getScopes() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("REST API call to get all OIDC scopes");
+        }
         return Response.ok().entity(oidcScopeManagementService.getScopes()).build();
     }
 
     @Override
     public Response updateScope(String id, ScopeUpdateRequest scopeUpdateRequest) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("REST API call to update OIDC scope: " + id);
+        }
         oidcScopeManagementService.updateScope(id, scopeUpdateRequest);
         return Response.ok().build();
     }

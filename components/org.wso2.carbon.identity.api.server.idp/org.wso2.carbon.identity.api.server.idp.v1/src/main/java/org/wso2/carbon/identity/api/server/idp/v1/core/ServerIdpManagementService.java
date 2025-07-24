@@ -258,12 +258,17 @@ public class ServerIdpManagementService {
      */
     public IdentityProviderResponse addIDP(IdentityProviderPOSTRequest identityProviderPOSTRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Adding identity provider: " + identityProviderPOSTRequest.getName());
+        }
         IdentityProvider identityProvider;
         try {
             validateSystemReservedIDP(identityProviderPOSTRequest.getName());
             identityProvider = identityProviderManager.addIdPWithResourceId(createIDP(identityProviderPOSTRequest),
                     ContextLoader.getTenantDomainFromContext());
+            log.info("Identity provider added successfully with ID: " + identityProvider.getResourceId());
         } catch (IdentityProviderManagementException e) {
+            log.error("Error occurred while adding identity provider: " + identityProviderPOSTRequest.getName(), e);
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_IDP, null);
         }
         return createIDPResponse(identityProvider);
@@ -277,15 +282,25 @@ public class ServerIdpManagementService {
      */
     public IdentityProviderResponse getIDP(String idpId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving identity provider with ID: " + idpId);
+        }
         try {
             IdentityProvider identityProvider = identityProviderManager.getIdPByResourceId(idpId,
                             ContextLoader.getTenantDomainFromContext(), true);
             if (identityProvider == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Identity provider not found with ID: " + idpId);
+                }
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
             }
+            if (log.isDebugEnabled()) {
+                log.debug("Identity provider retrieved successfully with ID: " + idpId);
+            }
             return createIDPResponse(identityProvider);
         } catch (IdentityProviderManagementException e) {
+            log.error("Error occurred while retrieving identity provider with ID: " + idpId, e);
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP, idpId);
         }
     }
@@ -328,10 +343,15 @@ public class ServerIdpManagementService {
      */
     public void deleteIDP(String identityProviderId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting identity provider with ID: " + identityProviderId);
+        }
         try {
             identityProviderManager.deleteIdPByResourceId(identityProviderId,
                     ContextLoader.getTenantDomainFromContext());
+            log.info("Identity provider deleted successfully with ID: " + identityProviderId);
         } catch (IdentityProviderManagementException e) {
+            log.error("Error occurred while deleting identity provider with ID: " + identityProviderId, e);
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_DELETING_IDP, identityProviderId);
         }
     }
@@ -344,10 +364,15 @@ public class ServerIdpManagementService {
      */
     public void forceDeleteIDP(String identityProviderId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Force deleting identity provider with ID: " + identityProviderId);
+        }
         try {
             identityProviderManager.forceDeleteIdpByResourceId(identityProviderId,
                     ContextLoader.getTenantDomainFromContext());
+            log.info("Identity provider force deleted successfully with ID: " + identityProviderId);
         } catch (IdentityProviderManagementException e) {
+            log.error("Error occurred while force deleting identity provider with ID: " + identityProviderId, e);
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_DELETING_IDP, identityProviderId);
         }
     }
@@ -413,12 +438,17 @@ public class ServerIdpManagementService {
      */
     public String importIDP(InputStream fileInputStream, Attachment fileDetail) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Importing identity provider from file");
+        }
         IdentityProvider identityProvider;
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             identityProvider = identityProviderManager.addIdPWithResourceId(
                     getIDPFromFile(fileInputStream, fileDetail), tenantDomain);
+            log.info("Identity provider imported successfully with ID: " + identityProvider.getResourceId());
         } catch (IdentityProviderManagementException e) {
+            log.error("Error occurred while importing identity provider from file", e);
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_IMPORTING_IDP, null);
         }
         return identityProvider.getResourceId();
@@ -433,16 +463,22 @@ public class ServerIdpManagementService {
      */
     public void updateIDPFromFile(String identityProviderId, InputStream fileInputStream, Attachment fileDetail) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating identity provider from file with ID: " + identityProviderId);
+        }
         IdentityProvider identityProvider;
         try {
             identityProvider = getIDPFromFile(fileInputStream, fileDetail);
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             if (RESIDENT_IDP_RESERVED_NAME.equals(identityProviderId)) {
                 identityProviderManager.updateResidentIdP(identityProvider, tenantDomain);
+                log.info("Resident identity provider updated successfully from file");
             } else {
                 identityProviderManager.updateIdPByResourceId(identityProviderId, identityProvider, tenantDomain);
+                log.info("Identity provider updated successfully from file with ID: " + identityProviderId);
             }
         } catch (IdentityProviderManagementException e) {
+            log.error("Error occurred while updating identity provider from file with ID: " + identityProviderId, e);
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP, null);
         }
     }

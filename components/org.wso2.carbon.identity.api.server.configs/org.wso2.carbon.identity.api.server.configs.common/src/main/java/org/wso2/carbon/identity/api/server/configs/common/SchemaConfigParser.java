@@ -65,6 +65,9 @@ public class SchemaConfigParser {
     private SchemaConfigParser() {
 
         schemasFilePath = IdentityUtil.getIdentityConfigDirPath() + File.separator + SCHEMA_FILE_NAME;
+        if (log.isDebugEnabled()) {
+            log.debug("Initializing SchemaConfigParser with schemas file path: " + schemasFilePath);
+        }
         buildConfiguration();
     }
 
@@ -73,6 +76,9 @@ public class SchemaConfigParser {
         if (schemaConfigParser == null) {
             synchronized (SchemaConfigParser.class) {
                 if (schemaConfigParser == null) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Creating new SchemaConfigParser instance.");
+                    }
                     schemaConfigParser = new SchemaConfigParser();
                 }
             }
@@ -94,9 +100,8 @@ public class SchemaConfigParser {
 
         File schemaFile = new File(schemasFilePath);
         if (!schemaFile.exists()) {
-            if (log.isDebugEnabled()) {
-                log.debug("Unable to find a valid configuration file in path: " + schemasFilePath);
-            }
+            log.warn("Schema configuration file not found at path: " + schemasFilePath + 
+                    ". Using empty schema configuration.");
             defaultSchemaMap = Collections.EMPTY_MAP;
             return;
         }
@@ -106,10 +111,14 @@ public class SchemaConfigParser {
             Optional<Map<String, List<String>>> addToSchemaMap;
             Optional<Map<String, List<String>>> removeFromMap;
             StAXOMBuilder builder = new StAXOMBuilder(inputStream);
+            if (log.isDebugEnabled()) {
+                log.debug("Building schema configuration from file: " + schemasFilePath);
+            }
             schemaMap = buildSchemasConfiguration(builder, DEFAULT_SCHEMA_CONFIG);
             addToSchemaMap = buildSchemasConfiguration(builder, ADD_SCHEMA_CONFIG);
             removeFromMap = buildSchemasConfiguration(builder, REMOVE_SCHEMA_CONFIG);
             if (!schemaMap.isPresent()) {
+                log.warn("No default schema configuration found. Using empty schema map.");
                 defaultSchemaMap = Collections.EMPTY_MAP;
                 return;
             }
@@ -123,7 +132,7 @@ public class SchemaConfigParser {
                 } else {
                     if (log.isDebugEnabled()) {
                         log.debug("Invalid configuration. Schema ID: " + key + " not available in '" +
-                                DEFAULT_SCHEMA_CONFIG + " of " + schemasFilePath);
+                                DEFAULT_SCHEMA_CONFIG + "' of " + schemasFilePath);
                     }
                 }
             }));
@@ -133,14 +142,19 @@ public class SchemaConfigParser {
                 } else {
                     if (log.isDebugEnabled()) {
                         log.debug("Invalid configuration. Schema ID: " + key + " not available in '" +
-                                DEFAULT_SCHEMA_CONFIG + " of " + schemasFilePath);
+                                DEFAULT_SCHEMA_CONFIG + "' of " + schemasFilePath);
                     }
                 }
             }));
 
         } catch (IOException | XMLStreamException e) {
+            log.error("Error occurred while reading schema configuration in path: " + schemasFilePath, e);
             throw IdentityRuntimeException.error("Error occurred while reading schema configuration in path: " +
                     schemasFilePath, e);
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Schema configuration successfully loaded with " + 
+                    (defaultSchemaMap != null ? defaultSchemaMap.size() : 0) + " schema entries.");
         }
         defaultSchemaMap = Collections.unmodifiableMap(defaultSchemaMap);
     }
@@ -177,6 +191,8 @@ public class SchemaConfigParser {
             OMElement schema = (OMElement) schemaIterator.next();
             String schemaId = schema.getAttributeValue(new QName("id"));
             if (StringUtils.isBlank(schemaId)) {
+                log.error("Invalid configuration. '" +  SCHEMA_ID_CONFIG + "' attribute of a '" + SCHEMAS_CONFIG + 
+                        "' element cannot be undefined in file: " + schemasFilePath);
                 throw IdentityRuntimeException.error("Invalid configuration. '" +  SCHEMA_ID_CONFIG + "' attribute of" +
                         " a '" + SCHEMAS_CONFIG + "' element cannot be undefined in file: " + schemasFilePath);
             }
