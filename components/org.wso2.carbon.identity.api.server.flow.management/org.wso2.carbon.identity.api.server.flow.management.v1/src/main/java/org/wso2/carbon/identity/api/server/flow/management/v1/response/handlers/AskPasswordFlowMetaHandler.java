@@ -18,17 +18,19 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers;
 
-import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.api.server.flow.management.v1.BaseConnectorConfigs;
-import org.wso2.carbon.identity.api.server.flow.management.v1.SelfRegistrationConnectorConfigs;
-import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
-import org.wso2.carbon.identity.recovery.IdentityRecoveryConstants;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.APPLE_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.CONFIRMATION_CODE_VALIDATION_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.FACEBOOK_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.FIDO2_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.GITHUB_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.GOOGLE_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.OFFICE365_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.OPENID_CONNECT_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.USER_RESOLVE_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.SELF_REGISTRATION_ATTRIBUTE_PROFILE;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USER_RESOLVE_EXECUTOR;
 import static org.wso2.carbon.identity.flow.mgt.Constants.FlowTypes.INVITED_USER_REGISTRATION;
 
 /**
@@ -51,19 +53,6 @@ public class AskPasswordFlowMetaHandler extends AbstractMetaResponseHandler {
     }
 
     @Override
-    public SelfRegistrationConnectorConfigs getConnectorConfigs() {
-
-        Utils utils = new Utils();
-        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-        SelfRegistrationConnectorConfigs connectorConfigs = new SelfRegistrationConnectorConfigs();
-        BaseConnectorConfigs baseConfigs = super.getConnectorConfigs();
-        connectorConfigs.setMultiAttributeLoginEnabled(baseConfigs.getMultiAttributeLoginEnabled());
-        connectorConfigs.setSelfRegistrationEnabled(utils.isFlowConfigEnabled(tenantDomain,
-                            IdentityRecoveryConstants.ConnectorConfig.ENABLE_SELF_SIGNUP));
-        return connectorConfigs;
-    }
-
-    @Override
     public List<String> getRequiredInputFields() {
 
         return new ArrayList<>();
@@ -74,6 +63,14 @@ public class AskPasswordFlowMetaHandler extends AbstractMetaResponseHandler {
 
         List<String> supportedExecutors = new ArrayList<>(super.getSupportedExecutors());
         supportedExecutors.add(USER_RESOLVE_EXECUTOR);
+        supportedExecutors.add(CONFIRMATION_CODE_VALIDATION_EXECUTOR);
+        supportedExecutors.add(OPENID_CONNECT_EXECUTOR);
+        supportedExecutors.add(GOOGLE_EXECUTOR);
+        supportedExecutors.add(FACEBOOK_EXECUTOR);
+        supportedExecutors.add(OFFICE365_EXECUTOR);
+        supportedExecutors.add(APPLE_EXECUTOR);
+        supportedExecutors.add(GITHUB_EXECUTOR);
+        supportedExecutors.add(FIDO2_EXECUTOR);
         return supportedExecutors;
     }
 

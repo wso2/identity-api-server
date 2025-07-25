@@ -19,9 +19,9 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1.core;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.api.server.flow.management.v1.BaseFlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfig;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfigPatchModel;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRequest;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Step;
@@ -85,9 +85,9 @@ public class ServerFlowMgtService {
      * Retrieve flow metadata based on the flow type.
      *
      * @param flowType Type of the flow.
-     * @return BaseFlowMetaResponse containing metadata.
+     * @return FlowMetaResponse containing metadata.
      */
-    public BaseFlowMetaResponse getFlowMeta(String flowType) {
+    public FlowMetaResponse getFlowMeta(String flowType) {
 
         Utils.validateFlowType(flowType);
         AbstractMetaResponseHandler metaResponseHandler = resolveHandler(flowType);

@@ -19,22 +19,22 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.api.server.flow.management.v1.BaseConnectorConfigs;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponseConnectionMeta;
-import org.wso2.carbon.identity.api.server.flow.management.v1.RegistrationFlowMetaResponse;
-import org.wso2.carbon.identity.api.server.flow.management.v1.SelfRegistrationConnectorConfigs;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
-import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.flow.mgt.Constants;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.APPLE_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.FACEBOOK_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.FIDO2_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.GITHUB_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.GOOGLE_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.OFFICE365_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.OPENID_CONNECT_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.SELF_REGISTRATION_ATTRIBUTE_PROFILE;
-import static org.wso2.carbon.identity.recovery.IdentityRecoveryConstants.ConnectorConfig.ENABLE_SELF_SIGNUP;
 
 /**
  * Handler for managing the registration flow meta information.
@@ -42,6 +42,9 @@ import static org.wso2.carbon.identity.recovery.IdentityRecoveryConstants.Connec
  * implementations for registration flow.
  */
 public class RegistrationFlowMetaHandler extends AbstractMetaResponseHandler {
+
+    private static final String ACCOUNT_VERIFICATION_ENABLED = "accountVerificationEnabled";
+    private static final String ACCOUNT_VERIFICATION_ENABLED_PROPERTY = "SelfRegistration.LockOnCreation";
 
     @Override
     public String getFlowType() {
@@ -56,65 +59,38 @@ public class RegistrationFlowMetaHandler extends AbstractMetaResponseHandler {
     }
 
     @Override
-    public SelfRegistrationConnectorConfigs getConnectorConfigs() {
+    public List<String> getRequiredInputFields() {
 
-        Utils utils = new Utils();
+        return new ArrayList<>();
+    }
+
+    @Override
+    public Map<String, Boolean> getConnectorConfigs() {
+
+        Map<String, Boolean> connectorConfigs = super.getConnectorConfigs();
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-        SelfRegistrationConnectorConfigs connectorConfigs = new SelfRegistrationConnectorConfigs();
-        BaseConnectorConfigs baseConfigs = super.getConnectorConfigs();
-        connectorConfigs.setMultiAttributeLoginEnabled(baseConfigs.getMultiAttributeLoginEnabled());
-        connectorConfigs.setSelfRegistrationEnabled(
-                    utils.isFlowConfigEnabled(tenantDomain, ENABLE_SELF_SIGNUP));
+        connectorConfigs.put(ACCOUNT_VERIFICATION_ENABLED,
+                Utils.getGovernanceConfig(tenantDomain, ACCOUNT_VERIFICATION_ENABLED_PROPERTY));
         return connectorConfigs;
     }
 
     @Override
-    public List<String> getRequiredInputFields() {
+    public FlowMetaResponse createResponse() {
 
-        return new ArrayList<>(getLoginInputFields());
-    }
-
-    @Override
-    public RegistrationFlowMetaResponse createResponse() {
-
-        RegistrationFlowMetaResponse response = new RegistrationFlowMetaResponse();
-        response.setFlowType(getFlowType());
-        response.setAttributeProfile(getAttributeProfile());
-        response.setSupportedExecutors(getSupportedExecutors());
-        response.setConnectorConfigs(getConnectorConfigs());
-        response.setConnectionMeta(getConnectionMeta());
-        return response;
-    }
-
-    /**
-     * Get the connection meta information for the flow.
-     *
-     * @return Connection meta information.
-     */
-    private FlowMetaResponseConnectionMeta getConnectionMeta() {
-
-        Utils utils = new Utils();
-        List<IdentityProvider> identityProviders = utils.getConnections();
-
-        List<Map<String, Object>> supportedConnections = identityProviders.stream()
-                .map(config -> {
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("name", config.getIdentityProviderName());
-                    map.put("enabled", config.isEnable());
-                    map.put("image", config.getImageUrl());
-                    return map;
-                })
-                .collect(Collectors.toList());
-
-        FlowMetaResponseConnectionMeta connections = new FlowMetaResponseConnectionMeta();
-        connections.setSupportedConnections(supportedConnections);
-        return connections;
+        return super.createResponse();
     }
 
     @Override
     public List<String> getSupportedExecutors() {
 
-        return new ArrayList<>(super.getSupportedExecutors());
+        List<String> supportedExecutors = super.getSupportedExecutors();
+        supportedExecutors.add(OPENID_CONNECT_EXECUTOR);
+        supportedExecutors.add(GOOGLE_EXECUTOR);
+        supportedExecutors.add(FACEBOOK_EXECUTOR);
+        supportedExecutors.add(OFFICE365_EXECUTOR);
+        supportedExecutors.add(APPLE_EXECUTOR);
+        supportedExecutors.add(GITHUB_EXECUTOR);
+        supportedExecutors.add(FIDO2_EXECUTOR);
+        return supportedExecutors;
     }
-
 }

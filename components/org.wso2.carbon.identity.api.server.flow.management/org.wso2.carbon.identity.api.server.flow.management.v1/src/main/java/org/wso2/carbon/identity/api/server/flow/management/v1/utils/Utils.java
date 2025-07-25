@@ -39,7 +39,6 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.Size;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Step;
 import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.AbstractMetaResponseHandler;
-import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.core.util.LambdaExceptionUtils;
 import org.wso2.carbon.identity.flow.mgt.Constants;
@@ -54,8 +53,6 @@ import org.wso2.carbon.identity.flow.mgt.model.StepDTO;
 import org.wso2.carbon.identity.governance.IdentityGovernanceException;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
 import org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants;
-import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
-import org.wso2.carbon.idp.mgt.IdpManager;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -72,7 +69,6 @@ import javax.ws.rs.core.Response;
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_DUPLICATE_COMPONENT_ID;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_GET_GOVERNANCE_CONFIG;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_GET_LOCAL_AUTHENTICATORS;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USERNAME_IDENTIFIER;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USER_IDENTIFIER;
@@ -83,6 +79,10 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.F
 public class Utils {
 
     private static final Log LOG = LogFactory.getLog(Utils.class);
+
+    private Utils() {
+
+    }
 
     /**
      * Handles exceptions and returns an APIError object.
@@ -315,7 +315,7 @@ public class Utils {
      *
      * @param tenantDomain Tenant domain.
      */
-    public boolean isFlowConfigEnabled(String tenantDomain, String connectorConfig) {
+    public static boolean getGovernanceConfig(String tenantDomain, String connectorConfig) {
 
         try {
             IdentityGovernanceService identityGovernanceService =
@@ -334,27 +334,6 @@ public class Utils {
                     ERROR_CODE_GET_GOVERNANCE_CONFIG.getCode(),
                     ERROR_CODE_GET_GOVERNANCE_CONFIG.getMessage(),
                     ERROR_CODE_GET_GOVERNANCE_CONFIG.getDescription(), e));
-        }
-    }
-
-    /**
-     * Retrieves the list of identity providers configured in the system.
-     *
-     * @return List of IdentityProvider objects.
-     */
-    public List<IdentityProvider> getConnections() {
-
-        try {
-            IdpManager idpManager =
-                    FlowMgtServiceHolder.getIdpManager();
-            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-            return idpManager.getIdPs(tenantDomain);
-
-        } catch (IdentityProviderManagementException e) {
-            throw handleFlowMgtException(new FlowMgtClientException(
-                    ERROR_CODE_GET_LOCAL_AUTHENTICATORS.getCode(),
-                    ERROR_CODE_GET_LOCAL_AUTHENTICATORS.getMessage(),
-                    ERROR_CODE_GET_LOCAL_AUTHENTICATORS.getDescription(), e));
         }
     }
 
@@ -430,7 +409,7 @@ public class Utils {
 
         List<String> required = metaResponseHandler.getRequiredInputFields();
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-        boolean alternativeLoginStatus = new Utils().isFlowConfigEnabled(tenantDomain,
+        boolean alternativeLoginStatus = Utils.getGovernanceConfig(tenantDomain,
                 MultiAttributeLoginConstants.MULTI_ATTRIBUTE_LOGIN_PROPERTY);
 
         // Determine which identifiers are acceptable for "identity"

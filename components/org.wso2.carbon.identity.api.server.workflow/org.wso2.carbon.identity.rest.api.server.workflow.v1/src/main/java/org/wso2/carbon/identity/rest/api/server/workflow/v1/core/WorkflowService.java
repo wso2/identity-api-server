@@ -111,7 +111,8 @@ public class WorkflowService {
 
         Workflow currentWorkflow;
         try {
-            if (workflowManagementService.isWorkflowExistByName(workflow.getName())) {
+            String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            if (workflowManagementService.isWorkflowExistByName(workflow.getName(), tenantDomain)) {
                 throw new WorkflowClientException("A workflow with name: " + workflow.getName() + " already exists.");
             }
             String workflowId = UUID.randomUUID().toString();

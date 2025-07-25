@@ -16,41 +16,45 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.api.server.flow.management.v1;
+package org.wso2.carbon.identity.api.server.application.management.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 
-import java.util.List;
-import java.util.Map;
+
+import io.swagger.annotations.*;
 import java.util.Objects;
-
 import javax.validation.Valid;
+import javax.xml.bind.annotation.*;
 
-public class FlowMetaResponseConnectionMeta  {
+public class ApplicationSharedOrgsRequestBody  {
   
-    private List<Map<String, Object>> supportedConnections = null;
-
+    private String applicationId;
 
     /**
     **/
-    public FlowMetaResponseConnectionMeta supportedConnections(List<Map<String, Object>> supportedConnections) {
+    public ApplicationSharedOrgsRequestBody applicationId(String applicationId) {
 
-        this.supportedConnections = supportedConnections;
+        this.applicationId = applicationId;
         return this;
     }
     
-    @ApiModelProperty(example = "[\"Email OTP\",\"SMS OTP\",\"Passkey\",\"LinkedIn\"]", value = "")
-    @JsonProperty("supportedConnections")
+    @ApiModelProperty(required = true, value = "")
+    @JsonProperty("applicationId")
     @Valid
-    public List<Map<String, Object>> getSupportedConnections() {
-        return supportedConnections;
+    @NotNull(message = "Property applicationId cannot be null.")
+
+    public String getApplicationId() {
+        return applicationId;
     }
-    public void setSupportedConnections(List<Map<String, Object>> supportedConnections) {
-        this.supportedConnections = supportedConnections;
+    public void setApplicationId(String applicationId) {
+        this.applicationId = applicationId;
     }
 
-    
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -61,22 +65,22 @@ public class FlowMetaResponseConnectionMeta  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        FlowMetaResponseConnectionMeta flowMetaResponseConnectionMeta = (FlowMetaResponseConnectionMeta) o;
-        return Objects.equals(this.supportedConnections, flowMetaResponseConnectionMeta.supportedConnections);
+        ApplicationSharedOrgsRequestBody applicationSharedOrgsRequestBody = (ApplicationSharedOrgsRequestBody) o;
+        return Objects.equals(this.applicationId, applicationSharedOrgsRequestBody.applicationId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(supportedConnections);
+        return Objects.hash(applicationId);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class FlowMetaResponseConnectionMeta {\n");
+        sb.append("class ApplicationSharedOrgsRequestBody {\n");
         
-        sb.append("    supportedConnections: ").append(toIndentedString(supportedConnections)).append("\n");
+        sb.append("    applicationId: ").append(toIndentedString(applicationId)).append("\n");
         sb.append("}");
         return sb.toString();
     }

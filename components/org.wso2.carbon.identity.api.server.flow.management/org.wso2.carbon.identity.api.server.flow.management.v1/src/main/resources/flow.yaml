@@ -3,7 +3,7 @@ info:
   description: >
     This document specifies a **Flow Composer RESTful API** for **WSO2
     Identity Server**.
-  version: '2'
+  version: '1.0'
   title: WSO2 Identity Server - Flow Management Rest API
   termsOfService: http://swagger.io/terms/
   contact:
@@ -140,7 +140,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BaseFlowMetaResponse'
+                $ref: '#/components/schemas/FlowMetaResponse'
         '400':
           description: Invalid flow type specified
           content:
@@ -308,45 +308,7 @@ components:
           items:
             $ref: '#/components/schemas/Step'
 
-    BaseConnectorConfigs:
-      type: object
-      properties:
-        multiAttributeLoginEnabled:
-          type: boolean
-          example: false
-
-    SelfRegistrationConnectorConfigs:
-      allOf:
-        - $ref: '#/components/schemas/BaseConnectorConfigs'
-        - type: object
-          properties:
-            selfRegistrationEnabled:
-              type: boolean
-              example: false
-
-    PasswordRecoveryConnectorConfigs:
-      allOf:
-        - $ref: '#/components/schemas/BaseConnectorConfigs'
-        - type: object
-          properties:
-            passwordRecoveryEnabled:
-              type: boolean
-              example: true
-
-    FlowMetaResponseConnectionMeta:
-      type: object
-      properties:
-        supportedConnections:
-          type: array
-          items:
-            type: string
-          example:
-            - Email OTP
-            - SMS OTP
-            - Passkey
-            - LinkedIn
-
-    BaseFlowMetaResponse:
+    FlowMetaResponse:
       type: object
       description: General metadata for a flow type
       properties:
@@ -357,29 +319,56 @@ components:
           type: array
           items:
             type: string
+            example: SMSOTPExecutor
         connectorConfigs:
-          $ref: '#/components/schemas/BaseConnectorConfigs'
+          type: object
         attributeProfile:
           type: string
           example: End-User-Profile
+        attributeMetadata:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttributeMetadata'
+        executorConnections:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExecutorConnections'
 
-    RegistrationFlowMetaResponse:
-      allOf:
-        - $ref: '#/components/schemas/BaseFlowMetaResponse'
-        - type: object
-          properties:
-            connections:
-              $ref: '#/components/schemas/FlowMetaResponseConnectionMeta'
-            connectorConfigs:
-              $ref: '#/components/schemas/SelfRegistrationConnectorConfigs'
+    ExecutorConnections:
+      type: object
+      description: Applicable connections for a given executor
+      properties:
+        executorName:
+          type: string
+          description: Name of the executor
+          example: OIDCExecutor
+        connections:
+          type: array
+          items:
+            type: string
+            example: IdpName
 
-    PasswordRecoveryFlowMetaResponse:
-      allOf:
-        - $ref: '#/components/schemas/BaseFlowMetaResponse'
-        - type: object
-          properties:
-            connectorConfigs:
-              $ref: '#/components/schemas/PasswordRecoveryConnectorConfigs'
+    AttributeMetadata:
+      type: object
+      description: Attribute metadata
+      properties:
+        name:
+          type: string
+          example: Username
+        claimURI:
+          type: string
+          example: http://wso2.org/claims/username
+        required:
+          type: boolean
+          example: true
+        readOnly:
+          type: boolean
+          example: true
+        validators:
+          type: array
+          items:
+            type: string
+            example: AlphanumericValidator
 
     FlowConfig:
       type: object
