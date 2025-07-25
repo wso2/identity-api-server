@@ -36,6 +36,10 @@ public class ExtensionListItemBuilder implements Function<ExtensionInfo, Extensi
     @Override
     public ExtensionListItem apply(ExtensionInfo extensionInfo) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Building ExtensionListItem for extension: " + (extensionInfo != null ? extensionInfo.getId() 
+                    : "null"));
+        }
         ExtensionListItem extensionListItem = new ExtensionListItem();
         extensionListItem.setId(extensionInfo.getId());
         extensionListItem.setVersion(extensionInfo.getVersion());

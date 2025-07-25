@@ -35,8 +35,10 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.organization.config.service.constant.OrganizationConfigConstants.ErrorMessages.ERROR_CODE_DISCOVERY_CONFIG_CONFLICT;
-import static org.wso2.carbon.identity.organization.config.service.constant.OrganizationConfigConstants.ErrorMessages.ERROR_CODE_DISCOVERY_CONFIG_NOT_EXIST;
+import static org.wso2.carbon.identity.organization.config.service.constant.OrganizationConfigConstants
+        .ErrorMessages.ERROR_CODE_DISCOVERY_CONFIG_CONFLICT;
+import static org.wso2.carbon.identity.organization.config.service.constant.OrganizationConfigConstants
+        .ErrorMessages.ERROR_CODE_DISCOVERY_CONFIG_NOT_EXIST;
 
 /**
  * Perform organization configuration management related operations.
@@ -59,12 +61,19 @@ public class OrganizationConfigsService {
      */
     public void addDiscoveryConfiguration(Config config) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Adding organization discovery configuration with " + 
+                    (config != null && config.getProperties() != null ? config.getProperties().size() : 0) + 
+                    " properties.");
+        }
         List<ConfigProperty> configProperties = config.getProperties().stream()
                 .map(property -> new ConfigProperty(property.getKey(), property.getValue()))
                 .collect(Collectors.toList());
         try {
             organizationConfigManager.addDiscoveryConfiguration(new DiscoveryConfig(configProperties));
+            LOG.info("Successfully added organization discovery configuration.");
         } catch (OrganizationConfigException e) {
+            LOG.error("Failed to add organization discovery configuration.", e);
             throw handleException(e);
         }
     }
@@ -76,13 +85,20 @@ public class OrganizationConfigsService {
      */
     public void updateDiscoveryConfiguration(Config config) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating organization discovery configuration with " + 
+                    (config != null && config.getProperties() != null ? config.getProperties().size() : 0) + 
+                    " properties.");
+        }
         List<ConfigProperty> configProperties = config.getProperties().stream()
                 .map(property -> new ConfigProperty(property.getKey(), property.getValue()))
                 .collect(Collectors.toList());
         try {
             organizationConfigManager.updateDiscoveryConfiguration
                     (new DiscoveryConfig(configProperties));
+            LOG.info("Successfully updated organization discovery configuration.");
         } catch (OrganizationConfigException e) {
+            LOG.error("Failed to update organization discovery configuration.", e);
             throw handleException(e);
         }
     }
@@ -94,6 +110,9 @@ public class OrganizationConfigsService {
      */
     public Config getDiscoveryConfiguration() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving organization discovery configuration.");
+        }
         try {
             DiscoveryConfig discoveryConfig = organizationConfigManager.getDiscoveryConfiguration();
 
@@ -106,8 +125,13 @@ public class OrganizationConfigsService {
                     }).collect(Collectors.toList());
             Config config = new Config();
             config.setProperties(properties);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully retrieved organization discovery configuration with " + 
+                        properties.size() + " properties.");
+            }
             return config;
         } catch (OrganizationConfigException e) {
+            LOG.error("Failed to retrieve organization discovery configuration.", e);
             throw handleException(e);
         }
     }
@@ -117,9 +141,14 @@ public class OrganizationConfigsService {
      */
     public void deleteDiscoveryConfiguration() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deleting organization discovery configuration.");
+        }
         try {
             organizationConfigManager.deleteDiscoveryConfiguration();
+            LOG.info("Successfully deleted organization discovery configuration.");
         } catch (OrganizationConfigException e) {
+            LOG.error("Failed to delete organization discovery configuration.", e);
             throw handleException(e);
         }
     }

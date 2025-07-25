@@ -133,8 +133,13 @@ public class RoleManagementEndpointUtils {
         String endpoint = SERVER_API_PATH_COMPONENT + V1_API_PATH_COMPONENT + PATH_SEPARATOR + ORGANIZATION_PATH +
                 PATH_SEPARATOR + organizationId + PATH_SEPARATOR + resourcePath + PATH_SEPARATOR + id;
         try {
-            return URI.create(ServiceURLBuilder.create().addPath(endpoint)
+            URI uri = URI.create(ServiceURLBuilder.create().addPath(endpoint)
                     .build().getAbsolutePublicURL());
+            if (LOG.isDebugEnabled()) {
+                String resourceType = resourcePath.substring(0, resourcePath.length() - 1);
+                LOG.debug(String.format("Built URI for %s: %s", resourceType, uri.toString()));
+            }
+            return uri;
         } catch (URLBuilderException e) {
             Error error = getError(errorMessage.getCode(), errorMessage.getMessage(),
                     String.format(errorMessage.getDescription(), id));

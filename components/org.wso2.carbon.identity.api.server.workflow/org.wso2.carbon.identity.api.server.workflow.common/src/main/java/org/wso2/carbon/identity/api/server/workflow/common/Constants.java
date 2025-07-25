@@ -18,10 +18,15 @@
 
 package org.wso2.carbon.identity.api.server.workflow.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Common constants for workflow API.
  */
 public class Constants {
+
+    private static final Log log = LogFactory.getLog(Constants.class);
 
     public static final String WORKFLOW_PREFIX = "WF-";
     public static final String APPROVAL_STEPS = "ApprovalSteps";
@@ -108,16 +113,25 @@ public class Constants {
 
         public String getCode() {
 
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieving error code with prefix: " + (WORKFLOW_PREFIX + code));
+            }
             return WORKFLOW_PREFIX + code;
         }
 
         public String getMessage() {
 
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieving error message: " + message);
+            }
             return message;
         }
 
         public String getDescription() {
 
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieving error description: " + description);
+            }
             return description;
         }
 

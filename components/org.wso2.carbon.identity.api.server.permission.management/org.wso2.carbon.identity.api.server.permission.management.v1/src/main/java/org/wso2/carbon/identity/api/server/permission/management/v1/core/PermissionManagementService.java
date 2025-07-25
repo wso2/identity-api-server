@@ -54,9 +54,16 @@ public class PermissionManagementService {
 
         try {
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-            return getPermissionObjects(rolePermissionManagementService.getAllPermissions(IdentityTenantUtil
-                    .getTenantId(tenantDomain)));
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Retrieving all permissions for tenant: " + tenantDomain);
+            }
+            Permission[] permissions = getPermissionObjects(rolePermissionManagementService.getAllPermissions(
+                    IdentityTenantUtil.getTenantId(tenantDomain)));
+            LOG.info("Successfully retrieved " + permissions.length + " permissions for tenant: " + tenantDomain);
+            return permissions;
         } catch (RolePermissionException e) {
+            String currentTenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            LOG.warn("Error occurred while retrieving permissions for tenant: " + currentTenantDomain);
             throw handleException(e);
         }
     }
@@ -69,6 +76,9 @@ public class PermissionManagementService {
      */
     private Permission[] getPermissionObjects(org.wso2.carbon.user.mgt.common.model.Permission[] permissions) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Converting " + permissions.length + " permission objects");
+        }
         Permission[] outputPermissions = new Permission[permissions.length];
         for (int i = 0; i < permissions.length; i++) {
             Permission permission = new Permission();

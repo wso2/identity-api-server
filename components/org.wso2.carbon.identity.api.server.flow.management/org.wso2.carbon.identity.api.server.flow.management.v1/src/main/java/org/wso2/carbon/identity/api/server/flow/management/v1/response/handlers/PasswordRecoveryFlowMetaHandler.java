@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.flow.management.v1.BaseConnectorConfigs;
 import org.wso2.carbon.identity.api.server.flow.management.v1.PasswordRecoveryConnectorConfigs;
@@ -40,6 +42,8 @@ import static org.wso2.carbon.identity.recovery.IdentityRecoveryConstants.Connec
  */
 public class PasswordRecoveryFlowMetaHandler extends AbstractMetaResponseHandler {
 
+    private static final Log LOG = LogFactory.getLog(PasswordRecoveryFlowMetaHandler.class);
+
     @Override
     public String getFlowType() {
 
@@ -55,18 +59,23 @@ public class PasswordRecoveryFlowMetaHandler extends AbstractMetaResponseHandler
     @Override
     public PasswordRecoveryConnectorConfigs getConnectorConfigs() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving connector configs for password recovery flow.");
+        }
         Utils utils = new Utils();
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         PasswordRecoveryConnectorConfigs connectorConfigs = new PasswordRecoveryConnectorConfigs();
         BaseConnectorConfigs baseConfigs = super.getConnectorConfigs();
         connectorConfigs.setMultiAttributeLoginEnabled(baseConfigs.getMultiAttributeLoginEnabled());
-        connectorConfigs.setPasswordRecoveryEnabled(
-                utils.isFlowConfigEnabled(tenantDomain,
-                        PASSWORD_RECOVERY_EMAIL_LINK_ENABLE) ||
-                utils.isFlowConfigEnabled(tenantDomain,
-                        PASSWORD_RECOVERY_SMS_OTP_ENABLE) ||
-                utils.isFlowConfigEnabled(tenantDomain,
-                        PASSWORD_RECOVERY_SEND_OTP_IN_EMAIL));
+        boolean passwordRecoveryEnabled = utils.isFlowConfigEnabled(tenantDomain,
+                PASSWORD_RECOVERY_EMAIL_LINK_ENABLE) ||
+                utils.isFlowConfigEnabled(tenantDomain, PASSWORD_RECOVERY_SMS_OTP_ENABLE) ||
+                utils.isFlowConfigEnabled(tenantDomain, PASSWORD_RECOVERY_SEND_OTP_IN_EMAIL);
+        connectorConfigs.setPasswordRecoveryEnabled(passwordRecoveryEnabled);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieved connector configs for password recovery flow in tenant: " + tenantDomain +
+                    " with passwordRecovery: " + passwordRecoveryEnabled);
+        }
         return connectorConfigs;
     }
 

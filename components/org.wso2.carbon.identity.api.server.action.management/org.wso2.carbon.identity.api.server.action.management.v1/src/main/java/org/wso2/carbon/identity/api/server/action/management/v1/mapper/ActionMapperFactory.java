@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.action.management.v1.mapper;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.action.management.api.exception.ActionMgtServerException;
 import org.wso2.carbon.identity.action.management.api.model.Action;
 
@@ -25,6 +27,8 @@ import org.wso2.carbon.identity.action.management.api.model.Action;
  * Factory class to get the ActionMapper based on the action type.
  */
 public class ActionMapperFactory {
+
+    private static final Log LOG = LogFactory.getLog(ActionMapperFactory.class);
 
     /**
      * Get ActionMapper object based on the action type.
@@ -34,6 +38,9 @@ public class ActionMapperFactory {
      */
     public static ActionMapper getActionMapper(Action.ActionTypes actionType) throws ActionMgtServerException {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Getting action mapper for type: " + (actionType != null ? actionType : "null"));
+        }
         ActionMapper actionMapper = null;
         switch (actionType) {
             case PRE_ISSUE_ACCESS_TOKEN:
@@ -46,14 +53,22 @@ public class ActionMapperFactory {
                 actionMapper = new PreUpdateProfileActionMapper();
                 break;
             default:
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("No mapper available for action type: " + actionType);
+                }
                 break;
         }
 
         if (actionMapper == null) {
+            LOG.error("No Action Mapper found for the given action type: " + 
+                    (actionType != null ? actionType.getDisplayName() : "null"));
             throw new ActionMgtServerException("No Action Mapper found for the given action type: " +
-                    actionType.getDisplayName());
+                    (actionType != null ? actionType.getDisplayName() : "null"));
         }
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Action mapper retrieved successfully for type: " + actionType);
+        }
         return actionMapper;
     }
 }

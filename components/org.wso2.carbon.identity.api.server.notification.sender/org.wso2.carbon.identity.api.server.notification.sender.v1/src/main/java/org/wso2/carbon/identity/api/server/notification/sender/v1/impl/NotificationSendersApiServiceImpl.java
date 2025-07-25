@@ -19,6 +19,8 @@
 package org.wso2.carbon.identity.api.server.notification.sender.v1.impl;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.MultitenantConstants;
 
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
@@ -46,18 +48,25 @@ import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenantDomainFromContext;
-import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.EMAIL_PUBLISHER_TYPE;
-import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.NOTIFICATION_SENDER_CONTEXT_PATH;
-import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.PLUS;
-import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.PUSH_PUBLISHER_TYPE;
-import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SMS_PUBLISHER_TYPE;
-import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.URL_ENCODED_SPACE;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.
+        NotificationSenderManagementConstants.EMAIL_PUBLISHER_TYPE;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.
+        NotificationSenderManagementConstants.NOTIFICATION_SENDER_CONTEXT_PATH;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.
+        NotificationSenderManagementConstants.PLUS;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.
+        NotificationSenderManagementConstants.PUSH_PUBLISHER_TYPE;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.
+        NotificationSenderManagementConstants.SMS_PUBLISHER_TYPE;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.
+        NotificationSenderManagementConstants.URL_ENCODED_SPACE;
 
 /**
  * Implementation of notification senders REST API.
  */
 public class NotificationSendersApiServiceImpl implements NotificationSendersApiService {
 
+    private static final Log log = LogFactory.getLog(NotificationSendersApiServiceImpl.class);
     private final NotificationSenderManagementService notificationSenderManagementService;
 
     public NotificationSendersApiServiceImpl() {
@@ -65,7 +74,11 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
         try {
             this.notificationSenderManagementService = NotificationSenderManagementServiceFactory
                     .getNotificationSenderManagementService();
+            if (log.isDebugEnabled()) {
+                log.debug("NotificationSendersApiServiceImpl initialized successfully");
+            }
         } catch (IllegalStateException e) {
+            log.error("Error occurred while initiating notification sender service", e);
             throw new RuntimeException("Error occurred while initiating notification sender service.", e);
         }
     }
@@ -73,7 +86,11 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     @Override
     public Response createEmailSender(EmailSenderAdd emailSenderAdd) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Creating email sender via API for tenant: " + getTenantDomainFromContext());
+        }
         if (StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+            log.warn("Email sender creation not allowed for super tenant");
             return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
         }
         EmailSender emailSender = notificationSenderManagementService.addEmailSender(emailSenderAdd);
@@ -94,6 +111,9 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     @Override
     public Response createPushSender(PushSenderAdd pushSenderAdd) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Creating push sender via API for tenant: " + getTenantDomainFromContext());
+        }
         PushSender pushSender = notificationSenderManagementService.addPushSender(pushSenderAdd);
         URI location = null;
         try {
@@ -112,6 +132,9 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     @Override
     public Response createSMSSender(SMSSenderAdd smSSenderAdd) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Creating SMS sender via API for tenant: " + getTenantDomainFromContext());
+        }
         SMSSender smsSender = notificationSenderManagementService.addSMSSender(smSSenderAdd);
         URI location = null;
         try {
@@ -130,7 +153,11 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     @Override
     public Response deleteEmailSender(String senderName) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting email sender: " + senderName + " for tenant: " + getTenantDomainFromContext());
+        }
         if (StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+            log.warn("Email sender deletion not allowed for super tenant");
             return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
         }
         notificationSenderManagementService.deleteNotificationSender(senderName);
@@ -140,6 +167,9 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     @Override
     public Response deletePushSender(String senderName) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting push sender: " + senderName + " for tenant: " + getTenantDomainFromContext());
+        }
         notificationSenderManagementService.deleteNotificationSender(senderName);
         return Response.noContent().build();
     }
@@ -147,6 +177,9 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     @Override
     public Response deleteSMSSender(String senderName) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting SMS sender: " + senderName + " for tenant: " + getTenantDomainFromContext());
+        }
         notificationSenderManagementService.deleteNotificationSender(senderName);
         return Response.noContent().build();
     }
@@ -154,7 +187,11 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     @Override
     public Response getEmailSender(String senderName) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Getting email sender: " + senderName + " for tenant: " + getTenantDomainFromContext());
+        }
         if (StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+            log.warn("Email sender retrieval not allowed for super tenant");
             return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
         }
         return Response.ok().entity(notificationSenderManagementService.getEmailSender(senderName)).build();
@@ -163,7 +200,11 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     @Override
     public Response getEmailSenders() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Getting all email senders for tenant: " + getTenantDomainFromContext());
+        }
         if (StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+            log.warn("Email senders retrieval not allowed for super tenant");
             return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
         }
         return Response.ok().entity(notificationSenderManagementService.getEmailSenders()).build();
@@ -172,31 +213,47 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     @Override
     public Response getPushSender(String senderName) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Getting push sender: " + senderName + " for tenant: " + getTenantDomainFromContext());
+        }
         return Response.ok().entity(notificationSenderManagementService.getPushSender(senderName)).build();
     }
 
     @Override
     public Response getPushSenders() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Getting all push senders for tenant: " + getTenantDomainFromContext());
+        }
         return Response.ok().entity(notificationSenderManagementService.getPushSenders()).build();
     }
 
     @Override
     public Response getSMSSender(String senderName) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Getting SMS sender: " + senderName + " for tenant: " + getTenantDomainFromContext());
+        }
         return Response.ok().entity(notificationSenderManagementService.getSMSSender(senderName)).build();
     }
 
     @Override
     public Response getSMSSenders() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Getting all SMS senders for tenant: " + getTenantDomainFromContext());
+        }
         return Response.ok().entity(notificationSenderManagementService.getSMSSenders()).build();
     }
 
     @Override
     public Response updateEmailSender(String senderName, EmailSenderUpdateRequest emailSenderUpdateRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating email sender: " + senderName + " for tenant: " + getTenantDomainFromContext());
+        }
         if (StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+            log.warn("Email sender update not allowed for super tenant");
             return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
         }
         return Response.ok()
@@ -207,6 +264,9 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     @Override
     public Response updatePushSender(String senderName, PushSenderUpdateRequest pushSenderUpdateRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating push sender: " + senderName + " for tenant: " + getTenantDomainFromContext());
+        }
         return Response.ok()
                 .entity(notificationSenderManagementService.updatePushSender(senderName, pushSenderUpdateRequest))
                 .build();
@@ -215,6 +275,9 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     @Override
     public Response updateSMSSender(String senderName, SMSSenderUpdateRequest smSSenderUpdateRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating SMS sender: " + senderName + " for tenant: " + getTenantDomainFromContext());
+        }
         return Response.ok()
                 .entity(notificationSenderManagementService.updateSMSSender(senderName, smSSenderUpdateRequest))
                 .build();

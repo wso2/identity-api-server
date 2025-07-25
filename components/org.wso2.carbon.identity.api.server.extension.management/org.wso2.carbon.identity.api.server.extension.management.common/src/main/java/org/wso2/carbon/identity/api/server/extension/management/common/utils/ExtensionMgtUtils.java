@@ -19,6 +19,8 @@
 package org.wso2.carbon.identity.api.server.extension.management.common.utils;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
@@ -34,6 +36,8 @@ import static org.wso2.carbon.identity.api.server.extension.management.common.ut
  */
 public class ExtensionMgtUtils {
 
+    private static final Log log = LogFactory.getLog(ExtensionMgtUtils.class);
+
     /**
      * Get the path of the extension type.
      *
@@ -42,6 +46,10 @@ public class ExtensionMgtUtils {
      */
     public static String getExtensionInfoLocation(String extensionType, String extensionId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Building extension info location for extensionType: " + extensionType + 
+                    ", extensionId: " + extensionId);
+        }
         return ContextLoader.buildURIForBody(
                 Constants.V1_API_PATH_COMPONENT + EXTENSION_MGT_PATH_COMPONENT + '/' +
                         extensionType + "/" + extensionId).toString();
@@ -58,6 +66,10 @@ public class ExtensionMgtUtils {
     public static APIError handleClientException(Response.Status status, ExtensionMgtConstants.ErrorMessage error,
                                                   String... data) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Handling client exception with error code: " + error.getCode() + 
+                    ", status: " + status);
+        }
         return new APIError(status, getErrorBuilder(error, data).build());
     }
 
@@ -72,6 +84,7 @@ public class ExtensionMgtUtils {
     public static APIError handleServerException(Response.Status status, ExtensionMgtConstants.ErrorMessage error,
                                                   String... data) {
 
+        log.error("Server exception occurred with error code: " + error.getCode() + ", status: " + status);
         return new APIError(status, getErrorBuilder(error, data).build());
     }
 
@@ -100,10 +113,17 @@ public class ExtensionMgtUtils {
      */
     public static void validateExtensionType(String extensionType) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Validating extension type: " + extensionType);
+        }
         if (!ArrayUtils.contains(ExtensionManagementServiceHolder.getExtensionManager()
                 .getExtensionTypes(), extensionType)) {
+            log.warn("Invalid extension type provided: " + extensionType);
             throw handleClientException(Response.Status.BAD_REQUEST, ExtensionMgtConstants.ErrorMessage
                     .ERROR_CODE_INVALID_EXTENSION_TYPE, extensionType);
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Extension type validation successful for: " + extensionType);
         }
     }
 }

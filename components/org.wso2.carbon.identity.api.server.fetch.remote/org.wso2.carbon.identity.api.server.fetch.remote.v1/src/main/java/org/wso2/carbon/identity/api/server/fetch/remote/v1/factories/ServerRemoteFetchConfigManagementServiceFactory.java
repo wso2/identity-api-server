@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.fetch.remote.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.fetch.remote.common.RemoteFetchServiceHolder;
 import org.wso2.carbon.identity.api.server.fetch.remote.v1.core.ServerRemoteFetchConfigManagementService;
 import org.wso2.carbon.identity.remotefetch.common.RemoteFetchConfigurationService;
@@ -27,17 +29,21 @@ import org.wso2.carbon.identity.remotefetch.common.RemoteFetchConfigurationServi
  */
 public class ServerRemoteFetchConfigManagementServiceFactory {
 
+    private static final Log log = LogFactory.getLog(ServerRemoteFetchConfigManagementServiceFactory.class);
     private static final ServerRemoteFetchConfigManagementService SERVICE;
 
     static {
+        log.debug("Initializing ServerRemoteFetchConfigManagementService");
         RemoteFetchConfigurationService remoteFetchConfigurationService = RemoteFetchServiceHolder
                 .getRemoteFetchConfigurationService();
 
         if (remoteFetchConfigurationService == null) {
+            log.error("RemoteFetchConfigurationService is not available from OSGi context");
             throw new IllegalStateException("RemoteFetchConfigurationService is not available from OSGi context.");
         }
 
         SERVICE = new ServerRemoteFetchConfigManagementService(remoteFetchConfigurationService);
+        log.info("ServerRemoteFetchConfigManagementService initialized successfully");
     }
 
     /**

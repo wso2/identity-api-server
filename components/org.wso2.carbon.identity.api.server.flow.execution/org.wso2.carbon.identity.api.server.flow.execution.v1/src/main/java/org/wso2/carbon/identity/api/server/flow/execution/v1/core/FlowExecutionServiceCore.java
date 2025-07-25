@@ -21,6 +21,8 @@ package org.wso2.carbon.identity.api.server.flow.execution.v1.core;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.FlowExecutionRequest;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.FlowExecutionResponse;
@@ -38,6 +40,7 @@ import java.util.Optional;
  */
 public class FlowExecutionServiceCore {
 
+    private static final Log LOG = LogFactory.getLog(FlowExecutionServiceCore.class);
     private final FlowExecutionService flowExecutionService;
 
     public FlowExecutionServiceCore(FlowExecutionService flowExecutionService) {
@@ -54,6 +57,10 @@ public class FlowExecutionServiceCore {
     public FlowExecutionResponse processFlowExecution(FlowExecutionRequest flowExecutionRequest) {
 
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Processing flow execution for tenant: " + tenantDomain + ", flowType: " + 
+                     (flowExecutionRequest != null ? flowExecutionRequest.getFlowType() : "null"));
+        }
         try {
             if (StringUtils.isBlank(flowExecutionRequest.getFlowId())) {
                 Utils.validateFlowInitiation(flowExecutionRequest);
@@ -69,9 +76,16 @@ public class FlowExecutionServiceCore {
             FlowExecutionResponse flowExecutionResponse = new FlowExecutionResponse();
 
             if (flowExecutionStep == null) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Flow execution returned null step for tenant: " + tenantDomain);
+                }
                 return flowExecutionResponse;
             }
 
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Flow execution completed successfully for tenant: " + tenantDomain + 
+                         ", flowId: " + flowExecutionStep.getFlowId());
+            }
             return flowExecutionResponse
                     .flowId(flowExecutionStep.getFlowId())
                     .flowStatus(flowExecutionStep.getFlowStatus())

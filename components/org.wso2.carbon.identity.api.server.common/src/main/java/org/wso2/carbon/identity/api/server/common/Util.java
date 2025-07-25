@@ -17,6 +17,8 @@
 package org.wso2.carbon.identity.api.server.common;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.slf4j.MDC;
 
 import java.nio.charset.StandardCharsets;
@@ -30,6 +32,7 @@ import java.util.UUID;
  */
 public class Util {
 
+    private static final Log LOG = LogFactory.getLog(Util.class);
     private static final String PAGE_LINK_REL_NEXT = "next";
     private static final String PAGE_LINK_REL_PREVIOUS = "previous";
     private static final String PAGINATION_LINK_FORMAT = Constants.V1_API_PATH_COMPONENT
@@ -46,7 +49,9 @@ public class Util {
             ref = MDC.get(Constants.CORRELATION_ID_MDC);
         } else {
             ref = UUID.randomUUID().toString();
-
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Generated new correlation ID: " + ref);
+            }
         }
         return ref;
     }
@@ -68,9 +73,17 @@ public class Util {
      */
     public static String base64URLEncode(String value) {
 
-        return Base64.getUrlEncoder()
+        if (value == null) {
+            LOG.warn("Attempting to encode null value for base64URL encoding");
+            return null;
+        }
+        String encoded = Base64.getUrlEncoder()
                 .withoutPadding()
                 .encodeToString(value.getBytes(StandardCharsets.UTF_8));
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Base64 URL encoded value of length: " + value.length());
+        }
+        return encoded;
     }
 
     /**
@@ -81,9 +94,22 @@ public class Util {
      */
     public static String base64URLDecode(String value) {
 
-        return new String(
-                Base64.getUrlDecoder().decode(value),
-                StandardCharsets.UTF_8);
+        if (value == null) {
+            LOG.warn("Attempting to decode null value for base64URL decoding");
+            return null;
+        }
+        try {
+            String decoded = new String(
+                    Base64.getUrlDecoder().decode(value),
+                    StandardCharsets.UTF_8);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Base64 URL decoded value of length: " + decoded.length());
+            }
+            return decoded;
+        } catch (IllegalArgumentException e) {
+            LOG.error("Failed to decode base64 URL value", e);
+            throw e;
+        }
     }
 
     /**
@@ -203,14 +229,29 @@ public class Util {
      */
     public static String getMediaType(String fileType) {
 
-        if (containsValidMediaType(fileType, Constants.VALID_MEDIA_TYPES_XML)) {
-            return Constants.MEDIA_TYPE_XML;
-        } else if (containsValidMediaType(fileType, Constants.VALID_MEDIA_TYPES_JSON)) {
-            return Constants.MEDIA_TYPE_JSON;
-        } else if (containsValidMediaType(fileType, Constants.VALID_MEDIA_TYPES_YAML)) {
-            return Constants.MEDIA_TYPE_YAML;
+        if (fileType == null) {
+            LOG.warn("File type is null when resolving media type");
+            return Constants.MEDIA_TYPE_UNSUPPORTED;
         }
-        return Constants.MEDIA_TYPE_UNSUPPORTED;
+
+        String mediaType;
+        if (containsValidMediaType(fileType, Constants.VALID_MEDIA_TYPES_XML)) {
+            mediaType = Constants.MEDIA_TYPE_XML;
+        } else if (containsValidMediaType(fileType, Constants.VALID_MEDIA_TYPES_JSON)) {
+            mediaType = Constants.MEDIA_TYPE_JSON;
+        } else if (containsValidMediaType(fileType, Constants.VALID_MEDIA_TYPES_YAML)) {
+            mediaType = Constants.MEDIA_TYPE_YAML;
+        } else {
+            mediaType = Constants.MEDIA_TYPE_UNSUPPORTED;
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Unsupported media type for file type: " + fileType);
+            }
+        }
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Resolved media type: " + mediaType + " for file type: " + fileType);
+        }
+        return mediaType;
     }
 
     private static boolean containsValidMediaType(String fileType, String[] supportedMediaTypes) {

@@ -39,20 +39,42 @@ import org.wso2.carbon.user.core.service.RealmService;
  */
 public class ApplicationManagementServiceHolder {
 
+    private static final Log log = LogFactory.getLog(ApplicationManagementServiceHolder.class);
+
     private ApplicationManagementServiceHolder() {
 
     }
 
     private static class ApplicationServiceHolder {
 
-        static final ApplicationManagementService SERVICE = (ApplicationManagementService) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext().getOSGiService(ApplicationManagementService.class, null);
+        private static final Log log = LogFactory.getLog(ApplicationServiceHolder.class);
+        static final ApplicationManagementService SERVICE = initializeService();
+
+        private static ApplicationManagementService initializeService() {
+
+            ApplicationManagementService service = (ApplicationManagementService) PrivilegedCarbonContext
+                    .getThreadLocalCarbonContext().getOSGiService(ApplicationManagementService.class, null);
+            if (service == null) {
+                log.warn("ApplicationManagementService is not available in the OSGi context.");
+            }
+            return service;
+        }
     }
 
     private static class OAuthAdminServiceImplHolder {
 
-        static final OAuthAdminServiceImpl SERVICE = (OAuthAdminServiceImpl) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext().getOSGiService(OAuthAdminServiceImpl.class, null);
+        private static final Log log = LogFactory.getLog(OAuthAdminServiceImplHolder.class);
+        static final OAuthAdminServiceImpl SERVICE = initializeService();
+
+        private static OAuthAdminServiceImpl initializeService() {
+
+            OAuthAdminServiceImpl service = (OAuthAdminServiceImpl) PrivilegedCarbonContext
+                    .getThreadLocalCarbonContext().getOSGiService(OAuthAdminServiceImpl.class, null);
+            if (service == null) {
+                log.warn("OAuthAdminServiceImpl is not available in the OSGi context.");
+            }
+            return service;
+        }
     }
 
     private static class STSAdminServiceInterfaceHolder {
@@ -68,13 +90,15 @@ public class ApplicationManagementServiceHolder {
         private static STSAdminServiceInterface initializeService() {
 
             try {
-
-                return (STSAdminServiceInterface) PrivilegedCarbonContext
+                STSAdminServiceInterface service = (STSAdminServiceInterface) PrivilegedCarbonContext
                         .getThreadLocalCarbonContext().getOSGiService(STSAdminServiceInterface.class, null);
+                if (service == null) {
+                    log.warn("STSAdminServiceInterface is not available in the OSGi context.");
+                }
+                return service;
             } catch (NullPointerException e) {
-                // Catch NullPointerException if the context or the service isn't properly set.
                 log.debug("NullPointerException occurred while retrieving STSAdminServiceInterface. " +
-                        "Context or service might not be available.");
+                        "Context or service might not be available.", e);
                 return null;
             }
         }
@@ -82,57 +106,146 @@ public class ApplicationManagementServiceHolder {
 
     private static class SAMLSSOConfigServiceImplHolder {
 
-        static final SAMLSSOConfigServiceImpl SERVICE = (SAMLSSOConfigServiceImpl) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext().getOSGiService(SAMLSSOConfigServiceImpl.class, null);
+        private static final Log log = LogFactory.getLog(SAMLSSOConfigServiceImplHolder.class);
+        static final SAMLSSOConfigServiceImpl SERVICE = initializeService();
+
+        private static SAMLSSOConfigServiceImpl initializeService() {
+
+            SAMLSSOConfigServiceImpl service = (SAMLSSOConfigServiceImpl) PrivilegedCarbonContext
+                    .getThreadLocalCarbonContext().getOSGiService(SAMLSSOConfigServiceImpl.class, null);
+            if (service == null) {
+                log.warn("SAMLSSOConfigServiceImpl is not available in the OSGi context.");
+            }
+            return service;
+        }
     }
 
     private static class LoginFlowAIManagerServiceHolder {
 
-        static final LoginFlowAIManager SERVICE =
-                (LoginFlowAIManager) PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                        .getOSGiService(LoginFlowAIManager.class, null);
+        private static final Log log = LogFactory.getLog(LoginFlowAIManagerServiceHolder.class);
+        static final LoginFlowAIManager SERVICE = initializeService();
+
+        private static LoginFlowAIManager initializeService() {
+
+            LoginFlowAIManager service = (LoginFlowAIManager) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                    .getOSGiService(LoginFlowAIManager.class, null);
+            if (service == null) {
+                log.warn("LoginFlowAIManager is not available in the OSGi context.");
+            }
+            return service;
+        }
     }
 
     private static class OAuthServerConfigurationHolder {
 
-        static final OAuthServerConfiguration SERVICE = (OAuthServerConfiguration) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext().getOSGiService(OAuthServerConfiguration.class, null);
+        private static final Log log = LogFactory.getLog(OAuthServerConfigurationHolder.class);
+        static final OAuthServerConfiguration SERVICE = initializeService();
+
+        private static OAuthServerConfiguration initializeService() {
+
+            OAuthServerConfiguration service = (OAuthServerConfiguration) PrivilegedCarbonContext
+                    .getThreadLocalCarbonContext().getOSGiService(OAuthServerConfiguration.class, null);
+            if (service == null) {
+                log.warn("OAuthServerConfiguration is not available in the OSGi context.");
+            }
+            return service;
+        }
     }
 
     private static class TemplateManagerHolder {
 
-        static final TemplateManager SERVICE = (TemplateManager) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext().getOSGiService(TemplateManager.class, null);
+        private static final Log log = LogFactory.getLog(TemplateManagerHolder.class);
+        static final TemplateManager SERVICE = initializeService();
+
+        private static TemplateManager initializeService() {
+
+            TemplateManager service = (TemplateManager) PrivilegedCarbonContext
+                    .getThreadLocalCarbonContext().getOSGiService(TemplateManager.class, null);
+            if (service == null) {
+                log.warn("TemplateManager is not available in the OSGi context.");
+            }
+            return service;
+        }
     }
 
     private static class CORSManagementServiceHolder {
 
-        static final CORSManagementService SERVICE = (CORSManagementService) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext().getOSGiService(CORSManagementService.class, null);
+        private static final Log log = LogFactory.getLog(CORSManagementServiceHolder.class);
+        static final CORSManagementService SERVICE = initializeService();
+
+        private static CORSManagementService initializeService() {
+
+            CORSManagementService service = (CORSManagementService) PrivilegedCarbonContext
+                    .getThreadLocalCarbonContext().getOSGiService(CORSManagementService.class, null);
+            if (service == null) {
+                log.warn("CORSManagementService is not available in the OSGi context.");
+            }
+            return service;
+        }
     }
 
     private static class RealmServiceHolder {
 
-        static final RealmService SERVICE = (RealmService) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+        private static final Log log = LogFactory.getLog(RealmServiceHolder.class);
+        static final RealmService SERVICE = initializeService();
+
+        private static RealmService initializeService() {
+
+            RealmService service = (RealmService) PrivilegedCarbonContext
+                    .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+            if (service == null) {
+                log.warn("RealmService is not available in the OSGi context.");
+            }
+            return service;
+        }
     }
 
     private static class APIResourceManagerHolder {
 
-        static final APIResourceManager SERVICE = (APIResourceManager) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext().getOSGiService(APIResourceManager.class, null);
+        private static final Log log = LogFactory.getLog(APIResourceManagerHolder.class);
+        static final APIResourceManager SERVICE = initializeService();
+
+        private static APIResourceManager initializeService() {
+
+            APIResourceManager service = (APIResourceManager) PrivilegedCarbonContext
+                    .getThreadLocalCarbonContext().getOSGiService(APIResourceManager.class, null);
+            if (service == null) {
+                log.warn("APIResourceManager is not available in the OSGi context.");
+            }
+            return service;
+        }
     }
 
     private static class AuthorizedAPIManagementServiceHolder {
 
-        static final AuthorizedAPIManagementService SERVICE = (AuthorizedAPIManagementService) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext().getOSGiService(AuthorizedAPIManagementService.class, null);
+        private static final Log log = LogFactory.getLog(AuthorizedAPIManagementServiceHolder.class);
+        static final AuthorizedAPIManagementService SERVICE = initializeService();
+
+        private static AuthorizedAPIManagementService initializeService() {
+
+            AuthorizedAPIManagementService service = (AuthorizedAPIManagementService) PrivilegedCarbonContext
+                    .getThreadLocalCarbonContext().getOSGiService(AuthorizedAPIManagementService.class, null);
+            if (service == null) {
+                log.warn("AuthorizedAPIManagementService is not available in the OSGi context.");
+            }
+            return service;
+        }
     }
 
     private static class OrgApplicationManagerHolder {
 
-        static final OrgApplicationManager SERVICE = (OrgApplicationManager) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext().getOSGiService(OrgApplicationManager.class, null);
+        private static final Log log = LogFactory.getLog(OrgApplicationManagerHolder.class);
+        static final OrgApplicationManager SERVICE = initializeService();
+
+        private static OrgApplicationManager initializeService() {
+
+            OrgApplicationManager service = (OrgApplicationManager) PrivilegedCarbonContext
+                    .getThreadLocalCarbonContext().getOSGiService(OrgApplicationManager.class, null);
+            if (service == null) {
+                log.warn("OrgApplicationManager is not available in the OSGi context.");
+            }
+            return service;
+        }
     }
 
     /**
@@ -142,6 +255,9 @@ public class ApplicationManagementServiceHolder {
      */
     public static ApplicationManagementService getApplicationManagementService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving ApplicationManagementService from OSGi context.");
+        }
         return ApplicationServiceHolder.SERVICE;
     }
 
@@ -152,6 +268,9 @@ public class ApplicationManagementServiceHolder {
      */
     public static OAuthAdminServiceImpl getOAuthAdminService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving OAuthAdminServiceImpl from OSGi context.");
+        }
         return OAuthAdminServiceImplHolder.SERVICE;
     }
 
@@ -162,6 +281,9 @@ public class ApplicationManagementServiceHolder {
      */
     public static STSAdminServiceInterface getStsAdminService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving STSAdminServiceInterface from OSGi context.");
+        }
         return STSAdminServiceInterfaceHolder.SERVICE;
     }
 
@@ -172,6 +294,9 @@ public class ApplicationManagementServiceHolder {
      */
     public static SAMLSSOConfigServiceImpl getSamlssoConfigService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving SAMLSSOConfigServiceImpl from OSGi context.");
+        }
         return SAMLSSOConfigServiceImplHolder.SERVICE;
     }
 
@@ -182,6 +307,9 @@ public class ApplicationManagementServiceHolder {
      */
     public static OAuthServerConfiguration getoAuthServerConfiguration() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving OAuthServerConfiguration from OSGi context.");
+        }
         return OAuthServerConfigurationHolder.SERVICE;
     }
 
@@ -192,6 +320,9 @@ public class ApplicationManagementServiceHolder {
      */
     public static TemplateManager getTemplateManager() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving TemplateManager from OSGi context.");
+        }
         return TemplateManagerHolder.SERVICE;
     }
 
@@ -202,6 +333,9 @@ public class ApplicationManagementServiceHolder {
      */
     public static CORSManagementService getCorsManagementService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving CORSManagementService from OSGi context.");
+        }
         return CORSManagementServiceHolder.SERVICE;
     }
 
@@ -212,6 +346,9 @@ public class ApplicationManagementServiceHolder {
      */
     public static RealmService getRealmService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving RealmService from OSGi context.");
+        }
         return RealmServiceHolder.SERVICE;
     }
 
@@ -222,6 +359,9 @@ public class ApplicationManagementServiceHolder {
      */
     public static APIResourceManager getApiResourceManager() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving APIResourceManager from OSGi context.");
+        }
         return APIResourceManagerHolder.SERVICE;
     }
 
@@ -232,6 +372,9 @@ public class ApplicationManagementServiceHolder {
      */
     public static AuthorizedAPIManagementService getAuthorizedAPIManagementService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving AuthorizedAPIManagementService from OSGi context.");
+        }
         return AuthorizedAPIManagementServiceHolder.SERVICE;
     }
 
@@ -242,6 +385,9 @@ public class ApplicationManagementServiceHolder {
      */
     public static OrgApplicationManager getOrgApplicationManager() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving OrgApplicationManager from OSGi context.");
+        }
         return OrgApplicationManagerHolder.SERVICE;
     }
 
@@ -251,6 +397,9 @@ public class ApplicationManagementServiceHolder {
      */
     public static LoginFlowAIManager getLoginFlowAIManagementService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving LoginFlowAIManager from OSGi context.");
+        }
         return LoginFlowAIManagerServiceHolder.SERVICE;
     }
 }

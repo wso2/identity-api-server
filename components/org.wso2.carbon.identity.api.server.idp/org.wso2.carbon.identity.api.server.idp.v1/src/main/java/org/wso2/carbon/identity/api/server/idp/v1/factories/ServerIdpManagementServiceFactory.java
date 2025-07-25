@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.idp.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.idp.common.IdentityProviderServiceHolder;
 import org.wso2.carbon.identity.api.server.idp.v1.core.ServerIdpManagementService;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
@@ -29,6 +31,7 @@ import org.wso2.carbon.idp.mgt.IdentityProviderManager;
  */
 public class ServerIdpManagementServiceFactory {
 
+    private static final Log log = LogFactory.getLog(ServerIdpManagementServiceFactory.class);
     private static final ServerIdpManagementService SERVICE;
 
     static {
@@ -38,19 +41,26 @@ public class ServerIdpManagementServiceFactory {
         TemplateManager templateManager = IdentityProviderServiceHolder.getTemplateManager();
 
         if (identityProviderManager == null) {
+            log.error("IdentityProviderManager is not available from OSGi context.");
             throw new IllegalStateException("IdentityProviderManager is not available from OSGi context.");
         }
 
         if (claimMetadataManagementService == null) {
+            log.error("ClaimMetadataManagementService is not available from OSGi context.");
             throw new IllegalStateException("ClaimMetadataManagementService is not available from OSGi context.");
         }
 
         if (templateManager == null) {
+            log.error("TemplateManager is not available from OSGi context.");
             throw new IllegalStateException("TemplateManager is not available from OSGi context.");
         }
 
+        if (log.isDebugEnabled()) {
+            log.debug("Initializing ServerIdpManagementService with required OSGi services.");
+        }
         SERVICE = new ServerIdpManagementService(identityProviderManager, templateManager,
                 claimMetadataManagementService);
+        log.info("ServerIdpManagementService initialized successfully.");
     }
 
     /**

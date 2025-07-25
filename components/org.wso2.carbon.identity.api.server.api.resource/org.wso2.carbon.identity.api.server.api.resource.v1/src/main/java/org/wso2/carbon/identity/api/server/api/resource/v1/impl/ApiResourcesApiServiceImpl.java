@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.api.resource.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCreationModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourcePatchModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceResponse;
@@ -45,6 +47,7 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
  */
 public class ApiResourcesApiServiceImpl implements ApiResourcesApiService {
 
+    private static final Log LOG = LogFactory.getLog(ApiResourcesApiServiceImpl.class);
     private final ServerAPIResourceManagementService serverAPIResourceManagementService;
     private final AuthorizationDetailsTypeManagementService typeMgtService;
 
@@ -56,6 +59,7 @@ public class ApiResourcesApiServiceImpl implements ApiResourcesApiService {
             this.typeMgtService = AuthorizationDetailsTypeManagementServiceFactory
                     .getAuthorizationDetailsTypeManagementService();
         } catch (IllegalStateException e) {
+            LOG.error("Failed to initialize API resource management services", e);
             throw new RuntimeException("Error occurred while initiating API resource management service.", e);
         }
     }
@@ -63,6 +67,10 @@ public class ApiResourcesApiServiceImpl implements ApiResourcesApiService {
     @Override
     public Response addAPIResource(APIResourceCreationModel apIResourceCreationModel) {
 
+        if (LOG.isDebugEnabled()) {
+            String identifier = apIResourceCreationModel != null ? apIResourceCreationModel.getIdentifier() : "null";
+            LOG.debug("Creating API resource with identifier: " + identifier);
+        }
         APIResourceResponse apiResourceResponse =
                 serverAPIResourceManagementService.addAPIResourceWithResourceId(apIResourceCreationModel);
         URI location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT +
@@ -82,6 +90,9 @@ public class ApiResourcesApiServiceImpl implements ApiResourcesApiService {
     @Override
     public Response apiResourcesApiResourceIdDelete(String apiResourceId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deleting API resource with ID: " + apiResourceId);
+        }
         serverAPIResourceManagementService.deleteAPIResource(apiResourceId);
         return Response.noContent().build();
     }

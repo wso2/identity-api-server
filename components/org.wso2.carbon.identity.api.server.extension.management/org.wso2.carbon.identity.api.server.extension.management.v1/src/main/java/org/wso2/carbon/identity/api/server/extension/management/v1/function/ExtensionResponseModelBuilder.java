@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.extension.management.v1.function;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.extension.management.v1.model.ExtensionResponseModel;
 import org.wso2.carbon.identity.extension.mgt.model.ExtensionInfo;
 
@@ -28,9 +30,15 @@ import java.util.function.Function;
  */
 public class ExtensionResponseModelBuilder implements Function<ExtensionInfo, ExtensionResponseModel> {
 
+    private static final Log log = LogFactory.getLog(ExtensionResponseModelBuilder.class);
+
     @Override
     public ExtensionResponseModel apply(ExtensionInfo extensionInfo) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Building ExtensionResponseModel for extension: " + (extensionInfo != null ? 
+                    extensionInfo.getId() : "null"));
+        }
         ExtensionResponseModel responseModel = new ExtensionResponseModel();
         responseModel.setId(extensionInfo.getId());
         responseModel.setVersion(extensionInfo.getVersion());

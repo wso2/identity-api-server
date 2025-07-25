@@ -79,6 +79,10 @@ public class ApplicationEmailTemplatesService {
                                                 boolean resolve, Integer limit, Integer offset,
                                                 String sortOrder, String sortBy) {
 
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Retrieving email template. TemplateTypeId: %s, TemplateId: %s, AppUuid: %s",
+                    templateTypeId, templateId, applicationUuid));
+        }
         handleNotSupportedParameters(limit, offset, sortOrder, sortBy);
 
         try {
@@ -91,6 +95,9 @@ public class ApplicationEmailTemplatesService {
             if (!internalEmailTemplate.getLocale().equals(templateId)) {
                 throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_NOT_FOUND);
             } else {
+                if (log.isDebugEnabled()) {
+                    log.debug(String.format("Successfully retrieved email template for locale: %s", templateId));
+                }
                 return buildEmailTemplateWithID(internalEmailTemplate);
             }
         } catch (I18nEmailMgtException e) {
@@ -116,12 +123,20 @@ public class ApplicationEmailTemplatesService {
                                                                          Integer limit, Integer offset,
                                                                          String sortOrder, String sortBy) {
 
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Retrieving templates list for type: %s, AppUuid: %s", templateTypeId,
+                    applicationUuid));
+        }
         handleNotSupportedParameters(limit, offset, sortOrder, sortBy);
 
         String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
         try {
             List<EmailTemplate> internalEmailTemplates = emailTemplateManager.getEmailTemplateType(
                     templateTypeDisplayName, getTenantDomainFromContext(), applicationUuid, resolve);
+            if (log.isDebugEnabled()) {
+                log.debug(String.format("Found %d templates for type: %s", internalEmailTemplates.size(),
+                        templateTypeDisplayName));
+            }
             return buildSimpleEmailTemplatesList(internalEmailTemplates, templateTypeId, applicationUuid);
         } catch (I18nEmailMgtException e) {
             if (StringUtils.equals(I18nMgtConstants.ErrorCodes.EMAIL_TEMPLATE_TYPE_NOT_FOUND, e.getErrorCode())) {
@@ -142,6 +157,11 @@ public class ApplicationEmailTemplatesService {
     public SimpleEmailTemplate addEmailTemplate(
             String templateTypeId, EmailTemplateWithID emailTemplateWithID, String applicationUuid) {
 
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Adding email template. TemplateTypeId: %s, Locale: %s, AppUuid: %s",
+                    templateTypeId, emailTemplateWithID != null ? emailTemplateWithID.getLocale() : "null",
+                    applicationUuid));
+        }
         String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
         try {
             boolean isTemplateExists = emailTemplateManager.isEmailTemplateExists(templateTypeDisplayName,
@@ -149,6 +169,8 @@ public class ApplicationEmailTemplatesService {
             if (!isTemplateExists) {
                 // Email template is new, hence add to the system.
                 addEmailTemplateToTheSystem(templateTypeDisplayName, emailTemplateWithID, applicationUuid);
+                log.info(String.format("Successfully added email template for type: %s, locale: %s in application: %s",
+                        templateTypeDisplayName, emailTemplateWithID.getLocale(), applicationUuid));
 
                 // Create and send the location of the created object as the response.
                 SimpleEmailTemplate simpleEmailTemplate = new SimpleEmailTemplate();
@@ -173,6 +195,10 @@ public class ApplicationEmailTemplatesService {
      */
     public void deleteEmailTemplate(String templateTypeId, String templateId, String applicationUuid) {
 
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Deleting email template. TemplateTypeId: %s, TemplateId: %s, AppUuid: %s",
+                    templateTypeId, templateId, applicationUuid));
+        }
         String templateTypeDisplayName;
         try {
             templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
@@ -186,6 +212,13 @@ public class ApplicationEmailTemplatesService {
             if (isTemplateExists) {
                 emailTemplateManager.deleteEmailTemplate(templateTypeDisplayName, templateId,
                         getTenantDomainFromContext(), applicationUuid);
+                log.info(String.format("Successfully deleted email template for type: %s, locale: %s in " +
+                        "application: %s", templateTypeDisplayName, templateId, applicationUuid));
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug(String.format("Email template not found for deletion. Type: %s, Locale: %s",
+                            templateTypeDisplayName, templateId));
+                }
             }
         } catch (I18nEmailMgtException e) {
             throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_DELETING_EMAIL_TEMPLATE);
@@ -200,6 +233,10 @@ public class ApplicationEmailTemplatesService {
      */
     public void deleteAllAppEmailTemplates(String templateTypeId, String applicationUuid) {
 
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Deleting all email templates for type: %s, AppUuid: %s", templateTypeId,
+                    applicationUuid));
+        }
         String templateTypeDisplayName;
         try {
             templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
@@ -213,6 +250,12 @@ public class ApplicationEmailTemplatesService {
             if (isTemplateTypeExists) {
                 emailTemplateManager.deleteEmailTemplates(templateTypeDisplayName, getTenantDomainFromContext(),
                         applicationUuid);
+                log.info(String.format("Successfully deleted all email templates for type: %s in application: %s",
+                        templateTypeDisplayName, applicationUuid));
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug(String.format("Template type not found for deletion: %s", templateTypeDisplayName));
+                }
             }
         } catch (I18nEmailMgtException e) {
             throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_DELETING_APP_EMAIL_TEMPLATES);
@@ -229,6 +272,10 @@ public class ApplicationEmailTemplatesService {
     public void updateEmailTemplate(String templateTypeId, String templateId, EmailTemplateWithID emailTemplateWithID,
                                     String applicationUuid) {
 
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Updating email template. TemplateTypeId: %s, TemplateId: %s, AppUuid: %s",
+                    templateTypeId, templateId, applicationUuid));
+        }
         String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
         try {
             /* Check whether the email template exists, first. Here, resolve param is specified as true since
@@ -238,6 +285,8 @@ public class ApplicationEmailTemplatesService {
                     getTenantDomainFromContext(), applicationUuid, true);
             if (isTemplateExists) {
                 addEmailTemplateToTheSystem(templateTypeDisplayName, emailTemplateWithID, applicationUuid);
+                log.info(String.format("Successfully updated email template for type: %s, locale: %s in " +
+                        "application: %s", templateTypeDisplayName, templateId, applicationUuid));
             } else {
                 throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_NOT_FOUND);
             }

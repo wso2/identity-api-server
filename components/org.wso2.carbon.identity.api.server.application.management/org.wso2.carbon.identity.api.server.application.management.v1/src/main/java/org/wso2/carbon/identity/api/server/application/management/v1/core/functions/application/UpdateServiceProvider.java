@@ -17,6 +17,8 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AssociatedRolesConfig;
@@ -34,8 +36,15 @@ import static org.wso2.carbon.identity.api.server.application.management.v1.core
  */
 public class UpdateServiceProvider implements UpdateFunction<ServiceProvider, ApplicationPatchModel> {
 
+    private static final Log log = LogFactory.getLog(UpdateServiceProvider.class);
+
     @Override
     public void apply(ServiceProvider serviceProvider, ApplicationPatchModel applicationPatchModel) {
+
+        String applicationName = serviceProvider != null ? serviceProvider.getApplicationName() : null;
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Updating ServiceProvider for application: %s", applicationName));
+        }
 
         setIfNotNull(applicationPatchModel.getName(), serviceProvider::setApplicationName);
         setIfNotNull(applicationPatchModel.getDescription(), serviceProvider::setDescription);
@@ -52,6 +61,9 @@ public class UpdateServiceProvider implements UpdateFunction<ServiceProvider, Ap
         patchAdvancedConfiguration(serviceProvider, applicationPatchModel.getAdvancedConfigurations());
         patchProvisioningConfiguration(applicationPatchModel.getProvisioningConfigurations(), serviceProvider);
         patchLogoutReturnUrl(serviceProvider, applicationPatchModel.getLogoutReturnUrl());
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Successfully updated ServiceProvider for application: %s", applicationName));
+        }
     }
 
     private void patchLogoutReturnUrl(ServiceProvider application, String logoutReturnUrl) {

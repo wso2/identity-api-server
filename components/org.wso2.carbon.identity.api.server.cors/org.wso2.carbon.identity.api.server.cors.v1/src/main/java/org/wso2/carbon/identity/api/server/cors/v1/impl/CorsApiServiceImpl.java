@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.cors.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.cors.v1.CorsApiService;
 import org.wso2.carbon.identity.api.server.cors.v1.core.CORSService;
 import org.wso2.carbon.identity.api.server.cors.v1.factories.CORSServiceFactory;
@@ -30,12 +32,20 @@ import javax.ws.rs.core.Response;
 public class CorsApiServiceImpl implements CorsApiService {
 
     private final CORSService corsService;
+    private static final Log log = LogFactory.getLog(CorsApiServiceImpl.class);
 
     public CorsApiServiceImpl() {
 
         try {
+            if (log.isDebugEnabled()) {
+                log.debug("Initializing CORS API service implementation");
+            }
             this.corsService = CORSServiceFactory.getCORSService();
+            if (log.isDebugEnabled()) {
+                log.debug("CORS API service implementation initialized successfully");
+            }
         } catch (IllegalStateException e) {
+            log.error("Error occurred while initiating API CORS management service", e);
             throw new RuntimeException("Error occurred while initiating API CORS management service.", e);
         }
     }
@@ -43,12 +53,18 @@ public class CorsApiServiceImpl implements CorsApiService {
     @Override
     public Response getAssociatedAppsByCORSOrigin(String corsOriginId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Processing request to get associated applications for CORS origin: " + corsOriginId);
+        }
         return Response.ok().entity(corsService.getAssociatedAppsByCORSOrigin(corsOriginId)).build();
     }
 
     @Override
     public Response getCORSOrigins() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Processing request to get CORS origins");
+        }
         return Response.ok().entity(corsService.getCORSOrigins()).build();
     }
 }

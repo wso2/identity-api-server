@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.input.validation.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.input.validation.mgt.services.InputValidationManagementService;
 
@@ -25,6 +27,8 @@ import org.wso2.carbon.identity.input.validation.mgt.services.InputValidationMan
  * Service holder class for input validation management.
  */
 public class InputValidationServiceHolder {
+
+    private static final Log log = LogFactory.getLog(InputValidationServiceHolder.class);
 
     private InputValidationServiceHolder () {};
 
@@ -41,6 +45,12 @@ public class InputValidationServiceHolder {
      */
     public static InputValidationManagementService getInputValidationMgtService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving InputValidationManagementService OSGi service.");
+        }
+        if (InputValidationManagementServiceHolder.SERVICE == null) {
+            log.warn("InputValidationManagementService OSGi service is null.");
+        }
         return InputValidationManagementServiceHolder.SERVICE;
     }
 }

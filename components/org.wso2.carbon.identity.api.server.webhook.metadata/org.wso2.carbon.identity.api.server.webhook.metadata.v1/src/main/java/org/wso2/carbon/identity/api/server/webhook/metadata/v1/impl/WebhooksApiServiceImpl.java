@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.webhook.metadata.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.WebhooksApiService;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.core.ServerWebhookMetadataService;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.factories.ServerWebhookMetadataServiceFactory;
@@ -31,21 +33,35 @@ import javax.ws.rs.core.Response;
  */
 public class WebhooksApiServiceImpl implements WebhooksApiService {
 
+    private static final Log LOG = LogFactory.getLog(WebhooksApiServiceImpl.class);
+
     @Override
     public Response getEventProfile(String profileName) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("API request to get event profile: " + profileName);
+        }
         ServerWebhookMetadataService webhookMetadataService =
                 ServerWebhookMetadataServiceFactory.getServerWebhookMetadataService();
         EventProfile eventProfile = webhookMetadataService.getEventProfile(profileName);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Successfully processed API request for event profile: " + profileName);
+        }
         return Response.ok().entity(eventProfile).build();
     }
 
     @Override
     public Response getEventProfiles() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("API request to get webhook metadata with event profiles");
+        }
         ServerWebhookMetadataService webhookMetadataService =
                 ServerWebhookMetadataServiceFactory.getServerWebhookMetadataService();
         WebhookMetadata webhookMetadata = webhookMetadataService.getWebhookMetadata();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Successfully processed API request for webhook metadata");
+        }
         return Response.ok().entity(webhookMetadata).build();
     }
 }

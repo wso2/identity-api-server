@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.certificate.validation.management.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.certificate.validation.management.v1.CertificateValidationApiService;
 import org.wso2.carbon.identity.api.server.certificate.validation.management.v1.core.ServerCertificateValidationManagementService;
 import org.wso2.carbon.identity.api.server.certificate.validation.management.v1.factories.ServerCertificateValidationManagementServiceFactory;
@@ -41,14 +43,18 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
  */
 public class CertificateValidationApiServiceImpl implements CertificateValidationApiService {
 
+    private static final Log LOG = LogFactory.getLog(CertificateValidationApiServiceImpl.class);
     private final ServerCertificateValidationManagementService certificateValidationManagementService;
 
     public CertificateValidationApiServiceImpl() {
 
+        LOG.debug("Initializing CertificateValidationApiServiceImpl");
         try {
             certificateValidationManagementService = ServerCertificateValidationManagementServiceFactory
                     .getServerCertificateValidationManagementService();
+            LOG.debug("Successfully initialized CertificateValidationApiServiceImpl");
         } catch (IllegalStateException e) {
+            LOG.error("Error occurred while initiating the certificate validation management service", e);
             throw new RuntimeException("Error occurred while initiating the certificate validation management service.",
                     e);
         }
@@ -57,6 +63,9 @@ public class CertificateValidationApiServiceImpl implements CertificateValidatio
     @Override
     public Response addCACertificate(CACertificateAddRequest caCertificateAddRequest) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Processing request to add CA certificate");
+        }
         CACertificate caCertificate = certificateValidationManagementService
                 .addCACertificate(caCertificateAddRequest.getCertificate());
         URI location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT +
@@ -68,6 +77,9 @@ public class CertificateValidationApiServiceImpl implements CertificateValidatio
     @Override
     public Response deleteCACertificateById(String certificateId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Processing request to delete CA certificate with ID: " + certificateId);
+        }
         certificateValidationManagementService.deleteCACertificate(certificateId);
         return Response.noContent().build();
     }
@@ -75,24 +87,36 @@ public class CertificateValidationApiServiceImpl implements CertificateValidatio
     @Override
     public Response getCACertificateById(String certificateId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Processing request to get CA certificate with ID: " + certificateId);
+        }
         return Response.ok().entity(certificateValidationManagementService.getCertificate(certificateId)).build();
     }
 
     @Override
     public Response getCACertificates() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Processing request to get all CA certificates");
+        }
         return Response.ok().entity(certificateValidationManagementService.getCACertificates()).build();
     }
 
     @Override
     public Response getCertificateRevocationValidator(String validatorName) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Processing request to get certificate revocation validator: " + validatorName);
+        }
         return Response.ok().entity(certificateValidationManagementService.getValidator(validatorName)).build();
     }
 
     @Override
     public Response getCertificateRevocationValidators() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Processing request to get all certificate revocation validators");
+        }
         return Response.ok().entity(certificateValidationManagementService.getValidators()).build();
     }
 
@@ -100,6 +124,9 @@ public class CertificateValidationApiServiceImpl implements CertificateValidatio
     public Response updateCACertificateById(String certificateId,
                                             CACertificateUpdateRequest caCertificateUpdateRequest) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Processing request to update CA certificate with ID: " + certificateId);
+        }
         return Response.ok().entity(certificateValidationManagementService.updateCACertificate(certificateId,
                 caCertificateUpdateRequest.getCertificate())).build();
     }
@@ -107,6 +134,9 @@ public class CertificateValidationApiServiceImpl implements CertificateValidatio
     @Override
     public Response updateCertificateRevocationValidator(String validatorName, Validator validator) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Processing request to update certificate revocation validator: " + validatorName);
+        }
         return Response.ok().entity(certificateValidationManagementService
                 .updateValidator(validatorName, validator)).build();
     }

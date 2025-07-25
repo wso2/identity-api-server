@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.configs.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.configs.v1.ConfigsApiService;
 import org.wso2.carbon.identity.api.server.configs.v1.core.ServerConfigManagementService;
 import org.wso2.carbon.identity.api.server.configs.v1.factories.ServerConfigManagementServiceFactory;
@@ -43,13 +45,21 @@ import javax.ws.rs.core.Response;
  */
 public class ConfigsApiServiceImpl implements ConfigsApiService {
 
+    private static final Log log = LogFactory.getLog(ConfigsApiServiceImpl.class);
     private final ServerConfigManagementService configManagementService;
 
     public ConfigsApiServiceImpl() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Initializing ConfigsApiServiceImpl.");
+        }
         try {
             configManagementService = ServerConfigManagementServiceFactory.getServerConfigManagementService();
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully initialized server config management service.");
+            }
         } catch (Exception e) {
+            log.error("Error occurred while initiating server config management services.", e);
             throw new RuntimeException("Error occurred while initiating server config management services.", e);
         }
     }
@@ -112,11 +122,20 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     @Override
     public Response getRemoteLoggingConfig(String logType) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving remote logging configuration for log type: " + logType);
+        }
         RemoteServerLoggerData remoteServerLoggerResponseData =
                 configManagementService.getRemoteServerConfig(logType);
         if (remoteServerLoggerResponseData != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully retrieved remote logging configuration for log type: " + logType);
+            }
             return Response.ok().entity(createRemoteLoggingConfig(remoteServerLoggerResponseData)).build();
         } else {
+            if (log.isDebugEnabled()) {
+                log.debug("No remote logging configuration found for log type: " + logType);
+            }
             return Response.status(Response.Status.NOT_FOUND).build();
         }
     }
@@ -202,7 +221,13 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     @Override
     public Response updateRemoteLoggingConfig(String logType, RemoteLoggingConfig remoteLoggingConfig) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating remote logging configuration for log type: " + logType);
+        }
         configManagementService.updateRemoteLoggingConfig(logType, remoteLoggingConfig);
+        if (log.isDebugEnabled()) {
+            log.debug("Successfully updated remote logging configuration for log type: " + logType);
+        }
         return Response.accepted().build();
     }
 
@@ -222,7 +247,13 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     @Override
     public Response updateSAMLInboundAuthConfig(InboundAuthSAML2Config inboundAuthSAML2Config) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating SAML inbound authentication configuration.");
+        }
         configManagementService.updateSAMLInboundAuthConfig(inboundAuthSAML2Config);
+        if (log.isDebugEnabled()) {
+            log.debug("Successfully updated SAML inbound authentication configuration.");
+        }
         return Response.ok().build();
     }
 
@@ -247,7 +278,13 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     @Override
     public Response deletePassiveSTSInboundAuthConfig() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting Passive STS inbound authentication configuration.");
+        }
         configManagementService.deletePassiveSTSInboundAuthConfig();
+        if (log.isDebugEnabled()) {
+            log.debug("Successfully deleted Passive STS inbound authentication configuration.");
+        }
         return Response.noContent().build();
     }
 
@@ -259,7 +296,13 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     @Override
     public Response deleteSAMLInboundAuthConfig() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting SAML inbound authentication configuration.");
+        }
         configManagementService.deleteSAMLInboundAuthConfig();
+        if (log.isDebugEnabled()) {
+            log.debug("Successfully deleted SAML inbound authentication configuration.");
+        }
         return Response.noContent().build();
     }
     

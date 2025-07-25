@@ -20,6 +20,8 @@ package org.wso2.carbon.identity.api.server.idp.v1.impl;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.idp.common.Constants;
 import org.wso2.carbon.identity.api.server.idp.common.IdentityProviderServiceHolder;
@@ -59,6 +61,8 @@ import static org.wso2.carbon.identity.api.server.idp.common.Constants.IDP_PATH_
  * The factory class for building federated authenticator configuration related models.
  */
 public class FederatedAuthenticatorConfigBuilderFactory {
+
+    private static final Log log = LogFactory.getLog(FederatedAuthenticatorConfigBuilderFactory.class);
 
     /**
      * Builds a FederatedAuthenticatorConfig instance based on the definedBy type for the
@@ -223,6 +227,11 @@ public class FederatedAuthenticatorConfigBuilderFactory {
 
         performSystemDefinedFederatedAuthenticatorCommonValidations(fedAuthConfigDTO);
         if (!areAllDistinct(fedAuthConfigDTO.properties)) {
+            String errorMsg = "Duplicate properties are found in the request for authenticator: " +
+                    fedAuthConfigDTO.authenticatorName;
+            if (log.isDebugEnabled()) {
+                log.debug(errorMsg);
+            }
             Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT;
             throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
                     String.format(error.getDescription(), " Duplicate properties are found in " +
@@ -250,6 +259,11 @@ public class FederatedAuthenticatorConfigBuilderFactory {
 
         // The System-defined authenticator configs must not have endpoint configurations; throw an error if they do.
         if (fedAuthConfigDTO.endpoint != null) {
+            String errorMsg = "Endpoint configuration provided for system-defined authenticator: " +
+                    fedAuthConfigDTO.authenticatorName;
+            if (log.isDebugEnabled()) {
+                log.debug(errorMsg);
+            }
             Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_ENDPOINT_PROVIDED_FOR_SYSTEM_AUTH;
             throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
                     String.format(error.getDescription(), fedAuthConfigDTO.authenticatorName));
@@ -277,6 +291,9 @@ public class FederatedAuthenticatorConfigBuilderFactory {
 
             return authConfig;
         } catch (NoSuchElementException | IllegalArgumentException e) {
+            String errorMsg = "Error occurred while creating user-defined authenticator config for: " +
+                    federatedAuthenticatorConfigDTO.authenticatorName;
+            log.error(errorMsg, e);
             throw new IdentityProviderManagementClientException(Constants.ErrorMessage
                     .ERROR_CODE_INVALID_INPUT.getCode(), Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT.getMessage(),
                     e.getMessage());
@@ -293,6 +310,11 @@ public class FederatedAuthenticatorConfigBuilderFactory {
 
         if (fedAuthConfigDTO.endpoint.getAuthentication().getProperties() == null
                 || fedAuthConfigDTO.endpoint.getAuthentication().getProperties().isEmpty()) {
+            String errorMsg = "Endpoint authentication properties must be provided for user defined federated " +
+                    "authenticator: " + fedAuthConfigDTO.authenticatorName;
+            if (log.isDebugEnabled()) {
+                log.debug(errorMsg);
+            }
             throw new IdentityProviderManagementClientException(
                     Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT.getCode(),
                     Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT.getMessage(),
@@ -306,6 +328,11 @@ public class FederatedAuthenticatorConfigBuilderFactory {
 
         // The User-defined authenticator configs must not have properties configurations; throw an error if they do.
         if (fedAuthConfigDTO.properties != null) {
+            String errorMsg = "Properties configuration provided for user-defined authenticator: " +
+                    fedAuthConfigDTO.authenticatorName;
+            if (log.isDebugEnabled()) {
+                log.debug(errorMsg);
+            }
             Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_PROPERTIES_PROVIDED_FOR_USER_AUTH;
             throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
                     String.format(error.getDescription(), fedAuthConfigDTO.authenticatorName));
@@ -313,6 +340,11 @@ public class FederatedAuthenticatorConfigBuilderFactory {
 
         // The User-defined authenticator configs must have endpoint configurations; throw an error if they don't.
         if (fedAuthConfigDTO.endpoint == null) {
+            String errorMsg = "No endpoint configuration provided for user-defined authenticator: " +
+                    fedAuthConfigDTO.authenticatorName;
+            if (log.isDebugEnabled()) {
+                log.debug(errorMsg);
+            }
             Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_NO_ENDPOINT_PROVIDED;
             throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
                     String.format(error.getDescription(), fedAuthConfigDTO.authenticatorName));
@@ -359,6 +391,10 @@ public class FederatedAuthenticatorConfigBuilderFactory {
                         metadataProperty.setValue(metadata);
                         samlAuthenticatorProperties.set(positionOfMetadataKey, metadataProperty);
                     } else {
+                        String errorMsg = "Invalid SAML metadata provided for authenticator";
+                        if (log.isDebugEnabled()) {
+                            log.debug(errorMsg);
+                        }
                         Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_INVALID_SAML_METADATA;
                         throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
                                 error.getDescription());
@@ -391,6 +427,10 @@ public class FederatedAuthenticatorConfigBuilderFactory {
                 }
             }
             if (scopesFieldFilled && queryParamsScopesFilled) {
+                String errorMsg = "Duplicate OIDC scopes found in both Scopes field and Additional Query Parameters";
+                if (log.isDebugEnabled()) {
+                    log.debug(errorMsg);
+                }
                 Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_DUPLICATE_OIDC_SCOPES;
                 throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
                         error.getDescription());
@@ -412,6 +452,10 @@ public class FederatedAuthenticatorConfigBuilderFactory {
                         oidcAuthenticatorProperty.getName())) {
                     String scopes = oidcAuthenticatorProperty.getValue();
                     if (StringUtils.isNotBlank(scopes) && !scopes.contains("openid")) {
+                        String errorMsg = "OIDC scopes must contain 'openid' scope. Provided scopes: " + scopes;
+                        if (log.isDebugEnabled()) {
+                            log.debug(errorMsg);
+                        }
                         Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_INVALID_OIDC_SCOPES;
                         throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
                                 error.getDescription());
@@ -467,8 +511,10 @@ public class FederatedAuthenticatorConfigBuilderFactory {
             endpoint.setAuthentication(authenticationType);
             authenticator.setEndpoint(endpoint);
         } catch (ClassCastException e) {
-            throw new IdentityProviderManagementServerException(String.format("Error occurred while resolving" +
-                    " endpoint configuration of the authenticator %s.", authenticator.getName()), e);
+            String errorMsg = String.format("Error occurred while resolving endpoint configuration of the " +
+                    "authenticator %s.", authenticator.getName());
+            log.error(errorMsg, e);
+            throw new IdentityProviderManagementServerException(errorMsg, e);
         }
     }
 
@@ -546,6 +592,9 @@ public class FederatedAuthenticatorConfigBuilderFactory {
                     }
                 }
             } catch (IdentityProviderManagementException e) {
+                String errorMsg = "Error occurred while retrieving authenticator display name for: " +
+                        authenticatorName;
+                log.error(errorMsg, e);
                 Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_IDP;
                 throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
                         error.getDescription());

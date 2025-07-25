@@ -62,9 +62,11 @@ public class APIResourceMgtEndpointUtil {
     public static void validateAPIResource(APIResourceCreationModel apiResource) {
 
         if (StringUtils.isBlank(apiResource.getName())) {
+            LOG.warn("API resource validation failed: name is blank");
             throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_INVALID_API_RESOURCE_NAME);
         }
         if (StringUtils.isBlank(apiResource.getIdentifier())) {
+            LOG.warn("API resource validation failed: identifier is blank");
             throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_INVALID_API_RESOURCE_IDENTIFIER);
         }
     }
@@ -77,6 +79,7 @@ public class APIResourceMgtEndpointUtil {
         for (ScopeCreationModel scope : scopes) {
             // Validate scope name.
             if (StringUtils.isBlank(scope.getName())) {
+                LOG.warn("Scope validation failed: scope name is blank");
                 throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_INVALID_SCOPE_NAME);
             }
             // Validate restricted scope names.
@@ -84,6 +87,8 @@ public class APIResourceMgtEndpointUtil {
                     IdentityUtil.getPropertyAsList(APIResourceMgtEndpointConstants.RESTRICTED_OAUTH2_SCOPES);
             for (String restrictedScope : restrictedScopes) {
                 if (scope.getName().startsWith(restrictedScope)) {
+                    String scopeName = scope != null ? scope.getName() : "null";
+                    LOG.warn("Scope validation failed: restricted scope name used - " + scopeName);
                     throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_RESTRICTED_SCOPE_NAME);
                 }
             }
@@ -94,6 +99,8 @@ public class APIResourceMgtEndpointUtil {
                         .getRegisteredOIDCScope(ContextLoader.getTenantDomainFromContext());
                 if (registeredOIDCScopes != null) {
                     if (registeredOIDCScopes.contains(scope.getName())) {
+                        String scopeName = scope != null ? scope.getName() : "null";
+                        LOG.warn("Scope validation failed: OIDC scope conflict - " + scopeName);
                         throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_RESTRICTED_OIDC_SCOPES);
                     }
                 }
@@ -120,6 +127,7 @@ public class APIResourceMgtEndpointUtil {
         for (String attribute : attributes) {
             String lowerCaseAttribute = attribute.toLowerCase(Locale.ENGLISH);
             if (!APIResourceMgtEndpointConstants.ALLOWED_SEARCH_ATTRIBUTES.contains(lowerCaseAttribute)) {
+                LOG.warn("Invalid search attribute provided: " + attribute);
                 throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_INVALID_SEARCH_ATTRIBUTE);
             }
             validatedAttributes.add(lowerCaseAttribute);

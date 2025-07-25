@@ -54,6 +54,9 @@ public class ContextLoader {
         if (IdentityUtil.threadLocalProperties.get().get(TENANT_NAME_FROM_CONTEXT) != null) {
             tenantDomain = (String) IdentityUtil.threadLocalProperties.get().get(TENANT_NAME_FROM_CONTEXT);
         }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieved tenant domain from context: " + tenantDomain);
+        }
         return tenantDomain;
     }
 
@@ -64,7 +67,11 @@ public class ContextLoader {
      */
     public static String getUsernameFromContext() {
 
-        return PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername();
+        String username = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieved username from context: " + (username != null ? username : "null"));
+        }
+        return username;
     }
 
     /**
@@ -81,8 +88,12 @@ public class ContextLoader {
 
         try {
             url = ServiceURLBuilder.create().addPath(context).build().getRelativePublicURL();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Built URI for body with endpoint: " + endpoint + ", resulting URL: " + url);
+            }
         } catch (URLBuilderException e) {
             String errorDescription = "Server encountered an error while building URL for response body.";
+            LOG.error("Failed to build URI for body with endpoint: " + endpoint, e);
             throw buildInternalServerError(e, errorDescription);
         }
         return URI.create(url);
@@ -104,8 +115,12 @@ public class ContextLoader {
         try {
             String url = ServiceURLBuilder.create().addPath(context).build().getAbsolutePublicURL();
             loc = URI.create(url);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Built URI for header with endpoint: " + endpoint + ", resulting URL: " + url);
+            }
         } catch (URLBuilderException e) {
             String errorDescription = "Server encountered an error while building URL for response header.";
+            LOG.error("Failed to build URI for header with endpoint: " + endpoint, e);
             throw buildInternalServerError(e, errorDescription);
         }
         return loc;

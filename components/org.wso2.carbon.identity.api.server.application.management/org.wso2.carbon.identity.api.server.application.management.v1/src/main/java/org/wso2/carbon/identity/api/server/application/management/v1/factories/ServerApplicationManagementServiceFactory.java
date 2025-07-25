@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.application.management.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
@@ -29,9 +31,13 @@ import org.wso2.carbon.identity.template.mgt.TemplateManager;
  */
 public class ServerApplicationManagementServiceFactory {
 
+    private static final Log log = LogFactory.getLog(ServerApplicationManagementServiceFactory.class);
     private  static final ServerApplicationManagementService SERVICE;
 
     static {
+        if (log.isDebugEnabled()) {
+            log.debug("Initializing ServerApplicationManagementService from OSGi context.");
+        }
         ApplicationManagementService applicationManagementService = ApplicationManagementServiceHolder
                 .getApplicationManagementService();
         AuthorizedAPIManagementService authorizedAPIManagementService = ApplicationManagementServiceHolder
@@ -39,19 +45,25 @@ public class ServerApplicationManagementServiceFactory {
         TemplateManager templateManager = ApplicationManagementServiceHolder.getTemplateManager();
 
         if (applicationManagementService == null) {
+            log.error("ApplicationManagementService is not available from OSGi context.");
             throw new IllegalStateException("ApplicationManagementService is not available from OSGi context.");
         }
 
         if (authorizedAPIManagementService == null) {
+            log.error("AuthorizedAPIManagementService is not available from OSGi context.");
             throw new IllegalStateException("AuthorizedAPIManagementService is not available from OSGi context.");
         }
 
         if (templateManager == null) {
+            log.error("TemplateManager is not available from OSGi context.");
             throw new IllegalStateException("TemplateManager is not available from OSGi context.");
         }
 
         SERVICE = new ServerApplicationManagementService(applicationManagementService, authorizedAPIManagementService,
                 templateManager);
+        if (log.isDebugEnabled()) {
+            log.debug("Successfully initialized ServerApplicationManagementService.");
+        }
     }
 
     /**

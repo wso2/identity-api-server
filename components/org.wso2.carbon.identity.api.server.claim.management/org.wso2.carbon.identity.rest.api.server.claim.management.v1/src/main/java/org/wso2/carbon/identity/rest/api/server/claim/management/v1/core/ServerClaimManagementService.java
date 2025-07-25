@@ -222,12 +222,21 @@ public class ServerClaimManagementService {
      */
     public String addClaimDialect(ClaimDialectReqDTO claimDialectReqDTO) {
 
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Adding claim dialect: " + (claimDialectReqDTO != null ? claimDialectReqDTO.getDialectURI() 
+                    : "null") + " for tenant: " + tenantDomain);
+        }
         try {
             validateClaimModificationEligibility();
             getClaimMetadataManagementService().addClaimDialect(
                     createClaimDialect(claimDialectReqDTO),
-                    ContextLoader.getTenantDomainFromContext());
+                    tenantDomain);
+            LOG.info("Successfully added claim dialect: " + (claimDialectReqDTO != null ? 
+                    claimDialectReqDTO.getDialectURI() : "null") + " for tenant: " + tenantDomain);
         } catch (ClaimMetadataException e) {
+            LOG.error("Failed to add claim dialect: " + (claimDialectReqDTO != null ? 
+                    claimDialectReqDTO.getDialectURI() : "null") + " for tenant: " + tenantDomain);
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_ADDING_DIALECT,
                     claimDialectReqDTO.getDialectURI());
         }
@@ -262,19 +271,28 @@ public class ServerClaimManagementService {
      */
     public void deleteClaimDialect(String dialectId) {
 
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deleting claim dialect: " + dialectId + " for tenant: " + tenantDomain);
+        }
         String claimDialectURI;
         try {
             validateClaimModificationEligibility();
             claimDialectURI = base64DecodeId(dialectId);
         } catch (Exception ignored) {
             // Ignoring the delete operation and return 204 response code, since the resource does not exist.
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Dialect not found for deletion, ignoring: " + dialectId);
+            }
             return;
         }
         try {
             claimMetadataManagementService.removeClaimDialect(
                     new ClaimDialect(claimDialectURI),
-                    ContextLoader.getTenantDomainFromContext());
+                    tenantDomain);
+            LOG.info("Successfully deleted claim dialect: " + claimDialectURI + " for tenant: " + tenantDomain);
         } catch (ClaimMetadataException e) {
+            LOG.error("Failed to delete claim dialect: " + claimDialectURI + " for tenant: " + tenantDomain);
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_DELETING_DIALECT, dialectId);
         }
 
@@ -373,6 +391,12 @@ public class ServerClaimManagementService {
      */
     public String addLocalClaim(LocalClaimReqDTO localClaimReqDTO) {
 
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Adding local claim: " + (localClaimReqDTO != null ? localClaimReqDTO.getClaimURI() 
+                    : "null") + " for tenant: " + tenantDomain);
+        }
+        
         // Validate mandatory attributes.
         if (StringUtils.isBlank(localClaimReqDTO.getClaimURI())) {
             throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_CLAIM_URI_NOT_SPECIFIED,
@@ -386,12 +410,17 @@ public class ServerClaimManagementService {
         try {
             validateClaimModificationEligibility();
             validateAttributeMappings(localClaimReqDTO.getAttributeMapping());
-            claimMetadataManagementService.addLocalClaim(createLocalClaim(localClaimReqDTO), ContextLoader
-                    .getTenantDomainFromContext());
+            claimMetadataManagementService.addLocalClaim(createLocalClaim(localClaimReqDTO), tenantDomain);
+            LOG.info("Successfully added local claim: " + localClaimReqDTO.getClaimURI() + " for tenant: " 
+                    + tenantDomain);
         } catch (ClaimMetadataException e) {
+            LOG.error("Failed to add local claim: " + localClaimReqDTO.getClaimURI() + " for tenant: " 
+                    + tenantDomain);
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_ADDING_LOCAL_CLAIM,
                     localClaimReqDTO.getClaimURI());
         } catch (UserStoreException e) {
+            LOG.error("UserStore error while adding local claim: " + localClaimReqDTO.getClaimURI() 
+                    + " for tenant: " + tenantDomain);
             throw handleException(e, ERROR_CODE_ERROR_ADDING_LOCAL_CLAIM, localClaimReqDTO.getClaimURI());
         }
 
@@ -1369,8 +1398,11 @@ public class ServerClaimManagementService {
      */
     public String importClaimDialectFromFile(InputStream fileInputStream, Attachment fileDetail) {
 
+        String fileName = fileDetail != null && fileDetail.getDataHandler() != null ? 
+                fileDetail.getDataHandler().getName() : "unknown";
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
         if (LOG.isDebugEnabled()) {
-            LOG.debug(String.format("Importing claim dialect from file: %s", fileDetail.getDataHandler().getName()));
+            LOG.debug(String.format("Importing claim dialect from file: %s for tenant: %s", fileName, tenantDomain));
         }
 
         String dialectId;
@@ -1379,6 +1411,7 @@ public class ServerClaimManagementService {
             dialectId = dialectConfiguration.getId();
 
             if (LOCAL_DIALECT_PATH.equals(dialectId)) {
+                LOG.warn("Attempted to import local claim dialect from file: " + fileName);
                 throw handleClaimManagementClientError(
                         Constant.ErrorMessage.ERROR_CODE_ERROR_IMPORTING_LOCAL_CLAIM_DIALECT, FORBIDDEN);
             }
@@ -1387,27 +1420,39 @@ public class ServerClaimManagementService {
             String dialectURI = addClaimDialect(dialectConfiguration.getClaimDialectReqDTO());
 
             importExternalClaims(dialectURI, externalClaimReqDTOList);
+            LOG.info("Successfully imported claim dialect from file: " + fileName + " for tenant: " + tenantDomain);
 
             return dialectId;
         } catch (ClaimMetadataException e) {
+            LOG.error("Failed to import claim dialect from file: " + fileName + " for tenant: " + tenantDomain);
             throw handleClaimManagementException(e, Constant.ErrorMessage.ERROR_CODE_ERROR_IMPORTING_CLAIM_DIALECT);
         }
     }
 
     private void importExternalClaims(String dialectID, List<ExternalClaimReqDTO> externalClaimReqDTOList) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Importing " + (externalClaimReqDTOList != null ? externalClaimReqDTOList.size() : 0) 
+                    + " external claims for dialect: " + dialectID);
+        }
         List<ClaimErrorDTO> errors = new ArrayList<>();
 
         for (ExternalClaimReqDTO externalClaimReqDTO : externalClaimReqDTOList) {
             try {
                 addExternalClaim(dialectID, externalClaimReqDTO);
             } catch (APIError e) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Failed to import external claim: " + externalClaimReqDTO.getClaimURI() 
+                            + " for dialect: " + dialectID);
+                }
                 ClaimErrorDTO claimErrorDTO = new ClaimErrorDTO(e.getResponseEntity());
                 claimErrorDTO.setClaimURI(externalClaimReqDTO.getClaimURI());
                 errors.add(claimErrorDTO);
             }
         }
         if (!errors.isEmpty()) {
+            LOG.warn("Failed to import " + errors.size() + " out of " + externalClaimReqDTOList.size() 
+                    + " external claims for dialect: " + dialectID);
             throw handleClaimManagementBulkClientError(Constant.ErrorMessage.ERROR_CODE_IMPORTING_EXTERNAL_CLAIMS,
                     BAD_REQUEST, errors, String.valueOf(errors.size()), String.valueOf(externalClaimReqDTOList.size()));
         }

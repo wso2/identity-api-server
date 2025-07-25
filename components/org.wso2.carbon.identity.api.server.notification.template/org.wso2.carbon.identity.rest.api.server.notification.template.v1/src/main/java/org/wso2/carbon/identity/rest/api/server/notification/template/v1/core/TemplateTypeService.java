@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.rest.api.server.notification.template.v1.core;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.notification.template.common.Constants;
 import org.wso2.carbon.identity.governance.exceptions.notiification.NotificationTemplateManagerException;
 import org.wso2.carbon.identity.governance.service.notification.NotificationTemplateManager;
@@ -36,6 +38,7 @@ import static org.wso2.carbon.identity.api.server.notification.template.common.C
  */
 public class TemplateTypeService {
 
+    private static final Log log = LogFactory.getLog(TemplateTypeService.class);
     private final NotificationTemplateManager notificationTemplateManager;
 
     public TemplateTypeService(NotificationTemplateManager notificationTemplateManager) {
@@ -53,6 +56,10 @@ public class TemplateTypeService {
                                                           TemplateTypeOverview templateTypeOverview) {
 
         String templateTypeDisplayName = templateTypeOverview.getDisplayName();
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Adding notification template type: %s for channel: %s in tenant: %s",
+                    templateTypeDisplayName, notificationChannel, getTenantDomainFromContext()));
+        }
         try {
             notificationTemplateManager.addNotificationTemplateType(notificationChannel, templateTypeDisplayName,
                     getTenantDomainFromContext());
@@ -62,6 +69,10 @@ public class TemplateTypeService {
             String templateTypeId = Util.resolveTemplateIdFromDisplayName(templateTypeDisplayName);
             response.setId(templateTypeId);
             response.setSelf(Util.getTemplateTypeLocation(templateTypeId, notificationChannel));
+            if (log.isDebugEnabled()) {
+                log.debug(String.format("Successfully added notification template type: %s with ID: %s for channel: %s",
+                        templateTypeDisplayName, templateTypeId, notificationChannel));
+            }
             return response;
         } catch (NotificationTemplateManagerException e) {
             throw Util.handleNotificationTemplateManagerException(e,
@@ -77,6 +88,10 @@ public class TemplateTypeService {
      */
     public List<TemplateTypeWithID> getAllNotificationTemplateTypes(String notificationChannel) {
 
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Retrieving all notification template types for channel: %s in tenant: %s",
+                    notificationChannel, getTenantDomainFromContext()));
+        }
         try {
             List<String> templateTypes = notificationTemplateManager.getAllNotificationTemplateTypes(
                     notificationChannel, getTenantDomainFromContext());
@@ -91,6 +106,10 @@ public class TemplateTypeService {
                             Util.getTemplateTypeLocation(templateTypeId, notificationChannel));
                     templateTypeWithIDs.add(templateTypeWithID);
                 }
+            }
+            if (log.isDebugEnabled()) {
+                log.debug(String.format("Retrieved %d notification template types for channel: %s",
+                        templateTypeWithIDs.size(), notificationChannel));
             }
             return templateTypeWithIDs;
         } catch (NotificationTemplateManagerException e) {
@@ -109,12 +128,20 @@ public class TemplateTypeService {
 
         String templateTypeDisplayName;
         templateTypeDisplayName = Util.decodeTemplateTypeId(templateTypeId);
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Deleting notification template type: %s (ID: %s) for channel: %s in tenant: %s",
+                    templateTypeDisplayName, templateTypeId, notificationChannel, getTenantDomainFromContext()));
+        }
         try {
             boolean isTemplateTypeExists = notificationTemplateManager.isNotificationTemplateTypeExists(
                             notificationChannel, templateTypeDisplayName, getTenantDomainFromContext());
             if (isTemplateTypeExists) {
                 notificationTemplateManager.deleteNotificationTemplateType(notificationChannel, templateTypeDisplayName,
                         getTenantDomainFromContext());
+                if (log.isDebugEnabled()) {
+                    log.debug(String.format("Successfully deleted notification template type: %s for channel: %s",
+                            templateTypeDisplayName, notificationChannel));
+                }
             } else {
                 throw Util.handleError(Constants.ErrorMessage.ERROR_TEMPLATE_TYPE_NOT_FOUND);
             }
@@ -132,6 +159,10 @@ public class TemplateTypeService {
      */
     public void resetTemplateType(String notificationChannel, String templateTypeId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Resetting template type: %s for channel: %s in tenant: %s",
+                    templateTypeId, notificationChannel, getTenantDomainFromContext()));
+        }
         if (NOTIFICATION_CHANNEL_EMAIL.equalsIgnoreCase(notificationChannel)) {
             notificationChannel = NOTIFICATION_CHANNEL_EMAIL;
         } else if (Constants.NOTIFICATION_CHANNEL_SMS.equalsIgnoreCase(notificationChannel)) {
@@ -148,6 +179,10 @@ public class TemplateTypeService {
                 notificationTemplateManager.resetNotificationTemplateType(notificationChannel, templateTypeDisplayName,
                         getTenantDomainFromContext()
                 );
+                if (log.isDebugEnabled()) {
+                    log.debug(String.format("Successfully reset template type: %s for channel: %s",
+                            templateTypeDisplayName, notificationChannel));
+                }
             } else {
                 throw Util.handleError(Constants.ErrorMessage.ERROR_TEMPLATE_TYPE_NOT_FOUND);
             }
@@ -168,6 +203,10 @@ public class TemplateTypeService {
                                                                   String templateTypeId) {
 
         String templateTypeDisplayName = Util.decodeTemplateTypeId(templateTypeId);
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Retrieving notification template type: %s (ID: %s) for channel: %s in tenant: %s",
+                    templateTypeDisplayName, templateTypeId, notificationChannel, getTenantDomainFromContext()));
+        }
         try {
             boolean isTemplateTypeExists = notificationTemplateManager.isNotificationTemplateTypeExists(
                             notificationChannel, templateTypeDisplayName, getTenantDomainFromContext());

@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.workflow.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.workflow.impl.WorkflowImplServiceImpl;
 import org.wso2.carbon.identity.workflow.mgt.WorkflowManagementService;
 import org.wso2.carbon.identity.workflow.mgt.WorkflowManagementServiceImpl;
@@ -27,16 +29,21 @@ import org.wso2.carbon.identity.workflow.mgt.WorkflowManagementServiceImpl;
  */
 public class WorkflowServiceHolder {
 
+    private static final Log log = LogFactory.getLog(WorkflowServiceHolder.class);
     private static final WorkflowManagementService service = new WorkflowManagementServiceImpl();
 
     public static WorkflowManagementService getWorkflowManagementService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving WorkflowManagementService instance.");
+        }
         return service;
     }
 
     // This is a placeholder for the actual implementation of WorkflowImplServiceImpl.
     public static WorkflowImplServiceImpl getWorkflowImplService() {
 
+        log.warn("WorkflowImplService implementation is not available. Returning null.");
         return null;
     }
 }

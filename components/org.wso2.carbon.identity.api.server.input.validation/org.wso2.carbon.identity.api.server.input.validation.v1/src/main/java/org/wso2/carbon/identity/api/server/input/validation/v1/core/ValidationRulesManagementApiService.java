@@ -75,6 +75,9 @@ public class ValidationRulesManagementApiService {
     public ValidationRulesManagementApiService(InputValidationManagementService inputValidationManagementService) {
 
         this.inputValidationManagementService = inputValidationManagementService;
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("ValidationRulesManagementApiService instance created.");
+        }
     }
 
     /**
@@ -85,11 +88,16 @@ public class ValidationRulesManagementApiService {
      */
     public List<ValidationConfigModel> getValidationConfiguration(String tenantDomain) {
 
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Getting validation configuration for tenant: " + tenantDomain);
+        }
         try {
             List<ValidationConfiguration> configurations = inputValidationManagementService
                     .getInputValidationConfiguration(tenantDomain);
+            LOGGER.info("Successfully retrieved validation configurations for tenant: " + tenantDomain);
             return buildResponse(configurations);
         } catch (InputValidationMgtException e) {
+            LOGGER.warn("Failed to get validation configuration for tenant: " + tenantDomain);
             throw handleInputValidationMgtException(e, ERROR_CODE_ERROR_GETTING_VALIDATION_CONFIG, tenantDomain);
         }
     }
@@ -102,12 +110,19 @@ public class ValidationRulesManagementApiService {
      */
     public ValidationConfigModel getValidationConfigurationForField(String tenantDomain, String field) {
 
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Getting validation configuration for field: " + field + " in tenant: " + tenantDomain);
+        }
         try {
             isFieldSupported(field);
             ValidationConfiguration configuration = inputValidationManagementService
                     .getInputValidationConfigurationForField(tenantDomain, field);
+            LOGGER.info("Successfully retrieved validation configuration for field: " + field + 
+                    " in tenant: " + tenantDomain);
             return buildResponse(configuration);
         } catch (InputValidationMgtException e) {
+            LOGGER.warn("Failed to get validation configuration for field: " + field + 
+                    " in tenant: " + tenantDomain);
             throw handleInputValidationMgtException(e, ERROR_CODE_ERROR_GETTING_VALIDATION_CONFIG, tenantDomain);
         }
     }
@@ -121,13 +136,18 @@ public class ValidationRulesManagementApiService {
     public List<ValidationConfigModel> updateInputValidationConfiguration(
             List<ValidationConfigModel> validationConfigModel, String tenantDomain) {
 
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Updating validation configuration for tenant: " + tenantDomain);
+        }
         try {
             List<ValidationConfiguration> requestDTO = buildRequestDTOFromValidationRequest(validationConfigModel);
             validateProperties(requestDTO, tenantDomain);
             List<ValidationConfiguration> configurations = inputValidationManagementService
                     .updateInputValidationConfiguration(requestDTO, tenantDomain);
+            LOGGER.info("Successfully updated validation configuration for tenant: " + tenantDomain);
             return buildResponse(configurations);
         } catch (InputValidationMgtException e) {
+            LOGGER.warn("Failed to update validation configuration for tenant: " + tenantDomain);
             throw handleInputValidationMgtException(e, ERROR_CODE_ERROR_UPDATING_VALIDATION_CONFIG, tenantDomain);
         }
     }
@@ -142,6 +162,10 @@ public class ValidationRulesManagementApiService {
     public ValidationConfigModel updateInputValidationConfigurationForField(
             ValidationConfigModel validationConfigModel, String tenantDomain) {
 
+        String field = validationConfigModel != null ? validationConfigModel.getField() : null;
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Updating validation configuration for field: " + field + " in tenant: " + tenantDomain);
+        }
         try {
             isFieldSupported(validationConfigModel.getField());
             List<ValidationConfigModel> configModels = new ArrayList<>();
@@ -150,8 +174,12 @@ public class ValidationRulesManagementApiService {
             validateProperties(requestDTO, tenantDomain);
             ValidationConfiguration configurations = inputValidationManagementService
                     .updateValidationConfiguration(requestDTO.get(0), tenantDomain);
+            LOGGER.info("Successfully updated validation configuration for field: " + field + 
+                    " in tenant: " + tenantDomain);
             return buildResponse(configurations);
         } catch (InputValidationMgtException e) {
+            LOGGER.warn("Failed to update validation configuration for field: " + field + 
+                    " in tenant: " + tenantDomain);
             throw handleInputValidationMgtException(e, ERROR_CODE_ERROR_UPDATING_VALIDATION_CONFIG, tenantDomain);
         }
     }
@@ -164,13 +192,18 @@ public class ValidationRulesManagementApiService {
      */
     public void revertInputValidationConfigurationForFields(List<String> fields, String tenantDomain) {
 
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Reverting validation configuration for fields in tenant: " + tenantDomain);
+        }
         try {
             for (String field : fields) {
                 isFieldSupported(field);
             }
 
             inputValidationManagementService.revertInputValidationConfiguration(fields, tenantDomain);
+            LOGGER.info("Successfully reverted validation configuration for fields in tenant: " + tenantDomain);
         } catch (InputValidationMgtException e) {
+            LOGGER.warn("Failed to revert validation configuration for fields in tenant: " + tenantDomain);
             throw handleInputValidationMgtException(e, ERROR_CODE_ERROR_REVERTING_VALIDATION_CONFIG, tenantDomain);
         }
     }
@@ -182,9 +215,13 @@ public class ValidationRulesManagementApiService {
      */
     public List<ValidatorModel> getValidators(String tenantDomain) {
 
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Getting validators for tenant: " + tenantDomain);
+        }
         List<ValidatorConfiguration> validators;
         try {
             validators = inputValidationManagementService.getValidatorConfigurations(tenantDomain);
+            LOGGER.info("Successfully retrieved validators for tenant: " + tenantDomain);
             return buildValidatorResponse(validators);
         } catch (InputValidationMgtException e) {
             if (ERROR_CODE_INPUT_VALIDATION_NOT_EXISTS.getCode().contains(e.getErrorCode())) {
@@ -193,6 +230,7 @@ public class ValidationRulesManagementApiService {
                             tenantDomain, e);
                 }
             }
+            LOGGER.warn("Failed to get validators for tenant: " + tenantDomain);
             throw handleInputValidationMgtException(e, ERROR_CODE_ERROR_GETTING_VALIDATORS, tenantDomain);
         }
     }

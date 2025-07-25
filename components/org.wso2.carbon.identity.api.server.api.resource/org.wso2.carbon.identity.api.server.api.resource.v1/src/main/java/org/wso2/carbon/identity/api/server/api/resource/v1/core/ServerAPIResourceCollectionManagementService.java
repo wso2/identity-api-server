@@ -20,6 +20,8 @@ package org.wso2.carbon.identity.api.server.api.resource.v1.core;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.api.resource.collection.mgt.APIResourceCollectionManager;
 import org.wso2.carbon.identity.api.resource.collection.mgt.constant.APIResourceCollectionManagementConstants;
@@ -55,6 +57,7 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
  */
 public class ServerAPIResourceCollectionManagementService {
 
+    private static final Log LOG = LogFactory.getLog(ServerAPIResourceCollectionManagementService.class);
     private final APIResourceCollectionManager apiResourceCollectionManager;
 
     public ServerAPIResourceCollectionManagementService(APIResourceCollectionManager apiResourceCollectionManager) {
@@ -71,6 +74,9 @@ public class ServerAPIResourceCollectionManagementService {
      */
     public APIResourceCollectionListResponse getAPIResourceCollections(String filter, String requiredAttributes) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving API resource collections with filter: " + (filter != null ? filter : "none"));
+        }
         APIResourceCollectionListResponse apiResourceCollectionListResponse = new APIResourceCollectionListResponse();
         try {
             List<String> requestedAttributeList = StringUtils.isNotEmpty(requiredAttributes) ?
@@ -110,6 +116,9 @@ public class ServerAPIResourceCollectionManagementService {
      */
     public APIResourceCollectionResponse getAPIResourceCollectionByCollectionId(String collectionId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving API resource collection with ID: " + collectionId);
+        }
         APIResourceCollectionResponse apiResourceCollectionResponse = new APIResourceCollectionResponse();
 
         try {

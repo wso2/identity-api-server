@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.api.resource.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopesApiService;
 import org.wso2.carbon.identity.api.server.api.resource.v1.core.ServerAPIResourceManagementService;
 import org.wso2.carbon.identity.api.server.api.resource.v1.factories.ServerAPIResourceManagementServiceFactory;
@@ -29,6 +31,7 @@ import javax.ws.rs.core.Response;
  */
 public class ScopesApiServiceImpl implements ScopesApiService {
 
+    private static final Log LOG = LogFactory.getLog(ScopesApiServiceImpl.class);
     private final ServerAPIResourceManagementService serverAPIResourceManagementService;
 
     public ScopesApiServiceImpl() {
@@ -37,6 +40,7 @@ public class ScopesApiServiceImpl implements ScopesApiService {
             this.serverAPIResourceManagementService = ServerAPIResourceManagementServiceFactory
                     .getServerAPIResourceManagementService();
         } catch (IllegalStateException e) {
+            LOG.error("Failed to initialize API resource management service", e);
             throw new RuntimeException("Error occurred while initiating API resource management service.", e);
         }
     }
@@ -44,6 +48,9 @@ public class ScopesApiServiceImpl implements ScopesApiService {
     @Override
     public Response scopesGet(String filter) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving scopes with filter: " + (filter != null ? filter : "none"));
+        }
         return Response.ok().entity(serverAPIResourceManagementService.getScopesByTenant(filter)).build();
     }
 }

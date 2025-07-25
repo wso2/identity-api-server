@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.script.library.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
@@ -46,13 +48,21 @@ import static org.wso2.carbon.identity.api.server.script.library.common.Constant
  */
 public class ScriptLibrariesApiServiceImpl implements ScriptLibrariesApiService {
 
+    private static final Log log = LogFactory.getLog(ScriptLibrariesApiServiceImpl.class);
     private final ServerScriptLibrariesService serverScriptLibrariesService;
 
     public ScriptLibrariesApiServiceImpl() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Initializing ScriptLibrariesApiServiceImpl.");
+        }
         try {
             this.serverScriptLibrariesService = ServerScriptLibrariesServiceFactory.getServerScriptLibrariesService();
+            if (log.isDebugEnabled()) {
+                log.debug("ScriptLibrariesApiServiceImpl initialized successfully.");
+            }
         } catch (IllegalStateException e) {
+            log.error("Error occurred while initiating ServerScriptLibrariesService: " + e.getMessage());
             throw new RuntimeException("Error occurred while initiating ServerScriptLibrariesService.", e);
         }
     }
@@ -61,14 +71,22 @@ public class ScriptLibrariesApiServiceImpl implements ScriptLibrariesApiService 
     public Response addScriptLibrary(String name, InputStream contentInputStream, Attachment contentDetail,
                                      String description) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Adding script library with name: " + (name != null ? name : "null"));
+        }
+        
         serverScriptLibrariesService.addScriptLibrary(name, contentInputStream, description);
+        
         try {
             URI location =
                     ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + SCRIPT_LIBRARY_PATH_COMPONENT
                             + "/" + URLEncoder.encode(name, StandardCharsets.UTF_8.name())
                             .replace("+", "%20"));
+            log.info("Script library added successfully with name: " + (name != null ? name : "null"));
             return Response.created(location).build();
         } catch (UnsupportedEncodingException e) {
+            log.error("Error encoding URL for script library name: " + (name != null ? name : "null") + 
+                     ", Error: " + e.getMessage());
             ErrorResponse errorResponse =
                     new ErrorResponse.Builder().withCode(Constants.ErrorMessage.ERROR_CODE_ERROR_ENCODING_URL
                             .getCode()).withMessage(Constants.ErrorMessage.ERROR_CODE_ERROR_ENCODING_URL.getMessage())
@@ -81,37 +99,81 @@ public class ScriptLibrariesApiServiceImpl implements ScriptLibrariesApiService 
     @Override
     public Response deleteScriptLibrary(String scriptLibraryName) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting script library with name: " + (scriptLibraryName != null ? scriptLibraryName : "null"));
+        }
+        
         serverScriptLibrariesService.deleteScriptLibrary(scriptLibraryName);
+        log.info("Script library deleted successfully with name: " + 
+                (scriptLibraryName != null ? scriptLibraryName : "null"));
         return Response.noContent().build();
     }
 
     @Override
     public Response getScriptLibraries(Integer limit, Integer offset) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving script libraries with limit: " + limit + ", offset: " + offset);
+        }
+        
         ScriptLibraryListResponse scriptLibraryListResponse = serverScriptLibrariesService.getScriptLibraries(limit,
                 offset);
+        
+        if (log.isDebugEnabled()) {
+            int count = scriptLibraryListResponse != null ? scriptLibraryListResponse.getCount() : 0;
+            log.debug("Retrieved " + count + " script libraries.");
+        }
+        
         return Response.ok().entity(scriptLibraryListResponse).build();
     }
 
     @Override
     public Response getScriptLibraryByName(String scriptLibraryName) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving script library by name: " + (scriptLibraryName != null ? scriptLibraryName : "null"));
+        }
+        
         ScriptLibraryResponse scriptLibraryResponse = serverScriptLibrariesService.getScriptLibrary(scriptLibraryName);
+        
+        if (log.isDebugEnabled()) {
+            log.debug("Successfully retrieved script library: " + 
+                     (scriptLibraryName != null ? scriptLibraryName : "null"));
+        }
+        
         return Response.ok().entity(scriptLibraryResponse).build();
     }
 
     @Override
     public Response getScriptLibraryContentByName(String scriptLibraryName) {
 
-        return Response.ok().entity(serverScriptLibrariesService.getScriptLibraryContentByName(scriptLibraryName))
-                .build();
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving script library content by name: " + 
+                     (scriptLibraryName != null ? scriptLibraryName : "null"));
+        }
+        
+        String content = serverScriptLibrariesService.getScriptLibraryContentByName(scriptLibraryName);
+        
+        if (log.isDebugEnabled()) {
+            log.debug("Successfully retrieved script library content for: " + 
+                     (scriptLibraryName != null ? scriptLibraryName : "null"));
+        }
+        
+        return Response.ok().entity(content).build();
     }
 
     @Override
     public Response updateScriptLibrary(String scriptLibraryName, InputStream contentInputStream,
                                         Attachment contentDetail, String description) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating script library with name: " + 
+                     (scriptLibraryName != null ? scriptLibraryName : "null"));
+        }
+        
         serverScriptLibrariesService.updateScriptLibrary(scriptLibraryName, contentInputStream, description);
+        log.info("Script library updated successfully with name: " + 
+                (scriptLibraryName != null ? scriptLibraryName : "null"));
         return Response.ok().build();
     }
 }

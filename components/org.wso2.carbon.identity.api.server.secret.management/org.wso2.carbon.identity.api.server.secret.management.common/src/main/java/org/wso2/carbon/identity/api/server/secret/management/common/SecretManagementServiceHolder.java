@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.secret.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.secret.mgt.core.SecretManager;
 
@@ -25,6 +27,8 @@ import org.wso2.carbon.identity.secret.mgt.core.SecretManager;
  * Service holder class for secret management.
  */
 public class SecretManagementServiceHolder {
+
+    private static final Log log = LogFactory.getLog(SecretManagementServiceHolder.class);
 
     private SecretManagementServiceHolder() {
 
@@ -43,6 +47,12 @@ public class SecretManagementServiceHolder {
      */
     public static SecretManager getSecretConfigManager() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving SecretManager OSGi service.");
+        }
+        if (SecretManagerServiceHolder.SERVICE == null) {
+            log.warn("SecretManager OSGi service is not available.");
+        }
         return SecretManagerServiceHolder.SERVICE;
     }
 }

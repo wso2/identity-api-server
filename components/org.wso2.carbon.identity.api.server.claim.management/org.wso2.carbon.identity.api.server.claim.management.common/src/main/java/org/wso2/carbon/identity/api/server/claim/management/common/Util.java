@@ -16,6 +16,8 @@
 
 package org.wso2.carbon.identity.api.server.claim.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
 import org.wso2.carbon.user.core.service.RealmService;
@@ -25,16 +27,7 @@ import org.wso2.carbon.user.core.service.RealmService;
  */
 public class Util {
 
-    /**
-     * Get ClaimMetadataManagementService osgi service.
-     *
-     * @return ClaimMetadataManagementService
-     */
-    @Deprecated
-    public static ClaimMetadataManagementService getClaimMetadataManagementService() {
-        return (ClaimMetadataManagementService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                .getOSGiService(ClaimMetadataManagementService.class, null);
-    }
+    private static final Log log = LogFactory.getLog(Util.class);
 
     /**
      * Get ClaimMetadataManagementService osgi service.
@@ -42,8 +35,37 @@ public class Util {
      * @return ClaimMetadataManagementService
      */
     @Deprecated
+    public static ClaimMetadataManagementService getClaimMetadataManagementService() {
+        
+        log.warn("getClaimMetadataManagementService() method is deprecated. Use ClaimManagementDataHolder instead.");
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving ClaimMetadataManagementService OSGi service via deprecated method.");
+        }
+        ClaimMetadataManagementService service = (ClaimMetadataManagementService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(ClaimMetadataManagementService.class, null);
+        if (service == null && log.isDebugEnabled()) {
+            log.debug("ClaimMetadataManagementService is not available.");
+        }
+        return service;
+    }
+
+    /**
+     * Get RealmService osgi service.
+     *
+     * @return RealmService
+     */
+    @Deprecated
     public static RealmService getRealmService() {
-        return (RealmService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+        
+        log.warn("getRealmService() method is deprecated.");
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving RealmService OSGi service via deprecated method.");
+        }
+        RealmService service = (RealmService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                 .getOSGiService(RealmService.class, null);
+        if (service == null && log.isDebugEnabled()) {
+            log.debug("RealmService is not available.");
+        }
+        return service;
     }
 }

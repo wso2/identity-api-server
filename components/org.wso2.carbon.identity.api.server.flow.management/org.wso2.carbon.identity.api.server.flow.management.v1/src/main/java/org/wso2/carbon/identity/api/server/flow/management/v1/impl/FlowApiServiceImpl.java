@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.flow.management.v1.BaseFlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowApiService;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfig;
@@ -36,13 +38,19 @@ import javax.ws.rs.core.Response;
  */
 public class FlowApiServiceImpl implements FlowApiService {
 
+    private static final Log LOG = LogFactory.getLog(FlowApiServiceImpl.class);
     ServerFlowMgtService flowMgtService;
 
     public FlowApiServiceImpl() {
 
         try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Initializing FlowApiServiceImpl.");
+            }
             this.flowMgtService = ServerFlowMgtServiceFactory.getFlowMgtService();
+            LOG.info("FlowApiServiceImpl initialized successfully.");
         } catch (IllegalStateException e) {
+            LOG.error("Error occurred while initiating flow management service.", e);
             throw new RuntimeException("Error occurred while initiating flow management service.", e);
         }
     }
@@ -50,42 +58,76 @@ public class FlowApiServiceImpl implements FlowApiService {
     @Override
     public Response getFlow(String flowType) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving flow for type: " + flowType);
+        }
         FlowResponse flow = flowMgtService.getFlow(flowType);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Successfully retrieved flow for type: " + flowType);
+        }
         return Response.ok().entity(flow).build();
     }
 
     @Override
     public Response getFlowConfigForFlow(String flowType) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving flow config for type: " + flowType);
+        }
         FlowConfig flowConfig = flowMgtService.getFlowConfigForFlow(flowType);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Successfully retrieved flow config for type: " + flowType);
+        }
         return Response.ok().entity(flowConfig).build();
     }
 
     @Override
     public Response getFlowConfigs() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving all flow configs.");
+        }
         List<FlowConfig> flowConfigs = flowMgtService.getFlowConfigs();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Successfully retrieved " + (flowConfigs != null ? flowConfigs.size() : 0) + " flow configs.");
+        }
         return Response.ok().entity(flowConfigs).build();
     }
 
     @Override
     public Response getFlowMeta(String flowType) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving flow meta for type: " + flowType);
+        }
         BaseFlowMetaResponse flowMeta = flowMgtService.getFlowMeta(flowType);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Successfully retrieved flow meta for type: " + flowType);
+        }
         return Response.ok().entity(flowMeta).build();
     }
 
     @Override
     public Response updateFlow(FlowRequest flowRequest) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating flow for type: " + (flowRequest != null ? flowRequest.getFlowType() : "null"));
+        }
         flowMgtService.updateFlow(flowRequest);
+        LOG.info("Flow updated successfully for type: " + (flowRequest != null ? flowRequest.getFlowType() : "null"));
         return Response.ok().build();
     }
 
     @Override
     public Response updateFlowConfig(FlowConfigPatchModel flowConfigPatchModel) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating flow config for type: " +
+                    (flowConfigPatchModel != null ? flowConfigPatchModel.getFlowType() : "null"));
+        }
         FlowConfig flowConfig = flowMgtService.updateFlowConfig(flowConfigPatchModel);
+        LOG.info("Flow config updated successfully for type: " +
+                (flowConfigPatchModel != null ? flowConfigPatchModel.getFlowType() : "null"));
         return Response.ok().entity(flowConfig).build();
     }
 

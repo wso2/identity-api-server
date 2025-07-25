@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.certificate.validation.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.x509Certificate.validation.service.CertificateValidationManagementService;
 
@@ -25,6 +27,8 @@ import org.wso2.carbon.identity.x509Certificate.validation.service.CertificateVa
  * Service holder class for server configuration related services.
  */
 public class CertificateValidationManagementServiceHolder {
+
+    private static final Log log = LogFactory.getLog(CertificateValidationManagementServiceHolder.class);
 
     private CertificateValidationManagementServiceHolder() {
 
@@ -37,7 +41,14 @@ public class CertificateValidationManagementServiceHolder {
      */
     public static CertificateValidationManagementService getCertificateValidationService() {
 
-        return CertificateValidationServiceHolder.SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving CertificateValidationManagementService OSGi service.");
+        }
+        CertificateValidationManagementService service = CertificateValidationServiceHolder.SERVICE;
+        if (service == null) {
+            log.warn("CertificateValidationManagementService is not available.");
+        }
+        return service;
     }
 
     /**

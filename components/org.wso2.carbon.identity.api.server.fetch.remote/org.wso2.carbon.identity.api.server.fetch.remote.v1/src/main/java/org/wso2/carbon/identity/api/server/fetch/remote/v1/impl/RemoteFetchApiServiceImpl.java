@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.fetch.remote.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.fetch.remote.common.RemoteFetchConfigurationConstants;
@@ -37,14 +39,20 @@ import javax.ws.rs.core.Response;
  */
 public class RemoteFetchApiServiceImpl implements RemoteFetchApiService {
 
+    private static final Log log = LogFactory.getLog(RemoteFetchApiServiceImpl.class);
     private final ServerRemoteFetchConfigManagementService serverRemoteFetchConfigManagementService;
 
     public RemoteFetchApiServiceImpl() {
 
         try {
+            if (log.isDebugEnabled()) {
+                log.debug("Initializing RemoteFetchApiServiceImpl");
+            }
             this.serverRemoteFetchConfigManagementService = ServerRemoteFetchConfigManagementServiceFactory
                     .getServerRemoteFetchConfigManagementService();
+            log.info("RemoteFetchApiServiceImpl initialized successfully");
         } catch (IllegalStateException e) {
+            log.error("Error occurred while initiating ServerRemoteFetchConfigManagementService", e);
             throw new RuntimeException("Error occurred while initiating ServerRemoteFetchConfigManagementService.", e);
         }
     }
@@ -52,6 +60,10 @@ public class RemoteFetchApiServiceImpl implements RemoteFetchApiService {
     @Override
     public Response addRemoteFetch(RemoteFetchConfigurationPOSTRequest remoteFetchConfigurationPOSTRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("API request to add remote fetch configuration: " + 
+                    remoteFetchConfigurationPOSTRequest.getRemoteFetchName());
+        }
         String remoteFetchConfigurationId = serverRemoteFetchConfigManagementService
                 .addRemoteFetchConfiguration(remoteFetchConfigurationPOSTRequest);
         return Response.created(getResourceLocation(remoteFetchConfigurationId)).build();
@@ -60,6 +72,9 @@ public class RemoteFetchApiServiceImpl implements RemoteFetchApiService {
     @Override
     public Response deleteRemoteFetch(String id) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("API request to delete remote fetch configuration with ID: " + id);
+        }
         serverRemoteFetchConfigManagementService.deleteRemoteFetchConfig(id);
         return Response.noContent().build();
     }
@@ -67,12 +82,18 @@ public class RemoteFetchApiServiceImpl implements RemoteFetchApiService {
     @Override
     public Response getRemoteFetch(String id) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("API request to get remote fetch configuration with ID: " + id);
+        }
         return Response.ok().entity(serverRemoteFetchConfigManagementService.getRemoteFetchConfig(id)).build();
     }
 
     @Override
     public Response getRemoteFetchConfigs() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("API request to get all remote fetch configurations");
+        }
         RemoteFetchConfigurationListResponse remoteFetchConfigurationListResponse =
                 serverRemoteFetchConfigManagementService.getRemoteFetchConfigs();
         return Response.ok().entity(remoteFetchConfigurationListResponse).build();
@@ -81,6 +102,9 @@ public class RemoteFetchApiServiceImpl implements RemoteFetchApiService {
     @Override
     public Response getStatus(String id) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("API request to get status for remote fetch configuration with ID: " + id);
+        }
         StatusListResponse statusListResponse = serverRemoteFetchConfigManagementService.getStatus(id);
         return Response.ok().entity(statusListResponse).build();
     }
@@ -88,6 +112,9 @@ public class RemoteFetchApiServiceImpl implements RemoteFetchApiService {
     @Override
     public Response handleWebHook(PushEventWebHookPOSTRequest pushEventWebHookPOSTRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("API request to handle webhook");
+        }
         serverRemoteFetchConfigManagementService.handleWebHook(pushEventWebHookPOSTRequest);
         return Response.accepted().build();
     }
@@ -95,6 +122,9 @@ public class RemoteFetchApiServiceImpl implements RemoteFetchApiService {
     @Override
     public Response triggerRemoteFetch(String id) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("API request to trigger remote fetch for configuration with ID: " + id);
+        }
         serverRemoteFetchConfigManagementService.triggerRemoteFetch(id);
         return Response.accepted().build();
     }
@@ -103,6 +133,9 @@ public class RemoteFetchApiServiceImpl implements RemoteFetchApiService {
     public Response updateRemoteFetch(String id,
                                       RemoteFetchConfigurationPatchRequest remoteFetchConfigurationPatchRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("API request to update remote fetch configuration with ID: " + id);
+        }
         serverRemoteFetchConfigManagementService.updateRemoteFetchConfig(id, remoteFetchConfigurationPatchRequest);
         return Response.ok().build();
     }

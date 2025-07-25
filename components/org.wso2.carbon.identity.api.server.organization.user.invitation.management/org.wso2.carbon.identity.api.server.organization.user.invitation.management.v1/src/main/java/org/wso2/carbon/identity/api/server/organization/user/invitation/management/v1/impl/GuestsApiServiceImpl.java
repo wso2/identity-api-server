@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.GuestsApiService;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.core.GuestApiServiceCore;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.factories.GuestApiServiceCoreFactory;
@@ -36,13 +38,18 @@ import javax.ws.rs.core.Response;
  */
 public class GuestsApiServiceImpl implements GuestsApiService {
 
+    private static final Log log = LogFactory.getLog(GuestsApiServiceImpl.class);
     private final GuestApiServiceCore guestApiServiceCore;
 
     public GuestsApiServiceImpl() {
 
         try {
             this.guestApiServiceCore = GuestApiServiceCoreFactory.getGuestApiServiceCore();
+            if (log.isDebugEnabled()) {
+                log.debug("GuestsApiServiceImpl initialized successfully");
+            }
         } catch (IllegalStateException e) {
+            log.error("Error occurred while initiating user invitation management services", e);
             throw new RuntimeException("Error occurred while initiating user invitation management services.", e);
         }
     }
@@ -50,6 +57,9 @@ public class GuestsApiServiceImpl implements GuestsApiService {
     @Override
     public Response invitationAcceptPost(AcceptanceRequestBody acceptanceRequestBody) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Processing invitation acceptance request");
+        }
         guestApiServiceCore.acceptInvitation(acceptanceRequestBody);
         return Response.noContent().build();
     }
@@ -57,6 +67,9 @@ public class GuestsApiServiceImpl implements GuestsApiService {
     @Override
     public Response invitationDelete(String invitationId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Processing invitation deletion request for ID: " + invitationId);
+        }
         guestApiServiceCore.deleteInvitation(invitationId);
         return Response.noContent().build();
     }
@@ -64,6 +77,9 @@ public class GuestsApiServiceImpl implements GuestsApiService {
     @Override
     public Response invitationIntrospectPost(IntrospectRequestBody introspectRequestBody) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Processing invitation introspection request");
+        }
         IntrospectSuccessResponse introspectSuccessResponse =
                 guestApiServiceCore.introspectInvitation(introspectRequestBody.getConfirmationCode());
         return Response.ok().entity(introspectSuccessResponse).build();
@@ -72,6 +88,9 @@ public class GuestsApiServiceImpl implements GuestsApiService {
     @Override
     public Response invitationListGet(String filter, Integer limit, Integer offset, String sortOrder, String sortBy) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Processing invitation list request with filter: " + filter);
+        }
         InvitationsListResponse invitationsListResponse = guestApiServiceCore.getInvitations(filter, limit, offset,
                 sortOrder, sortBy);
         return Response.ok().entity(invitationsListResponse).build();
@@ -80,6 +99,10 @@ public class GuestsApiServiceImpl implements GuestsApiService {
     @Override
     public Response invitationTriggerPost(InvitationRequestBody invitationRequestBody) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Processing invitation creation request for users: " 
+                    + invitationRequestBody.getUsernames());
+        }
         List<InvitationSuccessResponse> invitationSuccessResponse =
                 guestApiServiceCore.createInvitation(invitationRequestBody);
         return Response.ok().entity(invitationSuccessResponse).build();

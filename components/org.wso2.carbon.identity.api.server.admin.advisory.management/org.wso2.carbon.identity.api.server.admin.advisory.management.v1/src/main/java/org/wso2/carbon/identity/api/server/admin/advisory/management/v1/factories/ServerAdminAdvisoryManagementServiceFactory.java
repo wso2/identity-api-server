@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.admin.advisory.management.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.admin.advisory.mgt.service.AdminAdvisoryManagementService;
 import org.wso2.carbon.identity.api.server.admin.advisory.management.common.AdminAdvisoryManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.admin.advisory.management.v1.core.ServerAdminAdvisoryManagementService;
@@ -27,17 +29,23 @@ import org.wso2.carbon.identity.api.server.admin.advisory.management.v1.core.Ser
  */
 public class ServerAdminAdvisoryManagementServiceFactory {
 
+    private static final Log LOG = LogFactory.getLog(ServerAdminAdvisoryManagementServiceFactory.class);
     private static final ServerAdminAdvisoryManagementService SERVICE;
 
     static {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Initializing ServerAdminAdvisoryManagementService.");
+        }
         AdminAdvisoryManagementService adminAdvisoryManagementService = AdminAdvisoryManagementServiceHolder
                 .getAdminAdvisoryManagementService();
 
         if (adminAdvisoryManagementService == null) {
+            LOG.error("AdminAdvisoryManagementService is not available from OSGi context.");
             throw new IllegalStateException("AdminAdvisoryManagementService is not available from OSGi context.");
         }
 
         SERVICE = new ServerAdminAdvisoryManagementService(adminAdvisoryManagementService);
+        LOG.info("ServerAdminAdvisoryManagementService initialized successfully.");
     }
 
     /**

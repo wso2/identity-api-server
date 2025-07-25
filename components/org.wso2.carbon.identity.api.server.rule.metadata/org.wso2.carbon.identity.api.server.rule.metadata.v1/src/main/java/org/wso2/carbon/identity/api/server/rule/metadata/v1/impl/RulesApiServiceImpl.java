@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.rule.metadata.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.rule.metadata.v1.RulesApiService;
 import org.wso2.carbon.identity.api.server.rule.metadata.v1.core.ServerRuleMetadataService;
 import org.wso2.carbon.identity.api.server.rule.metadata.v1.factories.ServerRuleMetadataServiceFactory;
@@ -29,19 +31,31 @@ import javax.ws.rs.core.Response;
  */
 public class RulesApiServiceImpl implements RulesApiService {
 
+    private static final Log LOG = LogFactory.getLog(RulesApiServiceImpl.class);
     private final ServerRuleMetadataService serverRuleMetadataService;
 
     public RulesApiServiceImpl() {
 
+        LOG.info("Initializing RulesApiServiceImpl");
         try {
             serverRuleMetadataService = ServerRuleMetadataServiceFactory.getServerRuleMetadataService();
+            LOG.info("RulesApiServiceImpl initialized successfully");
         } catch (IllegalStateException e) {
+            LOG.error("Error occurred while retrieving RuleMetadataService", e);
             throw new RuntimeException("Error occurred while retrieving RuleMetadataService.", e);
         }
     }
 
     @Override
     public Response getExpressionMeta(String flow) {
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Received request to get expression metadata for flow: " + flow);
+        }
+        
+        if (flow == null || flow.trim().isEmpty()) {
+            LOG.warn("Received null or empty flow parameter for expression metadata request");
+        }
 
         return Response.ok().entity(serverRuleMetadataService.getExpressionMeta(flow)).build();
     }

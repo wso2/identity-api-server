@@ -65,11 +65,16 @@ public class SecretManagementService {
      */
     public SecretResponse addSecret(String secretType, SecretAddRequest secretAddRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Adding secret with name: " + secretAddRequest.getName() + " for type: " + secretType);
+        }
         validateSecretAddRequest(secretAddRequest);
         Secret requestDTO, responseDTO;
         try {
             requestDTO = buildSecretRequestDTOFromSecretAddRequest(secretAddRequest);
             responseDTO = secretManager.addSecret(secretType, requestDTO);
+            log.info("Secret added successfully with name: " + secretAddRequest.getName() + " for type: " + 
+                    secretType);
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.ERROR_CODE_ERROR_ADDING_SECRET,
                     secretAddRequest.getName());
@@ -136,8 +141,12 @@ public class SecretManagementService {
      */
     public void deleteSecret(String secretType, String name) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting secret with name: " + name + " for type: " + secretType);
+        }
         try {
             secretManager.deleteSecret(secretType, name);
+            log.info("Secret deleted successfully with name: " + name + " for type: " + secretType);
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.
                     ERROR_CODE_ERROR_DELETING_SECRET, name);
@@ -153,6 +162,9 @@ public class SecretManagementService {
      */
     public SecretResponse getSecret(String secretType, String name) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving secret with name: " + name + " for type: " + secretType);
+        }
         try {
             Secret responseDTO = secretManager.getSecret(secretType, name);
             SecretResponse secretResponse = new SecretResponse();
@@ -162,6 +174,9 @@ public class SecretManagementService {
             secretResponse.setSecretId(responseDTO.getSecretId());
             secretResponse.setType(responseDTO.getSecretType());
             secretResponse.setDescription(responseDTO.getDescription());
+            if (log.isDebugEnabled()) {
+                log.debug("Secret retrieved successfully with name: " + name + " for type: " + secretType);
+            }
             return secretResponse;
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.
@@ -177,9 +192,16 @@ public class SecretManagementService {
      */
     public List<SecretResponse> getSecretsList(String secretType) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving secrets list for type: " + secretType);
+        }
         try {
             Secrets secrets = secretManager.getSecrets(secretType);
             List<Secret> secretsList = secrets.getSecrets();
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieved " + (secretsList != null ? secretsList.size() : 0) + " secrets for type: " +
+                        secretType);
+            }
             return secretsList.stream().map(secret ->
                     buildSecretResponseFromResponseDTO(secret)).collect(Collectors.toList());
         } catch (SecretManagementException e) {
@@ -198,6 +220,10 @@ public class SecretManagementService {
      */
     public SecretResponse patchSecret(String secretType, String name, SecretPatchRequest secretPatchRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Patching secret with name: " + name + " for type: " + secretType + " with operation: " +
+                    secretPatchRequest.getOperation());
+        }
         Secret secret, responseDTO;
         try {
             secret = secretManager.getSecret(secretType, name);
@@ -225,7 +251,7 @@ public class SecretManagementService {
                 throw handleException(Response.Status.BAD_REQUEST, SecretManagementConstants.ErrorMessage
                         .ERROR_CODE_INVALID_INPUT, "Operation");
             }
-
+            log.info("Secret patched successfully with name: " + name + " for type: " + secretType);
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_SECRET,
                     name);
@@ -243,11 +269,15 @@ public class SecretManagementService {
      */
     public SecretResponse updateSecret(String secretType, String name, SecretUpdateRequest secretUpdateRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating secret with name: " + name + " for type: " + secretType);
+        }
         Secret requestDTO, responseDTO;
         SecretAddRequest secretAddRequest = buildSecretAddFromSecretUpdateRequest(name, secretUpdateRequest);
         try {
             requestDTO = buildSecretRequestDTOFromSecretAddRequest(secretAddRequest);
             responseDTO = secretManager.replaceSecret(secretType, requestDTO);
+            log.info("Secret updated successfully with name: " + name + " for type: " + secretType);
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_SECRET,
                     name);

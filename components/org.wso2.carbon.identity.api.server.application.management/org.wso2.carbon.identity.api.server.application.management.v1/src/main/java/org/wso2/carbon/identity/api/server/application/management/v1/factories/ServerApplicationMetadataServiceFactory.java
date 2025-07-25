@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.application.management.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationMetadataService;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
@@ -30,9 +32,13 @@ import org.wso2.carbon.security.sts.service.STSAdminServiceInterface;
  */
 public class ServerApplicationMetadataServiceFactory {
 
+    private static final Log log = LogFactory.getLog(ServerApplicationMetadataServiceFactory.class);
     private static final ServerApplicationMetadataService SERVICE;
 
     static {
+        if (log.isDebugEnabled()) {
+            log.debug("Initializing ServerApplicationMetadataService from OSGi context.");
+        }
         ApplicationManagementService applicationManagementService = ApplicationManagementServiceHolder
                 .getApplicationManagementService();
         SAMLSSOConfigServiceImpl samlSSOConfigService = ApplicationManagementServiceHolder.getSamlssoConfigService();
@@ -40,14 +46,17 @@ public class ServerApplicationMetadataServiceFactory {
         STSAdminServiceInterface sTSAdminServiceInterface = ApplicationManagementServiceHolder.getStsAdminService();
 
         if (applicationManagementService == null) {
+            log.error("ApplicationManagementService is not available from OSGi context.");
             throw new IllegalStateException("ApplicationManagementService is not available from OSGi context.");
         }
 
         if (samlSSOConfigService == null) {
+            log.error("SAMLSSOConfigServiceImpl is not available from OSGi context.");
             throw new IllegalStateException("SAMLSSOConfigServiceImpl is not available from OSGi context.");
         }
 
         if (oAuthAdminService == null) {
+            log.error("OAuthAdminServiceImpl is not available from OSGi context.");
             throw new IllegalStateException("OAuthAdminServiceImpl is not available from OSGi context.");
         }
 
@@ -55,6 +64,9 @@ public class ServerApplicationMetadataServiceFactory {
 
         SERVICE = new ServerApplicationMetadataService(applicationManagementService, samlSSOConfigService,
                 oAuthAdminService, sTSAdminServiceInterface);
+        if (log.isDebugEnabled()) {
+            log.debug("Successfully initialized ServerApplicationMetadataService.");
+        }
     }
 
     /**

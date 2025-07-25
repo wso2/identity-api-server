@@ -69,6 +69,9 @@ public class KeyStoreService {
     public KeyStoreService(KeyStoreManagementService keyStoreManagementService) {
 
         this.keyStoreManagementService = keyStoreManagementService;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("KeyStoreService initialized with KeyStoreManagementService.");
+        }
     }
 
     /**
@@ -79,10 +82,16 @@ public class KeyStoreService {
      */
     public List<CertificateResponse> listCertificateAliases(String filter) {
 
-        List<String> aliasList;
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Listing certificate aliases for tenant: " + tenantDomain + " with filter: " + filter);
+        }
+        List<String> aliasList;
         try {
             aliasList = keyStoreManagementService.getKeyStoreCertificateAliases(tenantDomain, filter);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Retrieved " + (aliasList != null ? aliasList.size() : 0) + " certificate aliases.");
+            }
         } catch (KeyStoreManagementException e) {
             throw handleException(e, "Unable to list certificates from keystore.");
         }
@@ -98,8 +107,11 @@ public class KeyStoreService {
      */
     public File getCertificate(String alias, boolean encodeCert) {
 
-        X509Certificate certificate;
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving certificate for alias: " + alias + " from tenant: " + tenantDomain);
+        }
+        X509Certificate certificate;
         try {
             certificate = keyStoreManagementService.getKeyStoreCertificate(tenantDomain, alias);
         } catch (KeyStoreManagementException e) {
@@ -107,6 +119,7 @@ public class KeyStoreService {
         }
 
         if (certificate == null) {
+            LOG.warn("Certificate not found for alias: " + alias + " in tenant: " + tenantDomain);
             throw handleException(ERROR_CODE_INVALID_ALIAS, alias, "Couldn't find a certificate with alias: " + alias +
                     " from the keystore.", Response.Status.BAD_REQUEST);
         }
@@ -122,8 +135,12 @@ public class KeyStoreService {
     public URI uploadCertificate(String alias, String certificate) {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Uploading certificate for alias: " + alias + " to tenant: " + tenantDomain);
+        }
         try {
             keyStoreManagementService.addCertificate(tenantDomain, alias, certificate);
+            LOG.info("Certificate uploaded successfully for alias: " + alias + " in tenant: " + tenantDomain);
         } catch (KeyStoreManagementException e) {
             throw handleException(e, "Unable to upload the certificate with alias: " + alias + " to the keystore.");
         }
@@ -140,8 +157,12 @@ public class KeyStoreService {
     public void deleteCertificate(String alias) {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deleting certificate for alias: " + alias + " from tenant: " + tenantDomain);
+        }
         try {
             keyStoreManagementService.deleteCertificate(tenantDomain, alias);
+            LOG.info("Certificate deleted successfully for alias: " + alias + " in tenant: " + tenantDomain);
         } catch (KeyStoreManagementException e) {
             throw handleException(e, "Unable to remove the certificate with alias: " + alias + " from the keystore.");
         }
@@ -155,10 +176,16 @@ public class KeyStoreService {
      */
     public List<CertificateResponse> listClientCertificateAliases(String filter) {
 
-        List<String> aliasList;
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Listing client certificate aliases for tenant: " + tenantDomain + " with filter: " + filter);
+        }
+        List<String> aliasList;
         try {
             aliasList = keyStoreManagementService.getClientCertificateAliases(tenantDomain, filter);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Retrieved " + (aliasList != null ? aliasList.size() : 0) + " client cert aliases.");
+            }
         } catch (KeyStoreManagementException e) {
             throw handleException(e, "Unable to retrieve the list of certificates from client truststore.");
         }
@@ -174,8 +201,11 @@ public class KeyStoreService {
      */
     public File getClientCertificate(String alias, boolean encodeCert) {
 
-        X509Certificate certificate;
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving client certificate for alias: " + alias + " from tenant: " + tenantDomain);
+        }
+        X509Certificate certificate;
         try {
             certificate = keyStoreManagementService.getClientCertificate(tenantDomain, alias);
         } catch (KeyStoreManagementException e) {
@@ -184,6 +214,7 @@ public class KeyStoreService {
         }
 
         if (certificate == null) {
+            LOG.warn("Client certificate not found for alias: " + alias + " in tenant: " + tenantDomain);
             throw handleException(ERROR_CODE_INVALID_ALIAS, alias, "Couldn't find a certificate with alias: " + alias +
                     " from the keystore.", Response.Status.BAD_REQUEST);
         }
@@ -198,8 +229,11 @@ public class KeyStoreService {
      */
     public File getPublicCertificate(boolean encodeCert) {
 
-        Map<String, X509Certificate> certificateData;
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving public certificate for tenant: " + tenantDomain);
+        }
+        Map<String, X509Certificate> certificateData;
         try {
             certificateData = keyStoreManagementService.getPublicCertificate(tenantDomain);
         } catch (KeyStoreManagementException e) {
@@ -208,10 +242,15 @@ public class KeyStoreService {
 
         String alias = null;
         X509Certificate certificate = null;
-        Set<String> keyset = certificateData.keySet();
-        for (String key : keyset) {
-            alias = key;
-            certificate = certificateData.get(alias);
+        if (certificateData != null) {
+            Set<String> keyset = certificateData.keySet();
+            for (String key : keyset) {
+                alias = key;
+                certificate = certificateData.get(alias);
+            }
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Retrieved public certificate with alias: " + alias + " for tenant: " + tenantDomain);
+            }
         }
         return generateCertificateFile(alias, certificate, encodeCert);
     }

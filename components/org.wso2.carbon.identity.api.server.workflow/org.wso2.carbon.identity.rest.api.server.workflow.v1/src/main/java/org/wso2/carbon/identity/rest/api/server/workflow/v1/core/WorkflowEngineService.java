@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.rest.api.server.workflow.v1.core;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
@@ -31,13 +33,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.rest.api.server.workflow.v1.core.WorkflowEngineConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_BPS_PROFILES;
+import static org.wso2.carbon.identity.rest.api.server.workflow.v1.core.WorkflowEngineConstants.ErrorMessage
+        .ERROR_CODE_ERROR_RETRIEVING_BPS_PROFILES;
 
 /**
  * Workflow engine service class
  */
 public class WorkflowEngineService {
 
+    private static final Log log = LogFactory.getLog(WorkflowEngineService.class);
     private final WorkflowImplServiceImpl workflowImplService;
 
     public WorkflowEngineService(WorkflowImplServiceImpl workflowImplService) {
@@ -49,9 +53,18 @@ public class WorkflowEngineService {
 
         try {
             int tenantId = IdentityTenantUtil.getTenantId(ContextLoader.getTenantDomainFromContext());
-            return workflowImplService.listBPSProfiles(tenantId).stream().map(new BPSProfilesToExternal())
-                    .collect(Collectors.toList());
+            if (log.isDebugEnabled()) {
+                log.debug("Listing workflow engines for tenant: " + tenantId);
+            }
+            List<WorkFlowEngineDTO> engines = workflowImplService.listBPSProfiles(tenantId).stream()
+                    .map(new BPSProfilesToExternal()).collect(Collectors.toList());
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully retrieved " + engines.size() + " workflow engines for tenant: " + tenantId);
+            }
+            return engines;
         } catch (WorkflowImplException e) {
+            log.error("Error occurred while retrieving workflow engines for tenant: " +
+                    IdentityTenantUtil.getTenantId(ContextLoader.getTenantDomainFromContext()), e);
             throw handleError(Response.Status.INTERNAL_SERVER_ERROR, ERROR_CODE_ERROR_RETRIEVING_BPS_PROFILES);
         }
     }

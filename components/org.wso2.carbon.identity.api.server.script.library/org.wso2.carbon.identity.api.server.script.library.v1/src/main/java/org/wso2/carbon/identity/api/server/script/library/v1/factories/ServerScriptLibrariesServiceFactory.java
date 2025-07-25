@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.script.library.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.script.library.common.ScriptLibraryServiceHolder;
 import org.wso2.carbon.identity.api.server.script.library.v1.core.ServerScriptLibrariesService;
 import org.wso2.carbon.identity.functions.library.mgt.FunctionLibraryManagementService;
@@ -27,17 +29,23 @@ import org.wso2.carbon.identity.functions.library.mgt.FunctionLibraryManagementS
  */
 public class ServerScriptLibrariesServiceFactory {
 
+    private static final Log log = LogFactory.getLog(ServerScriptLibrariesServiceFactory.class);
     private static final ServerScriptLibrariesService SERVICE;
 
     static {
+        if (log.isDebugEnabled()) {
+            log.debug("Initializing ServerScriptLibrariesServiceFactory.");
+        }
         FunctionLibraryManagementService functionLibraryManagementService = ScriptLibraryServiceHolder
                 .getScriptLibraryManagementService();
 
         if (functionLibraryManagementService == null) {
+            log.error("FunctionLibraryManagementService is not available from OSGi context.");
             throw new IllegalStateException("FunctionLibraryManagementService is not available from OSGi context.");
         }
 
         SERVICE = new ServerScriptLibrariesService(functionLibraryManagementService);
+        log.info("ServerScriptLibrariesService initialized successfully.");
     }
 
     /**
@@ -47,6 +55,9 @@ public class ServerScriptLibrariesServiceFactory {
      */
     public static ServerScriptLibrariesService getServerScriptLibrariesService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Returning ServerScriptLibrariesService instance.");
+        }
         return SERVICE;
     }
 }

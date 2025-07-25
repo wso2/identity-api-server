@@ -163,8 +163,12 @@ public class ServerUserStoreService {
     public UserStoreResponse addUserStore(UserStoreReq userStoreReq) {
 
         try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Adding user store: " + (userStoreReq != null ? userStoreReq.getName() : "null"));
+            }
             validateMandatoryProperties(userStoreReq);
             if (!isAvailableUserStoreTypes(getAvailableUserStoreTypes(), userStoreReq.getTypeId())) {
+                LOG.warn("Invalid user store type provided: " + userStoreReq.getTypeId());
                 throw handleException(Response.Status.BAD_REQUEST,
                         UserStoreConstants.ErrorMessage.ERROR_CODE_INVALID_USERSTORE_TYPE);
             }
@@ -180,9 +184,13 @@ public class ServerUserStoreService {
 
             UserStoreDTO userStoreDTO = createUserStoreDTO(userStoreReq);
             userStoreConfigService.addUserStore(userStoreDTO);
+            LOG.info("User store added successfully: " + userstoreDomain);
 
             if (claimAttributeMappingList != null) {
                 updateClaimMappings(userstoreDomain, tenantDomain, localClaimList);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Claim mappings updated for user store: " + userstoreDomain);
+                }
             }
 
             return buildUserStoreResponseDTO(userStoreReq);
@@ -201,10 +209,15 @@ public class ServerUserStoreService {
     public void deleteUserStore(String userstoreDomainId) {
 
         try {
-            userStoreConfigService.deleteUserStore(base64URLDecodeId(userstoreDomainId));
+            String domainName = base64URLDecodeId(userstoreDomainId);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Deleting user store: " + domainName);
+            }
+            userStoreConfigService.deleteUserStore(domainName);
+            LOG.info("User store deleted successfully: " + domainName);
         } catch (IdentityUserStoreClientException e) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug(e);
+                LOG.debug("Client error while deleting user store: " + base64URLDecodeId(userstoreDomainId), e);
             }
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
@@ -228,6 +241,9 @@ public class ServerUserStoreService {
         createUserStoreDTO(userStoreReq, domainId));
          */
         try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Updating user store with domain ID: " + domainId);
+            }
             validateUserstoreUpdateRequest(domainId, userStoreReq);
             String userstoreDomain = userStoreReq.getName();
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
@@ -238,8 +254,12 @@ public class ServerUserStoreService {
                 validateClaimMappings(tenantDomain, localClaimList);
             }
             userStoreConfigService.updateUserStore(createUserStoreDTO(userStoreReq), false);
+            LOG.info("User store updated successfully: " + userstoreDomain);
             if (claimAttributeMappingList != null) {
                 updateClaimMappings(userstoreDomain, tenantDomain, localClaimList);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Claim mappings updated for user store: " + userstoreDomain);
+                }
             }
             return buildUserStoreResponseDTO(userStoreReq);
         } catch (IdentityUserStoreMgtException e) {
@@ -268,6 +288,7 @@ public class ServerUserStoreService {
         UserStoreConfigurationsRes userStoreConfigurationsRes = getUserStoreByDomainId(domainId);
 
         if (userStoreConfigurationsRes == null) {
+            LOG.warn("User store not found for export with domain ID: " + domainId);
             throw handleException(Response.Status.NOT_FOUND,
                         UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_EXPORTING_USER_STORE);
         }
@@ -293,6 +314,7 @@ public class ServerUserStoreService {
         try {
             fileContent = generateFileFromModel(fileType, userStoreConfigsToExport);
         } catch (UserStoreException e) {
+            LOG.error("Error generating file for user store export: " + domainId, e);
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_EXPORTING_USER_STORE);
         }
@@ -313,10 +335,16 @@ public class ServerUserStoreService {
      */
     public String importUserStore(InputStream fileInputStream, Attachment fileDetail) {
 
+        String fileName = fileDetail != null && fileDetail.getDataHandler() != null ? 
+                fileDetail.getDataHandler().getName() : "unknown";
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Importing user store from file: " + fileName);
+        }
         UserStoreReq userStoreConfigs;
         try {
             userStoreConfigs = getUserStoreFromFile(fileInputStream, fileDetail);
         } catch (UserStoreException e) {
+            LOG.error("Error parsing user store file: " + fileName, e);
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_IMPORTING_USER_STORE);
         } catch (IdentityUserStoreMgtException e) {
@@ -326,6 +354,7 @@ public class ServerUserStoreService {
         }
 
         UserStoreResponse userStoreResponse = addUserStore(userStoreConfigs);
+        LOG.info("User store imported successfully from file: " + fileName + ", ID: " + userStoreResponse.getId());
         return userStoreResponse.getId();
     }
 
@@ -340,10 +369,16 @@ public class ServerUserStoreService {
     public String updateUserStoreFromFile(String userstoreDomainID, InputStream fileInputStream,
                                           Attachment fileDetail) {
 
+        String fileName = fileDetail != null && fileDetail.getDataHandler() != null ? 
+                fileDetail.getDataHandler().getName() : "unknown";
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating user store from file - domain ID: " + userstoreDomainID + ", file: " + fileName);
+        }
         UserStoreReq userStoreConfigs;
         try {
             userStoreConfigs = getUserStoreFromFile(fileInputStream, fileDetail);
         } catch (UserStoreException e) {
+            LOG.error("Error parsing user store file for update: " + fileName, e);
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_USER_STORE);
         }  catch (IdentityUserStoreMgtException e) {
@@ -353,6 +388,8 @@ public class ServerUserStoreService {
         }
 
         UserStoreResponse userStoreResponse = editUserStore(userstoreDomainID, userStoreConfigs);
+        LOG.info("User store updated successfully from file - domain ID: " + userstoreDomainID + 
+                ", file: " + fileName + ", ID: " + userStoreResponse.getId());
         return userStoreResponse.getId();
     }
 
@@ -363,6 +400,9 @@ public class ServerUserStoreService {
      */
     public List<AvailableUserStoreClassesRes> getAvailableUserStoreTypes() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving available user store types");
+        }
         Set<String> classNames;
         try {
             classNames = userStoreConfigService.getAvailableUserStoreClasses();
@@ -385,6 +425,9 @@ public class ServerUserStoreService {
                 }
 
                 propertiesToAdd.add(availableUserStoreClassesResDTO);
+            }
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Found " + propertiesToAdd.size() + " available user store types");
             }
             return propertiesToAdd;
         } catch (IdentityUserStoreMgtException e) {

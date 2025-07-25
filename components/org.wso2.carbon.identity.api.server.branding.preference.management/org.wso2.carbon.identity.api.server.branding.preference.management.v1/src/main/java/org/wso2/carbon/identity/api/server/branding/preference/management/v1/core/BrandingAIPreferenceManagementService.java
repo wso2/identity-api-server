@@ -58,11 +58,16 @@ public class BrandingAIPreferenceManagementService {
     public BrandingGenerationResponseModel generateBrandingPreference(
             BrandingGenerationRequestModel brandingGenerationRequestModel) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Initiating branding preference generation for website URL: " + 
+                    brandingGenerationRequestModel.getWebsiteUrl());
+        }
         try {
             String operationId = BrandingPreferenceServiceHolder.getBrandingPreferenceAiManager()
                     .generateBrandingPreference(brandingGenerationRequestModel.getWebsiteUrl());
             BrandingGenerationResponseModel response = new BrandingGenerationResponseModel();
             response.setOperationId(operationId);
+            LOG.info("Branding preference generation initiated successfully with operation ID: " + operationId);
             return response;
         } catch (AIServerException e) {
             throw handleServerException(e);
@@ -79,12 +84,16 @@ public class BrandingAIPreferenceManagementService {
      */
     public BrandingGenerationStatusModel getBrandingPreferenceGenerationStatus(String operationId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving branding preference generation status for operation ID: " + operationId);
+        }
         try {
             Object generationStatus = BrandingPreferenceServiceHolder.getBrandingPreferenceAiManager()
                     .getBrandingPreferenceGenerationStatus(operationId);
             BrandingGenerationStatusModel response = new BrandingGenerationStatusModel();
             Map<String, Object> generationStatusMap = convertObjectToMap(generationStatus);
             if (!generationStatusMap.containsKey(AI_RESPONSE_STATUS_KEY)) {
+                LOG.warn("AI response does not contain expected status key for operation ID: " + operationId);
                 throw new AIServerException(ERROR_CODE_ERROR_GETTING_BRANDING_RESULT_STATUS.getMessage(),
                         ERROR_CODE_ERROR_GETTING_BRANDING_RESULT_STATUS.getCode());
             }
@@ -105,6 +114,9 @@ public class BrandingAIPreferenceManagementService {
      */
     public BrandingGenerationResultModel getBrandingPreferenceGenerationResult(String operationId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving branding preference generation result for operation ID: " + operationId);
+        }
         try {
             Object generationResult = BrandingPreferenceServiceHolder.getBrandingPreferenceAiManager()
                     .getBrandingPreferenceGenerationResult(operationId);
@@ -114,12 +126,14 @@ public class BrandingAIPreferenceManagementService {
             response.setStatus(getStatusFromResult(resultMap));
 
             if (!resultMap.containsKey(AI_RESPONSE_DATA_KEY)) {
+                LOG.warn("AI response does not contain expected data key for operation ID: " + operationId);
                 throw new AIServerException(ERROR_CODE_ERROR_GETTING_BRANDING_RESULT_STATUS.getMessage(),
                         ERROR_CODE_ERROR_GETTING_BRANDING_RESULT_STATUS.getCode());
             }
 
             Map<String, Object> dataMap = (Map<String, Object>) resultMap.get(AI_RESPONSE_DATA_KEY);
             response.setData(dataMap);
+            LOG.info("Retrieved branding preference generation result successfully for operation ID: " + operationId);
             return response;
         } catch (AIServerException e) {
             throw handleServerException(e);

@@ -82,6 +82,9 @@ public class WorkflowService {
 
         Workflow currentWorkflow;
         try {
+            if (log.isDebugEnabled()) {
+                log.debug("Adding workflow with name: " + (workflow != null ? workflow.getName() : "null"));
+            }
             if (workflowManagementService.isWorkflowExistByName(workflow.getName())) {
                 throw new WorkflowClientException("A workflow with name: " + workflow.getName() + " already exists.");
             }
@@ -91,6 +94,7 @@ public class WorkflowService {
             List<Parameter> parameterList = createParameterList(workflowId, templateProperties);
             workflowManagementService.addWorkflow(currentWorkflow, parameterList,
                     CarbonContext.getThreadLocalCarbonContext().getTenantId());
+            log.info("Successfully added workflow: " + workflow.getName() + " with ID: " + workflowId);
             return getWorkflow(workflowId);
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_ADDING_WORKFLOW, null, e);
@@ -110,6 +114,10 @@ public class WorkflowService {
 
         Workflow currentWorkflow;
         try {
+            if (log.isDebugEnabled()) {
+                log.debug("Updating workflow with ID: " + workflowId + " and name: " + 
+                        (workflow != null ? workflow.getName() : "null"));
+            }
             Workflow existingWorkflow = workflowManagementService.getWorkflow(workflowId);
 
             if (existingWorkflow == null) {
@@ -120,6 +128,7 @@ public class WorkflowService {
             List<Parameter> parameterList = createParameterList(workflowId, templateProperties);
             workflowManagementService.addWorkflow(currentWorkflow, parameterList,
                     CarbonContext.getThreadLocalCarbonContext().getTenantId());
+            log.info("Successfully updated workflow with ID: " + workflowId);
             return getWorkflow(workflowId);
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_UPDATING_WORKFLOW, workflowId, e);
@@ -187,7 +196,11 @@ public class WorkflowService {
     public void removeWorkflow(String workflowId) {
 
         try {
+            if (log.isDebugEnabled()) {
+                log.debug("Removing workflow with ID: " + workflowId);
+            }
             workflowManagementService.removeWorkflow(workflowId);
+            log.info("Successfully removed workflow with ID: " + workflowId);
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_WORKFLOW_NOT_FOUND, workflowId, e);
         } catch (WorkflowException e) {
@@ -204,6 +217,12 @@ public class WorkflowService {
     public WorkflowAssociationResponse addAssociation(WorkflowAssociationRequest workflowAssociation) {
 
         try {
+            if (log.isDebugEnabled()) {
+                log.debug("Adding workflow association: " + 
+                        (workflowAssociation != null ? workflowAssociation.getAssociationName() : "null") +
+                        " for workflow ID: " + 
+                        (workflowAssociation != null ? workflowAssociation.getWorkflowId() : "null"));
+            }
             Workflow currentWorkflow = workflowManagementService.getWorkflow(workflowAssociation.getWorkflowId());
             WorkflowEvent event = workflowManagementService.getEvent(workflowAssociation.getOperation().toString());
             if (currentWorkflow == null) {
@@ -227,6 +246,8 @@ public class WorkflowService {
                             "workflow ID: " + workflowAssociation.getWorkflowId() + ", association name: "
                             + workflowAssociation.getAssociationName() + ", event: "
                             + workflowAssociation.getOperation().value()));
+            log.info("Successfully added workflow association: " + workflowAssociation.getAssociationName() + 
+                    " for workflow ID: " + workflowAssociation.getWorkflowId());
             return getAssociationDetails(createdAssociations);
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_ADDING_ASSOCIATION,
@@ -329,12 +350,16 @@ public class WorkflowService {
     public void removeAssociation(String associationId) {
 
         try {
+            if (log.isDebugEnabled()) {
+                log.debug("Removing workflow association with ID: " + associationId);
+            }
             Association association = workflowManagementService.getAssociation(associationId);
             if (association == null) {
                 throw new WorkflowClientException("A workflow association with ID: " + associationId +
                         "doesn't exist.");
             }
             workflowManagementService.removeAssociation(Integer.parseInt(associationId));
+            log.info("Successfully removed workflow association with ID: " + associationId);
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_ASSOCIATION_NOT_FOUND, associationId, e);
         } catch (WorkflowException e) {

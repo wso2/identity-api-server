@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.api.resource.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.api.resource.v1.MetaApiService;
 import org.wso2.carbon.identity.api.server.api.resource.v1.core.ServerAPIResourceCollectionManagementService;
 import org.wso2.carbon.identity.api.server.api.resource.v1.factories.ServerAPIResourceCollectionManagementServiceFactory;
@@ -29,6 +31,7 @@ import javax.ws.rs.core.Response;
  */
 public class MetaApiServiceImpl implements MetaApiService {
 
+    private static final Log LOG = LogFactory.getLog(MetaApiServiceImpl.class);
     private final ServerAPIResourceCollectionManagementService serverAPIResourceManagementService;
 
     public MetaApiServiceImpl() {
@@ -37,6 +40,7 @@ public class MetaApiServiceImpl implements MetaApiService {
             this.serverAPIResourceManagementService = ServerAPIResourceCollectionManagementServiceFactory
                     .getServerAPIResourceCollectionManagementService();
         } catch (IllegalStateException e) {
+            LOG.error("Failed to initialize API resource collection management service", e);
             throw new RuntimeException("Error occurred while initiating API resource collection management service.",
                     e);
         }
@@ -45,6 +49,9 @@ public class MetaApiServiceImpl implements MetaApiService {
     @Override
     public Response getAPIResourceCollectionByCollectionId(String collectionId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving API resource collection with ID: " + collectionId);
+        }
         return Response.ok().entity(
                 serverAPIResourceManagementService.getAPIResourceCollectionByCollectionId(collectionId)).build();
     }

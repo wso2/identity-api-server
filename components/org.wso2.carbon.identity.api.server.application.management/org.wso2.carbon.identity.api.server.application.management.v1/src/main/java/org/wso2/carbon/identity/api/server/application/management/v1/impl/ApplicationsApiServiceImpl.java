@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.application.management.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
@@ -53,7 +55,8 @@ import org.wso2.carbon.identity.api.server.application.management.v1.core.Server
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationSharingService;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.TransferResource;
 import org.wso2.carbon.identity.api.server.application.management.v1.factories.LoginFlowAIServiceFactory;
-import org.wso2.carbon.identity.api.server.application.management.v1.factories.ServerApplicationManagementServiceFactory;
+import org.wso2.carbon.identity.api.server.application.management.v1.factories
+        .ServerApplicationManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.application.management.v1.factories.ServerApplicationMetadataServiceFactory;
 import org.wso2.carbon.identity.api.server.application.management.v1.factories.ServerApplicationSharingServiceFactory;
 import org.wso2.carbon.identity.api.server.common.Constants;
@@ -70,12 +73,17 @@ import javax.ws.rs.core.Response;
  */
 public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
+    private static final Log log = LogFactory.getLog(ApplicationsApiServiceImpl.class);
+
     private final ServerApplicationManagementService applicationManagementService;
     private final ServerApplicationMetadataService applicationMetadataService;
     private final ServerApplicationSharingService applicationSharingService;
 
     public ApplicationsApiServiceImpl() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Initializing ApplicationsApiServiceImpl.");
+        }
         try {
             this.applicationManagementService = ServerApplicationManagementServiceFactory
                     .getServerApplicationManagementService();
@@ -83,7 +91,11 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
                     .getServerApplicationMetadataService();
             this.applicationSharingService = ServerApplicationSharingServiceFactory
                     .getServerApplicationSharingService();
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully initialized ApplicationsApiServiceImpl with required services.");
+            }
         } catch (IllegalStateException e) {
+            log.error("Error occurred while initiating application management services.", e);
             throw new RuntimeException("Error occurred while initiating application management services.", e);
         }
     }
@@ -93,6 +105,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     public Response getAllApplications(Integer limit, Integer offset, String filter, String sortOrder, String sortBy,
                                        String requiredAttributes) {
 
+        log.warn("Using deprecated getAllApplications method without excludeSystemPortals parameter.");
         return getAllApplications(limit, offset, filter, sortOrder, sortBy, requiredAttributes, false);
     }
 
@@ -100,14 +113,26 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     public Response getAllApplications(Integer limit, Integer offset, String filter, String sortOrder, String sortBy,
                                        String requiredAttributes, Boolean excludeSystemPortals) {
 
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Retrieving applications with limit: %s, offset: %s, excludeSystemPortals: %s",
+                    limit, offset, excludeSystemPortals));
+        }
         ApplicationListResponse listResponse = applicationManagementService.getAllApplications(limit, offset, filter,
                 sortOrder, sortBy, requiredAttributes, Boolean.TRUE.equals(excludeSystemPortals));
+        if (log.isDebugEnabled()) {
+            int count = listResponse != null && listResponse.getApplications() != null ? 
+                    listResponse.getApplications().size() : 0;
+            log.debug(String.format("Successfully retrieved %d applications.", count));
+        }
         return Response.ok().entity(listResponse).build();
     }
 
     @Override
     public Response getApplication(String applicationId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Retrieving application with ID: %s", applicationId));
+        }
         return Response.ok().entity(applicationManagementService.getApplication(applicationId)).build();
     }
 
@@ -140,14 +165,28 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response changeApplicationOwner(String applicationId, ApplicationOwner applicationOwner) {
 
+        String newOwner = applicationOwner != null ? applicationOwner.getId() : null;
+        if (log.isInfoEnabled()) {
+            log.info(String.format("Changing owner of application ID: %s to user: %s", applicationId, newOwner));
+        }
         applicationManagementService.changeApplicationOwner(applicationId, applicationOwner);
+        if (log.isInfoEnabled()) {
+            log.info(String.format("Successfully changed owner of application ID: %s", applicationId));
+        }
         return Response.ok().build();
     }
 
     @Override
     public Response createApplication(ApplicationModel applicationModel, String template) {
 
+        String applicationName = applicationModel != null ? applicationModel.getName() : null;
+        if (log.isInfoEnabled()) {
+            log.info(String.format("Creating application: %s with template: %s", applicationName, template));
+        }
         String resourceId = applicationManagementService.createApplication(applicationModel, template);
+        if (log.isInfoEnabled()) {
+            log.info(String.format("Successfully created application: %s with ID: %s", applicationName, resourceId));
+        }
         return Response.created(getResourceLocation(resourceId)).build();
     }
 
@@ -161,7 +200,13 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response deleteApplication(String applicationId) {
 
+        if (log.isInfoEnabled()) {
+            log.info(String.format("Deleting application with ID: %s", applicationId));
+        }
         applicationManagementService.deleteApplication(applicationId);
+        if (log.isInfoEnabled()) {
+            log.info(String.format("Successfully deleted application with ID: %s", applicationId));
+        }
         return Response.noContent().build();
     }
 
@@ -182,7 +227,13 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel) {
 
+        if (log.isInfoEnabled()) {
+            log.info(String.format("Patching application with ID: %s", applicationId));
+        }
         applicationManagementService.patchApplication(applicationId, applicationPatchModel);
+        if (log.isInfoEnabled()) {
+            log.info(String.format("Successfully patched application with ID: %s", applicationId));
+        }
         return Response.ok().build();
     }
 
@@ -290,6 +341,10 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response exportApplication(String applicationId, Boolean exportSecrets) {
 
+        if (log.isInfoEnabled()) {
+            log.info(String.format("Exporting application with ID: %s, exportSecrets: %s", applicationId, 
+                    exportSecrets));
+        }
         return Response.ok().entity(
                 applicationManagementService.exportApplication(applicationId, exportSecrets)).build();
     }
@@ -325,7 +380,15 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response importApplication(InputStream fileInputStream, Attachment fileDetail) {
 
+        String fileName = fileDetail != null ? fileDetail.getContentDisposition().getFilename() : null;
+        if (log.isInfoEnabled()) {
+            log.info(String.format("Importing application from file: %s", fileName));
+        }
         String resourceId = applicationManagementService.importApplication(fileInputStream, fileDetail);
+        if (log.isInfoEnabled()) {
+            log.info(String.format("Successfully imported application with ID: %s from file: %s", resourceId, 
+                    fileName));
+        }
         return Response.created(getResourceLocation(resourceId)).build();
     }
 

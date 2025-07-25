@@ -90,6 +90,10 @@ public class BrandingPreferenceManagementService {
     public BrandingPreferenceModel addBrandingPreference(BrandingPreferenceModel brandingPreferenceModel) {
 
         String tenantDomain = getTenantDomainFromContext();
+        if (log.isDebugEnabled()) {
+            log.debug("Adding branding preference for tenant: " + tenantDomain + " and type: " + 
+                    brandingPreferenceModel.getType());
+        }
         String preferencesJSON = generatePreferencesJSONFromRequest(brandingPreferenceModel.getPreference());
         if (!BrandingPreferenceUtils.isValidJSONString(preferencesJSON)) {
             throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_INVALID_BRANDING_PREFERENCE, null);
@@ -99,6 +103,7 @@ public class BrandingPreferenceManagementService {
         try {
             BrandingPreference requestDTO = buildRequestDTOFromBrandingRequest(brandingPreferenceModel);
             responseDTO = brandingPreferenceManager.addBrandingPreference(requestDTO);
+            log.info("Branding preference added successfully for tenant: " + tenantDomain);
         } catch (BrandingPreferenceMgtException e) {
             if (BRANDING_PREFERENCE_ALREADY_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
                 if (log.isDebugEnabled()) {
@@ -134,8 +139,13 @@ public class BrandingPreferenceManagementService {
             name = tenantDomain;
         }
 
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting branding preference for tenant: " + tenantDomain + ", type: " + type + 
+                    ", name: " + name + ", locale: " + locale);
+        }
         try {
             brandingPreferenceManager.deleteBrandingPreference(type, name, locale);
+            log.info("Branding preference deleted successfully for tenant: " + tenantDomain);
         } catch (BrandingPreferenceMgtException e) {
             if (BRANDING_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
                 if (log.isDebugEnabled()) {
@@ -253,6 +263,10 @@ public class BrandingPreferenceManagementService {
     public BrandingPreferenceModel updateBrandingPreference(BrandingPreferenceModel brandingPreferenceModel) {
 
         String tenantDomain = getTenantDomainFromContext();
+        if (log.isDebugEnabled()) {
+            log.debug("Updating branding preference for tenant: " + tenantDomain + " and type: " + 
+                    brandingPreferenceModel.getType());
+        }
 
         String preferencesJSON = generatePreferencesJSONFromRequest(brandingPreferenceModel.getPreference());
         if (!BrandingPreferenceUtils.isValidJSONString(preferencesJSON)) {
@@ -263,6 +277,7 @@ public class BrandingPreferenceManagementService {
         try {
             BrandingPreference requestDTO = buildRequestDTOFromBrandingRequest(brandingPreferenceModel);
             responseDTO = brandingPreferenceManager.replaceBrandingPreference(requestDTO);
+            log.info("Branding preference updated successfully for tenant: " + tenantDomain);
         } catch (BrandingPreferenceMgtException e) {
             if (BRANDING_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
                 if (log.isDebugEnabled()) {

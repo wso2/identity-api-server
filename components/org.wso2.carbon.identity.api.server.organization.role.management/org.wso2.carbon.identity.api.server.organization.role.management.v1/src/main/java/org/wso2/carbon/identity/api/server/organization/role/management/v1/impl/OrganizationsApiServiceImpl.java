@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.organization.role.management.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.organization.role.management.v1.OrganizationsApiService;
 import org.wso2.carbon.identity.api.server.organization.role.management.v1.factories.RoleManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.organization.role.management.v1.model.RolePatchRequest;
@@ -32,13 +34,18 @@ import javax.ws.rs.core.Response;
  */
 public class OrganizationsApiServiceImpl implements OrganizationsApiService {
 
+    private static final Log LOG = LogFactory.getLog(OrganizationsApiServiceImpl.class);
     private final RoleManagementService roleManagementService;
 
     public OrganizationsApiServiceImpl() {
 
         try {
             this.roleManagementService = RoleManagementServiceFactory.getRoleManagementService();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("OrganizationsApiServiceImpl initialized successfully.");
+            }
         } catch (IllegalStateException e) {
+            LOG.error("Error occurred while initiating role management service.", e);
             throw new RuntimeException("Error occurred while initiating role management service.", e);
         }
     }
@@ -46,6 +53,9 @@ public class OrganizationsApiServiceImpl implements OrganizationsApiService {
     @Override
     public Response createRole(String organizationId, RolePostRequest rolePostRequest) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Creating role for organization: %s", organizationId));
+        }
         return roleManagementService.createRole(organizationId, rolePostRequest);
     }
 
@@ -53,18 +63,27 @@ public class OrganizationsApiServiceImpl implements OrganizationsApiService {
     public Response organizationsOrganizationIdRolesGet(String organizationId, String filter, Integer count,
                                                         String cursor) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Getting roles for organization: %s", organizationId));
+        }
         return roleManagementService.getRolesOfOrganization(organizationId, filter, count, cursor);
     }
 
     @Override
     public Response organizationsOrganizationIdRolesRoleIdDelete(String roleId, String organizationId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Deleting role: %s for organization: %s", roleId, organizationId));
+        }
         return roleManagementService.deleteRole(organizationId, roleId);
     }
 
     @Override
     public Response organizationsOrganizationIdRolesRoleIdGet(String roleId, String organizationId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Getting role: %s for organization: %s", roleId, organizationId));
+        }
         return roleManagementService.getRoleUsingOrganizationIdAndRoleId(organizationId, roleId);
     }
 
@@ -72,6 +91,9 @@ public class OrganizationsApiServiceImpl implements OrganizationsApiService {
     public Response organizationsOrganizationIdRolesRoleIdPatch(String roleId, String organizationId,
                                                                 RolePatchRequest rolePatchRequest) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Patching role: %s for organization: %s", roleId, organizationId));
+        }
         return roleManagementService.patchRole(organizationId, roleId, rolePatchRequest);
     }
 
@@ -79,12 +101,18 @@ public class OrganizationsApiServiceImpl implements OrganizationsApiService {
     public Response organizationsOrganizationIdRolesRoleIdPut(String roleId, String organizationId,
                                                               RolePutRequest rolePutRequest) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Updating role: %s for organization: %s", roleId, organizationId));
+        }
         return roleManagementService.putRole(organizationId, roleId, rolePutRequest);
     }
 
     @Override
     public Response organizationsOrganizationIdUsersUserIdRolesGet(String userId, String organizationId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Getting roles for user: %s in organization: %s", userId, organizationId));
+        }
         return roleManagementService.getUserRolesOfOrganization(organizationId, userId);
     }
 }

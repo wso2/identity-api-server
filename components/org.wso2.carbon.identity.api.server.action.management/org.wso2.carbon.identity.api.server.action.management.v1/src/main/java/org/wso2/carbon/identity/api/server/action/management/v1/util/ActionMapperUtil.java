@@ -19,6 +19,8 @@
 package org.wso2.carbon.identity.api.server.action.management.v1.util;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.action.management.api.exception.ActionMgtClientException;
 import org.wso2.carbon.identity.action.management.api.exception.ActionMgtException;
@@ -50,6 +52,8 @@ import static org.wso2.carbon.identity.api.server.action.management.v1.constants
  */
 public class ActionMapperUtil {
 
+    private static final Log LOG = LogFactory.getLog(ActionMapperUtil.class);
+
     /**
      * Build Action object from ActionModel.
      *
@@ -60,6 +64,11 @@ public class ActionMapperUtil {
     public static Action buildActionRequest(Action.ActionTypes actionType, ActionModel actionModel)
             throws ActionMgtException {
 
+        if (LOG.isDebugEnabled()) {
+            String actionTypeName = actionType != null ? actionType.toString() : "null";
+            String actionName = actionModel != null ? actionModel.getName() : "null";
+            LOG.debug("Building action request for type: " + actionTypeName + " with name: " + actionName);
+        }
         Authentication authentication = ActionMapperUtil.buildAuthentication(
                 Authentication.Type.valueOfName(actionModel.getEndpoint().getAuthentication().getType().toString()),
                 actionModel.getEndpoint().getAuthentication().getProperties());
@@ -70,7 +79,7 @@ public class ActionMapperUtil {
                     PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain());
         }
 
-        return new Action.ActionRequestBuilder()
+        Action action = new Action.ActionRequestBuilder()
                 .name(actionModel.getName())
                 .description(actionModel.getDescription())
                 .endpoint(new EndpointConfig.EndpointConfigBuilder()
@@ -79,6 +88,11 @@ public class ActionMapperUtil {
                         .build())
                 .rule(actionRule)
                 .build();
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Action request built successfully for type: " + actionType);
+        }
+        return action;
     }
 
     /**
@@ -92,6 +106,9 @@ public class ActionMapperUtil {
     public static Action buildUpdatingActionRequest(Action.ActionTypes actionType, ActionUpdateModel actionUpdateModel)
             throws ActionMgtException {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Building updating action request for type: " + (actionType != null ? actionType : "null"));
+        }
         EndpointConfig endpointConfig = null;
         if (actionUpdateModel.getEndpoint() != null) {
 
@@ -113,12 +130,17 @@ public class ActionMapperUtil {
                     PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain());
         }
 
-        return new Action.ActionRequestBuilder()
+        Action action = new Action.ActionRequestBuilder()
                 .name(actionUpdateModel.getName())
                 .description(actionUpdateModel.getDescription())
                 .endpoint(endpointConfig)
                 .rule(actionRule)
                 .build();
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating action request built successfully for type: " + actionType);
+        }
+        return action;
     }
 
     /**

@@ -87,6 +87,9 @@ public class ServerEmailTemplatesService {
         handleNoteSupportedParameters(limit, offset, sortOrder, sortBy);
 
         try {
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieving all email template types from tenant: " + getTenantDomainFromContext());
+            }
             List<String> requestedAttributeList = null;
             List<EmailTemplate> allTemplates = null;
             List<String> availableTemplateTypes = emailTemplateManager
@@ -214,6 +217,10 @@ public class ServerEmailTemplatesService {
 
         String templateTypeDisplayName = emailTemplateType.getDisplayName();
         try {
+            if (log.isDebugEnabled()) {
+                log.debug("Adding email template type: " + templateTypeDisplayName + 
+                        " for tenant: " + getTenantDomainFromContext());
+            }
             // Add email template type without templates, first.
             emailTemplateManager.addEmailTemplateType(templateTypeDisplayName, getTenantDomainFromContext());
 
@@ -231,6 +238,9 @@ public class ServerEmailTemplatesService {
             response.setId(templateTypeId);
             response.setSelf(getTemplateTypeLocation(templateTypeId));
 
+            if (log.isDebugEnabled()) {
+                log.debug("Email template type added successfully: " + templateTypeDisplayName);
+            }
             return response;
         } catch (I18nEmailMgtException e) {
             throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_ADDING_EMAIL_TEMPLATE_TYPE);
@@ -248,6 +258,10 @@ public class ServerEmailTemplatesService {
 
         String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
         try {
+            if (log.isDebugEnabled()) {
+                log.debug("Adding email template: " + emailTemplateWithID.getId() + 
+                        " to template type: " + templateTypeDisplayName);
+            }
             boolean isTemplateExists = emailTemplateManager.isEmailTemplateExists(templateTypeDisplayName,
                     emailTemplateWithID.getId(), getTenantDomainFromContext());
             if (!isTemplateExists) {
@@ -258,6 +272,9 @@ public class ServerEmailTemplatesService {
                 SimpleEmailTemplate simpleEmailTemplate = new SimpleEmailTemplate();
                 simpleEmailTemplate.setSelf(getTemplateLocation(templateTypeId, emailTemplateWithID.getId()));
                 simpleEmailTemplate.setId(emailTemplateWithID.getId());
+                if (log.isDebugEnabled()) {
+                    log.debug("Email template added successfully: " + emailTemplateWithID.getId());
+                }
                 return simpleEmailTemplate;
             } else {
                 throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_ALREADY_EXISTS);
@@ -285,7 +302,13 @@ public class ServerEmailTemplatesService {
             boolean isTemplateTypeExists = emailTemplateManager.isEmailTemplateTypeExists(templateTypeDisplayName,
                     getTenantDomainFromContext());
             if (isTemplateTypeExists) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Deleting email template type: " + templateTypeDisplayName);
+                }
                 emailTemplateManager.deleteEmailTemplateType(templateTypeDisplayName, getTenantDomainFromContext());
+                if (log.isDebugEnabled()) {
+                    log.debug("Email template type deleted successfully: " + templateTypeDisplayName);
+                }
             }
         } catch (I18nEmailMgtException e) {
             throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_DELETING_EMAIL_TEMPLATE_TYPE);
@@ -311,8 +334,14 @@ public class ServerEmailTemplatesService {
             boolean isTemplateExists = emailTemplateManager.isEmailTemplateExists(templateTypeDisplayName, templateId,
                     getTenantDomainFromContext());
             if (isTemplateExists) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Deleting email template: " + templateId + " from type: " + templateTypeDisplayName);
+                }
                 emailTemplateManager.deleteEmailTemplate(templateTypeDisplayName, templateId,
                         getTenantDomainFromContext());
+                if (log.isDebugEnabled()) {
+                    log.debug("Email template deleted successfully: " + templateId);
+                }
             }
         } catch (I18nEmailMgtException e) {
             throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_DELETING_EMAIL_TEMPLATE);
@@ -330,11 +359,17 @@ public class ServerEmailTemplatesService {
 
         String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
         try {
+            if (log.isDebugEnabled()) {
+                log.debug("Updating email template: " + templateId + " in type: " + templateTypeDisplayName);
+            }
             // Check whether the email template exists, first.
             boolean isTemplateExists = emailTemplateManager.isEmailTemplateExists(templateTypeDisplayName, templateId,
                     getTenantDomainFromContext());
             if (isTemplateExists) {
                 addEmailTemplateToTheSystem(templateTypeDisplayName, emailTemplateWithID);
+                if (log.isDebugEnabled()) {
+                    log.debug("Email template updated successfully: " + templateId);
+                }
             } else {
                 throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_NOT_FOUND);
             }

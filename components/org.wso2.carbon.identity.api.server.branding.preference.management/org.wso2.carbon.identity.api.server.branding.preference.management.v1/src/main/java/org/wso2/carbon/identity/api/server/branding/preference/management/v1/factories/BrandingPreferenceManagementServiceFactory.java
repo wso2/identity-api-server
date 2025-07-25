@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.branding.preference.management.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceServiceHolder;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.core.BrandingPreferenceManagementService;
 import org.wso2.carbon.identity.branding.preference.management.core.BrandingPreferenceManager;
@@ -27,17 +29,21 @@ import org.wso2.carbon.identity.branding.preference.management.core.BrandingPref
  */
 public class BrandingPreferenceManagementServiceFactory {
 
+    private static final Log log = LogFactory.getLog(BrandingPreferenceManagementServiceFactory.class);
     private static final BrandingPreferenceManagementService SERVICE;
 
     static {
+        log.info("Initializing BrandingPreferenceManagementService factory");
         BrandingPreferenceManager brandingPreferenceManager = BrandingPreferenceServiceHolder
                 .getBrandingPreferenceManager();
 
         if (brandingPreferenceManager == null) {
+            log.error("BrandingPreferenceManager is not available from OSGi context");
             throw new IllegalStateException("BrandingPreferenceManager is not available from OSGi context.");
         }
 
         SERVICE = new BrandingPreferenceManagementService(brandingPreferenceManager);
+        log.info("BrandingPreferenceManagementService factory initialized successfully");
     }
 
     /**

@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.input.validation.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.input.validation.common.InputValidationServiceHolder;
 import org.wso2.carbon.identity.api.server.input.validation.v1.core.ValidationRulesManagementApiService;
 import org.wso2.carbon.identity.input.validation.mgt.services.InputValidationManagementService;
@@ -27,17 +29,24 @@ import org.wso2.carbon.identity.input.validation.mgt.services.InputValidationMan
  */
 public class ValidationRulesManagementApiServiceFactory {
 
+    private static final Log LOGGER = LogFactory.getLog(ValidationRulesManagementApiServiceFactory.class);
     private static final ValidationRulesManagementApiService SERVICE;
 
     static {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Initializing ValidationRulesManagementApiServiceFactory.");
+        }
         InputValidationManagementService inputValidationManagementService = InputValidationServiceHolder
                 .getInputValidationMgtService();
 
         if (inputValidationManagementService == null) {
-            throw new IllegalStateException("InputValidationManagementService is not available from OSGi context.");
+            String errorMsg = "InputValidationManagementService is not available from OSGi context.";
+            LOGGER.error(errorMsg);
+            throw new IllegalStateException(errorMsg);
         }
 
         SERVICE = new ValidationRulesManagementApiService(inputValidationManagementService);
+        LOGGER.info("ValidationRulesManagementApiService initialized successfully.");
     }
 
     /**
