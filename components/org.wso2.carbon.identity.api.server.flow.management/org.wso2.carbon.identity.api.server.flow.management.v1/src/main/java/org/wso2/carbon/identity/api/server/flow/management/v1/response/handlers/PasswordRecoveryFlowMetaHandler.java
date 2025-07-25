@@ -19,19 +19,15 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.api.server.flow.management.v1.BaseConnectorConfigs;
-import org.wso2.carbon.identity.api.server.flow.management.v1.PasswordRecoveryConnectorConfigs;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
 import org.wso2.carbon.identity.flow.mgt.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.END_USER_ATTRIBUTE_PROFILE;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USER_RESOLVE_EXECUTOR;
-import static org.wso2.carbon.identity.recovery.IdentityRecoveryConstants.ConnectorConfig.PASSWORD_RECOVERY_EMAIL_LINK_ENABLE;
-import static org.wso2.carbon.identity.recovery.IdentityRecoveryConstants.ConnectorConfig.PASSWORD_RECOVERY_SEND_OTP_IN_EMAIL;
-import static org.wso2.carbon.identity.recovery.IdentityRecoveryConstants.ConnectorConfig.PASSWORD_RECOVERY_SMS_OTP_ENABLE;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.USER_RESOLVE_EXECUTOR;
 
 /**
  * Handler for managing the password recovery flow meta information.
@@ -39,6 +35,13 @@ import static org.wso2.carbon.identity.recovery.IdentityRecoveryConstants.Connec
  * implementations for password recovery flow.
  */
 public class PasswordRecoveryFlowMetaHandler extends AbstractMetaResponseHandler {
+
+    private static final String PASSWORD_RECOVERY_EMAIL_OTP_ENABLED = "passwordRecoveryEmailOtpEnabled";
+    private static final String EMAIL_OTP_ENABLED_PROPERTY = "Recovery.Notification.Password.OTP.SendOTPInEmail";
+    private static final String PASSWORD_RECOVERY_SMS_OTP_ENABLED = "passwordRecoverySmsOtpEnabled";
+    private static final String SMS_OTP_ENABLED_PROPERTY = "Recovery.Notification.Password.smsOtp.Enable";
+    private static final String PASSWORD_RECOVERY_MAGIC_LINK_ENABLED = "passwordRecoveryMagicLinkEnabled";
+    private static final String EMAIL_LINK_ENABLED_PROPERTY = "Recovery.Notification.Password.emailLink.Enable";
 
     @Override
     public String getFlowType() {
@@ -53,20 +56,16 @@ public class PasswordRecoveryFlowMetaHandler extends AbstractMetaResponseHandler
     }
 
     @Override
-    public PasswordRecoveryConnectorConfigs getConnectorConfigs() {
+    public Map<String, Boolean> getConnectorConfigs() {
 
-        Utils utils = new Utils();
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-        PasswordRecoveryConnectorConfigs connectorConfigs = new PasswordRecoveryConnectorConfigs();
-        BaseConnectorConfigs baseConfigs = super.getConnectorConfigs();
-        connectorConfigs.setMultiAttributeLoginEnabled(baseConfigs.getMultiAttributeLoginEnabled());
-        connectorConfigs.setPasswordRecoveryEnabled(
-                utils.isFlowConfigEnabled(tenantDomain,
-                        PASSWORD_RECOVERY_EMAIL_LINK_ENABLE) ||
-                utils.isFlowConfigEnabled(tenantDomain,
-                        PASSWORD_RECOVERY_SMS_OTP_ENABLE) ||
-                utils.isFlowConfigEnabled(tenantDomain,
-                        PASSWORD_RECOVERY_SEND_OTP_IN_EMAIL));
+        Map<String, Boolean> connectorConfigs = super.getConnectorConfigs();
+        connectorConfigs.put(PASSWORD_RECOVERY_EMAIL_OTP_ENABLED,
+                Utils.getGovernanceConfig(tenantDomain, EMAIL_OTP_ENABLED_PROPERTY));
+        connectorConfigs.put(PASSWORD_RECOVERY_SMS_OTP_ENABLED,
+                Utils.getGovernanceConfig(tenantDomain, SMS_OTP_ENABLED_PROPERTY));
+        connectorConfigs.put(PASSWORD_RECOVERY_MAGIC_LINK_ENABLED,
+                Utils.getGovernanceConfig(tenantDomain, EMAIL_LINK_ENABLED_PROPERTY));
         return connectorConfigs;
     }
 
