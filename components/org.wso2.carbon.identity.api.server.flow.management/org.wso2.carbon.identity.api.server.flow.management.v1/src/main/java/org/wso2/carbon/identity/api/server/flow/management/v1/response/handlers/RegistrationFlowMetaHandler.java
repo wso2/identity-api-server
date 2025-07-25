@@ -71,7 +71,7 @@ public class RegistrationFlowMetaHandler extends AbstractMetaResponseHandler {
     @Override
     public List<String> getRequiredInputFields() {
 
-        return new ArrayList<>(getLoginInputFields());
+        return new ArrayList<>();
     }
 
     @Override
