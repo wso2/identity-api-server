@@ -903,7 +903,7 @@ public class WorkflowService {
                     case "datecategory":
                     case "operationtype":
                         if ("eq".equals(operator)) {
-                            result.put(field, value);
+                            result.put(field, value != null ? value : "");
                         } else {
                             throw new WorkflowClientException(
                                     "Only `eq` operator is supported for " + field + ": " + operator);
