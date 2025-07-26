@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.authenticators</artifactId>
-        <version>1.3.164-SNAPSHOT</version>
+        <version>1.3.164</version>
     </parent>
 
     <artifactId>org.wso2.carbon.identity.api.server.authenticators.v1</artifactId>
