@@ -81,7 +81,6 @@ public class WorkflowService {
     private final String allTasksRequestType = "ALL_TASKS";
     private final String myTasksRequestType = "MY_TASKS";
     private final String defaultBeginDate = "1950-01-01:00:00:00.000";
-    private final String defaultEndDate = LocalDateTime.now().format(dateTimeFormatter);
     private final String defaultRequestType = allTasksRequestType;
     private final String defaultDateCategory = StringUtils.EMPTY;
     private final String defaultStatus = StringUtils.EMPTY;
@@ -770,7 +769,7 @@ public class WorkflowService {
      * @throws WorkflowException If an error occurs while retrieving the instances.
      */
     private WorkflowInstanceListResponse getPaginatedWorkflowInstances(Integer limit, Integer offset, String filter)
-            throws WorkflowException , WorkflowClientException {
+            throws WorkflowException {
 
         String user = CarbonContext.getThreadLocalCarbonContext().getUsername();
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
@@ -782,12 +781,12 @@ public class WorkflowService {
 
         String requestType = defaultRequestType;
         String beginDate = defaultBeginDate;
-        String endDate = defaultEndDate;
+        String endDate = getDefaultEndDate();
         String dateCategory = defaultDateCategory;
         String status = defaultStatus;
         String operationType = defaultOperationType;
 
-        if (filterMap != null && !filterMap.isEmpty()) {
+        if (!filterMap.isEmpty()) {
             requestType = StringUtils.isBlank(filterMap.get(requestTypeKey)) ? requestType
                     : filterMap.get(requestTypeKey);
             beginDate = StringUtils.isBlank(filterMap.get(beginDateKey)) ? beginDate
@@ -808,16 +807,15 @@ public class WorkflowService {
                     : filterMap.get(operationTypeKey);
         }
 
-        String normalizedRequestType = requestType.toUpperCase();
-        if (!allTasksRequestType.equals(normalizedRequestType) &&
-                !myTasksRequestType.equals(normalizedRequestType)) {
+        if (!allTasksRequestType.equals(requestType) &&
+                !myTasksRequestType.equals(requestType)) {
             throw new WorkflowClientException("Invalid request type: " + requestType +
                     ". Valid types are 'ALL_TASKS' and 'MY_TASKS'.");
         }
 
         org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequestFilterResponse response = workflowManagementService
                 .getRequestsFromFilter(
-                        myTasksRequestType.equals(normalizedRequestType) ? user : StringUtils.EMPTY,
+                        myTasksRequestType.equals(requestType) ? user : StringUtils.EMPTY,
                         operationType,
                         beginDate,
                         endDate,
@@ -842,7 +840,7 @@ public class WorkflowService {
         }
 
         int totalCount = allItems.size();
-        int startIndex = offset != null ? offset : 0;
+        int startIndex = offset;
         int totalResult = response.getTotalCount();
 
         workflowInstanceListResponse.setInstances(allItems);
@@ -880,9 +878,7 @@ public class WorkflowService {
 
         // Regular expression to match the expected filter format: <field> <operator> <value>
         // E.g., "requestType eq MY_TASKS".
-        Pattern pattern = Pattern.compile(
-                filterPatternRegex,
-                Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile(filterPatternRegex, Pattern.CASE_INSENSITIVE);
         
         // Iterate through each condition and extract field, operator, and value.
         for (String condition : conditions) {
@@ -890,8 +886,8 @@ public class WorkflowService {
             Matcher matcher = pattern.matcher(trimmedCondition);
 
             if (matcher.matches()) {
-                String field = matcher.group(1).toLowerCase();
-                String operator = matcher.group(2).toLowerCase();
+                String field = matcher.group(1);
+                String operator = matcher.group(2);
                 String value = matcher.group(3);
 
                 // Remove surrounding quotes from the value if present.
@@ -903,7 +899,7 @@ public class WorkflowService {
                     case "datecategory":
                     case "operationtype":
                         if ("eq".equals(operator)) {
-                            result.put(field, value != null ? value : "");
+                            result.put(field, value);
                         } else {
                             throw new WorkflowClientException(
                                     "Only `eq` operator is supported for " + field + ": " + operator);
@@ -911,7 +907,7 @@ public class WorkflowService {
                         break;
                     case "begindate":
                         if ("ge".equals(operator)) {
-                            result.put("beginDate", value != null ? value : defaultBeginDate);
+                            result.put("beginDate", value);
                         } else {
                             throw new WorkflowClientException(
                                     "Only 'ge' operator supported for beginDate");
@@ -919,7 +915,7 @@ public class WorkflowService {
                         break;
                     case "enddate":
                         if ("le".equals(operator)) {
-                            result.put("endDate", value != null ? value : defaultEndDate);
+                            result.put("endDate", value);
                         } else {
                             throw new WorkflowClientException(
                                     "Only 'le' operator supported for endDate");
@@ -994,4 +990,13 @@ public class WorkflowService {
         throw handleClientError(Response.Status.BAD_REQUEST, errorEnum, data, e);
     }
 
+    /**
+     * Get the default end date as the current time.
+     *
+     * @return The current time formatted as a string.
+     */
+    private String getDefaultEndDate() {
+
+        return LocalDateTime.now().format(dateTimeFormatter);
+    }
 }
