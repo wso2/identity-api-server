@@ -24,7 +24,7 @@ import java.io.Serializable;
 import javax.validation.constraints.NotNull;
 
 /**
- * Common DTO for all the server API related error responses
+ * Common DTO for all the server API related error responses.
  */
 @ApiModel(description = "")
 public class ErrorDTO implements Serializable {

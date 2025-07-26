@@ -32,7 +32,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 /**
- * Build user object from user id and tenant domain
+ * Build user object from user id and tenant domain.
  */
 public class UserIdtoUser implements Function<String[], User> {
 

@@ -22,14 +22,14 @@ import static org.wso2.carbon.identity.api.server.common.Util.getCorrelation;
 import static org.wso2.carbon.identity.api.server.common.Util.isCorrelationIDPresent;
 
 /**
- * Common ErrorResponse Object for all the server API related errors
+ * Common ErrorResponse Object for all the server API related errors.
  */
 public class ErrorResponse extends ErrorDTO {
 
     private static final long serialVersionUID = -3502358623560083025L;
 
     /**
-     * ErrorResponse Builder
+     * ErrorResponse Builder.
      */
     public static class Builder {
         private String code;
