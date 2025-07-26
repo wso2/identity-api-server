@@ -77,24 +77,24 @@ public class WorkflowService {
 
     private static final Log log = LogFactory.getLog(WorkflowService.class);
     private final WorkflowManagementService workflowManagementService;
-    private final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd:HH:mm:ss.SSS");
-    private final String ALL_TASKS_REQUEST_TYPE = "ALL_TASKS";
-    private final String MY_TASKS_REQUEST_TYPE = "MY_TASKS";
-    private final String DEFAULT_BEGIN_DATE = "1950-01-01:00:00:00.000";
-    private final String DEFAULT_END_DATE = LocalDateTime.now().format(DATE_TIME_FORMATTER);
-    private final String DEFAULT_REQUEST_TYPE = ALL_TASKS_REQUEST_TYPE;
-    private final String DEFAULT_DATE_CATEGORY = StringUtils.EMPTY;
-    private final String DEFAULT_STATUS = StringUtils.EMPTY;
-    private final String DEFAULT_OPERATION_TYPE = StringUtils.EMPTY;
-    private final String REQUEST_TYPE_KEY = "requesttype";
-    private final String BEGIN_DATE_KEY = "beginDate";
-    private final String END_DATE_KEY = "endDate";
-    private final String DATE_CATEGORY_KEY = "datecategory";
-    private final String STATUS_KEY = "status";
-    private final String OPERATION_TYPE_KEY = "operationtype";
-    private final String FILTER_PATTERN_REGEX = "(\\w+)\\s+(eq|ge|le)\\s+['\"]?([^'\"\\s]+)['\"]?";
-    private final String AND_REGEX = "(?i)\\s+and\\s+";
-    private final String NO_QUOTE_REGEX = "^['\"]|['\"]$";
+    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd:HH:mm:ss.SSS");
+    private final String allTasksRequestType = "ALL_TASKS";
+    private final String myTasksRequestType = "MY_TASKS";
+    private final String defaultBeginDate = "1950-01-01:00:00:00.000";
+    private final String defaultEndDate = LocalDateTime.now().format(dateTimeFormatter);
+    private final String defaultRequestType = allTasksRequestType;
+    private final String defaultDateCategory = StringUtils.EMPTY;
+    private final String defaultStatus = StringUtils.EMPTY;
+    private final String defaultOperationType = StringUtils.EMPTY;
+    private final String requestTypeKey = "requesttype";
+    private final String beginDateKey = "beginDate";
+    private final String endDateKey = "endDate";
+    private final String dateCategoryKey = "datecategory";
+    private final String statusKey = "status";
+    private final String operationTypeKey = "operationtype";
+    private final String filterPatternRegex = "(\\w+)\\s+(eq|ge|le)\\s+['\"]?([^'\"\\s]+)['\"]?";
+    private final String andRegex = "(?i)\\s+and\\s+";
+    private final String noQuoteRegex = "^['\"]|['\"]$";
 
     public WorkflowService(WorkflowManagementService workflowManagementService) {
 
@@ -780,43 +780,44 @@ public class WorkflowService {
 
         Map<String, String> filterMap = parseWorkflowFilter(filter);
 
-        String requestType = DEFAULT_REQUEST_TYPE;
-        String beginDate = DEFAULT_BEGIN_DATE;
-        String endDate = DEFAULT_END_DATE;
-        String dateCategory = DEFAULT_DATE_CATEGORY;
-        String status = DEFAULT_STATUS;
-        String operationType = DEFAULT_OPERATION_TYPE;
+        String requestType = defaultRequestType;
+        String beginDate = defaultBeginDate;
+        String endDate = defaultEndDate;
+        String dateCategory = defaultDateCategory;
+        String status = defaultStatus;
+        String operationType = defaultOperationType;
 
         if (filterMap != null && !filterMap.isEmpty()) {
-            requestType = StringUtils.isBlank(filterMap.get(REQUEST_TYPE_KEY)) ? requestType
-                    : filterMap.get(REQUEST_TYPE_KEY);
-            beginDate = StringUtils.isBlank(filterMap.get(BEGIN_DATE_KEY)) ? beginDate
-                    : filterMap.get(BEGIN_DATE_KEY);
-            endDate = StringUtils.isBlank(filterMap.get(END_DATE_KEY)) ? endDate
-                    : filterMap.get(END_DATE_KEY);
+            requestType = StringUtils.isBlank(filterMap.get(requestTypeKey)) ? requestType
+                    : filterMap.get(requestTypeKey);
+            beginDate = StringUtils.isBlank(filterMap.get(beginDateKey)) ? beginDate
+                    : filterMap.get(beginDateKey);
+            endDate = StringUtils.isBlank(filterMap.get(endDateKey)) ? endDate
+                    : filterMap.get(endDateKey);
             try {
-                LocalDateTime.parse(beginDate, DATE_TIME_FORMATTER);
-                LocalDateTime.parse(endDate, DATE_TIME_FORMATTER);
+                LocalDateTime.parse(beginDate, dateTimeFormatter);
+                LocalDateTime.parse(endDate, dateTimeFormatter);
             } catch (DateTimeParseException e) {
                 throw new WorkflowClientException("Invalid date format. Expected format: yyyy-MM-dd:HH:mm:ss.SSS");
             }
-            dateCategory = StringUtils.isBlank(filterMap.get(DATE_CATEGORY_KEY)) ? dateCategory
-                    : filterMap.get(DATE_CATEGORY_KEY);
-            status = StringUtils.isBlank(filterMap.get(STATUS_KEY)) ? status
-                    : filterMap.get(STATUS_KEY);
-            operationType = StringUtils.isBlank(filterMap.get(OPERATION_TYPE_KEY)) ? null
-                    : filterMap.get(OPERATION_TYPE_KEY);
+            dateCategory = StringUtils.isBlank(filterMap.get(dateCategoryKey)) ? dateCategory
+                    : filterMap.get(dateCategoryKey);
+            status = StringUtils.isBlank(filterMap.get(statusKey)) ? status
+                    : filterMap.get(statusKey);
+            operationType = StringUtils.isBlank(filterMap.get(operationTypeKey)) ? null
+                    : filterMap.get(operationTypeKey);
         }
 
         String normalizedRequestType = requestType.toUpperCase();
-        if (!ALL_TASKS_REQUEST_TYPE.equals(normalizedRequestType) && !MY_TASKS_REQUEST_TYPE.equals(normalizedRequestType)) {
+        if (!allTasksRequestType.equals(normalizedRequestType) &&
+                !myTasksRequestType.equals(normalizedRequestType)) {
             throw new WorkflowClientException("Invalid request type: " + requestType +
                     ". Valid types are 'ALL_TASKS' and 'MY_TASKS'.");
         }
 
         org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequestFilterResponse response = workflowManagementService
                 .getRequestsFromFilter(
-                        MY_TASKS_REQUEST_TYPE.equals(normalizedRequestType) ? user : StringUtils.EMPTY,
+                        myTasksRequestType.equals(normalizedRequestType) ? user : StringUtils.EMPTY,
                         operationType,
                         beginDate,
                         endDate,
@@ -875,12 +876,12 @@ public class WorkflowService {
 
         // Split the filter string by "and" (case-insensitive) to get individual conditions in the form 
         // <field> <operator> <value>.
-        String[] conditions = decodedFilter.split(AND_REGEX);
+        String[] conditions = decodedFilter.split(andRegex);
 
         // Regular expression to match the expected filter format: <field> <operator> <value>
         // E.g., "requestType eq MY_TASKS".
         Pattern pattern = Pattern.compile(
-                FILTER_PATTERN_REGEX,
+                filterPatternRegex,
                 Pattern.CASE_INSENSITIVE);
         
         // Iterate through each condition and extract field, operator, and value.
@@ -894,7 +895,7 @@ public class WorkflowService {
                 String value = matcher.group(3);
 
                 // Remove surrounding quotes from the value if present.
-                value = value.replaceAll(NO_QUOTE_REGEX, "");
+                value = value.replaceAll(noQuoteRegex, "");
 
                 switch (field) {
                     case "requesttype":
@@ -910,7 +911,7 @@ public class WorkflowService {
                         break;
                     case "begindate":
                         if ("ge".equals(operator)) {
-                            result.put("beginDate", value != null ? value : DEFAULT_BEGIN_DATE);
+                            result.put("beginDate", value != null ? value : defaultBeginDate);
                         } else {
                             throw new WorkflowClientException(
                                     "Only 'ge' operator supported for beginDate");
@@ -918,7 +919,7 @@ public class WorkflowService {
                         break;
                     case "enddate":
                         if ("le".equals(operator)) {
-                            result.put("endDate", value != null ? value : DEFAULT_END_DATE);
+                            result.put("endDate", value != null ? value : defaultEndDate);
                         } else {
                             throw new WorkflowClientException(
                                     "Only 'le' operator supported for endDate");
