@@ -812,6 +812,10 @@ definitions:
           $ref: '#/definitions/Property'
       profiles:
         $ref: '#/definitions/Profiles'
+      skipUserStore:
+        type: boolean
+        description: Specifies if the claim value stored in the user store should be skipped.
+        example: true
 
   #-----------------------------------------------------
   # The Local Claim Response object
@@ -910,6 +914,10 @@ definitions:
               $ref: '#/definitions/Property'
           profiles:
             $ref: '#/definitions/Profiles'
+          skipUserStore:
+            type: boolean
+            description: Specifies if the claim value stored in the user store should be skipped.
+            example: true
 
   #-----------------------------------------------------
   # The Additional Attribute Mapping object
