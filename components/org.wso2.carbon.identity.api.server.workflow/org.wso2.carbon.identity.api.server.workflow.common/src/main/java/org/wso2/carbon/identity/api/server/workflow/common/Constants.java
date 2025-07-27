@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.identity.api.server.workflow.common;
 
+import java.time.format.DateTimeFormatter;
+import java.util.regex.Pattern;
+
 /**
  * Common constants for workflow API.
  */
@@ -29,11 +32,36 @@ public class Constants {
     public static final String TEMPLATE = "Template";
     public static final String STEP_NAME_DELIMITER = "-";
     public static final String PARAMETER_VALUE_SEPARATOR = ",";
-    public static final String WORKFLOW_IMPLEMENTATION = "Workflowimpl";
-    public static final String WORKFLOW_NAME = "WorkflowName";
     public static final int DEFAULT_OFFSET = 0;
     public static final String WORKFLOW_PATH_COMPONENT = "/workflows";
     public static final String WORKFLOW_ASSOCIATION_PATH_COMPONENT = "workflow-associations";
+
+    /**
+     * Workflow instance related constants.
+     */
+    public static final DateTimeFormatter WORKFLOW_INSTANCE_DATE_TIME_FORMATTER =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd:HH:mm:ss.SSS");
+    public static final DateTimeFormatter WORKFLOW_INSTANCE_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    public static final String WORKFLOW_INSTANCE_DEFAULT_BEGIN_DATE = "1950-01-01:00:00:00.000";
+    public static final String WORKFLOW_INSTANCE_REQUEST_TYPE_KEY = "requestType";
+    public static final String WORKFLOW_INSTANCE_CREATED_DATE_KEY = "createdAt";
+    public static final String WORKFLOW_INSTANCE_CREATED_START_DATE_KEY = "createdAtStartDate";
+    public static final String WORKFLOW_INSTANCE_CREATED_END_DATE_KEY = "createdAtEndDate";
+    public static final String WORKFLOW_INSTANCE_UPDATED_DATE_KEY = "updatedAt";
+    public static final String WORKFLOW_INSTANCE_UPDATED_START_DATE_KEY = "updatedAtStartDate";
+    public static final String WORKFLOW_INSTANCE_UPDATED_END_DATE_KEY = "updatedAtEndDate";
+    public static final String WORKFLOW_INSTANCE_STATUS_KEY = "status";
+    public static final String WORKFLOW_INSTANCE_OPERATION_TYPE_KEY = "operationType";
+    public static final Pattern WORKFLOW_INSTANCE_FILTER_PATTERN =
+            Pattern.compile("(\\w+)\\s+(eq|ge|le)\\s+['\"]?([^'\"\\s]+)['\"]?", Pattern.CASE_INSENSITIVE);
+    public static final String WORKFLOW_INSTANCE_AND_REGEX = "(?i)\\s+and\\s+";
+    public static final String WORKFLOW_INSTANCE_NO_QUOTE_REGEX = "^['\"]|['\"]$";
+    public static final String WORKFLOW_INSTANCE_MY_TASKS_REQUEST_TYPE = "MY_TASKS";
+    public static final String WORKFLOW_INSTANCE_ALL_TASKS_REQUEST_TYPE = "ALL_TASKS";
+
+    public static final String EQUALS_OPERATOR = "eq";
+    public static final String GREATER_THAN_OR_EQUAL_OPERATOR = "ge";
+    public static final String LESS_THAN_OR_EQUAL_OPERATOR = "le";
 
     private Constants() {
 

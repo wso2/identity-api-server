@@ -20,38 +20,12 @@ servers:
 security:
   - OAuth2: []
   - BasicAuth: []
-tags:
-  - name: default
-    description: Secured Admin-only calls
-paths:
-  /workflow-engines:
-    get:
-      summary: Retrieve all the available workflow engines.
-      description: |
-        Retrieve metadata information of all the workflow engines in the system.
 
-      operationId: searchWorkFlowEngines
-      responses:
-        "200":
-          description: search results matching criteria
-          content:
-            "application/json":
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/WorkflowEngine"
-        "400":
-          $ref: "#/components/responses/InvalidInput"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "500":
-          $ref: "#/components/responses/ServerError"
+paths:
   /workflows:
     get:
+      tags:
+        - Workflow Management
       summary: Retrieve all the available workflows.
       description: |
         Retrieve all the available workflows in the system.
@@ -102,6 +76,8 @@ paths:
         "500":
           $ref: "#/components/responses/ServerError"
     post:
+      tags:
+        - Workflow Management
       summary: Add a new workflow.
       description: |
         Create a new workflow using the specified workflow template and execution engine.
@@ -154,6 +130,8 @@ paths:
         required: true
   /workflows/{workflow-id}:
     get:
+      tags:
+        - Workflow Management
       summary: Retrieve the workflow by workflow id.
       description: |
         Retrieve information about a specific workflow identified by the workflow id.
@@ -182,6 +160,8 @@ paths:
         "500":
           $ref: "#/components/responses/ServerError"
     put:
+      tags:
+        - Workflow Management
       summary: Update an existing workflow.
       description: |
         Update a workflow identified by workflow-id.
@@ -247,6 +227,8 @@ paths:
                         values:
                           - 234
     delete:
+      tags:
+        - Workflow Management
       summary: Delete the workflow by workflow-id.
       description: |
         Delete a specific workflow identified by the workflow-id
@@ -271,6 +253,8 @@ paths:
           $ref: "#/components/responses/ServerError"
   /workflow-associations:
     get:
+      tags:
+        - Workflow Associations Management
       summary: Retrieve all the available workflow associations.
       description: |
         Retrieve all the available workflow associations in the system.
@@ -320,6 +304,8 @@ paths:
         "500":
           $ref: "#/components/responses/ServerError"
     post:
+      tags:
+        - Workflow Associations Management
       summary: Create a new workflow association.
       description: |
         Create a new workflow association by assigning a user operation to an existing workflow.
@@ -354,6 +340,8 @@ paths:
         required: true
   /workflow-associations/{association-id}:
     get:
+      tags:
+        - Workflow Associations Management
       summary: Get the workflow association by association-id.
       description: |
         Get a specific workflow association identified by the association id.
@@ -387,6 +375,8 @@ paths:
         "500":
           $ref: "#/components/responses/ServerError"
     delete:
+      tags:
+        - Workflow Associations Management
       summary: Delete the workflow association by association-id.
       description: |
         Delete a specific workflow association identified by the association ID.
@@ -410,6 +400,8 @@ paths:
         "500":
           $ref: "#/components/responses/ServerError"
     patch:
+      tags:
+        - Workflow Associations Management
       summary: |
         Partially update association by association-id.
       operationId: updateAssociation
@@ -469,6 +461,8 @@ paths:
 
   /workflow-instances:
     get:
+      tags:
+        - Workflow Instances Management
       summary: Get workflow instances for a tenant
       description: |
         Retrieve workflow instances filtered by various parameters.
@@ -495,7 +489,7 @@ paths:
 
             Example:
 
-                `operationType+eq+ADD_USER+and+requestType eq+MY_TASKS+and+status+eq+PENDING+and+dateCategory+eq+UPDATED+and+beginDate+ge+2025-06-01:09:57:47.000+and+endDate+le+2025-07-31:09:57:47.000`
+                `operationType+eq+ADD_USER+and+requestType+eq+MY_TASKS+and+status+eq+PENDING+and+createdAt+ge+2025-06-01:09:57:47.000+and+createdAt+le+2025-07-31:09:57:47.000`
           schema:
             type: string
       responses:
@@ -518,6 +512,8 @@ paths:
 
   /workflow-instances/{instance_id}:
     get:
+      tags:
+        - Workflow Instances Management
       summary: Get workflow instance by ID
       description: |
         Retrieve a specific workflow instance by providing its unique ID.
@@ -541,6 +537,8 @@ paths:
           $ref: "#/components/responses/NotFound"
 
     delete:
+      tags:
+        - Workflow Instances Management
       summary: Delete workflow instance by ID
       description: |
         Delete a workflow instance by providing the instance ID.
@@ -558,6 +556,35 @@ paths:
           description: Successfully deleted the workflow instance
         "404":
           $ref: "#/components/responses/NotFound"
+
+  /workflow-engines:
+    get:
+      tags:
+        - Workflow Engines
+      summary: Retrieve all the available workflow engines.
+      description: |
+        Retrieve metadata information of all the workflow engines in the system.
+
+      operationId: searchWorkFlowEngines
+      responses:
+        "200":
+          description: search results matching criteria
+          content:
+            "application/json":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WorkflowEngine"
+        "400":
+          $ref: "#/components/responses/InvalidInput"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
 components:
   schemas:
