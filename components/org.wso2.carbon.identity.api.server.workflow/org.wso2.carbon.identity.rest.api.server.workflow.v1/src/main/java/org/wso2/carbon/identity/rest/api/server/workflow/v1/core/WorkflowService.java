@@ -1000,7 +1000,7 @@ public class WorkflowService {
         int pos = startPos;
         while (pos < filter.length()) {
             // Find the keyword (case insensitive)
-            int keywordPos = filter.toLowerCase().indexOf(keyword.toLowerCase(), pos);
+            int keywordPos = filter.indexOf(keyword, pos);
             if (keywordPos == -1) {
                 return -1;
             }
