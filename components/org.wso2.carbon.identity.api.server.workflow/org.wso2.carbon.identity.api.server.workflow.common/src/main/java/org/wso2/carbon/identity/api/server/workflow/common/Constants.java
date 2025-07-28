@@ -19,7 +19,6 @@
 package org.wso2.carbon.identity.api.server.workflow.common;
 
 import java.time.format.DateTimeFormatter;
-import java.util.regex.Pattern;
 
 /**
  * Common constants for workflow API.
@@ -40,9 +39,8 @@ public class Constants {
      * Workflow instance related constants.
      */
     public static final DateTimeFormatter WORKFLOW_INSTANCE_DATE_TIME_FORMATTER =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd:HH:mm:ss.SSS");
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
     public static final DateTimeFormatter WORKFLOW_INSTANCE_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    public static final String WORKFLOW_INSTANCE_DEFAULT_BEGIN_DATE = "1950-01-01:00:00:00.000";
     public static final String WORKFLOW_INSTANCE_REQUEST_TYPE_KEY = "requestType";
     public static final String WORKFLOW_INSTANCE_CREATED_DATE_KEY = "createdAt";
     public static final String WORKFLOW_INSTANCE_CREATED_START_DATE_KEY = "createdAtStartDate";
@@ -52,10 +50,6 @@ public class Constants {
     public static final String WORKFLOW_INSTANCE_UPDATED_END_DATE_KEY = "updatedAtEndDate";
     public static final String WORKFLOW_INSTANCE_STATUS_KEY = "status";
     public static final String WORKFLOW_INSTANCE_OPERATION_TYPE_KEY = "operationType";
-    public static final Pattern WORKFLOW_INSTANCE_FILTER_PATTERN =
-            Pattern.compile("(\\w+)\\s+(eq|ge|le)\\s+['\"]?([^'\"\\s]+)['\"]?", Pattern.CASE_INSENSITIVE);
-    public static final String WORKFLOW_INSTANCE_AND_REGEX = "(?i)\\s+and\\s+";
-    public static final String WORKFLOW_INSTANCE_NO_QUOTE_REGEX = "^['\"]|['\"]$";
     public static final String WORKFLOW_INSTANCE_MY_TASKS_REQUEST_TYPE = "MY_TASKS";
     public static final String WORKFLOW_INSTANCE_ALL_TASKS_REQUEST_TYPE = "ALL_TASKS";
 

@@ -66,7 +66,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.regex.Matcher;
 
 import javax.ws.rs.core.Response;
 
@@ -736,7 +735,7 @@ public class WorkflowService {
 
         Map<String, String> filterMap = parseWorkflowFilter(filter);
 
-        String beginDate = Constants.WORKFLOW_INSTANCE_DEFAULT_BEGIN_DATE;
+        String beginDate = "1950-01-01 00:00:00.000";
         String endDate = getCurrentDateTime();
         String dateCategory = null;
         String status = null;
@@ -818,52 +817,41 @@ public class WorkflowService {
         if (StringUtils.isBlank(filter)) {
             return result;
         }
+        
         try {
             // Decode the filter string to handle URL encoding.
             String decodedFilter = URLDecoder.decode(filter, StandardCharsets.UTF_8.name());
 
-            // Split the filter string by "and" to get individual conditions in the form
-            // <field> <operator> <value>.
-            String[] conditions = decodedFilter.split(Constants.WORKFLOW_INSTANCE_AND_REGEX);
+            // Parse the filter string using a more robust approach
+            List<FilterCondition> conditions = parseFilterConditions(decodedFilter);
 
-            // Iterate through each condition and extract field, operator, and value.
-            for (String condition : conditions) {
-                String trimmedCondition = condition.trim();
-                Matcher matcher = Constants.WORKFLOW_INSTANCE_FILTER_PATTERN.matcher(trimmedCondition);
+            // Process each condition and extract field, operator, and value.
+            for (FilterCondition condition : conditions) {
+                String field = condition.getField();
+                String operator = condition.getOperator();
+                String value = condition.getValue();
 
-                if (matcher.matches()) {
-                    String field = matcher.group(1);
-                    String operator = matcher.group(2);
-                    String value = matcher.group(3);
-
-                    // Remove surrounding quotes from the value if present.
-                    value = value.replaceAll(Constants.WORKFLOW_INSTANCE_NO_QUOTE_REGEX, StringUtils.EMPTY);
-
-                    switch (field) {
-                        case Constants.WORKFLOW_INSTANCE_REQUEST_TYPE_KEY:
-                        case Constants.WORKFLOW_INSTANCE_STATUS_KEY:
-                        case Constants.WORKFLOW_INSTANCE_OPERATION_TYPE_KEY:
-                            if ("eq".equals(operator)) {
-                                result.put(field, value);
-                            } else {
-                                throw new WorkflowClientException("Only `eq` operator is supported for " + field +
-                                        ": " + operator);
-                            }
-                            break;
-                        case Constants.WORKFLOW_INSTANCE_CREATED_DATE_KEY:
-                            putValidatedDateInMap(result, Constants.WORKFLOW_INSTANCE_CREATED_DATE_KEY, value,
-                                    operator);
-                            break;
-                        case Constants.WORKFLOW_INSTANCE_UPDATED_DATE_KEY:
-                            putValidatedDateInMap(result, Constants.WORKFLOW_INSTANCE_UPDATED_DATE_KEY, value,
-                                    operator);
-                            break;
-                        default:
-                            throw new WorkflowClientException("Unknown field in filter: " + field);
-                    }
-                } else {
-                    throw new WorkflowClientException("Invalid filter format: " + trimmedCondition +
-                            " Expected format: <field> <operator> <value>, e.g., requestType eq MY_TASKS");
+                switch (field) {
+                    case Constants.WORKFLOW_INSTANCE_REQUEST_TYPE_KEY:
+                    case Constants.WORKFLOW_INSTANCE_STATUS_KEY:
+                    case Constants.WORKFLOW_INSTANCE_OPERATION_TYPE_KEY:
+                        if (Constants.EQUALS_OPERATOR.equals(operator)) {
+                            result.put(field, value);
+                        } else {
+                            throw new WorkflowClientException("Only `eq` operator is supported for " + field +
+                                    ": " + operator);
+                        }
+                        break;
+                    case Constants.WORKFLOW_INSTANCE_CREATED_DATE_KEY:
+                        putValidatedDateInMap(result, Constants.WORKFLOW_INSTANCE_CREATED_DATE_KEY, value,
+                                operator);
+                        break;
+                    case Constants.WORKFLOW_INSTANCE_UPDATED_DATE_KEY:
+                        putValidatedDateInMap(result, Constants.WORKFLOW_INSTANCE_UPDATED_DATE_KEY, value,
+                                operator);
+                        break;
+                    default:
+                        throw new WorkflowClientException("Unknown field in filter: " + field);
                 }
             }
         } catch (UnsupportedEncodingException e) {
@@ -879,6 +867,199 @@ public class WorkflowService {
         }
 
         return result;
+    }
+
+    /**
+     * Parses filter conditions from a filter string using a two-step approach.
+     * First splits by 'and' logical operator, then parses each condition by comparison operators.
+     * 
+     * @param filter The filter string to parse
+     * @return List of FilterCondition objects
+     * @throws WorkflowClientException If the filter format is invalid
+     */
+    private List<FilterCondition> parseFilterConditions(String filter) throws WorkflowClientException {
+        
+        List<FilterCondition> conditions = new ArrayList<>();
+        
+        // Step 1: Split by 'and' logical operator to get individual conditions
+        List<String> conditionStrings = splitByAndLogicalOperator(filter);
+        
+        // Step 2: Parse each condition by comparison operators
+        for (String conditionString : conditionStrings) {
+            FilterCondition condition = parseIndividualCondition(conditionString.trim());
+            conditions.add(condition);
+        }
+        
+        if (conditions.isEmpty()) {
+            throw new WorkflowClientException("No valid filter conditions found");
+        }
+        
+        return conditions;
+    }
+    
+    /**
+     * Splits the filter string by the specified logical operator while preserving spaces within values.
+     * 
+     * @param filter The filter string to split
+     * @return List of condition strings
+     */
+    private List<String> splitByAndLogicalOperator(String filter) {
+
+        String logicalOperator = "and";
+        List<String> conditions = new ArrayList<>();
+        String normalizedFilter = filter.trim();
+        int start = 0;
+        
+        while (start < normalizedFilter.length()) {
+            // Find the next occurrence of the logical operator
+            int operatorPos = findKeywordPosition(normalizedFilter, logicalOperator, start);
+            
+            if (operatorPos == -1) {
+                // No more logical operators found, take the rest as a condition
+                String condition = normalizedFilter.substring(start).trim();
+                if (!condition.isEmpty()) {
+                    conditions.add(condition);
+                }
+                break;
+            }
+            
+            // Extract condition before the logical operator
+            String condition = normalizedFilter.substring(start, operatorPos).trim();
+            if (!condition.isEmpty()) {
+                conditions.add(condition);
+            }
+            
+            // Move past the logical operator
+            start = operatorPos + logicalOperator.length();
+        }
+        
+        return conditions;
+    }
+    
+    /**
+     * Parses an individual condition string to extract field, operator, and value.
+     * 
+     * @param conditionString The individual condition string (e.g., "createdAt ge 2021-07-26:23 45:25.831")
+     * @return FilterCondition object
+     * @throws WorkflowClientException If the condition format is invalid
+     */
+    private FilterCondition parseIndividualCondition(String conditionString) throws WorkflowClientException {
+        
+        String[] comparisonOperators = {"eq", "ge", "le"};
+        
+        // Find the comparison operator in the condition
+        String foundOperator = null;
+        int operatorPos = -1;
+        
+        for (String operator : comparisonOperators) {
+            int pos = findKeywordPosition(conditionString, operator, 0);
+            if (pos != -1) {
+                if (foundOperator == null || pos < operatorPos) {
+                    foundOperator = operator;
+                    operatorPos = pos;
+                }
+            }
+        }
+        
+        if (foundOperator == null) {
+            throw new WorkflowClientException("No valid comparison operator found in condition: " + conditionString +
+                ". Supported operators are: eq, ge, le");
+        }
+        
+        // Extract field (before operator)
+        String field = conditionString.substring(0, operatorPos).trim();
+        if (field.isEmpty()) {
+            throw new WorkflowClientException("Field name is missing in condition: " + conditionString);
+        }
+        
+        // Extract value (after operator)
+        String value = conditionString.substring(operatorPos + foundOperator.length()).trim();
+        if (value.isEmpty()) {
+            throw new WorkflowClientException("Value is missing in condition: " + conditionString);
+        }
+        
+        // Validate operator
+        if (!isValidOperator(foundOperator)) {
+            throw new WorkflowClientException("Invalid operator: " + foundOperator + 
+                ". Supported operators are: eq, ge, le");
+        }
+        
+        return new FilterCondition(field, foundOperator, value);
+    }
+    
+    /**
+     * Finds the position of a keyword in the filter string, ensuring it's surrounded by word boundaries.
+     * 
+     * @param filter The filter string to search in
+     * @param keyword The keyword to find
+     * @param startPos The position to start searching from
+     * @return The position of the keyword, or -1 if not found
+     */
+    private int findKeywordPosition(String filter, String keyword, int startPos) {
+        
+        int pos = startPos;
+        while (pos < filter.length()) {
+            // Find the keyword (case insensitive)
+            int keywordPos = filter.toLowerCase().indexOf(keyword.toLowerCase(), pos);
+            if (keywordPos == -1) {
+                return -1;
+            }
+            
+            // Check if it's a whole word (surrounded by non-alphanumeric characters or string boundaries)
+            boolean validStart = (keywordPos == 0) || !Character.isLetterOrDigit(filter.charAt(keywordPos - 1));
+            boolean validEnd = (keywordPos + keyword.length() >= filter.length()) || 
+                              !Character.isLetterOrDigit(filter.charAt(keywordPos + keyword.length()));
+            
+            if (validStart && validEnd) {
+                return keywordPos;
+            }
+            
+            // Move past this occurrence and continue searching
+            pos = keywordPos + 1;
+        }
+        
+        return -1;
+    }
+    
+    /**
+     * Validates if the given operator is supported.
+     * 
+     * @param operator The operator to validate
+     * @return true if the operator is valid, false otherwise
+     */
+    private boolean isValidOperator(String operator) {
+
+        return Constants.EQUALS_OPERATOR.equalsIgnoreCase(operator) ||
+               Constants.GREATER_THAN_OR_EQUAL_OPERATOR.equalsIgnoreCase(operator) ||
+               Constants.LESS_THAN_OR_EQUAL_OPERATOR.equalsIgnoreCase(operator);
+    }
+    
+    /**
+     * Inner class to represent a filter condition.
+     */
+    private static class FilterCondition {
+
+        private final String field;
+        private final String operator;
+        private final String value;
+        
+        public FilterCondition(String field, String operator, String value) {
+            this.field = field;
+            this.operator = operator;
+            this.value = value;
+        }
+        
+        public String getField() {
+            return field;
+        }
+        
+        public String getOperator() {
+            return operator;
+        }
+        
+        public String getValue() {
+            return value;
+        }
     }
 
     private ErrorResponse.Builder getErrorBuilder(Constants.ErrorMessage errorMsg, String data) {
