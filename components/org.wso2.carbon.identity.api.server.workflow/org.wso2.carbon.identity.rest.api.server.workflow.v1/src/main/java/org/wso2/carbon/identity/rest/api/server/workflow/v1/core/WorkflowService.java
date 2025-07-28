@@ -952,11 +952,11 @@ public class WorkflowService {
         int matchedOperatorIndex = -1;
         
         for (String operator : comparisonOperators) {
-            int pos = findKeywordPosition(conditionString, operator, 0);
-            if (pos != -1) {
-                if (matchedOperator == null || pos < matchedOperatorIndex) {
+            int keywordPosition = findKeywordPosition(conditionString, operator, 0);
+            if (keywordPosition != -1) {
+                if (matchedOperator == null || keywordPosition < matchedOperatorIndex) {
                     matchedOperator = operator;
-                    matchedOperatorIndex = pos;
+                    matchedOperatorIndex = keywordPosition;
                 }
             }
         }
@@ -992,30 +992,31 @@ public class WorkflowService {
      * 
      * @param filter The filter string to search in
      * @param keyword The keyword to find
-     * @param startPos The position to start searching from
+     * @param startPosition The position to start searching from
      * @return The position of the keyword, or -1 if not found
      */
-    private int findKeywordPosition(String filter, String keyword, int startPos) {
+    private int findKeywordPosition(String filter, String keyword, int startPosition) {
         
-        int pos = startPos;
-        while (pos < filter.length()) {
+        int position = startPosition;
+        while (position < filter.length()) {
             // Find the keyword (case insensitive)
-            int keywordPos = filter.indexOf(keyword, pos);
-            if (keywordPos == -1) {
+            int keywordPosition = filter.indexOf(keyword, position);
+            if (keywordPosition == -1) {
                 return -1;
             }
             
             // Check if it's a whole word (surrounded by non-alphanumeric characters or string boundaries)
-            boolean validStart = (keywordPos == 0) || !Character.isLetterOrDigit(filter.charAt(keywordPos - 1));
-            boolean validEnd = (keywordPos + keyword.length() >= filter.length()) || 
-                              !Character.isLetterOrDigit(filter.charAt(keywordPos + keyword.length()));
+            boolean isValidStart = (keywordPosition == 0)
+                    || !Character.isLetterOrDigit(filter.charAt(keywordPosition - 1));
+            boolean isValidEnd = (keywordPosition + keyword.length() >= filter.length()) ||
+                              !Character.isLetterOrDigit(filter.charAt(keywordPosition + keyword.length()));
             
-            if (validStart && validEnd) {
-                return keywordPos;
+            if (isValidStart && isValidEnd) {
+                return keywordPosition;
             }
             
             // Move past this occurrence and continue searching
-            pos = keywordPos + 1;
+            position = keywordPosition + 1;
         }
         
         return -1;
@@ -1044,20 +1045,24 @@ public class WorkflowService {
         private final String value;
         
         public FilterCondition(String field, String operator, String value) {
+
             this.field = field;
             this.operator = operator;
             this.value = value;
         }
         
         public String getField() {
+
             return field;
         }
         
         public String getOperator() {
+
             return operator;
         }
         
         public String getValue() {
+
             return value;
         }
     }
