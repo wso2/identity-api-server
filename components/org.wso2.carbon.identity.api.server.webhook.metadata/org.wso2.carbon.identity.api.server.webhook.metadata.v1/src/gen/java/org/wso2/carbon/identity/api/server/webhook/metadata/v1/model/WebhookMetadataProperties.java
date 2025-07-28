@@ -22,10 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
-import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.EventProfileMetadata;
-import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.WebhookMetadataAdapter;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.WebhookMetadataOrganizationPolicy;
 import javax.validation.constraints.*;
 
@@ -35,60 +31,13 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class WebhookMetadata  {
+public class WebhookMetadataProperties  {
   
-    private List<EventProfileMetadata> profiles = null;
-
-    private WebhookMetadataAdapter adapter;
     private WebhookMetadataOrganizationPolicy organizationPolicy;
 
     /**
     **/
-    public WebhookMetadata profiles(List<EventProfileMetadata> profiles) {
-
-        this.profiles = profiles;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "")
-    @JsonProperty("profiles")
-    @Valid
-    public List<EventProfileMetadata> getProfiles() {
-        return profiles;
-    }
-    public void setProfiles(List<EventProfileMetadata> profiles) {
-        this.profiles = profiles;
-    }
-
-    public WebhookMetadata addProfilesItem(EventProfileMetadata profilesItem) {
-        if (this.profiles == null) {
-            this.profiles = new ArrayList<EventProfileMetadata>();
-        }
-        this.profiles.add(profilesItem);
-        return this;
-    }
-
-        /**
-    **/
-    public WebhookMetadata adapter(WebhookMetadataAdapter adapter) {
-
-        this.adapter = adapter;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "")
-    @JsonProperty("adapter")
-    @Valid
-    public WebhookMetadataAdapter getAdapter() {
-        return adapter;
-    }
-    public void setAdapter(WebhookMetadataAdapter adapter) {
-        this.adapter = adapter;
-    }
-
-    /**
-    **/
-    public WebhookMetadata organizationPolicy(WebhookMetadataOrganizationPolicy organizationPolicy) {
+    public WebhookMetadataProperties organizationPolicy(WebhookMetadataOrganizationPolicy organizationPolicy) {
 
         this.organizationPolicy = organizationPolicy;
         return this;
@@ -115,25 +64,21 @@ public class WebhookMetadata  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        WebhookMetadata webhookMetadata = (WebhookMetadata) o;
-        return Objects.equals(this.profiles, webhookMetadata.profiles) &&
-            Objects.equals(this.adapter, webhookMetadata.adapter) &&
-            Objects.equals(this.organizationPolicy, webhookMetadata.organizationPolicy);
+        WebhookMetadataProperties webhookMetadataProperties = (WebhookMetadataProperties) o;
+        return Objects.equals(this.organizationPolicy, webhookMetadataProperties.organizationPolicy);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(profiles, adapter, organizationPolicy);
+        return Objects.hash(organizationPolicy);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class WebhookMetadata {\n");
+        sb.append("class WebhookMetadataProperties {\n");
         
-        sb.append("    profiles: ").append(toIndentedString(profiles)).append("\n");
-        sb.append("    adapter: ").append(toIndentedString(adapter)).append("\n");
         sb.append("    organizationPolicy: ").append(toIndentedString(organizationPolicy)).append("\n");
         sb.append("}");
         return sb.toString();

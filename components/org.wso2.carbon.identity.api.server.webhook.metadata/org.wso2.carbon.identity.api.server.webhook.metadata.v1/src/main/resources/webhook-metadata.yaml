@@ -23,7 +23,7 @@ paths:
   /webhooks/metadata:
     get:
       summary: List Event Profiles
-      description: "This API returns the list of event profiles supported by WSO2 Identity Server.\n\n <b>Scope(Permission) required:</b> `internal_webhook_metadata_view` \n\n"
+      description: "This API returns the list of event profiles supported by WSO2 Identity Server.\n\n <b>Scope(Permission) required:</b> `internal_webhook_meta_view` \n\n"
       operationId: getEventProfiles
       tags:
         - Webhook Metadata
@@ -47,7 +47,79 @@ paths:
         x-codeSamples:
           - lang: Curl
             source: |
-              curl --location 'https://localhost:9443/t/carbon.super/api/server/v1/webhooks/event-profiles' -H 'Authorization: Basic YWRtaW46YWRtaW4='
+              curl --location 'https://localhost:9443/t/carbon.super/api/server/v1/webhooks/metadata/event-profiles' -H 'Authorization: Basic YWRtaW46YWRtaW4='
+    patch:
+      tags:
+        - Webhook Metadata
+      summary: Update webhook metadata properties
+      description: "This API updates an webhook metadata property and return the updated webhook metadata properties. \n\n
+        <b>Scope (Permission) required:</b> ``internal_webhook_meta_update``\n\n"
+      operationId: patchWebhookMetadata
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookMetadataProperties'
+        required: true
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookMetadataProperties'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "405":
+          description: Method Not Allowed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        x-codeSamples:
+          - lang: Curl
+            source: |
+              curl --location --request PATCH 'https://localhost:9443/t/carbon.super/api/server/v1/webhooks/metadata' \
+              -H 'Authorization: Basic YWRtaW46YWRtaW4=' \
+              -H 'Content-Type: application/json' \
+              -d '{
+                "organizationPolicy": {
+                  "policyName": "IMMEDIATE_EXISTING_AND_FUTURE_ORGS"
+                }
+              }'
+    put:
+      tags:
+        - Webhook Metadata
+      summary: Method Not Allowed
+      description: PUT operation is not supported on this resource.
+      operationId: putWebhookMetadataNotAllowed
+      responses:
+        '405':
+          description: Method Not Allowed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /webhooks/metadata/event-profiles/{profileName}:
     get:
@@ -55,7 +127,7 @@ paths:
       description: >
         This API retrieves detailed information about a specific event profile including its channels and events.
 
-        <b>Scope(Permission) required:</b> `internal_webhook_metadata_view`
+        <b>Scope(Permission) required:</b> `internal_webhook_meta_view`
       operationId: getEventProfile
       tags:
         - Webhook Metadata
@@ -164,6 +236,30 @@ components:
             type:
               type: string
               example: "Publisher"
+        organizationPolicy:
+          type: object
+          properties:
+            policyName:
+              type: string
+              enum:
+                - IMMEDIATE_EXISTING_AND_FUTURE_ORGS
+                - NO_SHARING
+              description: Webhook consuming organization policy name.
+              example: "IMMEDIATE_EXISTING_AND_FUTURE_ORGS"
+
+    WebhookMetadataProperties:
+      type: object
+      properties:
+        organizationPolicy:
+          type: object
+          properties:
+            policyName:
+              type: string
+              enum:
+                - IMMEDIATE_EXISTING_AND_FUTURE_ORGS
+                - NO_SHARING
+              description: Webhook consuming organization policy name.
+              example: "IMMEDIATE_EXISTING_AND_FUTURE_ORGS"
 
     EventProfileMetadata:
       type: object

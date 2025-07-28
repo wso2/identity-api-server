@@ -26,6 +26,7 @@ import java.util.List;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.Error;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.EventProfile;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.WebhookMetadata;
+import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.WebhookMetadataProperties;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.WebhooksApiService;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.factories.WebhooksApiServiceFactory;
 
@@ -53,7 +54,7 @@ public class WebhooksApi  {
     @Path("/metadata/event-profiles/{profileName}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get Event Profile Details", notes = "This API retrieves detailed information about a specific event profile including its channels and events. <b>Scope(Permission) required:</b> `internal_webhook_metadata_view` ", response = EventProfile.class, authorizations = {
+    @ApiOperation(value = "Get Event Profile Details", notes = "This API retrieves detailed information about a specific event profile including its channels and events. <b>Scope(Permission) required:</b> `internal_webhook_meta_view` ", response = EventProfile.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -76,12 +77,12 @@ public class WebhooksApi  {
     @Path("/metadata")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "List Event Profiles", notes = "This API returns the list of event profiles supported by WSO2 Identity Server.   <b>Scope(Permission) required:</b> `internal_webhook_metadata_view`   ", response = WebhookMetadata.class, authorizations = {
+    @ApiOperation(value = "List Event Profiles", notes = "This API returns the list of event profiles supported by WSO2 Identity Server.   <b>Scope(Permission) required:</b> `internal_webhook_meta_view`   ", response = WebhookMetadata.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Webhook Metadata" })
+    }, tags={ "Webhook Metadata", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = WebhookMetadata.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -91,6 +92,50 @@ public class WebhooksApi  {
     public Response getEventProfiles() {
 
         return delegate.getEventProfiles();
+    }
+
+    @Valid
+    @PATCH
+    @Path("/metadata")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update webhook metadata properties", notes = "This API updates an webhook metadata property and return the updated webhook metadata properties.    <b>Scope (Permission) required:</b> ``internal_webhook_meta_update``  ", response = WebhookMetadataProperties.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Webhook Metadata", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = WebhookMetadataProperties.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 405, message = "Method Not Allowed.", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response patchWebhookMetadata(@ApiParam(value = "" ,required=true) @Valid WebhookMetadataProperties webhookMetadataProperties) {
+
+        return delegate.patchWebhookMetadata(webhookMetadataProperties );
+    }
+
+    @Valid
+    @PUT
+    @Path("/metadata")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Method Not Allowed", notes = "PUT operation is not supported on this resource.", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Webhook Metadata" })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 405, message = "Method Not Allowed", response = Error.class)
+    })
+    public Response putWebhookMetadataNotAllowed() {
+
+        return delegate.putWebhookMetadataNotAllowed();
     }
 
 }
