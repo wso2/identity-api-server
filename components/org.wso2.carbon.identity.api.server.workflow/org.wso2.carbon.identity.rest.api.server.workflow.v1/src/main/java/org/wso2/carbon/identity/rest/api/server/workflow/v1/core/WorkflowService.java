@@ -1029,9 +1029,9 @@ public class WorkflowService {
      */
     private boolean isValidOperator(String operator) {
 
-        return Constants.EQUALS_OPERATOR.equalsIgnoreCase(operator) ||
-               Constants.GREATER_THAN_OR_EQUAL_OPERATOR.equalsIgnoreCase(operator) ||
-               Constants.LESS_THAN_OR_EQUAL_OPERATOR.equalsIgnoreCase(operator);
+        return Constants.EQUALS_OPERATOR.equals(operator) ||
+               Constants.GREATER_THAN_OR_EQUAL_OPERATOR.equals(operator) ||
+               Constants.LESS_THAN_OR_EQUAL_OPERATOR.equals(operator);
     }
     
     /**
