@@ -56,8 +56,8 @@ import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,8 +66,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 import javax.ws.rs.core.Response;
 
 /**
@@ -77,23 +76,6 @@ public class WorkflowService {
 
     private static final Log log = LogFactory.getLog(WorkflowService.class);
     private final WorkflowManagementService workflowManagementService;
-    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd:HH:mm:ss.SSS");
-    private final String allTasksRequestType = "ALL_TASKS";
-    private final String myTasksRequestType = "MY_TASKS";
-    private final String defaultBeginDate = "1950-01-01:00:00:00.000";
-    private final String defaultRequestType = allTasksRequestType;
-    private final String defaultDateCategory = StringUtils.EMPTY;
-    private final String defaultStatus = StringUtils.EMPTY;
-    private final String defaultOperationType = StringUtils.EMPTY;
-    private final String requestTypeKey = "requesttype";
-    private final String beginDateKey = "beginDate";
-    private final String endDateKey = "endDate";
-    private final String dateCategoryKey = "datecategory";
-    private final String statusKey = "status";
-    private final String operationTypeKey = "operationtype";
-    private final String filterPatternRegex = "(\\w+)\\s+(eq|ge|le)\\s+['\"]?([^'\"\\s]+)['\"]?";
-    private final String andRegex = "(?i)\\s+and\\s+";
-    private final String noQuoteRegex = "^['\"]|['\"]$";
 
     public WorkflowService(WorkflowManagementService workflowManagementService) {
 
@@ -715,47 +697,21 @@ public class WorkflowService {
      *
      * @param workflowRequest The WorkflowRequest object to map.
      * @return WorkflowInstanceListItem object containing the mapped data.
-     * @throws WorkflowException If an error occurs during mapping.
      */
     private WorkflowInstanceListItem mapWorkflowRequestToListItem(
-            org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest workflowRequest) throws WorkflowException {
+            org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest workflowRequest) {
 
         if (workflowRequest == null) {
             return null;
         }
 
         WorkflowInstanceListItem workflowInstanceListItem = new WorkflowInstanceListItem();
-
-        if (workflowRequest.getRequestId() != null) {
-            workflowInstanceListItem.setWorkflowInstanceId(workflowRequest.getRequestId());
-        } else {
-            throw new WorkflowClientException("Workflow request ID cannot be null.");
-        }
-
-        if (workflowRequest.getOperationType() != null) {
-            workflowInstanceListItem.setEventType(Operation.fromValue(workflowRequest.getOperationType()));
-        }
-        if (workflowRequest.getCreatedBy() != null) {
-            workflowInstanceListItem.setRequestInitiator(workflowRequest.getCreatedBy());
-        }
-
-        try {
-            if (workflowRequest.getCreatedAt() != null) {
-                workflowInstanceListItem.setCreatedAt(workflowRequest.getCreatedAt());
-            }
-            if (workflowRequest.getUpdatedAt() != null) {
-                workflowInstanceListItem.setUpdatedAt(workflowRequest.getUpdatedAt());
-            }
-        } catch (DateTimeParseException e) {
-            log.error("Failed to parse date in workflow request: " + e.getMessage());
-            throw new WorkflowClientException(
-                    "Invalid date format in workflow request. Expected format: yyyy-MM-dd:HH:mm:ss.SSS");
-        }
-
-        if (workflowRequest.getStatus() != null) {
-            workflowInstanceListItem.setStatus(InstanceStatus.fromValue(workflowRequest.getStatus()));
-        }
-
+        workflowInstanceListItem.setWorkflowInstanceId(workflowRequest.getRequestId());
+        workflowInstanceListItem.setEventType(Operation.fromValue(workflowRequest.getOperationType()));
+        workflowInstanceListItem.setRequestInitiator(workflowRequest.getCreatedBy());
+        workflowInstanceListItem.setCreatedAt(workflowRequest.getCreatedAt());
+        workflowInstanceListItem.setUpdatedAt(workflowRequest.getUpdatedAt());
+        workflowInstanceListItem.setStatus(InstanceStatus.fromValue(workflowRequest.getStatus()));
         return workflowInstanceListItem;
     }
 
@@ -771,7 +727,7 @@ public class WorkflowService {
     private WorkflowInstanceListResponse getPaginatedWorkflowInstances(Integer limit, Integer offset, String filter)
             throws WorkflowException {
 
-        String user = CarbonContext.getThreadLocalCarbonContext().getUsername();
+        String user = null;
         int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
 
         WorkflowInstanceListResponse workflowInstanceListResponse = new WorkflowInstanceListResponse();
@@ -779,50 +735,47 @@ public class WorkflowService {
 
         Map<String, String> filterMap = parseWorkflowFilter(filter);
 
-        String requestType = defaultRequestType;
-        String beginDate = defaultBeginDate;
-        String endDate = getDefaultEndDate();
-        String dateCategory = defaultDateCategory;
-        String status = defaultStatus;
-        String operationType = defaultOperationType;
+        String beginDate = "1950-01-01 00:00:00.000";
+        String endDate = getCurrentDateTime();
+        String dateCategory = null;
+        String status = null;
+        String operationType = null;
 
         if (!filterMap.isEmpty()) {
-            requestType = StringUtils.isBlank(filterMap.get(requestTypeKey)) ? requestType
-                    : filterMap.get(requestTypeKey);
-            beginDate = StringUtils.isBlank(filterMap.get(beginDateKey)) ? beginDate
-                    : filterMap.get(beginDateKey);
-            endDate = StringUtils.isBlank(filterMap.get(endDateKey)) ? endDate
-                    : filterMap.get(endDateKey);
-            try {
-                LocalDateTime.parse(beginDate, dateTimeFormatter);
-                LocalDateTime.parse(endDate, dateTimeFormatter);
-            } catch (DateTimeParseException e) {
-                throw new WorkflowClientException("Invalid date format. Expected format: yyyy-MM-dd:HH:mm:ss.SSS");
+            if (StringUtils.isNotEmpty(filterMap.get(Constants.WORKFLOW_INSTANCE_REQUEST_TYPE_KEY))) {
+                String requestType = filterMap.get(Constants.WORKFLOW_INSTANCE_REQUEST_TYPE_KEY);
+                if (!Constants.WORKFLOW_INSTANCE_MY_TASKS_REQUEST_TYPE.equals(requestType) &&
+                        !Constants.WORKFLOW_INSTANCE_ALL_TASKS_REQUEST_TYPE.equals(requestType)) {
+                    throw new WorkflowClientException("Invalid request type: " + requestType +
+                            ". Valid types are 'MY_TASKS' and 'ALL_TASKS'.");
+                }
+                if (Constants.WORKFLOW_INSTANCE_MY_TASKS_REQUEST_TYPE.equals(requestType)) {
+                    user = CarbonContext.getThreadLocalCarbonContext().getUsername();
+                }
             }
-            dateCategory = StringUtils.isBlank(filterMap.get(dateCategoryKey)) ? dateCategory
-                    : filterMap.get(dateCategoryKey);
-            status = StringUtils.isBlank(filterMap.get(statusKey)) ? status
-                    : filterMap.get(statusKey);
-            operationType = StringUtils.isBlank(filterMap.get(operationTypeKey)) ? null
-                    : filterMap.get(operationTypeKey);
-        }
 
-        if (!allTasksRequestType.equals(requestType) &&
-                !myTasksRequestType.equals(requestType)) {
-            throw new WorkflowClientException("Invalid request type: " + requestType +
-                    ". Valid types are 'ALL_TASKS' and 'MY_TASKS'.");
+            if (StringUtils.isNotEmpty(filterMap.get(Constants.WORKFLOW_INSTANCE_CREATED_START_DATE_KEY))) {
+                beginDate = filterMap.get(Constants.WORKFLOW_INSTANCE_CREATED_START_DATE_KEY);
+                dateCategory = "CREATED";
+            } else if (StringUtils.isNotEmpty(filterMap.get(Constants.WORKFLOW_INSTANCE_UPDATED_START_DATE_KEY))) {
+                dateCategory = "UPDATED";
+                beginDate = filterMap.get(Constants.WORKFLOW_INSTANCE_UPDATED_START_DATE_KEY);
+            }
+
+            if (StringUtils.isNotEmpty(filterMap.get(Constants.WORKFLOW_INSTANCE_CREATED_END_DATE_KEY))) {
+                endDate = filterMap.get(Constants.WORKFLOW_INSTANCE_CREATED_END_DATE_KEY);
+                dateCategory = "CREATED";
+            } else if (StringUtils.isNotEmpty(filterMap.get(Constants.WORKFLOW_INSTANCE_UPDATED_END_DATE_KEY))) {
+                dateCategory = "UPDATED";
+                endDate = filterMap.get(Constants.WORKFLOW_INSTANCE_UPDATED_END_DATE_KEY);
+            }
+
+            status = filterMap.get(Constants.WORKFLOW_INSTANCE_STATUS_KEY);
+            operationType = filterMap.get(Constants.WORKFLOW_INSTANCE_OPERATION_TYPE_KEY);
         }
 
         org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequestFilterResponse response = workflowManagementService
-                .getRequestsFromFilter(
-                        myTasksRequestType.equals(requestType) ? user : StringUtils.EMPTY,
-                        operationType,
-                        beginDate,
-                        endDate,
-                        dateCategory,
-                        tenantId,
-                        status, 
-                        limit, 
+                .getRequestsFromFilter(user, operationType, beginDate, endDate, dateCategory, tenantId, status, limit,
                         offset);
 
         org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest[] requests = response.getRequests();
@@ -830,12 +783,8 @@ public class WorkflowService {
         List<WorkflowInstanceListItem> allItems = new ArrayList<>();
         if (requests != null) {
             for (org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequest workflowRequest : requests) {
-                if (workflowRequest != null) {
-                    WorkflowInstanceListItem item = mapWorkflowRequestToListItem(workflowRequest);
-                    if (item != null) {
-                        allItems.add(item);
-                    }
-                }
+                WorkflowInstanceListItem item = mapWorkflowRequestToListItem(workflowRequest);
+                allItems.add(item);
             }
         }
 
@@ -863,79 +812,259 @@ public class WorkflowService {
      */
     public Map<String, String> parseWorkflowFilter(String filter) throws WorkflowClientException {
 
-    Map<String, String> result = new HashMap<>();
+        Map<String, String> result = new HashMap<>();
 
-    if (StringUtils.isBlank(filter)) {
-        return result;
-    }
-    try {
-        // Decode the filter string to handle URL encoding.
-        String decodedFilter = URLDecoder.decode(filter, StandardCharsets.UTF_8.name());
-
-        // Split the filter string by "and" (case-insensitive) to get individual conditions in the form 
-        // <field> <operator> <value>.
-        String[] conditions = decodedFilter.split(andRegex);
-
-        // Regular expression to match the expected filter format: <field> <operator> <value>
-        // E.g., "requestType eq MY_TASKS".
-        Pattern pattern = Pattern.compile(filterPatternRegex, Pattern.CASE_INSENSITIVE);
+        if (StringUtils.isBlank(filter)) {
+            return result;
+        }
         
-        // Iterate through each condition and extract field, operator, and value.
-        for (String condition : conditions) {
-            String trimmedCondition = condition.trim();
-            Matcher matcher = pattern.matcher(trimmedCondition);
+        try {
+            // Decode the filter string to handle URL encoding.
+            String decodedFilter = URLDecoder.decode(filter, StandardCharsets.UTF_8.name());
 
-            if (matcher.matches()) {
-                String field = matcher.group(1);
-                String operator = matcher.group(2);
-                String value = matcher.group(3);
+            // Parse the filter string using a more robust approach
+            List<FilterCondition> conditions = parseFilterConditions(decodedFilter);
 
-                // Remove surrounding quotes from the value if present.
-                value = value.replaceAll(noQuoteRegex, "");
+            // Process each condition and extract field, operator, and value.
+            for (FilterCondition condition : conditions) {
+                String field = condition.getField();
+                String operator = condition.getOperator();
+                String value = condition.getValue();
 
                 switch (field) {
-                    case "requesttype":
-                    case "status":
-                    case "datecategory":
-                    case "operationtype":
-                        if ("eq".equals(operator)) {
+                    case Constants.WORKFLOW_INSTANCE_REQUEST_TYPE_KEY:
+                    case Constants.WORKFLOW_INSTANCE_STATUS_KEY:
+                    case Constants.WORKFLOW_INSTANCE_OPERATION_TYPE_KEY:
+                        if (Constants.EQUALS_OPERATOR.equals(operator)) {
                             result.put(field, value);
                         } else {
-                            throw new WorkflowClientException(
-                                    "Only `eq` operator is supported for " + field + ": " + operator);
+                            throw new WorkflowClientException("Only `eq` operator is supported for " + field +
+                                    ": " + operator);
                         }
                         break;
-                    case "begindate":
-                        if ("ge".equals(operator)) {
-                            result.put("beginDate", value);
-                        } else {
-                            throw new WorkflowClientException(
-                                    "Only 'ge' operator supported for beginDate");
-                        }
+                    case Constants.WORKFLOW_INSTANCE_CREATED_DATE_KEY:
+                        putValidatedDateInMap(result, Constants.WORKFLOW_INSTANCE_CREATED_DATE_KEY, value,
+                                operator);
                         break;
-                    case "enddate":
-                        if ("le".equals(operator)) {
-                            result.put("endDate", value);
-                        } else {
-                            throw new WorkflowClientException(
-                                    "Only 'le' operator supported for endDate");
-                        }
+                    case Constants.WORKFLOW_INSTANCE_UPDATED_DATE_KEY:
+                        putValidatedDateInMap(result, Constants.WORKFLOW_INSTANCE_UPDATED_DATE_KEY, value,
+                                operator);
                         break;
                     default:
-                        throw new WorkflowClientException(
-                                "Unknown field in filter: " + field);
+                        throw new WorkflowClientException("Unknown field in filter: " + field);
                 }
-            } else {
-                throw new WorkflowClientException(
-                        "Invalid filter format: " + trimmedCondition +
-                                "\nExpected format: field operator value, e.g., requestType eq MY_TASKS");
             }
+        } catch (UnsupportedEncodingException e) {
+            throw new WorkflowClientException("Failed to decode filter string", e);
         }
-    } catch (UnsupportedEncodingException e) {
-        throw new WorkflowClientException("Failed to decode filter string", e);
+
+        boolean hasCreatedDate = result.containsKey(Constants.WORKFLOW_INSTANCE_CREATED_START_DATE_KEY) ||
+                result.containsKey(Constants.WORKFLOW_INSTANCE_CREATED_END_DATE_KEY);
+        boolean hasUpdatedDate = result.containsKey(Constants.WORKFLOW_INSTANCE_UPDATED_START_DATE_KEY) ||
+                result.containsKey(Constants.WORKFLOW_INSTANCE_UPDATED_END_DATE_KEY);
+        if (hasCreatedDate && hasUpdatedDate) {
+            throw new WorkflowClientException("Both createdAt and updatedAt date filters cannot be used together.");
+        }
+
+        return result;
     }
 
-    return result;
+    /**
+     * Parses filter conditions from a filter string using a two-step approach.
+     * First splits by 'and' logical operator, then parses each condition by comparison operators.
+     * 
+     * @param filter The filter string to parse
+     * @return List of FilterCondition objects
+     * @throws WorkflowClientException If the filter format is invalid
+     */
+    private List<FilterCondition> parseFilterConditions(String filter) throws WorkflowClientException {
+        
+        List<FilterCondition> conditions = new ArrayList<>();
+        
+        // Step 1: Split by 'and' logical operator to get individual conditions
+        List<String> conditionStrings = splitByAndLogicalOperator(filter);
+        
+        // Step 2: Parse each condition by comparison operators
+        for (String conditionString : conditionStrings) {
+            FilterCondition condition = parseIndividualCondition(conditionString.trim());
+            conditions.add(condition);
+        }
+        
+        if (conditions.isEmpty()) {
+            throw new WorkflowClientException("No valid filter conditions found");
+        }
+        
+        return conditions;
+    }
+    
+    /**
+     * Splits the filter string by the specified logical operator while preserving spaces within values.
+     * 
+     * @param filter The filter string to split
+     * @return List of condition strings
+     */
+    private List<String> splitByAndLogicalOperator(String filter) {
+
+        String logicalOperator = "and";
+        List<String> conditions = new ArrayList<>();
+        String normalizedFilter = filter.trim();
+        int start = 0;
+        
+        while (start < normalizedFilter.length()) {
+            // Find the next occurrence of the logical operator
+            int operatorPos = findKeywordPosition(normalizedFilter, logicalOperator, start);
+            
+            if (operatorPos == -1) {
+                // No more logical operators found, take the rest as a condition
+                String condition = normalizedFilter.substring(start).trim();
+                if (!condition.isEmpty()) {
+                    conditions.add(condition);
+                }
+                break;
+            }
+            
+            // Extract condition before the logical operator
+            String condition = normalizedFilter.substring(start, operatorPos).trim();
+            if (!condition.isEmpty()) {
+                conditions.add(condition);
+            }
+            
+            // Move past the logical operator
+            start = operatorPos + logicalOperator.length();
+        }
+        
+        return conditions;
+    }
+    
+    /**
+     * Parses an individual condition string to extract field, operator, and value.
+     * 
+     * @param conditionString The individual condition string (e.g., "createdAt ge 2021-07-26:23 45:25.831")
+     * @return FilterCondition object
+     * @throws WorkflowClientException If the condition format is invalid
+     */
+    private FilterCondition parseIndividualCondition(String conditionString) throws WorkflowClientException {
+        
+        String[] comparisonOperators = {"eq", "ge", "le"};
+        
+        // Find the comparison operator in the condition
+        String matchedOperator = null;
+        int matchedOperatorIndex = -1;
+        
+        for (String operator : comparisonOperators) {
+            int keywordPosition = findKeywordPosition(conditionString, operator, 0);
+            if (keywordPosition != -1) {
+                if (matchedOperator == null || keywordPosition < matchedOperatorIndex) {
+                    matchedOperator = operator;
+                    matchedOperatorIndex = keywordPosition;
+                }
+            }
+        }
+        
+        if (matchedOperator == null) {
+            throw new WorkflowClientException("No valid comparison operator found in condition: " + conditionString +
+                ". Supported operators are: eq, ge, le");
+        }
+        
+        // Extract field (before operator)
+        String fieldName = conditionString.substring(0, matchedOperatorIndex).trim();
+        if (fieldName.isEmpty()) {
+            throw new WorkflowClientException("Field name is missing in condition: " + conditionString);
+        }
+        
+        // Extract value (after operator)
+        String fieldValue = conditionString.substring(matchedOperatorIndex + matchedOperator.length()).trim();
+        if (fieldValue.isEmpty()) {
+            throw new WorkflowClientException("Value is missing in condition: " + conditionString);
+        }
+        
+        // Validate operator
+        if (!isValidOperator(matchedOperator)) {
+            throw new WorkflowClientException("Invalid operator: " + matchedOperator +
+                ". Supported operators are: eq, ge, le");
+        }
+        
+        return new FilterCondition(fieldName, matchedOperator, fieldValue);
+    }
+    
+    /**
+     * Finds the position of a keyword in the filter string, ensuring it's surrounded by word boundaries.
+     * 
+     * @param filter The filter string to search in
+     * @param keyword The keyword to find
+     * @param startPosition The position to start searching from
+     * @return The position of the keyword, or -1 if not found
+     */
+    private int findKeywordPosition(String filter, String keyword, int startPosition) {
+        
+        int position = startPosition;
+        while (position < filter.length()) {
+            // Find the keyword (case insensitive)
+            int keywordPosition = filter.indexOf(keyword, position);
+            if (keywordPosition == -1) {
+                return -1;
+            }
+            
+            // Check if it's a whole word (surrounded by non-alphanumeric characters or string boundaries)
+            boolean isValidStart = (keywordPosition == 0)
+                    || !Character.isLetterOrDigit(filter.charAt(keywordPosition - 1));
+            boolean isValidEnd = (keywordPosition + keyword.length() >= filter.length()) ||
+                              !Character.isLetterOrDigit(filter.charAt(keywordPosition + keyword.length()));
+            
+            if (isValidStart && isValidEnd) {
+                return keywordPosition;
+            }
+            
+            // Move past this occurrence and continue searching
+            position = keywordPosition + 1;
+        }
+        
+        return -1;
+    }
+    
+    /**
+     * Validates if the given operator is supported.
+     * 
+     * @param operator The operator to validate
+     * @return true if the operator is valid, false otherwise
+     */
+    private boolean isValidOperator(String operator) {
+
+        return Constants.EQUALS_OPERATOR.equals(operator) ||
+               Constants.GREATER_THAN_OR_EQUAL_OPERATOR.equals(operator) ||
+               Constants.LESS_THAN_OR_EQUAL_OPERATOR.equals(operator);
+    }
+    
+    /**
+     * Inner class to represent a filter condition.
+     */
+    private static class FilterCondition {
+
+        private final String field;
+        private final String operator;
+        private final String value;
+        
+        public FilterCondition(String field, String operator, String value) {
+
+            this.field = field;
+            this.operator = operator;
+            this.value = value;
+        }
+        
+        public String getField() {
+
+            return field;
+        }
+        
+        public String getOperator() {
+
+            return operator;
+        }
+        
+        public String getValue() {
+
+            return value;
+        }
     }
 
     private ErrorResponse.Builder getErrorBuilder(Constants.ErrorMessage errorMsg, String data) {
@@ -991,12 +1120,66 @@ public class WorkflowService {
     }
 
     /**
-     * Get the default end date as the current time.
+     * Get the current date time.
      *
      * @return The current time formatted as a string.
      */
-    private String getDefaultEndDate() {
+    private String getCurrentDateTime() {
 
-        return LocalDateTime.now().format(dateTimeFormatter);
+        return LocalDateTime.now().format(Constants.WORKFLOW_INSTANCE_DATE_TIME_FORMATTER);
+    }
+
+    private LocalDateTime parseDateTime(String date, String dateType) throws WorkflowClientException {
+
+        try {
+            return LocalDateTime.parse(date, Constants.WORKFLOW_INSTANCE_DATE_TIME_FORMATTER);
+        } catch (DateTimeParseException e) {
+            try {
+                LocalDate localDate = LocalDate.parse(date, Constants.WORKFLOW_INSTANCE_DATE_FORMATTER);
+                return localDate.atStartOfDay();
+            } catch (DateTimeParseException e1) {
+                throw new WorkflowClientException(String.format("Invalid date for %s. Expected formats: " +
+                        "yyyy-MM-dd | yyyy-MM-dd:HH:mm:ss.SSS", dateType));
+            }
+        }
+    }
+
+    private void putValidatedDateInMap(Map<String, String> filterMap, String key, String value, String operator)
+            throws WorkflowClientException {
+
+        LocalDateTime newDate = parseDateTime(value, key);
+        value = newDate.format(Constants.WORKFLOW_INSTANCE_DATE_TIME_FORMATTER);
+
+        if (Constants.GREATER_THAN_OR_EQUAL_OPERATOR.equals(operator)) {
+            String storeKey = Constants.WORKFLOW_INSTANCE_CREATED_START_DATE_KEY;
+            if (Constants.WORKFLOW_INSTANCE_UPDATED_DATE_KEY.equals(key)) {
+                storeKey = Constants.WORKFLOW_INSTANCE_UPDATED_START_DATE_KEY;
+            }
+            if (filterMap.get(storeKey) == null) {
+                filterMap.put(storeKey, value);
+                return;
+            }
+            LocalDateTime existingDate = LocalDateTime.parse(filterMap.get(storeKey),
+                    Constants.WORKFLOW_INSTANCE_DATE_TIME_FORMATTER);
+            if (newDate.isAfter(existingDate)) {
+                filterMap.put(storeKey, value);
+            }
+        } else if (Constants.LESS_THAN_OR_EQUAL_OPERATOR.equals(operator)) {
+            String storeKey = Constants.WORKFLOW_INSTANCE_CREATED_END_DATE_KEY;
+            if (Constants.WORKFLOW_INSTANCE_UPDATED_DATE_KEY.equals(key)) {
+                storeKey = Constants.WORKFLOW_INSTANCE_UPDATED_END_DATE_KEY;
+            }
+            if (filterMap.get(storeKey) == null) {
+                filterMap.put(storeKey, value);
+                return;
+            }
+            LocalDateTime existingDate = LocalDateTime.parse(filterMap.get(storeKey),
+                    Constants.WORKFLOW_INSTANCE_DATE_TIME_FORMATTER);
+            if (existingDate.isAfter(newDate)) {
+                filterMap.put(storeKey, value);
+            }
+        } else {
+            throw new WorkflowClientException("Only 'ge' & 'le' operator supported for date filtering");
+        }
     }
 }
