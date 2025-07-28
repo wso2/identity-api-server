@@ -948,43 +948,43 @@ public class WorkflowService {
         String[] comparisonOperators = {"eq", "ge", "le"};
         
         // Find the comparison operator in the condition
-        String foundOperator = null;
-        int operatorPos = -1;
+        String matchedOperator = null;
+        int matchedOperatorIndex = -1;
         
         for (String operator : comparisonOperators) {
             int pos = findKeywordPosition(conditionString, operator, 0);
             if (pos != -1) {
-                if (foundOperator == null || pos < operatorPos) {
-                    foundOperator = operator;
-                    operatorPos = pos;
+                if (matchedOperator == null || pos < matchedOperatorIndex) {
+                    matchedOperator = operator;
+                    matchedOperatorIndex = pos;
                 }
             }
         }
         
-        if (foundOperator == null) {
+        if (matchedOperator == null) {
             throw new WorkflowClientException("No valid comparison operator found in condition: " + conditionString +
                 ". Supported operators are: eq, ge, le");
         }
         
         // Extract field (before operator)
-        String field = conditionString.substring(0, operatorPos).trim();
-        if (field.isEmpty()) {
+        String fieldName = conditionString.substring(0, matchedOperatorIndex).trim();
+        if (fieldName.isEmpty()) {
             throw new WorkflowClientException("Field name is missing in condition: " + conditionString);
         }
         
         // Extract value (after operator)
-        String value = conditionString.substring(operatorPos + foundOperator.length()).trim();
-        if (value.isEmpty()) {
+        String fieldValue = conditionString.substring(matchedOperatorIndex + matchedOperator.length()).trim();
+        if (fieldValue.isEmpty()) {
             throw new WorkflowClientException("Value is missing in condition: " + conditionString);
         }
         
         // Validate operator
-        if (!isValidOperator(foundOperator)) {
-            throw new WorkflowClientException("Invalid operator: " + foundOperator + 
+        if (!isValidOperator(matchedOperator)) {
+            throw new WorkflowClientException("Invalid operator: " + matchedOperator +
                 ". Supported operators are: eq, ge, le");
         }
         
-        return new FilterCondition(field, foundOperator, value);
+        return new FilterCondition(fieldName, matchedOperator, fieldValue);
     }
     
     /**
@@ -1115,7 +1115,7 @@ public class WorkflowService {
     }
 
     /**
-     * Get the current data time.
+     * Get the current date time.
      *
      * @return The current time formatted as a string.
      */
@@ -1168,7 +1168,8 @@ public class WorkflowService {
                 filterMap.put(storeKey, value);
                 return;
             }
-            LocalDateTime existingDate = LocalDateTime.parse(filterMap.get(storeKey), Constants.WORKFLOW_INSTANCE_DATE_TIME_FORMATTER);
+            LocalDateTime existingDate = LocalDateTime.parse(filterMap.get(storeKey),
+                    Constants.WORKFLOW_INSTANCE_DATE_TIME_FORMATTER);
             if (existingDate.isAfter(newDate)) {
                 filterMap.put(storeKey, value);
             }
