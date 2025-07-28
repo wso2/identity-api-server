@@ -107,6 +107,19 @@ paths:
                   "policyName": "IMMEDIATE_EXISTING_AND_FUTURE_ORGS"
                 }
               }'
+    put:
+      tags:
+        - Webhook Metadata
+      summary: Method Not Allowed
+      description: PUT operation is not supported on this resource.
+      operationId: putWebhookMetadataNotAllowed
+      responses:
+        '405':
+          description: Method Not Allowed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /webhooks/metadata/event-profiles/{profileName}:
     get:

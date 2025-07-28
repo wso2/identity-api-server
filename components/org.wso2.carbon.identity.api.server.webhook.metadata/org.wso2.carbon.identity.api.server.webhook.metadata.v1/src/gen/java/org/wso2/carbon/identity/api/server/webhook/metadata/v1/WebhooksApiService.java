@@ -18,8 +18,16 @@
 
 package org.wso2.carbon.identity.api.server.webhook.metadata.v1;
 
+import org.wso2.carbon.identity.api.server.webhook.metadata.v1.*;
+import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.*;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import java.io.InputStream;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.Error;
+import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.EventProfile;
+import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.WebhookMetadata;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.model.WebhookMetadataProperties;
-
 import javax.ws.rs.core.Response;
 
 
@@ -30,4 +38,6 @@ public interface WebhooksApiService {
       public Response getEventProfiles();
 
       public Response patchWebhookMetadata(WebhookMetadataProperties webhookMetadataProperties);
+
+      public Response putWebhookMetadataNotAllowed();
 }

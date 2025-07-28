@@ -58,4 +58,10 @@ public class WebhooksApiServiceImpl implements WebhooksApiService {
         return Response.ok().entity(webhookMetadataService.updateWebhookMetadataProperties(webhookMetadataProperties))
                 .build();
     }
+
+    @Override
+    public Response putWebhookMetadataNotAllowed() {
+
+        return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
+    }
 }

@@ -104,7 +104,7 @@ public class WebhooksApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Webhook Metadata" })
+    }, tags={ "Webhook Metadata", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful Response", response = WebhookMetadataProperties.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
@@ -117,6 +117,25 @@ public class WebhooksApi  {
     public Response patchWebhookMetadata(@ApiParam(value = "" ,required=true) @Valid WebhookMetadataProperties webhookMetadataProperties) {
 
         return delegate.patchWebhookMetadata(webhookMetadataProperties );
+    }
+
+    @Valid
+    @PUT
+    @Path("/metadata")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Method Not Allowed", notes = "PUT operation is not supported on this resource.", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Webhook Metadata" })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 405, message = "Method Not Allowed", response = Error.class)
+    })
+    public Response putWebhookMetadataNotAllowed() {
+
+        return delegate.putWebhookMetadataNotAllowed();
     }
 
 }
