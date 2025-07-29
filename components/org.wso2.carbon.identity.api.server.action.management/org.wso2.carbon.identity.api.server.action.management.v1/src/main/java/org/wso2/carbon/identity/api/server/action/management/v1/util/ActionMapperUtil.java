@@ -76,6 +76,8 @@ public class ActionMapperUtil {
                 .endpoint(new EndpointConfig.EndpointConfigBuilder()
                         .uri(actionModel.getEndpoint().getUri())
                         .authentication(authentication)
+                        .allowedHeaders(actionModel.getEndpoint().getAllowedHeaders())
+                        .allowedParameters(actionModel.getEndpoint().getAllowedParameters())
                         .build())
                 .rule(actionRule)
                 .build();
@@ -101,10 +103,18 @@ public class ActionMapperUtil {
                                 .getAuthentication().getType().toString()),
                         actionUpdateModel.getEndpoint().getAuthentication().getProperties());
             }
-            endpointConfig = new EndpointConfig.EndpointConfigBuilder()
+            EndpointConfig.EndpointConfigBuilder builder = new EndpointConfig.EndpointConfigBuilder()
                     .uri(actionUpdateModel.getEndpoint().getUri())
-                    .authentication(authentication)
-                    .build();
+                    .authentication(authentication);
+
+            if (actionUpdateModel.getEndpoint().getAllowedHeaders() != null) {
+                builder.allowedHeaders(actionUpdateModel.getEndpoint().getAllowedHeaders());
+            }
+            if (actionUpdateModel.getEndpoint().getAllowedParameters() != null) {
+                builder.allowedParameters(actionUpdateModel.getEndpoint().getAllowedParameters());
+            }
+
+            endpointConfig = builder.build();
         }
 
         ActionRule actionRule = null;
@@ -140,7 +150,9 @@ public class ActionMapperUtil {
                         .uri(action.getEndpoint().getUri())
                         .authentication(new AuthenticationTypeResponse()
                                 .type(AuthenticationTypeResponse.TypeEnum.valueOf(action.getEndpoint()
-                                        .getAuthentication().getType().toString()))))
+                                        .getAuthentication().getType().toString())))
+                        .allowedHeaders(action.getEndpoint().getAllowedHeaders())
+                        .allowedParameters(action.getEndpoint().getAllowedParameters()))
                 .rule((action.getActionRule() != null) ? RuleMapper.toORRuleResponse(action.getActionRule()) :
                         null);
     }
