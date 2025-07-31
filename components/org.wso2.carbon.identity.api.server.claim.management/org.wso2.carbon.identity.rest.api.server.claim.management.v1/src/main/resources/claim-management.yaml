@@ -812,9 +812,9 @@ definitions:
           $ref: '#/definitions/Property'
       profiles:
         $ref: '#/definitions/Profiles'
-      skipUserStore:
+      isCustomPersistenceEnabled:
         type: boolean
-        description: Specifies if the claim value stored in the user store should be skipped.
+        description: Specifies whether the default claim persistence should be override.
         example: true
 
   #-----------------------------------------------------
@@ -914,9 +914,9 @@ definitions:
               $ref: '#/definitions/Property'
           profiles:
             $ref: '#/definitions/Profiles'
-          skipUserStore:
+          isCustomPersistenceEnabled:
             type: boolean
-            description: Specifies if the claim value stored in the user store should be skipped.
+            description: Specifies whether the default claim persistence should be override.
             example: true
 
   #-----------------------------------------------------

@@ -100,7 +100,7 @@ public class LocalClaimReqDTO {
     private InputFormatDTO inputFormat = null;
 
     @Valid
-    private Boolean skipUserStore = null;
+    private Boolean isCustomPersistenceEnabled = null;
     /**
     * A unique URI specific to the claim.
     **/
@@ -325,13 +325,13 @@ public class LocalClaimReqDTO {
      * Specifies if the claim value stored in the user store should be skipped.
      * And retrieve the claim value stored in the identity db.
      **/
-    @ApiModelProperty(value = "Specifies if the claim value stored in the user store should be skipped.")
-    @JsonProperty("skipUserStore")
-    public Boolean getSkipUserStore() {
-        return skipUserStore;
+    @ApiModelProperty(value = "Specifies whether the default claim persistence should be override.")
+    @JsonProperty("isCustomPersistenceEnabled")
+    public Boolean getIsCustomPersistenceEnabled() {
+        return isCustomPersistenceEnabled;
     }
-    public void setSkipUserStore(Boolean skipUserStore) {
-        this.skipUserStore = skipUserStore;
+    public void setIsCustomPersistenceEnabled(Boolean skipUserStore) {
+        this.isCustomPersistenceEnabled = skipUserStore;
     }
 
     @Override
@@ -358,7 +358,7 @@ public class LocalClaimReqDTO {
         sb.append("    properties: ").append(properties).append("\n");
         sb.append("    profiles: ").append(profiles).append("\n");
         sb.append("    inputFormat: ").append(inputFormat).append("\n");
-        sb.append("    skipUserStore: ").append(skipUserStore).append("\n");
+        sb.append("    isCustomPersistenceEnabled: ").append(isCustomPersistenceEnabled).append("\n");
 
         sb.append("}\n");
         return sb.toString();
