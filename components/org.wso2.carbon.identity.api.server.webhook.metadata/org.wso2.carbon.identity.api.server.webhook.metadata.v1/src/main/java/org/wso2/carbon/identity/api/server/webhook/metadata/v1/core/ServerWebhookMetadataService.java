@@ -103,19 +103,15 @@ public class ServerWebhookMetadataService {
         }
     }
 
-    public WebhookMetadataProperties updateWebhookMetadataProperties(
+    public WebhookMetadata updateWebhookMetadataProperties(
             WebhookMetadataProperties webhookMetadataProperties) {
 
         try {
-            WebhookMetadataProperties webhookMetadataPropertiesResponse = new WebhookMetadataProperties();
-            WebhookMetadataOrganizationPolicy organizationPolicy = new WebhookMetadataOrganizationPolicy();
-            organizationPolicy.setPolicyName(WebhookMetadataOrganizationPolicy.PolicyNameEnum.fromValue(
-                    (WebhookMetadataServiceHolder.getWebhookMetadataService()
-                            .updateWebhookMetadataProperties(mapWebhookMetadataProperties(webhookMetadataProperties),
-                                    CarbonContext.getThreadLocalCarbonContext()
-                                            .getTenantDomain())).getOrganizationPolicy().getPolicyValue()));
-            webhookMetadataPropertiesResponse.setOrganizationPolicy(organizationPolicy);
-            return webhookMetadataPropertiesResponse;
+            WebhookMetadataServiceHolder.getWebhookMetadataService()
+                    .updateWebhookMetadataProperties(mapWebhookMetadataProperties(webhookMetadataProperties),
+                            CarbonContext.getThreadLocalCarbonContext()
+                                    .getTenantDomain());
+            return getWebhookMetadata();
         } catch (WebhookMetadataException e) {
             throw WebhookMetadataAPIErrorBuilder.buildAPIError(e);
         }
