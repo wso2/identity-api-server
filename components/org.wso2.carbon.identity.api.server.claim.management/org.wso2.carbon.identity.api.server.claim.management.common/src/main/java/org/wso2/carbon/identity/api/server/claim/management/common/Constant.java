@@ -242,10 +242,7 @@ public class Constant {
         ERROR_CODE_CANONICAL_VALUES_NOT_SUPPORTED_FOR_NON_STRING_DATA_TYPES("CMT-60019",
                 "Canonical values are only supported for string data type.",
                 "The attribute: %s is not a string data type and canonical values are only supported for " +
-                        "string data type."),
-        ERROR_CODE_SKIP_USER_STORE_UPDATE_FAILURE("CMT-60020",
-                "Unable to update storage location.",
-                "Server encountered an error while updating the storage location for the claim.");
+                        "string data type.");
 
 
 
@@ -323,7 +320,7 @@ public class Constant {
     public static final String PROP_SUB_ATTRIBUTES = "subAttributes";
     public static final String PROP_CANONICAL_VALUES = "canonicalValues";
     public static final String PROP_INPUT_FORMAT = "inputFormat";
-    public static final String PROP_SKIP_USER_STORE = "skipUserStore";
+    public static final String PROP_IS_CUSTOM_PERSISTENCE_ENABLED = "isCustomPersistenceEnabled";
 
     public static final String PROP_MULTI_VALUED = "multiValued";
     public static final String PROP_UNIQUENESS_SCOPE = "UniquenessScope";
