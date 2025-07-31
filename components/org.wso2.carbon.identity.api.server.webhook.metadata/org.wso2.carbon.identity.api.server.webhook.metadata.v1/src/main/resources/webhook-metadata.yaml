@@ -67,7 +67,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WebhookMetadataProperties'
+                $ref: '#/components/schemas/WebhookMetadata'
         "400":
           description: Bad Request
           content:

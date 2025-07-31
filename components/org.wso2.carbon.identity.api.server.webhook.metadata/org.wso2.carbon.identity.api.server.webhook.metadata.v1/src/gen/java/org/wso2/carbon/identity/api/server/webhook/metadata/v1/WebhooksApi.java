@@ -99,14 +99,14 @@ public class WebhooksApi  {
     @Path("/metadata")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update webhook metadata properties", notes = "This API updates an webhook metadata property and return the updated webhook metadata properties.    <b>Scope (Permission) required:</b> ``internal_webhook_meta_update``  ", response = WebhookMetadataProperties.class, authorizations = {
+    @ApiOperation(value = "Update webhook metadata properties", notes = "This API updates an webhook metadata property and return the updated webhook metadata properties.    <b>Scope (Permission) required:</b> ``internal_webhook_meta_update``  ", response = WebhookMetadata.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Webhook Metadata", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful Response", response = WebhookMetadataProperties.class),
+        @ApiResponse(code = 200, message = "Successful Response", response = WebhookMetadata.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
