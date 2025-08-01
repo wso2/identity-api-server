@@ -247,6 +247,8 @@ public class Constant {
                 "The attribute: %s is not a string data type and canonical values are only supported for " +
                         "string data type.");
 
+
+
         private final String code;
         private final String message;
         private final String description;
@@ -321,6 +323,7 @@ public class Constant {
     public static final String PROP_SUB_ATTRIBUTES = "subAttributes";
     public static final String PROP_CANONICAL_VALUES = "canonicalValues";
     public static final String PROP_INPUT_FORMAT = "inputFormat";
+    public static final String PROP_IS_CUSTOM_PERSISTENCE_ENABLED = "isCustomPersistenceEnabled";
 
     public static final String PROP_MULTI_VALUED = "multiValued";
     public static final String PROP_UNIQUENESS_SCOPE = "UniquenessScope";
