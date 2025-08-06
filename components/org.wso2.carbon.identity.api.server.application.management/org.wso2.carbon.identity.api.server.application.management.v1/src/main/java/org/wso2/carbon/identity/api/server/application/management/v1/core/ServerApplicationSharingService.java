@@ -447,6 +447,7 @@ public class ServerApplicationSharingService {
                     .parentId(organizationNode.getParentOrganizationId())
                     .depthFromRoot(organizationNode.getDepthFromRoot())
                     .orgHandle(organizationNode.getOrganizationHandle())
+                    .status(BasicOrganizationResponse.StatusEnum.valueOf(organizationNode.getOrganizationStatus()))
                     .ref(buildOrganizationURL(organizationNode.getOrganizationId()).toString())
                     .hasChildren(organizationNode.hasChildren());
             List<RoleWithAudienceDO> roleWithAudienceDOList = organizationNode.getRoleWithAudienceDOList();
