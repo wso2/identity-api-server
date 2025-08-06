@@ -260,7 +260,7 @@ paths:
         Retrieve all the available workflow associations in the system.
 
         <b>Scope required:</b>
-                    * internal_workflow_associations_view
+                    * internal_workflow_association_view
       operationId: getWorkflowAssociations
       parameters:
         - $ref: "#/components/parameters/limitQueryParam"
@@ -311,7 +311,7 @@ paths:
         Create a new workflow association by assigning a user operation to an existing workflow.
 
         <b>Scope required:</b>
-                    * internal_workflow_associations_create
+                    * internal_workflow_association_create
 
       operationId: addWorkflowAssociation
       responses:
@@ -347,7 +347,7 @@ paths:
         Get a specific workflow association identified by the association id.
 
         <b>Scope required:</b>
-                            * internal_workflow_associations_view
+                            * internal_workflow_association_view
       operationId: getWorkflowAssociationById
       parameters:
         - $ref: "#/components/parameters/associationIdPathParam"
@@ -382,7 +382,7 @@ paths:
         Delete a specific workflow association identified by the association ID.
 
         <b>Scope required:</b>
-                            * internal_workflow_associations_view
+                            * internal_workflow_association_view
       operationId: deleteWorkflowAssociationById
       parameters:
         - $ref: "#/components/parameters/associationIdPathParam"
@@ -409,7 +409,7 @@ paths:
         Partially update an association by association-id.<br>
 
           <b>Scope required:</b> <br>
-              * internal_workflow_associations_update
+              * internal_workflow_association_update
       parameters:
         - $ref: "#/components/parameters/associationIdPathParam"
       requestBody:
@@ -467,7 +467,7 @@ paths:
       description: |
         Retrieve workflow instances filtered by various parameters.
 
-        <b>Scope required:</b> internal_workflow_instances_view
+        <b>Scope required:</b> internal_workflow_instance_view
       operationId: getWorkflowInstances
       parameters:
         - name: limit
@@ -489,7 +489,7 @@ paths:
 
             Example:
 
-                `operationType+eq+ADD_USER+and+requestType+eq+MY_TASKS+and+status+eq+PENDING+and+createdAt+ge+2025-06-01:09:57:47.000+and+createdAt+le+2025-07-31:09:57:47.000`
+                `operationType+eq+ADD_USER+and+requestType+eq+MY_TASKS+and+status+eq+PENDING+and+createdAt+ge+2025-06-01 09:57:47.000+and+createdAt+le+2025-07-31 09:57:47.000`
           schema:
             type: string
       responses:
@@ -518,7 +518,7 @@ paths:
       description: |
         Retrieve a specific workflow instance by providing its unique ID.
 
-        <b>Scope required:</b> internal_workflow_instances_view
+        <b>Scope required:</b> internal_workflow_instance_view
       operationId: getWorkflowInstanceById
       parameters:
         - name: instance_id
@@ -543,7 +543,7 @@ paths:
       description: |
         Delete a workflow instance by providing the instance ID.
 
-        <b>Scope required:</b> internal_workflow_instances_delete
+        <b>Scope required:</b> internal_workflow_instance_delete
       operationId: deleteWorkflowInstance
       parameters:
         - name: instance_id
