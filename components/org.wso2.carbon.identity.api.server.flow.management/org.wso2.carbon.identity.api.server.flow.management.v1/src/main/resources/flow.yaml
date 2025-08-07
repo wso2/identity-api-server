@@ -281,6 +281,135 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
+  /flow/generate:
+    post:
+      summary: Generate a flow
+      operationId: generateFlow
+      tags:
+        - Generate Flow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowGenerateRequest'
+      responses:
+        '200':
+          description: Flow generation request successfully submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlowGenerateResponse'
+        '400':
+          description: Invalid flow type specified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /flow/status:
+    get:
+      summary: Retrieve flow generation status
+      operationId: getFlowGenerationStatus
+      tags:
+        - Generate Flow
+      parameters:
+        - in: query
+          name: operationId
+          required: true
+          schema:
+            type: string
+          description: Operation id to get the generation status
+      responses:
+        '200':
+          description: Successfully retrieved the generation status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlowGenerateStatus'
+        '400':
+          description: Invalid operation specified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Encountered a server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /flow/result:
+    get:
+      summary: Retrieve flow generation result
+      operationId: getFlowGenerationResult
+      tags:
+        - Generate Flow
+      parameters:
+        - in: query
+          name: operationId
+          required: true
+          schema:
+            type: string
+          description: Operation id to get the generation result
+      responses:
+        '200':
+          description: Successfully retrieved the generation result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlowGenerateResult'
+        '400':
+          description: Invalid operation specified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Encountered a server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 components:
   schemas:
     FlowRequest:
@@ -293,11 +422,70 @@ components:
         flowType:
           type: string
           description: Type of the flow being updated
-          example: SELF_REGISTRATION
+          example: REGISTRATION
         steps:
           type: array
           items:
             $ref: '#/components/schemas/Step'
+
+    FlowGenerateRequest:
+      type: object
+      description: Request payload for generating a flow
+      required:
+        - flowType
+      properties:
+        flowType:
+          type: string
+          description: Type of the flow being updated
+          example: REGISTRATION
+        userQuery:
+          type: string
+          description: User query to generate the flow
+          example: Generate a registration flow with basic details and passkey
+
+    FlowGenerateResponse:
+      type: object
+      description: Response for generating a flow
+      properties:
+        operationId:
+          type: string
+          description: Id for the submitted generation operation
+          example: 2dc32cd4-3cde-4a77-bf95-af55a6738b92
+
+    FlowGenerateStatus:
+      type: object
+      description: Status response for generating a flow
+      properties:
+        optimizingQuery:
+          type: boolean
+          example: true
+        fetchingSamples:
+          type: boolean
+          example: true
+        generatingFlow:
+          type: boolean
+          example: true
+        completed:
+          type: boolean
+          example: true
+
+    FlowGenerateResult:
+      type: object
+      description: Result response for generating a flow
+      properties:
+        status:
+          type: string
+          example: SUCCESS
+        data:
+          type: object
+          properties:
+            steps:
+              type: array
+              items:
+                $ref: '#/components/schemas/Step'
+            error:
+              type: string
+              example: Error occurred while generating the flow
 
     FlowResponse:
       type: object
