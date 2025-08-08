@@ -133,6 +133,8 @@ public class LocalAuthenticatorConfigBuilderFactory {
             endpointConfigBuilder.authenticationProperties(endpointConfig.getAuthentication().getProperties()
                     .entrySet().stream().collect(Collectors.toMap(
                             Map.Entry::getKey, entry -> entry.getValue().toString())));
+            endpointConfigBuilder.allowedHeaders(endpointConfig.getAllowedHeaders());
+            endpointConfigBuilder.allowedParameters(endpointConfig.getAllowedParameters());
             return endpointConfigBuilder.build();
         } catch (NoSuchElementException | IllegalArgumentException e) {
             AuthenticatorMgtError error = AuthenticatorMgtError.ERROR_CODE_INVALID_ENDPOINT_CONFIG;
