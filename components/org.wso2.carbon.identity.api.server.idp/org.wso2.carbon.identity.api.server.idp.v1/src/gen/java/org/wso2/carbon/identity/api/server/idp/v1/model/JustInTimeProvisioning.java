@@ -1,18 +1,20 @@
 /*
-* Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2019-2025, WSO2 LLC. (http://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 package org.wso2.carbon.identity.api.server.idp.v1.model;
 
@@ -20,6 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.idp.v1.model.AccountLookupAttributeMapping;
 import javax.validation.constraints.*;
 
 
@@ -67,6 +72,8 @@ public enum SchemeEnum {
     private SchemeEnum scheme = SchemeEnum.PROVISION_SILENTLY;
     private String userstore = "PRIMARY";
     private Boolean associateLocalUser = false;
+    private List<AccountLookupAttributeMapping> accountLookupAttributeMappings = null;
+
 
 @XmlType(name="AttributeSyncMethodEnum")
 @XmlEnum(String.class)
@@ -177,6 +184,33 @@ public enum AttributeSyncMethodEnum {
     }
 
     /**
+    * List of local and federated attributes to be used for account lookup. 
+    **/
+    public JustInTimeProvisioning accountLookupAttributeMappings(List<AccountLookupAttributeMapping> accountLookupAttributeMappings) {
+
+        this.accountLookupAttributeMappings = accountLookupAttributeMappings;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "List of local and federated attributes to be used for account lookup. ")
+    @JsonProperty("accountLookupAttributeMappings")
+    @Valid
+    public List<AccountLookupAttributeMapping> getAccountLookupAttributeMappings() {
+        return accountLookupAttributeMappings;
+    }
+    public void setAccountLookupAttributeMappings(List<AccountLookupAttributeMapping> accountLookupAttributeMappings) {
+        this.accountLookupAttributeMappings = accountLookupAttributeMappings;
+    }
+
+    public JustInTimeProvisioning addAccountLookupAttributeMappingsItem(AccountLookupAttributeMapping accountLookupAttributeMappingsItem) {
+        if (this.accountLookupAttributeMappings == null) {
+            this.accountLookupAttributeMappings = new ArrayList<>();
+        }
+        this.accountLookupAttributeMappings.add(accountLookupAttributeMappingsItem);
+        return this;
+    }
+
+        /**
     **/
     public JustInTimeProvisioning attributeSyncMethod(AttributeSyncMethodEnum attributeSyncMethod) {
 
@@ -210,12 +244,13 @@ public enum AttributeSyncMethodEnum {
             Objects.equals(this.scheme, justInTimeProvisioning.scheme) &&
             Objects.equals(this.userstore, justInTimeProvisioning.userstore) &&
             Objects.equals(this.associateLocalUser, justInTimeProvisioning.associateLocalUser) &&
+            Objects.equals(this.accountLookupAttributeMappings, justInTimeProvisioning.accountLookupAttributeMappings) &&
             Objects.equals(this.attributeSyncMethod, justInTimeProvisioning.attributeSyncMethod);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(isEnabled, scheme, userstore, associateLocalUser, attributeSyncMethod);
+        return Objects.hash(isEnabled, scheme, userstore, associateLocalUser, accountLookupAttributeMappings, attributeSyncMethod);
     }
 
     @Override
@@ -228,6 +263,7 @@ public enum AttributeSyncMethodEnum {
         sb.append("    scheme: ").append(toIndentedString(scheme)).append("\n");
         sb.append("    userstore: ").append(toIndentedString(userstore)).append("\n");
         sb.append("    associateLocalUser: ").append(toIndentedString(associateLocalUser)).append("\n");
+        sb.append("    accountLookupAttributeMappings: ").append(toIndentedString(accountLookupAttributeMappings)).append("\n");
         sb.append("    attributeSyncMethod: ").append(toIndentedString(attributeSyncMethod)).append("\n");
         sb.append("}");
         return sb.toString();
