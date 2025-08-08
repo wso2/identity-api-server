@@ -76,6 +76,8 @@ public class ActionMapperUtil {
                 .endpoint(new EndpointConfig.EndpointConfigBuilder()
                         .uri(actionModel.getEndpoint().getUri())
                         .authentication(authentication)
+                        .allowedHeaders(actionModel.getEndpoint().getAllowedHeaders())
+                        .allowedParameters(actionModel.getEndpoint().getAllowedParameters())
                         .build())
                 .rule(actionRule)
                 .build();
@@ -104,6 +106,8 @@ public class ActionMapperUtil {
             endpointConfig = new EndpointConfig.EndpointConfigBuilder()
                     .uri(actionUpdateModel.getEndpoint().getUri())
                     .authentication(authentication)
+                    .allowedHeaders(actionUpdateModel.getEndpoint().getAllowedHeaders())
+                    .allowedParameters(actionUpdateModel.getEndpoint().getAllowedParameters())
                     .build();
         }
 
@@ -140,7 +144,9 @@ public class ActionMapperUtil {
                         .uri(action.getEndpoint().getUri())
                         .authentication(new AuthenticationTypeResponse()
                                 .type(AuthenticationTypeResponse.TypeEnum.valueOf(action.getEndpoint()
-                                        .getAuthentication().getType().toString()))))
+                                        .getAuthentication().getType().toString())))
+                        .allowedHeaders(action.getEndpoint().getAllowedHeaders())
+                        .allowedParameters(action.getEndpoint().getAllowedParameters()))
                 .rule((action.getActionRule() != null) ? RuleMapper.toORRuleResponse(action.getActionRule()) :
                         null);
     }
