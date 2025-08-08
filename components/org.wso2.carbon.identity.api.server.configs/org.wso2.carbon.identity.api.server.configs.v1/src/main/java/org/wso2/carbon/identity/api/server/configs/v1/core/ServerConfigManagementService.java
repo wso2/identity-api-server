@@ -287,6 +287,11 @@ public class ServerConfigManagementService {
     public void patchConfigs(List<Patch> patchRequest) {
 
         try {
+            if (OrganizationManagementUtil.isOrganization(ContextLoader.getTenantDomainFromContext())) {
+                throw handleException(Response.Status.FORBIDDEN, Constants.ErrorMessage
+                        .ERROR_CODE_CONFIG_UPDATE_NOT_ALLOWED, null);
+            }
+
             IdentityProvider residentIdP = idpManager.getResidentIdP(ContextLoader.getTenantDomainFromContext());
             // Resident Identity Provider can be null only due to an internal server error.
             if (residentIdP == null) {
@@ -305,6 +310,9 @@ public class ServerConfigManagementService {
             }
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_CONFIGS, null);
+        } catch (OrganizationManagementException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
+                    .ERROR_CODE_ERROR_UPDATING_CONFIGS, e.getMessage());
         }
     }
 

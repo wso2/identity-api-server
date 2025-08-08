@@ -102,6 +102,9 @@ public class Constants {
         ERROR_CODE_SCHEMA_NOT_FOUND("60004",
                 "Resource not found.",
                 "Unable to find a resource matching the provided schema identifier %s."),
+        ERROR_CODE_CONFIG_UPDATE_NOT_ALLOWED("60005",
+                "Configuration update not allowed.",
+                "The requested update is not allowed for the organization."),
 
         /**
          * CORS errors.
