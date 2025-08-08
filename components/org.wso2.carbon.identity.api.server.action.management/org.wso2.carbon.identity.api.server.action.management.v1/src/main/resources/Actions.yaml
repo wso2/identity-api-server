@@ -1301,8 +1301,6 @@ components:
       required:
         - uri
         - authentication
-        - allowedHeaders
-        - allowedParameters
       properties:
         uri:
           type: string
