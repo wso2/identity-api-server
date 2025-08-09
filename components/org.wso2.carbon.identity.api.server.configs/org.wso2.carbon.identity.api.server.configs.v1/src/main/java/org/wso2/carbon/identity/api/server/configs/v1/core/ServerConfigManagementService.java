@@ -913,6 +913,8 @@ public class ServerConfigManagementService {
         Endpoint endpoint = new Endpoint();
         endpoint.setUri(endpointConfig.getAuthenticatorEndpointUri());
         endpoint.setAuthentication(authenticationType);
+        endpoint.allowedHeaders(endpointConfig.getAuthenticatorEndpointAllowedHeaders());
+        endpoint.allowedParameters(endpointConfig.getAuthenticatorEndpointAllowedParameters());
         authenticator.endpoint(endpoint);
     }
 

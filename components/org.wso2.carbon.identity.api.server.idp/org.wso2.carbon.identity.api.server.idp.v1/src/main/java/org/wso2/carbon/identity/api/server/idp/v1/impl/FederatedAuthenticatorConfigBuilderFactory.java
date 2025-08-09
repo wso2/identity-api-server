@@ -273,6 +273,8 @@ public class FederatedAuthenticatorConfigBuilderFactory {
                         .entrySet().stream().collect(Collectors.toMap(
                                 Map.Entry::getKey, entry -> entry.getValue().toString())));
             }
+            endpointConfigBuilder.allowedHeaders(federatedAuthenticatorConfigDTO.endpoint.getAllowedHeaders());
+            endpointConfigBuilder.allowedParameters(federatedAuthenticatorConfigDTO.endpoint.getAllowedParameters());
             authConfig.setEndpointConfig(endpointConfigBuilder.build());
 
             return authConfig;
@@ -465,6 +467,8 @@ public class FederatedAuthenticatorConfigBuilderFactory {
             Endpoint endpoint = new Endpoint();
             endpoint.setUri(endpointConfig.getEndpointConfig().getUri());
             endpoint.setAuthentication(authenticationType);
+            endpoint.setAllowedHeaders(endpointConfig.getEndpointConfig().getAllowedHeaders());
+            endpoint.setAllowedParameters(endpointConfig.getEndpointConfig().getAllowedParameters());
             authenticator.setEndpoint(endpoint);
         } catch (ClassCastException e) {
             throw new IdentityProviderManagementServerException(String.format("Error occurred while resolving" +
