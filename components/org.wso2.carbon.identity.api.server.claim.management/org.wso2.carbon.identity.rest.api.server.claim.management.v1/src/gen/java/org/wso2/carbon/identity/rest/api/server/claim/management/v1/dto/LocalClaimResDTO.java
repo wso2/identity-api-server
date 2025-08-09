@@ -100,6 +100,9 @@ public class LocalClaimResDTO extends ClaimResDTO {
     @Valid
     private InputFormatDTO inputFormat = null;
 
+    @Valid
+    private Boolean isCustomPersistenceEnabled = null;
+
     /**
     * claim ID.
     **/
@@ -345,13 +348,26 @@ public class LocalClaimResDTO extends ClaimResDTO {
         this.inputFormat = inputFormat;
     }
 
+    /**
+     * Specifies if the claim value stored in the user store should be skipped.
+     * And retrieve the claim value stored in the identity db.
+     **/
+    @ApiModelProperty(value = "Specifies whether the default claim persistence should be override.")
+    @JsonProperty("isCustomPersistenceEnabled")
+    public Boolean getIsCustomPersistenceEnabled() {
+        return isCustomPersistenceEnabled;
+    }
+    public void setIsCustomPersistenceEnabled(Boolean skipUserStore) {
+        this.isCustomPersistenceEnabled = skipUserStore;
+    }
+
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class LocalClaimResDTO {\n");
+
         sb.append("  " + super.toString()).append("\n");
-        
         sb.append("    id: ").append(id).append("\n");
         sb.append("    claimURI: ").append(claimURI).append("\n");
         sb.append("    dialectURI: ").append(dialectURI).append("\n");
@@ -372,6 +388,7 @@ public class LocalClaimResDTO extends ClaimResDTO {
         sb.append("    properties: ").append(properties).append("\n");
         sb.append("    profiles: ").append(profiles).append("\n");
         sb.append("    inputFormat: ").append(inputFormat).append("\n");
+        sb.append("    isCustomPersistenceEnabled: ").append(isCustomPersistenceEnabled).append("\n");
         
         sb.append("}\n");
         return sb.toString();

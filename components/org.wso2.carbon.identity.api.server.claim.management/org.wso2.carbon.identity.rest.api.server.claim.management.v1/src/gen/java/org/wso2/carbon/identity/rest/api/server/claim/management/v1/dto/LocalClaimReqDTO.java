@@ -99,6 +99,8 @@ public class LocalClaimReqDTO {
     @Valid
     private InputFormatDTO inputFormat = null;
 
+    @Valid
+    private Boolean isCustomPersistenceEnabled = null;
     /**
     * A unique URI specific to the claim.
     **/
@@ -319,6 +321,19 @@ public class LocalClaimReqDTO {
         this.inputFormat = inputFormat;
     }
 
+    /**
+     * Specifies if the claim value stored in the user store should be skipped.
+     * And retrieve the claim value stored in the identity db.
+     **/
+    @ApiModelProperty(value = "Specifies whether the default claim persistence should be override.")
+    @JsonProperty("isCustomPersistenceEnabled")
+    public Boolean getIsCustomPersistenceEnabled() {
+        return isCustomPersistenceEnabled;
+    }
+    public void setIsCustomPersistenceEnabled(Boolean skipUserStore) {
+        this.isCustomPersistenceEnabled = skipUserStore;
+    }
+
     @Override
     public String toString() {
 
@@ -343,7 +358,8 @@ public class LocalClaimReqDTO {
         sb.append("    properties: ").append(properties).append("\n");
         sb.append("    profiles: ").append(profiles).append("\n");
         sb.append("    inputFormat: ").append(inputFormat).append("\n");
-        
+        sb.append("    isCustomPersistenceEnabled: ").append(isCustomPersistenceEnabled).append("\n");
+
         sb.append("}\n");
         return sb.toString();
     }
