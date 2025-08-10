@@ -100,9 +100,9 @@ public class PreUpdatePasswordActionResponse extends ActionResponse {
                 Objects.equals(this.getName(), actionResponse.getName()) &&
                 Objects.equals(this.getDescription(), actionResponse.getDescription()) &&
                 Objects.equals(this.getStatus(), actionResponse.getStatus()) &&
-                Objects.equals(this.getEndpoint(), actionResponse.getEndpoint()) &&
                 Objects.equals(this.getCreatedAt(), actionResponse.getCreatedAt()) &&
                 Objects.equals(this.getUpdatedAt(), actionResponse.getUpdatedAt()) &&
+                Objects.equals(this.getEndpoint(), actionResponse.getEndpoint()) &&
                 Objects.equals(this.passwordSharing, actionResponse.passwordSharing) &&
                 Objects.equals(this.attributes, actionResponse.attributes) &&
                 Objects.equals(this.getRule(), actionResponse.getRule());
