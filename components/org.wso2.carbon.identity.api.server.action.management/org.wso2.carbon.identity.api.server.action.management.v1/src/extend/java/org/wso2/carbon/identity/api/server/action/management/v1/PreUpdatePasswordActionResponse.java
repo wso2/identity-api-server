@@ -41,6 +41,8 @@ public class PreUpdatePasswordActionResponse extends ActionResponse {
         setName(actionResponse.getName());
         setDescription(actionResponse.getDescription());
         setStatus(actionResponse.getStatus());
+        setCreatedAt(actionResponse.getCreatedAt());
+        setUpdatedAt(actionResponse.getUpdatedAt());
         setEndpoint(actionResponse.getEndpoint());
         setRule(actionResponse.getRule());
     }
@@ -98,6 +100,8 @@ public class PreUpdatePasswordActionResponse extends ActionResponse {
                 Objects.equals(this.getName(), actionResponse.getName()) &&
                 Objects.equals(this.getDescription(), actionResponse.getDescription()) &&
                 Objects.equals(this.getStatus(), actionResponse.getStatus()) &&
+                Objects.equals(this.getCreatedAt(), actionResponse.getCreatedAt()) &&
+                Objects.equals(this.getUpdatedAt(), actionResponse.getUpdatedAt()) &&
                 Objects.equals(this.getEndpoint(), actionResponse.getEndpoint()) &&
                 Objects.equals(this.passwordSharing, actionResponse.passwordSharing) &&
                 Objects.equals(this.attributes, actionResponse.attributes) &&
@@ -106,8 +110,8 @@ public class PreUpdatePasswordActionResponse extends ActionResponse {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getType(), getName(), getDescription(), getStatus(), getEndpoint(),
-                passwordSharing, attributes, getRule());
+        return Objects.hash(getId(), getType(), getName(), getDescription(), getStatus(), getCreatedAt(),
+                getUpdatedAt(), getEndpoint(), passwordSharing, attributes, getRule());
     }
 
     @Override
@@ -120,6 +124,8 @@ public class PreUpdatePasswordActionResponse extends ActionResponse {
         sb.append("    name: ").append(toIndentedString(getName())).append("\n");
         sb.append("    description: ").append(toIndentedString(getDescription())).append("\n");
         sb.append("    status: ").append(toIndentedString(getStatus())).append("\n");
+        sb.append("    createdAt: ").append(toIndentedString(getCreatedAt())).append("\n");
+        sb.append("    updatedAt: ").append(toIndentedString(getUpdatedAt())).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(getEndpoint())).append("\n");
         sb.append("    passwordSharing: ").append(toIndentedString(passwordSharing)).append("\n");
         sb.append("    attributes: ").append(toIndentedString(attributes)).append("\n");
