@@ -248,8 +248,8 @@ public class ServerWebhookManagementService {
 
         WebhookResponse webhookResponse = new WebhookResponse();
         webhookResponse.setId(webhook.getId());
-        webhookResponse.setCreatedAt(String.valueOf(webhook.getCreatedAt()));
-        webhookResponse.setUpdatedAt(String.valueOf(webhook.getUpdatedAt()));
+        webhookResponse.setCreatedAt(webhook.getCreatedAt().toInstant().toString());
+        webhookResponse.setUpdatedAt(webhook.getUpdatedAt().toInstant().toString());
         webhookResponse.setEndpoint(webhook.getEndpoint());
         webhookResponse.setName(webhook.getName());
         WebhookRequestEventProfile eventProfile = new WebhookRequestEventProfile();

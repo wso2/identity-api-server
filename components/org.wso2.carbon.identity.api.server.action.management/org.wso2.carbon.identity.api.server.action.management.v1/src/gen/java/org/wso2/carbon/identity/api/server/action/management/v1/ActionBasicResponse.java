@@ -74,6 +74,8 @@ public enum StatusEnum {
 }
 
     private StatusEnum status;
+    private String createdAt;
+    private String updatedAt;
     private List<Link> links = null;
 
 
@@ -172,6 +174,44 @@ public enum StatusEnum {
     }
 
     /**
+    * Created time of the action.
+    **/
+    public ActionBasicResponse createdAt(String createdAt) {
+
+        this.createdAt = createdAt;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "2025-08-01T12:00:00Z", value = "Created time of the action.")
+    @JsonProperty("createdAt")
+    @Valid
+    public String getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    /**
+    * Last updated time of the action.
+    **/
+    public ActionBasicResponse updatedAt(String updatedAt) {
+
+        this.updatedAt = updatedAt;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "2025-09-01T13:00:00Z", value = "Last updated time of the action.")
+    @JsonProperty("updatedAt")
+    @Valid
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    /**
     **/
     public ActionBasicResponse links(List<Link> links) {
 
@@ -214,12 +254,14 @@ public enum StatusEnum {
             Objects.equals(this.name, actionBasicResponse.name) &&
             Objects.equals(this.description, actionBasicResponse.description) &&
             Objects.equals(this.status, actionBasicResponse.status) &&
+            Objects.equals(this.createdAt, actionBasicResponse.createdAt) &&
+            Objects.equals(this.updatedAt, actionBasicResponse.updatedAt) &&
             Objects.equals(this.links, actionBasicResponse.links);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, type, name, description, status, links);
+        return Objects.hash(id, type, name, description, status, createdAt, updatedAt, links);
     }
 
     @Override
@@ -233,6 +275,8 @@ public enum StatusEnum {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
+        sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
+        sb.append("    updatedAt: ").append(toIndentedString(updatedAt)).append("\n");
         sb.append("    links: ").append(toIndentedString(links)).append("\n");
         sb.append("}");
         return sb.toString();

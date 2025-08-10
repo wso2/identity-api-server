@@ -73,6 +73,8 @@ public enum StatusEnum {
 }
 
     private StatusEnum status;
+    private String createdAt;
+    private String updatedAt;
     private EndpointResponse endpoint;
     private ORRuleResponse rule;
 
@@ -171,6 +173,44 @@ public enum StatusEnum {
     }
 
     /**
+    * Created time of the action.
+    **/
+    public ActionResponse createdAt(String createdAt) {
+
+        this.createdAt = createdAt;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "2025-08-01T12:00:00Z", value = "Created time of the action.")
+    @JsonProperty("createdAt")
+    @Valid
+    public String getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    /**
+    * Last updated time of the action.
+    **/
+    public ActionResponse updatedAt(String updatedAt) {
+
+        this.updatedAt = updatedAt;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "2025-09-01T13:00:00Z", value = "Last updated time of the action.")
+    @JsonProperty("updatedAt")
+    @Valid
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    /**
     **/
     public ActionResponse endpoint(EndpointResponse endpoint) {
 
@@ -223,13 +263,15 @@ public enum StatusEnum {
             Objects.equals(this.name, actionResponse.name) &&
             Objects.equals(this.description, actionResponse.description) &&
             Objects.equals(this.status, actionResponse.status) &&
+            Objects.equals(this.createdAt, actionResponse.createdAt) &&
+            Objects.equals(this.updatedAt, actionResponse.updatedAt) &&
             Objects.equals(this.endpoint, actionResponse.endpoint) &&
             Objects.equals(this.rule, actionResponse.rule);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, type, name, description, status, endpoint, rule);
+        return Objects.hash(id, type, name, description, status, createdAt, updatedAt, endpoint, rule);
     }
 
     @Override
@@ -243,6 +285,8 @@ public enum StatusEnum {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
+        sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
+        sb.append("    updatedAt: ").append(toIndentedString(updatedAt)).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
         sb.append("    rule: ").append(toIndentedString(rule)).append("\n");
         sb.append("}");
