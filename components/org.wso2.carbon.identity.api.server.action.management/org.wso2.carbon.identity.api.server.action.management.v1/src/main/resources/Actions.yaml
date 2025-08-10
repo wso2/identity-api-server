@@ -212,8 +212,8 @@ paths:
                     name: Access Token Pre Issue
                     description: This action invokes before issuing an access token.
                     status: INACTIVE
-                    createdAt: 2025-08-01 12:00:00
-                    updatedAt: 2025-09-01 13:00:00
+                    createdAt: 2025-08-01T12:00:00Z
+                    updatedAt: 2025-09-01T13:00:00Z
                     endpoint:
                       uri: https://myextension.com/token
                       authentication:
@@ -246,8 +246,8 @@ paths:
                     name: Password Update Action
                     description: This action invokes before updating a user password.
                     status: INACTIVE
-                    createdAt: 2025-08-01 12:00:00
-                    updatedAt: 2025-09-01 13:00:00
+                    createdAt: 2025-08-01T12:00:00Z
+                    updatedAt: 2025-09-01T13:00:00Z
                     endpoint:
                       uri: https://myextension.com/pre-update-password
                       authentication:
@@ -286,8 +286,8 @@ paths:
                     name: Profile Update Action
                     description: This action invokes before updating a user profile.
                     status: INACTIVE
-                    createdAt: 2025-08-01 12:00:00
-                    updatedAt: 2025-09-01 13:00:00
+                    createdAt: 2025-08-01T12:00:00Z
+                    updatedAt: 2025-09-01T13:00:00Z
                     endpoint:
                       uri: https://myextension.com/pre-update-profile
                       authentication:
@@ -436,8 +436,8 @@ paths:
                       name: Access Token Pre Issue
                       description: This action invokes before issuing an access token.
                       status: ACTIVE
-                      createdAt: 2025-08-01 12:00:00
-                      updatedAt: 2025-09-01 13:00:00
+                      createdAt: 2025-08-01T12:00:00Z
+                      updatedAt: 2025-09-01T13:00:00Z
                       links:
                         - href: "/api/server/v1/actions/preIssueAccessToken/24f64d17-9824-4e28-8413-de45728d8e84"
                           method: GET
@@ -450,8 +450,8 @@ paths:
                       name: Password Update Action
                       description: This action invokes before updating a user password.
                       status: ACTIVE
-                      createdAt: 2025-08-01 12:00:00
-                      updatedAt: 2025-09-01 13:00:00
+                      createdAt: 2025-08-01T12:00:00Z
+                      updatedAt: 2025-09-01T13:00:00Z
                       links:
                         - href: "/api/server/v1/actions/preUpdatePassword/24f64d17-9824-4e28-8413-de45728d8e84"
                           method: GET
@@ -464,8 +464,8 @@ paths:
                       name: Profile Update Action
                       description: This action invokes before updating a user profile.
                       status: ACTIVE
-                      createdAt: 2025-08-01 12:00:00
-                      updatedAt: 2025-09-01 13:00:00
+                      createdAt: 2025-08-01T12:00:00Z
+                      updatedAt: 2025-09-01T13:00:00Z
                       links:
                         - href: "/api/server/v1/actions/preUpdateProfile/24f64d17-9824-4e28-8413-de45728d8e84"
                           method: GET
@@ -545,8 +545,8 @@ paths:
                     name: Access Token Pre Issue
                     description: This action invokes before issuing an access token.
                     status: ACTIVE
-                    createdAt: 2025-08-01 12:00:00
-                    updatedAt: 2025-09-01 13:00:00
+                    createdAt: 2025-08-01T12:00:00Z
+                    updatedAt: 2025-09-01T13:00:00Z
                     endpoint:
                       uri: https://myextension.com/token
                       authentication:
@@ -580,8 +580,8 @@ paths:
                     name: Password Update Action
                     description: This action invokes before updating a user password.
                     status: ACTIVE
-                    createdAt: 2025-08-01 12:00:00
-                    updatedAt: 2025-09-01 13:00:00
+                    createdAt: 2025-08-01T12:00:00Z
+                    updatedAt: 2025-09-01T13:00:00Z
                     endpoint:
                       uri: https://myextension.com/pre-update-password
                       authentication:
@@ -621,8 +621,8 @@ paths:
                     name: Profile Update Action
                     description: This action invokes before updating a user profile.
                     status: ACTIVE
-                    createdAt: 2025-08-01 12:00:00
-                    updatedAt: 2025-09-01 13:00:00
+                    createdAt: 2025-08-01T12:00:00Z
+                    updatedAt: 2025-09-01T13:00:00Z
                     endpoint:
                       uri: https://myextension.com/pre-update-profile
                       authentication:
@@ -807,8 +807,8 @@ paths:
                     name: Updated Access Token Pre Issue
                     description: This action invokes before issuing an access token.
                     status: ACTIVE
-                    createdAt: 2025-08-01 12:00:00
-                    updatedAt: 2025-09-01 13:00:00
+                    createdAt: 2025-08-01T12:00:00Z
+                    updatedAt: 2025-09-01T13:00:00Z
                     endpoint:
                       uri: https://myextension.com/external/token
                       authentication:
@@ -836,8 +836,8 @@ paths:
                     name: Updated Password Update Action
                     description: This action invokes before updating a user password.
                     status: ACTIVE
-                    createdAt: 2025-08-01 12:00:00
-                    updatedAt: 2025-09-01 13:00:00
+                    createdAt: 2025-08-01T12:00:00Z
+                    updatedAt: 2025-09-01T13:00:00Z
                     endpoint:
                       uri: https://myextension.com/external/pre-update-password
                       authentication:
@@ -870,8 +870,8 @@ paths:
                     name: Updated Profile Update Action
                     description: This action invokes before updating a user profile.
                     status: ACTIVE
-                    createdAt: 2025-08-01 12:00:00
-                    updatedAt: 2025-09-01 13:00:00
+                    createdAt: 2025-08-01T12:00:00Z
+                    updatedAt: 2025-09-01T13:00:00Z
                     endpoint:
                       uri: https://myextension.com/external/pre-update-profile
                       authentication:
@@ -1079,8 +1079,8 @@ paths:
                       name: Access Token Pre Issue
                       description: This action invokes before issuing an access token.
                       status: ACTIVE
-                      createdAt: 2025-08-01 12:00:00
-                      updatedAt: 2025-09-01 13:00:00
+                      createdAt: 2025-08-01T12:00:00Z
+                      updatedAt: 2025-09-01T13:00:00Z
                       links:
                         - href: "/api/server/v1/actions/preIssueAccessToken/24f64d17-9824-4e28-8413-de45728d8e84"
                           method: GET
@@ -1093,8 +1093,8 @@ paths:
                       name: Password Update Action
                       description: This action invokes before updating a user password.
                       status: ACTIVE
-                      createdAt: 2025-08-01 12:00:00
-                      updatedAt: 2025-09-01 13:00:00
+                      createdAt: 2025-08-01T12:00:00Z
+                      updatedAt: 2025-09-01T13:00:00Z
                       links:
                         - href: "/api/server/v1/actions/preUpdatePassword/24f64d17-9824-4e28-8413-de45728d8e84"
                           method: GET
@@ -1107,8 +1107,8 @@ paths:
                       name: Profile Update Action
                       description: This action invokes before updating a user profile.
                       status: ACTIVE
-                      createdAt: 2025-08-01 12:00:00
-                      updatedAt: 2025-09-01 13:00:00
+                      createdAt: 2025-08-01T12:00:00Z
+                      updatedAt: 2025-09-01T13:00:00Z
                       links:
                         - href: "/api/server/v1/actions/preUpdateProfile/24f64d17-9824-4e28-8413-de45728d8e84"
                           method: GET
@@ -1382,11 +1382,11 @@ components:
         createdAt:
           type: string
           description: Created time of the action.
-          example: "2025-08-01 12:00:00"
+          example: "2025-08-01T12:00:00Z"
         updatedAt:
           type: string
           description: Last updated time of the action.
-          example: "2025-09-01 13:00:00"
+          example: "2025-09-01T13:00:00Z"
         endpoint:
           $ref: '#/components/schemas/EndpointResponse'
         rule:
@@ -1421,11 +1421,11 @@ components:
         createdAt:
           type: string
           description: Created time of the action.
-          example: "2025-08-01 12:00:00"
+          example: "2025-08-01T12:00:00Z"
         updatedAt:
           type: string
           description: Last updated time of the action.
-          example: "2025-09-01 13:00:00"
+          example: "2025-09-01T13:00:00Z"
         links:
           type: array
           items:

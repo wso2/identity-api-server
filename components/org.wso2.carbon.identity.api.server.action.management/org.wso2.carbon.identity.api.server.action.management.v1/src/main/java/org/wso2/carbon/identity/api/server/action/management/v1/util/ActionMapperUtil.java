@@ -140,8 +140,8 @@ public class ActionMapperUtil {
                 .name(action.getName())
                 .description(action.getDescription())
                 .status(ActionResponse.StatusEnum.valueOf(action.getStatus().toString()))
-                .createdAt(action.getCreatedAt() != null ? action.getCreatedAt().toString() : null)
-                .updatedAt(action.getUpdatedAt() != null ? action.getUpdatedAt().toString() : null)
+                .createdAt(action.getCreatedAt() != null ? action.getCreatedAt().toInstant().toString() : null)
+                .updatedAt(action.getUpdatedAt() != null ? action.getUpdatedAt().toInstant().toString() : null)
                 .endpoint(new EndpointResponse()
                         .uri(action.getEndpoint().getUri())
                         .authentication(new AuthenticationTypeResponse()
@@ -167,8 +167,8 @@ public class ActionMapperUtil {
                 .name(action.getName())
                 .description(action.getDescription())
                 .status(ActionBasicResponse.StatusEnum.valueOf(action.getStatus().toString()))
-                .createdAt(action.getCreatedAt() != null ? action.getCreatedAt().toString() : null)
-                .updatedAt(action.getUpdatedAt() != null ? action.getUpdatedAt().toString() : null)
+                .createdAt(action.getCreatedAt() != null ? action.getCreatedAt().toInstant().toString() : null)
+                .updatedAt(action.getUpdatedAt() != null ? action.getUpdatedAt().toInstant().toString() : null)
                 .links(buildLinks(action));
     }
 

@@ -181,7 +181,7 @@ public enum StatusEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "2025-08-01 12:00:00", value = "Created time of the action.")
+    @ApiModelProperty(example = "2025-08-01T12:00:00Z", value = "Created time of the action.")
     @JsonProperty("createdAt")
     @Valid
     public String getCreatedAt() {
@@ -200,7 +200,7 @@ public enum StatusEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "2025-09-01 13:00:00", value = "Last updated time of the action.")
+    @ApiModelProperty(example = "2025-09-01T13:00:00Z", value = "Last updated time of the action.")
     @JsonProperty("updatedAt")
     @Valid
     public String getUpdatedAt() {
