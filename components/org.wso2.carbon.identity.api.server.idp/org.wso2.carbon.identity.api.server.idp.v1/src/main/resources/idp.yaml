@@ -3270,12 +3270,17 @@ components:
           type: boolean
           default: false
           example: true
+        skipJITForLookupFailure:
+            type: boolean
+            default: false
+            example: true
         accountLookupAttributeMappings:
           type: array
           items:
             $ref: '#/components/schemas/AccountLookupAttributeMapping'
           description: >
             List of local and federated attributes to be used for account lookup.
+            The maximum number of mappings is 2.
         attributeSyncMethod:
           type: string
           enum:

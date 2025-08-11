@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -72,6 +72,7 @@ public enum SchemeEnum {
     private SchemeEnum scheme = SchemeEnum.PROVISION_SILENTLY;
     private String userstore = "PRIMARY";
     private Boolean associateLocalUser = false;
+    private Boolean skipJITForLookupFailure = false;
     private List<AccountLookupAttributeMapping> accountLookupAttributeMappings = null;
 
 
@@ -184,6 +185,24 @@ public enum AttributeSyncMethodEnum {
     }
 
     /**
+    **/
+    public JustInTimeProvisioning skipJITForLookupFailure(Boolean skipJITForLookupFailure) {
+
+        this.skipJITForLookupFailure = skipJITForLookupFailure;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "true", value = "")
+    @JsonProperty("skipJITForLookupFailure")
+    @Valid
+    public Boolean getSkipJITForLookupFailure() {
+        return skipJITForLookupFailure;
+    }
+    public void setSkipJITForLookupFailure(Boolean skipJITForLookupFailure) {
+        this.skipJITForLookupFailure = skipJITForLookupFailure;
+    }
+
+    /**
     * List of local and federated attributes to be used for account lookup. 
     **/
     public JustInTimeProvisioning accountLookupAttributeMappings(List<AccountLookupAttributeMapping> accountLookupAttributeMappings) {
@@ -244,13 +263,14 @@ public enum AttributeSyncMethodEnum {
             Objects.equals(this.scheme, justInTimeProvisioning.scheme) &&
             Objects.equals(this.userstore, justInTimeProvisioning.userstore) &&
             Objects.equals(this.associateLocalUser, justInTimeProvisioning.associateLocalUser) &&
+            Objects.equals(this.skipJITForLookupFailure, justInTimeProvisioning.skipJITForLookupFailure) &&
             Objects.equals(this.accountLookupAttributeMappings, justInTimeProvisioning.accountLookupAttributeMappings) &&
             Objects.equals(this.attributeSyncMethod, justInTimeProvisioning.attributeSyncMethod);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(isEnabled, scheme, userstore, associateLocalUser, accountLookupAttributeMappings, attributeSyncMethod);
+        return Objects.hash(isEnabled, scheme, userstore, associateLocalUser, skipJITForLookupFailure, accountLookupAttributeMappings, attributeSyncMethod);
     }
 
     @Override
@@ -263,6 +283,7 @@ public enum AttributeSyncMethodEnum {
         sb.append("    scheme: ").append(toIndentedString(scheme)).append("\n");
         sb.append("    userstore: ").append(toIndentedString(userstore)).append("\n");
         sb.append("    associateLocalUser: ").append(toIndentedString(associateLocalUser)).append("\n");
+        sb.append("    skipJITForLookupFailure: ").append(toIndentedString(skipJITForLookupFailure)).append("\n");
         sb.append("    accountLookupAttributeMappings: ").append(toIndentedString(accountLookupAttributeMappings)).append("\n");
         sb.append("    attributeSyncMethod: ").append(toIndentedString(attributeSyncMethod)).append("\n");
         sb.append("}");

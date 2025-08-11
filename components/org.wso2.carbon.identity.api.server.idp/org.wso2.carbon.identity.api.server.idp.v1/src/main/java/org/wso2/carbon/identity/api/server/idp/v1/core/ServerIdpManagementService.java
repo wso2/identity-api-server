@@ -1823,6 +1823,7 @@ public class ServerIdpManagementService {
                     break;
             }
             jitConfig.setAssociateLocalUserEnabled(jit.getAssociateLocalUser());
+            jitConfig.setSkipJITOnAttrAccLookUpFailureEnabled(jit.getSkipJITForLookupFailure());
             jitConfig.setAccountLookupAttributeMappings(createAccountLookupAttributeMappingsConfig(
                     jit.getAccountLookupAttributeMappings()));
             jitConfig.setAttributeSyncMethod(jit.getAttributeSyncMethod().toString());
@@ -2438,6 +2439,7 @@ public class ServerIdpManagementService {
                     jitProvisionConfig.getProvisioningUserStore() : IdentityUtil.getPrimaryDomainName();
             jitConfig.setUserstore(provisioningUserStore);
             jitConfig.setAssociateLocalUser(jitProvisionConfig.isAssociateLocalUserEnabled());
+            jitConfig.setSkipJITForLookupFailure(jitProvisionConfig.isSkipJITOnAttrAccLookUpFailureEnabled());
             jitConfig.setAccountLookupAttributeMappings(createAccountLookupAttributeMapping(jitProvisionConfig));
             String attributeSyncMethod = StringUtils.isNotBlank(jitProvisionConfig.getAttributeSyncMethod()) ?
                     jitProvisionConfig.getAttributeSyncMethod() : FrameworkConstants.OVERRIDE_ALL;
