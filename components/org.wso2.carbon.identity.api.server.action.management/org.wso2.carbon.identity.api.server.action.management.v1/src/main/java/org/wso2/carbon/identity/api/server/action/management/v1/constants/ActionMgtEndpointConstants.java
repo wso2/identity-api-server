@@ -53,6 +53,10 @@ public class ActionMgtEndpointConstants {
                 "Provided request body content is not in the expected format."),
         ERROR_NOT_ALLOWED_ACTION_TYPE_IN_ORG_LEVEL("60015", "Action type is not allowed.",
                 "The requested action type: %s is not allowed at the organization level."),
+        ERROR_NOT_SUPPORTED_ALLOWED_HEADERS("60016", "Unable to perform the operation.",
+                "Allowed headers are not supported for the action type: %s."),
+        ERROR_NOT_SUPPORTED_ALLOWED_PARAMETERS("60017", "Unable to perform the operation.",
+                "Allowed parameters are not supported for the action type: %s."),
 
         // Server errors.
         ERROR_NOT_IMPLEMENTED_ACTION_TYPE("650015",
