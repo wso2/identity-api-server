@@ -148,4 +148,13 @@ public class FlowEndpointConstants {
         public static final String APPLE_AUTHENTICATOR = "AppleOIDCAuthenticator";
     }
 
+    /**
+     * Constants related to flow generation.
+     */
+    public static class FlowGeneration {
+
+        public static final String STATUS_FAILED = "FAILED";
+        public static final String STEPS = "steps";
+        public static final String ERROR = "error";
+    }
 }

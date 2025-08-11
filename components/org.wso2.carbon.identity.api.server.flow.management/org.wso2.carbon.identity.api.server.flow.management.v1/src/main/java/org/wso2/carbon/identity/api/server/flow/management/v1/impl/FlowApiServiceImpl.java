@@ -21,10 +21,16 @@ package org.wso2.carbon.identity.api.server.flow.management.v1.impl;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowApiService;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfig;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfigPatchModel;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateRequest;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateResult;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateStatus;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRequest;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.core.FlowAIServiceCore;
 import org.wso2.carbon.identity.api.server.flow.management.v1.core.ServerFlowMgtService;
+import org.wso2.carbon.identity.api.server.flow.management.v1.factories.FlowAIServiceFactory;
 import org.wso2.carbon.identity.api.server.flow.management.v1.factories.ServerFlowMgtServiceFactory;
 
 import java.util.List;
@@ -37,14 +43,23 @@ import javax.ws.rs.core.Response;
 public class FlowApiServiceImpl implements FlowApiService {
 
     ServerFlowMgtService flowMgtService;
+    FlowAIServiceCore flowAIServiceCore;
 
     public FlowApiServiceImpl() {
 
         try {
             this.flowMgtService = ServerFlowMgtServiceFactory.getFlowMgtService();
+            this.flowAIServiceCore = FlowAIServiceFactory.getFlowAIService();
         } catch (IllegalStateException e) {
             throw new RuntimeException("Error occurred while initiating flow management service.", e);
         }
+    }
+
+    @Override
+    public Response generateFlow(FlowGenerateRequest flowGenerateRequest) {
+
+        FlowGenerateResponse flowResponse = flowAIServiceCore.generateFlow(flowGenerateRequest);
+        return Response.ok().entity(flowResponse).build();
     }
 
     @Override
@@ -66,6 +81,20 @@ public class FlowApiServiceImpl implements FlowApiService {
 
         List<FlowConfig> flowConfigs = flowMgtService.getFlowConfigs();
         return Response.ok().entity(flowConfigs).build();
+    }
+
+    @Override
+    public Response getFlowGenerationResult(String operationId) {
+
+        FlowGenerateResult flowGenerateResult = flowAIServiceCore.getFlowGenerationResult(operationId);
+        return Response.ok().entity(flowGenerateResult).build();
+    }
+
+    @Override
+    public Response getFlowGenerationStatus(String operationId) {
+
+        FlowGenerateStatus status = flowAIServiceCore.getFlowGenerationStatus(operationId);
+        return Response.ok().entity(status).build();
     }
 
     @Override

@@ -19,6 +19,7 @@
 package org.wso2.carbon.identity.api.server.flow.management.common;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.flow.mgt.FlowAIService;
 import org.wso2.carbon.identity.flow.mgt.FlowMgtService;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
 import org.wso2.carbon.idp.mgt.IdpManager;
@@ -29,6 +30,7 @@ import org.wso2.carbon.idp.mgt.IdpManager;
 public class FlowMgtServiceHolder {
 
     private FlowMgtServiceHolder() {
+
     }
 
     private static class FlowMgtServiceHolderInstance {
@@ -49,6 +51,12 @@ public class FlowMgtServiceHolder {
         private static final IdpManager SERVICE =
                 (IdpManager) PrivilegedCarbonContext
                         .getThreadLocalCarbonContext().getOSGiService(IdpManager.class, null);
+    }
+
+    private static class FlowAIServiceHolder {
+
+        private static final FlowAIService SERVICE = (FlowAIService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(FlowAIService.class, null);
     }
 
     /**
@@ -79,5 +87,15 @@ public class FlowMgtServiceHolder {
     public static IdpManager getIdpManager() {
 
         return IdpManagerHolder.SERVICE;
+    }
+
+    /**
+     * Get FlowAIService OSGi service.
+     *
+     * @return FlowAIService
+     */
+    public static FlowAIService getFlowAIService() {
+
+        return FlowAIServiceHolder.SERVICE;
     }
 }

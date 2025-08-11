@@ -23,11 +23,17 @@ import javax.ws.rs.core.Response;
 
 public interface FlowApiService {
 
+    public Response generateFlow(FlowGenerateRequest flowGenerateRequest);
+
     public Response getFlow(String flowType);
 
     public Response getFlowConfigForFlow(String flowType);
 
     public Response getFlowConfigs();
+
+    public Response getFlowGenerationResult(String operationId);
+
+    public Response getFlowGenerationStatus(String operationId);
 
     public Response getFlowMeta(String flowType);
 
