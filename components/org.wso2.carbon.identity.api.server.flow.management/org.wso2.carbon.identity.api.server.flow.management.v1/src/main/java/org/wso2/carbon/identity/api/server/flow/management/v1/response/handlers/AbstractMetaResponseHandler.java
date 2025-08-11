@@ -169,7 +169,12 @@ public abstract class AbstractMetaResponseHandler {
                 }
             }
 
-            claimProperties.add(createUserIdentifierMeta());
+            // Add user identifier claim if multi-attribute login is enabled.
+            if (Utils.getGovernanceConfig(
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(),
+                    MultiAttributeLoginConstants.MULTI_ATTRIBUTE_LOGIN_PROPERTY)) {
+                claimProperties.add(createUserIdentifierMeta());
+            }
         } catch (ClaimMetadataException e) {
             throw Utils.handleFlowMgtException(new FlowMgtClientException(
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_GET_SUPPORTED_CLAIMS.getCode(),
