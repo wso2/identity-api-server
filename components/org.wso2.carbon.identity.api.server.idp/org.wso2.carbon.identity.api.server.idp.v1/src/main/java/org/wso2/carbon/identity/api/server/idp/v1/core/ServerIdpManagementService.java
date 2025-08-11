@@ -452,6 +452,7 @@ public class ServerIdpManagementService {
     private void processFederatedAuthenticatorsForResidentIDPUpdate(IdentityProvider newIdentityProvider) {
 
         try {
+            log.debug("Processing federated authenticators for resident IDP update.");
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             IdentityProvider oldResidentIDP = identityProviderManager.getResidentIdP(tenantDomain);
 
@@ -461,6 +462,7 @@ public class ServerIdpManagementService {
                     oldResidentIDP.getFederatedAuthenticatorConfigs();
 
             if (newFederatedAuthenticatorConfig == null || newFederatedAuthenticatorConfig.length == 0) {
+                log.debug("No federated authenticator configurations found in the new identity provider.");
                 return;
             }
             List<FederatedAuthenticatorConfig> fedAuthnConfigs = new ArrayList<>();
@@ -490,6 +492,7 @@ public class ServerIdpManagementService {
                                 IdentityApplicationConstants.Authenticator.PassiveSTS.IDENTITY_PROVIDER_ENTITY_ID) :
                         null;
                 if (!newstsIdPEntityIdProperty.equals(oldstsIdPEntityIdProperty)) {
+                    log.debug("Passive STS IDP entity ID has changed. Adding new configuration.");
                     FederatedAuthenticatorConfig passiveSTSFedAuthn = new FederatedAuthenticatorConfig();
                     passiveSTSFedAuthn.setName(IdentityApplicationConstants.Authenticator.PassiveSTS.NAME);
                     passiveSTSFedAuthn.setDefinedByType(DefinedByType.SYSTEM);
@@ -506,6 +509,7 @@ public class ServerIdpManagementService {
                     fedAuthnConfigs.toArray(new FederatedAuthenticatorConfig[0]));
 
         } catch (IdentityProviderManagementException e) {
+            log.error("Error occurred while processing federated authenticators for resident IDP update.", e);
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP, null);
         }
     }
