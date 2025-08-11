@@ -34,6 +34,7 @@ public class FlowEndpointConstants {
 
     public static final String USERNAME_IDENTIFIER = "http://wso2.org/claims/username";
     public static final String PASSWORD_IDENTIFIER = "password";
+    public static final String USER_IDENTIFIER_NAME = "User Identifier";
     public static final String USER_IDENTIFIER = "userIdentifier";
 
     public static final String IDP_TEMPLATE_ID = "templateId";
@@ -70,7 +71,11 @@ public class FlowEndpointConstants {
 
         ERROR_CODE_INVALID_METADATA("10007",
                 "Invalid metadata provided for the executor.",
-                "The metadata provided for the executor is invalid.");
+                "The metadata provided for the executor is invalid."),
+
+        ERROR_CODE_GET_SUPPORTED_CLAIMS("10008",
+                "Failed to retrieve supported claims.",
+                "An error occurred while reading supported claim metadata for the given attribute profile.");
 
         private final String code;
         private final String message;

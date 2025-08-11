@@ -20,11 +20,15 @@ package org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.flow.management.common.FlowMgtServiceHolder;
+import org.wso2.carbon.identity.api.server.flow.management.v1.AttributeMetadata;
 import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorConnections;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
+import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
+import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
+import org.wso2.carbon.identity.claim.metadata.mgt.model.LocalClaim;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
 import org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
@@ -38,6 +42,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DISPLAY_NAME;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_READ_ONLY;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_REQUIRED;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_GET_IDENTITY_PROVIDERS;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.APPLE_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.EMAIL_OTP_EXECUTOR;
@@ -52,6 +59,10 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.F
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.SMS_OTP_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.IDP_TEMPLATE_ID;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.MICROSOFT_IDP_TEMPLATE_ID;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USER_IDENTIFIER;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USER_IDENTIFIER_NAME;
+import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.GROUPS_CLAIM;
+import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.ROLES_CLAIM;
 
 /**
  * Abstract class for handling meta responses for different flows.
@@ -123,10 +134,49 @@ public abstract class AbstractMetaResponseHandler {
         FlowMetaResponse response = new FlowMetaResponse();
         response.setFlowType(getFlowType());
         response.setAttributeProfile(getAttributeProfile());
+        response.setAttributeMetadata(getSupportedClaims(getAttributeProfile()));
         response.setSupportedExecutors(getSupportedExecutors());
         response.setConnectorConfigs(getConnectorConfigs());
         response.setExecutorConnections(getExecutorConnections());
         return response;
+    }
+
+    private List<AttributeMetadata> getSupportedClaims(String attributeProfile) {
+
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        List<AttributeMetadata> claimProperties = new ArrayList<>();
+        try {
+            ClaimMetadataManagementService claimService = (ClaimMetadataManagementService) PrivilegedCarbonContext
+                    .getThreadLocalCarbonContext().getOSGiService(ClaimMetadataManagementService.class, null);
+            List<LocalClaim> attributeList =
+                    claimService.getSupportedLocalClaimsForProfile(tenantDomain, attributeProfile);
+
+            for (LocalClaim claim : attributeList) {
+                Map<String, String> claimProps = claim.getClaimProperties();
+                String displayName = claimProps.getOrDefault(PROP_DISPLAY_NAME, null);
+                boolean required =
+                        Boolean.parseBoolean(claimProps.getOrDefault(PROP_REQUIRED, String.valueOf(false)));
+                boolean readOnly =
+                        Boolean.parseBoolean(claimProps.getOrDefault(PROP_READ_ONLY, String.valueOf(false)));
+                String claimURI = claim.getClaimURI();
+                if (!GROUPS_CLAIM.equals(claimURI) && !ROLES_CLAIM.equals(claimURI)) {
+                    AttributeMetadata attributeMetadata = new AttributeMetadata();
+                    attributeMetadata.setName(displayName);
+                    attributeMetadata.claimURI(claimURI);
+                    attributeMetadata.setRequired(required);
+                    attributeMetadata.setReadOnly(readOnly);
+                    claimProperties.add(attributeMetadata);
+                }
+            }
+
+            claimProperties.add(createUserIdentifierMeta());
+        } catch (ClaimMetadataException e) {
+            throw Utils.handleFlowMgtException(new FlowMgtClientException(
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_GET_SUPPORTED_CLAIMS.getCode(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_GET_SUPPORTED_CLAIMS.getMessage(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_GET_SUPPORTED_CLAIMS.getDescription(), e));
+        }
+        return claimProperties;
     }
 
     /**
@@ -228,5 +278,15 @@ public abstract class AbstractMetaResponseHandler {
             offset += pageSize;
         } while (offset < totalCount);
         return identityProviders;
+    }
+
+    private AttributeMetadata createUserIdentifierMeta() {
+
+        AttributeMetadata meta = new AttributeMetadata();
+        meta.setName(USER_IDENTIFIER_NAME);
+        meta.claimURI(USER_IDENTIFIER);
+        meta.setRequired(true);
+        meta.setReadOnly(true);
+        return meta;
     }
 }
