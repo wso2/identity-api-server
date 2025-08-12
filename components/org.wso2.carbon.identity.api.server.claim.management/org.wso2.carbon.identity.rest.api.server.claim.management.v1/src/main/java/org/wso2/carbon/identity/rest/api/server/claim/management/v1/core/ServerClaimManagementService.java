@@ -153,8 +153,8 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DESCRIPTION;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DISPLAY_NAME;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DISPLAY_ORDER;
-import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_INPUT_FORMAT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_ENABLE_USER_STORE_PERSISTENCE;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_INPUT_FORMAT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_MULTI_VALUED;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_PROFILES_PREFIX;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_READ_ONLY;
@@ -1086,7 +1086,8 @@ public class ServerClaimManagementService {
 
         localClaimResDTO.setDisplayName(claimProperties.remove(PROP_DISPLAY_NAME));
         localClaimResDTO.setReadOnly(Boolean.valueOf(claimProperties.remove(PROP_READ_ONLY)));
-        localClaimResDTO.setEnableUserStorePersistence(Boolean.valueOf(claimProperties.remove(PROP_ENABLE_USER_STORE_PERSISTENCE)));
+        localClaimResDTO.setEnableUserStorePersistence(Boolean.valueOf(claimProperties.remove(
+                PROP_ENABLE_USER_STORE_PERSISTENCE)));
         String regEx = claimProperties.remove(PROP_REG_EX);
         localClaimResDTO.setRegEx(regEx);
         if (regEx == null) {
@@ -1289,7 +1290,8 @@ public class ServerClaimManagementService {
 
         claimProperties.put(PROP_READ_ONLY, String.valueOf(localClaimReqDTO.getReadOnly()));
         // TODO : Handle the case where enableUserStorePersistence is null by default.
-        claimProperties.put(PROP_ENABLE_USER_STORE_PERSISTENCE, String.valueOf(localClaimReqDTO.getEnableUserStorePersistence()));
+        claimProperties.put(PROP_ENABLE_USER_STORE_PERSISTENCE, String.valueOf(
+                localClaimReqDTO.getEnableUserStorePersistence()));
         claimProperties.put(PROP_REQUIRED, String.valueOf(localClaimReqDTO.getRequired()));
         claimProperties.put(PROP_SUPPORTED_BY_DEFAULT, String.valueOf(localClaimReqDTO.getSupportedByDefault()));
         if (localClaimReqDTO.getDataType() != null) {
