@@ -497,11 +497,6 @@ public class ServerIdpManagementService {
                     passiveSTSFedAuthn.setName(IdentityApplicationConstants.Authenticator.PassiveSTS.NAME);
                     passiveSTSFedAuthn.setDefinedByType(DefinedByType.SYSTEM);
 
-                    Property stsIdPEntityIdProperty = new Property();
-                    stsIdPEntityIdProperty.setName(IdentityApplicationConstants.Authenticator.PassiveSTS
-                            .IDENTITY_PROVIDER_ENTITY_ID);
-                    stsIdPEntityIdProperty.setValue(newstsIdPEntityIdProperty.getValue());
-
                     fedAuthnConfigs.add(passiveSTSFedAuthn);
                 }
             }
