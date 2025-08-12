@@ -41,6 +41,7 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.idp.common.Constants;
 import org.wso2.carbon.identity.api.server.idp.v1.impl.FederatedAuthenticatorConfigBuilderFactory;
+import org.wso2.carbon.identity.api.server.idp.v1.model.AccountLookupAttributeMapping;
 import org.wso2.carbon.identity.api.server.idp.v1.model.AssociationRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.AssociationResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Certificate;
@@ -79,6 +80,7 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.ProvisioningResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Roles;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.common.ApplicationAuthenticatorService;
+import org.wso2.carbon.identity.application.common.model.AccountLookupAttributeMappingConfig;
 import org.wso2.carbon.identity.application.common.model.CertificateInfo;
 import org.wso2.carbon.identity.application.common.model.ClaimConfig;
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
@@ -1821,6 +1823,9 @@ public class ServerIdpManagementService {
                     break;
             }
             jitConfig.setAssociateLocalUserEnabled(jit.getAssociateLocalUser());
+            jitConfig.setSkipJITOnAttrAccLookUpFailureEnabled(jit.getSkipJITForLookupFailure());
+            jitConfig.setAccountLookupAttributeMappings(createAccountLookupAttributeMappingsConfig(
+                    jit.getAccountLookupAttributeMappings()));
             jitConfig.setAttributeSyncMethod(jit.getAttributeSyncMethod().toString());
             identityProvider.setJustInTimeProvisioningConfig(jitConfig);
         }
@@ -2434,12 +2439,44 @@ public class ServerIdpManagementService {
                     jitProvisionConfig.getProvisioningUserStore() : IdentityUtil.getPrimaryDomainName();
             jitConfig.setUserstore(provisioningUserStore);
             jitConfig.setAssociateLocalUser(jitProvisionConfig.isAssociateLocalUserEnabled());
+            jitConfig.setSkipJITForLookupFailure(jitProvisionConfig.isSkipJITOnAttrAccLookUpFailureEnabled());
+            jitConfig.setAccountLookupAttributeMappings(createAccountLookupAttributeMapping(jitProvisionConfig));
             String attributeSyncMethod = StringUtils.isNotBlank(jitProvisionConfig.getAttributeSyncMethod()) ?
                     jitProvisionConfig.getAttributeSyncMethod() : FrameworkConstants.OVERRIDE_ALL;
             jitConfig.setAttributeSyncMethod(JustInTimeProvisioning.AttributeSyncMethodEnum
                     .valueOf(attributeSyncMethod));
         }
         return jitConfig;
+    }
+
+    private List<AccountLookupAttributeMapping> createAccountLookupAttributeMapping(
+            JustInTimeProvisioningConfig justInTimeProvisioningConfig) {
+
+        List<AccountLookupAttributeMapping> accLookupAttributeMappings = new ArrayList<>();
+        AccountLookupAttributeMappingConfig[] accountLookupAttributeMappings =
+                justInTimeProvisioningConfig.getAccountLookupAttributeMappings();
+        if (accountLookupAttributeMappings != null) {
+            for (AccountLookupAttributeMappingConfig accountLookupAttributeMapping : accountLookupAttributeMappings) {
+                AccountLookupAttributeMapping mapping = new AccountLookupAttributeMapping();
+                mapping.setLocalAttribute(accountLookupAttributeMapping.getLocalAttribute());
+                mapping.setFederatedAttribute(accountLookupAttributeMapping.getFederatedAttribute());
+                accLookupAttributeMappings.add(mapping);
+            }
+        }
+        return accLookupAttributeMappings;
+    }
+
+    private AccountLookupAttributeMappingConfig[] createAccountLookupAttributeMappingsConfig(
+            List<AccountLookupAttributeMapping> accountLookupAttributeMappings) {
+
+        if (accountLookupAttributeMappings == null || accountLookupAttributeMappings.isEmpty()) {
+            return new AccountLookupAttributeMappingConfig[0];
+        }
+        return accountLookupAttributeMappings.stream()
+                .map(mapping -> new AccountLookupAttributeMappingConfig(
+                        mapping.getLocalAttribute(),
+                        mapping.getFederatedAttribute()))
+                .toArray(AccountLookupAttributeMappingConfig[]::new);
     }
 
     private JustInTimeProvisioning.SchemeEnum getProvisioningType(JustInTimeProvisioningConfig jitProvisionConfig) {
