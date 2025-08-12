@@ -321,6 +321,7 @@ public class Constant {
     public static final String PROP_SUB_ATTRIBUTES = "subAttributes";
     public static final String PROP_CANONICAL_VALUES = "canonicalValues";
     public static final String PROP_INPUT_FORMAT = "inputFormat";
+    public static final String PROP_ENABLE_USER_STORE_PERSISTENCE = "enableUserStorePersistence";
 
     public static final String PROP_MULTI_VALUED = "multiValued";
     public static final String PROP_UNIQUENESS_SCOPE = "UniquenessScope";

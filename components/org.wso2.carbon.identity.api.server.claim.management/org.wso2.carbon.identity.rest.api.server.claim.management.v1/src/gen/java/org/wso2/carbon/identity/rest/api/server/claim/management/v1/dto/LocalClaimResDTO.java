@@ -100,6 +100,9 @@ public class LocalClaimResDTO extends ClaimResDTO {
     @Valid
     private InputFormatDTO inputFormat = null;
 
+    @Valid
+    private Boolean enableUserStorePersistence = null;
+
     /**
     * claim ID.
     **/
@@ -345,13 +348,25 @@ public class LocalClaimResDTO extends ClaimResDTO {
         this.inputFormat = inputFormat;
     }
 
+    /**
+     * Specifies whether the claim should be stored in the respective user store or not.
+     **/
+    @ApiModelProperty(value = "Specifies whether the claim should be stored in the respective user store or not. ")
+    @JsonProperty("enableUserStorePersistence")
+    public Boolean getEnableUserStorePersistence() {
+        return enableUserStorePersistence;
+    }
+    public void setEnableUserStorePersistence(Boolean enableUserStorePersistence) {
+        this.enableUserStorePersistence = enableUserStorePersistence;
+    }
+
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class LocalClaimResDTO {\n");
         sb.append("  " + super.toString()).append("\n");
-        
+
         sb.append("    id: ").append(id).append("\n");
         sb.append("    claimURI: ").append(claimURI).append("\n");
         sb.append("    dialectURI: ").append(dialectURI).append("\n");
@@ -372,6 +387,7 @@ public class LocalClaimResDTO extends ClaimResDTO {
         sb.append("    properties: ").append(properties).append("\n");
         sb.append("    profiles: ").append(profiles).append("\n");
         sb.append("    inputFormat: ").append(inputFormat).append("\n");
+        sb.append("    enableUserStorePersistence: ").append(enableUserStorePersistence).append("\n");
         
         sb.append("}\n");
         return sb.toString();

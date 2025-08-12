@@ -154,6 +154,7 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DISPLAY_NAME;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DISPLAY_ORDER;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_INPUT_FORMAT;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_ENABLE_USER_STORE_PERSISTENCE;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_MULTI_VALUED;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_PROFILES_PREFIX;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_READ_ONLY;
@@ -201,6 +202,7 @@ public class ServerClaimManagementService {
     );
 
     public static final String FALSE = "false";
+    public static final String TRUE = "true";
 
     private final ClaimMetadataManagementService claimMetadataManagementService;
     private final OrganizationManager organizationManager;
@@ -1056,7 +1058,7 @@ public class ServerClaimManagementService {
     /**
      * Builds the LocalClaimResDTO and handles default values for mandatory properties.
      * If any new properties are added and default value handling logic is updated in this method,
-     * {@link #populateDefaultProperties(LocalClaim)} should be updated accordingly as well.
+     * {@link #populateDefaultProperties(LocalClaim, LocalClaim)} should be updated accordingly as well.
      *
      */
     private LocalClaimResDTO getLocalClaimResDTO(LocalClaim localClaim) {
@@ -1084,6 +1086,7 @@ public class ServerClaimManagementService {
 
         localClaimResDTO.setDisplayName(claimProperties.remove(PROP_DISPLAY_NAME));
         localClaimResDTO.setReadOnly(Boolean.valueOf(claimProperties.remove(PROP_READ_ONLY)));
+        localClaimResDTO.setEnableUserStorePersistence(Boolean.valueOf(claimProperties.remove(PROP_ENABLE_USER_STORE_PERSISTENCE)));
         String regEx = claimProperties.remove(PROP_REG_EX);
         localClaimResDTO.setRegEx(regEx);
         if (regEx == null) {
@@ -1285,6 +1288,8 @@ public class ServerClaimManagementService {
         addAttributeProfilesToClaimProperties(localClaimReqDTO.getProfiles(), claimProperties);
 
         claimProperties.put(PROP_READ_ONLY, String.valueOf(localClaimReqDTO.getReadOnly()));
+        // TODO : Handle the case where enableUserStorePersistence is null by default.
+        claimProperties.put(PROP_ENABLE_USER_STORE_PERSISTENCE, String.valueOf(localClaimReqDTO.getEnableUserStorePersistence()));
         claimProperties.put(PROP_REQUIRED, String.valueOf(localClaimReqDTO.getRequired()));
         claimProperties.put(PROP_SUPPORTED_BY_DEFAULT, String.valueOf(localClaimReqDTO.getSupportedByDefault()));
         if (localClaimReqDTO.getDataType() != null) {
@@ -2092,6 +2097,14 @@ public class ServerClaimManagementService {
                 throw new ClaimMetadataException(String.valueOf(Constant.ErrorMessage
                         .ERROR_CODE_ERROR_SERIALIZING_INPUT_FORMAT), e);
             }
+        }
+
+        if (localClaim.getClaimURI().contains(IDENTITY_CLAIM_URI)) {
+            // If the claim URI is an identity claim, set claim property false.
+            localClaim.getClaimProperties().putIfAbsent(PROP_ENABLE_USER_STORE_PERSISTENCE, FALSE);
+        } else {
+            // If the claim URI is not an identity claim, set claim property true.
+            localClaim.getClaimProperties().putIfAbsent(PROP_ENABLE_USER_STORE_PERSISTENCE, TRUE);
         }
     }
 
