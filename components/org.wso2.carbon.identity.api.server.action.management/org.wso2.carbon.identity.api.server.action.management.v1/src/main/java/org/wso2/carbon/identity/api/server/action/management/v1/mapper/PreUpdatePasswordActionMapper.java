@@ -28,9 +28,17 @@ import org.wso2.carbon.identity.api.server.action.management.v1.PreUpdatePasswor
 import org.wso2.carbon.identity.api.server.action.management.v1.PreUpdatePasswordActionResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.PreUpdatePasswordActionUpdateModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.util.ActionMapperUtil;
+import org.wso2.carbon.identity.api.server.action.management.v1.util.ActionMgtEndpointUtil;
 import org.wso2.carbon.identity.certificate.management.model.Certificate;
 import org.wso2.carbon.identity.user.pre.update.password.action.api.model.PasswordSharing;
 import org.wso2.carbon.identity.user.pre.update.password.action.api.model.PreUpdatePasswordAction;
+
+import java.util.List;
+
+import javax.ws.rs.core.Response;
+
+import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_NOT_SUPPORTED_ALLOWED_HEADERS;
+import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_NOT_SUPPORTED_ALLOWED_PARAMETERS;
 
 /**
  * Pre Update Password Action Builder.
@@ -50,6 +58,8 @@ public class PreUpdatePasswordActionMapper implements ActionMapper {
             throw new ActionMgtServerException("Unsupported action model for action type: " + getSupportedActionType());
         }
 
+        validateAllowedHeadersAndParameters(actionModel.getEndpoint().getAllowedHeaders(),
+                actionModel.getEndpoint().getAllowedParameters());
         Action basicAction = ActionMapperUtil.buildActionRequest(getSupportedActionType(), actionModel);
         return new PreUpdatePasswordAction.RequestBuilder(basicAction)
                 .passwordSharing(buildPasswordSharingRequest((PreUpdatePasswordActionModel) actionModel))
@@ -65,6 +75,10 @@ public class PreUpdatePasswordActionMapper implements ActionMapper {
                     getSupportedActionType());
         }
 
+        if (actionUpdateModel.getEndpoint() != null) {
+            validateAllowedHeadersAndParameters(actionUpdateModel.getEndpoint().getAllowedHeaders(),
+                    actionUpdateModel.getEndpoint().getAllowedParameters());
+        }
         Action basicUpdatingAction = ActionMapperUtil.buildUpdatingActionRequest(getSupportedActionType(),
                 actionUpdateModel);
         return new PreUpdatePasswordAction.RequestBuilder(basicUpdatingAction)
@@ -134,5 +148,18 @@ public class PreUpdatePasswordActionMapper implements ActionMapper {
                         .valueOf(action.getPasswordSharing().getFormat().name()))
                 .certificate(action.getPasswordSharing().getCertificate() == null ? null :
                         action.getPasswordSharing().getCertificate().getCertificateContent());
+    }
+
+    private void validateAllowedHeadersAndParameters(List<String> allowedHeaders, List<String> allowedParams) {
+
+        if (allowedHeaders != null) {
+            throw ActionMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST,
+                    ERROR_NOT_SUPPORTED_ALLOWED_HEADERS, getSupportedActionType().name());
+        }
+
+        if (allowedParams != null) {
+            throw ActionMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST,
+                    ERROR_NOT_SUPPORTED_ALLOWED_PARAMETERS, getSupportedActionType().name());
+        }
     }
 }

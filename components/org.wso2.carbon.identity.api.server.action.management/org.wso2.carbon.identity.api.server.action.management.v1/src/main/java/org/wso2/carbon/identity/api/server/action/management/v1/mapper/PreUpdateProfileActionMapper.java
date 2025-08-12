@@ -28,7 +28,15 @@ import org.wso2.carbon.identity.api.server.action.management.v1.PreUpdateProfile
 import org.wso2.carbon.identity.api.server.action.management.v1.PreUpdateProfileActionResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.PreUpdateProfileActionUpdateModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.util.ActionMapperUtil;
+import org.wso2.carbon.identity.api.server.action.management.v1.util.ActionMgtEndpointUtil;
 import org.wso2.carbon.identity.user.pre.update.profile.action.api.model.PreUpdateProfileAction;
+
+import java.util.List;
+
+import javax.ws.rs.core.Response;
+
+import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_NOT_SUPPORTED_ALLOWED_HEADERS;
+import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_NOT_SUPPORTED_ALLOWED_PARAMETERS;
 
 /**
  * Pre Update Profile Action Mapper.
@@ -48,6 +56,8 @@ public class PreUpdateProfileActionMapper implements ActionMapper {
             throw new ActionMgtServerException("Unsupported action model for action type: " + getSupportedActionType());
         }
 
+        validateAllowedHeadersAndParameters(actionModel.getEndpoint().getAllowedHeaders(),
+                actionModel.getEndpoint().getAllowedParameters());
         Action basicAction = ActionMapperUtil.buildActionRequest(getSupportedActionType(), actionModel);
         return new PreUpdateProfileAction.RequestBuilder(basicAction)
                 .attributes(((PreUpdateProfileActionModel) actionModel).getAttributes())
@@ -62,6 +72,10 @@ public class PreUpdateProfileActionMapper implements ActionMapper {
                     getSupportedActionType());
         }
 
+        if (actionUpdateModel.getEndpoint() != null) {
+            validateAllowedHeadersAndParameters(actionUpdateModel.getEndpoint().getAllowedHeaders(),
+                    actionUpdateModel.getEndpoint().getAllowedParameters());
+        }
         Action basicUpdatingAction = ActionMapperUtil.buildUpdatingActionRequest(getSupportedActionType(),
                 actionUpdateModel);
         return new PreUpdateProfileAction.RequestBuilder(basicUpdatingAction)
@@ -80,5 +94,18 @@ public class PreUpdateProfileActionMapper implements ActionMapper {
         ActionResponse actionResponse = ActionMapperUtil.buildActionResponse(action);
         return new PreUpdateProfileActionResponse(actionResponse)
                 .attributes(((PreUpdateProfileAction) action).getAttributes());
+    }
+
+    private void validateAllowedHeadersAndParameters(List<String> allowedHeaders, List<String> allowedParams) {
+
+        if (allowedHeaders != null) {
+            throw ActionMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST,
+                    ERROR_NOT_SUPPORTED_ALLOWED_HEADERS, getSupportedActionType().name());
+        }
+
+        if (allowedParams != null) {
+            throw ActionMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST,
+                    ERROR_NOT_SUPPORTED_ALLOWED_PARAMETERS, getSupportedActionType().name());
+        }
     }
 }
