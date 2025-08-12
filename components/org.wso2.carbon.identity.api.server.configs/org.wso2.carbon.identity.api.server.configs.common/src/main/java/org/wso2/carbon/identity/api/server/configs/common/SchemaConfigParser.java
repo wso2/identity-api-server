@@ -24,7 +24,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.base.IdentityRuntimeException;
+import org.wso2.carbon.identity.claim.metadata.mgt.model.ExternalClaim;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
+import org.wso2.charon3.core.exceptions.CharonException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -55,6 +57,11 @@ public class SchemaConfigParser {
     private static final String SCHEMA_CONFIG = "Schema";
     private static final String SCHEMA_ID_CONFIG = "id";
     private static final String ATTRIBUTE_CONFIG = "Attribute";
+    private static final String CORE_SCHEMA = "urn:ietf:params:scim:schemas:core:2.0";
+    private static final String USER_SCHEMA = "urn:ietf:params:scim:schemas:core:2.0:User";
+    private static final String ENTERPRISE_USER_SCHEMA = "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User";
+    private static final String SYSTEM_SCHEMA =  "urn:scim:wso2:schema";
+    private static final String CUSTOM_SCHEMA = "urn:scim:schemas:extension:custom:User";
 
     private static final Log log = LogFactory.getLog(SchemaConfigParser.class);
     private static volatile SchemaConfigParser schemaConfigParser;
@@ -90,113 +97,36 @@ public class SchemaConfigParser {
         return defaultSchemaMap;
     }
 
-    private void buildConfiguration() {
+    private void buildConfiguration() throws CharonException {
 
-        File schemaFile = new File(schemasFilePath);
-        if (!schemaFile.exists()) {
-            if (log.isDebugEnabled()) {
-                log.debug("Unable to find a valid configuration file in path: " + schemasFilePath);
-            }
+        List<ExternalClaim> coreSchemaClaims = ConfigsServiceHolder.getExternalClaims(CORE_SCHEMA);
+        List<ExternalClaim> userSchemaClaims = ConfigsServiceHolder.getExternalClaims(USER_SCHEMA);
+        List<ExternalClaim> enterpriseUserSchemaClaims = ConfigsServiceHolder.getExternalClaims(ENTERPRISE_USER_SCHEMA);
+        List<ExternalClaim> systemSchemaClaims = ConfigsServiceHolder.getExternalClaims(SYSTEM_SCHEMA);
+        List<ExternalClaim> customSchemaClaims = ConfigsServiceHolder.getExternalClaims(CUSTOM_SCHEMA);
+
+        Map<String, List<String>> schemaMap = buildSchemasConfiguration(coreSchemaClaims, CORE_SCHEMA);
+        schemaMap.putAll(buildSchemasConfiguration(userSchemaClaims, USER_SCHEMA));
+        schemaMap.putAll(buildSchemasConfiguration(enterpriseUserSchemaClaims, ENTERPRISE_USER_SCHEMA));
+        schemaMap.putAll(buildSchemasConfiguration(systemSchemaClaims, SYSTEM_SCHEMA));
+        schemaMap.putAll(buildSchemasConfiguration(customSchemaClaims, CUSTOM_SCHEMA));
+
+        if (!schemaMap.isEmpty()) {
             defaultSchemaMap = Collections.EMPTY_MAP;
             return;
         }
-
-        try (InputStream inputStream = new FileInputStream(schemaFile)) {
-            Optional<Map<String, List<String>>> schemaMap;
-            Optional<Map<String, List<String>>> addToSchemaMap;
-            Optional<Map<String, List<String>>> removeFromMap;
-            StAXOMBuilder builder = new StAXOMBuilder(inputStream);
-            schemaMap = buildSchemasConfiguration(builder, DEFAULT_SCHEMA_CONFIG);
-            addToSchemaMap = buildSchemasConfiguration(builder, ADD_SCHEMA_CONFIG);
-            removeFromMap = buildSchemasConfiguration(builder, REMOVE_SCHEMA_CONFIG);
-            if (!schemaMap.isPresent()) {
-                defaultSchemaMap = Collections.EMPTY_MAP;
-                return;
-            }
-            defaultSchemaMap = schemaMap.get();
-            addToSchemaMap.ifPresent(stringListMap -> stringListMap.forEach((key, values) -> {
-                if (defaultSchemaMap.containsKey(key)) {
-                    defaultSchemaMap.get(key).addAll(values);
-                    List<String> uniqueAttributes = defaultSchemaMap.get(key).stream()
-                            .distinct().collect(Collectors.toList());
-                    defaultSchemaMap.put(key, uniqueAttributes);
-                } else {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Invalid configuration. Schema ID: " + key + " not available in '" +
-                                DEFAULT_SCHEMA_CONFIG + " of " + schemasFilePath);
-                    }
-                }
-            }));
-            removeFromMap.ifPresent(stringListMap -> stringListMap.forEach((key, values) -> {
-                if (defaultSchemaMap.containsKey(key)) {
-                    defaultSchemaMap.get(key).removeAll(values);
-                } else {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Invalid configuration. Schema ID: " + key + " not available in '" +
-                                DEFAULT_SCHEMA_CONFIG + " of " + schemasFilePath);
-                    }
-                }
-            }));
-
-        } catch (IOException | XMLStreamException e) {
-            throw IdentityRuntimeException.error("Error occurred while reading schema configuration in path: " +
-                    schemasFilePath, e);
-        }
+        defaultSchemaMap = schemaMap;
         defaultSchemaMap = Collections.unmodifiableMap(defaultSchemaMap);
     }
 
-    private Optional<Map<String, List<String>>> buildSchemasConfiguration(StAXOMBuilder builder,
-                                                                                 String configName) {
+    private Map<String, List<String>> buildSchemasConfiguration(List<ExternalClaim> externalClaims,
+                                                                          String schemaType) {
 
-        OMElement configSchema = builder.getDocumentElement().getFirstChildWithName(new QName(SCHEMAS_NAMESPACE,
-                configName));
-        if (configSchema == null) {
-            if (log.isDebugEnabled()) {
-                log.debug(configName + " not defined in file: " + schemasFilePath);
-            }
-            return Optional.empty();
-        }
-        OMElement schemas = configSchema.getFirstChildWithName(new QName(SCHEMAS_NAMESPACE, SCHEMAS_CONFIG));
-        if (schemas == null) {
-            if (log.isDebugEnabled()) {
-                log.debug(SCHEMAS_CONFIG + " not defined for the element: " + configName + " in file: " +
-                        schemasFilePath);
-            }
-            return Optional.empty();
-        }
-        Iterator schemaIterator = schemas.getChildrenWithLocalName(SCHEMA_CONFIG);
-        if (schemaIterator == null) {
-            if (log.isDebugEnabled()) {
-                log.debug(SCHEMA_CONFIG + " not defined for the element: " + configName + "in file: " +
-                        schemasFilePath);
-            }
-            return Optional.empty();
-        }
         Map<String, List<String>> dataMap = new HashMap<>();
-        while (schemaIterator.hasNext()) {
-            OMElement schema = (OMElement) schemaIterator.next();
-            String schemaId = schema.getAttributeValue(new QName("id"));
-            if (StringUtils.isBlank(schemaId)) {
-                throw IdentityRuntimeException.error("Invalid configuration. '" +  SCHEMA_ID_CONFIG + "' attribute of" +
-                        " a '" + SCHEMAS_CONFIG + "' element cannot be undefined in file: " + schemasFilePath);
-            }
-            Iterator attributes = schema.getChildrenWithLocalName(ATTRIBUTE_CONFIG);
-            if (attributes == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Attributes not defined for the schema ID: '" + schemaId + "' under element: " +
-                            configName + " in file: " + schemasFilePath);
-                }
-                continue;
-            }
-            List<String> attributeList = new ArrayList<>();
-            while (attributes.hasNext()) {
-                OMElement attribute = (OMElement) attributes.next();
-                if (attribute != null && StringUtils.isNotBlank(attribute.getText())) {
-                    attributeList.add(attribute.getText());
-                }
-            }
-            dataMap.put(schemaId, attributeList);
-        }
-        return Optional.of(dataMap);
+        List<String> attributeList = externalClaims.stream()
+                .map(ExternalClaim::getClaimURI)
+                .collect(Collectors.toList());
+        dataMap.put(schemaType, attributeList);
+        return dataMap;
     }
 }

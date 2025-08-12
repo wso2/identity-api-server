@@ -21,6 +21,9 @@ package org.wso2.carbon.identity.api.server.configs.common;
 import org.wso2.carbon.base.api.ServerConfigurationService;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
+import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
+import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
+import org.wso2.carbon.identity.claim.metadata.mgt.model.ExternalClaim;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
 import org.wso2.carbon.identity.oauth2.impersonation.services.ImpersonationConfigMgtService;
@@ -28,6 +31,9 @@ import org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.core.JWTClie
 import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 import org.wso2.carbon.idp.mgt.IdpManager;
 import org.wso2.carbon.logging.service.RemoteLoggingConfigService;
+import org.wso2.charon3.core.exceptions.CharonException;
+
+import java.util.List;
 
 /**
  * Service holder class for server configuration related services.
@@ -84,6 +90,13 @@ public class ConfigsServiceHolder {
         static final ServerConfigurationService SERVICE =
                 (ServerConfigurationService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                         .getOSGiService(ServerConfigurationService.class, null);
+    }
+
+    private static class ClaimMetaDataManagementServiceHolder {
+
+        static final ClaimMetadataManagementService SERVICE =
+                (ClaimMetadataManagementService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(ClaimMetadataManagementService.class, null);
     }
 
     /**
@@ -164,5 +177,35 @@ public class ConfigsServiceHolder {
     public static ServerConfigurationService getServerConfigurationService() {
 
         return ServerConfigurationServiceHolder.SERVICE;
+    }
+
+    /**
+     * Get ClaimMetadataManagementService osgi service.
+     *
+     * @return ClaimMetadataManagementService
+     */
+    public static ClaimMetadataManagementService getClaimMetadataManagementService() {
+
+        return ClaimMetaDataManagementServiceHolder.SERVICE;
+    }
+
+    /**
+     * Get external claims for a given external claim dialect.
+     *
+     * @param externalClaimDialect External claim dialect.
+     * @return List of external claims.
+     * @throws CharonException If an error occurs while retrieving external claims.
+     */
+    public static List<ExternalClaim> getExternalClaims(String externalClaimDialect) throws CharonException {
+
+        List<ExternalClaim> externalClaims = null;
+        try {
+            externalClaims = getClaimMetadataManagementService().getExternalClaims(externalClaimDialect,
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+        } catch (ClaimMetadataException e) {
+            throw new CharonException("Error while retrieving external claims.", e);
+        }
+
+        return externalClaims;
     }
 }
