@@ -97,6 +97,7 @@ import org.wso2.carbon.identity.application.common.model.RoleMapping;
 import org.wso2.carbon.identity.application.common.model.SubProperty;
 import org.wso2.carbon.identity.application.common.model.UserDefinedFederatedAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
+import org.wso2.carbon.identity.application.common.util.IdentityApplicationManagementUtil;
 import org.wso2.carbon.identity.base.AuthenticatorPropertyConstants.DefinedByType;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
@@ -440,11 +441,72 @@ public class ServerIdpManagementService {
             identityProvider = getIDPFromFile(fileInputStream, fileDetail);
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             if (RESIDENT_IDP_RESERVED_NAME.equals(identityProviderId)) {
+                processFederatedAuthenticatorsForResidentIDPUpdate(identityProvider);
                 identityProviderManager.updateResidentIdP(identityProvider, tenantDomain);
             } else {
                 identityProviderManager.updateIdPByResourceId(identityProviderId, identityProvider, tenantDomain);
             }
         } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP, null);
+        }
+    }
+
+    private void processFederatedAuthenticatorsForResidentIDPUpdate(IdentityProvider newIdentityProvider) {
+
+        try {
+            log.debug("Processing federated authenticators for resident IDP update.");
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            IdentityProvider oldResidentIDP = identityProviderManager.getResidentIdP(tenantDomain);
+
+            FederatedAuthenticatorConfig[] newFederatedAuthenticatorConfig =
+                    newIdentityProvider.getFederatedAuthenticatorConfigs();
+            FederatedAuthenticatorConfig[] oldFederatedAuthenticatorConfig =
+                    oldResidentIDP.getFederatedAuthenticatorConfigs();
+
+            if (newFederatedAuthenticatorConfig == null || newFederatedAuthenticatorConfig.length == 0) {
+                log.debug("No federated authenticator configurations found in the new identity provider.");
+                return;
+            }
+            List<FederatedAuthenticatorConfig> fedAuthnConfigs = new ArrayList<>();
+
+            // Add SAML2SSO authenticator
+            FederatedAuthenticatorConfig newSamlFederatedAuthConfig = IdentityApplicationManagementUtil
+                    .getFederatedAuthenticator(newFederatedAuthenticatorConfig,
+                            IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
+
+            fedAuthnConfigs.add(newSamlFederatedAuthConfig);
+
+            // Add Passive STS authenticator
+            FederatedAuthenticatorConfig newPassiveSTSFedAuthn = IdentityApplicationManagementUtil
+                    .getFederatedAuthenticator(newFederatedAuthenticatorConfig,
+                            IdentityApplicationConstants.Authenticator.PassiveSTS.NAME);
+            FederatedAuthenticatorConfig oldPassiveSTSFedAuthn = IdentityApplicationManagementUtil
+                    .getFederatedAuthenticator(oldFederatedAuthenticatorConfig,
+                            IdentityApplicationConstants.Authenticator.PassiveSTS.NAME);
+
+            if (newPassiveSTSFedAuthn != null) {
+
+                Property newstsIdPEntityIdProperty = IdentityApplicationManagementUtil.getProperty(newPassiveSTSFedAuthn
+                                .getProperties(),
+                        IdentityApplicationConstants.Authenticator.PassiveSTS.IDENTITY_PROVIDER_ENTITY_ID);
+                Property oldstsIdPEntityIdProperty = oldPassiveSTSFedAuthn != null ?
+                        IdentityApplicationManagementUtil.getProperty(newPassiveSTSFedAuthn.getProperties(),
+                                IdentityApplicationConstants.Authenticator.PassiveSTS.IDENTITY_PROVIDER_ENTITY_ID) :
+                        null;
+                if (!newstsIdPEntityIdProperty.equals(oldstsIdPEntityIdProperty)) {
+                    log.debug("Passive STS IDP entity ID has changed. Adding new configuration.");
+                    FederatedAuthenticatorConfig passiveSTSFedAuthn = new FederatedAuthenticatorConfig();
+                    passiveSTSFedAuthn.setName(IdentityApplicationConstants.Authenticator.PassiveSTS.NAME);
+                    passiveSTSFedAuthn.setDefinedByType(DefinedByType.SYSTEM);
+
+                    fedAuthnConfigs.add(passiveSTSFedAuthn);
+                }
+            }
+            newIdentityProvider.setFederatedAuthenticatorConfigs(
+                    fedAuthnConfigs.toArray(new FederatedAuthenticatorConfig[0]));
+
+        } catch (IdentityProviderManagementException e) {
+            log.error("Error occurred while processing federated authenticators for resident IDP update.", e);
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP, null);
         }
     }
