@@ -72,9 +72,9 @@ public class SchemaConfigParser {
      */
     public Map<String, List<String>> getSchemaMap() {
 
-        // Check if the custom shema attributes are updated.
+        // Check if the custom schema attributes are updated.
         try {
-            List<ExternalClaim> customSchemaClaims = ConfigsServiceHolder.getExternalClaims(CUSTOM_SCHEMA);
+            List<ExternalClaim> customSchemaClaims = ConfigsServiceUtils.getExternalClaims(CUSTOM_SCHEMA);
             Set<String> newCustomSchemaAttributes = customSchemaClaims.stream()
                         .map(ExternalClaim::getClaimURI)
                         .collect(Collectors.toSet());
@@ -84,7 +84,6 @@ public class SchemaConfigParser {
                 customSchemaAttributes = newCustomSchemaAttributes;
                 updateSchemaMap(new ArrayList<>(customSchemaAttributes));
             }
-
         } catch (ClaimMetadataException e) {
             log.error("Error while retrieving external claims for custom schema.", e);
         }
@@ -101,11 +100,11 @@ public class SchemaConfigParser {
         List<ExternalClaim> customSchemaClaims = null;
         try {
             // Load the external claims for each schema type.
-            coreSchemaClaims = ConfigsServiceHolder.getExternalClaims(CORE_SCHEMA);
-            userSchemaClaims = ConfigsServiceHolder.getExternalClaims(USER_SCHEMA);
-            enterpriseUserSchemaClaims = ConfigsServiceHolder.getExternalClaims(ENTERPRISE_USER_SCHEMA);
-            systemSchemaClaims = ConfigsServiceHolder.getExternalClaims(SYSTEM_SCHEMA);
-            customSchemaClaims = ConfigsServiceHolder.getExternalClaims(CUSTOM_SCHEMA);
+            coreSchemaClaims = ConfigsServiceUtils.getExternalClaims(CORE_SCHEMA);
+            userSchemaClaims = ConfigsServiceUtils.getExternalClaims(USER_SCHEMA);
+            enterpriseUserSchemaClaims = ConfigsServiceUtils.getExternalClaims(ENTERPRISE_USER_SCHEMA);
+            systemSchemaClaims = ConfigsServiceUtils.getExternalClaims(SYSTEM_SCHEMA);
+            customSchemaClaims = ConfigsServiceUtils.getExternalClaims(CUSTOM_SCHEMA);
 
             // Update the customSchemaAttributes if custom schema claims are available.
             if (customSchemaClaims != null && !customSchemaClaims.isEmpty()) {
@@ -124,7 +123,7 @@ public class SchemaConfigParser {
         schemaMap.putAll(buildSchemasConfiguration(customSchemaClaims, CUSTOM_SCHEMA));
 
         if (schemaMap.isEmpty()) {
-            this.schemaMap = Collections.EMPTY_MAP;
+            this.schemaMap = Collections.emptyMap();
             return;
         }
 
@@ -138,7 +137,7 @@ public class SchemaConfigParser {
         if (externalClaims == null || externalClaims.isEmpty()) {
 
             dataMap.put(schemaType, Collections.emptyList());
-            return  dataMap;
+            return dataMap;
         }
 
         List<String> attributeList = externalClaims.stream()
