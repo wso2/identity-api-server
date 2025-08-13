@@ -20,7 +20,7 @@
     <parent>
         <artifactId>identity-api-server</artifactId>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
-        <version>1.3.178-next-SNAPSHOT</version>
+        <version>1.3.178-next</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
