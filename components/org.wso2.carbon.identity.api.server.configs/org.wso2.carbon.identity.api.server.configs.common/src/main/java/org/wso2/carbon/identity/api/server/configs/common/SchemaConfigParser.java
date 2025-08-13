@@ -82,7 +82,7 @@ public class SchemaConfigParser {
             // If the custom schema attributes are not equal to the existing ones, update the schema map.
             if (customSchemaAttributes == null || !customSchemaAttributes.equals(newCustomSchemaAttributes)) {
                 customSchemaAttributes = newCustomSchemaAttributes;
-                updateSchemaMap(CUSTOM_SCHEMA, new ArrayList<>(customSchemaAttributes));
+                updateSchemaMap(new ArrayList<>(customSchemaAttributes));
             }
 
         } catch (ClaimMetadataException e) {
@@ -129,7 +129,6 @@ public class SchemaConfigParser {
         }
 
         this.schemaMap = schemaMap;
-        this.schemaMap = Collections.unmodifiableMap(this.schemaMap);
     }
 
     private Map<String, List<String>> buildSchemasConfiguration(List<ExternalClaim> externalClaims,
@@ -149,11 +148,11 @@ public class SchemaConfigParser {
         return dataMap;
     }
 
-    private void updateSchemaMap(String schemaType, List<String> attributeList) {
+    private void updateSchemaMap(List<String> attributeList) {
 
         if (this.schemaMap == null) {
             this.schemaMap = new HashMap<>();
         }
-        this.schemaMap.put(schemaType, attributeList);
+        this.schemaMap.put(CUSTOM_SCHEMA, attributeList);
     }
 }
