@@ -22,7 +22,7 @@
         <artifactId>org.wso2.carbon.identity.api.server.claim.management</artifactId>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <relativePath>../pom.xml</relativePath>
-        <version>1.3.178-next</version>
+        <version>1.3.179-next-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.identity.api.server.claim.management.common</artifactId>
