@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.com).
+ * Copyright (c) 2021-2025, WSO2 Inc. (http://www.wso2.com).
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -138,7 +138,8 @@ public class SchemaConfigParser {
         Map<String, List<String>> dataMap = new HashMap<>();
         if (externalClaims == null || externalClaims.isEmpty()) {
 
-            return dataMap;
+            dataMap.put(schemaType, Collections.emptyList());
+            return  dataMap;
         }
 
         List<String> attributeList = externalClaims.stream()
