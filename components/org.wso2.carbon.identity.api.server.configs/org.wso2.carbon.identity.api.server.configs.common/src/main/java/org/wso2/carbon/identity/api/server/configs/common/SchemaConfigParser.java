@@ -23,7 +23,12 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
 import org.wso2.carbon.identity.claim.metadata.mgt.model.ExternalClaim;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -108,7 +113,7 @@ public class SchemaConfigParser {
                         .map(ExternalClaim::getClaimURI)
                         .collect(Collectors.toSet());
             }
-        } catch (ClaimMetadataException e){
+        } catch (ClaimMetadataException e) {
             log.error("Error while retrieving external claims for schemas.", e);
         }
 
