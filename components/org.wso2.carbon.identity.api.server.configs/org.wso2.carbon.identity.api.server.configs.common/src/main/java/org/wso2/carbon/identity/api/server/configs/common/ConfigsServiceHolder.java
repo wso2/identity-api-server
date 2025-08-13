@@ -31,7 +31,6 @@ import org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.core.JWTClie
 import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 import org.wso2.carbon.idp.mgt.IdpManager;
 import org.wso2.carbon.logging.service.RemoteLoggingConfigService;
-import org.wso2.charon3.core.exceptions.CharonException;
 
 import java.util.List;
 
@@ -194,16 +193,16 @@ public class ConfigsServiceHolder {
      *
      * @param externalClaimDialect External claim dialect.
      * @return List of external claims.
-     * @throws CharonException If an error occurs while retrieving external claims.
+     * @throws ClaimMetadataException If an error occurs while retrieving external claims.
      */
-    public static List<ExternalClaim> getExternalClaims(String externalClaimDialect) throws CharonException {
+    public static List<ExternalClaim> getExternalClaims(String externalClaimDialect) throws ClaimMetadataException {
 
         List<ExternalClaim> externalClaims = null;
         try {
             externalClaims = getClaimMetadataManagementService().getExternalClaims(externalClaimDialect,
                     PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain());
         } catch (ClaimMetadataException e) {
-            throw new CharonException("Error while retrieving external claims.", e);
+            throw new ClaimMetadataException("Error while retrieving external claims.", e);
         }
 
         return externalClaims;
