@@ -22,13 +22,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
 import org.wso2.carbon.identity.claim.metadata.mgt.model.ExternalClaim;
+import org.wso2.carbon.identity.scim2.common.utils.SCIMCommonUtils;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -40,18 +39,11 @@ public class SchemaConfigParser {
     private static final String USER_SCHEMA = "urn:ietf:params:scim:schemas:core:2.0:User";
     private static final String ENTERPRISE_USER_SCHEMA = "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User";
     private static final String SYSTEM_SCHEMA =  "urn:scim:wso2:schema";
-    private static final String CUSTOM_SCHEMA = "urn:scim:schemas:extension:custom:User";
 
     private static final Log log = LogFactory.getLog(SchemaConfigParser.class);
     private static volatile SchemaConfigParser schemaConfigParser;
 
-    private Map<String, List<String>> schemaMap;
-    private Set<String> customSchemaAttributes;
-
-    private SchemaConfigParser() {
-
-        buildConfiguration();
-    }
+    private SchemaConfigParser() {}
 
     public static SchemaConfigParser getInstance() {
 
@@ -72,46 +64,22 @@ public class SchemaConfigParser {
      */
     public Map<String, List<String>> getSchemaMap() {
 
-        // Check if the custom schema attributes are updated.
-        try {
-            List<ExternalClaim> customSchemaClaims = ConfigsServiceUtils.getExternalClaims(CUSTOM_SCHEMA);
-            Set<String> newCustomSchemaAttributes = customSchemaClaims.stream()
-                        .map(ExternalClaim::getClaimURI)
-                        .collect(Collectors.toSet());
-
-            // If the custom schema attributes are not equal to the existing ones, update the schema map.
-            if (customSchemaAttributes == null || !customSchemaAttributes.equals(newCustomSchemaAttributes)) {
-                customSchemaAttributes = newCustomSchemaAttributes;
-                updateSchemaMap(new ArrayList<>(customSchemaAttributes));
-            }
-        } catch (ClaimMetadataException e) {
-            log.error("Error while retrieving external claims for custom schema.", e);
-        }
-
-        return schemaMap;
-    }
-
-    private void buildConfiguration() {
-
         List<ExternalClaim> coreSchemaClaims = null;
         List<ExternalClaim> userSchemaClaims = null;
         List<ExternalClaim> enterpriseUserSchemaClaims = null;
         List<ExternalClaim> systemSchemaClaims = null;
         List<ExternalClaim> customSchemaClaims = null;
+
+        String tenantDomain = SCIMCommonUtils.getTenantDomainFromContext();
+        String customSchemaURI = SCIMCommonUtils.getCustomSchemaURI();
         try {
             // Load the external claims for each schema type.
-            coreSchemaClaims = ConfigsServiceUtils.getExternalClaims(CORE_SCHEMA);
-            userSchemaClaims = ConfigsServiceUtils.getExternalClaims(USER_SCHEMA);
-            enterpriseUserSchemaClaims = ConfigsServiceUtils.getExternalClaims(ENTERPRISE_USER_SCHEMA);
-            systemSchemaClaims = ConfigsServiceUtils.getExternalClaims(SYSTEM_SCHEMA);
-            customSchemaClaims = ConfigsServiceUtils.getExternalClaims(CUSTOM_SCHEMA);
+            coreSchemaClaims = Utils.getExternalClaims(CORE_SCHEMA, tenantDomain);
+            userSchemaClaims = Utils.getExternalClaims(USER_SCHEMA, tenantDomain);
+            enterpriseUserSchemaClaims = Utils.getExternalClaims(ENTERPRISE_USER_SCHEMA, tenantDomain);
+            systemSchemaClaims = Utils.getExternalClaims(SYSTEM_SCHEMA, tenantDomain);
+            customSchemaClaims = Utils.getExternalClaims(customSchemaURI, tenantDomain);
 
-            // Update the customSchemaAttributes if custom schema claims are available.
-            if (customSchemaClaims != null && !customSchemaClaims.isEmpty()) {
-                customSchemaAttributes = customSchemaClaims.stream()
-                        .map(ExternalClaim::getClaimURI)
-                        .collect(Collectors.toSet());
-            }
         } catch (ClaimMetadataException e) {
             log.error("Error while retrieving external claims for schemas.", e);
         }
@@ -120,14 +88,12 @@ public class SchemaConfigParser {
         schemaMap.putAll(buildSchemasConfiguration(userSchemaClaims, USER_SCHEMA));
         schemaMap.putAll(buildSchemasConfiguration(enterpriseUserSchemaClaims, ENTERPRISE_USER_SCHEMA));
         schemaMap.putAll(buildSchemasConfiguration(systemSchemaClaims, SYSTEM_SCHEMA));
-        schemaMap.putAll(buildSchemasConfiguration(customSchemaClaims, CUSTOM_SCHEMA));
+        schemaMap.putAll(buildSchemasConfiguration(customSchemaClaims, customSchemaURI));
 
         if (schemaMap.isEmpty()) {
-            this.schemaMap = Collections.emptyMap();
-            return;
+            schemaMap = Collections.emptyMap();
         }
-
-        this.schemaMap = schemaMap;
+        return schemaMap;
     }
 
     private Map<String, List<String>> buildSchemasConfiguration(List<ExternalClaim> externalClaims,
@@ -145,13 +111,5 @@ public class SchemaConfigParser {
                 .collect(Collectors.toList());
         dataMap.put(schemaType, attributeList);
         return dataMap;
-    }
-
-    private void updateSchemaMap(List<String> attributeList) {
-
-        if (this.schemaMap == null) {
-            this.schemaMap = new HashMap<>();
-        }
-        this.schemaMap.put(CUSTOM_SCHEMA, attributeList);
     }
 }

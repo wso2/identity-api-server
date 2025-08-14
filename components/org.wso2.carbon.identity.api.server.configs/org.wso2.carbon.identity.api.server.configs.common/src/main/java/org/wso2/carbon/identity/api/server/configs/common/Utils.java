@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
@@ -19,7 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.configs.common;
 
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
 import org.wso2.carbon.identity.claim.metadata.mgt.model.ExternalClaim;
 
@@ -28,9 +26,9 @@ import java.util.List;
 /**
  * Utility class for Configs Service.
  */
-public class ConfigsServiceUtils {
+public class Utils {
 
-    private ConfigsServiceUtils() {}
+    private Utils() {}
 
     /**
      * Get external claims for a given external claim dialect.
@@ -39,16 +37,14 @@ public class ConfigsServiceUtils {
      * @return List of external claims.
      * @throws ClaimMetadataException If an error occurs while retrieving external claims.
      */
-    public static List<ExternalClaim> getExternalClaims(String externalClaimDialect) throws ClaimMetadataException {
+    public static List<ExternalClaim> getExternalClaims(String externalClaimDialect, String tenantDomain)
+            throws ClaimMetadataException {
 
-        List<ExternalClaim> externalClaims;
         try {
-            externalClaims = ConfigsServiceHolder.getClaimMetadataManagementService().getExternalClaims(
-                    externalClaimDialect, PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            return ConfigsServiceHolder.getClaimMetadataManagementService().
+                    getExternalClaims(externalClaimDialect, tenantDomain);
         } catch (ClaimMetadataException e) {
             throw new ClaimMetadataException("Error while retrieving external claims.", e);
         }
-
-        return externalClaims;
     }
 }
