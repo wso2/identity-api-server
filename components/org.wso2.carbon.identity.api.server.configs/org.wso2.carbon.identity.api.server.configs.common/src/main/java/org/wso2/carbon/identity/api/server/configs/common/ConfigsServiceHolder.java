@@ -21,6 +21,7 @@ package org.wso2.carbon.identity.api.server.configs.common;
 import org.wso2.carbon.base.api.ServerConfigurationService;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
+import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
 import org.wso2.carbon.identity.oauth2.impersonation.services.ImpersonationConfigMgtService;
@@ -84,6 +85,13 @@ public class ConfigsServiceHolder {
         static final ServerConfigurationService SERVICE =
                 (ServerConfigurationService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                         .getOSGiService(ServerConfigurationService.class, null);
+    }
+
+    private static class ClaimMetaDataManagementServiceHolder {
+
+        static final ClaimMetadataManagementService SERVICE =
+                (ClaimMetadataManagementService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(ClaimMetadataManagementService.class, null);
     }
 
     /**
@@ -164,5 +172,15 @@ public class ConfigsServiceHolder {
     public static ServerConfigurationService getServerConfigurationService() {
 
         return ServerConfigurationServiceHolder.SERVICE;
+    }
+
+    /**
+     * Get ClaimMetadataManagementService osgi service.
+     *
+     * @return ClaimMetadataManagementService
+     */
+    public static ClaimMetadataManagementService getClaimMetadataManagementService() {
+
+        return ClaimMetaDataManagementServiceHolder.SERVICE;
     }
 }
