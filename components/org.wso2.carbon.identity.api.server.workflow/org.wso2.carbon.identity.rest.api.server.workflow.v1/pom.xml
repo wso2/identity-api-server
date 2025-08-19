@@ -165,6 +165,10 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.wso2.carbon.identity.workflow</groupId>
+            <artifactId>org.wso2.carbon.identity.workflow.engine</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.wso2.carbon.identity.server.api</groupId>
             <artifactId>org.wso2.carbon.identity.api.server.common</artifactId>
             <scope>provided</scope>

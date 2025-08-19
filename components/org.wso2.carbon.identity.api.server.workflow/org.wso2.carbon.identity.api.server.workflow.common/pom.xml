@@ -51,5 +51,9 @@
             <groupId>org.wso2.carbon.identity.workflow.impl.bps</groupId>
             <artifactId>org.wso2.carbon.identity.workflow.impl</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.workflow</groupId>
+            <artifactId>org.wso2.carbon.identity.workflow.engine</artifactId>
+        </dependency>
     </dependencies>
 </project>

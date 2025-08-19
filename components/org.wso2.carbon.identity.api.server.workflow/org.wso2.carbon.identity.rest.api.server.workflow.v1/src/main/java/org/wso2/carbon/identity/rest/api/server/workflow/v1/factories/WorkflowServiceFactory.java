@@ -29,7 +29,8 @@ public class WorkflowServiceFactory {
     private static final WorkflowService SERVICE;
 
     static {
-        SERVICE = new WorkflowService(WorkflowServiceHolder.getWorkflowManagementService());
+        SERVICE = new WorkflowService(WorkflowServiceHolder.getWorkflowManagementService(),
+                WorkflowServiceHolder.getApprovalTaskService());
     }
 
     /**
