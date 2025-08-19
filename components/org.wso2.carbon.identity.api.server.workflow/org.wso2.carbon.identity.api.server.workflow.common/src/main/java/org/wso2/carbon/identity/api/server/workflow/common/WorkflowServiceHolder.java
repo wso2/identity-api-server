@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.workflow.common;
 
+import org.wso2.carbon.identity.workflow.engine.ApprovalTaskService;
+import org.wso2.carbon.identity.workflow.engine.ApprovalTaskServiceImpl;
 import org.wso2.carbon.identity.workflow.impl.WorkflowImplServiceImpl;
 import org.wso2.carbon.identity.workflow.mgt.WorkflowManagementService;
 import org.wso2.carbon.identity.workflow.mgt.WorkflowManagementServiceImpl;
@@ -27,11 +29,17 @@ import org.wso2.carbon.identity.workflow.mgt.WorkflowManagementServiceImpl;
  */
 public class WorkflowServiceHolder {
 
-    private static final WorkflowManagementService service = new WorkflowManagementServiceImpl();
+    private static final WorkflowManagementService workflowService = new WorkflowManagementServiceImpl();
+    private static final ApprovalTaskService approvalTaskService = new ApprovalTaskServiceImpl();
 
     public static WorkflowManagementService getWorkflowManagementService() {
 
-        return service;
+        return workflowService;
+    }
+
+    public static ApprovalTaskService getApprovalTaskService() {
+
+        return approvalTaskService;
     }
 
     // This is a placeholder for the actual implementation of WorkflowImplServiceImpl.
