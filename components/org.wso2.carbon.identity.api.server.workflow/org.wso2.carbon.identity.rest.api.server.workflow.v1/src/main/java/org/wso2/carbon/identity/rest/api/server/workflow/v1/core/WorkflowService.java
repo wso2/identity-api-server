@@ -45,6 +45,9 @@ import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowRespon
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowTemplateBase;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowTemplateParameters;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowTemplateParametersBase;
+import org.wso2.carbon.identity.workflow.engine.ApprovalTaskService;
+import org.wso2.carbon.identity.workflow.engine.exception.WorkflowEngineClientException;
+import org.wso2.carbon.identity.workflow.engine.exception.WorkflowEngineException;
 import org.wso2.carbon.identity.workflow.mgt.WorkflowManagementService;
 import org.wso2.carbon.identity.workflow.mgt.bean.Parameter;
 import org.wso2.carbon.identity.workflow.mgt.bean.Workflow;
@@ -76,10 +79,13 @@ public class WorkflowService {
 
     private static final Log log = LogFactory.getLog(WorkflowService.class);
     private final WorkflowManagementService workflowManagementService;
+    private final ApprovalTaskService approvalEventService;
 
-    public WorkflowService(WorkflowManagementService workflowManagementService) {
+    public WorkflowService(WorkflowManagementService workflowManagementService,
+                           ApprovalTaskService approvalEventService) {
 
         this.workflowManagementService = workflowManagementService;
+        this.approvalEventService = approvalEventService;
     }
 
     /**
@@ -602,10 +608,14 @@ public class WorkflowService {
                 throw new WorkflowClientException("Workflow instance ID cannot be null or empty.");
             }
             workflowManagementService.deleteWorkflowRequestCreatedByAnyUser(instanceId);
+            approvalEventService.deletePendingApprovalTasks(instanceId);
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_DELETING_WORKFLOW_INSTANCE,
                     instanceId, e);
-        } catch (WorkflowException e) {
+        } catch (WorkflowEngineClientException e) {
+            throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_DELETING_WORKFLOW_INSTANCE,
+                    instanceId, new WorkflowClientException(e.getMessage(), e));
+        } catch (WorkflowException | WorkflowEngineException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_DELETING_WORKFLOW_INSTANCE, instanceId, e);
         }
     }
