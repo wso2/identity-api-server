@@ -24,7 +24,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.base.IdentityRuntimeException;
+import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
+import org.wso2.carbon.identity.claim.metadata.mgt.model.ExternalClaim;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
+import org.wso2.carbon.identity.scim2.common.utils.SCIMCommonConstants;
+import org.wso2.carbon.identity.scim2.common.utils.SCIMCommonUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -87,6 +91,8 @@ public class SchemaConfigParser {
      */
     public Map<String, List<String>> getSchemaMap() {
 
+        // Update the default schema map with custom schema attributes.
+        updateCustomSchemaAttributes();
         return defaultSchemaMap;
     }
 
@@ -113,6 +119,17 @@ public class SchemaConfigParser {
                 defaultSchemaMap = Collections.EMPTY_MAP;
                 return;
             }
+
+            // Add system claims to the schema map.
+            try {
+                List<String> systemSchemaAttributeList = Utils.getExternalClaims(SCIMCommonConstants
+                            .SCIM_SYSTEM_USER_CLAIM_DIALECT, SCIMCommonUtils.getTenantDomainFromContext()).stream()
+                    .map(ExternalClaim::getClaimURI).collect(Collectors.toList());
+                schemaMap.get().put(SCIMCommonConstants.SCIM_SYSTEM_USER_CLAIM_DIALECT, systemSchemaAttributeList);
+            } catch (ClaimMetadataException e) {
+                log.error("Error while retrieving external claims for schemas.", e);
+            }
+
             defaultSchemaMap = schemaMap.get();
             addToSchemaMap.ifPresent(stringListMap -> stringListMap.forEach((key, values) -> {
                 if (defaultSchemaMap.containsKey(key)) {
@@ -142,7 +159,9 @@ public class SchemaConfigParser {
             throw IdentityRuntimeException.error("Error occurred while reading schema configuration in path: " +
                     schemasFilePath, e);
         }
-        defaultSchemaMap = Collections.unmodifiableMap(defaultSchemaMap);
+
+        // update the default schema map with custom schema attributes.
+        updateCustomSchemaAttributes();
     }
 
     private Optional<Map<String, List<String>>> buildSchemasConfiguration(StAXOMBuilder builder,
@@ -198,5 +217,24 @@ public class SchemaConfigParser {
             dataMap.put(schemaId, attributeList);
         }
         return Optional.of(dataMap);
+    }
+
+    private void updateCustomSchemaAttributes() {
+
+        String tenantDomain = SCIMCommonUtils.getTenantDomainFromContext();
+        String customSchemaURI = SCIMCommonUtils.getCustomSchemaURI();
+
+        // Get the existing external claims for the custom schema.
+        try {
+            List<ExternalClaim> customSchemaClaims = Utils.getExternalClaims(customSchemaURI, tenantDomain);
+            // Update defaultSchemaMap with the custom schema attributes by replacing the existing entry.
+            List<String> attributeList = customSchemaClaims.stream()
+                    .map(ExternalClaim::getClaimURI)
+                    .collect(Collectors.toList());
+            // Modify the default schema map to include custom schema attributes.
+            defaultSchemaMap.put(customSchemaURI, attributeList);
+        } catch (ClaimMetadataException e) {
+            log.error("Error while retrieving external claims for schemas.", e);
+        }
     }
 }
