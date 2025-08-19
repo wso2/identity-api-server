@@ -48,7 +48,6 @@ import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowTempla
 import org.wso2.carbon.identity.workflow.engine.ApprovalTaskService;
 import org.wso2.carbon.identity.workflow.engine.exception.WorkflowEngineClientException;
 import org.wso2.carbon.identity.workflow.engine.exception.WorkflowEngineException;
-import org.wso2.carbon.identity.workflow.engine.exception.WorkflowEngineServerException;
 import org.wso2.carbon.identity.workflow.mgt.WorkflowManagementService;
 import org.wso2.carbon.identity.workflow.mgt.bean.Parameter;
 import org.wso2.carbon.identity.workflow.mgt.bean.Workflow;
