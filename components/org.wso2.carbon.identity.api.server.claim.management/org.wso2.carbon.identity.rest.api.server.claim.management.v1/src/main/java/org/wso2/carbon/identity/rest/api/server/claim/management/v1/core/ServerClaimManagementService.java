@@ -88,14 +88,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
@@ -1302,10 +1301,13 @@ public class ServerClaimManagementService {
 
         if (ArrayUtils.isNotEmpty(localClaimReqDTO.getCanonicalValues())) {
             try {
-                Collection<LabelValueDTO> canonicalValuesSet =
-                        new HashSet<>(Arrays.asList(localClaimReqDTO.getCanonicalValues())).stream()
-                        .collect(Collectors.toMap(LabelValueDTO::getLabel, v -> v,
-                                (v1, v2) -> v1)).values();
+                Collection<LabelValueDTO> canonicalValuesSet = Arrays.stream(localClaimReqDTO.getCanonicalValues())
+                                .collect(Collectors.toMap(LabelValueDTO::getLabel, Function.identity(),
+                                        (v1, v2) -> v1)).values();
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Processing " + canonicalValuesSet.size() + " unique canonical values for claim: " +
+                            localClaimReqDTO.getClaimURI());
+                }
                 String jsonString = mapper.writeValueAsString(canonicalValuesSet);
                 claimProperties.put(PROP_CANONICAL_VALUES, jsonString);
             } catch (JsonProcessingException e) {
