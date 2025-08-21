@@ -90,6 +90,7 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -1303,7 +1304,7 @@ public class ServerClaimManagementService {
             try {
                 Collection<LabelValueDTO> canonicalValuesSet = Arrays.stream(localClaimReqDTO.getCanonicalValues())
                                 .collect(Collectors.toMap(LabelValueDTO::getLabel, Function.identity(),
-                                        (v1, v2) -> v1)).values();
+                                        (v1, v2) -> v1, LinkedHashMap::new)).values();
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Processing " + canonicalValuesSet.size() + " unique canonical values for claim: " +
                             localClaimReqDTO.getClaimURI());
