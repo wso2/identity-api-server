@@ -87,7 +87,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -1299,7 +1302,11 @@ public class ServerClaimManagementService {
 
         if (ArrayUtils.isNotEmpty(localClaimReqDTO.getCanonicalValues())) {
             try {
-                String jsonString = mapper.writeValueAsString(localClaimReqDTO.getCanonicalValues());
+                Collection<LabelValueDTO> canonicalValuesSet =
+                        new HashSet<>(Arrays.asList(localClaimReqDTO.getCanonicalValues())).stream()
+                        .collect(Collectors.toMap(LabelValueDTO::getLabel, v -> v,
+                                (v1, v2) -> v1)).values();
+                String jsonString = mapper.writeValueAsString(canonicalValuesSet);
                 claimProperties.put(PROP_CANONICAL_VALUES, jsonString);
             } catch (JsonProcessingException e) {
                 LOG.error("Error while parsing canonical values.", e);
