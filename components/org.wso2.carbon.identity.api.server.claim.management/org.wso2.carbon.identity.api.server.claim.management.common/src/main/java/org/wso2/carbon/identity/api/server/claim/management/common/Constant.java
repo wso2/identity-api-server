@@ -231,11 +231,11 @@ public class Constant {
         ERROR_CODE_SUB_ATTRIBUTES_NOT_SPECIFIED("CMT-60014", "Sub attributes not specified.",
                 "Sub attributes cannot be empty when the data type is complex."),
         ERROR_CODE_SUB_ATTRIBUTES_NOT_SCIM_COMPLIANT("CMT-60015", "SCIM mapping of the sub attribute " +
-                "is not compatible.", "SCIM mapping of %s should be in the format %s.%s to make %s a " +
-                "sub-attribute of %s"),
+                "is not compatible.", "SCIM mapping of '%s' should be in the format '%s.%s' to make '%s' a " +
+                "sub-attribute of '%s'."),
         ERROR_CODE_ATTRIBUTES_MARKED_AS_SUB_ATTRIBUTES_NOT_ALLOWED_TO_HAVE_SUB_ATTRIBUTES("CMT-60016",
                 "A Sub Attribute cannot have sub attributes.",
-                "This attribute is marked as sub attribute of the attribute %s"),
+                "This attribute is marked as a sub attribute of the attribute '%s'."),
         ERROR_CODE_UNSUPPORTED_INPUT_TYPE("CMT-60017",
                 "The provided input type doesn't match with the configured attribute meta data.",
                 "The provided input type: %s doesn't match with the configured attribute meta data."),
