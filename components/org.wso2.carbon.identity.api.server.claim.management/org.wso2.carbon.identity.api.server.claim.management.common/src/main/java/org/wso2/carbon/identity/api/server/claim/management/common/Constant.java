@@ -232,7 +232,7 @@ public class Constant {
                 "Sub attributes cannot be empty when the data type is complex."),
         ERROR_CODE_SUB_ATTRIBUTES_NOT_SCIM_COMPLIANT("CMT-60015", "SCIM mapping of the sub attribute " +
                 "is not compatible.", "SCIM mapping of '%s' should be in the format '%s.%s' to make '%s' a " +
-                "sub-attribute of '%s'."),
+                "sub attribute of '%s'."),
         ERROR_CODE_ATTRIBUTES_MARKED_AS_SUB_ATTRIBUTES_NOT_ALLOWED_TO_HAVE_SUB_ATTRIBUTES("CMT-60016",
                 "A Sub Attribute cannot have sub attributes.",
                 "This attribute is marked as a sub attribute of the attribute '%s'."),
