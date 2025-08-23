@@ -147,7 +147,6 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.INPUT_TYPE_MULTI_SELECT_DROPDOWN;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.INPUT_TYPE_NUMBER_INPUT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.INPUT_TYPE_RADIO_GROUP;
-import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.INPUT_TYPE_TEXT_INPUT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.INPUT_TYPE_TOGGLE;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.LOCAL_DIALECT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.LOCAL_DIALECT_PATH;
@@ -1808,8 +1807,7 @@ public class ServerClaimManagementService {
 
     }
 
-    private void validateSystemClaimUpdate(LocalClaimReqDTO localClaimReqDTO, String claimId)
-            throws ClaimMetadataClientException {
+    private void validateSystemClaimUpdate(LocalClaimReqDTO localClaimReqDTO, String claimId) {
 
         boolean isSystemClaim = localClaimReqDTO.getProperties().stream()
                 .anyMatch(property -> IS_SYSTEM_CLAIM.equals(property.getKey()) &&
@@ -1823,11 +1821,9 @@ public class ServerClaimManagementService {
         // Validate the multivalued property is updated.
         if (Boolean.TRUE.equals(existingClaim.getMultiValued()) !=
                 Boolean.TRUE.equals(localClaimReqDTO.getMultiValued())) {
-            throw new ClaimMetadataClientException(Constant.ErrorMessage
-                    .ERROR_CODE_SYSTEM_ATTRIBUTE_MULTIVALUED_STATE_UPDATE.getCode(),
-                    Constant.ErrorMessage.ERROR_CODE_SYSTEM_ATTRIBUTE_MULTIVALUED_STATE_UPDATE.getDescription());
+            throw handleClaimManagementClientError(Constant.ErrorMessage
+                    .ERROR_CODE_SYSTEM_ATTRIBUTE_MULTIVALUED_STATE_UPDATE, BAD_REQUEST);
         }
-
 
         // Validate the dataType property is updated.
         DataType requestedDataType = localClaimReqDTO.getDataType();
@@ -1835,8 +1831,8 @@ public class ServerClaimManagementService {
             requestedDataType = DataType.STRING;
         }
         if (existingClaim.getDataType() != requestedDataType) {
-            throw new ClaimMetadataClientException(Constant.ErrorMessage.ERROR_CODE_SYSTEM_ATTRIBUTE_DATA_TYPE_UPDATE
-                    .getCode(), Constant.ErrorMessage.ERROR_CODE_SYSTEM_ATTRIBUTE_DATA_TYPE_UPDATE.getDescription());
+            throw handleClaimManagementClientError(Constant.ErrorMessage
+                    .ERROR_CODE_SYSTEM_ATTRIBUTE_DATA_TYPE_UPDATE, BAD_REQUEST);
         }
     }
 
@@ -1846,8 +1842,8 @@ public class ServerClaimManagementService {
             return;
         }
         if (ArrayUtils.isEmpty(localClaimReqDTO.getSubAttributes())) {
-            throw new ClaimMetadataClientException(Constant.ErrorMessage.ERROR_CODE_SUB_ATTRIBUTES_NOT_SPECIFIED.
-                    getCode(), Constant.ErrorMessage.ERROR_CODE_SUB_ATTRIBUTES_NOT_SPECIFIED.getDescription());
+            throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_SUB_ATTRIBUTES_NOT_SPECIFIED,
+                    BAD_REQUEST);
         }
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
 
@@ -1856,26 +1852,21 @@ public class ServerClaimManagementService {
                 localClaimReqDTO.getSubAttributes());
     }
 
-    private void validateDataTypeUpdates(LocalClaimReqDTO localClaimReqDTO) throws ClaimMetadataClientException {
+    private void validateDataTypeUpdates(LocalClaimReqDTO localClaimReqDTO) {
 
         if (localClaimReqDTO.getDataType() == null) {
             return;
         }
         if (DataType.BOOLEAN.equals(localClaimReqDTO.getDataType())
                 && Boolean.TRUE.equals(localClaimReqDTO.getMultiValued())) {
-            String errorDescription = String.format(Constant.ErrorMessage
-                    .ERROR_CODE_BOOLEAN_ATTRIBUTE_CANNOT_BE_MULTI_VALUED.getDescription(),
-                    localClaimReqDTO.getClaimURI());
-            throw new ClaimMetadataClientException(Constant.ErrorMessage
-                    .ERROR_CODE_BOOLEAN_ATTRIBUTE_CANNOT_BE_MULTI_VALUED.getCode(), errorDescription);
+            throw handleClaimManagementClientError(Constant.ErrorMessage
+                    .ERROR_CODE_BOOLEAN_ATTRIBUTE_CANNOT_BE_MULTI_VALUED, BAD_REQUEST, localClaimReqDTO.getClaimURI());
         }
         if (ArrayUtils.isNotEmpty(localClaimReqDTO.getCanonicalValues()) &&
                 !DataType.STRING.equals(localClaimReqDTO.getDataType())) {
-            String errorDescription = String.format(Constant.ErrorMessage
-                    .ERROR_CODE_CANONICAL_VALUES_NOT_SUPPORTED_FOR_NON_STRING_DATA_TYPES.getDescription(),
-                    localClaimReqDTO.getClaimURI(), localClaimReqDTO.getDataType());
-            throw new ClaimMetadataClientException(Constant.ErrorMessage
-                    .ERROR_CODE_CANONICAL_VALUES_NOT_SUPPORTED_FOR_NON_STRING_DATA_TYPES.getCode(), errorDescription);
+            throw handleClaimManagementClientError(Constant.ErrorMessage
+                    .ERROR_CODE_CANONICAL_VALUES_NOT_SUPPORTED_FOR_NON_STRING_DATA_TYPES, BAD_REQUEST,
+                    localClaimReqDTO.getClaimURI(), localClaimReqDTO.getDataType().getValue());
         }
     }
 
@@ -1893,8 +1884,6 @@ public class ServerClaimManagementService {
         }
 
         switch (inputType) {
-            case INPUT_TYPE_TEXT_INPUT:
-                break;
             case INPUT_TYPE_DROPDOWN:
             case INPUT_TYPE_RADIO_GROUP:
             case INPUT_TYPE_MULTI_SELECT_DROPDOWN:
@@ -1940,10 +1929,14 @@ public class ServerClaimManagementService {
         }
     }
 
-    private void handleInputFormatClientException(String errorDescription) throws ClaimMetadataClientException {
+    private void handleInputFormatClientException(String errorDescription) {
 
-        throw new ClaimMetadataClientException(Constant.ErrorMessage.ERROR_CODE_UNSUPPORTED_INPUT_TYPE.getCode(),
-                errorDescription);
+        Constant.ErrorMessage errorEnum = Constant.ErrorMessage.ERROR_CODE_UNSUPPORTED_INPUT_TYPE;
+        ErrorResponse errorResponse = new ErrorResponse.Builder()
+                .withCode(errorEnum.getCode())
+                .withMessage(errorEnum.getMessage())
+                .withDescription(errorDescription).build();
+        throw new APIError(BAD_REQUEST, errorResponse);
     }
 
     private String getMappedSCIMClaim(String claimURI, String tenantDomain) throws ClaimMetadataException {
@@ -1962,18 +1955,18 @@ public class ServerClaimManagementService {
     private void validateSubAttributeSCIMMappingPattern(String claimURI, String tenantDomain, String[] subAttributes)
             throws ClaimMetadataException {
 
-        String customSchemaURI = SCIMCommonUtils.getCustomSchemaURI();
+        String customSchemaURI = SCIMCommonUtils.getCustomSchemaURI() + ":";
         String attributeSCIMMapping = getMappedSCIMClaim(claimURI, tenantDomain)
                 .replace(customSchemaURI, StringUtils.EMPTY);
         for (String subAttribute : subAttributes) {
             String subAttributeSCIMMapping = getMappedSCIMClaim(subAttribute, tenantDomain)
                     .replace(customSchemaURI, StringUtils.EMPTY);
             if (!subAttributeSCIMMapping.startsWith(attributeSCIMMapping + ".")) {
+                String attributeName = claimURI.replace(LOCAL_DIALECT + "/", StringUtils.EMPTY);
                 String subAttributeName = subAttribute.replace(LOCAL_DIALECT + "/", StringUtils.EMPTY);
-                String errorDescription = String.format(Constant.ErrorMessage
-                        .ERROR_CODE_SUB_ATTRIBUTES_NOT_SCIM_COMPLIANT.getDescription(), subAttributeName);
-                throw new ClaimMetadataClientException(Constant.ErrorMessage
-                        .ERROR_CODE_SUB_ATTRIBUTES_NOT_SCIM_COMPLIANT.getCode(), errorDescription);
+                throw handleClaimManagementClientError(Constant.ErrorMessage
+                                .ERROR_CODE_SUB_ATTRIBUTES_NOT_SCIM_COMPLIANT, BAD_REQUEST, subAttributeName,
+                        attributeSCIMMapping, subAttributeSCIMMapping, subAttributeName, attributeName);
             }
         }
     }
@@ -1988,12 +1981,10 @@ public class ServerClaimManagementService {
             }
             if (Arrays.stream(subAttributes.split(" "))
                     .anyMatch(subAttribute -> StringUtils.equals(subAttribute, claimURI))) {
-                String errorDescription = String.format(Constant.ErrorMessage
-                                .ERROR_CODE_ATTRIBUTES_MARKED_AS_SUB_ATTRIBUTES_NOT_ALLOWED_TO_HAVE_SUB_ATTRIBUTES
-                                .getDescription(), localClaim.getClaimURI());
-                throw new ClaimMetadataClientException(Constant.ErrorMessage
-                        .ERROR_CODE_ATTRIBUTES_MARKED_AS_SUB_ATTRIBUTES_NOT_ALLOWED_TO_HAVE_SUB_ATTRIBUTES.getCode(),
-                        errorDescription);
+                String attributeName = localClaim.getClaimURI().replace(LOCAL_DIALECT + "/", StringUtils.EMPTY);
+                throw handleClaimManagementClientError(Constant.ErrorMessage
+                        .ERROR_CODE_ATTRIBUTES_MARKED_AS_SUB_ATTRIBUTES_NOT_ALLOWED_TO_HAVE_SUB_ATTRIBUTES, BAD_REQUEST,
+                        attributeName);
             }
         }
     }
