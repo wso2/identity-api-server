@@ -147,7 +147,6 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.INPUT_TYPE_MULTI_SELECT_DROPDOWN;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.INPUT_TYPE_NUMBER_INPUT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.INPUT_TYPE_RADIO_GROUP;
-import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.INPUT_TYPE_TEXT_INPUT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.INPUT_TYPE_TOGGLE;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.LOCAL_DIALECT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.LOCAL_DIALECT_PATH;
