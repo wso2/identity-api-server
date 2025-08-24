@@ -77,7 +77,7 @@ components:
         actionId:
           type: string
           description: Action identifier
-          example: dnd-component-01afc2d2-f7b8-46db-95a9-c17336e7a1c6
+          example: button_40f64
         inputs:
           type: object
           description: Input values for the execution step
@@ -137,7 +137,11 @@ components:
         id:
           type: string
           description: Unique identifier of the component
-          example: dnd-component-210e95c0-c580-40b0-9646-7054bb340f64
+          example: button_40f64
+        actionId:
+          type: string
+          description: Action identifier
+          example: button_40f64
         type:
           type: string
           description: Specific component type (e.g., INPUT, BUTTON)

@@ -265,6 +265,11 @@ public class Utils {
                         .map(Utils::convertToComponent)
                         .collect(Collectors.toList()));
             case Constants.StepTypes.REDIRECTION:
+                if (dataDTO.getComponents() != null && !dataDTO.getComponents().isEmpty()) {
+                    data.components(dataDTO.getComponents().stream()
+                            .map(Utils::convertToComponent)
+                            .collect(Collectors.toList()));
+                }
                 return data.redirectURL(dataDTO.getRedirectURL());
             case Constants.StepTypes.WEBAUTHN:
                 return data.webAuthnData(dataDTO.getWebAuthnData());
@@ -331,7 +336,7 @@ public class Utils {
             return null;
         }
 
-        return new Component()
+        Component component = new Component()
                 .id(componentDTO.getId())
                 .type(componentDTO.getType())
                 .variant(componentDTO.getVariant())
@@ -339,6 +344,10 @@ public class Utils {
                 .components(componentDTO.getComponents() != null ? componentDTO.getComponents().stream()
                         .map(Utils::convertToComponent)
                         .collect(Collectors.toList()) : null);
+        if (Constants.ComponentTypes.BUTTON.equals(componentDTO.getType())) {
+            component.actionId(componentDTO.getId());
+        }
+        return component;
     }
 
     private static Map<String, Object> convertToMap(Object map) {
