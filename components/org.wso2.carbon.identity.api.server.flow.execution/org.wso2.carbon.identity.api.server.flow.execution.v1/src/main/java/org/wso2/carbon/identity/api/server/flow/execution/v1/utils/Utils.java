@@ -44,6 +44,7 @@ import org.wso2.carbon.identity.flow.mgt.model.FlowConfigDTO;
 import org.wso2.carbon.identity.governance.IdentityGovernanceException;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -261,10 +262,18 @@ public class Utils {
 
         switch (type) {
             case Constants.StepTypes.VIEW:
-                return data.components(dataDTO.getComponents().stream()
-                        .map(Utils::convertToComponent)
-                        .collect(Collectors.toList()));
+                if (dataDTO.getComponents() != null && !dataDTO.getComponents().isEmpty()) {
+                    return data.components(dataDTO.getComponents().stream()
+                            .map(Utils::convertToComponent)
+                            .collect(Collectors.toList()));
+                }
+                return data.components(new ArrayList<>());
             case Constants.StepTypes.REDIRECTION:
+                if (dataDTO.getComponents() != null && !dataDTO.getComponents().isEmpty()) {
+                    data.components(dataDTO.getComponents().stream()
+                            .map(Utils::convertToComponent)
+                            .collect(Collectors.toList()));
+                }
                 return data.redirectURL(dataDTO.getRedirectURL());
             case Constants.StepTypes.WEBAUTHN:
                 return data.webAuthnData(dataDTO.getWebAuthnData());
@@ -331,7 +340,7 @@ public class Utils {
             return null;
         }
 
-        return new Component()
+        Component component = new Component()
                 .id(componentDTO.getId())
                 .type(componentDTO.getType())
                 .variant(componentDTO.getVariant())
@@ -339,6 +348,10 @@ public class Utils {
                 .components(componentDTO.getComponents() != null ? componentDTO.getComponents().stream()
                         .map(Utils::convertToComponent)
                         .collect(Collectors.toList()) : null);
+        if (Constants.ComponentTypes.BUTTON.equals(componentDTO.getType())) {
+            component.actionId(componentDTO.getId());
+        }
+        return component;
     }
 
     private static Map<String, Object> convertToMap(Object map) {

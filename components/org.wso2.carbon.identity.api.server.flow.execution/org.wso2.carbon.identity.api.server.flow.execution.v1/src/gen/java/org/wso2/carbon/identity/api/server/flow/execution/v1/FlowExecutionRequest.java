@@ -104,7 +104,7 @@ public class FlowExecutionRequest  {
         return this;
     }
     
-    @ApiModelProperty(example = "dnd-component-01afc2d2-f7b8-46db-95a9-c17336e7a1c6", value = "Action identifier")
+    @ApiModelProperty(example = "button_40f64", value = "Action identifier")
     @JsonProperty("actionId")
     @Valid
     public String getActionId() {
