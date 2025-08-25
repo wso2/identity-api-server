@@ -99,6 +99,8 @@ public class LocalClaimReqDTO {
     @Valid
     private InputFormatDTO inputFormat = null;
 
+    @Valid
+    private Boolean enableUserStorePersistence = null;
     /**
     * A unique URI specific to the claim.
     **/
@@ -319,6 +321,18 @@ public class LocalClaimReqDTO {
         this.inputFormat = inputFormat;
     }
 
+    /**
+     * Specifies whether the claim value should be stored in the respective user store.
+     **/
+    @ApiModelProperty(value = "Specifies whether the claim value should be stored in the respective user store.")
+    @JsonProperty("enableUserStorePersistence")
+    public Boolean getEnableUserStorePersistence() {
+        return enableUserStorePersistence;
+    }
+    public void setEnableUserStorePersistence(Boolean enableUserStorePersistence) {
+        this.enableUserStorePersistence = enableUserStorePersistence;
+    }
+
     @Override
     public String toString() {
 
@@ -343,7 +357,8 @@ public class LocalClaimReqDTO {
         sb.append("    properties: ").append(properties).append("\n");
         sb.append("    profiles: ").append(profiles).append("\n");
         sb.append("    inputFormat: ").append(inputFormat).append("\n");
-        
+        sb.append("    enableUserStorePersistence: ").append(enableUserStorePersistence).append("\n");
+
         sb.append("}\n");
         return sb.toString();
     }

@@ -812,6 +812,10 @@ definitions:
           $ref: '#/definitions/Property'
       profiles:
         $ref: '#/definitions/Profiles'
+      enableUserStorePersistence:
+        type: boolean
+        description: Specifies whether the claim value should be stored in the user store.
+        example: true
 
   #-----------------------------------------------------
   # The Local Claim Response object
@@ -910,6 +914,10 @@ definitions:
               $ref: '#/definitions/Property'
           profiles:
             $ref: '#/definitions/Profiles'
+          enableUserStorePersistence:
+            type: boolean
+            description: Specifies whether the claim value should be stored in the user store.
+            example: true
 
   #-----------------------------------------------------
   # The Additional Attribute Mapping object
