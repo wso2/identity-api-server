@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.certificate.validation.management</artifactId>
-        <version>1.4.5-SNAPSHOT</version>
+        <version>1.4.5</version>
     </parent>
 
     <artifactId>org.wso2.carbon.identity.api.server.certificate.validation.management.v1</artifactId>
