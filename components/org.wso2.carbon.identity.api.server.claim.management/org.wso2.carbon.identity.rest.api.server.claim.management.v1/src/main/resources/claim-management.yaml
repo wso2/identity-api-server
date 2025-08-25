@@ -812,6 +812,10 @@ definitions:
           $ref: '#/definitions/Property'
       profiles:
         $ref: '#/definitions/Profiles'
+      isCustomPersistenceEnabled:
+        type: boolean
+        description: Specifies whether the default claim persistence should be override.
+        example: true
 
   #-----------------------------------------------------
   # The Local Claim Response object
@@ -910,6 +914,10 @@ definitions:
               $ref: '#/definitions/Property'
           profiles:
             $ref: '#/definitions/Profiles'
+          isCustomPersistenceEnabled:
+            type: boolean
+            description: Specifies whether the default claim persistence should be override.
+            example: true
 
   #-----------------------------------------------------
   # The Additional Attribute Mapping object
