@@ -94,6 +94,8 @@ public interface ConfigsApiService {
 
       public Response restoreServerRemoteLoggingConfigurations();
 
+      public Response deleteImpersonationConfiguration();
+
       public Response updateInboundScimConfigs(ScimConfig scimConfig);
 
       public Response updatePassiveSTSInboundAuthConfig(InboundAuthPassiveSTSConfig inboundAuthPassiveSTSConfig);
