@@ -640,6 +640,28 @@ public class ConfigsApi  {
     }
 
     @Valid
+    @DELETE
+    @Path("/impersonation")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Revert the tenant impersonation configuration.", notes = "Revert the tenant impersonation configuration. <b>Scope (Permission) required:</b> <br>   * internal_config_update ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Impersonation Configurations", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "Successful deletion", response = Void.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response deleteImpersonationConfiguration() {
+
+        return delegate.deleteImpersonationConfiguration();
+    }
+
+    @Valid
     @PUT
     @Path("/provisioning/inbound/scim")
     @Consumes({ "application/json" })

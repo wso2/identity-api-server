@@ -546,6 +546,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - Impersonation Configurations
+      summary: Revert the tenant impersonation configuration.
+      operationId: deleteImpersonationConfiguration
+      description: |
+        Revert the tenant impersonation configuration.
+        <b>Scope (Permission) required:</b> <br>
+          * internal_config_update
+      responses:
+        '204':
+          description: Successful deletion
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /configs/home-realm-identifiers:
     get:
       tags:

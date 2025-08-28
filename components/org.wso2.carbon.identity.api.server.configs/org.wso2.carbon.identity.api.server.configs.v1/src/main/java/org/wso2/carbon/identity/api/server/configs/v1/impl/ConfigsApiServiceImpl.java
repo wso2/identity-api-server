@@ -193,6 +193,13 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     }
 
     @Override
+    public Response deleteImpersonationConfiguration() {
+
+        configManagementService.deleteImpersonationConfiguration();
+        return Response.noContent().build();
+    }
+
+    @Override
     public Response updateInboundScimConfigs(ScimConfig scimConfig) {
 
         configManagementService.updateInboundScimConfigs(scimConfig);
