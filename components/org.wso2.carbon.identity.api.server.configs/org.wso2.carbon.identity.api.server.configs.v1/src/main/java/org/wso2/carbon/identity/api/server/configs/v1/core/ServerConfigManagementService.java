@@ -440,6 +440,21 @@ public class ServerConfigManagementService {
         }
     }
 
+    /**
+     * Deletes the impersonation configuration for the current tenant domain.
+     *
+     * @throws ImpersonationConfigMgtException If there is an error deleting the impersonation configuration.
+     */
+    public void deleteImpersonationConfiguration() {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            impersonationConfigMgtService.deleteImpersonationConfig(tenantDomain);
+        } catch (ImpersonationConfigMgtException e) {
+            throw handleImpersonationConfigException(e, Constants.ErrorMessage.ERROR_CODE_IMP_CONFIG_DELETE,
+                    tenantDomain);
+        }
+    }
 
     /**
      * Get the CORS config for a tenant.
