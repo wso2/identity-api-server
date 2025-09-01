@@ -244,17 +244,17 @@ public class ServerConfigManagementService {
         RealmConfig realmConfig = null;
 
         try {
-            boolean isUerAuthorizedToInternalConfigView;
+            boolean isUerAuthorizedToViewInternalConfig;
             boolean isSubOrganization = OrganizationManagementUtil.isOrganization(tenantDomain);
             if (isSubOrganization) {
-                isUerAuthorizedToInternalConfigView =
+                isUerAuthorizedToViewInternalConfig =
                         AuthzUtil.isUserAuthorized(user, Collections.singletonList("internal_org_config_view"));
             } else {
-                isUerAuthorizedToInternalConfigView =
+                isUerAuthorizedToViewInternalConfig =
                         AuthzUtil.isUserAuthorized(user, Collections.singletonList("internal_config_view"));
             }
 
-            if (isUerAuthorizedToInternalConfigView) {
+            if (isUerAuthorizedToViewInternalConfig) {
                 try {
                     if (userRealm != null && userRealm.getRealmConfiguration() != null) {
                         realmConfig = new RealmConfig();
