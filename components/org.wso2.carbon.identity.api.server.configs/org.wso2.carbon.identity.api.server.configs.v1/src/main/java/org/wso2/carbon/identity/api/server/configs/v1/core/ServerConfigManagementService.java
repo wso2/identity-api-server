@@ -64,6 +64,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.Schema;
 import org.wso2.carbon.identity.api.server.configs.v1.model.SchemaListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ScimConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ServerConfig;
+import org.wso2.carbon.identity.application.authentication.framework.model.AuthenticatedUser;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementClientException;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementServerException;
@@ -91,12 +92,14 @@ import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceSer
 import org.wso2.carbon.identity.cors.mgt.core.model.CORSConfiguration;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
 import org.wso2.carbon.identity.oauth.dcr.exception.DCRMException;
+import org.wso2.carbon.identity.oauth2.IdentityOAuth2Exception;
 import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationConfigMgtClientException;
 import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationConfigMgtException;
 import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationConfigMgtServerException;
 import org.wso2.carbon.identity.oauth2.impersonation.models.ImpersonationConfig;
 import org.wso2.carbon.identity.oauth2.impersonation.services.ImpersonationConfigMgtService;
 import org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.core.JWTClientAuthenticatorMgtService;
+import org.wso2.carbon.identity.oauth2.util.AuthzUtil;
 import org.wso2.carbon.identity.organization.management.service.exception.OrganizationManagementException;
 import org.wso2.carbon.identity.organization.management.service.util.OrganizationManagementUtil;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
@@ -232,18 +235,44 @@ public class ServerConfigManagementService {
         IdentityProvider residentIdP = getResidentIdP();
 
         UserRealm userRealm = CarbonContext.getThreadLocalCarbonContext().getUserRealm();
-        RealmConfig realmConfig = new RealmConfig();
+
+        String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        AuthenticatedUser user = new AuthenticatedUser();
+        user.setUserId(CarbonContext.getThreadLocalCarbonContext().getUserId());
+        user.setUserName(CarbonContext.getThreadLocalCarbonContext().getUsername());
+        user.setTenantDomain(tenantDomain);
+        RealmConfig realmConfig = null;
+
         try {
-            if (userRealm != null && userRealm.getRealmConfiguration() != null) {
-                realmConfig.adminUser(userRealm.getRealmConfiguration().getAdminUserName());
-                realmConfig.adminRole(userRealm.getRealmConfiguration().getAdminRoleName());
-                realmConfig.everyoneRole(userRealm.getRealmConfiguration().getEveryOneRoleName());
+            boolean isUerAuthorizedToInternalConfigView;
+            boolean isSubOrganization = OrganizationManagementUtil.isOrganization(tenantDomain);
+            if (isSubOrganization) {
+                isUerAuthorizedToInternalConfigView =
+                        AuthzUtil.isUserAuthorized(user, Collections.singletonList("internal_org_config_view"));
+            } else {
+                isUerAuthorizedToInternalConfigView =
+                        AuthzUtil.isUserAuthorized(user, Collections.singletonList("internal_config_view"));
             }
-        } catch (UserStoreException e) {
-            log.error("Error while retrieving user-realm information.", e);
+
+            if (isUerAuthorizedToInternalConfigView) {
+                try {
+                    if (userRealm != null && userRealm.getRealmConfiguration() != null) {
+                        realmConfig = new RealmConfig();
+                        realmConfig.adminUser(userRealm.getRealmConfiguration().getAdminUserName());
+                        realmConfig.adminRole(userRealm.getRealmConfiguration().getAdminRoleName());
+                        realmConfig.everyoneRole(userRealm.getRealmConfiguration().getEveryOneRoleName());
+                    }
+                } catch (UserStoreException e) {
+                    log.error("Error while retrieving user-realm information.", e);
+                    throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
+                            .ERROR_CODE_ERROR_RETRIEVING_CONFIGS, null);
+                }
+            }
+        } catch (IdentityOAuth2Exception | OrganizationManagementException e) {
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
                     .ERROR_CODE_ERROR_RETRIEVING_CONFIGS, null);
         }
+
         String idleSessionTimeout = null;
         IdentityProviderProperty idleSessionProp = IdentityApplicationManagementUtil.getProperty(
                 residentIdP.getIdpProperties(), IdentityApplicationConstants.SESSION_IDLE_TIME_OUT);
