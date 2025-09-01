@@ -236,43 +236,41 @@ public class ServerConfigManagementService {
 
         UserRealm userRealm = CarbonContext.getThreadLocalCarbonContext().getUserRealm();
 
-        String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-        AuthenticatedUser user = new AuthenticatedUser();
-        user.setUserId(CarbonContext.getThreadLocalCarbonContext().getUserId());
-        user.setUserName(CarbonContext.getThreadLocalCarbonContext().getUsername());
-        user.setTenantDomain(tenantDomain);
-        RealmConfig realmConfig = null;
-
+        String requestInitiatedTenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        String userId = CarbonContext.getThreadLocalCarbonContext().getUserId();
+        String userResidentOrganizationId = CarbonContext.getThreadLocalCarbonContext().getUserResidentOrganizationId();
+        boolean isUerAuthorizedToViewInternalConfig;
         try {
-            boolean isUerAuthorizedToViewInternalConfig;
-            boolean isSubOrganization = OrganizationManagementUtil.isOrganization(tenantDomain);
+            boolean isSubOrganization = OrganizationManagementUtil.isOrganization(requestInitiatedTenantDomain);
             if (isSubOrganization) {
                 isUerAuthorizedToViewInternalConfig =
-                        AuthzUtil.isUserAuthorized(user, Collections.singletonList("internal_org_config_view"));
+                        AuthzUtil.isUserAuthorized(userId, userResidentOrganizationId, requestInitiatedTenantDomain,
+                                Collections.singletonList("internal_org_config_view"));
             } else {
                 isUerAuthorizedToViewInternalConfig =
-                        AuthzUtil.isUserAuthorized(user, Collections.singletonList("internal_config_view"));
-            }
-
-            if (isUerAuthorizedToViewInternalConfig) {
-                try {
-                    if (userRealm != null && userRealm.getRealmConfiguration() != null) {
-                        realmConfig = new RealmConfig();
-                        realmConfig.adminUser(userRealm.getRealmConfiguration().getAdminUserName());
-                        realmConfig.adminRole(userRealm.getRealmConfiguration().getAdminRoleName());
-                        realmConfig.everyoneRole(userRealm.getRealmConfiguration().getEveryOneRoleName());
-                    }
-                } catch (UserStoreException e) {
-                    log.error("Error while retrieving user-realm information.", e);
-                    throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
-                            .ERROR_CODE_ERROR_RETRIEVING_CONFIGS, null);
-                }
+                        AuthzUtil.isUserAuthorized(userId, userResidentOrganizationId, requestInitiatedTenantDomain,
+                                Collections.singletonList("internal_config_view"));
             }
         } catch (IdentityOAuth2Exception | OrganizationManagementException e) {
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
                     .ERROR_CODE_ERROR_RETRIEVING_CONFIGS, null);
         }
 
+        RealmConfig realmConfig = null;
+        if (isUerAuthorizedToViewInternalConfig) {
+            try {
+                if (userRealm != null && userRealm.getRealmConfiguration() != null) {
+                    realmConfig = new RealmConfig();
+                    realmConfig.adminUser(userRealm.getRealmConfiguration().getAdminUserName());
+                    realmConfig.adminRole(userRealm.getRealmConfiguration().getAdminRoleName());
+                    realmConfig.everyoneRole(userRealm.getRealmConfiguration().getEveryOneRoleName());
+                }
+            } catch (UserStoreException e) {
+                log.error("Error while retrieving user-realm information.", e);
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
+                        .ERROR_CODE_ERROR_RETRIEVING_CONFIGS, null);
+            }
+        }
         String idleSessionTimeout = null;
         IdentityProviderProperty idleSessionProp = IdentityApplicationManagementUtil.getProperty(
                 residentIdP.getIdpProperties(), IdentityApplicationConstants.SESSION_IDLE_TIME_OUT);
@@ -300,8 +298,10 @@ public class ServerConfigManagementService {
         serverConfig.setHomeRealmIdentifiers(homeRealmIdentifiers);
         serverConfig.setProvisioning(buildProvisioningConfig());
         serverConfig.setAuthenticators(getAuthenticators(null));
-        serverConfig.setCors(getCORSConfiguration());
-        serverConfig.setDcr(getDCRConfiguration());
+        if (isUerAuthorizedToViewInternalConfig) {
+            serverConfig.setCors(getCORSConfiguration());
+            serverConfig.setDcr(getDCRConfiguration());
+        }
         return serverConfig;
     }
 
