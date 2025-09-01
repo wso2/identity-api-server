@@ -451,7 +451,8 @@ public class ServerConfigManagementService {
         try {
             impersonationConfigMgtService.deleteImpersonationConfig(tenantDomain);
         } catch (ImpersonationConfigMgtException e) {
-            throw handleImpersonationConfigException(e, Constants.ErrorMessage.ERROR_CODE_IMP_CONFIG_DELETE, null);
+            throw handleImpersonationConfigException(e, Constants.ErrorMessage.ERROR_CODE_IMP_CONFIG_DELETE,
+                    tenantDomain);
         }
     }
 
