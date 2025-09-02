@@ -74,6 +74,7 @@ public class FlowExecutionServiceCore {
 
             return flowExecutionResponse
                     .flowId(flowExecutionStep.getFlowId())
+                    .flowType(flowExecutionStep.getFlowType())
                     .flowStatus(flowExecutionStep.getFlowStatus())
                     .type(FlowExecutionResponse.TypeEnum.valueOf(flowExecutionStep.getStepType()))
                     .data(Utils.convertToData(flowExecutionStep.getData(), flowExecutionStep.getStepType()));
