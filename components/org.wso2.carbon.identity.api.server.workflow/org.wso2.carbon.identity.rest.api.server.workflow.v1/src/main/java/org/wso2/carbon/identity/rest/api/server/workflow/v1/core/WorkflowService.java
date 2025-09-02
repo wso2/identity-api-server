@@ -140,7 +140,7 @@ public class WorkflowService {
             workflowManagementService.addWorkflow(currentWorkflow, parameterList,
                     CarbonContext.getThreadLocalCarbonContext().getTenantId());
             // Update the corresponding approval tasks if there are any.
-            approvalEventService.updateApprovalTasksOnWorkflowUpdate(workflowId, parameterList, oldPrameterList);
+            approvalEventService.updatePendingApprovalTasksOnWorkflowUpdate(workflowId, parameterList, oldPrameterList);
             return getWorkflow(workflowId);
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_UPDATING_WORKFLOW, workflowId, e);
