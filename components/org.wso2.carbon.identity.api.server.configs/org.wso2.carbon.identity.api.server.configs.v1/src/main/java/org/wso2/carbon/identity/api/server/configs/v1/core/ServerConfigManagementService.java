@@ -27,6 +27,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.checkerframework.checker.units.qual.A;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
@@ -85,6 +86,7 @@ import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.base.AuthenticatorPropertyConstants;
 import org.wso2.carbon.identity.core.ServiceURLBuilder;
 import org.wso2.carbon.identity.core.URLBuilderException;
+import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceClientException;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceException;
@@ -149,6 +151,7 @@ public class ServerConfigManagementService {
     private final ImpersonationConfigMgtService impersonationConfigMgtService;
     private final JWTClientAuthenticatorMgtService jwtClientAuthenticatorMgtService;
     private final DCRConfigurationMgtService dcrConfigurationMgtService;
+    private static final String AUTHENTICATED_USER = "authenticatedUser";
 
     private static final Log log = LogFactory.getLog(ServerConfigManagementService.class);
 
@@ -234,43 +237,7 @@ public class ServerConfigManagementService {
 
         IdentityProvider residentIdP = getResidentIdP();
 
-        UserRealm userRealm = CarbonContext.getThreadLocalCarbonContext().getUserRealm();
-
-        String requestInitiatedTenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-        String userId = CarbonContext.getThreadLocalCarbonContext().getUserId();
-        String userResidentOrganizationId = CarbonContext.getThreadLocalCarbonContext().getUserResidentOrganizationId();
-        boolean isUerAuthorizedToViewInternalConfig;
-        try {
-            boolean isSubOrganization = OrganizationManagementUtil.isOrganization(requestInitiatedTenantDomain);
-            if (isSubOrganization) {
-                isUerAuthorizedToViewInternalConfig =
-                        AuthzUtil.isUserAuthorized(userId, userResidentOrganizationId, requestInitiatedTenantDomain,
-                                Collections.singletonList("internal_org_config_view"));
-            } else {
-                isUerAuthorizedToViewInternalConfig =
-                        AuthzUtil.isUserAuthorized(userId, userResidentOrganizationId, requestInitiatedTenantDomain,
-                                Collections.singletonList("internal_config_view"));
-            }
-        } catch (IdentityOAuth2Exception | OrganizationManagementException e) {
-            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
-                    .ERROR_CODE_ERROR_RETRIEVING_CONFIGS, null);
-        }
-
-        RealmConfig realmConfig = null;
-        if (isUerAuthorizedToViewInternalConfig) {
-            try {
-                if (userRealm != null && userRealm.getRealmConfiguration() != null) {
-                    realmConfig = new RealmConfig();
-                    realmConfig.adminUser(userRealm.getRealmConfiguration().getAdminUserName());
-                    realmConfig.adminRole(userRealm.getRealmConfiguration().getAdminRoleName());
-                    realmConfig.everyoneRole(userRealm.getRealmConfiguration().getEveryOneRoleName());
-                }
-            } catch (UserStoreException e) {
-                log.error("Error while retrieving user-realm information.", e);
-                throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
-                        .ERROR_CODE_ERROR_RETRIEVING_CONFIGS, null);
-            }
-        }
+        RealmConfig realmConfig = getRealmConfig();
         String idleSessionTimeout = null;
         IdentityProviderProperty idleSessionProp = IdentityApplicationManagementUtil.getProperty(
                 residentIdP.getIdpProperties(), IdentityApplicationConstants.SESSION_IDLE_TIME_OUT);
@@ -298,11 +265,69 @@ public class ServerConfigManagementService {
         serverConfig.setHomeRealmIdentifiers(homeRealmIdentifiers);
         serverConfig.setProvisioning(buildProvisioningConfig());
         serverConfig.setAuthenticators(getAuthenticators(null));
-        if (isUerAuthorizedToViewInternalConfig) {
-            serverConfig.setCors(getCORSConfiguration());
-            serverConfig.setDcr(getDCRConfiguration());
-        }
+        serverConfig.setCors(getCORSConfiguration());
+        serverConfig.setDcr(getDCRConfiguration());
         return serverConfig;
+    }
+
+    private RealmConfig getRealmConfig() {
+
+        RealmConfig realmConfig = null;
+        AuthenticatedUser authenticatedUser = getAuthenticatedUser();
+        if (authenticatedUser == null) {
+            return null;
+        }
+        String requestInitiatedTenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        try {
+            boolean isSubOrganization = OrganizationManagementUtil.isOrganization(requestInitiatedTenantDomain);
+            boolean isUerAuthorizedToViewAdminUserName =
+                    checkUserAuthorization(authenticatedUser, isSubOrganization, "user_mgt_view");
+            boolean isUerAuthorizedToViewRolesInRealmConfig =
+                    checkUserAuthorization(authenticatedUser, isSubOrganization, "role_mgt_view");
+            if (isUerAuthorizedToViewAdminUserName || isUerAuthorizedToViewRolesInRealmConfig) {
+                UserRealm userRealm = CarbonContext.getThreadLocalCarbonContext().getUserRealm();
+                if (userRealm != null && userRealm.getRealmConfiguration() != null) {
+                    realmConfig = new RealmConfig();
+                    if (isUerAuthorizedToViewAdminUserName) {
+                        realmConfig.adminUser(userRealm.getRealmConfiguration().getAdminUserName());
+                    }
+                    if (isUerAuthorizedToViewRolesInRealmConfig) {
+                        realmConfig.adminRole(userRealm.getRealmConfiguration().getAdminRoleName());
+                        realmConfig.everyoneRole(userRealm.getRealmConfiguration().getEveryOneRoleName());
+                    }
+                }
+            }
+            return realmConfig;
+        } catch (IdentityOAuth2Exception e) {
+            log.error("Error while checking user authorization.", e);
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
+                    .ERROR_CODE_ERROR_RETRIEVING_CONFIGS, null);
+        } catch (UserStoreException e) {
+            log.error("Error while retrieving user-realm information.", e);
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
+                    .ERROR_CODE_ERROR_RETRIEVING_CONFIGS, null);
+        } catch (OrganizationManagementException e) {
+            log.error("Error while resolving organization id of tenant domain " + requestInitiatedTenantDomain, e);
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
+                    .ERROR_CODE_ERROR_RETRIEVING_CONFIGS, null);
+        }
+    }
+
+    private AuthenticatedUser getAuthenticatedUser() {
+
+        Map<String, Object> threadLocalProperties = IdentityUtil.threadLocalProperties.get();
+        if (threadLocalProperties != null &&
+                threadLocalProperties.get(AUTHENTICATED_USER) instanceof AuthenticatedUser) {
+            return (AuthenticatedUser) threadLocalProperties.get(AUTHENTICATED_USER);
+        }
+        return null;
+    }
+
+    private boolean checkUserAuthorization(AuthenticatedUser authenticatedUser, boolean isSubOrganization,
+                                           String permission) throws IdentityOAuth2Exception {
+
+        String permissionPrefix = isSubOrganization ? "internal_org_" : "internal_";
+        return AuthzUtil.isUserAuthorized(authenticatedUser, Collections.singletonList(permissionPrefix + permission));
     }
 
     /**
