@@ -89,6 +89,7 @@ components:
       type: object
       required:
         - flowId
+        - flowType
         - flowStatus
         - type
       properties:
@@ -96,6 +97,10 @@ components:
           type: string
           description: Unique identifier for the flow execution
           example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        flowType:
+          type: string
+          description: Unique identifier to identify the flow type
+          example: REGISTRATION
         flowStatus:
           type: string
           example: INCOMPLETE

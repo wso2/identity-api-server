@@ -25,12 +25,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
-import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
 import org.wso2.carbon.identity.api.server.flow.execution.common.FlowExecutionServiceHolder;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.Component;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.Data;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.FlowExecutionRequest;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.constants.FlowExecutionEndpointConstants;
+import org.wso2.carbon.identity.api.server.flow.execution.v1.model.FlowExecutionErrorDTO;
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 import org.wso2.carbon.identity.flow.execution.engine.exception.FlowEngineClientException;
@@ -88,9 +88,9 @@ public class Utils {
      * @return APIError object.
      */
     public static APIError handleException(Response.Status status, String errorCode,
-                                           String message, String description) {
+                                           String message, String description, String flowType) {
 
-        return new APIError(status, getError(errorCode, message, description));
+        return new APIError(status, getError(errorCode, message, description, flowType));
     }
 
     /**
@@ -111,7 +111,7 @@ public class Utils {
         String errorCode = e.getErrorCode();
         errorCode = errorCode.contains(ERROR_CODE_DELIMITER) ? errorCode :
                 FlowExecutionEndpointConstants.REGISTRATION_FLOW_PREFIX + errorCode;
-        return handleException(status, errorCode, e.getMessage(), e.getDescription());
+        return handleException(status, errorCode, e.getMessage(), e.getDescription(), e.getFlowType());
     }
 
     /**
@@ -132,7 +132,7 @@ public class Utils {
                     !isShowUsernameUnavailabilityEnabled(tenantDomain)) {
                 return handleException(status, ERROR_CODE_INVALID_USER_INPUT.getCode(),
                         ERROR_CODE_INVALID_USER_INPUT.getMessage(),
-                        ERROR_CODE_INVALID_USER_INPUT.getDescription());
+                        ERROR_CODE_INVALID_USER_INPUT.getDescription(), e.getFlowType());
             }
         } else {
             LOG.error(e.getMessage(), e);
@@ -140,7 +140,7 @@ public class Utils {
         // handle NPE when confirmation code expired
         errorCode = errorCode.contains(ERROR_CODE_DELIMITER) ? errorCode :
                 FlowExecutionEndpointConstants.REGISTRATION_FLOW_PREFIX + errorCode;
-        return handleException(status, errorCode, e.getMessage(), e.getDescription());
+        return handleException(status, errorCode, e.getMessage(), e.getDescription(), e.getFlowType());
     }
 
     /**
@@ -151,12 +151,14 @@ public class Utils {
      * @param errorDescription Error description.
      * @return A generic error with the specified details.
      */
-    public static ErrorDTO getError(String errorCode, String errorMessage, String errorDescription) {
+    public static FlowExecutionErrorDTO getError(String errorCode, String errorMessage, String errorDescription,
+                                                 String flowType) {
 
-        ErrorDTO error = new ErrorDTO();
+        FlowExecutionErrorDTO error = new FlowExecutionErrorDTO();
         error.setCode(errorCode);
         error.setMessage(errorMessage);
         error.setDescription(errorDescription);
+        error.setFlowType(flowType);
         return error;
     }
 
