@@ -135,12 +135,16 @@ public class WorkflowService {
             currentWorkflow = createWorkflow(workflow, workflowId);
             List<WorkflowTemplateParameters> templateProperties = workflow.getTemplate().getSteps();
             List<Parameter> parameterList = createParameterList(workflowId, templateProperties);
+            List<Parameter> oldPrameterList =
+                    workflowManagementService.getWorkflowParameters(workflowId);
             workflowManagementService.addWorkflow(currentWorkflow, parameterList,
                     CarbonContext.getThreadLocalCarbonContext().getTenantId());
+            // Update the corresponding approval tasks if there are any.
+            approvalEventService.updatePendingApprovalTasksOnWorkflowUpdate(workflowId, parameterList, oldPrameterList);
             return getWorkflow(workflowId);
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_UPDATING_WORKFLOW, workflowId, e);
-        } catch (WorkflowException e) {
+        } catch (WorkflowException | WorkflowEngineException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_WORKFLOW, workflowId, e);
         }
     }

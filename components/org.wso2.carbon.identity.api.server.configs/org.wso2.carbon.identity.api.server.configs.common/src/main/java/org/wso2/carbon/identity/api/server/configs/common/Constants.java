@@ -205,7 +205,10 @@ public class Constants {
                 "Server encountered an error while deleting the SAML inbound auth configs."),
         ERROR_CODE_ERROR_PASSIVE_STS_INBOUND_AUTH_CONFIG_DELETE("65021",
                 "Unable to delete Passive STS inbound auth configs.",
-                "Server encountered an error while deleting the Passive STS inbound auth configs.");
+                "Server encountered an error while deleting the Passive STS inbound auth configs."),
+        ERROR_CODE_IMP_CONFIG_DELETE("65022",
+                "Unable to delete Impersonation configuration.",
+                "Server encountered an error while deleting the Impersonation configuration of %s.");
 
         private final String code;
         private final String message;
