@@ -49,7 +49,7 @@ public enum DataType {
      */
     DATE("date"),
     /**
-     * Time data type.
+     * Epoch timestamp data type.
      */
     EPOCH("epoch"),
     /**
