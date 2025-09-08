@@ -1909,7 +1909,7 @@ public class ServerClaimManagementService {
                 break;
             }
             case INPUT_TYPE_DATE_PICKER:
-                if (!DataType.DATE_TIME.equals(dataType)) {
+                if (!DataType.DATE.equals(dataType)) {
                     handleInputFormatClientException("Input format: date_picker can be used with date data type.");
                 }
                 break;
