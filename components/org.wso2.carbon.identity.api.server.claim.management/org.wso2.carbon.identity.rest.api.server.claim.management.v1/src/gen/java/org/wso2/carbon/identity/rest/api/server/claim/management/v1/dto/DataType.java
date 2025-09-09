@@ -45,6 +45,14 @@ public enum DataType {
      */
     DATE_TIME("date_time"),
     /**
+     * Date data type.
+     */
+    DATE("date"),
+    /**
+     * Epoch timestamp data type.
+     */
+    EPOCH("epoch"),
+    /**
      * Complex data type.
      */
     COMPLEX("complex");
