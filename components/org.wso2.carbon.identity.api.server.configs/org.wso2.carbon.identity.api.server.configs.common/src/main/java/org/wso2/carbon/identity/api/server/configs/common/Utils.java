@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.configs.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
 import org.wso2.carbon.identity.claim.metadata.mgt.model.ExternalClaim;
 
@@ -27,6 +29,8 @@ import java.util.List;
  * Utility class for Configs Service.
  */
 public class Utils {
+
+    private static final Log log = LogFactory.getLog(Utils.class);
 
     private Utils() {}
 
@@ -40,10 +44,21 @@ public class Utils {
     public static List<ExternalClaim> getExternalClaims(String externalClaimDialect, String tenantDomain)
             throws ClaimMetadataException {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving external claims for dialect: " + externalClaimDialect +
+                    " in tenant domain: " + tenantDomain);
+        }
         try {
-            return ConfigsServiceHolder.getClaimMetadataManagementService().
+            List<ExternalClaim> externalClaims = ConfigsServiceHolder.getClaimMetadataManagementService().
                     getExternalClaims(externalClaimDialect, tenantDomain);
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully retrieved " + (externalClaims != null ? externalClaims.size() : 0) +
+                        " external claims for dialect: " + externalClaimDialect);
+            }
+            return externalClaims;
         } catch (ClaimMetadataException e) {
+            log.error("Error while retrieving external claims for dialect: " + externalClaimDialect +
+                    " in tenant domain: " + tenantDomain, e);
             throw new ClaimMetadataException("Error while retrieving external claims.", e);
         }
     }

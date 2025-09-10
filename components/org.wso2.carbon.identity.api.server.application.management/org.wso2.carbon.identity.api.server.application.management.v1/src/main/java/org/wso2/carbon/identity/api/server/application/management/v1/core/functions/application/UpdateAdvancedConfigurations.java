@@ -20,6 +20,8 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 
 import com.google.gson.Gson;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.Certificate;
@@ -44,6 +46,7 @@ import static org.wso2.carbon.identity.api.server.application.management.v1.core
  */
 public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvider, AdvancedApplicationConfiguration> {
 
+    private static final Log log = LogFactory.getLog(UpdateAdvancedConfigurations.class);
     public static final String TYPE_JWKS = "JWKS";
     public static final String TYPE_PEM = "PEM";
 
@@ -51,6 +54,10 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
     public void apply(ServiceProvider serviceProvider,
                       AdvancedApplicationConfiguration advancedConfigurations) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating advanced configurations for application: " + 
+                serviceProvider.getApplicationName());
+        }
         if (advancedConfigurations != null) {
             handleAdditionalSpProperties(advancedConfigurations.getAdditionalSpProperties());
             setIfNotNull(advancedConfigurations.getSaas(), serviceProvider::setSaasApp);
@@ -87,6 +94,10 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
             }
             handleTrustedAppConfigurations(advancedConfigurations.getTrustedAppConfiguration(), serviceProvider);
             updateCertificate(advancedConfigurations.getCertificate(), serviceProvider);
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully updated advanced configurations for application: " + 
+                    serviceProvider.getApplicationName());
+            }
         }
     }
 
@@ -152,6 +163,9 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
     private void updateCertificate(Certificate certificate, ServiceProvider serviceProvider) {
 
         if (certificate != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Updating certificate configuration with type: " + certificate.getType());
+            }
             if (TYPE_PEM.equals(certificate.getType())) {
                 setIfNotNull(certificate.getValue(), serviceProvider::setCertificateContent);
                 serviceProvider.setJwksUri(null);
@@ -166,6 +180,7 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
 
         // `additionalSpProperties` not yet supported.
         if (!CollectionUtils.isEmpty(spAdditionalProperties)) {
+            log.warn("Additional SP properties are not yet supported. Request will be rejected.");
             throw buildBadRequestError(ADDITIONAL_SP_PROP_NOT_SUPPORTED.getCode(),
                     ADDITIONAL_SP_PROP_NOT_SUPPORTED.getDescription());
         }

@@ -17,6 +17,8 @@
 package org.wso2.carbon.identity.api.server.common;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.slf4j.MDC;
 
 import java.nio.charset.StandardCharsets;
@@ -30,6 +32,7 @@ import java.util.UUID;
  */
 public class Util {
 
+    private static final Log LOG = LogFactory.getLog(Util.class);
     private static final String PAGE_LINK_REL_NEXT = "next";
     private static final String PAGE_LINK_REL_PREVIOUS = "previous";
     private static final String PAGINATION_LINK_FORMAT = Constants.V1_API_PATH_COMPONENT
@@ -44,9 +47,14 @@ public class Util {
         String ref;
         if (isCorrelationIDPresent()) {
             ref = MDC.get(Constants.CORRELATION_ID_MDC);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Retrieved existing correlation ID from MDC.");
+            }
         } else {
             ref = UUID.randomUUID().toString();
-
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Generated new correlation ID as none was present in MDC.");
+            }
         }
         return ref;
     }
@@ -68,6 +76,9 @@ public class Util {
      */
     public static String base64URLEncode(String value) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Performing Base64 URL encoding.");
+        }
         return Base64.getUrlEncoder()
                 .withoutPadding()
                 .encodeToString(value.getBytes(StandardCharsets.UTF_8));
@@ -81,6 +92,9 @@ public class Util {
      */
     public static String base64URLDecode(String value) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Performing Base64 URL decoding.");
+        }
         return new String(
                 Base64.getUrlDecoder().decode(value),
                 StandardCharsets.UTF_8);
@@ -100,6 +114,10 @@ public class Util {
     public static Map<String, String> buildPaginationLinks(int limit, int currentOffset, int totalResultsFromSearch,
                                                            String servicePathComponent) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Building pagination links with limit: %d, offset: %d, total: %d", 
+                    limit, currentOffset, totalResultsFromSearch));
+        }
         Map<String, String> links = new HashMap<>();
 
         // Next link.
@@ -143,6 +161,11 @@ public class Util {
                                                            String servicePathComponent, String requiredAttributes,
                                                            String filter) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Building pagination links with limit: %d, offset: %d, total: %d, " +
+                    "attributes: %s, filter: %s", limit, currentOffset, totalResultsFromSearch, 
+                    requiredAttributes != null ? "[provided]" : "null", filter != null ? "[provided]" : "null"));
+        }
         Map<String, String> links = new HashMap<>();
 
         StringBuilder otherParams = new StringBuilder();
@@ -203,12 +226,20 @@ public class Util {
      */
     public static String getMediaType(String fileType) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Resolving media type for file type: " + (fileType != null ? fileType : "null"));
+        }
+        
         if (containsValidMediaType(fileType, Constants.VALID_MEDIA_TYPES_XML)) {
             return Constants.MEDIA_TYPE_XML;
         } else if (containsValidMediaType(fileType, Constants.VALID_MEDIA_TYPES_JSON)) {
             return Constants.MEDIA_TYPE_JSON;
         } else if (containsValidMediaType(fileType, Constants.VALID_MEDIA_TYPES_YAML)) {
             return Constants.MEDIA_TYPE_YAML;
+        }
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Unsupported media type for file type: " + (fileType != null ? fileType : "null"));
         }
         return Constants.MEDIA_TYPE_UNSUPPORTED;
     }

@@ -15,6 +15,8 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundSCIMProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.OutboundProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
@@ -35,9 +37,15 @@ import static org.wso2.carbon.identity.api.server.application.management.v1.core
  */
 public class UpdateProvisioningConfiguration implements UpdateFunction<ServiceProvider, ProvisioningConfiguration> {
 
+    private static final Log log = LogFactory.getLog(UpdateProvisioningConfiguration.class);
+
     @Override
     public void apply(ServiceProvider application, ProvisioningConfiguration provisioningConfigApiModel) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating provisioning configuration for application: " + 
+                (application != null ? application.getApplicationName() : "null"));
+        }
         if (provisioningConfigApiModel != null) {
             InboundSCIMProvisioningConfiguration inboundProvisioningModel =
                     provisioningConfigApiModel.getInboundProvisioning();
@@ -60,6 +68,10 @@ public class UpdateProvisioningConfiguration implements UpdateFunction<ServicePr
                 outboundProvisioningConfig.setProvisioningIdentityProviders(identityProviders);
 
                 application.setOutboundProvisioningConfig(outboundProvisioningConfig);
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully updated provisioning configuration for application: " + 
+                    (application != null ? application.getApplicationName() : "null"));
             }
         }
     }

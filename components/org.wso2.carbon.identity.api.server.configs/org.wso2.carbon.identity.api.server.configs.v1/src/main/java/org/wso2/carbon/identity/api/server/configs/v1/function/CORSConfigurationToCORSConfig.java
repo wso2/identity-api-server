@@ -19,6 +19,8 @@
 
 package org.wso2.carbon.identity.api.server.configs.v1.function;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
 import org.wso2.carbon.identity.cors.mgt.core.model.CORSConfiguration;
 
@@ -31,8 +33,14 @@ import java.util.function.Function;
  */
 public class CORSConfigurationToCORSConfig implements Function<CORSConfiguration, CORSConfig> {
 
+    private static final Log log = LogFactory.getLog(CORSConfigurationToCORSConfig.class);
+
     @Override
     public CORSConfig apply(CORSConfiguration corsConfiguration) {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Converting CORSConfiguration to CORSConfig.");
+        }
 
         CORSConfig corsConfig = new CORSConfig();
         corsConfig.setAllowGenericHttpRequests(corsConfiguration.isAllowGenericHttpRequests());

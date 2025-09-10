@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.branding.preference.management.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.core.BrandingAIPreferenceManagementService;
 
 /**
@@ -25,10 +27,14 @@ import org.wso2.carbon.identity.api.server.branding.preference.management.v1.cor
  */
 public class BrandingAIPreferenceManagementServiceFactory {
 
+    private static final Log log = LogFactory.getLog(BrandingAIPreferenceManagementServiceFactory.class);
     private static final BrandingAIPreferenceManagementService SERVICE;
 
     static {
         SERVICE = new BrandingAIPreferenceManagementService();
+        if (log.isDebugEnabled()) {
+            log.debug("BrandingAIPreferenceManagementService initialized successfully.");
+        }
     }
 
     public static BrandingAIPreferenceManagementService getBrandingAIPreferenceManagementService() {

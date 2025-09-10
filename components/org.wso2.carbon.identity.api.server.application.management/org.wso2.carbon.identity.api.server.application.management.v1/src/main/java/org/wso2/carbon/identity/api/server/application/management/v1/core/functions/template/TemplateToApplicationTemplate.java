@@ -20,6 +20,8 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplateModel;
@@ -36,9 +38,18 @@ import static org.wso2.carbon.identity.api.server.application.management.v1.core
  */
 public class TemplateToApplicationTemplate implements Function<Template, ApplicationTemplateModel> {
 
+    private static final Log log = LogFactory.getLog(TemplateToApplicationTemplate.class);
+
     @Override
     public ApplicationTemplateModel apply(Template template) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Converting template to application template: " + 
+                (template != null ? template.getTemplateName() : "null"));
+        }
+        if (template == null) {
+            return null;
+        }
         ApplicationTemplateModel applicationTemplate = new ApplicationTemplateModel();
         applicationTemplate.setName(template.getTemplateName());
         applicationTemplate.setId(template.getTemplateId());
@@ -83,6 +94,7 @@ public class TemplateToApplicationTemplate implements Function<Template, Applica
         try {
             return mapper.readValue(applicationTemplate, ApplicationModel.class);
         } catch (IOException e) {
+            log.error("Error occurred while parsing application template script", e);
             throw buildServerError(
                     ApplicationManagementConstants.ErrorMessage.ERROR_RESOLVING_APPLICATION_TEMPLATE.getCode(),
                     ApplicationManagementConstants.ErrorMessage.ERROR_RESOLVING_APPLICATION_TEMPLATE.getMessage(),

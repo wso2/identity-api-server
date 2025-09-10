@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.asynchronous.operation.status.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.framework.async.operation.status.mgt.api.service.AsyncOperationStatusMgtService;
 
@@ -25,6 +27,8 @@ import org.wso2.carbon.identity.framework.async.operation.status.mgt.api.service
  * Service holder for the async operation status management API component.
  */
 public class AsyncOperationStatusMgtServiceHolder {
+
+    private static final Log log = LogFactory.getLog(AsyncOperationStatusMgtServiceHolder.class);
 
     private AsyncOperationStatusMgtServiceHolder() {
 
@@ -44,6 +48,15 @@ public class AsyncOperationStatusMgtServiceHolder {
      */
     public static AsyncOperationStatusMgtService getAsyncOperationStatusMgtService() {
 
-        return ServiceHolder.SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving AsyncOperationStatusMgtService from service holder.");
+        }
+        
+        AsyncOperationStatusMgtService service = ServiceHolder.SERVICE;
+        if (service == null) {
+            log.warn("AsyncOperationStatusMgtService is not available.");
+        }
+        
+        return service;
     }
 }

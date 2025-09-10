@@ -19,6 +19,8 @@
 package org.wso2.carbon.identity.api.server.branding.preference.management.v1.impl;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.BrandingPreferenceApiService;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.core.BrandingPreferenceManagementService;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.factories.BrandingAIPreferenceManagementServiceFactory;
@@ -56,6 +58,7 @@ import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenant
  */
 public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiService {
 
+    private static final Log log = LogFactory.getLog(BrandingPreferenceApiServiceImpl.class);
     private final BrandingPreferenceManagementService brandingPreferenceManagementService;
 
     //TODO: Improve API to manage application level & language level theming resources in addition to the tenant level.
@@ -73,6 +76,9 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
     public Response addBrandingPreference(BrandingPreferenceModel brandingPreferenceModel) {
 
         if (StringUtils.isBlank(brandingPreferenceModel.getType().toString())) {
+            if (log.isDebugEnabled()) {
+                log.debug("Invalid request: Branding preference type is blank.");
+            }
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         if (!(ORGANIZATION_TYPE.equals(brandingPreferenceModel.getType().toString()) ||
@@ -104,6 +110,9 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
 
         if (StringUtils.isBlank(customTextModel.getType().toString())
                 || StringUtils.isBlank(customTextModel.getScreen())) {
+            if (log.isDebugEnabled()) {
+                log.debug("Invalid request: Custom text type or screen is blank.");
+            }
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         if (!ORGANIZATION_TYPE.equals(customTextModel.getType().toString())) {
@@ -137,6 +146,9 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
 
         if (type != null) {
             if (!(ORGANIZATION_TYPE.equals(type) || APPLICATION_TYPE.equals(type) || CUSTOM_TYPE.equals(type))) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Invalid request: Invalid type provided for branding preference deletion: " + type);
+                }
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
             if (!(ORGANIZATION_TYPE.equals(type) || APPLICATION_TYPE.equals(type))) {
@@ -170,12 +182,18 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
         if (StringUtils.isBlank(type)) {
             type = ORGANIZATION_TYPE;
         } else if (!(ORGANIZATION_TYPE.equals(type) || APPLICATION_TYPE.equals(type) || CUSTOM_TYPE.equals(type))) {
+            if (log.isDebugEnabled()) {
+                log.debug("Invalid request: Invalid type provided for custom text deletion: " + type);
+            }
             return Response.status(Response.Status.BAD_REQUEST).build();
         } else if (!ORGANIZATION_TYPE.equals(type)) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
         if (StringUtils.isBlank(screen)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Invalid request: Screen parameter is blank for custom text deletion.");
+            }
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         if (StringUtils.isBlank(locale)) {
