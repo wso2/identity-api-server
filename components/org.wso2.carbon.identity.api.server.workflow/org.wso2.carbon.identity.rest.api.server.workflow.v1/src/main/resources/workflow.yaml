@@ -945,6 +945,7 @@ components:
       type: string
       enum:
         - ADD_USER
+        - SELF_REGISTER_USER
         - DELETE_USER
         - UPDATE_ROLES_OF_USERS
         - ADD_ROLE
