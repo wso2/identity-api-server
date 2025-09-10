@@ -16,6 +16,9 @@
 
 package org.wso2.carbon.identity.api.server.claim.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -247,6 +250,7 @@ public class Constant {
                 "The attribute: %s is not a string data type and canonical values are only supported for " +
                         "string data type.");
 
+        private static final Log log = LogFactory.getLog(ErrorMessage.class);
         private final String code;
         private final String message;
         private final String description;
@@ -296,9 +300,14 @@ public class Constant {
 
             try {
                 String errorCode = resourceBundle.getString(serverCode);
+                if (log.isDebugEnabled()) {
+                    log.debug("Successfully mapped server error code: " + serverCode + " to error code: " + errorCode);
+                }
                 return messageIndex.get(errorCode);
             } catch (Throwable e) {
-                // Ignore if error mapping has invalid input.
+                if (log.isDebugEnabled()) {
+                    log.debug("Failed to map server error code: " + serverCode + ". Using default error code.", e);
+                }
             }
             return ErrorMessage.ERROR_CODE_INVALID_INPUT;
         }
