@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.organization.management.v1.exceptions;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.Error;
 
 import javax.ws.rs.WebApplicationException;
@@ -30,14 +32,23 @@ import javax.ws.rs.core.Response;
  */
 public class OrganizationManagementEndpointException extends WebApplicationException {
 
+    private static final Log LOG = LogFactory.getLog(OrganizationManagementEndpointException.class);
+
     public OrganizationManagementEndpointException(Response.Status status, Error error) {
 
         super(Response.status(status).entity(error).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .build());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Organization management endpoint exception created with status: " + status + 
+                    " and error code: " + (error != null ? error.getCode() : "null"));
+        }
     }
 
     public OrganizationManagementEndpointException(Response.Status status) {
 
         super(Response.status(status).build());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Organization management endpoint exception created with status: " + status);
+        }
     }
 }
