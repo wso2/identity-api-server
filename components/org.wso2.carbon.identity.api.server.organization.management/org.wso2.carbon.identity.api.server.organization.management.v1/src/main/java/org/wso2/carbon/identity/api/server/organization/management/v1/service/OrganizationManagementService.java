@@ -121,9 +121,13 @@ public class OrganizationManagementService {
                                          OrganizationManager organizationManager,
                                          OrganizationDiscoveryManager organizationDiscoveryManager) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Creating OrganizationManagementService instance");
+        }
         this.orgApplicationManager = orgApplicationManager;
         this.organizationManager = organizationManager;
         this.organizationDiscoveryManager = organizationDiscoveryManager;
+        LOG.info("OrganizationManagementService initialized successfully");
     }
 
     /**
@@ -139,6 +143,10 @@ public class OrganizationManagementService {
     public Response getOrganizations(String filter, Integer limit, String after, String before, Boolean recursive) {
 
         try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Retrieving organizations with parameters - filter: " + filter + ", limit: " + limit + 
+                        ", recursive: " + recursive);
+            }
             limit = validateLimit(limit);
             String sortOrder = StringUtils.isNotBlank(before) ? ASC_SORT_ORDER : DESC_SORT_ORDER;
             List<Organization> organizations = organizationManager.getOrganizationsList(limit + 1, after,
@@ -194,7 +202,11 @@ public class OrganizationManagementService {
     public Response deleteOrganization(String organizationId) {
 
         try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Deleting organization with ID: " + organizationId);
+            }
             organizationManager.deleteOrganization(organizationId);
+            LOG.info("Organization deleted successfully with ID: " + organizationId);
             return Response.noContent().build();
         } catch (OrganizationManagementClientException e) {
             return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);
@@ -273,9 +285,19 @@ public class OrganizationManagementService {
     public Response addOrganization(OrganizationPOSTRequest organizationPOSTRequest) {
 
         try {
+            if (LOG.isDebugEnabled()) {
+                String orgName = organizationPOSTRequest != null ? organizationPOSTRequest.getName() : "null";
+                LOG.debug("Adding new organization with name: " + orgName);
+            }
+            if (organizationPOSTRequest == null) {
+                LOG.error("Organization POST request cannot be null");
+                return Response.status(Response.Status.BAD_REQUEST).entity("Invalid request payload").build();
+            }
             Organization organization = organizationManager.addOrganization(getOrganizationFromPostRequest
                     (organizationPOSTRequest));
             String organizationId = organization.getId();
+            LOG.info("Organization created successfully with ID: " + organizationId + 
+                    " and name: " + organization.getName());
             return Response.created(OrganizationManagementEndpointUtil.getResourceLocation(organizationId)).entity
                     (getOrganizationResponse(organization)).build();
         } catch (OrganizationManagementClientException e) {
@@ -313,15 +335,23 @@ public class OrganizationManagementService {
     private void validateApplicationSharePostRequestBody(ApplicationSharePOSTRequest requestBody)
             throws OrganizationManagementClientException {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Validating application share request body");
+        }
+        
         if (requestBody == null) {
+            LOG.warn("Application share request body is null");
             throw handleClientException(ERROR_CODE_INVALID_SHARE_APPLICATION_EMPTY_REQUEST_BODY);
         }
         if (requestBody.getShareWithAllChildren() == null && requestBody.getSharedOrganizations() == null) {
+            LOG.warn("Both shareWithAllChildren and sharedOrganizations are null in request body");
             throw handleClientException(ERROR_CODE_INVALID_SHARE_APPLICATION_EMPTY_REQUEST_BODY);
         }
         if (requestBody.getShareWithAllChildren() != null
                 && requestBody.getShareWithAllChildren()
                 && CollectionUtils.isNotEmpty(requestBody.getSharedOrganizations())) {
+            LOG.warn("Invalid application share request: shareWithAllChildren is true but " +
+                    "sharedOrganizations is also provided");
             throw handleClientException(ERROR_CODE_INVALID_SHARE_APPLICATION_REQUEST_BODY);
         }
     }
