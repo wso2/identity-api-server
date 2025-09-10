@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.action.management.v1.mapper;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.action.management.api.exception.ActionMgtServerException;
 import org.wso2.carbon.identity.action.management.api.model.Action;
 
@@ -25,6 +27,8 @@ import org.wso2.carbon.identity.action.management.api.model.Action;
  * Factory class to get the ActionMapper based on the action type.
  */
 public class ActionMapperFactory {
+
+    private static final Log LOG = LogFactory.getLog(ActionMapperFactory.class);
 
     /**
      * Get ActionMapper object based on the action type.
@@ -50,8 +54,9 @@ public class ActionMapperFactory {
         }
 
         if (actionMapper == null) {
-            throw new ActionMgtServerException("No Action Mapper found for the given action type: " +
-                    actionType.getDisplayName());
+            String errorMessage = "No Action Mapper found for the given action type: " + actionType.getDisplayName();
+            LOG.error(errorMessage);
+            throw new ActionMgtServerException(errorMessage);
         }
 
         return actionMapper;

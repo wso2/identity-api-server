@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.api.resource.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesApiService;
 import org.wso2.carbon.identity.api.server.api.resource.v1.core.AuthorizationDetailsTypeManagementService;
 import org.wso2.carbon.identity.api.server.api.resource.v1.factories.AuthorizationDetailsTypeManagementServiceFactory;
@@ -31,6 +33,7 @@ import static javax.ws.rs.core.Response.Status.NOT_FOUND;
  */
 public class AuthorizationDetailsTypesApiServiceImpl implements AuthorizationDetailsTypesApiService {
 
+    private static final Log LOG = LogFactory.getLog(AuthorizationDetailsTypesApiServiceImpl.class);
     private final AuthorizationDetailsTypeManagementService typeMgtService;
 
     public AuthorizationDetailsTypesApiServiceImpl() {
@@ -38,7 +41,9 @@ public class AuthorizationDetailsTypesApiServiceImpl implements AuthorizationDet
         try {
             this.typeMgtService = AuthorizationDetailsTypeManagementServiceFactory
                     .getAuthorizationDetailsTypeManagementService();
+            LOG.info("Authorization details types API service implementation initialized successfully.");
         } catch (IllegalStateException e) {
+            LOG.error("Failed to initialize authorization details types API service.", e);
             throw new RuntimeException("Error occurred while initiating AuthorizationDetailsTypeManagementService.", e);
         }
     }
@@ -46,12 +51,18 @@ public class AuthorizationDetailsTypesApiServiceImpl implements AuthorizationDet
     @Override
     public Response authorizationDetailsTypesGet(String filter) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Request received to get authorization details types with filter: " + filter);
+        }
         return Response.ok().entity(typeMgtService.getAllAuthorizationDetailsTypes(filter)).build();
     }
 
     @Override
     public Response isAuthorizationDetailsTypeExists(final String filter) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Request received to check authorization details type existence with filter: " + filter);
+        }
         return typeMgtService.isAuthorizationDetailsTypeExists(filter)
                 ? Response.ok().build()
                 : Response.status(NOT_FOUND).build();

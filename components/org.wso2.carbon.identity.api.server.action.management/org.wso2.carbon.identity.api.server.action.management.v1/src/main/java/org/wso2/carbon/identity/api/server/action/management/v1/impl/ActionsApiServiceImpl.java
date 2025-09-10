@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.action.management.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionsApiService;
 import org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants;
@@ -36,13 +38,18 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
  */
 public class ActionsApiServiceImpl implements ActionsApiService {
 
+    private static final Log LOG = LogFactory.getLog(ActionsApiServiceImpl.class);
     private final ServerActionManagementService serverActionManagementService;
 
     public ActionsApiServiceImpl() {
 
         try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Initializing Actions API service implementation.");
+            }
             this.serverActionManagementService = ActionManagementServiceFactory.getActionManagementService();
         } catch (IllegalStateException e) {
+            LOG.error("Error occurred while initiating server action management service.", e);
             throw new RuntimeException("Error occurred while initiating server action management service.", e);
         }
     }
@@ -50,35 +57,50 @@ public class ActionsApiServiceImpl implements ActionsApiService {
     @Override
     public Response activateAction(String actionType, String actionId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Activating action with type: " + actionType + " and id: " + actionId);
+        }
         return Response.ok().entity(serverActionManagementService.activateAction(actionType, actionId)).build();
     }
 
     @Override
     public Response createAction(String actionType, String body) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Creating action with type: " + actionType);
+        }
         ActionResponse actionResponse = serverActionManagementService.createAction(actionType, body);
         URI location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT +
                 ActionMgtEndpointConstants.ACTION_PATH_COMPONENT + "/" + actionResponse.getId());
+        LOG.info("Action created successfully with id: " + actionResponse.getId());
         return Response.created(location).entity(actionResponse).build();
     }
 
     @Override
     public Response deactivateAction(String actionType, String actionId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deactivating action with type: " + actionType + " and id: " + actionId);
+        }
         return Response.ok().entity(serverActionManagementService.deactivateAction(actionType, actionId)).build();
     }
 
     @Override
     public Response deleteAction(String actionType, String actionId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deleting action with type: " + actionType + " and id: " + actionId);
+        }
         serverActionManagementService.deleteAction(actionType, actionId);
+        LOG.info("Action deleted successfully with id: " + actionId);
         return Response.noContent().build();
     }
 
     @Override
     public Response getActionByActionId(String actionType, String actionId) {
 
-        return Response.ok().entity(serverActionManagementService.getActionByActionId(actionType, actionId)).build();
+        return Response.ok().entity(serverActionManagementService.getActionByActionId(actionType, 
+                actionId)).build();
     }
 
     @Override
@@ -96,6 +118,11 @@ public class ActionsApiServiceImpl implements ActionsApiService {
     @Override
     public Response updateAction(String actionType, String actionId, String body) {
 
-        return Response.ok().entity(serverActionManagementService.updateAction(actionType, actionId, body)).build();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating action with type: " + actionType + " and id: " + actionId);
+        }
+        ActionResponse response = serverActionManagementService.updateAction(actionType, actionId, body);
+        LOG.info("Action updated successfully with id: " + actionId);
+        return Response.ok().entity(response).build();
     }
 }

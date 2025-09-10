@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.api.resource.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.api.resource.v1.MetaApiService;
 import org.wso2.carbon.identity.api.server.api.resource.v1.core.ServerAPIResourceCollectionManagementService;
 import org.wso2.carbon.identity.api.server.api.resource.v1.factories.ServerAPIResourceCollectionManagementServiceFactory;
@@ -29,6 +31,7 @@ import javax.ws.rs.core.Response;
  */
 public class MetaApiServiceImpl implements MetaApiService {
 
+    private static final Log LOG = LogFactory.getLog(MetaApiServiceImpl.class);
     private final ServerAPIResourceCollectionManagementService serverAPIResourceManagementService;
 
     public MetaApiServiceImpl() {
@@ -36,7 +39,9 @@ public class MetaApiServiceImpl implements MetaApiService {
         try {
             this.serverAPIResourceManagementService = ServerAPIResourceCollectionManagementServiceFactory
                     .getServerAPIResourceCollectionManagementService();
+            LOG.info("Meta API service implementation initialized successfully.");
         } catch (IllegalStateException e) {
+            LOG.error("Failed to initialize meta API service.", e);
             throw new RuntimeException("Error occurred while initiating API resource collection management service.",
                     e);
         }
@@ -45,6 +50,9 @@ public class MetaApiServiceImpl implements MetaApiService {
     @Override
     public Response getAPIResourceCollectionByCollectionId(String collectionId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Request received to get API resource collection by ID: " + collectionId);
+        }
         return Response.ok().entity(
                 serverAPIResourceManagementService.getAPIResourceCollectionByCollectionId(collectionId)).build();
     }
@@ -52,6 +60,9 @@ public class MetaApiServiceImpl implements MetaApiService {
     @Override
     public Response getAPIResourceCollections(String filter, String attributes) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Request received to get API resource collections with filter: " + filter);
+        }
         return Response.ok().entity(serverAPIResourceManagementService.getAPIResourceCollections(filter, attributes))
                 .build();
     }
