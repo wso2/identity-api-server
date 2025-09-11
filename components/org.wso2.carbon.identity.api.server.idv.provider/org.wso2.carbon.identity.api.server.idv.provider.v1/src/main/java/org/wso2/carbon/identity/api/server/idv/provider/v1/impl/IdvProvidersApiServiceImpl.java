@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.idv.provider.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.idv.provider.v1.IdvProvidersApiService;
 import org.wso2.carbon.identity.api.server.idv.provider.v1.core.IdVProviderService;
@@ -37,13 +39,18 @@ import javax.ws.rs.core.Response;
  */
 public class IdvProvidersApiServiceImpl implements IdvProvidersApiService {
 
+    private static final Log log = LogFactory.getLog(IdvProvidersApiServiceImpl.class);
     private final IdVProviderService idVProviderService;
 
     public IdvProvidersApiServiceImpl() {
     
         try {
             this.idVProviderService = IdVProviderServiceFactory.getIdVProviderService();
+            if (log.isDebugEnabled()) {
+                log.debug("IdvProvidersApiServiceImpl initialized successfully.");
+            }
         } catch (IllegalStateException e) {
+            log.error("Error occurred while initiating IdVProviderService: " + e.getMessage(), e);
             throw new RuntimeException("Error occurred while initiating IdVProviderService.", e);
         }
     }
@@ -51,38 +58,77 @@ public class IdvProvidersApiServiceImpl implements IdvProvidersApiService {
     @Override
     public Response addIdVProvider(IdVProviderRequest idVProviderRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Adding IdV provider with name: " + 
+                    (idVProviderRequest != null ? idVProviderRequest.getName() : "null"));
+        }
+
+        if (idVProviderRequest == null) {
+            log.warn("IdVProviderRequest is null. Cannot add IdV provider.");
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
         IdVProviderResponse idVProviderResponse =
                 idVProviderService.addIdVProvider(idVProviderRequest);
         URI location = ContextLoader.buildURIForHeader(IDV_API_PATH_COMPONENT + idVProviderResponse.getId());
+        log.info("IdV provider added successfully with ID: " + idVProviderResponse.getId());
         return Response.created(location).entity(idVProviderResponse).build();
     }
 
     @Override
     public Response deleteIdVProvider(String idvProviderId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting IdV provider with ID: " + idvProviderId);
+        }
         idVProviderService.deleteIdVProvider(idvProviderId);
+        log.info("IdV provider deleted successfully with ID: " + idvProviderId);
         return Response.noContent().build();
     }
 
     @Override
     public Response getIdVProvider(String idvProviderId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving IdV provider with ID: " + idvProviderId);
+        }
         IdVProviderResponse idVProviderResponse = idVProviderService.getIdVProvider(idvProviderId);
+        if (log.isDebugEnabled()) {
+            log.debug("IdV provider retrieved successfully with ID: " + idvProviderId);
+        }
         return Response.ok().entity(idVProviderResponse).build();
     }
 
     @Override
     public Response getIdVProviders(Integer limit, Integer offset, String filter) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving IdV providers with limit: " + limit + ", offset: " + offset + 
+                    ", filter: " + filter);
+        }
         IdVProviderListResponse idVProviderListResponse = idVProviderService.getIdVProviders(limit, offset, filter);
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieved " + idVProviderListResponse.getCount() + " IdV providers");
+        }
         return Response.ok().entity(idVProviderListResponse).build();
     }
 
     @Override
     public Response updateIdVProviders(String idvProviderId, IdVProviderRequest idVProviderRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating IdV provider with ID: " + idvProviderId + ", name: " + 
+                    (idVProviderRequest != null ? idVProviderRequest.getName() : "null"));
+        }
+
+        if (idVProviderRequest == null) {
+            log.warn("IdVProviderRequest is null. Cannot update IdV provider.");
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
         IdVProviderResponse idVProviderResponse =
                 idVProviderService.updateIdVProvider(idvProviderId, idVProviderRequest);
+        log.info("IdV provider updated successfully with ID: " + idvProviderId);
         return Response.ok().entity(idVProviderResponse).build();
     }
 }

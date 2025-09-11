@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.idp.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.apache.http.HttpHeaders;
@@ -55,6 +57,7 @@ import static org.wso2.carbon.identity.api.server.idp.common.Constants.IDP_TEMPL
  */
 public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiService {
 
+    private static final Log LOG = LogFactory.getLog(IdentityProvidersApiServiceImpl.class);
     private final ServerIdpManagementService idpManagementService;
 
     public IdentityProvidersApiServiceImpl() {
@@ -62,6 +65,7 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
         try {
             this.idpManagementService = ServerIdpManagementServiceFactory.getServerIdpManagementService();
         } catch (IllegalStateException e) {
+            LOG.error("Error occurred while initiating ServerIdpManagementService.", e);
             throw new RuntimeException("Error occurred while initiating ServerIdpManagementService.", e);
         }
     }
@@ -69,9 +73,18 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
     @Override
     public Response addIDP(IdentityProviderPOSTRequest identityProviderPOSTRequest) {
 
+        if (identityProviderPOSTRequest == null) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Adding identity provider: " + identityProviderPOSTRequest.getName());
+        }
         IdentityProviderResponse idPResponse = idpManagementService.addIDP(identityProviderPOSTRequest);
         URI location =
                 ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + IDP_PATH_COMPONENT + "/" + idPResponse.getId());
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Successfully created identity provider with ID: " + idPResponse.getId());
+        }
         return Response.created(location).entity(idPResponse).build();
     }
 
@@ -88,12 +101,17 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
     @Override
     public Response deleteIDP(String identityProviderId, Boolean force) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deleting identity provider: " + identityProviderId + ", force: " + force);
+        }
         if (force) {
             idpManagementService.forceDeleteIDP(identityProviderId);
         } else {
             idpManagementService.deleteIDP(identityProviderId);
         }
-
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Successfully deleted identity provider: " + identityProviderId);
+        }
         return Response.noContent().build();
     }
 

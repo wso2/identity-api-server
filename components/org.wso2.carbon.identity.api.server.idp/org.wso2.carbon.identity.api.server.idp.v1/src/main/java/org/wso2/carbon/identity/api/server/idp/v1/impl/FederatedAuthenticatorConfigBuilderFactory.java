@@ -20,6 +20,8 @@ package org.wso2.carbon.identity.api.server.idp.v1.impl;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.idp.common.Constants;
 import org.wso2.carbon.identity.api.server.idp.common.IdentityProviderServiceHolder;
@@ -59,6 +61,8 @@ import static org.wso2.carbon.identity.api.server.idp.common.Constants.IDP_PATH_
  * The factory class for building federated authenticator configuration related models.
  */
 public class FederatedAuthenticatorConfigBuilderFactory {
+
+    private static final Log LOG = LogFactory.getLog(FederatedAuthenticatorConfigBuilderFactory.class);
 
     /**
      * Builds a FederatedAuthenticatorConfig instance based on the definedBy type for the

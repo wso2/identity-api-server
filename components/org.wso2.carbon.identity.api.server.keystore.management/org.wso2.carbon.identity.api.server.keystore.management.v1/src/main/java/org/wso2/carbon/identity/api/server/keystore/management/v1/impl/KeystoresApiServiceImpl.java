@@ -19,6 +19,8 @@
 package org.wso2.carbon.identity.api.server.keystore.management.v1.impl;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.identity.api.server.keystore.management.v1.KeystoresApiService;
 import org.wso2.carbon.identity.api.server.keystore.management.v1.core.KeyStoreService;
@@ -36,13 +38,18 @@ import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenant
  */
 public class KeystoresApiServiceImpl implements KeystoresApiService {
 
+    private static final Log LOG = LogFactory.getLog(KeystoresApiServiceImpl.class);
     private final KeyStoreService keyStoreService;
 
     public KeystoresApiServiceImpl() {
 
         try {
             this.keyStoreService = KeyStoreServiceFactory.getKeyStoreService();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("KeystoresApiServiceImpl initialized successfully.");
+            }
         } catch (IllegalStateException e) {
+            LOG.error("Error occurred while initiating key store management service.", e);
             throw new RuntimeException("Error occurred while initiating key store management service.", e);
         }
     }
@@ -51,9 +58,14 @@ public class KeystoresApiServiceImpl implements KeystoresApiService {
     public Response deleteCertificate(String alias) {
 
         if (StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+            LOG.warn("Delete certificate operation not allowed for super tenant. Alias: " + alias);
             return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
         }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deleting certificate with alias: " + alias);
+        }
         keyStoreService.deleteCertificate(alias);
+        LOG.info("Certificate deleted successfully. Alias: " + alias);
         return Response.noContent().build();
     }
 
@@ -63,12 +75,18 @@ public class KeystoresApiServiceImpl implements KeystoresApiService {
         if (encodeCert == null) {
             encodeCert = false;
         }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving certificate with alias: " + alias + ", encodeCert: " + encodeCert);
+        }
         return Response.ok().entity(keyStoreService.getCertificate(alias, encodeCert)).build();
     }
 
     @Override
     public Response getCertificateAliases(String filter) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Listing certificate aliases with filter: " + filter);
+        }
         return Response.ok().entity(keyStoreService.listCertificateAliases(filter)).build();
     }
 
@@ -76,11 +94,15 @@ public class KeystoresApiServiceImpl implements KeystoresApiService {
     public Response getClientCertificate(String alias, Boolean encodeCert) {
 
         if (!StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+            LOG.warn("Get client certificate operation only allowed for super tenant. Alias: " + alias);
             return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
         }
 
         if (encodeCert == null) {
             encodeCert = false;
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving client certificate with alias: " + alias + ", encodeCert: " + encodeCert);
         }
         return Response.ok().entity(keyStoreService.getClientCertificate(alias, encodeCert)).build();
     }
@@ -89,7 +111,11 @@ public class KeystoresApiServiceImpl implements KeystoresApiService {
     public Response getClientCertificateAliases(String filter) {
 
         if (!StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+            LOG.warn("Get client certificate aliases operation only allowed for super tenant. Filter: " + filter);
             return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Listing client certificate aliases with filter: " + filter);
         }
         return Response.ok().entity(keyStoreService.listClientCertificateAliases(filter)).build();
     }
@@ -100,6 +126,9 @@ public class KeystoresApiServiceImpl implements KeystoresApiService {
         if (encodeCert == null) {
             encodeCert = false;
         }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving public certificate, encodeCert: " + encodeCert);
+        }
         return Response.ok().entity(keyStoreService.getPublicCertificate(encodeCert)).build();
     }
 
@@ -107,10 +136,20 @@ public class KeystoresApiServiceImpl implements KeystoresApiService {
     public Response uploadCertificate(CertificateRequest certificateRequest) {
 
         if (StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+            LOG.warn("Upload certificate operation not allowed for super tenant. Alias: " + 
+                    (certificateRequest != null ? certificateRequest.getAlias() : "null"));
             return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
+        }
+        if (certificateRequest == null) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        String alias = certificateRequest.getAlias();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Uploading certificate with alias: " + alias);
         }
         URI certResource = keyStoreService.uploadCertificate(certificateRequest.getAlias(),
                 certificateRequest.getCertificate());
+        LOG.info("Certificate uploaded successfully. Alias: " + alias);
         NewCookie resourceCookie = new NewCookie("Location", certResource.toString());
         return Response.created(certResource).cookie(resourceCookie).build();
     }

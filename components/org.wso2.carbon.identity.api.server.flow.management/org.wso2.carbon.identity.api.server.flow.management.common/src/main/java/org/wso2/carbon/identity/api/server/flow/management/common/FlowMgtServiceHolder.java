@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.flow.mgt.FlowAIService;
 import org.wso2.carbon.identity.flow.mgt.FlowMgtService;
@@ -28,6 +30,8 @@ import org.wso2.carbon.idp.mgt.IdpManager;
  * This class is used to hold the FlowMgtService instance.
  */
 public class FlowMgtServiceHolder {
+
+    private static final Log log = LogFactory.getLog(FlowMgtServiceHolder.class);
 
     private FlowMgtServiceHolder() {
 
@@ -66,7 +70,14 @@ public class FlowMgtServiceHolder {
      */
     public static FlowMgtService getMgtService() {
 
-        return FlowMgtServiceHolderInstance.SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving FlowMgtService OSGi service.");
+        }
+        FlowMgtService flowMgtService = FlowMgtServiceHolderInstance.SERVICE;
+        if (flowMgtService == null) {
+            log.warn("FlowMgtService OSGi service is not available.");
+        }
+        return flowMgtService;
     }
 
     /**
@@ -76,7 +87,14 @@ public class FlowMgtServiceHolder {
      */
     public static IdentityGovernanceService getIdentityGovernanceService() {
 
-        return IdentityGovernanceServiceHolder.SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving IdentityGovernanceService OSGi service.");
+        }
+        IdentityGovernanceService identityGovernanceService = IdentityGovernanceServiceHolder.SERVICE;
+        if (identityGovernanceService == null) {
+            log.warn("IdentityGovernanceService OSGi service is not available.");
+        }
+        return identityGovernanceService;
     }
 
     /**
@@ -86,7 +104,14 @@ public class FlowMgtServiceHolder {
      */
     public static IdpManager getIdpManager() {
 
-        return IdpManagerHolder.SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving IdpManager OSGi service.");
+        }
+        IdpManager idpManager = IdpManagerHolder.SERVICE;
+        if (idpManager == null) {
+            log.warn("IdpManager OSGi service is not available.");
+        }
+        return idpManager;
     }
 
     /**
@@ -96,6 +121,13 @@ public class FlowMgtServiceHolder {
      */
     public static FlowAIService getFlowAIService() {
 
-        return FlowAIServiceHolder.SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving FlowAIService OSGi service.");
+        }
+        FlowAIService flowAIService = FlowAIServiceHolder.SERVICE;
+        if (flowAIService == null) {
+            log.warn("FlowAIService OSGi service is not available.");
+        }
+        return flowAIService;
     }
 }

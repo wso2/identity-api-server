@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.idp.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
 import org.wso2.carbon.identity.template.mgt.TemplateManager;
@@ -27,6 +29,8 @@ import org.wso2.carbon.idp.mgt.IdentityProviderManager;
  * Service holder class for identity providers.
  */
 public class IdentityProviderServiceHolder {
+
+    private static final Log log = LogFactory.getLog(IdentityProviderServiceHolder.class);
 
     private IdentityProviderServiceHolder() {
 
@@ -56,6 +60,12 @@ public class IdentityProviderServiceHolder {
      */
     public static IdentityProviderManager getIdentityProviderManager() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving IdentityProviderManager service instance.");
+        }
+        if (IdentityProviderManagerHolder.SERVICE == null) {
+            log.warn("IdentityProviderManager service is not available.");
+        }
         return IdentityProviderManagerHolder.SERVICE;
     }
 
@@ -66,6 +76,12 @@ public class IdentityProviderServiceHolder {
      */
     public static ClaimMetadataManagementService getClaimMetadataManagementService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving ClaimMetadataManagementService service instance.");
+        }
+        if (ClaimMetadataManagementServiceHolder.SERVICE == null) {
+            log.warn("ClaimMetadataManagementService service is not available.");
+        }
         return ClaimMetadataManagementServiceHolder.SERVICE;
     }
 
@@ -76,6 +92,12 @@ public class IdentityProviderServiceHolder {
      */
     public static TemplateManager getTemplateManager() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving TemplateManager service instance.");
+        }
+        if (TemplateManagerHolder.SERVICE == null) {
+            log.warn("TemplateManager service is not available.");
+        }
         return TemplateManagerHolder.SERVICE;
     }
 }

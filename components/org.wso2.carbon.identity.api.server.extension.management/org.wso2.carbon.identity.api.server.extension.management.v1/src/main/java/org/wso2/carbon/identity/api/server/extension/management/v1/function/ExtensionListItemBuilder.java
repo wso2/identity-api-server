@@ -36,6 +36,16 @@ public class ExtensionListItemBuilder implements Function<ExtensionInfo, Extensi
     @Override
     public ExtensionListItem apply(ExtensionInfo extensionInfo) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Building ExtensionListItem for extension: " + 
+                (extensionInfo != null ? extensionInfo.getId() : "null"));
+        }
+
+        if (extensionInfo == null) {
+            log.warn("ExtensionInfo is null. Cannot build ExtensionListItem.");
+            return null;
+        }
+
         ExtensionListItem extensionListItem = new ExtensionListItem();
         extensionListItem.setId(extensionInfo.getId());
         extensionListItem.setVersion(extensionInfo.getVersion());
@@ -51,6 +61,11 @@ public class ExtensionListItemBuilder implements Function<ExtensionInfo, Extensi
         if (extensionInfo.getCustomAttributes() != null) {
             extensionListItem.setCustomAttributes(extensionInfo.getCustomAttributes());
         }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Successfully built ExtensionListItem for extension: " + extensionInfo.getId());
+        }
+
         return extensionListItem;
     }
 }

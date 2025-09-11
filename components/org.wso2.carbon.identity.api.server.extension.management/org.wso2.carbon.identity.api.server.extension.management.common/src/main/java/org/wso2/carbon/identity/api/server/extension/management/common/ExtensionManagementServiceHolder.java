@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.extension.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.extension.mgt.ExtensionManager;
 
@@ -25,6 +27,8 @@ import org.wso2.carbon.identity.extension.mgt.ExtensionManager;
  * Extension management service holder.
  */
 public class ExtensionManagementServiceHolder {
+
+    private static final Log log = LogFactory.getLog(ExtensionManagementServiceHolder.class);
 
     private ExtensionManagementServiceHolder() {}
 
@@ -41,6 +45,13 @@ public class ExtensionManagementServiceHolder {
      */
     public static ExtensionManager getExtensionManager() {
 
-        return ExtensionManagerHolder.SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving ExtensionManager OSGi service.");
+        }
+        ExtensionManager extensionManager = ExtensionManagerHolder.SERVICE;
+        if (extensionManager == null) {
+            log.warn("ExtensionManager OSGi service is not available.");
+        }
+        return extensionManager;
     }
 }

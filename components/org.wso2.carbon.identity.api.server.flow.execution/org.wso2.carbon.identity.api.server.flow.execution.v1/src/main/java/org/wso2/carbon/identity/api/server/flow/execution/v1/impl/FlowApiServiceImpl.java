@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.flow.execution.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.FlowApiService;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.FlowExecutionRequest;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.core.FlowExecutionServiceCore;
@@ -30,15 +32,29 @@ import javax.ws.rs.core.Response;
  */
 public class FlowApiServiceImpl implements FlowApiService {
 
+    private static final Log LOG = LogFactory.getLog(FlowApiServiceImpl.class);
     private final FlowExecutionServiceCore flowExecutionServiceCore;
 
     public FlowApiServiceImpl() {
 
         this.flowExecutionServiceCore = FlowExecutionServiceFactory.getFlowExecutionService();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("FlowApiServiceImpl initialized successfully.");
+        }
     }
 
     @Override
     public Response flowExecutePost(FlowExecutionRequest flowExecutionRequest) {
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Processing flow execution request for flowType: " + 
+                    (flowExecutionRequest != null ? flowExecutionRequest.getFlowType() : "null"));
+        }
+
+        if (flowExecutionRequest == null) {
+            LOG.warn("FlowExecutionRequest is null. Cannot process flow execution.");
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
 
         return Response.ok()
                 .entity(flowExecutionServiceCore.processFlowExecution((flowExecutionRequest)))

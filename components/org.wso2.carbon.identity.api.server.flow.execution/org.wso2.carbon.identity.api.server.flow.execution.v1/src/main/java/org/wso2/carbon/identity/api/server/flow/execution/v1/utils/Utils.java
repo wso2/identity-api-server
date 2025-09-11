@@ -169,6 +169,9 @@ public class Utils {
      */
     public static void isSelfRegistrationEnabled(String tenantDomain) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Checking if self registration is enabled for tenant: " + tenantDomain);
+        }
         try {
             IdentityGovernanceService identityGovernanceService =
                     FlowExecutionServiceHolder.getIdentityGovernanceService();
@@ -195,6 +198,9 @@ public class Utils {
      */
     public static void isDynamicRegistrationPortalEnabled(String tenantDomain) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Checking if dynamic registration portal is enabled for tenant: " + tenantDomain);
+        }
         try {
             IdentityGovernanceService identityGovernanceService =
                     FlowExecutionServiceHolder.getIdentityGovernanceService();
@@ -225,6 +231,9 @@ public class Utils {
      */
     public static boolean isShowUsernameUnavailabilityEnabled(String tenantDomain) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Checking if show username unavailability is enabled for tenant: " + tenantDomain);
+        }
         try {
             IdentityGovernanceService identityGovernanceService =
                     FlowExecutionServiceHolder.getIdentityGovernanceService();
@@ -292,8 +301,14 @@ public class Utils {
     public static void validateFlowInitiation(FlowExecutionRequest flowExecutionRequest) {
 
         String flowType = flowExecutionRequest.getFlowType();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Validating flow initiation request for flowType: " + flowType);
+        }
         if (StringUtils.isBlank(flowType) || Arrays.stream(Constants.FlowTypes.values())
                 .noneMatch(type -> type.name().equals(flowType))) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Invalid flow type provided: " + flowType);
+            }
             throw Utils.handleFlowException(new FlowEngineClientException(
                     ERROR_CODE_INVALID_FLOW_TYPE.getCode(),
                     ERROR_CODE_INVALID_FLOW_TYPE.getMessage(),
@@ -324,10 +339,17 @@ public class Utils {
      */
     public static boolean isOrchestrationEnabled(String flowType, String tenantDomain) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Checking if orchestration is enabled for flowType: " + flowType + ", tenant: " + tenantDomain);
+        }
         try {
             FlowConfigDTO flowConfig = FlowExecutionServiceHolder.getFlowMgtService().getFlowConfig(
                     flowType, IdentityTenantUtil.getTenantId(tenantDomain));
-            return flowConfig.getIsEnabled();
+            boolean isEnabled = flowConfig.getIsEnabled();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Orchestration enabled status for flowType " + flowType + ": " + isEnabled);
+            }
+            return isEnabled;
         } catch (FlowMgtFrameworkException e) {
             throw handleFlowException(new FlowEngineServerException(
                     ERROR_CODE_GET_FLOW_CONFIG.getCode(),

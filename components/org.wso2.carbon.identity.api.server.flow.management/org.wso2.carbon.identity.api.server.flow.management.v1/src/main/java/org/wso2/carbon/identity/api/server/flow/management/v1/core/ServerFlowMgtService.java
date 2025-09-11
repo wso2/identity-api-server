@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.core;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfig;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfigPatchModel;
@@ -50,6 +52,7 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils
  */
 public class ServerFlowMgtService {
 
+    private static final Log log = LogFactory.getLog(ServerFlowMgtService.class);
     private final FlowMgtService flowMgtService;
 
     public ServerFlowMgtService(FlowMgtService flowMgtService) {
@@ -64,6 +67,9 @@ public class ServerFlowMgtService {
      */
     public FlowResponse getFlow(String flowType) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving flow for type: " + flowType);
+        }
         FlowDTO flowDTO;
         try {
             Utils.validateFlowType(flowType);
@@ -71,12 +77,19 @@ public class ServerFlowMgtService {
                     .getFlow(flowType, PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
             FlowResponse flowResponse = new FlowResponse();
             if (flowDTO == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("No flow found for type: " + flowType);
+                }
                 return flowResponse;
             }
             flowResponse.steps(flowDTO.getSteps().stream().map(Utils::convertToStep)
                     .collect(Collectors.toList()));
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully retrieved flow for type: " + flowType);
+            }
             return flowResponse;
         } catch (FlowMgtFrameworkException e) {
+            log.error("Error retrieving flow for type: " + flowType, e);
             throw Utils.handleFlowMgtException(e);
         }
     }
@@ -101,6 +114,16 @@ public class ServerFlowMgtService {
      */
     public void updateFlow(FlowRequest flowRequest) {
 
+        String flowType = flowRequest != null ? flowRequest.getFlowType() : null;
+        if (log.isDebugEnabled()) {
+            log.debug("Updating flow for type: " + flowType);
+        }
+
+        if (flowRequest == null) {
+            log.warn("FlowRequest is null. Cannot update flow.");
+            throw new IllegalArgumentException("FlowRequest cannot be null");
+        }
+
         try {
             Utils.validateFlowType(flowRequest.getFlowType());
             validateFlow(flowRequest.getFlowType(), flowRequest.getSteps());
@@ -110,7 +133,9 @@ public class ServerFlowMgtService {
             flowDTO.setFlowType(flowRequest.getFlowType());
             flowMgtService.updateFlow(flowDTO,
                     PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
+            log.info("Flow updated successfully for type: " + flowType);
         } catch (FlowMgtFrameworkException e) {
+            log.error("Error updating flow for type: " + flowType, e);
             throw Utils.handleFlowMgtException(e);
         }
     }
@@ -158,6 +183,16 @@ public class ServerFlowMgtService {
      */
     public FlowConfig updateFlowConfig(FlowConfigPatchModel flowConfigPatchModel) {
 
+        String flowType = flowConfigPatchModel != null ? flowConfigPatchModel.getFlowType() : null;
+        if (log.isDebugEnabled()) {
+            log.debug("Updating flow config for type: " + flowType);
+        }
+
+        if (flowConfigPatchModel == null) {
+            log.warn("FlowConfigPatchModel is null. Cannot update flow config.");
+            throw new IllegalArgumentException("FlowConfigPatchModel cannot be null");
+        }
+
         try {
             Utils.validateFlowType(flowConfigPatchModel.getFlowType());
             FlowConfigDTO existingFlowConfig = flowMgtService.getFlowConfig(
@@ -176,8 +211,10 @@ public class ServerFlowMgtService {
             FlowConfigDTO updatedFlowConfig =
                     flowMgtService.updateFlowConfig(Utils.convertToFlowConfigDTO(flowConfigPatchModel),
                             PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
+            log.info("Flow config updated successfully for type: " + flowType);
             return Utils.convertToFlowConfig(updatedFlowConfig);
         } catch (FlowMgtFrameworkException e) {
+            log.error("Error updating flow config for type: " + flowType, e);
             throw Utils.handleFlowMgtException(e);
         }
     }
@@ -207,6 +244,9 @@ public class ServerFlowMgtService {
      */
     private AbstractMetaResponseHandler resolveHandler(String flowType) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Resolving handler for flow type: " + flowType);
+        }
         switch (Constants.FlowTypes.valueOf(flowType)) {
             case REGISTRATION:
                 return new RegistrationFlowMetaHandler();
@@ -215,6 +255,7 @@ public class ServerFlowMgtService {
             case INVITED_USER_REGISTRATION:
                 return new AskPasswordFlowMetaHandler();
             default:
+                log.error("No handler available for flow type: " + flowType);
                 throw new IllegalStateException("Unhandled flow type: " + flowType);
         }
     }
