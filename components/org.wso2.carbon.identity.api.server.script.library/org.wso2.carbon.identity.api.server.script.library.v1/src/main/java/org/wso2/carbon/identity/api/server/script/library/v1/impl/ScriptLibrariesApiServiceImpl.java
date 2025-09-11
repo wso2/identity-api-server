@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.script.library.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
@@ -46,6 +48,7 @@ import static org.wso2.carbon.identity.api.server.script.library.common.Constant
  */
 public class ScriptLibrariesApiServiceImpl implements ScriptLibrariesApiService {
 
+    private static final Log log = LogFactory.getLog(ScriptLibrariesApiServiceImpl.class);
     private final ServerScriptLibrariesService serverScriptLibrariesService;
 
     public ScriptLibrariesApiServiceImpl() {
@@ -61,12 +64,16 @@ public class ScriptLibrariesApiServiceImpl implements ScriptLibrariesApiService 
     public Response addScriptLibrary(String name, InputStream contentInputStream, Attachment contentDetail,
                                      String description) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Adding script library: " + name);
+        }
         serverScriptLibrariesService.addScriptLibrary(name, contentInputStream, description);
         try {
             URI location =
                     ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + SCRIPT_LIBRARY_PATH_COMPONENT
                             + "/" + URLEncoder.encode(name, StandardCharsets.UTF_8.name())
                             .replace("+", "%20"));
+            log.info("Script library successfully added: " + name);
             return Response.created(location).build();
         } catch (UnsupportedEncodingException e) {
             ErrorResponse errorResponse =
@@ -81,13 +88,20 @@ public class ScriptLibrariesApiServiceImpl implements ScriptLibrariesApiService 
     @Override
     public Response deleteScriptLibrary(String scriptLibraryName) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting script library: " + scriptLibraryName);
+        }
         serverScriptLibrariesService.deleteScriptLibrary(scriptLibraryName);
+        log.info("Script library successfully deleted: " + scriptLibraryName);
         return Response.noContent().build();
     }
 
     @Override
     public Response getScriptLibraries(Integer limit, Integer offset) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving script libraries with limit: " + limit + " and offset: " + offset);
+        }
         ScriptLibraryListResponse scriptLibraryListResponse = serverScriptLibrariesService.getScriptLibraries(limit,
                 offset);
         return Response.ok().entity(scriptLibraryListResponse).build();
@@ -96,6 +110,9 @@ public class ScriptLibrariesApiServiceImpl implements ScriptLibrariesApiService 
     @Override
     public Response getScriptLibraryByName(String scriptLibraryName) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving script library by name: " + scriptLibraryName);
+        }
         ScriptLibraryResponse scriptLibraryResponse = serverScriptLibrariesService.getScriptLibrary(scriptLibraryName);
         return Response.ok().entity(scriptLibraryResponse).build();
     }
@@ -103,6 +120,9 @@ public class ScriptLibrariesApiServiceImpl implements ScriptLibrariesApiService 
     @Override
     public Response getScriptLibraryContentByName(String scriptLibraryName) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving script library content for: " + scriptLibraryName);
+        }
         return Response.ok().entity(serverScriptLibrariesService.getScriptLibraryContentByName(scriptLibraryName))
                 .build();
     }
@@ -111,7 +131,11 @@ public class ScriptLibrariesApiServiceImpl implements ScriptLibrariesApiService 
     public Response updateScriptLibrary(String scriptLibraryName, InputStream contentInputStream,
                                         Attachment contentDetail, String description) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating script library: " + scriptLibraryName);
+        }
         serverScriptLibrariesService.updateScriptLibrary(scriptLibraryName, contentInputStream, description);
+        log.info("Script library successfully updated: " + scriptLibraryName);
         return Response.ok().build();
     }
 }

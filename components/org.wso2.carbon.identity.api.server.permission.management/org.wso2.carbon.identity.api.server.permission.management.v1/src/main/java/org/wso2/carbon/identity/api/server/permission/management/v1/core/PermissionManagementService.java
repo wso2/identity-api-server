@@ -54,8 +54,15 @@ public class PermissionManagementService {
 
         try {
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-            return getPermissionObjects(rolePermissionManagementService.getAllPermissions(IdentityTenantUtil
-                    .getTenantId(tenantDomain)));
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Retrieving all permissions for tenant: " + tenantDomain);
+            }
+            Permission[] permissions = getPermissionObjects(rolePermissionManagementService.getAllPermissions(
+                    IdentityTenantUtil.getTenantId(tenantDomain)));
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully retrieved " + permissions.length + " permissions for tenant: " + tenantDomain);
+            }
+            return permissions;
         } catch (RolePermissionException e) {
             throw handleException(e);
         }
@@ -69,6 +76,10 @@ public class PermissionManagementService {
      */
     private Permission[] getPermissionObjects(org.wso2.carbon.user.mgt.common.model.Permission[] permissions) {
 
+        if (permissions == null) {
+            LOG.warn("Permission array received is null, returning empty array");
+            return new Permission[0];
+        }
         Permission[] outputPermissions = new Permission[permissions.length];
         for (int i = 0; i < permissions.length; i++) {
             Permission permission = new Permission();

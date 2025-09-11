@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.webhook.management.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.WebhooksApiService;
@@ -37,6 +39,7 @@ import javax.ws.rs.core.Response;
  */
 public class WebhooksApiServiceImpl implements WebhooksApiService {
 
+    private static final Log LOG = LogFactory.getLog(WebhooksApiServiceImpl.class);
     private final ServerWebhookManagementService serverWebhookManagementService;
 
     public WebhooksApiServiceImpl() {
@@ -44,6 +47,7 @@ public class WebhooksApiServiceImpl implements WebhooksApiService {
         try {
             serverWebhookManagementService = ServerWebhookManagementServiceFactory.getServerWebhookManagementService();
         } catch (IllegalStateException e) {
+            LOG.error("Error occurred while retrieving WebhookManagementService.", e);
             throw new RuntimeException("Error occurred while retrieving WebhookManagementService.", e);
         }
     }
@@ -51,6 +55,9 @@ public class WebhooksApiServiceImpl implements WebhooksApiService {
     @Override
     public Response getWebhooks() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Getting all webhooks.");
+        }
         WebhookList webhooks = serverWebhookManagementService.getWebhooks();
         return Response.ok().entity(webhooks).build();
     }
@@ -58,6 +65,9 @@ public class WebhooksApiServiceImpl implements WebhooksApiService {
     @Override
     public Response getWebhookByWebhookId(String webhookId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Getting webhook by ID: " + webhookId);
+        }
         WebhookResponse webhook = serverWebhookManagementService.getWebhook(webhookId);
         return Response.ok().entity(webhook).build();
     }
@@ -65,6 +75,9 @@ public class WebhooksApiServiceImpl implements WebhooksApiService {
     @Override
     public Response createWebhook(WebhookRequest webhookRequest) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Creating webhook with name: " + (webhookRequest != null ? webhookRequest.getName() : "null"));
+        }
         WebhookResponse createdWebhook = serverWebhookManagementService.createWebhook(webhookRequest);
         URI location = ContextLoader.buildURIForBody(String.format(Constants.V1_API_PATH_COMPONENT +
                 "/webhooks/%s", createdWebhook.getId()));
@@ -74,6 +87,9 @@ public class WebhooksApiServiceImpl implements WebhooksApiService {
     @Override
     public Response updateWebhook(String webhookId, WebhookRequest webhookRequest) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating webhook with ID: " + webhookId);
+        }
         WebhookResponse updatedWebhook = serverWebhookManagementService.updateWebhook(webhookId, webhookRequest);
         return Response.ok().entity(updatedWebhook).build();
     }
@@ -81,6 +97,9 @@ public class WebhooksApiServiceImpl implements WebhooksApiService {
     @Override
     public Response deleteWebhook(String webhookId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deleting webhook with ID: " + webhookId);
+        }
         serverWebhookManagementService.deleteWebhook(webhookId);
         return Response.noContent().build();
     }
@@ -88,18 +107,27 @@ public class WebhooksApiServiceImpl implements WebhooksApiService {
     @Override
     public Response activateWebhook(String webhookId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Activating webhook with ID: " + webhookId);
+        }
         return Response.ok().entity(serverWebhookManagementService.activateWebhook(webhookId)).build();
     }
 
     @Override
     public Response deactivateWebhook(String webhookId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deactivating webhook with ID: " + webhookId);
+        }
         return Response.ok().entity(serverWebhookManagementService.deactivateWebhook(webhookId)).build();
     }
 
     @Override
     public Response retryWebhook(String webhookId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrying webhook with ID: " + webhookId);
+        }
         return Response.ok().entity(serverWebhookManagementService.retryWebhook(webhookId)).build();
     }
 }

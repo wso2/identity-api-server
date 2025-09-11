@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.rule.metadata.v1.core;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Field;
 import org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Link;
@@ -41,6 +43,7 @@ import java.util.List;
  */
 public class ServerRuleMetadataService {
 
+    private static final Log LOG = LogFactory.getLog(ServerRuleMetadataService.class);
     private final RuleMetadataService ruleMetadataService;
 
     public ServerRuleMetadataService(RuleMetadataService ruleMetadataService) {
@@ -56,16 +59,25 @@ public class ServerRuleMetadataService {
     public List<org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition> getExpressionMeta(
             String flow) {
 
+        String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving expression metadata for flow: " + flow + " in tenant: " + tenantDomain);
+        }
+
         try {
             FlowType flowType = FlowType.valueOfFlowAlias(flow);
 
-            List<FieldDefinition> fieldDefinitions = ruleMetadataService.getExpressionMeta(flowType,
-                            CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            List<FieldDefinition> fieldDefinitions = ruleMetadataService.getExpressionMeta(flowType, tenantDomain);
 
             List<org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition>
                     fieldDefinitionResponseList = new ArrayList<>();
             for (FieldDefinition fieldDefinition : fieldDefinitions) {
                 fieldDefinitionResponseList.add(buildFieldDefinitionResponse(fieldDefinition));
+            }
+
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully retrieved " + fieldDefinitionResponseList.size() + 
+                        " field definitions for flow: " + flow);
             }
 
             return fieldDefinitionResponseList;

@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.permission.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.user.mgt.RolePermissionManagementService;
 
@@ -25,6 +27,8 @@ import org.wso2.carbon.user.mgt.RolePermissionManagementService;
  * DataHolder class for RolePermissionManagementService.
  */
 public class RolePermissionManagementServiceDataHolder {
+
+    private static final Log log = LogFactory.getLog(RolePermissionManagementServiceDataHolder.class);
 
     private RolePermissionManagementServiceDataHolder() {}
 
@@ -41,6 +45,15 @@ public class RolePermissionManagementServiceDataHolder {
      */
     public static RolePermissionManagementService getRolePermissionManagementService() {
 
-        return RolePermissionManagementServiceHolder.SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Getting RolePermissionManagementService from OSGi registry.");
+        }
+        
+        RolePermissionManagementService service = RolePermissionManagementServiceHolder.SERVICE;
+        if (service == null) {
+            log.warn("RolePermissionManagementService is not available in OSGi registry.");
+        }
+        
+        return service;
     }
 }

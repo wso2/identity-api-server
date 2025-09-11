@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.workflow.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.workflow.engine.ApprovalTaskService;
 import org.wso2.carbon.identity.workflow.engine.ApprovalTaskServiceImpl;
 import org.wso2.carbon.identity.workflow.impl.WorkflowImplServiceImpl;
@@ -29,22 +31,32 @@ import org.wso2.carbon.identity.workflow.mgt.WorkflowManagementServiceImpl;
  */
 public class WorkflowServiceHolder {
 
+    private static final Log log = LogFactory.getLog(WorkflowServiceHolder.class);
     private static final WorkflowManagementService workflowService = new WorkflowManagementServiceImpl();
     private static final ApprovalTaskService approvalTaskService = new ApprovalTaskServiceImpl();
 
     public static WorkflowManagementService getWorkflowManagementService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving WorkflowManagementService instance.");
+        }
         return workflowService;
     }
 
     public static ApprovalTaskService getApprovalTaskService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving ApprovalTaskService instance.");
+        }
         return approvalTaskService;
     }
 
     // This is a placeholder for the actual implementation of WorkflowImplServiceImpl.
     public static WorkflowImplServiceImpl getWorkflowImplService() {
 
+        if (log.isWarnEnabled()) {
+            log.warn("WorkflowImplService is not implemented. Returning null.");
+        }
         return null;
     }
 }

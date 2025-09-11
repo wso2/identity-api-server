@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.webhook.metadata.v1.core;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.webhook.metadata.common.WebhookMetadataServiceHolder;
@@ -49,6 +51,8 @@ import static org.wso2.carbon.identity.api.server.webhook.metadata.v1.constants.
  */
 public class ServerWebhookMetadataService {
 
+    private static final Log LOG = LogFactory.getLog(ServerWebhookMetadataService.class);
+
     /**
      * Get an event profile by name.
      *
@@ -57,10 +61,16 @@ public class ServerWebhookMetadataService {
      */
     public EventProfile getEventProfile(String profileName) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving event profile: " + profileName);
+        }
         try {
             org.wso2.carbon.identity.webhook.metadata.api.model.EventProfile eventProfile =
                     WebhookMetadataServiceHolder.getWebhookMetadataService().getEventProfile(profileName);
             if (eventProfile == null) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Event profile not found: " + profileName);
+                }
                 throw WebhookMetadataAPIErrorBuilder.buildAPIError(Response.Status.NOT_FOUND,
                         ERROR_CODE_PROFILE_NOT_FOUND, profileName);
             }
@@ -77,6 +87,9 @@ public class ServerWebhookMetadataService {
      */
     public WebhookMetadata getWebhookMetadata() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving webhook metadata including all event profiles and active adapter");
+        }
         try {
             List<org.wso2.carbon.identity.webhook.metadata.api.model.EventProfile> eventProfiles =
                     WebhookMetadataServiceHolder.getWebhookMetadataService().getSupportedEventProfiles();
@@ -91,6 +104,10 @@ public class ServerWebhookMetadataService {
             WebhookMetadata webhookMetadata = new WebhookMetadata();
             webhookMetadata.setProfiles(eventProfileMetadataList);
             webhookMetadata.setAdapter(webhookMetadataAdapter);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully retrieved webhook metadata with " + eventProfileMetadataList.size() + 
+                        " event profiles");
+            }
             return webhookMetadata;
         } catch (WebhookMetadataException e) {
             throw WebhookMetadataAPIErrorBuilder.buildAPIError(e);
@@ -100,11 +117,18 @@ public class ServerWebhookMetadataService {
     public WebhookMetadata updateWebhookMetadataProperties(
             WebhookMetadataProperties webhookMetadataProperties) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating webhook metadata properties for tenant: " + 
+                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+        }
         try {
             WebhookMetadataServiceHolder.getWebhookMetadataService()
                     .updateWebhookMetadataProperties(mapWebhookMetadataProperties(webhookMetadataProperties),
                             CarbonContext.getThreadLocalCarbonContext()
                                     .getTenantDomain());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully updated webhook metadata properties");
+            }
             return getWebhookMetadata();
         } catch (WebhookMetadataException e) {
             throw WebhookMetadataAPIErrorBuilder.buildAPIError(e);

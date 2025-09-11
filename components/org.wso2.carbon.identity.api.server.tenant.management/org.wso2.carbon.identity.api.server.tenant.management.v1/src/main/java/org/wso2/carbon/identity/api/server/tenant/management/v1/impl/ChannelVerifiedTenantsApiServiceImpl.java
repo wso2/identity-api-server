@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.tenant.management.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants;
@@ -35,12 +37,17 @@ import javax.ws.rs.core.Response;
  */
 public class ChannelVerifiedTenantsApiServiceImpl implements ChannelVerifiedTenantsApiService {
 
+    private static final Log log = LogFactory.getLog(ChannelVerifiedTenantsApiServiceImpl.class);
     private final ServerTenantManagementService tenantManagementService;
 
     public ChannelVerifiedTenantsApiServiceImpl() {
         try {
+            if (log.isDebugEnabled()) {
+                log.debug("Initializing ChannelVerifiedTenantsApiServiceImpl");
+            }
             this.tenantManagementService = ServerTenantManagementServiceFactory.getServerTenantManagementService();
         } catch (IllegalStateException e) {
+            log.error("Error occurred while initiating ServerTenantManagementService", e);
             throw new RuntimeException("Error occurred while initiating ServerTenantManagementService.", e);
         }
     }
@@ -48,7 +55,12 @@ public class ChannelVerifiedTenantsApiServiceImpl implements ChannelVerifiedTena
     @Override
     public Response addChannelVerifiedTenant(ChannelVerifiedTenantModel channelVerifiedTenantModel) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Adding channel verified tenant for domain: " + 
+                    (channelVerifiedTenantModel != null ? channelVerifiedTenantModel.getDomain() : null));
+        }
         String resourceId = tenantManagementService.addTenant(channelVerifiedTenantModel);
+        log.info("Channel verified tenant created successfully with ID: " + resourceId);
         return Response.created(getResourceLocation(resourceId)).build();
     }
 
