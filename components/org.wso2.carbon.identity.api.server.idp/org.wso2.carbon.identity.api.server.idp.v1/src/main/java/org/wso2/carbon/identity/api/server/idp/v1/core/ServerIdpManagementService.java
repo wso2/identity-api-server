@@ -264,6 +264,7 @@ public class ServerIdpManagementService {
         IdentityProvider identityProvider;
         try {
             validateSystemReservedIDP(identityProviderPOSTRequest.getName());
+            validateFederatedAuthenticatorsPropertyLimit(identityProviderPOSTRequest.getFederatedAuthenticators());
             identityProvider = identityProviderManager.addIdPWithResourceId(createIDP(identityProviderPOSTRequest),
                     ContextLoader.getTenantDomainFromContext());
         } catch (IdentityProviderManagementException e) {
@@ -746,6 +747,10 @@ public class ServerIdpManagementService {
             // Need to create a clone, since modifying the fields of the original object, will modify the cached
             // IDP object.
             IdentityProvider idpToUpdate = createIdPClone(idp);
+
+            if (authenticator.getProperties() != null) {
+                validateAuthenticatorPropertyLimit(authenticator.getProperties().size());
+            }
 
             checkAuthenticatorExistence(federatedAuthenticatorId, tenantDomain);
             // Create new FederatedAuthenticatorConfig to store the federated authenticator information.
@@ -3761,5 +3766,44 @@ public class ServerIdpManagementService {
     private enum IdpOperation {
         CREATION,
         UPDATE
+    }
+
+    private void validateFederatedAuthenticatorsPropertyLimit(
+            FederatedAuthenticatorRequest federatedAuthenticatorRequest) {
+
+        if (federatedAuthenticatorRequest == null || federatedAuthenticatorRequest.getAuthenticators() == null) {
+            return;
+        }
+
+        for (FederatedAuthenticator authenticator : federatedAuthenticatorRequest.getAuthenticators()) {
+            if (authenticator.getProperties() != null) {
+                validateAuthenticatorPropertyLimit(authenticator.getProperties().size());
+            }
+        }
+    }
+
+    private void validateAuthenticatorPropertyLimit(int propertyCount) {
+
+        int maxFederatedAuthenticatorPropertyLimit;
+        try {
+            maxFederatedAuthenticatorPropertyLimit = Integer.parseInt(IdentityUtil
+                    .getProperty(Constants.MAX_FEDERATED_AUTHENTICATORS_PROPERTY_LIMIT));
+        } catch (NumberFormatException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("The system property: " + Constants.MAX_FEDERATED_AUTHENTICATORS_PROPERTY_LIMIT +
+                        " is not a valid integer.");
+            }
+            return;
+        }
+
+        if (propertyCount > maxFederatedAuthenticatorPropertyLimit) {
+            if (log.isDebugEnabled()) {
+                log.debug("The number of properties provided for the federated authenticator exceeds the maximum " +
+                        "allowed limit of: " + maxFederatedAuthenticatorPropertyLimit);
+            }
+            throw handleException(Response.Status.BAD_REQUEST,
+                    Constants.ErrorMessage.ERROR_CODE_MAX_FEDERATED_AUTHENTICATOR_PROPERTY_EXCEEDED,
+                    String.valueOf(maxFederatedAuthenticatorPropertyLimit));
+        }
     }
 }

@@ -95,6 +95,9 @@ public class Constants {
     public static final String TENANT_DOMAIN_KEY = "tenantDomain";
     public static final String SEARCH_VALUE_AUTHENTICATION_PROVISIONING = SERV_PROVISIONING + "," + SERV_AUTHENTICATION;
 
+    public static final String MAX_FEDERATED_AUTHENTICATORS_PROPERTY_LIMIT =
+            "MaxFederatedAuthenticatorPropertiesPerIdP";
+
     /**
      * Enum for error messages.
      */
@@ -161,6 +164,10 @@ public class Constants {
         ERROR_COED_MULTIPLE_USER_DEFINED_AUTHENTICATORS_FOUND("60044", "Invalid federated " +
                 "authenticators combination.", "Allow to have only one user defined " +
                 "federated authenticator and no system authenticators."),
+        ERROR_CODE_MAX_FEDERATED_AUTHENTICATOR_PROPERTY_EXCEEDED("60045",
+                "Maximum number of authenticator properties exceeded.",
+                "Maximum number of allowed properties for a federated authenticator have been exceeded. " +
+                        "Max allowed: %s."),
 
         // Server Error starting from 650xx.
         ERROR_CODE_ERROR_ADDING_IDP("65002",
