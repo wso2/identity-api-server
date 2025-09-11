@@ -76,6 +76,9 @@ public class ServerIdentityGovernanceService {
     public ServerIdentityGovernanceService(IdentityGovernanceService identityGovernanceService) {
 
         this.identityGovernanceService = identityGovernanceService;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("ServerIdentityGovernanceService initialized successfully.");
+        }
     }
 
     /**
@@ -93,6 +96,9 @@ public class ServerIdentityGovernanceService {
 
         try {
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Retrieving categorized connector list for tenant: " + tenantDomain);
+            }
             Map<String, List<ConnectorConfig>> connectorConfigs =
                     identityGovernanceService.getCategorizedConnectorListWithConfigs(tenantDomain);
 
@@ -102,6 +108,7 @@ public class ServerIdentityGovernanceService {
             GovernanceConstants.ErrorMessage errorEnum =
                     GovernanceConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_CATEGORIES;
             Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+            LOG.error("Failed to retrieve governance connector categories.", e);
             throw handleException(e, errorEnum, status);
         }
     }
@@ -134,10 +141,16 @@ public class ServerIdentityGovernanceService {
         try {
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             String category = new String(Base64.getUrlDecoder().decode(categoryId), StandardCharsets.UTF_8);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Retrieving connectors for category: " + category + " in tenant: " + tenantDomain);
+            }
             List<ConnectorConfig> connectorConfigs =
                     identityGovernanceService.getConnectorListWithConfigsByCategory(tenantDomain, category);
 
             if (connectorConfigs.size() == 0) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("No connectors found for category: " + category);
+                }
                 throw handleNotFoundError(categoryId, GovernanceConstants.ErrorMessage.ERROR_CODE_CATEGORY_NOT_FOUND);
             }
 
@@ -147,6 +160,7 @@ public class ServerIdentityGovernanceService {
             GovernanceConstants.ErrorMessage errorEnum =
                     GovernanceConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_CATEGORY;
             Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+            LOG.error("Failed to retrieve governance connectors by category.", e);
             throw handleException(e, errorEnum, status);
         }
     }
@@ -163,15 +177,24 @@ public class ServerIdentityGovernanceService {
         try {
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             String connectorName = new String(Base64.getUrlDecoder().decode(connectorId), StandardCharsets.UTF_8);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Retrieving connector: " + connectorName + " for tenant: " + tenantDomain);
+            }
             ConnectorConfig connectorConfig =
                     identityGovernanceService.getConnectorWithConfigs(tenantDomain, connectorName);
             if (connectorConfig == null) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Connector not found: " + connectorName);
+                }
                 throw handleNotFoundError(connectorId, GovernanceConstants.ErrorMessage.ERROR_CODE_CONNECTOR_NOT_FOUND);
             }
             String categoryIdFound = Base64.getUrlEncoder()
                     .withoutPadding()
                     .encodeToString(connectorConfig.getCategory().getBytes(StandardCharsets.UTF_8));
             if (!categoryId.equals(categoryIdFound)) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Connector category mismatch. Expected: " + categoryId + ", Found: " + categoryIdFound);
+                }
                 throw handleNotFoundError(connectorId, GovernanceConstants.ErrorMessage.ERROR_CODE_CONNECTOR_NOT_FOUND);
             }
 
@@ -181,6 +204,7 @@ public class ServerIdentityGovernanceService {
             GovernanceConstants.ErrorMessage errorEnum =
                     GovernanceConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_CONNECTOR;
             Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+            LOG.error("Failed to retrieve governance connector.", e);
             throw handleException(e, errorEnum, status);
         }
     }
@@ -194,6 +218,10 @@ public class ServerIdentityGovernanceService {
     public List<PreferenceResp> getConfigPreference(List<PreferenceSearchAttribute> preferenceSearchAttribute) {
 
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving config preferences for " + preferenceSearchAttribute.size() + 
+                    " attributes in tenant: " + tenantDomain);
+        }
         List<PreferenceResp> preferenceRespList = new ArrayList<>();
         for (PreferenceSearchAttribute prefSearchAttr : preferenceSearchAttribute) {
             String connectorName = prefSearchAttr.getConnectorName();
@@ -214,6 +242,7 @@ public class ServerIdentityGovernanceService {
                 GovernanceConstants.ErrorMessage errorEnum =
                         GovernanceConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_CONNECTOR_PREFERENCES;
                 Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+                LOG.error("Failed to retrieve connector preferences.", e);
                 throw handleException(e, errorEnum, status);
             }
         }
@@ -293,6 +322,9 @@ public class ServerIdentityGovernanceService {
 
         try {
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Updating governance connector property for tenant: " + tenantDomain);
+            }
 
             ConnectorRes connector = getGovernanceConnector(categoryId, connectorId);
             if (connector == null) {
@@ -317,6 +349,9 @@ public class ServerIdentityGovernanceService {
                 }
             }
             identityGovernanceService.updateConfiguration(tenantDomain, configurationDetails);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully updated connector configuration for tenant: " + tenantDomain);
+            }
         } catch (IdentityGovernanceClientException e) {
             throw handleBadRequestError(GovernanceConstants.ErrorMessage.ERROR_CODE_INVALID_CONNECTOR_CONFIGURATION,
                     e.getMessage());
@@ -324,6 +359,7 @@ public class ServerIdentityGovernanceService {
             GovernanceConstants.ErrorMessage errorEnum =
                     GovernanceConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_CONNECTOR_PROPERTY;
             Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+            LOG.error("Failed to update governance connector property.", e);
             throw handleException(e, errorEnum, status);
         }
     }
@@ -340,6 +376,9 @@ public class ServerIdentityGovernanceService {
 
         try {
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Updating multiple governance connector properties for tenant: " + tenantDomain);
+            }
 
             // Check whether the category ID exists.
             CategoryRes category = getGovernanceConnectorCategory(categoryId);
@@ -380,11 +419,15 @@ public class ServerIdentityGovernanceService {
             }
 
             identityGovernanceService.updateConfiguration(tenantDomain, configurationDetails);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully updated multiple connector configurations for tenant: " + tenantDomain);
+            }
 
         } catch (IdentityGovernanceException e) {
             GovernanceConstants.ErrorMessage errorEnum =
                     GovernanceConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_CONNECTOR_PROPERTY;
             Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+            LOG.error("Failed to update multiple governance connector properties.", e);
             throw handleException(e, errorEnum, status);
         }
     }
@@ -401,6 +444,9 @@ public class ServerIdentityGovernanceService {
 
         try {
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Reverting governance connector properties for tenant: " + tenantDomain);
+            }
             ConnectorRes connector = getGovernanceConnector(categoryId, connectorId);
 
             // Throw an error if propertyRevertReq contain properties that are not in the connector.
@@ -413,10 +459,14 @@ public class ServerIdentityGovernanceService {
             }
 
             identityGovernanceService.deleteConfiguration(propertyRevertReq.getProperties(), tenantDomain);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully reverted connector properties for tenant: " + tenantDomain);
+            }
         } catch (IdentityGovernanceException e) {
             GovernanceConstants.ErrorMessage errorEnum =
                     GovernanceConstants.ErrorMessage.ERROR_CODE_ERROR_REVERTING_CONNECTOR_PROPERTY;
             Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+            LOG.error("Failed to revert governance connector properties.", e);
             throw handleException(e, errorEnum, status);
         }
     }

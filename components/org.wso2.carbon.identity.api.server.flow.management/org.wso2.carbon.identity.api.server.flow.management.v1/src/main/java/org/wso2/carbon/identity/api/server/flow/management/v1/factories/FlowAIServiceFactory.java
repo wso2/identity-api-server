@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.flow.management.v1.core.FlowAIServiceCore;
 
 /**
@@ -25,10 +27,13 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.core.FlowAIService
  */
 public class FlowAIServiceFactory {
 
+    private static final Log log = LogFactory.getLog(FlowAIServiceFactory.class);
     private static final FlowAIServiceCore SERVICE;
 
     static {
+        log.info("Initializing FlowAIService factory.");
         SERVICE = new FlowAIServiceCore();
+        log.info("FlowAIService factory initialized successfully.");
     }
 
     /**

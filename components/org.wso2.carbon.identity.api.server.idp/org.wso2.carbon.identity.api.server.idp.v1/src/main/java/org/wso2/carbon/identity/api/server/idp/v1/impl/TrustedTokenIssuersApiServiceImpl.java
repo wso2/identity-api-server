@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.idp.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.idp.v1.TrustedTokenIssuersApiService;
 import org.wso2.carbon.identity.api.server.idp.v1.core.ServerIdpManagementService;
@@ -41,6 +43,7 @@ import static org.wso2.carbon.identity.api.server.idp.common.Constants.TRUSTED_T
  */
 public class TrustedTokenIssuersApiServiceImpl implements TrustedTokenIssuersApiService {
 
+    private static final Log LOG = LogFactory.getLog(TrustedTokenIssuersApiServiceImpl.class);
     private final ServerIdpManagementService idpManagementService;
 
     public TrustedTokenIssuersApiServiceImpl() {
@@ -48,6 +51,7 @@ public class TrustedTokenIssuersApiServiceImpl implements TrustedTokenIssuersApi
         try {
             this.idpManagementService = ServerIdpManagementServiceFactory.getServerIdpManagementService();
         } catch (IllegalStateException e) {
+            LOG.error("Error occurred while initiating ServerIdpManagementService.", e);
             throw new RuntimeException("Error occurred while initiating ServerIdpManagementService.", e);
         }
     }

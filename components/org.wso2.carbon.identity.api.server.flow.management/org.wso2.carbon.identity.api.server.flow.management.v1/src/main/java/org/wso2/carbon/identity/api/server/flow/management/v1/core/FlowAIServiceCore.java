@@ -80,6 +80,9 @@ public class FlowAIServiceCore {
      */
     public FlowGenerateStatus getFlowGenerationStatus(String operationId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Getting flow generation status for operation ID: " + operationId);
+        }
         try {
             FlowGenerationStatusDTO responseDTO = FlowMgtServiceHolder.getFlowAIService()
                     .getFlowGenerationStatus(operationId);
@@ -89,6 +92,7 @@ public class FlowAIServiceCore {
                     .generatingFlow(responseDTO.isGeneratingFlow())
                     .completed(responseDTO.isCompleted());
         } catch (FlowMgtFrameworkException e) {
+            log.error("Error getting flow generation status for operation ID: " + operationId, e);
             throw Utils.handleFlowMgtException(e);
         }
     }
@@ -126,6 +130,7 @@ public class FlowAIServiceCore {
             }
             return flowGenerateResult;
         } catch (FlowMgtFrameworkException e) {
+            log.error("Error retrieving flow generation result for operation ID: " + operationId, e);
             throw Utils.handleFlowMgtException(e);
         }
     }
