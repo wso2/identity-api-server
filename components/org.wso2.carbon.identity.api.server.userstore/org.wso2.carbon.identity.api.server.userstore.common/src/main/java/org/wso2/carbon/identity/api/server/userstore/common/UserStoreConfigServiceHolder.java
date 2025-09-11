@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.userstore.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
 import org.wso2.carbon.identity.user.store.configuration.UserStoreConfigService;
@@ -27,6 +29,8 @@ import org.wso2.carbon.user.core.service.RealmService;
  * Service holder class for User Store.
  */
 public class UserStoreConfigServiceHolder {
+
+    private static final Log LOG = LogFactory.getLog(UserStoreConfigServiceHolder.class);
 
     private UserStoreConfigServiceHolder() {}
 
@@ -55,6 +59,11 @@ public class UserStoreConfigServiceHolder {
      */
     public static UserStoreConfigService getUserStoreConfigService() {
 
+        if (UserStoreServiceHolder.SERVICE == null) {
+            LOG.warn("UserStoreConfigService OSGi service is not available.");
+        } else if (LOG.isDebugEnabled()) {
+            LOG.debug("UserStoreConfigService OSGi service retrieved successfully.");
+        }
         return UserStoreServiceHolder.SERVICE;
     }
 
@@ -65,6 +74,11 @@ public class UserStoreConfigServiceHolder {
      */
     public static RealmService getRealmService() {
 
+        if (RealmServiceHolder.SERVICE == null) {
+            LOG.warn("RealmService OSGi service is not available.");
+        } else if (LOG.isDebugEnabled()) {
+            LOG.debug("RealmService OSGi service retrieved successfully.");
+        }
         return RealmServiceHolder.SERVICE;
     }
 
@@ -75,6 +89,11 @@ public class UserStoreConfigServiceHolder {
      */
     public static ClaimMetadataManagementService getClaimMetadataManagementService() {
 
+        if (ClaimMetadataManagementServiceHolder.SERVICE == null) {
+            LOG.warn("ClaimMetadataManagementService OSGi service is not available.");
+        } else if (LOG.isDebugEnabled()) {
+            LOG.debug("ClaimMetadataManagementService OSGi service retrieved successfully.");
+        }
         return ClaimMetadataManagementServiceHolder.SERVICE;
     }
 }

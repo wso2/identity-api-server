@@ -44,10 +44,12 @@ public class RuleMetadataAPIErrorBuilder {
 
         Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
         if (exception instanceof RuleMetadataClientException) {
-            LOG.debug(exception.getMessage(), exception);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Client error in rule metadata operation: " + exception.getMessage(), exception);
+            }
             status = Response.Status.BAD_REQUEST;
         } else {
-            LOG.error(exception.getMessage(), exception);
+            LOG.error("Server error in rule metadata operation: " + exception.getMessage(), exception);
         }
 
         String errorCode = exception.getErrorCode();

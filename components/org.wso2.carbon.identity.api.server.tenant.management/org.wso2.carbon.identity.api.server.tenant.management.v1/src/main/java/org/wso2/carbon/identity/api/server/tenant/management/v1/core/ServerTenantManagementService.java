@@ -104,11 +104,21 @@ public class ServerTenantManagementService {
      */
     public String addTenant(TenantModel tenantModel) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Adding tenant for domain: " + (tenantModel != null ? tenantModel.getDomain() : null));
+        }
+        if (tenantModel == null) {
+            throw handleTenantManagementException(new TenantManagementClientException(
+                    "Tenant model cannot be null", "40001"),
+                    TenantManagementConstants.ErrorMessage.ERROR_CODE_ERROR_ADDING_TENANT, null);
+        }
         String resourceId;
         try {
             Tenant tenant = createTenantInfoBean(tenantModel);
             resourceId = tenantMgtService.addTenant(tenant);
+            log.info("Tenant added successfully with resource ID: " + resourceId);
         } catch (TenantMgtException e) {
+            log.error("Error adding tenant: " + tenantModel.getDomain(), e);
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage
                     .ERROR_CODE_ERROR_ADDING_TENANT, null);
         }
@@ -128,11 +138,19 @@ public class ServerTenantManagementService {
     public TenantsListResponse listTenants(Integer limit, Integer offset, String sortOrder, String sortBy,
                                            String filter) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Listing tenants with limit: " + limit + ", offset: " + offset + ", filter: " + filter);
+        }
         try {
             TenantSearchResult tenantSearchResult = tenantMgtService.listTenants(limit, offset, sortOrder, sortBy,
                     filter);
-            return createTenantListResponse(tenantSearchResult);
+            TenantsListResponse response = createTenantListResponse(tenantSearchResult);
+            if (log.isDebugEnabled()) {
+                log.debug("Listed " + response.getCount() + " tenants successfully");
+            }
+            return response;
         } catch (TenantMgtException e) {
+            log.error("Error listing tenants with filter: " + filter, e);
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage
                     .ERROR_CODE_ERROR_LISTING_TENANTS, null);
         }
@@ -146,10 +164,14 @@ public class ServerTenantManagementService {
      */
     public TenantResponseModel getTenant(String tenantUniqueID) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving tenant by ID: " + tenantUniqueID);
+        }
         try {
             Tenant tenant = tenantMgtService.getTenant(tenantUniqueID);
             return createTenantResponse(tenant);
         } catch (TenantMgtException e) {
+            log.error("Error retrieving tenant by ID: " + tenantUniqueID, e);
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
                     ERROR_CODE_ERROR_RETRIEVING_TENANT, tenantUniqueID);
         }
@@ -163,10 +185,14 @@ public class ServerTenantManagementService {
      */
     public TenantResponseModel getTenantByDomain(String domain) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving tenant by domain: " + domain);
+        }
         try {
             Tenant tenant = tenantMgtService.getTenantByDomain(domain);
             return createTenantResponse(tenant);
         } catch (TenantMgtException e) {
+            log.error("Error retrieving tenant by domain: " + domain, e);
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
                     ERROR_CODE_ERROR_RETRIEVING_TENANT, domain);
         }
@@ -180,9 +206,17 @@ public class ServerTenantManagementService {
      */
     public boolean isDomainAvailable(String tenantDomain) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Checking domain availability for: " + tenantDomain);
+        }
         try {
-            return tenantMgtService.isDomainAvailable(tenantDomain);
+            boolean available = tenantMgtService.isDomainAvailable(tenantDomain);
+            if (log.isDebugEnabled()) {
+                log.debug("Domain " + tenantDomain + " is " + (available ? "available" : "not available"));
+            }
+            return available;
         } catch (TenantMgtException e) {
+            log.error("Error checking domain availability for: " + tenantDomain, e);
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
                     ERROR_CODE_ERROR_RETRIEVING_TENANT, tenantDomain);
         }
@@ -196,10 +230,14 @@ public class ServerTenantManagementService {
      */
     public List<OwnerResponse> getOwners(String tenantUniqueID) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving owners for tenant ID: " + tenantUniqueID);
+        }
         try {
             User user = tenantMgtService.getOwner(tenantUniqueID);
             return createOwnerResponse(user);
         } catch (TenantMgtException e) {
+            log.error("Error retrieving owners for tenant ID: " + tenantUniqueID, e);
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
                     ERROR_CODE_ERROR_RETRIEVING_TENANT, tenantUniqueID);
         }
@@ -207,6 +245,9 @@ public class ServerTenantManagementService {
 
     public OwnerInfoResponse getOwner(String tenantUniqueID, String ownerID, String additionalClaims) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving owner info for tenant ID: " + tenantUniqueID + ", owner ID: " + ownerID);
+        }
         try {
             Tenant tenant = tenantMgtService.getTenant(tenantUniqueID);
             validateTenantOwnerId(tenant, ownerID);
@@ -214,6 +255,7 @@ public class ServerTenantManagementService {
             String[] claimsList = StringUtils.split(additionalClaims, ",");
             return createOwnerInfoResponse(tenant, claimsList);
         } catch (TenantMgtException e) {
+            log.error("Error retrieving owner info for tenant ID: " + tenantUniqueID + ", owner ID: " + ownerID, e);
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
                     ERROR_CODE_ERROR_RETRIEVING_OWNER, tenantUniqueID);
         }
@@ -221,6 +263,14 @@ public class ServerTenantManagementService {
 
     public void updateOwner(String tenantUniqueID, String ownerID, OwnerPutModel ownerPutModel) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating owner for tenant ID: " + tenantUniqueID + ", owner ID: " + ownerID);
+        }
+        if (ownerPutModel == null) {
+            throw handleTenantManagementException(new TenantManagementClientException(
+                    "Owner put model cannot be null", "40001"),
+                    TenantManagementConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_OWNER, null);
+        }
         try {
             Tenant tenant = tenantMgtService.getTenant(tenantUniqueID);
             validateTenantOwnerId(tenant, ownerID);
@@ -228,7 +278,9 @@ public class ServerTenantManagementService {
             createTenantInfoBean(tenant, ownerPutModel);
 
             tenantMgtService.updateOwner(tenant);
+            log.info("Owner updated successfully for tenant ID: " + tenantUniqueID);
         } catch (TenantMgtException e) {
+            log.error("Error updating owner for tenant ID: " + tenantUniqueID + ", owner ID: " + ownerID, e);
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
                     ERROR_CODE_ERROR_UPDATING_OWNER, tenantUniqueID);
         }
@@ -241,9 +293,14 @@ public class ServerTenantManagementService {
      */
     public void deleteTenantMetadata(String tenantUniqueID) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting tenant metadata for tenant ID: " + tenantUniqueID);
+        }
         try {
             tenantMgtService.deleteTenantMetaData(tenantUniqueID);
+            log.info("Tenant metadata deleted successfully for tenant ID: " + tenantUniqueID);
         } catch (TenantMgtException e) {
+            log.error("Error deleting tenant metadata for tenant ID: " + tenantUniqueID, e);
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
                     ERROR_CODE_DELETE_TENANT_METADATA, tenantUniqueID);
         }
@@ -258,14 +315,26 @@ public class ServerTenantManagementService {
      */
     public String updateTenantStatus(String tenantUniqueID, TenantPutModel tenantPutModel) {
 
+        if (tenantPutModel == null) {
+            throw handleTenantManagementException(new TenantManagementClientException(
+                    "Tenant put model cannot be null", "40001"),
+                    TenantManagementConstants.ErrorMessage.ERROR_CODE_UPDATE_LIFECYCLE_STATUS, null);
+        }
         boolean activated = tenantPutModel.getActivated();
+        if (log.isDebugEnabled()) {
+            log.debug("Updating tenant status for tenant ID: " + tenantUniqueID + ", activated: " + activated);
+        }
         try {
             if (activated) {
                 tenantMgtService.activateTenant(tenantUniqueID);
+                log.info("Tenant activated successfully: " + tenantUniqueID);
             } else {
                 tenantMgtService.deactivateTenant(tenantUniqueID);
+                log.info("Tenant deactivated successfully: " + tenantUniqueID);
             }
         } catch (TenantMgtException e) {
+            log.error("Error updating tenant status for tenant ID: " + tenantUniqueID + 
+                    ", activated: " + activated, e);
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
                     ERROR_CODE_UPDATE_LIFECYCLE_STATUS, String.valueOf(activated));
         }
@@ -305,7 +374,19 @@ public class ServerTenantManagementService {
 
     private void validateTenantOwnerId(Tenant tenant, String ownerID) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Validating tenant owner ID: " + ownerID + " for tenant: " + 
+                    (tenant != null ? tenant.getTenantUniqueID() : null));
+        }
+        if (tenant == null) {
+            throw handleException(Response.Status.BAD_REQUEST, TenantManagementConstants.ErrorMessage.
+                    ERROR_CODE_OWNER_NOT_FOUND, null);
+        }
         if (tenant.getAdminUserId() == null || !tenant.getAdminUserId().equals(ownerID)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Owner validation failed - owner not found for tenant: " + 
+                        tenant.getTenantUniqueID());
+            }
             throw handleException(Response.Status.BAD_REQUEST, TenantManagementConstants.ErrorMessage.
                     ERROR_CODE_OWNER_NOT_FOUND, tenant.getTenantUniqueID());
         }
@@ -614,12 +695,24 @@ public class ServerTenantManagementService {
     }
 
     public String addTenant(ChannelVerifiedTenantModel channelVerifiedTenantModel) {
+        if (log.isDebugEnabled()) {
+            log.debug("Adding channel verified tenant for domain: " + 
+                    (channelVerifiedTenantModel != null ? channelVerifiedTenantModel.getDomain() : null));
+        }
+        if (channelVerifiedTenantModel == null) {
+            throw handleTenantManagementException(new TenantManagementClientException(
+                    "Channel verified tenant model cannot be null", "40001"),
+                    TenantManagementConstants.ErrorMessage.ERROR_CODE_ERROR_ADDING_TENANT, null);
+        }
         String resourceId;
         try {
             validateInputAgainstCode(channelVerifiedTenantModel);
             Tenant tenant = createTenantInfoBean(channelVerifiedTenantModel);
             resourceId = tenantMgtService.addTenant(tenant);
+            log.info("Channel verified tenant added successfully with resource ID: " + resourceId);
         } catch (TenantMgtException e) {
+            log.error("Error adding channel verified tenant: " + 
+                    channelVerifiedTenantModel.getDomain(), e);
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage
                     .ERROR_CODE_ERROR_ADDING_TENANT, null);
         }
@@ -635,10 +728,16 @@ public class ServerTenantManagementService {
 
         String code = tenant.getCode();
         if (StringUtils.isBlank(code)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Validation code is missing for tenant registration");
+            }
             throw new TenantManagementClientException(ERROR_CODE_MISSING_REQUIRED_PARAMETER.getCode(),
                     String.format(ERROR_CODE_MISSING_REQUIRED_PARAMETER.getMessage(), CODE));
         }
 
+        if (log.isDebugEnabled()) {
+            log.debug("Validating tenant registration code");
+        }
         UserRecoveryDataStore userRecoveryDataStore = JDBCRecoveryDataStore.getInstance();
 
         // If the code is validated, the load method will return data. Otherwise method will throw exceptions.
@@ -648,6 +747,9 @@ public class ServerTenantManagementService {
                     tenant.getOwners().get(0) != null && tenant.getOwners().get(0).getEmail() != null &&
                     tenant.getOwners().get(0).getEmail().equalsIgnoreCase(recoveryData.getUser().getUserName())) {
                 userRecoveryDataStore.invalidate(code);
+                if (log.isDebugEnabled()) {
+                    log.debug("Code validation successful for tenant registration");
+                }
                 return;
             } else { // the confirmed email using the code and submitted emails are different.
                 userRecoveryDataStore.invalidate(code);
@@ -657,6 +759,7 @@ public class ServerTenantManagementService {
             }
 
         } catch (IdentityRecoveryException e) {
+            log.error("Error validating tenant registration code", e);
             throw handleException(Response.Status.UNAUTHORIZED, TenantManagementConstants.ErrorMessage
                     .ERROR_CODE_ERROR_VALIDATING_TENANT_CODE, null);
         }

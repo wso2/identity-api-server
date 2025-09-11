@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.permission.management.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.permission.management.common.RolePermissionManagementServiceDataHolder;
 import org.wso2.carbon.identity.api.server.permission.management.v1.core.PermissionManagementService;
 import org.wso2.carbon.user.mgt.RolePermissionManagementService;
@@ -27,6 +29,7 @@ import org.wso2.carbon.user.mgt.RolePermissionManagementService;
  */
 public class PermissionManagementServiceFactory {
 
+    private static final Log LOG = LogFactory.getLog(PermissionManagementServiceFactory.class);
     private static final PermissionManagementService SERVICE;
 
     static {
@@ -34,9 +37,11 @@ public class PermissionManagementServiceFactory {
                 .getRolePermissionManagementService();
 
         if (rolePermissionManagementService == null) {
+            LOG.error("RolePermissionManagementService is not available from OSGi context");
             throw new IllegalStateException("RolePermissionManagementService is not available from OSGi context.");
         }
 
+        LOG.info("PermissionManagementService initialized successfully");
         SERVICE = new PermissionManagementService(rolePermissionManagementService);
     }
 

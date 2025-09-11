@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.rest.api.server.workflow.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.WorkflowInstancesApiService;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.core.WorkflowService;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.factories.WorkflowServiceFactory;
@@ -29,23 +31,28 @@ import javax.ws.rs.core.Response;
  */
 public class WorkflowInstancesApiServiceImpl implements WorkflowInstancesApiService {
 
+    private static final Log log = LogFactory.getLog(WorkflowInstancesApiServiceImpl.class);
     private final WorkflowService workflowService;
 
     public WorkflowInstancesApiServiceImpl() {
         
+        log.debug("Initializing WorkflowInstancesApiServiceImpl");
         this.workflowService = WorkflowServiceFactory.getWorkflowService();
     }
 
     @Override
     public Response deleteWorkflowInstance(String instanceId) {
 
+        log.debug("Deleting workflow instance with ID: " + instanceId);
         workflowService.deleteWorkflowInstance(instanceId);
+        log.info("Successfully deleted workflow instance with ID: " + instanceId);
         return Response.noContent().build();
     }
 
     @Override
     public Response getWorkflowInstanceById(String instanceId) {
 
+        log.debug("Retrieving workflow instance with ID: " + instanceId);
         return Response.ok().entity(workflowService.getWorkflowInstanceById(instanceId)).build();
     }
 
@@ -53,6 +60,9 @@ public class WorkflowInstancesApiServiceImpl implements WorkflowInstancesApiServ
     public Response getWorkflowInstances(Integer limit, Integer offset, String filter, String sortBy,
             String sortOrder) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Listing workflow instances with limit: " + limit + ", offset: " + offset);
+        }
         return Response.ok().entity(workflowService.getWorkflowInstances(limit, offset, filter)).build();
     }
 }

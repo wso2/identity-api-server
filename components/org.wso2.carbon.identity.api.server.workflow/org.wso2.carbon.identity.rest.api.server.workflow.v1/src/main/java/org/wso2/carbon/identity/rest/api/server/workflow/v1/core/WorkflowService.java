@@ -96,6 +96,9 @@ public class WorkflowService {
      */
     public WorkflowResponse addWorkflow(WorkflowRequest workflow) {
 
+        if (workflow == null) {
+            throw new IllegalArgumentException("Workflow request cannot be null");
+        }
         Workflow currentWorkflow;
         try {
             String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
@@ -224,6 +227,9 @@ public class WorkflowService {
      */
     public WorkflowAssociationResponse addAssociation(WorkflowAssociationRequest workflowAssociation) {
 
+        if (workflowAssociation == null) {
+            throw new IllegalArgumentException("Workflow association request cannot be null");
+        }
         try {
             Workflow currentWorkflow = workflowManagementService.getWorkflow(workflowAssociation.getWorkflowId());
             WorkflowEvent event = workflowManagementService.getEvent(workflowAssociation.getOperation().toString());

@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.webhook.metadata.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.webhook.metadata.api.service.EventAdapterMetadataService;
 import org.wso2.carbon.identity.webhook.metadata.api.service.WebhookMetadataService;
@@ -26,6 +28,8 @@ import org.wso2.carbon.identity.webhook.metadata.api.service.WebhookMetadataServ
  * Service holder class for Webhook Metadata Service.
  */
 public class WebhookMetadataServiceHolder {
+
+    private static final Log log = LogFactory.getLog(WebhookMetadataServiceHolder.class);
 
     private WebhookMetadataServiceHolder() {
 
@@ -48,7 +52,14 @@ public class WebhookMetadataServiceHolder {
      */
     public static WebhookMetadataService getWebhookMetadataService() {
 
-        return WebhookMetadataServiceHolderInstance.WEBHOOK_METADATA_SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving WebhookMetadataService from OSGi service registry.");
+        }
+        WebhookMetadataService service = WebhookMetadataServiceHolderInstance.WEBHOOK_METADATA_SERVICE;
+        if (service == null) {
+            log.warn("WebhookMetadataService is not available in the OSGi service registry.");
+        }
+        return service;
     }
 
     /**
@@ -58,6 +69,13 @@ public class WebhookMetadataServiceHolder {
      */
     public static EventAdapterMetadataService getEventAdapterMetadataService() {
 
-        return WebhookMetadataServiceHolderInstance.EVENT_ADAPTER_METADATA_SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving EventAdapterMetadataService from OSGi service registry.");
+        }
+        EventAdapterMetadataService service = WebhookMetadataServiceHolderInstance.EVENT_ADAPTER_METADATA_SERVICE;
+        if (service == null) {
+            log.warn("EventAdapterMetadataService is not available in the OSGi service registry.");
+        }
+        return service;
     }
 }

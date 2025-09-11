@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.webhook.management.v1.core;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.model.WebhookList;
@@ -39,14 +41,17 @@ import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.webhook.management.v1.constants.WebhookMgtEndpointConstants.ErrorMessage.ERROR_NO_WEBHOOK_FOUND_ON_GIVEN_ID;
-import static org.wso2.carbon.identity.api.server.webhook.management.v1.constants.WebhookMgtEndpointConstants.WEBHOOK_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.webhook.management.v1.constants
+        .WebhookMgtEndpointConstants.ErrorMessage.ERROR_NO_WEBHOOK_FOUND_ON_GIVEN_ID;
+import static org.wso2.carbon.identity.api.server.webhook.management.v1.constants
+        .WebhookMgtEndpointConstants.WEBHOOK_PATH_COMPONENT;
 
 /**
  * Call internal osgi services to perform webhook management operations.
  */
 public class ServerWebhookManagementService {
 
+    private static final Log LOG = LogFactory.getLog(ServerWebhookManagementService.class);
     private final WebhookManagementService webhookManagementService;
 
     public ServerWebhookManagementService(WebhookManagementService webhookManagementService) {
@@ -61,13 +66,20 @@ public class ServerWebhookManagementService {
      */
     public WebhookList getWebhooks() {
 
+        String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving webhooks for tenant: " + tenantDomain);
+        }
         try {
-            List<Webhook> webhooks =
-                    webhookManagementService.getWebhooks(CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            List<Webhook> webhooks = webhookManagementService.getWebhooks(tenantDomain);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Found " + webhooks.size() + " webhooks for tenant: " + tenantDomain);
+            }
             return new WebhookList().webhooks(webhooks.stream()
                     .map(this::toWebhookSummary)
                     .collect(Collectors.toList()));
         } catch (WebhookMgtException e) {
+            LOG.error("Error retrieving webhooks for tenant: " + tenantDomain, e);
             throw WebhookManagementAPIErrorBuilder.buildAPIError(e);
         }
     }
@@ -80,15 +92,20 @@ public class ServerWebhookManagementService {
      */
     public WebhookResponse getWebhook(String webhookId) {
 
+        String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving webhook with ID: " + webhookId + " for tenant: " + tenantDomain);
+        }
         try {
-            Webhook webhook = webhookManagementService.getWebhook(webhookId,
-                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            Webhook webhook = webhookManagementService.getWebhook(webhookId, tenantDomain);
             if (webhook == null) {
+                LOG.warn("Webhook not found with ID: " + webhookId + " for tenant: " + tenantDomain);
                 throw WebhookManagementAPIErrorBuilder.buildAPIError(Response.Status.NOT_FOUND,
                         ERROR_NO_WEBHOOK_FOUND_ON_GIVEN_ID, webhookId);
             }
             return getWebhookResponse(webhook);
         } catch (WebhookMgtException e) {
+            LOG.error("Error retrieving webhook with ID: " + webhookId + " for tenant: " + tenantDomain, e);
             throw WebhookManagementAPIErrorBuilder.buildAPIError(e);
         }
     }
@@ -101,11 +118,22 @@ public class ServerWebhookManagementService {
      */
     public WebhookResponse createWebhook(WebhookRequest webhookRequest) {
 
+        String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        String webhookName = webhookRequest != null ? webhookRequest.getName() : "null";
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Creating webhook with name: " + webhookName + " for tenant: " + tenantDomain);
+        }
+        if (webhookRequest == null) {
+            throw new IllegalArgumentException("Webhook request cannot be null");
+        }
         try {
             Webhook webhook = buildWebhook(null, webhookRequest);
-            return getWebhookResponse(webhookManagementService.createWebhook(webhook,
-                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
+            WebhookResponse response = getWebhookResponse(
+                    webhookManagementService.createWebhook(webhook, tenantDomain));
+            LOG.info("Webhook created successfully with ID: " + response.getId() + " for tenant: " + tenantDomain);
+            return response;
         } catch (WebhookMgtException e) {
+            LOG.error("Error creating webhook with name: " + webhookName + " for tenant: " + tenantDomain, e);
             throw WebhookManagementAPIErrorBuilder.buildAPIError(e);
         }
     }
@@ -119,11 +147,18 @@ public class ServerWebhookManagementService {
      */
     public WebhookResponse updateWebhook(String webhookId, WebhookRequest webhookRequest) {
 
+        String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating webhook with ID: " + webhookId + " for tenant: " + tenantDomain);
+        }
         try {
             Webhook webhook = buildWebhook(webhookId, webhookRequest);
-            return getWebhookResponse(webhookManagementService.updateWebhook(webhookId, webhook,
-                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
+            WebhookResponse response = getWebhookResponse(
+                    webhookManagementService.updateWebhook(webhookId, webhook, tenantDomain));
+            LOG.info("Webhook updated successfully with ID: " + webhookId + " for tenant: " + tenantDomain);
+            return response;
         } catch (WebhookMgtException e) {
+            LOG.error("Error updating webhook with ID: " + webhookId + " for tenant: " + tenantDomain, e);
             throw WebhookManagementAPIErrorBuilder.buildAPIError(e);
         }
     }
@@ -135,10 +170,15 @@ public class ServerWebhookManagementService {
      */
     public void deleteWebhook(String webhookId) {
 
+        String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deleting webhook with ID: " + webhookId + " for tenant: " + tenantDomain);
+        }
         try {
-            webhookManagementService.deleteWebhook(webhookId,
-                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            webhookManagementService.deleteWebhook(webhookId, tenantDomain);
+            LOG.info("Webhook deleted successfully with ID: " + webhookId + " for tenant: " + tenantDomain);
         } catch (WebhookMgtException e) {
+            LOG.error("Error deleting webhook with ID: " + webhookId + " for tenant: " + tenantDomain, e);
             throw WebhookManagementAPIErrorBuilder.buildAPIError(e);
         }
     }
@@ -151,10 +191,17 @@ public class ServerWebhookManagementService {
      */
     public WebhookResponse activateWebhook(String webhookId) {
 
+        String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Activating webhook with ID: " + webhookId + " for tenant: " + tenantDomain);
+        }
         try {
-            return getWebhookResponse(webhookManagementService.activateWebhook(webhookId,
-                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
+            WebhookResponse response = getWebhookResponse(
+                    webhookManagementService.activateWebhook(webhookId, tenantDomain));
+            LOG.info("Webhook activated successfully with ID: " + webhookId + " for tenant: " + tenantDomain);
+            return response;
         } catch (WebhookMgtException e) {
+            LOG.error("Error activating webhook with ID: " + webhookId + " for tenant: " + tenantDomain, e);
             throw WebhookManagementAPIErrorBuilder.buildAPIError(e);
         }
     }
@@ -167,10 +214,17 @@ public class ServerWebhookManagementService {
      */
     public WebhookResponse deactivateWebhook(String webhookId) {
 
+        String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deactivating webhook with ID: " + webhookId + " for tenant: " + tenantDomain);
+        }
         try {
-            return getWebhookResponse(webhookManagementService.deactivateWebhook(webhookId,
-                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
+            WebhookResponse response = getWebhookResponse(
+                    webhookManagementService.deactivateWebhook(webhookId, tenantDomain));
+            LOG.info("Webhook deactivated successfully with ID: " + webhookId + " for tenant: " + tenantDomain);
+            return response;
         } catch (WebhookMgtException e) {
+            LOG.error("Error deactivating webhook with ID: " + webhookId + " for tenant: " + tenantDomain, e);
             throw WebhookManagementAPIErrorBuilder.buildAPIError(e);
         }
     }
@@ -183,10 +237,17 @@ public class ServerWebhookManagementService {
      */
     public WebhookResponse retryWebhook(String webhookId) {
 
+        String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrying webhook with ID: " + webhookId + " for tenant: " + tenantDomain);
+        }
         try {
-            return getWebhookResponse(webhookManagementService.retryWebhook(webhookId,
-                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
+            WebhookResponse response = getWebhookResponse(
+                    webhookManagementService.retryWebhook(webhookId, tenantDomain));
+            LOG.info("Webhook retry initiated successfully for ID: " + webhookId + " for tenant: " + tenantDomain);
+            return response;
         } catch (WebhookMgtException e) {
+            LOG.error("Error retrying webhook with ID: " + webhookId + " for tenant: " + tenantDomain, e);
             throw WebhookManagementAPIErrorBuilder.buildAPIError(e);
         }
     }
@@ -273,6 +334,7 @@ public class ServerWebhookManagementService {
                 webhookResponse.setChannelsSubscribed(null);
             }
         } catch (WebhookMgtException e) {
+            LOG.warn("Error setting channels subscribed for webhook ID: " + webhook.getId(), e);
             webhookResponse.setChannelsSubscribed(null);
         }
         return webhookResponse;

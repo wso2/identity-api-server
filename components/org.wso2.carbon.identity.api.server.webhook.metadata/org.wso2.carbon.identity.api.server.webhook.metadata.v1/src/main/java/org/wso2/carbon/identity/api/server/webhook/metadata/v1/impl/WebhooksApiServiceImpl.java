@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.webhook.metadata.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.WebhooksApiService;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.core.ServerWebhookMetadataService;
 import org.wso2.carbon.identity.api.server.webhook.metadata.v1.factories.ServerWebhookMetadataServiceFactory;
@@ -32,9 +34,14 @@ import javax.ws.rs.core.Response;
  */
 public class WebhooksApiServiceImpl implements WebhooksApiService {
 
+    private static final Log LOG = LogFactory.getLog(WebhooksApiServiceImpl.class);
+
     @Override
     public Response getEventProfile(String profileName) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Received request to get event profile: " + profileName);
+        }
         ServerWebhookMetadataService webhookMetadataService =
                 ServerWebhookMetadataServiceFactory.getServerWebhookMetadataService();
         EventProfile eventProfile = webhookMetadataService.getEventProfile(profileName);
@@ -44,6 +51,9 @@ public class WebhooksApiServiceImpl implements WebhooksApiService {
     @Override
     public Response getEventProfiles() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Received request to get all event profiles");
+        }
         ServerWebhookMetadataService webhookMetadataService =
                 ServerWebhookMetadataServiceFactory.getServerWebhookMetadataService();
         WebhookMetadata webhookMetadata = webhookMetadataService.getWebhookMetadata();
@@ -53,6 +63,9 @@ public class WebhooksApiServiceImpl implements WebhooksApiService {
     @Override
     public Response patchWebhookMetadata(WebhookMetadataProperties webhookMetadataProperties) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Received request to patch webhook metadata properties");
+        }
         ServerWebhookMetadataService webhookMetadataService =
                 ServerWebhookMetadataServiceFactory.getServerWebhookMetadataService();
         return Response.ok().entity(webhookMetadataService.updateWebhookMetadataProperties(webhookMetadataProperties))
@@ -62,6 +75,9 @@ public class WebhooksApiServiceImpl implements WebhooksApiService {
     @Override
     public Response putWebhookMetadataNotAllowed() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Received PUT request which is not allowed for webhook metadata");
+        }
         return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
     }
 }

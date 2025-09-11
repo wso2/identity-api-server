@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.rest.api.server.workflow.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.WorkflowsApiService;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.core.WorkflowService;
@@ -37,44 +39,59 @@ import static org.wso2.carbon.identity.api.server.workflow.common.Constants.WORK
  */
 public class WorkflowsApiServiceImpl implements WorkflowsApiService {
 
+    private static final Log log = LogFactory.getLog(WorkflowsApiServiceImpl.class);
     private final WorkflowService workflowService;
 
     public WorkflowsApiServiceImpl() {
 
+        log.debug("Initializing WorkflowsApiServiceImpl");
         this.workflowService = WorkflowServiceFactory.getWorkflowService();
     }
 
     @Override
     public Response addWorkflow(WorkflowRequest workflowRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Adding workflow: " + (workflowRequest != null ? workflowRequest.getName() : "null"));
+        }
         WorkflowResponse workflowResponse = workflowService.addWorkflow(workflowRequest);
         URI location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + WORKFLOW_PATH_COMPONENT + "/" +
                 workflowResponse.getId());
+        log.info("Successfully added workflow with ID: " + workflowResponse.getId());
         return Response.created(location).entity(workflowResponse).build();
     }
 
     @Override
     public Response deleteWorkflowById(String workflowId) {
 
+        log.debug("Deleting workflow with ID: " + workflowId);
         workflowService.removeWorkflow(workflowId);
+        log.info("Successfully deleted workflow with ID: " + workflowId);
         return Response.noContent().build();
     }
 
     @Override
     public Response getWorkflowById(String workflowId) {
 
+        log.debug("Retrieving workflow with ID: " + workflowId);
         return Response.ok().entity(workflowService.getWorkflow(workflowId)).build();
     }
 
     @Override
     public Response getWorkflows(Integer limit, Integer offset, String filter) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Listing workflows with limit: " + limit + ", offset: " + offset);
+        }
         return Response.ok().entity(workflowService.listPaginatedWorkflows(limit, offset, filter)).build();
     }
 
     @Override
     public Response updateWorkflow(String workflowId, WorkflowRequest workflowRequest) {
 
-        return Response.ok().entity(workflowService.updateWorkflow(workflowRequest, workflowId)).build();
+        log.debug("Updating workflow with ID: " + workflowId);
+        WorkflowResponse response = workflowService.updateWorkflow(workflowRequest, workflowId);
+        log.info("Successfully updated workflow with ID: " + workflowId);
+        return Response.ok().entity(response).build();
     }
 }

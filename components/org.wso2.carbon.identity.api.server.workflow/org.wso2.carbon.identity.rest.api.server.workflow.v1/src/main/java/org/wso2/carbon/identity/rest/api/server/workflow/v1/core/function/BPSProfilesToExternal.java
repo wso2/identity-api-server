@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.rest.api.server.workflow.v1.core.function;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.dto.WorkFlowEngineDTO;
 import org.wso2.carbon.identity.workflow.impl.bean.BPSProfile;
 
@@ -28,9 +30,18 @@ import java.util.function.Function;
  */
 public class BPSProfilesToExternal implements Function<BPSProfile, WorkFlowEngineDTO> {
 
+    private static final Log log = LogFactory.getLog(BPSProfilesToExternal.class);
+
     @Override
     public WorkFlowEngineDTO apply(BPSProfile bpsProfile) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Transforming BPSProfile to WorkFlowEngineDTO for profile: " + 
+                    (bpsProfile != null ? bpsProfile.getProfileName() : "null"));
+        }
+        if (bpsProfile == null) {
+            return new WorkFlowEngineDTO();
+        }
         WorkFlowEngineDTO workFlowEngineDTO = new WorkFlowEngineDTO();
         workFlowEngineDTO.setProfileName(bpsProfile.getProfileName());
         workFlowEngineDTO.setManagerHostURL(bpsProfile.getManagerHostURL());

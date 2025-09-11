@@ -40,8 +40,10 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.secret.mgt.core.constant.SecretConstants.ErrorMessages.ERROR_CODE_SECRET_ALREADY_EXISTS;
-import static org.wso2.carbon.identity.secret.mgt.core.constant.SecretConstants.ErrorMessages.ERROR_CODE_SECRET_DOES_NOT_EXISTS;
+import static org.wso2.carbon.identity.secret.mgt.core.constant.SecretConstants.ErrorMessages.
+        ERROR_CODE_SECRET_ALREADY_EXISTS;
+import static org.wso2.carbon.identity.secret.mgt.core.constant.SecretConstants.ErrorMessages.
+        ERROR_CODE_SECRET_DOES_NOT_EXISTS;
 
 /**
  * Invoke internal OSGi service to perform secret management operations.
@@ -66,10 +68,16 @@ public class SecretManagementService {
     public SecretResponse addSecret(String secretType, SecretAddRequest secretAddRequest) {
 
         validateSecretAddRequest(secretAddRequest);
+        if (log.isDebugEnabled()) {
+            log.debug("Adding secret for type: " + secretType + " with name: " + 
+                    secretAddRequest.getName());
+        }
         Secret requestDTO, responseDTO;
         try {
             requestDTO = buildSecretRequestDTOFromSecretAddRequest(secretAddRequest);
             responseDTO = secretManager.addSecret(secretType, requestDTO);
+            log.info("Secret added successfully for type: " + secretType + " with name: " + 
+                    secretAddRequest.getName());
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.ERROR_CODE_ERROR_ADDING_SECRET,
                     secretAddRequest.getName());
@@ -102,6 +110,10 @@ public class SecretManagementService {
      */
     private void validateSecretAddRequest(SecretAddRequest secretAddRequest) {
 
+        if (secretAddRequest == null) {
+            throw handleException(Response.Status.BAD_REQUEST, SecretManagementConstants.ErrorMessage.
+                    ERROR_CODE_INVALID_INPUT, null);
+        }
         String secretAddName = secretAddRequest.getName();
         if (StringUtils.isBlank(secretAddName)) {
             throw handleException(Response.Status.BAD_REQUEST, SecretManagementConstants.ErrorMessage.
@@ -136,8 +148,12 @@ public class SecretManagementService {
      */
     public void deleteSecret(String secretType, String name) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting secret for type: " + secretType + " with name: " + name);
+        }
         try {
             secretManager.deleteSecret(secretType, name);
+            log.info("Secret deleted successfully for type: " + secretType + " with name: " + name);
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.
                     ERROR_CODE_ERROR_DELETING_SECRET, name);
@@ -153,6 +169,9 @@ public class SecretManagementService {
      */
     public SecretResponse getSecret(String secretType, String name) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving secret for type: " + secretType + " with name: " + name);
+        }
         try {
             Secret responseDTO = secretManager.getSecret(secretType, name);
             SecretResponse secretResponse = new SecretResponse();

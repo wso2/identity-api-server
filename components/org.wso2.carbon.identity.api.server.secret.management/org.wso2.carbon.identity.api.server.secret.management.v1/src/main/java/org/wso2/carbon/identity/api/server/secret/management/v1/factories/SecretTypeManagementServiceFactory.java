@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.secret.management.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.secret.management.v1.core.SecretTypeManagementService;
 import org.wso2.carbon.identity.secret.mgt.core.SecretManager;
@@ -27,6 +29,7 @@ import org.wso2.carbon.identity.secret.mgt.core.SecretManager;
  */
 public class SecretTypeManagementServiceFactory {
 
+    private static final Log log = LogFactory.getLog(SecretTypeManagementServiceFactory.class);
     private static final SecretTypeManagementService SERVICE;
 
     static {
@@ -34,10 +37,14 @@ public class SecretTypeManagementServiceFactory {
                 .getOSGiService(SecretManager.class, null);
 
         if (secretManager == null) {
+            log.error("SecretManager is not available from OSGi context.");
             throw new IllegalStateException("SecretManager is not available from OSGi context.");
         }
 
         SERVICE = new SecretTypeManagementService(secretManager);
+        if (log.isDebugEnabled()) {
+            log.debug("SecretTypeManagementService factory initialized successfully.");
+        }
     }
 
     /**
