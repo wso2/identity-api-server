@@ -100,11 +100,16 @@ public class RoleManagementService {
     public Response createRole(String organizationId, RolePostRequest rolePostRequest) {
 
         try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Creating role in organization: " + organizationId + 
+                         " with display name: " + rolePostRequest.getDisplayName());
+            }
             Role role = roleManager.createRole(organizationId,
                     generateRoleFromPostRequest(rolePostRequest));
             URI roleURI = RoleManagementEndpointUtils.getUri(organizationId, role.getId(),
                     RoleManagementEndpointConstants.ROLE_PATH,
                     ERROR_CODE_ERROR_BUILDING_ROLE_URI);
+            LOG.info("Role created successfully in organization: " + organizationId + " with ID: " + role.getId());
             return Response.created(roleURI).entity(getRolePostResponse(role, roleURI)).build();
         } catch (OrganizationManagementClientException e) {
             return RoleManagementEndpointUtils.handleClientErrorResponse(e, LOG);
@@ -123,7 +128,11 @@ public class RoleManagementService {
     public Response deleteRole(String organizationId, String roleId) {
 
         try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Deleting role: " + roleId + " from organization: " + organizationId);
+            }
             roleManager.deleteRole(organizationId, roleId);
+            LOG.info("Role deleted successfully from organization: " + organizationId + " with ID: " + roleId);
             return Response.noContent().build();
         } catch (OrganizationManagementClientException e) {
             return RoleManagementEndpointUtils.handleClientErrorResponse(e, LOG);
@@ -166,6 +175,9 @@ public class RoleManagementService {
     public Response getRolesOfOrganization(String organizationId, String filter, Integer count, String cursor) {
 
         try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Retrieving roles for organization: " + organizationId + " with filter: " + filter);
+            }
             int limitValue = validateCount(count);
             RolesResponse rolesResponse = roleManager.getOrganizationRoles(limitValue, filter, organizationId, cursor);
             return Response.ok().entity(getRoleListResponse(organizationId, rolesResponse)).build();
@@ -186,6 +198,9 @@ public class RoleManagementService {
     public Response getUserRolesOfOrganization(String organizationId, String userId) {
 
         try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Retrieving roles for user: " + userId + " in organization: " + organizationId);
+            }
             String userResidentOrgId = String.valueOf(organizationUserResidentResolverService
                     .resolveResidentOrganization(userId, organizationId)
                     .orElseThrow(() -> handleClientException(ERROR_CODE_USER_ROOT_ORGANIZATION_NOT_FOUND, userId)));
@@ -214,6 +229,9 @@ public class RoleManagementService {
     public Response patchRole(String organizationId, String roleId, RolePatchRequest rolePatchRequest) {
 
         try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Patching role: " + roleId + " in organization: " + organizationId);
+            }
             List<RolePatchOperation> patchOperationList = rolePatchRequest.getOperations();
             List<PatchOperation> patchOperations = new ArrayList<>();
 
@@ -239,6 +257,7 @@ public class RoleManagementService {
             URI roleURI = RoleManagementEndpointUtils.getUri(organizationId, roleId,
                     RoleManagementEndpointConstants.ROLE_PATH,
                     ERROR_CODE_ERROR_BUILDING_ROLE_URI);
+            LOG.info("Role patched successfully in organization: " + organizationId + " with ID: " + roleId);
             return Response.ok().entity(getRolePatchResponse(role, roleURI)).build();
         } catch (OrganizationManagementClientException e) {
             return RoleManagementEndpointUtils.handleClientErrorResponse(e, LOG);
@@ -258,6 +277,9 @@ public class RoleManagementService {
     public Response putRole(String organizationId, String roleId, RolePutRequest rolePutRequest) {
 
         try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Updating role: " + roleId + " in organization: " + organizationId);
+            }
             if (StringUtils.isBlank(rolePutRequest.getDisplayName())) {
                 throw handleClientException(ERROR_CODE_ROLE_DISPLAY_NAME_NULL);
             }
@@ -276,7 +298,7 @@ public class RoleManagementService {
             URI roleURI = RoleManagementEndpointUtils.getUri(organizationId, roleId,
                     RoleManagementEndpointConstants.ROLE_PATH,
                     ERROR_CODE_ERROR_BUILDING_ROLE_URI);
-
+            LOG.info("Role updated successfully in organization: " + organizationId + " with ID: " + roleId);
             return Response.ok().entity(getRolePutResponse(role, roleURI)).build();
         } catch (OrganizationManagementClientException e) {
             return RoleManagementEndpointUtils.handleClientErrorResponse(e, LOG);

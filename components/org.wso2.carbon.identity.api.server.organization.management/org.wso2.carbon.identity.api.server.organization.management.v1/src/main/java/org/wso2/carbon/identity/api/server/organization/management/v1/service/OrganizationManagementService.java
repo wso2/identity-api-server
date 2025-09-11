@@ -138,11 +138,18 @@ public class OrganizationManagementService {
      */
     public Response getOrganizations(String filter, Integer limit, String after, String before, Boolean recursive) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Retrieving organizations with filter: %s, limit: %d, recursive: %s", 
+                    filter, limit, recursive));
+        }
         try {
             limit = validateLimit(limit);
             String sortOrder = StringUtils.isNotBlank(before) ? ASC_SORT_ORDER : DESC_SORT_ORDER;
             List<Organization> organizations = organizationManager.getOrganizationsList(limit + 1, after,
                     before, sortOrder, filter, Boolean.TRUE.equals(recursive));
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(String.format("Successfully retrieved %d organizations", organizations.size()));
+            }
             return Response.ok().entity(getOrganizationsResponse(limit, after, before, filter, organizations,
                     Boolean.TRUE.equals(recursive))).build();
         } catch (OrganizationManagementClientException e) {
@@ -160,6 +167,9 @@ public class OrganizationManagementService {
      */
     public Response checkOrganizationName(String organizationName) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Checking organization name availability: %s", organizationName));
+        }
         boolean nameExist = organizationManager.isOrganizationExistByNameInGivenHierarchy(organizationName);
         OrganizationNameCheckPOSTResponse response = new OrganizationNameCheckPOSTResponse().available(false);
         if (!nameExist) {
@@ -193,8 +203,12 @@ public class OrganizationManagementService {
      */
     public Response deleteOrganization(String organizationId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Deleting organization with ID: %s", organizationId));
+        }
         try {
             organizationManager.deleteOrganization(organizationId);
+            LOG.info(String.format("Organization deleted successfully. Organization ID: %s", organizationId));
             return Response.noContent().build();
         } catch (OrganizationManagementClientException e) {
             return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);
@@ -211,6 +225,10 @@ public class OrganizationManagementService {
      */
     public Response getOrganization(String organizationId, Boolean includePermissions) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Retrieving organization with ID: %s, includePermissions: %s", 
+                    organizationId, includePermissions));
+        }
         try {
             Organization organization = organizationManager.getOrganization(organizationId,
                     false, Boolean.TRUE.equals(includePermissions), true);
@@ -272,10 +290,16 @@ public class OrganizationManagementService {
      */
     public Response addOrganization(OrganizationPOSTRequest organizationPOSTRequest) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Creating organization with name: %s, type: %s", 
+                    organizationPOSTRequest.getName(), organizationPOSTRequest.getType()));
+        }
         try {
             Organization organization = organizationManager.addOrganization(getOrganizationFromPostRequest
                     (organizationPOSTRequest));
             String organizationId = organization.getId();
+            LOG.info(String.format("Organization created successfully. Organization ID: %s, Name: %s", 
+                    organizationId, organization.getName()));
             return Response.created(OrganizationManagementEndpointUtil.getResourceLocation(organizationId)).entity
                     (getOrganizationResponse(organization)).build();
         } catch (OrganizationManagementClientException e) {
@@ -302,6 +326,10 @@ public class OrganizationManagementService {
                     ? requestBody.getShareWithAllChildren() : false;
             orgApplicationManager.shareOrganizationApplication(organizationId, applicationId,
                     shareWithAllChildren, requestBody.getSharedOrganizations());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(String.format("Application shared successfully. Organization ID: %s, Application ID: %s", 
+                        organizationId, applicationId));
+            }
             return Response.ok().build();
         } catch (OrganizationManagementClientException e) {
             return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);
@@ -338,6 +366,10 @@ public class OrganizationManagementService {
 
         try {
             orgApplicationManager.deleteSharedApplication(organizationId, applicationId, sharedOrganizationId);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(String.format("Shared application deleted. Organization ID: %s, Application ID: %s", 
+                        organizationId, applicationId));
+            }
             return Response.noContent().build();
         } catch (OrganizationManagementClientException e) {
             return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);
@@ -419,6 +451,9 @@ public class OrganizationManagementService {
                     .addOrganizationDiscoveryAttributes(organizationDiscoveryPostRequest.getOrganizationId(),
                             getOrgDiscoveryAttributesFromPostRequest(organizationDiscoveryPostRequest), true);
             String organizationId = organizationDiscoveryPostRequest.getOrganizationId();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(String.format("Discovery attributes added for organization ID: %s", organizationId));
+            }
             return Response.created(OrganizationManagementEndpointUtil.getDiscoveryResourceLocation(organizationId))
                     .entity(getOrganizationDiscoveryAttributesResponse(orgDiscoveryAttributeList)).build();
         } catch (OrganizationManagementClientException e) {

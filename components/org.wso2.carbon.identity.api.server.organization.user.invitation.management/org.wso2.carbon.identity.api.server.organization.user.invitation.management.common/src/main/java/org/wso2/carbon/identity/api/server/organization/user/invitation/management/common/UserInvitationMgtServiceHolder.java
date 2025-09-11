@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.organization.user.invitation.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.organization.user.invitation.management.InvitationCoreService;
 
@@ -25,6 +27,8 @@ import org.wso2.carbon.identity.organization.user.invitation.management.Invitati
  * Holds the services which the shared user invitation management API component is using.
  */
 public class UserInvitationMgtServiceHolder {
+
+    private static final Log log = LogFactory.getLog(UserInvitationMgtServiceHolder.class);
 
     private UserInvitationMgtServiceHolder() {
 
@@ -43,6 +47,16 @@ public class UserInvitationMgtServiceHolder {
      */
     public static InvitationCoreService getInvitationCoreService() {
 
-        return InvitationCoreServiceHolder.SERVICE;
+        InvitationCoreService service = InvitationCoreServiceHolder.SERVICE;
+        if (service == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("InvitationCoreService is not available.");
+            }
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("InvitationCoreService retrieved successfully.");
+            }
+        }
+        return service;
     }
 }

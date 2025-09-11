@@ -138,8 +138,8 @@ public class RoleManagementEndpointUtils {
         } catch (URLBuilderException e) {
             Error error = getError(errorMessage.getCode(), errorMessage.getMessage(),
                     String.format(errorMessage.getDescription(), id));
-            LOG.error(String.format("Server encountered an error while building URL for %s ",
-                    resourcePath.substring(0, resourcePath.length() - 1)) + id);
+            LOG.error("Server encountered an error while building URL for " +
+                     resourcePath.substring(0, resourcePath.length() - 1) + " ID: " + id);
             throw new RoleManagementEndpointException(Response.Status.INTERNAL_SERVER_ERROR, error);
         }
     }
@@ -161,6 +161,7 @@ public class RoleManagementEndpointUtils {
         } catch (URLBuilderException e) {
             Error error = getError(errorMessage.getCode(), errorMessage.getMessage(),
                     String.format(errorMessage.getDescription(), id));
+            LOG.error("Error building SCIM2 URI for resource: " + resourcePath + " with ID: " + id);
             throw new RoleManagementEndpointException(Response.Status.INTERNAL_SERVER_ERROR, error);
         }
     }

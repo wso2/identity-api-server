@@ -98,9 +98,17 @@ public class SelfServiceMgtService {
 
         try {
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Retrieving organization governance configs for tenant domain: " + tenantDomain);
+            }
             ConnectorConfig connectorConfig = identityGovernanceService.getConnectorWithConfigs(tenantDomain,
                     SelfServiceMgtConstants.SELF_SERVICE_GOVERNANCE_CONNECTOR);
-            return buildConnectorResDTO(connectorConfig);
+            List<PropertyRes> properties = buildConnectorResDTO(connectorConfig);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully retrieved " + properties.size() +
+                        " governance configurations for tenant: " + tenantDomain);
+            }
+            return properties;
         } catch (IdentityGovernanceException e) {
             LOG.error(SelfServiceMgtConstants.ErrorMessage.ERROR_RETRIEVING_SELF_SERVICE_CONFIG.getDescription(), e);
             throw new SelfServiceMgtEndpointException(Response.Status.INTERNAL_SERVER_ERROR,
@@ -125,9 +133,19 @@ public class SelfServiceMgtService {
             }
             Map<String, String> copiedConfigurationDetails = new HashMap<>(configurationDetails);
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Updating " + configurationDetails.size() + " governance configurations for tenant: " +
+                        tenantDomain);
+            }
             identityGovernanceService.updateConfiguration(tenantDomain, configurationDetails);
             if (enablePostListener) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Executing post configuration update listeners for tenant: " + tenantDomain);
+                }
                 doPostConfigurationUpdate(copiedConfigurationDetails);
+            }
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully updated governance configurations for tenant: " + tenantDomain);
             }
         } catch (Exception e) {
             LOG.error(SelfServiceMgtConstants.ErrorMessage.ERROR_UPDATING_SELF_SERVICE_CONFIG.getDescription(), e);
@@ -152,11 +170,22 @@ public class SelfServiceMgtService {
         boolean isEnableSelfServiceUpdated =
                 configurationDetails.containsKey(SelfServiceMgtConstants.SELF_SERVICE_ENABLE_PROPERTY_NAME);
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Processing self-service enablement. Enable: " + enableSelfService +
+                    ", Updated: " + isEnableSelfServiceUpdated);
+        }
+
         // Create or remove self-service application.
         if (isEnableSelfServiceUpdated) {
             if (enableSelfService) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Creating self-service system application.");
+                }
                 createSystemApplication();
             } else {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Deleting self-service system application.");
+                }
                 deleteSystemApplication();
             }
         }
@@ -197,8 +226,15 @@ public class SelfServiceMgtService {
         }
 
         if (enableOnboardToSubOrganization && enableAdminEmailVerification) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Onboarding lite user store as both sub-org onboard and email verification are enabled.");
+            }
             onboardLiteUserStore();
         } else {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Removing lite user store as conditions are not met. Sub-org onboard: " +
+                        enableOnboardToSubOrganization + ", Email verification: " + enableAdminEmailVerification);
+            }
             removeLiteUserStore();
         }
     }
@@ -206,15 +242,24 @@ public class SelfServiceMgtService {
     private void removeLiteUserStore() {
 
         String userStoreName = getConfigProperty(SelfServiceMgtConstants.LITE_USER_USER_STORE_NAME);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Removing lite user store: " + userStoreName);
+        }
         String domainId = new String(Base64.getEncoder().encode(userStoreName.getBytes(StandardCharsets.UTF_8)),
                 StandardCharsets.UTF_8);
         getServerUserStoreService().deleteUserStore(domainId);
         updateLiteUserStoreConnectorConfigs(false);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Successfully removed lite user store: " + userStoreName);
+        }
     }
 
     private void onboardLiteUserStore() {
 
         try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Starting lite user store onboarding process.");
+            }
             InputStream inputStream = loadResourceFromClasspath(SelfServiceMgtConstants
                     .CREATE_LITE_USER_STORE_REQUEST_JSON);
             ObjectMapper objectMapper = new ObjectMapper();
@@ -226,6 +271,9 @@ public class SelfServiceMgtService {
             UserStoreReq userStoreReq = objectMapper.readValue(requestBody, UserStoreReq.class);
             getServerUserStoreService().addUserStore(userStoreReq);
             updateLiteUserStoreConnectorConfigs(true);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully onboarded lite user store.");
+            }
         } catch (IOException e) {
             LOG.error(SelfServiceMgtConstants.ErrorMessage.ERROR_ONBOARDING_LITE_USER_STORE.getDescription(), e);
             throw new SelfServiceMgtEndpointException(Response.Status.INTERNAL_SERVER_ERROR,
@@ -266,8 +314,14 @@ public class SelfServiceMgtService {
         String appName = getConfigProperty(SelfServiceMgtConstants.SELF_SERVICE_DEFAULT_APP_NAME);
 
         try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Creating system application '" + appName + "' for tenant: " + tenantDomain);
+            }
             // Check if the self-service app already exists, if yes, then return.
             if (isSSAppExists(tenantDomain, userName, appName)) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("System application '" + appName + "' already exists for tenant: " + tenantDomain);
+                }
                 return;
             }
 
@@ -286,9 +340,15 @@ public class SelfServiceMgtService {
 
             // Create the application using the Application Management Service.
             getServerApplicationManagementService().createApplication(model, null);
+            if (LOG.isInfoEnabled()) {
+                LOG.info("Successfully created system application '" + appName + "' for tenant: " + tenantDomain);
+            }
 
             // If legacy authorization runtime is enabled, skip subscribing to APIs.
             if (isLegacyAuthzRuntime()) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Legacy authorization runtime is enabled, skipping API subscriptions.");
+                }
                 return;
             }
 
@@ -307,6 +367,9 @@ public class SelfServiceMgtService {
 
             Map<String, List<String>> authorizedAPIAndScopeNames = getAuthorizedAPIsAndScopeNamesForSSApp();
 
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Authorizing " + authorizedAPIAndScopeNames.size() + " APIs for system application.");
+            }
             // Loop through the APIs and subscribe to them.
             for (Map.Entry<String, List<String>> entry : authorizedAPIAndScopeNames.entrySet()) {
                 String apiId = entry.getKey();
@@ -318,6 +381,9 @@ public class SelfServiceMgtService {
             ServiceProvider serviceProvider = applicationManagementService.getServiceProvider(sSApplicationBasicInfo
                     .getApplicationId());
             applicationManagementService.updateApplication(serviceProvider, tenantDomain, userName);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully shared system application with child organizations.");
+            }
 
         } catch (IOException | IdentityApplicationManagementException e) {
             LOG.error(SelfServiceMgtConstants.ErrorMessage.ERROR_CREATING_SYSTEM_APP.getDescription(), e);
@@ -335,9 +401,19 @@ public class SelfServiceMgtService {
         String appName = getConfigProperty(SelfServiceMgtConstants.SELF_SERVICE_DEFAULT_APP_NAME);
 
         try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Deleting system application '" + appName + "' for tenant: " + tenantDomain);
+            }
             // Check if the self-service app exists, if yes, then delete it.
             if (isSSAppExists(tenantDomain, userName, appName)) {
                 applicationManagementService.deleteApplication(appName, tenantDomain, userName);
+                if (LOG.isInfoEnabled()) {
+                    LOG.info("Successfully deleted system application '" + appName + "' for tenant: " + tenantDomain);
+                }
+            } else {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("System application '" + appName + "' does not exist for tenant: " + tenantDomain);
+                }
             }
         } catch (IdentityApplicationManagementException e) {
             LOG.error(SelfServiceMgtConstants.ErrorMessage.ERROR_DELETING_SYSTEM_APP.getDescription(), e);

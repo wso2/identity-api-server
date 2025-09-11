@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.organization.selfservice.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.resource.mgt.APIResourceManager;
 import org.wso2.carbon.identity.api.server.organization.selfservice.common.SelfServiceMgtServiceHolder;
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.core.SelfServiceMgtService;
@@ -29,6 +31,8 @@ import org.wso2.carbon.identity.governance.IdentityGovernanceService;
  * Factory class for SelfServiceMgtService.
  */
 public class SelfServiceMgtServiceFactory {
+
+    private static final Log LOG = LogFactory.getLog(SelfServiceMgtServiceFactory.class);
 
     private SelfServiceMgtServiceFactory() {
 
@@ -51,20 +55,31 @@ public class SelfServiceMgtServiceFactory {
 
     private static SelfServiceMgtService createServiceInstance() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Creating SelfServiceMgtService instance.");
+        }
         IdentityGovernanceService identityGovernanceService = getIdentityGovernanceService();
         ApplicationManagementService applicationManagementService = getApplicationManagementService();
         APIResourceManager apiResourceManager = getAPIResourceManager();
         AuthorizedAPIManagementService authorizedAPIManagementService = getAuthorizedAPIManagementService();
 
-        return new SelfServiceMgtService(identityGovernanceService, applicationManagementService, apiResourceManager,
-                authorizedAPIManagementService);
+        SelfServiceMgtService service = new SelfServiceMgtService(identityGovernanceService,
+                applicationManagementService, apiResourceManager, authorizedAPIManagementService);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Successfully created SelfServiceMgtService instance.");
+        }
+        return service;
     }
 
     private static IdentityGovernanceService getIdentityGovernanceService() {
 
         IdentityGovernanceService service = SelfServiceMgtServiceHolder.getIdentityGovernanceService();
         if (service == null) {
+            LOG.error("IdentityGovernanceService is not available from OSGi context.");
             throw new IllegalStateException("IdentityGovernanceService is not available from OSGi context.");
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Successfully retrieved IdentityGovernanceService from OSGi context.");
         }
         return service;
     }
@@ -73,7 +88,11 @@ public class SelfServiceMgtServiceFactory {
 
         ApplicationManagementService service = SelfServiceMgtServiceHolder.getApplicationManagementService();
         if (service == null) {
+            LOG.error("ApplicationManagementService is not available from OSGi context.");
             throw new IllegalStateException("ApplicationManagementService is not available from OSGi context.");
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Successfully retrieved ApplicationManagementService from OSGi context.");
         }
         return service;
     }
@@ -82,7 +101,11 @@ public class SelfServiceMgtServiceFactory {
 
         APIResourceManager service = SelfServiceMgtServiceHolder.getAPIResourceManager();
         if (service == null) {
+            LOG.error("APIResourceManager is not available from OSGi context.");
             throw new IllegalStateException("APIResourceManager is not available from OSGi context.");
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Successfully retrieved APIResourceManager from OSGi context.");
         }
         return service;
     }
@@ -91,7 +114,11 @@ public class SelfServiceMgtServiceFactory {
 
         AuthorizedAPIManagementService service = SelfServiceMgtServiceHolder.getAuthorizedAPIManagementService();
         if (service == null) {
+            LOG.error("AuthorizedAPIManagementService is not available from OSGi context.");
             throw new IllegalStateException("AuthorizedAPIManagementService is not available from OSGi context.");
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Successfully retrieved AuthorizedAPIManagementService from OSGi context.");
         }
         return service;
     }
