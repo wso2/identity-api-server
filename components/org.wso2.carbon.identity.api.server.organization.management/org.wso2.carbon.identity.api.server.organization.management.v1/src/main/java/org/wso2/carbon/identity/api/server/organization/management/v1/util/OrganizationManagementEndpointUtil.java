@@ -56,6 +56,9 @@ public class OrganizationManagementEndpointUtil {
      */
     public static Response handleClientErrorResponse(OrganizationManagementClientException e, Log log) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Handling client error with code: %s", e.getErrorCode()));
+        }
         if (isNotFoundError(e)) {
             throw buildException(Response.Status.NOT_FOUND, log, e);
         }
@@ -76,6 +79,9 @@ public class OrganizationManagementEndpointUtil {
      */
     public static Response handleServerErrorResponse(OrganizationManagementException e, Log log) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Handling server error with code: %s", e.getErrorCode()));
+        }
         throw buildException(Response.Status.INTERNAL_SERVER_ERROR, log, e);
     }
 
@@ -145,6 +151,9 @@ public class OrganizationManagementEndpointUtil {
      */
     public static URI getResourceLocation(String organizationId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Building resource location for organization ID: %s", organizationId));
+        }
         return buildURIForHeader(V1_API_PATH_COMPONENT + PATH_SEPARATOR + ORGANIZATION_PATH + PATH_SEPARATOR
                 + organizationId);
     }

@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.rest.api.server.notification.template.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.notification.template.common.Constants;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.NotificationApiService;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.core.TemplateTypeService;
@@ -52,6 +54,7 @@ import static org.wso2.carbon.identity.api.server.notification.template.common.C
  */
 public class NotificationApiServiceImpl implements NotificationApiService {
 
+    private static final Log log = LogFactory.getLog(NotificationApiServiceImpl.class);
     private final TemplatesService templatesService;
     private final TemplateTypeService templateTypeService;
 
@@ -59,42 +62,59 @@ public class NotificationApiServiceImpl implements NotificationApiService {
 
         templatesService = TemplatesServiceFactory.getTemplatesService();
         templateTypeService = TemplateTypeServiceFactory.getTemplateTypeService();
+        if (log.isDebugEnabled()) {
+            log.debug("NotificationApiServiceImpl initialized successfully.");
+        }
     }
 
     @Override
     public Response addAppEmailTemplate(String templateTypeId, String appUuid,
                                         EmailTemplateWithID emailTemplateWithID) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Adding email template for app. TemplateTypeId: " + templateTypeId + ", AppUuid: " + appUuid);
+        }
         SimpleTemplate simpleEmailTemplate = templatesService.addEmailTemplate(templateTypeId,
                 emailTemplateWithID, appUuid);
         URI headerLocation = buildURIForHeader(V1_API_PATH_COMPONENT + NOTIFICATION_TEMPLATES_API_PATH
                         + NOTIFICATION_TEMPLATES_API_BASE_PATH_EMAIL + TEMPLATE_TYPES_PATH + PATH_SEPARATOR
                         + templateTypeId + APP_TEMPLATES_PATH + PATH_SEPARATOR + appUuid + PATH_SEPARATOR
                         + simpleEmailTemplate.getLocale());
+        log.info("Successfully added email template for app. TemplateTypeId: " + templateTypeId + ", Locale: " 
+                + simpleEmailTemplate.getLocale());
         return Response.created(headerLocation).entity(simpleEmailTemplate).build();
     }
 
     @Override
     public Response addAppSMSTemplate(String templateTypeId, String appUuid, SMSTemplateWithID smSTemplateWithID) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Adding SMS template for app. TemplateTypeId: " + templateTypeId + ", AppUuid: " + appUuid);
+        }
         SimpleTemplate simpleSMSTemplate = templatesService.addSMSTemplate(templateTypeId,
                 smSTemplateWithID, appUuid);
         URI headerLocation = buildURIForHeader(V1_API_PATH_COMPONENT + NOTIFICATION_TEMPLATES_API_PATH
                 + NOTIFICATION_TEMPLATES_API_BASE_PATH_SMS + TEMPLATE_TYPES_PATH + PATH_SEPARATOR
                 + templateTypeId + APP_TEMPLATES_PATH + PATH_SEPARATOR + appUuid + PATH_SEPARATOR
                 + smSTemplateWithID.getLocale());
+        log.info("Successfully added SMS template for app. TemplateTypeId: " + templateTypeId + ", Locale: " 
+                + simpleSMSTemplate.getLocale());
         return Response.created(headerLocation).entity(simpleSMSTemplate).build();
     }
 
     @Override
     public Response addEmailTemplateType(TemplateTypeOverview templateTypeOverview) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Adding email template type: " + templateTypeOverview.getDisplayName());
+        }
         TemplateTypeWithID templateType = templateTypeService
                 .addNotificationTemplateType(Constants.NOTIFICATION_CHANNEL_EMAIL, templateTypeOverview);
         URI headerLocation = buildURIForHeader(
                 V1_API_PATH_COMPONENT + NOTIFICATION_TEMPLATES_API_PATH
                         + NOTIFICATION_TEMPLATES_API_BASE_PATH_EMAIL + TEMPLATE_TYPES_PATH
                         + PATH_SEPARATOR + templateType.getId());
+        log.info("Successfully added email template type: " + templateTypeOverview.getDisplayName());
         return Response.created(headerLocation).entity(templateType).build();
     }
 
@@ -137,7 +157,11 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     @Override
     public Response deleteAppEmailTemplate(String templateTypeId, String appUuid, String locale) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting email template. TemplateTypeId: " + templateTypeId + ", Locale: " + locale);
+        }
         templatesService.deleteEmailTemplate(templateTypeId, locale, appUuid);
+        log.info("Successfully deleted email template. TemplateTypeId: " + templateTypeId + ", Locale: " + locale);
         return Response.noContent().build();
     }
 
@@ -151,7 +175,11 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     @Override
     public Response deleteEmailTemplateType(String templateTypeId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting email template type with ID: " + templateTypeId);
+        }
         templateTypeService.deleteNotificationTemplateType(Constants.NOTIFICATION_CHANNEL_EMAIL, templateTypeId);
+        log.info("Successfully deleted email template type with ID: " + templateTypeId);
         return Response.noContent().build();
     }
 
@@ -289,8 +317,14 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     @Override
     public Response resetTemplateType(SimpleTemplateTypeID simpleTemplateTypeID) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Resetting template type. Channel: " + simpleTemplateTypeID.getChannel() 
+                    + ", TemplateTypeId: " + simpleTemplateTypeID.getTemplateTypeId());
+        }
         templateTypeService.resetTemplateType(simpleTemplateTypeID.getChannel(),
                 simpleTemplateTypeID.getTemplateTypeId());
+        log.info("Successfully reset template type. Channel: " + simpleTemplateTypeID.getChannel() 
+                + ", TemplateTypeId: " + simpleTemplateTypeID.getTemplateTypeId());
         return Response.noContent().build();
     }
 
@@ -298,7 +332,11 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     public Response updateAppEmailTemplate(String templateTypeId, String appUuid, String locale,
                                            EmailTemplate emailTemplate) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating email template. TemplateTypeId: " + templateTypeId + ", Locale: " + locale);
+        }
         templatesService.updateEmailTemplate(templateTypeId, locale, emailTemplate, appUuid);
+        log.info("Successfully updated email template. TemplateTypeId: " + templateTypeId + ", Locale: " + locale);
         return Response.ok().build();
     }
 

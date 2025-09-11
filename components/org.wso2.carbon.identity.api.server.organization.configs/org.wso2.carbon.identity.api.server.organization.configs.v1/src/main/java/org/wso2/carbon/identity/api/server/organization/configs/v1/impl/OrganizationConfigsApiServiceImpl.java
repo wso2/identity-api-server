@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.organization.configs.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.organization.configs.v1.OrganizationConfigsApiService;
 import org.wso2.carbon.identity.api.server.organization.configs.v1.core.OrganizationConfigsService;
 import org.wso2.carbon.identity.api.server.organization.configs.v1.factories.OrganizationConfigsServiceFactory;
@@ -30,13 +32,18 @@ import javax.ws.rs.core.Response;
  */
 public class OrganizationConfigsApiServiceImpl implements OrganizationConfigsApiService {
 
+    private static final Log LOG = LogFactory.getLog(OrganizationConfigsApiServiceImpl.class);
     private final OrganizationConfigsService organizationConfigsService;
 
     public OrganizationConfigsApiServiceImpl() {
 
         try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Initializing OrganizationConfigsApiServiceImpl.");
+            }
             this.organizationConfigsService = OrganizationConfigsServiceFactory.getOrganizationConfigsService();
         } catch (IllegalStateException e) {
+            LOG.error("Error occurred while initiating organization configuration service.", e);
             throw new RuntimeException("Error occurred while initiating organization configuration service.", e);
         }
     }
@@ -44,6 +51,9 @@ public class OrganizationConfigsApiServiceImpl implements OrganizationConfigsApi
     @Override
     public Response createDiscoveryConfig(Config config) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Received request to create discovery configuration.");
+        }
         organizationConfigsService.addDiscoveryConfiguration(config);
         return Response.status(Response.Status.CREATED).entity(config).build();
     }
@@ -51,6 +61,9 @@ public class OrganizationConfigsApiServiceImpl implements OrganizationConfigsApi
     @Override
     public Response deleteDiscoveryConfig() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Received request to delete discovery configuration.");
+        }
         organizationConfigsService.deleteDiscoveryConfiguration();
         return Response.noContent().build();
     }
@@ -58,12 +71,18 @@ public class OrganizationConfigsApiServiceImpl implements OrganizationConfigsApi
     @Override
     public Response getDiscoveryConfig() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Received request to get discovery configuration.");
+        }
         return Response.ok().entity(organizationConfigsService.getDiscoveryConfiguration()).build();
     }
 
     @Override
     public Response updateDiscoveryConfig(Config config) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Received request to update discovery configuration.");
+        }
         organizationConfigsService.updateDiscoveryConfiguration(config);
         return Response.ok().entity(config).build();
     }

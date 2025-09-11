@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.core;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.Error;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.ProcessSuccessResponse;
@@ -72,6 +74,7 @@ import static org.wso2.carbon.identity.api.server.organization.user.sharing.mana
  */
 public class UsersApiServiceCore {
 
+    private static final Log LOG = LogFactory.getLog(UsersApiServiceCore.class);
     private final UserSharingPolicyHandlerService userSharingPolicyHandlerService;
 
     public UsersApiServiceCore(UserSharingPolicyHandlerService userSharingPolicyHandlerService) {
@@ -86,7 +89,14 @@ public class UsersApiServiceCore {
      */
     public Response shareUser(UserShareRequestBody userShareRequestBody) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Initiating selective user sharing process.");
+        }
+
         if (userShareRequestBody == null) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Invalid selective user share request. Request body is null.");
+            }
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(buildErrorResponse(makeRequestError(INVALID_SELECTIVE_USER_SHARE_REQUEST_BODY))).build();
         }
@@ -96,11 +106,18 @@ public class UsersApiServiceCore {
 
         try {
             userSharingPolicyHandlerService.populateSelectiveUserShare(selectiveUserShareDO);
+            LOG.info("Selective user sharing process initiated successfully.");
             return Response.status(Response.Status.ACCEPTED)
                     .entity(getProcessSuccessResponse(RESPONSE_DETAIL_USER_SHARE)).build();
         } catch (UserSharingMgtClientException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Client error occurred during selective user sharing: " + e.getMessage());
+            }
             return Response.status(Response.Status.BAD_REQUEST).entity(buildErrorResponse(e)).build();
         } catch (UserSharingMgtException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Server error occurred during selective user sharing: " + e.getMessage());
+            }
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
         }
     }
@@ -112,7 +129,14 @@ public class UsersApiServiceCore {
      */
     public Response shareUserWithAll(UserShareWithAllRequestBody userShareWithAllRequestBody) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Initiating general user sharing process with all organizations.");
+        }
+
         if (userShareWithAllRequestBody == null) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Invalid general user share request. Request body is null.");
+            }
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(buildErrorResponse(makeRequestError(INVALID_GENERAL_USER_SHARE_REQUEST_BODY))).build();
         }
@@ -122,11 +146,18 @@ public class UsersApiServiceCore {
 
         try {
             userSharingPolicyHandlerService.populateGeneralUserShare(generalUserShareDO);
+            LOG.info("General user sharing process with all organizations initiated successfully.");
             return Response.status(Response.Status.ACCEPTED)
                     .entity(getProcessSuccessResponse(RESPONSE_DETAIL_USER_SHARE)).build();
         } catch (UserSharingMgtClientException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Client error occurred during general user sharing: " + e.getMessage());
+            }
             return Response.status(Response.Status.BAD_REQUEST).entity(buildErrorResponse(e)).build();
         } catch (UserSharingMgtException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Server error occurred during general user sharing: " + e.getMessage());
+            }
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
         }
     }
@@ -138,7 +169,14 @@ public class UsersApiServiceCore {
      */
     public Response unshareUser(UserUnshareRequestBody userUnshareRequestBody) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Initiating selective user unsharing process.");
+        }
+
         if (userUnshareRequestBody == null) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Invalid selective user unshare request. Request body is null.");
+            }
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(buildErrorResponse(makeRequestError(INVALID_SELECTIVE_USER_UNSHARE_REQUEST_BODY))).build();
         }
@@ -148,12 +186,19 @@ public class UsersApiServiceCore {
 
         try {
             userSharingPolicyHandlerService.populateSelectiveUserUnshare(selectiveUserUnshareDO);
+            LOG.info("Selective user unsharing process initiated successfully.");
             return Response.status(Response.Status.ACCEPTED)
                     .entity(getProcessSuccessResponse(RESPONSE_DETAIL_USER_UNSHARE))
                     .build();
         } catch (UserSharingMgtClientException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Client error occurred during selective user unsharing: " + e.getMessage());
+            }
             return Response.status(Response.Status.BAD_REQUEST).entity(buildErrorResponse(e)).build();
         } catch (UserSharingMgtException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Server error occurred during selective user unsharing: " + e.getMessage());
+            }
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
         }
     }
@@ -165,7 +210,14 @@ public class UsersApiServiceCore {
      */
     public Response unshareUserWithAll(UserUnshareWithAllRequestBody userUnshareWithAllRequestBody) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Initiating general user unsharing process from all organizations.");
+        }
+
         if (userUnshareWithAllRequestBody == null) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Invalid general user unshare request. Request body is null.");
+            }
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(buildErrorResponse(makeRequestError(INVALID_GENERAL_USER_UNSHARE_REQUEST_BODY))).build();
         }
@@ -175,12 +227,19 @@ public class UsersApiServiceCore {
 
         try {
             userSharingPolicyHandlerService.populateGeneralUserUnshare(generalUserUnshareDO);
+            LOG.info("General user unsharing process from all organizations initiated successfully.");
             return Response.status(Response.Status.ACCEPTED)
                     .entity(getProcessSuccessResponse(RESPONSE_DETAIL_USER_UNSHARE))
                     .build();
         } catch (UserSharingMgtClientException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Client error occurred during general user unsharing: " + e.getMessage());
+            }
             return Response.status(Response.Status.BAD_REQUEST).entity(buildErrorResponse(e)).build();
         } catch (UserSharingMgtException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Server error occurred during general user unsharing: " + e.getMessage());
+            }
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
         }
     }
@@ -199,7 +258,14 @@ public class UsersApiServiceCore {
     public Response getSharedOrganizations(String userId, String after, String before,
                                            Integer limit, String filter, Boolean recursive) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving shared organizations for user: " + (userId != null ? userId : "null"));
+        }
+
         if (userId == null) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Invalid user ID provided for retrieving shared organizations.");
+            }
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(buildErrorResponse(makeRequestError(INVALID_UUID_FORMAT))).build();
         }
@@ -210,10 +276,21 @@ public class UsersApiServiceCore {
                             recursive);
 
             UserSharedOrganizationsResponse response = populateUserSharedOrganizationsResponse(result);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully retrieved " 
+                        + (result.getSharedOrgs() != null ? result.getSharedOrgs().size() : 0) 
+                        + " shared organizations for user: " + userId);
+            }
             return Response.ok().entity(response).build();
         } catch (UserSharingMgtClientException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Client error occurred while retrieving shared organizations: " + e.getMessage());
+            }
             return Response.status(Response.Status.BAD_REQUEST).entity(buildErrorResponse(e)).build();
         } catch (UserSharingMgtException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Server error occurred while retrieving shared organizations: " + e.getMessage());
+            }
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
         }
     }
@@ -233,7 +310,15 @@ public class UsersApiServiceCore {
     public Response getSharedRoles(String userId, String orgId, String after, String before,
                                    Integer limit, String filter, Boolean recursive) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving shared roles for user: " + (userId != null ? userId : "null") + 
+                    " in organization: " + (orgId != null ? orgId : "null"));
+        }
+
         if (userId == null || orgId == null) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Invalid user ID or organization ID provided for retrieving shared roles.");
+            }
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(buildErrorResponse(makeRequestError(INVALID_UUID_FORMAT))).build();
         }
@@ -244,10 +329,21 @@ public class UsersApiServiceCore {
                             limit, filter, recursive);
 
             UserSharedRolesResponse response = populateUserSharedRolesResponse(result);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully retrieved " 
+                        + (result.getSharedRoles() != null ? result.getSharedRoles().size() : 0) 
+                        + " shared roles for user: " + userId + " in organization: " + orgId);
+            }
             return Response.ok().entity(response).build();
         } catch (UserSharingMgtClientException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Client error occurred while retrieving shared roles: " + e.getMessage());
+            }
             return Response.status(Response.Status.BAD_REQUEST).entity(buildErrorResponse(e)).build();
         } catch (UserSharingMgtException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Server error occurred while retrieving shared roles: " + e.getMessage());
+            }
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
         }
     }
