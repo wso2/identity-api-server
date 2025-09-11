@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.certificate.validation.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.x509Certificate.validation.service.CertificateValidationManagementService;
 
@@ -25,6 +27,8 @@ import org.wso2.carbon.identity.x509Certificate.validation.service.CertificateVa
  * Service holder class for server configuration related services.
  */
 public class CertificateValidationManagementServiceHolder {
+
+    private static final Log LOG = LogFactory.getLog(CertificateValidationManagementServiceHolder.class);
 
     private CertificateValidationManagementServiceHolder() {
 
@@ -37,7 +41,19 @@ public class CertificateValidationManagementServiceHolder {
      */
     public static CertificateValidationManagementService getCertificateValidationService() {
 
-        return CertificateValidationServiceHolder.SERVICE;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving CertificateValidationManagementService from OSGi service registry.");
+        }
+        
+        CertificateValidationManagementService service = CertificateValidationServiceHolder.SERVICE;
+        if (service == null) {
+            LOG.warn("CertificateValidationManagementService is not available from OSGi service registry.");
+        } else {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully retrieved CertificateValidationManagementService from OSGi service registry.");
+            }
+        }
+        return service;
     }
 
     /**
@@ -45,8 +61,22 @@ public class CertificateValidationManagementServiceHolder {
      */
     private static class CertificateValidationServiceHolder {
 
-        static final CertificateValidationManagementService SERVICE = (CertificateValidationManagementService)
-                PrivilegedCarbonContext.getThreadLocalCarbonContext().getOSGiService(
-                        CertificateValidationManagementService.class, null);
+        static final CertificateValidationManagementService SERVICE;
+
+        static {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Initializing CertificateValidationManagementService from OSGi service registry.");
+            }
+            SERVICE = (CertificateValidationManagementService) PrivilegedCarbonContext
+                    .getThreadLocalCarbonContext().getOSGiService(CertificateValidationManagementService.class, null);
+            if (SERVICE == null) {
+                LOG.warn("Failed to initialize CertificateValidationManagementService from OSGi service registry.");
+            } else {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Successfully initialized CertificateValidationManagementService from OSGi service " +
+                            "registry.");
+                }
+            }
+        }
     }
 }

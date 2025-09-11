@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.authenticators.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.AuthenticationType;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Endpoint;
@@ -45,6 +47,7 @@ import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
  */
 public class LocalAuthenticatorConfigBuilderFactory {
 
+    private static final Log log = LogFactory.getLog(LocalAuthenticatorConfigBuilderFactory.class);
     private static final String TAG_2FA = "2FA";
 
     /**
@@ -55,6 +58,17 @@ public class LocalAuthenticatorConfigBuilderFactory {
      */
     public static Authenticator build(UserDefinedLocalAuthenticatorConfig config) {
 
+        if (config == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("UserDefinedLocalAuthenticatorConfig is null, returning null");
+            }
+            return null;
+        }
+        
+        if (log.isDebugEnabled()) {
+            log.debug("Building authenticator model from UserDefinedLocalAuthenticatorConfig: " + config.getName());
+        }
+        
         Authenticator authenticator = new Authenticator();
         String authenticatorId = base64URLEncode(config.getName());
         authenticator.setName(config.getName());
@@ -69,6 +83,9 @@ public class LocalAuthenticatorConfigBuilderFactory {
         authenticator.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
                 CONFIGS_AUTHENTICATOR_PATH_COMPONENT, authenticatorId)).toString());
 
+        if (log.isDebugEnabled()) {
+            log.debug("Successfully built authenticator model for: " + config.getName());
+        }
         return authenticator;
     }
 
@@ -81,6 +98,15 @@ public class LocalAuthenticatorConfigBuilderFactory {
      */
     public static UserDefinedLocalAuthenticatorConfig build(UserDefinedLocalAuthenticatorCreation config)
             throws AuthenticatorMgtClientException {
+
+        if (config == null) {
+            throw new IllegalArgumentException("Authentication configuration cannot be null");
+        }
+        
+        if (log.isDebugEnabled()) {
+            log.debug("Building UserDefinedLocalAuthenticatorConfig from creation request: " + 
+                    config.getName());
+        }
 
         validateUserDefinedLocalAuthenticatorConfig(config);
         String authenticationType = AuthenticatorPropertyConstants.AuthenticationType.IDENTIFICATION.toString();
@@ -96,6 +122,7 @@ public class LocalAuthenticatorConfigBuilderFactory {
         authConfig.setEnabled(config.getIsEnabled());
         authConfig.setEndpointConfig(buildEndpointConfig(config.getEndpoint()));
 
+        log.info("Created user defined local authenticator config: " + config.getName());
         return authConfig;
     }
 
@@ -110,6 +137,15 @@ public class LocalAuthenticatorConfigBuilderFactory {
     public static UserDefinedLocalAuthenticatorConfig build(UserDefinedLocalAuthenticatorUpdate config,
                 LocalAuthenticatorConfig existingConfig) throws AuthenticatorMgtClientException {
 
+        if (existingConfig == null) {
+            throw new IllegalArgumentException("Existing authenticator configuration cannot be null");
+        }
+        
+        if (log.isDebugEnabled()) {
+            log.debug("Building UserDefinedLocalAuthenticatorConfig from update request for: " + 
+                    existingConfig.getName());
+        }
+
         UserDefinedLocalAuthenticatorConfig authConfig = new UserDefinedLocalAuthenticatorConfig(
                 resolveAuthenticationType(existingConfig));
         authConfig.setName(existingConfig.getName());
@@ -119,6 +155,7 @@ public class LocalAuthenticatorConfigBuilderFactory {
         authConfig.setEnabled(config.getIsEnabled());
         authConfig.setEndpointConfig(buildEndpointConfig(config.getEndpoint()));
 
+        log.info("Updated user defined local authenticator config: " + existingConfig.getName());
         return authConfig;
     }
 
@@ -137,6 +174,7 @@ public class LocalAuthenticatorConfigBuilderFactory {
             endpointConfigBuilder.allowedParameters(endpointConfig.getAllowedParameters());
             return endpointConfigBuilder.build();
         } catch (NoSuchElementException | IllegalArgumentException e) {
+            log.warn("Failed to build endpoint configuration due to invalid config: " + e.getMessage());
             AuthenticatorMgtError error = AuthenticatorMgtError.ERROR_CODE_INVALID_ENDPOINT_CONFIG;
             throw new AuthenticatorMgtClientException(error.getCode(), error.getMessage(), e.getMessage());
         }
@@ -155,12 +193,21 @@ public class LocalAuthenticatorConfigBuilderFactory {
     private static void validateUserDefinedLocalAuthenticatorConfig(UserDefinedLocalAuthenticatorCreation config)
             throws AuthenticatorMgtClientException {
 
+        if (config == null) {
+            throw new IllegalArgumentException("Authentication configuration cannot be null");
+        }
+        
+        if (config.getEndpoint() == null || config.getEndpoint().getAuthentication() == null) {
+            throw new IllegalArgumentException("Endpoint authentication configuration is required");
+        }
+        
         if (config.getEndpoint().getAuthentication().getType() == AuthenticationType.TypeEnum.NONE) {
             return;
         }
 
         if (config.getEndpoint().getAuthentication().getProperties() == null ||
                 config.getEndpoint().getAuthentication().getProperties().isEmpty()) {
+            log.warn("Endpoint authentication properties missing for authenticator: " + config.getName());
             AuthenticatorMgtError error = AuthenticatorMgtError.ERROR_CODE_INVALID_ENDPOINT_CONFIG;
             throw new AuthenticatorMgtClientException(error.getCode(), error.getMessage(),
                     "Endpoint authentication properties must be provided for user defined local authenticator: "
