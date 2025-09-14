@@ -20,208 +20,367 @@ package org.wso2.carbon.identity.api.server.idp.debug.v1.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
-import org.wso2.carbon.identity.api.server.idp.debug.common.Constants;
-import org.wso2.carbon.identity.api.server.idp.debug.common.DFDPApiErrorFactory;
 import org.wso2.carbon.identity.api.server.idp.debug.v1.IdpDebugApi;
 import org.wso2.carbon.identity.api.server.idp.debug.v1.core.DFDPService;
-import org.wso2.carbon.identity.api.server.idp.debug.v1.model.DFDPTestRequest;
+import org.wso2.carbon.identity.application.authentication.framework.handler.request.impl.DefaultRequestCoordinator;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.security.PermitAll;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Implementation of IdP Debug Flow Data Provider API.
  */
+@Path("/debug")
+@PermitAll
 public class IdpDebugApiServiceImpl implements IdpDebugApi {
 
     private static final Log LOG = LogFactory.getLog(IdpDebugApiServiceImpl.class);
     private final DFDPService dfdpService;
+
+    @Context
+    private HttpServletRequest request;
+    @Context
+    private HttpServletResponse response;
 
     public IdpDebugApiServiceImpl() {
         this.dfdpService = new DFDPService();
     }
 
     @Override
-    public Response debugIdpAuthentication(String idpName, String authenticatorName, String format, 
-                                         DFDPTestRequest testRequest) {
+    @GET
+    @POST
+    @PermitAll
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response debug() {
         try {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Testing IdP authentication for: " + idpName + 
-                         " with authenticator: " + authenticatorName + 
-                         " format: " + format);
+            // Use injected request/response for DefaultRequestCoordinator
+            if (request != null && response != null) {
+                request.setAttribute("action", "dfdp-debug");
+                DefaultRequestCoordinator coordinator = new DefaultRequestCoordinator();
+                coordinator.handle(request, response);
+                // The response is already written by the coordinator
+                return Response.ok().build();
             }
-
-            // Set default format if not provided
-            if (format == null || format.trim().isEmpty()) {
-                format = Constants.Defaults.DEFAULT_RESPONSE_FORMAT;
-            }
-
-            // Validate the format
-            if (!isValidFormat(format)) {
-                return Response.status(Response.Status.BAD_REQUEST)
-                        .entity(DFDPApiErrorFactory.buildError(
-                                Constants.ErrorMessage.ERROR_CODE_UNSUPPORTED_FORMAT))
-                        .build();
-            }
-
-            // Validate required parameters
-            if (idpName == null || idpName.trim().isEmpty()) {
-                return Response.status(Response.Status.BAD_REQUEST)
-                        .entity(DFDPApiErrorFactory.buildError(
-                                Constants.ErrorMessage.ERROR_CODE_ERROR_VALIDATING_REQUEST))
-                        .build();
-            }
-
-            // Call the service to test authentication
-            Object result = dfdpService.testIdpAuthentication(idpName, authenticatorName, format);
+            // Fallback: original logic if request/response not available
+            // Create a comprehensive debug response with IdP testing capabilities
+            Map<String, Object> responseMap = new HashMap<>();
+            responseMap.put("status", "success");
+            responseMap.put("message", "DFDP debug endpoint is working");
+            responseMap.put("timestamp", System.currentTimeMillis());
+            responseMap.put("version", "1.0.0");
+            responseMap.put("service", "IdP Debug Flow Data Provider");
             
-            return Response.ok(result).build();
-
+            // Add available testing endpoints
+            Map<String, String> availableEndpoints = new HashMap<>();
+            availableEndpoints.put("getIdps", 
+                "GET /api/server/v1/debug/idps - Get available identity providers");
+            availableEndpoints.put("getAuthenticators", 
+                "GET /api/server/v1/debug/idps/{idpName}/authenticators - Get IdP authenticators");
+            availableEndpoints.put("testAuthentication", 
+                "POST /api/server/v1/debug/idps/{idpName}/test - Test IdP authentication");
+            availableEndpoints.put("testSAML", 
+                "GET /api/server/v1/debug/test/saml?idp={idpName} - Test SAML federated authenticator");
+            availableEndpoints.put("testOIDC", 
+                "GET /api/server/v1/debug/test/oidc?idp={idpName} - Test OIDC federated authenticator");
+            availableEndpoints.put("testGoogle", 
+                "GET /api/server/v1/debug/test/google - Test Google OIDC authenticator");
+            availableEndpoints.put("testFacebook", 
+                "GET /api/server/v1/debug/test/facebook - Test Facebook authenticator");
+            availableEndpoints.put("testCustom", 
+                "GET /api/server/v1/debug/test/custom?authenticator={name}&idp={idpName} - Test custom authenticator");
+            responseMap.put("availableEndpoints", availableEndpoints);
+            
+            // Add system information
+            Map<String, Object> systemInfo = new HashMap<>();
+            systemInfo.put("javaVersion", System.getProperty("java.version"));
+            systemInfo.put("osName", System.getProperty("os.name"));
+            systemInfo.put("userTimezone", System.getProperty("user.timezone"));
+            responseMap.put("systemInfo", systemInfo);
+            
+            return Response.ok(responseMap).build();
+            
         } catch (Exception e) {
-            LOG.error("Error testing IdP authentication for IdP: " + idpName, e);
-            ErrorResponse errorResponse = new ErrorResponse.Builder()
-                    .withCode("ISV-60001")
-                    .withMessage("Internal Server Error")
-                    .withDescription("An error occurred while testing IdP authentication.")
-                    .build();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorResponse).build();
+            LOG.error("Error in debug endpoint", e);
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", "Internal server error: " + e.getMessage());
+            errorResponse.put("timestamp", System.currentTimeMillis());
+            
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                          .entity(errorResponse)
+                          .build();
         }
     }
 
-    @Override
-    public Response debugIdpOperations(String action, String idpName) {
-        try {
-            // Default action is health check
-            if (action == null || action.trim().isEmpty()) {
-                action = "health";
-            }
-
-            switch (action.toLowerCase()) {
-                case "list-idps":
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Retrieving available identity providers for testing");
-                    }
-                    Object idpList = dfdpService.getAvailableIdps();
-                    return Response.ok(idpList).build();
-
-                case "list-authenticators":
-                    if (idpName == null || idpName.trim().isEmpty()) {
-                        return Response.status(Response.Status.BAD_REQUEST)
-                                .entity(DFDPApiErrorFactory.buildError(
-                                        Constants.ErrorMessage.ERROR_CODE_ERROR_VALIDATING_REQUEST))
-                                .build();
-                    }
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Retrieving authenticators for IdP: " + idpName);
-                    }
-                    Object authenticators = dfdpService.getIdpAuthenticators(idpName);
-                    return Response.ok(authenticators).build();
-
-                case "health":
-                default:
-                    Map<String, Object> healthStatus = new HashMap<>();
-                    healthStatus.put("status", "UP");
-                    healthStatus.put("timestamp", System.currentTimeMillis());
-                    healthStatus.put("service", "IdP Debug Flow Data Provider API");
-                    healthStatus.put("version", "v1");
-                    return Response.ok(healthStatus).build();
-            }
-
-        } catch (Exception e) {
-            LOG.error("Error processing debug operation: " + action, e);
-            ErrorResponse errorResponse = new ErrorResponse.Builder()
-                    .withCode("ISV-60001")
-                    .withMessage("Internal Server Error")
-                    .withDescription("An error occurred while processing the debug operation.")
-                    .build();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorResponse).build();
-        }
-    }
-
-    @Override
+    @GET
+    @Path("/idps")
+    @PermitAll
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getAvailableIdps() {
         try {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Retrieving available identity providers for testing");
-            }
-
-            Object idpList = dfdpService.getAvailableIdps();
-            return Response.ok(idpList).build();
-
+            LOG.info("Getting available identity providers");
+            
+            Object idpsResult = dfdpService.getAvailableIdps();
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", "Available identity providers retrieved");
+            response.put("result", idpsResult);
+            response.put("timestamp", System.currentTimeMillis());
+            
+            return Response.ok(response).build();
+            
         } catch (Exception e) {
-            LOG.error("Error retrieving available identity providers", e);
+            LOG.error("Error getting available IdPs", e);
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", "Error getting available IdPs: " + e.getMessage());
+            errorResponse.put("timestamp", System.currentTimeMillis());
+            
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity(DFDPApiErrorFactory.buildError(
-                            Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDPS))
-                    .build();
-        }
-    }
-
-    @Override
-    public Response getIdpAuthenticators(String idpName) {
-        try {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Retrieving authenticators for IdP: " + idpName);
-            }
-
-            // Validate required parameters
-            if (idpName == null || idpName.trim().isEmpty()) {
-                return Response.status(Response.Status.BAD_REQUEST)
-                        .entity(DFDPApiErrorFactory.buildError(
-                                Constants.ErrorMessage.ERROR_CODE_ERROR_VALIDATING_REQUEST))
-                        .build();
-            }
-
-            Object authenticators = dfdpService.getIdpAuthenticators(idpName);
-            return Response.ok(authenticators).build();
-
-        } catch (Exception e) {
-            LOG.error("Error retrieving authenticators for IdP: " + idpName, e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity(DFDPApiErrorFactory.buildError(
-                            Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_AUTHENTICATORS))
-                    .build();
-        }
-    }
-
-    @Override
-    public Response getHealthStatus() {
-        try {
-            Map<String, Object> health = new HashMap<>();
-            health.put("status", "UP");
-            health.put("service", "IdP Debug Flow Data Provider");
-            health.put("timestamp", System.currentTimeMillis());
-            health.put("version", "v1");
-
-            return Response.ok(health).build();
-
-        } catch (Exception e) {
-            LOG.error("Error getting health status", e);
-            Map<String, Object> health = new HashMap<>();
-            health.put("status", "DOWN");
-            health.put("service", "IdP Debug Flow Data Provider");
-            health.put("timestamp", System.currentTimeMillis());
-            health.put("error", e.getMessage());
-
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity(health)
-                    .build();
+                          .entity(errorResponse)
+                          .build();
         }
     }
 
     /**
-     * Validates if the provided format is supported.
-     *
-     * @param format Response format to validate
-     * @return true if valid, false otherwise
+     * Test SAML federated authenticator with a specific IdP.
      */
-    private boolean isValidFormat(String format) {
-        return Constants.ResponseFormat.JSON.equals(format) ||
-               Constants.ResponseFormat.HTML.equals(format) ||
-               Constants.ResponseFormat.TEXT.equals(format) ||
-               Constants.ResponseFormat.SUMMARY.equals(format);
+    @GET
+    @Path("/test/saml")
+    @PermitAll
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response testSAMLAuthenticator(@QueryParam("idp") String idpName) {
+        try {
+            if (idpName == null || idpName.trim().isEmpty()) {
+                idpName = "DefaultSAMLIdP";
+            }
+            
+            LOG.info("Testing SAML authenticator with IdP: " + idpName);
+            
+            Object testResult = dfdpService.testIdpAuthentication(idpName, "SAML2Authenticator", "json");
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", "SAML authenticator test completed");
+            response.put("authenticatorType", "SAML2Authenticator");
+            response.put("idpName", idpName);
+            response.put("testResult", testResult);
+            response.put("timestamp", System.currentTimeMillis());
+            response.put("usageInfo", "This endpoint tests SAML2 federated authentication flow and claim mappings");
+            
+            return Response.ok(response).build();
+            
+        } catch (Exception e) {
+            LOG.error("Error testing SAML authenticator", e);
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", "Error testing SAML authenticator: " + e.getMessage());
+            errorResponse.put("authenticatorType", "SAML2Authenticator");
+            errorResponse.put("idpName", idpName);
+            errorResponse.put("timestamp", System.currentTimeMillis());
+            
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                          .entity(errorResponse)
+                          .build();
+        }
+    }
+
+    /**
+     * Test OIDC federated authenticator with a specific IdP.
+     */
+    @GET
+    @Path("/test/oidc")
+    @PermitAll
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response testOIDCAuthenticator(@QueryParam("idp") String idpName) {
+        try {
+            if (idpName == null || idpName.trim().isEmpty()) {
+                idpName = "DefaultOIDCIdP";
+            }
+            
+            LOG.info("Testing OIDC authenticator with IdP: " + idpName);
+            
+            Object testResult = dfdpService.testIdpAuthentication(idpName, "OIDCAuthenticator", "json");
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", "OIDC authenticator test completed");
+            response.put("authenticatorType", "OIDCAuthenticator");
+            response.put("idpName", idpName);
+            response.put("testResult", testResult);
+            response.put("timestamp", System.currentTimeMillis());
+            response.put("usageInfo", 
+                "This endpoint tests OpenID Connect federated authentication flow and claim mappings");
+            
+            return Response.ok(response).build();
+            
+        } catch (Exception e) {
+            LOG.error("Error testing OIDC authenticator", e);
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", "Error testing OIDC authenticator: " + e.getMessage());
+            errorResponse.put("authenticatorType", "OIDCAuthenticator");
+            errorResponse.put("idpName", idpName);
+            errorResponse.put("timestamp", System.currentTimeMillis());
+            
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                          .entity(errorResponse)
+                          .build();
+        }
+    }
+
+    /**
+     * Test Google OIDC federated authenticator.
+     */
+    @GET
+    @Path("/test/google")
+    @PermitAll
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response testGoogleAuthenticator() {
+        try {
+            LOG.info("Testing Google OIDC authenticator");
+            
+            Object testResult = dfdpService.testIdpAuthentication("Google", "GoogleOIDCAuthenticator", "json");
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", "Google OIDC authenticator test completed");
+            response.put("authenticatorType", "GoogleOIDCAuthenticator");
+            response.put("idpName", "Google");
+            response.put("testResult", testResult);
+            response.put("timestamp", System.currentTimeMillis());
+            response.put("usageInfo", "This endpoint tests Google OAuth 2.0 / OIDC authentication and claim mappings");
+            
+            return Response.ok(response).build();
+            
+        } catch (Exception e) {
+            LOG.error("Error testing Google authenticator", e);
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", "Error testing Google authenticator: " + e.getMessage());
+            errorResponse.put("authenticatorType", "GoogleOIDCAuthenticator");
+            errorResponse.put("idpName", "Google");
+            errorResponse.put("timestamp", System.currentTimeMillis());
+            
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                          .entity(errorResponse)
+                          .build();
+        }
+    }
+
+    /**
+     * Test Facebook federated authenticator.
+     */
+    @GET
+    @Path("/test/facebook")
+    @PermitAll
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response testFacebookAuthenticator() {
+        try {
+            LOG.info("Testing Facebook authenticator");
+            
+            Object testResult = dfdpService.testIdpAuthentication("Facebook", "FacebookAuthenticator", "json");
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", "Facebook authenticator test completed");
+            response.put("authenticatorType", "FacebookAuthenticator");
+            response.put("idpName", "Facebook");
+            response.put("testResult", testResult);
+            response.put("timestamp", System.currentTimeMillis());
+            response.put("usageInfo", "This endpoint tests Facebook Graph API authentication and claim mappings");
+            
+            return Response.ok(response).build();
+            
+        } catch (Exception e) {
+            LOG.error("Error testing Facebook authenticator", e);
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", "Error testing Facebook authenticator: " + e.getMessage());
+            errorResponse.put("authenticatorType", "FacebookAuthenticator");
+            errorResponse.put("idpName", "Facebook");
+            errorResponse.put("timestamp", System.currentTimeMillis());
+            
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                          .entity(errorResponse)
+                          .build();
+        }
+    }
+
+    /**
+     * Test custom federated authenticator.
+     */
+    @GET
+    @Path("/test/custom")
+    @PermitAll
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response testCustomAuthenticator(@QueryParam("authenticator") String authenticatorName, 
+                                          @QueryParam("idp") String idpName) {
+        try {
+            if (authenticatorName == null || authenticatorName.trim().isEmpty()) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("status", "error");
+                errorResponse.put("message", "Authenticator name is required. Use ?authenticator=<name>");
+                errorResponse.put("timestamp", System.currentTimeMillis());
+                errorResponse.put("example", 
+                    "/api/server/v1/debug/test/custom?authenticator=MyCustomAuthenticator&idp=MyIdP");
+                
+                return Response.status(Response.Status.BAD_REQUEST)
+                              .entity(errorResponse)
+                              .build();
+            }
+            
+            if (idpName == null || idpName.trim().isEmpty()) {
+                idpName = "DefaultIdP";
+            }
+            
+            LOG.info("Testing custom authenticator: " + authenticatorName + " with IdP: " + idpName);
+            
+            Object testResult = dfdpService.testIdpAuthentication(idpName, authenticatorName, "json");
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", "Custom authenticator test completed");
+            response.put("authenticatorType", authenticatorName);
+            response.put("idpName", idpName);
+            response.put("testResult", testResult);
+            response.put("timestamp", System.currentTimeMillis());
+            response.put("usageInfo", "This endpoint tests custom federated authenticators and their claim mappings");
+            
+            return Response.ok(response).build();
+            
+        } catch (Exception e) {
+            LOG.error("Error testing custom authenticator: " + authenticatorName, e);
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", "Error testing custom authenticator: " + e.getMessage());
+            errorResponse.put("authenticatorType", authenticatorName);
+            errorResponse.put("idpName", idpName);
+            errorResponse.put("timestamp", System.currentTimeMillis());
+            
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                          .entity(errorResponse)
+                          .build();
+        }
     }
 }
