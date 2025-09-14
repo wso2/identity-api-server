@@ -21,7 +21,7 @@ package org.wso2.carbon.identity.api.server.idp.debug.v1.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.idp.debug.v1.DebugApi;
-import org.wso2.carbon.identity.api.server.idp.debug.v1.core.DFDPDebugService;
+import org.wso2.carbon.identity.dfdp.core.DFDPDebugService;
 import org.wso2.carbon.identity.api.server.idp.debug.v1.model.DebugRequest;
 import org.wso2.carbon.identity.api.server.idp.debug.v1.model.DebugResponse;
 
@@ -67,8 +67,12 @@ public class DebugApiImpl implements DebugApi {
                 return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
             }
 
-            // Process debug authentication using event listeners
-            DebugResponse debugResponse = debugService.processDebugAuthentication(sessionId, debugRequest);
+            // Map API DebugRequest to core DebugRequest
+            org.wso2.carbon.identity.dfdp.core.DebugRequest coreRequest = mapToCoreDebugRequest(debugRequest);
+            // Process debug authentication using event listeners (core)
+            org.wso2.carbon.identity.dfdp.core.DebugResponse coreResponse = debugService.processDebugAuthentication(sessionId, coreRequest);
+            // Map core DebugResponse to API DebugResponse
+            DebugResponse debugResponse = mapToApiDebugResponse(coreResponse);
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("DFDP debug authentication completed with status: " + debugResponse.getStatus());
@@ -110,9 +114,10 @@ public class DebugApiImpl implements DebugApi {
                 return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
             }
 
-            // Test authenticator configuration and claim mapping
-            DebugResponse debugResponse = debugService.testAuthenticatorConfiguration(
+            // Test authenticator configuration and claim mapping (core)
+            org.wso2.carbon.identity.dfdp.core.DebugResponse coreResponse = debugService.testAuthenticatorConfiguration(
                 sessionId, idpId, authenticatorName, testClaims);
+            DebugResponse debugResponse = mapToApiDebugResponse(coreResponse);
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Authenticator test completed with status: " + debugResponse.getStatus());
@@ -148,14 +153,14 @@ public class DebugApiImpl implements DebugApi {
                 return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
             }
 
-            // Retrieve session data and event listener results
-            DebugResponse debugResponse = debugService.getDebugSessionData(sessionId);
-
-            if (debugResponse == null) {
+            // Retrieve session data and event listener results (core)
+            org.wso2.carbon.identity.dfdp.core.DebugResponse coreResponse = debugService.getDebugSessionData(sessionId);
+            if (coreResponse == null) {
                 DebugResponse notFoundResponse = createErrorResponse(sessionId, "SESSION_NOT_FOUND", 
                     "Debug session not found");
                 return Response.status(Response.Status.NOT_FOUND).entity(notFoundResponse).build();
             }
+            DebugResponse debugResponse = mapToApiDebugResponse(coreResponse);
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Debug session data retrieved successfully for session: " + sessionId);
@@ -190,5 +195,86 @@ public class DebugApiImpl implements DebugApi {
 
         errorResponse.setErrors(java.util.Arrays.asList(error));
         return errorResponse;
+    }
+
+    // --- Mapping methods between API and core models ---
+
+    /**
+     * Map API DebugRequest to core DebugRequest.
+     * @param apiRequest API DebugRequest
+     * @return core DebugRequest
+     */
+    private static org.wso2.carbon.identity.dfdp.core.DebugRequest mapToCoreDebugRequest(DebugRequest apiRequest) {
+        org.wso2.carbon.identity.dfdp.core.DebugRequest coreRequest = new org.wso2.carbon.identity.dfdp.core.DebugRequest();
+        coreRequest.setTargetIdp(apiRequest.getTargetIdp());
+        coreRequest.setTargetAuthenticator(apiRequest.getTargetAuthenticator());
+        coreRequest.setTestUser(apiRequest.getTestUser());
+        coreRequest.setEnableEventCapture(apiRequest.getEnableEventCapture());
+        coreRequest.setDebugMode(apiRequest.getDebugMode());
+        // Add more fields as needed
+        return coreRequest;
+    }
+
+    /**
+     * Map core DebugResponse to API DebugResponse.
+     * @param coreResponse core DebugResponse
+     * @return API DebugResponse
+     */
+    private static DebugResponse mapToApiDebugResponse(org.wso2.carbon.identity.dfdp.core.DebugResponse coreResponse) {
+        if (coreResponse == null) return null;
+        DebugResponse apiResponse = new DebugResponse();
+        apiResponse.setSessionId(coreResponse.getSessionId());
+        apiResponse.setTargetIdp(coreResponse.getTargetIdp());
+        apiResponse.setAuthenticatorUsed(coreResponse.getAuthenticatorUsed());
+        apiResponse.setStatus(coreResponse.getStatus());
+        // Map AuthenticationResult
+        if (coreResponse.getAuthenticationResult() != null) {
+            DebugResponse.AuthenticationResult apiAuthResult = new DebugResponse.AuthenticationResult();
+            org.wso2.carbon.identity.dfdp.core.DebugResponse.AuthenticationResult coreAuthResult = coreResponse.getAuthenticationResult();
+            apiAuthResult.setSuccess(coreAuthResult.isSuccess());
+            apiAuthResult.setUserExists(coreAuthResult.isUserExists());
+            apiAuthResult.setUserDetails(coreAuthResult.getUserDetails());
+            apiAuthResult.setResponseTime(coreAuthResult.getResponseTime());
+            apiResponse.setAuthenticationResult(apiAuthResult);
+        }
+        // Map ClaimsAnalysis
+        if (coreResponse.getClaimsAnalysis() != null) {
+            DebugResponse.ClaimsAnalysis apiClaims = new DebugResponse.ClaimsAnalysis();
+            org.wso2.carbon.identity.dfdp.core.DebugResponse.ClaimsAnalysis coreClaims = coreResponse.getClaimsAnalysis();
+            apiClaims.setOriginalRemoteClaims(coreClaims.getOriginalRemoteClaims());
+            apiClaims.setMappedLocalClaims(coreClaims.getMappedLocalClaims());
+            apiClaims.setMappingErrors(coreClaims.getMappingErrors());
+            apiResponse.setClaimsAnalysis(apiClaims);
+        }
+        // Map FlowEvents
+        if (coreResponse.getFlowEvents() != null) {
+            java.util.List<DebugResponse.FlowEvent> apiEvents = new java.util.ArrayList<>();
+            for (org.wso2.carbon.identity.dfdp.core.DebugResponse.FlowEvent coreEvent : coreResponse.getFlowEvents()) {
+                DebugResponse.FlowEvent apiEvent = new DebugResponse.FlowEvent();
+                apiEvent.setTimestamp(coreEvent.getTimestamp());
+                apiEvent.setEventType(coreEvent.getEventType());
+                apiEvent.setStep(coreEvent.getStep());
+                apiEvent.setSuccess(coreEvent.isSuccess());
+                apiEvent.setAuthenticator(coreEvent.getAuthenticator());
+                apiEvent.setData(coreEvent.getData());
+                apiEvents.add(apiEvent);
+            }
+            apiResponse.setFlowEvents(apiEvents);
+        }
+        // Map Errors
+        if (coreResponse.getErrors() != null) {
+            java.util.List<DebugResponse.DebugError> apiErrors = new java.util.ArrayList<>();
+            for (org.wso2.carbon.identity.dfdp.core.DebugResponse.DebugError coreError : coreResponse.getErrors()) {
+                DebugResponse.DebugError apiError = new DebugResponse.DebugError();
+                apiError.setCode(coreError.getCode());
+                apiError.setMessage(coreError.getMessage());
+                apiError.setStep(coreError.getStep());
+                apiErrors.add(apiError);
+            }
+            apiResponse.setErrors(apiErrors);
+        }
+        // Map Metadata
+        apiResponse.setMetadata(coreResponse.getMetadata());
+        return apiResponse;
     }
 }
