@@ -21,6 +21,7 @@ package org.wso2.carbon.identity.api.server.flow.management.v1.utils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -118,6 +119,22 @@ public class Utils {
         errorCode = errorCode.contains(ERROR_CODE_DELIMITER) ? errorCode :
                 FlowEndpointConstants.FLOW_PREFIX + errorCode;
         return handleException(status, errorCode, e.getMessage(), e.getDescription());
+    }
+
+    /**
+     * Handles exceptions and returns an APIError object.
+     *
+     * @param e FlowMgtFrameworkException object.
+     * @return APIError object.
+     */
+    public static APIError handleFlowMgtException(FlowMgtFrameworkException e, Object ... data) {
+
+        String description = e.getDescription();
+        if (ArrayUtils.isNotEmpty(data)) {
+            description = String.format(description, data);
+        }
+        e.setDescription(description);
+        return handleFlowMgtException(e);
     }
 
     /**
@@ -463,8 +480,7 @@ public class Utils {
         FlowConfig config = new FlowConfig();
         config.setFlowType(flowConfig.getFlowType());
         config.setIsEnabled(flowConfig.getIsEnabled() != null && flowConfig.getIsEnabled());
-        config.setIsAutoLoginEnabled(flowConfig.getIsAutoLoginEnabled() != null &&
-                flowConfig.getIsAutoLoginEnabled());
+        config.setProperties(flowConfig.getAllProperties());
         return config;
     }
 
@@ -473,8 +489,7 @@ public class Utils {
         FlowConfigDTO config = new FlowConfigDTO();
         config.setFlowType(flowConfig.getFlowType());
         config.setIsEnabled(flowConfig.getIsEnabled() != null && flowConfig.getIsEnabled());
-        config.setIsAutoLoginEnabled(flowConfig.getIsAutoLoginEnabled() != null &&
-                flowConfig.getIsAutoLoginEnabled());
+        config.addAllProperties(flowConfig.getProperties());
         return config;
     }
 
@@ -486,6 +501,48 @@ public class Utils {
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_FLOW_TYPE.getCode(),
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_FLOW_TYPE.getMessage(),
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_FLOW_TYPE.getDescription()));
+        }
+    }
+
+    /**
+     * Get the list of supported properties for a given flow type.
+     *
+     * @param flowType The flow type.
+     * @return List of supported properties.
+     */
+    public static List<String> getSupportedProperties(String flowType) {
+
+        Constants.FlowTypes flowTypeRequested  = Constants.FlowTypes.valueOf(flowType);
+        List<Constants.Properties> supportedFlags  = flowTypeRequested.getSupportedProperties();
+        return supportedFlags.stream().map(Constants.Properties::getName).collect(Collectors.toList());
+    }
+
+    /**
+     * Validate if the provided flag and value are supported.
+     *
+     * @param flag           The flag to validate.
+     * @param value          The value of the flag.
+     * @param supportedProperties List of supported properties.
+     */
+    public static void validateFlag(String flag, String value , List<String> supportedProperties, String flowType)
+            throws FlowMgtClientException {
+
+        if (StringUtils.isBlank(flag) || StringUtils.isBlank(value)) {
+
+            throw Utils.handleFlowMgtException( new FlowMgtClientException(
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_PROPERTY.getCode(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_PROPERTY.getMessage(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_PROPERTY.getDescription()),
+                    flag
+            );
+        }
+        if (!supportedProperties.contains(flag)) {
+            throw Utils.handleFlowMgtException( new FlowMgtClientException(
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getCode(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getMessage(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getDescription()),
+                    flag, flowType
+            );
         }
     }
 }

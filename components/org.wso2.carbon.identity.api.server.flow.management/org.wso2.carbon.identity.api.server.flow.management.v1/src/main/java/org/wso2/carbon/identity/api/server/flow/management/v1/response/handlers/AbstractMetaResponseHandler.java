@@ -138,7 +138,13 @@ public abstract class AbstractMetaResponseHandler {
         response.setSupportedExecutors(getSupportedExecutors());
         response.setConnectorConfigs(getConnectorConfigs());
         response.setExecutorConnections(getExecutorConnections());
+        response.setSupportedProperties(getSupportedProperties());
         return response;
+    }
+
+    private List<String> getSupportedProperties() {
+
+        return Utils.getSupportedProperties(getFlowType());
     }
 
     private List<AttributeMetadata> getSupportedClaims(String attributeProfile) {
