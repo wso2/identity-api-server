@@ -125,6 +125,7 @@ public class Utils {
      * Handles exceptions and returns an APIError object.
      *
      * @param e FlowMgtFrameworkException object.
+     * @param data Data to be added to the description.
      * @return APIError object.
      */
     public static APIError handleFlowMgtException(FlowMgtFrameworkException e, Object ... data) {
