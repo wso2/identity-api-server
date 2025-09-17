@@ -513,6 +513,11 @@ components:
         attributeProfile:
           type: string
           example: End-User-Profile
+        supportedFlowCompletionConfigs:
+          type: array
+          items:
+            type: string
+            example: enableEmailVerification
         attributeMetadata:
           type: array
           items:
@@ -570,10 +575,12 @@ components:
           type: boolean
           description: Indicate whether the orchestration is enabled for the flow
           example: true
-        isAutoLoginEnabled:
-          type: boolean
-          description: Indicate whether the auto login is enabled for the flow
-          example: true
+        flowCompletionConfigs:
+          type: object
+          description: Flow Completion Configs.
+          additionalProperties:
+            type: string
+            nullable : false
 
     FlowConfigPatchModel:
       type: object
@@ -589,10 +596,12 @@ components:
           type: boolean
           description: Indicate whether the orchestration is enabled for the flow
           example: true
-        isAutoLoginEnabled:
-          type: boolean
-          description: Indicate whether the auto login is enabled for the flow
-          example: true
+        flowCompletionConfigs:
+          type: object
+          description: Flow Completion Configs.
+          additionalProperties:
+            type: string
+            nullable : false
 
     Step:
       type: object

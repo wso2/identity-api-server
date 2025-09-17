@@ -38,6 +38,7 @@ import org.wso2.carbon.identity.flow.mgt.model.FlowDTO;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -163,14 +164,33 @@ public class ServerFlowMgtService {
             FlowConfigDTO existingFlowConfig = flowMgtService.getFlowConfig(
                     flowConfigPatchModel.getFlowType(),
                     PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
-            // If the patch model does not contain values for isEnabled or isAutoLoginEnabled,
+            // If the patch model does not contain values for isEnabled or any properties,
             // retain the existing values from the flow configuration.
             if (existingFlowConfig != null) {
                 if (flowConfigPatchModel.getIsEnabled() == null) {
                     flowConfigPatchModel.setIsEnabled(existingFlowConfig.getIsEnabled());
                 }
-                if (flowConfigPatchModel.getIsAutoLoginEnabled() == null) {
-                    flowConfigPatchModel.setIsAutoLoginEnabled(existingFlowConfig.getIsAutoLoginEnabled());
+
+                Map<String, String> existingFlowCompletionConfigs = existingFlowConfig.getAllFlowCompletionConfigs();
+                Map<String, String> patchFlowCompletionConfigs = flowConfigPatchModel.getFlowCompletionConfigs();
+                List<String> supportedFlowCompletionConfigs = Utils.getSupportedFlowCompletionConfig(
+                        flowConfigPatchModel.getFlowType());
+                // Validate the configs provided in the patch model.
+                if (patchFlowCompletionConfigs != null) {
+                    for (Map.Entry<String, String> entry : patchFlowCompletionConfigs.entrySet()) {
+                        String key = entry.getKey();
+                        String value = entry.getValue();
+                        Utils.validateFlag(key, value,
+                                supportedFlowCompletionConfigs, flowConfigPatchModel.getFlowType());
+                    }
+                }
+                // Iterate over existing configs and add those which are not present in the patch model.
+                for (Map.Entry<String, String> entry : existingFlowCompletionConfigs.entrySet()) {
+                    String key = entry.getKey();
+                    String value = entry.getValue();
+                    if (patchFlowCompletionConfigs == null || !patchFlowCompletionConfigs.containsKey(key)) {
+                        flowConfigPatchModel.putFlowCompletionConfigsItem(key, value);
+                    }
                 }
             }
             FlowConfigDTO updatedFlowConfig =

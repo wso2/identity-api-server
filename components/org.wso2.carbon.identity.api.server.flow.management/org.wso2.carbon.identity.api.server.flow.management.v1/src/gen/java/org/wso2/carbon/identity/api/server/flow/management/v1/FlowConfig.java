@@ -19,86 +19,97 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.validation.constraints.*;
 
+/**
+ * Flow configurations for a flow type
+ **/
+
+import io.swagger.annotations.*;
 import java.util.Objects;
-
 import javax.validation.Valid;
-
+import javax.xml.bind.annotation.*;
 @ApiModel(description = "Flow configurations for a flow type")
-public class FlowConfig {
-
+public class FlowConfig  {
+  
     private String flowType;
     private Boolean isEnabled;
-    private Boolean isAutoLoginEnabled;
+    private Map<String, String> flowCompletionConfigs = null;
+
 
     /**
-     * Flow type
-     **/
+    * Flow type
+    **/
     public FlowConfig flowType(String flowType) {
 
         this.flowType = flowType;
         return this;
     }
-
+    
     @ApiModelProperty(example = "REGISTRATION", value = "Flow type")
     @JsonProperty("flowType")
     @Valid
     public String getFlowType() {
-
         return flowType;
     }
-
     public void setFlowType(String flowType) {
-
         this.flowType = flowType;
     }
 
     /**
-     * Indicate whether the orchestration is enabled for the flow
-     **/
+    * Indicate whether the orchestration is enabled for the flow
+    **/
     public FlowConfig isEnabled(Boolean isEnabled) {
 
         this.isEnabled = isEnabled;
         return this;
     }
-
+    
     @ApiModelProperty(example = "true", value = "Indicate whether the orchestration is enabled for the flow")
     @JsonProperty("isEnabled")
     @Valid
     public Boolean getIsEnabled() {
-
         return isEnabled;
     }
-
     public void setIsEnabled(Boolean isEnabled) {
-
         this.isEnabled = isEnabled;
     }
 
     /**
-     * Indicate whether the auto login is enabled for the flow
-     **/
-    public FlowConfig isAutoLoginEnabled(Boolean isAutoLoginEnabled) {
+    * Flow Completion Configs.
+    **/
+    public FlowConfig flowCompletionConfigs(Map<String, String> flowCompletionConfigs) {
 
-        this.isAutoLoginEnabled = isAutoLoginEnabled;
+        this.flowCompletionConfigs = flowCompletionConfigs;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "Flow Completion Configs.")
+    @JsonProperty("flowCompletionConfigs")
+    @Valid
+    public Map<String, String> getFlowCompletionConfigs() {
+        return flowCompletionConfigs;
+    }
+    public void setFlowCompletionConfigs(Map<String, String> flowCompletionConfigs) {
+        this.flowCompletionConfigs = flowCompletionConfigs;
+    }
+
+
+    public FlowConfig putFlowCompletionConfigsItem(String key, String flowCompletionConfigsItem) {
+        if (this.flowCompletionConfigs == null) {
+            this.flowCompletionConfigs = new HashMap<String, String>();
+        }
+        this.flowCompletionConfigs.put(key, flowCompletionConfigsItem);
         return this;
     }
 
-    @ApiModelProperty(example = "true", value = "Indicate whether the auto login is enabled for the flow")
-    @JsonProperty("isAutoLoginEnabled")
-    @Valid
-    public Boolean getIsAutoLoginEnabled() {
-
-        return isAutoLoginEnabled;
-    }
-
-    public void setIsAutoLoginEnabled(Boolean isAutoLoginEnabled) {
-
-        this.isAutoLoginEnabled = isAutoLoginEnabled;
-    }
-
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -111,14 +122,13 @@ public class FlowConfig {
         }
         FlowConfig flowConfig = (FlowConfig) o;
         return Objects.equals(this.flowType, flowConfig.flowType) &&
-                Objects.equals(this.isEnabled, flowConfig.isEnabled) &&
-                Objects.equals(this.isAutoLoginEnabled, flowConfig.isAutoLoginEnabled);
+            Objects.equals(this.isEnabled, flowConfig.isEnabled) &&
+            Objects.equals(this.flowCompletionConfigs, flowConfig.flowCompletionConfigs);
     }
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(flowType, isEnabled, isAutoLoginEnabled);
+        return Objects.hash(flowType, isEnabled, flowCompletionConfigs);
     }
 
     @Override
@@ -126,18 +136,18 @@ public class FlowConfig {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class FlowConfig {\n");
-
+        
         sb.append("    flowType: ").append(toIndentedString(flowType)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
-        sb.append("    isAutoLoginEnabled: ").append(toIndentedString(isAutoLoginEnabled)).append("\n");
+        sb.append("    flowCompletionConfigs: ").append(toIndentedString(flowCompletionConfigs)).append("\n");
         sb.append("}");
         return sb.toString();
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
-     */
+    * Convert the given object to string with each line indented by 4 spaces
+    * (except the first line).
+    */
     private String toIndentedString(java.lang.Object o) {
 
         if (o == null) {

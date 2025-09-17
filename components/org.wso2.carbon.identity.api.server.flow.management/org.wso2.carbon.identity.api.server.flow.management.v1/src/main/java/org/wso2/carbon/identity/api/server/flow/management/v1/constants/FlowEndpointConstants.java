@@ -75,7 +75,15 @@ public class FlowEndpointConstants {
 
         ERROR_CODE_GET_SUPPORTED_CLAIMS("10008",
                 "Failed to retrieve supported claims.",
-                "An error occurred while reading supported claim metadata for the given attribute profile.");
+                "An error occurred while reading supported claim metadata for the given attribute profile."),
+
+        ERROR_CODE_INVALID_PROPERTY("10009",
+                "Invalid property value provided.",
+                "The provided value for property %s is not valid."),
+
+        ERROR_CODE_UNSUPPORTED_PROPERTY("10010",
+                "Unsupported property used in the flow.",
+                "The provided property %s is not supported for the flow type %s.");
 
         private final String code;
         private final String message;
