@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.api.resource.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.resource.collection.mgt.APIResourceCollectionManager;
 import org.wso2.carbon.identity.api.resource.mgt.APIResourceManager;
@@ -29,6 +31,8 @@ import org.wso2.carbon.identity.oauth.rar.core.AuthorizationDetailsSchemaValidat
  * Service holder class for api resource management.
  */
 public class APIResourceManagementServiceHolder {
+
+    private static final Log LOG = LogFactory.getLog(APIResourceManagementServiceHolder.class);
 
     private APIResourceManagementServiceHolder() {}
 
@@ -70,7 +74,14 @@ public class APIResourceManagementServiceHolder {
      */
     public static APIResourceManager getApiResourceManager() {
 
-        return APIResourceManagerHolder.SERVICE;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving APIResourceManager from OSGi service registry.");
+        }
+        APIResourceManager service = APIResourceManagerHolder.SERVICE;
+        if (service == null && LOG.isWarnEnabled()) {
+            LOG.warn("APIResourceManager service is not available.");
+        }
+        return service;
     }
 
     /**
@@ -80,7 +91,14 @@ public class APIResourceManagementServiceHolder {
      */
     public static APIResourceCollectionManager getApiResourceCollectionManager() {
 
-        return APIResourceCollectionManagerHolder.SERVICE;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving APIResourceCollectionManager from OSGi service registry.");
+        }
+        APIResourceCollectionManager service = APIResourceCollectionManagerHolder.SERVICE;
+        if (service == null && LOG.isWarnEnabled()) {
+            LOG.warn("APIResourceCollectionManager service is not available.");
+        }
+        return service;
     }
 
     /**
@@ -90,7 +108,14 @@ public class APIResourceManagementServiceHolder {
      */
     public static OAuthAdminServiceImpl getOAuthAdminServiceImpl() {
 
-        return OAuthAdminServiceImplHolder.SERVICE;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving OAuthAdminServiceImpl from OSGi service registry.");
+        }
+        OAuthAdminServiceImpl service = OAuthAdminServiceImplHolder.SERVICE;
+        if (service == null && LOG.isWarnEnabled()) {
+            LOG.warn("OAuthAdminServiceImpl service is not available.");
+        }
+        return service;
     }
 
     /**
@@ -100,7 +125,14 @@ public class APIResourceManagementServiceHolder {
      */
     public static AuthorizationDetailsTypeManager getAuthorizationDetailsTypeManager() {
 
-        return AuthorizationDetailsTypeManagerHolder.SERVICE;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving AuthorizationDetailsTypeManager from OSGi service registry.");
+        }
+        AuthorizationDetailsTypeManager service = AuthorizationDetailsTypeManagerHolder.SERVICE;
+        if (service == null && LOG.isWarnEnabled()) {
+            LOG.warn("AuthorizationDetailsTypeManager service is not available.");
+        }
+        return service;
     }
 
     /**
@@ -110,6 +142,13 @@ public class APIResourceManagementServiceHolder {
      */
     public static AuthorizationDetailsSchemaValidator getAuthorizationDetailsSchemaValidator() {
 
-        return AuthorizationDetailsSchemaValidatorHolder.SERVICE;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving AuthorizationDetailsSchemaValidator from OSGi service registry.");
+        }
+        AuthorizationDetailsSchemaValidator service = AuthorizationDetailsSchemaValidatorHolder.SERVICE;
+        if (service == null && LOG.isWarnEnabled()) {
+            LOG.warn("AuthorizationDetailsSchemaValidator service is not available.");
+        }
+        return service;
     }
 }
