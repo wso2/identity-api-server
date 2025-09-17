@@ -480,7 +480,7 @@ public class Utils {
         FlowConfig config = new FlowConfig();
         config.setFlowType(flowConfig.getFlowType());
         config.setIsEnabled(flowConfig.getIsEnabled() != null && flowConfig.getIsEnabled());
-        config.setProperties(flowConfig.getAllProperties());
+        config.setFlowCompletionConfigs(flowConfig.getAllFlowCompletionConfigs());
         return config;
     }
 
@@ -489,7 +489,7 @@ public class Utils {
         FlowConfigDTO config = new FlowConfigDTO();
         config.setFlowType(flowConfig.getFlowType());
         config.setIsEnabled(flowConfig.getIsEnabled() != null && flowConfig.getIsEnabled());
-        config.addAllProperties(flowConfig.getProperties());
+        config.addAllFlowCompletionConfigs(flowConfig.getFlowCompletionConfigs());
         return config;
     }
 
@@ -510,11 +510,11 @@ public class Utils {
      * @param flowType The flow type.
      * @return List of supported properties.
      */
-    public static List<String> getSupportedProperties(String flowType) {
+    public static List<String> getSupportedFlowCompletionConfig(String flowType) {
 
-        Constants.FlowTypes flowTypeRequested  = Constants.FlowTypes.valueOf(flowType);
-        List<Constants.Properties> supportedFlags  = flowTypeRequested.getSupportedProperties();
-        return supportedFlags.stream().map(Constants.Properties::getName).collect(Collectors.toList());
+        Constants.FlowTypes requestedFlowType  = Constants.FlowTypes.valueOf(flowType);
+        List<Constants.FlowCompletionConfig> supportedFlags  = requestedFlowType.getSupportedFlowCompletionConfigs();
+        return supportedFlags.stream().map(Constants.FlowCompletionConfig::getConfig).collect(Collectors.toList());
     }
 
     /**
@@ -529,7 +529,7 @@ public class Utils {
 
         if (StringUtils.isBlank(flag) || StringUtils.isBlank(value)) {
 
-            throw Utils.handleFlowMgtException( new FlowMgtClientException(
+            throw Utils.handleFlowMgtException(new FlowMgtClientException(
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_PROPERTY.getCode(),
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_PROPERTY.getMessage(),
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_PROPERTY.getDescription()),
@@ -537,7 +537,7 @@ public class Utils {
             );
         }
         if (!supportedProperties.contains(flag)) {
-            throw Utils.handleFlowMgtException( new FlowMgtClientException(
+            throw Utils.handleFlowMgtException(new FlowMgtClientException(
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getCode(),
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getMessage(),
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getDescription()),

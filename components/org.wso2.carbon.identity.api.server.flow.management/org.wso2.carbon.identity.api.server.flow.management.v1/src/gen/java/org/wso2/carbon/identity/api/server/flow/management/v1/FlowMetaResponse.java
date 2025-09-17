@@ -44,7 +44,7 @@ public class FlowMetaResponse  {
 
     private Object connectorConfigs;
     private String attributeProfile;
-    private List<String> supportedProperties = null;
+    private List<String> supportedFlowCompletionConfigs = null;
 
     private List<AttributeMetadata> attributeMetadata = null;
 
@@ -133,27 +133,27 @@ public class FlowMetaResponse  {
 
     /**
     **/
-    public FlowMetaResponse supportedProperties(List<String> supportedProperties) {
+    public FlowMetaResponse supportedFlowCompletionConfigs(List<String> supportedFlowCompletionConfigs) {
 
-        this.supportedProperties = supportedProperties;
+        this.supportedFlowCompletionConfigs = supportedFlowCompletionConfigs;
         return this;
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("supportedProperties")
+    @JsonProperty("supportedFlowCompletionConfigs")
     @Valid
-    public List<String> getSupportedProperties() {
-        return supportedProperties;
+    public List<String> getSupportedFlowCompletionConfigs() {
+        return supportedFlowCompletionConfigs;
     }
-    public void setSupportedProperties(List<String> supportedProperties) {
-        this.supportedProperties = supportedProperties;
+    public void setSupportedFlowCompletionConfigs(List<String> supportedFlowCompletionConfigs) {
+        this.supportedFlowCompletionConfigs = supportedFlowCompletionConfigs;
     }
 
-    public FlowMetaResponse addSupportedPropertiesItem(String supportedPropertiesItem) {
-        if (this.supportedProperties == null) {
-            this.supportedProperties = new ArrayList<String>();
+    public FlowMetaResponse addSupportedFlowCompletionConfigsItem(String supportedFlowCompletionConfigsItem) {
+        if (this.supportedFlowCompletionConfigs == null) {
+            this.supportedFlowCompletionConfigs = new ArrayList<String>();
         }
-        this.supportedProperties.add(supportedPropertiesItem);
+        this.supportedFlowCompletionConfigs.add(supportedFlowCompletionConfigsItem);
         return this;
     }
 
@@ -225,14 +225,14 @@ public class FlowMetaResponse  {
             Objects.equals(this.supportedExecutors, flowMetaResponse.supportedExecutors) &&
             Objects.equals(this.connectorConfigs, flowMetaResponse.connectorConfigs) &&
             Objects.equals(this.attributeProfile, flowMetaResponse.attributeProfile) &&
-            Objects.equals(this.supportedProperties, flowMetaResponse.supportedProperties) &&
+            Objects.equals(this.supportedFlowCompletionConfigs, flowMetaResponse.supportedFlowCompletionConfigs) &&
             Objects.equals(this.attributeMetadata, flowMetaResponse.attributeMetadata) &&
             Objects.equals(this.executorConnections, flowMetaResponse.executorConnections);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(flowType, supportedExecutors, connectorConfigs, attributeProfile, supportedProperties, attributeMetadata, executorConnections);
+        return Objects.hash(flowType, supportedExecutors, connectorConfigs, attributeProfile, supportedFlowCompletionConfigs, attributeMetadata, executorConnections);
     }
 
     @Override
@@ -245,7 +245,7 @@ public class FlowMetaResponse  {
         sb.append("    supportedExecutors: ").append(toIndentedString(supportedExecutors)).append("\n");
         sb.append("    connectorConfigs: ").append(toIndentedString(connectorConfigs)).append("\n");
         sb.append("    attributeProfile: ").append(toIndentedString(attributeProfile)).append("\n");
-        sb.append("    supportedProperties: ").append(toIndentedString(supportedProperties)).append("\n");
+        sb.append("    supportedFlowCompletionConfigs: ").append(toIndentedString(supportedFlowCompletionConfigs)).append("\n");
         sb.append("    attributeMetadata: ").append(toIndentedString(attributeMetadata)).append("\n");
         sb.append("    executorConnections: ").append(toIndentedString(executorConnections)).append("\n");
         sb.append("}");

@@ -171,23 +171,25 @@ public class ServerFlowMgtService {
                     flowConfigPatchModel.setIsEnabled(existingFlowConfig.getIsEnabled());
                 }
 
-                Map<String, String> existingProperties = existingFlowConfig.getAllProperties();
-                Map<String, String> patchProperties = flowConfigPatchModel.getProperties();
-                List<String> supportedProperties = Utils.getSupportedProperties(flowConfigPatchModel.getFlowType());
-                // Validate the properties provided in the patch model.
-                if (patchProperties != null) {
-                    for (Map.Entry<String, String> entry : patchProperties.entrySet()) {
+                Map<String, String> existingFlowCompletionConfigs = existingFlowConfig.getAllFlowCompletionConfigs();
+                Map<String, String> patchFlowCompletionConfigs = flowConfigPatchModel.getFlowCompletionConfigs();
+                List<String> supportedFlowCompletionConfigs = Utils.getSupportedFlowCompletionConfig(
+                        flowConfigPatchModel.getFlowType());
+                // Validate the configs provided in the patch model.
+                if (patchFlowCompletionConfigs != null) {
+                    for (Map.Entry<String, String> entry : patchFlowCompletionConfigs.entrySet()) {
                         String key = entry.getKey();
                         String value = entry.getValue();
-                        Utils.validateFlag(key, value, supportedProperties, flowConfigPatchModel.getFlowType());
+                        Utils.validateFlag(key, value,
+                                supportedFlowCompletionConfigs, flowConfigPatchModel.getFlowType());
                     }
                 }
-                // Iterate over existing properties and add those which are not present in the patch model.
-                for (Map.Entry<String, String> entry : existingProperties.entrySet()) {
+                // Iterate over existing configs and add those which are not present in the patch model.
+                for (Map.Entry<String, String> entry : existingFlowCompletionConfigs.entrySet()) {
                     String key = entry.getKey();
                     String value = entry.getValue();
-                    if (patchProperties == null || !patchProperties.containsKey(key)) {
-                        flowConfigPatchModel.putPropertiesItem(key, value);
+                    if (patchFlowCompletionConfigs == null || !patchFlowCompletionConfigs.containsKey(key)) {
+                        flowConfigPatchModel.putFlowCompletionConfigsItem(key, value);
                     }
                 }
             }

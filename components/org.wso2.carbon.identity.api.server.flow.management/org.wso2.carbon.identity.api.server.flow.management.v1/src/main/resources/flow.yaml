@@ -513,7 +513,7 @@ components:
         attributeProfile:
           type: string
           example: End-User-Profile
-        supportedProperties:
+        supportedFlowCompletionConfigs:
           type: array
           items:
             type: string
@@ -575,9 +575,9 @@ components:
           type: boolean
           description: Indicate whether the orchestration is enabled for the flow
           example: true
-        properties:
+        flowCompletionConfigs:
           type: object
-          description: Flow properties.
+          description: Flow Completion Configs.
           additionalProperties:
             type: string
             nullable : false
@@ -596,9 +596,9 @@ components:
           type: boolean
           description: Indicate whether the orchestration is enabled for the flow
           example: true
-        properties:
+        flowCompletionConfigs:
           type: object
-          description: Flow Properties.
+          description: Flow Completion Configs.
           additionalProperties:
             type: string
             nullable : false

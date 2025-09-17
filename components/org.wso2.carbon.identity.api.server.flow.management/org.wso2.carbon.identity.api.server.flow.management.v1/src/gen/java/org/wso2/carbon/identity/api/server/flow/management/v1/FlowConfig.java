@@ -40,7 +40,7 @@ public class FlowConfig  {
   
     private String flowType;
     private Boolean isEnabled;
-    private Map<String, String> properties = null;
+    private Map<String, String> flowCompletionConfigs = null;
 
 
     /**
@@ -82,30 +82,30 @@ public class FlowConfig  {
     }
 
     /**
-    * Flow properties.
+    * Flow Completion Configs.
     **/
-    public FlowConfig properties(Map<String, String> properties) {
+    public FlowConfig flowCompletionConfigs(Map<String, String> flowCompletionConfigs) {
 
-        this.properties = properties;
+        this.flowCompletionConfigs = flowCompletionConfigs;
         return this;
     }
     
-    @ApiModelProperty(value = "Flow properties.")
-    @JsonProperty("properties")
+    @ApiModelProperty(value = "Flow Completion Configs.")
+    @JsonProperty("flowCompletionConfigs")
     @Valid
-    public Map<String, String> getProperties() {
-        return properties;
+    public Map<String, String> getFlowCompletionConfigs() {
+        return flowCompletionConfigs;
     }
-    public void setProperties(Map<String, String> properties) {
-        this.properties = properties;
+    public void setFlowCompletionConfigs(Map<String, String> flowCompletionConfigs) {
+        this.flowCompletionConfigs = flowCompletionConfigs;
     }
 
 
-    public FlowConfig putPropertiesItem(String key, String propertiesItem) {
-        if (this.properties == null) {
-            this.properties = new HashMap<String, String>();
+    public FlowConfig putFlowCompletionConfigsItem(String key, String flowCompletionConfigsItem) {
+        if (this.flowCompletionConfigs == null) {
+            this.flowCompletionConfigs = new HashMap<String, String>();
         }
-        this.properties.put(key, propertiesItem);
+        this.flowCompletionConfigs.put(key, flowCompletionConfigsItem);
         return this;
     }
 
@@ -123,12 +123,12 @@ public class FlowConfig  {
         FlowConfig flowConfig = (FlowConfig) o;
         return Objects.equals(this.flowType, flowConfig.flowType) &&
             Objects.equals(this.isEnabled, flowConfig.isEnabled) &&
-            Objects.equals(this.properties, flowConfig.properties);
+            Objects.equals(this.flowCompletionConfigs, flowConfig.flowCompletionConfigs);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(flowType, isEnabled, properties);
+        return Objects.hash(flowType, isEnabled, flowCompletionConfigs);
     }
 
     @Override
@@ -139,7 +139,7 @@ public class FlowConfig  {
         
         sb.append("    flowType: ").append(toIndentedString(flowType)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
-        sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
+        sb.append("    flowCompletionConfigs: ").append(toIndentedString(flowCompletionConfigs)).append("\n");
         sb.append("}");
         return sb.toString();
     }
