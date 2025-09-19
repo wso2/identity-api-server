@@ -181,7 +181,7 @@ public class ServerFlowMgtService {
                     for (Map.Entry<String, String> entry : patchFlowCompletionConfigs.entrySet()) {
                         String key = entry.getKey();
                         String value = entry.getValue();
-                        Utils.validateFlag(key, value,
+                        Utils.validateFlowCompletionConfig(key, value,
                                 supportedFlowCompletionConfigs, flowConfigPatchModel.getFlowType());
                     }
                 }

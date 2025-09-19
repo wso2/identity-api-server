@@ -75,6 +75,7 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.F
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FlowGeneration.END;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FlowGeneration.FORM;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FlowGeneration.NEXT;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FlowGeneration.NULL;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USERNAME_IDENTIFIER;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USER_IDENTIFIER;
 
@@ -523,30 +524,33 @@ public class Utils {
     }
 
     /**
-     * Validate if the provided flag and value are supported.
+     * Validate the flow completion config and its value.
      *
-     * @param flag           The flag to validate.
-     * @param value          The value of the flag.
-     * @param supportedProperties List of supported properties.
+     * @param flowCompletionConfig The flow completion config to validate.
+     * @param value                The value of the flow completion config.
+     * @param supportedProperties  List of supported properties for the flow type.
+     * @param flowType             The flow type.
+     * @throws FlowMgtClientException If the flow completion config or its value is invalid.
      */
-    public static void validateFlag(String flag, String value , List<String> supportedProperties, String flowType)
+    public static void validateFlowCompletionConfig(String flowCompletionConfig, String value ,
+                                                    List<String> supportedProperties, String flowType)
             throws FlowMgtClientException {
 
-        if (StringUtils.isBlank(flag) || StringUtils.isBlank(value)) {
+        if (StringUtils.isBlank(flowCompletionConfig) || StringUtils.isBlank(value)) {
 
             throw Utils.handleFlowMgtException(new FlowMgtClientException(
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_FLOW_COMPLETION_CONFIG.getCode(),
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_FLOW_COMPLETION_CONFIG.getMessage(),
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_FLOW_COMPLETION_CONFIG.getDescription()),
-                    flag
+                    flowCompletionConfig
             );
         }
-        if (!supportedProperties.contains(flag)) {
+        if (!supportedProperties.contains(flowCompletionConfig)) {
             throw Utils.handleFlowMgtException(new FlowMgtClientException(
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_FLOW_COMPLETION_CONFIG.getCode(),
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_FLOW_COMPLETION_CONFIG.getMessage(),
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_FLOW_COMPLETION_CONFIG.getDescription()),
-                    flag, flowType
+                    flowCompletionConfig, flowType
             );
         }
     }
@@ -584,7 +588,7 @@ public class Utils {
                                 FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getCode(),
                                 FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getMessage(),
                                 FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getDescription()),
-                        NEXT, step.getData().getAction().getNext() == null ? null : EMPTY);
+                        NEXT, step.getData().getAction().getNext() == null ? NULL : EMPTY);
             }
             validateNextNodeReference(step.getData().getComponents());
         }
@@ -616,7 +620,7 @@ public class Utils {
                             FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getCode(),
                             FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getMessage(),
                             FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getDescription()),
-                    NEXT, component.getAction().getNext() == null ? null : EMPTY);
+                    NEXT, component.getAction().getNext() == null ? NULL : EMPTY);
         }
 
         // If the component is of type FORM, has its child components.

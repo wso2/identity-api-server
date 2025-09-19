@@ -175,6 +175,7 @@ public class FlowEndpointConstants {
         public static final String END = "END";
         public static final String NEXT = "next";
         public static final String EMPTY = "empty";
+        public static final String NULL = "null";
         public static final String FORM = "FORM";
     }
 }
