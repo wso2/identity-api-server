@@ -47,7 +47,6 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils
 import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils.validateIdentifiers;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils.validateNodeConnectivity;
 
-
 /**
  * Service class for flow management.
  */
