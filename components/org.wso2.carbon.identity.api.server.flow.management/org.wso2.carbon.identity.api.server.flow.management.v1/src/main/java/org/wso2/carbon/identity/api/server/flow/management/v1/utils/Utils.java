@@ -71,6 +71,11 @@ import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DE
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_DUPLICATE_COMPONENT_ID;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_GET_GOVERNANCE_CONFIG;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FlowGeneration.EMPTY;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FlowGeneration.END;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FlowGeneration.FORM;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FlowGeneration.NEXT;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FlowGeneration.NULL;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USERNAME_IDENTIFIER;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USER_IDENTIFIER;
 
@@ -519,31 +524,108 @@ public class Utils {
     }
 
     /**
-     * Validate if the provided flag and value are supported.
+     * Validate the flow completion config and its value.
      *
-     * @param flag           The flag to validate.
-     * @param value          The value of the flag.
-     * @param supportedProperties List of supported properties.
+     * @param flowCompletionConfig The flow completion config to validate.
+     * @param value                The value of the flow completion config.
+     * @param supportedProperties  List of supported properties for the flow type.
+     * @param flowType             The flow type.
+     * @throws FlowMgtClientException If the flow completion config or its value is invalid.
      */
-    public static void validateFlag(String flag, String value , List<String> supportedProperties, String flowType)
+    public static void validateFlowCompletionConfig(String flowCompletionConfig, String value ,
+                                                    List<String> supportedProperties, String flowType)
             throws FlowMgtClientException {
 
-        if (StringUtils.isBlank(flag) || StringUtils.isBlank(value)) {
+        if (StringUtils.isBlank(flowCompletionConfig) || StringUtils.isBlank(value)) {
 
             throw Utils.handleFlowMgtException(new FlowMgtClientException(
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_PROPERTY.getCode(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_PROPERTY.getMessage(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_PROPERTY.getDescription()),
-                    flag
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_FLOW_COMPLETION_CONFIG.getCode(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_FLOW_COMPLETION_CONFIG.getMessage(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_FLOW_COMPLETION_CONFIG.getDescription()),
+                    flowCompletionConfig
             );
         }
-        if (!supportedProperties.contains(flag)) {
+        if (!supportedProperties.contains(flowCompletionConfig)) {
             throw Utils.handleFlowMgtException(new FlowMgtClientException(
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getCode(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getMessage(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getDescription()),
-                    flag, flowType
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_FLOW_COMPLETION_CONFIG.getCode(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_FLOW_COMPLETION_CONFIG.getMessage(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_FLOW_COMPLETION_CONFIG.getDescription()),
+                    flowCompletionConfig, flowType
             );
+        }
+    }
+
+    /**
+     * Validate the connectivity of nodes in the flow graph.
+     *
+     * @param steps List of steps to validate.
+     */
+    public static void validateNodeConnectivity(List<Step> steps) {
+
+        if (CollectionUtils.isEmpty(steps)) {
+            throw Utils.handleFlowMgtException(new FlowMgtClientException(
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_EMPTY_STEPS.getCode(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_EMPTY_STEPS.getMessage(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_EMPTY_STEPS.getDescription()));
+        }
+        for (Step step : steps) {
+            validateNextNodeReference(step);
+        }
+    }
+
+    /**
+     * Validate the next node reference of a step.
+     *
+     * @param step Step to validate.
+     */
+    public static void validateNextNodeReference(Step step) {
+
+        //If the step is not END, and contains action, then the next must not be null.
+        if (!END.equals(step.getType())) {
+            if (step.getData() != null && step.getData().getAction() != null &&
+                    StringUtils.isBlank(step.getData().getAction().getNext())) {
+                throw Utils.handleFlowMgtException(new FlowMgtClientException(
+                                FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getCode(),
+                                FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getMessage(),
+                                FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getDescription()),
+                        NEXT, step.getData().getAction().getNext() == null ? NULL : EMPTY);
+            }
+            validateNextNodeReference(step.getData().getComponents());
+        }
+    }
+
+    /**
+     * Validate the next node reference of components recursively.
+     *
+     * @param components List of components to validate.
+     */
+    public static void validateNextNodeReference(List<Component> components) {
+
+        if (!CollectionUtils.isEmpty(components)) {
+            for (Component component : components) {
+                validateNextNodeReference(component);
+            }
+        }
+    }
+
+    /**
+     * Validate the next node reference of a component recursively.
+     *
+     * @param component Component to validate.
+     */
+    public static void validateNextNodeReference(Component component) {
+
+        if (component.getAction() != null && StringUtils.isBlank(component.getAction().getNext())) {
+            throw Utils.handleFlowMgtException(new FlowMgtClientException(
+                            FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getCode(),
+                            FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getMessage(),
+                            FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getDescription()),
+                    NEXT, component.getAction().getNext() == null ? NULL : EMPTY);
+        }
+
+        // If the component is of type FORM, has its child components.
+        if (FORM.equals(component.getType())) {
+            validateNextNodeReference(component.getComponents());
         }
     }
 }

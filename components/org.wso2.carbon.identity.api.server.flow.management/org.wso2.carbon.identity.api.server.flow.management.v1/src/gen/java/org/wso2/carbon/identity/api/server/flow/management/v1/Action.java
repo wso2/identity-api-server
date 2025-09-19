@@ -21,27 +21,31 @@ package org.wso2.carbon.identity.api.server.flow.management.v1;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
 import java.util.Objects;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+/**
+ * Represents an action which controls the flow
+ **/
 @ApiModel(description = "Represents an action which controls the flow")
-public class Action {
-
+public class Action  {
+  
     private String type;
     private Executor executor;
     private String next;
 
     /**
-     * Type of action
-     **/
+    * Type of action
+    **/
     public Action type(String type) {
 
         this.type = type;
         return this;
     }
-
+    
     @ApiModelProperty(example = "EXECUTOR", required = true, value = "Type of action")
     @JsonProperty("type")
     @Valid
@@ -50,52 +54,47 @@ public class Action {
     public String getType() {
         return type;
     }
-
     public void setType(String type) {
         this.type = type;
     }
 
     /**
-     *
-     **/
+    **/
     public Action executor(Executor executor) {
 
         this.executor = executor;
         return this;
     }
-
+    
     @ApiModelProperty(value = "")
     @JsonProperty("executor")
     @Valid
     public Executor getExecutor() {
         return executor;
     }
-
     public void setExecutor(Executor executor) {
         this.executor = executor;
     }
 
     /**
-     * ID of the next step. For the last step, value will be \&quot;COMPLETE\&quot;
-     **/
+    * ID of the next step. For the last step, value will be \&quot;COMPLETE\&quot;
+    **/
     public Action next(String next) {
 
         this.next = next;
         return this;
     }
-
-    @ApiModelProperty(example = "dnd-step-asd85f64-5717-4562-b3fc-2234f66afa6", required = true, value = "ID of the next step. For the last step, value will be \"COMPLETE\"")
+    
+    @ApiModelProperty(example = "dnd-step-asd85f64-5717-4562-b3fc-2234f66afa6", value = "ID of the next step. For the last step, value will be \"COMPLETE\"")
     @JsonProperty("next")
     @Valid
-    @NotNull(message = "Property next cannot be null.")
-
     public String getNext() {
         return next;
     }
-
     public void setNext(String next) {
         this.next = next;
     }
+
 
 
     @Override
@@ -109,8 +108,8 @@ public class Action {
         }
         Action action = (Action) o;
         return Objects.equals(this.type, action.type) &&
-                Objects.equals(this.executor, action.executor) &&
-                Objects.equals(this.next, action.next);
+            Objects.equals(this.executor, action.executor) &&
+            Objects.equals(this.next, action.next);
     }
 
     @Override
@@ -123,7 +122,7 @@ public class Action {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class Action {\n");
-
+        
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    executor: ").append(toIndentedString(executor)).append("\n");
         sb.append("    next: ").append(toIndentedString(next)).append("\n");
@@ -132,9 +131,9 @@ public class Action {
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
-     */
+    * Convert the given object to string with each line indented by 4 spaces
+    * (except the first line).
+    */
     private String toIndentedString(java.lang.Object o) {
 
         if (o == null) {

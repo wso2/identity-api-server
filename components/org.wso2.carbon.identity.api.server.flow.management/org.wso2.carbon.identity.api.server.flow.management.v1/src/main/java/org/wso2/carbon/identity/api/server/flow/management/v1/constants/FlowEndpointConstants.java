@@ -77,13 +77,21 @@ public class FlowEndpointConstants {
                 "Failed to retrieve supported claims.",
                 "An error occurred while reading supported claim metadata for the given attribute profile."),
 
-        ERROR_CODE_INVALID_PROPERTY("10009",
-                "Invalid property value provided.",
-                "The provided value for property %s is not valid."),
+        ERROR_CODE_INVALID_FLOW_COMPLETION_CONFIG("10009",
+                "Invalid flow completion config value provided.",
+                "The provided value for flow completion config %s is not valid."),
 
-        ERROR_CODE_UNSUPPORTED_PROPERTY("10010",
-                "Unsupported property used in the flow.",
-                "The provided property %s is not supported for the flow type %s.");
+        ERROR_CODE_UNSUPPORTED_FLOW_COMPLETION_CONFIG("10010",
+                "Unsupported flow completion config used in the flow.",
+                "The provided flow completion config %s is not supported for the flow type %s."),
+
+        ERROR_CODE_UNSUPPORTED_PROPERTY("10011",
+                "Invalid property value.",
+                "Property %s cannot be %s."),
+
+        ERROR_CODE_EMPTY_STEPS("10012",
+                "Empty steps in the flow.",
+                "The steps in the flow cannot be empty.");
 
         private final String code;
         private final String message;
@@ -164,5 +172,10 @@ public class FlowEndpointConstants {
         public static final String STATUS_FAILED = "FAILED";
         public static final String STEPS = "steps";
         public static final String ERROR = "error";
+        public static final String END = "END";
+        public static final String NEXT = "next";
+        public static final String EMPTY = "empty";
+        public static final String NULL = "null";
+        public static final String FORM = "FORM";
     }
 }

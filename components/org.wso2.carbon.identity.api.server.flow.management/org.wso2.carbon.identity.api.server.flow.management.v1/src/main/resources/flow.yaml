@@ -685,7 +685,6 @@ components:
       description: Represents an action which controls the flow
       required:
         - type
-        - next
       properties:
         type:
           type: string

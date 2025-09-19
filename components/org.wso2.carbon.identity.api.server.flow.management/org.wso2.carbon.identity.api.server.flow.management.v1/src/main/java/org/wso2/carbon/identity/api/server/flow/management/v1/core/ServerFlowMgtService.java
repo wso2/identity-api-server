@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils.collectFlowData;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils.validateExecutors;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils.validateIdentifiers;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils.validateNodeConnectivity;
 
 /**
  * Service class for flow management.
@@ -180,7 +181,7 @@ public class ServerFlowMgtService {
                     for (Map.Entry<String, String> entry : patchFlowCompletionConfigs.entrySet()) {
                         String key = entry.getKey();
                         String value = entry.getValue();
-                        Utils.validateFlag(key, value,
+                        Utils.validateFlowCompletionConfig(key, value,
                                 supportedFlowCompletionConfigs, flowConfigPatchModel.getFlowType());
                     }
                 }
@@ -215,6 +216,7 @@ public class ServerFlowMgtService {
         Set<String> flowFieldIdentifiers = new HashSet<>();
         Set<String> flowComponentIds = new HashSet<>();
         collectFlowData(flowSteps, flowExecutorNames, flowFieldIdentifiers, flowComponentIds);
+        validateNodeConnectivity(flowSteps);
         validateExecutors(metaResponseHandler, flowExecutorNames);
         validateIdentifiers(metaResponseHandler, flowFieldIdentifiers);
     }
