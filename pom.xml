@@ -360,6 +360,12 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.identity.flow.data.provider</artifactId>
+                <version>${carbon.identity.framework.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.extension.identity.x509certificate</groupId>
                 <artifactId>org.wso2.carbon.extension.identity.x509Certificate.validation</artifactId>
                 <version>${identity.x509Certificate.validation.version}</version>
@@ -416,6 +422,12 @@
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
                 <artifactId>org.wso2.carbon.identity.api.server.idp.common</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.idp.debug.common</artifactId>
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>
@@ -825,6 +837,12 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.idp.debug.v1</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
                 <artifactId>org.wso2.carbon.identity.api.server.flow.management.common</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -1014,6 +1032,7 @@
         <module>components/org.wso2.carbon.identity.api.server.userstore</module>
         <module>components/org.wso2.carbon.identity.api.server.keystore.management</module>
         <module>components/org.wso2.carbon.identity.api.server.idp</module>
+        <module>components/org.wso2.carbon.identity.api.server.idp.debug</module>
         <module>components/org.wso2.carbon.identity.api.server.script.library</module>
         <module>components/org.wso2.carbon.identity.api.server.oidc.scope.management</module>
         <module>components/org.wso2.carbon.identity.api.server.configs</module>
