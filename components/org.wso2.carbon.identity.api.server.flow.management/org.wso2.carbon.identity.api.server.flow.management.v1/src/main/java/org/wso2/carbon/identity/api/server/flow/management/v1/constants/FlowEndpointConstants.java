@@ -86,7 +86,7 @@ public class FlowEndpointConstants {
                 "The provided flow completion config %s is not supported for the flow type %s."),
 
         ERROR_CODE_UNSUPPORTED_PROPERTY("10011",
-                "Unsupported property.",
+                "Invalid property value.",
                 "Property %s cannot be %s."),
 
         ERROR_CODE_EMPTY_STEPS("10012",
@@ -175,5 +175,6 @@ public class FlowEndpointConstants {
         public static final String END = "END";
         public static final String NEXT = "next";
         public static final String EMPTY = "empty";
+        public static final String FORM = "FORM";
     }
 }

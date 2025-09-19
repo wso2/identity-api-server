@@ -73,6 +73,7 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.F
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FlowGeneration.EMPTY;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FlowGeneration.END;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FlowGeneration.FORM;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FlowGeneration.NEXT;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USERNAME_IDENTIFIER;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USER_IDENTIFIER;
@@ -576,13 +577,51 @@ public class Utils {
     public static void validateNextNodeReference(Step step) {
 
         //If the step is not END, and contains action, then the next must not be null.
-        if (END.equals(step.getType()) && step.getData() != null && step.getData().getAction() != null &&
-                StringUtils.isBlank(step.getData().getAction().getNext())) {
+        if (!END.equals(step.getType())) {
+            if (step.getData() != null && step.getData().getAction() != null &&
+                    StringUtils.isBlank(step.getData().getAction().getNext())) {
+                throw Utils.handleFlowMgtException(new FlowMgtClientException(
+                                FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getCode(),
+                                FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getMessage(),
+                                FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getDescription()),
+                        NEXT, step.getData().getAction().getNext() == null ? null : EMPTY);
+            }
+            validateNextNodeReference(step.getData().getComponents());
+        }
+    }
+
+    /**
+     * Validate the next node reference of components recursively.
+     *
+     * @param components List of components to validate.
+     */
+    public static void validateNextNodeReference(List<Component> components) {
+
+        if (!CollectionUtils.isEmpty(components)) {
+            for (Component component : components) {
+                validateNextNodeReference(component);
+            }
+        }
+    }
+
+    /**
+     * Validate the next node reference of a component recursively.
+     *
+     * @param component Component to validate.
+     */
+    public static void validateNextNodeReference(Component component) {
+
+        if (component.getAction() != null && StringUtils.isBlank(component.getAction().getNext())) {
             throw Utils.handleFlowMgtException(new FlowMgtClientException(
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getCode(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getMessage(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getDescription()),
-                    NEXT, step.getData().getAction().getNext() == null ? null : EMPTY);
+                            FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getCode(),
+                            FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getMessage(),
+                            FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getDescription()),
+                    NEXT, component.getAction().getNext() == null ? null : EMPTY);
+        }
+
+        // If the component is of type FORM, has its child components.
+        if (FORM.equals(component.getType())) {
+            validateNextNodeReference(component.getComponents());
         }
     }
 }

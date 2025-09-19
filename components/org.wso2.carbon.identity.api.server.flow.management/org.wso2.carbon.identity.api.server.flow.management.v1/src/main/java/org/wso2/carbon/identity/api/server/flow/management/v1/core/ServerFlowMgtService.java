@@ -43,9 +43,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils.collectFlowData;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils.validateNodeConnectivity;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils.validateExecutors;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils.validateIdentifiers;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils.validateNodeConnectivity;
 
 
 /**
