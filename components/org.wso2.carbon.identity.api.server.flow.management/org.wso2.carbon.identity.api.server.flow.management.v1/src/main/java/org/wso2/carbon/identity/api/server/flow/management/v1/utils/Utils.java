@@ -71,6 +71,9 @@ import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DE
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_DUPLICATE_COMPONENT_ID;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_GET_GOVERNANCE_CONFIG;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FlowGeneration.EMPTY;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FlowGeneration.END;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FlowGeneration.NEXT;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USERNAME_IDENTIFIER;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USER_IDENTIFIER;
 
@@ -531,19 +534,55 @@ public class Utils {
         if (StringUtils.isBlank(flag) || StringUtils.isBlank(value)) {
 
             throw Utils.handleFlowMgtException(new FlowMgtClientException(
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_PROPERTY.getCode(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_PROPERTY.getMessage(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_PROPERTY.getDescription()),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_FLOW_COMPLETION_CONFIG.getCode(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_FLOW_COMPLETION_CONFIG.getMessage(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_FLOW_COMPLETION_CONFIG.getDescription()),
                     flag
             );
         }
         if (!supportedProperties.contains(flag)) {
             throw Utils.handleFlowMgtException(new FlowMgtClientException(
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_FLOW_COMPLETION_CONFIG.getCode(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_FLOW_COMPLETION_CONFIG.getMessage(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_FLOW_COMPLETION_CONFIG.getDescription()),
+                    flag, flowType
+            );
+        }
+    }
+
+    /**
+     * Validate the connectivity of nodes in the flow graph.
+     *
+     * @param steps List of steps to validate.
+     */
+    public static void validateNodeConnectivity(List<Step> steps) {
+
+        if (CollectionUtils.isEmpty(steps)) {
+            throw Utils.handleFlowMgtException(new FlowMgtClientException(
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_EMPTY_STEPS.getCode(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_EMPTY_STEPS.getMessage(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_EMPTY_STEPS.getDescription()));
+        }
+        for (Step step : steps) {
+            validateNextNodeReference(step);
+        }
+    }
+
+    /**
+     * Validate the next node reference of a step.
+     *
+     * @param step Step to validate.
+     */
+    public static void validateNextNodeReference(Step step) {
+
+        //If the step is not END, and contains action, then the next must not be null.
+        if (END.equals(step.getType()) && step.getData() != null && step.getData().getAction() != null &&
+                StringUtils.isBlank(step.getData().getAction().getNext())) {
+            throw Utils.handleFlowMgtException(new FlowMgtClientException(
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getCode(),
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getMessage(),
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getDescription()),
-                    flag, flowType
-            );
+                    NEXT, step.getData().getAction().getNext() == null ? null : EMPTY);
         }
     }
 }

@@ -43,8 +43,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils.collectFlowData;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils.validateNodeConnectivity;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils.validateExecutors;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils.validateIdentifiers;
+
 
 /**
  * Service class for flow management.
@@ -215,6 +217,7 @@ public class ServerFlowMgtService {
         Set<String> flowFieldIdentifiers = new HashSet<>();
         Set<String> flowComponentIds = new HashSet<>();
         collectFlowData(flowSteps, flowExecutorNames, flowFieldIdentifiers, flowComponentIds);
+        validateNodeConnectivity(flowSteps);
         validateExecutors(metaResponseHandler, flowExecutorNames);
         validateIdentifiers(metaResponseHandler, flowFieldIdentifiers);
     }
