@@ -884,6 +884,28 @@
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.credential.management.common</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.credential.action.management.v1</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.outbound.auth.push</groupId>
+                <artifactId>org.wso2.carbon.identity.application.authenticator.push.device.handler</artifactId>
+                <version>${identity.notification.push.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.local.auth.fido</groupId>
+                <artifactId>org.wso2.carbon.identity.application.authenticator.fido2</artifactId>
+                <version>${identity.local.auth.fido.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -992,12 +1014,12 @@
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
         <identity.governance.version>1.11.103</identity.governance.version>
-        <carbon.identity.framework.version>7.8.650</carbon.identity.framework.version>
+        <carbon.identity.framework.version>7.8.610</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
         <findsecbugs-plugin.version>1.12.0</findsecbugs-plugin.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
-        <identity.event.handler.version>1.9.75</identity.event.handler.version>
-        <identity.inbound.oauth2.version>7.0.409</identity.inbound.oauth2.version>
+        <identity.event.handler.version>1.9.48</identity.event.handler.version>
+        <identity.inbound.oauth2.version>7.0.350</identity.inbound.oauth2.version>
         <identity.inbound.saml2.version>5.11.51</identity.inbound.saml2.version>
         <identity.x509Certificate.validation.version>1.1.19</identity.x509Certificate.validation.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
@@ -1017,6 +1039,8 @@
 
         <tenant.resource.manager.version>1.5.55</tenant.resource.manager.version>
         <identity.verification.version>1.0.15</identity.verification.version>
+        <identity.local.auth.fido.version>5.4.26</identity.local.auth.fido.version>
+        <identity.notification.push.version>0.1.5</identity.notification.push.version>
 
         <!-- Organization management core Version -->
         <org.wso2.carbon.identity.organization.management.core.version>1.1.41
@@ -1084,6 +1108,7 @@
         <module>components/org.wso2.carbon.identity.api.server.workflow</module>
         <module>components/org.wso2.carbon.identity.api.server.asynchronous.operation.status.management</module>
         <module>components/org.wso2.carbon.identity.api.server.vc.template.management</module>
+        <module>components/org.wso2.carbon.identity.api.server.credential.management</module>
     </modules>
 
 </project>
