@@ -18,8 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.credential.management.v1.factories;
 
-import org.wso2.carbon.identity.api.server.credential.management.common.AdminCredentialManagementServiceDataHolder;
-import org.wso2.carbon.identity.api.server.credential.management.common.service.AdminCredentialManagementService;
+import org.wso2.carbon.identity.api.server.credential.management.common.internal.CredentialManagementServiceImpl;
+import org.wso2.carbon.identity.api.server.credential.management.common.service.CredentialManagementService;
 import org.wso2.carbon.identity.api.server.credential.management.v1.core.ServerCredentialManagementService;
 
 public class ServerCredentialManagementServiceFactory {
@@ -31,13 +31,7 @@ public class ServerCredentialManagementServiceFactory {
     }
 
     static {
-        AdminCredentialManagementService adminCredentialManagementService = AdminCredentialManagementServiceDataHolder
-                .getAdminCredentialManagementService();
-
-        if (adminCredentialManagementService == null) {
-            throw new IllegalStateException("AdminCredentialManagementService is not available.");
-        }
-
+        CredentialManagementService adminCredentialManagementService = new CredentialManagementServiceImpl();
         SERVICE = new ServerCredentialManagementService(adminCredentialManagementService);
     }
 

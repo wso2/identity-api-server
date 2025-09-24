@@ -20,10 +20,8 @@ package org.wso2.carbon.identity.api.server.credential.management.common.interna
 
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants.CredentialTypes;
 import org.wso2.carbon.identity.api.server.credential.management.common.dto.CredentialDTO;
-import org.wso2.carbon.identity.api.server.credential.management.common.exception.AdminCredentialMgtClientException;
-import org.wso2.carbon.identity.api.server.credential.management.common.exception.AdminCredentialMgtException;
-import org.wso2.carbon.identity.api.server.credential.management.common.exception.AdminCredentialMgtServerException;
-import org.wso2.carbon.identity.api.server.credential.management.common.service.AdminCredentialManagementService;
+import org.wso2.carbon.identity.api.server.credential.management.common.exception.CredentialMgtException;
+import org.wso2.carbon.identity.api.server.credential.management.common.service.CredentialManagementService;
 import org.wso2.carbon.identity.api.server.credential.management.common.service.CredentialHandler;
 
 import java.util.ArrayList;
@@ -31,22 +29,22 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-public class AdminCredentialManagementServiceImpl implements AdminCredentialManagementService {
+public class CredentialManagementServiceImpl implements CredentialManagementService {
 
     private final Map<CredentialTypes, CredentialHandler> handlerMap;
 
-    public AdminCredentialManagementServiceImpl() {
+    public CredentialManagementServiceImpl() {
         handlerMap = new EnumMap<>(CredentialTypes.class);
         initializeHandlers();
     }
 
     private void initializeHandlers() {
-        handlerMap.put(CredentialTypes.PASSKEY, new FIDO2CredentialHandler());
+        handlerMap.put(CredentialTypes.PASSKEY, new PasskeyCredentialHandler());
         handlerMap.put(CredentialTypes.PUSH_AUTH, new PushCredentialHandler());
     }
 
     @Override
-    public List<CredentialDTO> getCredentialsForUser(String userId) throws AdminCredentialMgtException {
+    public List<CredentialDTO> getCredentialsForUser(String userId) throws CredentialMgtException {
         List<CredentialDTO> allCredentials = new ArrayList<>();
 
         for (CredentialHandler handler : handlerMap.values()) {
@@ -58,7 +56,7 @@ public class AdminCredentialManagementServiceImpl implements AdminCredentialMana
 
     @Override
     public void deleteCredentialForUser(String userId, String type, String credentialId)
-            throws AdminCredentialMgtException {
+            throws CredentialMgtException {
 
         CredentialTypes credentialType = CredentialTypes.valueOf(type);
 

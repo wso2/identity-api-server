@@ -25,6 +25,7 @@ public class CredentialMgtEndpointConstants {
     }
 
     public static final String CREDENTIAL_MGT_PREFIX = "CM-";
+    public static final String ERROR_CODE_DELIMITER = "-";
 
     /**
      * Error messages related to credential management.
@@ -42,10 +43,7 @@ public class CredentialMgtEndpointConstants {
                 "The provided credential ID is invalid."),
         ERROR_CODE_GET_CREDENTIALS("10004",
                 "Error occurred while retrieving credentials.",
-                "Server encountered an error while retrieving credentials for the user."),
-        ERROR_CODE_DELETE_CREDENTIAL("10005",
-                "Error occurred while deleting the credential.",
-                "Server encountered an error while deleting the credential for the user.");
+                "Server encountered an error while retrieving credentials for the user.");
 
         private final String code;
         private final String message;

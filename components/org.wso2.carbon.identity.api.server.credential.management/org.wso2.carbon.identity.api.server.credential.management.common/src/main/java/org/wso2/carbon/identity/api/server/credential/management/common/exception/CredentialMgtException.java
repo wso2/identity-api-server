@@ -21,26 +21,10 @@ package org.wso2.carbon.identity.api.server.credential.management.common.excepti
 /**
  * Base exception class for the Admin Credential Management Service.
  */
-public class AdminCredentialMgtException extends Exception {
+public class CredentialMgtException extends Exception {
 
     private String errorCode;
     private String description;
-
-    /**
-     * The default constructor.
-     */
-    public AdminCredentialMgtException() {
-        super();
-    }
-
-    /**
-     * Constructor with {@code message} parameter.
-     *
-     * @param message Message to be included in the exception.
-     */
-    public AdminCredentialMgtException(String message) {
-        super(message);
-    }
 
     /**
      * Constructor with {@code message}, {@code errorCode} and {@code description} parameters.
@@ -49,7 +33,7 @@ public class AdminCredentialMgtException extends Exception {
      * @param errorCode   Error code of the exception.
      * @param description Description of the exception.
      */
-    public AdminCredentialMgtException(String message, String errorCode, String description) {
+    public CredentialMgtException(String message, String errorCode, String description) {
         super(message);
         this.errorCode = errorCode;
         this.description = description;
@@ -63,19 +47,10 @@ public class AdminCredentialMgtException extends Exception {
      * @param description Description of the exception.
      * @param cause       Exception to be wrapped.
      */
-    public AdminCredentialMgtException(String message, String errorCode, String description, Throwable cause) {
+    public CredentialMgtException(String message, String errorCode, String description, Throwable cause) {
         super(message, cause);
         this.errorCode = errorCode;
         this.description = description;
-    }
-
-    /**
-     * Constructor with {@code cause} parameter.
-     *
-     * @param cause Exception to be wrapped.
-     */
-    public AdminCredentialMgtException(Throwable cause) {
-        super(cause);
     }
 
     /**
