@@ -18,13 +18,13 @@
 
 package org.wso2.carbon.identity.api.server.credential.management.common.internal;
 
-import org.wso2.carbon.identity.api.server.credential.management.common.AdminCredentialManagementServiceDataHolder;
+import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants;
+import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementServiceDataHolder;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants.CredentialTypes;
 import org.wso2.carbon.identity.api.server.credential.management.common.dto.CredentialDTO;
-import org.wso2.carbon.identity.api.server.credential.management.common.exception.AdminCredentialMgtClientException;
-import org.wso2.carbon.identity.api.server.credential.management.common.exception.AdminCredentialMgtException;
-import org.wso2.carbon.identity.api.server.credential.management.common.exception.AdminCredentialMgtServerException;
+import org.wso2.carbon.identity.api.server.credential.management.common.exception.CredentialMgtException;
 import org.wso2.carbon.identity.api.server.credential.management.common.service.CredentialHandler;
+import org.wso2.carbon.identity.api.server.credential.management.common.utils.CredentialManagementUtils;
 import org.wso2.carbon.identity.application.authenticator.push.device.handler.DeviceHandler;
 import org.wso2.carbon.identity.application.authenticator.push.device.handler.exception.PushDeviceHandlerClientException;
 import org.wso2.carbon.identity.application.authenticator.push.device.handler.exception.PushDeviceHandlerServerException;
@@ -38,42 +38,30 @@ public class PushCredentialHandler implements CredentialHandler {
     private final DeviceHandler deviceHandler;
 
     public PushCredentialHandler() {
-        this.deviceHandler = AdminCredentialManagementServiceDataHolder.getPushDeviceHandler();
+        this.deviceHandler = CredentialManagementServiceDataHolder.getPushDeviceHandler();
     }
 
     @Override
-    public List<CredentialDTO> getCredentialsForUser(String userId) throws AdminCredentialMgtException {
+    public List<CredentialDTO> getCredentialsForUser(String userId) throws CredentialMgtException {
         try {
             List<Device> pushCredentials = deviceHandler.listDevices(userId);
             return pushCredentials.stream().map(this::mapPushToCredentialDTO).collect(Collectors.toList());
         } catch (PushDeviceHandlerServerException e) {
-            throw new AdminCredentialMgtServerException(
-                    "CM-65006",
-                    "Server error retrieving push credentials for user: " + userId,
-                    "The server encountered an error while fetching push credentials.",
-                    e
-            );
+            throw CredentialManagementUtils.handleServerException(
+                    CredentialManagementConstants.ErrorMessages.ERROR_CODE_GET_PUSH_AUTH_DEVICE, e, userId);
         }
     }
 
     @Override
-    public void deleteCredentialForUser(String userId, String credentialId) throws AdminCredentialMgtException {
+    public void deleteCredentialForUser(String userId, String credentialId) throws CredentialMgtException {
         try {
             deviceHandler.unregisterDevice(credentialId);
         } catch (PushDeviceHandlerClientException e) {
-            throw new AdminCredentialMgtClientException(
-                    "CM-65007",
-                    "Client error deleting push credential: " + credentialId,
-                    "The request to delete the credential was invalid.",
-                    e
-            );
+            throw CredentialManagementUtils.handleClientException(
+                    CredentialManagementConstants.ErrorMessages.ERROR_CODE_DELETE_PUSH_AUTH_CREDENTIAL, e, userId);
         } catch (PushDeviceHandlerServerException e) {
-            throw new AdminCredentialMgtServerException(
-                    "CM-65008",
-                    "Server error deleting push credential: " + credentialId,
-                    "The server encountered an error while deleting the push credential.",
-                    e
-            );
+            throw CredentialManagementUtils.handleServerException(
+                    CredentialManagementConstants.ErrorMessages.ERROR_CODE_DELETE_PUSH_AUTH_DEVICE, e, userId);
         }
     }
 

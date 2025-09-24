@@ -50,6 +50,7 @@ public class CredentialApiServiceImpl implements CredentialApiService {
 
     @Override
     public Response deleteCredentialById(String userId, String type, String credentialId) {
+
         adminServerCredentialManagementService.deleteCredentialForUser(userId, type, credentialId);
 
         return Response.noContent().build();

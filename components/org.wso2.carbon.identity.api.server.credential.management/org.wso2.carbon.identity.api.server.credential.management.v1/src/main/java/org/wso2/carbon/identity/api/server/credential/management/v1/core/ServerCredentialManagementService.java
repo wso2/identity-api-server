@@ -19,8 +19,8 @@
 package org.wso2.carbon.identity.api.server.credential.management.v1.core;
 
 import org.wso2.carbon.identity.api.server.credential.management.common.dto.CredentialDTO;
-import org.wso2.carbon.identity.api.server.credential.management.common.exception.AdminCredentialMgtException;
-import org.wso2.carbon.identity.api.server.credential.management.common.service.AdminCredentialManagementService;
+import org.wso2.carbon.identity.api.server.credential.management.common.exception.CredentialMgtException;
+import org.wso2.carbon.identity.api.server.credential.management.common.service.CredentialManagementService;
 import org.wso2.carbon.identity.api.server.credential.management.v1.utils.CredentialMgtEndpointUtils;
 
 
@@ -28,29 +28,32 @@ import java.util.List;
 
 public class ServerCredentialManagementService {
 
-    private final AdminCredentialManagementService adminCredentialManagementService;
+    private final CredentialManagementService adminCredentialManagementService;
 
-    public ServerCredentialManagementService(AdminCredentialManagementService adminCredentialManagementService) {
+    public ServerCredentialManagementService(CredentialManagementService adminCredentialManagementService) {
+
         this.adminCredentialManagementService = adminCredentialManagementService;
     }
 
     public List<CredentialDTO> getCredentialsForUser(String userId) {
+
         try {
             CredentialMgtEndpointUtils.validateUserId(userId);
 
             return adminCredentialManagementService.getCredentialsForUser(userId);
-        } catch (AdminCredentialMgtException e) {
+        } catch (CredentialMgtException e) {
             throw CredentialMgtEndpointUtils.handleCredentialMgtException(e);
         }
     }
 
     public void deleteCredentialForUser(String userId, String type, String credentialId) {
+
         try {
             CredentialMgtEndpointUtils.validateUserId(userId);
             CredentialMgtEndpointUtils.validateCredentialId(credentialId);
             CredentialMgtEndpointUtils.validateCredentialType(type);
             adminCredentialManagementService.deleteCredentialForUser(userId, type, credentialId);
-        } catch (AdminCredentialMgtException e) {
+        } catch (CredentialMgtException e) {
             throw CredentialMgtEndpointUtils.handleCredentialMgtException(e);
         }
     }

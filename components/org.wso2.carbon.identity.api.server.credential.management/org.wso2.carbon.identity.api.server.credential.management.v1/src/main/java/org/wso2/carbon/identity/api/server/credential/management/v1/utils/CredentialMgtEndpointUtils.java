@@ -25,13 +25,11 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants.CredentialTypes;
 import org.wso2.carbon.identity.api.server.credential.management.common.dto.CredentialDTO;
-import org.wso2.carbon.identity.api.server.credential.management.common.exception.AdminCredentialMgtClientException;
-import org.wso2.carbon.identity.api.server.credential.management.common.exception.AdminCredentialMgtException;
-import org.wso2.carbon.identity.api.server.credential.management.common.exception.AdminCredentialMgtServerException;
+import org.wso2.carbon.identity.api.server.credential.management.common.exception.CredentialMgtClientException;
+import org.wso2.carbon.identity.api.server.credential.management.common.exception.CredentialMgtException;
+import org.wso2.carbon.identity.api.server.credential.management.common.exception.CredentialMgtServerException;
 import org.wso2.carbon.identity.api.server.credential.management.v1.Credential;
 import org.wso2.carbon.identity.api.server.credential.management.v1.constants.CredentialMgtEndpointConstants;
-
-import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER;
 
 import javax.ws.rs.core.Response;
 import java.util.Collections;
@@ -61,13 +59,13 @@ public class CredentialMgtEndpointUtils {
     /**
      * Handles exceptions and returns an APIError object.
      *
-     * @param e AdminCredentialMgtServerException object.
+     * @param e CredentialMgtServerException object.
      * @return APIError object.
      */
-    public static APIError handleCredentialMgtException(AdminCredentialMgtException e) {
+    public static APIError handleCredentialMgtException(CredentialMgtException e) {
 
         Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
-        if (e instanceof AdminCredentialMgtClientException) {
+        if (e instanceof CredentialMgtClientException) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(e.getMessage(), e);
             }
@@ -79,7 +77,7 @@ public class CredentialMgtEndpointUtils {
         String errorCode = e.getErrorCode();
         if (StringUtils.isBlank(errorCode)) {
             errorCode = CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_GET_CREDENTIALS.getCode();
-        } else if (!errorCode.contains(ERROR_CODE_DELIMITER)) {
+        } else if (!errorCode.contains(CredentialMgtEndpointConstants.ERROR_CODE_DELIMITER)) {
             errorCode = CredentialMgtEndpointConstants.CREDENTIAL_MGT_PREFIX + errorCode;
         }
 
@@ -108,11 +106,12 @@ public class CredentialMgtEndpointUtils {
      * Validate the credential type.
      *
      * @param value Credential type.
-     * @throws AdminCredentialMgtClientException Invalid credential type.
+     * @throws CredentialMgtClientException Invalid credential type.
      */
-    public static void validateCredentialType(String value) throws AdminCredentialMgtClientException {
+    public static void validateCredentialType(String value) throws CredentialMgtClientException {
+
         if (StringUtils.isBlank(value) || !CredentialTypes.fromString(value).isPresent()) {
-            throw new AdminCredentialMgtClientException(
+            throw new CredentialMgtClientException(
                     CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_CREDENTIAL_TYPE.getCode(),
                     CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_CREDENTIAL_TYPE.getMessage(),
                     CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_CREDENTIAL_TYPE.getDescription());
@@ -123,11 +122,12 @@ public class CredentialMgtEndpointUtils {
      * Validate the user ID.
      *
      * @param userId User ID.
-     * @throws AdminCredentialMgtClientException Invalid user ID.
+     * @throws CredentialMgtClientException Invalid user ID.
      */
-    public static void validateUserId(String userId) throws AdminCredentialMgtClientException {
+    public static void validateUserId(String userId) throws CredentialMgtClientException {
+
         if (StringUtils.isBlank(userId)) {
-            throw new AdminCredentialMgtClientException(
+            throw new CredentialMgtClientException(
                     CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_USER_ID.getCode(),
                     CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_USER_ID.getMessage(),
                     CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_USER_ID.getDescription());
@@ -138,11 +138,12 @@ public class CredentialMgtEndpointUtils {
      * Validate the credential ID.
      *
      * @param credentialId Credential ID.
-     * @throws AdminCredentialMgtClientException Invalid credential ID.
+     * @throws CredentialMgtClientException Invalid credential ID.
      */
-    public static void validateCredentialId(String credentialId) throws AdminCredentialMgtClientException {
+    public static void validateCredentialId(String credentialId) throws CredentialMgtClientException {
+
         if (StringUtils.isBlank(credentialId)) {
-            throw new AdminCredentialMgtClientException(
+            throw new CredentialMgtClientException(
                     CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_CREDENTIAL_ID.getCode(),
                     CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_CREDENTIAL_ID.getMessage(),
                     CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_CREDENTIAL_ID.getDescription());
@@ -170,7 +171,7 @@ public class CredentialMgtEndpointUtils {
             try {
                 credential.setType(Credential.TypeEnum.fromValue(dto.getType()));
             } catch (IllegalArgumentException ex) {
-                throw handleCredentialMgtException(new AdminCredentialMgtServerException(
+                throw handleCredentialMgtException(new CredentialMgtServerException(
                         CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_GET_CREDENTIALS.getCode(),
                         "Unsupported credential type returned by the backend service.",
                         "Unable to map credential type: " + dto.getType(),

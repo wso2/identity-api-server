@@ -21,14 +21,9 @@ package org.wso2.carbon.identity.api.server.credential.management.common.excepti
 /**
  * Server exception for Admin Credential Management operations.
  */
-public class AdminCredentialMgtServerException extends AdminCredentialMgtException {
+public class CredentialMgtServerException extends CredentialMgtException {
 
-    public AdminCredentialMgtServerException(String errorCode, String message, String description) {
-
-        super(message, errorCode, description);
-    }
-
-    public AdminCredentialMgtServerException(String errorCode, String message, String description, Throwable cause) {
+    public CredentialMgtServerException(String errorCode, String message, String description, Throwable cause) {
 
         super(message, errorCode, description, cause);
     }
