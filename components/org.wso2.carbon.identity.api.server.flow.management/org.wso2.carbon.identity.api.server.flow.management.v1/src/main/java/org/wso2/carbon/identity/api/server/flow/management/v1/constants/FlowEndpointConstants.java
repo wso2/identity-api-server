@@ -91,7 +91,11 @@ public class FlowEndpointConstants {
 
         ERROR_CODE_EMPTY_STEPS("10012",
                 "Empty steps in the flow.",
-                "The steps in the flow cannot be empty.");
+                "The steps in the flow cannot be empty."),
+
+        ERROR_CODE_REQUIRED_EXECUTOR_MISSING("10013",
+                "Required executor is missing in the flow.",
+                "The flow must contain the required executors.");
 
         private final String code;
         private final String message;
