@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.credential.management.common;
 
-import org.wso2.carbon.identity.api.server.credential.management.common.internal.AdminCredentialManagementServiceImpl;
 import org.wso2.carbon.identity.application.authenticator.fido2.core.WebAuthnService;
 import org.wso2.carbon.identity.application.authenticator.push.device.handler.DeviceHandler;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -26,15 +25,10 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 /**
  * Service holder class for credential management related services.
  */
-public class AdminCredentialManagementServiceDataHolder {
+public class CredentialManagementServiceDataHolder {
 
-    private AdminCredentialManagementServiceDataHolder() {
+    private CredentialManagementServiceDataHolder() {
 
-    }
-
-    private static class AdminCredentialServiceDataHolder {
-
-        static final AdminCredentialManagementServiceImpl SERVICE = new AdminCredentialManagementServiceImpl();
     }
 
     private static class WebAuthnServiceHolder {
@@ -47,16 +41,6 @@ public class AdminCredentialManagementServiceDataHolder {
 
         private static final DeviceHandler SERVICE = (DeviceHandler) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(DeviceHandler.class, null);
-    }
-
-    /**
-     * Get AdminCredentialManagementServiceImpl instance.
-     *
-     * @return AdminCredentialManagementServiceImpl instance
-     */
-    public static AdminCredentialManagementServiceImpl getAdminCredentialManagementService() {
-
-        return AdminCredentialServiceDataHolder.SERVICE;
     }
 
     /**

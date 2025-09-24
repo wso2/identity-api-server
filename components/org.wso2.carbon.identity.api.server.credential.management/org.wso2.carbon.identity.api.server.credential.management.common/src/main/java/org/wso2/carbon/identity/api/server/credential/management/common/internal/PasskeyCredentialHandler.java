@@ -18,28 +18,28 @@
 
 package org.wso2.carbon.identity.api.server.credential.management.common.internal;
 
-import org.wso2.carbon.identity.api.server.credential.management.common.AdminCredentialManagementServiceDataHolder;
+import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants;
+import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementServiceDataHolder;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants.CredentialTypes;
 import org.wso2.carbon.identity.api.server.credential.management.common.dto.CredentialDTO;
-import org.wso2.carbon.identity.api.server.credential.management.common.exception.AdminCredentialMgtClientException;
-import org.wso2.carbon.identity.api.server.credential.management.common.exception.AdminCredentialMgtException;
-import org.wso2.carbon.identity.api.server.credential.management.common.exception.AdminCredentialMgtServerException;
+import org.wso2.carbon.identity.api.server.credential.management.common.exception.CredentialMgtException;
 import org.wso2.carbon.identity.api.server.credential.management.common.service.CredentialHandler;
 import org.wso2.carbon.identity.application.authenticator.fido2.core.WebAuthnService;
 import org.wso2.carbon.identity.application.authenticator.fido2.dto.FIDO2CredentialRegistration;
 import org.wso2.carbon.identity.application.authenticator.fido2.exception.FIDO2AuthenticatorClientException;
 import org.wso2.carbon.identity.application.authenticator.fido2.exception.FIDO2AuthenticatorServerException;
+import org.wso2.carbon.identity.api.server.credential.management.common.utils.CredentialManagementUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class FIDO2CredentialHandler implements CredentialHandler {
+public class PasskeyCredentialHandler implements CredentialHandler {
 
     @Override
-    public List<CredentialDTO> getCredentialsForUser(String userId) throws AdminCredentialMgtException {
+    public List<CredentialDTO> getCredentialsForUser(String userId) throws CredentialMgtException {
         try {
-            WebAuthnService webAuthnService = AdminCredentialManagementServiceDataHolder.getWebAuthnService();
+            WebAuthnService webAuthnService = CredentialManagementServiceDataHolder.getWebAuthnService();
             Collection<FIDO2CredentialRegistration> fido2Credentials = webAuthnService.getFIDO2DeviceMetaData(userId);
 
             List<CredentialDTO> credentialDTOs = new ArrayList<>();
@@ -50,34 +50,22 @@ public class FIDO2CredentialHandler implements CredentialHandler {
 
             return credentialDTOs;
         } catch (FIDO2AuthenticatorServerException e) {
-            throw new AdminCredentialMgtServerException(
-                    "CM-65003",
-                    "Server error retrieving passkey credentials for user: " + userId,
-                    "The server encountered an error while fetching passkey credentials.",
-                    e
-            );
+            throw CredentialManagementUtils.handleServerException(
+                    CredentialManagementConstants.ErrorMessages.ERROR_CODE_GET_PASSKEYS, e, userId);
         }
     }
 
     @Override
-    public void deleteCredentialForUser(String userId, String credentialId) throws AdminCredentialMgtException {
+    public void deleteCredentialForUser(String userId, String credentialId) throws CredentialMgtException {
         try {
-            WebAuthnService webAuthnService = AdminCredentialManagementServiceDataHolder.getWebAuthnService();
+            WebAuthnService webAuthnService = CredentialManagementServiceDataHolder.getWebAuthnService();
             webAuthnService.deregisterFIDO2Credential(credentialId);
         } catch (FIDO2AuthenticatorClientException e) {
-            throw new AdminCredentialMgtClientException(
-                    "CM-65004",
-                    "Client error deleting passkey credential: " + credentialId,
-                    "The request to delete the credential was invalid.",
-                    e
-            );
+            throw CredentialManagementUtils.handleClientException(
+                    CredentialManagementConstants.ErrorMessages.ERROR_CODE_DELETE_PASSKEY_CREDENTIAL, e, userId);
         } catch (FIDO2AuthenticatorServerException e) {
-            throw new AdminCredentialMgtServerException(
-                    "CM-65005",
-                    "Server error deleting passkey credential: " + credentialId,
-                    "The server encountered an error while deleting the passkey credential.",
-                    e
-            );
+            throw CredentialManagementUtils.handleServerException(
+                    CredentialManagementConstants.ErrorMessages.ERROR_CODE_DELETE_PASSKEYS, e, userId);
         }
     }
 
