@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.idv.provider.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.extension.identity.verification.provider.IdVProviderManager;
 
@@ -25,6 +27,8 @@ import org.wso2.carbon.extension.identity.verification.provider.IdVProviderManag
  * Service holder class for identity verification Rest API.
  */
 public class IdentityVerificationServiceHolder {
+
+    private static final Log log = LogFactory.getLog(IdentityVerificationServiceHolder.class);
 
     private IdentityVerificationServiceHolder() {};
 
@@ -40,6 +44,14 @@ public class IdentityVerificationServiceHolder {
      */
     public static IdVProviderManager getIdVProviderManager() {
 
-        return IdVProviderManagerHolder.SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving IdVProviderManager OSGi service.");
+        }
+        
+        IdVProviderManager service = IdVProviderManagerHolder.SERVICE;
+        if (service == null) {
+            log.warn("IdVProviderManager OSGi service is not available.");
+        }
+        return service;
     }
 }

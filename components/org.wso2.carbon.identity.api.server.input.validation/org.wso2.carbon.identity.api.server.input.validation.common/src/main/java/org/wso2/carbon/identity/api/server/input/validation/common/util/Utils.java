@@ -18,16 +18,21 @@
 
 package org.wso2.carbon.identity.api.server.input.validation.common.util;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.slf4j.MDC;
 
 import java.util.UUID;
 
-import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.CORRELATION_ID;
+import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants
+        .CORRELATION_ID;
 
 /**
  * Util class.
  */
 public class Utils {
+
+    private static final Log log = LogFactory.getLog(Utils.class);
 
     /**
      * Get correlation id of current thread.
@@ -37,9 +42,17 @@ public class Utils {
     public static String getCorrelation() {
 
         if (isCorrelationIDPresent()) {
-            return MDC.get(CORRELATION_ID);
+            String correlationId = MDC.get(CORRELATION_ID);
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieved existing correlation ID from MDC: " + correlationId);
+            }
+            return correlationId;
         }
-        return UUID.randomUUID().toString();
+        String newCorrelationId = UUID.randomUUID().toString();
+        if (log.isDebugEnabled()) {
+            log.debug("Generated new correlation ID: " + newCorrelationId);
+        }
+        return newCorrelationId;
     }
 
     /**

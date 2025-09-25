@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.keystore.management.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.keystore.management.common.KeyStoreManagamentDataHolder;
 import org.wso2.carbon.identity.api.server.keystore.management.v1.core.KeyStoreService;
 import org.wso2.carbon.security.keystore.KeyStoreManagementService;
@@ -27,16 +29,22 @@ import org.wso2.carbon.security.keystore.KeyStoreManagementService;
  */
 public class KeyStoreServiceFactory {
 
+    private static final Log LOG = LogFactory.getLog(KeyStoreServiceFactory.class);
     private static final KeyStoreService SERVICE;
 
     static {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Initializing KeyStoreService factory.");
+        }
         KeyStoreManagementService keyStoreManagementService = KeyStoreManagamentDataHolder.getKeyStoreManager();
 
         if (keyStoreManagementService == null) {
+            LOG.error("KeyStoreManagementService is not available from OSGi context.");
             throw new IllegalStateException("KeyStoreManagementService is not available from OSGi context.");
         }
 
         SERVICE = new KeyStoreService(keyStoreManagementService);
+        LOG.info("KeyStoreService factory initialized successfully.");
     }
 
     /**
@@ -46,6 +54,9 @@ public class KeyStoreServiceFactory {
      */
     public static KeyStoreService getKeyStoreService() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving KeyStoreService instance.");
+        }
         return SERVICE;
     }
 }

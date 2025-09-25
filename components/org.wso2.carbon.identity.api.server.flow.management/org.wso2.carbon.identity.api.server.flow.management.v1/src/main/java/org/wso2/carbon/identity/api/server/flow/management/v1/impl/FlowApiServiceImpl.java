@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowApiService;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfig;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfigPatchModel;
@@ -42,21 +44,35 @@ import javax.ws.rs.core.Response;
  */
 public class FlowApiServiceImpl implements FlowApiService {
 
+    private static final Log log = LogFactory.getLog(FlowApiServiceImpl.class);
     ServerFlowMgtService flowMgtService;
     FlowAIServiceCore flowAIServiceCore;
 
     public FlowApiServiceImpl() {
 
         try {
+            log.info("Initializing Flow API service implementation.");
             this.flowMgtService = ServerFlowMgtServiceFactory.getFlowMgtService();
             this.flowAIServiceCore = FlowAIServiceFactory.getFlowAIService();
+            log.info("Flow API service implementation initialized successfully.");
         } catch (IllegalStateException e) {
+            log.error("Failed to initialize flow management service.", e);
             throw new RuntimeException("Error occurred while initiating flow management service.", e);
         }
     }
 
     @Override
     public Response generateFlow(FlowGenerateRequest flowGenerateRequest) {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Generating flow for type: " + 
+                    (flowGenerateRequest != null ? flowGenerateRequest.getFlowType() : null));
+        }
+
+        if (flowGenerateRequest == null) {
+            log.warn("FlowGenerateRequest is null. Cannot generate flow.");
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
 
         FlowGenerateResponse flowResponse = flowAIServiceCore.generateFlow(flowGenerateRequest);
         return Response.ok().entity(flowResponse).build();
@@ -65,6 +81,9 @@ public class FlowApiServiceImpl implements FlowApiService {
     @Override
     public Response getFlow(String flowType) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving flow for type: " + flowType);
+        }
         FlowResponse flow = flowMgtService.getFlow(flowType);
         return Response.ok().entity(flow).build();
     }
@@ -107,14 +126,36 @@ public class FlowApiServiceImpl implements FlowApiService {
     @Override
     public Response updateFlow(FlowRequest flowRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating flow for type: " + 
+                    (flowRequest != null ? flowRequest.getFlowType() : null));
+        }
+
+        if (flowRequest == null) {
+            log.warn("FlowRequest is null. Cannot update flow.");
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
         flowMgtService.updateFlow(flowRequest);
+        log.info("Flow updated successfully for type: " + flowRequest.getFlowType());
         return Response.ok().build();
     }
 
     @Override
     public Response updateFlowConfig(FlowConfigPatchModel flowConfigPatchModel) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating flow config for type: " + 
+                    (flowConfigPatchModel != null ? flowConfigPatchModel.getFlowType() : null));
+        }
+
+        if (flowConfigPatchModel == null) {
+            log.warn("FlowConfigPatchModel is null. Cannot update flow config.");
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
         FlowConfig flowConfig = flowMgtService.updateFlowConfig(flowConfigPatchModel);
+        log.info("Flow config updated successfully for type: " + flowConfigPatchModel.getFlowType());
         return Response.ok().entity(flowConfig).build();
     }
 }

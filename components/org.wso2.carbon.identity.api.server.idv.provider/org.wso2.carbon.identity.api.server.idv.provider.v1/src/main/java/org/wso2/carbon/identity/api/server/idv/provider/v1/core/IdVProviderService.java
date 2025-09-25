@@ -74,6 +74,18 @@ public class IdVProviderService {
 
         IdVProvider idVProvider;
         int tenantId = getTenantId();
+        if (log.isDebugEnabled()) {
+            log.debug("Adding IdV provider with name: " + 
+                    (idVProviderRequest != null ? idVProviderRequest.getName() : "null") + 
+                    " for tenant ID: " + tenantId);
+        }
+
+        if (idVProviderRequest == null) {
+            log.warn("IdVProviderRequest is null. Cannot add IdV provider.");
+            throw handleException(Response.Status.BAD_REQUEST,
+                    Constants.ErrorMessage.ERROR_ADDING_IDVP, "null");
+        }
+
         try {
             idVProvider = idvProviderManager.addIdVProvider(createIdVProvider(idVProviderRequest), tenantId);
         } catch (IdVProviderMgtException e) {
@@ -81,7 +93,12 @@ public class IdVProviderService {
                 throw handleException(Response.Status.CONFLICT,
                         Constants.ErrorMessage.ERROR_CODE_IDVP_EXISTS, idVProviderRequest.getName());
             }
-            throw handleIdVException(e, Constants.ErrorMessage.ERROR_ADDING_IDVP, idVProviderRequest.getName());
+            throw handleIdVException(e, Constants.ErrorMessage.ERROR_ADDING_IDVP, 
+                    idVProviderRequest.getName());
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("IdV provider created successfully with ID: " + idVProvider.getIdVProviderUuid() + 
+                    " for tenant ID: " + tenantId);
         }
         return getIdVProviderResponse(idVProvider);
     }
@@ -98,6 +115,18 @@ public class IdVProviderService {
         IdVProvider oldIdVProvider;
         IdVProvider newIdVProvider;
         int tenantId = getTenantId();
+        if (log.isDebugEnabled()) {
+            log.debug("Updating IdV provider with ID: " + idVProviderId + ", name: " + 
+                    (idVProviderRequest != null ? idVProviderRequest.getName() : "null") + 
+                    " for tenant ID: " + tenantId);
+        }
+
+        if (idVProviderRequest == null) {
+            log.warn("IdVProviderRequest is null. Cannot update IdV provider.");
+            throw handleException(Response.Status.BAD_REQUEST,
+                    Constants.ErrorMessage.ERROR_UPDATING_IDVP, idVProviderId);
+        }
+
         try {
             oldIdVProvider = idvProviderManager.getIdVProvider(idVProviderId, tenantId);
 
@@ -119,6 +148,10 @@ public class IdVProviderService {
                 throw handleIdVException(e, Constants.ErrorMessage.ERROR_UPDATING_IDVP, idVProviderId);
             }
         }
+        if (log.isDebugEnabled()) {
+            log.debug("IdV provider updated successfully with ID: " + idVProviderId + 
+                    " for tenant ID: " + tenantId);
+        }
         return getIdVProviderResponse(newIdVProvider);
     }
 
@@ -132,10 +165,18 @@ public class IdVProviderService {
 
         try {
             int tenantId = getTenantId();
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieving IdV provider with ID: " + idVProviderId + 
+                        " for tenant ID: " + tenantId);
+            }
             IdVProvider idVProvider = idvProviderManager.getIdVProvider(idVProviderId, tenantId);
             if (idVProvider == null) {
                 throw handleException(Response.Status.NOT_FOUND,
                         Constants.ErrorMessage.ERROR_CODE_IDVP_NOT_FOUND, idVProviderId);
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("IdV provider retrieved successfully with ID: " + idVProviderId + 
+                        " for tenant ID: " + tenantId);
             }
             return getIdVProviderResponse(idVProvider);
         } catch (IdVProviderMgtException e) {
@@ -169,6 +210,10 @@ public class IdVProviderService {
     public IdVProviderListResponse getIdVProviders(Integer limit, Integer offset, String filter) {
 
         int tenantId = getTenantId();
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving IdV providers with limit: " + limit + ", offset: " + offset + 
+                    ", filter: " + filter + " for tenant ID: " + tenantId);
+        }
         try {
             int totalResults = idvProviderManager.getCountOfIdVProviders(tenantId, filter);
 
@@ -194,6 +239,10 @@ public class IdVProviderService {
             offset = (offset == null) ? Integer.valueOf(0) : offset;
             idVProviderListResponse.setStartIndex(offset + 1);
             idVProviderListResponse.setTotalResults(totalResults);
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieved " + idVProviderListResponse.getCount() + " out of " + totalResults + 
+                        " IdV providers for tenant ID: " + tenantId);
+            }
             return idVProviderListResponse;
         } catch (IdVProviderMgtException e) {
             throw handleIdVException(e, Constants.ErrorMessage.ERROR_RETRIEVING_IDVPS,
@@ -209,8 +258,15 @@ public class IdVProviderService {
     public void deleteIdVProvider(String idVProviderId) {
 
         int tenantId = getTenantId();
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting IdV provider with ID: " + idVProviderId + " for tenant ID: " + tenantId);
+        }
         try {
             idvProviderManager.deleteIdVProvider(idVProviderId, tenantId);
+            if (log.isDebugEnabled()) {
+                log.debug("IdV provider deleted successfully with ID: " + idVProviderId + 
+                        " for tenant ID: " + tenantId);
+            }
         } catch (IdVProviderMgtException e) {
             throw handleIdVException(e, Constants.ErrorMessage.ERROR_DELETING_IDVP, idVProviderId);
         }
@@ -404,11 +460,16 @@ public class IdVProviderService {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         if (StringUtils.isBlank(tenantDomain)) {
+            log.warn("Tenant domain is blank or null while retrieving tenant ID");
             throw handleException(
                     Response.Status.INTERNAL_SERVER_ERROR,
                     Constants.ErrorMessage.ERROR_RETRIEVING_TENANT, tenantDomain);
         }
 
-        return IdentityTenantUtil.getTenantId(tenantDomain);
+        int tenantId = IdentityTenantUtil.getTenantId(tenantDomain);
+        if (log.isDebugEnabled()) {
+            log.debug("Resolved tenant ID: " + tenantId + " for domain: " + tenantDomain);
+        }
+        return tenantId;
     }
 }

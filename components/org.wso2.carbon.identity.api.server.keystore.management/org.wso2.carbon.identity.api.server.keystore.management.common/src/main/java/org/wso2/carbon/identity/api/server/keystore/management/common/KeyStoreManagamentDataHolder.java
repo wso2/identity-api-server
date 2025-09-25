@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.keystore.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.security.keystore.KeyStoreManagementService;
 
@@ -25,6 +27,8 @@ import org.wso2.carbon.security.keystore.KeyStoreManagementService;
  * Service holder class for keystore management.
  */
 public class KeyStoreManagamentDataHolder {
+
+    private static final Log log = LogFactory.getLog(KeyStoreManagamentDataHolder.class);
 
     public KeyStoreManagamentDataHolder() {}
 
@@ -41,6 +45,13 @@ public class KeyStoreManagamentDataHolder {
      */
     public static KeyStoreManagementService getKeyStoreManager() {
 
-        return KeyStoreManagementServiceHolder.SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving KeyStoreManagementService from OSGi context.");
+        }
+        KeyStoreManagementService service = KeyStoreManagementServiceHolder.SERVICE;
+        if (service == null && log.isWarnEnabled()) {
+            log.warn("KeyStoreManagementService is not available in OSGi context.");
+        }
+        return service;
     }
 }

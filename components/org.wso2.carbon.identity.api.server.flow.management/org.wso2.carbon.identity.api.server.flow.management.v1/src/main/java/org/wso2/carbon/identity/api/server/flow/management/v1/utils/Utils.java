@@ -440,6 +440,9 @@ public class Utils {
      */
     public static void validateIdentifiers(AbstractMetaResponseHandler metaResponseHandler, Set<String> identifiers) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Validating identifiers: " + identifiers);
+        }
         List<String> required = metaResponseHandler.getRequiredInputFields();
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         boolean alternativeLoginStatus = Utils.getGovernanceConfig(tenantDomain,
@@ -455,6 +458,7 @@ public class Utils {
         boolean hasIdentity = identifiers.stream().anyMatch(identityIdentifiers::contains);
 
         if (needsIdentity && !hasIdentity) {
+            LOG.warn("Required identity identifier missing for identifiers: " + identifiers);
             throw handleFlowMgtException(new FlowMgtClientException(
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_MISSING_IDENTIFIER.getCode(),
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_MISSING_IDENTIFIER.getMessage(),
@@ -468,6 +472,8 @@ public class Utils {
         remainingRequired.removeAll(identityIdentifiers);
 
         if (!identifiers.containsAll(remainingRequired)) {
+            LOG.warn("Missing required identifiers: " + remainingRequired + 
+                    ", provided: " + identifiers);
             throw handleFlowMgtException(new FlowMgtClientException(
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_MISSING_IDENTIFIER.getCode(),
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_MISSING_IDENTIFIER.getMessage(),
@@ -483,7 +489,11 @@ public class Utils {
      */
     public static void validateExecutors(AbstractMetaResponseHandler metaResponseHandler, Set<String> executors) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Validating executors: " + executors);
+        }
         if (!new HashSet<>(metaResponseHandler.getSupportedExecutors()).containsAll(executors)) {
+            LOG.warn("Unsupported executors found: " + executors);
             throw handleFlowMgtException(new FlowMgtClientException(
                     ERROR_CODE_UNSUPPORTED_EXECUTOR.getCode(),
                     ERROR_CODE_UNSUPPORTED_EXECUTOR.getMessage(),
@@ -523,8 +533,12 @@ public class Utils {
 
     public static void validateFlowType(String value) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Validating flow type: " + value);
+        }
         if (StringUtils.isBlank(value) || Arrays.stream(Constants.FlowTypes.values())
                 .noneMatch(type -> type.name().equals(value))) {
+            LOG.warn("Invalid flow type provided: " + value);
             throw Utils.handleFlowMgtException(new FlowMgtClientException(
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_FLOW_TYPE.getCode(),
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_FLOW_TYPE.getMessage(),

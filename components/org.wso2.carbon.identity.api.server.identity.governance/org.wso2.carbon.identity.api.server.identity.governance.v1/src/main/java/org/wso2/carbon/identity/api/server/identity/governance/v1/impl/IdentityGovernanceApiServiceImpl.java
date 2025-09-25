@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.identity.governance.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.IdentityGovernanceApiService;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.core.ServerIdentityGovernanceService;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.factories.ServerIdentityGovernanceServiceFactory;
@@ -35,14 +37,19 @@ import javax.ws.rs.core.Response;
  */
 public class IdentityGovernanceApiServiceImpl implements IdentityGovernanceApiService {
 
+    private static final Log LOG = LogFactory.getLog(IdentityGovernanceApiServiceImpl.class);
     private final ServerIdentityGovernanceService identityGovernanceService;
 
     public IdentityGovernanceApiServiceImpl() {
 
         try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Initializing IdentityGovernanceApiService implementation.");
+            }
             this.identityGovernanceService = ServerIdentityGovernanceServiceFactory
                     .getServerIdentityGovernanceService();
         } catch (IllegalStateException e) {
+            LOG.error("Error occurred while initiating identity governance service.", e);
             throw new RuntimeException("Error occurred while initiating identity governance service.", e);
         }
     }
@@ -50,6 +57,9 @@ public class IdentityGovernanceApiServiceImpl implements IdentityGovernanceApiSe
     @Override
     public Response getCategories(Integer limit, Integer offset, String filter, String sort) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving governance connector categories with limit: " + limit + ", offset: " + offset);
+        }
         return Response.ok().entity(identityGovernanceService.getGovernanceConnectors(limit, offset, filter, sort))
                 .build();
     }
@@ -57,25 +67,40 @@ public class IdentityGovernanceApiServiceImpl implements IdentityGovernanceApiSe
     @Override
     public Response getConnectorCategory(String categoryId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving governance connector category for categoryId: " + categoryId);
+        }
         return Response.ok().entity(identityGovernanceService.getGovernanceConnectorCategory(categoryId)).build();
     }
 
     @Override
     public Response getConnectorsOfCategory(String categoryId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving governance connectors for categoryId: " + categoryId);
+        }
         return Response.ok().entity(identityGovernanceService.getGovernanceConnectorsByCategory(categoryId)).build();
     }
 
     @Override
     public Response getConnector(String categoryId, String connectorId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving governance connector for categoryId: " + categoryId + ", connectorId: " + 
+                    connectorId);
+        }
         return Response.ok().entity(identityGovernanceService.getGovernanceConnector(categoryId, connectorId)).build();
     }
 
     @Override
     public Response patchConnector(String categoryId, String connectorId, ConnectorsPatchReq governanceConnector) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating governance connector for categoryId: " + categoryId + ", connectorId: " + 
+                    connectorId);
+        }
         identityGovernanceService.updateGovernanceConnectorProperty(categoryId, connectorId, governanceConnector);
+        LOG.info("Successfully updated governance connector property for connector: " + connectorId);
         return Response.ok().build();
     }
 
@@ -83,13 +108,24 @@ public class IdentityGovernanceApiServiceImpl implements IdentityGovernanceApiSe
     public Response patchConnectorsOfCategory(String categoryId,
                                               MultipleConnectorsPatchReq multipleConnectorsPatchReq) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating multiple governance connectors for categoryId: " + categoryId);
+        }
         identityGovernanceService.updateGovernanceConnectorProperties(categoryId, multipleConnectorsPatchReq);
+        LOG.info("Successfully updated governance connector properties for category: " + categoryId);
         return Response.ok().build();
     }
 
     @Override
     public Response getPreferenceByPost(List<PreferenceSearchAttribute> preferenceSearchAttribute) {
 
+        if (preferenceSearchAttribute == null) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving configuration preferences for " + 
+                    preferenceSearchAttribute.size() + " attributes");
+        }
         return Response.ok().entity(identityGovernanceService.getConfigPreference(preferenceSearchAttribute)).build();
     }
 
@@ -97,7 +133,12 @@ public class IdentityGovernanceApiServiceImpl implements IdentityGovernanceApiSe
     public Response revertConnectorProperties(String categoryId, String connectorId,
                                               PropertyRevertReq propertyRevertReq) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Reverting governance connector properties for categoryId: " + categoryId + 
+                    ", connectorId: " + connectorId);
+        }
         identityGovernanceService.revertGovernanceConnectorProperties(categoryId, connectorId, propertyRevertReq);
+        LOG.info("Successfully reverted governance connector properties for connector: " + connectorId);
         return Response.ok().build();
     }
 }

@@ -94,6 +94,9 @@ public class ServerRemoteFetchConfigManagementService {
      */
     public RemoteFetchConfigurationListResponse getRemoteFetchConfigs() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving all remote fetch configurations.");
+        }
         OptionalInt optionalIntLimit = OptionalInt.empty();
         OptionalInt optionalIntOffset = OptionalInt.empty();
 
@@ -113,8 +116,12 @@ public class ServerRemoteFetchConfigManagementService {
      */
     public void deleteRemoteFetchConfig(String remoteFetchConfigurationId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Attempting to delete remote fetch configuration with ID: " + remoteFetchConfigurationId);
+        }
         try {
             remoteFetchConfigurationService.deleteRemoteFetchConfiguration(remoteFetchConfigurationId);
+            log.info("Remote fetch configuration deleted successfully with ID: " + remoteFetchConfigurationId);
         } catch (RemoteFetchCoreException e) {
             throw handleRemoteFetchConfigurationException(e, RemoteFetchConfigurationConstants.
                     ErrorMessage.ERROR_CODE_ERROR_DELETING_RF_CONFIGS, remoteFetchConfigurationId);
@@ -183,12 +190,16 @@ public class ServerRemoteFetchConfigManagementService {
      */
     public void triggerRemoteFetch(String remoteFetchConfigurationId) {
 
+        log.info("Triggering remote fetch for configuration with ID: " + remoteFetchConfigurationId);
         try {
             RemoteFetchConfiguration remoteFetchConfiguration = remoteFetchConfigurationService
                     .getRemoteFetchConfiguration(remoteFetchConfigurationId);
             if (remoteFetchConfiguration != null) {
                 remoteFetchConfigurationService.triggerRemoteFetch(remoteFetchConfiguration);
+                log.info("Remote fetch triggered successfully for configuration with ID: " + 
+                        remoteFetchConfigurationId);
             } else {
+                log.warn("Remote fetch configuration not found with ID: " + remoteFetchConfigurationId);
                 throw handleException(Response.Status.NOT_FOUND, RemoteFetchConfigurationConstants.
                         ErrorMessage.ERROR_CODE_RE_CONFIG_NOT_FOUND, remoteFetchConfigurationId);
             }
@@ -206,10 +217,17 @@ public class ServerRemoteFetchConfigManagementService {
      */
     public String addRemoteFetchConfiguration(RemoteFetchConfigurationPOSTRequest remoteFetchConfigurationPOSTRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Adding new remote fetch configuration with name: " + 
+                    (remoteFetchConfigurationPOSTRequest != null ? 
+                    remoteFetchConfigurationPOSTRequest.getRemoteFetchName() : "null"));
+        }
         try {
             validatePOSTRequest(remoteFetchConfigurationPOSTRequest);
-            return remoteFetchConfigurationService.addRemoteFetchConfiguration(createRemoteFetchConfiguration(
-                    remoteFetchConfigurationPOSTRequest)).getId();
+            String configId = remoteFetchConfigurationService.addRemoteFetchConfiguration(
+                    createRemoteFetchConfiguration(remoteFetchConfigurationPOSTRequest)).getId();
+            log.info("Remote fetch configuration added successfully with ID: " + configId);
+            return configId;
         } catch (RemoteFetchCoreException e) {
             throw handleRemoteFetchConfigurationException(e, RemoteFetchConfigurationConstants.ErrorMessage.
                     ERROR_CODE_ERROR_ADDING_RF_CONFIG, null);
@@ -584,12 +602,18 @@ public class ServerRemoteFetchConfigManagementService {
      */
     public void handleWebHook(PushEventWebHookPOSTRequest pushEventWebHookPOSTRequest) {
 
+        log.info("Processing webhook request for remote fetch configuration.");
         try {
             validateWebHookRequest(pushEventWebHookPOSTRequest);
             String cloneURL = pushEventWebHookPOSTRequest.getRepository().getCloneUrl();
             String branch = populateBranch(pushEventWebHookPOSTRequest.getRef());
             List<String> modifiedFiles = extractAddedAndModifiedFiles(pushEventWebHookPOSTRequest.getCommits());
+            if (log.isDebugEnabled()) {
+                log.debug("Webhook processing for repository: " + cloneURL + ", branch: " + branch + 
+                        ", modified files count: " + (modifiedFiles != null ? modifiedFiles.size() : 0));
+            }
             remoteFetchConfigurationService.handleWebHook(cloneURL, branch, modifiedFiles);
+            log.info("Webhook request processed successfully for repository: " + cloneURL);
         } catch (RemoteFetchCoreException e) {
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR, RemoteFetchConfigurationConstants.ErrorMessage
                     .ERROR_CODE_ERROR_WEB_HOOK_REMOTE_FETCH, null);

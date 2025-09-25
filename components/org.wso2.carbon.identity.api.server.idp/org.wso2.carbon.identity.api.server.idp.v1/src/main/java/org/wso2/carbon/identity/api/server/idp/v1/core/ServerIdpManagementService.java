@@ -214,6 +214,10 @@ public class ServerIdpManagementService {
                                                 String sortBy, String sortOrder) {
 
         try {
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieving identity providers with filter: " + filter + ", limit: " + limit + 
+                         ", offset: " + offset);
+            }
             List<String> requestedAttributeList = null;
             if (StringUtils.isNotBlank(requiredAttributes)) {
                 requestedAttributeList = new ArrayList<>(Arrays.asList(requiredAttributes.split(",")));
@@ -222,6 +226,7 @@ public class ServerIdpManagementService {
                             ContextLoader.getTenantDomainFromContext(), requestedAttributeList),
                     requestedAttributeList);
         } catch (IdentityProviderManagementException e) {
+            log.error("Error while retrieving identity providers.", e);
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_IDPS, null);
         }
     }
@@ -241,6 +246,10 @@ public class ServerIdpManagementService {
                                                       String filter, String sortBy, String sortOrder) {
 
         try {
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieving trusted token issuers with filter: " + filter + ", limit: " + limit + 
+                         ", offset: " + offset);
+            }
             List<String> requestedAttributeList = null;
             if (StringUtils.isNotBlank(requiredAttributes)) {
                 requestedAttributeList = new ArrayList<>(Arrays.asList(requiredAttributes.split(",")));
@@ -249,6 +258,7 @@ public class ServerIdpManagementService {
                     sortOrder, ContextLoader.getTenantDomainFromContext(), requestedAttributeList),
                             requestedAttributeList);
         } catch (IdentityProviderManagementException e) {
+            log.error("Error while retrieving trusted token issuers.", e);
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_TRUSTED_TOKEN_ISSUERS, null);
         }
     }
@@ -261,13 +271,28 @@ public class ServerIdpManagementService {
      */
     public IdentityProviderResponse addIDP(IdentityProviderPOSTRequest identityProviderPOSTRequest) {
 
+        if (identityProviderPOSTRequest == null) {
+            throw handleIdPException(new IdentityProviderManagementClientException(
+                    Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT.getCode(), 
+                    "Identity provider request cannot be null."),
+                    Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT, null);
+        }
+        String idpName = identityProviderPOSTRequest.getName();
+        if (log.isDebugEnabled()) {
+            log.debug("Adding identity provider: " + idpName);
+        }
         IdentityProvider identityProvider;
         try {
             validateSystemReservedIDP(identityProviderPOSTRequest.getName());
             validateFederatedAuthenticatorsPropertyLimit(identityProviderPOSTRequest.getFederatedAuthenticators());
             identityProvider = identityProviderManager.addIdPWithResourceId(createIDP(identityProviderPOSTRequest),
                     ContextLoader.getTenantDomainFromContext());
+            if (log.isInfoEnabled()) {
+                log.info("Successfully added identity provider: " + identityProvider.getIdentityProviderName() + 
+                         " with resource ID: " + identityProvider.getResourceId());
+            }
         } catch (IdentityProviderManagementException e) {
+            log.error("Error while adding identity provider: " + idpName, e);
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_IDP, null);
         }
         return createIDPResponse(identityProvider);
@@ -281,15 +306,22 @@ public class ServerIdpManagementService {
      */
     public IdentityProviderResponse getIDP(String idpId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving identity provider with ID: " + idpId);
+        }
         try {
             IdentityProvider identityProvider = identityProviderManager.getIdPByResourceId(idpId,
                             ContextLoader.getTenantDomainFromContext(), true);
             if (identityProvider == null) {
+                if (log.isWarnEnabled()) {
+                    log.warn("Identity provider not found with ID: " + idpId);
+                }
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
             }
             return createIDPResponse(identityProvider);
         } catch (IdentityProviderManagementException e) {
+            log.error("Error while retrieving identity provider with ID: " + idpId, e);
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP, idpId);
         }
     }
@@ -332,10 +364,17 @@ public class ServerIdpManagementService {
      */
     public void deleteIDP(String identityProviderId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting identity provider with ID: " + identityProviderId);
+        }
         try {
             identityProviderManager.deleteIdPByResourceId(identityProviderId,
                     ContextLoader.getTenantDomainFromContext());
+            if (log.isInfoEnabled()) {
+                log.info("Successfully deleted identity provider with ID: " + identityProviderId);
+            }
         } catch (IdentityProviderManagementException e) {
+            log.error("Error while deleting identity provider with ID: " + identityProviderId, e);
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_DELETING_IDP, identityProviderId);
         }
     }
@@ -348,10 +387,17 @@ public class ServerIdpManagementService {
      */
     public void forceDeleteIDP(String identityProviderId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Force deleting identity provider with ID: " + identityProviderId);
+        }
         try {
             identityProviderManager.forceDeleteIdpByResourceId(identityProviderId,
                     ContextLoader.getTenantDomainFromContext());
+            if (log.isInfoEnabled()) {
+                log.info("Successfully force deleted identity provider with ID: " + identityProviderId);
+            }
         } catch (IdentityProviderManagementException e) {
+            log.error("Error while force deleting identity provider with ID: " + identityProviderId, e);
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_DELETING_IDP, identityProviderId);
         }
     }
