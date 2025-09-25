@@ -72,11 +72,22 @@ public class NotificationSenderManagementService {
      */
     public EmailSender addEmailSender(EmailSenderAdd emailSenderAdd) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Adding email sender: " + (emailSenderAdd != null ? emailSenderAdd.getName() : "null"));
+        }
+        
+        if (emailSenderAdd == null) {
+            log.error("Email sender add request cannot be null.");
+            throw new IllegalArgumentException("Email sender add request cannot be null.");
+        }
+        
         EmailSenderDTO dto = buildEmailSenderDTO(emailSenderAdd);
         try {
             EmailSenderDTO emailSenderDTO = notificationSenderManagementService.addEmailSender(dto);
+            log.info("Email sender added successfully: " + emailSenderDTO.getName());
             return buildEmailSenderFromDTO(emailSenderDTO);
         } catch (NotificationSenderManagementException e) {
+            log.error("Failed to add email sender: " + emailSenderAdd.getName());
             throw handleException(e);
         }
     }
@@ -89,11 +100,22 @@ public class NotificationSenderManagementService {
      */
     public SMSSender addSMSSender(SMSSenderAdd smsSenderAdd) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Adding SMS sender: " + (smsSenderAdd != null ? smsSenderAdd.getName() : "null"));
+        }
+        
+        if (smsSenderAdd == null) {
+            log.error("SMS sender add request cannot be null.");
+            throw new IllegalArgumentException("SMS sender add request cannot be null.");
+        }
+        
         SMSSenderDTO dto = buildSMSSenderDTO(smsSenderAdd);
         try {
             SMSSenderDTO smsSenderDTO = notificationSenderManagementService.addSMSSender(dto);
+            log.info("SMS sender added successfully: " + smsSenderDTO.getName());
             return buildSMSSenderFromDTO(smsSenderDTO);
         } catch (NotificationSenderManagementException e) {
+            log.error("Failed to add SMS sender: " + smsSenderAdd.getName());
             throw handleException(e);
         }
     }
@@ -106,12 +128,23 @@ public class NotificationSenderManagementService {
      */
     public PushSender addPushSender(PushSenderAdd pushSenderAdd) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Adding push sender: " + (pushSenderAdd != null ? pushSenderAdd.getName() : "null"));
+        }
+        
+        if (pushSenderAdd == null) {
+            log.error("Push sender add request cannot be null.");
+            throw new IllegalArgumentException("Push sender add request cannot be null.");
+        }
+        
         PushSenderDTO dto = buildPushSenderDTO(pushSenderAdd);
         try {
             PushSenderDTO pushSenderDTO = NotificationSenderServiceHolder.getNotificationSenderManagementService()
                     .addPushSender(dto);
+            log.info("Push sender added successfully: " + pushSenderDTO.getName());
             return buildPushSenderFromDTO(pushSenderDTO);
         } catch (NotificationSenderManagementException e) {
+            log.error("Failed to add push sender: " + pushSenderAdd.getName());
             throw handleException(e);
         }
     }
@@ -123,10 +156,16 @@ public class NotificationSenderManagementService {
      */
     public void deleteNotificationSender(String notificationSenderName) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting notification sender: " + notificationSenderName);
+        }
+        
         try {
             notificationSenderManagementService.deleteNotificationSender(notificationSenderName);
+            log.info("Notification sender deleted successfully: " + notificationSenderName);
         } catch (NotificationSenderManagementException e) {
-                throw handleException(e);
+            log.error("Failed to delete notification sender: " + notificationSenderName);
+            throw handleException(e);
         }
     }
 
@@ -138,10 +177,15 @@ public class NotificationSenderManagementService {
      */
     public EmailSender getEmailSender(String senderName) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving email sender: " + senderName);
+        }
+        
         try {
             EmailSenderDTO emailSenderDTO = notificationSenderManagementService.getEmailSender(senderName);
             return buildEmailSenderFromDTO(emailSenderDTO);
         } catch (NotificationSenderManagementException e) {
+            log.error("Failed to retrieve email sender: " + senderName);
             throw handleException(e);
         }
     }
@@ -154,10 +198,15 @@ public class NotificationSenderManagementService {
      */
     public SMSSender getSMSSender(String senderName) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving SMS sender: " + senderName);
+        }
+        
         try {
             SMSSenderDTO smsSenderDTO = notificationSenderManagementService.getSMSSender(senderName, false);
             return buildSMSSenderFromDTO(smsSenderDTO);
         } catch (NotificationSenderManagementException e) {
+            log.error("Failed to retrieve SMS sender: " + senderName);
             throw handleException(e);
         }
     }
@@ -170,11 +219,16 @@ public class NotificationSenderManagementService {
      */
     public PushSender getPushSender(String senderName) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving push sender: " + senderName);
+        }
+        
         try {
             PushSenderDTO pushSenderDTO = NotificationSenderServiceHolder.getNotificationSenderManagementService()
                     .getPushSender(senderName, false);
             return buildPushSenderFromDTO(pushSenderDTO);
         } catch (NotificationSenderManagementException e) {
+            log.error("Failed to retrieve push sender: " + senderName);
             throw handleException(e);
         }
     }
@@ -186,10 +240,15 @@ public class NotificationSenderManagementService {
      */
     public List<EmailSender> getEmailSenders() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving all email senders");
+        }
+        
         try {
             List<EmailSenderDTO> emailSenders = notificationSenderManagementService.getEmailSenders();
             return emailSenders.stream().map(this::buildEmailSenderFromDTO).collect(Collectors.toList());
         } catch (NotificationSenderManagementException e) {
+            log.error("Failed to retrieve email senders");
             throw handleException(e);
         }
     }
@@ -201,10 +260,15 @@ public class NotificationSenderManagementService {
      */
     public List<SMSSender> getSMSSenders() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving all SMS senders");
+        }
+        
         try {
             List<SMSSenderDTO> smsSenders = notificationSenderManagementService.getSMSSenders(false);
             return smsSenders.stream().map(this::buildSMSSenderFromDTO).collect(Collectors.toList());
         } catch (NotificationSenderManagementException e) {
+            log.error("Failed to retrieve SMS senders");
             throw handleException(e);
         }
     }
@@ -216,11 +280,16 @@ public class NotificationSenderManagementService {
      */
     public List<PushSender> getPushSenders() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving all push senders");
+        }
+        
         try {
             List<PushSenderDTO> pushSenders = NotificationSenderServiceHolder.getNotificationSenderManagementService()
                     .getPushSenders(false);
             return pushSenders.stream().map(this::buildPushSenderFromDTO).collect(Collectors.toList());
         } catch (NotificationSenderManagementException e) {
+            log.error("Failed to retrieve push senders");
             throw handleException(e);
         }
     }
@@ -234,11 +303,17 @@ public class NotificationSenderManagementService {
      */
     public EmailSender updateEmailSender(String senderName, EmailSenderUpdateRequest emailSenderUpdateRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating email sender: " + senderName);
+        }
+        
         EmailSenderDTO dto = buildEmailSenderDTO(senderName, emailSenderUpdateRequest);
         try {
             EmailSenderDTO emailSenderDTO = notificationSenderManagementService.updateEmailSender(dto);
+            log.info("Email sender updated successfully: " + senderName);
             return buildEmailSenderFromDTO(emailSenderDTO);
         } catch (NotificationSenderManagementException e) {
+            log.error("Failed to update email sender: " + senderName);
             throw handleException(e);
         }
     }
@@ -252,11 +327,17 @@ public class NotificationSenderManagementService {
      */
     public SMSSender updateSMSSender(String senderName, SMSSenderUpdateRequest smsSenderUpdateRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating SMS sender: " + senderName);
+        }
+        
         SMSSenderDTO dto = buildSMSSenderDTO(senderName, smsSenderUpdateRequest);
         try {
             SMSSenderDTO smsSenderDTO = notificationSenderManagementService.updateSMSSender(dto);
+            log.info("SMS sender updated successfully: " + senderName);
             return buildSMSSenderFromDTO(smsSenderDTO);
         } catch (NotificationSenderManagementException e) {
+            log.error("Failed to update SMS sender: " + senderName);
             throw handleException(e);
         }
     }
@@ -270,12 +351,18 @@ public class NotificationSenderManagementService {
      */
     public PushSender updatePushSender(String senderName, PushSenderUpdateRequest pushSenderUpdateRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating push sender: " + senderName);
+        }
+        
         PushSenderDTO dto = buildPushSenderDTO(senderName, pushSenderUpdateRequest);
         try {
             PushSenderDTO pushSenderDTO = NotificationSenderServiceHolder.getNotificationSenderManagementService()
                     .updatePushSender(dto);
+            log.info("Push sender updated successfully: " + senderName);
             return buildPushSenderFromDTO(pushSenderDTO);
         } catch (NotificationSenderManagementException e) {
+            log.error("Failed to update push sender: " + senderName);
             throw handleException(e);
         }
     }

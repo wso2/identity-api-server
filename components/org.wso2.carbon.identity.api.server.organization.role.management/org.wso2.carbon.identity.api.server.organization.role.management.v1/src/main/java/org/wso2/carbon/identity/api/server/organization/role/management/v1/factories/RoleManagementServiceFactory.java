@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.organization.role.management.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.organization.role.management.common.OrganizationRoleManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.organization.role.management.v1.service.RoleManagementService;
 import org.wso2.carbon.identity.organization.management.role.management.service.RoleManager;
@@ -28,6 +30,7 @@ import org.wso2.carbon.identity.organization.management.service.OrganizationUser
  */
 public class RoleManagementServiceFactory {
 
+    private static final Log LOG = LogFactory.getLog(RoleManagementServiceFactory.class);
     private static final RoleManagementService SERVICE;
 
     static {
@@ -36,10 +39,12 @@ public class RoleManagementServiceFactory {
                 OrganizationRoleManagementServiceHolder.getOrganizationUserResidentResolverService();
 
         if (roleManager == null) {
+            LOG.error("RoleManager service is not available from OSGi context");
             throw new IllegalStateException("RoleManager service is not available from OSGi context.");
         }
 
         if (organizationUserResidentResolverService == null) {
+            LOG.error("OrganizationUserResidentResolverService is not available from OSGi context");
             throw new IllegalStateException("OrganizationUserResidentResolverService is not available " +
                     "from OSGi context.");
         }

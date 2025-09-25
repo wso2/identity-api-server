@@ -19,6 +19,8 @@
 package org.wso2.carbon.identity.api.server.notification.sender.v1.impl;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.MultitenantConstants;
 
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
@@ -58,6 +60,7 @@ import static org.wso2.carbon.identity.api.server.notification.sender.common.Not
  */
 public class NotificationSendersApiServiceImpl implements NotificationSendersApiService {
 
+    private static final Log log = LogFactory.getLog(NotificationSendersApiServiceImpl.class);
     private final NotificationSenderManagementService notificationSenderManagementService;
 
     public NotificationSendersApiServiceImpl() {
@@ -65,7 +68,11 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
         try {
             this.notificationSenderManagementService = NotificationSenderManagementServiceFactory
                     .getNotificationSenderManagementService();
+            if (log.isDebugEnabled()) {
+                log.debug("NotificationSenderManagementService initialized successfully.");
+            }
         } catch (IllegalStateException e) {
+            log.error("Error occurred while initiating notification sender service.", e);
             throw new RuntimeException("Error occurred while initiating notification sender service.", e);
         }
     }
@@ -73,10 +80,19 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     @Override
     public Response createEmailSender(EmailSenderAdd emailSenderAdd) {
 
-        if (StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+        String tenantDomain = getTenantDomainFromContext();
+        if (log.isDebugEnabled()) {
+            log.debug("Creating email sender: " + (emailSenderAdd != null ? emailSenderAdd.getName() : "null") + 
+                     " for tenant: " + tenantDomain);
+        }
+        
+        if (StringUtils.equals(tenantDomain, MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+            log.warn("Email sender creation not allowed for super tenant domain.");
             return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
         }
         EmailSender emailSender = notificationSenderManagementService.addEmailSender(emailSenderAdd);
+        log.info("Email sender created successfully: " + emailSender.getName() + " for tenant: " + tenantDomain);
+        
         URI location = null;
         try {
             location = ContextLoader.buildURIForHeader(
@@ -84,6 +100,7 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
                             URLEncoder.encode(emailSender.getName(), StandardCharsets.UTF_8.name())
                                     .replace(PLUS, URL_ENCODED_SPACE));
         } catch (UnsupportedEncodingException e) {
+            log.error("Error occurred while encoding email sender name: " + emailSender.getName(), e);
             ErrorResponse errorResponse =
                     new ErrorResponse.Builder().withMessage("Error due to unsupported encoding.").build();
             throw new APIError(Response.Status.METHOD_NOT_ALLOWED, errorResponse);
@@ -94,7 +111,22 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     @Override
     public Response createPushSender(PushSenderAdd pushSenderAdd) {
 
+        String tenantDomain = getTenantDomainFromContext();
+        if (log.isDebugEnabled()) {
+            log.debug("Creating push sender: " + (pushSenderAdd != null ? pushSenderAdd.getName() : "null") + 
+                     " for tenant: " + tenantDomain);
+        }
+        
+        if (pushSenderAdd == null) {
+            log.error("Push sender add request cannot be null for tenant: " + tenantDomain);
+            ErrorResponse errorResponse = 
+                    new ErrorResponse.Builder().withMessage("Push sender add request cannot be null.").build();
+            throw new APIError(Response.Status.BAD_REQUEST, errorResponse);
+        }
+        
         PushSender pushSender = notificationSenderManagementService.addPushSender(pushSenderAdd);
+        log.info("Push sender created successfully: " + pushSender.getName() + " for tenant: " + tenantDomain);
+        
         URI location = null;
         try {
             location = ContextLoader.buildURIForHeader(
@@ -102,6 +134,7 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
                             URLEncoder.encode(pushSender.getName(), StandardCharsets.UTF_8.name())
                                     .replace(PLUS, URL_ENCODED_SPACE));
         } catch (UnsupportedEncodingException e) {
+            log.error("Error occurred while encoding push sender name: " + pushSender.getName(), e);
             ErrorResponse errorResponse =
                     new ErrorResponse.Builder().withMessage("Error due to unsupported encoding.").build();
             throw new APIError(Response.Status.METHOD_NOT_ALLOWED, errorResponse);
@@ -112,7 +145,22 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     @Override
     public Response createSMSSender(SMSSenderAdd smSSenderAdd) {
 
+        String tenantDomain = getTenantDomainFromContext();
+        if (log.isDebugEnabled()) {
+            log.debug("Creating SMS sender: " + (smSSenderAdd != null ? smSSenderAdd.getName() : "null") + 
+                     " for tenant: " + tenantDomain);
+        }
+        
+        if (smSSenderAdd == null) {
+            log.error("SMS sender add request cannot be null for tenant: " + tenantDomain);
+            ErrorResponse errorResponse = 
+                    new ErrorResponse.Builder().withMessage("SMS sender add request cannot be null.").build();
+            throw new APIError(Response.Status.BAD_REQUEST, errorResponse);
+        }
+        
         SMSSender smsSender = notificationSenderManagementService.addSMSSender(smSSenderAdd);
+        log.info("SMS sender created successfully: " + smsSender.getName() + " for tenant: " + tenantDomain);
+        
         URI location = null;
         try {
             location = ContextLoader.buildURIForHeader(
@@ -120,6 +168,7 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
                             URLEncoder.encode(smsSender.getName(), StandardCharsets.UTF_8.name())
                                     .replace(PLUS, URL_ENCODED_SPACE));
         } catch (UnsupportedEncodingException e) {
+            log.error("Error occurred while encoding SMS sender name: " + smsSender.getName(), e);
             ErrorResponse errorResponse =
                     new ErrorResponse.Builder().withMessage("Error due to unsupported encoding.").build();
             throw new APIError(Response.Status.METHOD_NOT_ALLOWED, errorResponse);
@@ -130,31 +179,57 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     @Override
     public Response deleteEmailSender(String senderName) {
 
-        if (StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+        String tenantDomain = getTenantDomainFromContext();
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting email sender: " + senderName + " for tenant: " + tenantDomain);
+        }
+        
+        if (StringUtils.equals(tenantDomain, MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+            log.warn("Email sender deletion not allowed for super tenant domain.");
             return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
         }
+        
         notificationSenderManagementService.deleteNotificationSender(senderName);
+        log.info("Email sender deleted successfully: " + senderName + " for tenant: " + tenantDomain);
         return Response.noContent().build();
     }
 
     @Override
     public Response deletePushSender(String senderName) {
 
+        String tenantDomain = getTenantDomainFromContext();
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting push sender: " + senderName + " for tenant: " + tenantDomain);
+        }
+        
         notificationSenderManagementService.deleteNotificationSender(senderName);
+        log.info("Push sender deleted successfully: " + senderName + " for tenant: " + tenantDomain);
         return Response.noContent().build();
     }
 
     @Override
     public Response deleteSMSSender(String senderName) {
 
+        String tenantDomain = getTenantDomainFromContext();
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting SMS sender: " + senderName + " for tenant: " + tenantDomain);
+        }
+        
         notificationSenderManagementService.deleteNotificationSender(senderName);
+        log.info("SMS sender deleted successfully: " + senderName + " for tenant: " + tenantDomain);
         return Response.noContent().build();
     }
 
     @Override
     public Response getEmailSender(String senderName) {
 
-        if (StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+        String tenantDomain = getTenantDomainFromContext();
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving email sender: " + senderName + " for tenant: " + tenantDomain);
+        }
+        
+        if (StringUtils.equals(tenantDomain, MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+            log.warn("Email sender retrieval not allowed for super tenant domain.");
             return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
         }
         return Response.ok().entity(notificationSenderManagementService.getEmailSender(senderName)).build();
@@ -163,7 +238,13 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     @Override
     public Response getEmailSenders() {
 
-        if (StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+        String tenantDomain = getTenantDomainFromContext();
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving all email senders for tenant: " + tenantDomain);
+        }
+        
+        if (StringUtils.equals(tenantDomain, MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+            log.warn("Email senders retrieval not allowed for super tenant domain.");
             return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
         }
         return Response.ok().entity(notificationSenderManagementService.getEmailSenders()).build();
@@ -172,51 +253,83 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     @Override
     public Response getPushSender(String senderName) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving push sender: " + senderName + " for tenant: " + getTenantDomainFromContext());
+        }
         return Response.ok().entity(notificationSenderManagementService.getPushSender(senderName)).build();
     }
 
     @Override
     public Response getPushSenders() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving all push senders for tenant: " + getTenantDomainFromContext());
+        }
         return Response.ok().entity(notificationSenderManagementService.getPushSenders()).build();
     }
 
     @Override
     public Response getSMSSender(String senderName) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving SMS sender: " + senderName + " for tenant: " + getTenantDomainFromContext());
+        }
         return Response.ok().entity(notificationSenderManagementService.getSMSSender(senderName)).build();
     }
 
     @Override
     public Response getSMSSenders() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving all SMS senders for tenant: " + getTenantDomainFromContext());
+        }
         return Response.ok().entity(notificationSenderManagementService.getSMSSenders()).build();
     }
 
     @Override
     public Response updateEmailSender(String senderName, EmailSenderUpdateRequest emailSenderUpdateRequest) {
 
-        if (StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+        String tenantDomain = getTenantDomainFromContext();
+        if (log.isDebugEnabled()) {
+            log.debug("Updating email sender: " + senderName + " for tenant: " + tenantDomain);
+        }
+        
+        if (StringUtils.equals(tenantDomain, MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+            log.warn("Email sender update not allowed for super tenant domain.");
             return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
         }
-        return Response.ok()
-                .entity(notificationSenderManagementService.updateEmailSender(senderName, emailSenderUpdateRequest))
-                .build();
+        
+        EmailSender updatedEmailSender = notificationSenderManagementService.updateEmailSender(senderName, 
+                emailSenderUpdateRequest);
+        log.info("Email sender updated successfully: " + senderName + " for tenant: " + tenantDomain);
+        return Response.ok().entity(updatedEmailSender).build();
     }
 
     @Override
     public Response updatePushSender(String senderName, PushSenderUpdateRequest pushSenderUpdateRequest) {
 
-        return Response.ok()
-                .entity(notificationSenderManagementService.updatePushSender(senderName, pushSenderUpdateRequest))
-                .build();
+        String tenantDomain = getTenantDomainFromContext();
+        if (log.isDebugEnabled()) {
+            log.debug("Updating push sender: " + senderName + " for tenant: " + tenantDomain);
+        }
+        
+        PushSender updatedPushSender = notificationSenderManagementService.updatePushSender(senderName, 
+                pushSenderUpdateRequest);
+        log.info("Push sender updated successfully: " + senderName + " for tenant: " + tenantDomain);
+        return Response.ok().entity(updatedPushSender).build();
     }
 
     @Override
     public Response updateSMSSender(String senderName, SMSSenderUpdateRequest smSSenderUpdateRequest) {
 
-        return Response.ok()
-                .entity(notificationSenderManagementService.updateSMSSender(senderName, smSSenderUpdateRequest))
-                .build();
+        String tenantDomain = getTenantDomainFromContext();
+        if (log.isDebugEnabled()) {
+            log.debug("Updating SMS sender: " + senderName + " for tenant: " + tenantDomain);
+        }
+        
+        SMSSender updatedSMSSender = notificationSenderManagementService.updateSMSSender(senderName, 
+                smSSenderUpdateRequest);
+        log.info("SMS sender updated successfully: " + senderName + " for tenant: " + tenantDomain);
+        return Response.ok().entity(updatedSMSSender).build();
     }
 }

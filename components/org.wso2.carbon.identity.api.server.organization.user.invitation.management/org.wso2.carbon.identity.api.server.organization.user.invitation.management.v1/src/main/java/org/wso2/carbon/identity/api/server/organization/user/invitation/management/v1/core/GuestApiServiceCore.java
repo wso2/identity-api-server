@@ -19,6 +19,8 @@
 package org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.core;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.common.UserInvitationMgtConstants;
@@ -63,11 +65,15 @@ import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
  */
 public class GuestApiServiceCore {
 
+    private static final Log log = LogFactory.getLog(GuestApiServiceCore.class);
     private final InvitationCoreService invitationCoreService;
 
     public GuestApiServiceCore(InvitationCoreService invitationCoreService) {
 
         this.invitationCoreService = invitationCoreService;
+        if (log.isDebugEnabled()) {
+            log.debug("GuestApiServiceCore initialized with InvitationCoreService.");
+        }
     }
 
     private static List<RoleAssignmentResponse> buildRoleAssignmentResponse(Invitation invitationRecord) {
@@ -111,6 +117,16 @@ public class GuestApiServiceCore {
      */
     public List<InvitationSuccessResponse> createInvitation(InvitationRequestBody invitationRequestBody) {
 
+        if (invitationRequestBody == null) {
+            log.error("InvitationRequestBody cannot be null.");
+            throw handleException(BAD_REQUEST, UserInvitationMgtConstants.ErrorMessage
+                    .ERROR_CODE_CREATE_INVITATION, "InvitationRequestBody cannot be null");
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Creating invitations for users: " +
+                    (invitationRequestBody.getUsernames() != null ?
+                            invitationRequestBody.getUsernames().size() : 0));
+        }
         InvitationDO invitation = new InvitationDO();
         invitation.setUsernamesList(invitationRequestBody.getUsernames());
         invitation.setUserDomain(invitationRequestBody.getUserDomain());
@@ -139,17 +155,22 @@ public class GuestApiServiceCore {
         List<InvitationResult> invitationResponse;
         try {
             invitationResponse = invitationCoreService.createInvitations(invitation);
+            log.info("Invitations created successfully for " + invitation.getUsernamesList().size() + " users.");
         } catch (UserInvitationMgtException e) {
             if (ERROR_CODE_MULTIPLE_INVITATIONS_FOR_USER.getCode().equals(e.getErrorCode())) {
+                log.warn("Multiple invitations found for users: " + invitation.getUsernamesList().toString());
                 throw handleException(BAD_REQUEST, UserInvitationMgtConstants.ErrorMessage
                         .ERROR_CODE_MULTIPLE_INVITATIONS_FOR_USER, invitation.getUsernamesList().toString());
             } else if (ERROR_CODE_INVALID_ROLE.getCode().equals(e.getErrorCode())) {
+                log.warn("Invalid role specified in invitation request.");
                 throw handleException(BAD_REQUEST, UserInvitationMgtConstants.ErrorMessage
                         .ERROR_CODE_INVALID_ROLE, StringUtils.EMPTY);
             } else if (ERROR_CODE_INVALID_GROUP.getCode().equals(e.getErrorCode())) {
+                log.warn("Invalid group specified in invitation request.");
                 throw handleException(BAD_REQUEST, UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_INVALID_GROUP,
                         StringUtils.EMPTY);
             }
+            log.error("Error creating invitations for users: " + invitation.getUsernamesList().toString(), e);
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_CREATE_INVITATION,
                     invitation.getUsernamesList().toString());
@@ -166,20 +187,33 @@ public class GuestApiServiceCore {
     public InvitationsListResponse getInvitations(String filter, Integer limit, Integer offset, String sortOrder,
                                                   String sortBy) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving invitations with filter: " + filter);
+        }
         if (!isUnsupportedParamAvailable(limit, offset, sortOrder, sortBy)) {
             try {
-                return buildInvitationsListResponse(invitationCoreService.getInvitations(filter));
+                List<Invitation> invitations = invitationCoreService.getInvitations(filter);
+                log.info("Retrieved " + (invitations != null ? invitations.size() : 0) + " invitations.");
+                if (invitations == null) {
+                    log.warn("Received null invitations list from core service.");
+                    invitations = new ArrayList<>();
+                }
+                return buildInvitationsListResponse(invitations);
             } catch (UserInvitationMgtException e) {
                 if (ERROR_CODE_INVALID_FILTER.getCode().equals(e.getErrorCode())) {
+                    log.warn("Invalid filter provided: " + filter);
                     throw handleException(BAD_REQUEST, UserInvitationMgtConstants.ErrorMessage
                             .ERROR_CODE_INVALID_FILTER, filter);
                 } else if (ERROR_CODE_UNSUPPORTED_FILTER_ATTRIBUTE_VALUE.getCode().equals(e.getErrorCode())) {
+                    log.warn("Unsupported filter attribute value in filter: " + filter);
                     throw handleException(BAD_REQUEST, UserInvitationMgtConstants.ErrorMessage
                             .ERROR_CODE_INVALID_FILTER, filter);
                 } else if (ERROR_CODE_UNSUPPORTED_FILTER_ATTRIBUTE.getCode().equals(e.getErrorCode())) {
+                    log.warn("Unsupported filter attribute in filter: " + filter);
                     throw handleException(BAD_REQUEST, UserInvitationMgtConstants.ErrorMessage
                             .ERROR_CODE_INVALID_FILTER, filter);
                 }
+                log.error("Error retrieving invitations.", e);
                 throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                         UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_GET_INVITATIONS, StringUtils.EMPTY);
             }
@@ -195,13 +229,26 @@ public class GuestApiServiceCore {
      */
     public IntrospectSuccessResponse introspectInvitation(String confirmationCode) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Introspecting invitation with confirmation code.");
+        }
         try {
-            return buildValidateResponse(invitationCoreService.introspectInvitation(confirmationCode));
-        } catch (UserInvitationMgtException e) {
-            if (ERROR_CODE_INVALID_CONFIRMATION_CODE.getCode().equals(e.getErrorCode())) {
+            Invitation invitation = invitationCoreService.introspectInvitation(confirmationCode);
+            log.info("Invitation introspection completed for user: " +
+                    (invitation != null ? invitation.getUsername() : "unknown"));
+            if (invitation == null) {
+                log.error("Received null invitation from core service for confirmation code.");
                 throw handleException(BAD_REQUEST, UserInvitationMgtConstants.ErrorMessage
                         .ERROR_CODE_INVALID_CONFIRMATION_CODE, confirmationCode);
             }
+            return buildValidateResponse(invitation);
+        } catch (UserInvitationMgtException e) {
+            if (ERROR_CODE_INVALID_CONFIRMATION_CODE.getCode().equals(e.getErrorCode())) {
+                log.warn("Invalid confirmation code provided for introspection.");
+                throw handleException(BAD_REQUEST, UserInvitationMgtConstants.ErrorMessage
+                        .ERROR_CODE_INVALID_CONFIRMATION_CODE, confirmationCode);
+            }
+            log.error("Error introspecting invitation.", e);
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_VALIDATE_INVITATION, confirmationCode);
         }
@@ -215,13 +262,24 @@ public class GuestApiServiceCore {
      */
     public boolean deleteInvitation(String invitationId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting invitation with ID: " + invitationId);
+        }
         try {
-            return invitationCoreService.deleteInvitation(invitationId);
+            boolean deleted = invitationCoreService.deleteInvitation(invitationId);
+            if (deleted) {
+                log.info("Invitation deleted successfully for ID: " + invitationId);
+            } else {
+                log.warn("Invitation deletion failed for ID: " + invitationId);
+            }
+            return deleted;
         } catch (UserInvitationMgtException e) {
             if (ERROR_CODE_INVALID_INVITATION_ID.getCode().equals(e.getErrorCode())) {
+                log.warn("Invalid invitation ID provided for deletion: " + invitationId);
                 throw handleException(BAD_REQUEST,
                         UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_INVALID_INVITATION, invitationId);
             }
+            log.error("Error deleting invitation with ID: " + invitationId, e);
             throw handleException(INTERNAL_SERVER_ERROR, UserInvitationMgtConstants.ErrorMessage
                     .ERROR_CODE_DELETE_INVITATION, invitationId);
         }
@@ -236,20 +294,28 @@ public class GuestApiServiceCore {
      */
     public void acceptInvitation(AcceptanceRequestBody acceptanceRequestBody) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Processing invitation acceptance.");
+        }
         try {
             invitationCoreService.acceptInvitation(acceptanceRequestBody.getConfirmationCode());
+            log.info("Invitation accepted successfully.");
         } catch (UserInvitationMgtException e) {
             if (ERROR_CODE_INVALID_CONFIRMATION_CODE.getCode().equals(e.getErrorCode())) {
+                log.warn("Invalid confirmation code provided for acceptance.");
                 throw handleException(BAD_REQUEST, UserInvitationMgtConstants.ErrorMessage
                         .ERROR_CODE_INVALID_CONFIRMATION_CODE_FOR_ACCEPTANCE, acceptanceRequestBody
                         .getConfirmationCode());
             } else if (ERROR_CODE_INVALID_USER.getCode().equals(e.getErrorCode())) {
+                log.warn("Invalid user provided for invitation acceptance.");
                 throw handleException(BAD_REQUEST, UserInvitationMgtConstants.ErrorMessage
                         .ERROR_CODE_INVALID_USER, StringUtils.EMPTY);
             } else if (ERROR_CODE_USER_ALREADY_EXISTS.getCode().equals(e.getErrorCode())) {
+                log.warn("User already exists in the organization.");
                 throw handleException(BAD_REQUEST, UserInvitationMgtConstants.ErrorMessage
                         .ERROR_CODE_EXISTING_USER, StringUtils.EMPTY);
             }
+            log.error("Error accepting invitation.", e);
             throw handleException(INTERNAL_SERVER_ERROR, UserInvitationMgtConstants.ErrorMessage
                             .ERROR_CODE_ACCEPT_INVITATION, acceptanceRequestBody.getConfirmationCode());
         }

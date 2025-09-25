@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.organization.role.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.organization.management.role.management.service.RoleManager;
 import org.wso2.carbon.identity.organization.management.service.OrganizationUserResidentResolverService;
@@ -26,6 +28,8 @@ import org.wso2.carbon.identity.organization.management.service.OrganizationUser
  * Service holder class for role management related services.
  */
 public class OrganizationRoleManagementServiceHolder {
+
+    private static final Log LOG = LogFactory.getLog(OrganizationRoleManagementServiceHolder.class);
 
     private OrganizationRoleManagementServiceHolder() {}
 
@@ -49,7 +53,14 @@ public class OrganizationRoleManagementServiceHolder {
      */
     public static RoleManager getRoleManager() {
 
-        return RoleManagerServiceHolder.SERVICE;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving RoleManager OSGi service.");
+        }
+        RoleManager roleManager = RoleManagerServiceHolder.SERVICE;
+        if (roleManager == null) {
+            LOG.warn("RoleManager OSGi service is not available.");
+        }
+        return roleManager;
     }
 
     /**
@@ -59,6 +70,13 @@ public class OrganizationRoleManagementServiceHolder {
      */
     public static OrganizationUserResidentResolverService getOrganizationUserResidentResolverService() {
 
-        return OrganizationUserResidentResolverServiceHolder.SERVICE;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving OrganizationUserResidentResolverService OSGi service.");
+        }
+        OrganizationUserResidentResolverService service = OrganizationUserResidentResolverServiceHolder.SERVICE;
+        if (service == null) {
+            LOG.warn("OrganizationUserResidentResolverService OSGi service is not available.");
+        }
+        return service;
     }
 }

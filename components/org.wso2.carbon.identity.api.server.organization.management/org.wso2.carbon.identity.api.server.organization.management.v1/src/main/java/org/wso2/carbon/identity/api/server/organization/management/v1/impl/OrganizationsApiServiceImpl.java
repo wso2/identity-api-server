@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.organization.management.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.organization.management.v1.OrganizationsApiService;
 import org.wso2.carbon.identity.api.server.organization.management.v1.factories.OrganizationManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.ApplicationSharePOSTRequest;
@@ -40,14 +42,22 @@ import javax.ws.rs.core.Response;
  */
 public class OrganizationsApiServiceImpl implements OrganizationsApiService {
 
+    private static final Log LOG = LogFactory.getLog(OrganizationsApiServiceImpl.class);
     private final OrganizationManagementService organizationManagementService;
 
     public OrganizationsApiServiceImpl() {
 
         try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Initializing OrganizationsApiServiceImpl.");
+            }
             this.organizationManagementService = OrganizationManagementServiceFactory
                     .getOrganizationManagementService();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("OrganizationsApiServiceImpl initialized successfully.");
+            }
         } catch (IllegalStateException e) {
+            LOG.error("Error occurred while initiating organization management service.", e);
             throw new RuntimeException("Error occurred while initiating organization management service.", e);
         }
     }

@@ -17,6 +17,8 @@
  */
 package org.wso2.carbon.identity.api.server.oidc.scope.management.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.common.OIDCScopeManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.core.OidcScopeManagementService;
 import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
@@ -25,17 +27,23 @@ import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
  * Factory class for OidcScopeManagementService.
  */
 public class OidcScopeManagementServiceFactory {
+    private static final Log LOG = LogFactory.getLog(OidcScopeManagementServiceFactory.class);
     private static final OidcScopeManagementService SERVICE;
 
     static {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Initializing OidcScopeManagementService");
+        }
         OAuthAdminServiceImpl oAuthAdminService = OIDCScopeManagementServiceHolder
                 .getOAuthAdminService();
 
         if (oAuthAdminService == null) {
+            LOG.warn("OAuthAdminServiceImpl is not available from OSGi context");
             throw new IllegalStateException("OAuthAdminServiceImpl is not available from OSGi context.");
         }
 
         SERVICE = new OidcScopeManagementService(oAuthAdminService);
+        LOG.info("OidcScopeManagementService initialized successfully");
     }
 
     /**
@@ -45,6 +53,9 @@ public class OidcScopeManagementServiceFactory {
      */
     public static OidcScopeManagementService getPermissionManagementService() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving OidcScopeManagementService instance");
+        }
         return SERVICE;
     }
 }

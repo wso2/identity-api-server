@@ -57,15 +57,27 @@ public class OidcScopeManagementService {
      */
     public String addScope(Scope scopeObject) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Adding OIDC scope: " + 
+                    (scopeObject != null ? scopeObject.getName() : "null"));
+        }
+
+        if (scopeObject == null) {
+            LOG.error("Cannot add OIDC scope: scopeObject is null");
+            throw new IllegalArgumentException("Scope object cannot be null");
+        }
         try {
             List<String> claimList = scopeObject.getClaims();
-            String[] claimArray = claimList.toArray(new String[claimList.size()]);
+            String[] claimArray = claimList != null ? 
+                    claimList.toArray(new String[claimList.size()]) : new String[0];
             ScopeDTO scopeDTO = new ScopeDTO(scopeObject.getName(), scopeObject.getDisplayName(),
                     scopeObject.getDescription(), claimArray);
             oauthAdminService.addScope(scopeDTO);
+            LOG.info("Successfully added OIDC scope: " + scopeDTO.getName());
             return scopeDTO.getName();
         } catch (IdentityOAuthAdminException e) {
-            throw handleException(e, "Server encountered an error while adding OIDC scope: " + scopeObject.getName());
+            throw handleException(e, "Server encountered an error while adding OIDC scope: " + 
+                    scopeObject.getName());
         }
     }
 
@@ -76,11 +88,15 @@ public class OidcScopeManagementService {
      */
     public void deleteScope(String id) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deleting OIDC scope: " + id);
+        }
         try {
             oauthAdminService.deleteScope(id);
+            LOG.info("Successfully deleted OIDC scope: " + id);
         } catch (IdentityOAuthClientException e) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug(e);
+                LOG.debug("Client exception occurred while deleting OIDC scope: " + id, e);
             }
         } catch (IdentityOAuthAdminException e) {
             throw handleException(e, "Server encountered an error while deleting OIDC scope: " + id);
@@ -95,6 +111,9 @@ public class OidcScopeManagementService {
      */
     public Scope getScope(String id) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving OIDC scope: " + id);
+        }
         try {
             ScopeDTO scopeDTO = oauthAdminService.getScope(id);
             return convertScopeDTOObjectToScope(scopeDTO);
@@ -110,9 +129,16 @@ public class OidcScopeManagementService {
      */
     public List<Scope> getScopes() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving all OIDC scopes");
+        }
         try {
             ScopeDTO[] scopes = oauthAdminService.getScopes();
-            return buildScopeList(scopes);
+            List<Scope> scopeList = buildScopeList(scopes);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Retrieved " + (scopes != null ? scopes.length : 0) + " OIDC scopes");
+            }
+            return scopeList;
         } catch (IdentityOAuthAdminException e) {
             throw handleException(e, "Server encountered an error while listing OIDC scopes.");
         }
@@ -127,12 +153,16 @@ public class OidcScopeManagementService {
      */
     public void updateScope(String id, ScopeUpdateRequest scopeUpdateObject) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating OIDC scope: " + id);
+        }
         try {
             List<String> claimList = scopeUpdateObject.getClaims();
             String[] claimArray = claimList.toArray(new String[claimList.size()]);
             ScopeDTO scopeDTO = new ScopeDTO(id, scopeUpdateObject.getDisplayName(),
                     scopeUpdateObject.getDescription(), claimArray);
             oauthAdminService.updateScope(scopeDTO);
+            LOG.info("Successfully updated OIDC scope: " + id);
         } catch (IdentityOAuthAdminException e) {
             throw handleException(e, "Server encountered an error while updating OIDC scope: " + id);
         }

@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.organization.configs.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.organization.config.service.OrganizationConfigManager;
 
@@ -25,6 +27,8 @@ import org.wso2.carbon.identity.organization.config.service.OrganizationConfigMa
  * Service holder class for organization configuration management.
  */
 public class OrganizationConfigsServiceHolder {
+
+    private static final Log log = LogFactory.getLog(OrganizationConfigsServiceHolder.class);
 
     public OrganizationConfigsServiceHolder() {}
 
@@ -41,6 +45,13 @@ public class OrganizationConfigsServiceHolder {
      */
     public static OrganizationConfigManager getOrganizationConfigManager() {
 
-        return OrganizationConfigManagerHolder.SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving OrganizationConfigManager OSGi service.");
+        }
+        OrganizationConfigManager configManager = OrganizationConfigManagerHolder.SERVICE;
+        if (configManager == null) {
+            log.warn("OrganizationConfigManager OSGi service is not available.");
+        }
+        return configManager;
     }
 }
