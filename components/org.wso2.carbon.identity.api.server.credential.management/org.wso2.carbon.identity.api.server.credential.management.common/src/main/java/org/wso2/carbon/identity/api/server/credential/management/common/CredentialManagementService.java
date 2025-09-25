@@ -16,20 +16,24 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.api.server.credential.management.common.service;
+package org.wso2.carbon.identity.api.server.credential.management.common;
 
 import org.wso2.carbon.identity.api.server.credential.management.common.dto.CredentialDTO;
 import org.wso2.carbon.identity.api.server.credential.management.common.exception.CredentialMgtException;
 import java.util.List;
 
-public interface CredentialHandler {
+/**
+ * Credential Management Service interface.
+ */
+public interface CredentialManagementService {
     /**
      * Retrieves credentials for a given user.
      */
     List<CredentialDTO> getCredentialsForUser(String userId) throws CredentialMgtException;
 
     /**
-     * Deletes a credential for a user.
+     * Deletes a credential of the specified type for a user.
      */
-    void deleteCredentialForUser(String userId, String credentialId) throws CredentialMgtException;
+    void deleteCredentialForUser(String userId, String type, String credentialId)
+        throws CredentialMgtException;
 }

@@ -16,37 +16,53 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.api.server.credential.management.common.internal;
+package org.wso2.carbon.identity.api.server.credential.management.common.impl;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementServiceDataHolder;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants.CredentialTypes;
 import org.wso2.carbon.identity.api.server.credential.management.common.dto.CredentialDTO;
 import org.wso2.carbon.identity.api.server.credential.management.common.exception.CredentialMgtException;
-import org.wso2.carbon.identity.api.server.credential.management.common.service.CredentialHandler;
+import org.wso2.carbon.identity.api.server.credential.management.common.CredentialHandler;
 import org.wso2.carbon.identity.api.server.credential.management.common.utils.CredentialManagementUtils;
-import org.wso2.carbon.identity.application.authenticator.push.device.handler.DeviceHandler;
-import org.wso2.carbon.identity.application.authenticator.push.device.handler.exception.PushDeviceHandlerClientException;
-import org.wso2.carbon.identity.application.authenticator.push.device.handler.exception.PushDeviceHandlerServerException;
-import org.wso2.carbon.identity.application.authenticator.push.device.handler.model.Device;
+import org.wso2.carbon.identity.notification.push.device.handler.DeviceHandlerService;
+import org.wso2.carbon.identity.notification.push.device.handler.exception.PushDeviceHandlerClientException;
+import org.wso2.carbon.identity.notification.push.device.handler.exception.PushDeviceHandlerException;
+import org.wso2.carbon.identity.notification.push.device.handler.model.Device;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants.ErrorMessages.ERROR_CODE_PUSH_AUTH_DEVICE_NOT_FOUND;
+
+/**
+ * Credential handler implementation for Push Authentication.
+ */
 public class PushCredentialHandler implements CredentialHandler {
 
-    private final DeviceHandler deviceHandler;
+    private final DeviceHandlerService deviceHandler;
 
     public PushCredentialHandler() {
+
         this.deviceHandler = CredentialManagementServiceDataHolder.getPushDeviceHandler();
     }
 
     @Override
     public List<CredentialDTO> getCredentialsForUser(String userId) throws CredentialMgtException {
+
         try {
-            List<Device> pushCredentials = deviceHandler.listDevices(userId);
+            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            List<Device> pushCredentials = Collections.singletonList(deviceHandler
+                    .getDeviceByUserId(userId, tenantDomain));
+
             return pushCredentials.stream().map(this::mapPushToCredentialDTO).collect(Collectors.toList());
-        } catch (PushDeviceHandlerServerException e) {
+        } catch (PushDeviceHandlerException e) {
+            if (ERROR_CODE_PUSH_AUTH_DEVICE_NOT_FOUND.equals(e.getErrorCode())) {
+                return Collections.emptyList();
+            }
+
             throw CredentialManagementUtils.handleServerException(
                     CredentialManagementConstants.ErrorMessages.ERROR_CODE_GET_PUSH_AUTH_DEVICE, e, userId);
         }
@@ -54,23 +70,30 @@ public class PushCredentialHandler implements CredentialHandler {
 
     @Override
     public void deleteCredentialForUser(String userId, String credentialId) throws CredentialMgtException {
+
         try {
             deviceHandler.unregisterDevice(credentialId);
         } catch (PushDeviceHandlerClientException e) {
             throw CredentialManagementUtils.handleClientException(
                     CredentialManagementConstants.ErrorMessages.ERROR_CODE_DELETE_PUSH_AUTH_CREDENTIAL, e, userId);
-        } catch (PushDeviceHandlerServerException e) {
+        } catch (PushDeviceHandlerException e) {
             throw CredentialManagementUtils.handleServerException(
                     CredentialManagementConstants.ErrorMessages.ERROR_CODE_DELETE_PUSH_AUTH_DEVICE, e, userId);
         }
     }
 
+    /**
+     * Map Push Authentication device to CredentialDTO.
+     *
+     * @param credential Push Authentication device.
+     * @return CredentialDTO.
+     */
     private CredentialDTO mapPushToCredentialDTO(Device credential) {
-        CredentialDTO credentialDTO = new CredentialDTO();
-        credentialDTO.setCredentialId(credential.getDeviceId());
-        credentialDTO.setDisplayName(credential.getDeviceName());
-        credentialDTO.setType(CredentialTypes.PUSH_AUTH.getApiValue());
 
-        return credentialDTO;
+        return new CredentialDTO.Builder()
+            .credentialId(credential.getDeviceId())
+            .displayName(credential.getDeviceName())
+            .type(CredentialTypes.PUSH_AUTH.getApiValue())
+            .build();
     }
 }

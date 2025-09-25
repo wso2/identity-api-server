@@ -25,6 +25,9 @@ import org.wso2.carbon.identity.api.server.credential.management.v1.utils.Creden
 
 import javax.ws.rs.core.Response;
 
+/**
+ * Implementation of the Credential API Service.
+ */
 public class CredentialApiServiceImpl implements CredentialApiService {
 
     private final ServerCredentialManagementService adminServerCredentialManagementService;

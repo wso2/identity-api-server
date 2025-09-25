@@ -21,6 +21,9 @@ package org.wso2.carbon.identity.api.server.credential.management.common;
 import java.util.Arrays;
 import java.util.Optional;
 
+/**
+ * Credential Management related constants.
+ */
 public class CredentialManagementConstants {
 
     private CredentialManagementConstants() {
@@ -34,10 +37,12 @@ public class CredentialManagementConstants {
         private final String apiValue;
 
         CredentialTypes(String apiValue) {
+
             this.apiValue = apiValue;
         }
 
         public String getApiValue() {
+
             return apiValue;
         }
 
@@ -50,13 +55,16 @@ public class CredentialManagementConstants {
         public static Optional<CredentialTypes> fromString(String value) {
 
             if (value == null) {
+
                 return Optional.empty();
             }
 
             String candidate = value.trim();
             if (candidate.isEmpty()) {
+
                 return Optional.empty();
             }
+
             return Arrays.stream(values())
                     .filter(type -> type.name().equalsIgnoreCase(candidate)
                             || type.getApiValue().equalsIgnoreCase(candidate))
@@ -64,6 +72,9 @@ public class CredentialManagementConstants {
         }
     }
 
+    /**
+     * Enum for error messages.
+     */
     public enum ErrorMessages {
 
         // Server errors.
@@ -79,10 +90,13 @@ public class CredentialManagementConstants {
         // Client errors.
         ERROR_CODE_DELETE_PASSKEY_CREDENTIAL("60001", "Error deleting credential.",
                 "The request to delete the passkey credential: %credentialId  was invalid."),
-        ERROR_CODE_DELETE_PUSH_AUTH_CREDENTIAL("60001", "Error deleting credential.",
-                "The request to delete the push auth credential: %credentialId  was invalid."),;
+        ERROR_CODE_DELETE_PUSH_AUTH_CREDENTIAL("60002", "Error deleting credential.",
+                "The request to delete the push auth credential: %credentialId  was invalid."),
+        ERROR_CODE_GET_USERNAME_FROM_USERID("60003", "Error retrieving username from user ID.",
+                "The request to retrieve the username from the user ID: %id was invalid."),;
 
         private static final String ERROR_PREFIX = "CM";
+        public static final String ERROR_CODE_PUSH_AUTH_DEVICE_NOT_FOUND = "PDH-15010";
         private final String code;
         private final String message;
         private final String description;
