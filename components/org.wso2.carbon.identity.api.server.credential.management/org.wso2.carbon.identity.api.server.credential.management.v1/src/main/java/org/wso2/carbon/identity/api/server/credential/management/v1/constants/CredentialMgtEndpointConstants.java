@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.identity.api.server.credential.management.v1.constants;
 
+/**
+ * Constants for Credential Management Endpoint.
+ */
 public class CredentialMgtEndpointConstants {
 
     private CredentialMgtEndpointConstants() {
@@ -50,20 +53,24 @@ public class CredentialMgtEndpointConstants {
         private final String description;
 
         ErrorMessages(String code, String message, String description) {
+
             this.code = code;
             this.message = message;
             this.description = description;
         }
 
         public String getCode() {
+
             return CREDENTIAL_MGT_PREFIX + code;
         }
 
         public String getMessage() {
+
             return message;
         }
 
         public String getDescription() {
+
             return description;
         }
     }

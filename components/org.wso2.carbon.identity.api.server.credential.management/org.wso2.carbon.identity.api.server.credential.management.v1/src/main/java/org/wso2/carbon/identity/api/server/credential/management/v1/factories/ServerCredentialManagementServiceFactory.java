@@ -18,10 +18,13 @@
 
 package org.wso2.carbon.identity.api.server.credential.management.v1.factories;
 
-import org.wso2.carbon.identity.api.server.credential.management.common.internal.CredentialManagementServiceImpl;
-import org.wso2.carbon.identity.api.server.credential.management.common.service.CredentialManagementService;
+import org.wso2.carbon.identity.api.server.credential.management.common.impl.CredentialManagementServiceImpl;
+import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementService;
 import org.wso2.carbon.identity.api.server.credential.management.v1.core.ServerCredentialManagementService;
 
+/**
+ * Factory class for ServerCredentialManagementService.
+ */
 public class ServerCredentialManagementServiceFactory {
 
     private static final ServerCredentialManagementService SERVICE;
@@ -31,8 +34,9 @@ public class ServerCredentialManagementServiceFactory {
     }
 
     static {
-        CredentialManagementService adminCredentialManagementService = new CredentialManagementServiceImpl();
-        SERVICE = new ServerCredentialManagementService(adminCredentialManagementService);
+
+        CredentialManagementService credentialManagementService = new CredentialManagementServiceImpl();
+        SERVICE = new ServerCredentialManagementService(credentialManagementService);
     }
 
     /**

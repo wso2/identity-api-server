@@ -21,10 +21,18 @@ package org.wso2.carbon.identity.api.server.credential.management.v1.factories;
 import org.wso2.carbon.identity.api.server.credential.management.v1.CredentialApiService;
 import org.wso2.carbon.identity.api.server.credential.management.v1.impl.CredentialApiServiceImpl;
 
+/**
+ * Factory class for Credential API Service.
+ */
 public class CredentialApiServiceFactory {
 
    private final static CredentialApiService SERVICE = new CredentialApiServiceImpl();
 
+   /**
+    * Get CredentialApiService instance.
+    *
+    * @return CredentialApiService.
+    */
    public static CredentialApiService getCredentialApi() {
 
       return SERVICE;

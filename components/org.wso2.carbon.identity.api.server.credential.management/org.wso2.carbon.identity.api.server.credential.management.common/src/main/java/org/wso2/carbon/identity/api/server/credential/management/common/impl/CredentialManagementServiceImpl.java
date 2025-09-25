@@ -16,35 +16,41 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.api.server.credential.management.common.internal;
+package org.wso2.carbon.identity.api.server.credential.management.common.impl;
 
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants.CredentialTypes;
 import org.wso2.carbon.identity.api.server.credential.management.common.dto.CredentialDTO;
 import org.wso2.carbon.identity.api.server.credential.management.common.exception.CredentialMgtException;
-import org.wso2.carbon.identity.api.server.credential.management.common.service.CredentialManagementService;
-import org.wso2.carbon.identity.api.server.credential.management.common.service.CredentialHandler;
+import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementService;
+import org.wso2.carbon.identity.api.server.credential.management.common.CredentialHandler;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Implementation of the CredentialManagementService interface.
+ */
 public class CredentialManagementServiceImpl implements CredentialManagementService {
 
     private final Map<CredentialTypes, CredentialHandler> handlerMap;
 
     public CredentialManagementServiceImpl() {
+
         handlerMap = new EnumMap<>(CredentialTypes.class);
         initializeHandlers();
     }
 
     private void initializeHandlers() {
+
         handlerMap.put(CredentialTypes.PASSKEY, new PasskeyCredentialHandler());
         handlerMap.put(CredentialTypes.PUSH_AUTH, new PushCredentialHandler());
     }
 
     @Override
     public List<CredentialDTO> getCredentialsForUser(String userId) throws CredentialMgtException {
+
         List<CredentialDTO> allCredentials = new ArrayList<>();
 
         for (CredentialHandler handler : handlerMap.values()) {
@@ -58,7 +64,7 @@ public class CredentialManagementServiceImpl implements CredentialManagementServ
     public void deleteCredentialForUser(String userId, String type, String credentialId)
             throws CredentialMgtException {
 
-        CredentialTypes credentialType = CredentialTypes.valueOf(type);
+        CredentialTypes credentialType = CredentialTypes.valueOf(type.replace("-", "_").toUpperCase());
 
         CredentialHandler handler = handlerMap.get(credentialType);
         handler.deleteCredentialForUser(userId, credentialId);

@@ -20,12 +20,14 @@ package org.wso2.carbon.identity.api.server.credential.management.v1.core;
 
 import org.wso2.carbon.identity.api.server.credential.management.common.dto.CredentialDTO;
 import org.wso2.carbon.identity.api.server.credential.management.common.exception.CredentialMgtException;
-import org.wso2.carbon.identity.api.server.credential.management.common.service.CredentialManagementService;
+import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementService;
 import org.wso2.carbon.identity.api.server.credential.management.v1.utils.CredentialMgtEndpointUtils;
-
 
 import java.util.List;
 
+/**
+ * Server service class for Credential Management Service.
+ */
 public class ServerCredentialManagementService {
 
     private final CredentialManagementService adminCredentialManagementService;
@@ -35,6 +37,12 @@ public class ServerCredentialManagementService {
         this.adminCredentialManagementService = adminCredentialManagementService;
     }
 
+    /**
+     * Get credentials for a given user.
+     *
+     * @param userId ID of the user.
+     * @return List of credentials.
+     */
     public List<CredentialDTO> getCredentialsForUser(String userId) {
 
         try {
@@ -46,6 +54,13 @@ public class ServerCredentialManagementService {
         }
     }
 
+    /**
+     * Delete a credential for a user.
+     *
+     * @param userId       ID of the user.
+     * @param type         Type of the credential.
+     * @param credentialId ID of the credential.
+     */
     public void deleteCredentialForUser(String userId, String type, String credentialId) {
 
         try {

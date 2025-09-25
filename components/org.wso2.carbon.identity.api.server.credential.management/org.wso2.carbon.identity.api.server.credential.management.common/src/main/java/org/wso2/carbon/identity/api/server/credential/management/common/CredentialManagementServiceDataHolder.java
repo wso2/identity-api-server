@@ -19,7 +19,7 @@
 package org.wso2.carbon.identity.api.server.credential.management.common;
 
 import org.wso2.carbon.identity.application.authenticator.fido2.core.WebAuthnService;
-import org.wso2.carbon.identity.application.authenticator.push.device.handler.DeviceHandler;
+import org.wso2.carbon.identity.notification.push.device.handler.DeviceHandlerService;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 
 /**
@@ -33,14 +33,13 @@ public class CredentialManagementServiceDataHolder {
 
     private static class WebAuthnServiceHolder {
 
-        private static final WebAuthnService SERVICE = (WebAuthnService) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext().getOSGiService(WebAuthnService.class, null);
+        private static final WebAuthnService SERVICE = new WebAuthnService();;
     }
 
     private static class PushDeviceHandlerHolder {
 
-        private static final DeviceHandler SERVICE = (DeviceHandler) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext().getOSGiService(DeviceHandler.class, null);
+        private static final DeviceHandlerService SERVICE = (DeviceHandlerService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(DeviceHandlerService.class, null);
     }
 
     /**
@@ -58,7 +57,7 @@ public class CredentialManagementServiceDataHolder {
      *
      * @return DeviceHandler
      */
-    public static DeviceHandler getPushDeviceHandler() {
+    public static DeviceHandlerService getPushDeviceHandler() {
 
         return PushDeviceHandlerHolder.SERVICE;
     }
