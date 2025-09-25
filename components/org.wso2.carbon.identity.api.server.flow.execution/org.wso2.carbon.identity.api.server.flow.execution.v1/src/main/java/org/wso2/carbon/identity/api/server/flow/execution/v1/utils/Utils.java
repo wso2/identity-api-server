@@ -53,7 +53,6 @@ import static org.wso2.carbon.identity.api.server.flow.execution.v1.constants.Fl
 import static org.wso2.carbon.identity.api.server.flow.execution.v1.constants.FlowExecutionEndpointConstants.ErrorMessage.ERROR_CODE_GET_FLOW_CONFIG;
 import static org.wso2.carbon.identity.api.server.flow.execution.v1.constants.FlowExecutionEndpointConstants.ErrorMessage.ERROR_CODE_INVALID_FLOW_TYPE;
 
-
 /**
  * Utility class for flow execution API.
  */
