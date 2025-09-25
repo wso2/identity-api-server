@@ -33,7 +33,7 @@ public class CredentialManagementServiceDataHolder {
 
     private static class WebAuthnServiceHolder {
 
-        private static final WebAuthnService SERVICE = new WebAuthnService();;
+        private static final WebAuthnService SERVICE = new WebAuthnService();
     }
 
     private static class PushDeviceHandlerHolder {

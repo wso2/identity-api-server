@@ -25,7 +25,7 @@ import javax.ws.rs.core.Response;
  */
 public interface CredentialApiService {
 
-      public Response getCredentialsByUserId(String userId);
+      Response getCredentialsByUserId(String userId);
 
-      public Response deleteCredentialById(String userId, String type, String credentialId);
+      Response deleteCredentialById(String userId, String type, String credentialId);
 }
