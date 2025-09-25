@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.rest.api.server.workflow.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.workflow.common.WorkflowServiceHolder;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.core.WorkflowEngineService;
 
@@ -26,9 +28,11 @@ import org.wso2.carbon.identity.rest.api.server.workflow.v1.core.WorkflowEngineS
  */
 public class WorkflowEngineServiceFactory {
 
+    private static final Log log = LogFactory.getLog(WorkflowEngineServiceFactory.class);
     private static final WorkflowEngineService SERVICE;
 
     static {
+        log.debug("Initializing WorkflowEngineService in factory");
         SERVICE = new WorkflowEngineService(WorkflowServiceHolder.getWorkflowImplService());
     }
 

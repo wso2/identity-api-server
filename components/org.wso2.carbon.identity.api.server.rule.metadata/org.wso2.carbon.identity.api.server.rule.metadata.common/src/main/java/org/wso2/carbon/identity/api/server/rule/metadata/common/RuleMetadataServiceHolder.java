@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.rule.metadata.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.rule.metadata.api.service.RuleMetadataService;
 
@@ -25,6 +27,8 @@ import org.wso2.carbon.identity.rule.metadata.api.service.RuleMetadataService;
  * Service holder class for Rule Metadata Service.
  */
 public class RuleMetadataServiceHolder {
+
+    private static final Log log = LogFactory.getLog(RuleMetadataServiceHolder.class);
 
     private RuleMetadataServiceHolder() {
 
@@ -43,6 +47,13 @@ public class RuleMetadataServiceHolder {
      */
     public static RuleMetadataService getRuleMetadataService() {
 
-        return RuleMetadataServiceHolderInstance.SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving RuleMetadataService instance from OSGi service registry.");
+        }
+        RuleMetadataService service = RuleMetadataServiceHolderInstance.SERVICE;
+        if (service == null) {
+            log.warn("RuleMetadataService is not available. Service might not be registered in OSGi registry.");
+        }
+        return service;
     }
 }

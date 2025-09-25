@@ -16,6 +16,9 @@
 
 package org.wso2.carbon.identity.api.server.permission.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -24,6 +27,8 @@ import java.util.ResourceBundle;
  * Permission Management constant class.
  */
 public class Constant {
+
+    private static final Log log = LogFactory.getLog(Constant.class);
 
     /**
      * Enum for error messages.
@@ -78,11 +83,20 @@ public class Constant {
          */
         public static ErrorMessage getMappedErrorMessage(String serverCode) {
 
+            if (log.isDebugEnabled()) {
+                log.debug("Getting mapped error message for server code: " + serverCode);
+            }
+
             try {
                 String errorCode = resourceBundle.getString(serverCode);
+                if (log.isDebugEnabled()) {
+                    log.debug("Found mapped error code: " + errorCode + " for server code: " + serverCode);
+                }
                 return messageIndex.get(errorCode);
             } catch (Throwable e) {
-                // Ignore if error mapping has invalid input.
+                if (log.isDebugEnabled()) {
+                    log.debug("Error mapping not found for server code: " + serverCode + ". Using default error.");
+                }
             }
             return ErrorMessage.ERROR_CODE_INVALID_INPUT;
         }

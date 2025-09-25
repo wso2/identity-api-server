@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.webhook.management.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.webhook.management.common.WebhookManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.webhook.management.v1.core.ServerWebhookManagementService;
 import org.wso2.carbon.identity.webhook.management.api.service.WebhookManagementService;
@@ -27,15 +29,18 @@ import org.wso2.carbon.identity.webhook.management.api.service.WebhookManagement
  */
 public class ServerWebhookManagementServiceFactory {
 
+    private static final Log LOG = LogFactory.getLog(ServerWebhookManagementServiceFactory.class);
     private static final ServerWebhookManagementService SERVICE;
 
     static {
         WebhookManagementService webhookManagementService =
                 WebhookManagementServiceHolder.getWebhookManagementService();
         if (webhookManagementService == null) {
+            LOG.error("WebhookManagementService is not available from OSGi context.");
             throw new IllegalStateException("WebhookManagementService is not available from OSGi context.");
         }
         SERVICE = new ServerWebhookManagementService(webhookManagementService);
+        LOG.info("ServerWebhookManagementService initialized successfully.");
     }
 
     /**

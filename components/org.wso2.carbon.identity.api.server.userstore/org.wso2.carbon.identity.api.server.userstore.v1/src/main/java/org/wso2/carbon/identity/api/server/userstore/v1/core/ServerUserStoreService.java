@@ -114,7 +114,8 @@ import static org.wso2.carbon.identity.api.server.common.Constants.REGEX_COMMA;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.Constants.XML_FILE_EXTENSION;
 import static org.wso2.carbon.identity.api.server.common.Constants.YAML_FILE_EXTENSION;
-import static org.wso2.carbon.identity.api.server.userstore.common.UserStoreConstants.ErrorMessage.ERROR_CODE_USER_STORE_LIMIT_REACHED;
+import static org.wso2.carbon.identity.api.server.userstore.common.UserStoreConstants.ErrorMessage.
+        ERROR_CODE_USER_STORE_LIMIT_REACHED;
 import static org.wso2.carbon.identity.core.util.IdentityUtil.isValidFileName;
 
 /**
@@ -163,8 +164,16 @@ public class ServerUserStoreService {
     public UserStoreResponse addUserStore(UserStoreReq userStoreReq) {
 
         try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Adding user store: " + (userStoreReq != null ? userStoreReq.getName() : "null"));
+            }
+            if (userStoreReq == null) {
+                throw handleException(Response.Status.BAD_REQUEST,
+                        UserStoreConstants.ErrorMessage.ERROR_CODE_REQUEST_BODY_NOT_FOUND);
+            }
             validateMandatoryProperties(userStoreReq);
             if (!isAvailableUserStoreTypes(getAvailableUserStoreTypes(), userStoreReq.getTypeId())) {
+                LOG.warn("Invalid user store type: " + userStoreReq.getTypeId());
                 throw handleException(Response.Status.BAD_REQUEST,
                         UserStoreConstants.ErrorMessage.ERROR_CODE_INVALID_USERSTORE_TYPE);
             }
@@ -185,8 +194,10 @@ public class ServerUserStoreService {
                 updateClaimMappings(userstoreDomain, tenantDomain, localClaimList);
             }
 
+            LOG.info("User store added successfully: " + userStoreReq.getName());
             return buildUserStoreResponseDTO(userStoreReq);
         } catch (IdentityUserStoreMgtException e) {
+            LOG.error("Error adding user store: " + (userStoreReq != null ? userStoreReq.getName() : "unknown"), e);
             UserStoreConstants.ErrorMessage errorEnum =
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_ADDING_USER_STORE;
             throw handleIdentityUserStoreMgtException(e, errorEnum);
@@ -201,12 +212,19 @@ public class ServerUserStoreService {
     public void deleteUserStore(String userstoreDomainId) {
 
         try {
-            userStoreConfigService.deleteUserStore(base64URLDecodeId(userstoreDomainId));
+            String decodedId = base64URLDecodeId(userstoreDomainId);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Deleting user store: " + decodedId);
+            }
+            userStoreConfigService.deleteUserStore(decodedId);
+            LOG.info("User store deleted successfully: " + decodedId);
         } catch (IdentityUserStoreClientException e) {
+            LOG.warn("User store not found for deletion: " + userstoreDomainId);
             if (LOG.isDebugEnabled()) {
                 LOG.debug(e);
             }
         } catch (IdentityUserStoreMgtException e) {
+            LOG.error("Error deleting user store: " + userstoreDomainId, e);
             UserStoreConstants.ErrorMessage errorEnum =
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_DELETING_USER_STORE;
             throw handleIdentityUserStoreMgtException(e, errorEnum);
@@ -228,6 +246,9 @@ public class ServerUserStoreService {
         createUserStoreDTO(userStoreReq, domainId));
          */
         try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Editing user store: " + domainId);
+            }
             validateUserstoreUpdateRequest(domainId, userStoreReq);
             String userstoreDomain = userStoreReq.getName();
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
@@ -241,8 +262,10 @@ public class ServerUserStoreService {
             if (claimAttributeMappingList != null) {
                 updateClaimMappings(userstoreDomain, tenantDomain, localClaimList);
             }
+            LOG.info("User store updated successfully: " + userstoreDomain);
             return buildUserStoreResponseDTO(userStoreReq);
         } catch (IdentityUserStoreMgtException e) {
+            LOG.error("Error updating user store: " + domainId, e);
             UserStoreConstants.ErrorMessage errorEnum =
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_USER_STORE;
             throw handleIdentityUserStoreMgtException(e, errorEnum);
@@ -313,19 +336,31 @@ public class ServerUserStoreService {
      */
     public String importUserStore(InputStream fileInputStream, Attachment fileDetail) {
 
+        String fileName = fileDetail != null && fileDetail.getDataHandler() != null ? 
+                fileDetail.getDataHandler().getName() : "unknown";
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Importing user store from file: " + fileName);
+        }
+        if (fileInputStream == null || fileDetail == null) {
+            throw handleException(Response.Status.BAD_REQUEST,
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_INVALID_INPUT);
+        }
         UserStoreReq userStoreConfigs;
         try {
             userStoreConfigs = getUserStoreFromFile(fileInputStream, fileDetail);
         } catch (UserStoreException e) {
+            LOG.error("Error importing user store from file: " + fileName, e);
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_IMPORTING_USER_STORE);
         } catch (IdentityUserStoreMgtException e) {
+            LOG.error("Error importing user store from file: " + fileName, e);
             UserStoreConstants.ErrorMessage errorEnum =
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_IMPORTING_USER_STORE;
             throw handleIdentityUserStoreMgtException(e, errorEnum);
         }
 
         UserStoreResponse userStoreResponse = addUserStore(userStoreConfigs);
+        LOG.info("User store imported successfully from file: " + fileName + ", ID: " + userStoreResponse.getId());
         return userStoreResponse.getId();
     }
 
@@ -340,19 +375,31 @@ public class ServerUserStoreService {
     public String updateUserStoreFromFile(String userstoreDomainID, InputStream fileInputStream,
                                           Attachment fileDetail) {
 
+        String fileName = fileDetail != null && fileDetail.getDataHandler() != null ? 
+                fileDetail.getDataHandler().getName() : "unknown";
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating user store from file: " + fileName + ", domain: " + userstoreDomainID);
+        }
+        if (fileInputStream == null || fileDetail == null) {
+            throw handleException(Response.Status.BAD_REQUEST,
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_INVALID_INPUT);
+        }
         UserStoreReq userStoreConfigs;
         try {
             userStoreConfigs = getUserStoreFromFile(fileInputStream, fileDetail);
         } catch (UserStoreException e) {
+            LOG.error("Error updating user store from file: " + fileName, e);
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_USER_STORE);
         }  catch (IdentityUserStoreMgtException e) {
+            LOG.error("Error updating user store from file: " + fileName, e);
             UserStoreConstants.ErrorMessage errorEnum =
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_USER_STORE;
             throw handleIdentityUserStoreMgtException(e, errorEnum);
         }
 
         UserStoreResponse userStoreResponse = editUserStore(userstoreDomainID, userStoreConfigs);
+        LOG.info("User store updated successfully from file: " + fileName + ", ID: " + userStoreResponse.getId());
         return userStoreResponse.getId();
     }
 
@@ -363,6 +410,9 @@ public class ServerUserStoreService {
      */
     public List<AvailableUserStoreClassesRes> getAvailableUserStoreTypes() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving available user store types");
+        }
         Set<String> classNames;
         try {
             classNames = userStoreConfigService.getAvailableUserStoreClasses();
@@ -386,8 +436,12 @@ public class ServerUserStoreService {
 
                 propertiesToAdd.add(availableUserStoreClassesResDTO);
             }
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Retrieved " + propertiesToAdd.size() + " available user store types");
+            }
             return propertiesToAdd;
         } catch (IdentityUserStoreMgtException e) {
+            LOG.error("Error retrieving available user store types", e);
             UserStoreConstants.ErrorMessage errorEnum =
                     UserStoreConstants.ErrorMessage.ERROR_CODE_RETRIEVING_USER_STORE_TYPE;
             throw handleIdentityUserStoreMgtException(e, errorEnum);
@@ -406,13 +460,21 @@ public class ServerUserStoreService {
     public List<UserStoreListResponse> getUserStoreList(Integer limit, Integer offset, String filter, String sort,
                                                         String requiredAttributes) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving user store list");
+        }
         handleNotImplementedBehaviour(limit, offset, filter, sort);
 
         try {
             UserStoreDTO[] userStoreDTOS = userStoreConfigService.getUserStores();
-            return buildUserStoreListResponse(userStoreDTOS, requiredAttributes);
+            List<UserStoreListResponse> response = buildUserStoreListResponse(userStoreDTOS, requiredAttributes);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Retrieved " + response.size() + " user stores");
+            }
+            return response;
 
         } catch (IdentityUserStoreMgtException e) {
+            LOG.error("Error retrieving user store list", e);
             UserStoreConstants.ErrorMessage errorEnum =
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_USER_STORE;
             throw handleIdentityUserStoreMgtException(e, errorEnum);
@@ -564,6 +626,9 @@ public class ServerUserStoreService {
         ConnectionEstablishedResponse connectionEstablishedResponse = new ConnectionEstablishedResponse();
         boolean isConnectionEstablished;
         connectionEstablishedResponse.setConnection(false);
+        if (rdBMSConnectionReq == null) {
+            return connectionEstablishedResponse;
+        }
         try {
             isConnectionEstablished = userStoreConfigService.testRDBMSConnection(rdBMSConnectionReq.getDomain(),
                     rdBMSConnectionReq.getDriverName(), rdBMSConnectionReq.getConnectionURL(),
@@ -1405,7 +1470,6 @@ public class ServerUserStoreService {
     private void validateUserstoreUpdateRequest(String domainID, UserStoreReq userStoreReq)
             throws IdentityUserStoreClientException {
 
-       validateUserStoreProperty(userStoreReq);
         if (StringUtils.isBlank(domainID)) {
             throw new IdentityUserStoreClientException(
                     UserStoreConstants.ErrorMessage.ERROR_CODE_EMPTY_DOMAIN_ID.getCode(),
@@ -1416,6 +1480,7 @@ public class ServerUserStoreService {
                     UserStoreConstants.ErrorMessage.ERROR_CODE_REQUEST_BODY_NOT_FOUND.getCode(),
                     UserStoreConstants.ErrorMessage.ERROR_CODE_REQUEST_BODY_NOT_FOUND.getMessage());
         }
+        validateUserStoreProperty(userStoreReq);
         if (StringUtils.isBlank(userStoreReq.getName())) {
             throw new IdentityUserStoreClientException(
                     UserStoreConstants.ErrorMessage.ERROR_CODE_EMPTY_DOMAIN_NAME.getCode(),

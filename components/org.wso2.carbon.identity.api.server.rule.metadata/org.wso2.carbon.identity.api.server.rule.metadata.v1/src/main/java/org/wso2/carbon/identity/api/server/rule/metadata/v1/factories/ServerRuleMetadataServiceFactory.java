@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.rule.metadata.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.rule.metadata.common.RuleMetadataServiceHolder;
 import org.wso2.carbon.identity.api.server.rule.metadata.v1.core.ServerRuleMetadataService;
 import org.wso2.carbon.identity.rule.metadata.api.service.RuleMetadataService;
@@ -27,14 +29,18 @@ import org.wso2.carbon.identity.rule.metadata.api.service.RuleMetadataService;
  */
 public class ServerRuleMetadataServiceFactory {
 
+    private static final Log LOG = LogFactory.getLog(ServerRuleMetadataServiceFactory.class);
     private static final ServerRuleMetadataService SERVICE;
 
     static {
+        LOG.info("Initializing ServerRuleMetadataService factory.");
         RuleMetadataService ruleMetadataService = RuleMetadataServiceHolder.getRuleMetadataService();
         if (ruleMetadataService == null) {
+            LOG.error("RuleMetadataService is not available from OSGi context.");
             throw new IllegalStateException("RuleMetadataService is not available from OSGi context.");
         }
         SERVICE = new ServerRuleMetadataService(ruleMetadataService);
+        LOG.info("ServerRuleMetadataService factory initialized successfully.");
     }
 
     /**

@@ -35,8 +35,10 @@ import org.wso2.carbon.identity.secret.mgt.core.model.SecretType;
 
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.secret.mgt.core.constant.SecretConstants.ErrorMessages.ERROR_CODE_SECRET_TYPE_ALREADY_EXISTS;
-import static org.wso2.carbon.identity.secret.mgt.core.constant.SecretConstants.ErrorMessages.ERROR_CODE_SECRET_TYPE_DOES_NOT_EXISTS;
+import static org.wso2.carbon.identity.secret.mgt.core.constant.SecretConstants.ErrorMessages.
+        ERROR_CODE_SECRET_TYPE_ALREADY_EXISTS;
+import static org.wso2.carbon.identity.secret.mgt.core.constant.SecretConstants.ErrorMessages.
+        ERROR_CODE_SECRET_TYPE_DOES_NOT_EXISTS;
 
 /**
  * Invoke internal OSGi service to perform secret type management operations.
@@ -44,7 +46,7 @@ import static org.wso2.carbon.identity.secret.mgt.core.constant.SecretConstants.
 public class SecretTypeManagementService {
 
     private final SecretManager secretManager;
-    private static final Log log = LogFactory.getLog(SecretManagementService.class);
+    private static final Log log = LogFactory.getLog(SecretTypeManagementService.class);
 
     public SecretTypeManagementService(SecretManager secretManager) {
 
@@ -60,10 +62,15 @@ public class SecretTypeManagementService {
     public SecretTypeResponse addSecretType(SecretTypeAddRequest secretTypeAddRequest) {
 
         validateSecretTypeAddRequest(secretTypeAddRequest);
+        if (log.isDebugEnabled()) {
+            log.debug("Adding secret type with name: " + 
+                    secretTypeAddRequest.getName());
+        }
         SecretType requestDTO, responseDTO;
         try {
             requestDTO = buildSecretTypeRequestDTOFromSecretTypeAddRequest(secretTypeAddRequest);
             responseDTO = secretManager.addSecretType(requestDTO);
+            log.info("Secret type added successfully with name: " + secretTypeAddRequest.getName());
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.ERROR_CODE_ERROR_ADDING_SECRET,
                     secretTypeAddRequest.getName());
@@ -93,6 +100,10 @@ public class SecretTypeManagementService {
      */
     private void validateSecretTypeAddRequest(SecretTypeAddRequest secretTypeAddRequest) {
 
+        if (secretTypeAddRequest == null) {
+            throw handleException(Response.Status.BAD_REQUEST, SecretManagementConstants.ErrorMessage.
+                    ERROR_CODE_INVALID_INPUT, null);
+        }
         String secretAddName = secretTypeAddRequest.getName();
         if (StringUtils.isBlank(secretAddName)) {
             throw handleException(Response.Status.BAD_REQUEST, SecretManagementConstants.ErrorMessage.
@@ -121,8 +132,12 @@ public class SecretTypeManagementService {
      */
     public void deleteSecretType(String secretTypeName) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting secret type with name: " + secretTypeName);
+        }
         try {
             secretManager.deleteSecretType(secretTypeName);
+            log.info("Secret type deleted successfully with name: " + secretTypeName);
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.
                     ERROR_CODE_ERROR_DELETING_SECRET, secretTypeName);
@@ -137,6 +152,9 @@ public class SecretTypeManagementService {
      */
     public SecretTypeResponse getSecretType(String secretTypeName) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving secret type with name: " + secretTypeName);
+        }
         try {
             SecretType responseDTO = secretManager.getSecretType(secretTypeName);
             SecretTypeResponse secretTypeResponse = new SecretTypeResponse();
