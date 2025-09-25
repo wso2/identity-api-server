@@ -71,6 +71,10 @@ public class PasswordExpiredUsersManagementApiService {
     public List<PasswordExpiredUser> getPasswordExpiredUsers(
             String expiredAfter, String excludeAfter, String tenantDomain) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Processing password expired users request for tenant: " + tenantDomain + 
+                    ", expiredAfter: " + expiredAfter + ", excludeAfter: " + excludeAfter);
+        }
         List<PasswordExpiredUserModel> passwordExpiredUsers = null;
         try {
             validateDates(expiredAfter, excludeAfter);
@@ -78,13 +82,22 @@ public class PasswordExpiredUsersManagementApiService {
             LocalDateTime expiredAfterDate = convertToDateObject(expiredAfter, DATE_EXPIRED_AFTER);
             LocalDateTime excludeAfterDate = convertToDateObject(excludeAfter, DATE_EXCLUDE_AFTER);
             if (excludeAfterDate == null) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Retrieving password expired users from specific date for tenant: " + tenantDomain);
+                }
                 passwordExpiredUsers = expiredPasswordIdentificationService
                         .getPasswordExpiredUsersFromSpecificDate(expiredAfterDate, tenantDomain);
             } else {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Retrieving password expired users between specific dates for tenant: " + tenantDomain);
+                }
                 passwordExpiredUsers = expiredPasswordIdentificationService
                         .getPasswordExpiredUsersBetweenSpecificDates(expiredAfterDate, excludeAfterDate, tenantDomain);
             }
-            return buildResponse(passwordExpiredUsers);
+            List<PasswordExpiredUser> result = buildResponse(passwordExpiredUsers);
+            LOG.info("Successfully retrieved " + result.size() + 
+                    " password expired users for tenant: " + tenantDomain);
+            return result;
         } catch (ExpiredPasswordIdentificationException e) {
             throw handleExpiredPasswordIdentificationException(e,
                     ErrorMessage.ERROR_RETRIEVING_PASSWORD_EXPIRED_USERS, tenantDomain);
@@ -251,13 +264,21 @@ public class PasswordExpiredUsersManagementApiService {
     private void validatePasswordExpiryFeatureEnabled (String tenantDomain)
             throws ExpiredPasswordIdentificationException {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Validating password expiry feature for tenant: " + tenantDomain);
+        }
         try {
             if (!PasswordPolicyUtils.isPasswordExpiryEnabled(tenantDomain)) {
+                LOG.warn("Password expiry feature is not enabled for tenant: " + tenantDomain);
                 ErrorMessage error = ErrorMessage.PASSWORD_EXPIRY_FEATURE_NOT_ENABLED;
                 throw new ExpiredPasswordIdentificationClientException(error.getCode(), error.getMessage(),
                         error.getDescription());
             }
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Password expiry feature validation successful for tenant: " + tenantDomain);
+            }
         } catch (PostAuthenticationFailedException e) {
+            LOG.error("Error occurred while validating password expiry feature for tenant: " + tenantDomain, e);
             throw new ExpiredPasswordIdentificationServerException(e);
         }
     }
