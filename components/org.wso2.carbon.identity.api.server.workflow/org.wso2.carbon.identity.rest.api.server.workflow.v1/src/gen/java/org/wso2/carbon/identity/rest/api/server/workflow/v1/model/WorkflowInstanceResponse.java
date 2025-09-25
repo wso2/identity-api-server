@@ -25,10 +25,14 @@ import io.swagger.annotations.ApiModelProperty;
 import java.time.LocalDateTime;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.InstanceStatus;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Operation;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Property;
 import javax.validation.constraints.*;
 
 
 import io.swagger.annotations.*;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
@@ -42,6 +46,7 @@ public class WorkflowInstanceResponse {
     private String updatedAt;
     private InstanceStatus status;
     private Object requestParameters;
+    private List<Property> properties = new ArrayList<Property>();
 
     /**
     **/
@@ -186,6 +191,36 @@ public class WorkflowInstanceResponse {
         this.requestInitiator = requestInitiator;
     }
 
+    /**
+    **/
+    public WorkflowInstanceResponse properties(List<Property> properties) {
+
+        this.properties = properties;
+        return this;
+    }
+
+    public WorkflowInstanceResponse addPropertiesItem(Property propertiesItem) {
+
+        if (this.properties == null) {
+            this.properties = new ArrayList<Property>();
+        }
+        this.properties.add(propertiesItem);
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("properties")
+    @Valid
+    public List<Property> getProperties() {
+
+        return properties;
+    }
+
+    public void setProperties(List<Property> properties) {
+
+        this.properties = properties;
+    }
+
     @Override
     public boolean equals(java.lang.Object o) {
 
@@ -196,17 +231,20 @@ public class WorkflowInstanceResponse {
             return false;
         }
         WorkflowInstanceResponse workflowInstanceResponse = (WorkflowInstanceResponse) o;
-        return Objects.equals(this.eventType, workflowInstanceResponse.eventType) &&
+        return Objects.equals(this.workflowInstanceId, workflowInstanceResponse.workflowInstanceId) &&
+            Objects.equals(this.eventType, workflowInstanceResponse.eventType) &&
+            Objects.equals(this.requestInitiator, workflowInstanceResponse.requestInitiator) &&
             Objects.equals(this.createdAt, workflowInstanceResponse.createdAt) &&
             Objects.equals(this.updatedAt, workflowInstanceResponse.updatedAt) &&
             Objects.equals(this.status, workflowInstanceResponse.status) &&
-            Objects.equals(this.requestParameters, workflowInstanceResponse.requestParameters);
+            Objects.equals(this.requestParameters, workflowInstanceResponse.requestParameters) &&
+            Objects.equals(this.properties, workflowInstanceResponse.properties);
     }
 
     @Override
     public int hashCode() {
         
-        return Objects.hash(eventType, createdAt, updatedAt, status, requestParameters);
+        return Objects.hash(workflowInstanceId, eventType, requestInitiator, createdAt, updatedAt, status, requestParameters, properties);
     }
 
     @Override
@@ -215,11 +253,14 @@ public class WorkflowInstanceResponse {
         StringBuilder sb = new StringBuilder();
         sb.append("class WorkflowInstanceResponse {\n");
         
+        sb.append("    workflowInstanceId: ").append(toIndentedString(workflowInstanceId)).append("\n");
         sb.append("    eventType: ").append(toIndentedString(eventType)).append("\n");
+        sb.append("    requestInitiator: ").append(toIndentedString(requestInitiator)).append("\n");
         sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
         sb.append("    updatedAt: ").append(toIndentedString(updatedAt)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("    requestParameters: ").append(toIndentedString(requestParameters)).append("\n");
+        sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");
         return sb.toString();
     }
