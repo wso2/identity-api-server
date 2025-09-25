@@ -53,6 +53,13 @@ public class ContextLoader {
         String tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
         if (IdentityUtil.threadLocalProperties.get().get(TENANT_NAME_FROM_CONTEXT) != null) {
             tenantDomain = (String) IdentityUtil.threadLocalProperties.get().get(TENANT_NAME_FROM_CONTEXT);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Retrieved tenant domain from thread local context: " + tenantDomain);
+            }
+        } else {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Using default super tenant domain as no tenant context found.");
+            }
         }
         return tenantDomain;
     }
@@ -64,7 +71,11 @@ public class ContextLoader {
      */
     public static String getUsernameFromContext() {
 
-        return PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername();
+        String username = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieved username from carbon context: " + (username != null ? "[username]" : "null"));
+        }
+        return username;
     }
 
     /**
@@ -76,12 +87,19 @@ public class ContextLoader {
      */
     public static URI buildURIForBody(String endpoint) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Building URI for response body with endpoint: " + endpoint);
+        }
         String url;
         String context = getContext(endpoint);
 
         try {
             url = ServiceURLBuilder.create().addPath(context).build().getRelativePublicURL();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully built relative URI for response body.");
+            }
         } catch (URLBuilderException e) {
+            LOG.error("Failed to build URL for response body with endpoint: " + endpoint, e);
             String errorDescription = "Server encountered an error while building URL for response body.";
             throw buildInternalServerError(e, errorDescription);
         }
@@ -98,13 +116,20 @@ public class ContextLoader {
      */
     public static URI buildURIForHeader(String endpoint) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Building URI for response header with endpoint: " + endpoint);
+        }
         URI loc;
         String context = getContext(endpoint);
 
         try {
             String url = ServiceURLBuilder.create().addPath(context).build().getAbsolutePublicURL();
             loc = URI.create(url);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully built absolute URI for response header.");
+            }
         } catch (URLBuilderException e) {
+            LOG.error("Failed to build URL for response header with endpoint: " + endpoint, e);
             String errorDescription = "Server encountered an error while building URL for response header.";
             throw buildInternalServerError(e, errorDescription);
         }

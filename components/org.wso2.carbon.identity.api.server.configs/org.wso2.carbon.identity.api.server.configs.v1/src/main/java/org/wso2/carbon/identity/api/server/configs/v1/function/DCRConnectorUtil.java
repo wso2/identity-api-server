@@ -48,6 +48,9 @@ public class DCRConnectorUtil {
      */
     public static DCRConfig getDCRConfig(DCRConfigurationMgtService dcrConfigurationMgtService) throws DCRMException {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving DCR configuration.");
+        }
         DCRConfiguration dcrConfiguration = dcrConfigurationMgtService.getDCRConfiguration();
 
         return dcrConfigurationToDCRConfig(dcrConfiguration);
@@ -62,11 +65,17 @@ public class DCRConnectorUtil {
     public static void setDCRConfig(DCRConfig dcrConfig, DCRConfigurationMgtService dcrConfigurationMgtService)
             throws DCRMException {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Setting DCR configuration.");
+        }
         dcrConfigurationMgtService.setDCRConfiguration((getDCRConfigurationFromDCRConfig(dcrConfig)));
     }
 
     private static DCRConfig dcrConfigurationToDCRConfig(DCRConfiguration dcrConfiguration) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Converting DCRConfiguration to DCRConfig.");
+        }
         DCRConfig dcrConfig = new DCRConfig();
         dcrConfig.setAuthenticationRequired(dcrConfiguration.getAuthenticationRequired());
         dcrConfig.setEnableFapiEnforcement(dcrConfiguration.getEnableFapiEnforcement());

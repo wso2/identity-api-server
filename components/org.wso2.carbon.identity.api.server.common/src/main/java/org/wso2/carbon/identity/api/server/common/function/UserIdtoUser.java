@@ -40,15 +40,22 @@ public class UserIdtoUser implements Function<String[], User> {
 
     @Override
     public User apply(String... args) {
+        if (log.isDebugEnabled()) {
+            log.debug("Extracting user from provided arguments.");
+        }
         return extractUser(args[0], args[1]);
     }
 
     private User extractUser(String userId, String tenantDomain) {
 
         try {
+            if (log.isDebugEnabled()) {
+                log.debug("Processing user extraction for tenant domain: " + tenantDomain);
+            }
             String decodedUsername = new String(Base64.getDecoder().decode(userId), StandardCharsets.UTF_8);
 
             if (StringUtils.isBlank(userId)) {
+                log.warn("Empty or blank userId provided for user extraction.");
                 throw new WebApplicationException("UserID is empty.");
             }
             String[] strComponent = decodedUsername.split("/");
@@ -58,10 +65,17 @@ public class UserIdtoUser implements Function<String[], User> {
 
             if (strComponent.length == 1) {
                 username = strComponent[0];
+                if (log.isDebugEnabled()) {
+                    log.debug("Extracted username without realm from userId for tenant: " + tenantDomain);
+                }
             } else if (strComponent.length == 2) {
                 realm = strComponent[0];
                 username = strComponent[1];
+                if (log.isDebugEnabled()) {
+                    log.debug("Extracted username and realm from userId for tenant: " + tenantDomain);
+                }
             } else {
+                log.warn("Invalid userId format provided. Expected format: username or realm/username");
                 throw new WebApplicationException("Provided UserID is " + "not in the correct format.");
             }
 
@@ -70,8 +84,13 @@ public class UserIdtoUser implements Function<String[], User> {
             user.setUserStoreDomain(realm);
             user.setTenantDomain(tenantDomain);
 
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully created user object for tenant: " + tenantDomain);
+            }
             return user;
         } catch (Exception e) {
+            log.error("Failed to extract user from userId for tenant: " + 
+                    (tenantDomain != null ? tenantDomain : "null"), e);
             throw new APIError(Response.Status.BAD_REQUEST,
                     new ErrorResponse.Builder().withCode(Constants.ErrorMessages.ERROR_CODE_INVALID_USERNAME.getCode())
                             .withMessage(Constants.ErrorMessages.ERROR_CODE_INVALID_USERNAME.getMessage())

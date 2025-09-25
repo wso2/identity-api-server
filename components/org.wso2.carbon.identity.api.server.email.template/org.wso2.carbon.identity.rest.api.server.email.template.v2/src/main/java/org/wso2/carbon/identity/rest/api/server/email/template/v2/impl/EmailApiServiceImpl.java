@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.rest.api.server.email.template.v2.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.EmailApiService;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.core.ApplicationEmailTemplatesService;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.core.ServerEmailTemplatesService;
@@ -44,16 +46,20 @@ import static org.wso2.carbon.identity.api.server.email.template.common.Constant
  */
 public class EmailApiServiceImpl implements EmailApiService {
 
+    private static final Log log = LogFactory.getLog(EmailApiServiceImpl.class);
     private final ServerEmailTemplatesService emailTemplatesService;
     private final ApplicationEmailTemplatesService applicationEmailTemplatesService;
 
     public EmailApiServiceImpl() {
 
         try {
+            log.info("Initializing EmailApiServiceImpl.");
             this.emailTemplatesService = ServerEmailTemplatesServiceFactory.getServerEmailTemplatesService();
             this.applicationEmailTemplatesService = ApplicationEmailTemplatesServiceFactory
                     .getApplicationEmailTemplatesService();
+            log.info("EmailApiServiceImpl initialized successfully.");
         } catch (IllegalStateException e) {
+            log.error("Error occurred while initiating email template management services.");
             throw new RuntimeException("Error occurred while initiating email template management services.", e);
         }
     }
@@ -62,8 +68,13 @@ public class EmailApiServiceImpl implements EmailApiService {
     public Response addAppEmailTemplate(
             String templateTypeId, String appUuid, EmailTemplateWithID emailTemplateWithID) {
 
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Adding app email template for templateTypeId: %s, appUuid: %s, locale: %s",
+                    templateTypeId, appUuid, emailTemplateWithID != null ? emailTemplateWithID.getLocale() : null));
+        }
         SimpleEmailTemplate simpleEmailTemplate = applicationEmailTemplatesService.addEmailTemplate(templateTypeId,
                 emailTemplateWithID, appUuid);
+        log.info("App email template added successfully.");
         URI headerLocation = buildURIForHeader(
                 V2_API_PATH_COMPONENT + EMAIL_TEMPLATES_API_BASE_PATH + EMAIL_TEMPLATE_TYPES_PATH +
                         PATH_SEPARATOR + templateTypeId + APP_EMAIL_TEMPLATES_PATH +
@@ -74,7 +85,16 @@ public class EmailApiServiceImpl implements EmailApiService {
     @Override
     public Response addEmailTemplateType(EmailTemplateTypeOverview emailTemplateTypeOverview) {
 
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Adding email template type: %s",
+                    emailTemplateTypeOverview != null ? emailTemplateTypeOverview.getDisplayName() : null));
+        }
+        if (emailTemplateTypeOverview == null) {
+            log.error("Email template type overview cannot be null.");
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
         EmailTemplateTypeWithID templateType = emailTemplatesService.addEmailTemplateType(emailTemplateTypeOverview);
+        log.info("Email template type added successfully.");
         URI headerLocation = buildURIForHeader(
                 V2_API_PATH_COMPONENT + EMAIL_TEMPLATES_API_BASE_PATH + EMAIL_TEMPLATE_TYPES_PATH +
                         PATH_SEPARATOR + templateType.getId());
@@ -84,8 +104,13 @@ public class EmailApiServiceImpl implements EmailApiService {
     @Override
     public Response addOrgEmailTemplate(String templateTypeId, EmailTemplateWithID emailTemplateWithID) {
 
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Adding org email template for templateTypeId: %s, locale: %s",
+                    templateTypeId, emailTemplateWithID != null ? emailTemplateWithID.getLocale() : null));
+        }
         SimpleEmailTemplate simpleEmailTemplate = emailTemplatesService.addEmailTemplate(templateTypeId,
                 emailTemplateWithID);
+        log.info("Org email template added successfully.");
         URI headerLocation = buildURIForHeader(
                 V2_API_PATH_COMPONENT + EMAIL_TEMPLATES_API_BASE_PATH + EMAIL_TEMPLATE_TYPES_PATH +
                         PATH_SEPARATOR + templateTypeId + ORG_EMAIL_TEMPLATES_PATH +
@@ -96,27 +121,45 @@ public class EmailApiServiceImpl implements EmailApiService {
     @Override
     public Response deleteAppEmailTemplate(String templateTypeId, String appUuid, String locale) {
 
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Deleting app email template for templateTypeId: %s, appUuid: %s, locale: %s",
+                    templateTypeId, appUuid, locale));
+        }
         applicationEmailTemplatesService.deleteEmailTemplate(templateTypeId, locale, appUuid);
+        log.info("App email template deleted successfully.");
         return Response.noContent().build();
     }
 
     @Override
     public Response deleteEmailTemplateType(String templateTypeId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Deleting email template type with id: %s", templateTypeId));
+        }
         emailTemplatesService.deleteEmailTemplateType(templateTypeId);
+        log.info("Email template type deleted successfully.");
         return Response.noContent().build();
     }
 
     @Override
     public Response deleteOrgEmailTemplate(String templateTypeId, String locale) {
 
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Deleting org email template for templateTypeId: %s, locale: %s",
+                    templateTypeId, locale));
+        }
         emailTemplatesService.deleteEmailTemplate(templateTypeId, locale);
+        log.info("Org email template deleted successfully.");
         return Response.noContent().build();
     }
 
     @Override
     public Response getAllEmailTemplateTypes(Integer limit, Integer offset, String sortOrder, String sortBy) {
 
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Retrieving all email template types with limit: %s, offset: %s",
+                    limit, offset));
+        }
         return Response.ok().entity(
                 emailTemplatesService.getAllEmailTemplateTypes(limit, offset, sortOrder, sortBy)).build();
     }
@@ -166,7 +209,12 @@ public class EmailApiServiceImpl implements EmailApiService {
     public Response updateAppEmailTemplate(
             String templateTypeId, String appUuid, String locale, EmailTemplateWithID emailTemplateWithID) {
 
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Updating app email template for templateTypeId: %s, appUuid: %s, locale: %s",
+                    templateTypeId, appUuid, locale));
+        }
         applicationEmailTemplatesService.updateEmailTemplate(templateTypeId, locale, emailTemplateWithID, appUuid);
+        log.info("App email template updated successfully.");
         return Response.ok().build();
     }
 
@@ -174,7 +222,12 @@ public class EmailApiServiceImpl implements EmailApiService {
     public Response updateOrgEmailTemplate(
             String templateTypeId, String locale, EmailTemplateWithID emailTemplateWithID) {
 
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Updating org email template for templateTypeId: %s, locale: %s",
+                    templateTypeId, locale));
+        }
         emailTemplatesService.updateEmailTemplate(templateTypeId, locale, emailTemplateWithID);
+        log.info("Org email template updated successfully.");
         return Response.ok().build();
     }
 }

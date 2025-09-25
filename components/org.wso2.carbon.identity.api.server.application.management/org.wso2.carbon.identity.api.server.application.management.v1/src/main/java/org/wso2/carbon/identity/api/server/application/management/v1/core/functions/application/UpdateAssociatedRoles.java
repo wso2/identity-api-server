@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.v1.AssociatedRolesConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
 import org.wso2.carbon.identity.application.common.model.RoleV2;
@@ -31,9 +33,15 @@ import java.util.stream.Collectors;
  */
 public class UpdateAssociatedRoles implements UpdateFunction<ServiceProvider, AssociatedRolesConfig> {
 
+    private static final Log log = LogFactory.getLog(UpdateAssociatedRoles.class);
+
     @Override
     public void apply(ServiceProvider serviceProvider, AssociatedRolesConfig associatedRolesConfig) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating associated roles config for application: " + 
+                serviceProvider.getApplicationName());
+        }
         org.wso2.carbon.identity.application.common.model.AssociatedRolesConfig rolesConfig =
                 new org.wso2.carbon.identity.application.common.model.AssociatedRolesConfig();
         if (associatedRolesConfig != null) {
@@ -47,5 +55,9 @@ public class UpdateAssociatedRoles implements UpdateFunction<ServiceProvider, As
             }
         }
         serviceProvider.setAssociatedRolesConfig(rolesConfig);
+        if (log.isDebugEnabled()) {
+            log.debug("Successfully updated associated roles config for application: " + 
+                serviceProvider.getApplicationName());
+        }
     }
 }

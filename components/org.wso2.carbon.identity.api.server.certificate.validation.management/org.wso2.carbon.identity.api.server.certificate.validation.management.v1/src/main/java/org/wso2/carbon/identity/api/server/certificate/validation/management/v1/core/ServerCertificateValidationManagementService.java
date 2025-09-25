@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.certificate.validation.management.v1.core;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.certificate.validation.management.v1.model.CACertificate;
 import org.wso2.carbon.identity.api.server.certificate.validation.management.v1.model.CACertificates;
 import org.wso2.carbon.identity.api.server.certificate.validation.management.v1.model.Validator;
@@ -28,6 +30,7 @@ import org.wso2.carbon.identity.x509Certificate.validation.exception.Certificate
 import org.wso2.carbon.identity.x509Certificate.validation.model.CACertificateInfo;
 import org.wso2.carbon.identity.x509Certificate.validation.service.CertificateValidationManagementService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.wso2.carbon.identity.api.server.certificate.validation.management.v1.util.ModelMapperUtil.mapApiModelToCertificateValidatorObject;
@@ -41,6 +44,7 @@ import static org.wso2.carbon.identity.api.server.certificate.validation.managem
  */
 public class ServerCertificateValidationManagementService {
 
+    private static final Log LOG = LogFactory.getLog(ServerCertificateValidationManagementService.class);
     private final CertificateValidationManagementService certificateValidationManagementService;
 
     public ServerCertificateValidationManagementService(CertificateValidationManagementService
@@ -50,14 +54,27 @@ public class ServerCertificateValidationManagementService {
     }
 
     /**
-     * Get the logger instance.
+     * Get validators.
+     *
+     * @return Validators.
      */
     public Validators getValidators() {
 
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving certificate validators for tenant: " + tenantDomain);
+        }
         try {
             List<org.wso2.carbon.identity.x509Certificate.validation.model.Validator> validators =
-                    certificateValidationManagementService.getValidators(ContextLoader.getTenantDomainFromContext());
+                    certificateValidationManagementService.getValidators(tenantDomain);
 
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully retrieved " + (validators != null ? validators.size() : 0) + 
+                         " validators for tenant: " + tenantDomain);
+            }
+            if (validators == null) {
+                validators = new ArrayList<>();
+            }
             return mapValidatorsToApiModel(validators);
         } catch (CertificateValidationManagementException e) {
             throw CertificateValidationMgtEndpointUtil.handleCertificateValidationMgtException(e);
@@ -72,11 +89,17 @@ public class ServerCertificateValidationManagementService {
      */
     public Validator getValidator(String name) {
 
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving certificate validator with name: " + name + " for tenant: " + tenantDomain);
+        }
         try {
             org.wso2.carbon.identity.x509Certificate.validation.model.Validator validator =
-                    certificateValidationManagementService
-                            .getValidator(name, ContextLoader.getTenantDomainFromContext());
+                    certificateValidationManagementService.getValidator(name, tenantDomain);
 
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully retrieved validator: " + name + " for tenant: " + tenantDomain);
+            }
             return mapValidatorToApiModel(validator);
         } catch (CertificateValidationManagementException e) {
             throw CertificateValidationMgtEndpointUtil.handleCertificateValidationMgtException(e);
@@ -92,12 +115,17 @@ public class ServerCertificateValidationManagementService {
      */
     public Validator updateValidator(String validatorName, Validator validator) {
 
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating certificate validator: " + validatorName + " for tenant: " + tenantDomain);
+        }
         try {
             org.wso2.carbon.identity.x509Certificate.validation.model.Validator updatedValidator =
                     certificateValidationManagementService
                             .updateValidator(mapApiModelToCertificateValidatorObject(validator, validatorName),
-                                    ContextLoader.getTenantDomainFromContext());
+                                    tenantDomain);
 
+            LOG.info("Successfully updated certificate validator: " + validatorName + " for tenant: " + tenantDomain);
             return mapValidatorToApiModel(updatedValidator);
         } catch (CertificateValidationManagementException e) {
             throw CertificateValidationMgtEndpointUtil.handleCertificateValidationMgtException(e);
@@ -111,10 +139,21 @@ public class ServerCertificateValidationManagementService {
      */
     public CACertificates getCACertificates() {
 
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving CA certificates for tenant: " + tenantDomain);
+        }
         try {
             List<CACertificateInfo> caCertificates = certificateValidationManagementService
-                    .getCACertificates(ContextLoader.getTenantDomainFromContext());
+                    .getCACertificates(tenantDomain);
 
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully retrieved " + (caCertificates != null ? caCertificates.size() : 0) + 
+                         " CA certificates for tenant: " + tenantDomain);
+            }
+            if (caCertificates == null) {
+                caCertificates = new ArrayList<>();
+            }
             return mapCACertificatesToApiModel(caCertificates);
         } catch (CertificateValidationManagementException e) {
             throw CertificateValidationMgtEndpointUtil.handleCertificateValidationMgtException(e);
@@ -129,10 +168,17 @@ public class ServerCertificateValidationManagementService {
      */
     public CACertificate getCertificate(String certificateId) {
 
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving CA certificate with ID: " + certificateId + " for tenant: " + tenantDomain);
+        }
         try {
             CACertificateInfo caCertificate = certificateValidationManagementService
-                    .getCACertificate(certificateId, ContextLoader.getTenantDomainFromContext());
+                    .getCACertificate(certificateId, tenantDomain);
 
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully retrieved CA certificate: " + certificateId + " for tenant: " + tenantDomain);
+            }
             return mapCACertificateToApiModel(caCertificate);
         } catch (CertificateValidationManagementException e) {
             throw CertificateValidationMgtEndpointUtil.handleCertificateValidationMgtException(e);
@@ -147,11 +193,20 @@ public class ServerCertificateValidationManagementService {
      */
     public CACertificate addCACertificate(String caCertificate) {
 
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Adding CA certificate for tenant: " + tenantDomain);
+        }
         try {
             CACertificateInfo addedCACertificate = certificateValidationManagementService
-                    .addCACertificate(caCertificate,
-                            ContextLoader.getTenantDomainFromContext());
+                    .addCACertificate(caCertificate, tenantDomain);
 
+            LOG.info("Successfully added CA certificate with ID: " + (addedCACertificate != null ? 
+                     addedCACertificate.getCertId() : "null") + " for tenant: " + tenantDomain);
+            if (addedCACertificate == null) {
+                throw new CertificateValidationManagementException(
+                    "Failed to retrieve added CA certificate information");
+            }
             return mapCACertificateToApiModel(addedCACertificate);
         } catch (CertificateValidationManagementException e) {
             throw CertificateValidationMgtEndpointUtil.handleCertificateValidationMgtException(e);
@@ -167,11 +222,15 @@ public class ServerCertificateValidationManagementService {
      */
     public CACertificate updateCACertificate(String certificateId, String caCertificate) {
 
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating CA certificate with ID: " + certificateId + " for tenant: " + tenantDomain);
+        }
         try {
             CACertificateInfo updatedCACertificate = certificateValidationManagementService
-                    .updateCACertificate(certificateId, caCertificate,
-                            ContextLoader.getTenantDomainFromContext());
+                    .updateCACertificate(certificateId, caCertificate, tenantDomain);
 
+            LOG.info("Successfully updated CA certificate: " + certificateId + " for tenant: " + tenantDomain);
             return mapCACertificateToApiModel(updatedCACertificate);
         } catch (CertificateValidationManagementException e) {
             throw CertificateValidationMgtEndpointUtil.handleCertificateValidationMgtException(e);
@@ -185,9 +244,13 @@ public class ServerCertificateValidationManagementService {
      */
     public void deleteCACertificate(String certificateId) {
 
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deleting CA certificate with ID: " + certificateId + " for tenant: " + tenantDomain);
+        }
         try {
-            certificateValidationManagementService.deleteCACertificate(certificateId,
-                    ContextLoader.getTenantDomainFromContext());
+            certificateValidationManagementService.deleteCACertificate(certificateId, tenantDomain);
+            LOG.info("Successfully deleted CA certificate: " + certificateId + " for tenant: " + tenantDomain);
         } catch (CertificateValidationManagementException e) {
             throw CertificateValidationMgtEndpointUtil.handleCertificateValidationMgtException(e);
         }

@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.cors.v1.function;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.cors.v1.model.CORSOriginObject;
 import org.wso2.carbon.identity.cors.mgt.core.model.CORSOrigin;
 
@@ -28,9 +30,21 @@ import java.util.function.Function;
  */
 public class CORSOriginToCORSOriginObject implements Function<CORSOrigin, CORSOriginObject> {
 
+    private static final Log log = LogFactory.getLog(CORSOriginToCORSOriginObject.class);
+
     @Override
     public CORSOriginObject apply(CORSOrigin corsOrigin) {
 
+        if (corsOrigin == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("CORS origin is null, returning null");
+            }
+            return null;
+        }
+        
+        if (log.isDebugEnabled()) {
+            log.debug("Converting CORS origin: " + corsOrigin.getOrigin());
+        }
         CORSOriginObject corsOriginGetObject = new CORSOriginObject();
         corsOriginGetObject.setId(corsOrigin.getId());
         corsOriginGetObject.setUrl(corsOrigin.getOrigin());
