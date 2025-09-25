@@ -16,36 +16,51 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.api.server.credential.management.common.internal;
+package org.wso2.carbon.identity.api.server.credential.management.common.impl;
 
+import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementServiceDataHolder;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants.CredentialTypes;
 import org.wso2.carbon.identity.api.server.credential.management.common.dto.CredentialDTO;
 import org.wso2.carbon.identity.api.server.credential.management.common.exception.CredentialMgtException;
-import org.wso2.carbon.identity.api.server.credential.management.common.service.CredentialHandler;
+import org.wso2.carbon.identity.api.server.credential.management.common.CredentialHandler;
 import org.wso2.carbon.identity.application.authenticator.fido2.core.WebAuthnService;
 import org.wso2.carbon.identity.application.authenticator.fido2.dto.FIDO2CredentialRegistration;
 import org.wso2.carbon.identity.application.authenticator.fido2.exception.FIDO2AuthenticatorClientException;
 import org.wso2.carbon.identity.application.authenticator.fido2.exception.FIDO2AuthenticatorServerException;
 import org.wso2.carbon.identity.api.server.credential.management.common.utils.CredentialManagementUtils;
+import org.wso2.carbon.user.api.UserRealm;
+import org.wso2.carbon.user.core.UserStoreException;
+import org.wso2.carbon.user.core.common.AbstractUserStoreManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Handler for managing passkey (FIDO2/WebAuthn) credentials.
+ */
 public class PasskeyCredentialHandler implements CredentialHandler {
+
+    private final WebAuthnService webAuthnService;
+
+    public PasskeyCredentialHandler() {
+
+        this.webAuthnService = CredentialManagementServiceDataHolder.getWebAuthnService();
+    }
 
     @Override
     public List<CredentialDTO> getCredentialsForUser(String userId) throws CredentialMgtException {
+
         try {
-            WebAuthnService webAuthnService = CredentialManagementServiceDataHolder.getWebAuthnService();
-            Collection<FIDO2CredentialRegistration> fido2Credentials = webAuthnService.getFIDO2DeviceMetaData(userId);
+            String username = getUsernameFromUserId(userId);
+            Collection<FIDO2CredentialRegistration> passkeyCredentials = webAuthnService.getFIDO2DeviceMetaData(username);
 
             List<CredentialDTO> credentialDTOs = new ArrayList<>();
 
-            for (FIDO2CredentialRegistration credential : fido2Credentials) {
-                credentialDTOs.add(mapFIDO2ToCredentialDTO(credential));
+            for (FIDO2CredentialRegistration credential : passkeyCredentials) {
+                credentialDTOs.add(mapPasskeyToCredentialDTO(credential));
             }
 
             return credentialDTOs;
@@ -57,9 +72,10 @@ public class PasskeyCredentialHandler implements CredentialHandler {
 
     @Override
     public void deleteCredentialForUser(String userId, String credentialId) throws CredentialMgtException {
+
         try {
-            WebAuthnService webAuthnService = CredentialManagementServiceDataHolder.getWebAuthnService();
-            webAuthnService.deregisterFIDO2Credential(credentialId);
+            String username = getUsernameFromUserId(userId);
+            webAuthnService.deregisterFIDO2Credential(credentialId, username);
         } catch (FIDO2AuthenticatorClientException e) {
             throw CredentialManagementUtils.handleClientException(
                     CredentialManagementConstants.ErrorMessages.ERROR_CODE_DELETE_PASSKEY_CREDENTIAL, e, userId);
@@ -69,14 +85,41 @@ public class PasskeyCredentialHandler implements CredentialHandler {
         }
     }
 
-    private CredentialDTO mapFIDO2ToCredentialDTO(FIDO2CredentialRegistration credential) {
-        CredentialDTO credentialDTO = new CredentialDTO();
-        if (credential.getCredential() != null && credential.getCredential().getCredentialId() != null) {
-            credentialDTO.setCredentialId(credential.getCredential().getCredentialId().getBase64Url());
-        }
-        credentialDTO.setDisplayName(credential.getDisplayName());
-        credentialDTO.setType(CredentialTypes.PASSKEY.getApiValue());
+    /**
+     * Map FIDO2CredentialRegistration to CredentialDTO.
+     *
+     * @param credential FIDO2CredentialRegistration object.
+     * @return CredentialDTO object.
+     */
+    private CredentialDTO mapPasskeyToCredentialDTO(FIDO2CredentialRegistration credential) {
 
-        return credentialDTO;
+        return new CredentialDTO.Builder()
+            .credentialId(credential.getCredential().getCredentialId().getBase64Url())
+            .displayName(credential.getDisplayName())
+            .type(CredentialTypes.PASSKEY.getApiValue())
+            .build();
+    }
+
+    /**
+     * Get username from user ID.
+     *
+     * @param userId User ID.
+     * @return Username.
+     * @throws CredentialMgtException Error while retrieving the username.
+     */
+    private String getUsernameFromUserId(String userId) throws CredentialMgtException {
+
+        try {
+            UserRealm userRealm = CarbonContext.getThreadLocalCarbonContext().getUserRealm();
+            AbstractUserStoreManager userStoreManager =
+                    (AbstractUserStoreManager) userRealm.getUserStoreManager();
+
+            return userStoreManager.getUserNameFromUserID(userId);
+        } catch (UserStoreException e) {
+            throw CredentialManagementUtils.handleServerException(
+                    CredentialManagementConstants.ErrorMessages.ERROR_CODE_GET_USERNAME_FROM_USERID, e, userId);
+        } catch (org.wso2.carbon.user.api.UserStoreException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

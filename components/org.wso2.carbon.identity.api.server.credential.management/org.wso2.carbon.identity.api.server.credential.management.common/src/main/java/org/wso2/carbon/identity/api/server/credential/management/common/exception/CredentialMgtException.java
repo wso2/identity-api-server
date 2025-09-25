@@ -34,6 +34,7 @@ public class CredentialMgtException extends Exception {
      * @param description Description of the exception.
      */
     public CredentialMgtException(String message, String errorCode, String description) {
+
         super(message);
         this.errorCode = errorCode;
         this.description = description;
@@ -48,6 +49,7 @@ public class CredentialMgtException extends Exception {
      * @param cause       Exception to be wrapped.
      */
     public CredentialMgtException(String message, String errorCode, String description, Throwable cause) {
+
         super(message, cause);
         this.errorCode = errorCode;
         this.description = description;
@@ -59,6 +61,7 @@ public class CredentialMgtException extends Exception {
      * @return Returns the {@code description}.
      */
     public String getDescription() {
+
         return description;
     }
 
@@ -68,6 +71,7 @@ public class CredentialMgtException extends Exception {
      * @return Returns the {@code errorCode}.
      */
     public String getErrorCode() {
+
         return errorCode;
     }
 
@@ -77,6 +81,7 @@ public class CredentialMgtException extends Exception {
      * @param errorCode The value to be set as the {@code errorCode}.
      */
     protected void setErrorCode(String errorCode) {
+
         this.errorCode = errorCode;
     }
 
@@ -86,6 +91,7 @@ public class CredentialMgtException extends Exception {
      * @param description The value to be set as the {@code description}.
      */
     protected void setDescription(String description) {
+
         this.description = description;
     }
 }

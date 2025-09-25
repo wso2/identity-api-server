@@ -897,8 +897,8 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.identity.outbound.auth.push</groupId>
-                <artifactId>org.wso2.carbon.identity.application.authenticator.push.device.handler</artifactId>
+                <groupId>org.wso2.carbon.identity.notification.push</groupId>
+                <artifactId>org.wso2.carbon.identity.notification.push.device.handler</artifactId>
                 <version>${identity.notification.push.version}</version>
             </dependency>
             <dependency>
@@ -1040,7 +1040,7 @@
         <tenant.resource.manager.version>1.5.55</tenant.resource.manager.version>
         <identity.verification.version>1.0.15</identity.verification.version>
         <identity.local.auth.fido.version>5.4.26</identity.local.auth.fido.version>
-        <identity.notification.push.version>0.1.5</identity.notification.push.version>
+        <identity.notification.push.version>1.0.6</identity.notification.push.version>
 
         <!-- Organization management core Version -->
         <org.wso2.carbon.identity.organization.management.core.version>1.1.41

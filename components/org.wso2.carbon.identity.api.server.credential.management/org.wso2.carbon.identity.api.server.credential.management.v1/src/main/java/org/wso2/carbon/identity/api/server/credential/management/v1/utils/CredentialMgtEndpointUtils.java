@@ -82,6 +82,7 @@ public class CredentialMgtEndpointUtils {
         }
 
         String description = StringUtils.isNotBlank(e.getDescription()) ? e.getDescription() : e.getMessage();
+
         return handleException(status, errorCode, e.getMessage(), description);
     }
 
@@ -112,9 +113,9 @@ public class CredentialMgtEndpointUtils {
 
         if (StringUtils.isBlank(value) || !CredentialTypes.fromString(value).isPresent()) {
             throw new CredentialMgtClientException(
-                    CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_CREDENTIAL_TYPE.getCode(),
-                    CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_CREDENTIAL_TYPE.getMessage(),
-                    CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_CREDENTIAL_TYPE.getDescription());
+                CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_CREDENTIAL_TYPE.getCode(),
+                CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_CREDENTIAL_TYPE.getMessage(),
+                CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_CREDENTIAL_TYPE.getDescription());
         }
     }
 
@@ -128,9 +129,9 @@ public class CredentialMgtEndpointUtils {
 
         if (StringUtils.isBlank(userId)) {
             throw new CredentialMgtClientException(
-                    CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_USER_ID.getCode(),
-                    CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_USER_ID.getMessage(),
-                    CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_USER_ID.getDescription());
+                CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_USER_ID.getCode(),
+                CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_USER_ID.getMessage(),
+                CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_USER_ID.getDescription());
         }
     }
 
@@ -144,12 +145,18 @@ public class CredentialMgtEndpointUtils {
 
         if (StringUtils.isBlank(credentialId)) {
             throw new CredentialMgtClientException(
-                    CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_CREDENTIAL_ID.getCode(),
-                    CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_CREDENTIAL_ID.getMessage(),
-                    CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_CREDENTIAL_ID.getDescription());
+                CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_CREDENTIAL_ID.getCode(),
+                CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_CREDENTIAL_ID.getMessage(),
+                CredentialMgtEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_CREDENTIAL_ID.getDescription());
         }
     }
 
+    /**
+     * Convert a list of CredentialDTO to a list of Credential response objects.
+     *
+     * @param credentialDTOS List of CredentialDTO objects.
+     * @return List of Credential response objects.
+     */
     public static List<Credential> toCredentialResponse(List<CredentialDTO> credentialDTOS) {
 
         if (credentialDTOS == null || credentialDTOS.isEmpty()) {
@@ -157,15 +164,21 @@ public class CredentialMgtEndpointUtils {
         }
 
         return credentialDTOS.stream()
-                .map(CredentialMgtEndpointUtils::toCredential)
-                .collect(Collectors.toList());
+            .map(CredentialMgtEndpointUtils::toCredential)
+            .collect(Collectors.toList());
     }
 
+    /**
+     * Convert a CredentialDTO to a Credential response object.
+     *
+     * @param dto CredentialDTO object.
+     * @return Credential response object.
+     */
     private static Credential toCredential(CredentialDTO dto) {
 
         Credential credential = new Credential()
-                .credentialId(dto.getCredentialId())
-                .displayName(dto.getDisplayName());
+            .credentialId(dto.getCredentialId())
+            .displayName(dto.getDisplayName());
 
         if (StringUtils.isNotBlank(dto.getType())) {
             try {

@@ -20,7 +20,9 @@ package org.wso2.carbon.identity.api.server.credential.management.v1;
 
 import javax.ws.rs.core.Response;
 
-
+/**
+ * Credential API Service.
+ */
 public interface CredentialApiService {
 
       public Response getCredentialsByUserId(String userId);

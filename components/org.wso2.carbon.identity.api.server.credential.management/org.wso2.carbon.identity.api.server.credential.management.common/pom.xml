@@ -42,9 +42,8 @@
             <artifactId>org.wso2.carbon.identity.application.authenticator.fido2</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.identity.outbound.auth.push</groupId>
-            <artifactId>org.wso2.carbon.identity.application.authenticator.push.device.handler</artifactId>
+            <groupId>org.wso2.carbon.identity.notification.push</groupId>
+            <artifactId>org.wso2.carbon.identity.notification.push.device.handler</artifactId>
         </dependency>
     </dependencies>
 </project>
-

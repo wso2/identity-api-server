@@ -18,32 +18,64 @@
 
 package org.wso2.carbon.identity.api.server.credential.management.common.dto;
 
+/**
+ * Credential Data Transfer Object.
+ */
 public class CredentialDTO {
-    private String credentialId;
-    private String displayName;
-    private String type;
+
+    private final String credentialId;
+    private final String displayName;
+    private final String type;
+
+    private CredentialDTO(Builder builder) {
+
+        this.credentialId = builder.credentialId;
+        this.displayName = builder.displayName;
+        this.type = builder.type;
+    }
 
     public String getCredentialId() {
+
         return credentialId;
     }
 
-    public void setCredentialId(String credentialId) {
-        this.credentialId = credentialId;
-    }
-
     public String getDisplayName() {
+
         return displayName;
     }
 
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
-
     public String getType() {
+
         return type;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public static class Builder {
+
+        private String credentialId;
+        private String displayName;
+        private String type;
+
+        public Builder credentialId(String credentialId) {
+
+            this.credentialId = credentialId;
+            return this;
+        }
+
+        public Builder displayName(String displayName) {
+
+            this.displayName = displayName;
+            return this;
+        }
+
+        public Builder type(String type) {
+
+            this.type = type;
+            return this;
+        }
+
+        public CredentialDTO build() {
+
+            return new CredentialDTO(this);
+        }
     }
 }
