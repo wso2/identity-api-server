@@ -151,7 +151,6 @@ public class FlowEndpointConstants {
         public static final String EMAIL_OTP_EXECUTOR = "EmailOTPExecutor";
         public static final String SMS_OTP_EXECUTOR = "SMSOTPExecutor";
         public static final String MAGIC_LINK_EXECUTOR = "MagicLinkExecutor";
-        public static final String PASSWORD_ONBOARD_EXECUTOR = "PasswordOnboardExecutor";
         public static final String CONFIRMATION_CODE_VALIDATION_EXECUTOR = "ConfirmationCodeValidationExecutor";
         public static final String USER_PROVISIONING_EXECUTOR = "UserProvisioningExecutor";
     }
