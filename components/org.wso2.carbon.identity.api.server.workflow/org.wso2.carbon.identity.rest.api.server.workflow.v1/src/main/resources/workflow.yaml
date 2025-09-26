@@ -936,6 +936,20 @@ components:
           $ref: "#/components/schemas/InstanceStatus"
         requestParameters:
           type: object
+        properties:
+          type: array
+          items:
+            $ref: "#/components/schemas/Property"
+
+    Property:
+      type: object
+      properties:
+        key:
+          type: string
+          example: some_key
+        value:
+          type: string
+          example: some_value
 
     InstanceStatus:
       type: string

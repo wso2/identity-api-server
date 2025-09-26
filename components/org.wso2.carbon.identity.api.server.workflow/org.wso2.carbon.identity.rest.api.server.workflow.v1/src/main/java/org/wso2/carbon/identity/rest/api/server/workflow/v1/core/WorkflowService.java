@@ -30,6 +30,7 @@ import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.InstanceStatus;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Operation;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.OptionDetails;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Property;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationListItem;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationListResponse;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationPatchRequest;
@@ -69,6 +70,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
@@ -690,6 +692,13 @@ public class WorkflowService {
         response.setWorkflowInstanceId(workflowRequest.getRequestId());
         response.setEventType(Operation.fromValue(workflowRequest.getOperationType()));
         response.setRequestInitiator(workflowRequest.getCreatedBy());
+
+        if (workflowRequest.getProperties() != null) {
+            List<Property> properties = workflowRequest.getProperties().stream().map(property ->
+                    new Property(property.getKey(), property.getValue())
+            ).collect(Collectors.toList());
+            response.setProperties(properties);
+        }
         try {
             if (workflowRequest.getCreatedAt() != null) {
                 response.setCreatedAt(workflowRequest.getCreatedAt());
