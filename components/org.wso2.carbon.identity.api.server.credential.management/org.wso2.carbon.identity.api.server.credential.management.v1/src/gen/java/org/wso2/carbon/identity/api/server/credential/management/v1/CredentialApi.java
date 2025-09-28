@@ -67,7 +67,6 @@ public class CredentialApi {
         @ApiResponse(code = 400, message = "Bad Request. The request is malformed, for example, due to an invalid user-id or device-id format.", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized. The request has not been applied because it lacks valid authentication credentials for the target resource.", response = Error.class),
         @ApiResponse(code = 403, message = "Forbidden. The server understood the request but refuses to authorize it. This can happen if the administrator lacks the required permissions or is trying to access a user outside of their organizational hierarchy.", response = Error.class),
-        @ApiResponse(code = 404, message = "Not Found. The user specified by the user-id or the device specified by the device-id does not exist.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error. An unexpected condition was encountered on the server.", response = Error.class)
     })
     public Response deleteCredentialById(@ApiParam(value = "The unique identifier of the user.", required=true) @PathParam("user-id") String userId, @ApiParam(value = "The type of the credential.",required=true, allowableValues="passkey, push-auth", defaultValue="null") @PathParam("type") String type, @ApiParam(value = "The unique identifier of the device to be deleted.",required=true) @PathParam("credential-id") String credentialId) {
