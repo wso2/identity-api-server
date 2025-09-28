@@ -79,21 +79,21 @@ public class CredentialManagementConstants {
 
         // Server errors.
         ERROR_CODE_GET_PASSKEYS("65001", "Error retrieving registered passkeys.",
-                "Unexpected server error while fetching registered passkeys for user: %id."),
+                "Unexpected server error while fetching registered passkeys for user: %s."),
         ERROR_CODE_DELETE_PASSKEYS("65002", "Error deleting registered passkey.",
-                "Unexpected server error while deleting registered passkey: %credentialId for user: %id."),
+                "Unexpected server error while deleting registered passkey: %credentialId for user: %s."),
         ERROR_CODE_GET_PUSH_AUTH_DEVICE("65003", "Error retrieving registered push auth devices.",
-                "Unexpected server error while fetching registered push auth device for user: %id."),
+                "Unexpected server error while fetching registered push auth device for user: %s."),
         ERROR_CODE_DELETE_PUSH_AUTH_DEVICE("65004", "Error deleting registered push auth devices.",
-                "Unexpected server error while deleting registered push auth device: %credentialId for user: %id."),
+                "Unexpected server error while deleting registered push auth device: %s for user: %s."),
 
         // Client errors.
         ERROR_CODE_DELETE_PASSKEY_CREDENTIAL("60001", "Error deleting credential.",
-                "The request to delete the passkey credential: %credentialId  was invalid."),
+                "The request to delete the passkey credential: %s  was invalid."),
         ERROR_CODE_DELETE_PUSH_AUTH_CREDENTIAL("60002", "Error deleting credential.",
-                "The request to delete the push auth credential: %credentialId  was invalid."),
+                "The request to delete the push auth credential: %s  was invalid."),
         ERROR_CODE_GET_USERNAME_FROM_USERID("60003", "Error retrieving username from user ID.",
-                "The request to retrieve the username from the user ID: %id was invalid."),;
+                "The request to retrieve the username from the user ID: %s was invalid."),;
 
         private static final String ERROR_PREFIX = "CM";
         public static final String ERROR_CODE_PUSH_AUTH_DEVICE_NOT_FOUND = "PDH-15010";

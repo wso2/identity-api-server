@@ -74,8 +74,8 @@ public class PushCredentialHandler implements CredentialHandler {
         try {
             deviceHandler.unregisterDevice(credentialId);
         } catch (PushDeviceHandlerClientException e) {
-            throw CredentialManagementUtils.handleClientException(
-                    CredentialManagementConstants.ErrorMessages.ERROR_CODE_DELETE_PUSH_AUTH_CREDENTIAL, e, userId);
+            throw CredentialManagementUtils.handleClientException(CredentialManagementConstants.ErrorMessages
+                    .ERROR_CODE_DELETE_PUSH_AUTH_CREDENTIAL, e, credentialId);
         } catch (PushDeviceHandlerException e) {
             throw CredentialManagementUtils.handleServerException(
                     CredentialManagementConstants.ErrorMessages.ERROR_CODE_DELETE_PUSH_AUTH_DEVICE, e, userId);
