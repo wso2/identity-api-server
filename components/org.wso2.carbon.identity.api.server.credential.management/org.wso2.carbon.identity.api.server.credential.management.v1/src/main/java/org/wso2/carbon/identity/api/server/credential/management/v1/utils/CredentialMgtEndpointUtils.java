@@ -31,12 +31,14 @@ import org.wso2.carbon.identity.api.server.credential.management.common.exceptio
 import org.wso2.carbon.identity.api.server.credential.management.v1.Credential;
 import org.wso2.carbon.identity.api.server.credential.management.v1.constants.CredentialMgtEndpointConstants;
 
-import javax.ws.rs.core.Response;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.ws.rs.core.Response;
 
-
+/**
+ * Utility class of Credential Management Endpoint.
+ */
 public class CredentialMgtEndpointUtils {
 
     private static final Log LOG = LogFactory.getLog(CredentialMgtEndpointUtils.class);

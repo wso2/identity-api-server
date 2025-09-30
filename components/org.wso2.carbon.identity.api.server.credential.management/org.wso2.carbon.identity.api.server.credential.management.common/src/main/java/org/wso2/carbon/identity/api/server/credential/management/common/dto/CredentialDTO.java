@@ -49,6 +49,9 @@ public class CredentialDTO {
         return type;
     }
 
+    /**
+     * Builder class for CredentialDTO.
+     */
     public static class Builder {
 
         private String credentialId;

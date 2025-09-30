@@ -20,6 +20,7 @@ package org.wso2.carbon.identity.api.server.credential.management.common;
 
 import org.wso2.carbon.identity.api.server.credential.management.common.dto.CredentialDTO;
 import org.wso2.carbon.identity.api.server.credential.management.common.exception.CredentialMgtException;
+
 import java.util.List;
 
 /**
