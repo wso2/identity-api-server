@@ -18,15 +18,16 @@
 
 package org.wso2.carbon.identity.api.server.credential.management.common.impl;
 
+import org.wso2.carbon.identity.api.server.credential.management.common.CredentialHandler;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants.CredentialTypes;
+import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementService;
 import org.wso2.carbon.identity.api.server.credential.management.common.dto.CredentialDTO;
 import org.wso2.carbon.identity.api.server.credential.management.common.exception.CredentialMgtException;
-import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementService;
-import org.wso2.carbon.identity.api.server.credential.management.common.CredentialHandler;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -64,7 +65,8 @@ public class CredentialManagementServiceImpl implements CredentialManagementServ
     public void deleteCredentialForUser(String userId, String type, String credentialId)
             throws CredentialMgtException {
 
-        CredentialTypes credentialType = CredentialTypes.valueOf(type.replace("-", "_").toUpperCase());
+        CredentialTypes credentialType = CredentialTypes.valueOf(type.replace("-", "_")
+                .toUpperCase(Locale.ROOT));
 
         CredentialHandler handler = handlerMap.get(credentialType);
         handler.deleteCredentialForUser(userId, credentialId);

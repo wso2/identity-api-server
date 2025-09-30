@@ -19,17 +19,17 @@
 package org.wso2.carbon.identity.api.server.credential.management.common.impl;
 
 import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.identity.api.server.credential.management.common.CredentialHandler;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants;
-import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementServiceDataHolder;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants.CredentialTypes;
+import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementServiceDataHolder;
 import org.wso2.carbon.identity.api.server.credential.management.common.dto.CredentialDTO;
 import org.wso2.carbon.identity.api.server.credential.management.common.exception.CredentialMgtException;
-import org.wso2.carbon.identity.api.server.credential.management.common.CredentialHandler;
+import org.wso2.carbon.identity.api.server.credential.management.common.utils.CredentialManagementUtils;
 import org.wso2.carbon.identity.application.authenticator.fido2.core.WebAuthnService;
 import org.wso2.carbon.identity.application.authenticator.fido2.dto.FIDO2CredentialRegistration;
 import org.wso2.carbon.identity.application.authenticator.fido2.exception.FIDO2AuthenticatorClientException;
 import org.wso2.carbon.identity.application.authenticator.fido2.exception.FIDO2AuthenticatorServerException;
-import org.wso2.carbon.identity.api.server.credential.management.common.utils.CredentialManagementUtils;
 import org.wso2.carbon.user.api.UserRealm;
 import org.wso2.carbon.user.core.UserStoreException;
 import org.wso2.carbon.user.core.common.AbstractUserStoreManager;
@@ -55,7 +55,8 @@ public class PasskeyCredentialHandler implements CredentialHandler {
 
         try {
             String username = getUsernameFromUserId(userId);
-            Collection<FIDO2CredentialRegistration> passkeyCredentials = webAuthnService.getFIDO2DeviceMetaData(username);
+            Collection<FIDO2CredentialRegistration> passkeyCredentials = webAuthnService
+                    .getFIDO2DeviceMetaData(username);
 
             List<CredentialDTO> credentialDTOs = new ArrayList<>();
 

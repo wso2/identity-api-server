@@ -19,12 +19,12 @@
 package org.wso2.carbon.identity.api.server.credential.management.common.impl;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.api.server.credential.management.common.CredentialHandler;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants;
-import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementServiceDataHolder;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants.CredentialTypes;
+import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementServiceDataHolder;
 import org.wso2.carbon.identity.api.server.credential.management.common.dto.CredentialDTO;
 import org.wso2.carbon.identity.api.server.credential.management.common.exception.CredentialMgtException;
-import org.wso2.carbon.identity.api.server.credential.management.common.CredentialHandler;
 import org.wso2.carbon.identity.api.server.credential.management.common.utils.CredentialManagementUtils;
 import org.wso2.carbon.identity.notification.push.device.handler.DeviceHandlerService;
 import org.wso2.carbon.identity.notification.push.device.handler.exception.PushDeviceHandlerClientException;

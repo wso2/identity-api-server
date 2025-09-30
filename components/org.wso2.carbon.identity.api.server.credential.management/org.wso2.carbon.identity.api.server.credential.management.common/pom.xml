@@ -45,5 +45,21 @@
             <groupId>org.wso2.carbon.identity.notification.push</groupId>
             <artifactId>org.wso2.carbon.identity.notification.push.device.handler</artifactId>
         </dependency>
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-testng</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

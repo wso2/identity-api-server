@@ -18,7 +18,9 @@
 
 package org.wso2.carbon.identity.api.server.credential.management.common;
 
+import java.text.Collator;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Optional;
 
 /**
@@ -30,6 +32,9 @@ public class CredentialManagementConstants {
 
     }
 
+    /**
+     * Enum for supported credential types.
+     */
     public enum CredentialTypes {
         PASSKEY("passkey"),
         PUSH_AUTH("push-auth");
@@ -65,9 +70,12 @@ public class CredentialManagementConstants {
                 return Optional.empty();
             }
 
+            Collator collator = Collator.getInstance(Locale.ROOT);
+            collator.setStrength(Collator.PRIMARY);
+
             return Arrays.stream(values())
-                    .filter(type -> type.name().equalsIgnoreCase(candidate)
-                            || type.getApiValue().equalsIgnoreCase(candidate))
+                    .filter(type -> collator.compare(type.name(), candidate) == 0
+                            || collator.compare(type.getApiValue(), candidate) == 0)
                     .findFirst();
         }
     }
@@ -93,7 +101,8 @@ public class CredentialManagementConstants {
         ERROR_CODE_DELETE_PUSH_AUTH_CREDENTIAL("60002", "Error deleting credential.",
                 "The request to delete the push auth credential: %s  was invalid."),
         ERROR_CODE_GET_USERNAME_FROM_USERID("60003", "Error retrieving username from user ID.",
-                "The request to retrieve the username from the user ID: %s was invalid."),;
+                "The request to retrieve the username from the user ID: %s was invalid."),
+        ;
 
         private static final String ERROR_PREFIX = "CM";
         public static final String ERROR_CODE_PUSH_AUTH_DEVICE_NOT_FOUND = "PDH-15010";
