@@ -840,6 +840,12 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-testng</artifactId>
+                <version>${mockito-testng.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
                 <artifactId>org.wso2.carbon.identity.api.server.application.management.v1</artifactId>
                 <version>${project.version}</version>
@@ -1040,7 +1046,7 @@
         <tenant.resource.manager.version>1.5.55</tenant.resource.manager.version>
         <identity.verification.version>1.0.15</identity.verification.version>
         <identity.local.auth.fido.version>5.4.26</identity.local.auth.fido.version>
-        <identity.notification.push.version>1.0.7</identity.notification.push.version>
+        <identity.notification.push.version>1.0.7-SNAPSHOT</identity.notification.push.version>
 
         <!-- Organization management core Version -->
         <org.wso2.carbon.identity.organization.management.core.version>1.1.41
@@ -1061,6 +1067,7 @@
         <!-- Unit test versions -->
         <testng.version>6.9.10</testng.version>
         <mockito-core.version>4.6.1</mockito-core.version>
+        <mockito-testng.version>0.5.2</mockito-testng.version>
         <jacoco.version>0.8.2</jacoco.version>
         <h2database.version>2.2.220</h2database.version>
     </properties>

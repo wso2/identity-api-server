@@ -63,7 +63,6 @@ public enum TypeEnum {
 }
 
     private TypeEnum type;
-    private java.util.Date registeredAt;
 
     /**
     * The unique identifier for the credential.
@@ -122,27 +121,6 @@ public enum TypeEnum {
         this.type = type;
     }
 
-    /**
-    * The timestamp when the credential was registered.
-    **/
-    public Credential registeredAt(java.util.Date registeredAt) {
-
-        this.registeredAt = registeredAt;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "2023-10-27T10:00Z", value = "The timestamp when the credential was registered.")
-    @JsonProperty("registeredAt")
-    @Valid
-    public java.util.Date getRegisteredAt() {
-        return registeredAt;
-    }
-    public void setRegisteredAt(java.util.Date registeredAt) {
-        this.registeredAt = registeredAt;
-    }
-
-
-
     @Override
     public boolean equals(java.lang.Object o) {
 
@@ -155,13 +133,12 @@ public enum TypeEnum {
         Credential credential = (Credential) o;
         return Objects.equals(this.credentialId, credential.credentialId) &&
             Objects.equals(this.displayName, credential.displayName) &&
-            Objects.equals(this.type, credential.type) &&
-            Objects.equals(this.registeredAt, credential.registeredAt);
+            Objects.equals(this.type, credential.type);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(credentialId, displayName, type, registeredAt);
+        return Objects.hash(credentialId, displayName, type);
     }
 
     @Override
@@ -173,7 +150,6 @@ public enum TypeEnum {
         sb.append("    credentialId: ").append(toIndentedString(credentialId)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
-        sb.append("    registeredAt: ").append(toIndentedString(registeredAt)).append("\n");
         sb.append("}");
         return sb.toString();
     }

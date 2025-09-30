@@ -18,9 +18,9 @@
 
 package org.wso2.carbon.identity.api.server.credential.management.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.application.authenticator.fido2.core.WebAuthnService;
 import org.wso2.carbon.identity.notification.push.device.handler.DeviceHandlerService;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 
 /**
  * Service holder class for credential management related services.

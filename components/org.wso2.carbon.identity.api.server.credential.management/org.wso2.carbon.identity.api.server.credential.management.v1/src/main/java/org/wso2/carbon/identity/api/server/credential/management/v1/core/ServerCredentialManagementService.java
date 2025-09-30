@@ -18,9 +18,9 @@
 
 package org.wso2.carbon.identity.api.server.credential.management.v1.core;
 
+import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementService;
 import org.wso2.carbon.identity.api.server.credential.management.common.dto.CredentialDTO;
 import org.wso2.carbon.identity.api.server.credential.management.common.exception.CredentialMgtException;
-import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementService;
 import org.wso2.carbon.identity.api.server.credential.management.v1.utils.CredentialMgtEndpointUtils;
 
 import java.util.List;
