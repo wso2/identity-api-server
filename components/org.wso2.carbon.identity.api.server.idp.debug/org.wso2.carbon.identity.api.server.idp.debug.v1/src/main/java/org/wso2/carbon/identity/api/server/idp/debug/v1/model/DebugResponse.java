@@ -82,47 +82,47 @@ public class DebugResponse {
     @ApiModel(description = "Authentication result details")
     public static class AuthenticationResult {
         @JsonProperty("success")
-        private Boolean success;
+        private boolean success;
 
         @JsonProperty("userExists")
-        private Boolean userExists;
+        private boolean userExists;
 
         @JsonProperty("userDetails")
-        private Map<String, String> userDetails;
+        private String userDetails;
 
         @JsonProperty("responseTime")
-        private Long responseTime;
+        private long responseTime;
 
         // Getters and setters
-        public Boolean getSuccess() {
+        public boolean isSuccess() {
             return success;
         }
         
-        public void setSuccess(Boolean success) {
+        public void setSuccess(boolean success) {
             this.success = success;
         }
         
-        public Boolean getUserExists() {
+        public boolean isUserExists() {
             return userExists;
         }
         
-        public void setUserExists(Boolean userExists) {
+        public void setUserExists(boolean userExists) {
             this.userExists = userExists;
         }
         
-        public Map<String, String> getUserDetails() {
+        public String getUserDetails() {
             return userDetails;
         }
         
-        public void setUserDetails(Map<String, String> userDetails) {
+        public void setUserDetails(String userDetails) {
             this.userDetails = userDetails;
         }
         
-        public Long getResponseTime() {
+        public long getResponseTime() {
             return responseTime;
         }
         
-        public void setResponseTime(Long responseTime) {
+        public void setResponseTime(long responseTime) {
             this.responseTime = responseTime;
         }
     }
@@ -137,12 +137,6 @@ public class DebugResponse {
 
         @JsonProperty("mappedLocalClaims")
         private Map<String, String> mappedLocalClaims;
-
-        @JsonProperty("filteredClaims")
-        private Map<String, String> filteredClaims;
-
-        @JsonProperty("systemClaims")
-        private Map<String, String> systemClaims;
 
         @JsonProperty("mappingErrors")
         private List<String> mappingErrors;
@@ -164,22 +158,6 @@ public class DebugResponse {
             this.mappedLocalClaims = mappedLocalClaims;
         }
         
-        public Map<String, String> getFilteredClaims() {
-            return filteredClaims;
-        }
-        
-        public void setFilteredClaims(Map<String, String> filteredClaims) {
-            this.filteredClaims = filteredClaims;
-        }
-        
-        public Map<String, String> getSystemClaims() {
-            return systemClaims;
-        }
-        
-        public void setSystemClaims(Map<String, String> systemClaims) {
-            this.systemClaims = systemClaims;
-        }
-        
         public List<String> getMappingErrors() {
             return mappingErrors;
         }
@@ -195,7 +173,7 @@ public class DebugResponse {
     @ApiModel(description = "Authentication flow event captured by event listeners")
     public static class FlowEvent {
         @JsonProperty("timestamp")
-        private Long timestamp;
+        private long timestamp;
 
         @JsonProperty("eventType")
         private String eventType;
@@ -203,21 +181,21 @@ public class DebugResponse {
         @JsonProperty("step")
         private String step;
 
+        @JsonProperty("success")
+        private boolean success;
+
         @JsonProperty("authenticator")
         private String authenticator;
 
         @JsonProperty("data")
-        private Map<String, Object> data;
-
-        @JsonProperty("success")
-        private Boolean success;
+        private Object data;
 
         // Getters and setters
-        public Long getTimestamp() {
+        public long getTimestamp() {
             return timestamp;
         }
         
-        public void setTimestamp(Long timestamp) {
+        public void setTimestamp(long timestamp) {
             this.timestamp = timestamp;
         }
         
@@ -237,6 +215,14 @@ public class DebugResponse {
             this.step = step;
         }
         
+        public boolean isSuccess() {
+            return success;
+        }
+        
+        public void setSuccess(boolean success) {
+            this.success = success;
+        }
+        
         public String getAuthenticator() {
             return authenticator;
         }
@@ -245,20 +231,12 @@ public class DebugResponse {
             this.authenticator = authenticator;
         }
         
-        public Map<String, Object> getData() {
+        public Object getData() {
             return data;
         }
         
-        public void setData(Map<String, Object> data) {
+        public void setData(Object data) {
             this.data = data;
-        }
-        
-        public Boolean getSuccess() {
-            return success;
-        }
-        
-        public void setSuccess(Boolean success) {
-            this.success = success;
         }
     }
 
@@ -275,9 +253,6 @@ public class DebugResponse {
 
         @JsonProperty("step")
         private String step;
-
-        @JsonProperty("details")
-        private Map<String, Object> details;
 
         // Getters and setters
         public String getCode() {
@@ -302,14 +277,6 @@ public class DebugResponse {
         
         public void setStep(String step) {
             this.step = step;
-        }
-        
-        public Map<String, Object> getDetails() {
-            return details;
-        }
-        
-        public void setDetails(Map<String, Object> details) {
-            this.details = details;
         }
     }
 

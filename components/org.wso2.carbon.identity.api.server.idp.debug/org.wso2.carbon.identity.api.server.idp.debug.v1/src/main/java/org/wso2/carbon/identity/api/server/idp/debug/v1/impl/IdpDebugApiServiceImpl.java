@@ -21,13 +21,10 @@ package org.wso2.carbon.identity.api.server.idp.debug.v1.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.idp.debug.v1.IdpDebugApi;
-import org.wso2.carbon.identity.dfdp.core.DFDPService;
-import org.wso2.carbon.identity.application.authentication.framework.handler.request.impl.DefaultRequestCoordinator;
-import org.wso2.carbon.identity.application.authentication.framework.context.AuthenticationContext;
-import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkUtils;
-import org.wso2.carbon.identity.application.authentication.framework.cache.AuthenticationContextCache;
-import org.wso2.carbon.identity.application.authentication.framework.cache.AuthenticationContextCacheKey;
-import org.wso2.carbon.identity.application.authentication.framework.cache.AuthenticationContextCacheEntry;
+import org.wso2.carbon.identity.debug.framework.DebugFlowService;
+import org.wso2.carbon.idp.mgt.IdentityProviderManager;
+import org.wso2.carbon.identity.application.common.model.IdentityProvider;
+import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 
 
 import java.util.HashMap;
@@ -38,7 +35,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -53,7 +49,6 @@ import javax.servlet.http.HttpServletResponse;
 public class IdpDebugApiServiceImpl implements IdpDebugApi {
 
     private static final Log LOG = LogFactory.getLog(IdpDebugApiServiceImpl.class);
-    //private final DFDPService dfdpService;
 
     @Context
     private HttpServletRequest request;
@@ -64,15 +59,18 @@ public class IdpDebugApiServiceImpl implements IdpDebugApi {
         //this.dfdpService = new DFDPService();
     }
 
+    /**
+     * Handles the debug authentication flow request.
+     *
+     * @return Response containing debug flow results.
+     */
     @Override
-    @GET
     @POST
-    @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
     public Response debug() {
         try {
             // Parse query parameters from the request.
-            String idpName = request.getParameter("idpName");
+            String idpResourceId = request.getParameter("idpResourceId");
             String authenticatorName = request.getParameter("authenticatorName");
             String username = request.getParameter("username");
             String password = request.getParameter("password");
@@ -82,116 +80,42 @@ public class IdpDebugApiServiceImpl implements IdpDebugApi {
             }
 
             // Validate required parameters.
-            if (idpName == null || authenticatorName == null || username == null || password == null) {
+            if (idpResourceId == null || authenticatorName == null || username == null || password == null) {
                 Map<String, Object> error = new HashMap<>();
                 error.put("status", "error");
-                error.put("message", "Missing required parameters: idpName, authenticatorName, username, password");
+                error.put("message", "Missing required parameters: idpResourceId, authenticatorName, username, password");
                 return Response.status(Response.Status.BAD_REQUEST).entity(error).build();
             }
 
-            // Create and configure AuthenticationContext.
-            AuthenticationContext authContext = new AuthenticationContext();
-            authContext.setRequestType("DFDP_DEBUG");
-            authContext.setCallerSessionKey(java.util.UUID.randomUUID().toString());
-            authContext.setProperty("idpName", idpName);
-            authContext.setProperty("authenticatorName", authenticatorName);
-            authContext.setProperty("username", username);
-            authContext.setProperty("password", password);
-            authContext.setTenantDomain("carbon.super");
-            authContext.setRelyingParty("DFDP_DEBUG_SP");
-            authContext.setProperty("IS_DEBUG_FLOW", Boolean.TRUE);
-            request.setAttribute("sessionDataKey", sessionDataKey);
-            request.setAttribute("AuthenticationContext", authContext);
-            request.setAttribute("DFDP_API_FLOW", Boolean.TRUE);
-            String debugSessionId = java.util.UUID.randomUUID().toString();
-            request.setAttribute("DFDP_DEBUG_SESSION_ID", debugSessionId);
-
-            // Ensure SequenceConfig is set to avoid NPE in framework.
-            if (authContext.getSequenceConfig() == null) {
-                org.wso2.carbon.identity.application.authentication.framework.config.model.SequenceConfig sequenceConfig =
-                        new org.wso2.carbon.identity.application.authentication.framework.config.model.SequenceConfig();
-                sequenceConfig.setName("DFDP_DEBUG_SEQUENCE");
-                sequenceConfig.setApplicationId("DFDP_DEBUG_SP");
-                org.wso2.carbon.identity.application.authentication.framework.config.model.StepConfig stepConfig =
-                        new org.wso2.carbon.identity.application.authentication.framework.config.model.StepConfig();
-                stepConfig.setOrder(1);
-                stepConfig.setSubjectIdentifierStep(true);
-                stepConfig.setSubjectAttributeStep(true);
-                org.wso2.carbon.identity.application.authentication.framework.config.model.AuthenticatorConfig authenticatorConfig =
-                        new org.wso2.carbon.identity.application.authentication.framework.config.model.AuthenticatorConfig();
-                authenticatorConfig.setName(authenticatorName);
-                authenticatorConfig.setEnabled(true);
-                java.util.List<String> idpNames = new java.util.ArrayList<>();
-                idpNames.add(idpName);
-                authenticatorConfig.setIdPNames(idpNames);
-                java.util.Map<String, org.wso2.carbon.identity.application.common.model.IdentityProvider> idps = new java.util.HashMap<>();
-                org.wso2.carbon.identity.application.common.model.IdentityProvider idpObj = new org.wso2.carbon.identity.application.common.model.IdentityProvider();
-                idpObj.setIdentityProviderName(idpName);
-                org.wso2.carbon.identity.application.common.model.FederatedAuthenticatorConfig fedAuthConfig =
-                        new org.wso2.carbon.identity.application.common.model.FederatedAuthenticatorConfig();
-                fedAuthConfig.setName(authenticatorName);
-                fedAuthConfig.setEnabled(true);
-                idpObj.setFederatedAuthenticatorConfigs(new org.wso2.carbon.identity.application.common.model.FederatedAuthenticatorConfig[]{fedAuthConfig});
-                idpObj.setDefaultAuthenticatorConfig(fedAuthConfig);
-                idps.put(idpName, idpObj);
-                authenticatorConfig.setIdPs(idps);
-                stepConfig.setAuthenticatorList(java.util.Collections.singletonList(authenticatorConfig));
-                java.util.Map<Integer, org.wso2.carbon.identity.application.authentication.framework.config.model.StepConfig> stepMap =
-                        new java.util.HashMap<>();
-                stepMap.put(1, stepConfig);
-                sequenceConfig.setStepMap(stepMap);
-                org.wso2.carbon.identity.application.common.model.ServiceProvider sp =
-                        new org.wso2.carbon.identity.application.common.model.ServiceProvider();
-                sp.setApplicationName("DFDP_DEBUG_SP");
-                sp.setApplicationResourceId("DFDP_DEBUG_SP_RESOURCE_ID");
-                org.wso2.carbon.identity.application.authentication.framework.config.model.ApplicationConfig appConfig =
-                        new org.wso2.carbon.identity.application.authentication.framework.config.model.ApplicationConfig(sp, "carbon.super");
-                sequenceConfig.setApplicationConfig(appConfig);
-                authContext.setSequenceConfig(sequenceConfig);
-                authContext.setProperty("ServiceProviderResourceId", "DFDP_DEBUG_SP_RESOURCE_ID");
+            // Fetch IdP object using idp-mgt by resourceId.
+            IdentityProviderManager idpManager = IdentityProviderManager.getInstance();
+            IdentityProvider idpObj;
+            try {
+                idpObj = idpManager.getIdPByResourceId(idpResourceId, "carbon.super", true);
+            } catch (IdentityProviderManagementException e) {
+                Map<String, Object> error = new HashMap<>();
+                error.put("status", "error");
+                error.put("message", "Invalid IdP resourceId: " + e.getMessage());
+                return Response.status(Response.Status.BAD_REQUEST).entity(error).build();
+            }
+            if (idpObj == null) {
+                Map<String, Object> error = new HashMap<>();
+                error.put("status", "error");
+                error.put("message", "Identity Provider not found for resourceId: " + idpResourceId);
+                return Response.status(Response.Status.NOT_FOUND).entity(error).build();
             }
 
-            // Set the context identifier to match the sessionDataKey for framework compatibility.
-            authContext.setContextIdentifier(sessionDataKey);
+            // Delegate debug flow logic to DebugFlowService in debug-framework.
+            DebugFlowService debugFlowService = new DebugFlowService();
+            Map<String, Object> debugResults = debugFlowService.executeDebugFlow(
+                idpObj, authenticatorName, username, password, sessionDataKey, request, response);
 
-            // Add AuthenticationContext to cache so the framework can find it.
-            final String finalSessionDataKey = sessionDataKey;
-            AuthenticationContextCacheKey cacheKey = new AuthenticationContextCacheKey(finalSessionDataKey);
-            AuthenticationContextCacheEntry cacheEntry = new AuthenticationContextCacheEntry(authContext);
-            AuthenticationContextCache.getInstance().addToCache(cacheKey, cacheEntry);
-            request.setAttribute("sessionDataKey", finalSessionDataKey);
-
-            // Register DFDP event listener for this debug session
-            DFDPService dfdpService = new DFDPService();
-            // dfdpService.registerLogger(debugSessionId, ...); // If such a method exists
-
-            // Wrap the request to inject sessionDataKey as a parameter for the framework.
-            javax.servlet.http.HttpServletRequest wrappedRequest = new javax.servlet.http.HttpServletRequestWrapper(request) {
-                @Override
-                public String getParameter(String name) {
-                    if ("sessionDataKey".equals(name)) {
-                        return finalSessionDataKey;
-                    }
-                    return super.getParameter(name);
-                }
-            };
-
-            // Invoke the authentication flow using DefaultRequestCoordinator.
-            DefaultRequestCoordinator coordinator = new DefaultRequestCoordinator();
-            coordinator.handle(wrappedRequest, response);
-
-            // After the flow, collect events, claims, and run analysis/reporting.
-            // This is a placeholder for the actual event/claim collection and analysis logic.
-            Map<String, Object> debugResults = dfdpService.getAllRealIncomingClaims(idpName, authenticatorName, finalSessionDataKey);
-            // Optionally, run analysis and reporting here if available in DFDPService.
-
-            // Build DebugResponse (populate as much as possible from debugResults and captured events).
+            // Build DebugResponse (populate as much as possible from debugResults).
             org.wso2.carbon.identity.api.server.idp.debug.v1.model.DebugResponse debugResponse = new org.wso2.carbon.identity.api.server.idp.debug.v1.model.DebugResponse();
-            debugResponse.setSessionId(debugSessionId);
+            debugResponse.setSessionId((String) debugResults.getOrDefault("debugSessionId", ""));
             debugResponse.setStatus((String) debugResults.getOrDefault("status", "IN_PROGRESS"));
-            debugResponse.setTargetIdp(idpName);
+            debugResponse.setTargetIdp(idpObj.getIdentityProviderName());
             debugResponse.setAuthenticatorUsed(authenticatorName);
-            // Populate authenticationResult, claimsAnalysis, flowEvents, errors, metadata as available.
             debugResponse.setMetadata((Map<String, Object>) debugResults.get("metadata"));
             // TODO: Populate authenticationResult, claimsAnalysis, flowEvents, errors from logger/analyzer/reporter if available.
 
@@ -208,30 +132,4 @@ public class IdpDebugApiServiceImpl implements IdpDebugApi {
         }
     }
 
-    @GET
-    @Path("/idps")
-    @PermitAll
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getAvailableIdps() {
-        try {
-            LOG.info("Getting available identity providers");
-            // Use local DFDPService instance for testing.
-            Object idpsResult = new DFDPService().getAvailableIdps();
-            Map<String, Object> response = new HashMap<>();
-            response.put("status", "success");
-            response.put("message", "Available identity providers retrieved");
-            response.put("result", idpsResult);
-            response.put("timestamp", System.currentTimeMillis());
-            return Response.ok(response).build();
-        } catch (Exception e) {
-            LOG.error("Error getting available IdPs", e);
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("status", "error");
-            errorResponse.put("message", "Error getting available IdPs: " + e.getMessage());
-            errorResponse.put("timestamp", System.currentTimeMillis());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                          .entity(errorResponse)
-                          .build();
-        }
-    }
 }
