@@ -46,8 +46,6 @@ public class ServerCredentialManagementService {
     public List<CredentialDTO> getCredentialsForUser(String userId) {
 
         try {
-            CredentialMgtEndpointUtils.validateUserId(userId);
-
             return adminCredentialManagementService.getCredentialsForUser(userId);
         } catch (CredentialMgtException e) {
             throw CredentialMgtEndpointUtils.handleCredentialMgtException(e);
@@ -64,7 +62,6 @@ public class ServerCredentialManagementService {
     public void deleteCredentialForUser(String userId, String type, String credentialId) {
 
         try {
-            CredentialMgtEndpointUtils.validateUserId(userId);
             CredentialMgtEndpointUtils.validateCredentialId(credentialId);
             CredentialMgtEndpointUtils.validateCredentialType(type);
             adminCredentialManagementService.deleteCredentialForUser(userId, type, credentialId);
