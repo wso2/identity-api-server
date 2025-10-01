@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.credential.management.common.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialHandler;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants.CredentialTypes;
@@ -43,6 +45,8 @@ import java.util.List;
  */
 public class PasskeyCredentialHandler implements CredentialHandler {
 
+    private static final Log LOG = LogFactory.getLog(PasskeyCredentialHandler.class);
+
     private final WebAuthnService webAuthnService;
     private final UserRealm userRealm;
 
@@ -55,17 +59,23 @@ public class PasskeyCredentialHandler implements CredentialHandler {
     @Override
     public List<CredentialDTO> getCredentialsForUser(String userId) throws CredentialMgtException {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving passkey credentials for user: " + userId);
+        }
         try {
             String username = resolveUsernameFromUserId(userId);
             Collection<FIDO2CredentialRegistration> passkeyCredentials = webAuthnService
                     .getFIDO2DeviceMetaData(username);
 
             List<CredentialDTO> credentialDTOs = new ArrayList<>();
-
             for (FIDO2CredentialRegistration credential : passkeyCredentials) {
                 credentialDTOs.add(mapPasskeyToCredentialDTO(credential));
             }
 
+            if (LOG.isDebugEnabled()) {
+                LOG.info("Successfully retrieved " + credentialDTOs.size() + " passkey credentials for user: "
+                        + userId);
+            }
             return credentialDTOs;
         } catch (FIDO2AuthenticatorServerException e) {
             throw CredentialManagementUtils.handleServerException(
@@ -79,9 +89,15 @@ public class PasskeyCredentialHandler implements CredentialHandler {
     @Override
     public void deleteCredentialForUser(String userId, String credentialId) throws CredentialMgtException {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deleting passkey credential for user: " + userId);
+        }
         try {
             String username = resolveUsernameFromUserId(userId);
             webAuthnService.deregisterFIDO2Credential(credentialId, username);
+            if (LOG.isDebugEnabled()) {
+                LOG.info("Successfully deleted passkey credential for user: " + userId);
+            }
         } catch (FIDO2AuthenticatorClientException e) {
             throw CredentialManagementUtils.handleClientException(
                     CredentialManagementConstants.ErrorMessages.ERROR_CODE_DELETE_PASSKEY_CREDENTIAL, e, userId);
