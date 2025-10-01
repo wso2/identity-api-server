@@ -143,7 +143,8 @@ public class PasskeyCredentialHandler implements CredentialHandler {
             throw CredentialManagementUtils.handleServerException(
                     CredentialManagementConstants.ErrorMessages.ERROR_CODE_GET_USERNAME_FROM_USERID, e, userId);
         } catch (org.wso2.carbon.user.api.UserStoreException e) {
-            throw new RuntimeException(e);
+            throw CredentialManagementUtils.handleServerException(
+                    CredentialManagementConstants.ErrorMessages.ERROR_CODE_GET_USERNAME_FROM_USERID, e, userId);
         }
     }
 }
