@@ -89,7 +89,7 @@ public class CredentialManagementConstants {
         ERROR_CODE_GET_PASSKEYS("65001", "Error retrieving registered passkeys.",
                 "Unexpected server error while fetching registered passkeys for user: %s."),
         ERROR_CODE_DELETE_PASSKEYS("65002", "Error deleting registered passkey.",
-                "Unexpected server error while deleting registered passkey: %credentialId for user: %s."),
+                "Unexpected server error while deleting registered passkey: %s for user: %s."),
         ERROR_CODE_GET_PUSH_AUTH_DEVICE("65003", "Error retrieving registered push auth devices.",
                 "Unexpected server error while fetching registered push auth device for user: %s."),
         ERROR_CODE_DELETE_PUSH_AUTH_DEVICE("65004", "Error deleting registered push auth devices.",
