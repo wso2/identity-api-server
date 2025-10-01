@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.credential.management.common.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialHandler;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants.CredentialTypes;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementService;
@@ -34,6 +36,8 @@ import java.util.Map;
  * Implementation of the CredentialManagementService interface.
  */
 public class CredentialManagementServiceImpl implements CredentialManagementService {
+
+    private static final Log LOG = LogFactory.getLog(CredentialManagementServiceImpl.class);
 
     private final Map<CredentialTypes, CredentialHandler> handlerMap;
 
@@ -52,12 +56,17 @@ public class CredentialManagementServiceImpl implements CredentialManagementServ
     @Override
     public List<CredentialDTO> getCredentialsForUser(String userId) throws CredentialMgtException {
 
-        List<CredentialDTO> allCredentials = new ArrayList<>();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving credentials for user: " + userId);
+        }
 
+        List<CredentialDTO> allCredentials = new ArrayList<>();
         for (CredentialHandler handler : handlerMap.values()) {
             allCredentials.addAll(handler.getCredentialsForUser(userId));
         }
-
+        if (LOG.isDebugEnabled()) {
+            LOG.info("Successfully retrieved " + allCredentials.size() + " credentials for user.");
+        }
         return allCredentials;
     }
 
@@ -65,10 +74,16 @@ public class CredentialManagementServiceImpl implements CredentialManagementServ
     public void deleteCredentialForUser(String userId, String type, String credentialId)
             throws CredentialMgtException {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deleting credential type: " + type + " with ID: " + credentialId + " for user: " + userId);
+        }
+
         CredentialTypes credentialType = CredentialTypes.valueOf(type.replace("-", "_")
                 .toUpperCase(Locale.ROOT));
-
         CredentialHandler handler = handlerMap.get(credentialType);
         handler.deleteCredentialForUser(userId, credentialId);
+        if (LOG.isDebugEnabled()) {
+            LOG.info("Successfully deleted credential for user");
+        }
     }
 }
