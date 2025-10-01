@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.credential.management.common.impl;
 
-import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialHandler;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants.CredentialTypes;
@@ -30,6 +29,7 @@ import org.wso2.carbon.identity.application.authenticator.fido2.core.WebAuthnSer
 import org.wso2.carbon.identity.application.authenticator.fido2.dto.FIDO2CredentialRegistration;
 import org.wso2.carbon.identity.application.authenticator.fido2.exception.FIDO2AuthenticatorClientException;
 import org.wso2.carbon.identity.application.authenticator.fido2.exception.FIDO2AuthenticatorServerException;
+import org.wso2.carbon.identity.base.IdentityRuntimeException;
 import org.wso2.carbon.user.api.UserRealm;
 import org.wso2.carbon.user.core.UserStoreException;
 import org.wso2.carbon.user.core.common.AbstractUserStoreManager;
@@ -44,17 +44,19 @@ import java.util.List;
 public class PasskeyCredentialHandler implements CredentialHandler {
 
     private final WebAuthnService webAuthnService;
+    private final UserRealm userRealm;
 
     public PasskeyCredentialHandler() {
 
         this.webAuthnService = CredentialManagementServiceDataHolder.getWebAuthnService();
+        this.userRealm = CredentialManagementServiceDataHolder.getUserRealmService();
     }
 
     @Override
     public List<CredentialDTO> getCredentialsForUser(String userId) throws CredentialMgtException {
 
         try {
-            String username = getUsernameFromUserId(userId);
+            String username = resolveUsernameFromUserId(userId);
             Collection<FIDO2CredentialRegistration> passkeyCredentials = webAuthnService
                     .getFIDO2DeviceMetaData(username);
 
@@ -68,6 +70,9 @@ public class PasskeyCredentialHandler implements CredentialHandler {
         } catch (FIDO2AuthenticatorServerException e) {
             throw CredentialManagementUtils.handleServerException(
                     CredentialManagementConstants.ErrorMessages.ERROR_CODE_GET_PASSKEYS, e, userId);
+        } catch (IdentityRuntimeException e) {
+            throw CredentialManagementUtils.handleClientException(
+                    CredentialManagementConstants.ErrorMessages.ERROR_CODE_USER_NOT_FOUND, e, userId);
         }
     }
 
@@ -75,7 +80,7 @@ public class PasskeyCredentialHandler implements CredentialHandler {
     public void deleteCredentialForUser(String userId, String credentialId) throws CredentialMgtException {
 
         try {
-            String username = getUsernameFromUserId(userId);
+            String username = resolveUsernameFromUserId(userId);
             webAuthnService.deregisterFIDO2Credential(credentialId, username);
         } catch (FIDO2AuthenticatorClientException e) {
             throw CredentialManagementUtils.handleClientException(
@@ -83,6 +88,9 @@ public class PasskeyCredentialHandler implements CredentialHandler {
         } catch (FIDO2AuthenticatorServerException e) {
             throw CredentialManagementUtils.handleServerException(
                     CredentialManagementConstants.ErrorMessages.ERROR_CODE_DELETE_PASSKEYS, e, userId);
+        } catch (IdentityRuntimeException e) {
+            throw CredentialManagementUtils.handleClientException(
+                    CredentialManagementConstants.ErrorMessages.ERROR_CODE_USER_NOT_FOUND, e, userId);
         }
     }
 
@@ -108,10 +116,9 @@ public class PasskeyCredentialHandler implements CredentialHandler {
      * @return Username.
      * @throws CredentialMgtException Error while retrieving the username.
      */
-    private String getUsernameFromUserId(String userId) throws CredentialMgtException {
+    private String resolveUsernameFromUserId(String userId) throws CredentialMgtException {
 
         try {
-            UserRealm userRealm = CarbonContext.getThreadLocalCarbonContext().getUserRealm();
             AbstractUserStoreManager userStoreManager =
                     (AbstractUserStoreManager) userRealm.getUserStoreManager();
 
