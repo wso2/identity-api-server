@@ -102,6 +102,8 @@ public class CredentialManagementConstants {
                 "The request to delete the push auth credential: %s  was invalid."),
         ERROR_CODE_GET_USERNAME_FROM_USERID("60003", "Error retrieving username from user ID.",
                 "The request to retrieve the username from the user ID: %s was invalid."),
+        ERROR_CODE_USER_NOT_FOUND("60004", "User not found",
+                "User with ID %s not found in the tenant domain."),
         ;
 
         private static final String ERROR_PREFIX = "CM";

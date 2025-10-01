@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
+import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants.CredentialTypes;
 import org.wso2.carbon.identity.api.server.credential.management.common.dto.CredentialDTO;
 import org.wso2.carbon.identity.api.server.credential.management.common.exception.CredentialMgtClientException;
@@ -71,7 +72,12 @@ public class CredentialMgtEndpointUtils {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(e.getMessage(), e);
             }
-            status = Response.Status.BAD_REQUEST;
+            if (StringUtils.equals(e.getErrorCode(),
+                    CredentialManagementConstants.ErrorMessages.ERROR_CODE_USER_NOT_FOUND.getCode())) {
+                status = Response.Status.NO_CONTENT;
+            } else {
+                status = Response.Status.BAD_REQUEST;
+            }
         } else {
             LOG.error(e.getMessage(), e);
         }

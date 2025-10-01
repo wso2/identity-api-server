@@ -1046,7 +1046,7 @@
         <tenant.resource.manager.version>1.5.55</tenant.resource.manager.version>
         <identity.verification.version>1.0.15</identity.verification.version>
         <identity.local.auth.fido.version>5.4.26</identity.local.auth.fido.version>
-        <identity.notification.push.version>1.0.7-SNAPSHOT</identity.notification.push.version>
+        <identity.notification.push.version>1.0.6</identity.notification.push.version>
 
         <!-- Organization management core Version -->
         <org.wso2.carbon.identity.organization.management.core.version>1.1.41
