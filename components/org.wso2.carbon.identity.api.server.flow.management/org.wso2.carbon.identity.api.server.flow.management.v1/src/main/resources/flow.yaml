@@ -526,6 +526,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ExecutorConnections'
+        workflowEnabled:
+          type: boolean
+          example: false
 
     ExecutorConnections:
       type: object
