@@ -18,8 +18,16 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.identity.api.server.flow.management.common.FlowMgtServiceHolder;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
 import org.wso2.carbon.identity.flow.mgt.Constants;
+import org.wso2.carbon.identity.workflow.mgt.WorkflowManagementService;
+import org.wso2.carbon.identity.workflow.mgt.dto.Association;
+import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +48,9 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.F
  */
 public class RegistrationFlowMetaHandler extends AbstractMetaResponseHandler {
 
+    private static final String SELF_REGISTRATION_WORKFLOW_ASSOCIATION_FILTER = "operation eq SELF_REGISTER_USER";
+    private static final Log log = LogFactory.getLog(RegistrationFlowMetaHandler.class);
+
     @Override
     public String getFlowType() {
 
@@ -50,6 +61,29 @@ public class RegistrationFlowMetaHandler extends AbstractMetaResponseHandler {
     public String getAttributeProfile() {
 
         return SELF_REGISTRATION_ATTRIBUTE_PROFILE;
+    }
+
+    @Override
+    public boolean getWorkflowEnabled() {
+
+        try {
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieving workflow associations for SELF_REGISTER_USER operation for tenant: " +
+                        CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            }
+            WorkflowManagementService workflowManagementService = FlowMgtServiceHolder.getWorkflowManagementService();
+            List<Association> associationList = workflowManagementService.listPaginatedAssociations(
+                    CarbonContext.getThreadLocalCarbonContext().getTenantId(), 1, 0,
+                    SELF_REGISTRATION_WORKFLOW_ASSOCIATION_FILTER);
+            if (CollectionUtils.isNotEmpty(associationList)) {
+                return true;
+            }
+        } catch (WorkflowException e) {
+            log.error("Error while retrieving workflow associations for tenant: " +
+                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain(), e);
+            return false;
+        }
+        return false;
     }
 
     @Override
