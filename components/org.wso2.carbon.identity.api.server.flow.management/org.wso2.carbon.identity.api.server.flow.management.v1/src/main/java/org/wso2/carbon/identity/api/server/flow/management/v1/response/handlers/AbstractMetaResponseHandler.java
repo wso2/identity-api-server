@@ -88,6 +88,16 @@ public abstract class AbstractMetaResponseHandler {
     public abstract String getAttributeProfile();
 
     /**
+     * Check if the workflow is enabled for the flow.
+     *
+     * @return True if workflow is enabled, false otherwise.
+     */
+    public boolean getWorkflowEnabled() {
+
+        return false;
+    }
+
+    /**
      * Get the supported executors for the flow.
      *
      * @return List of supported executors.
@@ -134,6 +144,7 @@ public abstract class AbstractMetaResponseHandler {
         FlowMetaResponse response = new FlowMetaResponse();
         response.setFlowType(getFlowType());
         response.setAttributeProfile(getAttributeProfile());
+        response.setWorkflowEnabled(getWorkflowEnabled());
         response.setAttributeMetadata(getSupportedClaims(getAttributeProfile()));
         response.setSupportedExecutors(getSupportedExecutors());
         response.setConnectorConfigs(getConnectorConfigs());

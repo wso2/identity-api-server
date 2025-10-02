@@ -22,6 +22,7 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.flow.mgt.FlowAIService;
 import org.wso2.carbon.identity.flow.mgt.FlowMgtService;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
+import org.wso2.carbon.identity.workflow.mgt.WorkflowManagementService;
 import org.wso2.carbon.idp.mgt.IdpManager;
 
 /**
@@ -57,6 +58,13 @@ public class FlowMgtServiceHolder {
 
         private static final FlowAIService SERVICE = (FlowAIService) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(FlowAIService.class, null);
+    }
+
+    private static class WorkflowServiceHolder {
+
+        private static final WorkflowManagementService SERVICE =
+                (WorkflowManagementService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(WorkflowManagementService.class, null);
     }
 
     /**
@@ -97,5 +105,15 @@ public class FlowMgtServiceHolder {
     public static FlowAIService getFlowAIService() {
 
         return FlowAIServiceHolder.SERVICE;
+    }
+
+    /**
+     * Get WorkflowManagementService OSGi service.
+     *
+     * @return WorkflowManagementService
+     */
+    public static WorkflowManagementService getWorkflowManagementService() {
+
+        return WorkflowServiceHolder.SERVICE;
     }
 }
