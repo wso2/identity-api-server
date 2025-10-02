@@ -36,6 +36,7 @@ public class ActionUpdateModel  {
   
     private String name;
     private String description;
+    private String version;
     private EndpointUpdateModel endpoint;
     private ORRule rule;
 
@@ -75,6 +76,25 @@ public class ActionUpdateModel  {
     }
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    /**
+    * Version of the action.
+    **/
+    public ActionUpdateModel version(String version) {
+
+        this.version = version;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "v2", value = "Version of the action.")
+    @JsonProperty("version")
+    @Valid
+    public String getVersion() {
+        return version;
+    }
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     /**
@@ -127,13 +147,14 @@ public class ActionUpdateModel  {
         ActionUpdateModel actionUpdateModel = (ActionUpdateModel) o;
         return Objects.equals(this.name, actionUpdateModel.name) &&
             Objects.equals(this.description, actionUpdateModel.description) &&
+            Objects.equals(this.version, actionUpdateModel.version) &&
             Objects.equals(this.endpoint, actionUpdateModel.endpoint) &&
             Objects.equals(this.rule, actionUpdateModel.rule);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, endpoint, rule);
+        return Objects.hash(name, description, version, endpoint, rule);
     }
 
     @Override
@@ -144,6 +165,7 @@ public class ActionUpdateModel  {
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
+        sb.append("    version: ").append(toIndentedString(version)).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
         sb.append("    rule: ").append(toIndentedString(rule)).append("\n");
         sb.append("}");
