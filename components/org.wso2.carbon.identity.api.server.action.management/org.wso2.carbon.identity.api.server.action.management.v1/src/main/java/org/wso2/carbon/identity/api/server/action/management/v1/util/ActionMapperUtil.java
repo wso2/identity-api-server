@@ -120,6 +120,7 @@ public class ActionMapperUtil {
         return new Action.ActionRequestBuilder()
                 .name(actionUpdateModel.getName())
                 .description(actionUpdateModel.getDescription())
+                .actionVersion(actionUpdateModel.getVersion())
                 .endpoint(endpointConfig)
                 .rule(actionRule)
                 .build();
@@ -140,6 +141,7 @@ public class ActionMapperUtil {
                 .name(action.getName())
                 .description(action.getDescription())
                 .status(ActionResponse.StatusEnum.valueOf(action.getStatus().toString()))
+                .version(action.getActionVersion())
                 .createdAt(action.getCreatedAt() != null ? action.getCreatedAt().toInstant().toString() : null)
                 .updatedAt(action.getUpdatedAt() != null ? action.getUpdatedAt().toInstant().toString() : null)
                 .endpoint(new EndpointResponse()
@@ -167,6 +169,7 @@ public class ActionMapperUtil {
                 .name(action.getName())
                 .description(action.getDescription())
                 .status(ActionBasicResponse.StatusEnum.valueOf(action.getStatus().toString()))
+                .version(action.getActionVersion())
                 .createdAt(action.getCreatedAt() != null ? action.getCreatedAt().toInstant().toString() : null)
                 .updatedAt(action.getUpdatedAt() != null ? action.getUpdatedAt().toInstant().toString() : null)
                 .links(buildLinks(action));
