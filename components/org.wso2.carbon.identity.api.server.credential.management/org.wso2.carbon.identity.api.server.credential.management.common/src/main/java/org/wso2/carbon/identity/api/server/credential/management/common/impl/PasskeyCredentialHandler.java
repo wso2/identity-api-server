@@ -20,6 +20,7 @@ package org.wso2.carbon.identity.api.server.credential.management.common.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialHandler;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants.CredentialTypes;
@@ -48,12 +49,10 @@ public class PasskeyCredentialHandler implements CredentialHandler {
     private static final Log LOG = LogFactory.getLog(PasskeyCredentialHandler.class);
 
     private final WebAuthnService webAuthnService;
-    private final UserRealm userRealm;
 
     public PasskeyCredentialHandler() {
 
         this.webAuthnService = CredentialManagementServiceDataHolder.getWebAuthnService();
-        this.userRealm = CredentialManagementServiceDataHolder.getUserRealmService();
     }
 
     @Override
@@ -135,9 +134,8 @@ public class PasskeyCredentialHandler implements CredentialHandler {
     private String resolveUsernameFromUserId(String userId) throws CredentialMgtException {
 
         try {
-            AbstractUserStoreManager userStoreManager =
-                    (AbstractUserStoreManager) userRealm.getUserStoreManager();
-
+            UserRealm userRealm = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm();
+            AbstractUserStoreManager userStoreManager = (AbstractUserStoreManager) userRealm.getUserStoreManager();
             return userStoreManager.getUserNameFromUserID(userId);
         } catch (UserStoreException e) {
             throw CredentialManagementUtils.handleServerException(
