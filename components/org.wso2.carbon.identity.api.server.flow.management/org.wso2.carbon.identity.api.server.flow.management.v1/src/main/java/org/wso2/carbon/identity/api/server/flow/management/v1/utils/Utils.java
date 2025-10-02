@@ -25,6 +25,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
@@ -55,6 +56,9 @@ import org.wso2.carbon.identity.flow.mgt.model.StepDTO;
 import org.wso2.carbon.identity.governance.IdentityGovernanceException;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
 import org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants;
+import org.wso2.carbon.identity.workflow.mgt.WorkflowManagementService;
+import org.wso2.carbon.identity.workflow.mgt.dto.Association;
+import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowException;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -87,6 +91,10 @@ public class Utils {
 
     private static final Log LOG = LogFactory.getLog(Utils.class);
     private static final String EXECUTOR = "EXECUTOR";
+
+    private static final Map<Constants.FlowTypes, String> WORKFLOW_FILTERS = Map.of(
+            Constants.FlowTypes.REGISTRATION, "operation eq SELF_REGISTER_USER",
+            Constants.FlowTypes.INVITED_USER_REGISTRATION, "operation eq ADD_USER");
 
     private Utils() {
 
@@ -649,5 +657,33 @@ public class Utils {
         if (FORM.equals(component.getType())) {
             validateNextNodeReference(component.getComponents());
         }
+    }
+
+    /**
+     * Check if there are any workflow associations for the given flow type in the tenant.
+     *
+     * @param flowType The flow type to check for workflow associations.
+     * @return True if there are workflow associations, false otherwise.
+     */
+    public static boolean isWorkflowEnabled(Constants.FlowTypes flowType) {
+
+        try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Retrieving workflow associations for SELF_REGISTER_USER operation for tenant: " +
+                        CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            }
+            WorkflowManagementService workflowManagementService = FlowMgtServiceHolder.getWorkflowManagementService();
+            List<Association> associationList = workflowManagementService.listPaginatedAssociations(
+                    CarbonContext.getThreadLocalCarbonContext().getTenantId(), 1, 0,
+                    WORKFLOW_FILTERS.get(flowType));
+            if (CollectionUtils.isNotEmpty(associationList)) {
+                return true;
+            }
+        } catch (WorkflowException e) {
+            LOG.error("Error while retrieving workflow associations for tenant: " +
+                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain(), e);
+            return false;
+        }
+        return false;
     }
 }
