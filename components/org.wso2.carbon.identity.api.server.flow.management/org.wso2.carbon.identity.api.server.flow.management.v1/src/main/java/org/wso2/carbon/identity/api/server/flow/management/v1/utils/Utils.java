@@ -64,6 +64,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -92,9 +93,12 @@ public class Utils {
     private static final Log LOG = LogFactory.getLog(Utils.class);
     private static final String EXECUTOR = "EXECUTOR";
 
-    private static final Map<Constants.FlowTypes, String> WORKFLOW_FILTERS = Map.of(
-            Constants.FlowTypes.REGISTRATION, "operation eq SELF_REGISTER_USER",
-            Constants.FlowTypes.INVITED_USER_REGISTRATION, "operation eq ADD_USER");
+    private static final Map<Constants.FlowTypes, String> WORKFLOW_FILTERS = new HashMap<>();
+
+    static {
+        WORKFLOW_FILTERS.put(Constants.FlowTypes.REGISTRATION, "operation eq SELF_REGISTER_USER");
+        WORKFLOW_FILTERS.put(Constants.FlowTypes.INVITED_USER_REGISTRATION, "operation eq ADD_USER");
+    }
 
     private Utils() {
 
