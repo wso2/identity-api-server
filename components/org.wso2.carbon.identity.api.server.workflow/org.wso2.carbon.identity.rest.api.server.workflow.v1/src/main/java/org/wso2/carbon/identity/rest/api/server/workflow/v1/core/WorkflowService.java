@@ -230,11 +230,6 @@ public class WorkflowService {
             Workflow currentWorkflow = workflowManagementService.getWorkflow(workflowAssociation.getWorkflowId());
             WorkflowEvent event = workflowManagementService.getEvent(workflowAssociation.getOperation().toString());
 
-            if (!workflowManagementService.listPaginatedAssociations(tenantId, 1, 0,
-                    "operation eq " + event.getEventId()).isEmpty()) {
-                throw new WorkflowClientException("A workflow association already exist for the event: " +
-                        event.getEventFriendlyName());
-            }
             if (currentWorkflow == null) {
                 throw new WorkflowClientException("A workflow with ID: " + workflowAssociation.getWorkflowId() +
                         " doesn't exist.");
@@ -244,6 +239,12 @@ public class WorkflowService {
                         " doesn't exist.");
             }
             int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+            if (!workflowManagementService.listPaginatedAssociations(tenantId, 1, 0,
+                    "operation eq " + event.getEventId()).isEmpty()) {
+                throw new WorkflowClientException("A workflow association already exist for the event: " +
+                        event.getEventFriendlyName());
+            }
+
             if (!workflowManagementService.listPaginatedAssociations(tenantId, 1, 0,
                     "operation eq " + event.getEventId()).isEmpty()) {
                 throw new WorkflowClientException("A workflow association already exists for the event: " +
