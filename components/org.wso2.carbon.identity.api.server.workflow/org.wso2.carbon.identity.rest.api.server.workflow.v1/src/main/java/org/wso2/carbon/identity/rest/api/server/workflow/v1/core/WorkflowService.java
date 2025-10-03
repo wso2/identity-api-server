@@ -234,7 +234,7 @@ public class WorkflowService {
 
             if (!workflowManagementService.listPaginatedAssociations(tenantId, 1, 0,
                     "operation eq " + event.getEventId()).isEmpty()) {
-                throw new WorkflowClientException("A workflow association already exist for the event: " +
+                throw new WorkflowClientException("A workflow association already exists for the event: " +
                         event.getEventFriendlyName());
             }
             if (currentWorkflow == null) {
