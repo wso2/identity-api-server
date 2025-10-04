@@ -237,6 +237,13 @@ public class WorkflowService {
                 throw new WorkflowClientException("An event with ID: " + workflowAssociation.getOperation().toString() +
                         " doesn't exist.");
             }
+            int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+            if (!workflowManagementService.listPaginatedAssociations(tenantId, 1, 0,
+                    "operation eq " + event.getEventId()).isEmpty()) {
+                throw new WorkflowClientException("A workflow association already exists for the event: " +
+                        event.getEventFriendlyName());
+            }
+
             workflowManagementService.addAssociation(workflowAssociation.getAssociationName(),
                     workflowAssociation.getWorkflowId(), workflowAssociation.getOperation().toString(),
                     null);
