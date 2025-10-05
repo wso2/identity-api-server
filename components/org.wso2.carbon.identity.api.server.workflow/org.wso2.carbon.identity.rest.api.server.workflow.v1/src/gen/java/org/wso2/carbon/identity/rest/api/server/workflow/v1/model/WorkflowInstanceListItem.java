@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.time.LocalDateTime;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.InstanceStatus;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Operation;
 import javax.validation.constraints.*;
@@ -34,7 +33,7 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 public class WorkflowInstanceListItem  {
-    
+  
     private String workflowInstanceId;
     private Operation eventType;
     private String requestInitiator;
@@ -42,25 +41,27 @@ public class WorkflowInstanceListItem  {
     private String updatedAt;
     private InstanceStatus status;
 
+    /**
+    * Unique id to represent a workflow instance
+    **/
     public WorkflowInstanceListItem workflowInstanceId(String workflowInstanceId) {
 
         this.workflowInstanceId = workflowInstanceId;
         return this;
     }
-
-    @ApiModelProperty(value = "")
+    
+    @ApiModelProperty(example = "500", value = "Unique id to represent a workflow instance")
     @JsonProperty("workflowInstanceId")
     @Valid
     public String getWorkflowInstanceId() {
-
         return workflowInstanceId;
     }
-
     public void setWorkflowInstanceId(String workflowInstanceId) {
-
         this.workflowInstanceId = workflowInstanceId;
     }
 
+    /**
+    **/
     public WorkflowInstanceListItem eventType(Operation eventType) {
 
         this.eventType = eventType;
@@ -71,13 +72,28 @@ public class WorkflowInstanceListItem  {
     @JsonProperty("eventType")
     @Valid
     public Operation getEventType() {
-
         return eventType;
     }
-
     public void setEventType(Operation eventType) {
-
         this.eventType = eventType;
+    }
+
+    /**
+    **/
+    public WorkflowInstanceListItem requestInitiator(String requestInitiator) {
+
+        this.requestInitiator = requestInitiator;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("requestInitiator")
+    @Valid
+    public String getRequestInitiator() {
+        return requestInitiator;
+    }
+    public void setRequestInitiator(String requestInitiator) {
+        this.requestInitiator = requestInitiator;
     }
 
     /**
@@ -92,12 +108,9 @@ public class WorkflowInstanceListItem  {
     @JsonProperty("createdAt")
     @Valid
     public String getCreatedAt() {
-
         return createdAt;
     }
-
     public void setCreatedAt(String createdAt) {
-
         this.createdAt = createdAt;
     }
 
@@ -113,12 +126,9 @@ public class WorkflowInstanceListItem  {
     @JsonProperty("updatedAt")
     @Valid
     public String getUpdatedAt() {
-
         return updatedAt;
     }
-
     public void setUpdatedAt(String updatedAt) {
-
         this.updatedAt = updatedAt;
     }
 
@@ -134,33 +144,13 @@ public class WorkflowInstanceListItem  {
     @JsonProperty("status")
     @Valid
     public InstanceStatus getStatus() {
-
         return status;
     }
-
     public void setStatus(InstanceStatus status) {
-
         this.status = status;
     }
 
-    public WorkflowInstanceListItem requestInitiator(String requestInitiator) {
 
-        this.requestInitiator = requestInitiator;
-        return this;
-    }
-
-    @ApiModelProperty(value = "")
-    @JsonProperty("requestInitiator")
-    @Valid
-    public String getRequestInitiator() {
-
-        return requestInitiator;
-    }
-
-    public void setRequestInitiator(String requestInitiator) {
-
-        this.requestInitiator = requestInitiator;
-    }
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -172,16 +162,17 @@ public class WorkflowInstanceListItem  {
             return false;
         }
         WorkflowInstanceListItem workflowInstanceListItem = (WorkflowInstanceListItem) o;
-        return Objects.equals(this.eventType, workflowInstanceListItem.eventType) &&
+        return Objects.equals(this.workflowInstanceId, workflowInstanceListItem.workflowInstanceId) &&
+            Objects.equals(this.eventType, workflowInstanceListItem.eventType) &&
+            Objects.equals(this.requestInitiator, workflowInstanceListItem.requestInitiator) &&
             Objects.equals(this.createdAt, workflowInstanceListItem.createdAt) &&
             Objects.equals(this.updatedAt, workflowInstanceListItem.updatedAt) &&
             Objects.equals(this.status, workflowInstanceListItem.status);
-            }
+    }
 
     @Override
     public int hashCode() {
-        
-        return Objects.hash(eventType, createdAt, updatedAt, status);
+        return Objects.hash(workflowInstanceId, eventType, requestInitiator, createdAt, updatedAt, status);
     }
 
     @Override
@@ -190,7 +181,9 @@ public class WorkflowInstanceListItem  {
         StringBuilder sb = new StringBuilder();
         sb.append("class WorkflowInstanceListItem {\n");
         
+        sb.append("    workflowInstanceId: ").append(toIndentedString(workflowInstanceId)).append("\n");
         sb.append("    eventType: ").append(toIndentedString(eventType)).append("\n");
+        sb.append("    requestInitiator: ").append(toIndentedString(requestInitiator)).append("\n");
         sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
         sb.append("    updatedAt: ").append(toIndentedString(updatedAt)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
@@ -207,7 +200,7 @@ public class WorkflowInstanceListItem  {
         if (o == null) {
             return "null";
         }
-        return o.toString().replace("\n", "\n   ");
+        return o.toString().replace("\n", "\n");
     }
 }
 

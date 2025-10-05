@@ -37,10 +37,6 @@ public class WorkflowInstanceListResponse  {
   
     private Integer totalResults;
     private Integer startIndex;
-    public Integer getStartIndex() {
-        return startIndex;
-    }
-
     private Integer count;
     private List<WorkflowInstanceListItem> instances = null;
 
@@ -53,7 +49,7 @@ public class WorkflowInstanceListResponse  {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(example = "10", value = "")
     @JsonProperty("totalResults")
     @Valid
     public Integer getTotalResults() {
@@ -65,13 +61,31 @@ public class WorkflowInstanceListResponse  {
 
     /**
     **/
+    public WorkflowInstanceListResponse startIndex(Integer startIndex) {
+
+        this.startIndex = startIndex;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "3", value = "")
+    @JsonProperty("startIndex")
+    @Valid
+    public Integer getStartIndex() {
+        return startIndex;
+    }
+    public void setStartIndex(Integer startIndex) {
+        this.startIndex = startIndex;
+    }
+
+    /**
+    **/
     public WorkflowInstanceListResponse count(Integer count) {
 
         this.count = count;
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(example = "10", value = "")
     @JsonProperty("count")
     @Valid
     public Integer getCount() {
@@ -120,13 +134,14 @@ public class WorkflowInstanceListResponse  {
         }
         WorkflowInstanceListResponse workflowInstanceListResponse = (WorkflowInstanceListResponse) o;
         return Objects.equals(this.totalResults, workflowInstanceListResponse.totalResults) &&
+            Objects.equals(this.startIndex, workflowInstanceListResponse.startIndex) &&
             Objects.equals(this.count, workflowInstanceListResponse.count) &&
             Objects.equals(this.instances, workflowInstanceListResponse.instances);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(totalResults, count, instances);
+        return Objects.hash(totalResults, startIndex, count, instances);
     }
 
     @Override
@@ -136,6 +151,7 @@ public class WorkflowInstanceListResponse  {
         sb.append("class WorkflowInstanceListResponse {\n");
         
         sb.append("    totalResults: ").append(toIndentedString(totalResults)).append("\n");
+        sb.append("    startIndex: ").append(toIndentedString(startIndex)).append("\n");
         sb.append("    count: ").append(toIndentedString(count)).append("\n");
         sb.append("    instances: ").append(toIndentedString(instances)).append("\n");
         sb.append("}");
@@ -151,11 +167,7 @@ public class WorkflowInstanceListResponse  {
         if (o == null) {
             return "null";
         }
-        return o.toString().replace("\n", "\n   ");
-    }
-
-    public void setStartIndex(Integer startIndex) {
-        this.startIndex = startIndex;
+        return o.toString().replace("\n", "\n");
     }
 }
 

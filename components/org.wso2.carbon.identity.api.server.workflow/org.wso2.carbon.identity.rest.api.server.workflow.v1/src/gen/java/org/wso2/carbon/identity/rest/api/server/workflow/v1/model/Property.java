@@ -19,60 +19,63 @@
 package org.wso2.carbon.identity.rest.api.server.workflow.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 
+
+import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
+import javax.xml.bind.annotation.*;
 
 public class Property  {
   
     private String key;
     private String value;
 
-    public Property() {}
-
-    public Property(String key, String value) {
-
-        this.key = key;
-        this.value = value;
-    }
-
+    /**
+    **/
     public Property key(String key) {
 
         this.key = key;
         return this;
     }
     
-    @ApiModelProperty(example = "some_key", value = "")
+    @ApiModelProperty(example = "some_key", required = true, value = "")
     @JsonProperty("key")
     @Valid
-    public String getKey() {
+    @NotNull(message = "Property key cannot be null.")
 
+    public String getKey() {
         return key;
     }
     public void setKey(String key) {
-
         this.key = key;
     }
 
+    /**
+    **/
     public Property value(String value) {
 
         this.value = value;
         return this;
     }
     
-    @ApiModelProperty(example = "some_value", value = "")
+    @ApiModelProperty(example = "some_value", required = true, value = "")
     @JsonProperty("value")
     @Valid
-    public String getValue() {
+    @NotNull(message = "Property value cannot be null.")
 
+    public String getValue() {
         return value;
     }
-
     public void setValue(String value) {
-
         this.value = value;
     }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -90,7 +93,6 @@ public class Property  {
 
     @Override
     public int hashCode() {
-
         return Objects.hash(key, value);
     }
 

@@ -50,8 +50,7 @@ public class WorkflowInstancesApiServiceImpl implements WorkflowInstancesApiServ
     }
 
     @Override
-    public Response getWorkflowInstances(Integer limit, Integer offset, String filter, String sortBy,
-            String sortOrder) {
+    public Response getWorkflowInstances(Integer limit, Integer offset, String filter) {
 
         return Response.ok().entity(workflowService.getWorkflowInstances(limit, offset, filter)).build();
     }

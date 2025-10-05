@@ -710,9 +710,13 @@ public class WorkflowService {
         response.setRequestInitiator(workflowRequest.getCreatedBy());
 
         if (workflowRequest.getProperties() != null) {
-            List<Property> properties = workflowRequest.getProperties().stream().map(property ->
-                    new Property(property.getKey(), property.getValue())
-            ).collect(Collectors.toList());
+
+            List<Property> properties = workflowRequest.getProperties().stream().map(property -> {
+                Property prop = new Property();
+                prop.setKey(property.getKey());
+                prop.setValue(property.getValue());
+                return prop;
+            }).collect(Collectors.toList());
             response.setProperties(properties);
         }
         try {

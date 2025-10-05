@@ -22,7 +22,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.InstanceStatus;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Operation;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Property;
@@ -30,42 +31,38 @@ import javax.validation.constraints.*;
 
 
 import io.swagger.annotations.*;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class WorkflowInstanceResponse {
+public class WorkflowInstanceResponse  {
   
     private String workflowInstanceId;
     private Operation eventType;
-    private String requestInitiator;
     private String createdAt;
+    private String requestInitiator;
     private String updatedAt;
     private InstanceStatus status;
     private Object requestParameters;
-    private List<Property> properties = new ArrayList<Property>();
+    private List<Property> properties = null;
+
 
     /**
+    * Unique id to represent a workflow instance
     **/
     public WorkflowInstanceResponse workflowInstanceId(String workflowInstanceId) {
 
         this.workflowInstanceId = workflowInstanceId;
         return this;
     }
-
-    @ApiModelProperty(value = "")
+    
+    @ApiModelProperty(example = "500", value = "Unique id to represent a workflow instance")
     @JsonProperty("workflowInstanceId")
     @Valid
     public String getWorkflowInstanceId() {
-
         return workflowInstanceId;
     }
-
     public void setWorkflowInstanceId(String workflowInstanceId) {
-
         this.workflowInstanceId = workflowInstanceId;
     }
 
@@ -81,12 +78,9 @@ public class WorkflowInstanceResponse {
     @JsonProperty("eventType")
     @Valid
     public Operation getEventType() {
-
         return eventType;
     }
-
     public void setEventType(Operation eventType) {
-
         this.eventType = eventType;
     }
 
@@ -100,14 +94,30 @@ public class WorkflowInstanceResponse {
     
     @ApiModelProperty(value = "")
     @JsonProperty("createdAt")
+    @Valid
     public String getCreatedAt() {
-
         return createdAt;
     }
-
     public void setCreatedAt(String createdAt) {
-
         this.createdAt = createdAt;
+    }
+
+    /**
+    **/
+    public WorkflowInstanceResponse requestInitiator(String requestInitiator) {
+
+        this.requestInitiator = requestInitiator;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("requestInitiator")
+    @Valid
+    public String getRequestInitiator() {
+        return requestInitiator;
+    }
+    public void setRequestInitiator(String requestInitiator) {
+        this.requestInitiator = requestInitiator;
     }
 
     /**
@@ -120,12 +130,11 @@ public class WorkflowInstanceResponse {
     
     @ApiModelProperty(value = "")
     @JsonProperty("updatedAt")
+    @Valid
     public String getUpdatedAt() {
-
         return updatedAt;
     }
     public void setUpdatedAt(String updatedAt) {
-
         this.updatedAt = updatedAt;
     }
 
@@ -141,12 +150,9 @@ public class WorkflowInstanceResponse {
     @JsonProperty("status")
     @Valid
     public InstanceStatus getStatus() {
-
         return status;
     }
-
     public void setStatus(InstanceStatus status) {
-
         this.status = status;
     }
 
@@ -162,33 +168,10 @@ public class WorkflowInstanceResponse {
     @JsonProperty("requestParameters")
     @Valid
     public Object getRequestParameters() {
-
         return requestParameters;
     }
-
     public void setRequestParameters(Object requestParameters) {
-
         this.requestParameters = requestParameters;
-    }
-
-    /**
-    **/
-    public WorkflowInstanceResponse requestInitiator(String requestInitiator) {
-
-        this.requestInitiator = requestInitiator;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "")
-    @JsonProperty("requestInitiator")
-    public String getRequestInitiator() {
-
-        return requestInitiator;
-    }
-
-    public void setRequestInitiator(String requestInitiator) {
-
-        this.requestInitiator = requestInitiator;
     }
 
     /**
@@ -198,28 +181,26 @@ public class WorkflowInstanceResponse {
         this.properties = properties;
         return this;
     }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("properties")
+    @Valid
+    public List<Property> getProperties() {
+        return properties;
+    }
+    public void setProperties(List<Property> properties) {
+        this.properties = properties;
+    }
 
     public WorkflowInstanceResponse addPropertiesItem(Property propertiesItem) {
-
         if (this.properties == null) {
-            this.properties = new ArrayList<Property>();
+            this.properties = new ArrayList<>();
         }
         this.properties.add(propertiesItem);
         return this;
     }
 
-    @ApiModelProperty(value = "")
-    @JsonProperty("properties")
-    @Valid
-    public List<Property> getProperties() {
-
-        return properties;
-    }
-
-    public void setProperties(List<Property> properties) {
-
-        this.properties = properties;
-    }
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -233,8 +214,8 @@ public class WorkflowInstanceResponse {
         WorkflowInstanceResponse workflowInstanceResponse = (WorkflowInstanceResponse) o;
         return Objects.equals(this.workflowInstanceId, workflowInstanceResponse.workflowInstanceId) &&
             Objects.equals(this.eventType, workflowInstanceResponse.eventType) &&
-            Objects.equals(this.requestInitiator, workflowInstanceResponse.requestInitiator) &&
             Objects.equals(this.createdAt, workflowInstanceResponse.createdAt) &&
+            Objects.equals(this.requestInitiator, workflowInstanceResponse.requestInitiator) &&
             Objects.equals(this.updatedAt, workflowInstanceResponse.updatedAt) &&
             Objects.equals(this.status, workflowInstanceResponse.status) &&
             Objects.equals(this.requestParameters, workflowInstanceResponse.requestParameters) &&
@@ -243,8 +224,7 @@ public class WorkflowInstanceResponse {
 
     @Override
     public int hashCode() {
-        
-        return Objects.hash(workflowInstanceId, eventType, requestInitiator, createdAt, updatedAt, status, requestParameters, properties);
+        return Objects.hash(workflowInstanceId, eventType, createdAt, requestInitiator, updatedAt, status, requestParameters, properties);
     }
 
     @Override
@@ -255,8 +235,8 @@ public class WorkflowInstanceResponse {
         
         sb.append("    workflowInstanceId: ").append(toIndentedString(workflowInstanceId)).append("\n");
         sb.append("    eventType: ").append(toIndentedString(eventType)).append("\n");
-        sb.append("    requestInitiator: ").append(toIndentedString(requestInitiator)).append("\n");
         sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
+        sb.append("    requestInitiator: ").append(toIndentedString(requestInitiator)).append("\n");
         sb.append("    updatedAt: ").append(toIndentedString(updatedAt)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("    requestParameters: ").append(toIndentedString(requestParameters)).append("\n");
@@ -274,7 +254,7 @@ public class WorkflowInstanceResponse {
         if (o == null) {
             return "null";
         }
-        return o.toString().replace("\n", "\n    ");
+        return o.toString().replace("\n", "\n");
     }
 }
 
