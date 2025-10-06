@@ -117,6 +117,17 @@ public class ServerFlowMgtService {
         }
     }
 
+    public void deleteFlow(String flowType) {
+
+        try {
+            Utils.validateFlowType(flowType);
+            flowMgtService.deleteFlow(flowType,
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
+        } catch (FlowMgtFrameworkException e) {
+            throw Utils.handleFlowMgtException(e);
+        }
+    }
+
     /**
      * Retrieve the flow configurations.
      *
