@@ -56,6 +56,7 @@ import org.wso2.carbon.identity.workflow.mgt.dto.Association;
 import org.wso2.carbon.identity.workflow.mgt.dto.WorkflowEvent;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowClientException;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowException;
+import org.wso2.carbon.identity.workflow.mgt.util.WorkflowRequestStatus;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -280,6 +281,12 @@ public class WorkflowService {
         boolean isEnable;
         String eventId;
         try {
+            int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+            if (tenantId != workflowManagementService.getWorkflow(workflowAssociation.getWorkflowId()).getTenantId()) {
+                throw new WorkflowClientException("A workflow association with ID: " +
+                        workflowAssociation.getWorkflowId() + " doesn't exist.");
+            }
+
             if (workflowAssociation.getIsEnabled() == null) {
                 isEnable = workflowManagementService.getAssociation(associationId).isEnabled();
             } else {
@@ -360,7 +367,9 @@ public class WorkflowService {
 
         try {
             Association association = workflowManagementService.getAssociation(associationId);
-            if (association == null) {
+            int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+            if (association == null || tenantId != workflowManagementService
+                    .getWorkflow(association.getWorkflowId()).getTenantId()) {
                 throw new WorkflowClientException("A workflow association with ID: " + associationId +
                         "doesn't exist.");
             }
@@ -616,6 +625,29 @@ public class WorkflowService {
             associationResponse.setIsEnabled(association.isEnabled());
         }
         return associationResponse;
+    }
+
+    public void abortWorkflowInstance(String instanceId) {
+
+        try {
+            if (StringUtils.isBlank(instanceId)) {
+                throw new WorkflowClientException("Workflow instance ID cannot be null or empty.");
+            }
+            if (!WorkflowRequestStatus.PENDING.name()
+                    .equals(workflowManagementService.getWorkflowRequestBean(instanceId).getStatus())) {
+                throw new WorkflowClientException("Only PENDING workflow instances can be aborted.");
+            }
+            workflowManagementService.abortWorkflowRequest(instanceId);
+            approvalEventService.deletePendingApprovalTasks(instanceId);
+        } catch (WorkflowClientException e) {
+            throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_ABORTING_WORKFLOW_INSTANCE,
+                    instanceId, e);
+        } catch (WorkflowEngineClientException e) {
+            throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_ABORTING_WORKFLOW_INSTANCE,
+                    instanceId, new WorkflowClientException(e.getMessage(), e));
+        } catch (WorkflowException | WorkflowEngineException e) {
+            throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_ABORTING_WORKFLOW_INSTANCE, instanceId, e);
+        }
     }
 
     /**

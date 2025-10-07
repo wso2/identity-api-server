@@ -21,6 +21,7 @@ package org.wso2.carbon.identity.rest.api.server.workflow.v1.impl;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.WorkflowInstancesApiService;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.core.WorkflowService;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.factories.WorkflowServiceFactory;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.InstanceStatus;
 
 import javax.ws.rs.core.Response;
 
@@ -34,6 +35,13 @@ public class WorkflowInstancesApiServiceImpl implements WorkflowInstancesApiServ
     public WorkflowInstancesApiServiceImpl() {
         
         this.workflowService = WorkflowServiceFactory.getWorkflowService();
+    }
+
+    @Override
+    public Response abortWorkflowInstance(String instanceId) {
+
+        workflowService.abortWorkflowInstance(instanceId);
+        return Response.ok().entity(InstanceStatus.ABORTED).build();
     }
 
     @Override

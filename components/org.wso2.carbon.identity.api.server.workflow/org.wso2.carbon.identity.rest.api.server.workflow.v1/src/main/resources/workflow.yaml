@@ -539,9 +539,9 @@ paths:
     delete:
       tags:
         - Workflow Instances Management
-      summary: Abort workflow instance by ID
+      summary: Delete workflow instance by ID
       description: |
-        Abort a workflow instance by providing the instance ID.
+        Delete a workflow instance by providing the instance ID.
 
         <b>Scope required:</b> internal_workflow_instance_delete
       operationId: deleteWorkflowInstance
@@ -556,6 +556,37 @@ paths:
           description: Successfully deleted the workflow instance
         "404":
           $ref: "#/components/responses/NotFound"
+
+  /workflow-instances/{instance_id}/abort:
+    post:
+      tags:
+        - Workflow Instances Management
+      summary: Abort a workflow instance by ID
+      description: |
+        Abort a workflow instance by providing the instance ID.
+
+        <b>Scope required:</b> internal_workflow_instance_update
+      operationId: abortWorkflowInstance
+      parameters:
+        - name: instance_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully aborted the workflow instance
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InstanceStatus"
+        "400":
+          $ref: "#/components/responses/InvalidInput"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
 
   /workflow-engines:
     get:

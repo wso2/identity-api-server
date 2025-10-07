@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Error;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.InstanceStatus;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowInstanceListResponse;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowInstanceResponse;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.WorkflowInstancesApiService;
@@ -46,6 +47,28 @@ public class WorkflowInstancesApi  {
     public WorkflowInstancesApi() {
 
         this.delegate = WorkflowInstancesApiServiceFactory.getWorkflowInstancesApi();
+    }
+
+    @Valid
+    @POST
+    @Path("/{instance_id}/abort")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Abort a workflow instance by ID", notes = "Abort a workflow instance by providing the instance ID.  <b>Scope required:</b> internal_workflow_instance_update ", response = InstanceStatus.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Workflow Instances Management", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successfully aborted the workflow instance", response = InstanceStatus.class),
+        @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
+    })
+    public Response abortWorkflowInstance(@ApiParam(value = "",required=true) @PathParam("instance_id") String instanceId) {
+
+        return delegate.abortWorkflowInstance(instanceId );
     }
 
     @Valid

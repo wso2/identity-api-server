@@ -91,6 +91,8 @@ public class Constants {
                 "logs.", "Encountered an error while listing the workflow logs."),
         ERROR_CODE_CLIENT_ERROR_DELETING_WORKFLOW_INSTANCE("51012", "Unable to delete workflow log.",
                 "Encountered an error while deleting the workflow log identifier %s."),
+        ERROR_CODE_CLIENT_ERROR_ABORTING_WORKFLOW_INSTANCE("51013", "Unable to abort workflow instance.",
+                "Encountered an error while aborting the workflow instance identifier %s."),
         // Server Errors starting from 500xx.
         ERROR_CODE_ERROR_LISTING_WORKFLOWS("50020", "Unable to list existing workflows",
                 "Server encountered an error while listing the workflows."),
@@ -125,7 +127,9 @@ public class Constants {
         ERROR_CODE_ERROR_RETRIEVING_WORKFLOW_INSTANCE("50031", "Unable to retrieve workflow log.",
                 "Server encountered an error while retrieving the workflow log for identifier %s."),
         ERROR_CODE_ERROR_LISTING_WORKFLOW_INSTANCES("50032", "Unable to list existing workflow logs.",
-                "Server encountered an error while listing the workflow logs.");
+                "Server encountered an error while listing the workflow logs."),
+        ERROR_CODE_ERROR_ABORTING_WORKFLOW_INSTANCE("50033", "Unable to abort workflow instance).",
+                "Server encountered an error while aborting the workflow instance for identifier %s.");
 
         private final String code;
         private final String message;
