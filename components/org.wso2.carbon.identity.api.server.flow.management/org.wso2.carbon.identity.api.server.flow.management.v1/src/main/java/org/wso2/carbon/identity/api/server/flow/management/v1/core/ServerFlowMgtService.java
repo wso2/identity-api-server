@@ -117,6 +117,11 @@ public class ServerFlowMgtService {
         }
     }
 
+    /**
+     * Delete the flow for a specific flow type.
+     *
+     * @param flowType Type of the flow.
+     */
     public void deleteFlow(String flowType) {
 
         try {
