@@ -661,7 +661,7 @@ public class WorkflowService {
             if (StringUtils.isBlank(instanceId)) {
                 throw new WorkflowClientException("Workflow instance ID cannot be null or empty.");
             }
-            workflowManagementService.deleteWorkflowRequestCreatedByAnyUser(instanceId);
+            workflowManagementService.permanentlyDeleteWorkflowRequestByAnyUser(instanceId);
             approvalEventService.deletePendingApprovalTasks(instanceId);
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_DELETING_WORKFLOW_INSTANCE,
