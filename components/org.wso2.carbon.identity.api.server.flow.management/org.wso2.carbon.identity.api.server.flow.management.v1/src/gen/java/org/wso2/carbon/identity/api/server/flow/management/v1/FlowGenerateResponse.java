@@ -41,7 +41,7 @@ public class FlowGenerateResponse {
     }
 
     @ApiModelProperty(example = "2dc32cd4-3cde-4a77-bf95-af55a6738b92", value = "Id for the submitted generation operation")
-    @JsonProperty("operationId")
+    @JsonProperty("operation_id")
     @Valid
     public String getOperationId() {
 
