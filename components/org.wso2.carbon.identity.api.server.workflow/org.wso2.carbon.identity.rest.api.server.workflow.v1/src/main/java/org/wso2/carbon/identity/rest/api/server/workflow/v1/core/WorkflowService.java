@@ -281,12 +281,6 @@ public class WorkflowService {
         boolean isEnable;
         String eventId;
         try {
-            int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
-            if (tenantId != workflowManagementService.getWorkflow(workflowAssociation.getWorkflowId()).getTenantId()) {
-                throw new WorkflowClientException("A workflow association with ID: " +
-                        workflowAssociation.getWorkflowId() + " doesn't exist.");
-            }
-
             if (workflowAssociation.getIsEnabled() == null) {
                 isEnable = workflowManagementService.getAssociation(associationId).isEnabled();
             } else {
@@ -367,9 +361,7 @@ public class WorkflowService {
 
         try {
             Association association = workflowManagementService.getAssociation(associationId);
-            int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
-            if (association == null || tenantId != workflowManagementService
-                    .getWorkflow(association.getWorkflowId()).getTenantId()) {
+            if (association == null) {
                 throw new WorkflowClientException("A workflow association with ID: " + associationId +
                         "doesn't exist.");
             }
