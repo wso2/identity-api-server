@@ -25,20 +25,19 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Error;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowInstanceListItem;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.InstanceStatus;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowInstanceListResponse;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowInstanceResponse;
 import javax.ws.rs.core.Response;
 
 
 public interface WorkflowInstancesApiService {
 
+      public Response abortWorkflowInstance(String instanceId);
+
       public Response deleteWorkflowInstance(String instanceId);
 
       public Response getWorkflowInstanceById(String instanceId);
 
-      public Response getWorkflowInstances(Integer limit,
-                                           Integer offset,
-                                           String filter,
-                                           String sortBy,
-                                           String sortOrder);
+      public Response getWorkflowInstances(Integer limit, Integer offset, String filter);
 }

@@ -56,6 +56,7 @@ import org.wso2.carbon.identity.workflow.mgt.dto.Association;
 import org.wso2.carbon.identity.workflow.mgt.dto.WorkflowEvent;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowClientException;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowException;
+import org.wso2.carbon.identity.workflow.mgt.util.WorkflowRequestStatus;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -618,6 +619,29 @@ public class WorkflowService {
         return associationResponse;
     }
 
+    public void abortWorkflowInstance(String instanceId) {
+
+        try {
+            if (StringUtils.isBlank(instanceId)) {
+                throw new WorkflowClientException("Workflow instance ID cannot be null or empty.");
+            }
+            if (!WorkflowRequestStatus.PENDING.name()
+                    .equals(workflowManagementService.getWorkflowRequestBean(instanceId).getStatus())) {
+                throw new WorkflowClientException("Only PENDING workflow instances can be aborted.");
+            }
+            workflowManagementService.abortWorkflowRequest(instanceId);
+            approvalEventService.deletePendingApprovalTasks(instanceId);
+        } catch (WorkflowClientException e) {
+            throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_ABORTING_WORKFLOW_INSTANCE,
+                    instanceId, e);
+        } catch (WorkflowEngineClientException e) {
+            throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_ABORTING_WORKFLOW_INSTANCE,
+                    instanceId, new WorkflowClientException(e.getMessage(), e));
+        } catch (WorkflowException | WorkflowEngineException e) {
+            throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_ABORTING_WORKFLOW_INSTANCE, instanceId, e);
+        }
+    }
+
     /**
      * Deletes a workflow instance by its ID.
      *
@@ -629,7 +653,7 @@ public class WorkflowService {
             if (StringUtils.isBlank(instanceId)) {
                 throw new WorkflowClientException("Workflow instance ID cannot be null or empty.");
             }
-            workflowManagementService.deleteWorkflowRequestCreatedByAnyUser(instanceId);
+            workflowManagementService.permanentlyDeleteWorkflowRequestByAnyUser(instanceId);
             approvalEventService.deletePendingApprovalTasks(instanceId);
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_DELETING_WORKFLOW_INSTANCE,
@@ -710,9 +734,13 @@ public class WorkflowService {
         response.setRequestInitiator(workflowRequest.getCreatedBy());
 
         if (workflowRequest.getProperties() != null) {
-            List<Property> properties = workflowRequest.getProperties().stream().map(property ->
-                    new Property(property.getKey(), property.getValue())
-            ).collect(Collectors.toList());
+
+            List<Property> properties = workflowRequest.getProperties().stream().map(property -> {
+                Property prop = new Property();
+                prop.setKey(property.getKey());
+                prop.setValue(property.getValue());
+                return prop;
+            }).collect(Collectors.toList());
             response.setProperties(properties);
         }
         try {
