@@ -128,7 +128,7 @@ public class Constants {
                 "Server encountered an error while retrieving the workflow log for identifier %s."),
         ERROR_CODE_ERROR_LISTING_WORKFLOW_INSTANCES("50032", "Unable to list existing workflow logs.",
                 "Server encountered an error while listing the workflow logs."),
-        ERROR_CODE_ERROR_ABORTING_WORKFLOW_INSTANCE("50033", "Unable to abort workflow instance).",
+        ERROR_CODE_ERROR_ABORTING_WORKFLOW_INSTANCE("50033", "Unable to abort workflow instance.",
                 "Server encountered an error while aborting the workflow instance for identifier %s.");
 
         private final String code;
