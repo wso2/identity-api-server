@@ -363,7 +363,8 @@ public class WorkflowService {
                     workflowManagementService.getAssociationsForWorkflow(association.getWorkflowId());
             if (associationsForWorkflow == null || associationsForWorkflow.size() <= 1) {
                 throw new WorkflowClientException("The workflow association with ID: " + associationId +
-                        " cannot be deleted as it is the only association for the related workflow.");
+                        " cannot be deleted as it is the only association for the related workflow: " +
+                        association.getWorkflowId());
             }
             workflowManagementService.removeAssociation(Integer.parseInt(associationId));
         } catch (WorkflowClientException e) {
