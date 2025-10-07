@@ -86,7 +86,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [SELF_REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
+            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
           description: Type of the flow to retrieve
       responses:
         '200':
@@ -120,6 +120,47 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+    delete:
+      summary: Delete the flow
+      operationId: deleteFlow
+      tags:
+        - Flow Composer
+      parameters:
+        - in: query
+          name: flowType
+          required: true
+          schema:
+            type: string
+            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
+          description: Type of the flow to delete
+      responses:
+        '204':
+          description: Flow successfully deleted
+        '400':
+          description: Invalid request body or unsupported flow type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Encountered a server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   /flow/meta:
     get:
       summary: Retrieve metadata related to a flow type
@@ -132,7 +173,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [SELF_REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
+            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
           description: Type of the flow to get metadata for
       responses:
         '200':
@@ -206,7 +247,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [SELF_REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
+            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
           description: Type of the flow to get configurations for
       responses:
         '200':

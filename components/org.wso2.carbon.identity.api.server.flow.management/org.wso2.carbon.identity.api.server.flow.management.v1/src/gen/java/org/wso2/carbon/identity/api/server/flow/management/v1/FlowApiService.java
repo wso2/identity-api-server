@@ -23,6 +23,8 @@ import javax.ws.rs.core.Response;
 
 public interface FlowApiService {
 
+    public Response deleteFlow(String flowType);
+
     public Response generateFlow(FlowGenerateRequest flowGenerateRequest);
 
     public Response getFlow(String flowType);
