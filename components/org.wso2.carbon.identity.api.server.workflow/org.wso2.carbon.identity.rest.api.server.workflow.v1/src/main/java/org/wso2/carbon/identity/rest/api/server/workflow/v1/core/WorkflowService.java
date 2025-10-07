@@ -357,6 +357,14 @@ public class WorkflowService {
                 throw new WorkflowClientException("A workflow association with ID: " + associationId +
                         "doesn't exist.");
             }
+
+            // Ensure at least one association exists for the related workflow before allowing deletion.
+            List<Association> associationsForWorkflow =
+                    workflowManagementService.getAssociationsForWorkflow(association.getWorkflowId());
+            if (associationsForWorkflow == null || associationsForWorkflow.size() <= 1) {
+                throw new WorkflowClientException("The workflow association with ID: " + associationId +
+                        " cannot be deleted as it is the only association for the related workflow.");
+            }
             workflowManagementService.removeAssociation(Integer.parseInt(associationId));
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_ASSOCIATION_NOT_FOUND, associationId, e);
