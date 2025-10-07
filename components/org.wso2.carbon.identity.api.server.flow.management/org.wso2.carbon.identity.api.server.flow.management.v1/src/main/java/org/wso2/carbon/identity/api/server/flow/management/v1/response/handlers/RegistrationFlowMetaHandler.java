@@ -18,7 +18,10 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
 import org.wso2.carbon.identity.flow.mgt.Constants;
 
 import java.util.ArrayList;
@@ -40,6 +43,8 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.F
  */
 public class RegistrationFlowMetaHandler extends AbstractMetaResponseHandler {
 
+    private static final Log log = LogFactory.getLog(RegistrationFlowMetaHandler.class);
+
     @Override
     public String getFlowType() {
 
@@ -50,6 +55,12 @@ public class RegistrationFlowMetaHandler extends AbstractMetaResponseHandler {
     public String getAttributeProfile() {
 
         return SELF_REGISTRATION_ATTRIBUTE_PROFILE;
+    }
+
+    @Override
+    public boolean getWorkflowEnabled() {
+
+        return Utils.isWorkflowEnabled(Constants.FlowTypes.REGISTRATION);
     }
 
     @Override

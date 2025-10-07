@@ -237,6 +237,13 @@ public class WorkflowService {
                 throw new WorkflowClientException("An event with ID: " + workflowAssociation.getOperation().toString() +
                         " doesn't exist.");
             }
+            int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+            if (!workflowManagementService.listPaginatedAssociations(tenantId, 1, 0,
+                    "operation eq " + event.getEventId()).isEmpty()) {
+                throw new WorkflowClientException("A workflow association already exists for the event: " +
+                        event.getEventFriendlyName());
+            }
+
             workflowManagementService.addAssociation(workflowAssociation.getAssociationName(),
                     workflowAssociation.getWorkflowId(), workflowAssociation.getOperation().toString(),
                     null);
@@ -356,6 +363,15 @@ public class WorkflowService {
             if (association == null) {
                 throw new WorkflowClientException("A workflow association with ID: " + associationId +
                         "doesn't exist.");
+            }
+
+            // Ensure at least one association exists for the related workflow before allowing deletion.
+            List<Association> associationsForWorkflow =
+                    workflowManagementService.getAssociationsForWorkflow(association.getWorkflowId());
+            if (associationsForWorkflow == null || associationsForWorkflow.size() <= 1) {
+                throw new WorkflowClientException("The workflow association with ID: " + associationId +
+                        " cannot be deleted as it is the only association for the related workflow: " +
+                        association.getWorkflowId());
             }
             workflowManagementService.removeAssociation(Integer.parseInt(associationId));
         } catch (WorkflowClientException e) {

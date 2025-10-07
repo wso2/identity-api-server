@@ -56,6 +56,13 @@ public class FlowApiServiceImpl implements FlowApiService {
     }
 
     @Override
+    public Response deleteFlow(String flowType) {
+
+        flowMgtService.deleteFlow(flowType);
+        return Response.noContent().build();
+    }
+
+    @Override
     public Response generateFlow(FlowGenerateRequest flowGenerateRequest) {
 
         FlowGenerateResponse flowResponse = flowAIServiceCore.generateFlow(flowGenerateRequest);

@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers;
 
+import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,6 +74,12 @@ public class AskPasswordFlowMetaHandler extends AbstractMetaResponseHandler {
         supportedExecutors.add(GITHUB_EXECUTOR);
         supportedExecutors.add(FIDO2_EXECUTOR);
         return supportedExecutors;
+    }
+
+    @Override
+    public boolean getWorkflowEnabled() {
+
+        return Utils.isWorkflowEnabled(INVITED_USER_REGISTRATION);
     }
 
 }
