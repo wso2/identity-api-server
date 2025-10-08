@@ -57,7 +57,7 @@ public class WorkflowEnginesApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={  })
+    }, tags={ "Workflow Engines" })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "search results matching criteria", response = WorkflowEngine.class, responseContainer = "List"),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),

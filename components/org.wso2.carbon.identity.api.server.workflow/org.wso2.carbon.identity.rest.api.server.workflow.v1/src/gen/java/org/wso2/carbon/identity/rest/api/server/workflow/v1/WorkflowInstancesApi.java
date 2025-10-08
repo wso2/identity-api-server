@@ -24,8 +24,9 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Error;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowInstanceListItem;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.InstanceStatus;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowInstanceListResponse;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowInstanceResponse;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.WorkflowInstancesApiService;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.factories.WorkflowInstancesApiServiceFactory;
 
@@ -39,7 +40,7 @@ import javax.validation.constraints.*;
 @Path("/workflow-instances")
 @Api(description = "The workflow-instances API")
 
-public class WorkflowInstancesApi {
+public class WorkflowInstancesApi  {
 
     private final WorkflowInstancesApiService delegate;
 
@@ -49,84 +50,89 @@ public class WorkflowInstancesApi {
     }
 
     @Valid
+    @POST
+    @Path("/{instance_id}/abort")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Abort a workflow instance by ID", notes = "Abort a workflow instance by providing the instance ID.  <b>Scope required:</b> internal_workflow_instance_update ", response = InstanceStatus.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Workflow Instances Management", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successfully aborted the workflow instance", response = InstanceStatus.class),
+        @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
+    })
+    public Response abortWorkflowInstance(@ApiParam(value = "",required=true) @PathParam("instance_id") String instanceId) {
+
+        return delegate.abortWorkflowInstance(instanceId );
+    }
+
+    @Valid
     @DELETE
     @Path("/{instance_id}")
-
+    
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete workflow instance by ID", notes = "Delete a workflow instance by providing the " +
-            "instance ID.  <b>Scope required:</b> internal_workflow_instance_manage ", response = Void.class, authorizations = {
-                    @Authorization(value = "BasicAuth"),
-                    @Authorization(value = "OAuth2", scopes = {
-
-                    })
-            }, tags = {})
-    @ApiResponses(value = {
-            @ApiResponse(code = 204, message = "Successfully deleted the workflow instance", response = Void.class),
-            @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class)
+    @ApiOperation(value = "Delete workflow instance by ID", notes = "Delete a workflow instance by providing the instance ID.  <b>Scope required:</b> internal_workflow_instance_delete ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Workflow Instances Management", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "Successfully deleted the workflow instance", response = Void.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class)
     })
-    public Response deleteWorkflowInstance(
-            @ApiParam(value = "", required = true) @PathParam("instance_id") String instanceId) {
+    public Response deleteWorkflowInstance(@ApiParam(value = "",required=true) @PathParam("instance_id") String instanceId) {
 
-        return delegate.deleteWorkflowInstance(instanceId);
+        return delegate.deleteWorkflowInstance(instanceId );
     }
 
     @Valid
     @GET
     @Path("/{instance_id}")
-
+    
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get workflow instance by ID", notes = "Retrieve a specific workflow instance by providing" +
-            " its unique ID.  <b>Scope required:</b> internal_workflow_instance_view ", response = WorkflowInstanceListItem.class, authorizations = {
-                    @Authorization(value = "BasicAuth"),
-                    @Authorization(value = "OAuth2", scopes = {
-
-                    })
-            }, tags = {})
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Workflow instance retrieved successfully", response = WorkflowInstanceListItem.class),
-            @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class)
+    @ApiOperation(value = "Get workflow instance by ID", notes = "Retrieve a specific workflow instance by providing its unique ID.  <b>Scope required:</b> internal_workflow_instance_view ", response = WorkflowInstanceResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Workflow Instances Management", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Workflow instance retrieved successfully", response = WorkflowInstanceResponse.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class)
     })
-    public Response getWorkflowInstanceById(
-            @ApiParam(value = "", required = true) @PathParam("instance_id") String instanceId) {
+    public Response getWorkflowInstanceById(@ApiParam(value = "",required=true) @PathParam("instance_id") String instanceId) {
 
-        return delegate.getWorkflowInstanceById(instanceId);
+        return delegate.getWorkflowInstanceById(instanceId );
     }
 
     @Valid
     @GET
-
+    
+    
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get workflow instances for a tenant", notes = "Retrieve workflow instances filtered by " +
-            "various parameters.  Use a `filter` query param with supported operators like `eq`, `gt`, `gte`, `lt`, " +
-            "`lte`, `in`.  **Examples**: - `filter=createdAt>=2024-01-01T00:00:00Z` - `filter=status=APPROVED` - " +
-            "`filter=operationType in (CREATE,UPDATE)` - `filter=createdAt>=2024-01-01T00:00:00Z AND " +
-            "updatedAt<2025-01-01T00:00:00Z`  <b>Scope required:</b> internal_workflow_instance_view ", response = WorkflowInstanceListResponse.class, authorizations = {
-                    @Authorization(value = "BasicAuth"),
-                    @Authorization(value = "OAuth2", scopes = {
-
-                    })
-            }, tags = {})
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Workflow instances retrieved successfully", response = WorkflowInstanceListResponse.class),
-            @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
-            @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
-            @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-            @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class),
-            @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
+    @ApiOperation(value = "Get workflow instances for a tenant", notes = "Retrieve workflow instances filtered by various parameters.  <b>Scope required:</b> internal_workflow_instance_view ", response = WorkflowInstanceListResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Workflow Instances Management" })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Workflow instances retrieved successfully", response = WorkflowInstanceListResponse.class),
+        @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response getWorkflowInstances(
-            @Valid @ApiParam(value = "", defaultValue = "25") @DefaultValue("25") @QueryParam("limit") Integer limit,
-            @Valid @ApiParam(value = "", defaultValue = "0") @DefaultValue("0") @QueryParam("offset") Integer offset,
-            @Valid @ApiParam(value = "Filter conditions using logical expressions. " +
-                    "Supported operators: =, !=, >, >=, <, <=, in. Combine multiple " +
-                    "conditions with `AND`, `OR`. ") @QueryParam("filter") String filter,
-            @Valid @ApiParam(value = "", allowableValues = "createdAt, updatedAt, " +
-                    "status, operationType, workflowName")
+    public Response getWorkflowInstances(    @Valid@ApiParam(value = "", defaultValue="25") @DefaultValue("25")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "", defaultValue="0") @DefaultValue("0")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Filter conditions using logical expressions. Supported operators: `eq`, `le`, `ge`.  Combine multiple conditions with `and`.  Example:      `operationType+eq+ADD_USER+and+requestType+eq+MY_TASKS+and+status+eq+PENDING+and+createdAt+ge+2025-06-01 09:57:47.000+and+createdAt+le+2025-07-31 09:57:47.000` ")  @QueryParam("filter") String filter) {
 
-            @QueryParam("sortBy") String sortBy,
-            @Valid @ApiParam(value = "", allowableValues = "asc, desc") @QueryParam("sortOrder") String sortOrder) {
-
-        return delegate.getWorkflowInstances(limit, offset, filter, sortBy, sortOrder);
+        return delegate.getWorkflowInstances(limit,  offset,  filter );
     }
 
 }
