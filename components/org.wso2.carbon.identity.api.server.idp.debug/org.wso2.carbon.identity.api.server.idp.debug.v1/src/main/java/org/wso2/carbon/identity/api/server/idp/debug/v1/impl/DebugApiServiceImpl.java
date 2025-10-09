@@ -18,17 +18,18 @@
 
 package org.wso2.carbon.identity.api.server.idp.debug.v1.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.ws.rs.core.Response;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.idp.debug.v1.DebugApiService;
 import org.wso2.carbon.identity.api.server.idp.debug.v1.model.DebugConnectionRequest;
 import org.wso2.carbon.identity.api.server.idp.debug.v1.model.DebugConnectionResponse;
 import org.wso2.carbon.identity.api.server.idp.debug.v1.service.SimpleDebugService;
-import org.wso2.carbon.identity.api.server.common.error.APIError;
-
-import javax.ws.rs.core.Response;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Implementation of DebugApiService for testing Identity Provider authentication flows.
@@ -46,62 +47,72 @@ public class DebugApiServiceImpl implements DebugApiService {
     }
 
     /**
-     * Debug IdP connection with authentication credentials.
+     * Debug IdP connection with OAuth 2.0 flow.
+     * Generates authorization URL for user authentication.
      *
      * @param idpId Identity Provider ID from path parameter.
-     * @param debugConnectionRequest Debug connection request containing credentials.
-     * @return Response containing debug authentication results and claims.
+     * @param debugConnectionRequest Debug connection request containing OAuth 2.0 parameters.
+     * @return Response containing OAuth 2.0 authorization URL and session information.
      */
     @Override
     public Response debugConnection(String idpId, DebugConnectionRequest debugConnectionRequest) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Processing debug connection request for IdP: " + idpId);
+            LOG.debug("Processing OAuth 2.0 debug connection request for IdP: " + 
+                (idpId != null ? idpId.replaceAll("[\r\n]", "_") : "null"));
         }
 
         try {
             // Input validation at API layer.
-            if (debugConnectionRequest == null) {
-                return createErrorResponse("INVALID_REQUEST", "Request body is required", 
-                    Response.Status.BAD_REQUEST);
-            }
-
             if (idpId == null || idpId.trim().isEmpty()) {
                 return createErrorResponse("INVALID_REQUEST", "Identity Provider ID is required", 
                     Response.Status.BAD_REQUEST);
             }
 
-            // Execute debug flow.
-            String sessionId = debugService.executeDebugFlow(
-                idpId, 
-                debugConnectionRequest.getUsername(), 
-                debugConnectionRequest.getPassword()
+            // Extract OAuth 2.0 parameters from request (all optional).
+            String authenticatorName = null;
+            String redirectUri = null;
+            String scope = null;
+            Map<String, String> additionalParams = null;
+            
+            if (debugConnectionRequest != null) {
+                authenticatorName = debugConnectionRequest.getAuthenticatorName();
+                redirectUri = debugConnectionRequest.getRedirectUri();
+                scope = debugConnectionRequest.getScope();
+                additionalParams = debugConnectionRequest.getAdditionalParams();
+            }
+
+            LOG.info("Generating OAuth 2.0 authorization URL for IdP: " + 
+                (idpId != null ? idpId.replaceAll("[\r\n]", "_") : "null") + 
+                " with authenticator: " + 
+                (authenticatorName != null ? authenticatorName.replaceAll("[\r\n]", "_") : "null"));
+
+            // Generate OAuth 2.0 authorization URL using the new flow.
+            Map<String, Object> oauth2Result = debugService.generateOAuth2AuthorizationUrl(
+                idpId, authenticatorName, redirectUri, scope, additionalParams
             );
 
-            // Create response.
-            DebugConnectionResponse response = new DebugConnectionResponse();
-            response.setSessionId(sessionId);
-            response.setStatus("SUCCESS");
-            response.setMessage("Debug connection completed successfully");
-            
-            // Add metadata.
-            Map<String, Object> metadata = new HashMap<>();
-            metadata.put("idpId", idpId);
-            metadata.put("username", debugConnectionRequest.getUsername());
-            metadata.put("timestamp", System.currentTimeMillis());
-            response.setMetadata(metadata);
+            // Create OAuth 2.0 response.
+            DebugConnectionResponse response = createOAuth2Response(oauth2Result, idpId);
 
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Debug connection completed for IdP: " + idpId + ", sessionId: " + sessionId);
+                Object sessionId = oauth2Result.get("sessionId");
+                LOG.debug("OAuth 2.0 authorization URL generated for IdP: " + 
+                    (idpId != null ? idpId.replaceAll("[\r\n]", "_") : "null") + 
+                    ", sessionId: " + 
+                    (sessionId != null ? sessionId.toString().replaceAll("[\r\n]", "_") : "null"));
             }
 
             return Response.ok(response).build();
 
         } catch (APIError e) {
-            LOG.error("API error in debug connection for IdP: " + idpId, e);
+            LOG.error("API error in OAuth 2.0 debug connection for IdP: " + 
+                (idpId != null ? idpId.replaceAll("[\r\n]", "_") : "null"), e);
             return createErrorResponse(e.getCode(), e.getMessage(), mapToHttpStatus(e.getCode()));
         } catch (Exception e) {
-            LOG.error("Unexpected error in debug connection for IdP: " + idpId, e);
-            return createErrorResponse("INTERNAL_ERROR", "An unexpected error occurred", 
+            LOG.error("Unexpected error in OAuth 2.0 debug connection for IdP: " + 
+                (idpId != null ? idpId.replaceAll("[\r\n]", "_") : "null"), e);
+            return createErrorResponse("INTERNAL_ERROR", 
+                "Failed to generate OAuth 2.0 authorization URL: " + e.getMessage(), 
                 Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
@@ -129,6 +140,38 @@ public class DebugApiServiceImpl implements DebugApiService {
     }
 
     /**
+     * Creates OAuth 2.0 response from service layer result.
+     *
+     * @param oauth2Result OAuth 2.0 generation result from service layer.
+     * @param idpId Identity Provider ID.
+     * @return DebugConnectionResponse with OAuth 2.0 authorization URL.
+     */
+    private DebugConnectionResponse createOAuth2Response(Map<String, Object> oauth2Result, String idpId) {
+        DebugConnectionResponse response = new DebugConnectionResponse();
+        
+        // Set basic response data.
+        response.setSessionId((String) oauth2Result.get("sessionId"));
+        response.setAuthorizationUrl((String) oauth2Result.get("authorizationUrl"));
+        response.setStatus((String) oauth2Result.get("status"));
+        response.setMessage((String) oauth2Result.get("message"));
+
+        // Create comprehensive metadata.
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("idpId", idpId);
+        metadata.put("idpName", oauth2Result.get("idpName"));
+        metadata.put("authenticatorName", oauth2Result.get("authenticatorName"));
+        metadata.put("timestamp", oauth2Result.get("timestamp"));
+        metadata.put("flow", "OAuth 2.0 Authorization Code with PKCE");
+        metadata.put("nextStep", "Redirect user to authorizationUrl for authentication");
+        metadata.put("callbackEndpoint", "/commonauth");
+        
+        response.setMetadata(metadata);
+        return response;
+    }
+
+
+
+    /**
      * Maps API error codes to HTTP status codes.
      *
      * @param errorCode API error code.
@@ -139,7 +182,7 @@ public class DebugApiServiceImpl implements DebugApiService {
             return Response.Status.INTERNAL_SERVER_ERROR;
         }
         
-        switch (errorCode.toUpperCase()) {
+        switch (errorCode.toUpperCase(java.util.Locale.ROOT)) {
             case "IDP_NOT_FOUND":
                 return Response.Status.NOT_FOUND;
             case "INVALID_REQUEST":

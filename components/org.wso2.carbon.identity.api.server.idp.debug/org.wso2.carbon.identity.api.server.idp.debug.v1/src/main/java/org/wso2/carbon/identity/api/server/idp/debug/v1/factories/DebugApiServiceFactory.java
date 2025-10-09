@@ -21,10 +21,18 @@ package org.wso2.carbon.identity.api.server.idp.debug.v1.factories;
 import org.wso2.carbon.identity.api.server.idp.debug.v1.DebugApiService;
 import org.wso2.carbon.identity.api.server.idp.debug.v1.impl.DebugApiServiceImpl;
 
+/**
+ * Factory class for creating Debug API service instances.
+ */
 public class DebugApiServiceFactory {
 
     private static final DebugApiService service = new DebugApiServiceImpl();
 
+    /**
+     * Get the Debug API service instance.
+     *
+     * @return Debug API service instance.
+     */
     public static DebugApiService getDebugApi() {
         return service;
     }

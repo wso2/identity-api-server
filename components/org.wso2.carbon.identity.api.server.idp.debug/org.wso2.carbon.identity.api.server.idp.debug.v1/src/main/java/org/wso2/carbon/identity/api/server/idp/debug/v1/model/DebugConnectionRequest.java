@@ -22,32 +22,34 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import javax.validation.constraints.NotNull;
+
 
 /**
- * Debug connection request model for IdP authentication testing.
- * Contains username and password for authentication flow testing.
+ * Debug connection request model for IdP OAuth 2.0 authentication testing.
+ * Contains parameters for OAuth 2.0 authorization URL generation.
  */
-@ApiModel(description = "Debug connection request for IdP authentication testing")
+@ApiModel(description = "Debug connection request for IdP OAuth 2.0 authentication testing")
 public class DebugConnectionRequest {
-
-    @NotNull
-    @ApiModelProperty(value = "Username for authentication test", required = true, example = "abc@gmail.com")
-    @JsonProperty("username")
-    private String username;
-
-    @NotNull
-    @ApiModelProperty(value = "Password for authentication test", required = true, example = "Linuka@123")
-    @JsonProperty("password")
-    private String password;
 
     @ApiModelProperty(value = "Optional authenticator name to use for testing")
     @JsonProperty("authenticatorName")
     private String authenticatorName;
 
+    @ApiModelProperty(value = "Custom redirect URI for OAuth 2.0 callback (optional)")
+    @JsonProperty("redirectUri")
+    private String redirectUri;
+
+    @ApiModelProperty(value = "Custom OAuth 2.0 scope (optional)", example = "openid profile email")
+    @JsonProperty("scope")
+    private String scope;
+
     @ApiModelProperty(value = "Request timeout in seconds", example = "30")
     @JsonProperty("timeoutSeconds")
     private Integer timeoutSeconds = 30;
+
+    @ApiModelProperty(value = "Additional OAuth 2.0 parameters as key-value pairs")
+    @JsonProperty("additionalParams")
+    private java.util.Map<String, String> additionalParams;
 
     /**
      * Default constructor.
@@ -57,50 +59,66 @@ public class DebugConnectionRequest {
     }
 
     /**
-     * Constructor with username and password.
+     * Constructor with authenticator name.
      *
-     * @param username Username for authentication test.
-     * @param password Password for authentication test.
+     * @param authenticatorName Authenticator name for OAuth 2.0 test.
      */
-    public DebugConnectionRequest(String username, String password) {
-        this.username = username;
-        this.password = password;
+    public DebugConnectionRequest(String authenticatorName) {
+        this.authenticatorName = authenticatorName;
     }
 
     /**
-     * Gets the username.
+     * Gets the redirect URI.
      *
-     * @return Username.
+     * @return Redirect URI.
      */
-    public String getUsername() {
-        return username;
+    public String getRedirectUri() {
+        return redirectUri;
     }
 
     /**
-     * Sets the username.
+     * Sets the redirect URI.
      *
-     * @param username Username to set.
+     * @param redirectUri Redirect URI to set.
      */
-    public void setUsername(String username) {
-        this.username = username;
+    public void setRedirectUri(String redirectUri) {
+        this.redirectUri = redirectUri;
     }
 
     /**
-     * Gets the password.
+     * Gets the OAuth 2.0 scope.
      *
-     * @return Password.
+     * @return OAuth 2.0 scope.
      */
-    public String getPassword() {
-        return password;
+    public String getScope() {
+        return scope;
     }
 
     /**
-     * Sets the password.
+     * Sets the OAuth 2.0 scope.
      *
-     * @param password Password to set.
+     * @param scope OAuth 2.0 scope to set.
      */
-    public void setPassword(String password) {
-        this.password = password;
+    public void setScope(String scope) {
+        this.scope = scope;
+    }
+
+    /**
+     * Gets the additional OAuth 2.0 parameters.
+     *
+     * @return Additional OAuth 2.0 parameters.
+     */
+    public java.util.Map<String, String> getAdditionalParams() {
+        return additionalParams;
+    }
+
+    /**
+     * Sets the additional OAuth 2.0 parameters.
+     *
+     * @param additionalParams Additional OAuth 2.0 parameters to set.
+     */
+    public void setAdditionalParams(java.util.Map<String, String> additionalParams) {
+        this.additionalParams = additionalParams;
     }
 
     /**
@@ -142,10 +160,11 @@ public class DebugConnectionRequest {
     @Override
     public String toString() {
         return "DebugConnectionRequest{" +
-                "username='" + username + '\'' +
-                ", password='[PROTECTED]'" +
-                ", authenticatorName='" + authenticatorName + '\'' +
+                "authenticatorName='" + authenticatorName + '\'' +
+                ", redirectUri='" + redirectUri + '\'' +
+                ", scope='" + scope + '\'' +
                 ", timeoutSeconds=" + timeoutSeconds +
+                ", additionalParams=" + additionalParams +
                 '}';
     }
 }

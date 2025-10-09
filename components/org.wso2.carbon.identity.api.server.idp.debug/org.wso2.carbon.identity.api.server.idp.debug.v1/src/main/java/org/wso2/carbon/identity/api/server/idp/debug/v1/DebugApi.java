@@ -18,18 +18,30 @@
 
 package org.wso2.carbon.identity.api.server.idp.debug.v1;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
+
 import org.wso2.carbon.identity.api.server.idp.debug.v1.factories.DebugApiServiceFactory;
-import org.wso2.carbon.identity.api.server.idp.debug.v1.model.Error;
 import org.wso2.carbon.identity.api.server.idp.debug.v1.model.DebugConnectionRequest;
 import org.wso2.carbon.identity.api.server.idp.debug.v1.model.DebugConnectionResponse;
+import org.wso2.carbon.identity.api.server.idp.debug.v1.model.Error;
 
-import javax.validation.Valid;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
-import javax.validation.constraints.*;
-
+/**
+ * Debug API for OAuth 2.0 authentication flow debugging.
+ */
 @Path("/debug")
 @Api(description = "The debug API")
 public class DebugApi {

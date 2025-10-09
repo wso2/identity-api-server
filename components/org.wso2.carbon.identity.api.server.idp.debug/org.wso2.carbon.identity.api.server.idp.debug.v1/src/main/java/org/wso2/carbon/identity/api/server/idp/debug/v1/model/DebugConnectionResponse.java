@@ -25,20 +25,28 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.Map;
 
 /**
- * Debug connection response model for IdP authentication testing results.
+ * Debug connection response model for IdP OAuth 2.0 authentication testing results.
  */
-@ApiModel(description = "Debug connection response for IdP authentication testing results")
+@ApiModel(description = "Debug connection response for IdP OAuth 2.0 authentication testing results")
 public class DebugConnectionResponse {
 
     @ApiModelProperty(value = "Debug session ID", example = "debug-session-12345")
     @JsonProperty("sessionId")
     private String sessionId;
 
-    @ApiModelProperty(value = "Status of the debug operation", example = "SUCCESS")
+    @ApiModelProperty(value = "OAuth 2.0 authorization URL for user authentication", 
+                      example = "https://accounts.google.com/oauth/authorize?response_type=code&client_id=123"
+                               + "&redirect_uri=https%3A%2F%2Flocalhost%3A9443%2Fcommonauth"
+                               + "&scope=openid+profile+email&state=debug-session-12345"
+                               + "&code_challenge=abc123&code_challenge_method=S256")
+    @JsonProperty("authorizationUrl")
+    private String authorizationUrl;
+
+    @ApiModelProperty(value = "Status of the debug operation", example = "URL_GENERATED")
     @JsonProperty("status")
     private String status;
 
-    @ApiModelProperty(value = "Response message", example = "Debug connection completed successfully")
+    @ApiModelProperty(value = "Response message", example = "OAuth 2.0 authorization URL generated successfully")
     @JsonProperty("message")
     private String message;
 
@@ -69,6 +77,24 @@ public class DebugConnectionResponse {
      */
     public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
+    }
+
+    /**
+     * Gets the OAuth 2.0 authorization URL.
+     *
+     * @return Authorization URL.
+     */
+    public String getAuthorizationUrl() {
+        return authorizationUrl;
+    }
+
+    /**
+     * Sets the OAuth 2.0 authorization URL.
+     *
+     * @param authorizationUrl Authorization URL to set.
+     */
+    public void setAuthorizationUrl(String authorizationUrl) {
+        this.authorizationUrl = authorizationUrl;
     }
 
     /**
@@ -129,6 +155,7 @@ public class DebugConnectionResponse {
     public String toString() {
         return "DebugConnectionResponse{" +
                 "sessionId='" + sessionId + '\'' +
+                ", authorizationUrl='" + authorizationUrl + '\'' +
                 ", status='" + status + '\'' +
                 ", message='" + message + '\'' +
                 ", metadata=" + metadata +

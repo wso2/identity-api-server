@@ -32,8 +32,7 @@ import org.apache.commons.lang.StringUtils;
 
 // Import IdentityProvider and related classes from Carbon Identity framework
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
-import org.wso2.carbon.idp.mgt.IdentityProviderManager;
-import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
+
 
 // Import API error classes
 import org.wso2.carbon.identity.api.server.common.error.APIError;
@@ -49,7 +48,6 @@ import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
 public class DebugService {
 
     private static final Log LOG = LogFactory.getLog(DebugService.class);
-    private static final String DEFAULT_TENANT_DOMAIN = "carbon.super";
 
     /**
      * Constructor.
@@ -70,32 +68,35 @@ public class DebugService {
      */
     public DebugResponse executeDebugFlow(String idpId, String username, String password) throws APIError {
         
-        // Input validation.
-        validateDebugRequest(idpId, username, password);
+        LOG.warn("Legacy executeDebugFlow with credentials called - converting to OAuth 2.0 flow");
         
-        String sessionId = generateDebugSessionId();
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Starting debug flow for IdP: " + idpId + ", session: " + sessionId);
-        }
-
         try {
-            // Step 1: Get IdP object using idp-mgt.
-            IdentityProvider identityProvider = getIdentityProvider(idpId);
+            // Convert to OAuth 2.0 flow using SimpleDebugService.
+            SimpleDebugService simpleDebugService = new SimpleDebugService();
+            Map<String, Object> oauth2Result = simpleDebugService.generateOAuth2AuthorizationUrl(idpId, null, null, null, null);
             
-            // Step 2: Execute debug authentication flow.
-            Map<String, Object> debugResult = performDebugAuthentication(identityProvider, username, password, sessionId);
+            // Convert to legacy response format.
+            DebugResponse response = new DebugResponse();
+            response.setSessionId((String) oauth2Result.get("sessionId"));
+            response.setStatus((String) oauth2Result.get("status"));
+            response.setTargetIdp(idpId);
+            response.setAuthenticatorUsed((String) oauth2Result.get("authenticatorName"));
             
-            // Step 3: Build and return response.
-            return buildDebugResponse(sessionId, identityProvider, debugResult);
+            // Add OAuth URL to metadata.
+            Map<String, Object> metadata = new HashMap<>();
+            metadata.put("authorizationUrl", oauth2Result.get("authorizationUrl"));
+            metadata.put("message", "Legacy API converted to OAuth 2.0 flow. Use authorizationUrl for authentication.");
+            metadata.put("timestamp", oauth2Result.get("timestamp"));
+            response.setMetadata(metadata);
             
-        } catch (IdentityProviderManagementException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("IdP not found: " + idpId, e);
-            }
-            throw createAPIError("IDP_NOT_FOUND", "Identity Provider not found: " + idpId);
+            return response;
+            
+        } catch (APIError e) {
+            throw e;
         } catch (Exception e) {
-            LOG.error("Error executing debug flow for IdP: " + idpId, e);
-            throw createAPIError("INTERNAL_ERROR", "Failed to execute debug flow: " + e.getMessage());
+            LOG.error("Error converting legacy debug flow for IdP: " + 
+                (idpId != null ? idpId.replaceAll("[\r\n]", "_") : "null"), e);
+            throw createAPIError("INTERNAL_ERROR", "Failed to execute legacy debug flow: " + e.getMessage());
         }
     }
 
@@ -150,7 +151,7 @@ public class DebugService {
             return false;
         }
         
-        String lowerInput = input.toLowerCase();
+        String lowerInput = input.toLowerCase(java.util.Locale.ROOT);
         String[] sqlPatterns = {"'", "\"", ";", "--", "/*", "*/", "union", "select", "insert", "update", "delete"};
         
         for (String pattern : sqlPatterns) {
@@ -159,28 +160,6 @@ public class DebugService {
             }
         }
         return false;
-    }
-
-    /**
-     * Retrieves Identity Provider by ID or name.
-     *
-     * @param idpId Identity Provider ID (resource ID or name).
-     * @return IdentityProvider object.
-     * @throws IdentityProviderManagementException if IdP not found.
-     */
-    private IdentityProvider getIdentityProvider(String idpId) throws IdentityProviderManagementException {
-        IdentityProviderManager idpManager = IdentityProviderManager.getInstance();
-        
-        try {
-            // Try to get by resource ID first.
-            return idpManager.getIdPByResourceId(idpId, DEFAULT_TENANT_DOMAIN, true);
-        } catch (IdentityProviderManagementException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Failed to get IdP by resource ID, trying by name: " + e.getMessage());
-            }
-            // If not found by resource ID, try by name.
-            return idpManager.getIdPByName(idpId, DEFAULT_TENANT_DOMAIN);
-        }
     }
 
     /**
@@ -202,248 +181,10 @@ public class DebugService {
 
 
 
-    /**
-     * Performs debug authentication using the debug framework components.
-     * Follows the architecture: ContextProvider -> Executer -> FederatedIdP -> /commonauth -> RequestCoordinator -> Processor
-     *
-     * @param identityProvider Identity Provider.
-     * @param username Username for authentication.
-     * @param password Password for authentication.
-     * @param sessionId Debug session ID.
-     * @return Debug result map.
-     */
-    private Map<String, Object> performDebugAuthentication(IdentityProvider identityProvider, 
-                                                          String username, String password, 
-                                                          String sessionId) {
-        Map<String, Object> debugResult = new HashMap<>();
-        debugResult.put("sessionId", sessionId);
-        debugResult.put("idpName", identityProvider.getIdentityProviderName());
-        debugResult.put("timestamp", System.currentTimeMillis());
-        
-        try {
-            // STEP 1: Use ContextProvider to create debug context
-            org.wso2.carbon.identity.debug.framework.ContextProvider contextProvider = 
-                new org.wso2.carbon.identity.debug.framework.ContextProvider();
-            
-            // Create mock request for context provider (in real scenario, this would be the actual request)
-            javax.servlet.http.HttpServletRequest mockRequest = createMockRequest(username, password);
-            
-            // Provide context with IdP ID and authenticator name
-            org.wso2.carbon.identity.application.authentication.framework.context.AuthenticationContext context = 
-                contextProvider.provideContext(mockRequest, identityProvider.getResourceId(), getDefaultAuthenticatorName(identityProvider));
-            
-            // STEP 2: Use Executer to initiate authentication with IdP
-            org.wso2.carbon.identity.debug.framework.Executer executer = 
-                new org.wso2.carbon.identity.debug.framework.Executer();
-            
-            // Execute authentication - this will send to FederatedIdP and callback to /commonauth
-            boolean executionStarted = executer.execute(identityProvider, context);
-            
-            if (executionStarted) {
-                debugResult.put("authenticationStarted", true);
-                debugResult.put("status", "AUTHENTICATION_INITIATED");
-                
-                // STEP 3: Simulate the callback flow (RequestCoordinator -> Processor)
-                // In real implementation, this would happen via /commonauth callback
-                // Store context for callback handling
-                org.wso2.carbon.identity.debug.framework.RequestCoordinator.storeDebugContext(sessionId, context);
-                
-                // Simulate callback processing
-                Map<String, Object> callbackResult = simulateCallbackProcessing(context, sessionId);
-                debugResult.putAll(callbackResult);
-                
-            } else {
-                debugResult.put("authenticationStarted", false);
-                debugResult.put("status", "EXECUTION_FAILED");
-                debugResult.put("error", "Failed to initiate authentication with IdP");
-            }
-            
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Debug authentication using framework completed for session: " + sessionId);
-            }
-            
-        } catch (Exception e) {
-            LOG.error("Error in debug authentication using framework: " + e.getMessage(), e);
-            debugResult.put("authenticationSuccess", false);
-            debugResult.put("status", "ERROR");
-            debugResult.put("error", e.getMessage());
-        }
-        
-        return debugResult;
-    }
-    
-    /**
-     * Creates a mock HTTP request for debug framework.
-     *
-     * @param username Username for debug.
-     * @param password Password for debug.
-     * @return Mock HttpServletRequest.
-     */
-    private javax.servlet.http.HttpServletRequest createMockRequest(String username, String password) {
-        // Create a simple mock request - in real implementation, this would be the actual request
-        return new javax.servlet.http.HttpServletRequestWrapper(new MockHttpServletRequest()) {
-            @Override
-            public String getParameter(String name) {
-                switch (name) {
-                    case "username":
-                        return username;
-                    case "password":
-                        return password;
-                    case "isDebugFlow":
-                        return "true";
-                    default:
-                        return super.getParameter(name);
-                }
-            }
-            
-            @Override
-            public String getRequestURI() {
-                return "/api/server/v1/debug/connection";
-            }
-            
-            @Override
-            public String getRemoteAddr() {
-                return "127.0.0.1";
-            }
-            
-            @Override
-            public String getHeader(String name) {
-                if ("User-Agent".equals(name)) {
-                    return "Debug-Client/1.0";
-                }
-                return super.getHeader(name);
-            }
-        };
-    }
-    
-    /**
-     * Simple mock HTTP servlet request.
-     */
-    private static class MockHttpServletRequest implements javax.servlet.http.HttpServletRequest {
-        // Basic implementation - only essential methods
-        @Override public String getParameter(String name) { return null; }
-        @Override public String getRequestURI() { return "/"; }
-        @Override public String getRemoteAddr() { return "127.0.0.1"; }
-        @Override public String getHeader(String name) { return null; }
-        
-        // All other methods return default values or throw UnsupportedOperationException
-        @Override public String getAuthType() { return null; }
-        @Override public javax.servlet.http.Cookie[] getCookies() { return new javax.servlet.http.Cookie[0]; }
-        @Override public long getDateHeader(String name) { return -1; }
-        @Override public java.util.Enumeration<String> getHeaders(String name) { return java.util.Collections.emptyEnumeration(); }
-        @Override public java.util.Enumeration<String> getHeaderNames() { return java.util.Collections.emptyEnumeration(); }
-        @Override public int getIntHeader(String name) { return -1; }
-        @Override public String getMethod() { return "POST"; }
-        @Override public String getPathInfo() { return null; }
-        @Override public String getPathTranslated() { return null; }
-        @Override public String getContextPath() { return ""; }
-        @Override public String getQueryString() { return null; }
-        @Override public String getRemoteUser() { return null; }
-        @Override public boolean isUserInRole(String role) { return false; }
-        @Override public java.security.Principal getUserPrincipal() { return null; }
-        @Override public String getRequestedSessionId() { return null; }
-        @Override public StringBuffer getRequestURL() { return new StringBuffer("http://localhost:9443/api/server/v1/debug/connection"); }
-        @Override public String getServletPath() { return ""; }
-        @Override public javax.servlet.http.HttpSession getSession(boolean create) { return null; }
-        @Override public javax.servlet.http.HttpSession getSession() { return null; }
-        @Override public boolean isRequestedSessionIdValid() { return false; }
-        @Override public boolean isRequestedSessionIdFromCookie() { return false; }
-        @Override public boolean isRequestedSessionIdFromURL() { return false; }
-        @Override public boolean isRequestedSessionIdFromUrl() { return false; }
-        @Override public boolean authenticate(javax.servlet.http.HttpServletResponse response) { return false; }
-        @Override public void login(String username, String password) {}
-        @Override public void logout() {}
-        @Override public java.util.Collection<javax.servlet.http.Part> getParts() { return java.util.Collections.emptyList(); }
-        @Override public javax.servlet.http.Part getPart(String name) { return null; }
 
-        @Override public Object getAttribute(String name) { return null; }
-        @Override public java.util.Enumeration<String> getAttributeNames() { return java.util.Collections.emptyEnumeration(); }
-        @Override public String getCharacterEncoding() { return "UTF-8"; }
-        @Override public void setCharacterEncoding(String env) {}
-        @Override public int getContentLength() { return -1; }
 
-        @Override public String getContentType() { return "application/json"; }
-        @Override public javax.servlet.ServletInputStream getInputStream() { return null; }
-        @Override public java.util.Enumeration<String> getParameterNames() { return java.util.Collections.emptyEnumeration(); }
-        @Override public String[] getParameterValues(String name) { return null; }
-        @Override public java.util.Map<String, String[]> getParameterMap() { return java.util.Collections.emptyMap(); }
-        @Override public String getProtocol() { return "HTTP/1.1"; }
-        @Override public String getScheme() { return "https"; }
-        @Override public String getServerName() { return "localhost"; }
-        @Override public int getServerPort() { return 9443; }
-        @Override public java.io.BufferedReader getReader() { return null; }
-        @Override public String getRemoteHost() { return "localhost"; }
-        @Override public void setAttribute(String name, Object o) {}
-        @Override public void removeAttribute(String name) {}
-        @Override public java.util.Locale getLocale() { return java.util.Locale.getDefault(); }
-        @Override public java.util.Enumeration<java.util.Locale> getLocales() { return java.util.Collections.emptyEnumeration(); }
-        @Override public boolean isSecure() { return true; }
-        @Override public javax.servlet.RequestDispatcher getRequestDispatcher(String path) { return null; }
-        @Override public String getRealPath(String path) { return null; }
-        @Override public int getRemotePort() { return 12345; }
-        @Override public String getLocalName() { return "localhost"; }
-        @Override public String getLocalAddr() { return "127.0.0.1"; }
-        @Override public int getLocalPort() { return 9443; }
-        @Override public javax.servlet.ServletContext getServletContext() { return null; }
-        @Override public javax.servlet.AsyncContext startAsync() { return null; }
-        @Override public javax.servlet.AsyncContext startAsync(javax.servlet.ServletRequest servletRequest, javax.servlet.ServletResponse servletResponse) { return null; }
-        @Override public boolean isAsyncStarted() { return false; }
-        @Override public boolean isAsyncSupported() { return false; }
-        @Override public javax.servlet.AsyncContext getAsyncContext() { return null; }
-        @Override public javax.servlet.DispatcherType getDispatcherType() { return javax.servlet.DispatcherType.REQUEST; }
-    }
-    
-    /**
-     * Gets the default authenticator name for the IdP.
-     *
-     * @param identityProvider Identity Provider.
-     * @return Default authenticator name.
-     */
-    private String getDefaultAuthenticatorName(IdentityProvider identityProvider) {
-        if (identityProvider.getFederatedAuthenticatorConfigs() != null && 
-            identityProvider.getFederatedAuthenticatorConfigs().length > 0) {
-            return identityProvider.getFederatedAuthenticatorConfigs()[0].getName();
-        }
-        return "DefaultAuthenticator";
-    }
-    
-    /**
-     * Simulates callback processing using RequestCoordinator and Processor.
-     *
-     * @param context Authentication context.
-     * @param sessionId Session ID.
-     * @return Callback processing result.
-     */
-    private Map<String, Object> simulateCallbackProcessing(org.wso2.carbon.identity.application.authentication.framework.context.AuthenticationContext context, String sessionId) {
-        Map<String, Object> result = new HashMap<>();
-        
-        try {
-            // Simulate successful authentication for demo
-            context.setProperty("DEBUG_AUTH_RESULT", true);
-            context.setProperty("DEBUG_CALLBACK_RESULT", true);
-            context.setProperty("DEBUG_CALLBACK_PROCESSED", "true");
-            context.setProperty("DEBUG_AUTH_COMPLETED", "true");
-            
-            // Use Processor to process the results
-            org.wso2.carbon.identity.debug.framework.Processor processor = 
-                new org.wso2.carbon.identity.debug.framework.Processor();
-            
-            Object processedResult = processor.process(context);
-            
-            result.put("authenticationSuccess", true);
-            result.put("status", "SUCCESS");
-            result.put("processedResult", processedResult);
-            result.put("callbackProcessed", true);
-            
-        } catch (Exception e) {
-            LOG.error("Error in callback processing simulation: " + e.getMessage(), e);
-            result.put("authenticationSuccess", false);
-            result.put("status", "CALLBACK_ERROR");
-            result.put("error", e.getMessage());
-        }
-        
-        return result;
-    }
+
+
 
     /**
      * Builds debug response from debug result.

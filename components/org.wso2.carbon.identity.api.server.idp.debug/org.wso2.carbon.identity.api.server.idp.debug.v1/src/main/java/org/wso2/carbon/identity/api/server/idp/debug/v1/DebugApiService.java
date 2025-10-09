@@ -23,6 +23,9 @@ import org.wso2.carbon.identity.api.server.idp.debug.v1.model.DebugConnectionReq
 import javax.validation.Valid;
 import javax.ws.rs.core.Response;
 
+/**
+ * Service interface for Identity Provider debugging operations.
+ */
 public interface DebugApiService {
     
     /**
