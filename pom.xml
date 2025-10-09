@@ -899,6 +899,7 @@
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
                 <artifactId>org.wso2.carbon.identity.api.credential.action.management.v1</artifactId>
+                <artifactId>org.wso2.carbon.identity.api.server.user.credential.management.common</artifactId>
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>
@@ -1061,9 +1062,6 @@
         <org.wso2.carbon.identity.inbound.provisioning.scim2.version>3.4.146
         </org.wso2.carbon.identity.inbound.provisioning.scim2.version>
 
-        <!-- VC related versions -->
-        <carbon.identity.openid4vc.version>1.0.0</carbon.identity.openid4vc.version>
-
         <!-- Unit test versions -->
         <testng.version>6.9.10</testng.version>
         <mockito-core.version>4.6.1</mockito-core.version>
@@ -1116,6 +1114,7 @@
         <module>components/org.wso2.carbon.identity.api.server.asynchronous.operation.status.management</module>
         <module>components/org.wso2.carbon.identity.api.server.vc.template.management</module>
         <module>components/org.wso2.carbon.identity.api.server.credential.management</module>
+        <module>components/org.wso2.carbon.identity.api.server.user.credential.management</module>
     </modules>
 
 </project>
