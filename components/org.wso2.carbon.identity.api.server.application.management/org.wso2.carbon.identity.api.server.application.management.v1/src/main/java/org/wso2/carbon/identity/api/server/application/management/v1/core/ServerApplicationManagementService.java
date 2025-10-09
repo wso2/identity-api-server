@@ -35,6 +35,7 @@ import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.resource.mgt.APIResourceMgtException;
+import org.wso2.carbon.identity.api.resource.mgt.constant.APIResourceManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
@@ -115,6 +116,8 @@ import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.application.mgt.AuthorizedAPIManagementService;
 import org.wso2.carbon.identity.application.mgt.inbound.dto.ApplicationDTO;
 import org.wso2.carbon.identity.application.mgt.inbound.dto.InboundProtocolConfigurationDTO;
+import org.wso2.carbon.identity.authorization.common.AuthorizationUtil;
+import org.wso2.carbon.identity.authorization.common.exception.ForbiddenException;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.configuration.mgt.core.model.ResourceSearchBean;
 import org.wso2.carbon.identity.configuration.mgt.core.search.ComplexCondition;
@@ -187,6 +190,7 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.BLOCK_SYSTEM_RESERVED_APP_CREATION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_APPLICATION_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_PROCESSING_REQUEST;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.FORBIDDEN_OPERATION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.UNSUPPORTED_OUTBOUND_PROVISIONING_CONFIGURATION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.USE_EXTERNAL_CONSENT_PAGE_NOT_SUPPORTED;
@@ -1459,6 +1463,11 @@ public class ServerApplicationManagementService {
             if (apiResource == null) {
                 throw buildClientError(ErrorMessage.API_RESOURCE_NOT_FOUND, authorizedAPIId, tenantDomain);
             }
+
+            if (!Boolean.parseBoolean(IdentityUtil.getProperty(
+                            ApplicationManagementConstants.SKIP_ENFORCE_AUTHORIZED_API_UPDATE_PERMISSION))) {
+                validateUserCanUpdateAPIResourceType(apiResource);
+            }
             validateAPIResourceScopes(apiResource, authorizedAPICreationModel.getScopes());
             this.validateAPIResourceAuthorizationDetailsTypes(apiResource,
                     authorizedAPICreationModel.getAuthorizationDetailsTypes());
@@ -1488,6 +1497,9 @@ public class ServerApplicationManagementService {
         } catch (APIResourceMgtException e) {
             String msg = "Error while fetching API resource with id: " + authorizedAPICreationModel.getId();
             throw Utils.buildServerError(msg, e);
+        } catch (ForbiddenException e) {
+            throw Utils.buildForbiddenError(FORBIDDEN_OPERATION.getCode(), FORBIDDEN_OPERATION.getMessage(),
+                    FORBIDDEN_OPERATION.getDescription());
         }
     }
 
@@ -1500,12 +1512,25 @@ public class ServerApplicationManagementService {
     public void deleteAuthorizedAPI(String applicationId, String apiId) {
 
         try {
-            authorizedAPIManagementService.deleteAuthorizedAPI(applicationId, apiId,
-                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            APIResource apiResource = ApplicationManagementServiceHolder.getApiResourceManager()
+                    .getAPIResourceById(apiId, tenantDomain);
+            if (!Boolean.parseBoolean(IdentityUtil.getProperty(
+                    ApplicationManagementConstants.SKIP_ENFORCE_AUTHORIZED_API_UPDATE_PERMISSION))) {
+                validateUserCanUpdateAPIResourceType(apiResource);
+            }
+            authorizedAPIManagementService.deleteAuthorizedAPI(applicationId, apiId, tenantDomain);
+
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error while deleting authorized API with id: " + apiId + " from the application with  id: "
                     + applicationId;
             throw handleIdentityApplicationManagementException(e, msg);
+        } catch (APIResourceMgtException e) {
+            String msg = "Error while fetching API resource with id: " + apiId;
+            throw Utils.buildServerError(msg, e);
+        } catch (ForbiddenException e) {
+            throw Utils.buildForbiddenError(FORBIDDEN_OPERATION.getCode(), FORBIDDEN_OPERATION.getMessage(),
+                    FORBIDDEN_OPERATION.getDescription());
         }
     }
 
@@ -1544,6 +1569,10 @@ public class ServerApplicationManagementService {
             if (apiResource == null) {
                 throw buildClientError(ErrorMessage.API_RESOURCE_NOT_FOUND, apiId, tenantDomain);
             }
+            if (!Boolean.parseBoolean(IdentityUtil.getProperty(
+                    ApplicationManagementConstants.SKIP_ENFORCE_AUTHORIZED_API_UPDATE_PERMISSION))) {
+                validateUserCanUpdateAPIResourceType(apiResource);
+            }
             validateAPIResourceScopes(apiResource, addedScopes);
             validateAPIResourceAuthorizationDetailsTypes(apiResource, addedAuthorizationDetailsTypes);
 
@@ -1573,6 +1602,9 @@ public class ServerApplicationManagementService {
             String msg = "Error while updating authorized API with id: " + apiId + " for the application with  id: "
                     + applicationId;
             throw handleIdentityApplicationManagementException(e, msg);
+        } catch (ForbiddenException e) {
+            throw Utils.buildForbiddenError(FORBIDDEN_OPERATION.getCode(), FORBIDDEN_OPERATION.getMessage(),
+                    FORBIDDEN_OPERATION.getDescription());
         }
     }
 
@@ -1683,6 +1715,21 @@ public class ServerApplicationManagementService {
                 throw buildClientError(ErrorMessage.SCOPES_NOT_FOUND, apiResource.getId(),
                         CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
             }
+        }
+    }
+
+    private void validateUserCanUpdateAPIResourceType(APIResource apiResource) throws ForbiddenException {
+
+        if (apiResource == null) {
+            return;
+        }
+
+        if (APIResourceManagementConstants.BUSINESS_TYPE.equals(apiResource.getType())) {
+            AuthorizationUtil.validateOperationScopes(
+                    ApplicationManagementConstants.UPDATE_BUSINESS_AUTHORIZED_API_OPERATION);
+        } else {
+            AuthorizationUtil.validateOperationScopes(
+                    ApplicationManagementConstants.UPDATE_INTERNAL_AUTHORIZED_API_OPERATION);
         }
     }
 
