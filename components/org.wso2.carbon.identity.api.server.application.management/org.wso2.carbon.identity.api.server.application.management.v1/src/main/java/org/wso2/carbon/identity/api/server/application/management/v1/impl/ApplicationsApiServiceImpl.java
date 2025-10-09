@@ -47,6 +47,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Provisionin
 import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
+import org.wso2.carbon.identity.api.server.application.management.v1.ScriptUpdateModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationMetadataService;
@@ -431,6 +432,13 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
         return applicationSharingService.unshareApplicationFromSelectedOrganizations(
                 applicationUnshareSelectedRequestBody);
+    }
+
+    @Override
+    public Response updateAuthenticationScript(String applicationId, ScriptUpdateModel scriptUpdateModel) {
+
+        applicationManagementService.updateAuthenticationScript(applicationId, scriptUpdateModel);
+        return Response.ok().build();
     }
 
     @Override

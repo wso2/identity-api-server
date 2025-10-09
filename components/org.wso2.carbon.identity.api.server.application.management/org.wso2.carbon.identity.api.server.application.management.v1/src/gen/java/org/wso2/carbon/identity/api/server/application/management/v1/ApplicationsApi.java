@@ -62,6 +62,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApp
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
+import org.wso2.carbon.identity.api.server.application.management.v1.ScriptUpdateModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.SharedApplicationsResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.SharedOrganizationsResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
@@ -1331,6 +1332,29 @@ public class ApplicationsApi  {
     public Response unshareApplicationFromSelected(@ApiParam(value = "" ,required=true) @Valid ApplicationUnshareSelectedRequestBody applicationUnshareSelectedRequestBody) {
 
         return delegate.unshareApplicationFromSelected(applicationUnshareSelectedRequestBody );
+    }
+
+    @Valid
+    @PUT
+    @Path("/{applicationId}/authenticationSequence/script")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update authentication script of the application", notes = "This API provides the capability to update the authentication script of the application. <br>   <b>Scope(Permission) required:</b> `internal_application_script_update` </br> ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Applications", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successfully Updated", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response updateAuthenticationScript(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "This represents the authentication script to be updated." ,required=true) @Valid ScriptUpdateModel scriptUpdateModel) {
+
+        return delegate.updateAuthenticationScript(applicationId,  scriptUpdateModel );
     }
 
     @Valid

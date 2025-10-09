@@ -49,6 +49,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Application
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesList;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPICreationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIResponse;
@@ -67,6 +68,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApp
 import org.wso2.carbon.identity.api.server.application.management.v1.Role;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
+import org.wso2.carbon.identity.api.server.application.management.v1.ScriptUpdateModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApiModelToServiceProvider;
@@ -104,11 +106,13 @@ import org.wso2.carbon.identity.application.common.model.ImportResponse;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.InboundConfigurationProtocol;
+import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.Scope;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.SpFileContent;
 import org.wso2.carbon.identity.application.common.model.User;
+import org.wso2.carbon.identity.application.common.model.script.AuthenticationScriptConfig;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationManagementUtil;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
@@ -198,6 +202,7 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.NAME;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.TEMPLATE_ID;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.TEMPLATE_VERSION;
+import static org.wso2.carbon.identity.api.server.application.management.v1.constants.ApplicationManagementEndpointConstants.SCRIPT_UPDATE_OPERATION_SCOPE_NAME;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotImplementedError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.getInboundAuthKey;
@@ -684,6 +689,27 @@ public class ServerApplicationManagementService {
 
             ServiceProvider serviceProvider = parseSP(spFileContent, fileType, tenantDomain);
 
+            /*
+             * internal_application_script_update scope is required when, performing adaptive script related operations.
+             * Validate the permission before allowing the operation.
+             */
+            ServiceProvider existingApp =
+                    applicationManagementService.getServiceProvider(serviceProvider.getApplicationName(), tenantDomain);
+            if (isAppUpdate && existingApp != null) {
+                LocalAndOutboundAuthenticationConfig existingAuthConfig =
+                        existingApp.getLocalAndOutBoundAuthenticationConfig();
+                if (existingAuthConfig != null && existingAuthConfig.getAuthenticationScriptConfig() != null &&
+                        existingAuthConfig.getAuthenticationScriptConfig().getContent() != null) {
+                    validateAuthenticationScriptUpdatePermission();
+                }
+            }
+            LocalAndOutboundAuthenticationConfig updatingAuthConfig =
+                    serviceProvider.getLocalAndOutBoundAuthenticationConfig();
+            if (updatingAuthConfig != null && updatingAuthConfig.getAuthenticationScriptConfig() != null &&
+                    updatingAuthConfig.getAuthenticationScriptConfig().getContent() != null) {
+                validateAuthenticationScriptUpdatePermission();
+            }
+
             ImportResponse importResponse = applicationManagementService.importSPApplication(serviceProvider,
                     tenantDomain, username, isAppUpdate);
 
@@ -807,6 +833,15 @@ public class ServerApplicationManagementService {
 
     public String createApplication(ApplicationModel applicationModel, String template) {
 
+        /*
+         * Create application with the adaptive script requires the internal_application_script_update scope.
+         * Validate the permission before allowing the update.
+         */
+        AuthenticationSequence authSequence = applicationModel.getAuthenticationSequence();
+        if (authSequence != null && authSequence.getScript() != null) {
+            validateAuthenticationScriptUpdatePermission();
+        }
+
         if (StringUtils.isNotBlank(template)) {
             String errorCode = APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED.getCode();
             throw buildNotImplementedError(errorCode, "Application creation with templates not supported.");
@@ -905,6 +940,14 @@ public class ServerApplicationManagementService {
     public void patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel) {
 
         ServiceProvider appToUpdate = cloneApplication(applicationId);
+        /*
+         * Updating the adaptive script requires the internal_application_script_update scope.
+         * Validate the permission before allowing the update.
+         */
+        if (isScriptUpdating(appToUpdate, applicationPatchModel)) {
+            validateAuthenticationScriptUpdatePermission();
+        }
+
         if (applicationPatchModel != null) {
             blockRenameAppsToSystemReservedApps(applicationPatchModel.getName(), appToUpdate.getApplicationName());
         }
@@ -923,7 +966,6 @@ public class ServerApplicationManagementService {
         if (applicationPatchModel != null) {
             new UpdateServiceProvider().apply(appToUpdate, applicationPatchModel);
         }
-
 
         boolean isAllowUpdateSystemApps = isAllowUpdateSystemApplication(appToUpdate.getApplicationName(),
                 applicationPatchModel);
@@ -946,6 +988,54 @@ public class ServerApplicationManagementService {
         }
     }
 
+    private boolean isScriptUpdating(ServiceProvider existingApp, ApplicationPatchModel appPatchModel) {
+
+        if (appPatchModel == null || appPatchModel.getAuthenticationSequence() == null) {
+            return false;
+        }
+
+        if (appPatchModel.getAuthenticationSequence().getScript() != null) {
+            return true;
+        }
+
+        // Check whether the authentication sequence is reverting to default when current authentication sequence
+        // has a script configured.
+        LocalAndOutboundAuthenticationConfig existingAuthConfig = existingApp.getLocalAndOutBoundAuthenticationConfig();
+        String currentAuthenticationType = existingAuthConfig.getAuthenticationType();
+        boolean isRevertToDefault =
+                appPatchModel.getAuthenticationSequence().getType() == AuthenticationSequence.TypeEnum.DEFAULT &&
+                StringUtils.isNotBlank(currentAuthenticationType) &&
+                !AuthenticationSequence.TypeEnum.DEFAULT.name().equals(currentAuthenticationType);
+
+        return isRevertToDefault && existingAuthConfig.getAuthenticationScriptConfig() != null &&
+                existingAuthConfig.getAuthenticationScriptConfig().getContent() != null;
+    }
+
+    private void validateAuthenticationScriptUpdatePermission() {
+
+        if (isSkippedEnforcingScriptUpdatePermission()) {
+            return;
+        }
+
+        try {
+            AuthorizationUtil.validateOperationScopes(SCRIPT_UPDATE_OPERATION_SCOPE_NAME);
+        } catch (ForbiddenException e) {
+            throw Utils.buildForbiddenError(FORBIDDEN_OPERATION.getCode(), FORBIDDEN_OPERATION.getMessage(),
+                    FORBIDDEN_OPERATION.getDescription());
+        }
+    }
+
+    private boolean isSkippedEnforcingScriptUpdatePermission() {
+
+        String skipEnforceScriptUpdatePermissionValue =
+                IdentityUtil.getProperty("ApplicationMgt.SkipEnforceScriptUpdatePermission");
+        if (StringUtils.isBlank(skipEnforceScriptUpdatePermissionValue)) {
+            return false;
+        }
+
+        return Boolean.parseBoolean(skipEnforceScriptUpdatePermissionValue);
+    }
+
     private void restrictRoleAssociationUpdateInOrgAudience(String applicationId,
                                                             ApplicationPatchModel applicationPatchModel) {
 
@@ -958,6 +1048,62 @@ public class ServerApplicationManagementService {
                 if (associatedRoles != null && !associatedRoles.isEmpty()) {
                     throw buildClientError(ErrorMessage.INVALID_ROLE_ASSOCIATION_FOR_ORGANIZATION_AUDIENCE);
                 }
+            }
+        }
+    }
+
+    /**
+     * Update the authentication script of an application.
+     *
+     * @param applicationId     ID of the application.
+     * @param scriptUpdateModel Script update model.
+     */
+    public void updateAuthenticationScript(String applicationId, ScriptUpdateModel scriptUpdateModel) {
+
+        ServiceProvider updatingApp = cloneApplication(applicationId);
+        LocalAndOutboundAuthenticationConfig authConfig = updatingApp.getLocalAndOutBoundAuthenticationConfig();
+
+        boolean isScriptReverting = StringUtils.isBlank(scriptUpdateModel.getScript());
+        boolean isAuthStepsNotConfigured = authConfig == null || authConfig.getAuthenticationSteps() == null ||
+                authConfig.getAuthenticationSteps().length == 0;
+
+        if (isScriptReverting) {
+            if (isAuthStepsNotConfigured) {
+                return;
+            }
+
+            authConfig.setAuthenticationScriptConfig(null);
+        } else {
+            String authType = authConfig != null ? authConfig.getAuthenticationType() : null;
+            if (ApplicationConstants.AUTH_TYPE_DEFAULT.equals(authType) || isAuthStepsNotConfigured) {
+                throw Utils.buildBadRequestError("Update authentication steps before configuring the script.");
+            }
+
+            AuthenticationScriptConfig adaptiveScript = new AuthenticationScriptConfig();
+            adaptiveScript.setContent(scriptUpdateModel.getScript());
+            adaptiveScript.setEnabled(true);
+            authConfig.setAuthenticationScriptConfig(adaptiveScript);
+        }
+
+        ApplicationPatchModel patchModel = new ApplicationPatchModel()
+                .name(updatingApp.getApplicationName())
+                .authenticationSequence(new AuthenticationSequence().script(scriptUpdateModel.getScript()));
+        boolean isAllowUpdateSystemApps = isAllowUpdateSystemApplication(updatingApp.getApplicationName(), patchModel);
+
+        try {
+            if (isAllowUpdateSystemApps) {
+                IdentityApplicationManagementUtil.setAllowUpdateSystemApplicationThreadLocal(true);
+            }
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            String username = ContextLoader.getUsernameFromContext();
+            applicationManagementService.updateApplicationByResourceId(applicationId, updatingApp, tenantDomain,
+                    username);
+        } catch (IdentityApplicationManagementException e) {
+            String msg = "Error while updating the adaptive script of application with id: " + applicationId;
+            throw handleIdentityApplicationManagementException(e, msg);
+        } finally {
+            if (isAllowUpdateSystemApps) {
+                IdentityApplicationManagementUtil.removeAllowUpdateSystemApplicationThreadLocal();
             }
         }
     }
