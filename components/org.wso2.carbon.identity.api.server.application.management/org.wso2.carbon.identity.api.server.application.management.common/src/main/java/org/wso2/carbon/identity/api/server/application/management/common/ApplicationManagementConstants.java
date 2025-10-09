@@ -189,7 +189,9 @@ public class ApplicationManagementConstants {
                 "One or more authorization detail types in the request were not found for the " +
                         "API resource with ID '%s' in the tenant domain '%s'."),
 
-        FORBIDDEN_OPERATION("60520", "Forbidden", "Operation is not permitted. You do not have permissions to make this request."),
+        FORBIDDEN_OPERATION("60520",
+                "Forbidden",
+                "Operation is not permitted. You do not have permissions to make this request."),
 
         // Server Errors.
         ERROR_RETRIEVING_SAML_METADATA("65001",
