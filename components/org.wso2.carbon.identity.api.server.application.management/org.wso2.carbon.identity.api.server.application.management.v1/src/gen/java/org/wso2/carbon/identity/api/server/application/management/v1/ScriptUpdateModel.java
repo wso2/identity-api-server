@@ -43,7 +43,7 @@ public class ScriptUpdateModel  {
         return this;
     }
     
-    @ApiModelProperty(example = "var onLoginRequest = function(context) {     executeStep(1); }; ", required = true, value = "Script to be updated.")
+    @ApiModelProperty(example = "var onLoginRequest = function(context) {     executeStep(1); }; ", required = true, value = "Authentication script to be updated.")
     @JsonProperty("script")
     @Valid
     @NotNull(message = "Property script cannot be null.")
