@@ -1515,12 +1515,12 @@ public class ServerApplicationManagementService {
             String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             APIResource apiResource = ApplicationManagementServiceHolder.getApiResourceManager()
                     .getAPIResourceById(apiId, tenantDomain);
-            authorizedAPIManagementService.deleteAuthorizedAPI(applicationId, apiId,
-                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
             if (!Boolean.parseBoolean(IdentityUtil.getProperty(
                     ApplicationManagementConstants.SKIP_ENFORCE_AUTHORIZED_API_UPDATE_PERMISSION))) {
                 validateUserCanUpdateAPIResourceType(apiResource);
             }
+            authorizedAPIManagementService.deleteAuthorizedAPI(applicationId, apiId, tenantDomain);
+
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error while deleting authorized API with id: " + apiId + " from the application with  id: "
                     + applicationId;
