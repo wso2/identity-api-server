@@ -184,6 +184,9 @@ public class ApplicationManagementConstants {
                 "API authorization details types not found.",
                 "One or more authorization detail types in the request were not found for the " +
                         "API resource with ID '%s' in the tenant domain '%s'."),
+        FORBIDDEN_ADAPTIVE_SCRIPT_UPDATE("60520",
+                "Forbidden",
+                "Operation is not permitted. You do not have permissions to make this request."),
 
         // Server Errors.
         ERROR_RETRIEVING_SAML_METADATA("65001",

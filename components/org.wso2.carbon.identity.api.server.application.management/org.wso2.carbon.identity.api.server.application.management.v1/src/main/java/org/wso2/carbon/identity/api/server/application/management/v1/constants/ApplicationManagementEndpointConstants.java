@@ -44,4 +44,6 @@ public class ApplicationManagementEndpointConstants {
             = "Application sharing update process triggered successfully.";
     public static final String APPLICATION_UNSHARE_TRIGGER_SUCCESS
             = "Application unsharing process triggered successfully.";
+
+    public static final String SCRIPT_UPDATE_OPERATION_SCOPE_NAME = "updateAuthenticationScript";
 }
