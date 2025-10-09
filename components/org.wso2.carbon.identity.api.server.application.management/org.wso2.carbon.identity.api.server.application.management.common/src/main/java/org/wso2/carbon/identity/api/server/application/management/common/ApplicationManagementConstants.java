@@ -96,6 +96,7 @@ public class ApplicationManagementConstants {
 
     public static final String UPDATE_INTERNAL_AUTHORIZED_API_OPERATION = "updateInternalAuthorizedAPI";
     public static final String UPDATE_BUSINESS_AUTHORIZED_API_OPERATION = "updateBusinessAuthorizedAPI";
+    public static final String VIEW_APPLICATION_CLIENT_SECRET_OPERATION = "viewApplicationClientSecret";
     public static final String SKIP_ENFORCE_AUTHORIZED_API_UPDATE_PERMISSION = "ApplicationMgt" +
             ".SkipEnforceAuthorizedAPIUpdatePermission";
     /**

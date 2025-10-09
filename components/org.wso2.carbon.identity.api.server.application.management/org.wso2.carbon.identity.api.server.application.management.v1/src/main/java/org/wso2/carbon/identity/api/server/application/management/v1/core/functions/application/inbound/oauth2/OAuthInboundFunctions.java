@@ -19,6 +19,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
@@ -29,6 +30,9 @@ import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRe
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.mgt.inbound.InboundFunctions;
 import org.wso2.carbon.identity.application.mgt.inbound.dto.InboundProtocolConfigurationDTO;
+import org.wso2.carbon.identity.authorization.common.AuthorizationUtil;
+import org.wso2.carbon.identity.authorization.common.exception.ForbiddenException;
+import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceClientException;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceException;
 import org.wso2.carbon.identity.cors.mgt.core.model.CORSOrigin;
@@ -42,6 +46,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.VIEW_APPLICATION_CLIENT_SECRET_OPERATION;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildServerError;
 import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.OAUTH2;
@@ -205,6 +210,8 @@ public class OAuthInboundFunctions {
 
             OpenIDConnectConfiguration openIDConnectConfiguration = new OAuthConsumerAppToApiModel().apply(oauthApp);
 
+            removeClientSecretIfUnauthorized(openIDConnectConfiguration);
+
             // Set CORS origins as allowed domains.
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             String applicationResourceId = ApplicationManagementServiceHolder.getApplicationManagementService()
@@ -219,6 +226,21 @@ public class OAuthInboundFunctions {
         } catch (IdentityOAuthAdminException | IdentityApplicationManagementException
                 | CORSManagementServiceException e) {
             throw buildServerError("Error while retrieving oauth application for clientId: " + clientId, e);
+        }
+    }
+
+    private static void removeClientSecretIfUnauthorized(OpenIDConnectConfiguration openIDConnectConfiguration) {
+
+        if (Boolean.parseBoolean(IdentityUtil.getProperty(
+                ApplicationManagementConstants.SKIP_ENFORCE_AUTHORIZED_API_UPDATE_PERMISSION))) {
+            return;
+        }
+
+        try {
+            AuthorizationUtil.validateOperationScopes(VIEW_APPLICATION_CLIENT_SECRET_OPERATION);
+        } catch (ForbiddenException e) {
+            // Removing the client secret if operation scope is not present.
+            openIDConnectConfiguration.setClientSecret(null);
         }
     }
 
