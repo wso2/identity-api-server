@@ -1005,7 +1005,7 @@ public class ServerApplicationManagementService {
         boolean isRevertToDefault =
                 appPatchModel.getAuthenticationSequence().getType() == AuthenticationSequence.TypeEnum.DEFAULT &&
                 StringUtils.isNotBlank(currentAuthenticationType) &&
-                !AuthenticationSequence.TypeEnum.DEFAULT.toString().equalsIgnoreCase(currentAuthenticationType);
+                !AuthenticationSequence.TypeEnum.DEFAULT.name().equals(currentAuthenticationType);
 
         return isRevertToDefault && existingAuthConfig.getAuthenticationScriptConfig() != null &&
                 existingAuthConfig.getAuthenticationScriptConfig().getContent() != null;
