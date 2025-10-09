@@ -864,13 +864,7 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
-                <artifactId>org.wso2.carbon.identity.api.server.credential.management.common</artifactId>
-                <version>${project.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.identity.server.api</groupId>
-                <artifactId>org.wso2.carbon.identity.api.credential.action.management.v1</artifactId>
+                <artifactId>org.wso2.carbon.identity.api.server.user.credential.management.common</artifactId>
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>
@@ -1083,7 +1077,7 @@
         <module>components/org.wso2.carbon.identity.api.server.webhook.metadata</module>
         <module>components/org.wso2.carbon.identity.api.server.workflow</module>
         <module>components/org.wso2.carbon.identity.api.server.asynchronous.operation.status.management</module>
-        <module>components/org.wso2.carbon.identity.api.server.credential.management</module>
+        <module>components/org.wso2.carbon.identity.api.server.user.credential.management</module>
     </modules>
 
 </project>
