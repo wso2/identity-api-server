@@ -58,6 +58,7 @@ import static org.wso2.carbon.identity.api.server.flow.execution.v1.constants.Fl
  */
 public class Utils {
 
+    private static final String RESEND = "RESEND";
     private static final Log LOG = LogFactory.getLog(Utils.class);
 
     private Utils() {
@@ -249,6 +250,18 @@ public class Utils {
                         .collect(Collectors.toList()) : null);
         if (Constants.ComponentTypes.BUTTON.equals(componentDTO.getType())) {
             component.actionId(componentDTO.getId());
+        } else if (Constants.ComponentTypes.FORM.equals(componentDTO.getType())
+                && componentDTO.getComponents() != null) {
+            // Set the action id of the button component to the RESEND components inside the form.
+            String formActionId = componentDTO.getComponents().stream()
+                    .filter(c -> Constants.ComponentTypes.BUTTON.equals(c.getType()))
+                    .findFirst()
+                    .map(ComponentDTO::getId)
+                    .orElse(null);
+            if (StringUtils.isNotBlank(formActionId)) {
+                component.getComponents().stream().filter(c -> RESEND
+                        .equals(c.getType())).forEach(c -> c.setActionId(formActionId));
+            }
         }
         return component;
     }
