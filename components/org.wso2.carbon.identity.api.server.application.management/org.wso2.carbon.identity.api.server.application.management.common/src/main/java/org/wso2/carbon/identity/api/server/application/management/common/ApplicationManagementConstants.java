@@ -94,6 +94,10 @@ public class ApplicationManagementConstants {
     public static final String AI_RESPONSE_DATA_KEY = "data";
     public static final String AI_RESPONSE_STATUS_KEY = "status";
 
+    public static final String UPDATE_INTERNAL_AUTHORIZED_API_OPERATION = "updateInternalAuthorizedAPI";
+    public static final String UPDATE_BUSINESS_AUTHORIZED_API_OPERATION = "updateBusinessAuthorizedAPI";
+    public static final String SKIP_ENFORCE_AUTHORIZED_API_UPDATE_PERMISSION = "ApplicationMgt" +
+            ".SkipEnforceAuthorizedAPIUpdatePermission";
     /**
      * Enums for error messages.
      */
@@ -185,6 +189,10 @@ public class ApplicationManagementConstants {
                 "One or more authorization detail types in the request were not found for the " +
                         "API resource with ID '%s' in the tenant domain '%s'."),
         FORBIDDEN_ADAPTIVE_SCRIPT_UPDATE("60520",
+                "Forbidden",
+                "Operation is not permitted. You do not have permissions to make this request."),
+
+        FORBIDDEN_OPERATION("60520",
                 "Forbidden",
                 "Operation is not permitted. You do not have permissions to make this request."),
 
