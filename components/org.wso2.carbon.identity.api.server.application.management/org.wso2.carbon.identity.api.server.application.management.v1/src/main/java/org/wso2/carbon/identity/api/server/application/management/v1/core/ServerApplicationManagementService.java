@@ -1021,10 +1021,8 @@ public class ServerApplicationManagementService {
         try {
             AuthorizationUtil.validateOperationScopes(SCRIPT_UPDATE_OPERATION_SCOPE_NAME);
         } catch (ForbiddenException e) {
-            throw Utils.buildForbiddenError(
-                    FORBIDDEN_ADAPTIVE_SCRIPT_UPDATE.getCode(),
-                    FORBIDDEN_ADAPTIVE_SCRIPT_UPDATE.getMessage(),
-                    FORBIDDEN_ADAPTIVE_SCRIPT_UPDATE.getDescription());
+            throw Utils.buildForbiddenError(FORBIDDEN_OPERATION.getCode(), FORBIDDEN_OPERATION.getMessage(),
+                    FORBIDDEN_OPERATION.getDescription());
         }
     }
 
