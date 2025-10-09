@@ -994,8 +994,7 @@ public class ServerApplicationManagementService {
             return false;
         }
 
-        if (appPatchModel.getAuthenticationSequence() != null &&
-                appPatchModel.getAuthenticationSequence().getScript() != null) {
+        if (appPatchModel.getAuthenticationSequence().getScript() != null) {
             return true;
         }
 
