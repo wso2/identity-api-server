@@ -18,50 +18,40 @@
 
 package org.wso2.carbon.identity.api.server.idp.debug.v1.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+import javax.ws.rs.core.Response;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.idp.debug.v1.IdpDebugApi;
-import org.wso2.carbon.identity.api.server.idp.debug.v1.service.SimpleDebugService;
-
-import javax.ws.rs.core.Response;
+import org.wso2.carbon.identity.api.server.idp.debug.v1.model.DebugResponse;
 
 /**
- * Implementation of IdP Debug Flow API.
- * This implementation follows the architecture diagram by delegating business logic to the DebugService.
+ * Legacy IdP Debug API implementation.
+ * 
+ * @deprecated This endpoint is deprecated. Use POST /debug/connection/{idpId} instead.
  */
+@Deprecated
 public class IdpDebugApiServiceImpl implements IdpDebugApi {
 
     private static final Log LOG = LogFactory.getLog(IdpDebugApiServiceImpl.class);
-    private final SimpleDebugService debugService;
 
     /**
-     * Constructor initializes the debug service.
-     */
-    public IdpDebugApiServiceImpl() {
-        this.debugService = new SimpleDebugService();
-    }
-
-    /**
-     * Handles the debug authentication flow request.
-     * This endpoint provides backward compatibility for existing API consumers.
-     *
-     * @return Response containing debug flow results.
+     * Handles legacy debug requests.
+     * 
+     * @deprecated Use POST /debug/connection/{idpId} instead.
+     * @return Response indicating deprecation and recommended endpoint.
      */
     @Override
+    @Deprecated
     public Response debug() {
         try {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Processing legacy debug request - redirecting to proper API usage");
-            }
-            
-            // Create a basic response indicating this endpoint is deprecated
-            org.wso2.carbon.identity.api.server.idp.debug.v1.model.DebugResponse debugResponse = 
-                new org.wso2.carbon.identity.api.server.idp.debug.v1.model.DebugResponse();
-            
+            DebugResponse debugResponse = new DebugResponse();
             debugResponse.setSessionId(java.util.UUID.randomUUID().toString());
             debugResponse.setStatus("INFO");
             
-            java.util.Map<String, Object> metadata = new java.util.HashMap<>();
+            Map<String, Object> metadata = new HashMap<>();
             metadata.put("message", "This endpoint is deprecated. Use POST /debug/connection/{idpId} instead.");
             metadata.put("recommendedEndpoint", "/api/server/v1/debug/connection/{idpId}");
             metadata.put("timestamp", System.currentTimeMillis());
@@ -70,9 +60,9 @@ public class IdpDebugApiServiceImpl implements IdpDebugApi {
             return Response.ok(debugResponse).build();
             
         } catch (Exception e) {
-            LOG.error("Error in legacy debug endpoint: " + e.getMessage(), e);
+            LOG.error("Error in legacy debug endpoint", e);
             
-            java.util.Map<String, Object> errorResponse = new java.util.HashMap<>();
+            Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("status", "ERROR");
             errorResponse.put("message", "Internal server error: " + e.getMessage());
             errorResponse.put("timestamp", System.currentTimeMillis());

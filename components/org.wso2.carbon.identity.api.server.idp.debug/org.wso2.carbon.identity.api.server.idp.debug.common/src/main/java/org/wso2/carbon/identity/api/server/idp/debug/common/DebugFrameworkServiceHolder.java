@@ -35,39 +35,7 @@ public class DebugFrameworkServiceHolder {
         // Private constructor to prevent instantiation
     }
 
-    /**
-     * Gets the debug flow service using OSGi service lookup.
-     * This method uses reflection to avoid compile-time dependencies on debug framework classes.
-     *
-     * @return Debug flow service instance if available, null otherwise.
-     */
-    public static Object getDebugFlowService() {
-        try {
-            // Use OSGi service lookup with class name string to avoid compile-time dependency
-            Object debugService = PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                    .getOSGiService(Class.forName("org.wso2.carbon.identity.debug.framework.DebugFlowService"), null);
-            
-            if (debugService == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("DebugFlowService not available via OSGi service lookup");
-                }
-            } else {
-                if (log.isDebugEnabled()) {
-                    log.debug("Successfully retrieved DebugFlowService via OSGi lookup");
-                }
-            }
-            
-            return debugService;
-        } catch (ClassNotFoundException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("DebugFlowService class not found: " + e.getMessage());
-            }
-            return null;
-        } catch (Exception e) {
-            log.error("Error retrieving DebugFlowService: " + e.getMessage(), e);
-            return null;
-        }
-    }
+
 
     /**
      * Gets the debug service using OSGi service lookup.
@@ -137,30 +105,7 @@ public class DebugFrameworkServiceHolder {
         }
     }
 
-    /**
-     * Invokes a method on the debug flow service using reflection.
-     * This allows us to call methods without compile-time dependencies.
-     *
-     * @param methodName Method name to invoke.
-     * @param parameterTypes Parameter types for the method.
-     * @param arguments Arguments to pass to the method.
-     * @return Method result or null if invocation fails.
-     */
-    public static Object invokeDebugFlowServiceMethod(String methodName, Class<?>[] parameterTypes, Object... arguments) {
-        Object debugFlowService = getDebugFlowService();
-        if (debugFlowService == null) {
-            log.warn("DebugFlowService not available for method invocation: " + methodName);
-            return null;
-        }
 
-        try {
-            java.lang.reflect.Method method = debugFlowService.getClass().getMethod(methodName, parameterTypes);
-            return method.invoke(debugFlowService, arguments);
-        } catch (Exception e) {
-            log.error("Error invoking DebugFlowService method '" + methodName + "': " + e.getMessage(), e);
-            return null;
-        }
-    }
 
     /**
      * Invokes a method on the debug service using reflection.
@@ -193,27 +138,10 @@ public class DebugFrameworkServiceHolder {
      * @return true if debug services are available, false otherwise.
      */
     public static boolean isDebugFrameworkAvailable() {
-        return getDebugFlowService() != null || getDebugService() != null;
+        return getDebugService() != null;
     }
 
-    /**
-     * Creates a new instance of DebugFlowService using reflection.
-     * This method instantiates the service directly if OSGi lookup fails.
-     *
-     * @return New DebugFlowService instance or null if creation fails.
-     */
-    public static Object createDebugFlowService() {
-        try {
-            Class<?> debugFlowServiceClass = Class.forName("org.wso2.carbon.identity.debug.framework.DebugFlowService");
-            return debugFlowServiceClass.getDeclaredConstructor().newInstance();
-        } catch (ClassNotFoundException e) {
-            log.debug("DebugFlowService class not found for direct instantiation: " + e.getMessage());
-            return null;
-        } catch (Exception e) {
-            log.error("Error creating DebugFlowService instance: " + e.getMessage(), e);
-            return null;
-        }
-    }
+
 
     /**
      * Creates a new instance of Executer using reflection.

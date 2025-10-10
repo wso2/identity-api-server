@@ -20,7 +20,6 @@ package org.wso2.carbon.identity.api.server.idp.debug.v1.impl;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.logging.Log;
@@ -56,11 +55,6 @@ public class DebugApiServiceImpl implements DebugApiService {
      */
     @Override
     public Response debugConnection(String idpId, DebugConnectionRequest debugConnectionRequest) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Processing OAuth 2.0 debug connection request for IdP: " + 
-                (idpId != null ? idpId.replaceAll("[\r\n]", "_") : "null"));
-        }
-
         try {
             // Input validation at API layer.
             if (idpId == null || idpId.trim().isEmpty()) {
@@ -81,36 +75,20 @@ public class DebugApiServiceImpl implements DebugApiService {
                 additionalParams = debugConnectionRequest.getAdditionalParams();
             }
 
-            LOG.info("Generating OAuth 2.0 authorization URL for IdP: " + 
-                (idpId != null ? idpId.replaceAll("[\r\n]", "_") : "null") + 
-                " with authenticator: " + 
-                (authenticatorName != null ? authenticatorName.replaceAll("[\r\n]", "_") : "null"));
-
-            // Generate OAuth 2.0 authorization URL using the new flow.
+            // Generate OAuth 2.0 authorization URL using the service layer.
             Map<String, Object> oauth2Result = debugService.generateOAuth2AuthorizationUrl(
                 idpId, authenticatorName, redirectUri, scope, additionalParams
             );
 
             // Create OAuth 2.0 response.
             DebugConnectionResponse response = createOAuth2Response(oauth2Result, idpId);
-
-            if (LOG.isDebugEnabled()) {
-                Object sessionId = oauth2Result.get("sessionId");
-                LOG.debug("OAuth 2.0 authorization URL generated for IdP: " + 
-                    (idpId != null ? idpId.replaceAll("[\r\n]", "_") : "null") + 
-                    ", sessionId: " + 
-                    (sessionId != null ? sessionId.toString().replaceAll("[\r\n]", "_") : "null"));
-            }
-
             return Response.ok(response).build();
 
         } catch (APIError e) {
-            LOG.error("API error in OAuth 2.0 debug connection for IdP: " + 
-                (idpId != null ? idpId.replaceAll("[\r\n]", "_") : "null"), e);
+            LOG.error("API error in OAuth 2.0 debug connection for IdP: " + idpId, e);
             return createErrorResponse(e.getCode(), e.getMessage(), mapToHttpStatus(e.getCode()));
         } catch (Exception e) {
-            LOG.error("Unexpected error in OAuth 2.0 debug connection for IdP: " + 
-                (idpId != null ? idpId.replaceAll("[\r\n]", "_") : "null"), e);
+            LOG.error("Unexpected error in OAuth 2.0 debug connection for IdP: " + idpId, e);
             return createErrorResponse("INTERNAL_ERROR", 
                 "Failed to generate OAuth 2.0 authorization URL: " + e.getMessage(), 
                 Response.Status.INTERNAL_SERVER_ERROR);
@@ -168,8 +146,6 @@ public class DebugApiServiceImpl implements DebugApiService {
         response.setMetadata(metadata);
         return response;
     }
-
-
 
     /**
      * Maps API error codes to HTTP status codes.

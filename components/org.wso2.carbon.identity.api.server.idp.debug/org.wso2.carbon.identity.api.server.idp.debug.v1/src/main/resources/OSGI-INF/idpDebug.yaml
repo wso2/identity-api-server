@@ -1,0 +1,204 @@
+openapi: 3.0.0
+info:
+  description: >
+    This document specifies an **Identity Provider Debug RESTful API** for
+    **WSO2 Identity Server**. This API provides the capability to debug
+    identity provider authentication flows by simulating OAuth 2.0/OIDC
+    authentication processes and generating comprehensive debug information
+    including authorization URLs, authentication results, token details, 
+    claims analysis, and flow events.
+  version: "v1"
+  title: WSO2 Identity Server - Identity Provider Debug API definition
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    name: WSO2
+    url: 'http://wso2.com/products/identity-server/'
+    email: architecture@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+security:
+  - OAuth2: []
+  - BasicAuth: []
+paths:
+  '/debug/connection/{idp-id}':
+    post:
+      tags:
+        - Identity Provider Debug
+      summary: |
+        Debug identity provider connection
+      description: >
+        This API provides the capability to debug identity provider connections
+        by generating OAuth 2.0 authorization URLs with PKCE for authentication
+        flow testing. <br>
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/idpmgt/view <br>
+        <b>Scope required:</b> <br>
+            * internal_idp_view
+      operationId: debugConnection
+      parameters:
+        - name: idp-id
+          in: path
+          description: ID of the identity provider to debug
+          required: true
+          schema:
+            type: string
+            example: 'e4f77260-4e28-4ad4-abd9-101d202ee86f'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DebugConnectionRequest'
+        description: Debug connection request parameters
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebugConnectionResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Identity Provider Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+servers:
+  - url: 'https://localhost:9443/t/{tenant-domain}/api/server/v1'
+    variables:
+      tenant-domain:
+        default: carbon.super
+
+components:
+  schemas:
+    DebugConnectionRequest:
+      type: object
+      properties:
+        authenticatorName:
+          type: string
+          description: Specific federated authenticator to debug
+          example: 'OpenIDConnectAuthenticator'
+        redirectUri:
+          type: string
+          description: OAuth 2.0 redirect URI for callback
+          example: 'https://localhost:9443/commonauth'
+        scope:
+          type: string
+          description: OAuth 2.0 scopes to request
+          example: 'openid profile email'
+        additionalParams:
+          type: object
+          additionalProperties:
+            type: string
+          description: Additional OAuth 2.0 parameters
+          example:
+            prompt: 'consent'
+            max_age: '3600'
+
+    DebugConnectionResponse:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          description: Unique debug session identifier
+          example: 'debug-e0e71b45-6c7d-43a6-945b-fd448d31b4e0'
+        status:
+          type: string
+          enum: ['SUCCESS', 'FAILURE']
+          description: Debug connection status
+          example: 'SUCCESS'
+        message:
+          type: string
+          description: Human-readable status message
+          example: 'OAuth 2.0 authorization URL generated successfully'
+        authorizationUrl:
+          type: string
+          description: Generated OAuth 2.0 authorization URL for user authentication
+          example: 'https://idp.example.com/oauth2/authorize?response_type=code&client_id=sample_client&redirect_uri=https%3A%2F%2Flocalhost%3A9443%2Fcommonauth&scope=openid+profile+email&state=debug-e0e71b45-6c7d-43a6-945b-fd448d31b4e0&code_challenge=OE9AYfM5dAoiRnD7x0ZU1NXQRc6ENe2iDXmAS74VeSU&code_challenge_method=S256'
+        metadata:
+          type: object
+          properties:
+            idpId:
+              type: string
+              description: Identity provider ID
+              example: 'e4f77260-4e28-4ad4-abd9-101d202ee86f'
+            idpName:
+              type: string
+              description: Identity provider name
+              example: 'External IdP'
+            authenticatorName:
+              type: string
+              description: Authenticator used for debug
+              example: 'OpenIDConnectAuthenticator'
+            timestamp:
+              type: integer
+              format: int64
+              description: Debug session creation timestamp
+              example: 1759997879960
+            flow:
+              type: string
+              description: OAuth 2.0 flow type
+              example: 'OAuth 2.0 Authorization Code with PKCE'
+            nextStep:
+              type: string
+              description: Instructions for next step
+              example: 'Redirect user to authorizationUrl for authentication'
+            callbackEndpoint:
+              type: string
+              description: Callback endpoint for OAuth response
+              example: '/commonauth'
+          description: Additional debug metadata and instructions
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          example: 'IDP_NOT_FOUND'
+        message:
+          type: string
+          example: 'Identity Provider not found'
+        description:
+          type: string
+          example: 'The specified identity provider does not exist'
+        traceId:
+          type: string
+          example: 'e0fbcfeb-3617-43c4-8dd0-7b7d38e13047'
+
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://localhost:9443/oauth2/authorize'
+          tokenUrl: 'https://localhost:9443/oauth2/token'
+          scopes: {}
