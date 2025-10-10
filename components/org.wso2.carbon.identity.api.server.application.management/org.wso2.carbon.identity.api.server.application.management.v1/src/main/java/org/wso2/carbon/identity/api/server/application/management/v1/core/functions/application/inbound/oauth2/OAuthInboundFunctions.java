@@ -232,7 +232,7 @@ public class OAuthInboundFunctions {
     private static void removeClientSecretIfUnauthorized(OpenIDConnectConfiguration openIDConnectConfiguration) {
 
         if (Boolean.parseBoolean(IdentityUtil.getProperty(
-                ApplicationManagementConstants.SKIP_ENFORCE_AUTHORIZED_API_UPDATE_PERMISSION))) {
+                ApplicationManagementConstants.SKIP_ENFORCE_CLIENT_SECRET_UPDATE_PERMISSION))) {
             return;
         }
 
