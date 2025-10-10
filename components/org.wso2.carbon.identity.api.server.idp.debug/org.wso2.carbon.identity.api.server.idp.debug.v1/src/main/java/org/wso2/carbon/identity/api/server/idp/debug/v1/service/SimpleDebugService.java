@@ -34,7 +34,7 @@ import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 /**
  * Service layer for IdP debug operations.
  * This service provides a clean interface for the API layer and delegates to debug framework components.
- * It follows the architecture diagram by using the DebugFlowService which orchestrates:
+ * It follows the OAuth 2.0 flow architecture using debug framework components:
  * 1. ContextProvider - Creates context with IdP id and other relevant data
  * 2. Executer - Invokes authenticator and sends to FederatedIdP
  * 3. RequestCoordinator - Handles callback from /commonauth with debug identifier  
@@ -164,14 +164,6 @@ public class SimpleDebugService {
             throw new RuntimeException("Failed to generate OAuth 2.0 authorization URL: " + e.getMessage(), e);
         }
     }
-
-    // Removed validateCredentialsDirectly - using debug framework instead
-
-    
-
-    // Removed all service logic methods - now using debug framework only
-
-
 
 
     /**

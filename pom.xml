@@ -1046,6 +1046,7 @@
         <module>components/org.wso2.carbon.identity.api.server.webhook.metadata</module>
         <module>components/org.wso2.carbon.identity.api.server.workflow</module>
         <module>components/org.wso2.carbon.identity.api.server.asynchronous.operation.status.management</module>
+        <module>components/org.wso2.carbon.identity.api.server.idp.debug</module>
     </modules>
 
 </project>
