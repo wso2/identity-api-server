@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.rest.api.server.claim.management.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.http.HttpHeaders;
 import org.wso2.carbon.identity.api.server.common.FileContent;
@@ -45,6 +47,7 @@ import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIF
  */
 public class ClaimManagementApiServiceImpl extends ClaimManagementApiService {
 
+    private static final Log LOG = LogFactory.getLog(ClaimManagementApiServiceImpl.class);
     private static final String HTTP_HEADER_CONTENT_DISPOSITION = "Content-Disposition";
 
     private final ServerClaimManagementService claimManagementService;
@@ -52,8 +55,12 @@ public class ClaimManagementApiServiceImpl extends ClaimManagementApiService {
     public ClaimManagementApiServiceImpl() {
 
         try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Initializing ClaimManagementApiServiceImpl");
+            }
             claimManagementService = ServerClaimManagementServiceFactory.getServerClaimManagementService();
         } catch (Exception e) {
+            LOG.error("Error occurred while initiating claim management services", e);
             throw new RuntimeException("Error occurred while initiating claim management services.", e);
         }
     }
@@ -61,6 +68,15 @@ public class ClaimManagementApiServiceImpl extends ClaimManagementApiService {
     @Override
     public Response addClaimDialect(ClaimDialectReqDTO claimDialect) {
 
+        if (claimDialect == null) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Null claim dialect provided for addition");
+            }
+            throw new IllegalArgumentException("Claim dialect cannot be null");
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Adding claim dialect: " + claimDialect.getDialectURI());
+        }
         String resourceId = claimManagementService.addClaimDialect(claimDialect);
         return Response.created(getResourceLocation(resourceId)).build();
     }
@@ -68,6 +84,16 @@ public class ClaimManagementApiServiceImpl extends ClaimManagementApiService {
     @Override
     public Response addExternalClaim(String dialectId, ExternalClaimReqDTO externalClaim) {
 
+        if (externalClaim == null) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Null external claim provided for addition to dialect: " + dialectId);
+            }
+            throw new IllegalArgumentException("External claim cannot be null");
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Adding external claim to dialect: " + dialectId + ", claim URI: " + 
+                     externalClaim.getClaimURI());
+        }
         String resourceId = claimManagementService.addExternalClaim(dialectId, externalClaim);
         return Response.created(getResourceLocation(dialectId, resourceId)).build();
     }
@@ -75,6 +101,15 @@ public class ClaimManagementApiServiceImpl extends ClaimManagementApiService {
     @Override
     public Response addLocalClaim(LocalClaimReqDTO localClaim) {
 
+        if (localClaim == null) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Null local claim provided for addition");
+            }
+            throw new IllegalArgumentException("Local claim cannot be null");
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Adding local claim: " + localClaim.getClaimURI());
+        }
         String resourceId = claimManagementService.addLocalClaim(localClaim);
         return Response.created(getResourceLocation(LOCAL_DIALECT_PATH, resourceId)).build();
     }
@@ -82,6 +117,15 @@ public class ClaimManagementApiServiceImpl extends ClaimManagementApiService {
     @Override
     public Response importClaimDialectFromFile(InputStream fileInputStream, Attachment fileDetail) {
 
+        if (fileInputStream == null || fileDetail == null) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Null file input stream or file detail provided for claim dialect import");
+            }
+            throw new IllegalArgumentException("File input stream and file detail cannot be null");
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Importing claim dialect from file: " + fileDetail.getContentDisposition().getFilename());
+        }
         String resourceId = claimManagementService.importClaimDialectFromFile(fileInputStream, fileDetail);
         return Response.created(getResourceLocation(resourceId)).build();
     }
@@ -98,6 +142,9 @@ public class ClaimManagementApiServiceImpl extends ClaimManagementApiService {
     @Override
     public Response deleteClaimDialect(String dialectId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deleting claim dialect: " + dialectId);
+        }
         claimManagementService.deleteClaimDialect(dialectId);
         return Response.noContent().build();
     }
@@ -105,6 +152,9 @@ public class ClaimManagementApiServiceImpl extends ClaimManagementApiService {
     @Override
     public Response deleteExternalClaim(String dialectId, String claimId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deleting external claim: " + claimId + " from dialect: " + dialectId);
+        }
         claimManagementService.deleteExternalClaim(dialectId, claimId);
         return Response.noContent().build();
     }
@@ -112,6 +162,9 @@ public class ClaimManagementApiServiceImpl extends ClaimManagementApiService {
     @Override
     public Response deleteLocalClaim(String claimId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deleting local claim: " + claimId);
+        }
         claimManagementService.deleteLocalClaim(claimId);
         return Response.noContent().build();
     }
