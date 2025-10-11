@@ -15,6 +15,9 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimMappings;
@@ -44,9 +47,15 @@ import static org.wso2.carbon.identity.api.server.application.management.v1.core
  */
 public class UpdateClaimConfiguration implements UpdateFunction<ServiceProvider, ClaimConfiguration> {
 
+    private static final Log log = LogFactory.getLog(UpdateClaimConfiguration.class);
+
     @Override
     public void apply(ServiceProvider application, ClaimConfiguration claimApiModel) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating claim configuration for application: " + 
+                application.getApplicationName());
+        }
         if (claimApiModel != null) {
             ClaimConfig applicationClaimConfiguration = getClaimConfig(application);
 
@@ -58,6 +67,10 @@ public class UpdateClaimConfiguration implements UpdateFunction<ServiceProvider,
             updateRoleClaimConfigs(claimApiModel.getRole(), application);
             // Subject claim.
             updateSubjectClaimConfigs(claimApiModel.getSubject(), application);
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully updated claim configuration for application: " + 
+                    application.getApplicationName());
+            }
         }
     }
 
@@ -135,6 +148,8 @@ public class UpdateClaimConfiguration implements UpdateFunction<ServiceProvider,
 
             if (Boolean.TRUE.equals(subjectApiModel.getMappedLocalSubjectMandatory()) &&
                     Boolean.FALSE.equals(subjectApiModel.getUseMappedLocalSubject())) {
+                log.warn("Invalid subject claim configuration: mapped local subject mandatory is true but " +
+                    "use mapped local subject is false");
                 throw buildBadRequestError(ERROR_ASSERT_LOCAL_SUBJECT_IDENTIFIER_DISABLED.getCode(),
                         ERROR_ASSERT_LOCAL_SUBJECT_IDENTIFIER_DISABLED.getDescription());
             }

@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.application.management.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
@@ -71,12 +73,16 @@ import javax.ws.rs.core.Response;
  */
 public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
+    private static final Log log = LogFactory.getLog(ApplicationsApiServiceImpl.class);
     private final ServerApplicationManagementService applicationManagementService;
     private final ServerApplicationMetadataService applicationMetadataService;
     private final ServerApplicationSharingService applicationSharingService;
 
     public ApplicationsApiServiceImpl() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Initializing ApplicationsApiServiceImpl.");
+        }
         try {
             this.applicationManagementService = ServerApplicationManagementServiceFactory
                     .getServerApplicationManagementService();
@@ -85,7 +91,11 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
             this.applicationSharingService = ServerApplicationSharingServiceFactory
                     .getServerApplicationSharingService();
         } catch (IllegalStateException e) {
+            log.error("Error occurred while initiating application management services.", e);
             throw new RuntimeException("Error occurred while initiating application management services.", e);
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Successfully initialized ApplicationsApiServiceImpl.");
         }
     }
 
@@ -101,6 +111,10 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     public Response getAllApplications(Integer limit, Integer offset, String filter, String sortOrder, String sortBy,
                                        String requiredAttributes, Boolean excludeSystemPortals) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving applications with limit: " + limit + ", offset: " + offset + ", filter: " + 
+                filter);
+        }
         ApplicationListResponse listResponse = applicationManagementService.getAllApplications(limit, offset, filter,
                 sortOrder, sortBy, requiredAttributes, Boolean.TRUE.equals(excludeSystemPortals));
         return Response.ok().entity(listResponse).build();
@@ -109,6 +123,9 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response getApplication(String applicationId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving application with ID: " + applicationId);
+        }
         return Response.ok().entity(applicationManagementService.getApplication(applicationId)).build();
     }
 
@@ -148,7 +165,12 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response createApplication(ApplicationModel applicationModel, String template) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Creating application with name: " + 
+                (applicationModel != null ? applicationModel.getName() : "null") + ", template: " + template);
+        }
         String resourceId = applicationManagementService.createApplication(applicationModel, template);
+        log.info("Successfully created application with ID: " + resourceId);
         return Response.created(getResourceLocation(resourceId)).build();
     }
 
@@ -162,7 +184,11 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response deleteApplication(String applicationId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting application with ID: " + applicationId);
+        }
         applicationManagementService.deleteApplication(applicationId);
+        log.info("Successfully deleted application with ID: " + applicationId);
         return Response.noContent().build();
     }
 
@@ -183,7 +209,11 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Updating application with ID: " + applicationId);
+        }
         applicationManagementService.patchApplication(applicationId, applicationPatchModel);
+        log.info("Successfully updated application with ID: " + applicationId);
         return Response.ok().build();
     }
 
