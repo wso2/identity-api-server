@@ -45,13 +45,18 @@ public class TemplatesServiceHolder {
 
     private static NotificationTemplateManager resolveNotificationTemplateManager() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Starting to resolve NotificationTemplateManager service.");
+        }
         Hashtable<String, String> serviceProperties = new Hashtable<>();
         serviceProperties.put(I18nMgtConstants.SERVICE_PROPERTY_KEY_SERVICE_NAME,
                 I18nMgtConstants.SERVICE_PROPERTY_VAL_NOTIFICATION_TEMPLATE_MANAGER);
         NotificationTemplateManager taskOperationService = (NotificationTemplateManager) PrivilegedCarbonContext.
                 getThreadLocalCarbonContext().getOSGiService(NotificationTemplateManager.class, serviceProperties);
         if (taskOperationService == null) {
-            LOG.debug("Unable to retrieve NotificationTemplateManager service.");
+            LOG.error("Unable to retrieve NotificationTemplateManager service from OSGi service registry.");
+        } else {
+            LOG.info("Successfully resolved NotificationTemplateManager service.");
         }
         return taskOperationService;
     }
@@ -63,6 +68,13 @@ public class TemplatesServiceHolder {
      */
     public static NotificationTemplateManager getNotificationTemplateManager() {
 
-        return NotificationTemplateManagerHolder.SERVICE;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving NotificationTemplateManager service from holder.");
+        }
+        NotificationTemplateManager service = NotificationTemplateManagerHolder.SERVICE;
+        if (service == null) {
+            LOG.warn("NotificationTemplateManager service is not available.");
+        }
+        return service;
     }
 }
