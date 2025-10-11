@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.Valid;
+import java.util.Objects;
 
 @ApiModel(description = "Input format of the attribute.")
 public class InputFormatDTO {
@@ -54,5 +55,24 @@ public class InputFormatDTO {
         sb.append("    inputType: ").append(inputType).append("\n");
         sb.append("}\n");
         return sb.toString();
+    }
+
+    @Override
+    public boolean equals(java.lang.Object o) {
+
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        InputFormatDTO profilesDTO = (InputFormatDTO) o;
+        return Objects.equals(this.inputType, profilesDTO.inputType);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(inputType);
     }
 }
