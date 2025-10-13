@@ -202,6 +202,7 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.NAME;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.TEMPLATE_ID;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.TEMPLATE_VERSION;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.VIEW_APPLICATION_CLIENT_SECRET_OPERATION;
 import static org.wso2.carbon.identity.api.server.application.management.v1.constants.ApplicationManagementEndpointConstants.SCRIPT_UPDATE_OPERATION_SCOPE_NAME;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotImplementedError;
@@ -516,11 +517,27 @@ public class ServerApplicationManagementService {
 
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            exportSecrets = hasOperationScopeForSecretExport(exportSecrets);
             return applicationManagementService.exportSPApplicationFromAppID(applicationId, exportSecrets,
                     tenantDomain);
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error exporting application with id: " + applicationId;
             throw handleIdentityApplicationManagementException(e, msg);
+        }
+    }
+
+    private boolean hasOperationScopeForSecretExport(boolean exportSecrets) {
+
+        if (Boolean.parseBoolean(IdentityUtil.getProperty(
+                ApplicationManagementConstants.SKIP_ENFORCE_CLIENT_SECRET_UPDATE_PERMISSION)) || !exportSecrets) {
+            return exportSecrets;
+        }
+
+        try {
+            AuthorizationUtil.validateOperationScopes(VIEW_APPLICATION_CLIENT_SECRET_OPERATION);
+            return true;
+        } catch (ForbiddenException e) {
+            return false;
         }
     }
 
