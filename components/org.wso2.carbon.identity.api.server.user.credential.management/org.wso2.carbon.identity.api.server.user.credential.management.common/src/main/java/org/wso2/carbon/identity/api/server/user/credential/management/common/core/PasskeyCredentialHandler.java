@@ -34,7 +34,8 @@ import org.wso2.carbon.identity.application.authenticator.fido2.dto.FIDO2Credent
 import org.wso2.carbon.identity.application.authenticator.fido2.exception.FIDO2AuthenticatorClientException;
 import org.wso2.carbon.identity.application.authenticator.fido2.exception.FIDO2AuthenticatorServerException;
 import org.wso2.carbon.identity.base.IdentityRuntimeException;
-import org.wso2.carbon.user.api.UserRealm;
+import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
+import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.user.core.UserStoreException;
 import org.wso2.carbon.user.core.common.AbstractUserStoreManager;
 
@@ -140,8 +141,10 @@ public class PasskeyCredentialHandler implements UserCredentialHandler {
     private String resolveUsernameFromUserId(String userId) throws CredentialMgtException {
 
         try {
-            UserRealm userRealm = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm();
-            AbstractUserStoreManager userStoreManager = (AbstractUserStoreManager) userRealm.getUserStoreManager();
+            RealmService userRealm = UserCredentialManagementServiceDataHolder.getRealmService();
+            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            AbstractUserStoreManager userStoreManager = (AbstractUserStoreManager) userRealm
+                    .getTenantUserRealm(IdentityTenantUtil.getTenantId(tenantDomain)).getUserStoreManager();
             return userStoreManager.getUserNameFromUserID(userId);
         } catch (UserStoreException e) {
             throw CredentialManagementUtils.handleServerException(

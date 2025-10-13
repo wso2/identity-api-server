@@ -21,6 +21,7 @@ package org.wso2.carbon.identity.api.server.user.credential.management.common;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.application.authenticator.fido2.core.WebAuthnService;
 import org.wso2.carbon.identity.notification.push.device.handler.DeviceHandlerService;
+import org.wso2.carbon.user.core.service.RealmService;
 
 /**
  * Service holder class for credential management related services.
@@ -42,6 +43,12 @@ public class UserCredentialManagementServiceDataHolder {
                 .getThreadLocalCarbonContext().getOSGiService(DeviceHandlerService.class, null);
     }
 
+    private static class RealmServiceHolder {
+
+        static final RealmService SERVICE = (RealmService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
+    }
+
     /**
      * Get WebAuthnService OSGi service.
      *
@@ -60,5 +67,15 @@ public class UserCredentialManagementServiceDataHolder {
     public static DeviceHandlerService getPushDeviceHandler() {
 
         return PushDeviceHandlerHolder.SERVICE;
+    }
+
+    /**
+     * Get RealmService OSGi service.
+     *
+     * @return RealmService
+     */
+    public static RealmService getRealmService() {
+
+        return RealmServiceHolder.SERVICE;
     }
 }
