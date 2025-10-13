@@ -160,4 +160,49 @@ public class DebugFrameworkServiceHolder {
             return null;
         }
     }
+
+    /**
+     * Creates a new instance of ContextProvider using reflection.
+     *
+     * @return New ContextProvider instance or null if creation fails.
+     */
+    public static Object createContextProvider() {
+        try {
+            Class<?> contextProviderClass = Class.forName("org.wso2.carbon.identity.debug.framework.ContextProvider");
+            return contextProviderClass.getDeclaredConstructor().newInstance();
+        } catch (ClassNotFoundException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("ContextProvider class not found for direct instantiation: " + e.getMessage());
+            }
+            return null;
+        } catch (Exception e) {
+            log.error("Error creating ContextProvider instance: " + e.getMessage(), e);
+            return null;
+        }
+    }
+
+    /**
+     * Invokes a method on the ContextProvider using reflection.
+     * This allows us to call context creation methods without compile-time dependencies.
+     *
+     * @param methodName Method name to invoke on ContextProvider.
+     * @param parameterTypes Parameter types for the method.
+     * @param arguments Arguments to pass to the method.
+     * @return Method result or null if invocation fails.
+     */
+    public static Object invokeContextProviderMethod(String methodName, Class<?>[] parameterTypes, Object... arguments) {
+        Object contextProvider = createContextProvider();
+        if (contextProvider == null) {
+            log.warn("ContextProvider not available for method invocation: " + methodName);
+            return null;
+        }
+
+        try {
+            java.lang.reflect.Method method = contextProvider.getClass().getMethod(methodName, parameterTypes);
+            return method.invoke(contextProvider, arguments);
+        } catch (Exception e) {
+            log.error("Error invoking ContextProvider method '" + methodName + "': " + e.getMessage(), e);
+            return null;
+        }
+    }
 }

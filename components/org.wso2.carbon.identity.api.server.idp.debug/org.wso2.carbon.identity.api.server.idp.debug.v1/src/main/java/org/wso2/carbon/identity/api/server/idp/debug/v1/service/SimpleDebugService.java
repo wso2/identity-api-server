@@ -20,16 +20,10 @@ package org.wso2.carbon.identity.api.server.idp.debug.v1.service;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.idp.debug.common.DebugFrameworkServiceHolder;
-import org.wso2.carbon.identity.application.authentication.framework.context.AuthenticationContext;
-import org.wso2.carbon.identity.application.common.model.IdentityProvider;
-import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
-import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 
 /**
  * Service layer for IdP debug operations.
@@ -43,7 +37,6 @@ import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 public class SimpleDebugService {
 
     private static final Log log = LogFactory.getLog(SimpleDebugService.class);
-    private static final String DEFAULT_TENANT_DOMAIN = "carbon.super";
 
     /**
      * Constructor initializes debug framework service via service holder pattern.
@@ -53,8 +46,8 @@ public class SimpleDebugService {
     }
 
     /**
-     * Generates OAuth 2.0 authorization URL for IdP debug testing.
-     * This method follows the new OAuth 2.0 flow architecture.
+     * Generates OAuth 2.0 authorization URL for debug flow using headless browser simulation.
+     * This method delegates to the debug framework's ContextProvider for proper separation of concerns.
      *
      * @param idpId Identity Provider resource ID.
      * @param authenticatorName Optional authenticator name.
@@ -66,79 +59,44 @@ public class SimpleDebugService {
     public Map<String, Object> generateOAuth2AuthorizationUrl(String idpId, String authenticatorName, 
                                                               String redirectUri, String scope, 
                                                               Map<String, String> additionalParams) {
-        // Input validation.
-        validateDebugRequest(idpId);
-        
         try {
-            // Get the IdP object.
-            IdentityProvider idp = getIdentityProvider(idpId);
-            if (idp == null) {
-                throw new RuntimeException("Identity Provider not found for ID: " + idpId);
-            }
-
-            if (!idp.isEnable()) {
-                throw new RuntimeException("Identity Provider is disabled: " + idp.getIdentityProviderName());
-            }
-
-            // Determine authenticator to use.
-            String targetAuthenticator = determineAuthenticator(idp, authenticatorName);
-            if (targetAuthenticator == null) {
-                throw new RuntimeException("No suitable authenticator found for IdP: " + idp.getIdentityProviderName());
-            }
-
-            // Generate session data key for debug flow.
-            String sessionDataKey = "debug-" + UUID.randomUUID().toString();
-
-            // Create authentication context and use Executer to build OAuth 2.0 URL.
-            AuthenticationContext context = new AuthenticationContext();
-            context.setContextIdentifier(sessionDataKey);
-            context.setProperty("DEBUG_SESSION", "true");
-            context.setProperty("DEBUG_AUTHENTICATOR_NAME", targetAuthenticator);
-            context.setProperty("IDP_CONFIG", idp);
+            // Delegate context creation to debug framework's ContextProvider.
+            // This removes all business logic from the API layer.
+            Object context = DebugFrameworkServiceHolder.invokeContextProviderMethod(
+                "createOAuth2DebugContext",
+                new Class<?>[]{String.class, String.class, String.class, String.class, Map.class},
+                idpId, authenticatorName, redirectUri, scope, additionalParams
+            );
             
-            // Add custom parameters if provided.
-            if (redirectUri != null) {
-                context.setProperty("CUSTOM_REDIRECT_URI", redirectUri);
+            if (context == null) {
+                throw new RuntimeException("Failed to create debug context from ContextProvider");
             }
-            if (scope != null) {
-                context.setProperty("CUSTOM_SCOPE", scope);
+            
+            // Extract IdP information from the context for response building.
+            Object idpConfig = getPropertyFromContext(context, "IDP_CONFIG");
+            String idpName = (String) getPropertyFromContext(context, "DEBUG_IDP_NAME");
+            String targetAuthenticator = (String) getPropertyFromContext(context, "DEBUG_AUTHENTICATOR_NAME");
+            String sessionDataKey = getContextIdentifier(context);
+            
+            if (sessionDataKey == null) {
+                throw new RuntimeException("Session data key not found in context");
             }
-            if (additionalParams != null) {
-                context.setProperty("ADDITIONAL_OAUTH_PARAMS", additionalParams);
-            }
-
-            // Use Executer via service holder to build OAuth 2.0 authorization URL.
+            
+            // Execute OAuth 2.0 URL generation using the debug framework.
             Object executer = DebugFrameworkServiceHolder.createExecuter();
             if (executer == null) {
                 throw new RuntimeException("Failed to create Executer instance from debug framework");
             }
             
-            // Execute using reflection
-            Object executeResult = DebugFrameworkServiceHolder.invokeDebugServiceMethod("execute", 
-                new Class<?>[]{IdentityProvider.class, AuthenticationContext.class}, idp, context);
-            
-            boolean success = false;
-            if (executeResult instanceof Boolean) {
-                success = (Boolean) executeResult;
-            } else {
-                // Try invoking on the executer object directly
-                try {
-                    java.lang.reflect.Method executeMethod = executer.getClass()
-                        .getMethod("execute", IdentityProvider.class, AuthenticationContext.class);
-                    Object result = executeMethod.invoke(executer, idp, context);
-                    success = (Boolean) result;
-                } catch (Exception e) {
-                    log.error("Error invoking execute method on Executer", e);
-                    throw new RuntimeException("Failed to execute debug flow", e);
-                }
-            }
+            // Execute the debug flow using reflection to maintain loose coupling.
+            boolean success = executeDebugFlow(executer, idpConfig, context);
             
             if (!success) {
                 throw new RuntimeException("Failed to generate OAuth 2.0 authorization URL");
             }
             
             // Get the generated authorization URL from context.
-            String authorizationUrl = (String) context.getProperty("DEBUG_EXTERNAL_REDIRECT_URL");
+            String authorizationUrl = (String) getPropertyFromContext(context, "DEBUG_EXTERNAL_REDIRECT_URL");
             if (authorizationUrl == null) {
                 throw new RuntimeException("OAuth 2.0 authorization URL not found in context");
             }
@@ -150,8 +108,8 @@ public class SimpleDebugService {
             result.put("status", "URL_GENERATED");
             result.put("message", "OAuth 2.0 authorization URL generated successfully. " +
                                    "Redirect user to this URL for authentication.");
-            result.put("idpName", idp.getIdentityProviderName());
-            result.put("authenticatorName", targetAuthenticator);
+            result.put("idpName", idpName != null ? idpName : "Unknown");
+            result.put("authenticatorName", targetAuthenticator != null ? targetAuthenticator : "Unknown");
             result.put("timestamp", System.currentTimeMillis());
             
             return result;
@@ -165,134 +123,76 @@ public class SimpleDebugService {
         }
     }
 
+    /**
+     * Gets a property from AuthenticationContext using reflection.
+     *
+     * @param context AuthenticationContext object.
+     * @param propertyName Property name to retrieve.
+     * @return Property value or null if not found.
+     */
+    private Object getPropertyFromContext(Object context, String propertyName) {
+        try {
+            java.lang.reflect.Method getPropertyMethod = context.getClass().getMethod("getProperty", String.class);
+            return getPropertyMethod.invoke(context, propertyName);
+        } catch (Exception e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Error getting property '" + propertyName + "' from context: " + e.getMessage());
+            }
+            return null;
+        }
+    }
 
     /**
-     * Gets identity provider by ID using IdP management service.
+     * Gets the context identifier from AuthenticationContext using reflection.
      *
-     * @param idpId Identity Provider ID (resource ID).
-     * @return IdentityProvider object if found, null otherwise.
+     * @param context AuthenticationContext object.
+     * @return Context identifier or null if not found.
      */
-    private IdentityProvider getIdentityProvider(String idpId) {
+    private String getContextIdentifier(Object context) {
         try {
-            // Start tenant flow for the default tenant.
-            PrivilegedCarbonContext.startTenantFlow();
-            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(DEFAULT_TENANT_DOMAIN, true);
+            java.lang.reflect.Method getContextIdentifierMethod = context.getClass().getMethod("getContextIdentifier");
+            Object result = getContextIdentifierMethod.invoke(context);
+            return result != null ? result.toString() : null;
+        } catch (Exception e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Error getting context identifier: " + e.getMessage());
+            }
+            return null;
+        }
+    }
 
-            IdentityProviderManager idpManager = IdentityProviderManager.getInstance();
+    /**
+     * Executes the debug flow using reflection to maintain loose coupling.
+     *
+     * @param executer Executer instance.
+     * @param idpConfig Identity Provider configuration.
+     * @param context Authentication context.
+     * @return true if execution successful, false otherwise.
+     */
+    private boolean executeDebugFlow(Object executer, Object idpConfig, Object context) {
+        try {
+            // First try using the debug service method.
+            Object executeResult = DebugFrameworkServiceHolder.invokeDebugServiceMethod("execute", 
+                new Class<?>[]{Class.forName("org.wso2.carbon.identity.application.common.model.IdentityProvider"), 
+                              Class.forName("org.wso2.carbon.identity.application.authentication.framework.context.AuthenticationContext")}, 
+                idpConfig, context);
             
-            try {
-                // First try to get by resource ID.
-                return idpManager.getIdPByResourceId(idpId, DEFAULT_TENANT_DOMAIN, true);
-            } catch (IdentityProviderManagementException e) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Failed to get IdP by resource ID, trying by name: " + e.getMessage());
-                }
-                // If not found by resource ID, try by name.
-                try {
-                    return idpManager.getIdPByName(idpId, DEFAULT_TENANT_DOMAIN, true);
-                } catch (IdentityProviderManagementException ex) {
-                    log.error("Failed to get IdP by name: " + ex.getMessage(), ex);
-                    return null;
-                }
+            if (executeResult instanceof Boolean) {
+                return (Boolean) executeResult;
+            } else {
+                // Try invoking on the executer object directly.
+                java.lang.reflect.Method executeMethod = executer.getClass()
+                    .getMethod("execute", 
+                              Class.forName("org.wso2.carbon.identity.application.common.model.IdentityProvider"),
+                              Class.forName("org.wso2.carbon.identity.application.authentication.framework.context.AuthenticationContext"));
+                Object result = executeMethod.invoke(executer, idpConfig, context);
+                return result instanceof Boolean ? (Boolean) result : false;
             }
         } catch (Exception e) {
-            log.error("Error retrieving Identity Provider: " + e.getMessage(), e);
-            return null;
-        } finally {
-            PrivilegedCarbonContext.endTenantFlow();
-        }
-    }
-
-    /**
-     * Determines which authenticator to use for the debug flow.
-     *
-     * @param idp Identity Provider.
-     * @param authenticatorName Requested authenticator name (optional).
-     * @return Authenticator name to use.
-     */
-    private String determineAuthenticator(IdentityProvider idp, String authenticatorName) {
-        if (authenticatorName != null && !authenticatorName.trim().isEmpty()) {
-            // Check if the specified authenticator exists in IdP configuration.
-            if (idp.getFederatedAuthenticatorConfigs() != null) {
-                for (org.wso2.carbon.identity.application.common.model.FederatedAuthenticatorConfig config : 
-                     idp.getFederatedAuthenticatorConfigs()) {
-                    if (authenticatorName.equals(config.getName())) {
-                        return authenticatorName;
-                    }
-                }
-            }
-        }
-
-        // Use default authenticator from IdP configuration.
-        if (idp.getDefaultAuthenticatorConfig() != null) {
-            return idp.getDefaultAuthenticatorConfig().getName();
-        }
-
-        // Use first available authenticator.
-        if (idp.getFederatedAuthenticatorConfigs() != null && idp.getFederatedAuthenticatorConfigs().length > 0) {
-            return idp.getFederatedAuthenticatorConfigs()[0].getName();
-        }
-
-        return null;
-    }
-
-    /**
-     * Validates debug request parameters for OAuth 2.0 flow.
-     *
-     * @param idpId Identity Provider ID.
-     * @throws RuntimeException if validation fails.
-     */
-    private void validateDebugRequest(String idpId) throws RuntimeException {
-        if (isBlank(idpId)) {
-            throw new RuntimeException("Identity Provider ID is required");
-        }
-        
-        // Security: Basic input validation to prevent injection.
-        if (idpId.length() > 255) {
-            throw new RuntimeException("Identity Provider ID must be less than 255 characters");
-        }
-        
-        // Security: Check for potentially dangerous characters.
-        if (containsSqlInjectionPattern(idpId)) {
-            throw new RuntimeException("Invalid characters detected in IdP ID");
-        }
-    }
-
-    /**
-     * Basic SQL injection pattern detection.
-     * 
-     * Vulnerability: Potential XSS - Input validation should be more comprehensive.
-     * Risk: Basic pattern matching may not catch all injection attempts.
-     * Suggestion: Use a proper input sanitization library or framework validation.
-     *
-     * @param input Input string to validate.
-     * @return true if suspicious patterns detected, false otherwise.
-     */
-    private boolean containsSqlInjectionPattern(String input) {
-        if (input == null) {
+            log.error("Error executing debug flow", e);
             return false;
         }
-        
-        String lowerInput = input.toLowerCase(java.util.Locale.ROOT);
-        String[] sqlPatterns = {"'", "\"", ";", "--", "/*", "*/", "union", "select", "insert", "update", "delete"};
-        
-        for (String pattern : sqlPatterns) {
-            if (lowerInput.contains(pattern)) {
-                return true;
-            }
-        }
-        return false;
     }
 
 
-
-    /**
-     * Checks if a string is blank (null, empty, or whitespace only).
-     *
-     * @param str String to check.
-     * @return true if blank, false otherwise.
-     */
-    private boolean isBlank(String str) {
-        return str == null || str.trim().isEmpty();
-    }
 }
