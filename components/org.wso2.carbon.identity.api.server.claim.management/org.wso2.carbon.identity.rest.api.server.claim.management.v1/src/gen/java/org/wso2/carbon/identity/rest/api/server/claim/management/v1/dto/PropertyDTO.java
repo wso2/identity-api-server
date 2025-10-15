@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.util.Objects;
 
 @ApiModel(description = "")
 public class PropertyDTO {
@@ -67,5 +68,24 @@ public class PropertyDTO {
         
         sb.append("}\n");
         return sb.toString();
+    }
+
+    @Override
+    public boolean equals(java.lang.Object o) {
+
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        PropertyDTO propertyDTO = (PropertyDTO) o;
+        return Objects.equals(this.key, propertyDTO.key) && Objects.equals(this.value, propertyDTO.value);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(key, value);
     }
 }

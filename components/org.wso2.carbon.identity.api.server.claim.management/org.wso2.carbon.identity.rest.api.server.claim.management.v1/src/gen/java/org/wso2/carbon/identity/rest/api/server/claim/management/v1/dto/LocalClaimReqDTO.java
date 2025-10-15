@@ -367,7 +367,7 @@ public class LocalClaimReqDTO {
                         localClaimResDTO.getSharedProfileValueResolvingMethod()) &&
                 compareProfiles(this.getProfiles(), localClaimResDTO.getProfiles()) &&
                 compareInputFormats(this.getInputFormat(), localClaimResDTO.getInputFormat()) &&
-                compareIntegers(this.getDisplayOrder(), localClaimResDTO.getDisplayOrder()) &&
+                Objects.equals(this.getDisplayOrder(), localClaimResDTO.getDisplayOrder()) &&
                 Objects.equals(this.getReadOnly(), localClaimResDTO.getReadOnly()) &&
                 Objects.equals(this.getRequired(), localClaimResDTO.getRequired()) &&
                 Objects.equals(this.getSupportedByDefault(), localClaimResDTO.getSupportedByDefault()) &&
@@ -378,19 +378,10 @@ public class LocalClaimReqDTO {
         }
 
         // Compare arrays.
-        boolean arraysMatch = compareArrays(this.getSubAttributes(), localClaimResDTO.getSubAttributes()) &&
-                compareArrays(this.getCanonicalValues(), localClaimResDTO.getCanonicalValues());
-        if (!arraysMatch) {
-            return false;
-        }
-
-        // Compare attribute mappings.
-        if (!compareLists(this.getAttributeMapping(), localClaimResDTO.getAttributeMapping())) {
-            return false;
-        }
-
-        // Compare properties.
-        return compareLists(this.getProperties(), localClaimResDTO.getProperties());
+        return Arrays.equals(this.getSubAttributes(), localClaimResDTO.getSubAttributes()) &&
+                Arrays.equals(this.getCanonicalValues(), localClaimResDTO.getCanonicalValues()) &&
+                compareLists(this.getAttributeMapping(), localClaimResDTO.getAttributeMapping()) &&
+                compareLists(this.getProperties(), localClaimResDTO.getProperties());
     }
 
     private boolean compareEnums(Enum<?> enum1, Enum<?> enum2) {
@@ -432,25 +423,6 @@ public class LocalClaimReqDTO {
         return inputFormat1.equals(inputFormat2);
     }
 
-    private boolean compareIntegers(Integer int1, Integer int2) {
-
-        return Objects.equals(int1, int2);
-    }
-
-    private boolean compareArrays(Object[] array1, Object[] array2) {
-
-        if (array1 == null && array2 == null) {
-            return true;
-        }
-        if (array1 == null) {
-            array1 = new Object[0];
-        }
-        if (array2 == null) {
-            array2 = new Object[0];
-        }
-        return Arrays.equals(array1, array2);
-    }
-
     private <T> boolean compareLists(List<T> list1, List<T> list2) {
 
         if (list1 == null && list2 == null) {
@@ -460,12 +432,7 @@ public class LocalClaimReqDTO {
             return false;
         }
         for (int i = 0; i < list1.size(); i++) {
-            T item1 = list1.get(i);
-            T item2 = list2.get(i);
-            if (item1 == null && item2 == null) {
-                continue;
-            }
-            if (item1 == null || item2 == null || !StringUtils.equals(item1.toString(), item2.toString())) {
+            if (!Objects.equals(list1.get(i), list2.get(i))) {
                 return false;
             }
         }
