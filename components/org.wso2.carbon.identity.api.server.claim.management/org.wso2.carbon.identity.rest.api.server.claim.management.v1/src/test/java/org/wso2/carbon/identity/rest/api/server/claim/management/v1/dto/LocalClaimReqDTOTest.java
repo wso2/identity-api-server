@@ -179,7 +179,7 @@ public class LocalClaimReqDTOTest {
         labelValueDTO.setValue("value2");
         testObject.setCanonicalValues(new LabelValueDTO[]{labelValueDTO});
 
-        when(mockClaimResDTO.getSubAttributes()).thenReturn(null);
+        when(mockClaimResDTO.getSubAttributes()).thenReturn(new String[0]);
         when(mockClaimResDTO.getCanonicalValues()).thenReturn(new LabelValueDTO[]{labelValueDTOExpected});
 
         boolean result = testObject.equals(mockClaimResDTO);
@@ -356,8 +356,8 @@ public class LocalClaimReqDTOTest {
         testObject.setSubAttributes(null);
         testObject.setCanonicalValues(null);
 
-        when(mockClaimResDTO.getSubAttributes()).thenReturn(null);
-        when(mockClaimResDTO.getCanonicalValues()).thenReturn(null);
+        when(mockClaimResDTO.getSubAttributes()).thenReturn(new String[0]);
+        when(mockClaimResDTO.getCanonicalValues()).thenReturn(new LabelValueDTO[0]);
 
         setupMatchingAttributeMappings(mockClaimResDTO);
         setupMatchingProperties(mockClaimResDTO);
@@ -389,8 +389,8 @@ public class LocalClaimReqDTOTest {
 
         testObject.setSubAttributes(null);
         testObject.setCanonicalValues(null);
-        when(mock.getSubAttributes()).thenReturn(null);
-        when(mock.getCanonicalValues()).thenReturn(null);
+        when(mock.getSubAttributes()).thenReturn(new String[0]);
+        when(mock.getCanonicalValues()).thenReturn(new LabelValueDTO[0]);
     }
 
     private void setupMatchingAttributeMappings(LocalClaimResDTO mock) {
