@@ -100,68 +100,6 @@ public class DebugService {
         }
     }
 
-
-
-    /**
-     * Validates debug request parameters.
-     *
-     * @param idpId Identity Provider ID.
-     * @param username Username.
-     * @param password Password.
-     * @throws APIError if validation fails.
-     */
-    private void validateDebugRequest(String idpId, String username, String password) throws APIError {
-        if (StringUtils.isBlank(idpId)) {
-            throw createAPIError("INVALID_REQUEST", "Identity Provider ID is required");
-        }
-        
-        if (StringUtils.isBlank(username)) {
-            throw createAPIError("INVALID_REQUEST", "Username is required for debug authentication");
-        }
-        
-        if (StringUtils.isBlank(password)) {
-            throw createAPIError("INVALID_REQUEST", "Password is required for debug authentication");
-        }
-        
-        // Security: Basic input validation to prevent injection.
-        if (username.length() > 255 || password.length() > 255) {
-            throw createAPIError("INVALID_REQUEST", "Username and password must be less than 255 characters");
-        }
-        
-        // Security: Check for potentially dangerous characters.
-        if (containsSqlInjectionPattern(username) || containsSqlInjectionPattern(password)) {
-            throw createAPIError("INVALID_REQUEST", "Invalid characters detected in credentials");
-        }
-    }
-
-
-
-    /**
-     * Basic SQL injection pattern detection.
-     * 
-     * Vulnerability: Potential XSS - Input validation should be more comprehensive.
-     * Risk: Basic pattern matching may not catch all injection attempts.
-     * Suggestion: Use a proper input sanitization library or framework validation.
-     *
-     * @param input Input string to validate.
-     * @return true if suspicious patterns detected, false otherwise.
-     */
-    private boolean containsSqlInjectionPattern(String input) {
-        if (input == null) {
-            return false;
-        }
-        
-        String lowerInput = input.toLowerCase(java.util.Locale.ROOT);
-        String[] sqlPatterns = {"'", "\"", ";", "--", "/*", "*/", "union", "select", "insert", "update", "delete"};
-        
-        for (String pattern : sqlPatterns) {
-            if (lowerInput.contains(pattern)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /**
      * Creates APIError with proper error response.
      *

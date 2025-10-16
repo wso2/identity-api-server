@@ -19,7 +19,6 @@
 package org.wso2.carbon.identity.api.server.idp.debug.v1;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;

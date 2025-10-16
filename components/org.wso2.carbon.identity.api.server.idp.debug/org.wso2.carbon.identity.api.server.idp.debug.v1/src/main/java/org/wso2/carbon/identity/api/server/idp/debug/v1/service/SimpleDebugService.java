@@ -20,6 +20,8 @@ package org.wso2.carbon.identity.api.server.idp.debug.v1.service;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.wso2.carbon.identity.application.common.model.IdentityProvider;
+import org.wso2.carbon.identity.application.authentication.framework.context.AuthenticationContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,10 +31,6 @@ import org.wso2.carbon.identity.api.server.idp.debug.common.DebugFrameworkServic
  * Service layer for IdP debug operations.
  * This service provides a clean interface for the API layer and delegates to debug framework components.
  * It follows the OAuth 2.0 flow architecture using debug framework components:
- * 1. ContextProvider - Creates context with IdP id and other relevant data
- * 2. Executer - Invokes authenticator and sends to FederatedIdP
- * 3. RequestCoordinator - Handles callback from /commonauth with debug identifier  
- * 4. Processor - Processes results and sends to client
  */
 public class SimpleDebugService {
 
@@ -173,18 +171,15 @@ public class SimpleDebugService {
         try {
             // First try using the debug service method.
             Object executeResult = DebugFrameworkServiceHolder.invokeDebugServiceMethod("execute", 
-                new Class<?>[]{Class.forName("org.wso2.carbon.identity.application.common.model.IdentityProvider"), 
-                              Class.forName("org.wso2.carbon.identity.application.authentication.framework.context.AuthenticationContext")}, 
+                new Class<?>[]{IdentityProvider.class, AuthenticationContext.class}, 
                 idpConfig, context);
-            
+
             if (executeResult instanceof Boolean) {
                 return (Boolean) executeResult;
             } else {
                 // Try invoking on the executer object directly.
                 java.lang.reflect.Method executeMethod = executer.getClass()
-                    .getMethod("execute", 
-                              Class.forName("org.wso2.carbon.identity.application.common.model.IdentityProvider"),
-                              Class.forName("org.wso2.carbon.identity.application.authentication.framework.context.AuthenticationContext"));
+                    .getMethod("execute", IdentityProvider.class, AuthenticationContext.class);
                 Object result = executeMethod.invoke(executer, idpConfig, context);
                 return result instanceof Boolean ? (Boolean) result : false;
             }
