@@ -818,6 +818,12 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-testng</artifactId>
+                <version>${mockito-testng.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
                 <artifactId>org.wso2.carbon.identity.api.server.application.management.v1</artifactId>
                 <version>${project.version}</version>
@@ -855,6 +861,22 @@
                 <artifactId>org.wso2.carbon.identity.api.server.webhook.metadata.common</artifactId>
                 <version>${project.version}</version>
                 <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.user.credential.management.common</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.notification.push</groupId>
+                <artifactId>org.wso2.carbon.identity.notification.push.device.handler</artifactId>
+                <version>${identity.notification.push.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.local.auth.fido</groupId>
+                <artifactId>org.wso2.carbon.identity.application.authenticator.fido2</artifactId>
+                <version>${identity.local.auth.fido.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -989,6 +1011,8 @@
 
         <tenant.resource.manager.version>1.5.55</tenant.resource.manager.version>
         <identity.verification.version>1.0.15</identity.verification.version>
+        <identity.local.auth.fido.version>5.4.26</identity.local.auth.fido.version>
+        <identity.notification.push.version>1.0.6</identity.notification.push.version>
 
         <!-- Organization management core Version -->
         <org.wso2.carbon.identity.organization.management.core.version>1.1.41
@@ -1006,6 +1030,7 @@
         <!-- Unit test versions -->
         <testng.version>6.9.10</testng.version>
         <mockito-core.version>4.6.1</mockito-core.version>
+        <mockito-testng.version>0.5.2</mockito-testng.version>
         <jacoco.version>0.8.2</jacoco.version>
         <h2database.version>2.2.220</h2database.version>
     </properties>
@@ -1052,6 +1077,7 @@
         <module>components/org.wso2.carbon.identity.api.server.webhook.metadata</module>
         <module>components/org.wso2.carbon.identity.api.server.workflow</module>
         <module>components/org.wso2.carbon.identity.api.server.asynchronous.operation.status.management</module>
+        <module>components/org.wso2.carbon.identity.api.server.user.credential.management</module>
     </modules>
 
 </project>
