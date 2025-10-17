@@ -22,9 +22,11 @@ import io.swagger.annotations.ApiModel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.*;
+import org.apache.commons.lang.StringUtils;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -346,5 +348,94 @@ public class LocalClaimReqDTO {
         
         sb.append("}\n");
         return sb.toString();
+    }
+
+    public boolean equals(LocalClaimResDTO localClaimResDTO) {
+
+        if (localClaimResDTO == null) {
+            return false;
+        }
+
+        // Compare basic fields.
+        boolean basicFieldsMatch = StringUtils.equals(this.getClaimURI(), localClaimResDTO.getClaimURI()) &&
+                StringUtils.equals(this.getDescription(), localClaimResDTO.getDescription()) &&
+                StringUtils.equals(this.getDisplayName(), localClaimResDTO.getDisplayName()) &&
+                StringUtils.equals(this.getRegEx(), localClaimResDTO.getRegEx()) &&
+                compareEnums(this.getDataType(), localClaimResDTO.getDataType()) &&
+                compareEnums(this.getUniquenessScope(), localClaimResDTO.getUniquenessScope()) &&
+                compareEnums(this.getSharedProfileValueResolvingMethod(),
+                        localClaimResDTO.getSharedProfileValueResolvingMethod()) &&
+                compareProfiles(this.getProfiles(), localClaimResDTO.getProfiles()) &&
+                compareInputFormats(this.getInputFormat(), localClaimResDTO.getInputFormat()) &&
+                Objects.equals(this.getDisplayOrder(), localClaimResDTO.getDisplayOrder()) &&
+                Objects.equals(this.getReadOnly(), localClaimResDTO.getReadOnly()) &&
+                Objects.equals(this.getRequired(), localClaimResDTO.getRequired()) &&
+                Objects.equals(this.getSupportedByDefault(), localClaimResDTO.getSupportedByDefault()) &&
+                Objects.equals(this.getMultiValued(), localClaimResDTO.getMultiValued());
+
+        if (!basicFieldsMatch) {
+            return false;
+        }
+
+        // Compare arrays.
+        return Arrays.equals(this.getSubAttributes(), localClaimResDTO.getSubAttributes()) &&
+                Arrays.equals(this.getCanonicalValues(), localClaimResDTO.getCanonicalValues()) &&
+                compareLists(this.getAttributeMapping(), localClaimResDTO.getAttributeMapping()) &&
+                compareLists(this.getProperties(), localClaimResDTO.getProperties());
+    }
+
+    private boolean compareEnums(Enum<?> enum1, Enum<?> enum2) {
+
+        if (enum1 == null && enum2 == null) {
+            return true;
+        }
+        if (enum1 == null || enum2 == null) {
+            return false;
+        }
+        return StringUtils.equals(enum1.name(), enum2.name());
+    }
+
+    private boolean compareProfiles(ProfilesDTO profile1, ProfilesDTO profile2) {
+
+        if (profile1 == null && profile2 == null) {
+            return true;
+        }
+        if (profile1 == null) {
+            profile1 = new ProfilesDTO();
+        }
+        if (profile2 == null) {
+            profile2 = new ProfilesDTO();
+        }
+        return profile1.equals(profile2);
+    }
+
+    private boolean compareInputFormats(InputFormatDTO inputFormat1, InputFormatDTO inputFormat2) {
+
+        if (inputFormat1 == null && inputFormat2 == null) {
+            return true;
+        }
+        if (inputFormat1 == null) {
+            inputFormat1 = new InputFormatDTO();
+        }
+        if (inputFormat2 == null) {
+            inputFormat2 = new InputFormatDTO();
+        }
+        return inputFormat1.equals(inputFormat2);
+    }
+
+    private <T> boolean compareLists(List<T> list1, List<T> list2) {
+
+        if (list1 == null && list2 == null) {
+            return true;
+        }
+        if (list1 == null || list2 == null || list1.size() != list2.size()) {
+            return false;
+        }
+        for (int i = 0; i < list1.size(); i++) {
+            if (!Objects.equals(list1.get(i), list2.get(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 }

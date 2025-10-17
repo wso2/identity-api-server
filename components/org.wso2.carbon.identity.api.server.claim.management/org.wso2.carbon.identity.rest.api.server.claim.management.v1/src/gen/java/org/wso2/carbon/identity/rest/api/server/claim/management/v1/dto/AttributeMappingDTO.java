@@ -23,8 +23,9 @@ import com.fasterxml.jackson.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.util.Objects;
 
-    /**
+/**
     * Claim userstore attribute mapping.
     **/
 @ApiModel(description = "Claim userstore attribute mapping.")
@@ -73,5 +74,25 @@ public class AttributeMappingDTO {
         
         sb.append("}\n");
         return sb.toString();
+    }
+
+    @Override
+    public boolean equals(java.lang.Object o) {
+
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        AttributeMappingDTO attributeMappingDTO = (AttributeMappingDTO) o;
+        return Objects.equals(this.mappedAttribute, attributeMappingDTO.mappedAttribute)
+                && Objects.equals(this.userstore, attributeMappingDTO.userstore);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(mappedAttribute, userstore);
     }
 }
