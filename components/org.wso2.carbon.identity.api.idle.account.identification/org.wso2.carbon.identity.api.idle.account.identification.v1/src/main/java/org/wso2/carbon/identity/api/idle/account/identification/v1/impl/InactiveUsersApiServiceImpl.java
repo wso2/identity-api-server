@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.idle.account.identification.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.idle.account.identification.common.ContextLoader;
 import org.wso2.carbon.identity.api.idle.account.identification.v1.InactiveUsersApiService;
 import org.wso2.carbon.identity.api.idle.account.identification.v1.core.InactiveUsersManagementApiService;
@@ -31,13 +33,19 @@ import javax.ws.rs.core.Response;
  */
 public class InactiveUsersApiServiceImpl implements InactiveUsersApiService {
 
+    private static final Log LOG = LogFactory.getLog(InactiveUsersApiServiceImpl.class);
     private final InactiveUsersManagementApiService inactiveUsersManagementApiService;
 
     public InactiveUsersApiServiceImpl() {
         try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Initializing InactiveUsersApiServiceImpl.");
+            }
             this.inactiveUsersManagementApiService = InactiveUsersManagementApiServiceFactory
                     .getInactiveUsersManagementApiService();
+            LOG.info("InactiveUsersApiServiceImpl initialized successfully.");
         } catch (IllegalStateException e) {
+            LOG.error("Error occurred while initiating inactive users management service.", e);
             throw new RuntimeException("Error occurred while initiating inactive users management service.", e);
         }
     }
@@ -46,6 +54,10 @@ public class InactiveUsersApiServiceImpl implements InactiveUsersApiService {
     public Response getInactiveUsers(String inactiveAfter, String excludeBefore) {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Retrieving inactive users for tenant: %s, inactiveAfter: %s, excludeBefore: %s",
+                    tenantDomain, inactiveAfter, excludeBefore));
+        }
         return Response.ok().entity(inactiveUsersManagementApiService
                 .getInactiveUsers(inactiveAfter, excludeBefore, tenantDomain)).build();
     }
@@ -55,6 +67,10 @@ public class InactiveUsersApiServiceImpl implements InactiveUsersApiService {
             throws IdleAccountIdentificationClientException {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Retrieving inactive users with filter for tenant: %s, inactiveAfter: %s, " +
+                    "excludeBefore: %s, filter: %s", tenantDomain, inactiveAfter, excludeBefore, filter));
+        }
 
         if (filter != null) {
             return Response.ok().entity(
