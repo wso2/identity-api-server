@@ -59,11 +59,27 @@ public class OrganizationConfigsService {
      */
     public void addDiscoveryConfiguration(Config config) {
 
+        if (config == null) {
+            LOG.error("Configuration object is null. Cannot add discovery configuration.");
+            throw new IllegalArgumentException("Configuration object cannot be null.");
+        }
+        
+        if (config.getProperties() == null) {
+            LOG.error("Configuration properties are null. Cannot add discovery configuration.");
+            throw new IllegalArgumentException("Configuration properties cannot be null.");
+        }
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Adding organization discovery configuration with " + config.getProperties().size() + 
+                    " properties.");
+        }
+
         List<ConfigProperty> configProperties = config.getProperties().stream()
                 .map(property -> new ConfigProperty(property.getKey(), property.getValue()))
                 .collect(Collectors.toList());
         try {
             organizationConfigManager.addDiscoveryConfiguration(new DiscoveryConfig(configProperties));
+            LOG.info("Successfully added organization discovery configuration.");
         } catch (OrganizationConfigException e) {
             throw handleException(e);
         }
@@ -76,12 +92,28 @@ public class OrganizationConfigsService {
      */
     public void updateDiscoveryConfiguration(Config config) {
 
+        if (config == null) {
+            LOG.error("Configuration object is null. Cannot update discovery configuration.");
+            throw new IllegalArgumentException("Configuration object cannot be null.");
+        }
+        
+        if (config.getProperties() == null) {
+            LOG.error("Configuration properties are null. Cannot update discovery configuration.");
+            throw new IllegalArgumentException("Configuration properties cannot be null.");
+        }
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating organization discovery configuration with " + config.getProperties().size() + 
+                    " properties.");
+        }
+
         List<ConfigProperty> configProperties = config.getProperties().stream()
                 .map(property -> new ConfigProperty(property.getKey(), property.getValue()))
                 .collect(Collectors.toList());
         try {
             organizationConfigManager.updateDiscoveryConfiguration
                     (new DiscoveryConfig(configProperties));
+            LOG.info("Successfully updated organization discovery configuration.");
         } catch (OrganizationConfigException e) {
             throw handleException(e);
         }
@@ -93,6 +125,10 @@ public class OrganizationConfigsService {
      * @return The organization discovery configuration.
      */
     public Config getDiscoveryConfiguration() {
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving organization discovery configuration.");
+        }
 
         try {
             DiscoveryConfig discoveryConfig = organizationConfigManager.getDiscoveryConfiguration();
@@ -106,6 +142,11 @@ public class OrganizationConfigsService {
                     }).collect(Collectors.toList());
             Config config = new Config();
             config.setProperties(properties);
+            
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Retrieved organization discovery configuration with " + properties.size() + " properties.");
+            }
+            
             return config;
         } catch (OrganizationConfigException e) {
             throw handleException(e);
@@ -117,8 +158,13 @@ public class OrganizationConfigsService {
      */
     public void deleteDiscoveryConfiguration() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deleting organization discovery configuration.");
+        }
+
         try {
             organizationConfigManager.deleteDiscoveryConfiguration();
+            LOG.info("Successfully deleted organization discovery configuration.");
         } catch (OrganizationConfigException e) {
             throw handleException(e);
         }

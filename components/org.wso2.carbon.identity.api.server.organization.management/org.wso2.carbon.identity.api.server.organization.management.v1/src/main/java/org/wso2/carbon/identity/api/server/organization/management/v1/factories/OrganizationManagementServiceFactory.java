@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.organization.management.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.organization.management.common.OrganizationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.organization.management.v1.service.OrganizationManagementService;
 import org.wso2.carbon.identity.organization.discovery.service.OrganizationDiscoveryManager;
@@ -29,28 +31,38 @@ import org.wso2.carbon.identity.organization.management.service.OrganizationMana
  */
 public class OrganizationManagementServiceFactory {
 
+    private static final Log LOG = LogFactory.getLog(OrganizationManagementServiceFactory.class);
     private static final OrganizationManagementService SERVICE;
 
     static {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Initializing OrganizationManagementService factory.");
+        }
         OrgApplicationManager orgApplicationManager = OrganizationManagementServiceHolder.getOrgApplicationManager();
         OrganizationManager organizationManager = OrganizationManagementServiceHolder.getOrganizationManager();
         OrganizationDiscoveryManager organizationDiscoveryManager = OrganizationManagementServiceHolder
                 .getOrganizationDiscoveryManager();
 
         if (orgApplicationManager == null) {
+            LOG.error("OrgApplicationManager service is not available from OSGi context.");
             throw new IllegalStateException("OrgApplicationManager service is not available from OSGi context.");
         }
 
         if (organizationManager == null) {
+            LOG.error("OrganizationManager service is not available from OSGi context.");
             throw new IllegalStateException("OrganizationManager service is not available from OSGi context.");
         }
 
         if (organizationDiscoveryManager == null) {
+            LOG.error("OrganizationDiscoveryManager service is not available from OSGi context.");
             throw new IllegalStateException("OrganizationDiscoveryManager service is not available from OSGi context.");
         }
 
         SERVICE = new OrganizationManagementService(orgApplicationManager,
                 organizationManager, organizationDiscoveryManager);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("OrganizationManagementService factory initialization completed successfully.");
+        }
     }
 
     /**

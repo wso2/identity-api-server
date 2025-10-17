@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.oidc.scope.management.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.common.OidcScopeConstants;
@@ -36,13 +38,19 @@ import javax.ws.rs.core.Response;
  */
 public class OidcApiServiceImpl implements OidcApiService {
 
+    private static final Log LOG = LogFactory.getLog(OidcApiServiceImpl.class);
     private final OidcScopeManagementService oidcScopeManagementService;
 
     public OidcApiServiceImpl() {
 
         try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Initializing OidcApiServiceImpl");
+            }
             this.oidcScopeManagementService = OidcScopeManagementServiceFactory.getPermissionManagementService();
+            LOG.info("OidcApiServiceImpl initialized successfully");
         } catch (IllegalStateException e) {
+            LOG.warn("Error occurred while initiating OidcScopeManagementService", e);
             throw new RuntimeException("Error occurred while initiating OidcScopeManagementService.", e);
         }
     }
@@ -50,33 +58,57 @@ public class OidcApiServiceImpl implements OidcApiService {
     @Override
     public Response addScope(Scope scope) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Processing add scope request for: " + 
+                    (scope != null ? scope.getName() : "null"));
+        }
+
+        if (scope == null) {
+            LOG.error("Cannot process add scope request: scope parameter is null");
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
         String resourceId = oidcScopeManagementService.addScope(scope);
+        LOG.info("Scope added successfully with ID: " + resourceId);
         return Response.created(getResourceLocation(resourceId)).build();
     }
 
     @Override
     public Response deleteScope(String id) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Processing delete scope request for ID: " + id);
+        }
         oidcScopeManagementService.deleteScope(id);
+        LOG.info("Scope deletion processed for ID: " + id);
         return Response.noContent().build();
     }
 
     @Override
     public Response getScope(String id) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Processing get scope request for ID: " + id);
+        }
         return Response.ok().entity(oidcScopeManagementService.getScope(id)).build();
     }
 
     @Override
     public Response getScopes() {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Processing get all scopes request");
+        }
         return Response.ok().entity(oidcScopeManagementService.getScopes()).build();
     }
 
     @Override
     public Response updateScope(String id, ScopeUpdateRequest scopeUpdateRequest) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Processing update scope request for ID: " + id);
+        }
         oidcScopeManagementService.updateScope(id, scopeUpdateRequest);
+        LOG.info("Scope updated successfully for ID: " + id);
         return Response.ok().build();
     }
 

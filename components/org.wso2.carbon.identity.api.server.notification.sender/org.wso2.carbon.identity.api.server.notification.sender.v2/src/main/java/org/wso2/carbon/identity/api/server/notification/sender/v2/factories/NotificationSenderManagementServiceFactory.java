@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.notification.sender.v2.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderServiceHolder;
 import org.wso2.carbon.identity.api.server.notification.sender.v2.core.NotificationSenderManagementService;
 
@@ -26,18 +28,24 @@ import org.wso2.carbon.identity.api.server.notification.sender.v2.core.Notificat
  */
 public class NotificationSenderManagementServiceFactory {
 
+    private static final Log log = LogFactory.getLog(NotificationSenderManagementServiceFactory.class);
     private static final NotificationSenderManagementService SERVICE;
 
     static {
+        if (log.isDebugEnabled()) {
+            log.debug("Initializing NotificationSenderManagementServiceFactory.");
+        }
         org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementService
                 notificationSenderManagementService = NotificationSenderServiceHolder
                         .getNotificationSenderManagementService();
 
         if (notificationSenderManagementService == null) {
+            log.error("NotificationSenderManagementService is not available from OSGi context.");
             throw new IllegalStateException("NotificationSenderManagementService is not available from OSGi context.");
         }
 
         SERVICE = new NotificationSenderManagementService(notificationSenderManagementService);
+        log.info("NotificationSenderManagementServiceFactory initialized successfully.");
     }
 
     /**
@@ -47,6 +55,9 @@ public class NotificationSenderManagementServiceFactory {
      */
     public static NotificationSenderManagementService getNotificationSenderManagementService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving NotificationSenderManagementService instance.");
+        }
         return SERVICE;
     }
 }

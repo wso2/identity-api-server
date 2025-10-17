@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.GuestsApiService;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.core.GuestApiServiceCore;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.factories.GuestApiServiceCoreFactory;
@@ -36,13 +38,18 @@ import javax.ws.rs.core.Response;
  */
 public class GuestsApiServiceImpl implements GuestsApiService {
 
+    private static final Log log = LogFactory.getLog(GuestsApiServiceImpl.class);
     private final GuestApiServiceCore guestApiServiceCore;
 
     public GuestsApiServiceImpl() {
 
         try {
             this.guestApiServiceCore = GuestApiServiceCoreFactory.getGuestApiServiceCore();
+            if (log.isDebugEnabled()) {
+                log.debug("GuestsApiServiceImpl initialized successfully.");
+            }
         } catch (IllegalStateException e) {
+            log.error("Error occurred while initiating user invitation management services.", e);
             throw new RuntimeException("Error occurred while initiating user invitation management services.", e);
         }
     }
@@ -50,38 +57,64 @@ public class GuestsApiServiceImpl implements GuestsApiService {
     @Override
     public Response invitationAcceptPost(AcceptanceRequestBody acceptanceRequestBody) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Processing invitation acceptance request.");
+        }
         guestApiServiceCore.acceptInvitation(acceptanceRequestBody);
+        log.info("Invitation acceptance processed successfully.");
         return Response.noContent().build();
     }
 
     @Override
     public Response invitationDelete(String invitationId) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Processing invitation deletion request for invitationId: " + invitationId);
+        }
         guestApiServiceCore.deleteInvitation(invitationId);
+        log.info("Invitation deleted successfully for invitationId: " + invitationId);
         return Response.noContent().build();
     }
 
     @Override
     public Response invitationIntrospectPost(IntrospectRequestBody introspectRequestBody) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Processing invitation introspection request.");
+        }
         IntrospectSuccessResponse introspectSuccessResponse =
                 guestApiServiceCore.introspectInvitation(introspectRequestBody.getConfirmationCode());
+        log.info("Invitation introspection completed successfully.");
         return Response.ok().entity(introspectSuccessResponse).build();
     }
 
     @Override
     public Response invitationListGet(String filter, Integer limit, Integer offset, String sortOrder, String sortBy) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Processing invitations list request with filter: " + filter);
+        }
         InvitationsListResponse invitationsListResponse = guestApiServiceCore.getInvitations(filter, limit, offset,
                 sortOrder, sortBy);
+        log.info("Invitations list retrieved successfully.");
         return Response.ok().entity(invitationsListResponse).build();
     }
 
     @Override
     public Response invitationTriggerPost(InvitationRequestBody invitationRequestBody) {
 
+        if (invitationRequestBody == null) {
+            log.error("InvitationRequestBody cannot be null in invitation creation request.");
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Processing invitation creation request for usernames: " +
+                    (invitationRequestBody.getUsernames() != null ?
+                            invitationRequestBody.getUsernames().size() + " users" : "unknown users"));
+        }
         List<InvitationSuccessResponse> invitationSuccessResponse =
                 guestApiServiceCore.createInvitation(invitationRequestBody);
+        log.info("Invitation creation processed successfully.");
         return Response.ok().entity(invitationSuccessResponse).build();
     }
 }

@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.rest.api.server.notification.template.v1.core;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.notification.template.common.Constants;
 import org.wso2.carbon.identity.governance.exceptions.notiification.NotificationTemplateManagerException;
 import org.wso2.carbon.identity.governance.service.notification.NotificationTemplateManager;
@@ -36,11 +38,15 @@ import static org.wso2.carbon.identity.api.server.notification.template.common.C
  */
 public class TemplateTypeService {
 
+    private static final Log log = LogFactory.getLog(TemplateTypeService.class);
     private final NotificationTemplateManager notificationTemplateManager;
 
     public TemplateTypeService(NotificationTemplateManager notificationTemplateManager) {
 
         this.notificationTemplateManager = notificationTemplateManager;
+        if (log.isDebugEnabled()) {
+            log.debug("TemplateTypeService initialized successfully.");
+        }
     }
     /**
      * Add a new template type for a given channel.
@@ -53,6 +59,9 @@ public class TemplateTypeService {
                                                           TemplateTypeOverview templateTypeOverview) {
 
         String templateTypeDisplayName = templateTypeOverview.getDisplayName();
+        if (log.isDebugEnabled()) {
+            log.debug("Adding template type: " + templateTypeDisplayName + ", Channel: " + notificationChannel);
+        }
         try {
             notificationTemplateManager.addNotificationTemplateType(notificationChannel, templateTypeDisplayName,
                     getTenantDomainFromContext());
@@ -62,6 +71,8 @@ public class TemplateTypeService {
             String templateTypeId = Util.resolveTemplateIdFromDisplayName(templateTypeDisplayName);
             response.setId(templateTypeId);
             response.setSelf(Util.getTemplateTypeLocation(templateTypeId, notificationChannel));
+            log.info("Successfully added template type: " + templateTypeDisplayName + ", Channel: " 
+                    + notificationChannel);
             return response;
         } catch (NotificationTemplateManagerException e) {
             throw Util.handleNotificationTemplateManagerException(e,
@@ -77,6 +88,9 @@ public class TemplateTypeService {
      */
     public List<TemplateTypeWithID> getAllNotificationTemplateTypes(String notificationChannel) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving all template types for channel: " + notificationChannel);
+        }
         try {
             List<String> templateTypes = notificationTemplateManager.getAllNotificationTemplateTypes(
                     notificationChannel, getTenantDomainFromContext());
@@ -109,13 +123,21 @@ public class TemplateTypeService {
 
         String templateTypeDisplayName;
         templateTypeDisplayName = Util.decodeTemplateTypeId(templateTypeId);
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting template type: " + templateTypeDisplayName + ", Channel: " + notificationChannel);
+        }
         try {
             boolean isTemplateTypeExists = notificationTemplateManager.isNotificationTemplateTypeExists(
                             notificationChannel, templateTypeDisplayName, getTenantDomainFromContext());
             if (isTemplateTypeExists) {
                 notificationTemplateManager.deleteNotificationTemplateType(notificationChannel, templateTypeDisplayName,
                         getTenantDomainFromContext());
+                log.info("Successfully deleted template type: " + templateTypeDisplayName + ", Channel: " 
+                        + notificationChannel);
             } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("Template type not found for deletion: " + templateTypeDisplayName);
+                }
                 throw Util.handleError(Constants.ErrorMessage.ERROR_TEMPLATE_TYPE_NOT_FOUND);
             }
         } catch (NotificationTemplateManagerException e) {
