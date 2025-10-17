@@ -229,6 +229,9 @@ public class ServerConfigManagementService {
      */
     public ServerConfig getConfigs() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving server configurations.");
+        }
         IdentityProvider residentIdP = getResidentIdP();
 
         UserRealm userRealm = CarbonContext.getThreadLocalCarbonContext().getUserRealm();
@@ -286,6 +289,9 @@ public class ServerConfigManagementService {
      */
     public void patchConfigs(List<Patch> patchRequest) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Patching server configurations with " + patchRequest.size() + " patches.");
+        }
         try {
             if (OrganizationManagementUtil.isOrganization(ContextLoader.getTenantDomainFromContext())) {
                 throw handleException(Response.Status.FORBIDDEN, Constants.ErrorMessage
@@ -370,6 +376,9 @@ public class ServerConfigManagementService {
 
         // Retrieve the tenant domain from the current context
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving impersonation configuration for tenant: " + tenantDomain);
+        }
         ImpersonationConfiguration impersonationConfiguration = new ImpersonationConfiguration();
         try {
             // Get the impersonation configuration for the tenant domain

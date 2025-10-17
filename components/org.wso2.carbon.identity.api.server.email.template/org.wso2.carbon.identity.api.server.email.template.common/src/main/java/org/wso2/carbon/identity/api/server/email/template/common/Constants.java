@@ -108,7 +108,13 @@ public class Constants {
         ERROR_ATTRIBUTE_NOT_SUPPORTED("50006", Status.BAD_REQUEST, "Attribute type not found",
                 "Invalid attribute for email templates. Supported attributes are: 'templates', " +
                         "'templates.id', 'templates.contentType', 'templates.subject', 'templates.body' " +
-                        "and 'templates.footer'.");
+                        "and 'templates.footer'."),
+        ERROR_EMAIL_TEMPLATE_REQUIRED("50007", Status.BAD_REQUEST, "Email template is required",
+                "Email template object is required in the request body."),
+        ERROR_EMAIL_TEMPLATE_TYPE_REQUIRED("50008", Status.BAD_REQUEST, "Email template type is required",
+                "Email template type object is required in the request body."),
+        ERROR_EMAIL_TEMPLATES_REQUIRED("50009", Status.BAD_REQUEST, "Email templates list is required",
+                "Email templates list is required in the request body.");
 
         private final String message;
         private final Status httpStatus;

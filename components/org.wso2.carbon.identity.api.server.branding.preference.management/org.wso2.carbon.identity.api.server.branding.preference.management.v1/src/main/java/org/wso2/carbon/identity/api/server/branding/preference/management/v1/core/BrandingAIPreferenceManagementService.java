@@ -58,9 +58,18 @@ public class BrandingAIPreferenceManagementService {
     public BrandingGenerationResponseModel generateBrandingPreference(
             BrandingGenerationRequestModel brandingGenerationRequestModel) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Initiating branding preference generation for website URL: " +
+                    (brandingGenerationRequestModel.getWebsiteUrl() != null ? 
+                    brandingGenerationRequestModel.getWebsiteUrl() : "null"));
+        }
         try {
             String operationId = BrandingPreferenceServiceHolder.getBrandingPreferenceAiManager()
                     .generateBrandingPreference(brandingGenerationRequestModel.getWebsiteUrl());
+            if (LOG.isInfoEnabled()) {
+                LOG.info("Branding preference generation initiated successfully with operation ID: " + 
+                        (operationId != null ? operationId : "null"));
+            }
             BrandingGenerationResponseModel response = new BrandingGenerationResponseModel();
             response.setOperationId(operationId);
             return response;
@@ -79,6 +88,10 @@ public class BrandingAIPreferenceManagementService {
      */
     public BrandingGenerationStatusModel getBrandingPreferenceGenerationStatus(String operationId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving branding preference generation status for operation ID: " + 
+                    (operationId != null ? operationId : "null"));
+        }
         try {
             Object generationStatus = BrandingPreferenceServiceHolder.getBrandingPreferenceAiManager()
                     .getBrandingPreferenceGenerationStatus(operationId);
@@ -89,6 +102,10 @@ public class BrandingAIPreferenceManagementService {
                         ERROR_CODE_ERROR_GETTING_BRANDING_RESULT_STATUS.getCode());
             }
             response.setStatus(generationStatusMap.get(AI_RESPONSE_STATUS_KEY));
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully retrieved branding preference generation status for operation ID: " + 
+                        (operationId != null ? operationId : "null"));
+            }
             return response;
         } catch (AIServerException e) {
             throw handleServerException(e);
@@ -105,6 +122,10 @@ public class BrandingAIPreferenceManagementService {
      */
     public BrandingGenerationResultModel getBrandingPreferenceGenerationResult(String operationId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving branding preference generation result for operation ID: " + 
+                    (operationId != null ? operationId : "null"));
+        }
         try {
             Object generationResult = BrandingPreferenceServiceHolder.getBrandingPreferenceAiManager()
                     .getBrandingPreferenceGenerationResult(operationId);
@@ -120,6 +141,10 @@ public class BrandingAIPreferenceManagementService {
 
             Map<String, Object> dataMap = (Map<String, Object>) resultMap.get(AI_RESPONSE_DATA_KEY);
             response.setData(dataMap);
+            if (LOG.isInfoEnabled()) {
+                LOG.info("Successfully retrieved branding preference generation result for operation ID: " + 
+                        (operationId != null ? operationId : "null"));
+            }
             return response;
         } catch (AIServerException e) {
             throw handleServerException(e);
