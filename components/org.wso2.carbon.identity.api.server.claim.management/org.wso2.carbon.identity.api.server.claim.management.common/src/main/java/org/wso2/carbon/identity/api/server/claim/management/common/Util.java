@@ -16,6 +16,8 @@
 
 package org.wso2.carbon.identity.api.server.claim.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
 import org.wso2.carbon.user.core.service.RealmService;
@@ -25,6 +27,8 @@ import org.wso2.carbon.user.core.service.RealmService;
  */
 public class Util {
 
+    private static final Log log = LogFactory.getLog(Util.class);
+
     /**
      * Get ClaimMetadataManagementService osgi service.
      *
@@ -32,8 +36,15 @@ public class Util {
      */
     @Deprecated
     public static ClaimMetadataManagementService getClaimMetadataManagementService() {
-        return (ClaimMetadataManagementService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                .getOSGiService(ClaimMetadataManagementService.class, null);
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving deprecated ClaimMetadataManagementService from OSGi context.");
+        }
+        ClaimMetadataManagementService service = (ClaimMetadataManagementService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(ClaimMetadataManagementService.class, null);
+        if (service == null && log.isDebugEnabled()) {
+            log.debug("ClaimMetadataManagementService is not available in the OSGi context.");
+        }
+        return service;
     }
 
     /**
@@ -43,7 +54,14 @@ public class Util {
      */
     @Deprecated
     public static RealmService getRealmService() {
-        return (RealmService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving deprecated RealmService from OSGi context.");
+        }
+        RealmService service = (RealmService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                 .getOSGiService(RealmService.class, null);
+        if (service == null && log.isDebugEnabled()) {
+            log.debug("RealmService is not available in the OSGi context.");
+        }
+        return service;
     }
 }

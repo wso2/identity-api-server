@@ -16,6 +16,8 @@
 
 package org.wso2.carbon.identity.api.server.claim.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
 import org.wso2.carbon.identity.organization.management.service.OrganizationManager;
@@ -24,6 +26,8 @@ import org.wso2.carbon.identity.organization.management.service.OrganizationMana
  * Service holder class for identity governance.
  */
 public class ClaimManagementDataHolder {
+
+    private static final Log log = LogFactory.getLog(ClaimManagementDataHolder.class);
 
     private static class OrganizationManagerHolder {
 
@@ -44,7 +48,14 @@ public class ClaimManagementDataHolder {
      */
     public static ClaimMetadataManagementService getClaimMetadataManagementService() {
 
-        return ClaimMetadataManagementServiceHolder.SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving ClaimMetadataManagementService from OSGi context.");
+        }
+        ClaimMetadataManagementService service = ClaimMetadataManagementServiceHolder.SERVICE;
+        if (service == null && log.isDebugEnabled()) {
+            log.debug("ClaimMetadataManagementService is not available in the OSGi context.");
+        }
+        return service;
     }
 
     /**
@@ -54,6 +65,13 @@ public class ClaimManagementDataHolder {
      */
     public static OrganizationManager getOrganizationManager() {
 
-        return OrganizationManagerHolder.SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving OrganizationManager from OSGi context.");
+        }
+        OrganizationManager service = OrganizationManagerHolder.SERVICE;
+        if (service == null && log.isDebugEnabled()) {
+            log.debug("OrganizationManager is not available in the OSGi context.");
+        }
+        return service;
     }
 }

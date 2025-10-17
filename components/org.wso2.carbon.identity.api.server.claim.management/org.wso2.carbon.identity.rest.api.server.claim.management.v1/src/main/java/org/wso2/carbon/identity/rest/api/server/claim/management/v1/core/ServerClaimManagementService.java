@@ -226,6 +226,9 @@ public class ServerClaimManagementService {
      */
     public String addClaimDialect(ClaimDialectReqDTO claimDialectReqDTO) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Adding claim dialect: " + claimDialectReqDTO.getDialectURI());
+        }
         try {
             validateClaimModificationEligibility();
             getClaimMetadataManagementService().addClaimDialect(
@@ -235,8 +238,10 @@ public class ServerClaimManagementService {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_ADDING_DIALECT,
                     claimDialectReqDTO.getDialectURI());
         }
-
-        return getResourceId(claimDialectReqDTO.getDialectURI());
+        
+        String resourceId = getResourceId(claimDialectReqDTO.getDialectURI());
+        LOG.info("Successfully added claim dialect: " + claimDialectReqDTO.getDialectURI());
+        return resourceId;
     }
 
     /**
@@ -247,6 +252,9 @@ public class ServerClaimManagementService {
      */
     public String addClaimDialect(String dialectURI) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Adding claim dialect with URI: " + dialectURI);
+        }
         try {
             validateClaimModificationEligibility();
             claimMetadataManagementService.addClaimDialect(
@@ -255,8 +263,10 @@ public class ServerClaimManagementService {
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_ADDING_DIALECT, dialectURI);
         }
-
-        return getResourceId(dialectURI);
+        
+        String resourceId = getResourceId(dialectURI);
+        LOG.info("Successfully added claim dialect with URI: " + dialectURI);
+        return resourceId;
     }
 
     /**
@@ -266,12 +276,18 @@ public class ServerClaimManagementService {
      */
     public void deleteClaimDialect(String dialectId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deleting claim dialect with ID: " + dialectId);
+        }
         String claimDialectURI;
         try {
             validateClaimModificationEligibility();
             claimDialectURI = base64DecodeId(dialectId);
         } catch (Exception ignored) {
             // Ignoring the delete operation and return 204 response code, since the resource does not exist.
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Claim dialect not found or invalid ID, ignoring delete operation: " + dialectId);
+            }
             return;
         }
         try {
@@ -281,7 +297,8 @@ public class ServerClaimManagementService {
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_DELETING_DIALECT, dialectId);
         }
-
+        
+        LOG.info("Successfully deleted claim dialect with ID: " + dialectId);
     }
 
     /**
@@ -292,6 +309,9 @@ public class ServerClaimManagementService {
      */
     public ClaimDialectResDTO getClaimDialect(String dialectId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving claim dialect with ID: " + dialectId);
+        }
         try {
             List<ClaimDialect> claimDialectList = claimMetadataManagementService.getClaimDialects(
                     ContextLoader.getTenantDomainFromContext());
@@ -307,7 +327,11 @@ public class ServerClaimManagementService {
                 throw handleClaimManagementClientError(ERROR_CODE_DIALECT_NOT_FOUND, NOT_FOUND, dialectId);
             }
 
-            return getClaimDialectResDTO(claimDialect);
+            ClaimDialectResDTO result = getClaimDialectResDTO(claimDialect);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully retrieved claim dialect: " + result.getDialectURI());
+            }
+            return result;
 
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_RETRIEVING_DIALECT, dialectId);
@@ -325,12 +349,20 @@ public class ServerClaimManagementService {
      */
     public List<ClaimDialectResDTO> getClaimDialects(Integer limit, Integer offset, String filter, String sort) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving claim dialects with parameters - limit: " + limit + ", offset: " + offset + 
+                    ", filter: " + filter + ", sort: " + sort);
+        }
         handleNotImplementedCapabilities(limit, offset, filter, sort);
         try {
             List<ClaimDialect> claimDialectList = claimMetadataManagementService.getClaimDialects(ContextLoader
                     .getTenantDomainFromContext());
 
-            return getClaimDialectResDTOs(claimDialectList);
+            List<ClaimDialectResDTO> result = getClaimDialectResDTOs(claimDialectList);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully retrieved " + result.size() + " claim dialects");
+            }
+            return result;
 
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_RETRIEVING_DIALECTS);
@@ -348,6 +380,10 @@ public class ServerClaimManagementService {
      */
     public String updateClaimDialect(String dialectId, ClaimDialectReqDTO claimDialectReqDTO) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating claim dialect with ID: " + dialectId + ", new URI: " + 
+                    claimDialectReqDTO.getDialectURI());
+        }
         try {
             validateClaimModificationEligibility();
             // If the old and new dialect uri is the same we don't need to do a db update.
@@ -366,7 +402,9 @@ public class ServerClaimManagementService {
         }
 
         // Since the dialects identifier has changed we have to send the new identifier in the location header.
-        return getResourceId(claimDialectReqDTO.getDialectURI());
+        String resourceId = getResourceId(claimDialectReqDTO.getDialectURI());
+        LOG.info("Successfully updated claim dialect with ID: " + dialectId);
+        return resourceId;
     }
 
     /**
@@ -377,6 +415,9 @@ public class ServerClaimManagementService {
      */
     public String addLocalClaim(LocalClaimReqDTO localClaimReqDTO) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Adding local claim: " + localClaimReqDTO.getClaimURI());
+        }
         // Validate mandatory attributes.
         if (StringUtils.isBlank(localClaimReqDTO.getClaimURI())) {
             throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_CLAIM_URI_NOT_SPECIFIED,
@@ -398,8 +439,10 @@ public class ServerClaimManagementService {
         } catch (UserStoreException e) {
             throw handleException(e, ERROR_CODE_ERROR_ADDING_LOCAL_CLAIM, localClaimReqDTO.getClaimURI());
         }
-
-        return getResourceId(localClaimReqDTO.getClaimURI());
+        
+        String resourceId = getResourceId(localClaimReqDTO.getClaimURI());
+        LOG.info("Successfully added local claim: " + localClaimReqDTO.getClaimURI());
+        return resourceId;
     }
 
     /**
@@ -409,12 +452,18 @@ public class ServerClaimManagementService {
      */
     public void deleteLocalClaim(String claimId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deleting local claim with ID: " + claimId);
+        }
         String claimURI;
         try {
             validateClaimModificationEligibility();
             claimURI = base64DecodeId(claimId);
         } catch (Exception ignored) {
             // Ignoring the delete operation and return 204 response code, since the resource does not exist.
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Local claim not found or invalid ID, ignoring delete operation: " + claimId);
+            }
             return;
         }
         try {
@@ -422,7 +471,8 @@ public class ServerClaimManagementService {
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_DELETING_LOCAL_CLAIM, claimId);
         }
-
+        
+        LOG.info("Successfully deleted local claim with ID: " + claimId);
     }
 
     /**
@@ -433,6 +483,9 @@ public class ServerClaimManagementService {
      */
     public LocalClaimResDTO getLocalClaim(String claimId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving local claim with ID: " + claimId);
+        }
         try {
             List<LocalClaim> localClaimList = claimMetadataManagementService.getLocalClaims(ContextLoader
                     .getTenantDomainFromContext());
@@ -443,7 +496,11 @@ public class ServerClaimManagementService {
                 throw handleClaimManagementClientError(ERROR_CODE_LOCAL_CLAIM_NOT_FOUND, NOT_FOUND, claimId);
             }
 
-            return getLocalClaimResDTO(localClaim);
+            LocalClaimResDTO result = getLocalClaimResDTO(localClaim);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully retrieved local claim: " + result.getClaimURI());
+            }
+            return result;
 
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_RETRIEVING_LOCAL_CLAIM, claimId);
@@ -463,6 +520,11 @@ public class ServerClaimManagementService {
      */
     public List<LocalClaimResDTO> getLocalClaims(Boolean excludeIdentityClaims, String attributes, Integer limit,
                                                  Integer offset, String filter, String sort) {
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving local claims - excludeIdentity: " + excludeIdentityClaims + ", attributes: " + 
+                    attributes + ", limit: " + limit + ", offset: " + offset);
+        }
 
         return getLocalClaims(excludeIdentityClaims, attributes, limit, offset, filter, sort, false, null);
     }
@@ -523,6 +585,10 @@ public class ServerClaimManagementService {
      */
     public void updateLocalClaim(String claimId, LocalClaimReqDTO localClaimReqDTO) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating local claim with ID: " + claimId + ", URI: " + 
+                    localClaimReqDTO.getClaimURI());
+        }
         try {
             if (isSubOrganizationContext()) {
                 /*
@@ -554,6 +620,7 @@ public class ServerClaimManagementService {
         } catch (UserStoreException e) {
             throw handleException(e, ERROR_CODE_ERROR_ADDING_LOCAL_CLAIM, localClaimReqDTO.getClaimURI());
         }
+        LOG.info("Successfully updated local claim with ID: " + claimId);
         getResourceId(localClaimReqDTO.getClaimURI());
     }
 
@@ -748,7 +815,9 @@ public class ServerClaimManagementService {
                 claimResDTOList.addAll(externalClaimResDTOList);
                 dialectConfiguration.setClaims(claimResDTOList);
             }
-            return generateFileFromModel(fileType, dialectConfiguration);
+            FileContent result = generateFileFromModel(fileType, dialectConfiguration);
+            LOG.info("Successfully exported claim dialect to " + fileType + " file for ID: " + dialectId);
+            return result;
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_RETRIEVING_DIALECT, dialectId);
         }
@@ -845,6 +914,10 @@ public class ServerClaimManagementService {
      */
     public String addExternalClaim(String dialectId, ExternalClaimReqDTO externalClaimReqDTO) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Adding external claim for dialect " + dialectId + ": " + 
+                    externalClaimReqDTO.getClaimURI());
+        }
         try {
             validateClaimModificationEligibility();
             if (!isDialectExists(dialectId)) {
@@ -857,8 +930,11 @@ public class ServerClaimManagementService {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_ADDING_EXTERNAL_CLAIM,
                     externalClaimReqDTO.getClaimURI());
         }
-
-        return getResourceId(externalClaimReqDTO.getClaimURI());
+        
+        String resourceId = getResourceId(externalClaimReqDTO.getClaimURI());
+        LOG.info("Successfully added external claim: " + externalClaimReqDTO.getClaimURI() +
+                " for dialect: " + dialectId);
+        return resourceId;
     }
 
     /**
@@ -869,6 +945,9 @@ public class ServerClaimManagementService {
      */
     public void deleteExternalClaim(String dialectId, String claimId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deleting external claim " + claimId + " from dialect: " + dialectId);
+        }
         String externalClaimURI;
         String externalClaimDialectURI;
         try {
@@ -877,6 +956,10 @@ public class ServerClaimManagementService {
             externalClaimDialectURI = base64DecodeId(dialectId);
         } catch (Exception ignored) {
             // Ignoring the delete operation and return 204 response code, since the resource does not exist.
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("External claim not found or invalid ID, ignoring delete: " + claimId + 
+                        " from dialect: " + dialectId);
+            }
             return;
         }
 
@@ -886,7 +969,8 @@ public class ServerClaimManagementService {
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_DELETING_EXTERNAL_CLAIM, claimId);
         }
-
+        
+        LOG.info("Successfully deleted external claim " + claimId + " from dialect: " + dialectId);
     }
 
     /**
@@ -898,12 +982,18 @@ public class ServerClaimManagementService {
      */
     public ExternalClaimResDTO getExternalClaim(String dialectId, String claimId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving external claim " + claimId + " from dialect: " + dialectId);
+        }
         try {
             List<ExternalClaim> externalClaimList = claimMetadataManagementService.getExternalClaims(
                     base64DecodeId(dialectId),
                     ContextLoader.getTenantDomainFromContext());
 
             if (CollectionUtils.isEmpty(externalClaimList)) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("No external claims found for dialect: " + dialectId);
+                }
                 throw handleClaimManagementClientError(ERROR_CODE_CLAIMS_NOT_FOUND_FOR_DIALECT, NOT_FOUND, dialectId);
             }
 
@@ -965,6 +1055,10 @@ public class ServerClaimManagementService {
      */
     public void updateExternalClaim(String dialectId, String claimId, ExternalClaimReqDTO externalClaimReqDTO) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating external claim " + claimId + " in dialect " + dialectId + " with URI: " + 
+                    externalClaimReqDTO.getClaimURI());
+        }
         try {
             validateClaimModificationEligibility();
             if (!StringUtils.equals(base64DecodeId(claimId), externalClaimReqDTO.getClaimURI())) {
@@ -976,6 +1070,7 @@ public class ServerClaimManagementService {
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_UPDATING_EXTERNAL_CLAIM, claimId, dialectId);
         }
+        LOG.info("Successfully updated external claim " + claimId + " in dialect: " + dialectId);
         getResourceId(externalClaimReqDTO.getClaimURI());
     }
 
@@ -1433,7 +1528,8 @@ public class ServerClaimManagementService {
             String dialectURI = addClaimDialect(dialectConfiguration.getClaimDialectReqDTO());
 
             importExternalClaims(dialectURI, externalClaimReqDTOList);
-
+            
+            LOG.info("Successfully imported claim dialect from file: " + fileDetail.getDataHandler().getName());
             return dialectId;
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, Constant.ErrorMessage.ERROR_CODE_ERROR_IMPORTING_CLAIM_DIALECT);
@@ -1454,8 +1550,12 @@ public class ServerClaimManagementService {
             }
         }
         if (!errors.isEmpty()) {
+            LOG.warn("Failed to import " + errors.size() + " out of " + externalClaimReqDTOList.size() + 
+                    " external claims");
             throw handleClaimManagementBulkClientError(Constant.ErrorMessage.ERROR_CODE_IMPORTING_EXTERNAL_CLAIMS,
                     BAD_REQUEST, errors, String.valueOf(errors.size()), String.valueOf(externalClaimReqDTOList.size()));
+        } else {
+            LOG.info("Successfully imported all " + externalClaimReqDTOList.size() + " external claims");
         }
     }
 
@@ -1797,6 +1897,10 @@ public class ServerClaimManagementService {
     private void validateAttributeMappings(List<AttributeMappingDTO> attributeMappingDTOList)
             throws UserStoreException {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Validating attribute mappings, count: " + 
+                    (attributeMappingDTOList != null ? attributeMappingDTOList.size() : 0));
+        }
         if (attributeMappingDTOList == null) {
             throw handleClaimManagementClientError(ERROR_CODE_EMPTY_ATTRIBUTE_MAPPINGS, BAD_REQUEST);
         }
@@ -1822,6 +1926,9 @@ public class ServerClaimManagementService {
     private void validateClaimModificationEligibility() throws ClaimMetadataClientException {
 
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Validating claim modification eligibility for tenant: " + tenantDomain);
+        }
         try {
             String organizationId = organizationManager.resolveOrganizationId(tenantDomain);
             boolean isPrimaryOrg = organizationManager.isPrimaryOrganization(organizationId);
