@@ -789,12 +789,12 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
-                <artifactId>org.wso2.carbon.identity.api.server.vs.config.management.common</artifactId>
+                <artifactId>common</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
-                <artifactId>org.wso2.carbon.identity.api.server.vs.config.management.v1</artifactId>
+                <artifactId>v1</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -874,7 +874,7 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
-                <artifactId>org.wso2.carbon.identity.api.server.vs.config.management.common</artifactId>
+                <artifactId>org.wso2.carbon.identity.api.server.vc.config.management.common</artifactId>
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>
