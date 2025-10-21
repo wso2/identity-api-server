@@ -1,0 +1,345 @@
+/*
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+package org.wso2.carbon.identity.api.server.vc.config.management.v1.core;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.identity.api.server.common.Constants;
+import org.wso2.carbon.identity.api.server.common.ContextLoader;
+import org.wso2.carbon.identity.api.server.common.error.APIError;
+import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.api.server.vc.config.management.v1.ClaimMapping;
+import org.wso2.carbon.identity.api.server.vc.config.management.v1.CredentialMetadata;
+import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfiguration;
+import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationCreationModel;
+import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationUpdateModel;
+import org.wso2.carbon.identity.vc.config.management.VCCredentialConfigManager;
+import org.wso2.carbon.identity.vc.config.management.exception.VCConfigMgtClientException;
+import org.wso2.carbon.identity.vc.config.management.exception.VCConfigMgtException;
+import org.wso2.carbon.identity.vc.config.management.exception.VCConfigMgtServerException;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import javax.ws.rs.core.Response;
+
+/**
+ * Server Verifiable Credential Configuration management service.
+ */
+public class ServerVCCredentialConfigManagementService {
+
+    private static final Log LOG = LogFactory.getLog(ServerVCCredentialConfigManagementService.class);
+    private final VCCredentialConfigManager vcCredentialConfigManager;
+
+    public ServerVCCredentialConfigManagementService(VCCredentialConfigManager vcCredentialConfigManager) {
+
+        this.vcCredentialConfigManager = vcCredentialConfigManager;
+    }
+
+    /**
+     * Add a new VC credential configuration.
+     *
+     * @param creationModel API request payload.
+     * @return Created credential configuration.
+     */
+    public VCCredentialConfiguration addVCCredentialConfiguration(
+            VCCredentialConfigurationCreationModel creationModel) {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration toCreate =
+                    toInternalModel(creationModel);
+            org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration created =
+                    vcCredentialConfigManager.create(toCreate, tenantDomain);
+            return toApiModel(created);
+        } catch (VCConfigMgtException e) {
+            throw handleVCConfigException(e, "Error while creating VC credential configuration", null);
+        }
+    }
+
+    /**
+     * Delete a VC credential configuration by identifier.
+     *
+     * @param configId Configuration identifier.
+     */
+    public void deleteVCCredentialConfiguration(String configId) {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            vcCredentialConfigManager.delete(configId, tenantDomain);
+        } catch (VCConfigMgtException e) {
+            throw handleVCConfigException(e, "Error while deleting VC credential configuration", configId);
+        }
+    }
+
+    /**
+     * Retrieve a VC credential configuration.
+     *
+     * @param configId Configuration identifier.
+     * @return Credential configuration.
+     */
+    public VCCredentialConfiguration getVCCredentialConfiguration(String configId) {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration configuration =
+                    vcCredentialConfigManager.get(configId, tenantDomain);
+            if (configuration == null) {
+                throw notFound("VC credential configuration not found", configId);
+            }
+            return toApiModel(configuration);
+        } catch (APIError e) {
+            throw e;
+        } catch (VCConfigMgtException e) {
+            throw handleVCConfigException(e, "Error while retrieving VC credential configuration", configId);
+        }
+    }
+
+    /**
+     * List VC credential configurations for the logged-in tenant.
+     *
+     * @return List of credential configurations.
+     */
+    public List<VCCredentialConfiguration> listVCCredentialConfigurations() {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            List<org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration> configurations =
+                    vcCredentialConfigManager.list(tenantDomain);
+            if (configurations == null) {
+                return Collections.emptyList();
+            }
+            return configurations.stream()
+                    .filter(Objects::nonNull)
+                    .map(this::toApiModel)
+                    .collect(Collectors.toList());
+        } catch (VCConfigMgtException e) {
+            throw handleVCConfigException(e, "Error while listing VC credential configurations", null);
+        }
+    }
+
+    /**
+     * Update an existing VC credential configuration.
+     *
+     * @param configId     Configuration identifier.
+     * @param updateModel  Update payload.
+     * @return Updated credential configuration.
+     */
+    public VCCredentialConfiguration updateVCCredentialConfiguration(String configId,
+                                                                     VCCredentialConfigurationUpdateModel updateModel) {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration toUpdate =
+                    toInternalModel(updateModel);
+            org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration updated =
+                    vcCredentialConfigManager.update(configId, toUpdate, tenantDomain);
+            return toApiModel(updated);
+        } catch (VCConfigMgtException e) {
+            throw handleVCConfigException(e, "Error while updating VC credential configuration", configId);
+        }
+    }
+
+    private VCCredentialConfiguration toApiModel(
+            org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration model) {
+
+        if (model == null) {
+            return null;
+        }
+
+        VCCredentialConfiguration apiModel = new VCCredentialConfiguration();
+        if (StringUtils.isNotBlank(model.getId())) {
+            try {
+                apiModel.setId(UUID.fromString(model.getId()));
+            } catch (IllegalArgumentException e) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Ignoring invalid VC credential configuration id: " + model.getId(), e);
+                }
+            }
+        }
+        apiModel.setIdentifier(model.getIdentifier());
+        apiModel.setConfigurationId(model.getConfigurationId());
+        apiModel.setScope(model.getScope());
+        if (StringUtils.isNotBlank(model.getFormat())) {
+            try {
+                apiModel.setFormat(VCCredentialConfiguration.FormatEnum.fromValue(model.getFormat()));
+            } catch (IllegalArgumentException e) {
+                LOG.warn("Unsupported VC credential configuration format: " + model.getFormat(), e);
+            }
+        }
+        apiModel.setCredentialSigningAlgValuesSupported(model.getCredentialSigningAlgValuesSupported());
+        apiModel.setCredentialType(model.getCredentialType());
+        apiModel.setCredentialMetadata(toApiCredentialMetadata(model.getCredentialMetadata()));
+
+        List<org.wso2.carbon.identity.vc.config.management.model.ClaimMapping> claimMappings =
+                model.getClaimMappings();
+        if (claimMappings != null) {
+            apiModel.setClaimMappings(claimMappings.stream()
+                    .filter(Objects::nonNull)
+                    .map(this::toApiClaimMapping)
+                    .collect(Collectors.toList()));
+        } else {
+            apiModel.setClaimMappings(new ArrayList<>());
+        }
+
+        apiModel.setExpiryInSeconds(model.getExpiryInSeconds());
+        return apiModel;
+    }
+
+    private CredentialMetadata toApiCredentialMetadata(
+            org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration.CredentialMetadata metadata) {
+
+        if (metadata == null) {
+            return null;
+        }
+        CredentialMetadata apiMetadata = new CredentialMetadata();
+        apiMetadata.setDisplay(metadata.getDisplay());
+        return apiMetadata;
+    }
+
+    private ClaimMapping toApiClaimMapping(org.wso2.carbon.identity.vc.config.management.model.ClaimMapping mapping) {
+
+        ClaimMapping apiMapping = new ClaimMapping();
+        apiMapping.setClaimURI(mapping.getClaimURI());
+        apiMapping.setDisplay(mapping.getDisplay());
+        return apiMapping;
+    }
+
+    private org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration toInternalModel(
+            VCCredentialConfigurationCreationModel model) {
+
+        org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration internalModel =
+                new org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration();
+        internalModel.setIdentifier(model.getIdentifier());
+        String configurationId = StringUtils.isNotBlank(model.getConfigurationId()) ?
+                model.getConfigurationId() : model.getIdentifier();
+        internalModel.setConfigurationId(configurationId);
+        internalModel.setScope(model.getScope());
+        if (model.getFormat() != null) {
+            internalModel.setFormat(model.getFormat().value());
+        }
+        internalModel.setCredentialSigningAlgValuesSupported(model.getCredentialSigningAlgValuesSupported());
+        internalModel.setCredentialType(model.getCredentialType());
+        internalModel.setCredentialMetadata(toInternalCredentialMetadata(model.getCredentialMetadata()));
+        if (model.getClaimMappings() != null) {
+            internalModel.setClaimMappings(model.getClaimMappings().stream()
+                    .filter(Objects::nonNull)
+                    .map(this::toInternalClaimMapping)
+                    .collect(Collectors.toList()));
+        }
+        internalModel.setExpiryInSeconds(model.getExpiryInSeconds());
+        return internalModel;
+    }
+
+    private org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration toInternalModel(
+            VCCredentialConfigurationUpdateModel model) {
+
+        return toInternalModel((VCCredentialConfigurationCreationModel) model);
+    }
+
+    private org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration.CredentialMetadata
+    toInternalCredentialMetadata(CredentialMetadata metadata) {
+
+        if (metadata == null) {
+            return null;
+        }
+        org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration.CredentialMetadata
+                internalMetadata =
+                new org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration.CredentialMetadata();
+        internalMetadata.setDisplay(metadata.getDisplay());
+        return internalMetadata;
+    }
+
+    private org.wso2.carbon.identity.vc.config.management.model.ClaimMapping toInternalClaimMapping(ClaimMapping
+                                                                                                            mapping) {
+
+        org.wso2.carbon.identity.vc.config.management.model.ClaimMapping internalMapping =
+                new org.wso2.carbon.identity.vc.config.management.model.ClaimMapping();
+        internalMapping.setClaimURI(mapping.getClaimURI());
+        internalMapping.setDisplay(mapping.getDisplay());
+        return internalMapping;
+    }
+
+    private APIError notFound(String message, String data) {
+
+        ErrorResponse error = new ErrorResponse.Builder()
+                .withCode("VC-60001")
+                .withMessage("Resource not found")
+                .withDescription(includeData(message, data))
+                .build(LOG, message);
+        return new APIError(Response.Status.NOT_FOUND, error);
+    }
+
+    private APIError handleVCConfigException(VCConfigMgtException exception, String defaultDescription, String data) {
+
+        ErrorResponse errorResponse;
+        Response.Status status;
+        String description = StringUtils.isNotBlank(exception.getMessage()) ?
+                exception.getMessage() : defaultDescription;
+
+        if (exception instanceof VCConfigMgtClientException) {
+            errorResponse = new ErrorResponse.Builder()
+                    .withCode(prefixCode(exception.getCode()))
+                    .withMessage("Invalid request or data")
+                    .withDescription(includeData(description, data))
+                    .build(LOG, exception.getMessage());
+            status = Response.Status.BAD_REQUEST;
+        } else if (exception instanceof VCConfigMgtServerException) {
+            errorResponse = new ErrorResponse.Builder()
+                    .withCode(prefixCode(exception.getCode()))
+                    .withMessage("Server error")
+                    .withDescription(includeData(description, data))
+                    .build(LOG, exception, description);
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+        } else {
+            errorResponse = new ErrorResponse.Builder()
+                    .withCode("VC-65000")
+                    .withMessage("Unexpected error")
+                    .withDescription(includeData(defaultDescription, data))
+                    .build(LOG, exception, defaultDescription);
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+        }
+        return new APIError(status, errorResponse);
+    }
+
+    private String prefixCode(String code) {
+
+        if (StringUtils.isBlank(code)) {
+            return "VC-00000";
+        }
+        if (code.contains(Constants.ERROR_CODE_DELIMITER)) {
+            return code;
+        }
+        return "VC-" + code;
+    }
+
+    private String includeData(String message, String data) {
+
+        if (StringUtils.isNotBlank(data)) {
+            return message + ": " + data;
+        }
+        return message;
+    }
+}
+
