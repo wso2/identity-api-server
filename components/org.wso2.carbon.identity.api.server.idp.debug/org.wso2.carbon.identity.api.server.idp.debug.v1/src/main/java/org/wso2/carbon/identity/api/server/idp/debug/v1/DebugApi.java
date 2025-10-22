@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -19,6 +19,7 @@
 package org.wso2.carbon.identity.api.server.idp.debug.v1;
 
 import javax.validation.Valid;
+import javax.ws.rs.GET;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -51,6 +52,27 @@ public class DebugApi {
         this.delegate = DebugApiServiceFactory.getDebugApi();
     }
 
+        /**
+         * Retrieves the debug result for a given session ID (state).
+         * @param sessionId The session ID (state) to fetch the debug result for.
+         * @return JSON debug result or 404 if not found.
+         */
+        @GET
+        @Path("/result/{session-id}")
+        @Produces({ "application/json" })
+        @ApiOperation(value = "Get debug result by session ID", notes = "Fetches the debug result for the given session ID (state).", response = String.class)
+        @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Debug result found", response = String.class),
+            @ApiResponse(code = 404, message = "Debug result not found", response = Error.class)
+        })
+        public Response getDebugResult(@ApiParam(value = "Session ID (state)", required = true) @PathParam("session-id") String sessionId) {
+            String result = org.wso2.carbon.identity.debug.framework.DebugResultCache.get(sessionId);
+            if (result != null) {
+                return Response.ok(result).build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND).entity("Debug result not found").build();
+            }
+        }
     @Valid
     @POST
     @Path("/connection/{idp-id}")
