@@ -177,14 +177,14 @@ public class ServerAPIResourceManagementService {
                     Collections.reverse(apiResources);
                 }
                 if (!isFirstPage) {
-                    String encodedString = Base64.getEncoder().encodeToString(apiResources.get(0).getCursorKey()
+                    String encodedString = Base64.getEncoder().encodeToString(apiResources.get(0).getName()
                             .toString().getBytes(StandardCharsets.UTF_8));
                     apiResourceListResponse.addLinksItem(buildPaginationLink(url + "&before=" + encodedString,
                             "previous"));
                 }
                 if (!isLastPage) {
                     String encodedString = Base64.getEncoder().encodeToString(apiResources.get(apiResources.size() - 1)
-                            .getCursorKey().toString().getBytes(StandardCharsets.UTF_8));
+                            .getName().toString().getBytes(StandardCharsets.UTF_8));
                     apiResourceListResponse.addLinksItem(buildPaginationLink(url + "&after=" + encodedString, "next"));
                 }
             }
