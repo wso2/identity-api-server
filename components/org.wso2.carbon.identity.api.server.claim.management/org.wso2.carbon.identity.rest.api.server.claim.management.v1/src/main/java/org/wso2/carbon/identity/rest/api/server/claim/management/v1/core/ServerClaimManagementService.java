@@ -1207,6 +1207,10 @@ public class ServerClaimManagementService {
             }
         }
 
+        String managedInUserStore =
+                claimProperties.remove(ClaimConstants.MANAGED_IN_USER_STORE_PROPERTY);
+        localClaimResDTO.setManagedInUserStore(Boolean.valueOf(managedInUserStore));
+
         List<AttributeMappingDTO> attributeMappingDTOs = new ArrayList<>();
         for (AttributeMapping attributeMapping : localClaim.getMappedAttributes()) {
             AttributeMappingDTO attributeMappingDTO = new AttributeMappingDTO();
@@ -1303,6 +1307,12 @@ public class ServerClaimManagementService {
 
         if (StringUtils.isNotBlank(localClaimReqDTO.getRegEx())) {
             claimProperties.put(PROP_REG_EX, localClaimReqDTO.getRegEx());
+        }
+
+        Boolean managedInUserStore = localClaimReqDTO.getManagedInUserStoreEnabled();
+        if (managedInUserStore != null) {
+            claimProperties.put(ClaimConstants.MANAGED_IN_USER_STORE_PROPERTY,
+                    String.valueOf(managedInUserStore));
         }
 
         if (localClaimReqDTO.getDisplayOrder() != null) {

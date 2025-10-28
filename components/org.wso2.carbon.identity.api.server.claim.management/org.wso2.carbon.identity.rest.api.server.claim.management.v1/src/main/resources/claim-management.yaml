@@ -757,6 +757,10 @@ definitions:
         type: boolean
         description: Specifies if the claim will be prompted during user registration and displayed on the user profile.
         example: true
+      managedInUserStore:
+        type: boolean
+        description: Specifies if the managed in user store is enabled for the claim.
+        example: true
       dataType:
         type: string
         description: The data type of the attribute.
@@ -861,6 +865,10 @@ definitions:
           supportedByDefault:
             type: boolean
             description: Specifies if the claim will be prompted during user registration and displayed on the user profile.
+            example: true
+          managedInUserStore:
+            type: boolean
+            description: Specifies if the managed in user store is enabled for the claim.
             example: true
           dataType:
             type: string
