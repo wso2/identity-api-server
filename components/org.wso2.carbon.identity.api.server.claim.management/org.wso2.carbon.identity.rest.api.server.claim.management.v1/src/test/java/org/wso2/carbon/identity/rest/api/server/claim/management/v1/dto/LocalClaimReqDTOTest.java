@@ -65,6 +65,7 @@ public class LocalClaimReqDTOTest {
         dto.setReadOnly(false);
         dto.setRequired(true);
         dto.setSupportedByDefault(true);
+        dto.setManagedInUserStore(true);
         dto.setMultiValued(false);
         dto.setDisplayOrder(1);
     }
@@ -79,6 +80,7 @@ public class LocalClaimReqDTOTest {
         when(mockClaimResDTO.getReadOnly()).thenReturn(false);
         when(mockClaimResDTO.getRequired()).thenReturn(true);
         when(mockClaimResDTO.getSupportedByDefault()).thenReturn(true);
+        when(mockClaimResDTO.getManagedInUserStoreEnabled()).thenReturn(true);
         when(mockClaimResDTO.getMultiValued()).thenReturn(false);
         when(mockClaimResDTO.getDisplayOrder()).thenReturn(1);
 
@@ -96,6 +98,7 @@ public class LocalClaimReqDTOTest {
         when(mockClaimResDTO.getReadOnly()).thenReturn(false);
         when(mockClaimResDTO.getRequired()).thenReturn(true);
         when(mockClaimResDTO.getSupportedByDefault()).thenReturn(true);
+        when(mockClaimResDTO.getManagedInUserStoreEnabled()).thenReturn(true);
         when(mockClaimResDTO.getMultiValued()).thenReturn(false);
         when(mockClaimResDTO.getDisplayOrder()).thenReturn(1);
 
@@ -113,6 +116,7 @@ public class LocalClaimReqDTOTest {
         when(mockClaimResDTO.getReadOnly()).thenReturn(true);
         when(mockClaimResDTO.getRequired()).thenReturn(true);
         when(mockClaimResDTO.getSupportedByDefault()).thenReturn(true);
+        when(mockClaimResDTO.getManagedInUserStoreEnabled()).thenReturn(true);
         when(mockClaimResDTO.getMultiValued()).thenReturn(false);
         when(mockClaimResDTO.getDisplayOrder()).thenReturn(1);
 
@@ -130,6 +134,7 @@ public class LocalClaimReqDTOTest {
         when(mockClaimResDTO.getReadOnly()).thenReturn(false);
         when(mockClaimResDTO.getRequired()).thenReturn(false);
         when(mockClaimResDTO.getSupportedByDefault()).thenReturn(true);
+        when(mockClaimResDTO.getManagedInUserStoreEnabled()).thenReturn(true);
         when(mockClaimResDTO.getMultiValued()).thenReturn(false);
         when(mockClaimResDTO.getDisplayOrder()).thenReturn(1);
 
@@ -147,6 +152,7 @@ public class LocalClaimReqDTOTest {
         when(mockClaimResDTO.getReadOnly()).thenReturn(false);
         when(mockClaimResDTO.getRequired()).thenReturn(true);
         when(mockClaimResDTO.getSupportedByDefault()).thenReturn(true);
+        when(mockClaimResDTO.getManagedInUserStoreEnabled()).thenReturn(true);
         when(mockClaimResDTO.getMultiValued()).thenReturn(false);
         when(mockClaimResDTO.getDisplayOrder()).thenReturn(5);
 
@@ -287,6 +293,7 @@ public class LocalClaimReqDTOTest {
         when(mockClaimResDTO.getReadOnly()).thenReturn(false);
         when(mockClaimResDTO.getRequired()).thenReturn(true);
         when(mockClaimResDTO.getSupportedByDefault()).thenReturn(true);
+        when(mockClaimResDTO.getManagedInUserStoreEnabled()).thenReturn(true);
         when(mockClaimResDTO.getMultiValued()).thenReturn(false);
         when(mockClaimResDTO.getDisplayOrder()).thenReturn(1);
         when(mockClaimResDTO.getProfiles()).thenReturn(null);
@@ -376,6 +383,7 @@ public class LocalClaimReqDTOTest {
         when(mock.getReadOnly()).thenReturn(false);
         when(mock.getRequired()).thenReturn(true);
         when(mock.getSupportedByDefault()).thenReturn(true);
+        when(mock.getManagedInUserStoreEnabled()).thenReturn(true);
         when(mock.getMultiValued()).thenReturn(false);
         when(mock.getDisplayOrder()).thenReturn(1);
         when(mock.getDataType()).thenReturn(null);

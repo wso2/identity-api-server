@@ -65,6 +65,9 @@ public class LocalClaimResDTO extends ClaimResDTO {
     private Boolean supportedByDefault = null;
 
     @Valid
+    private Boolean managedInUserStore = null;
+
+    @Valid
     private DataType dataType = null;
 
     @Valid
@@ -221,6 +224,21 @@ public class LocalClaimResDTO extends ClaimResDTO {
     }
 
     /**
+    * Specifies if the managed in user store is enabled for the claim.
+    **/
+    @ApiModelProperty(value = "Specifies if the managed in user store is enabled for the claim.")
+    @JsonProperty("managedInUserStore")
+    public Boolean getManagedInUserStoreEnabled() {
+
+        return managedInUserStore;
+    }
+
+    public void setManagedInUserStore(Boolean managedInUserStore) {
+
+        this.managedInUserStore = managedInUserStore;
+    }
+
+    /**
      * Specifies the type of data which the claim holds.
      **/
     @ApiModelProperty(value = "Specifies the type of data stored in the corresponding claim value.")
@@ -362,6 +380,7 @@ public class LocalClaimResDTO extends ClaimResDTO {
         sb.append("    regEx: ").append(regEx).append("\n");
         sb.append("    required: ").append(required).append("\n");
         sb.append("    supportedByDefault: ").append(supportedByDefault).append("\n");
+        sb.append("    managedInUserStore: ").append(managedInUserStore).append("\n");
         sb.append("    dataType: ").append(dataType).append("\n");
         sb.append("    subAttributes: ").append(Arrays.toString(subAttributes)).append("\n");
         sb.append("    canonicalValues: ").append(Arrays.toString(canonicalValues)).append("\n");

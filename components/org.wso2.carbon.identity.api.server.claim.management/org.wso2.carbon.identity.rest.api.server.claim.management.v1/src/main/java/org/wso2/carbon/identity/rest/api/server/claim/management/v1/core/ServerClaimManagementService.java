@@ -434,16 +434,15 @@ public class ServerClaimManagementService {
     public LocalClaimResDTO getLocalClaim(String claimId) {
 
         try {
-            List<LocalClaim> localClaimList = claimMetadataManagementService.getLocalClaims(ContextLoader
-                    .getTenantDomainFromContext());
+            String claimURI = base64DecodeId(claimId);
+            Optional<LocalClaim> localClaim = claimMetadataManagementService.getLocalClaim(claimURI, ContextLoader
+                    .getTenantDomainFromContext(), true);
 
-            LocalClaim localClaim = extractLocalClaimFromClaimList(base64DecodeId(claimId), localClaimList);
-
-            if (localClaim == null) {
+            if (!localClaim.isPresent()) {
                 throw handleClaimManagementClientError(ERROR_CODE_LOCAL_CLAIM_NOT_FOUND, NOT_FOUND, claimId);
             }
 
-            return getLocalClaimResDTO(localClaim);
+            return getLocalClaimResDTO(localClaim.get());
 
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_RETRIEVING_LOCAL_CLAIM, claimId);
@@ -1208,6 +1207,10 @@ public class ServerClaimManagementService {
             }
         }
 
+        String managedInUserStore =
+                claimProperties.remove(ClaimConstants.MANAGED_IN_USER_STORE_PROPERTY);
+        localClaimResDTO.setManagedInUserStore(Boolean.valueOf(managedInUserStore));
+
         List<AttributeMappingDTO> attributeMappingDTOs = new ArrayList<>();
         for (AttributeMapping attributeMapping : localClaim.getMappedAttributes()) {
             AttributeMappingDTO attributeMappingDTO = new AttributeMappingDTO();
@@ -1304,6 +1307,12 @@ public class ServerClaimManagementService {
 
         if (StringUtils.isNotBlank(localClaimReqDTO.getRegEx())) {
             claimProperties.put(PROP_REG_EX, localClaimReqDTO.getRegEx());
+        }
+
+        Boolean managedInUserStore = localClaimReqDTO.getManagedInUserStoreEnabled();
+        if (managedInUserStore != null) {
+            claimProperties.put(ClaimConstants.MANAGED_IN_USER_STORE_PROPERTY,
+                    String.valueOf(managedInUserStore));
         }
 
         if (localClaimReqDTO.getDisplayOrder() != null) {
