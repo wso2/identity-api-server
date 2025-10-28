@@ -978,7 +978,7 @@
         <carbon.multitenancy.version>4.11.31</carbon.multitenancy.version>
         <org.wso2.carbon.identity.remotefetch.version>0.7.12</org.wso2.carbon.identity.remotefetch.version>
         <org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>2.5.18</org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>
-        <org.wso2.carbon.logging.service.version>4.10.22</org.wso2.carbon.logging.service.version>
+        <org.wso2.carbon.logging.service.version>4.10.26</org.wso2.carbon.logging.service.version>
         <org.wso2.carbon.event.publisher.version>5.2.61</org.wso2.carbon.event.publisher.version>
         <identity.branding.preference.management.version>1.1.22</identity.branding.preference.management.version>
         <apache.felix.scr.ds.annotations.version>1.2.4</apache.felix.scr.ds.annotations.version>
