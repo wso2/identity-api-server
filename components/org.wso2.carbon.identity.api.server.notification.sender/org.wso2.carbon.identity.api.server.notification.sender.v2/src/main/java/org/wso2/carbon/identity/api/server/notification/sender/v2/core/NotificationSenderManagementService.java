@@ -98,8 +98,8 @@ public class NotificationSenderManagementService {
      */
     public SMSSender addSMSSender(SMSSenderAdd smsSenderAdd) {
 
-        SMSSenderDTO dto = buildSMSSenderDTO(smsSenderAdd);
         try {
+            SMSSenderDTO dto = buildSMSSenderDTO(smsSenderAdd);
             SMSSenderDTO smsSenderDTO = notificationSenderManagementService.addSMSSender(dto);
             return buildSMSSenderFromDTO(smsSenderDTO);
         } catch (NotificationSenderManagementException e) {
@@ -261,8 +261,8 @@ public class NotificationSenderManagementService {
      */
     public SMSSender updateSMSSender(String senderName, SMSSenderUpdateRequest smsSenderUpdateRequest) {
 
-        SMSSenderDTO dto = buildSMSSenderDTO(senderName, smsSenderUpdateRequest);
         try {
+            SMSSenderDTO dto = buildSMSSenderDTO(senderName, smsSenderUpdateRequest);
             SMSSenderDTO smsSenderDTO = notificationSenderManagementService.updateSMSSender(dto);
             return buildSMSSenderFromDTO(smsSenderDTO);
         } catch (NotificationSenderManagementException e) {
@@ -368,39 +368,40 @@ public class NotificationSenderManagementService {
         return emailSender;
     }
 
-    private SMSSenderDTO buildSMSSenderDTO(SMSSenderAdd smsSenderAdd) {
+    private SMSSenderDTO buildSMSSenderDTO(SMSSenderAdd smsSenderAdd) throws NotificationSenderManagementException {
 
-        SMSSenderDTO dto = new SMSSenderDTO();
-        dto.setName(smsSenderAdd.getName());
-        dto.setProvider(smsSenderAdd.getProvider());
-        dto.setProviderURL(smsSenderAdd.getProviderURL());
-        dto.setKey(smsSenderAdd.getKey());
-        dto.setSecret(smsSenderAdd.getSecret());
-        dto.setSender(smsSenderAdd.getSender());
-        dto.setContentType(smsSenderAdd.getContentType().toString());
+        SMSSenderDTO.Builder builder = new SMSSenderDTO.Builder();
+        builder.name(smsSenderAdd.getName());
+        builder.provider(smsSenderAdd.getProvider());
+        builder.providerURL(smsSenderAdd.getProviderURL());
+        builder.key(smsSenderAdd.getKey());
+        builder.secret(smsSenderAdd.getSecret());
+        builder.sender(smsSenderAdd.getSender());
+        builder.contentType(smsSenderAdd.getContentType().toString());
         List<Properties> properties = smsSenderAdd.getProperties();
         if (properties != null) {
-            properties.forEach((prop) -> dto.getProperties().put(prop.getKey(), prop.getValue()));
+            properties.forEach((prop) -> builder.addProperty(prop.getKey(), prop.getValue()));
         }
-        return dto;
+        return builder.build();
     }
 
 
-    private SMSSenderDTO buildSMSSenderDTO(String senderName, SMSSenderUpdateRequest smsSenderUpdateRequest) {
+    private SMSSenderDTO buildSMSSenderDTO(String senderName, SMSSenderUpdateRequest smsSenderUpdateRequest)
+            throws NotificationSenderManagementException {
 
-        SMSSenderDTO dto = new SMSSenderDTO();
-        dto.setName(senderName);
-        dto.setProvider(smsSenderUpdateRequest.getProvider());
-        dto.setProviderURL(smsSenderUpdateRequest.getProviderURL());
-        dto.setKey(smsSenderUpdateRequest.getKey());
-        dto.setSecret(smsSenderUpdateRequest.getSecret());
-        dto.setSender(smsSenderUpdateRequest.getSender());
-        dto.setContentType(smsSenderUpdateRequest.getContentType().toString());
+        SMSSenderDTO.Builder builder = new SMSSenderDTO.Builder();
+        builder.name(senderName);
+        builder.provider(smsSenderUpdateRequest.getProvider());
+        builder.providerURL(smsSenderUpdateRequest.getProviderURL());
+        builder.key(smsSenderUpdateRequest.getKey());
+        builder.secret(smsSenderUpdateRequest.getSecret());
+        builder.sender(smsSenderUpdateRequest.getSender());
+        builder.contentType(smsSenderUpdateRequest.getContentType().toString());
         List<Properties> properties = smsSenderUpdateRequest.getProperties();
         if (properties != null) {
-            properties.forEach((prop) -> dto.getProperties().put(prop.getKey(), prop.getValue()));
+            properties.forEach((prop) -> builder.addProperty(prop.getKey(), prop.getValue()));
         }
-        return dto;
+        return builder.build();
     }
 
     private APIError handleException(NotificationSenderManagementException e) {
