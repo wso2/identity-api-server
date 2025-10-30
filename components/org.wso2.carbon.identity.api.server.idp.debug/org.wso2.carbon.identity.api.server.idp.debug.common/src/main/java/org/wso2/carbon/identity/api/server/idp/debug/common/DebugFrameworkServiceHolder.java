@@ -21,11 +21,14 @@ package org.wso2.carbon.identity.api.server.idp.debug.common;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.debug.framework.ContextProvider;
+import org.wso2.carbon.identity.debug.framework.DebugService;
+import org.wso2.carbon.identity.debug.framework.Executer;
+import org.wso2.carbon.identity.debug.framework.RequestCoordinator;
 
 /**
  * Service holder class for debug framework services.
- * This class provides access to debug framework services through OSGi service lookup
- * to overcome classloader isolation between web applications and OSGi bundles.
+ * This class provides access to debug framework services through OSGi service lookup.
  */
 public class DebugFrameworkServiceHolder {
 
@@ -39,15 +42,14 @@ public class DebugFrameworkServiceHolder {
 
     /**
      * Gets the debug service using OSGi service lookup.
-     * This method uses reflection to avoid compile-time dependencies on debug framework classes.
      *
      * @return Debug service instance if available, null otherwise.
      */
     public static Object getDebugService() {
         try {
-            // Use OSGi service lookup with class name string to avoid compile-time dependency
+            // Use OSGi service lookup with class
             Object debugService = PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                    .getOSGiService(Class.forName("org.wso2.carbon.identity.debug.framework.DebugService"), null);
+                    .getOSGiService(DebugService.class, null);
             
             if (debugService == null) {
                 if (log.isDebugEnabled()) {
@@ -60,11 +62,6 @@ public class DebugFrameworkServiceHolder {
             }
             
             return debugService;
-        } catch (ClassNotFoundException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("DebugService class not found: " + e.getMessage());
-            }
-            return null;
         } catch (Exception e) {
             log.error("Error retrieving DebugService: " + e.getMessage(), e);
             return null;
@@ -73,15 +70,14 @@ public class DebugFrameworkServiceHolder {
 
     /**
      * Gets the RequestCoordinator using OSGi service lookup.
-     * This method uses reflection to avoid compile-time dependencies on debug framework classes.
      *
      * @return RequestCoordinator instance if available, null otherwise.
      */
     public static Object getRequestCoordinator() {
         try {
-            // Use OSGi service lookup with class name string to avoid compile-time dependency
+            // Use OSGi service lookup with class
             Object requestCoordinator = PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                    .getOSGiService(Class.forName("org.wso2.carbon.identity.debug.framework.RequestCoordinator"), null);
+                    .getOSGiService(RequestCoordinator.class, null);
             
             if (requestCoordinator == null) {
                 if (log.isDebugEnabled()) {
@@ -94,11 +90,6 @@ public class DebugFrameworkServiceHolder {
             }
             
             return requestCoordinator;
-        } catch (ClassNotFoundException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("RequestCoordinator class not found: " + e.getMessage());
-            }
-            return null;
         } catch (Exception e) {
             log.error("Error retrieving RequestCoordinator: " + e.getMessage(), e);
             return null;
@@ -144,17 +135,13 @@ public class DebugFrameworkServiceHolder {
 
 
     /**
-     * Creates a new instance of Executer using reflection.
+     * Creates a new instance of Executer.
      *
      * @return New Executer instance or null if creation fails.
      */
     public static Object createExecuter() {
         try {
-            Class<?> executerClass = Class.forName("org.wso2.carbon.identity.debug.framework.Executer");
-            return executerClass.getDeclaredConstructor().newInstance();
-        } catch (ClassNotFoundException e) {
-            log.debug("Executer class not found for direct instantiation: " + e.getMessage());
-            return null;
+            return new Executer();
         } catch (Exception e) {
             log.error("Error creating Executer instance: " + e.getMessage(), e);
             return null;
@@ -162,19 +149,13 @@ public class DebugFrameworkServiceHolder {
     }
 
     /**
-     * Creates a new instance of ContextProvider using reflection.
+     * Creates a new instance of ContextProvider.
      *
      * @return New ContextProvider instance or null if creation fails.
      */
     public static Object createContextProvider() {
         try {
-            Class<?> contextProviderClass = Class.forName("org.wso2.carbon.identity.debug.framework.ContextProvider");
-            return contextProviderClass.getDeclaredConstructor().newInstance();
-        } catch (ClassNotFoundException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("ContextProvider class not found for direct instantiation: " + e.getMessage());
-            }
-            return null;
+            return new ContextProvider();
         } catch (Exception e) {
             log.error("Error creating ContextProvider instance: " + e.getMessage(), e);
             return null;
@@ -190,7 +171,8 @@ public class DebugFrameworkServiceHolder {
      * @param arguments Arguments to pass to the method.
      * @return Method result or null if invocation fails.
      */
-    public static Object invokeContextProviderMethod(String methodName, Class<?>[] parameterTypes, Object... arguments) {
+    public static Object invokeContextProviderMethod(
+            String methodName, Class<?>[] parameterTypes, Object... arguments) {
         Object contextProvider = createContextProvider();
         if (contextProvider == null) {
             log.warn("ContextProvider not available for method invocation: " + methodName);

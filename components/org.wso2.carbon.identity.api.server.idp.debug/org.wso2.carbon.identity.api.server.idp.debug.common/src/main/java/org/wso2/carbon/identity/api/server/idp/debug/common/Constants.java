@@ -87,31 +87,4 @@ public class Constants {
             return code + " | " + description;
         }
     }
-
-    /**
-     * Response format constants.
-     */
-    public static class ResponseFormat {
-        public static final String JSON = "json";
-        public static final String HTML = "html";
-        public static final String TEXT = "text";
-        public static final String SUMMARY = "summary";
-    }
-
-    /**
-     * Authentication status constants.
-     */
-    public static class AuthenticationStatus {
-        public static final String SUCCESS = "SUCCESS";
-        public static final String FAILED = "FAILED";
-        public static final String ERROR = "ERROR";
-    }
-
-    /**
-     * Default values.
-     */
-    public static class Defaults {
-        public static final String DEFAULT_RESPONSE_FORMAT = ResponseFormat.JSON;
-        public static final int DEFAULT_TIMEOUT_SECONDS = 30;
-    }
 }

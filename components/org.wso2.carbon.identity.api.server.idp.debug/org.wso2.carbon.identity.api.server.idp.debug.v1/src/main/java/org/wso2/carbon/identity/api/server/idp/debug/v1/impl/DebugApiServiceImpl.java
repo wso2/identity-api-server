@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,31 +18,34 @@
 
 package org.wso2.carbon.identity.api.server.idp.debug.v1.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-import javax.ws.rs.core.Response;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.wso2.carbon.identity.api.server.common.error.APIError;
-import org.wso2.carbon.identity.api.server.idp.debug.v1.DebugApiService;
 import org.wso2.carbon.identity.api.server.idp.debug.v1.model.DebugConnectionRequest;
 import org.wso2.carbon.identity.api.server.idp.debug.v1.model.DebugConnectionResponse;
-import org.wso2.carbon.identity.api.server.idp.debug.v1.service.SimpleDebugService;
+import org.wso2.carbon.identity.api.server.idp.debug.v1.service.DebugService;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.ws.rs.core.Response;
+
+
 
 /**
- * Implementation of DebugApiService for testing Identity Provider authentication flows.
+ * Implementation of Debug API service for testing Identity Provider authentication flows.
  */
-public class DebugApiServiceImpl implements DebugApiService {
+public class DebugApiServiceImpl {
 
     private static final Log LOG = LogFactory.getLog(DebugApiServiceImpl.class);
-    private final SimpleDebugService debugService;
+    private final DebugService debugService;
 
     /**
      * Constructor initializes the service layer.
      */
     public DebugApiServiceImpl() {
-        this.debugService = new SimpleDebugService();
+        this.debugService = new DebugService();
     }
 
     /**
@@ -53,7 +56,6 @@ public class DebugApiServiceImpl implements DebugApiService {
      * @param debugConnectionRequest Debug connection request containing OAuth 2.0 parameters.
      * @return Response containing OAuth 2.0 authorization URL and session information.
      */
-    @Override
     public Response debugConnection(String idpId, DebugConnectionRequest debugConnectionRequest) {
         try {
             // Input validation at API layer.
@@ -61,6 +63,11 @@ public class DebugApiServiceImpl implements DebugApiService {
                 return createErrorResponse("INVALID_REQUEST", "Identity Provider ID is required", 
                     Response.Status.BAD_REQUEST);
             }
+
+            // Ensure proper handling of Unicode transformations.
+            String normalizedIdpId = idpId != null
+                    ? java.text.Normalizer.normalize(idpId, java.text.Normalizer.Form.NFC)
+                    : null;
 
             // Extract OAuth 2.0 parameters from request (all optional).
             String authenticatorName = null;
@@ -77,18 +84,25 @@ public class DebugApiServiceImpl implements DebugApiService {
 
             // Generate OAuth 2.0 authorization URL using the service layer.
             Map<String, Object> oauth2Result = debugService.generateOAuth2AuthorizationUrl(
-                idpId, authenticatorName, redirectUri, scope, additionalParams
+                normalizedIdpId, authenticatorName, redirectUri, scope, additionalParams
             );
 
             // Create OAuth 2.0 response.
-            DebugConnectionResponse response = createOAuth2Response(oauth2Result, idpId);
+            DebugConnectionResponse response = createOAuth2Response(oauth2Result, normalizedIdpId);
             return Response.ok(response).build();
 
         } catch (APIError e) {
-            LOG.error("API error in OAuth 2.0 debug connection for IdP: " + idpId, e);
+            String sanitizedIdpId = idpId != null
+                    ? idpId.replaceAll("[\r\n]", "")
+                    : "null";
+            LOG.error("API error in OAuth 2.0 debug connection for IdP: " + sanitizedIdpId, e);
             return createErrorResponse(e.getCode(), e.getMessage(), mapToHttpStatus(e.getCode()));
         } catch (Exception e) {
-            LOG.error("Unexpected error in OAuth 2.0 debug connection for IdP: " + idpId, e);
+            String sanitizedIdpId = idpId != null
+                    ? idpId.replaceAll("[\r\n]", "")
+                    : "null";
+            LOG.error("Unexpected error in OAuth 2.0 debug connection for IdP: "
+                    + sanitizedIdpId, e);
             return createErrorResponse("INTERNAL_ERROR", 
                 "Failed to generate OAuth 2.0 authorization URL: " + e.getMessage(), 
                 Response.Status.INTERNAL_SERVER_ERROR);

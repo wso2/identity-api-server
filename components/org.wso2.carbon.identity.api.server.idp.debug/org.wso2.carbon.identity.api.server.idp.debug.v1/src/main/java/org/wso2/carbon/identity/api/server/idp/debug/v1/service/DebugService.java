@@ -18,165 +18,181 @@
 
 package org.wso2.carbon.identity.api.server.idp.debug.v1.service;
 
-import org.wso2.carbon.identity.api.server.idp.debug.v1.model.DebugResponse;
-import org.wso2.carbon.identity.api.server.idp.debug.v1.model.DebugResponse.AuthenticationResult;
-import org.wso2.carbon.identity.api.server.idp.debug.v1.model.DebugResponse.ClaimsAnalysis;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import org.wso2.carbon.identity.api.server.idp.debug.common.DebugFrameworkServiceHolder;
+import org.wso2.carbon.identity.application.authentication.framework.context.AuthenticationContext;
+import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
-import java.util.Collections;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.lang.StringUtils;
-
-// Import IdentityProvider and related classes from Carbon Identity framework
-import org.wso2.carbon.identity.application.common.model.IdentityProvider;
-
-
-// Import API error classes
-import org.wso2.carbon.identity.api.server.common.error.APIError;
-import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
 
 /**
  * Service layer for IdP debug operations.
- * Handles business logic for debug authentication flows following the architecture:
- * API Layer -> Service Layer -> Framework Components
- * 
- * This service encapsulates all business logic and provides a clean interface for the API layer.
+ * This service provides a clean interface for the API layer and delegates to debug framework components.
+ * It follows the OAuth 2.0 flow architecture using debug framework components:
  */
 public class DebugService {
 
-    private static final Log LOG = LogFactory.getLog(DebugService.class);
+    private static final Log log = LogFactory.getLog(DebugService.class);
 
     /**
-     * Constructor.
+     * Constructor initializes debug framework service via service holder pattern.
      */
     public DebugService() {
-        // Service is stateless.
+        // Debug framework services will be loaded on-demand during OAuth URL generation
     }
 
     /**
-     * Execute debug authentication flow for the specified IdP.
-     * Follows the architecture: Service Layer -> Framework Components.
+     * Generates OAuth 2.0 authorization URL for debug flow using headless browser simulation.
+     * This method delegates to the debug framework's ContextProvider for proper separation of concerns.
      *
-     * @param idpId Identity Provider ID (resource ID or name).
-     * @param username Username for authentication test.
-     * @param password Password for authentication test.
-     * @return DebugResponse containing authentication results and claims.
-     * @throws APIError if validation fails or execution encounters errors.
+     * @param idpId Identity Provider resource ID.
+     * @param authenticatorName Optional authenticator name.
+     * @param redirectUri Optional custom redirect URI.
+     * @param scope Optional OAuth 2.0 scope.
+     * @param additionalParams Optional additional OAuth 2.0 parameters.
+     * @return OAuth 2.0 authorization URL and session information.
      */
-    public DebugResponse executeDebugFlow(String idpId, String username, String password) throws APIError {
-        
-        LOG.warn("Legacy executeDebugFlow with credentials called - converting to OAuth 2.0 flow");
-        
+    public Map<String, Object> generateOAuth2AuthorizationUrl(String idpId, String authenticatorName, 
+                                                              String redirectUri, String scope, 
+                                                              Map<String, String> additionalParams) {
         try {
-            // Convert to OAuth 2.0 flow using SimpleDebugService.
-            SimpleDebugService simpleDebugService = new SimpleDebugService();
-            Map<String, Object> oauth2Result = simpleDebugService.generateOAuth2AuthorizationUrl(idpId, null, null, null, null);
+            // Delegate context creation to debug framework's ContextProvider.
+            // This removes all business logic from the API layer.
+            Object context = DebugFrameworkServiceHolder.invokeContextProviderMethod(
+                "createOAuth2DebugContext",
+                new Class<?>[]{String.class, String.class, String.class, String.class, Map.class},
+                idpId, authenticatorName, redirectUri, scope, additionalParams
+            );
             
-            // Convert to legacy response format.
-            DebugResponse response = new DebugResponse();
-            response.setSessionId((String) oauth2Result.get("sessionId"));
-            response.setStatus((String) oauth2Result.get("status"));
-            response.setTargetIdp(idpId);
-            response.setAuthenticatorUsed((String) oauth2Result.get("authenticatorName"));
+            if (context == null) {
+                throw new RuntimeException("Failed to create debug context from ContextProvider");
+            }
             
-            // Add OAuth URL to metadata.
-            Map<String, Object> metadata = new HashMap<>();
-            metadata.put("authorizationUrl", oauth2Result.get("authorizationUrl"));
-            metadata.put("message", "Legacy API converted to OAuth 2.0 flow. Use authorizationUrl for authentication.");
-            metadata.put("timestamp", oauth2Result.get("timestamp"));
-            response.setMetadata(metadata);
+            // Extract IdP information from the context for response building.
+            Object idpConfig = getPropertyFromContext(context, "IDP_CONFIG");
+            String idpName = (String) getPropertyFromContext(context, "DEBUG_IDP_NAME");
+            String targetAuthenticator = (String) getPropertyFromContext(context, "DEBUG_AUTHENTICATOR_NAME");
+            String sessionDataKey = getContextIdentifier(context);
             
-            return response;
+            if (sessionDataKey == null) {
+                throw new RuntimeException("Session data key not found in context");
+            }
             
-        } catch (APIError e) {
+                // Execute OAuth 2.0 URL generation using the debug framework.
+                Object executer = DebugFrameworkServiceHolder.createExecuter();
+                // Set executor instance in context for reporting
+                if (context instanceof AuthenticationContext) {
+                    ((AuthenticationContext) context).setProperty("DEBUG_EXECUTOR_INSTANCE", executer);
+                }
+                // Execute the debug flow using reflection to maintain loose coupling.
+                boolean success = executeDebugFlow(executer, idpConfig, context);
+                if (!success) {
+                    throw new RuntimeException("Failed to generate OAuth 2.0 authorization URL");
+                }
+            
+            // Get the generated authorization URL from context.
+            String authorizationUrl = (String) getPropertyFromContext(context, "DEBUG_EXTERNAL_REDIRECT_URL");
+            if (authorizationUrl == null) {
+                throw new RuntimeException("OAuth 2.0 authorization URL not found in context");
+            }
+
+            // Build response with URL and session information.
+            Map<String, Object> result = new HashMap<>();
+            result.put("sessionId", sessionDataKey);
+            result.put("authorizationUrl", authorizationUrl);
+            result.put("status", "URL_GENERATED");
+            result.put("message", "OAuth 2.0 authorization URL generated successfully. " +
+                                   "Redirect user to this URL for authentication.");
+            result.put("idpName", idpName != null ? idpName : "Unknown");
+                result.put("authenticatorName", targetAuthenticator != null ? targetAuthenticator : "Unknown");
+                // Add executor class name for clarity
+                String executorClass = executer != null ? executer.getClass().getSimpleName() : "UnknownExecutor";
+                result.put("executor", executorClass);
+            result.put("timestamp", System.currentTimeMillis());
+            
+            return result;
+            
+        } catch (RuntimeException e) {
+                String sanitizedMessage = e.getMessage() != null ? e.getMessage().replaceAll("[\r\n]", "") : "";
+                log.error("Runtime error generating OAuth 2.0 URL: " + sanitizedMessage, e);
             throw e;
         } catch (Exception e) {
-            LOG.error("Error converting legacy debug flow for IdP: " + 
-                (idpId != null ? idpId.replaceAll("[\r\n]", "_") : "null"), e);
-            throw createAPIError("INTERNAL_ERROR", "Failed to execute legacy debug flow: " + e.getMessage());
+                String sanitizedMessage = e.getMessage() != null ? e.getMessage().replaceAll("[\r\n]", "") : "";
+                log.error("Unexpected error generating OAuth 2.0 URL: " + sanitizedMessage, e);
+                throw new RuntimeException("Failed to generate OAuth 2.0 authorization URL: " + sanitizedMessage, e);
         }
     }
 
     /**
-     * Creates APIError with proper error response.
+     * Gets a property from AuthenticationContext using reflection.
      *
-     * @param errorCode Error code.
-     * @param message Error message.
-     * @return APIError.
+     * @param context AuthenticationContext object.
+     * @param propertyName Property name to retrieve.
+     * @return Property value or null if not found.
      */
-    private APIError createAPIError(String errorCode, String message) {
-        ErrorDTO errorDTO = new ErrorDTO();
-        errorDTO.setCode(errorCode);
-        errorDTO.setMessage(message);
-        errorDTO.setDescription(message);
-        return new APIError(javax.ws.rs.core.Response.Status.BAD_REQUEST, errorDTO);
-    }
-
-
-
-
-
-
-
-
-
-
-    /**
-     * Builds debug response from debug result.
-     *
-     * @param sessionId Debug session ID.
-     * @param identityProvider Identity Provider.
-     * @param debugResult Debug result map.
-     * @return DebugResponse.
-     */
-    @SuppressWarnings("unchecked")
-    private DebugResponse buildDebugResponse(String sessionId, IdentityProvider identityProvider, 
-                                           Map<String, Object> debugResult) {
-        DebugResponse response = new DebugResponse();
-        response.setSessionId(sessionId);
-        response.setTargetIdp(identityProvider.getIdentityProviderName());
-        
-        Boolean authSuccess = (Boolean) debugResult.get("authenticationSuccess");
-        response.setStatus(Boolean.TRUE.equals(authSuccess) ? "SUCCESS" : "FAILURE");
-
-        // Build authentication result.
-        AuthenticationResult authResult = new AuthenticationResult();
-        authResult.setSuccess(Boolean.TRUE.equals(authSuccess));
-        authResult.setUserExists(Boolean.TRUE.equals(authSuccess));
-        response.setAuthenticationResult(authResult);
-
-        // Build claims analysis.
-        Map<String, String> claims = (Map<String, String>) debugResult.get("claims");
-        if (claims != null) {
-            ClaimsAnalysis claimsAnalysis = new ClaimsAnalysis();
-            claimsAnalysis.setOriginalRemoteClaims(claims);
-            claimsAnalysis.setMappedLocalClaims(claims);
-            claimsAnalysis.setMappingErrors(Collections.emptyList());
-            response.setClaimsAnalysis(claimsAnalysis);
+    private Object getPropertyFromContext(Object context, String propertyName) {
+        try {
+            java.lang.reflect.Method getPropertyMethod = context.getClass().getMethod("getProperty", String.class);
+            return getPropertyMethod.invoke(context, propertyName);
+        } catch (Exception e) {
+                if (log.isDebugEnabled()) {
+                    String sanitizedMessage = e.getMessage() != null ? e.getMessage().replaceAll("[\r\n]", "") : "";
+                    log.debug("Error getting property '" + propertyName + "' from context: " + sanitizedMessage);
+                }
+            return null;
         }
-
-        // Add metadata.
-        Map<String, Object> metadata = new HashMap<>();
-        metadata.put("idpResourceId", identityProvider.getResourceId());
-        metadata.put("timestamp", debugResult.get("timestamp"));
-        response.setMetadata(metadata);
-
-        return response;
     }
 
     /**
-     * Generates unique debug session ID.
+     * Gets the context identifier from AuthenticationContext using reflection.
      *
-     * @return Debug session ID.
+     * @param context AuthenticationContext object.
+     * @return Context identifier or null if not found.
      */
-    private String generateDebugSessionId() {
-        return "debug-" + UUID.randomUUID().toString();
+    private String getContextIdentifier(Object context) {
+        try {
+            java.lang.reflect.Method getContextIdentifierMethod = context.getClass().getMethod("getContextIdentifier");
+            Object result = getContextIdentifierMethod.invoke(context);
+            return result != null ? result.toString() : null;
+        } catch (Exception e) {
+                if (log.isDebugEnabled()) {
+                    String sanitizedMessage = e.getMessage() != null ? e.getMessage().replaceAll("[\r\n]", "") : "";
+                    log.debug("Error getting context identifier: " + sanitizedMessage);
+                }
+            return null;
+        }
     }
 
+    /**
+     * Executes the debug flow using reflection to maintain loose coupling.
+     *
+     * @param executer Executer instance.
+     * @param idpConfig Identity Provider configuration.
+     * @param context Authentication context.
+     * @return true if execution successful, false otherwise.
+     */
+    private boolean executeDebugFlow(Object executer, Object idpConfig, Object context) {
+        try {
+            Object executeResult = DebugFrameworkServiceHolder.invokeDebugServiceMethod("execute", 
+                new Class<?>[]{IdentityProvider.class, AuthenticationContext.class}, 
+                idpConfig, context);
 
-
-
+            if (executeResult instanceof Boolean) {
+                return (Boolean) executeResult;
+            } else {
+                // Try invoking on the executer object directly.
+                java.lang.reflect.Method executeMethod = executer.getClass()
+                    .getMethod("execute", IdentityProvider.class, AuthenticationContext.class);
+                Object result = executeMethod.invoke(executer, idpConfig, context);
+                return result instanceof Boolean ? (Boolean) result : false;
+            }
+        } catch (Exception e) {
+            String sanitizedMessage = e.getMessage() != null ? e.getMessage().replaceAll("[\r\n]", "") : "";
+            log.error("Error executing debug flow: " + sanitizedMessage, e);
+            return false;
+        }
+    }
 }
