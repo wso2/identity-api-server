@@ -86,7 +86,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [SELF_REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
+            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
           description: Type of the flow to retrieve
       responses:
         '200':
@@ -120,6 +120,47 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+    delete:
+      summary: Delete the flow
+      operationId: deleteFlow
+      tags:
+        - Flow Composer
+      parameters:
+        - in: query
+          name: flowType
+          required: true
+          schema:
+            type: string
+            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
+          description: Type of the flow to delete
+      responses:
+        '204':
+          description: Flow successfully deleted
+        '400':
+          description: Invalid request body or unsupported flow type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Encountered a server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   /flow/meta:
     get:
       summary: Retrieve metadata related to a flow type
@@ -132,7 +173,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [SELF_REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
+            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
           description: Type of the flow to get metadata for
       responses:
         '200':
@@ -206,7 +247,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [SELF_REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
+            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
           description: Type of the flow to get configurations for
       responses:
         '200':
@@ -320,14 +361,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /flow/status:
+  /flow/status/{operationId}:
     get:
       summary: Retrieve flow generation status
       operationId: getFlowGenerationStatus
       tags:
         - Generate Flow
       parameters:
-        - in: query
+        - in: path
           name: operationId
           required: true
           schema:
@@ -365,14 +406,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /flow/result:
+  /flow/result/{operationId}:
     get:
       summary: Retrieve flow generation result
       operationId: getFlowGenerationResult
       tags:
         - Generate Flow
       parameters:
-        - in: query
+        - in: path
           name: operationId
           required: true
           schema:
@@ -432,13 +473,14 @@ components:
       type: object
       description: Request payload for generating a flow
       required:
-        - flowType
+        - flow_type
+        - user_query
       properties:
-        flowType:
+        flow_type:
           type: string
           description: Type of the flow being updated
           example: REGISTRATION
-        userQuery:
+        user_query:
           type: string
           description: User query to generate the flow
           example: Generate a registration flow with basic details and passkey
@@ -447,7 +489,7 @@ components:
       type: object
       description: Response for generating a flow
       properties:
-        operationId:
+        operation_id:
           type: string
           description: Id for the submitted generation operation
           example: 2dc32cd4-3cde-4a77-bf95-af55a6738b92
@@ -526,6 +568,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ExecutorConnections'
+        workflowEnabled:
+          type: boolean
+          example: false
 
     ExecutorConnections:
       type: object

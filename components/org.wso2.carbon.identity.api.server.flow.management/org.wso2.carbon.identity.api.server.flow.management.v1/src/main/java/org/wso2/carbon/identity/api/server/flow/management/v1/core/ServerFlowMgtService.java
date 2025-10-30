@@ -118,6 +118,22 @@ public class ServerFlowMgtService {
     }
 
     /**
+     * Delete the flow for a specific flow type.
+     *
+     * @param flowType Type of the flow.
+     */
+    public void deleteFlow(String flowType) {
+
+        try {
+            Utils.validateFlowType(flowType);
+            flowMgtService.deleteFlow(flowType,
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
+        } catch (FlowMgtFrameworkException e) {
+            throw Utils.handleFlowMgtException(e);
+        }
+    }
+
+    /**
      * Retrieve the flow configurations.
      *
      * @return List of FlowConfig.

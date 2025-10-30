@@ -60,7 +60,7 @@ public class WorkflowAssociationsApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={  })
+    }, tags={ "Workflow Associations Management", })
     @ApiResponses(value = { 
         @ApiResponse(code = 201, message = "Item Created", response = WorkflowAssociationResponse.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
@@ -84,7 +84,7 @@ public class WorkflowAssociationsApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={  })
+    }, tags={ "Workflow Associations Management", })
     @ApiResponses(value = { 
         @ApiResponse(code = 204, message = "Item Deleted", response = Void.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
@@ -108,7 +108,7 @@ public class WorkflowAssociationsApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={  })
+    }, tags={ "Workflow Associations Management", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Array of workflow associations matching the search criteria", response = WorkflowAssociationResponse.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
@@ -132,7 +132,7 @@ public class WorkflowAssociationsApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={  })
+    }, tags={ "Workflow Associations Management", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful Response", response = WorkflowAssociationListResponse.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
@@ -156,7 +156,7 @@ public class WorkflowAssociationsApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={  })
+    }, tags={ "Workflow Associations Management" })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successfully Updated", response = WorkflowAssociationResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),

@@ -59,7 +59,7 @@ public class WorkflowsApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={  })
+    }, tags={ "Workflow Management", })
     @ApiResponses(value = { 
         @ApiResponse(code = 201, message = "Successful response", response = WorkflowResponse.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
@@ -83,7 +83,7 @@ public class WorkflowsApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={  })
+    }, tags={ "Workflow Management", })
     @ApiResponses(value = { 
         @ApiResponse(code = 204, message = "Item Deleted", response = Void.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
@@ -107,7 +107,7 @@ public class WorkflowsApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={  })
+    }, tags={ "Workflow Management", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response", response = WorkflowResponse.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
@@ -131,7 +131,7 @@ public class WorkflowsApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={  })
+    }, tags={ "Workflow Management", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response", response = WorkflowListResponse.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
@@ -155,7 +155,7 @@ public class WorkflowsApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={  })
+    }, tags={ "Workflow Management" })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response", response = WorkflowResponse.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
