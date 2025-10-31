@@ -144,7 +144,7 @@
     <FindBugsFilter>
         <Match>
             <Class name="org.wso2.carbon.identity.api.server.notification.sender.v1.core.NotificationSenderManagementService"/>
-            <Method name="resetTemplateType"/>
+            <Method name="buildEmailSenderFromDTO"/>
             <Bug pattern="IMPROPER_UNICODE"/>
         </Match>
     </FindBugsFilter>
