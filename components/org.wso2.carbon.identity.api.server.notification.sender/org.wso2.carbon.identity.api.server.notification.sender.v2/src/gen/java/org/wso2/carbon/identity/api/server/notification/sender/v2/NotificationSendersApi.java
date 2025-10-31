@@ -359,6 +359,31 @@ public class NotificationSendersApi  {
     }
 
     @Valid
+    @PATCH
+    @Path("/email/{sender-name}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update an email sender", notes = "This API provides the capability to update an email sender by name. The URL encoded email sender name is used as sender-name.<br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/configmgt/update <br>   <b>Scope required:</b> <br>     * internal_config_mgt_update ", response = EmailSender.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Email Senders", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = EmailSender.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 405, message = "Method Not Allowed.", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response patchEmailSender(@ApiParam(value = "name of the email sender",required=true) @PathParam("sender-name") String senderName, @ApiParam(value = "" ,required=true) @Valid EmailSenderUpdateRequest emailSenderUpdateRequest) {
+
+        return delegate.patchEmailSender(senderName,  emailSenderUpdateRequest );
+    }
+
+    @Valid
     @PUT
     @Path("/email/{sender-name}")
     @Consumes({ "application/json" })
