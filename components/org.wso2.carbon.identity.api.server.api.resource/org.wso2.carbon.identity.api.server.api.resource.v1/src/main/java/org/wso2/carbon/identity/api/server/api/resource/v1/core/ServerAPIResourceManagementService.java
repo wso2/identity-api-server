@@ -178,13 +178,13 @@ public class ServerAPIResourceManagementService {
                 }
                 if (!isFirstPage) {
                     String encodedString = Base64.getEncoder().encodeToString(apiResources.get(0).getName()
-                            .toString().getBytes(StandardCharsets.UTF_8));
+                            .getBytes(StandardCharsets.UTF_8));
                     apiResourceListResponse.addLinksItem(buildPaginationLink(url + "&before=" + encodedString,
                             "previous"));
                 }
                 if (!isLastPage) {
                     String encodedString = Base64.getEncoder().encodeToString(apiResources.get(apiResources.size() - 1)
-                            .getName().toString().getBytes(StandardCharsets.UTF_8));
+                            .getName().getBytes(StandardCharsets.UTF_8));
                     apiResourceListResponse.addLinksItem(buildPaginationLink(url + "&after=" + encodedString, "next"));
                 }
             }
