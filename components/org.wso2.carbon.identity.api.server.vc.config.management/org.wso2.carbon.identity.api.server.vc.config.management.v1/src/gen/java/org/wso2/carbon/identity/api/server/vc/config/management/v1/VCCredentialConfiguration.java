@@ -24,8 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.vc.config.management.v1.ClaimMapping;
-import org.wso2.carbon.identity.api.server.vc.config.management.v1.CredentialMetadata;
+import org.wso2.carbon.identity.api.server.vc.config.management.v1.Metadata;
 import javax.validation.constraints.*;
 
 
@@ -41,12 +40,12 @@ public class VCCredentialConfiguration  {
     private String configurationId;
     private String scope;
     private String format;
-    private String credentialSigningAlgValuesSupported;
-    private String credentialType;
-    private CredentialMetadata credentialMetadata;
-    private List<ClaimMapping> claimMappings = new ArrayList<ClaimMapping>();
+    private String signingAlgorithm;
+    private String type;
+    private Metadata metadata;
+    private List<String> claims = new ArrayList<String>();
 
-    private Integer expiryInSeconds;
+    private Integer expiryIn;
 
     /**
     **/
@@ -153,108 +152,108 @@ public class VCCredentialConfiguration  {
     /**
     * Single JWS algorithm
     **/
-    public VCCredentialConfiguration credentialSigningAlgValuesSupported(String credentialSigningAlgValuesSupported) {
+    public VCCredentialConfiguration signingAlgorithm(String signingAlgorithm) {
 
-        this.credentialSigningAlgValuesSupported = credentialSigningAlgValuesSupported;
+        this.signingAlgorithm = signingAlgorithm;
         return this;
     }
     
     @ApiModelProperty(example = "RS256", required = true, value = "Single JWS algorithm")
-    @JsonProperty("credentialSigningAlgValuesSupported")
+    @JsonProperty("signingAlgorithm")
     @Valid
-    @NotNull(message = "Property credentialSigningAlgValuesSupported cannot be null.")
+    @NotNull(message = "Property signingAlgorithm cannot be null.")
 
-    public String getCredentialSigningAlgValuesSupported() {
-        return credentialSigningAlgValuesSupported;
+    public String getSigningAlgorithm() {
+        return signingAlgorithm;
     }
-    public void setCredentialSigningAlgValuesSupported(String credentialSigningAlgValuesSupported) {
-        this.credentialSigningAlgValuesSupported = credentialSigningAlgValuesSupported;
+    public void setSigningAlgorithm(String signingAlgorithm) {
+        this.signingAlgorithm = signingAlgorithm;
     }
 
     /**
-    * credentialType
+    * Credential Type
     **/
-    public VCCredentialConfiguration credentialType(String credentialType) {
+    public VCCredentialConfiguration type(String type) {
 
-        this.credentialType = credentialType;
+        this.type = type;
         return this;
     }
     
-    @ApiModelProperty(example = "employee_badge", required = true, value = "credentialType")
-    @JsonProperty("credentialType")
+    @ApiModelProperty(example = "employee_badge", required = true, value = "Credential Type")
+    @JsonProperty("type")
     @Valid
-    @NotNull(message = "Property credentialType cannot be null.")
+    @NotNull(message = "Property type cannot be null.")
 
-    public String getCredentialType() {
-        return credentialType;
+    public String getType() {
+        return type;
     }
-    public void setCredentialType(String credentialType) {
-        this.credentialType = credentialType;
+    public void setType(String type) {
+        this.type = type;
     }
 
     /**
     **/
-    public VCCredentialConfiguration credentialMetadata(CredentialMetadata credentialMetadata) {
+    public VCCredentialConfiguration metadata(Metadata metadata) {
 
-        this.credentialMetadata = credentialMetadata;
-        return this;
-    }
-    
-    @ApiModelProperty(required = true, value = "")
-    @JsonProperty("credentialMetadata")
-    @Valid
-    @NotNull(message = "Property credentialMetadata cannot be null.")
-
-    public CredentialMetadata getCredentialMetadata() {
-        return credentialMetadata;
-    }
-    public void setCredentialMetadata(CredentialMetadata credentialMetadata) {
-        this.credentialMetadata = credentialMetadata;
-    }
-
-    /**
-    **/
-    public VCCredentialConfiguration claimMappings(List<ClaimMapping> claimMappings) {
-
-        this.claimMappings = claimMappings;
+        this.metadata = metadata;
         return this;
     }
     
     @ApiModelProperty(required = true, value = "")
-    @JsonProperty("claimMappings")
+    @JsonProperty("metadata")
     @Valid
-    @NotNull(message = "Property claimMappings cannot be null.")
+    @NotNull(message = "Property metadata cannot be null.")
 
-    public List<ClaimMapping> getClaimMappings() {
-        return claimMappings;
+    public Metadata getMetadata() {
+        return metadata;
     }
-    public void setClaimMappings(List<ClaimMapping> claimMappings) {
-        this.claimMappings = claimMappings;
+    public void setMetadata(Metadata metadata) {
+        this.metadata = metadata;
     }
 
-    public VCCredentialConfiguration addClaimMappingsItem(ClaimMapping claimMappingsItem) {
-        this.claimMappings.add(claimMappingsItem);
+    /**
+    **/
+    public VCCredentialConfiguration claims(List<String> claims) {
+
+        this.claims = claims;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "[\"givenname\",\"surname\",\"email\"]", required = true, value = "")
+    @JsonProperty("claims")
+    @Valid
+    @NotNull(message = "Property claims cannot be null.")
+
+    public List<String> getClaims() {
+        return claims;
+    }
+    public void setClaims(List<String> claims) {
+        this.claims = claims;
+    }
+
+    public VCCredentialConfiguration addClaimsItem(String claimsItem) {
+        this.claims.add(claimsItem);
         return this;
     }
 
         /**
     **/
-    public VCCredentialConfiguration expiryInSeconds(Integer expiryInSeconds) {
+    public VCCredentialConfiguration expiryIn(Integer expiryIn) {
 
-        this.expiryInSeconds = expiryInSeconds;
+        this.expiryIn = expiryIn;
         return this;
     }
     
     @ApiModelProperty(example = "31536000", required = true, value = "")
-    @JsonProperty("expiryInSeconds")
+    @JsonProperty("expiryIn")
     @Valid
-    @NotNull(message = "Property expiryInSeconds cannot be null.")
+    @NotNull(message = "Property expiryIn cannot be null.")
 
-    public Integer getExpiryInSeconds() {
-        return expiryInSeconds;
+    public Integer getExpiryIn() {
+        return expiryIn;
     }
-    public void setExpiryInSeconds(Integer expiryInSeconds) {
-        this.expiryInSeconds = expiryInSeconds;
+    public void setExpiryIn(Integer expiryIn) {
+        this.expiryIn = expiryIn;
     }
 
 
@@ -274,16 +273,16 @@ public class VCCredentialConfiguration  {
             Objects.equals(this.configurationId, vcCredentialConfiguration.configurationId) &&
             Objects.equals(this.scope, vcCredentialConfiguration.scope) &&
             Objects.equals(this.format, vcCredentialConfiguration.format) &&
-            Objects.equals(this.credentialSigningAlgValuesSupported, vcCredentialConfiguration.credentialSigningAlgValuesSupported) &&
-            Objects.equals(this.credentialType, vcCredentialConfiguration.credentialType) &&
-            Objects.equals(this.credentialMetadata, vcCredentialConfiguration.credentialMetadata) &&
-            Objects.equals(this.claimMappings, vcCredentialConfiguration.claimMappings) &&
-            Objects.equals(this.expiryInSeconds, vcCredentialConfiguration.expiryInSeconds);
+            Objects.equals(this.signingAlgorithm, vcCredentialConfiguration.signingAlgorithm) &&
+            Objects.equals(this.type, vcCredentialConfiguration.type) &&
+            Objects.equals(this.metadata, vcCredentialConfiguration.metadata) &&
+            Objects.equals(this.claims, vcCredentialConfiguration.claims) &&
+            Objects.equals(this.expiryIn, vcCredentialConfiguration.expiryIn);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, identifier, configurationId, scope, format, credentialSigningAlgValuesSupported, credentialType, credentialMetadata, claimMappings, expiryInSeconds);
+        return Objects.hash(id, identifier, configurationId, scope, format, signingAlgorithm, type, metadata, claims, expiryIn);
     }
 
     @Override
@@ -297,11 +296,11 @@ public class VCCredentialConfiguration  {
         sb.append("    configurationId: ").append(toIndentedString(configurationId)).append("\n");
         sb.append("    scope: ").append(toIndentedString(scope)).append("\n");
         sb.append("    format: ").append(toIndentedString(format)).append("\n");
-        sb.append("    credentialSigningAlgValuesSupported: ").append(toIndentedString(credentialSigningAlgValuesSupported)).append("\n");
-        sb.append("    credentialType: ").append(toIndentedString(credentialType)).append("\n");
-        sb.append("    credentialMetadata: ").append(toIndentedString(credentialMetadata)).append("\n");
-        sb.append("    claimMappings: ").append(toIndentedString(claimMappings)).append("\n");
-        sb.append("    expiryInSeconds: ").append(toIndentedString(expiryInSeconds)).append("\n");
+        sb.append("    signingAlgorithm: ").append(toIndentedString(signingAlgorithm)).append("\n");
+        sb.append("    type: ").append(toIndentedString(type)).append("\n");
+        sb.append("    metadata: ").append(toIndentedString(metadata)).append("\n");
+        sb.append("    claims: ").append(toIndentedString(claims)).append("\n");
+        sb.append("    expiryIn: ").append(toIndentedString(expiryIn)).append("\n");
         sb.append("}");
         return sb.toString();
     }

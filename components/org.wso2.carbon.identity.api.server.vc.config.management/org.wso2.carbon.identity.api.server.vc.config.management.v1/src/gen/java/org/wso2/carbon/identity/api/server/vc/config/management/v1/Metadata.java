@@ -18,9 +18,10 @@
 
 package org.wso2.carbon.identity.api.server.vc.config.management.v1;
 
-import java.util.List;
-import org.wso2.carbon.identity.api.server.vc.config.management.v1.Metadata;
-import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationCreationModel;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 
 
@@ -29,8 +30,30 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class VCCredentialConfigurationUpdateModel extends VCCredentialConfigurationCreationModel {
+public class Metadata  {
   
+    private String display;
+
+    /**
+    * JSON string of an array of display objects (wallet-facing).
+    **/
+    public Metadata display(String display) {
+
+        this.display = display;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "[{\"name\":\"Employee Badge\",\"locale\":\"en-US\",\"background_color\":\"#003366\",\"text_color\":\"#FFFFFF\"}]", required = true, value = "JSON string of an array of display objects (wallet-facing).")
+    @JsonProperty("display")
+    @Valid
+    @NotNull(message = "Property display cannot be null.")
+
+    public String getDisplay() {
+        return display;
+    }
+    public void setDisplay(String display) {
+        this.display = display;
+    }
 
 
 
@@ -43,24 +66,22 @@ public class VCCredentialConfigurationUpdateModel extends VCCredentialConfigurat
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        if (!super.equals(o)) {
-            return false;
-        }
-        
-        return true;
+        Metadata metadata = (Metadata) o;
+        return Objects.equals(this.display, metadata.display);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash();
+        return Objects.hash(display);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class VCCredentialConfigurationUpdateModel {\n");
-        sb.append("    ").append(toIndentedString(super.toString())).append("\n");
+        sb.append("class Metadata {\n");
+        
+        sb.append("    display: ").append(toIndentedString(display)).append("\n");
         sb.append("}");
         return sb.toString();
     }
