@@ -25,13 +25,7 @@ import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
-import org.wso2.carbon.identity.api.server.vc.config.management.v1.ClaimMapping;
-import org.wso2.carbon.identity.api.server.vc.config.management.v1.CredentialMetadata;
-import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfiguration;
-import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationCreationModel;
-import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationList;
-import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationListItem;
-import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationUpdateModel;
+import org.wso2.carbon.identity.api.server.vc.config.management.v1.*;
 import org.wso2.carbon.identity.vc.config.management.VCCredentialConfigManager;
 import org.wso2.carbon.identity.vc.config.management.exception.VCConfigMgtClientException;
 import org.wso2.carbon.identity.vc.config.management.exception.VCConfigMgtException;
@@ -68,13 +62,13 @@ public class ServerVCCredentialConfigManagementService {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
-            org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration toCreate =
+            org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration config =
                     toInternalModel(creationModel);
             org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration created =
-                    vcCredentialConfigManager.create(toCreate, tenantDomain);
+                    vcCredentialConfigManager.add(config, tenantDomain);
             return toApiModel(created);
         } catch (VCConfigMgtException e) {
-            throw handleVCConfigException(e, "Error while creating VC credential configuration", null);
+            throw handleVCConfigException(e, "Error while adding VC credential configuration", null);
         }
     }
 
@@ -184,42 +178,30 @@ public class ServerVCCredentialConfigManagementService {
         apiModel.setConfigurationId(model.getConfigurationId());
         apiModel.setScope(model.getScope());
         apiModel.setFormat(model.getFormat());
-        apiModel.setCredentialSigningAlgValuesSupported(model.getCredentialSigningAlgValuesSupported());
-        apiModel.setCredentialType(model.getCredentialType());
-        apiModel.setCredentialMetadata(toApiCredentialMetadata(model.getCredentialMetadata()));
+        apiModel.setSigningAlgorithm(model.getSigningAlgorithm());
+        apiModel.setType(model.getType());
+        apiModel.setMetadata(toApiCredentialMetadata(model.getMetadata()));
 
-        List<org.wso2.carbon.identity.vc.config.management.model.ClaimMapping> claimMappings =
-                model.getClaimMappings();
-        if (claimMappings != null) {
-            apiModel.setClaimMappings(claimMappings.stream()
-                    .filter(Objects::nonNull)
-                    .map(this::toApiClaimMapping)
-                    .collect(Collectors.toList()));
+        List<String> claims = model.getClaims();
+        if (claims != null) {
+            apiModel.setClaims(claims);
         } else {
-            apiModel.setClaimMappings(new ArrayList<>());
+            apiModel.setClaims(new ArrayList<>());
         }
 
-        apiModel.setExpiryInSeconds(model.getExpiryInSeconds());
+        apiModel.setExpiryIn(model.getExpiryIn());
         return apiModel;
     }
 
-    private CredentialMetadata toApiCredentialMetadata(
-            org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration.CredentialMetadata metadata) {
+    private Metadata toApiCredentialMetadata(
+            org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration.Metadata metadata) {
 
         if (metadata == null) {
             return null;
         }
-        CredentialMetadata apiMetadata = new CredentialMetadata();
+        Metadata apiMetadata = new Metadata();
         apiMetadata.setDisplay(metadata.getDisplay());
         return apiMetadata;
-    }
-
-    private ClaimMapping toApiClaimMapping(org.wso2.carbon.identity.vc.config.management.model.ClaimMapping mapping) {
-
-        ClaimMapping apiMapping = new ClaimMapping();
-        apiMapping.setClaimURI(mapping.getClaimURI());
-        apiMapping.setDisplay(mapping.getDisplay());
-        return apiMapping;
     }
 
     private org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration toInternalModel(
@@ -233,16 +215,13 @@ public class ServerVCCredentialConfigManagementService {
         internalModel.setConfigurationId(configurationId);
         internalModel.setScope(model.getScope());
         internalModel.setFormat(model.getFormat());
-        internalModel.setCredentialSigningAlgValuesSupported(model.getCredentialSigningAlgValuesSupported());
-        internalModel.setCredentialType(model.getCredentialType());
-        internalModel.setCredentialMetadata(toInternalCredentialMetadata(model.getCredentialMetadata()));
-        if (model.getClaimMappings() != null) {
-            internalModel.setClaimMappings(model.getClaimMappings().stream()
-                    .filter(Objects::nonNull)
-                    .map(this::toInternalClaimMapping)
-                    .collect(Collectors.toList()));
+        internalModel.setSigningAlgorithm(model.getSigningAlgorithm());
+        internalModel.setType(model.getType());
+        internalModel.setMetadata(toInternalCredentialMetadata(model.getMetadata()));
+        if (model.getClaims() != null) {
+            internalModel.setClaims(model.getClaims());
         }
-        internalModel.setExpiryInSeconds(model.getExpiryInSeconds());
+        internalModel.setExpiryIn(model.getExpiryIn());
         return internalModel;
     }
 
@@ -252,27 +231,17 @@ public class ServerVCCredentialConfigManagementService {
         return toInternalModel((VCCredentialConfigurationCreationModel) model);
     }
 
-    private org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration.CredentialMetadata
-    toInternalCredentialMetadata(CredentialMetadata metadata) {
+    private org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration.Metadata
+    toInternalCredentialMetadata(Metadata metadata) {
 
         if (metadata == null) {
             return null;
         }
-        org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration.CredentialMetadata
+        org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration.Metadata
                 internalMetadata =
-                new org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration.CredentialMetadata();
+                new org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration.Metadata();
         internalMetadata.setDisplay(metadata.getDisplay());
         return internalMetadata;
-    }
-
-    private org.wso2.carbon.identity.vc.config.management.model.ClaimMapping toInternalClaimMapping(ClaimMapping
-                                                                                                            mapping) {
-
-        org.wso2.carbon.identity.vc.config.management.model.ClaimMapping internalMapping =
-                new org.wso2.carbon.identity.vc.config.management.model.ClaimMapping();
-        internalMapping.setClaimURI(mapping.getClaimURI());
-        internalMapping.setDisplay(mapping.getDisplay());
-        return internalMapping;
     }
 
     private APIError notFound(String data) {
