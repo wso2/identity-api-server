@@ -26,6 +26,7 @@ import java.util.List;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.Error;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfiguration;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationCreationModel;
+import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationList;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationUpdateModel;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VcCredentialConfigurationsApiService;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.factories.VcCredentialConfigurationsApiServiceFactory;
@@ -124,14 +125,14 @@ public class VcCredentialConfigurationsApi  {
     
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "List configurations", notes = "", response = VCCredentialConfiguration.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "List configurations", notes = "", response = VCCredentialConfigurationList.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "VC Credential Configurations", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Array of configs", response = VCCredentialConfiguration.class, responseContainer = "List"),
+        @ApiResponse(code = 200, message = "Array of configs", response = VCCredentialConfigurationList.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),

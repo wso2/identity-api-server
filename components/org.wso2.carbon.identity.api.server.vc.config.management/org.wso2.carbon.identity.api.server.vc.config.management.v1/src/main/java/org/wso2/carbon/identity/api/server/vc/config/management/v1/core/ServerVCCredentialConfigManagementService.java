@@ -29,6 +29,8 @@ import org.wso2.carbon.identity.api.server.vc.config.management.v1.ClaimMapping;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.CredentialMetadata;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfiguration;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationCreationModel;
+import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationList;
+import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationListItem;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationUpdateModel;
 import org.wso2.carbon.identity.vc.config.management.VCCredentialConfigManager;
 import org.wso2.carbon.identity.vc.config.management.exception.VCConfigMgtClientException;
@@ -36,10 +38,8 @@ import org.wso2.carbon.identity.vc.config.management.exception.VCConfigMgtExcept
 import org.wso2.carbon.identity.vc.config.management.exception.VCConfigMgtServerException;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
@@ -106,34 +106,41 @@ public class ServerVCCredentialConfigManagementService {
             org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration configuration =
                     vcCredentialConfigManager.get(configId, tenantDomain);
             if (configuration == null) {
-                throw notFound("VC credential configuration not found", configId);
+                throw notFound(configId);
             }
             return toApiModel(configuration);
-        } catch (APIError e) {
-            throw e;
         } catch (VCConfigMgtException e) {
-            throw handleVCConfigException(e, "Error while retrieving VC credential configuration", configId);
-        }
-    }
+             throw handleVCConfigException(e, "Error while retrieving VC credential configuration", configId);
+         }
+     }
 
     /**
      * List VC credential configurations for the logged-in tenant.
      *
      * @return List of credential configurations.
      */
-    public List<VCCredentialConfiguration> listVCCredentialConfigurations() {
+    public VCCredentialConfigurationList listVCCredentialConfigurations() {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
             List<org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration> configurations =
                     vcCredentialConfigManager.list(tenantDomain);
-            if (configurations == null) {
-                return Collections.emptyList();
+
+            VCCredentialConfigurationList result = new VCCredentialConfigurationList();
+            if (configurations == null || configurations.isEmpty()) {
+                result.setTotalResults(0);
+                result.setVcCredentialConfigurations(new ArrayList<>());
+                return result;
             }
-            return configurations.stream()
+
+            List<VCCredentialConfigurationListItem> items = configurations.stream()
                     .filter(Objects::nonNull)
-                    .map(this::toApiModel)
+                    .map(this::toApiListItem)
                     .collect(Collectors.toList());
+
+            result.setTotalResults(items.size());
+            result.setVcCredentialConfigurations(items);
+            return result;
         } catch (VCConfigMgtException e) {
             throw handleVCConfigException(e, "Error while listing VC credential configurations", null);
         }
@@ -170,24 +177,13 @@ public class ServerVCCredentialConfigManagementService {
 
         VCCredentialConfiguration apiModel = new VCCredentialConfiguration();
         if (StringUtils.isNotBlank(model.getId())) {
-            try {
-                apiModel.setId(UUID.fromString(model.getId()));
-            } catch (IllegalArgumentException e) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Ignoring invalid VC credential configuration id: " + model.getId(), e);
-                }
-            }
+            // The generated API model expects id as String.
+            apiModel.setId(model.getId());
         }
         apiModel.setIdentifier(model.getIdentifier());
         apiModel.setConfigurationId(model.getConfigurationId());
         apiModel.setScope(model.getScope());
-        if (StringUtils.isNotBlank(model.getFormat())) {
-            try {
-                apiModel.setFormat(VCCredentialConfiguration.FormatEnum.fromValue(model.getFormat()));
-            } catch (IllegalArgumentException e) {
-                LOG.warn("Unsupported VC credential configuration format: " + model.getFormat(), e);
-            }
-        }
+        apiModel.setFormat(model.getFormat());
         apiModel.setCredentialSigningAlgValuesSupported(model.getCredentialSigningAlgValuesSupported());
         apiModel.setCredentialType(model.getCredentialType());
         apiModel.setCredentialMetadata(toApiCredentialMetadata(model.getCredentialMetadata()));
@@ -236,9 +232,7 @@ public class ServerVCCredentialConfigManagementService {
                 model.getConfigurationId() : model.getIdentifier();
         internalModel.setConfigurationId(configurationId);
         internalModel.setScope(model.getScope());
-        if (model.getFormat() != null) {
-            internalModel.setFormat(model.getFormat().value());
-        }
+        internalModel.setFormat(model.getFormat());
         internalModel.setCredentialSigningAlgValuesSupported(model.getCredentialSigningAlgValuesSupported());
         internalModel.setCredentialType(model.getCredentialType());
         internalModel.setCredentialMetadata(toInternalCredentialMetadata(model.getCredentialMetadata()));
@@ -281,8 +275,9 @@ public class ServerVCCredentialConfigManagementService {
         return internalMapping;
     }
 
-    private APIError notFound(String message, String data) {
+    private APIError notFound(String data) {
 
+        String message = "VC credential configuration not found";
         ErrorResponse error = new ErrorResponse.Builder()
                 .withCode("VC-60001")
                 .withMessage("Resource not found")
@@ -341,5 +336,18 @@ public class ServerVCCredentialConfigManagementService {
         }
         return message;
     }
-}
 
+    private VCCredentialConfigurationListItem toApiListItem(
+            org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration model) {
+
+        if (model == null) {
+            return null;
+        }
+        VCCredentialConfigurationListItem item = new VCCredentialConfigurationListItem();
+        item.setId(model.getId());
+        item.setIdentifier(model.getIdentifier());
+        item.setConfigurationId(model.getConfigurationId());
+        item.setScope(model.getScope());
+        return item;
+    }
+}

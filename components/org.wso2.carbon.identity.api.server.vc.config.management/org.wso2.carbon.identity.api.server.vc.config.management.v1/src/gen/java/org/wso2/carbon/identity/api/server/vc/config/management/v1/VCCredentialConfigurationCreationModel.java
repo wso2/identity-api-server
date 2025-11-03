@@ -39,40 +39,7 @@ public class VCCredentialConfigurationCreationModel  {
     private String identifier;
     private String configurationId;
     private String scope;
-
-@XmlType(name="FormatEnum")
-@XmlEnum(String.class)
-public enum FormatEnum {
-
-    @XmlEnumValue("jwt_vc_json") JWT_VC_JSON(String.valueOf("jwt_vc_json"));
-
-
-    private String value;
-
-    FormatEnum(String v) {
-        value = v;
-    }
-
-    public String value() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return String.valueOf(value);
-    }
-
-    public static FormatEnum fromValue(String value) {
-        for (FormatEnum b : FormatEnum.values()) {
-            if (b.value.equals(value)) {
-                return b;
-            }
-        }
-        throw new IllegalArgumentException("Unexpected value '" + value + "'");
-    }
-}
-
-    private FormatEnum format = FormatEnum.JWT_VC_JSON;
+    private String format;
     private String credentialSigningAlgValuesSupported;
     private String credentialType;
     private CredentialMetadata credentialMetadata;
@@ -141,7 +108,7 @@ public enum FormatEnum {
 
     /**
     **/
-    public VCCredentialConfigurationCreationModel format(FormatEnum format) {
+    public VCCredentialConfigurationCreationModel format(String format) {
 
         this.format = format;
         return this;
@@ -152,10 +119,10 @@ public enum FormatEnum {
     @Valid
     @NotNull(message = "Property format cannot be null.")
 
-    public FormatEnum getFormat() {
+    public String getFormat() {
         return format;
     }
-    public void setFormat(FormatEnum format) {
+    public void setFormat(String format) {
         this.format = format;
     }
 

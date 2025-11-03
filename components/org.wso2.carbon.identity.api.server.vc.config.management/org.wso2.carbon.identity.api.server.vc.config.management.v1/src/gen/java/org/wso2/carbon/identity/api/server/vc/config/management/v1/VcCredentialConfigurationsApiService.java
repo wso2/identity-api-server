@@ -27,6 +27,7 @@ import java.util.List;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.Error;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfiguration;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationCreationModel;
+import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationList;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationUpdateModel;
 import javax.ws.rs.core.Response;
 
