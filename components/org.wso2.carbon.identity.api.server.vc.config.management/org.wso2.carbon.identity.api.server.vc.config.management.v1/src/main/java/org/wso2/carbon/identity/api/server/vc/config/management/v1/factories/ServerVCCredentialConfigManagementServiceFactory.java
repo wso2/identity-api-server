@@ -27,7 +27,7 @@ import org.wso2.carbon.identity.vc.config.management.VCCredentialConfigManager;
  */
 public final class ServerVCCredentialConfigManagementServiceFactory {
 
-    private static volatile ServerVCCredentialConfigManagementService SERVICE;
+    private static final ServerVCCredentialConfigManagementService SERVICE;
 
     static {
         VCCredentialConfigManager vcCredentialConfigManager = VCCredentialConfigManagementServiceHolder

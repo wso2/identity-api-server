@@ -24,7 +24,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.ClaimMapping;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.CredentialMetadata;
 import javax.validation.constraints.*;
@@ -37,44 +36,11 @@ import javax.xml.bind.annotation.*;
 
 public class VCCredentialConfiguration  {
   
-    private UUID id;
+    private String id;
     private String identifier;
     private String configurationId;
     private String scope;
-
-@XmlType(name="FormatEnum")
-@XmlEnum(String.class)
-public enum FormatEnum {
-
-    @XmlEnumValue("jwt_vc_json") JWT_VC_JSON(String.valueOf("jwt_vc_json"));
-
-
-    private String value;
-
-    FormatEnum(String v) {
-        value = v;
-    }
-
-    public String value() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return String.valueOf(value);
-    }
-
-    public static FormatEnum fromValue(String value) {
-        for (FormatEnum b : FormatEnum.values()) {
-            if (b.value.equals(value)) {
-                return b;
-            }
-        }
-        throw new IllegalArgumentException("Unexpected value '" + value + "'");
-    }
-}
-
-    private FormatEnum format = FormatEnum.JWT_VC_JSON;
+    private String format;
     private String credentialSigningAlgValuesSupported;
     private String credentialType;
     private CredentialMetadata credentialMetadata;
@@ -84,7 +50,7 @@ public enum FormatEnum {
 
     /**
     **/
-    public VCCredentialConfiguration id(UUID id) {
+    public VCCredentialConfiguration id(String id) {
 
         this.id = id;
         return this;
@@ -95,10 +61,10 @@ public enum FormatEnum {
     @Valid
     @NotNull(message = "Property id cannot be null.")
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -166,21 +132,21 @@ public enum FormatEnum {
 
     /**
     **/
-    public VCCredentialConfiguration format(FormatEnum format) {
+    public VCCredentialConfiguration format(String format) {
 
         this.format = format;
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "")
+    @ApiModelProperty(example = "jwt_vc_json", required = true, value = "")
     @JsonProperty("format")
     @Valid
     @NotNull(message = "Property format cannot be null.")
 
-    public FormatEnum getFormat() {
+    public String getFormat() {
         return format;
     }
-    public void setFormat(FormatEnum format) {
+    public void setFormat(String format) {
         this.format = format;
     }
 
@@ -272,7 +238,6 @@ public enum FormatEnum {
     }
 
         /**
-    * minimum: 60
     **/
     public VCCredentialConfiguration expiryInSeconds(Integer expiryInSeconds) {
 
@@ -284,7 +249,7 @@ public enum FormatEnum {
     @JsonProperty("expiryInSeconds")
     @Valid
     @NotNull(message = "Property expiryInSeconds cannot be null.")
- @Min(60)
+
     public Integer getExpiryInSeconds() {
         return expiryInSeconds;
     }
