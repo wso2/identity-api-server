@@ -22,8 +22,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
-import org.wso2.carbon.identity.api.server.common.error.APIError;
-import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.vc.config.management.common.VCCredentialConfigManagementConstants;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfiguration;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationCreationModel;
@@ -33,7 +31,6 @@ import org.wso2.carbon.identity.api.server.vc.config.management.v1.core.ServerVC
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.factories.ServerVCCredentialConfigManagementServiceFactory;
 
 import java.net.URI;
-import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
@@ -96,7 +93,7 @@ public class VcCredentialConfigurationsApiServiceImpl implements VcCredentialCon
         return Response.ok().entity(updatedConfiguration).build();
     }
 
-    private URI buildResourceLocation(UUID resourceId) {
+    private URI buildResourceLocation(String resourceId) {
 
         StringBuilder pathBuilder = new StringBuilder(Constants.V1_API_PATH_COMPONENT)
                 .append(VCCredentialConfigManagementConstants.VC_CREDENTIAL_CONFIG_PATH_COMPONENT);
