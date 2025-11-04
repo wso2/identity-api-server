@@ -253,6 +253,24 @@ public class NotificationSenderManagementService {
     }
 
     /**
+     * Patch email sender details by name.
+     *
+     * @param senderName               Email sender's name.
+     * @param emailSenderUpdateRequest Email sender's updated configurations.
+     * @return Updated email sender.
+     */
+    public EmailSender patchEmailSender(String senderName, EmailSenderUpdateRequest emailSenderUpdateRequest) {
+
+        try {
+            EmailSenderDTO dto = updateEmailSenderDTOFromPatchRequest(senderName, emailSenderUpdateRequest);
+            EmailSenderDTO emailSenderDTO = notificationSenderManagementService.updateEmailSender(dto);
+            return buildEmailSenderFromDTO(emailSenderDTO);
+        } catch (NotificationSenderManagementException e) {
+            throw handleException(e);
+        }
+    }
+
+    /**
      * Update sms sender details by name.
      *
      * @param senderName             SMS sender' name.
@@ -328,6 +346,43 @@ public class NotificationSenderManagementService {
             }
         });
         return dto;
+    }
+
+    private EmailSenderDTO updateEmailSenderDTOFromPatchRequest(String senderName,
+                                                                EmailSenderUpdateRequest emailSenderUpdateRequest) {
+
+        EmailSenderDTO existingEmailSenderDTO;
+        try {
+            existingEmailSenderDTO = notificationSenderManagementService.getEmailSender(senderName);
+        } catch (NotificationSenderManagementException e) {
+            throw handleException(e);
+        }
+        existingEmailSenderDTO.setName(senderName);
+        if (emailSenderUpdateRequest == null) {
+            return existingEmailSenderDTO;
+        }
+        existingEmailSenderDTO.setFromAddress(emailSenderUpdateRequest.getFromAddress() != null ?
+                emailSenderUpdateRequest.getFromAddress() : existingEmailSenderDTO.getFromAddress());
+        existingEmailSenderDTO.setSmtpPort(emailSenderUpdateRequest.getSmtpPort() != null ?
+                emailSenderUpdateRequest.getSmtpPort() : existingEmailSenderDTO.getSmtpPort());
+        existingEmailSenderDTO.setSmtpServerHost(emailSenderUpdateRequest.getSmtpServerHost() != null ?
+                emailSenderUpdateRequest.getSmtpServerHost() : existingEmailSenderDTO.getSmtpServerHost());
+        existingEmailSenderDTO.setAuthType(emailSenderUpdateRequest.getAuthType() != null ?
+                emailSenderUpdateRequest.getAuthType() : existingEmailSenderDTO.getAuthType());
+        if (emailSenderUpdateRequest.getProperties() != null && !emailSenderUpdateRequest.getProperties().isEmpty()) {
+            emailSenderUpdateRequest.getProperties().forEach((prop) -> {
+                if (StringUtils.isNotBlank(prop.getKey()) && StringUtils.isNotBlank(prop.getValue())) {
+                    existingEmailSenderDTO.getProperties().put(prop.getKey(), prop.getValue());
+                }
+            });
+        }
+        if (BASIC.equalsIgnoreCase(existingEmailSenderDTO.getAuthType())) {
+            existingEmailSenderDTO.getProperties().put(USERNAME, existingEmailSenderDTO.getUsername());
+            existingEmailSenderDTO.getProperties().put(PASSWORD, existingEmailSenderDTO.getPassword());
+            existingEmailSenderDTO.setUsername(null);
+            existingEmailSenderDTO.setPassword(null);
+        }
+        return existingEmailSenderDTO;
     }
 
     private EmailSender buildEmailSenderFromDTO(EmailSenderDTO dto) {
