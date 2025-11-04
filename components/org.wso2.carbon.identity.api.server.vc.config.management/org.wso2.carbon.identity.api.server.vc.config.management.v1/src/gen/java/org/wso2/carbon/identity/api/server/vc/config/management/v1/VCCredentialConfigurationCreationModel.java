@@ -44,7 +44,7 @@ public class VCCredentialConfigurationCreationModel  {
     private Metadata metadata;
     private List<String> claims = new ArrayList<String>();
 
-    private Integer expiryIn;
+    private Integer expiresIn;
 
     /**
     **/
@@ -213,22 +213,22 @@ public class VCCredentialConfigurationCreationModel  {
         /**
     * minimum: 60
     **/
-    public VCCredentialConfigurationCreationModel expiryIn(Integer expiryIn) {
+    public VCCredentialConfigurationCreationModel expiresIn(Integer expiresIn) {
 
-        this.expiryIn = expiryIn;
+        this.expiresIn = expiresIn;
         return this;
     }
     
     @ApiModelProperty(required = true, value = "")
-    @JsonProperty("expiryIn")
+    @JsonProperty("expiresIn")
     @Valid
-    @NotNull(message = "Property expiryIn cannot be null.")
+    @NotNull(message = "Property expiresIn cannot be null.")
  @Min(60)
-    public Integer getExpiryIn() {
-        return expiryIn;
+    public Integer getExpiresIn() {
+        return expiresIn;
     }
-    public void setExpiryIn(Integer expiryIn) {
-        this.expiryIn = expiryIn;
+    public void setExpiresIn(Integer expiresIn) {
+        this.expiresIn = expiresIn;
     }
 
 
@@ -251,12 +251,12 @@ public class VCCredentialConfigurationCreationModel  {
             Objects.equals(this.type, vcCredentialConfigurationCreationModel.type) &&
             Objects.equals(this.metadata, vcCredentialConfigurationCreationModel.metadata) &&
             Objects.equals(this.claims, vcCredentialConfigurationCreationModel.claims) &&
-            Objects.equals(this.expiryIn, vcCredentialConfigurationCreationModel.expiryIn);
+            Objects.equals(this.expiresIn, vcCredentialConfigurationCreationModel.expiresIn);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(identifier, configurationId, scope, format, signingAlgorithm, type, metadata, claims, expiryIn);
+        return Objects.hash(identifier, configurationId, scope, format, signingAlgorithm, type, metadata, claims, expiresIn);
     }
 
     @Override
@@ -273,7 +273,7 @@ public class VCCredentialConfigurationCreationModel  {
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    metadata: ").append(toIndentedString(metadata)).append("\n");
         sb.append("    claims: ").append(toIndentedString(claims)).append("\n");
-        sb.append("    expiryIn: ").append(toIndentedString(expiryIn)).append("\n");
+        sb.append("    expiresIn: ").append(toIndentedString(expiresIn)).append("\n");
         sb.append("}");
         return sb.toString();
     }
