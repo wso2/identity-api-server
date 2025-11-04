@@ -43,11 +43,9 @@ public class Metadata  {
         return this;
     }
     
-    @ApiModelProperty(example = "[{\"name\":\"Employee Badge\",\"locale\":\"en-US\",\"background_color\":\"#003366\",\"text_color\":\"#FFFFFF\"}]", required = true, value = "JSON string of an array of display objects (wallet-facing).")
+    @ApiModelProperty(example = "[{\"name\":\"Employee Badge\",\"locale\":\"en-US\",\"background_color\":\"#003366\",\"text_color\":\"#FFFFFF\"}]", value = "JSON string of an array of display objects (wallet-facing).")
     @JsonProperty("display")
     @Valid
-    @NotNull(message = "Property display cannot be null.")
-
     public String getDisplay() {
         return display;
     }

@@ -194,7 +194,7 @@ public class ServerVCCredentialConfigManagementService {
             apiModel.setClaims(new ArrayList<>());
         }
 
-        apiModel.setExpiryIn(model.getExpiryIn());
+        apiModel.setExpiresIn(model.getExpiresIn());
         return apiModel;
     }
 
@@ -226,7 +226,7 @@ public class ServerVCCredentialConfigManagementService {
         if (model.getClaims() != null) {
             internalModel.setClaims(model.getClaims());
         }
-        internalModel.setExpiryIn(model.getExpiryIn());
+        internalModel.setExpiresIn(model.getExpiresIn());
         return internalModel;
     }
 
