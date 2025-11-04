@@ -45,7 +45,7 @@ public class VCCredentialConfiguration  {
     private Metadata metadata;
     private List<String> claims = new ArrayList<String>();
 
-    private Integer expiryIn;
+    private Integer expiresIn;
 
     /**
     **/
@@ -238,22 +238,22 @@ public class VCCredentialConfiguration  {
 
         /**
     **/
-    public VCCredentialConfiguration expiryIn(Integer expiryIn) {
+    public VCCredentialConfiguration expiresIn(Integer expiresIn) {
 
-        this.expiryIn = expiryIn;
+        this.expiresIn = expiresIn;
         return this;
     }
     
     @ApiModelProperty(example = "31536000", required = true, value = "")
-    @JsonProperty("expiryIn")
+    @JsonProperty("expiresIn")
     @Valid
-    @NotNull(message = "Property expiryIn cannot be null.")
+    @NotNull(message = "Property expiresIn cannot be null.")
 
-    public Integer getExpiryIn() {
-        return expiryIn;
+    public Integer getExpiresIn() {
+        return expiresIn;
     }
-    public void setExpiryIn(Integer expiryIn) {
-        this.expiryIn = expiryIn;
+    public void setExpiresIn(Integer expiresIn) {
+        this.expiresIn = expiresIn;
     }
 
 
@@ -277,12 +277,12 @@ public class VCCredentialConfiguration  {
             Objects.equals(this.type, vcCredentialConfiguration.type) &&
             Objects.equals(this.metadata, vcCredentialConfiguration.metadata) &&
             Objects.equals(this.claims, vcCredentialConfiguration.claims) &&
-            Objects.equals(this.expiryIn, vcCredentialConfiguration.expiryIn);
+            Objects.equals(this.expiresIn, vcCredentialConfiguration.expiresIn);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, identifier, configurationId, scope, format, signingAlgorithm, type, metadata, claims, expiryIn);
+        return Objects.hash(id, identifier, configurationId, scope, format, signingAlgorithm, type, metadata, claims, expiresIn);
     }
 
     @Override
@@ -300,7 +300,7 @@ public class VCCredentialConfiguration  {
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    metadata: ").append(toIndentedString(metadata)).append("\n");
         sb.append("    claims: ").append(toIndentedString(claims)).append("\n");
-        sb.append("    expiryIn: ").append(toIndentedString(expiryIn)).append("\n");
+        sb.append("    expiresIn: ").append(toIndentedString(expiresIn)).append("\n");
         sb.append("}");
         return sb.toString();
     }
