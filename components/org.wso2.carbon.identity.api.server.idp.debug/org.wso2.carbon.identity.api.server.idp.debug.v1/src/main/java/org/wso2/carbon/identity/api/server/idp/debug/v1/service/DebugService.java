@@ -81,17 +81,23 @@ public class DebugService {
                 throw new RuntimeException("Session data key not found in context");
             }
             
-                // Execute OAuth 2.0 URL generation using the debug framework.
-                Object executer = DebugFrameworkServiceHolder.createExecuter();
-                // Set executor instance in context for reporting
-                if (context instanceof AuthenticationContext) {
-                    ((AuthenticationContext) context).setProperty("DEBUG_EXECUTOR_INSTANCE", executer);
-                }
-                // Execute the debug flow using reflection to maintain loose coupling.
-                boolean success = executeDebugFlow(executer, idpConfig, context);
-                if (!success) {
-                    throw new RuntimeException("Failed to generate OAuth 2.0 authorization URL");
-                }
+            // Execute OAuth 2.0 URL generation using the debug framework.
+            // Directly call Executer.execute() instead of going through RequestCoordinator.
+            Object executer = DebugFrameworkServiceHolder.createExecuter();
+            if (executer == null) {
+                throw new RuntimeException("Failed to create Executer instance");
+            }
+            
+            // Set executor instance in context for reporting
+            if (context instanceof AuthenticationContext) {
+                ((AuthenticationContext) context).setProperty("DEBUG_EXECUTOR_INSTANCE", executer);
+            }
+            
+            // Execute the debug flow directly on Executer using reflection to maintain loose coupling.
+            boolean success = executeExecuterDirectly(executer, idpConfig, context);
+            if (!success) {
+                throw new RuntimeException("Failed to generate OAuth 2.0 authorization URL");
+            }
             
             // Get the generated authorization URL from context.
             String authorizationUrl = (String) getPropertyFromContext(context, "DEBUG_EXTERNAL_REDIRECT_URL");
@@ -167,32 +173,35 @@ public class DebugService {
     }
 
     /**
-     * Executes the debug flow using reflection to maintain loose coupling.
+     * Executes the Executer directly, skipping RequestCoordinator.
+     * This maintains the direct flow: ContextProvider → Executer
      *
      * @param executer Executer instance.
      * @param idpConfig Identity Provider configuration.
      * @param context Authentication context.
      * @return true if execution successful, false otherwise.
      */
-    private boolean executeDebugFlow(Object executer, Object idpConfig, Object context) {
+    private boolean executeExecuterDirectly(Object executer, Object idpConfig, Object context) {
         try {
-            Object executeResult = DebugFrameworkServiceHolder.invokeDebugServiceMethod("execute", 
+            // Invoke Executer.execute() directly with IdentityProvider and AuthenticationContext
+            Object executeResult = DebugFrameworkServiceHolder.invokeExecuterMethod("execute", 
                 new Class<?>[]{IdentityProvider.class, AuthenticationContext.class}, 
-                idpConfig, context);
+                executer, idpConfig, context);
 
             if (executeResult instanceof Boolean) {
                 return (Boolean) executeResult;
             } else {
-                // Try invoking on the executer object directly.
-                java.lang.reflect.Method executeMethod = executer.getClass()
-                    .getMethod("execute", IdentityProvider.class, AuthenticationContext.class);
-                Object result = executeMethod.invoke(executer, idpConfig, context);
-                return result instanceof Boolean ? (Boolean) result : false;
+                if (log.isDebugEnabled()) {
+                    log.debug("Executer.execute() returned unexpected type: " + 
+                             (executeResult != null ? executeResult.getClass().getName() : "null"));
+                }
+                return false;
             }
         } catch (Exception e) {
             String sanitizedMessage = e.getMessage() != null ? e.getMessage().replaceAll("[\r\n]", "") : "";
-            log.error("Error executing debug flow: " + sanitizedMessage, e);
+            log.error("Error executing Executer directly: " + sanitizedMessage, e);
             return false;
         }
     }
 }
+

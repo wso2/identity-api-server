@@ -163,6 +163,37 @@ public class DebugFrameworkServiceHolder {
     }
 
     /**
+     * Invokes a method on the Executer using reflection.
+     * This allows us to call executer methods directly without compile-time dependencies.
+     *
+     * @param methodName Method name to invoke on Executer.
+     * @param parameterTypes Parameter types for the method.
+     * @param executer The Executer instance (can be null to create new one).
+     * @param arguments Arguments to pass to the method.
+     * @return Method result or null if invocation fails.
+     */
+    public static Object invokeExecuterMethod(String methodName, Class<?>[] parameterTypes, 
+                                               Object executer, Object... arguments) {
+        Object executerInstance = executer;
+        if (executerInstance == null) {
+            executerInstance = createExecuter();
+        }
+        
+        if (executerInstance == null) {
+            log.warn("Executer not available for method invocation: " + methodName);
+            return null;
+        }
+
+        try {
+            java.lang.reflect.Method method = executerInstance.getClass().getMethod(methodName, parameterTypes);
+            return method.invoke(executerInstance, arguments);
+        } catch (Exception e) {
+            log.error("Error invoking Executer method '" + methodName + "': " + e.getMessage(), e);
+            return null;
+        }
+    }
+
+    /**
      * Invokes a method on the ContextProvider using reflection.
      * This allows us to call context creation methods without compile-time dependencies.
      *
