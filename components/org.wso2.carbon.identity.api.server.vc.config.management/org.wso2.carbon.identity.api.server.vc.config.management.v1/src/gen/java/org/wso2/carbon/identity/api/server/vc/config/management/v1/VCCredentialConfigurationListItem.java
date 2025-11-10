@@ -34,7 +34,7 @@ public class VCCredentialConfigurationListItem  {
   
     private String id;
     private String identifier;
-    private String configurationId;
+    private String displayName;
     private String scope;
 
     /**
@@ -81,22 +81,22 @@ public class VCCredentialConfigurationListItem  {
     /**
     * Published as &#x60;credential_configuration_id&#x60; in issuer metadata. Defaults to &#x60;identifier&#x60; if omitted.
     **/
-    public VCCredentialConfigurationListItem configurationId(String configurationId) {
+    public VCCredentialConfigurationListItem displayName(String displayName) {
 
-        this.configurationId = configurationId;
+        this.displayName = displayName;
         return this;
     }
     
     @ApiModelProperty(example = "EmployeeBadge", required = true, value = "Published as `credential_configuration_id` in issuer metadata. Defaults to `identifier` if omitted.")
-    @JsonProperty("configurationId")
+    @JsonProperty("displayName")
     @Valid
-    @NotNull(message = "Property configurationId cannot be null.")
+    @NotNull(message = "Property displayName cannot be null.")
 
-    public String getConfigurationId() {
-        return configurationId;
+    public String getDisplayName() {
+        return displayName;
     }
-    public void setConfigurationId(String configurationId) {
-        this.configurationId = configurationId;
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     /**
@@ -133,13 +133,13 @@ public class VCCredentialConfigurationListItem  {
         VCCredentialConfigurationListItem vcCredentialConfigurationListItem = (VCCredentialConfigurationListItem) o;
         return Objects.equals(this.id, vcCredentialConfigurationListItem.id) &&
             Objects.equals(this.identifier, vcCredentialConfigurationListItem.identifier) &&
-            Objects.equals(this.configurationId, vcCredentialConfigurationListItem.configurationId) &&
+            Objects.equals(this.displayName, vcCredentialConfigurationListItem.displayName) &&
             Objects.equals(this.scope, vcCredentialConfigurationListItem.scope);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, identifier, configurationId, scope);
+        return Objects.hash(id, identifier, displayName, scope);
     }
 
     @Override
@@ -150,7 +150,7 @@ public class VCCredentialConfigurationListItem  {
         
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    identifier: ").append(toIndentedString(identifier)).append("\n");
-        sb.append("    configurationId: ").append(toIndentedString(configurationId)).append("\n");
+        sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    scope: ").append(toIndentedString(scope)).append("\n");
         sb.append("}");
         return sb.toString();
