@@ -180,10 +180,9 @@ public class ServerVCCredentialConfigManagementService {
             apiModel.setId(model.getId());
         }
         apiModel.setIdentifier(model.getIdentifier());
-        apiModel.setConfigurationId(model.getConfigurationId());
+        apiModel.setDisplayName(model.getDisplayName());
         apiModel.setScope(model.getScope());
         apiModel.setFormat(model.getFormat());
-        apiModel.setSigningAlgorithm(model.getSigningAlgorithm());
         apiModel.setType(model.getType());
         apiModel.setMetadata(toApiCredentialMetadata(model.getMetadata()));
 
@@ -215,12 +214,9 @@ public class ServerVCCredentialConfigManagementService {
         org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration internalModel =
                 new org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration();
         internalModel.setIdentifier(model.getIdentifier());
-        String configurationId = StringUtils.isNotBlank(model.getConfigurationId()) ?
-                model.getConfigurationId() : model.getIdentifier();
-        internalModel.setConfigurationId(configurationId);
+        internalModel.setDisplayName(model.getDisplayName());
         internalModel.setScope(model.getScope());
         internalModel.setFormat(model.getFormat());
-        internalModel.setSigningAlgorithm(model.getSigningAlgorithm());
         internalModel.setType(model.getType());
         internalModel.setMetadata(toInternalCredentialMetadata(model.getMetadata()));
         if (model.getClaims() != null) {
@@ -320,7 +316,7 @@ public class ServerVCCredentialConfigManagementService {
         VCCredentialConfigurationListItem item = new VCCredentialConfigurationListItem();
         item.setId(model.getId());
         item.setIdentifier(model.getIdentifier());
-        item.setConfigurationId(model.getConfigurationId());
+        item.setDisplayName(model.getDisplayName());
         item.setScope(model.getScope());
         return item;
     }

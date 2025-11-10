@@ -28,31 +28,35 @@ import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialC
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationCreationModel;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationList;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationUpdateModel;
-import org.wso2.carbon.identity.api.server.vc.config.management.v1.VcCredentialConfigurationsApiService;
-import org.wso2.carbon.identity.api.server.vc.config.management.v1.factories.VcCredentialConfigurationsApiServiceFactory;
+import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCOffer;
+import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCOfferCreationModel;
+import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCOfferList;
+import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCOfferUpdateModel;
+import org.wso2.carbon.identity.api.server.vc.config.management.v1.VcApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
+import org.wso2.carbon.identity.api.server.vc.config.management.v1.factories.VcApiServiceFactory;
 
 import javax.validation.constraints.*;
 
-@Path("/vc-credential-configurations")
-@Api(description = "The vc-credential-configurations API")
+@Path("/vc")
+@Api(description = "The vc API")
 
-public class VcCredentialConfigurationsApi  {
+public class VcApi  {
 
-    private final VcCredentialConfigurationsApiService delegate;
+    private final VcApiService delegate;
 
-    public VcCredentialConfigurationsApi() {
+    public VcApi() {
 
-        this.delegate = VcCredentialConfigurationsApiServiceFactory.getVcCredentialConfigurationsApi();
+        this.delegate = VcApiServiceFactory.getVcApi();
     }
 
     @Valid
     @POST
-    
+    @Path("/credential-configs")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @ApiOperation(value = "Add new configuration", notes = "", response = VCCredentialConfiguration.class, authorizations = {
@@ -74,8 +78,31 @@ public class VcCredentialConfigurationsApi  {
     }
 
     @Valid
+    @POST
+    @Path("/offers")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Create a credential offer", notes = "", response = VCOffer.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "VC Offers", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 201, message = "Created", response = VCOffer.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response createVCOffer(@ApiParam(value = "" ,required=true) @Valid VCOfferCreationModel vcOfferCreationModel) {
+
+        return delegate.createVCOffer(vcOfferCreationModel );
+    }
+
+    @Valid
     @DELETE
-    @Path("/{config-id}")
+    @Path("/credential-configs/{config-id}")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Delete configuration", notes = "", response = Void.class, authorizations = {
@@ -97,8 +124,32 @@ public class VcCredentialConfigurationsApi  {
     }
 
     @Valid
+    @DELETE
+    @Path("/offers/{offer-id}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Delete offer by ID", notes = "", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "VC Offers", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "Deleted", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response deleteVCOffer(@ApiParam(value = "Server-generated offer identifier (opaque).",required=true) @PathParam("offer-id") String offerId) {
+
+        return delegate.deleteVCOffer(offerId );
+    }
+
+    @Valid
     @GET
-    @Path("/{config-id}")
+    @Path("/credential-configs/{config-id}")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Get configuration", notes = "", response = VCCredentialConfiguration.class, authorizations = {
@@ -122,7 +173,31 @@ public class VcCredentialConfigurationsApi  {
 
     @Valid
     @GET
+    @Path("/offers/{offer-id}")
     
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Get offer by ID", notes = "", response = VCOffer.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "VC Offers", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Offer", response = VCOffer.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getVCOffer(@ApiParam(value = "Server-generated offer identifier (opaque).",required=true) @PathParam("offer-id") String offerId) {
+
+        return delegate.getVCOffer(offerId );
+    }
+
+    @Valid
+    @GET
+    @Path("/credential-configs")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "List configurations", notes = "", response = VCCredentialConfigurationList.class, authorizations = {
@@ -145,8 +220,31 @@ public class VcCredentialConfigurationsApi  {
     }
 
     @Valid
+    @GET
+    @Path("/offers")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "List credential offers", notes = "", response = VCOfferList.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "VC Offers", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Offer list", response = VCOfferList.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response listVCOffers() {
+
+        return delegate.listVCOffers();
+    }
+
+    @Valid
     @PUT
-    @Path("/{config-id}")
+    @Path("/credential-configs/{config-id}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @ApiOperation(value = "Update configuration", notes = "", response = VCCredentialConfiguration.class, authorizations = {
@@ -154,7 +252,7 @@ public class VcCredentialConfigurationsApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "VC Credential Configurations" })
+    }, tags={ "VC Credential Configurations", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Updated", response = VCCredentialConfiguration.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
@@ -166,6 +264,30 @@ public class VcCredentialConfigurationsApi  {
     public Response updateVCCredentialConfiguration(@ApiParam(value = "Server-generated UUID of the configuration.",required=true) @PathParam("config-id") String configId, @ApiParam(value = "" ,required=true) @Valid VCCredentialConfigurationUpdateModel vcCredentialConfigurationUpdateModel) {
 
         return delegate.updateVCCredentialConfiguration(configId,  vcCredentialConfigurationUpdateModel );
+    }
+
+    @Valid
+    @PUT
+    @Path("/offers/{offer-id}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update offer by ID", notes = "", response = VCOffer.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "VC Offers" })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Updated offer", response = VCOffer.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response updateVCOffer(@ApiParam(value = "Server-generated offer identifier (opaque).",required=true) @PathParam("offer-id") String offerId, @ApiParam(value = "" ,required=true) @Valid VCOfferUpdateModel vcOfferUpdateModel) {
+
+        return delegate.updateVCOffer(offerId,  vcOfferUpdateModel );
     }
 
 }

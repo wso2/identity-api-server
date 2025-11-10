@@ -36,10 +36,9 @@ import javax.xml.bind.annotation.*;
 public class VCCredentialConfigurationCreationModel  {
   
     private String identifier;
-    private String configurationId;
+    private String displayName;
     private String scope;
     private String format;
-    private String signingAlgorithm;
     private String type;
     private Metadata metadata;
     private List<String> claims = new ArrayList<String>();
@@ -69,20 +68,20 @@ public class VCCredentialConfigurationCreationModel  {
     /**
     * If not provided, server sets to &#x60;identifier&#x60;.
     **/
-    public VCCredentialConfigurationCreationModel configurationId(String configurationId) {
+    public VCCredentialConfigurationCreationModel displayName(String displayName) {
 
-        this.configurationId = configurationId;
+        this.displayName = displayName;
         return this;
     }
     
     @ApiModelProperty(value = "If not provided, server sets to `identifier`.")
-    @JsonProperty("configurationId")
+    @JsonProperty("displayName")
     @Valid
-    public String getConfigurationId() {
-        return configurationId;
+    public String getDisplayName() {
+        return displayName;
     }
-    public void setConfigurationId(String configurationId) {
-        this.configurationId = configurationId;
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     /**
@@ -123,26 +122,6 @@ public class VCCredentialConfigurationCreationModel  {
     }
     public void setFormat(String format) {
         this.format = format;
-    }
-
-    /**
-    **/
-    public VCCredentialConfigurationCreationModel signingAlgorithm(String signingAlgorithm) {
-
-        this.signingAlgorithm = signingAlgorithm;
-        return this;
-    }
-    
-    @ApiModelProperty(required = true, value = "")
-    @JsonProperty("signingAlgorithm")
-    @Valid
-    @NotNull(message = "Property signingAlgorithm cannot be null.")
-
-    public String getSigningAlgorithm() {
-        return signingAlgorithm;
-    }
-    public void setSigningAlgorithm(String signingAlgorithm) {
-        this.signingAlgorithm = signingAlgorithm;
     }
 
     /**
@@ -244,10 +223,9 @@ public class VCCredentialConfigurationCreationModel  {
         }
         VCCredentialConfigurationCreationModel vcCredentialConfigurationCreationModel = (VCCredentialConfigurationCreationModel) o;
         return Objects.equals(this.identifier, vcCredentialConfigurationCreationModel.identifier) &&
-            Objects.equals(this.configurationId, vcCredentialConfigurationCreationModel.configurationId) &&
+            Objects.equals(this.displayName, vcCredentialConfigurationCreationModel.displayName) &&
             Objects.equals(this.scope, vcCredentialConfigurationCreationModel.scope) &&
             Objects.equals(this.format, vcCredentialConfigurationCreationModel.format) &&
-            Objects.equals(this.signingAlgorithm, vcCredentialConfigurationCreationModel.signingAlgorithm) &&
             Objects.equals(this.type, vcCredentialConfigurationCreationModel.type) &&
             Objects.equals(this.metadata, vcCredentialConfigurationCreationModel.metadata) &&
             Objects.equals(this.claims, vcCredentialConfigurationCreationModel.claims) &&
@@ -256,7 +234,7 @@ public class VCCredentialConfigurationCreationModel  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(identifier, configurationId, scope, format, signingAlgorithm, type, metadata, claims, expiresIn);
+        return Objects.hash(identifier, displayName, scope, format, type, metadata, claims, expiresIn);
     }
 
     @Override
@@ -266,10 +244,9 @@ public class VCCredentialConfigurationCreationModel  {
         sb.append("class VCCredentialConfigurationCreationModel {\n");
         
         sb.append("    identifier: ").append(toIndentedString(identifier)).append("\n");
-        sb.append("    configurationId: ").append(toIndentedString(configurationId)).append("\n");
+        sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    scope: ").append(toIndentedString(scope)).append("\n");
         sb.append("    format: ").append(toIndentedString(format)).append("\n");
-        sb.append("    signingAlgorithm: ").append(toIndentedString(signingAlgorithm)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    metadata: ").append(toIndentedString(metadata)).append("\n");
         sb.append("    claims: ").append(toIndentedString(claims)).append("\n");
