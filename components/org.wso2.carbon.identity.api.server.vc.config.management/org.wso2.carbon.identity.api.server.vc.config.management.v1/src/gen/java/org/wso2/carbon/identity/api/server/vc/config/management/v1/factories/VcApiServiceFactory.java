@@ -18,14 +18,14 @@
 
 package org.wso2.carbon.identity.api.server.vc.config.management.v1.factories;
 
-import org.wso2.carbon.identity.api.server.vc.config.management.v1.VcCredentialConfigurationsApiService;
-import org.wso2.carbon.identity.api.server.vc.config.management.v1.impl.VcCredentialConfigurationsApiServiceImpl;
+import org.wso2.carbon.identity.api.server.vc.config.management.v1.VcApiService;
+import org.wso2.carbon.identity.api.server.vc.config.management.v1.impl.VcApiServiceImpl;
 
-public class VcCredentialConfigurationsApiServiceFactory {
+public class VcApiServiceFactory {
 
-   private final static VcCredentialConfigurationsApiService service = new VcCredentialConfigurationsApiServiceImpl();
+   private final static VcApiService service = new VcApiServiceImpl();
 
-   public static VcCredentialConfigurationsApiService getVcCredentialConfigurationsApi()
+   public static VcApiService getVcApi()
    {
       return service;
    }

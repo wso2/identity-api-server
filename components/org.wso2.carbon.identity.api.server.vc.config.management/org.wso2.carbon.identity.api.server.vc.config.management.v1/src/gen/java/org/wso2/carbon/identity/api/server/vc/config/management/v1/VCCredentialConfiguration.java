@@ -37,10 +37,9 @@ public class VCCredentialConfiguration  {
   
     private String id;
     private String identifier;
-    private String configurationId;
+    private String displayName;
     private String scope;
     private String format;
-    private String signingAlgorithm;
     private String type;
     private Metadata metadata;
     private List<String> claims = new ArrayList<String>();
@@ -91,22 +90,22 @@ public class VCCredentialConfiguration  {
     /**
     * Published as &#x60;credential_configuration_id&#x60; in issuer metadata. Defaults to &#x60;identifier&#x60; if omitted.
     **/
-    public VCCredentialConfiguration configurationId(String configurationId) {
+    public VCCredentialConfiguration displayName(String displayName) {
 
-        this.configurationId = configurationId;
+        this.displayName = displayName;
         return this;
     }
     
     @ApiModelProperty(example = "EmployeeBadge", required = true, value = "Published as `credential_configuration_id` in issuer metadata. Defaults to `identifier` if omitted.")
-    @JsonProperty("configurationId")
+    @JsonProperty("displayName")
     @Valid
-    @NotNull(message = "Property configurationId cannot be null.")
+    @NotNull(message = "Property displayName cannot be null.")
 
-    public String getConfigurationId() {
-        return configurationId;
+    public String getDisplayName() {
+        return displayName;
     }
-    public void setConfigurationId(String configurationId) {
-        this.configurationId = configurationId;
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     /**
@@ -147,27 +146,6 @@ public class VCCredentialConfiguration  {
     }
     public void setFormat(String format) {
         this.format = format;
-    }
-
-    /**
-    * Single JWS algorithm
-    **/
-    public VCCredentialConfiguration signingAlgorithm(String signingAlgorithm) {
-
-        this.signingAlgorithm = signingAlgorithm;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "RS256", required = true, value = "Single JWS algorithm")
-    @JsonProperty("signingAlgorithm")
-    @Valid
-    @NotNull(message = "Property signingAlgorithm cannot be null.")
-
-    public String getSigningAlgorithm() {
-        return signingAlgorithm;
-    }
-    public void setSigningAlgorithm(String signingAlgorithm) {
-        this.signingAlgorithm = signingAlgorithm;
     }
 
     /**
@@ -270,10 +248,9 @@ public class VCCredentialConfiguration  {
         VCCredentialConfiguration vcCredentialConfiguration = (VCCredentialConfiguration) o;
         return Objects.equals(this.id, vcCredentialConfiguration.id) &&
             Objects.equals(this.identifier, vcCredentialConfiguration.identifier) &&
-            Objects.equals(this.configurationId, vcCredentialConfiguration.configurationId) &&
+            Objects.equals(this.displayName, vcCredentialConfiguration.displayName) &&
             Objects.equals(this.scope, vcCredentialConfiguration.scope) &&
             Objects.equals(this.format, vcCredentialConfiguration.format) &&
-            Objects.equals(this.signingAlgorithm, vcCredentialConfiguration.signingAlgorithm) &&
             Objects.equals(this.type, vcCredentialConfiguration.type) &&
             Objects.equals(this.metadata, vcCredentialConfiguration.metadata) &&
             Objects.equals(this.claims, vcCredentialConfiguration.claims) &&
@@ -282,7 +259,7 @@ public class VCCredentialConfiguration  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, identifier, configurationId, scope, format, signingAlgorithm, type, metadata, claims, expiresIn);
+        return Objects.hash(id, identifier, displayName, scope, format, type, metadata, claims, expiresIn);
     }
 
     @Override
@@ -293,10 +270,9 @@ public class VCCredentialConfiguration  {
         
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    identifier: ").append(toIndentedString(identifier)).append("\n");
-        sb.append("    configurationId: ").append(toIndentedString(configurationId)).append("\n");
+        sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    scope: ").append(toIndentedString(scope)).append("\n");
         sb.append("    format: ").append(toIndentedString(format)).append("\n");
-        sb.append("    signingAlgorithm: ").append(toIndentedString(signingAlgorithm)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    metadata: ").append(toIndentedString(metadata)).append("\n");
         sb.append("    claims: ").append(toIndentedString(claims)).append("\n");
