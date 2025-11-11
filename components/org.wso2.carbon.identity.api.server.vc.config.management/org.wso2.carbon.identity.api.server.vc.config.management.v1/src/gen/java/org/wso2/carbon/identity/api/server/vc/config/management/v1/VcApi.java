@@ -56,7 +56,7 @@ public class VcApi  {
 
     @Valid
     @POST
-    @Path("/credential-configs")
+    @Path("/credential-configurations")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @ApiOperation(value = "Add new configuration", notes = "", response = VCCredentialConfiguration.class, authorizations = {
@@ -102,7 +102,7 @@ public class VcApi  {
 
     @Valid
     @DELETE
-    @Path("/credential-configs/{config-id}")
+    @Path("/credential-configurations/{config-id}")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Delete configuration", notes = "", response = Void.class, authorizations = {
@@ -149,7 +149,7 @@ public class VcApi  {
 
     @Valid
     @GET
-    @Path("/credential-configs/{config-id}")
+    @Path("/credential-configurations/{config-id}")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Get configuration", notes = "", response = VCCredentialConfiguration.class, authorizations = {
@@ -197,7 +197,7 @@ public class VcApi  {
 
     @Valid
     @GET
-    @Path("/credential-configs")
+    @Path("/credential-configurations")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "List configurations", notes = "", response = VCCredentialConfigurationList.class, authorizations = {
@@ -244,7 +244,7 @@ public class VcApi  {
 
     @Valid
     @PUT
-    @Path("/credential-configs/{config-id}")
+    @Path("/credential-configurations/{config-id}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @ApiOperation(value = "Update configuration", notes = "", response = VCCredentialConfiguration.class, authorizations = {

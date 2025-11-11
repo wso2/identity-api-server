@@ -229,7 +229,18 @@ public class ServerVCCredentialConfigManagementService {
     private org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration toInternalModel(
             VCCredentialConfigurationUpdateModel model) {
 
-        return toInternalModel((VCCredentialConfigurationCreationModel) model);
+        org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration internalModel =
+                new org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration();
+        internalModel.setDisplayName(model.getDisplayName());
+        internalModel.setScope(model.getScope());
+        internalModel.setFormat(model.getFormat());
+        internalModel.setType(model.getType());
+        internalModel.setMetadata(toInternalCredentialMetadata(model.getMetadata()));
+        if (model.getClaims() != null) {
+            internalModel.setClaims(model.getClaims());
+        }
+        internalModel.setExpiresIn(model.getExpiresIn());
+        return internalModel;
     }
 
     private org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration.Metadata

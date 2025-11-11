@@ -206,7 +206,7 @@ public class ServerVCOfferManagementService {
         org.wso2.carbon.identity.vc.config.management.model.VCOffer internalModel =
                 new org.wso2.carbon.identity.vc.config.management.model.VCOffer();
         if (model.getDisplayName() != null) {
-            internalModel.setDisplayName(model.getDisplayName().toString());
+            internalModel.setDisplayName(model.getDisplayName());
         }
         if (model.getCredentialConfigurationIds() != null) {
             internalModel.setCredentialConfigurationIds(model.getCredentialConfigurationIds());

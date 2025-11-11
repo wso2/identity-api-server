@@ -37,13 +37,13 @@ import javax.xml.bind.annotation.*;
 @ApiModel(description = "Fields allowed to change after creation.")
 public class VCOfferUpdateModel  {
   
-    private java.util.Date displayName;
+    private String displayName;
     private List<String> credentialConfigurationIds = null;
 
 
     /**
     **/
-    public VCOfferUpdateModel displayName(java.util.Date displayName) {
+    public VCOfferUpdateModel displayName(String displayName) {
 
         this.displayName = displayName;
         return this;
@@ -52,10 +52,10 @@ public class VCOfferUpdateModel  {
     @ApiModelProperty(value = "")
     @JsonProperty("displayName")
     @Valid
-    public java.util.Date getDisplayName() {
+    public String getDisplayName() {
         return displayName;
     }
-    public void setDisplayName(java.util.Date displayName) {
+    public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
 
