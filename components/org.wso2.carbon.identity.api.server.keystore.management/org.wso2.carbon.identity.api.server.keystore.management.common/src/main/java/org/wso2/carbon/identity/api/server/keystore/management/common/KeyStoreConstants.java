@@ -27,6 +27,8 @@ public class KeyStoreConstants {
     public static final String CERTIFICATE_FILE_EXTENSION = ".cer";
     public static final String CERTIFICATE_TEMPORARY_DIRECTORY_PATH = "tmp/certs";
     public static final String PATH_SEPERATOR = "/";
+    public static final String HTTP_REQUEST_MESSAGE_KEY = "HTTP.REQUEST";
+    public static final String ACCEPT_HEADER = "Accept";
 
     /**
      * Enum for Keystore management service related errors.
