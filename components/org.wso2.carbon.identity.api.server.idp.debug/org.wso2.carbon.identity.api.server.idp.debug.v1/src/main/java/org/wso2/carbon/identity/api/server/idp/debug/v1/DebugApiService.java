@@ -124,9 +124,23 @@ public class DebugApiService {
     private DebugConnectionResponse createOAuth2Response(Map<String, Object> oauth2Result, String idpId) {
         DebugConnectionResponse response = new DebugConnectionResponse();
         
-        // Set basic response data.
-        response.setSessionId((String) oauth2Result.get("sessionId"));
-        response.setAuthorizationUrl((String) oauth2Result.get("authorizationUrl"));
+        // Extract or generate session ID (state parameter).
+        String sessionId = (String) oauth2Result.get("sessionId");
+        if (sessionId == null) {
+            // Fall back to state if sessionId not present (state is what OAuth2Executor returns)
+            sessionId = (String) oauth2Result.get("state");
+        }
+        if (sessionId == null) {
+            // Generate a debug session ID if neither present
+            sessionId = "debug-" + java.util.UUID.randomUUID().toString().replace("-", "");
+        }
+        response.setSessionId(sessionId);
+        
+        // Set authorization URL
+        String authUrl = (String) oauth2Result.get("authorizationUrl");
+        response.setAuthorizationUrl(authUrl);
+        
+        // Set status and message
         response.setStatus((String) oauth2Result.get("status"));
         response.setMessage((String) oauth2Result.get("message"));
 
@@ -139,6 +153,7 @@ public class DebugApiService {
         metadata.put("flow", "OAuth 2.0 Authorization Code with PKCE");
         metadata.put("nextStep", "Redirect user to authorizationUrl for authentication");
         metadata.put("callbackEndpoint", "/commonauth");
+        metadata.put("sessionId", sessionId);
         
         response.setMetadata(metadata);
         return response;

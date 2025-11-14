@@ -22,8 +22,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.wso2.carbon.identity.api.server.idp.debug.common.DebugFrameworkServiceHolder;
-import org.wso2.carbon.identity.application.authentication.framework.context.AuthenticationContext;
-import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,7 +44,7 @@ public class DebugService {
 
     /**
      * Generates OAuth 2.0 authorization URL for debug flow using headless browser simulation.
-     * This method delegates to the debug framework's ContextProvider for proper separation of concerns.
+     * This method delegates to the debug framework's OAuth2ContextResolver and OAuth2Executor.
      *
      * @param idpId Identity Provider resource ID.
      * @param authenticatorName Optional authenticator name.
@@ -59,148 +57,163 @@ public class DebugService {
                                                               String redirectUri, String scope, 
                                                               Map<String, String> additionalParams) {
         try {
-            // Delegate context creation to debug framework's ContextProvider.
-            // This removes all business logic from the API layer.
-            Object context = DebugFrameworkServiceHolder.invokeContextProviderMethod(
-                "createOAuth2DebugContext",
-                new Class<?>[]{String.class, String.class, String.class, String.class, Map.class},
-                idpId, authenticatorName, redirectUri, scope, additionalParams
+            // Check if debug framework is available.
+            if (!DebugFrameworkServiceHolder.isDebugFrameworkAvailable()) {
+                throw new RuntimeException("Debug framework services are not available");
+            }
+            
+            // Get the OAuth2ContextResolver.
+            Object contextResolver = DebugFrameworkServiceHolder.getDebugContextResolver();
+            if (contextResolver == null) {
+                throw new RuntimeException("DebugContextResolver not available");
+            }
+            
+            // Build authentication context map with IdP and OAuth2 configuration.
+            Map<String, Object> authenticationContext = new HashMap<>();
+            authenticationContext.put("idpName", idpId);
+            authenticationContext.put("authenticatorName", authenticatorName != null ? authenticatorName : "oauth2");
+            // TODO: Extract actual IdP configuration (endpoints, client credentials, etc.)
+            // For now, these would come from IdP configuration store.
+            
+            // Invoke resolveContext method on OAuth2ContextResolver.
+            Object oauth2Context = DebugFrameworkServiceHolder.invokeDebugContextResolverMethod(
+                contextResolver,
+                "resolveContext",
+                new Class<?>[]{Map.class},
+                authenticationContext
             );
             
-            if (context == null) {
-                throw new RuntimeException("Failed to create debug context from ContextProvider");
+            if (oauth2Context == null) {
+                throw new RuntimeException("Failed to resolve OAuth2 context");
             }
             
-            // Extract IdP information from the context for response building.
-            Object idpConfig = getPropertyFromContext(context, "IDP_CONFIG");
-            String idpName = (String) getPropertyFromContext(context, "DEBUG_IDP_NAME");
-            String targetAuthenticator = (String) getPropertyFromContext(context, "DEBUG_AUTHENTICATOR_NAME");
-            String sessionDataKey = getContextIdentifier(context);
-            
-            if (sessionDataKey == null) {
-                throw new RuntimeException("Session data key not found in context");
+            // Get the OAuth2Executor.
+            Object executor = DebugFrameworkServiceHolder.getDebugExecutor();
+            if (executor == null) {
+                throw new RuntimeException("DebugExecutor not available");
             }
             
-            // Execute OAuth 2.0 URL generation using the debug framework.
-            // Directly call Executer.execute() instead of going through RequestCoordinator.
-            Object executer = DebugFrameworkServiceHolder.createExecuter();
-            if (executer == null) {
-                throw new RuntimeException("Failed to create Executer instance");
+            // Invoke execute method on OAuth2Executor (standard DebugExecutor interface).
+            Object authUrlResult = DebugFrameworkServiceHolder.invokeDebugExecutorMethod(
+                executor,
+                "execute",
+                new Class<?>[]{Map.class},
+                oauth2Context
+            );
+            
+            if (authUrlResult == null) {
+                throw new RuntimeException("Authorization URL generation returned null result");
             }
             
-            // Set executor instance in context for reporting
-            if (context instanceof AuthenticationContext) {
-                ((AuthenticationContext) context).setProperty("DEBUG_EXECUTOR_INSTANCE", executer);
-            }
+            // Extract the result details using reflection.
+            Map<String, Object> resultMap = extractDebugResultData(authUrlResult);
             
-            // Execute the debug flow directly on Executer using reflection to maintain loose coupling.
-            boolean success = executeExecuterDirectly(executer, idpConfig, context);
-            if (!success) {
-                throw new RuntimeException("Failed to generate OAuth 2.0 authorization URL");
-            }
+            // Add additional metadata.
+            resultMap.put("timestamp", System.currentTimeMillis());
+            resultMap.put("idpName", idpId);
+            resultMap.put("authenticatorName", authenticatorName != null ? authenticatorName : "oauth2");
+            resultMap.put("status", "SUCCESS");
             
-            // Get the generated authorization URL from context.
-            String authorizationUrl = (String) getPropertyFromContext(context, "DEBUG_EXTERNAL_REDIRECT_URL");
-            if (authorizationUrl == null) {
-                throw new RuntimeException("OAuth 2.0 authorization URL not found in context");
-            }
-
-            // Build response with URL and session information.
-            Map<String, Object> result = new HashMap<>();
-            result.put("sessionId", sessionDataKey);
-            result.put("authorizationUrl", authorizationUrl);
-            result.put("status", "URL_GENERATED");
-            result.put("message", "OAuth 2.0 authorization URL generated successfully. " +
-                                   "Redirect user to this URL for authentication.");
-            result.put("idpName", idpName != null ? idpName : "Unknown");
-                result.put("authenticatorName", targetAuthenticator != null ? targetAuthenticator : "Unknown");
-                // Add executor class name for clarity
-                String executorClass = executer != null ? executer.getClass().getSimpleName() : "UnknownExecutor";
-                result.put("executor", executorClass);
-            result.put("timestamp", System.currentTimeMillis());
-            
-            return result;
+            return resultMap;
             
         } catch (RuntimeException e) {
-                String sanitizedMessage = e.getMessage() != null ? e.getMessage().replaceAll("[\r\n]", "") : "";
-                log.error("Runtime error generating OAuth 2.0 URL: " + sanitizedMessage, e);
+            String sanitizedMessage = e.getMessage() != null ? e.getMessage().replaceAll("[\r\n]", "") : "";
+            log.error("Runtime error generating OAuth 2.0 URL: " + sanitizedMessage, e);
             throw e;
         } catch (Exception e) {
-                String sanitizedMessage = e.getMessage() != null ? e.getMessage().replaceAll("[\r\n]", "") : "";
-                log.error("Unexpected error generating OAuth 2.0 URL: " + sanitizedMessage, e);
-                throw new RuntimeException("Failed to generate OAuth 2.0 authorization URL: " + sanitizedMessage, e);
+            String sanitizedMessage = e.getMessage() != null ? e.getMessage().replaceAll("[\r\n]", "") : "";
+            log.error("Unexpected error generating OAuth 2.0 URL: " + sanitizedMessage, e);
+            throw new RuntimeException("Failed to generate OAuth 2.0 authorization URL: " + sanitizedMessage, e);
         }
     }
-
+    
     /**
-     * Gets a property from AuthenticationContext using reflection.
+     * Extracts debug result data using reflection.
+     * This method avoids compile-time dependency on DebugResult class.
+     * DebugResult has getResultData() and getMetadata() methods that return Maps.
      *
-     * @param context AuthenticationContext object.
-     * @param propertyName Property name to retrieve.
-     * @return Property value or null if not found.
+     * @param authUrlResult The result from OAuth2Executor.execute().
+     * @return Map containing extracted result data.
      */
-    private Object getPropertyFromContext(Object context, String propertyName) {
+    private Map<String, Object> extractDebugResultData(Object authUrlResult) {
+        Map<String, Object> result = new HashMap<>();
+        
         try {
-            java.lang.reflect.Method getPropertyMethod = context.getClass().getMethod("getProperty", String.class);
-            return getPropertyMethod.invoke(context, propertyName);
-        } catch (Exception e) {
-                if (log.isDebugEnabled()) {
-                    String sanitizedMessage = e.getMessage() != null ? e.getMessage().replaceAll("[\r\n]", "") : "";
-                    log.debug("Error getting property '" + propertyName + "' from context: " + sanitizedMessage);
+            // If the result is already a Map, use it directly.
+            if (authUrlResult instanceof Map) {
+                Map<?, ?> resultMap = (Map<?, ?>) authUrlResult;
+                for (Map.Entry<?, ?> entry : resultMap.entrySet()) {
+                    if (entry.getKey() != null && entry.getValue() != null) {
+                        result.put(entry.getKey().toString(), entry.getValue());
+                    }
                 }
-            return null;
-        }
-    }
-
-    /**
-     * Gets the context identifier from AuthenticationContext using reflection.
-     *
-     * @param context AuthenticationContext object.
-     * @return Context identifier or null if not found.
-     */
-    private String getContextIdentifier(Object context) {
-        try {
-            java.lang.reflect.Method getContextIdentifierMethod = context.getClass().getMethod("getContextIdentifier");
-            Object result = getContextIdentifierMethod.invoke(context);
-            return result != null ? result.toString() : null;
-        } catch (Exception e) {
-                if (log.isDebugEnabled()) {
-                    String sanitizedMessage = e.getMessage() != null ? e.getMessage().replaceAll("[\r\n]", "") : "";
-                    log.debug("Error getting context identifier: " + sanitizedMessage);
-                }
-            return null;
-        }
-    }
-
-    /**
-     * Executes the Executer directly, skipping RequestCoordinator.
-     * This maintains the direct flow: ContextProvider → Executer
-     *
-     * @param executer Executer instance.
-     * @param idpConfig Identity Provider configuration.
-     * @param context Authentication context.
-     * @return true if execution successful, false otherwise.
-     */
-    private boolean executeExecuterDirectly(Object executer, Object idpConfig, Object context) {
-        try {
-            // Invoke Executer.execute() directly with IdentityProvider and AuthenticationContext
-            Object executeResult = DebugFrameworkServiceHolder.invokeExecuterMethod("execute", 
-                new Class<?>[]{IdentityProvider.class, AuthenticationContext.class}, 
-                executer, idpConfig, context);
-
-            if (executeResult instanceof Boolean) {
-                return (Boolean) executeResult;
             } else {
-                if (log.isDebugEnabled()) {
-                    log.debug("Executer.execute() returned unexpected type: " + 
-                             (executeResult != null ? executeResult.getClass().getName() : "null"));
+                // Try to extract from DebugResult using getResultData() and getMetadata()
+                Object resultDataObj = invokeMethodViaReflection(authUrlResult, "getResultData", new Class<?>[]{});
+                if (resultDataObj instanceof Map) {
+                    Map<?, ?> resultDataMap = (Map<?, ?>) resultDataObj;
+                    for (Map.Entry<?, ?> entry : resultDataMap.entrySet()) {
+                        if (entry.getKey() != null && entry.getValue() != null) {
+                            result.put(entry.getKey().toString(), entry.getValue());
+                        }
+                    }
                 }
-                return false;
+                
+                Object metadataObj = invokeMethodViaReflection(authUrlResult, "getMetadata", new Class<?>[]{});
+                if (metadataObj instanceof Map) {
+                    Map<?, ?> metadataMap = (Map<?, ?>) metadataObj;
+                    for (Map.Entry<?, ?> entry : metadataMap.entrySet()) {
+                        if (entry.getKey() != null && entry.getValue() != null) {
+                            // Don't overwrite existing result data with metadata
+                            String key = entry.getKey().toString();
+                            if (!result.containsKey(key)) {
+                                result.put(key, entry.getValue());
+                            }
+                        }
+                    }
+                }
+                
+                // Extract basic DebugResult fields if not already present
+                if (!result.containsKey("status")) {
+                    Object status = invokeMethodViaReflection(authUrlResult, "getStatus", new Class<?>[]{});
+                    if (status != null) {
+                        result.put("status", status.toString());
+                    }
+                }
+                
+                if (!result.containsKey("timestamp")) {
+                    Object timestamp = invokeMethodViaReflection(authUrlResult, "getTimestamp", new Class<?>[]{});
+                    if (timestamp != null) {
+                        result.put("timestamp", timestamp);
+                    }
+                }
             }
         } catch (Exception e) {
-            String sanitizedMessage = e.getMessage() != null ? e.getMessage().replaceAll("[\r\n]", "") : "";
-            log.error("Error executing Executer directly: " + sanitizedMessage, e);
-            return false;
+            if (log.isDebugEnabled()) {
+                log.debug("Error extracting debug result data: " + e.getMessage());
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Invokes a method on an object using reflection.
+     *
+     * @param object The object on which to invoke the method.
+     * @param methodName The name of the method to invoke.
+     * @param parameterTypes The parameter types of the method.
+     * @return The result of the method invocation, or null if the method is not found or returns null.
+     */
+    private Object invokeMethodViaReflection(Object object, String methodName, Class<?>[] parameterTypes) {
+        try {
+            java.lang.reflect.Method method = object.getClass().getMethod(methodName, parameterTypes);
+            return method.invoke(object);
+        } catch (Exception e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Method " + methodName + " not found on object " + object.getClass().getName());
+            }
+            return null;
         }
     }
 }

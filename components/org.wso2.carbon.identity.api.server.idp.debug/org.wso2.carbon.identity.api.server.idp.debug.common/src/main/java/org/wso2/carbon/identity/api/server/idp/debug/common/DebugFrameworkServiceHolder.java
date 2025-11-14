@@ -21,10 +21,9 @@ package org.wso2.carbon.identity.api.server.idp.debug.common;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.debug.framework.ContextProvider;
-import org.wso2.carbon.identity.debug.framework.DebugService;
-import org.wso2.carbon.identity.debug.framework.Executer;
-import org.wso2.carbon.identity.debug.framework.RequestCoordinator;
+import org.wso2.carbon.identity.debug.framework.core.DebugContextResolver;
+import org.wso2.carbon.identity.debug.framework.core.DebugExecutor;
+import org.wso2.carbon.identity.debug.framework.core.DebugRequestCoordinator;
 
 /**
  * Service holder class for debug framework services.
@@ -35,90 +34,128 @@ public class DebugFrameworkServiceHolder {
     private static final Log log = LogFactory.getLog(DebugFrameworkServiceHolder.class);
     
     private DebugFrameworkServiceHolder() {
-        // Private constructor to prevent instantiation
+        // Private constructor to prevent instantiation.
     }
 
-
-
     /**
-     * Gets the debug service using OSGi service lookup.
+     * Gets a DebugExecutor instance via OSGi service lookup.
+     * The new debug framework uses DebugExecutor interface.
+     * OIDC module registers OAuth2Executor as DebugExecutor type.
      *
-     * @return Debug service instance if available, null otherwise.
+     * @return DebugExecutor instance if available, null otherwise.
      */
-    public static Object getDebugService() {
+    public static Object getDebugExecutor() {
         try {
-            // Use OSGi service lookup with class
-            Object debugService = PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                    .getOSGiService(DebugService.class, null);
-            
-            if (debugService == null) {
+            PrivilegedCarbonContext context = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+            if (context == null) {
                 if (log.isDebugEnabled()) {
-                    log.debug("DebugService not available via OSGi service lookup");
+                    log.debug("PrivilegedCarbonContext not available");
+                }
+                return null;
+            }
+            
+            // Look up DebugExecutor by interface type.
+            Object service = context.getOSGiService(DebugExecutor.class, null);
+            
+            if (service == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("DebugExecutor not available via OSGi service lookup");
                 }
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug("Successfully retrieved DebugService via OSGi lookup");
+                    log.debug("Successfully retrieved DebugExecutor via OSGi lookup");
                 }
             }
             
-            return debugService;
+            return service;
+        } catch (NullPointerException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("NullPointerException while retrieving DebugExecutor: " + e.getMessage());
+            }
+            return null;
         } catch (Exception e) {
-            log.error("Error retrieving DebugService: " + e.getMessage(), e);
+            log.error("Error retrieving DebugExecutor: " + e.getMessage(), e);
             return null;
         }
     }
 
     /**
-     * Gets the RequestCoordinator using OSGi service lookup.
+     * Gets a DebugContextResolver instance via OSGi service lookup.
+     * The new debug framework uses DebugContextResolver interface.
+     * OIDC module registers OAuth2ContextResolver as DebugContextResolver type.
      *
-     * @return RequestCoordinator instance if available, null otherwise.
+     * @return DebugContextResolver instance if available, null otherwise.
      */
-    public static Object getRequestCoordinator() {
+    public static Object getDebugContextResolver() {
         try {
-            // Use OSGi service lookup with class
-            Object requestCoordinator = PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                    .getOSGiService(RequestCoordinator.class, null);
-            
-            if (requestCoordinator == null) {
+            PrivilegedCarbonContext context = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+            if (context == null) {
                 if (log.isDebugEnabled()) {
-                    log.debug("RequestCoordinator not available via OSGi service lookup");
+                    log.debug("PrivilegedCarbonContext not available");
+                }
+                return null;
+            }
+            
+            // Look up DebugContextResolver by interface type.
+            Object service = context.getOSGiService(DebugContextResolver.class, null);
+            
+            if (service == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("DebugContextResolver not available via OSGi service lookup");
                 }
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug("Successfully retrieved RequestCoordinator via OSGi lookup");
+                    log.debug("Successfully retrieved DebugContextResolver via OSGi lookup");
                 }
             }
             
-            return requestCoordinator;
+            return service;
+        } catch (NullPointerException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("NullPointerException while retrieving DebugContextResolver: " + e.getMessage());
+            }
+            return null;
         } catch (Exception e) {
-            log.error("Error retrieving RequestCoordinator: " + e.getMessage(), e);
+            log.error("Error retrieving DebugContextResolver: " + e.getMessage(), e);
             return null;
         }
     }
 
-
-
     /**
-     * Invokes a method on the debug service using reflection.
-     * This allows us to call methods without compile-time dependencies.
+     * Gets a DebugRequestProcessor instance via OSGi service lookup.
      *
-     * @param methodName Method name to invoke.
-     * @param parameterTypes Parameter types for the method.
-     * @param arguments Arguments to pass to the method.
-     * @return Method result or null if invocation fails.
+     * @return DebugRequestProcessor instance if available, null otherwise.
      */
-    public static Object invokeDebugServiceMethod(String methodName, Class<?>[] parameterTypes, Object... arguments) {
-        Object debugService = getDebugService();
-        if (debugService == null) {
-            log.warn("DebugService not available for method invocation: " + methodName);
-            return null;
-        }
-
+    public static Object getDebugRequestProcessor() {
         try {
-            java.lang.reflect.Method method = debugService.getClass().getMethod(methodName, parameterTypes);
-            return method.invoke(debugService, arguments);
+            PrivilegedCarbonContext context = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+            if (context == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("PrivilegedCarbonContext not available");
+                }
+                return null;
+            }
+            
+            Object service = context.getOSGiService(DebugRequestCoordinator.class, null);
+            
+            if (service == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("DebugRequestProcessor not available via OSGi service lookup");
+                }
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("Successfully retrieved DebugRequestProcessor via OSGi lookup");
+                }
+            }
+            
+            return service;
+        } catch (NullPointerException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("NullPointerException while retrieving DebugRequestProcessor: " + e.getMessage());
+            }
+            return null;
         } catch (Exception e) {
-            log.error("Error invoking DebugService method '" + methodName + "': " + e.getMessage(), e);
+            log.error("Error retrieving DebugRequestProcessor: " + e.getMessage(), e);
             return null;
         }
     }
@@ -129,92 +166,55 @@ public class DebugFrameworkServiceHolder {
      * @return true if debug services are available, false otherwise.
      */
     public static boolean isDebugFrameworkAvailable() {
-        return getDebugService() != null;
-    }
-
-
-
-    /**
-     * Creates a new instance of Executer.
-     *
-     * @return New Executer instance or null if creation fails.
-     */
-    public static Object createExecuter() {
-        try {
-            return new Executer();
-        } catch (Exception e) {
-            log.error("Error creating Executer instance: " + e.getMessage(), e);
-            return null;
-        }
+        return getDebugExecutor() != null && getDebugContextResolver() != null;
     }
 
     /**
-     * Creates a new instance of ContextProvider.
+     * Invokes a method on the DebugExecutor using reflection.
      *
-     * @return New ContextProvider instance or null if creation fails.
-     */
-    public static Object createContextProvider() {
-        try {
-            return new ContextProvider();
-        } catch (Exception e) {
-            log.error("Error creating ContextProvider instance: " + e.getMessage(), e);
-            return null;
-        }
-    }
-
-    /**
-     * Invokes a method on the Executer using reflection.
-     * This allows us to call executer methods directly without compile-time dependencies.
-     *
-     * @param methodName Method name to invoke on Executer.
-     * @param parameterTypes Parameter types for the method.
-     * @param executer The Executer instance (can be null to create new one).
-     * @param arguments Arguments to pass to the method.
-     * @return Method result or null if invocation fails.
-     */
-    public static Object invokeExecuterMethod(String methodName, Class<?>[] parameterTypes, 
-                                               Object executer, Object... arguments) {
-        Object executerInstance = executer;
-        if (executerInstance == null) {
-            executerInstance = createExecuter();
-        }
-        
-        if (executerInstance == null) {
-            log.warn("Executer not available for method invocation: " + methodName);
-            return null;
-        }
-
-        try {
-            java.lang.reflect.Method method = executerInstance.getClass().getMethod(methodName, parameterTypes);
-            return method.invoke(executerInstance, arguments);
-        } catch (Exception e) {
-            log.error("Error invoking Executer method '" + methodName + "': " + e.getMessage(), e);
-            return null;
-        }
-    }
-
-    /**
-     * Invokes a method on the ContextProvider using reflection.
-     * This allows us to call context creation methods without compile-time dependencies.
-     *
-     * @param methodName Method name to invoke on ContextProvider.
+     * @param debugExecutor The DebugExecutor instance.
+     * @param methodName Method name to invoke.
      * @param parameterTypes Parameter types for the method.
      * @param arguments Arguments to pass to the method.
      * @return Method result or null if invocation fails.
      */
-    public static Object invokeContextProviderMethod(
-            String methodName, Class<?>[] parameterTypes, Object... arguments) {
-        Object contextProvider = createContextProvider();
-        if (contextProvider == null) {
-            log.warn("ContextProvider not available for method invocation: " + methodName);
+    public static Object invokeDebugExecutorMethod(Object debugExecutor, String methodName, 
+                                                   Class<?>[] parameterTypes, Object... arguments) {
+        if (debugExecutor == null) {
+            log.warn("DebugExecutor not available for method invocation: " + methodName);
             return null;
         }
 
         try {
-            java.lang.reflect.Method method = contextProvider.getClass().getMethod(methodName, parameterTypes);
-            return method.invoke(contextProvider, arguments);
+            java.lang.reflect.Method method = debugExecutor.getClass().getMethod(methodName, parameterTypes);
+            return method.invoke(debugExecutor, arguments);
         } catch (Exception e) {
-            log.error("Error invoking ContextProvider method '" + methodName + "': " + e.getMessage(), e);
+            log.error("Error invoking DebugExecutor method '" + methodName + "': " + e.getMessage(), e);
+            return null;
+        }
+    }
+
+    /**
+     * Invokes a method on the DebugContextResolver using reflection.
+     *
+     * @param debugContextResolver The DebugContextResolver instance.
+     * @param methodName Method name to invoke.
+     * @param parameterTypes Parameter types for the method.
+     * @param arguments Arguments to pass to the method.
+     * @return Method result or null if invocation fails.
+     */
+    public static Object invokeDebugContextResolverMethod(Object debugContextResolver, String methodName,
+                                                          Class<?>[] parameterTypes, Object... arguments) {
+        if (debugContextResolver == null) {
+            log.warn("DebugContextResolver not available for method invocation: " + methodName);
+            return null;
+        }
+
+        try {
+            java.lang.reflect.Method method = debugContextResolver.getClass().getMethod(methodName, parameterTypes);
+            return method.invoke(debugContextResolver, arguments);
+        } catch (Exception e) {
+            log.error("Error invoking DebugContextResolver method '" + methodName + "': " + e.getMessage(), e);
             return null;
         }
     }

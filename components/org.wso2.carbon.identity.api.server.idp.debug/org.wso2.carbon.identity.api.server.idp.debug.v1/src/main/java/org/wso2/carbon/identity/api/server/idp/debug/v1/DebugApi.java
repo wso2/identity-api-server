@@ -71,7 +71,7 @@ public class DebugApi {
             @ApiParam(value = "Session ID (state)", required = true)
 
             @PathParam("session-id") String sessionId) {
-        String resultJson = org.wso2.carbon.identity.debug.framework.DebugResultCache.get(sessionId);
+        String resultJson = getDebugResultFromCache(sessionId);
         if (resultJson != null) {
             // Parse the JSON result and enrich with step status metadata if needed.
             try {
@@ -106,6 +106,26 @@ public class DebugApi {
             }
         } else {
             return Response.status(Response.Status.NOT_FOUND).entity("Debug result not found").build();
+        }
+    }
+
+    /**
+     * Retrieves debug result from cache using reflection to avoid direct OSGi dependency.
+     *
+     * @param sessionId The session ID (state) to fetch the debug result for.
+     * @return The debug result JSON or null if not found.
+     */
+    private String getDebugResultFromCache(String sessionId) {
+        try {
+            Class<?> cacheClass = Class.forName(
+                    "org.wso2.carbon.identity.debug.framework.core.cache.DebugResultCache");
+            java.lang.reflect.Method getMethod = cacheClass.getMethod("get", String.class);
+            Object result = getMethod.invoke(null, sessionId);
+            return (String) result;
+        } catch (Exception e) {
+            org.apache.commons.logging.LogFactory.getLog(DebugApi.class)
+                    .debug("Error retrieving debug result from cache using reflection: " + e.getMessage(), e);
+            return null;
         }
     }
 
