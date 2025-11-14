@@ -64,6 +64,9 @@ public class LocalClaimReqDTO {
     private Boolean supportedByDefault = null;
 
     @Valid
+    private Boolean managedInUserStore = null;
+
+    @Valid
     private DataType dataType = null;
 
     @Valid
@@ -195,6 +198,21 @@ public class LocalClaimReqDTO {
     }
     public void setSupportedByDefault(Boolean supportedByDefault) {
         this.supportedByDefault = supportedByDefault;
+    }
+
+    /**
+    * Specifies if the managed in user store is enabled for the claim.
+    **/
+    @ApiModelProperty(value = "Specifies if the managed in user store is enabled for the claim.")
+    @JsonProperty("managedInUserStore")
+    public Boolean getManagedInUserStoreEnabled() {
+
+        return managedInUserStore;
+    }
+
+    public void setManagedInUserStore(Boolean managedInUserStore) {
+
+        this.managedInUserStore = managedInUserStore;
     }
 
     /**
@@ -335,6 +353,7 @@ public class LocalClaimReqDTO {
         sb.append("    regEx: ").append(regEx).append("\n");
         sb.append("    required: ").append(required).append("\n");
         sb.append("    supportedByDefault: ").append(supportedByDefault).append("\n");
+        sb.append("    managedInUserStore: ").append(managedInUserStore).append("\n");
         sb.append("    dataType: ").append(dataType).append("\n");
         sb.append("    subAttributes: ").append(Arrays.toString(subAttributes)).append("\n");
         sb.append("    canonicalValues: ").append(Arrays.toString(canonicalValues)).append("\n");
@@ -371,6 +390,7 @@ public class LocalClaimReqDTO {
                 Objects.equals(this.getReadOnly(), localClaimResDTO.getReadOnly()) &&
                 Objects.equals(this.getRequired(), localClaimResDTO.getRequired()) &&
                 Objects.equals(this.getSupportedByDefault(), localClaimResDTO.getSupportedByDefault()) &&
+                Objects.equals(this.getManagedInUserStoreEnabled(), localClaimResDTO.getManagedInUserStoreEnabled()) &&
                 Objects.equals(this.getMultiValued(), localClaimResDTO.getMultiValued());
 
         if (!basicFieldsMatch) {
