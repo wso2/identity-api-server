@@ -28,14 +28,14 @@ import java.util.Map;
 import javax.validation.constraints.*;
 
 /**
- * The type of authentication required by the action&#39;s endpoint. The following options are supported:   - BASIC: Basic authentication with a username and password.&lt;br&gt;   &#x60;&#x60;{     \&quot;type\&quot;: \&quot;CLIENT_CREDENTIAL\&quot;,     \&quot;properties\&quot;: {       \&quot;username\&quot;: \&quot;auth_username\&quot;,       \&quot;password\&quot;: \&quot;auth_password\&quot;     }   }&#x60;&#x60;   - API_CREDENTIAL: API key secret based authentication.&lt;br&gt;   &#x60;&#x60;{     \&quot;type\&quot;: \&quot;API_CREDENTIAL\&quot;,     \&quot;properties\&quot;: {       \&quot;key\&quot;: \&quot;123ert45\&quot;,       \&quot;secret\&quot;: \&quot;12345-abcde-67890\&quot;     }   }&#x60;&#x60; 
+ * The type of authentication required by the action&#39;s endpoint. The following options are supported:   - CLIENT_CREDENTIAL: OAuth 2.0 client credentials authentication.&lt;br&gt;   &#x60;&#x60;{     \&quot;type\&quot;: \&quot;CLIENT_CREDENTIAL\&quot;,     \&quot;properties\&quot;: {       \&quot;clientId\&quot;: \&quot;3e172dd2-901b-43a9-a26a-728466795f01\&quot;,       \&quot;clientSecret\&quot;: \&quot;83cdc120-ccf6-4163-a4a8-c1ba3e872daa\&quot;,       \&quot;tokenEndpoint\&quot;: \&quot;https://custom.idp.com/todos\&quot;,       \&quot;scopes\&quot;: \&quot;send_scope\&quot;     }   }&#x60;&#x60;  - BASIC: Username and password based authentication.&lt;br&gt;   &#x60;&#x60;{     \&quot;type\&quot;: \&quot;BASIC\&quot;,     \&quot;properties\&quot;: {       \&quot;username\&quot;: \&quot;admin\&quot;,       \&quot;password\&quot;: \&quot;admin123\&quot;     }   }&#x60;&#x60; - BEARER: Token based based authentication.&lt;br&gt;   &#x60;&#x60;{     \&quot;type\&quot;: \&quot;BEARER\&quot;,     \&quot;properties\&quot;: {       \&quot;token\&quot;: \&quot;12345-abcde-67890\&quot;     }   }&#x60;&#x60; - API_KEY: API key secret based authentication.&lt;br&gt;   &#x60;&#x60;{     \&quot;type\&quot;: \&quot;API_KEY\&quot;,     \&quot;properties\&quot;: {       \&quot;header\&quot;: \&quot;auth\&quot;,       \&quot;value\&quot;: \&quot;123ert45\&quot;     }   }&#x60;&#x60; 
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "The type of authentication required by the action's endpoint. The following options are supported:   - BASIC: Basic authentication with a username and password.<br>   ``{     \"type\": \"CLIENT_CREDENTIAL\",     \"properties\": {       \"username\": \"auth_username\",       \"password\": \"auth_password\"     }   }``   - API_CREDENTIAL: API key secret based authentication.<br>   ``{     \"type\": \"API_CREDENTIAL\",     \"properties\": {       \"key\": \"123ert45\",       \"secret\": \"12345-abcde-67890\"     }   }`` ")
+@ApiModel(description = "The type of authentication required by the action's endpoint. The following options are supported:   - CLIENT_CREDENTIAL: OAuth 2.0 client credentials authentication.<br>   ``{     \"type\": \"CLIENT_CREDENTIAL\",     \"properties\": {       \"clientId\": \"3e172dd2-901b-43a9-a26a-728466795f01\",       \"clientSecret\": \"83cdc120-ccf6-4163-a4a8-c1ba3e872daa\",       \"tokenEndpoint\": \"https://custom.idp.com/todos\",       \"scopes\": \"send_scope\"     }   }``  - BASIC: Username and password based authentication.<br>   ``{     \"type\": \"BASIC\",     \"properties\": {       \"username\": \"admin\",       \"password\": \"admin123\"     }   }`` - BEARER: Token based based authentication.<br>   ``{     \"type\": \"BEARER\",     \"properties\": {       \"token\": \"12345-abcde-67890\"     }   }`` - API_KEY: API key secret based authentication.<br>   ``{     \"type\": \"API_KEY\",     \"properties\": {       \"header\": \"auth\",       \"value\": \"123ert45\"     }   }`` ")
 public class Authentication  {
   
 
@@ -43,7 +43,7 @@ public class Authentication  {
 @XmlEnum(String.class)
 public enum TypeEnum {
 
-    @XmlEnumValue("CLIENT_CREDENTIAL") CLIENT_CREDENTIAL(String.valueOf("CLIENT_CREDENTIAL")), @XmlEnumValue("BASIC") BASIC(String.valueOf("BASIC")), @XmlEnumValue("API_KEY") API_KEY(String.valueOf("API_KEY")), @XmlEnumValue("BEARER") BEARER(String.valueOf("BEARER"));
+    @XmlEnumValue("CLIENT_CREDENTIAL") CLIENT_CREDENTIAL(String.valueOf("CLIENT_CREDENTIAL")), @XmlEnumValue("BASIC") BASIC(String.valueOf("BASIC")), @XmlEnumValue("API_KEY") API_KEY(String.valueOf("API_KEY")), @XmlEnumValue("BEARER") BEARER(String.valueOf("BEARER")), @XmlEnumValue("NONE") NONE(String.valueOf("NONE"));
 
 
     private String value;

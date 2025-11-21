@@ -1212,8 +1212,10 @@ components:
           ``{
             "type": "CLIENT_CREDENTIAL",
             "properties": {
-              "username": "auth_username",
-              "password": "auth_password"
+              "clientId": "3e172dd2-901b-43a9-a26a-728466795f01",
+              "clientSecret": "83cdc120-ccf6-4163-a4a8-c1ba3e872daa",
+              "tokenEndpoint": "https://custom.idp.com/todos",
+              "scopes": "send_scope"
             }
           }`` 
         - BASIC: Username and password based authentication.<br>
@@ -1249,6 +1251,7 @@ components:
             - BASIC
             - API_KEY
             - BEARER
+            - NONE
           example: CLIENT_CREDENTIAL
         properties:
           type: object

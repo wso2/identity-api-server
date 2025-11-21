@@ -35,6 +35,7 @@ import org.wso2.carbon.identity.api.server.notification.sender.v2.model.PushSend
 import org.wso2.carbon.identity.api.server.notification.sender.v2.model.SMSSender;
 import org.wso2.carbon.identity.api.server.notification.sender.v2.model.SMSSenderAdd;
 import org.wso2.carbon.identity.api.server.notification.sender.v2.model.SMSSenderUpdateRequest;
+import org.wso2.carbon.identity.notification.sender.tenant.config.dto.Authentication.Property;
 import org.wso2.carbon.identity.notification.sender.tenant.config.dto.EmailSenderDTO;
 import org.wso2.carbon.identity.notification.sender.tenant.config.dto.PushSenderDTO;
 import org.wso2.carbon.identity.notification.sender.tenant.config.dto.SMSSenderDTO;
@@ -43,9 +44,9 @@ import org.wso2.carbon.identity.notification.sender.tenant.config.exception.Noti
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -429,6 +430,9 @@ public class NotificationSenderManagementService {
 
     private SMSSender buildSMSSenderFromDTO(SMSSenderDTO dto) {
 
+        Set<Property> authPropToExclude = new HashSet<>(
+                Arrays.asList(Property.PASSWORD, Property.CLIENT_SECRET, Property.ACCESS_TOKEN, Property.VALUE));
+
         SMSSender smsSender = new SMSSender();
         smsSender.setName(dto.getName());
         smsSender.setProvider(dto.getProvider());
@@ -437,11 +441,16 @@ public class NotificationSenderManagementService {
         smsSender.setSecret(dto.getSecret());
         smsSender.setSender(dto.getSender());
         smsSender.setContentType(SMSSender.ContentTypeEnum.valueOf(dto.getContentType()));
+
         if (dto.getAuthentication() != null) {
+            Map<String, Object> filteredAuthProp = dto.getAuthentication().getProperties().entrySet().stream()
+                .filter(entry -> !authPropToExclude.contains(Property.valueOf(entry.getKey())))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
             smsSender.setAuthentication(new Authentication()
                     .type(Authentication.TypeEnum.fromValue(dto.getAuthentication().getType().getName()))
-                    .properties(new HashMap<>(dto.getAuthentication().getProperties())));
+                    .properties(filteredAuthProp));
         }
+
         List<Properties> properties = new ArrayList<>();
         dto.getProperties().forEach((key, value) -> {
             Properties prop = new Properties();
