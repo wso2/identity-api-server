@@ -2049,7 +2049,7 @@ public class ServerClaimManagementService {
 
         Optional<LocalClaim>
                 existingLocalClaim = getClaimMetadataManagementService().getLocalClaim(base64DecodeId(claimID),
-                ContextLoader.getTenantDomainFromContext());
+                ContextLoader.getTenantDomainFromContext(), true);
 
         if (!existingLocalClaim.isPresent()) {
             throw handleClaimManagementClientError(ERROR_CODE_LOCAL_CLAIM_NOT_FOUND, BAD_REQUEST, claimID);
