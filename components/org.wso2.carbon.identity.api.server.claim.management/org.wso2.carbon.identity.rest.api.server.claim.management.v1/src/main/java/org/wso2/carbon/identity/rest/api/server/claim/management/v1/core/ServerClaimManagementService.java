@@ -2142,6 +2142,16 @@ public class ServerClaimManagementService {
                         .ERROR_CODE_ERROR_SERIALIZING_INPUT_FORMAT), e);
             }
         }
+
+        if (!incomingLocalClaim.getClaimProperties().containsKey(MANAGED_IN_USER_STORE_PROPERTY)
+                && localClaim.getClaimProperties().containsKey(MANAGED_IN_USER_STORE_PROPERTY)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(String.format("Populating the '%s' property from the existing local claim for claim URI: %s",
+                        MANAGED_IN_USER_STORE_PROPERTY, localClaim.getClaimURI()));
+            }
+            incomingLocalClaim.setClaimProperty(MANAGED_IN_USER_STORE_PROPERTY,
+                    localClaim.getClaimProperty(MANAGED_IN_USER_STORE_PROPERTY));
+        }
     }
 
     private String handleAdditionalProperties(Map<String, String> claimProperties, String propertyName) {
