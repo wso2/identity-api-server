@@ -43,62 +43,107 @@ public class DebugService {
     }
 
     /**
-     * Generates OAuth 2.0 authorization URL for debug flow using headless browser simulation.
-     * This method delegates to the debug framework's OAuth2ContextResolver and OAuth2Executor.
+     * Handles generic debug request for any resource type with properties.
+     * Delegates to the appropriate debug handler based on resource type.
      *
-     * @param idpId Identity Provider resource ID.
-     * @param authenticatorName Optional authenticator name.
-     * @param redirectUri Optional custom redirect URI.
-     * @param scope Optional OAuth 2.0 scope.
-     * @param additionalParams Optional additional OAuth 2.0 parameters.
-     * @return OAuth 2.0 authorization URL and session information.
+     * @param resourceId Resource ID to debug.
+     * @param resourceType Type of resource (IDP, APPLICATION, CONNECTOR, etc.).
+     * @param properties Generic properties map for the debug request (optional).
+     * @return Debug result containing session information and status.
      */
-    public Map<String, Object> generateOAuth2AuthorizationUrl(String idpId, String authenticatorName, 
-                                                              String redirectUri, String scope, 
-                                                              Map<String, String> additionalParams) {
+    public Map<String, Object> handleGenericDebugRequest(String resourceId, String resourceType,
+                                                         java.util.Map<String, String> properties) {
         try {
             // Check if debug framework is available.
             if (!DebugFrameworkServiceHolder.isDebugFrameworkAvailable()) {
                 throw new RuntimeException("Debug framework services are not available");
             }
             
-            // Get the OAuth2ContextResolver.
-            Object contextResolver = DebugFrameworkServiceHolder.getDebugContextResolver();
-            if (contextResolver == null) {
-                throw new RuntimeException("DebugContextResolver not available");
+            // Get the DebugRequestCoordinator for centralized request handling.
+            Object requestCoordinator = DebugFrameworkServiceHolder.getDebugRequestCoordinator();
+            if (requestCoordinator == null) {
+                throw new RuntimeException("DebugRequestCoordinator not available");
             }
             
-            // Build authentication context map with IdP and OAuth2 configuration.
-            Map<String, Object> authenticationContext = new HashMap<>();
-            authenticationContext.put("idpName", idpId);
-            authenticationContext.put("authenticatorName", authenticatorName != null ? authenticatorName : "oauth2");
-            // TODO: Extract actual IdP configuration (endpoints, client credentials, etc.)
-            // For now, these would come from IdP configuration store.
+            // Build generic debug request context.
+            Map<String, Object> debugRequestContext = new HashMap<>();
+            debugRequestContext.put("resourceId", resourceId);
+            debugRequestContext.put("resourceType", resourceType);
+            debugRequestContext.put("properties", properties != null ? properties : new HashMap<String, String>());
+            debugRequestContext.put("requestType", "GENERIC_DEBUG_REQUEST");
             
-            // Invoke resolveContext method on OAuth2ContextResolver.
-            Object oauth2Context = DebugFrameworkServiceHolder.invokeDebugContextResolverMethod(
-                contextResolver,
-                "resolveContext",
+            // Delegate to DebugRequestCoordinator to handle the debug request.
+            // The coordinator will detect the resource type and route to appropriate handler.
+            Object debugResult = DebugFrameworkServiceHolder.invokeDebugRequestCoordinatorMethod(
+                requestCoordinator,
+                "handleResourceDebugRequest",
                 new Class<?>[]{Map.class},
-                authenticationContext
+                debugRequestContext
             );
             
-            if (oauth2Context == null) {
-                throw new RuntimeException("Failed to resolve OAuth2 context");
+            if (debugResult == null) {
+                throw new RuntimeException("Debug request returned null result");
             }
             
-            // Get the OAuth2Executor.
-            Object executor = DebugFrameworkServiceHolder.getDebugExecutor();
-            if (executor == null) {
-                throw new RuntimeException("DebugExecutor not available");
+            // Extract the result details using reflection.
+            Map<String, Object> resultMap = extractDebugResultData(debugResult);
+            
+            // Add additional metadata.
+            resultMap.put("timestamp", System.currentTimeMillis());
+            resultMap.put("resourceId", resourceId);
+            resultMap.put("resourceType", resourceType);
+            resultMap.put("status", resultMap.getOrDefault("status", "SUCCESS"));
+            
+            return resultMap;
+            
+        } catch (RuntimeException e) {
+            String sanitizedMessage = e.getMessage() != null ? e.getMessage().replaceAll("[\r\n]", "") : "";
+            log.error("Runtime error in generic debug request for resource: " + sanitizedMessage, e);
+            throw e;
+        } catch (Exception e) {
+            String sanitizedMessage = e.getMessage() != null ? e.getMessage().replaceAll("[\r\n]", "") : "";
+            log.error("Unexpected error in generic debug request: " + sanitizedMessage, e);
+            throw new RuntimeException("Failed to process generic debug request: " + sanitizedMessage, e);
+        }
+    }
+
+    /**
+     * Generates OAuth 2.0 authorization URL for debug flow using headless browser simulation.
+     * This method delegates to the debug framework's DebugRequestCoordinator which handles
+     * protocol-agnostic request routing and coordinates context resolution and execution.
+     *
+     * @param idpId Identity Provider resource ID.
+     * @param properties Optional properties for OAuth 2.0 configuration.
+     * @return OAuth 2.0 authorization URL and session information.
+     */
+    public Map<String, Object> generateOAuth2AuthorizationUrl(String idpId, 
+                                                              Map<String, String> properties) {
+        try {
+            // Check if debug framework is available.
+            if (!DebugFrameworkServiceHolder.isDebugFrameworkAvailable()) {
+                throw new RuntimeException("Debug framework services are not available");
             }
             
-            // Invoke execute method on OAuth2Executor (standard DebugExecutor interface).
-            Object authUrlResult = DebugFrameworkServiceHolder.invokeDebugExecutorMethod(
-                executor,
-                "execute",
+            // Get the DebugRequestCoordinator for centralized request handling.
+            Object requestCoordinator = DebugFrameworkServiceHolder.getDebugRequestCoordinator();
+            if (requestCoordinator == null) {
+                throw new RuntimeException("DebugRequestCoordinator not available");
+            }
+            
+            // Build debug request context with IdP and OAuth2 configuration.
+            Map<String, Object> debugRequestContext = new HashMap<>();
+            debugRequestContext.put("idpId", idpId);
+            debugRequestContext.put("properties", properties != null ? properties : new HashMap<String, String>());
+            debugRequestContext.put("requestType", "INITIAL_DEBUG_REQUEST");
+            
+            // Delegate to DebugRequestCoordinator to handle protocol-specific routing.
+            // The coordinator will detect the protocol, load appropriate context resolver,
+            // execute the flow, and return the authorization URL.
+            Object authUrlResult = DebugFrameworkServiceHolder.invokeDebugRequestCoordinatorMethod(
+                requestCoordinator,
+                "handleInitialDebugRequest",
                 new Class<?>[]{Map.class},
-                oauth2Context
+                debugRequestContext
             );
             
             if (authUrlResult == null) {
@@ -110,8 +155,7 @@ public class DebugService {
             
             // Add additional metadata.
             resultMap.put("timestamp", System.currentTimeMillis());
-            resultMap.put("idpName", idpId);
-            resultMap.put("authenticatorName", authenticatorName != null ? authenticatorName : "oauth2");
+            resultMap.put("idpId", idpId);
             resultMap.put("status", "SUCCESS");
             
             return resultMap;

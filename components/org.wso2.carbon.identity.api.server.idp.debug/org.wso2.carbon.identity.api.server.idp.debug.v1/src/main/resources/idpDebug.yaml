@@ -23,10 +23,56 @@ servers:
         description: "The tenant domain."
 
 paths:
+  /debug:
+    post:
+      summary: "Start Generic Debug Flow"
+      description: "Initiates a generalized debug flow for any resource type with configurable properties."
+      operationId: "startGenericDebug"
+      tags:
+        - "Debug"
+      requestBody:
+        description: "Generic debug request with resource ID, resource type, and properties."
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenericDebugRequest"
+      responses:
+        '200':
+          description: "Debug flow initiated successfully."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DebugConnectionResponse"
+        '400':
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '401':
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '403':
+          description: "Forbidden"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '500':
+          description: "Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
   /debug/connection/{idp-id}:
     post:
       summary: "Start IDP Debug Flow"
-      description: "Initiates the debug flow for a specific Identity Provider."
+      description: "Initiates the debug flow for a specific Identity Provider. (Deprecated: Use POST /debug for generic testing)"
       operationId: "startIdpDebug"
       tags:
         - "Debug"
@@ -125,6 +171,32 @@ paths:
 
 components:
   schemas:
+    # ---------------
+    # Generic Debug
+    # ---------------
+    GenericDebugRequest:
+      type: object
+      required:
+        - resourceId
+        - resourceType
+      description: "Generic debug request for testing various resource types and properties."
+      properties:
+        resourceId:
+          type: string
+          description: "Resource ID to debug (e.g., Identity Provider ID, Application ID)."
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        resourceType:
+          type: string
+          description: "Type of resource to debug (e.g., IDP, APPLICATION, CONNECTOR)."
+          example: "IDP"
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+          description: "Generic properties for resource debugging as key-value pairs (optional)."
+          example:
+            "authenticatorName": "OpenIDConnectAuthenticator"
+
     # -------------
     # Common Error
     # -------------
@@ -183,27 +255,35 @@ components:
     DebugConnectionResponse:
       type: object
       properties:
-        sessionId:
+        result:
+          $ref: "#/components/schemas/DebugResult"
+      description: "Debug connection response wrapping the debug result object."
+
+    DebugResult:
+      type: object
+      properties:
+        debugId:
           type: string
           description: "Debug session ID."
-          example: "debug-session-12345"
+          example: "debug-496f5a3f-0094-42f2-8188-d2baa9a1287c"
         authorizationUrl:
           type: string
           description: "OAuth 2.0 authorization URL for user authentication."
-          example: "https://accounts.google.com/oauth/authorize?..."
+          example: "https://api.asgardeo.io/t/linuka/oauth2/authorize?response_type=code&client_id=lfrTEyDGHBEUbeBKoiaosz1y8Aca&redirect_uri=https%3A%2F%2Flocalhost%3A9443%2Fcommonauth"
         status:
           type: string
           description: "Status of the debug operation."
-          example: "URL_GENERATED"
+          enum: ["SUCCESS", "IN_PROGRESS", "FAILURE", "DIRECT_RESULT"]
+          example: "SUCCESS"
         message:
           type: string
           description: "Response message."
           example: "OAuth 2.0 authorization URL generated successfully"
-        metadata:
-          type: object
-          additionalProperties:
-            type: string
-          description: "Additional metadata about the debug operation."
+        timestamp:
+          type: integer
+          format: int64
+          description: "Timestamp when the debug operation was processed."
+          example: 1763700680541
 
     # -----------------------------
     # GET /debug/result/{session-id}

@@ -71,14 +71,25 @@ public class DebugApi {
             @ApiParam(value = "Session ID (state)", required = true)
 
             @PathParam("session-id") String sessionId) {
+       
+        // Try lookup with the session ID as-is first (works for contextId with hyphens)
         String resultJson = getDebugResultFromCache(sessionId);
+        
+        // If not found, try with normalized format (removes hyphens for state parameter)
+        if (resultJson == null) {
+            String normalizedSessionId = normalizeSessionId(sessionId);
+            resultJson = getDebugResultFromCache(normalizedSessionId);
+        }
+        
         if (resultJson != null) {
             // Parse the JSON result and enrich with step status metadata if needed.
             try {
                 // Use Jackson for JSON parsing (assume available in project).
                 ObjectMapper mapper = new ObjectMapper();
+                @SuppressWarnings("unchecked")
                 java.util.Map<String, Object> resultMap = mapper.readValue(resultJson, java.util.Map.class);
                 // Check for metadata and step status fields.
+                @SuppressWarnings("unchecked")
                 java.util.Map<String, Object> metadata = (java.util.Map<String, Object>) resultMap.get("metadata");
                 if (metadata == null || metadata.isEmpty()) {
                     metadata = new java.util.HashMap<>();
@@ -96,17 +107,39 @@ public class DebugApi {
                 String enrichedJson = mapper.writeValueAsString(resultMap);
                 return Response.ok(enrichedJson).build();
             } catch (Exception e) {
-                // Log the exception and return an error response.
-                String sanitizedSessionId = sessionId != null ? sessionId.replaceAll("[\r\n]", "") : "null";
-                org.apache.commons.logging.LogFactory.getLog(DebugApi.class)
-                        .error("Error processing debug result for session ID: " + sanitizedSessionId, e);
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                         .entity("Failed to process debug result.")
                         .build();
             }
         } else {
-            return Response.status(Response.Status.NOT_FOUND).entity("Debug result not found").build();
+            return createNotFoundResponse(sessionId);
         }
+    }
+
+    /**
+     * Normalizes the session ID by removing hyphens from UUID format.
+     * Handles both formats:
+     * - debug-d045722f-2c10-4c18-97ca-4f38befef4e4 (with hyphens) 
+     * - debug-d04572f2c104c1897ca4f38befef4e4 (without hyphens)
+     * 
+     * Always converts to: debug-<32-char-hex-UUID-no-hyphens>
+     * 
+     * @param sessionId The session ID to normalize.
+     * @return Normalized session ID without hyphens in UUID part.
+     */
+    private String normalizeSessionId(String sessionId) {
+        if (sessionId == null || !sessionId.startsWith("debug-")) {
+            return sessionId;
+        }
+        
+        // Extract everything after "debug-" prefix
+        String uuidPart = sessionId.substring(6);
+        
+        // Remove ALL hyphens from the UUID part
+        String normalizedUuid = uuidPart.replaceAll("-", "");
+        
+        // Return normalized format: debug-<32-char-uuid-without-hyphens>
+        return "debug-" + normalizedUuid;
     }
 
     /**
@@ -121,6 +154,11 @@ public class DebugApi {
                     "org.wso2.carbon.identity.debug.framework.core.cache.DebugResultCache");
             java.lang.reflect.Method getMethod = cacheClass.getMethod("get", String.class);
             Object result = getMethod.invoke(null, sessionId);
+            
+            org.apache.commons.logging.LogFactory.getLog(DebugApi.class)
+                    .info("Retrieving debug result from cache for session ID: " + sessionId + 
+                          ", result: " + (result != null ? "found" : "not found"));
+            
             return (String) result;
         } catch (Exception e) {
             org.apache.commons.logging.LogFactory.getLog(DebugApi.class)
@@ -129,19 +167,35 @@ public class DebugApi {
         }
     }
 
+    /**
+     * Creates an error response for missing debug results.
+     *
+     * @param sessionId The session ID that was not found.
+     * @return Error response with appropriate HTTP status.
+     */
+    private Response createNotFoundResponse(String sessionId) {
+        Error errorResponse = new Error();
+        errorResponse.setCode("DEBUG_RESULT_NOT_FOUND");
+        errorResponse.setMessage("Debug result not found");
+        errorResponse.setDescription("No debug result found for session ID: " + sessionId + 
+                ". The debug session may have expired or the session ID is invalid.");
+        
+        return Response.status(Response.Status.NOT_FOUND).entity(errorResponse).build();
+    }
+
     @Valid
     @POST
-    @Path("/connection/{idp-id}")
+    @Path("")
     @Consumes({"application/json"})
     @Produces({"application/json"})
-    @ApiOperation(value = "Debug IdP connection",
-            notes = "Debug identity provider connections.",
+    @ApiOperation(value = "Start debug session",
+            notes = "Initiates a debug session for any resource type and properties.",
             response = DebugConnectionResponse.class,
             authorizations = {
                     @Authorization(value = "BasicAuth"),
                     @Authorization(value = "OAuth2", scopes = {})
             },
-            tags = {"Identity Provider Debug"})
+            tags = {"Debug"})
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successful response",
                     response = DebugConnectionResponse.class),
@@ -151,11 +205,9 @@ public class DebugApi {
             @ApiResponse(code = 404, message = "Not Found", response = Error.class),
             @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response debugConnection(
-            @ApiParam(value = "ID of the identity provider", required = true)
-            @PathParam("idp-id") String idpId,
-            @ApiParam(value = "Debug connection request", required = true)
-            @Valid DebugConnectionRequest debugConnectionRequest) {
-        return delegate.debugConnection(idpId, debugConnectionRequest);
+    public Response startDebugSession(
+            @ApiParam(value = " Debug request with resourceId, resourceType, and properties", required = true)
+            @Valid DebugConnectionRequest debugRequest) {
+        return delegate.startDebugSession(debugRequest);
     }
 }

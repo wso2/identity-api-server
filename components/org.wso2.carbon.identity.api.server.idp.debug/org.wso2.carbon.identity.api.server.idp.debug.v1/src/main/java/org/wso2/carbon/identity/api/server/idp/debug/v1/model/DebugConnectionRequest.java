@@ -22,34 +22,24 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-
-
 /**
- * Debug connection request model for IdP OAuth 2.0 authentication testing.
- * Contains parameters for OAuth 2.0 authorization URL generation.
+ * Debug request model for testing authentication flows and resources.
+ * Supports both IdP OAuth 2.0 authentication testing and generic resource debugging.
  */
-@ApiModel(description = "Debug connection request for IdP OAuth 2.0 authentication testing")
+@ApiModel(description = "Debug request for authentication flow and resource testing")
 public class DebugConnectionRequest {
 
-    @ApiModelProperty(value = "Optional authenticator name to use for testing")
-    @JsonProperty("authenticatorName")
-    private String authenticatorName;
+    @ApiModelProperty(value = "Resource ID to debug (e.g., Identity Provider ID)", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
+    @JsonProperty("resourceId")
+    private String resourceId;
 
-    @ApiModelProperty(value = "Custom redirect URI for OAuth 2.0 callback (optional)")
-    @JsonProperty("redirectUri")
-    private String redirectUri;
+    @ApiModelProperty(value = "Resource type to debug (e.g., IDP, APPLICATION, CONNECTOR)", required = true, example = "IDP")
+    @JsonProperty("resourceType")
+    private String resourceType;
 
-    @ApiModelProperty(value = "Custom OAuth 2.0 scope (optional)", example = "openid profile email")
-    @JsonProperty("scope")
-    private String scope;
-
-    @ApiModelProperty(value = "Request timeout in seconds", example = "30")
-    @JsonProperty("timeoutSeconds")
-    private Integer timeoutSeconds = 30;
-
-    @ApiModelProperty(value = "Additional OAuth 2.0 parameters as key-value pairs")
-    @JsonProperty("additionalParams")
-    private java.util.Map<String, String> additionalParams;
+    @ApiModelProperty(value = "Generic properties for resource debugging as key-value pairs (optional)", example = "{\"authenticatorName\": \"OpenIDConnectAuthenticator\"}")
+    @JsonProperty("properties")
+    private java.util.Map<String, String> properties;
 
     /**
      * Default constructor.
@@ -59,112 +49,90 @@ public class DebugConnectionRequest {
     }
 
     /**
-     * Constructor with authenticator name.
+     * Constructor with resource ID and type.
      *
-     * @param authenticatorName Authenticator name for OAuth 2.0 test.
+     * @param resourceId The resource ID to debug.
+     * @param resourceType The type of resource to debug.
      */
-    public DebugConnectionRequest(String authenticatorName) {
-        this.authenticatorName = authenticatorName;
+    public DebugConnectionRequest(String resourceId, String resourceType) {
+        this.resourceId = resourceId;
+        this.resourceType = resourceType;
     }
 
     /**
-     * Gets the redirect URI.
+     * Constructor with all fields.
      *
-     * @return Redirect URI.
+     * @param resourceId The resource ID to debug.
+     * @param resourceType The type of resource to debug.
+     * @param properties Generic properties for debugging.
      */
-    public String getRedirectUri() {
-        return redirectUri;
+    public DebugConnectionRequest(String resourceId, String resourceType, java.util.Map<String, String> properties) {
+        this.resourceId = resourceId;
+        this.resourceType = resourceType;
+        this.properties = properties;
     }
 
     /**
-     * Sets the redirect URI.
+     * Gets the resource ID.
      *
-     * @param redirectUri Redirect URI to set.
+     * @return Resource ID.
      */
-    public void setRedirectUri(String redirectUri) {
-        this.redirectUri = redirectUri;
+    public String getResourceId() {
+        return resourceId;
     }
 
     /**
-     * Gets the OAuth 2.0 scope.
+     * Sets the resource ID.
      *
-     * @return OAuth 2.0 scope.
+     * @param resourceId Resource ID to set.
      */
-    public String getScope() {
-        return scope;
+    public void setResourceId(String resourceId) {
+        this.resourceId = resourceId;
     }
 
     /**
-     * Sets the OAuth 2.0 scope.
+     * Gets the resource type.
      *
-     * @param scope OAuth 2.0 scope to set.
+     * @return Resource type.
      */
-    public void setScope(String scope) {
-        this.scope = scope;
+    public String getResourceType() {
+        return resourceType;
     }
 
     /**
-     * Gets the additional OAuth 2.0 parameters.
+     * Sets the resource type.
      *
-     * @return Additional OAuth 2.0 parameters.
+     * @param resourceType Resource type to set.
      */
-    public java.util.Map<String, String> getAdditionalParams() {
-        return additionalParams;
+    public void setResourceType(String resourceType) {
+        this.resourceType = resourceType;
     }
 
     /**
-     * Sets the additional OAuth 2.0 parameters.
+     * Gets the properties map.
      *
-     * @param additionalParams Additional OAuth 2.0 parameters to set.
+     * @return Properties map.
      */
-    public void setAdditionalParams(java.util.Map<String, String> additionalParams) {
-        this.additionalParams = additionalParams;
+    public java.util.Map<String, String> getProperties() {
+        return properties;
     }
 
     /**
-     * Gets the authenticator name.
+     * Sets the properties map.
      *
-     * @return Authenticator name.
+     * @param properties Properties map to set.
      */
-    public String getAuthenticatorName() {
-        return authenticatorName;
-    }
-
-    /**
-     * Sets the authenticator name.
-     *
-     * @param authenticatorName Authenticator name to set.
-     */
-    public void setAuthenticatorName(String authenticatorName) {
-        this.authenticatorName = authenticatorName;
-    }
-
-    /**
-     * Gets the timeout in seconds.
-     *
-     * @return Timeout in seconds.
-     */
-    public Integer getTimeoutSeconds() {
-        return timeoutSeconds;
-    }
-
-    /**
-     * Sets the timeout in seconds.
-     *
-     * @param timeoutSeconds Timeout in seconds to set.
-     */
-    public void setTimeoutSeconds(Integer timeoutSeconds) {
-        this.timeoutSeconds = timeoutSeconds;
+    public void setProperties(java.util.Map<String, String> properties) {
+        this.properties = properties;
     }
 
     @Override
     public String toString() {
         return "DebugConnectionRequest{" +
-                "authenticatorName='" + authenticatorName + '\'' +
-                ", redirectUri='" + redirectUri + '\'' +
-                ", scope='" + scope + '\'' +
-                ", timeoutSeconds=" + timeoutSeconds +
-                ", additionalParams=" + additionalParams +
+                "resourceId='" + resourceId + '\'' +
+                ", resourceType='" + resourceType + '\'' +
+                ", properties=" + properties +
                 '}';
     }
 }
+

@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.idp.debug.v1.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -26,33 +27,14 @@ import java.util.Map;
 
 /**
  * Debug connection response model for IdP OAuth 2.0 authentication testing results.
+ * Wraps the debug operation result in a 'result' object for consistent structure.
  */
 @ApiModel(description = "Debug connection response for IdP OAuth 2.0 authentication testing results")
 public class DebugConnectionResponse {
 
-    @ApiModelProperty(value = "Debug session ID", example = "debug-session-12345")
-    @JsonProperty("sessionId")
-    private String sessionId;
-
-    @ApiModelProperty(value = "OAuth 2.0 authorization URL for user authentication", 
-                      example = "https://accounts.google.com/oauth/authorize?response_type=code&client_id=123"
-                               + "&redirect_uri=https%3A%2F%2Flocalhost%3A9443%2Fcommonauth"
-                               + "&scope=openid+profile+email&state=debug-session-12345"
-                               + "&code_challenge=abc123&code_challenge_method=S256")
-    @JsonProperty("authorizationUrl")
-    private String authorizationUrl;
-
-    @ApiModelProperty(value = "Status of the debug operation", example = "URL_GENERATED")
-    @JsonProperty("status")
-    private String status;
-
-    @ApiModelProperty(value = "Response message", example = "OAuth 2.0 authorization URL generated successfully")
-    @JsonProperty("message")
-    private String message;
-
-    @ApiModelProperty(value = "Additional metadata about the debug operation")
-    @JsonProperty("metadata")
-    private Map<String, Object> metadata;
+    @ApiModelProperty(value = "Debug operation result containing sessionId, authorizationUrl, status, and metadata")
+    @JsonProperty("result")
+    private DebugResult result;
 
     /**
      * Default constructor.
@@ -62,103 +44,159 @@ public class DebugConnectionResponse {
     }
 
     /**
-     * Gets the session ID.
+     * Gets the debug result.
      *
-     * @return Session ID.
+     * @return Debug result.
      */
-    public String getSessionId() {
-        return sessionId;
+    public DebugResult getResult() {
+        return result;
     }
 
     /**
-     * Sets the session ID.
+     * Sets the debug result.
      *
-     * @param sessionId Session ID to set.
+     * @param result Debug result to set.
      */
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
+    public void setResult(DebugResult result) {
+        this.result = result;
     }
 
     /**
-     * Gets the OAuth 2.0 authorization URL.
+     * Gets the debug ID from result.
+     *
+     * @return Debug ID.
+     */
+    @JsonIgnore
+    public String getDebugId() {
+        return result != null ? result.getDebugId() : null;
+    }
+
+    /**
+     * Sets the debug ID in result.
+     *
+     * @param debugId Debug ID to set.
+     */
+    public void setDebugId(String debugId) {
+        if (this.result == null) {
+            this.result = new DebugResult();
+        }
+        this.result.setDebugId(debugId);
+    }
+
+    /**
+     * Gets the authorization URL from result.
      *
      * @return Authorization URL.
      */
+    @JsonIgnore
     public String getAuthorizationUrl() {
-        return authorizationUrl;
+        return result != null ? result.getAuthorizationUrl() : null;
     }
 
     /**
-     * Sets the OAuth 2.0 authorization URL.
+     * Sets the authorization URL in result.
      *
      * @param authorizationUrl Authorization URL to set.
      */
     public void setAuthorizationUrl(String authorizationUrl) {
-        this.authorizationUrl = authorizationUrl;
+        if (this.result == null) {
+            this.result = new DebugResult();
+        }
+        this.result.setAuthorizationUrl(authorizationUrl);
     }
 
     /**
-     * Gets the status.
+     * Gets the status from result.
      *
      * @return Status.
      */
+    @JsonIgnore
     public String getStatus() {
-        return status;
+        return result != null ? result.getStatus() : null;
     }
 
     /**
-     * Sets the status.
+     * Sets the status in result.
      *
      * @param status Status to set.
      */
     public void setStatus(String status) {
-        this.status = status;
+        if (this.result == null) {
+            this.result = new DebugResult();
+        }
+        this.result.setStatus(status);
     }
 
     /**
-     * Gets the message.
+     * Gets the message from result.
      *
      * @return Message.
      */
+    @JsonIgnore
     public String getMessage() {
-        return message;
+        return result != null ? result.getMessage() : null;
     }
 
     /**
-     * Sets the message.
+     * Sets the message in result.
      *
      * @param message Message to set.
      */
     public void setMessage(String message) {
-        this.message = message;
+        if (this.result == null) {
+            this.result = new DebugResult();
+        }
+        this.result.setMessage(message);
     }
 
     /**
-     * Gets the metadata.
+     * Gets the metadata from result.
      *
      * @return Metadata.
      */
+    @JsonIgnore
     public Map<String, Object> getMetadata() {
-        return metadata;
+        return result != null ? result.getMetadata() : null;
     }
 
     /**
-     * Sets the metadata.
+     * Sets the metadata in result.
      *
      * @param metadata Metadata to set.
      */
     public void setMetadata(Map<String, Object> metadata) {
-        this.metadata = metadata;
+        if (this.result == null) {
+            this.result = new DebugResult();
+        }
+        this.result.setMetadata(metadata);
+    }
+
+    /**
+     * Gets the timestamp from result.
+     *
+     * @return Timestamp.
+     */
+    @JsonIgnore
+    public Long getTimestamp() {
+        return result != null ? result.getTimestamp() : null;
+    }
+
+    /**
+     * Sets the timestamp in result.
+     *
+     * @param timestamp Timestamp to set.
+     */
+    public void setTimestamp(Long timestamp) {
+        if (this.result == null) {
+            this.result = new DebugResult();
+        }
+        this.result.setTimestamp(timestamp);
     }
 
     @Override
     public String toString() {
         return "DebugConnectionResponse{" +
-                "sessionId='" + sessionId + '\'' +
-                ", authorizationUrl='" + authorizationUrl + '\'' +
-                ", status='" + status + '\'' +
-                ", message='" + message + '\'' +
-                ", metadata=" + metadata +
+                "result=" + result +
                 '}';
     }
 }

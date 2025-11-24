@@ -53,7 +53,7 @@ public class DebugApiServiceImpl {
      * Generates authorization URL for user authentication.
      *
      * @param idpId Identity Provider ID from path parameter.
-     * @param debugConnectionRequest Debug connection request containing OAuth 2.0 parameters.
+     * @param debugConnectionRequest Debug connection request.
      * @return Response containing OAuth 2.0 authorization URL and session information.
      */
     public Response debugConnection(String idpId, DebugConnectionRequest debugConnectionRequest) {
@@ -69,22 +69,16 @@ public class DebugApiServiceImpl {
                     ? java.text.Normalizer.normalize(idpId, java.text.Normalizer.Form.NFC)
                     : null;
 
-            // Extract OAuth 2.0 parameters from request (all optional).
-            String authenticatorName = null;
-            String redirectUri = null;
-            String scope = null;
-            Map<String, String> additionalParams = null;
+            // Extract properties from request (optional).
+            Map<String, String> properties = null;
             
             if (debugConnectionRequest != null) {
-                authenticatorName = debugConnectionRequest.getAuthenticatorName();
-                redirectUri = debugConnectionRequest.getRedirectUri();
-                scope = debugConnectionRequest.getScope();
-                additionalParams = debugConnectionRequest.getAdditionalParams();
+                properties = debugConnectionRequest.getProperties();
             }
 
             // Generate OAuth 2.0 authorization URL using the service layer.
             Map<String, Object> oauth2Result = debugService.generateOAuth2AuthorizationUrl(
-                normalizedIdpId, authenticatorName, redirectUri, scope, additionalParams
+                normalizedIdpId, properties
             );
 
             // Create OAuth 2.0 response.
@@ -119,14 +113,9 @@ public class DebugApiServiceImpl {
      */
     private Response createErrorResponse(String errorCode, String errorMessage, Response.Status status) {
         DebugConnectionResponse errorResponse = new DebugConnectionResponse();
-        errorResponse.setSessionId(java.util.UUID.randomUUID().toString());
+        errorResponse.setDebugId(java.util.UUID.randomUUID().toString());
         errorResponse.setStatus("FAILURE");
         errorResponse.setMessage(errorMessage);
-
-        Map<String, Object> errorDetails = new HashMap<>();
-        errorDetails.put("code", errorCode);
-        errorDetails.put("message", errorMessage);
-        errorResponse.setMetadata(errorDetails);
 
         return Response.status(status).entity(errorResponse).build();
     }
@@ -142,22 +131,31 @@ public class DebugApiServiceImpl {
         DebugConnectionResponse response = new DebugConnectionResponse();
         
         // Set basic response data.
-        response.setSessionId((String) oauth2Result.get("sessionId"));
+        String debugId = (String) oauth2Result.get("sessionId");
+        if (debugId == null) {
+            debugId = (String) oauth2Result.get("state");
+        }
+        if (debugId == null) {
+            debugId = "debug-" + java.util.UUID.randomUUID().toString().replace("-", "");
+        }
+        response.setDebugId(debugId);
+        
         response.setAuthorizationUrl((String) oauth2Result.get("authorizationUrl"));
         response.setStatus((String) oauth2Result.get("status"));
         response.setMessage((String) oauth2Result.get("message"));
-
-        // Create comprehensive metadata.
-        Map<String, Object> metadata = new HashMap<>();
-        metadata.put("idpId", idpId);
-        metadata.put("idpName", oauth2Result.get("idpName"));
-        metadata.put("authenticatorName", oauth2Result.get("authenticatorName"));
-        metadata.put("timestamp", oauth2Result.get("timestamp"));
-        metadata.put("flow", "OAuth 2.0 Authorization Code with PKCE");
-        metadata.put("nextStep", "Redirect user to authorizationUrl for authentication");
-        metadata.put("callbackEndpoint", "/commonauth");
         
-        response.setMetadata(metadata);
+        // Set timestamp
+        Long timestamp = null;
+        Object timestampObj = oauth2Result.get("timestamp");
+        if (timestampObj instanceof Long) {
+            timestamp = (Long) timestampObj;
+        } else if (timestampObj instanceof Number) {
+            timestamp = ((Number) timestampObj).longValue();
+        } else {
+            timestamp = System.currentTimeMillis();
+        }
+        response.setTimestamp(timestamp);
+
         return response;
     }
 
@@ -173,7 +171,7 @@ public class DebugApiServiceImpl {
         }
         
         switch (errorCode.toUpperCase(java.util.Locale.ROOT)) {
-            case "IDP_NOT_FOUND":
+            case "RESOURCE_NOT_FOUND":
                 return Response.Status.NOT_FOUND;
             case "INVALID_REQUEST":
                 return Response.Status.BAD_REQUEST;

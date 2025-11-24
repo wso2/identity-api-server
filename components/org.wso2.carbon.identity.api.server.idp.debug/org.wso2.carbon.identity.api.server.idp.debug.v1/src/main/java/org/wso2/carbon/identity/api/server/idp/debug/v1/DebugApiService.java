@@ -46,11 +46,58 @@ public class DebugApiService {
     }
 
     /**
+     * Starts a debug session for any resource type with custom properties.
+     * Initiates debugging for the specified resource and generates appropriate response.
+     *
+     * @param debugRequest Debug request containing resourceId, resourceType, and properties.
+     * @return Response containing debug result and session information.
+     */
+    public Response startDebugSession(DebugConnectionRequest debugRequest) {
+        try {
+            // Input validation at API layer.
+            if (debugRequest == null) {
+                return createErrorResponse("INVALID_REQUEST", "Debug request is required", 
+                    Response.Status.BAD_REQUEST);
+            }
+
+            String resourceId = debugRequest.getResourceId();
+            String resourceType = debugRequest.getResourceType();
+
+            if (resourceId == null || resourceId.trim().isEmpty()) {
+                return createErrorResponse("INVALID_REQUEST", "Resource ID is required", 
+                    Response.Status.BAD_REQUEST);
+            }
+
+            if (resourceType == null || resourceType.trim().isEmpty()) {
+                return createErrorResponse("INVALID_REQUEST", "Resource type is required", 
+                    Response.Status.BAD_REQUEST);
+            }
+
+            // Delegate to DebugService for resource-type-specific handling.
+            Map<String, Object> debugResult = debugService.handleGenericDebugRequest(
+                resourceId, resourceType, debugRequest.getProperties()
+            );
+
+            // Create response from debug result.
+            DebugConnectionResponse response = createDebugResponse(debugResult, resourceId, resourceType);
+            return Response.ok(response).build();
+
+        } catch (Exception e) {
+            String sanitizedResourceId = debugRequest != null && debugRequest.getResourceId() != null ? 
+                debugRequest.getResourceId().replaceAll("[\r\n]", "") : "null";
+            LOG.error("Unexpected error in generic debug request for resource: " + sanitizedResourceId, e);
+            return createErrorResponse("INTERNAL_ERROR", 
+                "Failed to process debug request: " + e.getMessage(), 
+                Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
      * Debug IdP connection with OAuth 2.0 flow.
      * Generates authorization URL for user authentication.
      *
      * @param idpId Identity Provider ID from path parameter.
-     * @param debugConnectionRequest Debug connection request containing OAuth 2.0 parameters.
+     * @param debugConnectionRequest Debug connection request.
      * @return Response containing OAuth 2.0 authorization URL and session information.
      */
     public Response debugConnection(String idpId, DebugConnectionRequest debugConnectionRequest) {
@@ -61,22 +108,16 @@ public class DebugApiService {
                     Response.Status.BAD_REQUEST);
             }
 
-            // Extract OAuth 2.0 parameters from request (all optional).
-            String authenticatorName = null;
-            String redirectUri = null;
-            String scope = null;
-            Map<String, String> additionalParams = null;
+            // Extract properties from request if available (all optional).
+            Map<String, String> properties = null;
             
             if (debugConnectionRequest != null) {
-                authenticatorName = debugConnectionRequest.getAuthenticatorName();
-                redirectUri = debugConnectionRequest.getRedirectUri();
-                scope = debugConnectionRequest.getScope();
-                additionalParams = debugConnectionRequest.getAdditionalParams();
+                properties = debugConnectionRequest.getProperties();
             }
 
             // Generate OAuth 2.0 authorization URL using the service layer.
             Map<String, Object> oauth2Result = debugService.generateOAuth2AuthorizationUrl(
-                idpId, authenticatorName, redirectUri, scope, additionalParams
+                idpId, properties
             );
 
             // Create OAuth 2.0 response.
@@ -102,14 +143,9 @@ public class DebugApiService {
      */
     private Response createErrorResponse(String errorCode, String errorMessage, Response.Status status) {
         DebugConnectionResponse errorResponse = new DebugConnectionResponse();
-        errorResponse.setSessionId(java.util.UUID.randomUUID().toString());
+        errorResponse.setDebugId(java.util.UUID.randomUUID().toString());
         errorResponse.setStatus("FAILURE");
         errorResponse.setMessage(errorMessage);
-
-        Map<String, Object> errorDetails = new HashMap<>();
-        errorDetails.put("code", errorCode);
-        errorDetails.put("message", errorMessage);
-        errorResponse.setMetadata(errorDetails);
 
         return Response.status(status).entity(errorResponse).build();
     }
@@ -124,17 +160,17 @@ public class DebugApiService {
     private DebugConnectionResponse createOAuth2Response(Map<String, Object> oauth2Result, String idpId) {
         DebugConnectionResponse response = new DebugConnectionResponse();
         
-        // Extract or generate session ID (state parameter).
-        String sessionId = (String) oauth2Result.get("sessionId");
-        if (sessionId == null) {
+        // Extract or generate debug ID (state parameter).
+        String debugId = (String) oauth2Result.get("sessionId");
+        if (debugId == null) {
             // Fall back to state if sessionId not present (state is what OAuth2Executor returns)
-            sessionId = (String) oauth2Result.get("state");
+            debugId = (String) oauth2Result.get("state");
         }
-        if (sessionId == null) {
-            // Generate a debug session ID if neither present
-            sessionId = "debug-" + java.util.UUID.randomUUID().toString().replace("-", "");
+        if (debugId == null) {
+            // Generate a debug ID if neither present
+            debugId = "debug-" + java.util.UUID.randomUUID().toString().replace("-", "");
         }
-        response.setSessionId(sessionId);
+        response.setDebugId(debugId);
         
         // Set authorization URL
         String authUrl = (String) oauth2Result.get("authorizationUrl");
@@ -143,19 +179,65 @@ public class DebugApiService {
         // Set status and message
         response.setStatus((String) oauth2Result.get("status"));
         response.setMessage((String) oauth2Result.get("message"));
-
-        // Create comprehensive metadata.
-        Map<String, Object> metadata = new HashMap<>();
-        metadata.put("idpId", idpId);
-        metadata.put("idpName", oauth2Result.get("idpName"));
-        metadata.put("authenticatorName", oauth2Result.get("authenticatorName"));
-        metadata.put("timestamp", oauth2Result.get("timestamp"));
-        metadata.put("flow", "OAuth 2.0 Authorization Code with PKCE");
-        metadata.put("nextStep", "Redirect user to authorizationUrl for authentication");
-        metadata.put("callbackEndpoint", "/commonauth");
-        metadata.put("sessionId", sessionId);
         
-        response.setMetadata(metadata);
+        // Set timestamp
+        Long timestamp = null;
+        Object timestampObj = oauth2Result.get("timestamp");
+        if (timestampObj instanceof Long) {
+            timestamp = (Long) timestampObj;
+        } else if (timestampObj instanceof Number) {
+            timestamp = ((Number) timestampObj).longValue();
+        } else {
+            timestamp = System.currentTimeMillis();
+        }
+        response.setTimestamp(timestamp);
+        
+        return response;
+    }
+
+    /**
+     * Creates debug response from generic debug result.
+     *
+     * @param debugResult Debug result from service layer.
+     * @param resourceId Resource ID being debugged.
+     * @param resourceType Resource type being debugged.
+     * @return DebugConnectionResponse with debug information.
+     */
+    private DebugConnectionResponse createDebugResponse(Map<String, Object> debugResult, String resourceId, String resourceType) {
+        DebugConnectionResponse response = new DebugConnectionResponse();
+        
+        // Extract or generate debug ID.
+        String debugId = (String) debugResult.get("sessionId");
+        if (debugId == null) {
+            debugId = (String) debugResult.get("state");
+        }
+        if (debugId == null) {
+            debugId = "debug-" + java.util.UUID.randomUUID().toString().replace("-", "");
+        }
+        response.setDebugId(debugId);
+        
+        // Set authorization URL if available.
+        String authUrl = (String) debugResult.get("authorizationUrl");
+        if (authUrl != null) {
+            response.setAuthorizationUrl(authUrl);
+        }
+        
+        // Set status and message.
+        response.setStatus((String) debugResult.getOrDefault("status", "SUCCESS"));
+        response.setMessage((String) debugResult.getOrDefault("message", "Debug request processed successfully"));
+        
+        // Set timestamp at top level.
+        Long timestamp = null;
+        Object timestampObj = debugResult.get("timestamp");
+        if (timestampObj instanceof Long) {
+            timestamp = (Long) timestampObj;
+        } else if (timestampObj instanceof Number) {
+            timestamp = ((Number) timestampObj).longValue();
+        } else {
+            timestamp = System.currentTimeMillis();
+        }
+        response.setTimestamp(timestamp);
+        
         return response;
     }
 }
