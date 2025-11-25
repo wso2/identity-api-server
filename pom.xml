@@ -864,7 +864,7 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
-                <artifactId>org.wso2.carbon.identity.api.server.user.credential.management.common</artifactId>
+                <artifactId>org.wso2.carbon.identity.api.server.credential.management.common</artifactId>
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>
@@ -1014,7 +1014,7 @@
         <identity.local.auth.fido.version>5.4.26</identity.local.auth.fido.version>
         <identity.notification.push.version>1.0.6</identity.notification.push.version>
 
-        <!-- Organization management core Version -->
+        <!-- Organization management impl Version -->
         <org.wso2.carbon.identity.organization.management.core.version>1.1.41
         </org.wso2.carbon.identity.organization.management.core.version>
         <org.wso2.carbon.identity.organization.management.core.version.range>[1.0.0, 2.0.0)
@@ -1077,7 +1077,7 @@
         <module>components/org.wso2.carbon.identity.api.server.webhook.metadata</module>
         <module>components/org.wso2.carbon.identity.api.server.workflow</module>
         <module>components/org.wso2.carbon.identity.api.server.asynchronous.operation.status.management</module>
-        <module>components/org.wso2.carbon.identity.api.server.user.credential.management</module>
+        <module>components/org.wso2.carbon.identity.api.server.credential.management</module>
     </modules>
 
 </project>
