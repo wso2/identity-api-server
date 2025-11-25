@@ -21,7 +21,7 @@
 <suite name="org.wso2.carbon.identity.api.server.credential.management.common">
     <test name="credential-mgt-tests" preserve-order="true" parallel="false">
         <classes>
-            <class name="org.wso2.carbon.identity.api.server.user.credential.management.v1.core.UserCredentialManagementServiceImplTest"/>
+            <class name="org.wso2.carbon.identity.api.server.credential.management.v1.impl.CredentialManagementServiceImplTest"/>
         </classes>
     </test>
 </suite>
