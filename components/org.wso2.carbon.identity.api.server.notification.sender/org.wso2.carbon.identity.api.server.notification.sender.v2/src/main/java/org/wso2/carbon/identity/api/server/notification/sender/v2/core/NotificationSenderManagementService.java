@@ -444,7 +444,7 @@ public class NotificationSenderManagementService {
 
         if (dto.getAuthentication() != null) {
             Map<String, Object> filteredAuthProp = dto.getAuthentication().getProperties().entrySet().stream()
-                .filter(entry -> !authPropToExclude.contains(Property.valueOf(entry.getKey())))
+                .filter(entry -> !authPropToExclude.contains(Property.valueOfName(entry.getKey())))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
             smsSender.setAuthentication(new Authentication()
                     .type(Authentication.TypeEnum.fromValue(dto.getAuthentication().getType().getName()))
