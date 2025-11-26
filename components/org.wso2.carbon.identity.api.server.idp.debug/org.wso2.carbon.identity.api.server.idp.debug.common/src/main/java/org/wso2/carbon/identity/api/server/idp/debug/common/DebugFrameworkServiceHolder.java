@@ -80,11 +80,11 @@ public class DebugFrameworkServiceHolder {
     }
 
     /**
-     * Gets a DebugContextResolver instance via OSGi service lookup.
-     * The new debug framework uses DebugContextResolver interface.
-     * OIDC module registers OAuth2ContextResolver as DebugContextResolver type.
+     * Gets a DebugContextProvider instance via OSGi service lookup.
+     * The new debug framework uses DebugContextProvider interface.
+     * OIDC module registers OAuth2ContextProvider as DebugContextProvider type.
      *
-     * @return DebugContextResolver instance if available, null otherwise.
+     * @return DebugContextProvider instance if available, null otherwise.
      */
     public static Object DebugContextProvider() {
         try {
@@ -96,27 +96,27 @@ public class DebugFrameworkServiceHolder {
                 return null;
             }
             
-            // Look up DebugContextResolver by interface type.
+            // Look up DebugContextProvider by interface type.
             Object service = context.getOSGiService(DebugContextProvider.class, null);
             
             if (service == null) {
                 if (log.isDebugEnabled()) {
-                    log.debug("DebugContextResolver not available via OSGi service lookup");
+                    log.debug("DebugContextProvider not available via OSGi service lookup");
                 }
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug("Successfully retrieved DebugContextResolver via OSGi lookup");
+                    log.debug("Successfully retrieved DebugContextProvider via OSGi lookup");
                 }
             }
             
             return service;
         } catch (NullPointerException e) {
             if (log.isDebugEnabled()) {
-                log.debug("NullPointerException while retrieving DebugContextResolver: " + e.getMessage());
+                log.debug("NullPointerException while retrieving DebugContextProvider: " + e.getMessage());
             }
             return null;
         } catch (Exception e) {
-            log.error("Error retrieving DebugContextResolver: " + e.getMessage(), e);
+            log.error("Error retrieving DebugContextProvider: " + e.getMessage(), e);
             return null;
         }
     }
@@ -204,26 +204,26 @@ public class DebugFrameworkServiceHolder {
     }
 
     /**
-     * Invokes a method on the DebugContextResolver using reflection.
+     * Invokes a method on the DebugContextProvider using reflection.
      *
-     * @param debugContextResolver The DebugContextResolver instance.
+     * @param debugContextProvider The DebugContextProvider instance.
      * @param methodName Method name to invoke.
      * @param parameterTypes Parameter types for the method.
      * @param arguments Arguments to pass to the method.
      * @return Method result or null if invocation fails.
      */
-    public static Object invokeDebugContextResolverMethod(Object debugContextResolver, String methodName,
+    public static Object invokeDebugContextResolverMethod(Object debugContextProvider, String methodName,
                                                           Class<?>[] parameterTypes, Object... arguments) {
-        if (debugContextResolver == null) {
-            log.warn("DebugContextResolver not available for method invocation: " + methodName);
+        if (debugContextProvider == null) {
+            log.warn("DebugContextProvider not available for method invocation: " + methodName);
             return null;
         }
 
         try {
-            java.lang.reflect.Method method = debugContextResolver.getClass().getMethod(methodName, parameterTypes);
-            return method.invoke(debugContextResolver, arguments);
+            java.lang.reflect.Method method = debugContextProvider.getClass().getMethod(methodName, parameterTypes);
+            return method.invoke(debugContextProvider, arguments);
         } catch (Exception e) {
-            log.error("Error invoking DebugContextResolver method '" + methodName + "': " + e.getMessage(), e);
+            log.error("Error invoking DebugContextProvider method '" + methodName + "': " + e.getMessage(), e);
             return null;
         }
     }
