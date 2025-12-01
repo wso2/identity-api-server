@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.vc.config.management.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.vc.config.management.common.VCCredentialConfigManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.core.ServerVCOfferManagementService;
 import org.wso2.carbon.identity.vc.config.management.VCOfferManager;
@@ -27,6 +29,7 @@ import org.wso2.carbon.identity.vc.config.management.VCOfferManager;
  */
 public final class ServerVCOfferManagementServiceFactory {
 
+    private static final Log LOG = LogFactory.getLog(ServerVCOfferManagementServiceFactory.class);
     private static final ServerVCOfferManagementService SERVICE;
 
     static {
@@ -38,6 +41,9 @@ public final class ServerVCOfferManagementServiceFactory {
         }
 
         SERVICE = new ServerVCOfferManagementService(vcOfferManager);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("ServerVCOfferManagementService initialized successfully.");
+        }
     }
 
     /**
