@@ -66,6 +66,9 @@ public class ServerVCCredentialConfigManagementService {
             VCCredentialConfigurationCreationModel creationModel) {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Adding VC credential configuration for tenant: " + tenantDomain);
+        }
         try {
             org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration config =
                     toInternalModel(creationModel);
@@ -85,6 +88,9 @@ public class ServerVCCredentialConfigManagementService {
     public void deleteVCCredentialConfiguration(String configId) {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deleting VC credential configuration: " + configId + " for tenant: " + tenantDomain);
+        }
         try {
             vcCredentialConfigManager.delete(configId, tenantDomain);
         } catch (VCConfigMgtException e) {
@@ -101,6 +107,9 @@ public class ServerVCCredentialConfigManagementService {
     public VCCredentialConfiguration getVCCredentialConfiguration(String configId) {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving VC credential configuration: " + configId + " for tenant: " + tenantDomain);
+        }
         try {
             org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration configuration =
                     vcCredentialConfigManager.get(configId, tenantDomain);
@@ -121,6 +130,9 @@ public class ServerVCCredentialConfigManagementService {
     public VCCredentialConfigurationList listVCCredentialConfigurations() {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Listing VC credential configurations for tenant: " + tenantDomain);
+        }
         try {
             List<org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration> configurations =
                     vcCredentialConfigManager.list(tenantDomain);
@@ -156,6 +168,9 @@ public class ServerVCCredentialConfigManagementService {
                                                                      VCCredentialConfigurationUpdateModel updateModel) {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating VC credential configuration: " + configId + " for tenant: " + tenantDomain);
+        }
         try {
             org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration toUpdate =
                     toInternalModel(updateModel);

@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.vc.config.management.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.vc.config.management.common.VCCredentialConfigManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.core.ServerVCCredentialConfigManagementService;
 import org.wso2.carbon.identity.vc.config.management.VCCredentialConfigManager;
@@ -27,6 +29,7 @@ import org.wso2.carbon.identity.vc.config.management.VCCredentialConfigManager;
  */
 public final class ServerVCCredentialConfigManagementServiceFactory {
 
+    private static final Log LOG = LogFactory.getLog(ServerVCCredentialConfigManagementServiceFactory.class);
     private static final ServerVCCredentialConfigManagementService SERVICE;
 
     static {
@@ -38,6 +41,9 @@ public final class ServerVCCredentialConfigManagementServiceFactory {
         }
 
         SERVICE = new ServerVCCredentialConfigManagementService(vcCredentialConfigManager);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("ServerVCCredentialConfigManagementService initialized successfully.");
+        }
     }
 
     /**

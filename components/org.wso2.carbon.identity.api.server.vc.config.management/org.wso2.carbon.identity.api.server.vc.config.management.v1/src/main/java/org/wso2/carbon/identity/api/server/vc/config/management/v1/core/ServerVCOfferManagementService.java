@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
 /**
- * Server Verifiable Credential Configuration management service.
+ * Server Verifiable Credential Offer management service.
  */
 public class ServerVCOfferManagementService {
 
@@ -64,6 +64,9 @@ public class ServerVCOfferManagementService {
     public VCOffer addVCOffer(VCOfferCreationModel creationModel) {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Adding VC offer for tenant: " + tenantDomain);
+        }
         try {
             org.wso2.carbon.identity.vc.config.management.model.VCOffer offer =
                     toInternalModel(creationModel);
@@ -83,6 +86,9 @@ public class ServerVCOfferManagementService {
     public void deleteVCOffer(String offerId) {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deleting VC offer: " + offerId + " for tenant: " + tenantDomain);
+        }
         try {
             vcOfferManager.delete(offerId, tenantDomain);
         } catch (VCConfigMgtException e) {
@@ -99,6 +105,9 @@ public class ServerVCOfferManagementService {
     public VCOffer getVCOffer(String offerId) {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving VC offer: " + offerId + " for tenant: " + tenantDomain);
+        }
         try {
             org.wso2.carbon.identity.vc.config.management.model.VCOffer offer =
                     vcOfferManager.get(offerId, tenantDomain);
@@ -119,6 +128,9 @@ public class ServerVCOfferManagementService {
     public VCOfferList listVCOffers() {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Listing VC offers for tenant: " + tenantDomain);
+        }
         try {
             List<org.wso2.carbon.identity.vc.config.management.model.VCOffer> offers =
                     vcOfferManager.list(tenantDomain);
@@ -154,6 +166,9 @@ public class ServerVCOfferManagementService {
                                  VCOfferUpdateModel updateModel) {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating VC offer: " + offerId + " for tenant: " + tenantDomain);
+        }
         try {
             org.wso2.carbon.identity.vc.config.management.model.VCOffer toUpdate =
                     toInternalModel(updateModel);
