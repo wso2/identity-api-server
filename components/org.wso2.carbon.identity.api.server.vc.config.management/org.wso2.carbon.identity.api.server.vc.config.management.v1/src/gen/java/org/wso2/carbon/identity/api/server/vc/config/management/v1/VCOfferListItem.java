@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -32,27 +32,25 @@ import javax.xml.bind.annotation.*;
 
 public class VCOfferListItem  {
   
-    private String offerId;
+    private String id;
     private String displayName;
 
     /**
     **/
-    public VCOfferListItem offerId(String offerId) {
+    public VCOfferListItem id(String id) {
 
-        this.offerId = offerId;
+        this.id = id;
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "")
-    @JsonProperty("offerId")
+    @ApiModelProperty(value = "")
+    @JsonProperty("id")
     @Valid
-    @NotNull(message = "Property offerId cannot be null.")
-
-    public String getOfferId() {
-        return offerId;
+    public String getId() {
+        return id;
     }
-    public void setOfferId(String offerId) {
-        this.offerId = offerId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**
@@ -85,13 +83,13 @@ public class VCOfferListItem  {
             return false;
         }
         VCOfferListItem vcOfferListItem = (VCOfferListItem) o;
-        return Objects.equals(this.offerId, vcOfferListItem.offerId) &&
+        return Objects.equals(this.id, vcOfferListItem.id) &&
             Objects.equals(this.displayName, vcOfferListItem.displayName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(offerId, displayName);
+        return Objects.hash(id, displayName);
     }
 
     @Override
@@ -100,7 +98,7 @@ public class VCOfferListItem  {
         StringBuilder sb = new StringBuilder();
         sb.append("class VCOfferListItem {\n");
         
-        sb.append("    offerId: ").append(toIndentedString(offerId)).append("\n");
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("}");
         return sb.toString();

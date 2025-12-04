@@ -75,7 +75,7 @@ public class VcApiServiceImpl implements VcApiService {
     public Response createVCOffer(VCOfferCreationModel vcOfferCreationModel) {
 
         VCOffer createdOffer = serverVCOfferManagementService.addVCOffer(vcOfferCreationModel);
-        URI location = buildOfferResourceLocation(createdOffer != null ? createdOffer.getOfferId() : null);
+        URI location = buildOfferResourceLocation(createdOffer != null ? createdOffer.getId() : null);
         return Response.created(location).entity(createdOffer).build();
     }
 

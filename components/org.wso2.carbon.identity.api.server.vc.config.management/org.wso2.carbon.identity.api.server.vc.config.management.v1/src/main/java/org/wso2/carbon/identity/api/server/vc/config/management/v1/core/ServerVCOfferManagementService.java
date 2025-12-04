@@ -189,7 +189,7 @@ public class ServerVCOfferManagementService {
 
         VCOffer apiModel = new VCOffer();
         if (StringUtils.isNotBlank(model.getOfferId())) {
-            apiModel.setOfferId(model.getOfferId());
+            apiModel.setId(model.getOfferId());
         }
         apiModel.setDisplayName(model.getDisplayName());
 
@@ -298,7 +298,7 @@ public class ServerVCOfferManagementService {
             return null;
         }
         VCOfferListItem item = new VCOfferListItem();
-        item.setOfferId(model.getOfferId());
+        item.setId(model.getOfferId());
         item.setDisplayName(model.getDisplayName());
         return item;
     }
