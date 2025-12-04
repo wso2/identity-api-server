@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -34,29 +34,29 @@ import javax.xml.bind.annotation.*;
 
 public class VCOffer  {
   
-    private String offerId;
+    private String id;
     private String displayName;
     private List<String> credentialConfigurationIds = new ArrayList<String>();
 
 
     /**
     **/
-    public VCOffer offerId(String offerId) {
+    public VCOffer id(String id) {
 
-        this.offerId = offerId;
+        this.id = id;
         return this;
     }
     
     @ApiModelProperty(example = "7e5f9d2a-6b5e-4df6-9b87-8a3d1a4a0c31", required = true, value = "")
-    @JsonProperty("offerId")
+    @JsonProperty("id")
     @Valid
-    @NotNull(message = "Property offerId cannot be null.")
+    @NotNull(message = "Property id cannot be null.")
 
-    public String getOfferId() {
-        return offerId;
+    public String getId() {
+        return id;
     }
-    public void setOfferId(String offerId) {
-        this.offerId = offerId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**
@@ -116,14 +116,14 @@ public class VCOffer  {
             return false;
         }
         VCOffer vcOffer = (VCOffer) o;
-        return Objects.equals(this.offerId, vcOffer.offerId) &&
+        return Objects.equals(this.id, vcOffer.id) &&
             Objects.equals(this.displayName, vcOffer.displayName) &&
             Objects.equals(this.credentialConfigurationIds, vcOffer.credentialConfigurationIds);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(offerId, displayName, credentialConfigurationIds);
+        return Objects.hash(id, displayName, credentialConfigurationIds);
     }
 
     @Override
@@ -132,7 +132,7 @@ public class VCOffer  {
         StringBuilder sb = new StringBuilder();
         sb.append("class VCOffer {\n");
         
-        sb.append("    offerId: ").append(toIndentedString(offerId)).append("\n");
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    credentialConfigurationIds: ").append(toIndentedString(credentialConfigurationIds)).append("\n");
         sb.append("}");
