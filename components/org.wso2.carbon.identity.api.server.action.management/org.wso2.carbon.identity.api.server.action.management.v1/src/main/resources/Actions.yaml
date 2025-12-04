@@ -1269,6 +1269,7 @@ components:
         - PRE_UPDATE_PASSWORD
         - PRE_UPDATE_PROFILE
         - PRE_REGISTRATION
+        - PRE_ISSUE_ID_TOKEN
     ActionModel:
       type: object
       required:
