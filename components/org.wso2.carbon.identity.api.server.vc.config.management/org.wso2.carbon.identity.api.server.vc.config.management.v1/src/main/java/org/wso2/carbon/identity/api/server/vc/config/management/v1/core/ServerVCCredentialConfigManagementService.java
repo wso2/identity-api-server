@@ -25,7 +25,6 @@ import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
-import org.wso2.carbon.identity.api.server.vc.config.management.v1.Metadata;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfiguration;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationCreationModel;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationList;
@@ -182,6 +181,38 @@ public class ServerVCCredentialConfigManagementService {
         }
     }
 
+    public VCCredentialConfiguration generateVCCredentialOffer(String configId) {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Generating VC credential offer for configuration: " + configId + " for tenant: "
+                    + tenantDomain);
+        }
+        try {
+            org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration updated =
+                    vcCredentialConfigManager.generateOffer(configId, tenantDomain);
+            return toApiModel(updated);
+        } catch (VCConfigMgtException e) {
+            throw handleVCConfigException(e, "Error while updating VC credential configuration", configId);
+        }
+    }
+
+    public VCCredentialConfiguration revokeVCCredentialOffer(String configId) {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Revoking VC credential offer for configuration: " + configId + " for tenant: "
+                    + tenantDomain);
+        }
+        try {
+            org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration updated =
+                    vcCredentialConfigManager.revokeOffer(configId, tenantDomain);
+            return toApiModel(updated);
+        } catch (VCConfigMgtException e) {
+            throw handleVCConfigException(e, "Error while updating VC credential configuration", configId);
+        }
+    }
+
     private VCCredentialConfiguration toApiModel(
             org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration model) {
 
@@ -199,7 +230,6 @@ public class ServerVCCredentialConfigManagementService {
         apiModel.setScope(model.getScope());
         apiModel.setFormat(model.getFormat());
         apiModel.setType(model.getType());
-        apiModel.setMetadata(toApiCredentialMetadata(model.getMetadata()));
 
         List<String> claims = model.getClaims();
         if (claims != null) {
@@ -212,17 +242,6 @@ public class ServerVCCredentialConfigManagementService {
         return apiModel;
     }
 
-    private Metadata toApiCredentialMetadata(
-            org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration.Metadata metadata) {
-
-        if (metadata == null) {
-            return null;
-        }
-        Metadata apiMetadata = new Metadata();
-        apiMetadata.setDisplay(metadata.getDisplay());
-        return apiMetadata;
-    }
-
     private org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration toInternalModel(
             VCCredentialConfigurationCreationModel model) {
 
@@ -233,7 +252,6 @@ public class ServerVCCredentialConfigManagementService {
         internalModel.setScope(model.getScope());
         internalModel.setFormat(model.getFormat());
         internalModel.setType(model.getType());
-        internalModel.setMetadata(toInternalCredentialMetadata(model.getMetadata()));
         if (model.getClaims() != null) {
             internalModel.setClaims(model.getClaims());
         }
@@ -250,25 +268,11 @@ public class ServerVCCredentialConfigManagementService {
         internalModel.setScope(model.getScope());
         internalModel.setFormat(model.getFormat());
         internalModel.setType(model.getType());
-        internalModel.setMetadata(toInternalCredentialMetadata(model.getMetadata()));
         if (model.getClaims() != null) {
             internalModel.setClaims(model.getClaims());
         }
         internalModel.setExpiresIn(model.getExpiresIn());
         return internalModel;
-    }
-
-    private org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration.Metadata
-    toInternalCredentialMetadata(Metadata metadata) {
-
-        if (metadata == null) {
-            return null;
-        }
-        org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration.Metadata
-                internalMetadata =
-                new org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration.Metadata();
-        internalMetadata.setDisplay(metadata.getDisplay());
-        return internalMetadata;
     }
 
     private APIError notFound(String data) {

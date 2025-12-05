@@ -24,7 +24,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.vc.config.management.v1.Metadata;
 import javax.validation.constraints.*;
 
 /**
@@ -42,7 +41,6 @@ public class VCCredentialConfigurationUpdateModel  {
     private String scope;
     private String format;
     private String type;
-    private Metadata metadata;
     private List<String> claims = null;
 
     private Integer expiresIn;
@@ -122,24 +120,6 @@ public class VCCredentialConfigurationUpdateModel  {
 
     /**
     **/
-    public VCCredentialConfigurationUpdateModel metadata(Metadata metadata) {
-
-        this.metadata = metadata;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "")
-    @JsonProperty("metadata")
-    @Valid
-    public Metadata getMetadata() {
-        return metadata;
-    }
-    public void setMetadata(Metadata metadata) {
-        this.metadata = metadata;
-    }
-
-    /**
-    **/
     public VCCredentialConfigurationUpdateModel claims(List<String> claims) {
 
         this.claims = claims;
@@ -199,14 +179,13 @@ public class VCCredentialConfigurationUpdateModel  {
             Objects.equals(this.scope, vcCredentialConfigurationUpdateModel.scope) &&
             Objects.equals(this.format, vcCredentialConfigurationUpdateModel.format) &&
             Objects.equals(this.type, vcCredentialConfigurationUpdateModel.type) &&
-            Objects.equals(this.metadata, vcCredentialConfigurationUpdateModel.metadata) &&
             Objects.equals(this.claims, vcCredentialConfigurationUpdateModel.claims) &&
             Objects.equals(this.expiresIn, vcCredentialConfigurationUpdateModel.expiresIn);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(displayName, scope, format, type, metadata, claims, expiresIn);
+        return Objects.hash(displayName, scope, format, type, claims, expiresIn);
     }
 
     @Override
@@ -219,7 +198,6 @@ public class VCCredentialConfigurationUpdateModel  {
         sb.append("    scope: ").append(toIndentedString(scope)).append("\n");
         sb.append("    format: ").append(toIndentedString(format)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
-        sb.append("    metadata: ").append(toIndentedString(metadata)).append("\n");
         sb.append("    claims: ").append(toIndentedString(claims)).append("\n");
         sb.append("    expiresIn: ").append(toIndentedString(expiresIn)).append("\n");
         sb.append("}");
