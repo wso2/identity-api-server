@@ -239,6 +239,9 @@ public class ServerVCCredentialConfigManagementService {
         }
 
         apiModel.setExpiresIn(model.getExpiresIn());
+        if (StringUtils.isNotBlank(model.getOfferId())) {
+            apiModel.setOfferId(model.getOfferId());
+        }
         return apiModel;
     }
 
