@@ -63,6 +63,7 @@ import static org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIR
 import static org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants.DEFAULT_LIMIT;
 import static org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants.DESC_SORT_ORDER;
 import static org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants.MCP_SERVER_RESOURCE_TYPE;
+import static org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants.VC_RESOURCE_TYPE;
 
 import static org.wso2.carbon.identity.api.server.api.resource.v1.util.AuthorizationDetailsTypeMgtUtil.toAuthorizationDetailsGetModels;
 import static org.wso2.carbon.identity.api.server.api.resource.v1.util.AuthorizationDetailsTypeMgtUtil.toAuthorizationDetailsTypes;
@@ -615,7 +616,8 @@ public class ServerAPIResourceManagementService {
 
         if (apiResource.getType() != null &&
                 !apiResource.getType().startsWith(APIResourceMgtEndpointConstants.BUSINESS_API_RESOURCE_TYPE)
-                && !apiResource.getType().startsWith(MCP_SERVER_RESOURCE_TYPE)) {
+                && !apiResource.getType().startsWith(MCP_SERVER_RESOURCE_TYPE)
+                && !apiResource.getType().startsWith(VC_RESOURCE_TYPE)) {
             throw APIResourceMgtEndpointUtil.handleException(Response.Status.FORBIDDEN,
                     ErrorMessage.ERROR_CODE_SYSTEM_API_RESOURCE_NOT_MODIFIABLE);
         }
