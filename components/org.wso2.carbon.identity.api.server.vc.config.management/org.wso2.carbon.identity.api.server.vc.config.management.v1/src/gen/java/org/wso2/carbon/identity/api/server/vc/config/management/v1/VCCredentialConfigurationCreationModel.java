@@ -24,7 +24,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.vc.config.management.v1.Metadata;
 import javax.validation.constraints.*;
 
 
@@ -40,7 +39,6 @@ public class VCCredentialConfigurationCreationModel  {
     private String scope;
     private String format;
     private String type;
-    private Metadata metadata;
     private List<String> claims = new ArrayList<String>();
 
     private Integer expiresIn;
@@ -146,26 +144,6 @@ public class VCCredentialConfigurationCreationModel  {
 
     /**
     **/
-    public VCCredentialConfigurationCreationModel metadata(Metadata metadata) {
-
-        this.metadata = metadata;
-        return this;
-    }
-    
-    @ApiModelProperty(required = true, value = "")
-    @JsonProperty("metadata")
-    @Valid
-    @NotNull(message = "Property metadata cannot be null.")
-
-    public Metadata getMetadata() {
-        return metadata;
-    }
-    public void setMetadata(Metadata metadata) {
-        this.metadata = metadata;
-    }
-
-    /**
-    **/
     public VCCredentialConfigurationCreationModel claims(List<String> claims) {
 
         this.claims = claims;
@@ -227,14 +205,13 @@ public class VCCredentialConfigurationCreationModel  {
             Objects.equals(this.scope, vcCredentialConfigurationCreationModel.scope) &&
             Objects.equals(this.format, vcCredentialConfigurationCreationModel.format) &&
             Objects.equals(this.type, vcCredentialConfigurationCreationModel.type) &&
-            Objects.equals(this.metadata, vcCredentialConfigurationCreationModel.metadata) &&
             Objects.equals(this.claims, vcCredentialConfigurationCreationModel.claims) &&
             Objects.equals(this.expiresIn, vcCredentialConfigurationCreationModel.expiresIn);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(identifier, displayName, scope, format, type, metadata, claims, expiresIn);
+        return Objects.hash(identifier, displayName, scope, format, type, claims, expiresIn);
     }
 
     @Override
@@ -248,7 +225,6 @@ public class VCCredentialConfigurationCreationModel  {
         sb.append("    scope: ").append(toIndentedString(scope)).append("\n");
         sb.append("    format: ").append(toIndentedString(format)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
-        sb.append("    metadata: ").append(toIndentedString(metadata)).append("\n");
         sb.append("    claims: ").append(toIndentedString(claims)).append("\n");
         sb.append("    expiresIn: ").append(toIndentedString(expiresIn)).append("\n");
         sb.append("}");

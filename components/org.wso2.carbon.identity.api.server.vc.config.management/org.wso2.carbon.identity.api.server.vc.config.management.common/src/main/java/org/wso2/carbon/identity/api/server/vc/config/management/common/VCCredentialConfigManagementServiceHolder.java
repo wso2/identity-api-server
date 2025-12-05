@@ -20,7 +20,6 @@ package org.wso2.carbon.identity.api.server.vc.config.management.common;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.vc.config.management.VCCredentialConfigManager;
-import org.wso2.carbon.identity.vc.config.management.VCOfferManager;
 
 /**
  * Service holder for {@link VCCredentialConfigManager} OSGi service.
@@ -34,8 +33,6 @@ public final class VCCredentialConfigManagementServiceHolder {
 
         static final VCCredentialConfigManager CONFIG_SERVICE = (VCCredentialConfigManager) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(VCCredentialConfigManager.class, null);
-        static final VCOfferManager OFFER_SERVICE = (VCOfferManager) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext().getOSGiService(VCOfferManager.class, null);
 
     }
 
@@ -47,15 +44,5 @@ public final class VCCredentialConfigManagementServiceHolder {
     public static VCCredentialConfigManager getVCCredentialConfigManager() {
 
         return ServiceHolder.CONFIG_SERVICE;
-    }
-
-    /**
-     * Get the {@link VCOfferManager} OSGi service.
-     *
-     * @return The VCOfferManager service instance.
-     */
-    public static VCOfferManager getVCOfferManager() {
-
-        return ServiceHolder.OFFER_SERVICE;
     }
 }

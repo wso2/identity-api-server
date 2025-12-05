@@ -28,7 +28,6 @@ public final class VCCredentialConfigManagementConstants {
     }
 
     public static final String VC_CREDENTIAL_CONFIG_PATH_COMPONENT = "vc/credential-configurations";
-    public static final String VC_OFFER_PATH_COMPONENT = "vc/offers";
     public static final String PATH_SEPARATOR = "/";
 }
 

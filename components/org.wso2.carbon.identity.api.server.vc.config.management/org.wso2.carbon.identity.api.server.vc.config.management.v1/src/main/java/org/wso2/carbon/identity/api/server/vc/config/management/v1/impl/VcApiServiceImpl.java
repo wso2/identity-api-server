@@ -26,15 +26,9 @@ import org.wso2.carbon.identity.api.server.vc.config.management.common.VCCredent
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfiguration;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationCreationModel;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationUpdateModel;
-import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCOffer;
-import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCOfferCreationModel;
-import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCOfferUpdateModel;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VcApiService;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.core.ServerVCCredentialConfigManagementService;
-import org.wso2.carbon.identity.api.server.vc.config.management.v1.core.ServerVCOfferManagementService;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.factories.ServerVCCredentialConfigManagementServiceFactory;
-import org.wso2.carbon.identity.api.server.vc.config.management.v1.factories.ServerVCOfferManagementServiceFactory;
-
 import java.net.URI;
 
 import javax.ws.rs.core.Response;
@@ -47,15 +41,12 @@ public class VcApiServiceImpl implements VcApiService {
     private static final Log LOG = LogFactory.getLog(VcApiServiceImpl.class);
 
     private volatile ServerVCCredentialConfigManagementService serverVCCredentialConfigManagementService;
-    private volatile ServerVCOfferManagementService serverVCOfferManagementService;
 
     public VcApiServiceImpl() {
 
         try {
             this.serverVCCredentialConfigManagementService = ServerVCCredentialConfigManagementServiceFactory
                     .getServerVCCredentialConfigManagementService();
-            this.serverVCOfferManagementService = ServerVCOfferManagementServiceFactory
-                    .getServerVCOfferManagementService();
         } catch (IllegalStateException e) {
             throw new RuntimeException("Error occurred while initiating server vc config management service.", e);
         }
@@ -72,14 +63,6 @@ public class VcApiServiceImpl implements VcApiService {
     }
 
     @Override
-    public Response createVCOffer(VCOfferCreationModel vcOfferCreationModel) {
-
-        VCOffer createdOffer = serverVCOfferManagementService.addVCOffer(vcOfferCreationModel);
-        URI location = buildOfferResourceLocation(createdOffer != null ? createdOffer.getId() : null);
-        return Response.created(location).entity(createdOffer).build();
-    }
-
-    @Override
     public Response deleteVCCredentialConfiguration(String configId) {
 
         serverVCCredentialConfigManagementService.deleteVCCredentialConfiguration(configId);
@@ -87,10 +70,10 @@ public class VcApiServiceImpl implements VcApiService {
     }
 
     @Override
-    public Response deleteVCOffer(String offerId) {
+    public Response generateVCCredentialOffer(String configId) {
 
-        serverVCOfferManagementService.deleteVCOffer(offerId);
-        return Response.noContent().build();
+        return Response.ok().entity(serverVCCredentialConfigManagementService.generateVCCredentialOffer(configId))
+                .build();
     }
 
     @Override
@@ -102,22 +85,16 @@ public class VcApiServiceImpl implements VcApiService {
     }
 
     @Override
-    public Response getVCOffer(String offerId) {
-
-        VCOffer offer = serverVCOfferManagementService.getVCOffer(offerId);
-        return Response.ok().entity(offer).build();
-    }
-
-    @Override
     public Response listVCCredentialConfigurations() {
 
         return Response.ok().entity(serverVCCredentialConfigManagementService.listVCCredentialConfigurations()).build();
     }
 
     @Override
-    public Response listVCOffers() {
+    public Response revokeVCCredentialOffer(String configId) {
 
-        return Response.ok().entity(serverVCOfferManagementService.listVCOffers()).build();
+        return Response.ok().entity(serverVCCredentialConfigManagementService.revokeVCCredentialOffer(configId))
+                .build();
     }
 
     @Override
@@ -130,29 +107,12 @@ public class VcApiServiceImpl implements VcApiService {
         return Response.ok().entity(updatedConfiguration).build();
     }
 
-    @Override
-    public Response updateVCOffer(String offerId, VCOfferUpdateModel vcOfferUpdateModel) {
-
-        VCOffer updatedOffer = serverVCOfferManagementService.updateVCOffer(offerId, vcOfferUpdateModel);
-        return Response.ok().entity(updatedOffer).build();
-    }
-
     private URI buildConfigResourceLocation(String resourceId) {
 
         StringBuilder pathBuilder = new StringBuilder(Constants.V1_API_PATH_COMPONENT)
                 .append(VCCredentialConfigManagementConstants.VC_CREDENTIAL_CONFIG_PATH_COMPONENT);
         if (resourceId != null) {
             pathBuilder.append(VCCredentialConfigManagementConstants.PATH_SEPARATOR).append(resourceId);
-        }
-        return ContextLoader.buildURIForHeader(pathBuilder.toString());
-    }
-
-    private URI buildOfferResourceLocation(String offerId) {
-
-        StringBuilder pathBuilder = new StringBuilder(Constants.V1_API_PATH_COMPONENT)
-                .append(VCCredentialConfigManagementConstants.VC_OFFER_PATH_COMPONENT);
-        if (offerId != null) {
-            pathBuilder.append(VCCredentialConfigManagementConstants.PATH_SEPARATOR).append(offerId);
         }
         return ContextLoader.buildURIForHeader(pathBuilder.toString());
     }
