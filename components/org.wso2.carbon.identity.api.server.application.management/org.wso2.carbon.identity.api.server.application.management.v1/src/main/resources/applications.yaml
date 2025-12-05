@@ -4026,6 +4026,11 @@ components:
           description: Decides whether the refresh token needs to be renewed during refresh grant flow.
           type: boolean
           example: true
+        extendRenewedRefreshTokenExpiryTime:
+            description: "Decides whether the expiry time of the renewed refresh token needs to be extended based on the
+            refresh token expiry time configured."
+            type: boolean
+            example: false
     SubjectTokenConfiguration:
       type: object
       properties:

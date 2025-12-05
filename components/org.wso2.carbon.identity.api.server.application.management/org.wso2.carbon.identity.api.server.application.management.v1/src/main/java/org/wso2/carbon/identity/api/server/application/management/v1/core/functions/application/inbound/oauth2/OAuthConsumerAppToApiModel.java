@@ -120,7 +120,9 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
 
         return new RefreshTokenConfiguration()
                 .expiryInSeconds(oAuthConsumerAppDTO.getRefreshTokenExpiryTime())
-                .renewRefreshToken(Boolean.parseBoolean(oAuthConsumerAppDTO.getRenewRefreshTokenEnabled()));
+                .renewRefreshToken(Boolean.parseBoolean(oAuthConsumerAppDTO.getRenewRefreshTokenEnabled()))
+                .extendRenewedRefreshTokenExpiryTime(Boolean.parseBoolean(
+                        oAuthConsumerAppDTO.getExtendRenewedRefreshTokenExpiryTime()));
     }
 
     private IdTokenConfiguration buildIdTokenConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {

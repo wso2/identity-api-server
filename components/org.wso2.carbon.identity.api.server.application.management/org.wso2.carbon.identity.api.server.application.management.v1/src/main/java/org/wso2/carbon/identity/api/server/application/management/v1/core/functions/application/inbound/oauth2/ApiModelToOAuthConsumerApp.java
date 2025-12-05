@@ -141,6 +141,9 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
             String renewRefreshToken = refreshToken.getRenewRefreshToken() != null ?
                     String.valueOf(refreshToken.getRenewRefreshToken()) : null;
             consumerAppDTO.setRenewRefreshTokenEnabled(renewRefreshToken);
+            String extendRefreshTokenExpiryTime = refreshToken.getExtendRenewedRefreshTokenExpiryTime() != null ?
+                    String.valueOf(refreshToken.getExtendRenewedRefreshTokenExpiryTime()) : null;
+            consumerAppDTO.setExtendRenewedRefreshTokenExpiryTime(extendRefreshTokenExpiryTime);
         }
     }
 
