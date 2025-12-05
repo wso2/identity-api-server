@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -34,6 +34,7 @@ public class RefreshTokenConfiguration  {
   
     private Long expiryInSeconds;
     private Boolean renewRefreshToken;
+    private Boolean extendRenewedRefreshTokenExpiryTime;
 
     /**
     **/
@@ -72,6 +73,25 @@ public class RefreshTokenConfiguration  {
         this.renewRefreshToken = renewRefreshToken;
     }
 
+    /**
+    * Decides whether the expiry time of the renewed refresh token needs to be extended based on the refresh token expiry time configured.
+    **/
+    public RefreshTokenConfiguration extendRenewedRefreshTokenExpiryTime(Boolean extendRenewedRefreshTokenExpiryTime) {
+
+        this.extendRenewedRefreshTokenExpiryTime = extendRenewedRefreshTokenExpiryTime;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "Decides whether the expiry time of the renewed refresh token needs to be extended based on the refresh token expiry time configured.")
+    @JsonProperty("extendRenewedRefreshTokenExpiryTime")
+    @Valid
+    public Boolean getExtendRenewedRefreshTokenExpiryTime() {
+        return extendRenewedRefreshTokenExpiryTime;
+    }
+    public void setExtendRenewedRefreshTokenExpiryTime(Boolean extendRenewedRefreshTokenExpiryTime) {
+        this.extendRenewedRefreshTokenExpiryTime = extendRenewedRefreshTokenExpiryTime;
+    }
+
 
 
     @Override
@@ -85,12 +105,13 @@ public class RefreshTokenConfiguration  {
         }
         RefreshTokenConfiguration refreshTokenConfiguration = (RefreshTokenConfiguration) o;
         return Objects.equals(this.expiryInSeconds, refreshTokenConfiguration.expiryInSeconds) &&
-            Objects.equals(this.renewRefreshToken, refreshTokenConfiguration.renewRefreshToken);
+            Objects.equals(this.renewRefreshToken, refreshTokenConfiguration.renewRefreshToken) &&
+            Objects.equals(this.extendRenewedRefreshTokenExpiryTime, refreshTokenConfiguration.extendRenewedRefreshTokenExpiryTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(expiryInSeconds, renewRefreshToken);
+        return Objects.hash(expiryInSeconds, renewRefreshToken, extendRenewedRefreshTokenExpiryTime);
     }
 
     @Override
@@ -101,6 +122,7 @@ public class RefreshTokenConfiguration  {
         
         sb.append("    expiryInSeconds: ").append(toIndentedString(expiryInSeconds)).append("\n");
         sb.append("    renewRefreshToken: ").append(toIndentedString(renewRefreshToken)).append("\n");
+        sb.append("    extendRenewedRefreshTokenExpiryTime: ").append(toIndentedString(extendRenewedRefreshTokenExpiryTime)).append("\n");
         sb.append("}");
         return sb.toString();
     }
