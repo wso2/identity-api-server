@@ -21,7 +21,11 @@ package org.wso2.carbon.identity.api.server.idp.v1.core;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
@@ -55,6 +59,7 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorLi
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorPUTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdPGroup;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderExportResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListItem;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPOSTRequest;
@@ -78,6 +83,7 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.idp.v1.model.ProvisioningClaim;
 import org.wso2.carbon.identity.api.server.idp.v1.model.ProvisioningResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Roles;
+import org.wso2.carbon.identity.api.server.idp.v1.util.CertificateUtil;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.common.ApplicationAuthenticatorService;
 import org.wso2.carbon.identity.application.common.model.AccountLookupAttributeMappingConfig;
@@ -190,6 +196,8 @@ public class ServerIdpManagementService {
     private final TemplateManager templateManager;
 
     private static final Log log = LogFactory.getLog(ServerIdpManagementService.class);
+
+    private static final String IDP_EXPORT_SUPPORT_MULTIPLE_CERT = "IdentityProviders.SupportMultipleCertificateExport";
 
     public ServerIdpManagementService(IdentityProviderManager identityProviderManager, TemplateManager templateManager,
                                       ClaimMetadataManagementService claimMetadataManagementService) {
@@ -396,7 +404,7 @@ public class ServerIdpManagementService {
 
         FileContent fileContent;
         try {
-            fileContent = generateFileFromModel(fileType, idpToExport);
+            fileContent = generateFileFromModel(fileType, createIDPExportResponse(idpToExport));
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_EXPORTING_IDP, idpId);
         }
@@ -421,7 +429,7 @@ public class ServerIdpManagementService {
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             identityProvider = identityProviderManager.addIdPWithResourceId(
-                    getIDPFromFile(fileInputStream, fileDetail), tenantDomain);
+                    createIDPImportRequest(getIDPFromFile(fileInputStream, fileDetail)), tenantDomain);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_IMPORTING_IDP, null);
         }
@@ -439,7 +447,7 @@ public class ServerIdpManagementService {
 
         IdentityProvider identityProvider;
         try {
-            identityProvider = getIDPFromFile(fileInputStream, fileDetail);
+            identityProvider = createIDPImportRequest(getIDPFromFile(fileInputStream, fileDetail));
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             if (RESIDENT_IDP_RESERVED_NAME.equals(identityProviderId)) {
                 processFederatedAuthenticatorsForResidentIDPUpdate(identityProvider);
@@ -450,6 +458,79 @@ public class ServerIdpManagementService {
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP, null);
         }
+    }
+
+    /**
+     * This exclusion strategy is to skip the 'certificate' field derived from the IdentityProvider class while
+     * keeping the new 'certificate' type declared in IdentityProviderExportResponse class.
+     */
+    private static class CertificateSkippingExclusionStrategy implements ExclusionStrategy {
+
+        @Override
+        public boolean shouldSkipField(FieldAttributes f) {
+            return f.getName().equals("certificate") &&
+                    f.getDeclaringClass() == IdentityProviderExportResponse.class;
+        }
+
+        @Override
+        public boolean shouldSkipClass(Class<?> clazz) {
+            return false;
+        }
+    }
+
+    private IdentityProvider createIDPExportResponse(IdentityProvider identityProvider) {
+
+        if (!Boolean.parseBoolean(IdentityUtil.getProperty(IDP_EXPORT_SUPPORT_MULTIPLE_CERT))) {
+            log.debug("IDP export/import with multiple certificates is not enabled. Exporting the IDP as is.");
+            return identityProvider;
+        }
+
+        Gson gson = new GsonBuilder()
+                .setExclusionStrategies(new CertificateSkippingExclusionStrategy())
+                .create();
+        JsonObject json = gson.toJsonTree(identityProvider).getAsJsonObject();
+        IdentityProviderExportResponse exportResponse = gson.fromJson(json, IdentityProviderExportResponse.class);
+
+        Certificate certificate = null;
+        IdentityProviderProperty[] idpProperties = identityProvider.getIdpProperties();
+        for (IdentityProviderProperty property : idpProperties) {
+            if (Constants.JWKS_URI.equals(property.getName())) {
+                certificate = new Certificate().jwksUri(property.getValue());
+                break;
+            }
+        }
+        if (certificate == null && ArrayUtils.isNotEmpty(identityProvider.getCertificateInfoArray())) {
+            List<String> certificates = new ArrayList<>();
+            for (CertificateInfo certInfo : identityProvider.getCertificateInfoArray()) {
+                certificates.add(certInfo.getCertValue());
+            }
+            certificate = new Certificate().certificates(certificates);
+        }
+
+        exportResponse.setCertificate(certificate);
+
+        return exportResponse;
+    }
+
+    private IdentityProvider createIDPImportRequest(IdentityProvider identityProvider)
+            throws IdentityProviderManagementClientException {
+
+        if (!Boolean.parseBoolean(IdentityUtil.getProperty(IDP_EXPORT_SUPPORT_MULTIPLE_CERT))) {
+            log.debug("IDP export/import with multiple certificates is not enabled. Importing the IDP as is.");
+            return identityProvider;
+        }
+
+        Gson gson = new GsonBuilder()
+                .setExclusionStrategies(new CertificateSkippingExclusionStrategy())
+                .create();
+        JsonObject json = gson.toJsonTree(identityProvider).getAsJsonObject();
+        IdentityProvider importRequest = gson.fromJson(json, IdentityProvider.class);
+
+        String certificates = CertificateUtil.convertCertificateJsonString(((
+                (IdentityProviderExportResponse) identityProvider).getCertificates()));
+        importRequest.setCertificate(certificates);
+
+        return importRequest;
     }
 
     private void processFederatedAuthenticatorsForResidentIDPUpdate(IdentityProvider newIdentityProvider) {
@@ -3606,6 +3687,10 @@ public class ServerIdpManagementService {
     private FileContent parseIdpToXml(IdentityProvider identityProvider)
             throws IdentityProviderManagementException {
 
+        /*
+        Todo: when supporting MultipleCertificateExport for XML, update the below instance type
+         with identityProvider.getClass().
+         */
         StringBuilder fileNameSB = new StringBuilder(identityProvider.getIdentityProviderName());
         fileNameSB.append(XML_FILE_EXTENSION);
 
@@ -3641,6 +3726,10 @@ public class ServerIdpManagementService {
     private FileContent parseIdpToYaml(IdentityProvider identityProvider)
             throws IdentityProviderManagementException {
 
+        /*
+        Todo: when supporting MultipleCertificateExport for XML, update the below instance type
+         with identityProvider.getClass().
+         */
         StringBuilder fileNameSB = new StringBuilder(identityProvider.getIdentityProviderName());
         fileNameSB.append(YAML_FILE_EXTENSION);
 
@@ -3737,6 +3826,9 @@ public class ServerIdpManagementService {
             throws IdentityProviderManagementClientException {
 
         try {
+            if (Boolean.parseBoolean(IdentityUtil.getProperty(IDP_EXPORT_SUPPORT_MULTIPLE_CERT))) {
+                return new ObjectMapper().readValue(fileContent.getContent(), IdentityProviderExportResponse.class);
+            }
             return new ObjectMapper().readValue(fileContent.getContent(), IdentityProvider.class);
         } catch (JsonProcessingException e) {
             throw new IdentityProviderManagementClientException(String.format("Error in reading JSON " +
