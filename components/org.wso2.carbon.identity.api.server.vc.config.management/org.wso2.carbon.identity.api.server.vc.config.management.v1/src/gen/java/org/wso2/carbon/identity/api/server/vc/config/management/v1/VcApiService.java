@@ -42,7 +42,7 @@ public interface VcApiService {
 
       public Response getVCCredentialConfiguration(String configId);
 
-      public Response listVCCredentialConfigurations();
+      public Response listVCCredentialConfigurations(String before, String after, String filter, Integer limit, String attributes);
 
       public Response revokeVCCredentialOffer(String configId);
 

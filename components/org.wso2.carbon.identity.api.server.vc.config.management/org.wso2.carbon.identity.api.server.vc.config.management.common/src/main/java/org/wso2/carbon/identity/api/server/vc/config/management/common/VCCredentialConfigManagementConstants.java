@@ -29,5 +29,8 @@ public final class VCCredentialConfigManagementConstants {
 
     public static final String VC_CREDENTIAL_CONFIG_PATH_COMPONENT = "vc/credential-configurations";
     public static final String PATH_SEPARATOR = "/";
+    public static final Integer DEFAULT_LIMIT = 10;
+    public static final String ASC_SORT_ORDER = "ASC";
+    public static final String DESC_SORT_ORDER = "DESC";
 }
 

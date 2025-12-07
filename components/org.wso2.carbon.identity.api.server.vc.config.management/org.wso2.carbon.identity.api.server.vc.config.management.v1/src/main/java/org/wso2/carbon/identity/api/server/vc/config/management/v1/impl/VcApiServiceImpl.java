@@ -85,9 +85,11 @@ public class VcApiServiceImpl implements VcApiService {
     }
 
     @Override
-    public Response listVCCredentialConfigurations() {
+    public Response listVCCredentialConfigurations(String before, String after, String filter, Integer limit,
+                                                   String attributes) {
 
-        return Response.ok().entity(serverVCCredentialConfigManagementService.listVCCredentialConfigurations()).build();
+        return Response.ok().entity(serverVCCredentialConfigManagementService.listVCCredentialConfigurations(before,
+                after, filter, limit, attributes)).build();
     }
 
     @Override

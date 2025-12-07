@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.vc.config.management.v1.PaginationLink;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationListItem;
 import javax.validation.constraints.*;
 
@@ -36,6 +37,8 @@ import javax.xml.bind.annotation.*;
 public class VCCredentialConfigurationList  {
   
     private Integer totalResults;
+    private List<PaginationLink> links = null;
+
     private List<VCCredentialConfigurationListItem> vcCredentialConfigurations = null;
 
 
@@ -58,6 +61,32 @@ public class VCCredentialConfigurationList  {
     }
 
     /**
+    **/
+    public VCCredentialConfigurationList links(List<PaginationLink> links) {
+
+        this.links = links;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("links")
+    @Valid
+    public List<PaginationLink> getLinks() {
+        return links;
+    }
+    public void setLinks(List<PaginationLink> links) {
+        this.links = links;
+    }
+
+    public VCCredentialConfigurationList addLinksItem(PaginationLink linksItem) {
+        if (this.links == null) {
+            this.links = new ArrayList<PaginationLink>();
+        }
+        this.links.add(linksItem);
+        return this;
+    }
+
+        /**
     **/
     public VCCredentialConfigurationList vcCredentialConfigurations(List<VCCredentialConfigurationListItem> vcCredentialConfigurations) {
 
@@ -96,12 +125,13 @@ public class VCCredentialConfigurationList  {
         }
         VCCredentialConfigurationList vcCredentialConfigurationList = (VCCredentialConfigurationList) o;
         return Objects.equals(this.totalResults, vcCredentialConfigurationList.totalResults) &&
+            Objects.equals(this.links, vcCredentialConfigurationList.links) &&
             Objects.equals(this.vcCredentialConfigurations, vcCredentialConfigurationList.vcCredentialConfigurations);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(totalResults, vcCredentialConfigurations);
+        return Objects.hash(totalResults, links, vcCredentialConfigurations);
     }
 
     @Override
@@ -111,6 +141,7 @@ public class VCCredentialConfigurationList  {
         sb.append("class VCCredentialConfigurationList {\n");
         
         sb.append("    totalResults: ").append(toIndentedString(totalResults)).append("\n");
+        sb.append("    links: ").append(toIndentedString(links)).append("\n");
         sb.append("    vcCredentialConfigurations: ").append(toIndentedString(vcCredentialConfigurations)).append("\n");
         sb.append("}");
         return sb.toString();

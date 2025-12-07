@@ -25,6 +25,7 @@ import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.api.server.vc.config.management.v1.PaginationLink;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfiguration;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationCreationModel;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationList;
@@ -34,13 +35,25 @@ import org.wso2.carbon.identity.vc.config.management.VCCredentialConfigManager;
 import org.wso2.carbon.identity.vc.config.management.exception.VCConfigMgtClientException;
 import org.wso2.carbon.identity.vc.config.management.exception.VCConfigMgtException;
 import org.wso2.carbon.identity.vc.config.management.exception.VCConfigMgtServerException;
+import org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfigSearchResult;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
+
+import static org.wso2.carbon.identity.api.server.vc.config.management.common.VCCredentialConfigManagementConstants.ASC_SORT_ORDER;
+import static org.wso2.carbon.identity.api.server.vc.config.management.common.VCCredentialConfigManagementConstants.DEFAULT_LIMIT;
+import static org.wso2.carbon.identity.api.server.vc.config.management.common.VCCredentialConfigManagementConstants.DESC_SORT_ORDER;
+import static org.wso2.carbon.identity.api.server.vc.config.management.common.VCCredentialConfigManagementConstants.PATH_SEPARATOR;
+import static org.wso2.carbon.identity.api.server.vc.config.management.common.VCCredentialConfigManagementConstants.VC_CREDENTIAL_CONFIG_PATH_COMPONENT;
 
 /**
  * Server Verifiable Credential Configuration management service.
@@ -126,30 +139,82 @@ public class ServerVCCredentialConfigManagementService {
      *
      * @return List of credential configurations.
      */
-    public VCCredentialConfigurationList listVCCredentialConfigurations() {
+    public VCCredentialConfigurationList listVCCredentialConfigurations(String before, String after, String filter,
+                                                                        Integer limit, String attributes) {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         if (LOG.isDebugEnabled()) {
             LOG.debug("Listing VC credential configurations for tenant: " + tenantDomain);
         }
-        try {
-            List<org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration> configurations =
-                    vcCredentialConfigManager.list(tenantDomain);
 
-            VCCredentialConfigurationList result = new VCCredentialConfigurationList();
+        VCCredentialConfigurationList result = new VCCredentialConfigurationList();
+
+        try {
+            // Set default values if the parameters are not set.
+            limit = validatedLimit(limit);
+
+            // Validate before and after parameters.
+            if (StringUtils.isNotBlank(before) && StringUtils.isNotBlank(after)) {
+                throw handleVCConfigException(
+                        new VCConfigMgtClientException("60003",
+                                "Both 'before' and 'after' parameters cannot be specified together"),
+                        "Invalid pagination parameters", "before: " + before + ", after: " + after);
+            }
+
+            // Set the pagination sort order.
+            String paginationSortOrder = StringUtils.isNotBlank(before) ? DESC_SORT_ORDER : ASC_SORT_ORDER;
+
+            VCCredentialConfigSearchResult searchResult =
+                    vcCredentialConfigManager.listWithPagination(after, before, limit + 1, filter,
+                            paginationSortOrder, tenantDomain);
+
+            List<org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration> configurations =
+                    searchResult.getConfigurations();
+
+            if (configurations != null && !configurations.isEmpty()) {
+                boolean hasMoreItems = configurations.size() > limit;
+                boolean needsReverse = StringUtils.isNotBlank(before);
+                boolean isFirstPage = (StringUtils.isBlank(before) && StringUtils.isBlank(after)) ||
+                        (StringUtils.isNotBlank(before) && !hasMoreItems);
+                boolean isLastPage = !hasMoreItems && (StringUtils.isNotBlank(after) || StringUtils.isBlank(before));
+
+                String url = "?limit=" + limit;
+
+                if (StringUtils.isNotBlank(filter)) {
+                    try {
+                        url += "&filter=" + URLEncoder.encode(filter, StandardCharsets.UTF_8.name());
+                    } catch (UnsupportedEncodingException e) {
+                        LOG.error("Server encountered an error while building pagination URL for the response.", e);
+                    }
+                }
+
+                if (hasMoreItems) {
+                    configurations.remove(configurations.size() - 1);
+                }
+                if (needsReverse) {
+                    Collections.reverse(configurations);
+                }
+                if (!isFirstPage) {
+                    String encodedString = Base64.getEncoder().encodeToString(
+                            configurations.get(0).getCursorKey().toString().getBytes(StandardCharsets.UTF_8));
+                    result.addLinksItem(buildPaginationLink(url + "&before=" + encodedString, "previous"));
+                }
+                if (!isLastPage) {
+                    String encodedString = Base64.getEncoder().encodeToString(configurations
+                            .get(configurations.size() - 1).getCursorKey().toString().getBytes(StandardCharsets.UTF_8));
+                    result.addLinksItem(buildPaginationLink(url + "&after=" + encodedString, "next"));
+                }
+            }
             if (configurations == null || configurations.isEmpty()) {
                 result.setTotalResults(0);
                 result.setVcCredentialConfigurations(new ArrayList<>());
                 return result;
             }
-
-            List<VCCredentialConfigurationListItem> items = configurations.stream()
+            result.setTotalResults(searchResult.getTotalCount());
+            result.setVcCredentialConfigurations(configurations.stream()
                     .filter(Objects::nonNull)
                     .map(this::toApiListItem)
-                    .collect(Collectors.toList());
-
-            result.setTotalResults(items.size());
-            result.setVcCredentialConfigurations(items);
+                    .collect(Collectors.toList()));
             return result;
         } catch (VCConfigMgtException e) {
             throw handleVCConfigException(e, "Error while listing VC credential configurations", null);
@@ -352,5 +417,31 @@ public class ServerVCCredentialConfigManagementService {
         item.setDisplayName(model.getDisplayName());
         item.setScope(model.getScope());
         return item;
+    }
+
+    private Integer validatedLimit(Integer limit) {
+
+        limit = limit == null ? DEFAULT_LIMIT : limit;
+        if (limit <= 0) {
+            throw handleVCConfigException(
+                    new VCConfigMgtClientException("60002", "Limit must be a positive integer"),
+                    "Invalid limit value", limit.toString());
+        }
+        return limit;
+    }
+
+    /**
+     * Build pagination link.
+     *
+     * @param url URL with query parameters.
+     * @param rel Relation type (previous or next).
+     * @return Pagination link.
+     */
+    private PaginationLink buildPaginationLink(String url, String rel) {
+
+        return new PaginationLink()
+                .href(ContextLoader.buildURIForHeader(Constants.V1_API_PATH_COMPONENT + PATH_SEPARATOR +
+                        VC_CREDENTIAL_CONFIG_PATH_COMPONENT + url).toString())
+                .rel(rel);
     }
 }
