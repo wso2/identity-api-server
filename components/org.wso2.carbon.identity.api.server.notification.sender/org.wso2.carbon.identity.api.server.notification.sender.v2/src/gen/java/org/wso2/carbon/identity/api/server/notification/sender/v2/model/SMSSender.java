@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.notification.sender.v2.model.Authentication;
 import org.wso2.carbon.identity.api.server.notification.sender.v2.model.Properties;
 import javax.validation.constraints.*;
 
@@ -41,6 +42,7 @@ public class SMSSender  {
     private String key;
     private String secret;
     private String sender;
+    private Authentication authentication;
 
 @XmlType(name="ContentTypeEnum")
 @XmlEnum(String.class)
@@ -194,6 +196,24 @@ public enum ContentTypeEnum {
 
     /**
     **/
+    public SMSSender authentication(Authentication authentication) {
+
+        this.authentication = authentication;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("authentication")
+    @Valid
+    public Authentication getAuthentication() {
+        return authentication;
+    }
+    public void setAuthentication(Authentication authentication) {
+        this.authentication = authentication;
+    }
+
+    /**
+    **/
     public SMSSender contentType(ContentTypeEnum contentType) {
 
         this.contentType = contentType;
@@ -256,13 +276,14 @@ public enum ContentTypeEnum {
             Objects.equals(this.key, smSSender.key) &&
             Objects.equals(this.secret, smSSender.secret) &&
             Objects.equals(this.sender, smSSender.sender) &&
+            Objects.equals(this.authentication, smSSender.authentication) &&
             Objects.equals(this.contentType, smSSender.contentType) &&
             Objects.equals(this.properties, smSSender.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, provider, providerURL, key, secret, sender, contentType, properties);
+        return Objects.hash(name, provider, providerURL, key, secret, sender, authentication, contentType, properties);
     }
 
     @Override
@@ -277,6 +298,7 @@ public enum ContentTypeEnum {
         sb.append("    key: ").append(toIndentedString(key)).append("\n");
         sb.append("    secret: ").append(toIndentedString(secret)).append("\n");
         sb.append("    sender: ").append(toIndentedString(sender)).append("\n");
+        sb.append("    authentication: ").append(toIndentedString(authentication)).append("\n");
         sb.append("    contentType: ").append(toIndentedString(contentType)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");

@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.notification.sender.v2.model.Authentication;
 import org.wso2.carbon.identity.api.server.notification.sender.v2.model.Properties;
 import javax.validation.constraints.*;
 
@@ -39,6 +40,7 @@ public class SMSSenderUpdateRequest  {
     private String providerURL;
     private String key;
     private String secret;
+    private Authentication authentication;
     private String sender;
 
 @XmlType(name="ContentTypeEnum")
@@ -153,6 +155,24 @@ public enum ContentTypeEnum {
 
     /**
     **/
+    public SMSSenderUpdateRequest authentication(Authentication authentication) {
+
+        this.authentication = authentication;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("authentication")
+    @Valid
+    public Authentication getAuthentication() {
+        return authentication;
+    }
+    public void setAuthentication(Authentication authentication) {
+        this.authentication = authentication;
+    }
+
+    /**
+    **/
     public SMSSenderUpdateRequest sender(String sender) {
 
         this.sender = sender;
@@ -231,6 +251,7 @@ public enum ContentTypeEnum {
             Objects.equals(this.providerURL, smSSenderUpdateRequest.providerURL) &&
             Objects.equals(this.key, smSSenderUpdateRequest.key) &&
             Objects.equals(this.secret, smSSenderUpdateRequest.secret) &&
+            Objects.equals(this.authentication, smSSenderUpdateRequest.authentication) &&
             Objects.equals(this.sender, smSSenderUpdateRequest.sender) &&
             Objects.equals(this.contentType, smSSenderUpdateRequest.contentType) &&
             Objects.equals(this.properties, smSSenderUpdateRequest.properties);
@@ -238,7 +259,7 @@ public enum ContentTypeEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(provider, providerURL, key, secret, sender, contentType, properties);
+        return Objects.hash(provider, providerURL, key, secret, authentication, sender, contentType, properties);
     }
 
     @Override
@@ -251,6 +272,7 @@ public enum ContentTypeEnum {
         sb.append("    providerURL: ").append(toIndentedString(providerURL)).append("\n");
         sb.append("    key: ").append(toIndentedString(key)).append("\n");
         sb.append("    secret: ").append(toIndentedString(secret)).append("\n");
+        sb.append("    authentication: ").append(toIndentedString(authentication)).append("\n");
         sb.append("    sender: ").append(toIndentedString(sender)).append("\n");
         sb.append("    contentType: ").append(toIndentedString(contentType)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
