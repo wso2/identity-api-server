@@ -1511,7 +1511,7 @@ components:
   schemas:
     ActionType:
       type: string
-      description: Action types supported. As of now only 'PRE_ISSUE_ACCESS_TOKEN' and 'PRE_ISSUE-ID_TOKEN' is implemented.
+      description: Action types supported. As of now only 'PRE_ISSUE_ACCESS_TOKEN' and 'PRE_ISSUE-ID_TOKEN' are implemented.
       enum:
         - PRE_ISSUE_ACCESS_TOKEN
         - PRE_UPDATE_PASSWORD

@@ -130,28 +130,28 @@ paths:
                           - href: /applications?filter=name+eq+*&limit=10
                             method: GET
                             rel: filter
-                          - field:
-                              name: grantType
-                              displayName: grant type
-                            operators:
-                              - name: equals
-                                displayName: equals
-                              - name: notEquals
-                                displayName: not equals
-                            value:
-                              inputType: options
-                              valueType: string
-                              values:
-                                - name: authorization_code
-                                  displayName: authorization code
-                                - name: password
-                                  displayName: password
-                                - name: refresh_token
-                                  displayName: refresh token
-                                - name: device code
-                                  displayName: urn:ietf:params:oauth:grant-type:device_code
-                                - name: organization switch
-                                  displayName: organization switch
+                    - field:
+                        name: grantType
+                        displayName: grant type
+                      operators:
+                        - name: equals
+                          displayName: equals
+                        - name: notEquals
+                          displayName: not equals
+                      value:
+                        inputType: options
+                        valueType: string
+                        values:
+                          - name: authorization_code
+                            displayName: authorization code
+                          - name: password
+                            displayName: password
+                          - name: refresh_token
+                            displayName: refresh token
+                          - name: urn:ietf:params:oauth:grant-type:device_code
+                            displayName: device code
+                          - name: organization switch
+                            displayName: organization switch
                 preUpdatePassword:
                   summary: Sample response for pre-update password flow
                   value:
