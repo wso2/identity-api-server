@@ -51,6 +51,11 @@ paths:
                   description: This action invokes before updating a user profile.
                   count: 1
                   self: "/api/server/v1/actions/preUpdateProfile"
+                - type: PRE_ISSUE_ID_TOKEN
+                  displayName: Pre Issue ID Token
+                  description: This action invokes before issuing an ID token.
+                  count: 1
+                  self: "/api/server/v1/actions/preIssueIdToken"
         '401':
           description: Unauthorized
         '403':
@@ -86,6 +91,7 @@ paths:
               - preUpdatePassword
               - preUpdateProfile
               - preRegistration
+              - preIssueIdToken
       requestBody:
         content:
           application/json:
@@ -125,6 +131,39 @@ paths:
                           - field: grantType
                             operator: equals
                             value: client_credentials
+              preIssueIdToken:
+                summary: Sample payload for pre issue ID token action
+                value:
+                  name: ID Token Pre Issue
+                  description: This action invokes before issuing an ID token.
+                  endpoint:
+                    uri: https://myextension.com/idtoken
+                    authentication:
+                      properties:
+                        username: auth_username
+                        password: auth_password
+                      type: BASIC
+                    allowedHeaders:
+                      - x-geo-location
+                      - host
+                    allowedParameters:
+                      - device-id
+                  rule:
+                    condition: OR
+                    rules:
+                      - condition: AND
+                        expressions:
+                          - field: application
+                            operator: equals
+                            value: 29ed9110-d0eb-48e3-918c-4832e8c9c81f
+                          - field: grantType
+                            operator: notEquals
+                            value: refresh_token
+                      - condition: AND
+                        expressions:
+                          - field: grantType
+                            operator: equals
+                            value: authorization_code
               preUpdatePassword:
                 summary: Sample payload for pre update password action
                 value:
@@ -235,6 +274,36 @@ paths:
                             - field: grantType
                               operator: equals
                               value: client_credentials
+                preIssueIdToken:
+                  summary: Sample response for pre issue ID token action
+                  value:
+                    id: 24f64d17-9824-4e28-8413-de45728d8e84
+                    name: ID Token Pre Issue
+                    description: This action invokes before issuing an ID token.
+                    status: INACTIVE
+                    version: v1
+                    createdAt: 2025-08-01T12:00:00Z
+                    updatedAt: 2025-09-01T13:00:00Z
+                    endpoint:
+                      uri: https://myextension.com/idtoken
+                      authentication:
+                        type: BASIC
+                    rule:
+                      condition: OR
+                      rules:
+                        - condition: AND
+                          expressions:
+                            - field: application
+                              operator: equals
+                              value: 29ed9110-d0eb-48e3-918c-4832e8c9c81f
+                            - field: grantType
+                              operator: notEquals
+                              value: refresh_token
+                        - condition: AND
+                          expressions:
+                            - field: grantType
+                              operator: equals
+                              value: authorization_code
                 preUpdatePassword:
                   summary: Sample response for pre update password action
                   value:
@@ -348,6 +417,27 @@ paths:
                     "allowedParameters": [ "device-id" ]
                 }
             }'
+        - lang: Curl - preIssueIdToken
+          source: |
+            curl --location 'https://localhost:9443/api/server/v1/actions/preIssueIdToken' \
+            -H 'Authorization: Basic YWRtaW46YWRtaW4=' \
+            -H 'Content-Type: application/json' \
+            -d '{
+                "name": "ID Token Pre Issue",
+                "description": "This is the configuration of pre-action for issuing id token.",
+                "endpoint": {
+                    "uri": "https://myextension.com/idtoken",
+                    "authentication": {
+                        "properties": {
+                            "username": "auth_username",
+                            "password": "auth_password"
+                        },
+                        "type": "BASIC"
+                    },
+                    "allowedHeaders": [ "x-geo-location", "host" ],
+                    "allowedParameters": [ "device-id" ]
+                }
+            }'
         - lang: Curl - preUpdatePassword
           source: |
             curl --location 'https://localhost:9443/api/server/v1/actions/preUpdatePassword' \
@@ -413,6 +503,7 @@ paths:
               - preUpdatePassword
               - preUpdateProfile
               - preRegistration
+              - preIssueIdToken
       responses:
         '200':
           description: OK
@@ -434,6 +525,21 @@ paths:
                       updatedAt: 2025-09-01T13:00:00Z
                       links:
                         - href: "/api/server/v1/actions/preIssueAccessToken/24f64d17-9824-4e28-8413-de45728d8e84"
+                          method: GET
+                          rel: self
+                preIssueIdToken:
+                  summary: Sample response for pre issue ID token action
+                  value:
+                    - id: c0beccc0-4a63-45a4-8563-ec006b38270a
+                      type: PRE_ISSUE_ID_TOKEN
+                      name: ID Token Pre Issue
+                      description: This action invokes before issuing an ID token.
+                      status: ACTIVE
+                      version: v1
+                      createdAt: 2025-08-01T12:00:00Z
+                      updatedAt: 2025-09-01T13:00:00Z
+                      links:
+                        - href: "/api/server/v1/actions/preIssueIdToken/c0beccc0-4a63-45a4-8563-ec006b38270a"
                           method: GET
                           rel: self
                 preUpdatePassword:
@@ -519,6 +625,7 @@ paths:
               - preUpdatePassword
               - preUpdateProfile
               - preRegistration
+              - preIssueIdToken
         - name: actionId
           in: path
           description: Unique identifier of the action.
@@ -569,6 +676,37 @@ paths:
                             - field: grantType
                               operator: equals
                               value: client_credentials
+                preIssueIdToken:
+                  summary: Sample response for pre issue ID token action
+                  value:
+                    id: c0beccc0-4a63-45a4-8563-ec006b38270a
+                    type: PRE_ISSUE_ID_TOKEN
+                    name: ID Token Pre Issue
+                    description: This action invokes before issuing an ID token.
+                    status: ACTIVE
+                    version: v1
+                    createdAt: 2025-08-01T12:00:00Z
+                    updatedAt: 2025-09-01T13:00:00Z
+                    endpoint:
+                      uri: https://myextension.com/idtoken
+                      authentication:
+                        type: BASIC
+                    rule:
+                      condition: OR
+                      rules:
+                        - condition: AND
+                          expressions:
+                            - field: application
+                              operator: equals
+                              value: 29ed9110-d0eb-48e3-918c-4832e8c9c81f
+                            - field: grantType
+                              operator: notEquals
+                              value: refresh_token
+                        - condition: AND
+                          expressions:
+                            - field: grantType
+                              operator: equals
+                              value: authorization_code
                 preUpdatePassword:
                   summary: Sample response for pre update password action
                   value:
@@ -691,6 +829,7 @@ paths:
               - preUpdatePassword
               - preUpdateProfile
               - preRegistration
+              - preIssueIdToken
         - name: actionId
           in: path
           description: Unique identifier of the action.
@@ -731,6 +870,34 @@ paths:
                           - field: grantType
                             operator: notEquals
                             value: password
+              preIssueIdToken:
+                summary: Sample payload for pre issue ID token action update
+                value:
+                  name: Updated ID Token Pre Issue
+                  description: This action invokes before issuing an ID token.
+                  version: v2
+                  endpoint:
+                    uri: https://myextension.com/external/idtoken
+                    authentication:
+                      properties:
+                        token: 346dfbb5-6a8c-447a-9aaa-88fa2dd95962
+                      type: BEARER
+                    allowedHeaders:
+                      - x-geo-location
+                      - host
+                    allowedParameters:
+                        - device-id
+                  rule:
+                    condition: OR
+                    rules:
+                      - condition: AND
+                        expressions:
+                          - field: application
+                            operator: equals
+                            value: 29ed9110-d0eb-48e3-918c-4832e8c9c81f
+                          - field: grantType
+                            operator: notEquals
+                            value: refresh_token
               preUpdatePassword:
                 summary: Sample payload for pre update password action update
                 value:
@@ -822,6 +989,36 @@ paths:
                             - field: grantType
                               operator: notEquals
                               value: password
+                preIssueIdToken:
+                  summary: Sample response for pre issue ID token action
+                  value:
+                    id: c0beccc0-4a63-45a4-8563-ec006b38270a
+                    name: Updated ID Token Pre Issue
+                    description: This action invokes before issuing an ID token.
+                    status: ACTIVE
+                    version: v1
+                    createdAt: 2025-08-01T12:00:00Z
+                    updatedAt: 2025-09-01T13:00:00Z
+                    endpoint:
+                      uri: https://myextension.com/external/idtoken
+                      authentication:
+                        type: BEARER
+                      allowedHeaders:
+                        - x-geo-location
+                        - host
+                      allowedParameters:
+                        - device-id
+                    rule:
+                      condition: OR
+                      rules:
+                        - condition: AND
+                          expressions:
+                            - field: application
+                              operator: equals
+                              value: 29ed9110-d0eb-48e3-918c-4832e8c9c81f
+                            - field: grantType
+                              operator: notEquals
+                              value: refresh_token
                 preUpdatePassword:
                   summary: Sample response for pre update password action
                   value:
@@ -910,7 +1107,7 @@ paths:
       x-codeSamples:
         - lang: Curl - preIssueAccessToken
           source: |
-            curl --location --request PATCH 'https://localhost:9443/api/server/v1/actions/{actionType}/{actionId}' \
+            curl --location --request PATCH 'https://localhost:9443/api/server/v1/actions/preIssueAccessToken/{actionId}' \
             -H 'Content-Type: application/json' \
             -H 'Accept: application/json' \
             -H 'Authorization: Basic YWRtaW46YWRtaW4=' \
@@ -924,6 +1121,27 @@ paths:
                         "properties": {
                             "header": "sample_header",
                             "value": "sample_value"
+                        }
+                    },
+                    "allowedHeaders": [ "x-geo-location", "host" ],
+                    "allowedParameters": [ "device-id" ]
+                }
+            }'
+        - lang: Curl - preIssueIdToken
+          source: |
+            curl --location --request PATCH 'https://localhost:9443/api/server/v1/actions/preIssueIdToken/{actionId}' \
+            -H 'Content-Type: application/json' \
+            -H 'Accept: application/json' \
+            -H 'Authorization: Basic YWRtaW46YWRtaW4=' \
+            -d '{
+                "name": "Updated ID Token Pre Issue",
+                "description": "This is the configuration of pre-action for issuing ID token from myextensions.com.",
+                "endpoint": {
+                    "uri": "http://myextensions.com/id-token",
+                    "authentication": {
+                        "type": "BEARER",
+                        "properties": {
+                            "token": "346dfbb5-6a8c-447a-9aaa-88fa2dd95962"
                         }
                     },
                     "allowedHeaders": [ "x-geo-location", "host" ],
@@ -991,6 +1209,7 @@ paths:
               - preUpdatePassword
               - preUpdateProfile
               - preRegistration
+              - preIssueIdToken
         - name: actionId
           in: path
           description: Unique identifier of the action.
@@ -1047,6 +1266,7 @@ paths:
               - preUpdatePassword
               - preUpdateProfile
               - preRegistration
+              - preIssueIdToken
         - name: actionId
           in: path
           description: Unique identifier of the action.
@@ -1074,6 +1294,21 @@ paths:
                       updatedAt: 2025-09-01T13:00:00Z
                       links:
                         - href: "/api/server/v1/actions/preIssueAccessToken/24f64d17-9824-4e28-8413-de45728d8e84"
+                          method: GET
+                          rel: self
+                preIssueIdToken:
+                  summary: Sample response for pre issue ID token action
+                  value:
+                    - id: c0beccc0-4a63-45a4-8563-ec006b38270a
+                      type: PRE_ISSUE_ID_TOKEN
+                      name: ID Token Pre Issue
+                      description: This action invokes before issuing an ID token.
+                      status: ACTIVE
+                      version: v1
+                      createdAt: 2025-08-01T12:00:00Z
+                      updatedAt: 2025-09-01T13:00:00Z
+                      links:
+                        - href: "/api/server/v1/actions/preIssueIdToken/c0beccc0-4a63-45a4-8563-ec006b38270a"
                           method: GET
                           rel: self
                 preUpdatePassword:
@@ -1159,6 +1394,7 @@ paths:
               - preUpdatePassword
               - preUpdateProfile
               - preRegistration
+              - preIssueIdToken
         - name: actionId
           in: path
           description: Unique identifier of the action.
@@ -1183,6 +1419,18 @@ paths:
                       status: INACTIVE
                       links:
                         - href: "/api/server/v1/actions/preIssueAccessToken/24f64d17-9824-4e28-8413-de45728d8e84"
+                          method: GET
+                          rel: self
+                preIssueIdToken:
+                  summary: Sample response for pre issue ID token action
+                  value:
+                    - id: c0beccc0-4a63-45a4-8563-ec006b38270a
+                      type: PRE_ISSUE_ID_TOKEN
+                      name: ID Token Pre Issue
+                      description: This action invokes before issuing an ID token.
+                      status: INACTIVE
+                      links:
+                        - href: "/api/server/v1/actions/preIssueIdToken/c0beccc0-4a63-45a4-8563-ec006b38270a"
                           method: GET
                           rel: self
                 preUpdatePassword:
@@ -1263,12 +1511,13 @@ components:
   schemas:
     ActionType:
       type: string
-      description: Action types supported. As of now only 'PRE_ISSUE_ACCESS_TOKEN' is implemented.
+      description: Action types supported. As of now only 'PRE_ISSUE_ACCESS_TOKEN' and 'PRE_ISSUE-ID_TOKEN' is implemented.
       enum:
         - PRE_ISSUE_ACCESS_TOKEN
         - PRE_UPDATE_PASSWORD
         - PRE_UPDATE_PROFILE
         - PRE_REGISTRATION
+        - PRE_ISSUE_ID_TOKEN
     ActionModel:
       type: object
       required:
