@@ -886,7 +886,7 @@ paths:
                       - x-geo-location
                       - host
                     allowedParameters:
-                        - device-id
+                      - device-id
                   rule:
                     condition: OR
                     rules:
