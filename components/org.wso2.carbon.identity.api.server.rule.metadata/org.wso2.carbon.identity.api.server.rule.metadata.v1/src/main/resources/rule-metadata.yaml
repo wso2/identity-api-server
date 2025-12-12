@@ -37,7 +37,7 @@ paths:
         description: |
           Specifies the flow to retrieve rule metadata. This ensures that the metadata returned is relevant to the given flow.
 
-          Note: At present, only the 'preIssueAccessToken' and 'preUpdatePassword' flows are supported.
+          Note: At present, only the 'preIssueAccessToken', 'preUpdatePassword' and 'preIssueIdToken' flows are supported.
         required: true
         style: form
         explode: true
@@ -45,6 +45,7 @@ paths:
           type: string
           enum:
           - preIssueAccessToken
+          - preIssueIdToken
           - preUpdatePassword
           - preProfileUpdate
           - preLogin
@@ -106,6 +107,51 @@ paths:
                         displayName: client credentials
                       - name: urn:ietf:params:oauth:grant-type:token-exchange
                         displayName: token exchange
+                preIssueIdToken:
+                    summary: Sample response for pre-issue ID token flow
+                    value:
+                    - field:
+                        name: application
+                        displayName: application
+                      operators:
+                        - name: equals
+                          displayName: equals
+                        - name: notEquals
+                          displayName: not equals
+                      value:
+                        inputType: options
+                        valueType: reference
+                        valueReferenceAttribute: id
+                        valueDisplayAttribute: name
+                        links:
+                          - href: /applications?offset=0&limit=10
+                            method: GET
+                            rel: values
+                          - href: /applications?filter=name+eq+*&limit=10
+                            method: GET
+                            rel: filter
+                    - field:
+                        name: grantType
+                        displayName: grant type
+                      operators:
+                        - name: equals
+                          displayName: equals
+                        - name: notEquals
+                          displayName: not equals
+                      value:
+                        inputType: options
+                        valueType: string
+                        values:
+                          - name: authorization_code
+                            displayName: authorization code
+                          - name: password
+                            displayName: password
+                          - name: refresh_token
+                            displayName: refresh token
+                          - name: urn:ietf:params:oauth:grant-type:device_code
+                            displayName: device code
+                          - name: organization switch
+                            displayName: organization switch
                 preUpdatePassword:
                   summary: Sample response for pre-update password flow
                   value:

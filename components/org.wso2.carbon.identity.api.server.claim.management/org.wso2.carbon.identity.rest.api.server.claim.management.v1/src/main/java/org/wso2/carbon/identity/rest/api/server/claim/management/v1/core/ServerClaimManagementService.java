@@ -176,6 +176,7 @@ import static org.wso2.carbon.identity.api.server.common.Constants.XML_FILE_EXTE
 import static org.wso2.carbon.identity.api.server.common.Constants.YAML_FILE_EXTENSION;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIForBody;
 import static org.wso2.carbon.identity.claim.metadata.mgt.util.ClaimConstants.IS_SYSTEM_CLAIM;
+import static org.wso2.carbon.identity.claim.metadata.mgt.util.ClaimConstants.MANAGED_IN_USER_STORE_PROPERTY;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_ORGANIZATION_NOT_FOUND_FOR_TENANT;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
@@ -434,16 +435,15 @@ public class ServerClaimManagementService {
     public LocalClaimResDTO getLocalClaim(String claimId) {
 
         try {
-            List<LocalClaim> localClaimList = claimMetadataManagementService.getLocalClaims(ContextLoader
-                    .getTenantDomainFromContext());
+            String claimURI = base64DecodeId(claimId);
+            Optional<LocalClaim> localClaim = claimMetadataManagementService.getLocalClaim(claimURI, ContextLoader
+                    .getTenantDomainFromContext(), true);
 
-            LocalClaim localClaim = extractLocalClaimFromClaimList(base64DecodeId(claimId), localClaimList);
-
-            if (localClaim == null) {
+            if (!localClaim.isPresent()) {
                 throw handleClaimManagementClientError(ERROR_CODE_LOCAL_CLAIM_NOT_FOUND, NOT_FOUND, claimId);
             }
 
-            return getLocalClaimResDTO(localClaim);
+            return getLocalClaimResDTO(localClaim.get());
 
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_RETRIEVING_LOCAL_CLAIM, claimId);
@@ -1208,6 +1208,10 @@ public class ServerClaimManagementService {
             }
         }
 
+        String managedInUserStore =
+                claimProperties.remove(ClaimConstants.MANAGED_IN_USER_STORE_PROPERTY);
+        localClaimResDTO.setManagedInUserStore(Boolean.valueOf(managedInUserStore));
+
         List<AttributeMappingDTO> attributeMappingDTOs = new ArrayList<>();
         for (AttributeMapping attributeMapping : localClaim.getMappedAttributes()) {
             AttributeMappingDTO attributeMappingDTO = new AttributeMappingDTO();
@@ -1304,6 +1308,12 @@ public class ServerClaimManagementService {
 
         if (StringUtils.isNotBlank(localClaimReqDTO.getRegEx())) {
             claimProperties.put(PROP_REG_EX, localClaimReqDTO.getRegEx());
+        }
+
+        Boolean managedInUserStore = localClaimReqDTO.getManagedInUserStoreEnabled();
+        if (managedInUserStore != null) {
+            claimProperties.put(ClaimConstants.MANAGED_IN_USER_STORE_PROPERTY,
+                    String.valueOf(managedInUserStore));
         }
 
         if (localClaimReqDTO.getDisplayOrder() != null) {
@@ -2038,9 +2048,11 @@ public class ServerClaimManagementService {
     private void validateLocalClaimUpdate(String claimID, LocalClaim incomingLocalClaim)
             throws ClaimMetadataException {
 
+        boolean fetchManagedInUserStoreProperty =
+                incomingLocalClaim.getClaimProperties().containsKey(MANAGED_IN_USER_STORE_PROPERTY);
         Optional<LocalClaim>
                 existingLocalClaim = getClaimMetadataManagementService().getLocalClaim(base64DecodeId(claimID),
-                ContextLoader.getTenantDomainFromContext());
+                ContextLoader.getTenantDomainFromContext(), fetchManagedInUserStoreProperty);
 
         if (!existingLocalClaim.isPresent()) {
             throw handleClaimManagementClientError(ERROR_CODE_LOCAL_CLAIM_NOT_FOUND, BAD_REQUEST, claimID);
@@ -2129,6 +2141,16 @@ public class ServerClaimManagementService {
                 throw new ClaimMetadataException(String.valueOf(Constant.ErrorMessage
                         .ERROR_CODE_ERROR_SERIALIZING_INPUT_FORMAT), e);
             }
+        }
+
+        if (!incomingLocalClaim.getClaimProperties().containsKey(MANAGED_IN_USER_STORE_PROPERTY)
+                && localClaim.getClaimProperties().containsKey(MANAGED_IN_USER_STORE_PROPERTY)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(String.format("Populating the '%s' property from the existing local claim for claim URI: %s",
+                        MANAGED_IN_USER_STORE_PROPERTY, localClaim.getClaimURI()));
+            }
+            incomingLocalClaim.setClaimProperty(MANAGED_IN_USER_STORE_PROPERTY,
+                    localClaim.getClaimProperty(MANAGED_IN_USER_STORE_PROPERTY));
         }
     }
 

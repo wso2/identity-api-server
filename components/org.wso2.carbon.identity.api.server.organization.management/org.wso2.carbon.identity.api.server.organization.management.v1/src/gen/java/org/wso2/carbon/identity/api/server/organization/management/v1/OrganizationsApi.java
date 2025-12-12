@@ -273,7 +273,7 @@ public class OrganizationsApi  {
         @ApiResponse(code = 500, message = "Internal server error.", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented.", response = Error.class)
     })
-    public Response organizationsDiscoveryGet(    @Valid@ApiParam(value = "Condition to filter the retrieval of records.")  @QueryParam("filter") String filter,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination.")  @QueryParam("offset") Integer offset,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to be returned. (Should be greater than 0)")  @QueryParam("limit") Integer limit) {
+    public Response organizationsDiscoveryGet(    @Valid@ApiParam(value = "Condition to filter the retrieval of records.")  @QueryParam("filter") String filter,     @Valid @Min(value = 0, message = "offset must be greater than or equal to 0.")@ApiParam(value = "Number of records to skip for pagination.")  @QueryParam("offset") Integer offset,     @Valid @Min(value = 0, message = "limit must be greater than or equal to 0.")@ApiParam(value = "Maximum number of records to be returned. (Should be greater than 0)")  @QueryParam("limit") Integer limit) {
 
         return delegate.organizationsDiscoveryGet(filter,  offset,  limit );
     }

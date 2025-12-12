@@ -141,11 +141,17 @@
             <Bug pattern="IMPROPER_UNICODE"/>
         </Match>
     </FindBugsFilter>
+    <!--
+        Suppress SERVLET_HEADER false positive for Accept header access.
+        The Accept header is already validated by JAX-RS against the @Produces annotation.
+        Only specified content types are allowed through JAX-RS filtering, and the header is
+        only used for additional JSON rejection in certificate download endpoints.
+    -->
     <FindBugsFilter>
         <Match>
-            <Class name="org.wso2.carbon.identity.api.server.notification.sender.v1.core.NotificationSenderManagementService"/>
-            <Method name="buildEmailSenderFromDTO"/>
-            <Bug pattern="IMPROPER_UNICODE"/>
+            <Class name="org.wso2.carbon.identity.api.server.keystore.management.v1.impl.KeystoresApiServiceImpl" />
+            <Method name="getCurrentAcceptHeader" />
+            <Bug pattern="SERVLET_HEADER" />
         </Match>
     </FindBugsFilter>
 </FindBugsFilter>

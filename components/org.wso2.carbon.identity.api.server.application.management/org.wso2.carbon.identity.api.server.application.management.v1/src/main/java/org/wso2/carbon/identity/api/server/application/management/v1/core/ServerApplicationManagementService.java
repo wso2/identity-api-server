@@ -562,6 +562,7 @@ public class ServerApplicationManagementService {
         ServiceProvider serviceProvider;
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            exportSecrets = hasOperationScopeForSecretExport(exportSecrets);
             serviceProvider = applicationManagementService.exportSPFromAppID(applicationId, exportSecrets,
                     tenantDomain);
         } catch (IdentityApplicationManagementException e) {

@@ -19,6 +19,8 @@
 package org.wso2.carbon.identity.api.server.keystore.management.v1.impl;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.identity.api.server.keystore.management.v1.KeystoresApiService;
 import org.wso2.carbon.identity.api.server.keystore.management.v1.core.KeyStoreService;
@@ -26,15 +28,21 @@ import org.wso2.carbon.identity.api.server.keystore.management.v1.factories.KeyS
 import org.wso2.carbon.identity.api.server.keystore.management.v1.model.CertificateRequest;
 
 import java.net.URI;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenantDomainFromContext;
+import static org.wso2.carbon.identity.api.server.keystore.management.common.KeyStoreConstants.ACCEPT_HEADER;
+import static org.wso2.carbon.identity.api.server.keystore.management.common.KeyStoreConstants.HTTP_REQUEST_MESSAGE_KEY;
 
 /**
  * API service implementation of Keystore management service operations.
  */
 public class KeystoresApiServiceImpl implements KeystoresApiService {
+
+    private static final Log log = LogFactory.getLog(KeystoresApiServiceImpl.class);
 
     private final KeyStoreService keyStoreService;
 
@@ -60,6 +68,10 @@ public class KeystoresApiServiceImpl implements KeystoresApiService {
     @Override
     public Response getCertificate(String alias, Boolean encodeCert) {
 
+        if (isJsonResponseRequested()) {
+            return Response.status(Response.Status.NOT_ACCEPTABLE).build();
+        }
+
         if (encodeCert == null) {
             encodeCert = false;
         }
@@ -77,6 +89,9 @@ public class KeystoresApiServiceImpl implements KeystoresApiService {
 
         if (!StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
             return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
+        }
+        if (isJsonResponseRequested()) {
+            return Response.status(Response.Status.NOT_ACCEPTABLE).build();
         }
 
         if (encodeCert == null) {
@@ -97,6 +112,10 @@ public class KeystoresApiServiceImpl implements KeystoresApiService {
     @Override
     public Response getPublicCertificate(Boolean encodeCert) {
 
+        if (isJsonResponseRequested()) {
+            return Response.status(Response.Status.NOT_ACCEPTABLE).build();
+        }
+
         if (encodeCert == null) {
             encodeCert = false;
         }
@@ -113,5 +132,41 @@ public class KeystoresApiServiceImpl implements KeystoresApiService {
                 certificateRequest.getCertificate());
         NewCookie resourceCookie = new NewCookie("Location", certResource.toString());
         return Response.created(certResource).cookie(resourceCookie).build();
+    }
+
+    /**
+     * Checks if JSON response is requested for certificate download endpoints.
+     * JSON responses are not supported for certificate downloads.
+     *
+     * @return true if JSON is requested, false otherwise.
+     */
+    private boolean isJsonResponseRequested() {
+
+        String acceptHeader = getCurrentAcceptHeader();
+        if (acceptHeader == null) {
+            return false;
+        }
+        return acceptHeader.contains(MediaType.APPLICATION_JSON);
+    }
+
+    /**
+     * Gets the Accept header from the current HTTP request using Apache CXF.
+     *
+     * @return Accept header value or null if not accessible.
+     */
+    private String getCurrentAcceptHeader() {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Attempting to retrieve Accept header from current CXF message.");
+        }
+
+        org.apache.cxf.message.Message message = org.apache.cxf.phase.PhaseInterceptorChain.getCurrentMessage();
+        if (message != null) {
+            HttpServletRequest request = (HttpServletRequest) message.get(HTTP_REQUEST_MESSAGE_KEY);
+            if (request != null) {
+                return request.getHeader(ACCEPT_HEADER);
+            }
+        }
+        return null;
     }
 }
