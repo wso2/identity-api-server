@@ -35,7 +35,6 @@ public class VCCredentialConfigurationListItem  {
     private String id;
     private String identifier;
     private String displayName;
-    private String scope;
 
     /**
     **/
@@ -99,26 +98,6 @@ public class VCCredentialConfigurationListItem  {
         this.displayName = displayName;
     }
 
-    /**
-    **/
-    public VCCredentialConfigurationListItem scope(String scope) {
-
-        this.scope = scope;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "employee_badge", required = true, value = "")
-    @JsonProperty("scope")
-    @Valid
-    @NotNull(message = "Property scope cannot be null.")
-
-    public String getScope() {
-        return scope;
-    }
-    public void setScope(String scope) {
-        this.scope = scope;
-    }
-
 
 
     @Override
@@ -133,13 +112,12 @@ public class VCCredentialConfigurationListItem  {
         VCCredentialConfigurationListItem vcCredentialConfigurationListItem = (VCCredentialConfigurationListItem) o;
         return Objects.equals(this.id, vcCredentialConfigurationListItem.id) &&
             Objects.equals(this.identifier, vcCredentialConfigurationListItem.identifier) &&
-            Objects.equals(this.displayName, vcCredentialConfigurationListItem.displayName) &&
-            Objects.equals(this.scope, vcCredentialConfigurationListItem.scope);
+            Objects.equals(this.displayName, vcCredentialConfigurationListItem.displayName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, identifier, displayName, scope);
+        return Objects.hash(id, identifier, displayName);
     }
 
     @Override
@@ -151,7 +129,6 @@ public class VCCredentialConfigurationListItem  {
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    identifier: ").append(toIndentedString(identifier)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
-        sb.append("    scope: ").append(toIndentedString(scope)).append("\n");
         sb.append("}");
         return sb.toString();
     }

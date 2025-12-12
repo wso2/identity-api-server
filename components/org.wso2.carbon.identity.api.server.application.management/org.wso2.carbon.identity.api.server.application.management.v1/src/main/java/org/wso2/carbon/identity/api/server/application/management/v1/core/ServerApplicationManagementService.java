@@ -1889,8 +1889,7 @@ public class ServerApplicationManagementService {
         }
 
         if (APIResourceManagementConstants.APIResourceTypes.BUSINESS.equals(apiResource.getType()) ||
-            APIResourceManagementConstants.APIResourceTypes.MCP.equals(apiResource.getType()) ||
-                APIResourceManagementConstants.APIResourceTypes.VC.equals(apiResource.getType())) {
+            APIResourceManagementConstants.APIResourceTypes.MCP.equals(apiResource.getType())) {
             AuthorizationUtil.validateOperationScopes(
                     ApplicationManagementConstants.UPDATE_BUSINESS_AUTHORIZED_API_OPERATION);
         } else {

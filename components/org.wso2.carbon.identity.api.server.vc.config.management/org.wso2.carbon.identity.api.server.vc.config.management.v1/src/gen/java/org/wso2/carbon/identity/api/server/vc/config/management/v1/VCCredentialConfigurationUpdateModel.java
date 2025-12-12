@@ -38,9 +38,7 @@ import javax.xml.bind.annotation.*;
 public class VCCredentialConfigurationUpdateModel  {
   
     private String displayName;
-    private String scope;
     private String format;
-    private String type;
     private List<String> claims = null;
 
     private Integer expiresIn;
@@ -66,24 +64,6 @@ public class VCCredentialConfigurationUpdateModel  {
 
     /**
     **/
-    public VCCredentialConfigurationUpdateModel scope(String scope) {
-
-        this.scope = scope;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "")
-    @JsonProperty("scope")
-    @Valid
-    public String getScope() {
-        return scope;
-    }
-    public void setScope(String scope) {
-        this.scope = scope;
-    }
-
-    /**
-    **/
     public VCCredentialConfigurationUpdateModel format(String format) {
 
         this.format = format;
@@ -98,24 +78,6 @@ public class VCCredentialConfigurationUpdateModel  {
     }
     public void setFormat(String format) {
         this.format = format;
-    }
-
-    /**
-    **/
-    public VCCredentialConfigurationUpdateModel type(String type) {
-
-        this.type = type;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "")
-    @JsonProperty("type")
-    @Valid
-    public String getType() {
-        return type;
-    }
-    public void setType(String type) {
-        this.type = type;
     }
 
     /**
@@ -176,16 +138,14 @@ public class VCCredentialConfigurationUpdateModel  {
         }
         VCCredentialConfigurationUpdateModel vcCredentialConfigurationUpdateModel = (VCCredentialConfigurationUpdateModel) o;
         return Objects.equals(this.displayName, vcCredentialConfigurationUpdateModel.displayName) &&
-            Objects.equals(this.scope, vcCredentialConfigurationUpdateModel.scope) &&
             Objects.equals(this.format, vcCredentialConfigurationUpdateModel.format) &&
-            Objects.equals(this.type, vcCredentialConfigurationUpdateModel.type) &&
             Objects.equals(this.claims, vcCredentialConfigurationUpdateModel.claims) &&
             Objects.equals(this.expiresIn, vcCredentialConfigurationUpdateModel.expiresIn);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(displayName, scope, format, type, claims, expiresIn);
+        return Objects.hash(displayName, format, claims, expiresIn);
     }
 
     @Override
@@ -195,9 +155,7 @@ public class VCCredentialConfigurationUpdateModel  {
         sb.append("class VCCredentialConfigurationUpdateModel {\n");
         
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
-        sb.append("    scope: ").append(toIndentedString(scope)).append("\n");
         sb.append("    format: ").append(toIndentedString(format)).append("\n");
-        sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    claims: ").append(toIndentedString(claims)).append("\n");
         sb.append("    expiresIn: ").append(toIndentedString(expiresIn)).append("\n");
         sb.append("}");

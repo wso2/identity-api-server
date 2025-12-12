@@ -630,9 +630,9 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.identity.framework</groupId>
-                <artifactId>org.wso2.carbon.identity.vc.config.management</artifactId>
-                <version>${carbon.identity.framework.version}</version>
+                <groupId>org.wso2.carbon.identity.openid4vc</groupId>
+                <artifactId>org.wso2.carbon.identity.openid4vc.config.management</artifactId>
+                <version>${carbon.identity.openid4vc.version}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
@@ -1024,6 +1024,9 @@
 
         <org.wso2.carbon.identity.inbound.provisioning.scim2.version>3.4.146
         </org.wso2.carbon.identity.inbound.provisioning.scim2.version>
+
+        <!-- VC related versions -->
+        <carbon.identity.openid4vc.version>1.0.0-SNAPSHOT</carbon.identity.openid4vc.version>
 
         <!-- Unit test versions -->
         <testng.version>6.9.10</testng.version>

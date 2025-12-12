@@ -19,7 +19,7 @@
 package org.wso2.carbon.identity.api.server.vc.config.management.common;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.vc.config.management.VCCredentialConfigManager;
+import org.wso2.carbon.identity.openid4vc.config.management.VCCredentialConfigManager;
 
 /**
  * Service holder for {@link VCCredentialConfigManager} OSGi service.

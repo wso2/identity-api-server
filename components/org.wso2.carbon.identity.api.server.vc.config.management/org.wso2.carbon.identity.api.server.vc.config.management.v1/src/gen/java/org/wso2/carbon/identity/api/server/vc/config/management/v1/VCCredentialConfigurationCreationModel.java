@@ -36,9 +36,7 @@ public class VCCredentialConfigurationCreationModel  {
   
     private String identifier;
     private String displayName;
-    private String scope;
     private String format;
-    private String type;
     private List<String> claims = new ArrayList<String>();
 
     private Integer expiresIn;
@@ -84,26 +82,6 @@ public class VCCredentialConfigurationCreationModel  {
 
     /**
     **/
-    public VCCredentialConfigurationCreationModel scope(String scope) {
-
-        this.scope = scope;
-        return this;
-    }
-    
-    @ApiModelProperty(required = true, value = "")
-    @JsonProperty("scope")
-    @Valid
-    @NotNull(message = "Property scope cannot be null.")
-
-    public String getScope() {
-        return scope;
-    }
-    public void setScope(String scope) {
-        this.scope = scope;
-    }
-
-    /**
-    **/
     public VCCredentialConfigurationCreationModel format(String format) {
 
         this.format = format;
@@ -120,26 +98,6 @@ public class VCCredentialConfigurationCreationModel  {
     }
     public void setFormat(String format) {
         this.format = format;
-    }
-
-    /**
-    **/
-    public VCCredentialConfigurationCreationModel type(String type) {
-
-        this.type = type;
-        return this;
-    }
-    
-    @ApiModelProperty(required = true, value = "")
-    @JsonProperty("type")
-    @Valid
-    @NotNull(message = "Property type cannot be null.")
-
-    public String getType() {
-        return type;
-    }
-    public void setType(String type) {
-        this.type = type;
     }
 
     /**
@@ -202,16 +160,14 @@ public class VCCredentialConfigurationCreationModel  {
         VCCredentialConfigurationCreationModel vcCredentialConfigurationCreationModel = (VCCredentialConfigurationCreationModel) o;
         return Objects.equals(this.identifier, vcCredentialConfigurationCreationModel.identifier) &&
             Objects.equals(this.displayName, vcCredentialConfigurationCreationModel.displayName) &&
-            Objects.equals(this.scope, vcCredentialConfigurationCreationModel.scope) &&
             Objects.equals(this.format, vcCredentialConfigurationCreationModel.format) &&
-            Objects.equals(this.type, vcCredentialConfigurationCreationModel.type) &&
             Objects.equals(this.claims, vcCredentialConfigurationCreationModel.claims) &&
             Objects.equals(this.expiresIn, vcCredentialConfigurationCreationModel.expiresIn);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(identifier, displayName, scope, format, type, claims, expiresIn);
+        return Objects.hash(identifier, displayName, format, claims, expiresIn);
     }
 
     @Override
@@ -222,9 +178,7 @@ public class VCCredentialConfigurationCreationModel  {
         
         sb.append("    identifier: ").append(toIndentedString(identifier)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
-        sb.append("    scope: ").append(toIndentedString(scope)).append("\n");
         sb.append("    format: ").append(toIndentedString(format)).append("\n");
-        sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    claims: ").append(toIndentedString(claims)).append("\n");
         sb.append("    expiresIn: ").append(toIndentedString(expiresIn)).append("\n");
         sb.append("}");

@@ -82,8 +82,8 @@
             <artifactId>org.wso2.carbon.identity.api.server.common</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.identity.framework</groupId>
-            <artifactId>org.wso2.carbon.identity.vc.config.management</artifactId>
+            <groupId>org.wso2.carbon.identity.openid4vc</groupId>
+            <artifactId>org.wso2.carbon.identity.openid4vc.config.management</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

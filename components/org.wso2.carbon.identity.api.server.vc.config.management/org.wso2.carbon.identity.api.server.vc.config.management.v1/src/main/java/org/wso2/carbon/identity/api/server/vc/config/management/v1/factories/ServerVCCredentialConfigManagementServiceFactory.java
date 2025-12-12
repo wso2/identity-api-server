@@ -22,7 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.vc.config.management.common.VCCredentialConfigManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.core.ServerVCCredentialConfigManagementService;
-import org.wso2.carbon.identity.vc.config.management.VCCredentialConfigManager;
+import org.wso2.carbon.identity.openid4vc.config.management.VCCredentialConfigManager;
 
 /**
  * Factory class for {@link ServerVCCredentialConfigManagementService}.

@@ -31,11 +31,11 @@ import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialC
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationList;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationListItem;
 import org.wso2.carbon.identity.api.server.vc.config.management.v1.VCCredentialConfigurationUpdateModel;
-import org.wso2.carbon.identity.vc.config.management.VCCredentialConfigManager;
-import org.wso2.carbon.identity.vc.config.management.exception.VCConfigMgtClientException;
-import org.wso2.carbon.identity.vc.config.management.exception.VCConfigMgtException;
-import org.wso2.carbon.identity.vc.config.management.exception.VCConfigMgtServerException;
-import org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfigSearchResult;
+import org.wso2.carbon.identity.openid4vc.config.management.VCCredentialConfigManager;
+import org.wso2.carbon.identity.openid4vc.config.management.exception.VCConfigMgtClientException;
+import org.wso2.carbon.identity.openid4vc.config.management.exception.VCConfigMgtException;
+import org.wso2.carbon.identity.openid4vc.config.management.exception.VCConfigMgtServerException;
+import org.wso2.carbon.identity.openid4vc.config.management.model.VCCredentialConfigSearchResult;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -82,9 +82,9 @@ public class ServerVCCredentialConfigManagementService {
             LOG.debug("Adding VC credential configuration for tenant: " + tenantDomain);
         }
         try {
-            org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration config =
+            org.wso2.carbon.identity.openid4vc.config.management.model.VCCredentialConfiguration config =
                     toInternalModel(creationModel);
-            org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration created =
+            org.wso2.carbon.identity.openid4vc.config.management.model.VCCredentialConfiguration created =
                     vcCredentialConfigManager.add(config, tenantDomain);
             return toApiModel(created);
         } catch (VCConfigMgtException e) {
@@ -123,7 +123,7 @@ public class ServerVCCredentialConfigManagementService {
             LOG.debug("Retrieving VC credential configuration: " + configId + " for tenant: " + tenantDomain);
         }
         try {
-            org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration configuration =
+            org.wso2.carbon.identity.openid4vc.config.management.model.VCCredentialConfiguration configuration =
                     vcCredentialConfigManager.get(configId, tenantDomain);
             if (configuration == null) {
                 throw notFound(configId);
@@ -168,7 +168,7 @@ public class ServerVCCredentialConfigManagementService {
                     vcCredentialConfigManager.listWithPagination(after, before, limit + 1, filter,
                             paginationSortOrder, tenantDomain);
 
-            List<org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration> configurations =
+            List<org.wso2.carbon.identity.openid4vc.config.management.model.VCCredentialConfiguration> configurations =
                     searchResult.getConfigurations();
 
             if (configurations != null && !configurations.isEmpty()) {
@@ -236,9 +236,9 @@ public class ServerVCCredentialConfigManagementService {
             LOG.debug("Updating VC credential configuration: " + configId + " for tenant: " + tenantDomain);
         }
         try {
-            org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration toUpdate =
+            org.wso2.carbon.identity.openid4vc.config.management.model.VCCredentialConfiguration toUpdate =
                     toInternalModel(updateModel);
-            org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration updated =
+            org.wso2.carbon.identity.openid4vc.config.management.model.VCCredentialConfiguration updated =
                     vcCredentialConfigManager.update(configId, toUpdate, tenantDomain);
             return toApiModel(updated);
         } catch (VCConfigMgtException e) {
@@ -254,7 +254,7 @@ public class ServerVCCredentialConfigManagementService {
                     + tenantDomain);
         }
         try {
-            org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration updated =
+            org.wso2.carbon.identity.openid4vc.config.management.model.VCCredentialConfiguration updated =
                     vcCredentialConfigManager.generateOffer(configId, tenantDomain);
             return toApiModel(updated);
         } catch (VCConfigMgtException e) {
@@ -270,7 +270,7 @@ public class ServerVCCredentialConfigManagementService {
                     + tenantDomain);
         }
         try {
-            org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration updated =
+            org.wso2.carbon.identity.openid4vc.config.management.model.VCCredentialConfiguration updated =
                     vcCredentialConfigManager.revokeOffer(configId, tenantDomain);
             return toApiModel(updated);
         } catch (VCConfigMgtException e) {
@@ -279,7 +279,7 @@ public class ServerVCCredentialConfigManagementService {
     }
 
     private VCCredentialConfiguration toApiModel(
-            org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration model) {
+            org.wso2.carbon.identity.openid4vc.config.management.model.VCCredentialConfiguration model) {
 
         if (model == null) {
             return null;
@@ -287,14 +287,11 @@ public class ServerVCCredentialConfigManagementService {
 
         VCCredentialConfiguration apiModel = new VCCredentialConfiguration();
         if (StringUtils.isNotBlank(model.getId())) {
-            // The generated API model expects id as String.
             apiModel.setId(model.getId());
         }
         apiModel.setIdentifier(model.getIdentifier());
         apiModel.setDisplayName(model.getDisplayName());
-        apiModel.setScope(model.getScope());
         apiModel.setFormat(model.getFormat());
-        apiModel.setType(model.getType());
 
         List<String> claims = model.getClaims();
         if (claims != null) {
@@ -310,16 +307,14 @@ public class ServerVCCredentialConfigManagementService {
         return apiModel;
     }
 
-    private org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration toInternalModel(
+    private org.wso2.carbon.identity.openid4vc.config.management.model.VCCredentialConfiguration toInternalModel(
             VCCredentialConfigurationCreationModel model) {
 
-        org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration internalModel =
-                new org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration();
+        org.wso2.carbon.identity.openid4vc.config.management.model.VCCredentialConfiguration internalModel =
+                new org.wso2.carbon.identity.openid4vc.config.management.model.VCCredentialConfiguration();
         internalModel.setIdentifier(model.getIdentifier());
         internalModel.setDisplayName(model.getDisplayName());
-        internalModel.setScope(model.getScope());
         internalModel.setFormat(model.getFormat());
-        internalModel.setType(model.getType());
         if (model.getClaims() != null) {
             internalModel.setClaims(model.getClaims());
         }
@@ -327,15 +322,13 @@ public class ServerVCCredentialConfigManagementService {
         return internalModel;
     }
 
-    private org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration toInternalModel(
+    private org.wso2.carbon.identity.openid4vc.config.management.model.VCCredentialConfiguration toInternalModel(
             VCCredentialConfigurationUpdateModel model) {
 
-        org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration internalModel =
-                new org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration();
+        org.wso2.carbon.identity.openid4vc.config.management.model.VCCredentialConfiguration internalModel =
+                new org.wso2.carbon.identity.openid4vc.config.management.model.VCCredentialConfiguration();
         internalModel.setDisplayName(model.getDisplayName());
-        internalModel.setScope(model.getScope());
         internalModel.setFormat(model.getFormat());
-        internalModel.setType(model.getType());
         if (model.getClaims() != null) {
             internalModel.setClaims(model.getClaims());
         }
@@ -406,7 +399,7 @@ public class ServerVCCredentialConfigManagementService {
     }
 
     private VCCredentialConfigurationListItem toApiListItem(
-            org.wso2.carbon.identity.vc.config.management.model.VCCredentialConfiguration model) {
+            org.wso2.carbon.identity.openid4vc.config.management.model.VCCredentialConfiguration model) {
 
         if (model == null) {
             return null;
@@ -415,7 +408,6 @@ public class ServerVCCredentialConfigManagementService {
         item.setId(model.getId());
         item.setIdentifier(model.getIdentifier());
         item.setDisplayName(model.getDisplayName());
-        item.setScope(model.getScope());
         return item;
     }
 
