@@ -18,11 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.organization.user.sharing.management.v2;
 
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import java.io.InputStream;
-import java.util.List;
-
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v2.factories.UsersApiServiceFactory;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v2.model.Error;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v2.model.ProcessSuccessResponse;
@@ -32,14 +27,11 @@ import org.wso2.carbon.identity.api.server.organization.user.sharing.management.
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v2.model.UserSharingPatchRequest;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v2.model.UserUnshareAllRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v2.model.UserUnshareSelectedRequestBody;
-import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v2.UsersApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
-
-import javax.validation.constraints.*;
 
 @Path("/users")
 @Api(description = "The users API")

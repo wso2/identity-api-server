@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 2.0.0
+  version: 1.0.0
   title: "User Sharing API Definition (v2)"
   description: |-
     This document defines the **User Sharing REST API (v2)** for organizations in **WSO2 Identity Server**.
@@ -17,7 +17,7 @@ info:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 servers:
-  - url: "https://{server-url}/t/{tenant-domain}/api/server/v2"
+  - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
     variables:
       tenant-domain:
         default: "carbon.super"
@@ -198,7 +198,7 @@ paths:
               userCriteria:
                 userIds:
                   - "7a1b7d63-8cfc-4dc9-9332-3f84641b72d8"
-              policy: "ALL_EXISTING_ORGS_ONLY"
+              policy: "ALL_EXISTING_AND_FUTURE_ORGS"
               roleAssignment:
                 mode: "SELECTED"
                 roles:
@@ -525,8 +525,6 @@ components:
             Possible values:
             - `ALL_EXISTING_ORGS_ONLY`
             - `ALL_EXISTING_AND_FUTURE_ORGS`
-            - `IMMEDIATE_EXISTING_ORGS_ONLY`
-            - `IMMEDIATE_EXISTING_AND_FUTURE_ORGS`
         roleAssignment:
           $ref: "#/components/schemas/RoleAssignment"
           description: |-
@@ -677,7 +675,7 @@ components:
     SharingMode:
       type: object
       description: |-
-        Represents the *policy + role assignment* mode used for sharing.
+        Represents whether a user is shared using a future-sharing policy. The policy is always a future policy, and the associated role assignments are mapped accordingly.
       required:
         - policy
         - roleAssignment
@@ -686,9 +684,7 @@ components:
           type: string
           description: |-
             Effective sharing policy. Values depend on context:
-            - For global sharing (share-with-all): `ALL_EXISTING_ORGS_ONLY`, `ALL_EXISTING_AND_FUTURE_ORGS`,
-              `IMMEDIATE_EXISTING_ORGS_ONLY`, `IMMEDIATE_EXISTING_AND_FUTURE_ORGS`.
-            - For per-org configs: `SELECTED_ORG_*` variants.
+            - `ALL_EXISTING_AND_FUTURE_ORGS`.
         roleAssignment:
           $ref: "#/components/schemas/RoleAssignment"
 

@@ -26,21 +26,21 @@ import org.wso2.carbon.identity.api.server.organization.user.sharing.management.
 import javax.validation.constraints.*;
 
 /**
- * Represents the *policy + role assignment* mode used for sharing.
+ * Represents whether a user is shared using a future-sharing policy. The policy is always a future policy, and the associated role assignments are mapped accordingly.
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "Represents the *policy + role assignment* mode used for sharing.")
+@ApiModel(description = "Represents whether a user is shared using a future-sharing policy. The policy is always a future policy, and the associated role assignments are mapped accordingly.")
 public class SharingMode  {
   
     private String policy;
     private RoleAssignment roleAssignment;
 
     /**
-    * Effective sharing policy. Values depend on context: - For global sharing (share-with-all): &#x60;ALL_EXISTING_ORGS_ONLY&#x60;, &#x60;ALL_EXISTING_AND_FUTURE_ORGS&#x60;,   &#x60;IMMEDIATE_EXISTING_ORGS_ONLY&#x60;, &#x60;IMMEDIATE_EXISTING_AND_FUTURE_ORGS&#x60;. - For per-org configs: &#x60;SELECTED_ORG_*&#x60; variants.
+    * Effective sharing policy. Values depend on context: - &#x60;ALL_EXISTING_AND_FUTURE_ORGS&#x60;.
     **/
     public SharingMode policy(String policy) {
 
@@ -48,7 +48,7 @@ public class SharingMode  {
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "Effective sharing policy. Values depend on context: - For global sharing (share-with-all): `ALL_EXISTING_ORGS_ONLY`, `ALL_EXISTING_AND_FUTURE_ORGS`,   `IMMEDIATE_EXISTING_ORGS_ONLY`, `IMMEDIATE_EXISTING_AND_FUTURE_ORGS`. - For per-org configs: `SELECTED_ORG_*` variants.")
+    @ApiModelProperty(required = true, value = "Effective sharing policy. Values depend on context: - `ALL_EXISTING_AND_FUTURE_ORGS`.")
     @JsonProperty("policy")
     @Valid
     @NotNull(message = "Property policy cannot be null.")
