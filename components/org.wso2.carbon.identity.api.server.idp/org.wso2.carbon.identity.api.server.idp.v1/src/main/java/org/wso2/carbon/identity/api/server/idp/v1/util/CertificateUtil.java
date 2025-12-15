@@ -20,6 +20,8 @@ package org.wso2.carbon.identity.api.server.idp.v1.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Certificate;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
 
@@ -39,6 +41,7 @@ public final class CertificateUtil {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final Pattern PEM_INNER_BASE64 =
             Pattern.compile("-----BEGIN CERTIFICATE-----(.*?)-----END CERTIFICATE-----", Pattern.DOTALL);
+    private static final Log log = LogFactory.getLog(CertificateUtil.class);
 
     /**
      * Convert incoming `Certificate` model (containing certificates list) to a JSON array string
@@ -53,6 +56,10 @@ public final class CertificateUtil {
      */
     public static String convertCertificateJsonString(Certificate certificate)
             throws IdentityProviderManagementClientException {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Converting certificate to JSON string format");
+        }
 
         if (certificate == null) {
             return "[]";
