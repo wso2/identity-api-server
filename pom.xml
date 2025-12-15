@@ -631,7 +631,7 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.openid4vc</groupId>
-                <artifactId>org.wso2.carbon.identity.openid4vc.config.management</artifactId>
+                <artifactId>org.wso2.carbon.identity.openid4vc.template.management</artifactId>
                 <version>${carbon.identity.openid4vc.version}</version>
                 <scope>provided</scope>
             </dependency>
@@ -874,7 +874,7 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
-                <artifactId>org.wso2.carbon.identity.api.server.vc.config.management.common</artifactId>
+                <artifactId>org.wso2.carbon.identity.api.server.vc.template.management.common</artifactId>
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>
@@ -1077,7 +1077,7 @@
         <module>components/org.wso2.carbon.identity.api.server.webhook.metadata</module>
         <module>components/org.wso2.carbon.identity.api.server.workflow</module>
         <module>components/org.wso2.carbon.identity.api.server.asynchronous.operation.status.management</module>
-        <module>components/org.wso2.carbon.identity.api.server.vc.config.management</module>
+        <module>components/org.wso2.carbon.identity.api.server.vc.template.management</module>
     </modules>
 
 </project>
