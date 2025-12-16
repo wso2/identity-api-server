@@ -18,14 +18,14 @@
 
 package org.wso2.carbon.identity.api.server.vc.template.management.v1.factories;
 
-import org.wso2.carbon.identity.api.server.vc.template.management.v1.VcApiService;
-import org.wso2.carbon.identity.api.server.vc.template.management.v1.impl.VcApiServiceImpl;
+import org.wso2.carbon.identity.api.server.vc.template.management.v1.VcTemplatesApiService;
+import org.wso2.carbon.identity.api.server.vc.template.management.v1.impl.VcTemplatesApiServiceImpl;
 
-public class VcApiServiceFactory {
+public class VcTemplatesApiServiceFactory {
 
-   private final static VcApiService service = new VcApiServiceImpl();
+   private final static VcTemplatesApiService service = new VcTemplatesApiServiceImpl();
 
-   public static VcApiService getVcApi()
+   public static VcTemplatesApiService getVcTemplatesApi()
    {
       return service;
    }

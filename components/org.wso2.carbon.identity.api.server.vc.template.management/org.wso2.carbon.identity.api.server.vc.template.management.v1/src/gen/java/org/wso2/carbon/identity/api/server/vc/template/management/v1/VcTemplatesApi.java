@@ -28,32 +28,31 @@ import org.wso2.carbon.identity.api.server.vc.template.management.v1.VCTemplate;
 import org.wso2.carbon.identity.api.server.vc.template.management.v1.VCTemplateCreationModel;
 import org.wso2.carbon.identity.api.server.vc.template.management.v1.VCTemplateList;
 import org.wso2.carbon.identity.api.server.vc.template.management.v1.VCTemplateUpdateModel;
-import org.wso2.carbon.identity.api.server.vc.template.management.v1.VcApiService;
+import org.wso2.carbon.identity.api.server.vc.template.management.v1.VcTemplatesApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
-import org.wso2.carbon.identity.api.server.vc.template.management.v1.factories.ServerVCTemplateManagementServiceFactory;
-import org.wso2.carbon.identity.api.server.vc.template.management.v1.factories.VcApiServiceFactory;
+import org.wso2.carbon.identity.api.server.vc.template.management.v1.factories.VcTemplatesApiServiceFactory;
 
 import javax.validation.constraints.*;
 
-@Path("/vc")
-@Api(description = "The vc API")
+@Path("/vc-templates")
+@Api(description = "The vc-templates API")
 
-public class VcApi  {
+public class VcTemplatesApi  {
 
-    private final VcApiService delegate;
+    private final VcTemplatesApiService delegate;
 
-    public VcApi() {
+    public VcTemplatesApi() {
 
-        this.delegate = VcApiServiceFactory.getVcApi();
+        this.delegate = VcTemplatesApiServiceFactory.getVcTemplatesApi();
     }
 
     @Valid
     @POST
-    @Path("/templates")
+    
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @ApiOperation(value = "Add new template", notes = "", response = VCTemplate.class, authorizations = {
@@ -76,7 +75,7 @@ public class VcApi  {
 
     @Valid
     @DELETE
-    @Path("/templates/{template-id}")
+    @Path("/{template-id}")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Delete template", notes = "", response = Void.class, authorizations = {
@@ -99,7 +98,7 @@ public class VcApi  {
 
     @Valid
     @POST
-    @Path("/templates/{template-id}/offer")
+    @Path("/{template-id}/offer")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Generate or regenerate credential offer", notes = "Creates a new credential offer.", response = VCTemplate.class, authorizations = {
@@ -122,7 +121,7 @@ public class VcApi  {
 
     @Valid
     @GET
-    @Path("/templates/{template-id}")
+    @Path("/{template-id}")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Get template", notes = "", response = VCTemplate.class, authorizations = {
@@ -146,7 +145,7 @@ public class VcApi  {
 
     @Valid
     @GET
-    @Path("/templates")
+    
     
     @Produces({ "application/json" })
     @ApiOperation(value = "List templates", notes = "", response = VCTemplateList.class, authorizations = {
@@ -170,7 +169,7 @@ public class VcApi  {
 
     @Valid
     @DELETE
-    @Path("/templates/{template-id}/offer")
+    @Path("/{template-id}/offer")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Revoke credential offer", notes = "Revokes and deletes the existing credential offer.", response = VCTemplate.class, authorizations = {
@@ -193,7 +192,7 @@ public class VcApi  {
 
     @Valid
     @PUT
-    @Path("/templates/{template-id}")
+    @Path("/{template-id}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @ApiOperation(value = "Update template", notes = "", response = VCTemplate.class, authorizations = {

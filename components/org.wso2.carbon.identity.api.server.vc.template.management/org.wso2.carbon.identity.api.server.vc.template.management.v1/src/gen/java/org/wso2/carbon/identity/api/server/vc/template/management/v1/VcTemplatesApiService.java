@@ -32,7 +32,7 @@ import org.wso2.carbon.identity.api.server.vc.template.management.v1.VCTemplateU
 import javax.ws.rs.core.Response;
 
 
-public interface VcApiService {
+public interface VcTemplatesApiService {
 
       public Response addVCTemplate(VCTemplateCreationModel vcTemplateCreationModel);
 

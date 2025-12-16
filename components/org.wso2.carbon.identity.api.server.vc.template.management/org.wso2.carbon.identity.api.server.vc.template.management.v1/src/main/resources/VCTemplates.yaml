@@ -24,7 +24,7 @@ security:
   - BasicAuth: []
 
 paths:
-  /vc/templates:
+  /vc-templates:
     get:
       tags: ["VC Templates"]
       summary: "List templates"
@@ -87,7 +87,7 @@ paths:
           headers:
             Location:
               schema: { type: string }
-              example: "/api/server/v1/vc/templates/7e5f9d2a-6b5e-4df6-9b87-8a3d1a4a0c31"
+              example: "/api/server/v1/vc-templates/7e5f9d2a-6b5e-4df6-9b87-8a3d1a4a0c31"
           content:
             application/json:
               schema: { $ref: "#/components/schemas/VCTemplate" }
@@ -108,7 +108,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /vc/templates/{template-id}:
+  /vc-templates/{template-id}:
     parameters:
       - in: path
         name: template-id
@@ -208,7 +208,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /vc/templates/{template-id}/offer:
+  /vc-templates/{template-id}/offer:
     parameters:
       - in: path
         name: template-id

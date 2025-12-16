@@ -26,7 +26,7 @@ import org.wso2.carbon.identity.api.server.vc.template.management.common.VCTempl
 import org.wso2.carbon.identity.api.server.vc.template.management.v1.VCTemplate;
 import org.wso2.carbon.identity.api.server.vc.template.management.v1.VCTemplateCreationModel;
 import org.wso2.carbon.identity.api.server.vc.template.management.v1.VCTemplateUpdateModel;
-import org.wso2.carbon.identity.api.server.vc.template.management.v1.VcApiService;
+import org.wso2.carbon.identity.api.server.vc.template.management.v1.VcTemplatesApiService;
 import org.wso2.carbon.identity.api.server.vc.template.management.v1.core.ServerVCTemplateManagementService;
 import org.wso2.carbon.identity.api.server.vc.template.management.v1.factories.ServerVCTemplateManagementServiceFactory;
 
@@ -35,15 +35,16 @@ import java.net.URI;
 import javax.ws.rs.core.Response;
 
 /**
- * Implementation of VcApiService for managing Verifiable Credential templates.
+ * Implementation of the VcTemplatesApiService interface.
+ * Handles VC template management operations including creation, retrieval, update, and deletion.
  */
-public class VcApiServiceImpl implements VcApiService {
+public class VcTemplatesApiServiceImpl implements VcTemplatesApiService {
 
-    private static final Log LOG = LogFactory.getLog(VcApiServiceImpl.class);
+    private static final Log LOG = LogFactory.getLog(VcTemplatesApiServiceImpl.class);
 
     private final ServerVCTemplateManagementService serverVCTemplateManagementService;
 
-    public VcApiServiceImpl() {
+    public VcTemplatesApiServiceImpl() {
 
         try {
             this.serverVCTemplateManagementService = ServerVCTemplateManagementServiceFactory
