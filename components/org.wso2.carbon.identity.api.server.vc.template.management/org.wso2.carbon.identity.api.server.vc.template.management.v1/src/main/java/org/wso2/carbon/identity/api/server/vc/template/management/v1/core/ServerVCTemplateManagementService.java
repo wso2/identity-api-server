@@ -25,6 +25,7 @@ import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.api.server.vc.template.management.common.VCTemplateManagementConstants;
 import org.wso2.carbon.identity.api.server.vc.template.management.v1.PaginationLink;
 import org.wso2.carbon.identity.api.server.vc.template.management.v1.VCTemplate;
 import org.wso2.carbon.identity.api.server.vc.template.management.v1.VCTemplateCreationModel;
@@ -36,6 +37,7 @@ import org.wso2.carbon.identity.openid4vc.template.management.exception.VCTempla
 import org.wso2.carbon.identity.openid4vc.template.management.exception.VCTemplateMgtException;
 import org.wso2.carbon.identity.openid4vc.template.management.exception.VCTemplateMgtServerException;
 import org.wso2.carbon.identity.openid4vc.template.management.model.VCTemplateSearchResult;
+import org.wso2.carbon.identity.openid4vc.template.management.util.VCTemplateMgtExceptionHandler;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -54,6 +56,8 @@ import static org.wso2.carbon.identity.api.server.vc.template.management.common.
 import static org.wso2.carbon.identity.api.server.vc.template.management.common.VCTemplateManagementConstants.DESC_SORT_ORDER;
 import static org.wso2.carbon.identity.api.server.vc.template.management.common.VCTemplateManagementConstants.PATH_SEPARATOR;
 import static org.wso2.carbon.identity.api.server.vc.template.management.common.VCTemplateManagementConstants.VC_TEMPLATE_PATH_COMPONENT;
+import static org.wso2.carbon.identity.openid4vc.template.management.constant.VCTemplateManagementConstants.ErrorMessages.ERROR_CODE_INVALID_CLAIM;
+import static org.wso2.carbon.identity.openid4vc.template.management.constant.VCTemplateManagementConstants.ErrorMessages.ERROR_CODE_INVALID_QUERY_PARAM;
 
 /**
  * Server Verifiable Credential Template management service.
@@ -87,7 +91,7 @@ public class ServerVCTemplateManagementService {
                     vcTemplateManager.add(template, tenantDomain);
             return toApiModel(created);
         } catch (VCTemplateMgtException e) {
-            throw handleVCTemplateException(e, "Error while adding VC template", null);
+            throw handleVCTemplateException(e);
         }
     }
 
@@ -105,7 +109,7 @@ public class ServerVCTemplateManagementService {
         try {
             vcTemplateManager.delete(templateId, tenantDomain);
         } catch (VCTemplateMgtException e) {
-            throw handleVCTemplateException(e, "Error while deleting VC template", templateId);
+            throw handleVCTemplateException(e);
         }
     }
 
@@ -129,7 +133,7 @@ public class ServerVCTemplateManagementService {
             }
             return toApiModel(template);
         } catch (VCTemplateMgtException e) {
-             throw handleVCTemplateException(e, "Error while retrieving VC template", templateId);
+             throw handleVCTemplateException(e);
          }
      }
 
@@ -155,9 +159,8 @@ public class ServerVCTemplateManagementService {
             // Validate before and after parameters.
             if (StringUtils.isNotBlank(before) && StringUtils.isNotBlank(after)) {
                 throw handleVCTemplateException(
-                        new VCTemplateMgtClientException("60003",
-                                "Both 'before' and 'after' parameters cannot be specified together"),
-                        "Invalid pagination parameters", "before: " + before + ", after: " + after);
+                        VCTemplateMgtExceptionHandler.handleClientException(
+                                ERROR_CODE_INVALID_QUERY_PARAM, "Both 'before' and 'after' parameters are provided."));
             }
 
             // Set the pagination sort order.
@@ -216,7 +219,7 @@ public class ServerVCTemplateManagementService {
                     .collect(Collectors.toList()));
             return result;
         } catch (VCTemplateMgtException e) {
-            throw handleVCTemplateException(e, "Error while listing VC templates", null);
+            throw handleVCTemplateException(e);
         }
     }
 
@@ -240,7 +243,7 @@ public class ServerVCTemplateManagementService {
                     vcTemplateManager.update(templateId, toUpdate, tenantDomain);
             return toApiModel(updated);
         } catch (VCTemplateMgtException e) {
-            throw handleVCTemplateException(e, "Error while updating VC template", templateId);
+            throw handleVCTemplateException(e);
         }
     }
 
@@ -256,7 +259,7 @@ public class ServerVCTemplateManagementService {
                     vcTemplateManager.generateOffer(templateId, tenantDomain);
             return toApiModel(updated);
         } catch (VCTemplateMgtException e) {
-            throw handleVCTemplateException(e, "Error while updating VC template", templateId);
+            throw handleVCTemplateException(e);
         }
     }
 
@@ -272,7 +275,7 @@ public class ServerVCTemplateManagementService {
                     vcTemplateManager.revokeOffer(templateId, tenantDomain);
             return toApiModel(updated);
         } catch (VCTemplateMgtException e) {
-            throw handleVCTemplateException(e, "Error while updating VC template", templateId);
+            throw handleVCTemplateException(e);
         }
     }
 
@@ -345,37 +348,48 @@ public class ServerVCTemplateManagementService {
         return new APIError(Response.Status.NOT_FOUND, error);
     }
 
-    private APIError handleVCTemplateException(VCTemplateMgtException exception, String defaultDescription,
-                                               String data) {
+    private APIError handleVCTemplateException(VCTemplateMgtException exception) {
 
         ErrorResponse errorResponse;
         Response.Status status;
-        String description = StringUtils.isNotBlank(exception.getMessage()) ?
-                exception.getMessage() : defaultDescription;
 
         if (exception instanceof VCTemplateMgtClientException) {
             errorResponse = new ErrorResponse.Builder()
-                    .withCode(prefixCode(exception.getCode()))
-                    .withMessage("Invalid request or data")
-                    .withDescription(includeData(description, data))
-                    .build(LOG, exception.getMessage());
-            status = Response.Status.BAD_REQUEST;
+                    .withCode(prefixCode(exception.getErrorCode()))
+                    .withMessage(exception.getMessage())
+                    .withDescription(exception.getDescription())
+                    .build(LOG, exception.getDescription());
+            status = getClientErrorStatus(exception.getErrorCode());
         } else if (exception instanceof VCTemplateMgtServerException) {
             errorResponse = new ErrorResponse.Builder()
-                    .withCode(prefixCode(exception.getCode()))
-                    .withMessage("Server error")
-                    .withDescription(includeData(description, data))
-                    .build(LOG, exception, description);
+                    .withCode(prefixCode(exception.getErrorCode()))
+                    .withMessage(exception.getMessage())
+                    .withDescription(exception.getDescription())
+                    .build(LOG, exception.getDescription());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         } else {
             errorResponse = new ErrorResponse.Builder()
-                    .withCode("VC-65000")
+                    .withCode("VCM-65000")
                     .withMessage("Unexpected error")
-                    .withDescription(includeData(defaultDescription, data))
-                    .build(LOG, exception, defaultDescription);
+                    .withDescription("An unexpected error occurred while processing the VC template request.")
+                    .build(LOG, "An unexpected error occurred while processing the VC template request.");
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
         return new APIError(status, errorResponse);
+    }
+
+    private Response.Status getClientErrorStatus(String errorCode) {
+
+        if (StringUtils.isBlank(errorCode)) {
+            return Response.Status.BAD_REQUEST;
+        }
+
+        if (errorCode.contains(VCTemplateManagementConstants.ErrorMessages.ERROR_CODE_TEMPLATE_NOT_FOUND.getCode())
+                || errorCode.contains(VCTemplateManagementConstants.ErrorMessages.ERROR_CODE_OFFER_NOT_FOUND
+                .getCode())) {
+            return Response.Status.NOT_FOUND;
+        }
+        return Response.Status.BAD_REQUEST;
     }
 
     private String prefixCode(String code) {
@@ -415,8 +429,7 @@ public class ServerVCTemplateManagementService {
         limit = limit == null ? DEFAULT_LIMIT : limit;
         if (limit <= 0) {
             throw handleVCTemplateException(
-                    new VCTemplateMgtClientException("60002", "Limit must be a positive integer"),
-                    "Invalid limit value", limit.toString());
+                    VCTemplateMgtExceptionHandler.handleClientException(ERROR_CODE_INVALID_CLAIM, limit.toString()));
         }
         return limit;
     }
