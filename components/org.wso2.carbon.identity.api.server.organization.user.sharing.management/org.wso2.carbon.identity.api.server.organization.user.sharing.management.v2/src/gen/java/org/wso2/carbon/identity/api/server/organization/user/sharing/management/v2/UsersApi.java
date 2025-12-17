@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -61,9 +61,9 @@ public class UsersApi  {
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response getUserSharedOrganizations(@ApiParam(value = "The ID of the user.",required=true) @PathParam("userId") String userId,     @Valid@ApiParam(value = "Base64 encoded cursor for forward pagination.")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Base64 encoded cursor for backward pagination.")  @QueryParam("before") String before,     @Valid@ApiParam(value = "Maximum number of records to return.")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Condition to filter the retrieval of records. Supports operations like `sw`, `co`, `ew`, and `eq` depending on implementation.")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Whether to include shared organizations recursively in the hierarchy.")  @QueryParam("recursive") Boolean recursive) {
+    public Response getUserSharedOrganizations(@ApiParam(value = "The ID of the user.",required=true) @PathParam("userId") String userId,     @Valid@ApiParam(value = "Base64 encoded cursor value for backward pagination.")  @QueryParam("before") String before,     @Valid@ApiParam(value = "Base64 encoded cursor value for forward pagination.")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Condition to filter the retrieval of records. Supports `sw`, `co`, `ew`, and `eq` operations.")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Maximum number of records to return. If you do not specify this parameter, this will return all shared organizations.")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Determines whether a recursive search should happen. If set to true, includes shared organizations in all levels of the hierarchy; if set to false, includes only shared organizations in the next level of the hierarchy.")  @QueryParam("recursive") Boolean recursive,     @Valid@ApiParam(value = "Specifies the required parameters in the response. Supported values: `roles`, `sharingMode`.", allowableValues="sharingMode")  @QueryParam("attributes") String attributes) {
 
-        return delegate.getUserSharedOrganizations(userId,  after,  before,  limit,  filter,  recursive );
+        return delegate.getUserSharedOrganizations(userId,  before,  after,  filter,  limit,  recursive,  attributes );
     }
 
     @Valid

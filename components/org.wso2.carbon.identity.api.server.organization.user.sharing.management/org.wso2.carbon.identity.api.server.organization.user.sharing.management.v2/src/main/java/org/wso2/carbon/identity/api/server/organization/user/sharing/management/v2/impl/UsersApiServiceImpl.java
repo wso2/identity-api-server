@@ -50,10 +50,11 @@ public class UsersApiServiceImpl implements UsersApiService {
     }
 
     @Override
-    public Response getUserSharedOrganizations(String userId, String after, String before, Integer limit, String filter,
-                                               Boolean recursive) {
+    public Response getUserSharedOrganizations(String userId, String before, String after, String filter, Integer limit,
+                                               Boolean recursive, String attributes) {
 
-        return usersApiServiceCore.getUserSharedOrganizations(userId, after, before, limit, filter, recursive);
+        return usersApiServiceCore.getUserSharedOrganizations(userId, before, after, filter, limit, recursive,
+                attributes);
     }
 
     @Override

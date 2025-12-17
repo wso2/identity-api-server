@@ -20,7 +20,7 @@ package org.wso2.carbon.identity.api.server.organization.user.sharing.management
 
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.UserSharingMgtServiceHolder;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v2.core.UsersApiServiceCore;
-import org.wso2.carbon.identity.organization.management.organization.user.sharing.UserSharingPolicyHandlerService;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.UserSharingPolicyHandlerServiceV2;
 
 /**
  * Factory class for UsersApiService V2.
@@ -30,12 +30,13 @@ public class UsersApiServiceCoreFactory {
     private static final UsersApiServiceCore SERVICE;
 
     static {
-        UserSharingPolicyHandlerService userSharingPolicyHandlerService = UserSharingMgtServiceHolder
-                .getUserSharingPolicyHandlerService();
-        if (userSharingPolicyHandlerService == null) {
-            throw new IllegalStateException("UserSharingPolicyHandlerService is not available from the OSGi context.");
+        UserSharingPolicyHandlerServiceV2 userSharingPolicyHandlerServiceV2 = UserSharingMgtServiceHolder
+                .getUserSharingPolicyHandlerServiceV2();
+        if (userSharingPolicyHandlerServiceV2 == null) {
+            throw new IllegalStateException(
+                    "UserSharingPolicyHandlerServiceV2 is not available from the OSGi context.");
         }
-        SERVICE = new UsersApiServiceCore(userSharingPolicyHandlerService);
+        SERVICE = new UsersApiServiceCore(userSharingPolicyHandlerServiceV2);
     }
 
     /**

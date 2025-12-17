@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -37,7 +37,7 @@ import javax.ws.rs.core.Response;
 
 public interface UsersApiService {
 
-      public Response getUserSharedOrganizations(String userId, String after, String before, Integer limit, String filter, Boolean recursive);
+      public Response getUserSharedOrganizations(String userId, String before, String after, String filter, Integer limit, Boolean recursive, String attributes);
 
       public Response patchUserSharing(UserSharingPatchRequest userSharingPatchRequest);
 
