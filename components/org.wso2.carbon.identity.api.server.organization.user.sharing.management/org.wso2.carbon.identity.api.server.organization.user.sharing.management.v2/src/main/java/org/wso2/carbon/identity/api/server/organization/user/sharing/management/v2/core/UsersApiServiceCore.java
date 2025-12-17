@@ -113,6 +113,7 @@ public class UsersApiServiceCore {
      */
     public Response shareUsersWithSelectedOrgs(UserShareSelectedRequestBody userShareSelectedRequestBody) {
 
+        LOG.debug("Initiating selective user sharing.");
         if (userShareSelectedRequestBody == null) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(buildErrorResponse(makeRequestError(INVALID_SELECTIVE_USER_SHARE_REQUEST_BODY))).build();
@@ -142,6 +143,7 @@ public class UsersApiServiceCore {
      */
     public Response shareUsersWithAllOrgs(UserShareAllRequestBody userShareAllRequestBody) {
 
+        LOG.debug("Initiating general user sharing.");
         if (userShareAllRequestBody == null) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(buildErrorResponse(makeRequestError(INVALID_GENERAL_USER_SHARE_REQUEST_BODY))).build();
@@ -171,6 +173,7 @@ public class UsersApiServiceCore {
      */
     public Response unshareUsersFromSelectedOrgs(UserUnshareSelectedRequestBody userUnshareSelectedRequestBody) {
 
+        LOG.debug("Initiating selective user unsharing.");
         if (userUnshareSelectedRequestBody == null) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(buildErrorResponse(makeRequestError(INVALID_SELECTIVE_USER_UNSHARE_REQUEST_BODY))).build();
@@ -200,6 +203,7 @@ public class UsersApiServiceCore {
      */
     public Response unshareUsersFromAllOrgs(UserUnshareAllRequestBody userUnshareAllRequestBody) {
 
+        LOG.debug("Initiating general user unsharing.");
         if (userUnshareAllRequestBody == null) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(buildErrorResponse(makeRequestError(INVALID_GENERAL_USER_UNSHARE_REQUEST_BODY))).build();
@@ -230,6 +234,7 @@ public class UsersApiServiceCore {
      */
     public Response patchUserSharing(UserSharingPatchRequest userSharingPatchRequest) {
 
+        LOG.debug("Initiating user sharing patch operation.");
         if (userSharingPatchRequest == null) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(buildErrorResponse(makeRequestError(INVALID_GENERAL_USER_UNSHARE_REQUEST_BODY))).build();
@@ -267,6 +272,9 @@ public class UsersApiServiceCore {
     public Response getUserSharedOrganizations(String userId, String before, String after, String filter, Integer limit,
                                                Boolean recursive, String attributes) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving organizations shared with user: " + userId);
+        }
         if (userId == null) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(buildErrorResponse(makeRequestError(INVALID_UUID_FORMAT))).build();
