@@ -56,7 +56,6 @@ import static org.wso2.carbon.identity.api.server.vc.template.management.common.
 import static org.wso2.carbon.identity.api.server.vc.template.management.common.VCTemplateManagementConstants.DESC_SORT_ORDER;
 import static org.wso2.carbon.identity.api.server.vc.template.management.common.VCTemplateManagementConstants.PATH_SEPARATOR;
 import static org.wso2.carbon.identity.api.server.vc.template.management.common.VCTemplateManagementConstants.VC_TEMPLATE_PATH_COMPONENT;
-import static org.wso2.carbon.identity.openid4vc.template.management.constant.VCTemplateManagementConstants.ErrorMessages.ERROR_CODE_INVALID_CLAIM;
 import static org.wso2.carbon.identity.openid4vc.template.management.constant.VCTemplateManagementConstants.ErrorMessages.ERROR_CODE_INVALID_QUERY_PARAM;
 
 /**
@@ -367,14 +366,14 @@ public class ServerVCTemplateManagementService {
 
         if (exception instanceof VCTemplateMgtClientException) {
             errorResponse = new ErrorResponse.Builder()
-                    .withCode(prefixCode(exception.getErrorCode()))
+                    .withCode(exception.getErrorCode())
                     .withMessage(exception.getMessage())
                     .withDescription(exception.getDescription())
                     .build(LOG, exception.getDescription());
             status = getClientErrorStatus(exception.getErrorCode());
         } else if (exception instanceof VCTemplateMgtServerException) {
             errorResponse = new ErrorResponse.Builder()
-                    .withCode(prefixCode(exception.getErrorCode()))
+                    .withCode(exception.getErrorCode())
                     .withMessage(exception.getMessage())
                     .withDescription(exception.getDescription())
                     .build(LOG, exception.getDescription());
@@ -404,17 +403,6 @@ public class ServerVCTemplateManagementService {
         return Response.Status.BAD_REQUEST;
     }
 
-    private String prefixCode(String code) {
-
-        if (StringUtils.isBlank(code)) {
-            return "VC-00000";
-        }
-        if (code.contains(Constants.ERROR_CODE_DELIMITER)) {
-            return code;
-        }
-        return "VC-" + code;
-    }
-
     private String includeData(String message, String data) {
 
         if (StringUtils.isNotBlank(data)) {
@@ -441,7 +429,8 @@ public class ServerVCTemplateManagementService {
         limit = limit == null ? DEFAULT_LIMIT : limit;
         if (limit <= 0) {
             throw handleVCTemplateException(
-                    VCTemplateMgtExceptionHandler.handleClientException(ERROR_CODE_INVALID_CLAIM, limit.toString()));
+                    VCTemplateMgtExceptionHandler.handleClientException(ERROR_CODE_INVALID_QUERY_PARAM,
+                            limit.toString()));
         }
         return limit;
     }
