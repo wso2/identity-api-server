@@ -630,6 +630,12 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.identity.openid4vc</groupId>
+                <artifactId>org.wso2.carbon.identity.openid4vc.template.management</artifactId>
+                <version>${carbon.identity.openid4vc.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.admin.advisory.mgt</artifactId>
                 <version>${carbon.kernel.version}</version>
@@ -782,6 +788,16 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>v1</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.identity.inbound.auth.oauth2</groupId>
                 <artifactId>org.wso2.carbon.identity.oauth.rar</artifactId>
                 <version>${identity.inbound.oauth2.version}</version>
@@ -853,6 +869,12 @@
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
                 <artifactId>org.wso2.carbon.identity.api.server.webhook.metadata.common</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.vc.template.management.common</artifactId>
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>
@@ -964,7 +986,7 @@
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
         <identity.governance.version>1.11.103</identity.governance.version>
-        <carbon.identity.framework.version>7.8.630</carbon.identity.framework.version>
+        <carbon.identity.framework.version>7.8.643</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
         <findsecbugs-plugin.version>1.12.0</findsecbugs-plugin.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
@@ -1002,6 +1024,9 @@
 
         <org.wso2.carbon.identity.inbound.provisioning.scim2.version>3.4.146
         </org.wso2.carbon.identity.inbound.provisioning.scim2.version>
+
+        <!-- VC related versions -->
+        <carbon.identity.openid4vc.version>1.0.0</carbon.identity.openid4vc.version>
 
         <!-- Unit test versions -->
         <testng.version>6.9.10</testng.version>
@@ -1052,6 +1077,7 @@
         <module>components/org.wso2.carbon.identity.api.server.webhook.metadata</module>
         <module>components/org.wso2.carbon.identity.api.server.workflow</module>
         <module>components/org.wso2.carbon.identity.api.server.asynchronous.operation.status.management</module>
+        <module>components/org.wso2.carbon.identity.api.server.vc.template.management</module>
     </modules>
 
 </project>
