@@ -27,7 +27,7 @@ public final class VCTemplateManagementConstants {
 
     }
 
-    public static final String VC_TEMPLATE_PATH_COMPONENT = "vc/templates";
+    public static final String VC_TEMPLATE_PATH_COMPONENT = "vc-templates";
     public static final String PATH_SEPARATOR = "/";
     public static final Integer DEFAULT_LIMIT = 10;
     public static final String ASC_SORT_ORDER = "ASC";

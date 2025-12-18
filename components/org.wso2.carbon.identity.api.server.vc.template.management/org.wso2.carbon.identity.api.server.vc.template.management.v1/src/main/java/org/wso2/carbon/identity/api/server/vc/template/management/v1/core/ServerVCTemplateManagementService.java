@@ -247,6 +247,12 @@ public class ServerVCTemplateManagementService {
         }
     }
 
+    /**
+     * Generate a VC credential offer for a template.
+     *
+     * @param templateId Template ID.
+     * @return Updated template with offer details.
+     */
     public VCTemplate generateOffer(String templateId) {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
@@ -263,6 +269,12 @@ public class ServerVCTemplateManagementService {
         }
     }
 
+    /**
+     * Revoke a VC credential offer for a template.
+     *
+     * @param templateId Template ID.
+     * @return Updated template without offer details.
+     */
     public VCTemplate revokeOffer(String templateId) {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
