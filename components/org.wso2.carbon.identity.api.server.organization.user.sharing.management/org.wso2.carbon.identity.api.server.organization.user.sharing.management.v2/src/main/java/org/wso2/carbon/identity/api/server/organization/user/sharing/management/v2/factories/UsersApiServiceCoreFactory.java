@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.organization.user.sharing.management.v2.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.UserSharingMgtServiceHolder;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v2.core.UsersApiServiceCore;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.UserSharingPolicyHandlerServiceV2;
@@ -27,12 +29,17 @@ import org.wso2.carbon.identity.organization.management.organization.user.sharin
  */
 public class UsersApiServiceCoreFactory {
 
+    private static final Log LOG = LogFactory.getLog(UsersApiServiceCoreFactory.class);
     private static final UsersApiServiceCore SERVICE;
 
     static {
+        LOG.debug("Initializing UsersApiServiceCoreFactory");
         UserSharingPolicyHandlerServiceV2 userSharingPolicyHandlerServiceV2 = UserSharingMgtServiceHolder
                 .getUserSharingPolicyHandlerServiceV2();
         if (userSharingPolicyHandlerServiceV2 == null) {
+            LOG.error(
+                    "Failed to initialize UsersApiServiceCoreFactory: UserSharingPolicyHandlerServiceV2 is not " +
+                            "available from OSGi context");
             throw new IllegalStateException(
                     "UserSharingPolicyHandlerServiceV2 is not available from the OSGi context.");
         }

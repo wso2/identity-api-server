@@ -20,6 +20,8 @@ package org.wso2.carbon.identity.api.server.organization.user.sharing.management
 
 
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v2.UsersApiService;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v2.core.UsersApiServiceCore;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v2.factories.UsersApiServiceCoreFactory;
@@ -38,13 +40,18 @@ import static org.wso2.carbon.identity.api.server.organization.user.sharing.mana
  */
 public class UsersApiServiceImpl implements UsersApiService {
 
+    private static final Log LOG = LogFactory.getLog(UsersApiServiceImpl.class);
     private final UsersApiServiceCore usersApiServiceCore;
 
     public UsersApiServiceImpl() {
 
         try {
             this.usersApiServiceCore = UsersApiServiceCoreFactory.getUsersApiServiceCore();
+            LOG.info("UsersApiServiceImpl V2 initialized successfully.");
         } catch (IllegalStateException e) {
+            if(LOG.isDebugEnabled()) {
+                LOG.error("Failed to initialize UsersApiServiceImpl: " + e.getMessage());
+            }
             throw new RuntimeException(ERROR_INITIATING_USERS_API_SERVICE.getMessage(), e);
         }
     }
