@@ -36,6 +36,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.core.functi
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
+import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 
 import java.util.ArrayList;
@@ -143,8 +144,9 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
             String renewRefreshToken = refreshToken.getRenewRefreshToken() != null ?
                     String.valueOf(refreshToken.getRenewRefreshToken()) : null;
             consumerAppDTO.setRenewRefreshTokenEnabled(renewRefreshToken);
-            String extendRefreshTokenExpiryTime = refreshToken.getExtendRenewedRefreshTokenExpiryTime() != null ?
-                    String.valueOf(refreshToken.getExtendRenewedRefreshTokenExpiryTime()) : null;
+            boolean extendRefreshTokenExpiryTime = refreshToken.getExtendRenewedRefreshTokenExpiryTime() != null ?
+                    refreshToken.getExtendRenewedRefreshTokenExpiryTime() : OAuthServerConfiguration.getInstance()
+                    .isExtendRenewedTokenExpiryTimeEnabled();
             consumerAppDTO.setExtendRenewedRefreshTokenExpiryTime(extendRefreshTokenExpiryTime);
         }
     }
