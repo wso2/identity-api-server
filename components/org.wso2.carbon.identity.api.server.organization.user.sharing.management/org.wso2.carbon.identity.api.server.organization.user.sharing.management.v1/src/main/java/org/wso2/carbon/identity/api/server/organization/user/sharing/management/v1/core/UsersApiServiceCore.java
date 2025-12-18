@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.core;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.Error;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.ProcessSuccessResponse;
@@ -72,6 +74,7 @@ import static org.wso2.carbon.identity.api.server.organization.user.sharing.mana
  */
 public class UsersApiServiceCore {
 
+    private static final Log LOG = LogFactory.getLog(UsersApiServiceCore.class);
     private final UserSharingPolicyHandlerService userSharingPolicyHandlerService;
 
     public UsersApiServiceCore(UserSharingPolicyHandlerService userSharingPolicyHandlerService) {
@@ -101,6 +104,7 @@ public class UsersApiServiceCore {
         } catch (UserSharingMgtClientException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(buildErrorResponse(e)).build();
         } catch (UserSharingMgtException e) {
+            LOG.error("Error occurred while sharing user with specific organizations.", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
         }
     }
@@ -127,6 +131,7 @@ public class UsersApiServiceCore {
         } catch (UserSharingMgtClientException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(buildErrorResponse(e)).build();
         } catch (UserSharingMgtException e) {
+            LOG.error("Error occurred while sharing user with all organizations.", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
         }
     }
@@ -154,6 +159,7 @@ public class UsersApiServiceCore {
         } catch (UserSharingMgtClientException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(buildErrorResponse(e)).build();
         } catch (UserSharingMgtException e) {
+            LOG.error("Error occurred while unsharing user from specific organizations.", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
         }
     }
@@ -181,6 +187,7 @@ public class UsersApiServiceCore {
         } catch (UserSharingMgtClientException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(buildErrorResponse(e)).build();
         } catch (UserSharingMgtException e) {
+            LOG.error("Error occurred while unsharing user from all organizations.", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
         }
     }
@@ -214,6 +221,7 @@ public class UsersApiServiceCore {
         } catch (UserSharingMgtClientException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(buildErrorResponse(e)).build();
         } catch (UserSharingMgtException e) {
+            LOG.error("Error occurred while retrieving organizations shared with user: " + userId, e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
         }
     }
@@ -248,6 +256,7 @@ public class UsersApiServiceCore {
         } catch (UserSharingMgtClientException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(buildErrorResponse(e)).build();
         } catch (UserSharingMgtException e) {
+            LOG.error("Error occurred while retrieving roles shared with user: " + userId + " in org: " + orgId, e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
         }
     }
@@ -436,11 +445,13 @@ public class UsersApiServiceCore {
             List<ResponseLinkDO> resultLinks) {
 
         List<UserSharedOrganizationsResponseLinks> responseLinks = new ArrayList<>();
-        for (ResponseLinkDO resultLink : resultLinks) {
-            UserSharedOrganizationsResponseLinks links = new UserSharedOrganizationsResponseLinks();
-            links.href(resultLink.getHref());
-            links.rel(resultLink.getRel());
-            responseLinks.add(links);
+        if (resultLinks != null) {
+            for (ResponseLinkDO resultLink : resultLinks) {
+                UserSharedOrganizationsResponseLinks links = new UserSharedOrganizationsResponseLinks();
+                links.href(resultLink.getHref());
+                links.rel(resultLink.getRel());
+                responseLinks.add(links);
+            }
         }
         return responseLinks;
     }

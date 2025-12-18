@@ -1,17 +1,19 @@
 /*
- *  Copyright (c) (2019-2025), WSO2 LLC. (http://www.wso2.org).
+ * Copyright (c) (2019-2025), WSO2 LLC. (http://www.wso2.com).
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.wso2.carbon.identity.rest.api.server.claim.management.v1.core;
@@ -174,6 +176,7 @@ import static org.wso2.carbon.identity.api.server.common.Constants.XML_FILE_EXTE
 import static org.wso2.carbon.identity.api.server.common.Constants.YAML_FILE_EXTENSION;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIForBody;
 import static org.wso2.carbon.identity.claim.metadata.mgt.util.ClaimConstants.IS_SYSTEM_CLAIM;
+import static org.wso2.carbon.identity.claim.metadata.mgt.util.ClaimConstants.MANAGED_IN_USER_STORE_PROPERTY;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_ORGANIZATION_NOT_FOUND_FOR_TENANT;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
@@ -432,16 +435,15 @@ public class ServerClaimManagementService {
     public LocalClaimResDTO getLocalClaim(String claimId) {
 
         try {
-            List<LocalClaim> localClaimList = claimMetadataManagementService.getLocalClaims(ContextLoader
-                    .getTenantDomainFromContext());
+            String claimURI = base64DecodeId(claimId);
+            Optional<LocalClaim> localClaim = claimMetadataManagementService.getLocalClaim(claimURI, ContextLoader
+                    .getTenantDomainFromContext(), true);
 
-            LocalClaim localClaim = extractLocalClaimFromClaimList(base64DecodeId(claimId), localClaimList);
-
-            if (localClaim == null) {
+            if (!localClaim.isPresent()) {
                 throw handleClaimManagementClientError(ERROR_CODE_LOCAL_CLAIM_NOT_FOUND, NOT_FOUND, claimId);
             }
 
-            return getLocalClaimResDTO(localClaim);
+            return getLocalClaimResDTO(localClaim.get());
 
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_RETRIEVING_LOCAL_CLAIM, claimId);
@@ -592,6 +594,8 @@ public class ServerClaimManagementService {
             throws ClaimMetadataException {
 
         List<ClaimErrorDTO> errors = new ArrayList<>();
+        List<LocalClaim> localClaimList = claimMetadataManagementService.getLocalClaims(ContextLoader
+                .getTenantDomainFromContext());
 
         for (LocalClaimReqDTO localClaimReqDTO : localClaimReqDTOList) {
             try {
@@ -599,10 +603,25 @@ public class ServerClaimManagementService {
                     throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_EMPTY_LOCAL_CLAIM_URI,
                             BAD_REQUEST);
                 }
-                String claimId = getResourceId(localClaimReqDTO.getClaimURI());
-                if (isLocalClaimExist(claimId)) {
-                    updateLocalClaim(claimId, localClaimReqDTO);
+                LocalClaim localClaim = extractLocalClaimFromClaimList(localClaimReqDTO.getClaimURI(), localClaimList);
+                if (localClaim != null) {
+                    // If the existing local claim has not changed, skip update.
+                    if (localClaimChanged(localClaimReqDTO, localClaim)) {
+                        String claimId = getResourceId(localClaimReqDTO.getClaimURI());
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("Updating local claim: " + localClaimReqDTO.getClaimURI());
+                        }
+                        updateLocalClaim(claimId, localClaimReqDTO);
+                    } else {
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("Skipping db update as the old localClaim and the new localClaim is " +
+                                    "the same. ClaimURI: " + localClaimReqDTO.getClaimURI());
+                        }
+                    }
                 } else {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Adding local claim: " + localClaimReqDTO.getClaimURI());
+                    }
                     addLocalClaim(localClaimReqDTO);
                 }
             } catch (APIError e) {
@@ -652,6 +671,8 @@ public class ServerClaimManagementService {
         }
 
         List<ClaimErrorDTO> errors = new ArrayList<>();
+        List<ExternalClaim> externalClaimList = claimMetadataManagementService.getExternalClaims(
+                base64DecodeId(dialectId), ContextLoader.getTenantDomainFromContext());
 
         for (ExternalClaimReqDTO externalClaimReqDTO : externalClaimReqDTOList) {
             try {
@@ -659,10 +680,26 @@ public class ServerClaimManagementService {
                     throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_EMPTY_EXTERNAL_CLAIM_URI,
                             BAD_REQUEST);
                 }
-                String claimId = getResourceId(externalClaimReqDTO.getClaimURI());
-                if (isExternalClaimExist(dialectId, claimId)) {
-                    updateExternalClaim(dialectId, claimId, externalClaimReqDTO);
+                ExternalClaim externalClaim = extractExternalClaimFromClaimList(externalClaimReqDTO.getClaimURI(),
+                        externalClaimList);
+                if (externalClaim != null) {
+                    // If the existing external claim has not changed, skip update.
+                    if (externalClaimChanged(externalClaimReqDTO, externalClaim)) {
+                        String claimId = getResourceId(externalClaimReqDTO.getClaimURI());
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("Updating external claim: " + externalClaimReqDTO.getClaimURI());
+                        }
+                        updateExternalClaim(dialectId, claimId, externalClaimReqDTO);
+                    } else {
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("Skipping db update as the old externalClaim and the new externalClaim is " +
+                                    "the same. ClaimURI: " + externalClaimReqDTO.getClaimURI());
+                        }
+                    }
                 } else {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Adding external claim: " + externalClaimReqDTO.getClaimURI());
+                    }
                     addExternalClaim(dialectId, externalClaimReqDTO);
                 }
             } catch (APIError e) {
@@ -1171,6 +1208,10 @@ public class ServerClaimManagementService {
             }
         }
 
+        String managedInUserStore =
+                claimProperties.remove(ClaimConstants.MANAGED_IN_USER_STORE_PROPERTY);
+        localClaimResDTO.setManagedInUserStore(Boolean.valueOf(managedInUserStore));
+
         List<AttributeMappingDTO> attributeMappingDTOs = new ArrayList<>();
         for (AttributeMapping attributeMapping : localClaim.getMappedAttributes()) {
             AttributeMappingDTO attributeMappingDTO = new AttributeMappingDTO();
@@ -1267,6 +1308,12 @@ public class ServerClaimManagementService {
 
         if (StringUtils.isNotBlank(localClaimReqDTO.getRegEx())) {
             claimProperties.put(PROP_REG_EX, localClaimReqDTO.getRegEx());
+        }
+
+        Boolean managedInUserStore = localClaimReqDTO.getManagedInUserStoreEnabled();
+        if (managedInUserStore != null) {
+            claimProperties.put(ClaimConstants.MANAGED_IN_USER_STORE_PROPERTY,
+                    String.valueOf(managedInUserStore));
         }
 
         if (localClaimReqDTO.getDisplayOrder() != null) {
@@ -1551,23 +1598,22 @@ public class ServerClaimManagementService {
         return claimDialect != null;
     }
 
-    private boolean isLocalClaimExist(String claimId) throws ClaimMetadataException {
+    private boolean localClaimChanged(LocalClaimReqDTO newClaimDTO, LocalClaim existingClaim) {
 
-        List<LocalClaim> localClaimList = claimMetadataManagementService.getLocalClaims(ContextLoader
-                .getTenantDomainFromContext());
-        LocalClaim localClaim = extractLocalClaimFromClaimList(base64DecodeId(claimId), localClaimList);
-
-        return localClaim != null;
+        if (newClaimDTO == null || existingClaim == null) {
+            return true;
+        }
+        LocalClaimResDTO existingClaimDTO = getLocalClaimResDTO(existingClaim);
+        return !newClaimDTO.equals(existingClaimDTO);
     }
 
-    private boolean isExternalClaimExist(String dialectId, String claimId) throws ClaimMetadataException {
+    private boolean externalClaimChanged(ExternalClaimReqDTO newClaimDTO, ExternalClaim existingClaim) {
 
-        List<ExternalClaim> externalClaimList = claimMetadataManagementService.getExternalClaims(
-                base64DecodeId(dialectId),
-                ContextLoader.getTenantDomainFromContext());
-        ExternalClaim externalClaim = extractExternalClaimFromClaimList(base64DecodeId(claimId), externalClaimList);
-
-        return externalClaim != null;
+        if (newClaimDTO == null || existingClaim == null) {
+            return true;
+        }
+        ExternalClaimResDTO existingClaimDTO = getExternalClaimResDTO(existingClaim);
+        return !newClaimDTO.equals(existingClaimDTO);
     }
 
     private APIError handleClaimManagementException(ClaimMetadataException e, Constant.ErrorMessage errorEnum,
@@ -2002,9 +2048,11 @@ public class ServerClaimManagementService {
     private void validateLocalClaimUpdate(String claimID, LocalClaim incomingLocalClaim)
             throws ClaimMetadataException {
 
+        boolean fetchManagedInUserStoreProperty =
+                incomingLocalClaim.getClaimProperties().containsKey(MANAGED_IN_USER_STORE_PROPERTY);
         Optional<LocalClaim>
                 existingLocalClaim = getClaimMetadataManagementService().getLocalClaim(base64DecodeId(claimID),
-                ContextLoader.getTenantDomainFromContext());
+                ContextLoader.getTenantDomainFromContext(), fetchManagedInUserStoreProperty);
 
         if (!existingLocalClaim.isPresent()) {
             throw handleClaimManagementClientError(ERROR_CODE_LOCAL_CLAIM_NOT_FOUND, BAD_REQUEST, claimID);
@@ -2093,6 +2141,16 @@ public class ServerClaimManagementService {
                 throw new ClaimMetadataException(String.valueOf(Constant.ErrorMessage
                         .ERROR_CODE_ERROR_SERIALIZING_INPUT_FORMAT), e);
             }
+        }
+
+        if (!incomingLocalClaim.getClaimProperties().containsKey(MANAGED_IN_USER_STORE_PROPERTY)
+                && localClaim.getClaimProperties().containsKey(MANAGED_IN_USER_STORE_PROPERTY)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(String.format("Populating the '%s' property from the existing local claim for claim URI: %s",
+                        MANAGED_IN_USER_STORE_PROPERTY, localClaim.getClaimURI()));
+            }
+            incomingLocalClaim.setClaimProperty(MANAGED_IN_USER_STORE_PROPERTY,
+                    localClaim.getClaimProperty(MANAGED_IN_USER_STORE_PROPERTY));
         }
     }
 
