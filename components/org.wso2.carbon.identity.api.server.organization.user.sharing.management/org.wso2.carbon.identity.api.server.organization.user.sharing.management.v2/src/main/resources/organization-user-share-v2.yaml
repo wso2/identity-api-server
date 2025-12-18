@@ -17,7 +17,7 @@ info:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 servers:
-  - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
+  - url: 'https://{server-url}/t/{tenant-domain}/api/server/v2'
     variables:
       tenant-domain:
         default: "carbon.super"

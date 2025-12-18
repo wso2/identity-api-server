@@ -78,8 +78,10 @@ import static org.wso2.carbon.identity.api.server.organization.user.sharing.mana
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_GENERAL_USER_UNSHARE_REQUEST_BODY;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_SELECTIVE_USER_SHARE_REQUEST_BODY;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_SELECTIVE_USER_UNSHARE_REQUEST_BODY;
+import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_USER_SHARE_PATCH_REQUEST_BODY;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_UUID_FORMAT;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.RESPONSE_DETAIL_USER_SHARE;
+import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.RESPONSE_DETAIL_USER_SHARE_PATCH;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.RESPONSE_DETAIL_USER_UNSHARE;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.RESPONSE_STATUS_PROCESSING;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.USER_IDS;
@@ -237,21 +239,21 @@ public class UsersApiServiceCore {
         LOG.debug("Initiating user sharing patch operation.");
         if (userSharingPatchRequest == null) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(buildErrorResponse(makeRequestError(INVALID_GENERAL_USER_UNSHARE_REQUEST_BODY))).build();
+                    .entity(buildErrorResponse(makeRequestError(INVALID_USER_SHARE_PATCH_REQUEST_BODY))).build();
         }
 
-        // Populate GeneralUserUnshareDO object from the request body.
+        // Populate PatchUserShareDO object from the request body.
         UserSharePatchDO userSharePatchDO = populateUserSharePatch(userSharingPatchRequest);
 
         try {
             userSharingPolicyHandlerServiceV2.updateRoleAssignmentV2(userSharePatchDO);
             return Response.status(Response.Status.ACCEPTED)
-                    .entity(getProcessSuccessResponse(RESPONSE_DETAIL_USER_UNSHARE))
+                    .entity(getProcessSuccessResponse(RESPONSE_DETAIL_USER_SHARE_PATCH))
                     .build();
         } catch (UserSharingMgtClientException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(buildErrorResponse(e)).build();
         } catch (UserSharingMgtException e) {
-            LOG.error("Error occurred while unsharing user from all organizations.", e);
+            LOG.error("Error occurred while patching shared user attributes.", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
         }
     }

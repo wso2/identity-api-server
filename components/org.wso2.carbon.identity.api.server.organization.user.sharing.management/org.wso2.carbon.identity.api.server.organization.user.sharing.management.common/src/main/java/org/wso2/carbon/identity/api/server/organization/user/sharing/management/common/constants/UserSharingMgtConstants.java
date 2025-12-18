@@ -30,6 +30,8 @@ public class UserSharingMgtConstants {
     public static final String RESPONSE_STATUS_PROCESSING = "Processing";
     public static final String RESPONSE_DETAIL_USER_SHARE = "User sharing process triggered successfully.";
     public static final String RESPONSE_DETAIL_USER_UNSHARE = "User unsharing process triggered successfully.";
+    public static final String RESPONSE_DETAIL_USER_SHARE_PATCH =
+            "Shared user attributes patch process triggered successfully.";
 
     /**
      * Enum for user sharing management related errors.
@@ -60,6 +62,10 @@ public class UserSharingMgtConstants {
                 "Invalid UUID format.",
                 "The UUID provided in the request is not in a valid format. " +
                         "Please provide a valid UUID."),
+        INVALID_USER_SHARE_PATCH_REQUEST_BODY("60005",
+                "Invalid user share patch request body.",
+                "The user share patch request body is either null or empty. " +
+                        "Please provide a valid user share patch request body."),
 
         // Server errors.
         ERROR_INITIATING_USERS_API_SERVICE("65001",
