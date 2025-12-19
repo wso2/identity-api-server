@@ -74,6 +74,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.ERROR_MISSING_USER_CRITERIA;
+import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.ERROR_UNSUPPORTED_USER_SHARE_PATCH_PATH;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_GENERAL_USER_SHARE_REQUEST_BODY;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_GENERAL_USER_UNSHARE_REQUEST_BODY;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_SELECTIVE_USER_SHARE_REQUEST_BODY;
@@ -121,10 +123,10 @@ public class UsersApiServiceCore {
                     .entity(buildErrorResponse(makeRequestError(INVALID_SELECTIVE_USER_SHARE_REQUEST_BODY))).build();
         }
 
-        // Populate selectiveUserShareV2DO object from the request body.
-        SelectiveUserShareV2DO selectiveUserShareV2DO = populateSelectiveUserShareV2DO(userShareSelectedRequestBody);
-
         try {
+            // Populate selectiveUserShareV2DO object from the request body.
+            SelectiveUserShareV2DO selectiveUserShareV2DO =
+                    populateSelectiveUserShareV2DO(userShareSelectedRequestBody);
             userSharingPolicyHandlerServiceV2.populateSelectiveUserShareV2(selectiveUserShareV2DO);
             return Response.status(Response.Status.ACCEPTED)
                     .entity(getProcessSuccessResponse(RESPONSE_DETAIL_USER_SHARE)).build();
@@ -151,10 +153,9 @@ public class UsersApiServiceCore {
                     .entity(buildErrorResponse(makeRequestError(INVALID_GENERAL_USER_SHARE_REQUEST_BODY))).build();
         }
 
-        // Populate GeneralUserShareDO object from the request body.
-        GeneralUserShareV2DO generalUserShareV2DO = populateGeneralUserShareV2DO(userShareAllRequestBody);
-
         try {
+            // Populate GeneralUserShareDO object from the request body.
+            GeneralUserShareV2DO generalUserShareV2DO = populateGeneralUserShareV2DO(userShareAllRequestBody);
             userSharingPolicyHandlerServiceV2.populateGeneralUserShareV2(generalUserShareV2DO);
             return Response.status(Response.Status.ACCEPTED)
                     .entity(getProcessSuccessResponse(RESPONSE_DETAIL_USER_SHARE)).build();
@@ -181,10 +182,10 @@ public class UsersApiServiceCore {
                     .entity(buildErrorResponse(makeRequestError(INVALID_SELECTIVE_USER_UNSHARE_REQUEST_BODY))).build();
         }
 
-        // Populate SelectiveUserUnshareDO object from the request body.
-        SelectiveUserUnshareDO selectiveUserUnshareDO = populateSelectiveUserUnshareDO(userUnshareSelectedRequestBody);
-
         try {
+            // Populate SelectiveUserUnshareDO object from the request body.
+            SelectiveUserUnshareDO selectiveUserUnshareDO =
+                    populateSelectiveUserUnshareDO(userUnshareSelectedRequestBody);
             userSharingPolicyHandlerServiceV2.populateSelectiveUserUnshareV2(selectiveUserUnshareDO);
             return Response.status(Response.Status.ACCEPTED)
                     .entity(getProcessSuccessResponse(RESPONSE_DETAIL_USER_UNSHARE))
@@ -211,10 +212,9 @@ public class UsersApiServiceCore {
                     .entity(buildErrorResponse(makeRequestError(INVALID_GENERAL_USER_UNSHARE_REQUEST_BODY))).build();
         }
 
-        // Populate GeneralUserUnshareDO object from the request body.
-        GeneralUserUnshareDO generalUserUnshareDO = populateGeneralUserUnshareDO(userUnshareAllRequestBody);
-
         try {
+            // Populate GeneralUserUnshareDO object from the request body.
+            GeneralUserUnshareDO generalUserUnshareDO = populateGeneralUserUnshareDO(userUnshareAllRequestBody);
             userSharingPolicyHandlerServiceV2.populateGeneralUserUnshareV2(generalUserUnshareDO);
             return Response.status(Response.Status.ACCEPTED)
                     .entity(getProcessSuccessResponse(RESPONSE_DETAIL_USER_UNSHARE))
@@ -242,10 +242,9 @@ public class UsersApiServiceCore {
                     .entity(buildErrorResponse(makeRequestError(INVALID_USER_SHARE_PATCH_REQUEST_BODY))).build();
         }
 
-        // Populate PatchUserShareDO object from the request body.
-        UserSharePatchDO userSharePatchDO = populateUserSharePatch(userSharingPatchRequest);
-
         try {
+            // Populate PatchUserShareDO object from the request body.
+            UserSharePatchDO userSharePatchDO = populateUserSharePatch(userSharingPatchRequest);
             userSharingPolicyHandlerServiceV2.updateRoleAssignmentV2(userSharePatchDO);
             return Response.status(Response.Status.ACCEPTED)
                     .entity(getProcessSuccessResponse(RESPONSE_DETAIL_USER_SHARE_PATCH))
@@ -309,7 +308,7 @@ public class UsersApiServiceCore {
      * @return A populated SelectiveUserShareDO object.
      */
     private SelectiveUserShareV2DO populateSelectiveUserShareV2DO(
-            UserShareSelectedRequestBody userShareSelectedRequestBody) {
+            UserShareSelectedRequestBody userShareSelectedRequestBody) throws UserSharingMgtClientException {
 
         SelectiveUserShareV2DO selectiveUserShareV2DO = new SelectiveUserShareV2DO();
 
@@ -339,7 +338,8 @@ public class UsersApiServiceCore {
      * @param userShareAllRequestBody Contains details for sharing users with all organizations.
      * @return A populated GeneralUserShareDO object.
      */
-    private GeneralUserShareV2DO populateGeneralUserShareV2DO(UserShareAllRequestBody userShareAllRequestBody) {
+    private GeneralUserShareV2DO populateGeneralUserShareV2DO(UserShareAllRequestBody userShareAllRequestBody)
+            throws UserSharingMgtClientException {
 
         GeneralUserShareV2DO generalUserShareV2DO = new GeneralUserShareV2DO();
 
@@ -363,7 +363,7 @@ public class UsersApiServiceCore {
      * @return A populated SelectiveUserUnshareDO object.
      */
     private SelectiveUserUnshareDO populateSelectiveUserUnshareDO(
-            UserUnshareSelectedRequestBody userUnshareSelectedRequestBody) {
+            UserUnshareSelectedRequestBody userUnshareSelectedRequestBody) throws UserSharingMgtClientException {
 
         SelectiveUserUnshareDO selectiveUserUnshareDO = new SelectiveUserUnshareDO();
 
@@ -384,7 +384,8 @@ public class UsersApiServiceCore {
      * @param userUnshareAllRequestBody Contains details for removing shared access.
      * @return A populated GeneralUserUnshareDO object.
      */
-    private GeneralUserUnshareDO populateGeneralUserUnshareDO(UserUnshareAllRequestBody userUnshareAllRequestBody) {
+    private GeneralUserUnshareDO populateGeneralUserUnshareDO(UserUnshareAllRequestBody userUnshareAllRequestBody)
+            throws UserSharingMgtClientException {
 
         GeneralUserUnshareDO generalUserUnshareDO = new GeneralUserUnshareDO();
 
@@ -402,7 +403,8 @@ public class UsersApiServiceCore {
      * @param userSharingPatchRequest Contains details for patching user sharing.
      * @return A populated PatchUserShareDO object.
      */
-    private UserSharePatchDO populateUserSharePatch(UserSharingPatchRequest userSharingPatchRequest) {
+    private UserSharePatchDO populateUserSharePatch(UserSharingPatchRequest userSharingPatchRequest)
+            throws UserSharingMgtClientException {
 
         UserSharePatchDO userSharePatchDO = new UserSharePatchDO();
 
@@ -481,7 +483,8 @@ public class UsersApiServiceCore {
      * @return A map of user criteria keyed by criterion type.
      * @throws IllegalArgumentException If no supported user criteria are provided.
      */
-    private Map<String, UserCriteriaType> buildUserCriteriaFromRequest(UserCriteria userCriteria) {
+    private Map<String, UserCriteriaType> buildUserCriteriaFromRequest(UserCriteria userCriteria)
+            throws UserSharingMgtClientException {
 
         Map<String, UserCriteriaType> userCriteriaMap = new HashMap<>();
 
@@ -491,7 +494,7 @@ public class UsersApiServiceCore {
         }
 
         if (userCriteriaMap.isEmpty()) {
-            throw new IllegalArgumentException("At least one user criterion must be provided.");
+            throw makeRequestError(ERROR_MISSING_USER_CRITERIA);
         }
 
         return userCriteriaMap;
@@ -544,7 +547,8 @@ public class UsersApiServiceCore {
      * @param operations List of patch operations from the request.
      * @return List of internal {@link PatchOperationDO} instances.
      */
-    private List<PatchOperationDO> buildPatchOperationsFromRequest(List<UserSharingPatchOperation> operations) {
+    private List<PatchOperationDO> buildPatchOperationsFromRequest(List<UserSharingPatchOperation> operations)
+            throws UserSharingMgtClientException {
 
         List<PatchOperationDO> patchOperations = new ArrayList<>();
 
@@ -567,7 +571,8 @@ public class UsersApiServiceCore {
      * @return Internal values object appropriate for the given path.
      * @throws IllegalArgumentException If the path is empty or not supported.
      */
-    private Object buildPatchOperationValuesFromRequest(String path, List<RoleShareConfig> values) {
+    private Object buildPatchOperationValuesFromRequest(String path, List<RoleShareConfig> values)
+            throws UserSharingMgtClientException {
 
         if (path == null || path.isEmpty()) {
             throw new IllegalArgumentException("Patch operation 'path' cannot be empty.");
@@ -578,7 +583,7 @@ public class UsersApiServiceCore {
             return buildRoleWithAudienceDO(values);
         }
 
-        throw new IllegalArgumentException("Unsupported patch path: " + path);
+        throw makeRequestError(ERROR_UNSUPPORTED_USER_SHARE_PATCH_PATH);
     }
 
     /**

@@ -384,12 +384,10 @@ paths:
           required: false
           schema:
             type: string
-            enum:
-              - sharingMode
+          example: "roles"
           description: |-
             Specifies the required parameters in the response.
             Supported values: `roles`, `sharingMode`.
-          example: "roles"
       responses:
         "200":
           description: Successful response with the user's shared organizations.

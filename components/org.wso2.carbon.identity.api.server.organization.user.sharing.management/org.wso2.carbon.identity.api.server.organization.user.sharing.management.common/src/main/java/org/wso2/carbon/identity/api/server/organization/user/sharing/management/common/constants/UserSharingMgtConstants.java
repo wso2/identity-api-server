@@ -66,6 +66,13 @@ public class UserSharingMgtConstants {
                 "Invalid user share patch request body.",
                 "The user share patch request body is either null or empty. " +
                         "Please provide a valid user share patch request body."),
+        ERROR_MISSING_USER_CRITERIA("60006",
+                "Missing user criteria in the request body.",
+                "The user criteria is missing in the request body. Please provide the user criteria to proceed."),
+        ERROR_UNSUPPORTED_USER_SHARE_PATCH_PATH("60007",
+                "Unsupported user share patch path.",
+                "The provided patch path to update attributes of shared user is not supported. " +
+                        "Please provide a valid patch path."),
 
         // Server errors.
         ERROR_INITIATING_USERS_API_SERVICE("65001",
