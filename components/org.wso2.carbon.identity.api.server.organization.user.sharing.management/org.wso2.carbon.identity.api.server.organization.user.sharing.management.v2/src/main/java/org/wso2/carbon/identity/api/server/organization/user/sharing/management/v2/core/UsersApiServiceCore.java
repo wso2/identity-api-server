@@ -78,6 +78,7 @@ import javax.ws.rs.core.UriInfo;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.ERROR_EMPTY_USER_SHARE_PATCH_PATH;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.ERROR_MISSING_USER_CRITERIA;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.ERROR_UNSUPPORTED_USER_SHARE_PATCH_PATH;
+import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.ERROR_UNSUPPORTED_USER_SHARE_POLICY;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_GENERAL_USER_SHARE_REQUEST_BODY;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_GENERAL_USER_UNSHARE_REQUEST_BODY;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_SELECTIVE_USER_SHARE_REQUEST_BODY;
@@ -335,7 +336,7 @@ public class UsersApiServiceCore {
         for (UserOrgShareConfig orgDetail : userShareSelectedRequestBody.getOrganizations()) {
             SelectiveUserShareOrgDetailsV2DO selectiveUserShareOrgDetailsV2DO = new SelectiveUserShareOrgDetailsV2DO();
             selectiveUserShareOrgDetailsV2DO.setOrganizationId(orgDetail.getOrgId());
-            selectiveUserShareOrgDetailsV2DO.setPolicy(PolicyEnum.getPolicyByValue(orgDetail.getPolicy()));
+            selectiveUserShareOrgDetailsV2DO.setPolicy(resolvePolicy(orgDetail.getPolicy()));
             selectiveUserShareOrgDetailsV2DO.setRoleAssignments(
                     buildRoleAssignmentFromRequest(orgDetail.getRoleAssignment()));
             organizationsList.add(selectiveUserShareOrgDetailsV2DO);
@@ -362,7 +363,7 @@ public class UsersApiServiceCore {
         generalUserShareV2DO.setUserCriteria(userCriteria);
 
         // Set policy and roles.
-        generalUserShareV2DO.setPolicy(PolicyEnum.getPolicyByValue(userShareAllRequestBody.getPolicy()));
+        generalUserShareV2DO.setPolicy(resolvePolicy(userShareAllRequestBody.getPolicy()));
         generalUserShareV2DO.setRoleAssignments(
                 buildRoleAssignmentFromRequest(userShareAllRequestBody.getRoleAssignment()));
 
@@ -597,6 +598,22 @@ public class UsersApiServiceCore {
         }
 
         throw makeRequestError(ERROR_UNSUPPORTED_USER_SHARE_PATCH_PATH);
+    }
+
+    /**
+     * Resolves the string representation of a policy to its corresponding PolicyEnum.
+     *
+     * @param policy The string representation of the policy.
+     * @return The corresponding PolicyEnum.
+     * @throws UserSharingMgtClientException If the provided policy is unsupported.
+     */
+    private PolicyEnum resolvePolicy(String policy) throws UserSharingMgtClientException {
+
+        try {
+            return PolicyEnum.getPolicyByValue(policy);
+        } catch (IllegalArgumentException e) {
+            throw makeRequestError(ERROR_UNSUPPORTED_USER_SHARE_POLICY);
+        }
     }
 
     /**

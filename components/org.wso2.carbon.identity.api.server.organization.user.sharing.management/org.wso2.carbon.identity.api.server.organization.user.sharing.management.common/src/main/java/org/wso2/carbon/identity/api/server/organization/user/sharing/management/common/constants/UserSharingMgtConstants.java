@@ -77,6 +77,9 @@ public class UserSharingMgtConstants {
                 "Empty user share patch path.",
                 "The provided patch path to update attributes of shared user is empty. " +
                         "Please provide a valid patch path."),
+        ERROR_UNSUPPORTED_USER_SHARE_POLICY("60009",
+                "Unsupported user share policy.",
+                "The provided user share policy is not supported. Please provide a valid user share policy."),
 
         // Server errors.
         ERROR_INITIATING_USERS_API_SERVICE("65001",
