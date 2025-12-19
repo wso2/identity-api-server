@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v2.model.Error;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v2.model.Link;
@@ -74,6 +75,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.ERROR_EMPTY_USER_SHARE_PATCH_PATH;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.ERROR_MISSING_USER_CRITERIA;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.ERROR_UNSUPPORTED_USER_SHARE_PATCH_PATH;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_GENERAL_USER_SHARE_REQUEST_BODY;
@@ -117,14 +119,16 @@ public class UsersApiServiceCore {
      */
     public Response shareUsersWithSelectedOrgs(UserShareSelectedRequestBody userShareSelectedRequestBody) {
 
-        LOG.debug("Initiating selective user sharing.");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Selective user sharing API v2 invoked form tenantDomain: " +
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+        }
         if (userShareSelectedRequestBody == null) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(buildErrorResponse(makeRequestError(INVALID_SELECTIVE_USER_SHARE_REQUEST_BODY))).build();
         }
 
         try {
-            // Populate selectiveUserShareV2DO object from the request body.
             SelectiveUserShareV2DO selectiveUserShareV2DO =
                     populateSelectiveUserShareV2DO(userShareSelectedRequestBody);
             userSharingPolicyHandlerServiceV2.populateSelectiveUserShareV2(selectiveUserShareV2DO);
@@ -147,14 +151,16 @@ public class UsersApiServiceCore {
      */
     public Response shareUsersWithAllOrgs(UserShareAllRequestBody userShareAllRequestBody) {
 
-        LOG.debug("Initiating general user sharing.");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("General user sharing API v2 invoked form tenantDomain: " +
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+        }
         if (userShareAllRequestBody == null) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(buildErrorResponse(makeRequestError(INVALID_GENERAL_USER_SHARE_REQUEST_BODY))).build();
         }
 
         try {
-            // Populate GeneralUserShareDO object from the request body.
             GeneralUserShareV2DO generalUserShareV2DO = populateGeneralUserShareV2DO(userShareAllRequestBody);
             userSharingPolicyHandlerServiceV2.populateGeneralUserShareV2(generalUserShareV2DO);
             return Response.status(Response.Status.ACCEPTED)
@@ -176,14 +182,16 @@ public class UsersApiServiceCore {
      */
     public Response unshareUsersFromSelectedOrgs(UserUnshareSelectedRequestBody userUnshareSelectedRequestBody) {
 
-        LOG.debug("Initiating selective user unsharing.");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Selective user un-sharing API v2 invoked form tenantDomain: " +
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+        }
         if (userUnshareSelectedRequestBody == null) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(buildErrorResponse(makeRequestError(INVALID_SELECTIVE_USER_UNSHARE_REQUEST_BODY))).build();
         }
 
         try {
-            // Populate SelectiveUserUnshareDO object from the request body.
             SelectiveUserUnshareDO selectiveUserUnshareDO =
                     populateSelectiveUserUnshareDO(userUnshareSelectedRequestBody);
             userSharingPolicyHandlerServiceV2.populateSelectiveUserUnshareV2(selectiveUserUnshareDO);
@@ -206,14 +214,16 @@ public class UsersApiServiceCore {
      */
     public Response unshareUsersFromAllOrgs(UserUnshareAllRequestBody userUnshareAllRequestBody) {
 
-        LOG.debug("Initiating general user unsharing.");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("General user un-sharing API v2 invoked form tenantDomain: " +
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+        }
         if (userUnshareAllRequestBody == null) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(buildErrorResponse(makeRequestError(INVALID_GENERAL_USER_UNSHARE_REQUEST_BODY))).build();
         }
 
         try {
-            // Populate GeneralUserUnshareDO object from the request body.
             GeneralUserUnshareDO generalUserUnshareDO = populateGeneralUserUnshareDO(userUnshareAllRequestBody);
             userSharingPolicyHandlerServiceV2.populateGeneralUserUnshareV2(generalUserUnshareDO);
             return Response.status(Response.Status.ACCEPTED)
@@ -236,14 +246,16 @@ public class UsersApiServiceCore {
      */
     public Response patchUserSharing(UserSharingPatchRequest userSharingPatchRequest) {
 
-        LOG.debug("Initiating user sharing patch operation.");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Patch user sharing API v2 invoked form tenantDomain: " +
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+        }
         if (userSharingPatchRequest == null) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(buildErrorResponse(makeRequestError(INVALID_USER_SHARE_PATCH_REQUEST_BODY))).build();
         }
 
         try {
-            // Populate PatchUserShareDO object from the request body.
             UserSharePatchDO userSharePatchDO = populateUserSharePatch(userSharingPatchRequest);
             userSharingPolicyHandlerServiceV2.updateRoleAssignmentV2(userSharePatchDO);
             return Response.status(Response.Status.ACCEPTED)
@@ -274,7 +286,8 @@ public class UsersApiServiceCore {
                                                Boolean recursive, String attributes) {
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Retrieving organizations shared with user: " + userId);
+            LOG.debug("Get user shared organizations API v2 invoked form tenantDomain: " +
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain() + " of user: " + userId);
         }
         if (userId == null) {
             return Response.status(Response.Status.BAD_REQUEST)
@@ -488,7 +501,7 @@ public class UsersApiServiceCore {
 
         Map<String, UserCriteriaType> userCriteriaMap = new HashMap<>();
 
-        // userIds
+        // Populate user IDs criterion (if provided).
         if (userCriteria.getUserIds() != null && !userCriteria.getUserIds().isEmpty()) {
             userCriteriaMap.put(USER_IDS, new UserIdList(userCriteria.getUserIds()));
         }
@@ -575,7 +588,7 @@ public class UsersApiServiceCore {
             throws UserSharingMgtClientException {
 
         if (path == null || path.isEmpty()) {
-            throw new IllegalArgumentException("Patch operation 'path' cannot be empty.");
+            throw makeRequestError(ERROR_EMPTY_USER_SHARE_PATCH_PATH);
         }
 
         // For now, support only role patching.
