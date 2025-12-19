@@ -29,8 +29,24 @@ public class WorkflowServiceFactory {
     private static final WorkflowService SERVICE;
 
     static {
-        SERVICE = new WorkflowService(WorkflowServiceHolder.getWorkflowManagementService(),
-                WorkflowServiceHolder.getApprovalTaskService());
+        org.wso2.carbon.identity.workflow.mgt.WorkflowManagementService workflowManagementService =
+                WorkflowServiceHolder.getWorkflowManagementService();
+        org.wso2.carbon.identity.workflow.engine.ApprovalTaskService approvalTaskService =
+                WorkflowServiceHolder.getApprovalTaskService();
+        org.wso2.carbon.identity.rule.management.api.service.RuleManagementService ruleManagementService =
+                WorkflowServiceHolder.getRuleManagementService();
+
+        if (workflowManagementService == null) {
+            throw new IllegalStateException("WorkflowManagementService is not available from OSGi context.");
+        }
+        if (approvalTaskService == null) {
+            throw new IllegalStateException("ApprovalTaskService is not available from OSGi context.");
+        }
+        if (ruleManagementService == null) {
+            throw new IllegalStateException("RuleManagementService is not available from OSGi context.");
+        }
+
+        SERVICE = new WorkflowService(workflowManagementService, approvalTaskService, ruleManagementService);
     }
 
     /**

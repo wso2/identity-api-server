@@ -845,6 +845,8 @@ components:
           type: boolean
           example: true
           description: "Association Status"
+        rule:
+          $ref: "#/components/schemas/ORRuleResponse"
 
     WorkflowAssociationResponse:
       type: object
@@ -867,6 +869,8 @@ components:
           type: boolean
           example: true
           description: "Association Status"
+        rule:
+            $ref: "#/components/schemas/ORRuleResponse"
 
     WorkflowAssociationRequest:
       type: object
@@ -890,6 +894,8 @@ components:
           example: true
           description: "Association Status"
           default: true
+        rule:
+          $ref: "#/components/schemas/ORRule"
 
     WorkflowAssociationPatchRequest:
       type: object
@@ -908,6 +914,8 @@ components:
           type: boolean
           example: true
           description: "Association Status"
+        rule:
+          $ref: "#/components/schemas/ORRule"
 
     WorkflowInstanceListResponse:
       type: object
@@ -1018,6 +1026,104 @@ components:
         traceId:
           type: string
           example: Some Trace ID
+    ORRule:
+      type: object
+      description:  Represents a rule configuration that combines multiple sub-rules with an OR condition.
+        If any of the sub-rules evaluate to true, the ORRule is considered satisfied.
+      properties:
+        condition:
+          type: string
+          description: The logical condition for combining the su-rules. For ORRule, the value 
+            must always be "OR".
+          enum: ["OR"]
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/ANDRule'
+          minItems: 1
+
+    ORRuleResponse:
+      type: object
+      description: Rule configured for the action.
+      properties:
+        condition:
+          type: string
+          enum: [ "OR" ]
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/ANDRuleResponse'
+          description: A list of sub-rules that are combined using the OR condition. Each sub-rule is an ANDRule.
+          minItems: 1
+
+    ANDRule:
+      type: object
+      description: A sub-rule that combines expression with AND condition.
+      required:
+        - condition
+        - expressions
+      properties:
+        condition:
+          type: string
+          enum: ["AND"]
+          description: The logical condition for combining the expressions. For ANDRule, the value must always be "AND".
+        expressions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Expression'
+          minItems: 1
+          description:  A list of expressions that are combined using the AND condition. All expressions must evaluate to true for the ANDRule to pass.
+
+    ANDRuleResponse:
+      type: object
+      description: Represents a rule configuration that combines multiple expressions with an AND condition. All expressions in the ANDRule must evaluate to true for the rule to be satisfied.
+      properties:
+        condition:
+          type: string
+          enum: [ "AND" ]
+          description: The logical condition for combining the expressions. For ANDRule, the value must always be "AND".
+        expressions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpressionResponse'
+          minItems: 1
+          description: A list of expressions that are combined using the AND condition. All expressions must evaluate to true for the ANDRule to pass.
+
+    Expression:
+      type: object
+      description: Represents a single logical condition or comparison within a rule. An expression defines a field, and operator, and a value that is evaluated.
+      required:
+        - field
+        - operator
+        - value
+      properties:
+        field:
+          type: string
+          description: The field or attribute of the entity being evaluated (e.g.,application, role).
+          example: application
+        operator:
+          type: string
+          description: The comparison operator used to evaluate the the field and value. Common operators include "equals", "contains", "startsWith", etc.
+          example: equals
+        value:
+          type: string
+          description: The value that the field is compared against based on the operator.
+          example: FinanceApp
+
+    ExpressionResponse:
+      type: object
+      description: Expressions in the rule.
+      properties:
+        field:
+          type: string
+          example: application
+        operator:
+          type: string
+          example: equals
+        value:
+          type: string
+          example: myapp
+
   responses:
     NotFound:
       description: The specified resource is not found
