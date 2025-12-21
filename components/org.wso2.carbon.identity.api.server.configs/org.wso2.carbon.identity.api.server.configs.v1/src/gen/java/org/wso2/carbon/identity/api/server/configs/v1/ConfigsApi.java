@@ -31,6 +31,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Error;
+import org.wso2.carbon.identity.api.server.configs.v1.model.FraudDetectionConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationConfiguration;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
@@ -180,6 +181,30 @@ public class ConfigsApi  {
     public Response getConfigs() {
 
         return delegate.getConfigs();
+    }
+
+    @Valid
+    @GET
+    @Path("/fraud-detection")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Get fraud detection configs.", notes = "Retrieve fraud detection related configurations of a tenant.", response = FraudDetectionConfig.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Fraud Detection", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successfully retrieved.", response = FraudDetectionConfig.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getFraudDetectionConfigs() {
+
+        return delegate.getFraudDetectionConfigs();
     }
 
     @Valid
@@ -659,6 +684,30 @@ public class ConfigsApi  {
     public Response deleteImpersonationConfiguration() {
 
         return delegate.deleteImpersonationConfiguration();
+    }
+
+    @Valid
+    @PUT
+    @Path("/fraud-detection")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update fraud detection configs.", notes = "Update fraud detection related configuration of a tenant.", response = FraudDetectionConfig.class, authorizations = {
+            @Authorization(value = "BasicAuth"),
+            @Authorization(value = "OAuth2", scopes = {
+
+            })
+    }, tags={ "Fraud Detection", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully updated.", response = FraudDetectionConfig.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+            @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response updateFraudDetectionConfigs(@ApiParam(value = "" ,required=true) @Valid FraudDetectionConfig fraudDetectionConfig) {
+
+        return delegate.updateFraudDetectionConfigs(fraudDetectionConfig );
     }
 
     @Valid

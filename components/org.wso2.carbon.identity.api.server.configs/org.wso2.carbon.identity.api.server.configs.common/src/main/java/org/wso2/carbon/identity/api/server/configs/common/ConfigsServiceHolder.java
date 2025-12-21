@@ -23,6 +23,7 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
+import org.wso2.carbon.identity.fraud.detection.core.service.FraudDetectionConfigsService;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
 import org.wso2.carbon.identity.oauth2.impersonation.services.ImpersonationConfigMgtService;
 import org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.core.JWTClientAuthenticatorMgtService;
@@ -92,6 +93,13 @@ public class ConfigsServiceHolder {
         static final ClaimMetadataManagementService SERVICE =
                 (ClaimMetadataManagementService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                         .getOSGiService(ClaimMetadataManagementService.class, null);
+    }
+
+    private static class FraudDetectionConfigsServiceHolder {
+
+        static final FraudDetectionConfigsService SERVICE =
+                (FraudDetectionConfigsService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(FraudDetectionConfigsService.class, null);
     }
 
     /**
@@ -182,5 +190,15 @@ public class ConfigsServiceHolder {
     public static ClaimMetadataManagementService getClaimMetadataManagementService() {
 
         return ClaimMetaDataManagementServiceHolder.SERVICE;
+    }
+
+    /**
+     * Get FraudDetectionConfigsService osgi service.
+     *
+     * @return FraudDetectionConfigsService
+     */
+    public static FraudDetectionConfigsService getFraudDetectionConfigsService() {
+
+        return FraudDetectionConfigsServiceHolder.SERVICE;
     }
 }

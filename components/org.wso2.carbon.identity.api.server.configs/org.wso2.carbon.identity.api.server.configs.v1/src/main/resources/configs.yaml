@@ -1121,6 +1121,83 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /configs/fraud-detection:
+    get:
+      tags:
+        - Fraud Detection
+      summary: Get fraud detection configs.
+      operationId: getFraudDetectionConfigs
+      description: Retrieve fraud detection related configurations of a tenant.
+      responses:
+        '200':
+          description: Successfully retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FraudDetectionConfig'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - Fraud Detection
+      summary: Update fraud detection configs.
+      operationId: updateFraudDetectionConfigs
+      description: Update fraud detection related configuration of a tenant.
+      responses:
+        '200':
+          description: Successfully updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FraudDetectionConfig'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FraudDetectionConfig'
+        required: true
 servers:
   - url: 'https://localhost:9443/t/{tenant-domain}/api/server/v1'
     variables:
@@ -1506,6 +1583,51 @@ components:
           type: boolean
           description: If true, then email notification will sent to user when impersonation starts.
           example: true
+    FraudDetectionConfig:
+      type: object
+      properties:
+        publishUserInfo:
+          type: boolean
+          description: 'If true, publish user personal information to the fraud detector.'
+          example: true
+        publishDeviceMetadata:
+          type: boolean
+          description: 'If true, publish device related metadata to the fraud detector.'
+          example: true
+        logRequestPayload:
+          type: boolean
+          description: 'If true, log the request payloads sent to the fraud detector.'
+          example: true
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventConfig'
+    EventConfig:
+      type: object
+      properties:
+        eventName:
+          type: string
+          description: 'Name of the event'
+          example: 'Event.User_registration'
+        enabled:
+          type: boolean
+          description: 'If true, publish the event related data to the fraud detector.'
+          example: true
+        properties:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventProperty'
+    EventProperty:
+      type: object
+      properties:
+        propertyKey:
+          type: string
+          description: 'key of the event property'
+          example: 'propertyKey1'
+        propertyValue:
+          type: string
+          description: 'value of the event property'
+          example: 'propertyValue1'
     CORSPatchRequest:
       type: array
       items:

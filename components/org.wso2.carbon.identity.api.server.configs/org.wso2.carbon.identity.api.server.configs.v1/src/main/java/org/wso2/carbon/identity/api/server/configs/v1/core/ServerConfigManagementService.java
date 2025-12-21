@@ -48,6 +48,9 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Endpoint;
+import org.wso2.carbon.identity.api.server.configs.v1.model.EventConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.EventProperty;
+import org.wso2.carbon.identity.api.server.configs.v1.model.FraudDetectionConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationConfiguration;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
@@ -89,6 +92,12 @@ import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceCli
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceException;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceServerException;
 import org.wso2.carbon.identity.cors.mgt.core.model.CORSConfiguration;
+import org.wso2.carbon.identity.fraud.detection.core.exception.FraudDetectionConfigClientException;
+import org.wso2.carbon.identity.fraud.detection.core.exception.FraudDetectionConfigServerException;
+import org.wso2.carbon.identity.fraud.detection.core.exception.IdentityFraudDetectionException;
+import org.wso2.carbon.identity.fraud.detection.core.model.EventConfigDTO;
+import org.wso2.carbon.identity.fraud.detection.core.model.FraudDetectionConfigDTO;
+import org.wso2.carbon.identity.fraud.detection.core.service.FraudDetectionConfigsService;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
 import org.wso2.carbon.identity.oauth.dcr.exception.DCRMException;
 import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationConfigMgtClientException;
@@ -115,6 +124,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -140,6 +150,7 @@ import static org.wso2.carbon.identity.api.server.configs.common.Constants.PATH_
 public class ServerConfigManagementService {
 
     private final ApplicationManagementService applicationManagementService;
+    private final FraudDetectionConfigsService fraudDetectionConfigsService;
     private final IdpManager idpManager;
     private final CORSManagementService corsManagementService;
     private final RemoteLoggingConfigService remoteLoggingConfigService;
@@ -155,7 +166,8 @@ public class ServerConfigManagementService {
                                          RemoteLoggingConfigService remoteLoggingConfigService,
                                          ImpersonationConfigMgtService impersonationConfigMgtService,
                                          DCRConfigurationMgtService dcrConfigurationMgtService,
-                                         JWTClientAuthenticatorMgtService jwtClientAuthenticatorMgtService) {
+                                         JWTClientAuthenticatorMgtService jwtClientAuthenticatorMgtService,
+                                         FraudDetectionConfigsService fraudDetectionConfigsService) {
 
         this.applicationManagementService = applicationManagementService;
         this.idpManager = idpManager;
@@ -164,6 +176,7 @@ public class ServerConfigManagementService {
         this.impersonationConfigMgtService = impersonationConfigMgtService;
         this.dcrConfigurationMgtService = dcrConfigurationMgtService;
         this.jwtClientAuthenticatorMgtService = jwtClientAuthenticatorMgtService;
+        this.fraudDetectionConfigsService = fraudDetectionConfigsService;
     }
 
     /**
@@ -2016,5 +2029,125 @@ public class ServerConfigManagementService {
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     Constants.ErrorMessage.ERROR_CODE_ERROR_PASSIVE_STS_INBOUND_AUTH_CONFIG_DELETE, null);
         }
+    }
+
+    public FraudDetectionConfig getFraudDetectionConfigs() {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            FraudDetectionConfigDTO fraudDetectionConfigDTO
+                    = fraudDetectionConfigsService.getFraudDetectionConfigs(tenantDomain);
+            return buildFraudDetectionConfig(fraudDetectionConfigDTO);
+        } catch (FraudDetectionConfigServerException e) {
+            throw handleFraudDetectionConfigException(e,
+                    Constants.ErrorMessage.ERROR_CODE_FRAUD_DETECTION_CONFIG_RETRIEVE, null);
+        }
+    }
+
+    public FraudDetectionConfig updateFraudDetectionConfigs(FraudDetectionConfig fraudDetectionConfig) {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            FraudDetectionConfigDTO fraudDetectionConfigDTO =
+                    fraudDetectionConfigsService.updateFraudDetectionConfigs(
+                            buildFraudDetectionConfigDTO(fraudDetectionConfig), tenantDomain);
+            return buildFraudDetectionConfig(fraudDetectionConfigDTO);
+        } catch (FraudDetectionConfigServerException e) {
+            throw handleFraudDetectionConfigException(e,
+                    Constants.ErrorMessage.ERROR_CODE_FRAUD_DETECTION_CONFIG_UPDATE, null);
+        }
+    }
+
+    private FraudDetectionConfig buildFraudDetectionConfig(FraudDetectionConfigDTO dto) {
+
+        FraudDetectionConfig fraudDetectionConfig = new FraudDetectionConfig();
+        fraudDetectionConfig.setPublishUserInfo(dto.isPublishUserInfo());
+        fraudDetectionConfig.setPublishDeviceMetadata(dto.isPublishDeviceMetadata());
+        fraudDetectionConfig.setLogRequestPayload(dto.isLogRequestPayload());
+
+        List<EventConfig> eventConfigs = new ArrayList<>();
+        dto.getEvents().forEach((eventName, eventConfigDTO) -> {
+
+            List<EventProperty> eventProperties = new ArrayList<>();
+            eventConfigDTO.getProperties().forEach((key, value) -> {
+
+                EventProperty eventProperty = new EventProperty();
+                eventProperty.setPropertyKey(key);
+                eventProperty.setPropertyValue(value);
+                eventProperties.add(eventProperty);
+            });
+
+            EventConfig eventConfig = new EventConfig();
+            eventConfig.setEventName(eventName);
+            eventConfig.setEnabled(eventConfigDTO.isEnabled());
+            eventConfig.setProperties(eventProperties);
+            eventConfigs.add(eventConfig);
+        });
+
+        fraudDetectionConfig.setEvents(eventConfigs);
+        return fraudDetectionConfig;
+    }
+
+    private FraudDetectionConfigDTO buildFraudDetectionConfigDTO(FraudDetectionConfig config) {
+
+        FraudDetectionConfigDTO fraudDetectionConfigDTO = new FraudDetectionConfigDTO();
+        fraudDetectionConfigDTO.setPublishUserInfo(config.getPublishUserInfo());
+        fraudDetectionConfigDTO.setPublishDeviceMetadata(config.getPublishDeviceMetadata());
+        fraudDetectionConfigDTO.setLogRequestPayload(config.getLogRequestPayload());
+
+        Map<String, EventConfigDTO> eventConfigDTOMap = new HashMap<>();
+        config.getEvents().forEach(eventConfig -> {
+
+            Map<String, String> propertiesMap = new HashMap<>();
+            eventConfig.getProperties().forEach(eventProperty ->
+                    propertiesMap.put(eventProperty.getPropertyKey(), eventProperty.getPropertyValue()));
+
+            EventConfigDTO eventConfigDTO = new EventConfigDTO(eventConfig.getEnabled());
+            eventConfigDTO.setProperties(propertiesMap);
+            eventConfigDTOMap.put(eventConfig.getEventName(), eventConfigDTO);
+        });
+
+        fraudDetectionConfigDTO.setEvents(eventConfigDTOMap);
+
+        return fraudDetectionConfigDTO;
+    }
+
+    private APIError handleFraudDetectionConfigException(IdentityFraudDetectionException e,
+                                                         Constants.ErrorMessage errorEnum, String data) {
+
+        ErrorResponse errorResponse;
+        Response.Status status;
+
+        if (e instanceof FraudDetectionConfigClientException) {
+
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e.getMessage());
+            if (e.getErrorCode() != null) {
+                String errorCode = e.getErrorCode();
+                errorCode =
+                        errorCode.contains(org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER) ?
+                                errorCode : Constants.CONFIG_ERROR_PREFIX + errorCode;
+                errorResponse.setCode(errorCode);
+            }
+            errorResponse.setDescription(e.getMessage());
+            status = Response.Status.BAD_REQUEST;
+        } else if (e instanceof FraudDetectionConfigServerException) {
+
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.description());
+            if (e.getErrorCode() != null) {
+                String errorCode = e.getErrorCode();
+                errorCode =
+                        errorCode.contains(org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER) ?
+                                errorCode : Constants.CONFIG_ERROR_PREFIX + errorCode;
+                errorResponse.setCode(errorCode);
+            }
+            errorResponse.setDescription(e.getMessage());
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+        } else {
+
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.description());
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+        }
+
+        return new APIError(status, errorResponse);
     }
 }

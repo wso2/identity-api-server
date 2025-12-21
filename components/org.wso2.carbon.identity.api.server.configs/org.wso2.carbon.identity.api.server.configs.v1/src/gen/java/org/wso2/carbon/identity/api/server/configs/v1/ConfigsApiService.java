@@ -57,6 +57,8 @@ public interface ConfigsApiService {
 
       public Response getConfigs();
 
+      public Response getFraudDetectionConfigs();
+
       public Response getHomeRealmIdentifiers();
 
       public Response getImpersonationConfiguration();
@@ -95,6 +97,8 @@ public interface ConfigsApiService {
       public Response restoreServerRemoteLoggingConfigurations();
 
       public Response deleteImpersonationConfiguration();
+
+      public Response updateFraudDetectionConfigs(FraudDetectionConfig fraudDetectionConfig);
 
       public Response updateInboundScimConfigs(ScimConfig scimConfig);
 

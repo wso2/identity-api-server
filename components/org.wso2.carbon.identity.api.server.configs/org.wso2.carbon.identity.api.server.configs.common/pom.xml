@@ -82,6 +82,11 @@
             <artifactId>org.wso2.carbon.identity.scim2.common</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <artifactId>org.wso2.carbon.identity.fraud.detection.core</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
     
 </project>
