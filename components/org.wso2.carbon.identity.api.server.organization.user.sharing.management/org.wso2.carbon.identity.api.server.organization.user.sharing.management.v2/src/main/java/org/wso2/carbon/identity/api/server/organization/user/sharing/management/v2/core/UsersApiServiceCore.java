@@ -333,15 +333,18 @@ public class UsersApiServiceCore {
 
         // Set organizations details - policy and roles for each organization.
         List<SelectiveUserShareOrgDetailsV2DO> organizationsList = new ArrayList<>();
-        for (UserOrgShareConfig orgDetail : userShareSelectedRequestBody.getOrganizations()) {
-            if (orgDetail != null) {
-                SelectiveUserShareOrgDetailsV2DO selectiveUserShareOrgDetailsV2DO =
-                        new SelectiveUserShareOrgDetailsV2DO();
-                selectiveUserShareOrgDetailsV2DO.setOrganizationId(orgDetail.getOrgId());
-                selectiveUserShareOrgDetailsV2DO.setPolicy(resolvePolicy(orgDetail.getPolicy()));
-                selectiveUserShareOrgDetailsV2DO.setRoleAssignments(
-                        buildRoleAssignmentFromRequest(orgDetail.getRoleAssignment()));
-                organizationsList.add(selectiveUserShareOrgDetailsV2DO);
+        List<UserOrgShareConfig> orgDetails = userShareSelectedRequestBody.getOrganizations();
+        if (orgDetails != null) {
+            for (UserOrgShareConfig orgDetail : orgDetails) {
+                if (orgDetail != null) {
+                    SelectiveUserShareOrgDetailsV2DO selectiveUserShareOrgDetailsV2DO =
+                            new SelectiveUserShareOrgDetailsV2DO();
+                    selectiveUserShareOrgDetailsV2DO.setOrganizationId(orgDetail.getOrgId());
+                    selectiveUserShareOrgDetailsV2DO.setPolicy(resolvePolicy(orgDetail.getPolicy()));
+                    selectiveUserShareOrgDetailsV2DO.setRoleAssignments(
+                            buildRoleAssignmentFromRequest(orgDetail.getRoleAssignment()));
+                    organizationsList.add(selectiveUserShareOrgDetailsV2DO);
+                }
             }
         }
         selectiveUserShareV2DO.setOrganizations(organizationsList);
@@ -555,11 +558,13 @@ public class UsersApiServiceCore {
         List<RoleWithAudienceDO> rolesList = new ArrayList<>();
         if (roles != null) {
             for (RoleShareConfig role : roles) {
-                RoleWithAudienceDO roleDetails = new RoleWithAudienceDO();
-                roleDetails.setRoleName(role.getDisplayName());
-                roleDetails.setAudienceName(role.getAudience().getDisplay());
-                roleDetails.setAudienceType(role.getAudience().getType());
-                rolesList.add(roleDetails);
+                if (role != null) {
+                    RoleWithAudienceDO roleDetails = new RoleWithAudienceDO();
+                    roleDetails.setRoleName(role.getDisplayName());
+                    roleDetails.setAudienceName(role.getAudience().getDisplay());
+                    roleDetails.setAudienceType(role.getAudience().getType());
+                    rolesList.add(roleDetails);
+                }
             }
         }
         return rolesList;
@@ -579,12 +584,14 @@ public class UsersApiServiceCore {
 
         if (operations != null) {
             for (UserSharingPatchOperation operation : operations) {
-                PatchOperationDO patchOperationDO = new PatchOperationDO();
-                patchOperationDO.setOperation(UserSharePatchOperation.fromValue(operation.getOp()));
-                patchOperationDO.setPath(operation.getPath());
-                patchOperationDO.setValues(
-                        buildPatchOperationValuesFromRequest(operation.getPath(), operation.getValue()));
-                patchOperations.add(patchOperationDO);
+                if (operation != null) {
+                    PatchOperationDO patchOperationDO = new PatchOperationDO();
+                    patchOperationDO.setOperation(UserSharePatchOperation.fromValue(operation.getOp()));
+                    patchOperationDO.setPath(operation.getPath());
+                    patchOperationDO.setValues(
+                            buildPatchOperationValuesFromRequest(operation.getPath(), operation.getValue()));
+                    patchOperations.add(patchOperationDO);
+                }
             }
         }
         return patchOperations;
