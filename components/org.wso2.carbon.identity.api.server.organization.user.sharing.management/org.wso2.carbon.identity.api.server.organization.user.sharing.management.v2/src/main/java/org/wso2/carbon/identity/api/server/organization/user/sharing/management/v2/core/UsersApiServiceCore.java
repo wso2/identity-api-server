@@ -85,6 +85,7 @@ import static org.wso2.carbon.identity.api.server.organization.user.sharing.mana
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_SELECTIVE_USER_SHARE_REQUEST_BODY;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_SELECTIVE_USER_UNSHARE_REQUEST_BODY;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_USER_SHARE_PATCH_REQUEST_BODY;
+import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_UUID_FORMAT;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.RESPONSE_DETAIL_USER_SHARE;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.RESPONSE_DETAIL_USER_SHARE_PATCH;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.RESPONSE_DETAIL_USER_UNSHARE;
@@ -121,7 +122,7 @@ public class UsersApiServiceCore {
     public Response shareUsersWithSelectedOrgs(UserShareSelectedRequestBody userShareSelectedRequestBody) {
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Selective user sharing API v2 invoked form tenantDomain: " +
+            LOG.debug("Selective user sharing API v2 invoked from tenantDomain: " +
                     PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain());
         }
         if (userShareSelectedRequestBody == null) {
@@ -153,7 +154,7 @@ public class UsersApiServiceCore {
     public Response shareUsersWithAllOrgs(UserShareAllRequestBody userShareAllRequestBody) {
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("General user sharing API v2 invoked form tenantDomain: " +
+            LOG.debug("General user sharing API v2 invoked from tenantDomain: " +
                     PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain());
         }
         if (userShareAllRequestBody == null) {
@@ -184,7 +185,7 @@ public class UsersApiServiceCore {
     public Response unshareUsersFromSelectedOrgs(UserUnshareSelectedRequestBody userUnshareSelectedRequestBody) {
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Selective user un-sharing API v2 invoked form tenantDomain: " +
+            LOG.debug("Selective user un-sharing API v2 invoked from tenantDomain: " +
                     PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain());
         }
         if (userUnshareSelectedRequestBody == null) {
@@ -216,7 +217,7 @@ public class UsersApiServiceCore {
     public Response unshareUsersFromAllOrgs(UserUnshareAllRequestBody userUnshareAllRequestBody) {
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("General user un-sharing API v2 invoked form tenantDomain: " +
+            LOG.debug("General user un-sharing API v2 invoked from tenantDomain: " +
                     PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain());
         }
         if (userUnshareAllRequestBody == null) {
@@ -248,7 +249,7 @@ public class UsersApiServiceCore {
     public Response patchUserSharing(UserSharingPatchRequest userSharingPatchRequest) {
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Patch user sharing API v2 invoked form tenantDomain: " +
+            LOG.debug("Patch user sharing API v2 invoked from tenantDomain: " +
                     PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain());
         }
         if (userSharingPatchRequest == null) {
@@ -287,12 +288,18 @@ public class UsersApiServiceCore {
                                                Boolean recursive, String attributes) {
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Get user shared organizations API v2 invoked form tenantDomain: " +
+            LOG.debug("Get user shared organizations API v2 invoked from tenantDomain: " +
                     PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain() + " of user: " + userId);
         }
         if (userId == null) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(buildErrorResponse(makeRequestError(ERROR_MISSING_USER_IDS))).build();
+        }
+        try {
+            UUID.fromString(userId); // Validate UUID format.
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(buildErrorResponse(makeRequestError(INVALID_UUID_FORMAT))).build();
         }
 
         try {
