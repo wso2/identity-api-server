@@ -561,9 +561,12 @@ public class UsersApiServiceCore {
                 if (role != null) {
                     RoleWithAudienceDO roleDetails = new RoleWithAudienceDO();
                     roleDetails.setRoleName(role.getDisplayName());
-                    roleDetails.setAudienceName(role.getAudience().getDisplay());
-                    roleDetails.setAudienceType(role.getAudience().getType());
-                    rolesList.add(roleDetails);
+                    RoleShareConfigAudience audience = role.getAudience();
+                    if (audience != null) {
+                        roleDetails.setAudienceName(audience.getDisplay());
+                        roleDetails.setAudienceType(audience.getType());
+                        rolesList.add(roleDetails);
+                    }
                 }
             }
         }
