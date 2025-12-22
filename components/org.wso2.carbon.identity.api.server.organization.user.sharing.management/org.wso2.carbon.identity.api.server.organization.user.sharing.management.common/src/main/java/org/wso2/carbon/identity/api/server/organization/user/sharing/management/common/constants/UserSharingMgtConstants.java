@@ -80,6 +80,9 @@ public class UserSharingMgtConstants {
         ERROR_UNSUPPORTED_USER_SHARE_POLICY("60009",
                 "Unsupported user share policy.",
                 "The provided user share policy is not supported. Please provide a valid user share policy."),
+        ERROR_MISSING_USER_IDS("60010",
+                "Missing user IDs in the request body.",
+                "The user ID is missing in the request body. Please provide the user ID to proceed."),
 
         // Server errors.
         ERROR_INITIATING_USERS_API_SERVICE("65001",

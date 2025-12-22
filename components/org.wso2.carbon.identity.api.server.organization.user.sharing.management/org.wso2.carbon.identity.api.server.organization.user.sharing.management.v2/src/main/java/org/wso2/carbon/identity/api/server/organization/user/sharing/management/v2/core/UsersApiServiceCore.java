@@ -77,6 +77,7 @@ import javax.ws.rs.core.UriInfo;
 
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.ERROR_EMPTY_USER_SHARE_PATCH_PATH;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.ERROR_MISSING_USER_CRITERIA;
+import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.ERROR_MISSING_USER_IDS;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.ERROR_UNSUPPORTED_USER_SHARE_PATCH_PATH;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.ERROR_UNSUPPORTED_USER_SHARE_POLICY;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_GENERAL_USER_SHARE_REQUEST_BODY;
@@ -84,7 +85,6 @@ import static org.wso2.carbon.identity.api.server.organization.user.sharing.mana
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_SELECTIVE_USER_SHARE_REQUEST_BODY;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_SELECTIVE_USER_UNSHARE_REQUEST_BODY;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_USER_SHARE_PATCH_REQUEST_BODY;
-import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.INVALID_UUID_FORMAT;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.RESPONSE_DETAIL_USER_SHARE;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.RESPONSE_DETAIL_USER_SHARE_PATCH;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.RESPONSE_DETAIL_USER_UNSHARE;
@@ -292,7 +292,7 @@ public class UsersApiServiceCore {
         }
         if (userId == null) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(buildErrorResponse(makeRequestError(INVALID_UUID_FORMAT))).build();
+                    .entity(buildErrorResponse(makeRequestError(ERROR_MISSING_USER_IDS))).build();
         }
 
         try {
