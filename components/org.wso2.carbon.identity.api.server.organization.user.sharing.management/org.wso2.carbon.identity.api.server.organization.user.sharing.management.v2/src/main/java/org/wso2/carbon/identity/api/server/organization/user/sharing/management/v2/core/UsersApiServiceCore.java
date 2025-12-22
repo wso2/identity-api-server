@@ -334,12 +334,15 @@ public class UsersApiServiceCore {
         // Set organizations details - policy and roles for each organization.
         List<SelectiveUserShareOrgDetailsV2DO> organizationsList = new ArrayList<>();
         for (UserOrgShareConfig orgDetail : userShareSelectedRequestBody.getOrganizations()) {
-            SelectiveUserShareOrgDetailsV2DO selectiveUserShareOrgDetailsV2DO = new SelectiveUserShareOrgDetailsV2DO();
-            selectiveUserShareOrgDetailsV2DO.setOrganizationId(orgDetail.getOrgId());
-            selectiveUserShareOrgDetailsV2DO.setPolicy(resolvePolicy(orgDetail.getPolicy()));
-            selectiveUserShareOrgDetailsV2DO.setRoleAssignments(
-                    buildRoleAssignmentFromRequest(orgDetail.getRoleAssignment()));
-            organizationsList.add(selectiveUserShareOrgDetailsV2DO);
+            if (orgDetail != null) {
+                SelectiveUserShareOrgDetailsV2DO selectiveUserShareOrgDetailsV2DO =
+                        new SelectiveUserShareOrgDetailsV2DO();
+                selectiveUserShareOrgDetailsV2DO.setOrganizationId(orgDetail.getOrgId());
+                selectiveUserShareOrgDetailsV2DO.setPolicy(resolvePolicy(orgDetail.getPolicy()));
+                selectiveUserShareOrgDetailsV2DO.setRoleAssignments(
+                        buildRoleAssignmentFromRequest(orgDetail.getRoleAssignment()));
+                organizationsList.add(selectiveUserShareOrgDetailsV2DO);
+            }
         }
         selectiveUserShareV2DO.setOrganizations(organizationsList);
 
@@ -528,8 +531,16 @@ public class UsersApiServiceCore {
     private RoleAssignmentDO buildRoleAssignmentFromRequest(RoleAssignment roleAssignment) {
 
         RoleAssignmentDO roleAssignmentDO = new RoleAssignmentDO();
-        roleAssignmentDO.setMode(RoleAssignmentMode.fromString(roleAssignment.getMode().toString()));
-        roleAssignmentDO.setRoles(buildRoleWithAudienceDO(roleAssignment.getRoles()));
+        if (roleAssignment != null) {
+            RoleAssignmentMode mode = roleAssignment.getMode() != null
+                    ? RoleAssignmentMode.fromString(roleAssignment.getMode().toString())
+                    : RoleAssignmentMode.NONE;
+            roleAssignmentDO.setMode(mode);
+            roleAssignmentDO.setRoles(buildRoleWithAudienceDO(roleAssignment.getRoles()));
+        } else {
+            roleAssignmentDO.setMode(RoleAssignmentMode.NONE);
+            roleAssignmentDO.setRoles(new ArrayList<>());
+        }
         return roleAssignmentDO;
     }
 
@@ -566,14 +577,16 @@ public class UsersApiServiceCore {
 
         List<PatchOperationDO> patchOperations = new ArrayList<>();
 
-        for (UserSharingPatchOperation operation : operations) {
-            PatchOperationDO patchOperationDO = new PatchOperationDO();
-            patchOperationDO.setOperation(UserSharePatchOperation.fromValue(operation.getOp()));
-            patchOperationDO.setPath(operation.getPath());
-            patchOperationDO.setValues(buildPatchOperationValuesFromRequest(operation.getPath(), operation.getValue()));
-            patchOperations.add(patchOperationDO);
+        if (operations != null) {
+            for (UserSharingPatchOperation operation : operations) {
+                PatchOperationDO patchOperationDO = new PatchOperationDO();
+                patchOperationDO.setOperation(UserSharePatchOperation.fromValue(operation.getOp()));
+                patchOperationDO.setPath(operation.getPath());
+                patchOperationDO.setValues(
+                        buildPatchOperationValuesFromRequest(operation.getPath(), operation.getValue()));
+                patchOperations.add(patchOperationDO);
+            }
         }
-
         return patchOperations;
     }
 
