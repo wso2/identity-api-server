@@ -86,7 +86,7 @@ public class NotificationSenderManagementService {
 
         EmailSenderDTO dto = buildEmailSenderDTO(emailSenderAdd);
         try {
-            EmailSenderDTO emailSenderDTO = notificationSenderManagementService.addEmailSender(dto);
+            EmailSenderDTO emailSenderDTO = notificationSenderManagementService.addEmailSender(dto, true);
             return buildEmailSenderFromDTO(emailSenderDTO);
         } catch (NotificationSenderManagementException e) {
             throw handleException(e);
@@ -248,7 +248,7 @@ public class NotificationSenderManagementService {
 
         EmailSenderDTO dto = buildEmailSenderDTO(senderName, emailSenderUpdateRequest);
         try {
-            EmailSenderDTO emailSenderDTO = notificationSenderManagementService.updateEmailSender(dto);
+            EmailSenderDTO emailSenderDTO = notificationSenderManagementService.updateEmailSender(dto, true);
             return buildEmailSenderFromDTO(emailSenderDTO);
         } catch (NotificationSenderManagementException e) {
             throw handleException(e);
