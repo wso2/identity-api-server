@@ -99,6 +99,8 @@ public class BrandingPreferenceManagementService {
         try {
             BrandingPreference requestDTO = buildRequestDTOFromBrandingRequest(brandingPreferenceModel);
             responseDTO = brandingPreferenceManager.addBrandingPreference(requestDTO);
+            log.info("Branding preference added successfully for tenant: " + tenantDomain + 
+                    " and type: " + brandingPreferenceModel.getType());
         } catch (BrandingPreferenceMgtException e) {
             if (BRANDING_PREFERENCE_ALREADY_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
                 if (log.isDebugEnabled()) {
@@ -136,6 +138,8 @@ public class BrandingPreferenceManagementService {
 
         try {
             brandingPreferenceManager.deleteBrandingPreference(type, name, locale);
+            log.info("Branding preference deleted successfully for tenant: " + tenantDomain + 
+                    " and type: " + type);
         } catch (BrandingPreferenceMgtException e) {
             if (BRANDING_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
                 if (log.isDebugEnabled()) {
@@ -263,6 +267,8 @@ public class BrandingPreferenceManagementService {
         try {
             BrandingPreference requestDTO = buildRequestDTOFromBrandingRequest(brandingPreferenceModel);
             responseDTO = brandingPreferenceManager.replaceBrandingPreference(requestDTO);
+            log.info("Branding preference updated successfully for tenant: " + tenantDomain + 
+                    " and type: " + brandingPreferenceModel.getType());
         } catch (BrandingPreferenceMgtException e) {
             if (BRANDING_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
                 if (log.isDebugEnabled()) {
@@ -302,6 +308,8 @@ public class BrandingPreferenceManagementService {
         try {
             CustomText requestDTO = buildRequestDTOFromCustomTextRequest(customTextModal);
             responseDTO = brandingPreferenceManager.addCustomText(requestDTO);
+            log.info("Custom text preference added successfully for tenant: " + tenantDomain + 
+                    " and screen: " + (customTextModal.getScreen() != null ? customTextModal.getScreen() : "null"));
         } catch (BrandingPreferenceMgtException e) {
             if (CUSTOM_TEXT_PREFERENCE_ALREADY_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
                 if (log.isDebugEnabled()) {
@@ -332,6 +340,8 @@ public class BrandingPreferenceManagementService {
 
         try {
             brandingPreferenceManager.deleteCustomText(type, name, screen, locale);
+            log.info("Custom text preference deleted successfully for tenant: " + tenantDomain + 
+                    " and screen: " + (screen != null ? screen : "null"));
         } catch (BrandingPreferenceMgtException e) {
             if (CUSTOM_TEXT_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
                 if (log.isDebugEnabled()) {
@@ -450,6 +460,8 @@ public class BrandingPreferenceManagementService {
         try {
             CustomText requestDTO = buildRequestDTOFromCustomTextRequest(customTextModel);
             responseDTO = brandingPreferenceManager.replaceCustomText(requestDTO);
+            log.info("Custom text preference updated successfully for tenant: " + tenantDomain + 
+                    " and screen: " + (customTextModel.getScreen() != null ? customTextModel.getScreen() : "null"));
         } catch (BrandingPreferenceMgtException e) {
             if (CUSTOM_TEXT_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
                 if (log.isDebugEnabled()) {

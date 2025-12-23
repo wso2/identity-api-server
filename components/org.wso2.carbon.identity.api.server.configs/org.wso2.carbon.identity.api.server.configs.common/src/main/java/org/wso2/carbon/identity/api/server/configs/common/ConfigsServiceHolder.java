@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.configs.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.api.ServerConfigurationService;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
@@ -34,6 +36,8 @@ import org.wso2.carbon.logging.service.RemoteLoggingConfigService;
  * Service holder class for server configuration related services.
  */
 public class ConfigsServiceHolder {
+
+    private static final Log log = LogFactory.getLog(ConfigsServiceHolder.class);
 
     private ConfigsServiceHolder() {}
 
@@ -101,6 +105,9 @@ public class ConfigsServiceHolder {
      */
     public static ApplicationManagementService getApplicationManagementService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving ApplicationManagementService from OSGi context.");
+        }
         return ApplicationManagementServiceHolder.SERVICE;
     }
 
@@ -111,6 +118,9 @@ public class ConfigsServiceHolder {
      */
     public static IdentityProviderManager getIdentityProviderManager() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving IdentityProviderManager from OSGi context.");
+        }
         return IdentityProviderManagerHolder.SERVICE;
     }
 
@@ -121,6 +131,9 @@ public class ConfigsServiceHolder {
      */
     public static CORSManagementService getCorsManagementService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving CORSManagementService from OSGi context.");
+        }
         return CORSManagementServiceHolder.SERVICE;
     }
 
@@ -131,6 +144,9 @@ public class ConfigsServiceHolder {
      */
     public static RemoteLoggingConfigService getRemoteLoggingConfigService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving RemoteLoggingConfigService from OSGi context.");
+        }
         return RemoteLoggingConfigServiceHolder.SERVICE;
     }
 
@@ -141,6 +157,9 @@ public class ConfigsServiceHolder {
      */
     public static ImpersonationConfigMgtService getImpersonationConfigMgtService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving ImpersonationConfigMgtService from OSGi context.");
+        }
         return ImpersonationConfigMgtServiceHolder.SERVICE;
     }
 
@@ -151,6 +170,9 @@ public class ConfigsServiceHolder {
      */
     public static DCRConfigurationMgtService getDcrConfigurationMgtService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving DCRConfigurationMgtService from OSGi context.");
+        }
         return DCRConfigurationMgtServiceHolder.SERVICE;
     }
 
@@ -161,6 +183,9 @@ public class ConfigsServiceHolder {
      */
     public static JWTClientAuthenticatorMgtService getJWTClientAuthenticatorMgtService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving JWTClientAuthenticatorMgtService from OSGi context.");
+        }
         return JWTClientAuthenticatorMgtServiceHolder.SERVICE;
     }
 
@@ -171,6 +196,9 @@ public class ConfigsServiceHolder {
      */
     public static ServerConfigurationService getServerConfigurationService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving ServerConfigurationService from OSGi context.");
+        }
         return ServerConfigurationServiceHolder.SERVICE;
     }
 
@@ -181,6 +209,9 @@ public class ConfigsServiceHolder {
      */
     public static ClaimMetadataManagementService getClaimMetadataManagementService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving ClaimMetadataManagementService from OSGi context.");
+        }
         return ClaimMetaDataManagementServiceHolder.SERVICE;
     }
 }

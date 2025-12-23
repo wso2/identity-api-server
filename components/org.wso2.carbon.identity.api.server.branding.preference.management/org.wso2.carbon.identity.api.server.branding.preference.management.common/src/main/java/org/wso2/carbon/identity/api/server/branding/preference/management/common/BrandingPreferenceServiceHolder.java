@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.branding.preference.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.branding.preference.management.core.BrandingPreferenceManager;
 import org.wso2.carbon.identity.branding.preference.management.core.ai.BrandingAIPreferenceManager;
@@ -26,6 +28,8 @@ import org.wso2.carbon.identity.branding.preference.management.core.ai.BrandingA
  * Service holder class for branding preference management.
  */
 public class BrandingPreferenceServiceHolder {
+
+    private static final Log log = LogFactory.getLog(BrandingPreferenceServiceHolder.class);
 
     private static class BrandingPreferenceManagerHolder {
 
@@ -46,7 +50,14 @@ public class BrandingPreferenceServiceHolder {
      */
     public static BrandingPreferenceManager getBrandingPreferenceManager() {
 
-        return BrandingPreferenceManagerHolder.SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving BrandingPreferenceManager OSGi service.");
+        }
+        BrandingPreferenceManager manager = BrandingPreferenceManagerHolder.SERVICE;
+        if (manager == null && log.isDebugEnabled()) {
+            log.debug("BrandingPreferenceManager OSGi service is not available.");
+        }
+        return manager;
     }
 
     /**
@@ -56,6 +67,13 @@ public class BrandingPreferenceServiceHolder {
      */
     public static BrandingAIPreferenceManager getBrandingPreferenceAiManager() {
 
-        return BrandingAIPreferenceManagerServiceHolder.SERVICE;
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving BrandingAIPreferenceManager OSGi service.");
+        }
+        BrandingAIPreferenceManager aiManager = BrandingAIPreferenceManagerServiceHolder.SERVICE;
+        if (aiManager == null && log.isDebugEnabled()) {
+            log.debug("BrandingAIPreferenceManager OSGi service is not available.");
+        }
+        return aiManager;
     }
 }

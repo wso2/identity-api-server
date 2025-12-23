@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.email.template.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.email.mgt.EmailTemplateManager;
 
@@ -30,8 +32,20 @@ public class EmailTemplatesServiceHolder {
 
     private static class EmailTemplateManagerHolder {
 
-        static final EmailTemplateManager SERVICE = (EmailTemplateManager) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext().getOSGiService(EmailTemplateManager.class, null);
+        private static final Log log = LogFactory.getLog(EmailTemplateManagerHolder.class);
+        static final EmailTemplateManager SERVICE = initializeService();
+
+        private static EmailTemplateManager initializeService() {
+
+            EmailTemplateManager service = (EmailTemplateManager) PrivilegedCarbonContext
+                    .getThreadLocalCarbonContext().getOSGiService(EmailTemplateManager.class, null);
+            if (service == null) {
+                log.warn("EmailTemplateManager is not available in OSGi context.");
+            } else {
+                log.debug("EmailTemplateManager successfully retrieved from OSGi context.");
+            }
+            return service;
+        }
     }
 
     /**

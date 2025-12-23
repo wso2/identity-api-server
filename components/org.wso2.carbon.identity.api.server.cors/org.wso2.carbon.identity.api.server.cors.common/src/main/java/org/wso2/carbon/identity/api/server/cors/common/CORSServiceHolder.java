@@ -16,6 +16,8 @@
 
 package org.wso2.carbon.identity.api.server.cors.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 
@@ -23,6 +25,8 @@ import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
  * Service holder class for server configuration related services.
  */
 public class CORSServiceHolder {
+
+    private static final Log log = LogFactory.getLog(CORSServiceHolder.class);
 
     private CORSServiceHolder() {}
 
@@ -39,6 +43,12 @@ public class CORSServiceHolder {
      */
     public static CORSManagementService getCorsManagementService() {
 
-        return CORSManagementServiceHolder.SERVICE;
+        CORSManagementService service = CORSManagementServiceHolder.SERVICE;
+        if (service == null) {
+            log.warn("CORSManagementService is not available. CORS configurations may not function properly.");
+        } else if (log.isDebugEnabled()) {
+            log.debug("CORSManagementService retrieved successfully.");
+        }
+        return service;
     }
 }

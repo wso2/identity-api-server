@@ -75,15 +75,26 @@ public class AsyncOperationsApiServiceCore {
     public AsyncOperationsApiServiceCore(AsyncOperationStatusMgtService asyncOperationStatusMgtService) {
 
         this.asyncOperationStatusMgtService = asyncOperationStatusMgtService;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("AsyncOperationsApiServiceCore initialized with AsyncOperationStatusMgtService.");
+        }
     }
 
     public Response getOperations(String after, String before, Integer limit, String filter) {
 
         String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Retrieving operations for tenant: %s with parameters - after: %s, " +
+                    "before: %s, limit: %s, filter: %s", tenantDomain, after, before, limit, filter));
+        }
         try {
             limit = validateLimit(limit);
             List<OperationResponseDTO> records =
                     asyncOperationStatusMgtService.getOperations(tenantDomain, after, before, limit + 1, filter);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(String.format("Successfully retrieved %d operations for tenant: %s", 
+                        records != null ? records.size() : 0, tenantDomain));
+            }
             return Response.ok().entity(getOperationsResponse(limit, after, before, filter, records)).build();
         } catch (AsyncOperationStatusMgtException e) {
             throw AsyncOperationStatusEndpointUtil.handleAsyncOperationStatusMgtException(e);
@@ -93,9 +104,15 @@ public class AsyncOperationsApiServiceCore {
     public Response getOperation(String operationId) {
 
         String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Retrieving operation with ID: %s for tenant: %s", operationId, tenantDomain));
+        }
         try {
             OperationResponseDTO record = asyncOperationStatusMgtService.getOperation(operationId, tenantDomain);
             if (record == null) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(String.format("Operation not found for ID: %s in tenant: %s", operationId, tenantDomain));
+                }
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
             return Response.ok().entity(getOperationResponse(record)).build();
@@ -107,10 +124,18 @@ public class AsyncOperationsApiServiceCore {
     public Response getUnitOperation(String unitOperationId) {
 
         String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Retrieving unit operation with ID: %s for tenant: %s", 
+                    unitOperationId, tenantDomain));
+        }
         try {
             UnitOperationResponseDTO record = asyncOperationStatusMgtService.getUnitOperation(unitOperationId,
                     tenantDomain);
             if (record == null) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(String.format("Unit operation not found for ID: %s in tenant: %s", 
+                            unitOperationId, tenantDomain));
+                }
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
             return Response.ok().entity(getUnitOperationResponse(record)).build();
@@ -123,11 +148,20 @@ public class AsyncOperationsApiServiceCore {
                                       Integer limit, String filter) {
 
         String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Retrieving unit operations for operation ID: %s in tenant: %s with " +
+                    "parameters - after: %s, before: %s, limit: %s, filter: %s", 
+                    operationId, tenantDomain, after, before, limit, filter));
+        }
         try {
             limit = validateLimit(limit);
             List<UnitOperationResponseDTO> records =
                     asyncOperationStatusMgtService.getUnitOperationStatusRecords(operationId, tenantDomain, after,
                             before, limit + 1, filter);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(String.format("Successfully retrieved %d unit operations for operation ID: %s in tenant: %s", 
+                        records != null ? records.size() : 0, operationId, tenantDomain));
+            }
             return Response.ok().entity(
                     getUnitOperationsResponse(limit, after, before, filter, records, operationId)).build();
         } catch (AsyncOperationStatusMgtException e) {
@@ -178,7 +212,8 @@ public class AsyncOperationsApiServiceCore {
                 try {
                     url += "&" + FILTER_PARAM + "=" + URLEncoder.encode(filter, StandardCharsets.UTF_8.name());
                 } catch (UnsupportedEncodingException e) {
-                    throw new AsyncOperationStatusMgtServerException("Error");
+                    LOG.error("Error encoding filter parameter for pagination URL", e);
+                    throw new AsyncOperationStatusMgtServerException("Error encoding filter parameter");
                 }
             }
 
@@ -258,7 +293,8 @@ public class AsyncOperationsApiServiceCore {
                 try {
                     url += "&" + FILTER_PARAM + "=" + URLEncoder.encode(filter, StandardCharsets.UTF_8.name());
                 } catch (UnsupportedEncodingException e) {
-                    throw new AsyncOperationStatusMgtServerException("Error");
+                    LOG.error("Error encoding filter parameter for unit operations pagination URL", e);
+                    throw new AsyncOperationStatusMgtServerException("Error encoding filter parameter");
                 }
             }
 

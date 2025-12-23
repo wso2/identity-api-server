@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.cors.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.cors.common.CORSServiceHolder;
 import org.wso2.carbon.identity.api.server.cors.v1.core.CORSService;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
@@ -27,16 +29,24 @@ import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
  */
 public class CORSServiceFactory {
 
+    private static final Log log = LogFactory.getLog(CORSServiceFactory.class);
     private static final CORSService SERVICE;
 
     static {
+        if (log.isDebugEnabled()) {
+            log.debug("Initializing CORS service factory.");
+        }
         CORSManagementService corsManagementService = CORSServiceHolder.getCorsManagementService();
 
         if (corsManagementService == null) {
+            log.error("CORSManagementService is not available from OSGi context.");
             throw new IllegalStateException("CORSManagementService is not available from OSGi context.");
         }
 
         SERVICE = new CORSService(corsManagementService);
+        if (log.isDebugEnabled()) {
+            log.debug("CORS service factory initialized successfully.");
+        }
     }
 
     /**
@@ -46,6 +56,9 @@ public class CORSServiceFactory {
      */
     public static CORSService getCORSService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving CORS service instance.");
+        }
         return SERVICE;
     }
 }

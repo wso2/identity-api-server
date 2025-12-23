@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.rest.api.server.email.template.v2.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.email.mgt.EmailTemplateManager;
 import org.wso2.carbon.identity.api.server.email.template.common.EmailTemplatesServiceHolder;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.core.ApplicationEmailTemplatesService;
@@ -27,16 +29,20 @@ import org.wso2.carbon.identity.rest.api.server.email.template.v2.core.Applicati
  */
 public class ApplicationEmailTemplatesServiceFactory {
 
+    private static final Log log = LogFactory.getLog(ApplicationEmailTemplatesServiceFactory.class);
     private static final ApplicationEmailTemplatesService SERVICE;
 
     static {
+        log.info("Initializing ApplicationEmailTemplatesServiceFactory.");
         EmailTemplateManager emailTemplateManager = EmailTemplatesServiceHolder.getEmailTemplateManager();
 
         if (emailTemplateManager == null) {
+            log.error("EmailTemplateManager is not available from OSGi context.");
             throw new IllegalStateException("EmailTemplateManager is not available from OSGi context.");
         }
 
         SERVICE = new ApplicationEmailTemplatesService(emailTemplateManager);
+        log.info("ApplicationEmailTemplatesServiceFactory initialized successfully.");
     }
 
     /**
@@ -46,6 +52,9 @@ public class ApplicationEmailTemplatesServiceFactory {
      */
     public static ApplicationEmailTemplatesService getApplicationEmailTemplatesService() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving ApplicationEmailTemplatesService instance.");
+        }
         return SERVICE;
     }
 }
