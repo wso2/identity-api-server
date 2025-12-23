@@ -96,6 +96,10 @@ public class InactiveUsersManagementApiService {
     public List<InactiveUser> getInactiveUsers(String inactiveAfter, String excludeBefore, String tenantDomain,
                                                String filter) throws IdleAccountIdentificationClientException {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Getting inactive users for tenant: %s with parameters - inactiveAfter: %s, " +
+                    "excludeBefore: %s, filter: %s", tenantDomain, inactiveAfter, excludeBefore, filter));
+        }
         List<InactiveUserModel> inactiveUsers = null;
         try {
             validateDates(inactiveAfter, excludeBefore);
@@ -113,18 +117,30 @@ public class InactiveUsersManagementApiService {
                             idleAccountIdentificationService.getLimitedInactiveUsersFromSpecificDate(inactiveAfterDate,
                                     excludeBeforeDate, tenantDomain);
                 }
-                return buildResponse(inactiveUsers);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(String.format("Retrieved %d inactive users for tenant: %s",
+                            inactiveUsers != null ? inactiveUsers.size() : 0, tenantDomain));
+                }
+                return buildResponse(inactiveUsers != null ? inactiveUsers : new ArrayList<>());
             }
 
             List<ExpressionNode> expressionNodes = getExpressionNodes(filter);
             if (validateExpressionNodes(expressionNodes)) {
                 boolean isDisabled = Boolean.parseBoolean(expressionNodes.get(0).getValue());
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(String.format("Filtering inactive users by disabled status: %s for tenant: %s",
+                            isDisabled, tenantDomain));
+                }
 
                 inactiveUsers = IdleAccountIdentificationServiceHolder.getIdleAccountIdentificationService()
                         .filterInactiveUsersIfDisabled(inactiveAfterDate, excludeBeforeDate, tenantDomain,
                                 isDisabled);
 
-                return buildResponse(inactiveUsers);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(String.format("Retrieved %d filtered inactive users for tenant: %s",
+                            inactiveUsers != null ? inactiveUsers.size() : 0, tenantDomain));
+                }
+                return buildResponse(inactiveUsers != null ? inactiveUsers : new ArrayList<>());
             }
             return getInactiveUsers(inactiveAfter, excludeBefore, tenantDomain);
 
@@ -143,8 +159,14 @@ public class InactiveUsersManagementApiService {
     private void validateDates(String inactiveAfter, String excludeBefore) throws
             IdleAccountIdentificationClientException {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Validating dates - inactiveAfter: %s, excludeBefore: %s",
+                    inactiveAfter, excludeBefore));
+        }
+
         // Check if the required parameter 'inactiveAfter' is present.
         if (StringUtils.isEmpty(inactiveAfter)) {
+            LOG.warn("Required parameter 'inactiveAfter' is missing.");
             ErrorMessage error = ErrorMessage.ERROR_REQUIRED_PARAMETER_MISSING;
             throw new IdleAccountIdentificationClientException(error.getCode(), error.getMessage(),
                     String.format(error.getDescription(), DATE_INACTIVE_AFTER));
@@ -168,8 +190,12 @@ public class InactiveUsersManagementApiService {
             IdleAccountIdentificationClientException {
 
         if (Pattern.matches(DATE_FORMAT_REGEX, dateString)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(String.format("Date format validation successful for %s: %s", dateType, dateString));
+            }
             return;
         }
+        LOG.warn(String.format("Invalid date format for %s: %s", dateType, dateString));
         ErrorMessage error = ErrorMessage.ERROR_DATE_REGEX_MISMATCH;
         throw new IdleAccountIdentificationClientException(error.getCode(), error.getMessage(),
                 String.format(error.getDescription(), dateType));
@@ -302,6 +328,8 @@ public class InactiveUsersManagementApiService {
         if (inactiveAfterDate != null && excludeBeforeDate != null
                 && inactiveAfterDate.isBefore(excludeBeforeDate)) {
 
+            LOG.warn(String.format("Invalid date combination: inactiveAfter (%s) is before excludeBefore (%s)",
+                    inactiveAfterDate, excludeBeforeDate));
             ErrorMessage error = ErrorMessage.ERROR_INVALID_DATE_COMBINATION;
             throw new IdleAccountIdentificationClientException(error.getCode(), error.getMessage(),
                     String.format(error.getDescription()));
@@ -318,6 +346,9 @@ public class InactiveUsersManagementApiService {
     private List<ExpressionNode> getExpressionNodes(String filter) throws IdleAccountIdentificationClientException {
 
         // Filter example : isDisabled eq true.
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Processing filter expression: %s", filter));
+        }
         List<ExpressionNode> expressionNodes = new ArrayList<>();
         FilterTreeBuilder filterTreeBuilder;
         if (StringUtils.isNotBlank(filter)) {
@@ -326,6 +357,7 @@ public class InactiveUsersManagementApiService {
                 Node rootNode = filterTreeBuilder.buildTree();
                 setExpressionNodeList(rootNode, expressionNodes);
             } catch (IOException | IdentityException e) {
+                LOG.warn(String.format("Invalid filter expression: %s", filter), e);
                 ErrorMessage error = ErrorMessage.ERROR_INVALID_FILTER;
                 throw new IdleAccountIdentificationClientException(error.getCode(), error.getMessage(),
                         String.format(error.getDescription()));
