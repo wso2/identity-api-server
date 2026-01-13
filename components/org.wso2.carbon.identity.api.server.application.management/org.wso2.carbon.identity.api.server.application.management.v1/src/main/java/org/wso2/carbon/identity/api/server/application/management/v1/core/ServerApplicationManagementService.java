@@ -227,7 +227,8 @@ import static org.wso2.carbon.identity.cors.mgt.core.constant.ErrorMessages.ERRO
 import static org.wso2.carbon.identity.organization.management.service.util.Utils.isLegacyAuthzRuntime;
 
 /**
- * Calls internal osgi services to perform server application management related operations.
+ * Calls internal osgi services to perform server application management related 
+ * operations.
  */
 public class ServerApplicationManagementService {
 
@@ -707,7 +708,10 @@ public class ServerApplicationManagementService {
             String fileType = fileDetail.getDataHandler().getContentType();
 
             ServiceProvider serviceProvider = parseSP(spFileContent, fileType, tenantDomain);
-
+            
+            if (serviceProvider.getAccessUrl() != null) {
+                serviceProvider.setAccessUrl(StringUtils.trimToNull(serviceProvider.getAccessUrl()));
+            }
             /*
              * internal_application_script_update scope is required when, performing
              * adaptive script related operations.
@@ -914,7 +918,7 @@ public class ServerApplicationManagementService {
         try {
             // Trim access URL before persistence
             if (applicationModel.getAccessUrl() != null) {
-                applicationModel.setAccessUrl(StringUtils.trim(applicationModel.getAccessUrl()));
+                applicationModel.setAccessUrl(StringUtils.trimToNull(applicationModel.getAccessUrl()));
             }
 
             ApplicationDTO applicationDTO = new ApiModelToServiceProvider().apply(applicationModel);
@@ -996,7 +1000,11 @@ public class ServerApplicationManagementService {
         if (applicationPatchModel != null) {
             // Trim access URL before persistence
             if (applicationPatchModel.getAccessUrl() != null) {
-                applicationPatchModel.setAccessUrl(StringUtils.trim(applicationPatchModel.getAccessUrl()));
+                applicationModel.setAccessUrl(StringUtils.trimToNull(applicationModel.getAccessUrl()));
+
+            }
+            if (log.isDebugEnabled()) {
+    log.debug("Patching application with id: {}.", applicationId);
             }
             new UpdateServiceProvider().apply(appToUpdate, applicationPatchModel);
         }
