@@ -78,10 +78,10 @@ public class CredentialManagementServiceImplTest {
     }
 
     /**
-     * Test getCredentialsForUser when both handlers return credentials successfully.
+     * Test getCredentials when both handlers return credentials successfully.
      */
     @Test
-    public void testGetCredentialsForUser() throws CredentialMgtException {
+    public void testGetCredentials() throws CredentialMgtException {
 
         CredentialDTO passkeyCredential = createMockCredential("passkey-1", "passkey", "Test Passkey");
         CredentialDTO pushCredential = createMockCredential("push-1", "push-auth", "Test Push Device");
@@ -103,10 +103,10 @@ public class CredentialManagementServiceImplTest {
     }
 
     /**
-     * Test getCredentialsForUser when both handlers return empty lists.
+     * Test getCredentials when both handlers return empty lists.
      */
     @Test
-    public void testGetCredentialsForUserEmptyResult() throws CredentialMgtException {
+    public void testGetCredentialsWithEmptyResult() throws CredentialMgtException {
 
         when(passkeyHandler.getCredentials(TEST_USER_ID)).thenReturn(new ArrayList<>());
         when(pushAuthHandler.getCredentials(TEST_USER_ID)).thenReturn(new ArrayList<>());
@@ -201,17 +201,17 @@ public class CredentialManagementServiceImplTest {
             throws CredentialMgtException {
 
         String credentialId = "credential-456";
-        CredentialDeletionRequestDTO userCredentialDeletionRequest =
+        CredentialDeletionRequestDTO credentialDeletionRequest =
                 createMockDeletionRequest(TEST_USER_ID, typeInput, credentialId);
 
         doCallRealMethod().when(userCredentialManagementService)
-                .deleteCredential(userCredentialDeletionRequest);
+                .deleteCredential(credentialDeletionRequest);
 
-        userCredentialManagementService.deleteCredential(userCredentialDeletionRequest);
+        userCredentialManagementService.deleteCredential(credentialDeletionRequest);
 
         CredentialHandler expectedHandler = expectedType == CredentialTypes.PASSKEY ?
                 passkeyHandler : pushAuthHandler;
-        verify(expectedHandler, times(1)).deleteCredential(userCredentialDeletionRequest);
+        verify(expectedHandler, times(1)).deleteCredential(credentialDeletionRequest);
     }
 
     /**
@@ -222,11 +222,11 @@ public class CredentialManagementServiceImplTest {
 
         String type = "invalid-type";
         String credentialId = "credential-456";
-        CredentialDeletionRequestDTO userCredentialDeletionRequest =
+        CredentialDeletionRequestDTO credentialDeletionRequest =
                 createMockDeletionRequest(TEST_USER_ID, type, credentialId);
-        doCallRealMethod().when(userCredentialManagementService).deleteCredential(userCredentialDeletionRequest);
+        doCallRealMethod().when(userCredentialManagementService).deleteCredential(credentialDeletionRequest);
 
-        userCredentialManagementService.deleteCredential(userCredentialDeletionRequest);
+        userCredentialManagementService.deleteCredential(credentialDeletionRequest);
     }
 
     /**
@@ -237,15 +237,15 @@ public class CredentialManagementServiceImplTest {
 
         String type = "passkey";
         String credentialId = "error-credential";
-        CredentialDeletionRequestDTO userCredentialDeletionRequest =
+        CredentialDeletionRequestDTO credentialDeletionRequest =
                 createMockDeletionRequest(TEST_USER_ID, type, credentialId);
         CredentialMgtException expectedException = new CredentialMgtException("ERROR", "Passkey handler error",
                 "An error occurred in the passkey handler");
 
-        doThrow(expectedException).when(passkeyHandler).deleteCredential(userCredentialDeletionRequest);
-        doCallRealMethod().when(userCredentialManagementService).deleteCredential(userCredentialDeletionRequest);
+        doThrow(expectedException).when(passkeyHandler).deleteCredential(credentialDeletionRequest);
+        doCallRealMethod().when(userCredentialManagementService).deleteCredential(credentialDeletionRequest);
 
-        userCredentialManagementService.deleteCredential(userCredentialDeletionRequest);
+        userCredentialManagementService.deleteCredential(credentialDeletionRequest);
     }
 
     @DataProvider(name = "edgeCaseInputs")

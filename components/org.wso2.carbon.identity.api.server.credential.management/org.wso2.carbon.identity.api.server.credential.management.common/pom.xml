@@ -45,5 +45,9 @@
             <groupId>org.wso2.carbon.identity.notification.push</groupId>
             <artifactId>org.wso2.carbon.identity.notification.push.device.handler</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.server.api</groupId>
+            <artifactId>org.wso2.carbon.identity.api.server.common</artifactId>
+        </dependency>
     </dependencies>
 </project>

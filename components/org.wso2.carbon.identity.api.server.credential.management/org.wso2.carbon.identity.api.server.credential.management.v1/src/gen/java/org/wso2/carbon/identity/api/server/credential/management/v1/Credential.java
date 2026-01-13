@@ -31,53 +31,53 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 public class Credential  {
-  
+
     private String credentialId;
     private String displayName;
 
-@XmlType(name="TypeEnum")
-@XmlEnum(String.class)
-public enum TypeEnum {
+    @XmlType(name="TypeEnum")
+    @XmlEnum(String.class)
+    public enum TypeEnum {
 
-    @XmlEnumValue("passkey") PASSKEY(String.valueOf("passkey")), @XmlEnumValue("push-auth") PUSH_AUTH(String.valueOf("push-auth"));
+        @XmlEnumValue("passkey") PASSKEY(String.valueOf("passkey")), @XmlEnumValue("push-auth") PUSH_AUTH(String.valueOf("push-auth"));
 
 
-    private String value;
+        private String value;
 
-    TypeEnum(String v) {
-        value = v;
-    }
-
-    public String value() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return String.valueOf(value);
-    }
-
-    public static TypeEnum fromValue(String value) {
-        for (TypeEnum b : TypeEnum.values()) {
-            if (b.value.equals(value)) {
-                return b;
-            }
+        TypeEnum(String v) {
+            value = v;
         }
-        throw new IllegalArgumentException("Unexpected value '" + value + "'");
+
+        public String value() {
+            return value;
+        }
+
+        @Override
+        public String toString() {
+            return String.valueOf(value);
+        }
+
+        public static TypeEnum fromValue(String value) {
+            for (TypeEnum b : TypeEnum.values()) {
+                if (b.value.equals(value)) {
+                    return b;
+                }
+            }
+            throw new IllegalArgumentException("Unexpected value '" + value + "'");
+        }
     }
-}
 
     private TypeEnum type;
 
     /**
-    * The unique identifier for the credential.
-    **/
+     * The unique identifier for the credential.
+     **/
     public Credential credentialId(String credentialId) {
 
         this.credentialId = credentialId;
         return this;
     }
-    
+
     @ApiModelProperty(example = "a5a81c76-27a3-42d4-82a8-55285d82a4a1", value = "The unique identifier for the credential.")
     @JsonProperty("credentialId")
     @Valid
@@ -89,14 +89,14 @@ public enum TypeEnum {
     }
 
     /**
-    * A user-friendly name for the credential.
-    **/
+     * A user-friendly name for the credential.
+     **/
     public Credential displayName(String displayName) {
 
         this.displayName = displayName;
         return this;
     }
-    
+
     @ApiModelProperty(example = "YubiKey 5C", value = "A user-friendly name for the credential.")
     @JsonProperty("displayName")
     @Valid
@@ -108,14 +108,14 @@ public enum TypeEnum {
     }
 
     /**
-    * The type of the credential.
-    **/
+     * The type of the credential.
+     **/
     public Credential type(TypeEnum type) {
 
         this.type = type;
         return this;
     }
-    
+
     @ApiModelProperty(value = "The type of the credential.")
     @JsonProperty("type")
     @Valid
@@ -139,8 +139,8 @@ public enum TypeEnum {
         }
         Credential credential = (Credential) o;
         return Objects.equals(this.credentialId, credential.credentialId) &&
-            Objects.equals(this.displayName, credential.displayName) &&
-            Objects.equals(this.type, credential.type);
+                Objects.equals(this.displayName, credential.displayName) &&
+                Objects.equals(this.type, credential.type);
     }
 
     @Override
@@ -153,7 +153,7 @@ public enum TypeEnum {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class Credential {\n");
-        
+
         sb.append("    credentialId: ").append(toIndentedString(credentialId)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
@@ -162,9 +162,9 @@ public enum TypeEnum {
     }
 
     /**
-    * Convert the given object to string with each line indented by 4 spaces
-    * (except the first line).
-    */
+     * Convert the given object to string with each line indented by 4 spaces
+     * (except the first line).
+     */
     private String toIndentedString(java.lang.Object o) {
 
         if (o == null) {
@@ -173,4 +173,3 @@ public enum TypeEnum {
         return o.toString().replace("\n", "\n");
     }
 }
-

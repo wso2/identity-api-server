@@ -21,7 +21,6 @@ package org.wso2.carbon.identity.api.server.credential.management.common;
 import java.text.Collator;
 import java.util.Arrays;
 import java.util.Locale;
-import java.util.Optional;
 
 /**
  * Credential Management related constants.
@@ -36,6 +35,7 @@ public class CredentialManagementConstants {
      * Enum for supported credential types.
      */
     public enum CredentialTypes {
+
         PASSKEY("passkey"),
         PUSH_AUTH("push-auth");
 
@@ -57,17 +57,17 @@ public class CredentialManagementConstants {
          * @param value Credential type provided by the caller.
          * @return Matching credential type if available.
          */
-        public static Optional<CredentialTypes> fromString(String value) {
+        public static CredentialTypes fromString(String value) {
 
             if (value == null) {
 
-                return Optional.empty();
+                return null;
             }
 
             String candidate = value.trim();
             if (candidate.isEmpty()) {
 
-                return Optional.empty();
+                return null;
             }
 
             Collator collator = Collator.getInstance(Locale.ROOT);
@@ -76,7 +76,8 @@ public class CredentialManagementConstants {
             return Arrays.stream(values())
                     .filter(type -> collator.compare(type.name(), candidate) == 0
                             || collator.compare(type.getApiValue(), candidate) == 0)
-                    .findFirst();
+                    .findFirst()
+                    .orElse(null);
         }
     }
 

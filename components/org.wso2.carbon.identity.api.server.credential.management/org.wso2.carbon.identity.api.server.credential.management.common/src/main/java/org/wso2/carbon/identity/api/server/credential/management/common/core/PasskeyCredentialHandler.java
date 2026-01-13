@@ -74,7 +74,7 @@ public class PasskeyCredentialHandler implements CredentialHandler {
             }
 
             if (LOG.isDebugEnabled()) {
-                LOG.info("Successfully retrieved " + credentialDTOs.size() + " passkey credentials for entity ID: "
+                LOG.debug("Successfully retrieved " + credentialDTOs.size() + " passkey credentials for entity ID: "
                         + entityId);
             }
             return credentialDTOs;
@@ -98,7 +98,7 @@ public class PasskeyCredentialHandler implements CredentialHandler {
             String username = resolveUsernameFromUserId(credentialDeletionRequest.getEntityId());
             webAuthnService.deregisterFIDO2Credential(credentialDeletionRequest.getCredentialId(), username);
             if (LOG.isDebugEnabled()) {
-                LOG.info("Successfully deleted passkey credential for entity ID: "
+                LOG.debug("Successfully deleted passkey credential for entity ID: "
                         + credentialDeletionRequest.getEntityId());
             }
         } catch (FIDO2AuthenticatorClientException e) {

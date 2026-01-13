@@ -50,15 +50,15 @@ public class UsersApi  {
     @Valid
     @DELETE
     @Path("/{user-id}/credentials/{type}/{credential-id}")
-    
+
     @Produces({ "application/json" })
     @ApiOperation(value = "Delete a user-enrolled credential.", notes = "Deletes a specific enrolled credential for a user. Requires administrative privileges with appropriate scope and organizational permissions.", response = Void.class, tags={ "Delete User Credential", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "User Credential Deleted.", response = Void.class),
-        @ApiResponse(code = 400, message = "Bad Request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden.", response = Error.class),
-        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "User Credential Deleted.", response = Void.class),
+            @ApiResponse(code = 400, message = "Bad Request.", response = Error.class),
+            @ApiResponse(code = 401, message = "Unauthorized.", response = Error.class),
+            @ApiResponse(code = 403, message = "Forbidden.", response = Error.class),
+            @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
     public Response deleteUserCredentialById(@ApiParam(value = "The unique identifier of the user.",required=true) @PathParam("user-id") String userId, @ApiParam(value = "The type of the credential.",required=true, allowableValues="passkey, push-auth") @PathParam("type") String type, @ApiParam(value = "The unique identifier of the device to be deleted.",required=true) @PathParam("credential-id") String credentialId) {
 
@@ -68,20 +68,19 @@ public class UsersApi  {
     @Valid
     @GET
     @Path("/{user-id}/credentials")
-    
+
     @Produces({ "application/json" })
     @ApiOperation(value = "Get all credentials for a user", notes = "Retrieves a list of all user-enrolled credentials. Requires administrative privileges with appropriate scope and organizational permissions. This API currently supports passkey and push authentication credentials.", response = Credential.class, responseContainer = "List", tags={ "Get User Credentials" })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = Credential.class, responseContainer = "List"),
-        @ApiResponse(code = 400, message = "Bad Request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden.", response = Error.class),
-        @ApiResponse(code = 404, message = "User Not Found.", response = Error.class),
-        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = Credential.class, responseContainer = "List"),
+            @ApiResponse(code = 400, message = "Bad Request.", response = Error.class),
+            @ApiResponse(code = 401, message = "Unauthorized.", response = Error.class),
+            @ApiResponse(code = 403, message = "Forbidden.", response = Error.class),
+            @ApiResponse(code = 404, message = "User Not Found.", response = Error.class),
+            @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
     public Response getUserCredentialsById(@ApiParam(value = "The unique identifier of the user.",required=true) @PathParam("user-id") String userId) {
 
         return delegate.getUserCredentialsById(userId );
     }
-
 }

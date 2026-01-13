@@ -20,7 +20,7 @@ package org.wso2.carbon.identity.api.server.credential.management.common.core;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialHandler;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants;
 import org.wso2.carbon.identity.api.server.credential.management.common.CredentialManagementConstants.CredentialTypes;
@@ -61,12 +61,12 @@ public class PushCredentialHandler implements CredentialHandler {
             LOG.debug("Retrieving push authentication credential for entity ID: " + entityId);
         }
         try {
-            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
             List<Device> pushCredentials = Collections.singletonList(deviceHandler
                     .getDeviceByUserId(entityId, tenantDomain));
 
             if (LOG.isDebugEnabled()) {
-                LOG.info("Successfully retrieved push authentication credential for entity ID: " + entityId);
+                LOG.debug("Successfully retrieved push authentication credential for entity ID: " + entityId);
             }
             return pushCredentials.stream().map(this::mapPushToCredentialDTO).collect(Collectors.toList());
         } catch (PushDeviceHandlerException e) {
@@ -92,7 +92,7 @@ public class PushCredentialHandler implements CredentialHandler {
         try {
             deviceHandler.unregisterDevice(credentialDeletionRequest.getCredentialId());
             if (LOG.isDebugEnabled()) {
-                LOG.info("Successfully deleted push authentication credential for entity ID: "
+                LOG.debug("Successfully deleted push authentication credential for entity ID: "
                         + credentialDeletionRequest.getEntityId());
             }
         } catch (PushDeviceHandlerClientException e) {

@@ -119,7 +119,7 @@ public class CredentialMgtEndpointUtils {
      */
     public static void validateCredentialType(String value) throws CredentialMgtClientException {
 
-        if (!CredentialTypes.fromString(value).isPresent()) {
+        if (CredentialTypes.fromString(value) == null) {
             throw new CredentialMgtClientException(CredentialManagementConstants
                     .ErrorMessages.ERROR_CODE_INVALID_CREDENTIAL_TYPE);
         }
@@ -152,8 +152,8 @@ public class CredentialMgtEndpointUtils {
         }
 
         return credentialDTOS.stream()
-            .map(CredentialMgtEndpointUtils::toCredential)
-            .collect(Collectors.toList());
+                .map(CredentialMgtEndpointUtils::toCredential)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -165,8 +165,8 @@ public class CredentialMgtEndpointUtils {
     private static Credential toCredential(CredentialDTO dto) {
 
         Credential credential = new Credential()
-            .credentialId(dto.getCredentialId())
-            .displayName(dto.getDisplayName());
+                .credentialId(dto.getCredentialId())
+                .displayName(dto.getDisplayName());
 
         if (StringUtils.isNotBlank(dto.getType())) {
             try {

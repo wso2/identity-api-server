@@ -30,7 +30,6 @@ import org.wso2.carbon.identity.api.server.credential.management.v1.utils.Creden
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -62,7 +61,7 @@ public class CredentialManagementServiceImpl implements CredentialManagementServ
             }
         }
         if (LOG.isDebugEnabled()) {
-            LOG.info("Successfully retrieved " + allCredentials.size() + " credentials.");
+            LOG.debug("Successfully retrieved " + allCredentials.size() + " credentials.");
         }
         return allCredentials;
     }
@@ -79,15 +78,14 @@ public class CredentialManagementServiceImpl implements CredentialManagementServ
         try {
             CredentialMgtEndpointUtils.validateCredentialId(credentialDeletionRequest.getCredentialId());
             CredentialMgtEndpointUtils.validateCredentialType(credentialDeletionRequest.getType());
-            CredentialTypes credentialType = CredentialTypes.valueOf(credentialDeletionRequest.getType()
-                    .replace("-", "_").toUpperCase(Locale.ROOT));
+            CredentialTypes credentialType = CredentialTypes.fromString(credentialDeletionRequest.getType());
             CredentialHandler handler = handlerMap.get(credentialType);
             handler.deleteCredential(credentialDeletionRequest);
         } catch (CredentialMgtException e) {
             throw CredentialMgtEndpointUtils.handleCredentialMgtException(e);
         }
         if (LOG.isDebugEnabled()) {
-            LOG.info("Successfully deleted credential type: "
+            LOG.debug("Successfully deleted credential type: "
                     + credentialDeletionRequest.getType() + " with ID: "
                     + credentialDeletionRequest.getCredentialId() + " for entity ID: "
                     + credentialDeletionRequest.getEntityId());

@@ -27,6 +27,7 @@ import java.util.List;
  * Credential Management Service interface.
  */
 public interface CredentialManagementService {
+
     /**
      * Retrieves credentials for a given entity.
      */

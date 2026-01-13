@@ -31,20 +31,20 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 public class Error  {
-  
+
     private String code;
     private String message;
     private String description;
 
     /**
-    * A unique, machine-readable error code following the WSO2 standard.
-    **/
+     * A unique, machine-readable error code following the WSO2 standard.
+     **/
     public Error code(String code) {
 
         this.code = code;
         return this;
     }
-    
+
     @ApiModelProperty(example = "CM-60401", value = "A unique, machine-readable error code following the WSO2 standard.")
     @JsonProperty("code")
     @Valid
@@ -56,14 +56,14 @@ public class Error  {
     }
 
     /**
-    * A human-readable summary of the error.
-    **/
+     * A human-readable summary of the error.
+     **/
     public Error message(String message) {
 
         this.message = message;
         return this;
     }
-    
+
     @ApiModelProperty(example = "User not found.", value = "A human-readable summary of the error.")
     @JsonProperty("message")
     @Valid
@@ -75,14 +75,14 @@ public class Error  {
     }
 
     /**
-    * A more detailed explanation of the error.
-    **/
+     * A more detailed explanation of the error.
+     **/
     public Error description(String description) {
 
         this.description = description;
         return this;
     }
-    
+
     @ApiModelProperty(example = "The user specified by the user-id does not exist in the system.", value = "A more detailed explanation of the error.")
     @JsonProperty("description")
     @Valid
@@ -106,8 +106,8 @@ public class Error  {
         }
         Error error = (Error) o;
         return Objects.equals(this.code, error.code) &&
-            Objects.equals(this.message, error.message) &&
-            Objects.equals(this.description, error.description);
+                Objects.equals(this.message, error.message) &&
+                Objects.equals(this.description, error.description);
     }
 
     @Override
@@ -120,7 +120,7 @@ public class Error  {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class Error {\n");
-        
+
         sb.append("    code: ").append(toIndentedString(code)).append("\n");
         sb.append("    message: ").append(toIndentedString(message)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
@@ -129,9 +129,9 @@ public class Error  {
     }
 
     /**
-    * Convert the given object to string with each line indented by 4 spaces
-    * (except the first line).
-    */
+     * Convert the given object to string with each line indented by 4 spaces
+     * (except the first line).
+     */
     private String toIndentedString(java.lang.Object o) {
 
         if (o == null) {
@@ -140,4 +140,3 @@ public class Error  {
         return o.toString().replace("\n", "\n");
     }
 }
-
