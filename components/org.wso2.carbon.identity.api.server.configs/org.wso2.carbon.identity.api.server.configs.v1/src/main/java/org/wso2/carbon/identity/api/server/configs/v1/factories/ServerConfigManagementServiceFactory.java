@@ -4,6 +4,7 @@ import org.wso2.carbon.identity.api.server.configs.common.ConfigsServiceHolder;
 import org.wso2.carbon.identity.api.server.configs.v1.core.ServerConfigManagementService;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
+import org.wso2.carbon.identity.fraud.detection.core.service.FraudDetectionConfigsService;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
 import org.wso2.carbon.identity.oauth2.impersonation.services.ImpersonationConfigMgtService;
 import org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.core.JWTClientAuthenticatorMgtService;
@@ -30,6 +31,8 @@ public class ServerConfigManagementServiceFactory {
         JWTClientAuthenticatorMgtService jwtClientAuthenticatorMgtService = ConfigsServiceHolder
                 .getJWTClientAuthenticatorMgtService();
         DCRConfigurationMgtService dcrConfigurationMgtService = ConfigsServiceHolder.getDcrConfigurationMgtService();
+        FraudDetectionConfigsService fraudDetectionConfigsService = ConfigsServiceHolder
+                .getFraudDetectionConfigsService();
 
         if (applicationManagementService == null) {
             throw new IllegalStateException("ApplicationManagementService is not available from OSGi context.");
@@ -59,12 +62,17 @@ public class ServerConfigManagementServiceFactory {
             throw new IllegalStateException("DCRConfigurationMgtService is not available from OSGi context.");
         }
 
+        if (fraudDetectionConfigsService == null) {
+            throw new IllegalStateException("FraudDetectionConfigsService is not available from OSGi context.");
+        }
+
         SERVICE = new ServerConfigManagementService(applicationManagementService, identityProviderManager,
                 corsManagementService,
                 remoteLoggingConfigService,
                 impersonationConfigMgtService,
                 dcrConfigurationMgtService,
-                jwtClientAuthenticatorMgtService);
+                jwtClientAuthenticatorMgtService,
+                fraudDetectionConfigsService);
     }
 
     /**
