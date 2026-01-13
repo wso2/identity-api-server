@@ -237,8 +237,8 @@ public class ServerApplicationManagementService {
     private final ServerApplicationMetadataService applicationMetadataService;
 
     public ServerApplicationManagementService(ApplicationManagementService applicationManagementService,
-                                              AuthorizedAPIManagementService authorizedAPIManagementService,
-                                              TemplateManager templateManager) {
+            AuthorizedAPIManagementService authorizedAPIManagementService,
+            TemplateManager templateManager) {
 
         this.applicationManagementService = applicationManagementService;
         this.authorizedAPIManagementService = authorizedAPIManagementService;
@@ -262,11 +262,11 @@ public class ServerApplicationManagementService {
     private static final String YML_FILE_EXTENSION = ".yml";
     private static final String JSON_FILE_EXTENSION = ".json";
     private static final String XML_FILE_EXTENSION = ".xml";
-    private static final String[] VALID_MEDIA_TYPES_XML = {"application/xml", "text/xml"};
-    private static final String[] VALID_MEDIA_TYPES_YAML = {"application/yaml", "text/yaml", "application/x-yaml"};
-    private static final String[] VALID_MEDIA_TYPES_JSON = {"application/json", "text/json"};
-    private static final Class<?>[] INBOUND_CONFIG_PROTOCOLS = new Class<?>[]{ServiceProvider.class,
-            SAMLSSOServiceProviderDTO.class, OAuthAppDO.class};
+    private static final String[] VALID_MEDIA_TYPES_XML = { "application/xml", "text/xml" };
+    private static final String[] VALID_MEDIA_TYPES_YAML = { "application/yaml", "text/yaml", "application/x-yaml" };
+    private static final String[] VALID_MEDIA_TYPES_JSON = { "application/json", "text/json" };
+    private static final Class<?>[] INBOUND_CONFIG_PROTOCOLS = new Class<?>[] { ServiceProvider.class,
+            SAMLSSOServiceProviderDTO.class, OAuthAppDO.class };
 
     static {
         SUPPORTED_FILTER_ATTRIBUTES.add(NAME);
@@ -284,14 +284,14 @@ public class ServerApplicationManagementService {
 
     @Deprecated
     public ApplicationListResponse getAllApplications(Integer limit, Integer offset, String filter, String sortOrder,
-                                                      String sortBy, String requiredAttributes) {
+            String sortBy, String requiredAttributes) {
 
         return getAllApplications(limit, offset, filter, sortOrder, sortBy, requiredAttributes, false);
     }
 
     public ApplicationListResponse getAllApplications(Integer limit, Integer offset, String filter, String sortOrder,
-                                                      String sortBy, String requiredAttributes,
-                                                      Boolean excludeSystemPortals) {
+            String sortBy, String requiredAttributes,
+            Boolean excludeSystemPortals) {
 
         handleNotImplementedCapabilities(sortOrder, sortBy);
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
@@ -319,7 +319,7 @@ public class ServerApplicationManagementService {
                     excludeSystemPortals);
 
             ApplicationBasicInfo[] filteredAppList = applicationManagementService.getApplicationBasicInfo(tenantDomain,
-            username, filter, offset, limit, excludeSystemPortals);
+                    username, filter, offset, limit, excludeSystemPortals);
             int resultsInCurrentPage = filteredAppList.length;
 
             List<String> requestedAttributeList = new ArrayList<>();
@@ -347,7 +347,7 @@ public class ServerApplicationManagementService {
                         .count(resultsInCurrentPage)
                         .applications(getApplicationListItems(serviceProviderList, requestedAttributeList))
                         .links(Util.buildPaginationLinks(limit, offset, totalResults,
-                                        APPLICATION_MANAGEMENT_PATH_COMPONENT, requiredAttributes, filter)
+                                APPLICATION_MANAGEMENT_PATH_COMPONENT, requiredAttributes, filter)
                                 .entrySet()
                                 .stream()
                                 .map(link -> new Link().rel(link.getKey()).href(link.getValue()))
@@ -359,7 +359,7 @@ public class ServerApplicationManagementService {
                         .count(resultsInCurrentPage)
                         .applications(getApplicationListItems(filteredAppList))
                         .links(Util.buildPaginationLinks(limit, offset, totalResults,
-                                        APPLICATION_MANAGEMENT_PATH_COMPONENT, requiredAttributes, filter)
+                                APPLICATION_MANAGEMENT_PATH_COMPONENT, requiredAttributes, filter)
                                 .entrySet()
                                 .stream()
                                 .map(link -> new Link().rel(link.getKey()).href(link.getValue()))
@@ -411,7 +411,7 @@ public class ServerApplicationManagementService {
     }
 
     private List<ServiceProvider> getSpWithRequiredAttributes(ApplicationBasicInfo[] filteredAppList,
-                                                              List<String> requestedAttributeList)
+            List<String> requestedAttributeList)
             throws IdentityApplicationManagementException {
 
         List<ServiceProvider> serviceProviderList = new ArrayList<>();
@@ -510,7 +510,8 @@ public class ServerApplicationManagementService {
      * Export an application identified by the applicationId, as an XML string.
      *
      * @param applicationId ID of the application to be exported.
-     * @param exportSecrets If True, all hashed or encrypted secrets will also be exported.
+     * @param exportSecrets If True, all hashed or encrypted secrets will also be
+     *                      exported.
      * @return XML string of the application.
      */
     public String exportApplication(String applicationId, Boolean exportSecrets) {
@@ -545,7 +546,8 @@ public class ServerApplicationManagementService {
      * Export an application identified by the applicationId, in the given format.
      *
      * @param applicationId ID of the application to be exported.
-     * @param exportSecrets If True, all hashed or encrypted secrets will also be exported.
+     * @param exportSecrets If True, all hashed or encrypted secrets will also be
+     *                      exported.
      * @param fileType      The format of the exported string.
      * @return string of the application in the given format.
      */
@@ -608,8 +610,7 @@ public class ServerApplicationManagementService {
             return new TransferResource(
                     fileNameSB.toString(),
                     fileContent.getBytes(StandardCharsets.UTF_8),
-                    new MimeType("application/octet-stream")
-            );
+                    new MimeType("application/octet-stream"));
         } catch (MimeTypeParseException e) {
             throw new RuntimeException("Failed to parse MIME type", e);
         }
@@ -627,8 +628,8 @@ public class ServerApplicationManagementService {
                 public void beforeMarshal(Object source) {
                     if (source instanceof InboundAuthenticationConfig) {
                         InboundAuthenticationConfig config = (InboundAuthenticationConfig) source;
-                        for (InboundAuthenticationRequestConfig requestConfig
-                                : config.getInboundAuthenticationRequestConfigs()) {
+                        for (InboundAuthenticationRequestConfig requestConfig : config
+                                .getInboundAuthenticationRequestConfigs()) {
                             requestConfig.setInboundConfiguration(null);
                         }
                     }
@@ -708,21 +709,22 @@ public class ServerApplicationManagementService {
             ServiceProvider serviceProvider = parseSP(spFileContent, fileType, tenantDomain);
 
             /*
-             * internal_application_script_update scope is required when, performing adaptive script related operations.
+             * internal_application_script_update scope is required when, performing
+             * adaptive script related operations.
              * Validate the permission before allowing the operation.
              */
-            ServiceProvider existingApp =
-                    applicationManagementService.getServiceProvider(serviceProvider.getApplicationName(), tenantDomain);
+            ServiceProvider existingApp = applicationManagementService
+                    .getServiceProvider(serviceProvider.getApplicationName(), tenantDomain);
             if (isAppUpdate && existingApp != null) {
-                LocalAndOutboundAuthenticationConfig existingAuthConfig =
-                        existingApp.getLocalAndOutBoundAuthenticationConfig();
+                LocalAndOutboundAuthenticationConfig existingAuthConfig = existingApp
+                        .getLocalAndOutBoundAuthenticationConfig();
                 if (existingAuthConfig != null && existingAuthConfig.getAuthenticationScriptConfig() != null &&
                         existingAuthConfig.getAuthenticationScriptConfig().getContent() != null) {
                     validateAuthenticationScriptUpdatePermission();
                 }
             }
-            LocalAndOutboundAuthenticationConfig updatingAuthConfig =
-                    serviceProvider.getLocalAndOutBoundAuthenticationConfig();
+            LocalAndOutboundAuthenticationConfig updatingAuthConfig = serviceProvider
+                    .getLocalAndOutBoundAuthenticationConfig();
             if (updatingAuthConfig != null && updatingAuthConfig.getAuthenticationScriptConfig() != null &&
                     updatingAuthConfig.getAuthenticationScriptConfig().getContent() != null) {
                 validateAuthenticationScriptUpdatePermission();
@@ -838,8 +840,8 @@ public class ServerApplicationManagementService {
 
     private APIError handleErrorResponse(ImportResponse importResponse) {
 
-        String errorCode = importResponse.getErrorCode() != null ?
-                importResponse.getErrorCode() : INVALID_REQUEST.getCode();
+        String errorCode = importResponse.getErrorCode() != null ? importResponse.getErrorCode()
+                : INVALID_REQUEST.getCode();
         String msg = "Error importing application from XML file.";
         String description = null;
         if (ArrayUtils.isNotEmpty(importResponse.getErrors())) {
@@ -852,7 +854,8 @@ public class ServerApplicationManagementService {
     public String createApplication(ApplicationModel applicationModel, String template) {
 
         /*
-         * Create application with the adaptive script requires the internal_application_script_update scope.
+         * Create application with the adaptive script requires the
+         * internal_application_script_update scope.
          * Validate the permission before allowing the update.
          */
         AuthenticationSequence authSequence = applicationModel.getAuthenticationSequence();
@@ -866,8 +869,10 @@ public class ServerApplicationManagementService {
         }
 
         /*
-         * CORS adding step should be moved to the service layer and the validation also should happen there.
-         * But for now we are handling the validation here. (This should move when the CORS management is
+         * CORS adding step should be moved to the service layer and the validation also
+         * should happen there.
+         * But for now we are handling the validation here. (This should move when the
+         * CORS management is
          * moved to the service layer).
          */
         if (applicationModel.getInboundProtocolConfiguration() != null &&
@@ -907,6 +912,11 @@ public class ServerApplicationManagementService {
 
         String applicationId = null;
         try {
+            // Trim access URL before persistence
+            if (applicationModel.getAccessUrl() != null) {
+                applicationModel.setAccessUrl(StringUtils.trim(applicationModel.getAccessUrl()));
+            }
+
             ApplicationDTO applicationDTO = new ApiModelToServiceProvider().apply(applicationModel);
             applicationId = applicationManagementService.createApplication(applicationDTO, tenantDomain, username);
 
@@ -943,7 +953,8 @@ public class ServerApplicationManagementService {
             throw buildClientError(e, "Error creating application. Allow CORS origins update failed.");
         } catch (Throwable e) {
             /*
-             * For more information read https://github.com/wso2/product-is/issues/12579. This is to overcome the
+             * For more information read https://github.com/wso2/product-is/issues/12579.
+             * This is to overcome the
              * above issue.
              */
             if (applicationId != null) {
@@ -959,7 +970,8 @@ public class ServerApplicationManagementService {
 
         ServiceProvider appToUpdate = cloneApplication(applicationId);
         /*
-         * Updating the adaptive script requires the internal_application_script_update scope.
+         * Updating the adaptive script requires the internal_application_script_update
+         * scope.
          * Validate the permission before allowing the update.
          */
         if (isScriptUpdating(appToUpdate, applicationPatchModel)) {
@@ -982,6 +994,10 @@ public class ServerApplicationManagementService {
         }
 
         if (applicationPatchModel != null) {
+            // Trim access URL before persistence
+            if (applicationPatchModel.getAccessUrl() != null) {
+                applicationPatchModel.setAccessUrl(StringUtils.trim(applicationPatchModel.getAccessUrl()));
+            }
             new UpdateServiceProvider().apply(appToUpdate, applicationPatchModel);
         }
 
@@ -1016,12 +1032,13 @@ public class ServerApplicationManagementService {
             return true;
         }
 
-        // Check whether the authentication sequence is reverting to default when current authentication sequence
+        // Check whether the authentication sequence is reverting to default when
+        // current authentication sequence
         // has a script configured.
         LocalAndOutboundAuthenticationConfig existingAuthConfig = existingApp.getLocalAndOutBoundAuthenticationConfig();
         String currentAuthenticationType = existingAuthConfig.getAuthenticationType();
-        boolean isRevertToDefault =
-                appPatchModel.getAuthenticationSequence().getType() == AuthenticationSequence.TypeEnum.DEFAULT &&
+        boolean isRevertToDefault = appPatchModel.getAuthenticationSequence()
+                .getType() == AuthenticationSequence.TypeEnum.DEFAULT &&
                 StringUtils.isNotBlank(currentAuthenticationType) &&
                 !AuthenticationSequence.TypeEnum.DEFAULT.name().equals(currentAuthenticationType);
 
@@ -1045,8 +1062,8 @@ public class ServerApplicationManagementService {
 
     private boolean isSkippedEnforcingScriptUpdatePermission() {
 
-        String skipEnforceScriptUpdatePermissionValue =
-                IdentityUtil.getProperty("ApplicationMgt.SkipEnforceScriptUpdatePermission");
+        String skipEnforceScriptUpdatePermissionValue = IdentityUtil
+                .getProperty("ApplicationMgt.SkipEnforceScriptUpdatePermission");
         if (StringUtils.isBlank(skipEnforceScriptUpdatePermissionValue)) {
             return false;
         }
@@ -1055,7 +1072,7 @@ public class ServerApplicationManagementService {
     }
 
     private void restrictRoleAssociationUpdateInOrgAudience(String applicationId,
-                                                            ApplicationPatchModel applicationPatchModel) {
+            ApplicationPatchModel applicationPatchModel) {
 
         ServiceProvider application = getServiceProvider(applicationId);
         String allowedAudience = application.getAssociatedRolesConfig().getAllowedAudience();
@@ -1133,8 +1150,8 @@ public class ServerApplicationManagementService {
         CORSManagementService corsManagementService = ApplicationManagementServiceHolder.getCorsManagementService();
         try {
             // Delete CORS origins for OIDC Apps.
-            List<CORSOrigin> existingCORSOrigins =
-                    corsManagementService.getApplicationCORSOrigins(applicationId, tenantDomain);
+            List<CORSOrigin> existingCORSOrigins = corsManagementService.getApplicationCORSOrigins(applicationId,
+                    tenantDomain);
             if (!CollectionUtils.isEmpty(existingCORSOrigins)) {
                 ApplicationManagementServiceHolder.getCorsManagementService()
                         .deleteCORSOrigins(applicationId,
@@ -1149,8 +1166,9 @@ public class ServerApplicationManagementService {
             throw handleIdentityApplicationManagementException(e, msg);
         } catch (CORSManagementServiceClientException e) {
             /*
-             For not existing application scenarios the following error code will be returned. To preserve the behaviour
-             we need to return 204.
+             * For not existing application scenarios the following error code will be
+             * returned. To preserve the behaviour
+             * we need to return 204.
              */
             if (ERROR_CODE_INVALID_APP_ID.getCode().equals(e.getErrorCode())) {
                 if (log.isDebugEnabled()) {
@@ -1286,7 +1304,8 @@ public class ServerApplicationManagementService {
     public void putInboundOAuthConfiguration(String applicationId, OpenIDConnectConfiguration oidcConfigModel) {
 
         /*
-         * CORS updating step should be moved to the service layer and the validation also should happen there.
+         * CORS updating step should be moved to the service layer and the validation
+         * also should happen there.
          * But for now we are handling the validation here.
          */
         validateCORSOrigins(oidcConfigModel.getAllowedOrigins());
@@ -1299,7 +1318,7 @@ public class ServerApplicationManagementService {
     }
 
     public void putInboundPassiveSTSConfiguration(String applicationId,
-                                                  PassiveStsConfiguration passiveStsConfiguration) {
+            PassiveStsConfiguration passiveStsConfiguration) {
 
         putInbound(applicationId, passiveStsConfiguration, PassiveSTSInboundFunctions::putPassiveSTSInbound);
     }
@@ -1310,7 +1329,7 @@ public class ServerApplicationManagementService {
     }
 
     public void updateCustomInbound(String applicationId, String inboundType,
-                                    CustomInboundProtocolConfiguration customInbound) {
+            CustomInboundProtocolConfiguration customInbound) {
 
         if (isUnknownInboundType(inboundType)) {
             throw buildBadRequestError("Unknown inbound type: " + inboundType);
@@ -1323,7 +1342,8 @@ public class ServerApplicationManagementService {
     /**
      * Create a new template object.
      *
-     * @param applicationTemplateModel applicationTemplateModel from which the template is created.
+     * @param applicationTemplateModel applicationTemplateModel from which the
+     *                                 template is created.
      * @return unique id of the newly created template.
      */
     public String createApplicationTemplate(ApplicationTemplateModel applicationTemplateModel) {
@@ -1344,17 +1364,17 @@ public class ServerApplicationManagementService {
      * @param offset number of records to skip for pagination.
      * @return ApplicationTemplatesList containing the list of templates.
      */
-    public ApplicationTemplatesList listApplicationTemplates(Integer limit, Integer offset, SearchContext
-            searchContext) {
+    public ApplicationTemplatesList listApplicationTemplates(Integer limit, Integer offset,
+            SearchContext searchContext) {
 
         validatePaginationSupport(limit, offset);
         try {
-            List<Template> templateList = templateManager.listTemplates(TemplateMgtConstants.TemplateType
-                    .APPLICATION_TEMPLATE.toString(), null, null, getSearchCondition
-                    (TemplateMgtConstants.TemplateType.APPLICATION_TEMPLATE.toString(), ContextLoader
+            List<Template> templateList = templateManager.listTemplates(
+                    TemplateMgtConstants.TemplateType.APPLICATION_TEMPLATE.toString(), null, null,
+                    getSearchCondition(TemplateMgtConstants.TemplateType.APPLICATION_TEMPLATE.toString(), ContextLoader
                             .getTenantDomainFromContext(), searchContext));
-            List<ApplicationTemplatesListItem> applicationTemplateList = templateList.stream().map(new
-                    TemplateToApplicationTemplateListItem()).collect(Collectors.toList());
+            List<ApplicationTemplatesListItem> applicationTemplateList = templateList.stream()
+                    .map(new TemplateToApplicationTemplateListItem()).collect(Collectors.toList());
 
             ApplicationTemplatesList applicationTemplates = new ApplicationTemplatesList();
             applicationTemplates.setTemplates(applicationTemplateList);
@@ -1378,7 +1398,8 @@ public class ServerApplicationManagementService {
             return false;
         }
 
-        // For the Console it is allowed update associated roles and authentication sequence.
+        // For the Console it is allowed update associated roles and authentication
+        // sequence.
         if (StringUtils.equalsIgnoreCase(CONSOLE_APP, appName)
                 && StringUtils.equalsIgnoreCase(CONSOLE_APP, applicationPatchModel.getName())) {
             return applicationPatchModel.getDescription() == null
@@ -1408,10 +1429,10 @@ public class ServerApplicationManagementService {
             if (searchCondition != null) {
                 Condition result = buildSearchCondition(searchCondition);
                 List<Condition> list = new ArrayList<>();
-                Condition typeCondition = new PrimitiveCondition(ApplicationManagementConstants.TemplateProperties
-                        .TEMPLATE_TYPE_KEY, EQUALS, templateType);
-                Condition tenantCondition = new PrimitiveCondition(ApplicationManagementConstants.TemplateProperties
-                        .TENANT_DOMAIN_KEY, EQUALS, tenantDomain);
+                Condition typeCondition = new PrimitiveCondition(
+                        ApplicationManagementConstants.TemplateProperties.TEMPLATE_TYPE_KEY, EQUALS, templateType);
+                Condition tenantCondition = new PrimitiveCondition(
+                        ApplicationManagementConstants.TemplateProperties.TENANT_DOMAIN_KEY, EQUALS, tenantDomain);
                 if (result instanceof ComplexCondition) {
                     list = ((ComplexCondition) result).getConditions();
                     list.add(typeCondition);
@@ -1441,26 +1462,30 @@ public class ServerApplicationManagementService {
         if (!(searchCondition.getStatement() == null)) {
             PrimitiveStatement primitiveStatement = searchCondition.getStatement();
 
-            if (ApplicationManagementConstants.TemplateProperties.SEARCH_KEYS.contains(primitiveStatement.getProperty
-                    ())) {
+            if (ApplicationManagementConstants.TemplateProperties.SEARCH_KEYS
+                    .contains(primitiveStatement.getProperty())) {
                 List<Condition> list = new ArrayList<>();
-                Condition attrKeyCondition = new PrimitiveCondition(ApplicationManagementConstants.TemplateProperties
-                        .ATTR_KEY, EQUALS, primitiveStatement.getProperty());
-                Condition attrValueCondition = new PrimitiveCondition(ApplicationManagementConstants
-                        .TemplateProperties.ATTR_VALUE, getPrimitiveOperatorFromOdata(primitiveStatement.getCondition
-                        ()), primitiveStatement.getValue());
+                Condition attrKeyCondition = new PrimitiveCondition(
+                        ApplicationManagementConstants.TemplateProperties.ATTR_KEY, EQUALS,
+                        primitiveStatement.getProperty());
+                Condition attrValueCondition = new PrimitiveCondition(
+                        ApplicationManagementConstants.TemplateProperties.ATTR_VALUE,
+                        getPrimitiveOperatorFromOdata(primitiveStatement.getCondition()),
+                        primitiveStatement.getValue());
                 list.add(attrKeyCondition);
                 list.add(attrValueCondition);
                 return new ComplexCondition(getComplexOperatorFromOdata(ConditionType.AND),
                         list);
             } else if (ApplicationManagementConstants.TemplateProperties.SEARCH_KEY_NAME.equals(primitiveStatement
                     .getProperty())) {
-                return new PrimitiveCondition(ApplicationManagementConstants.TemplateProperties
-                        .SEARCH_KEY_NAME_INTERNAL, getPrimitiveOperatorFromOdata(primitiveStatement
-                        .getCondition()), primitiveStatement.getValue());
+                return new PrimitiveCondition(
+                        ApplicationManagementConstants.TemplateProperties.SEARCH_KEY_NAME_INTERNAL,
+                        getPrimitiveOperatorFromOdata(primitiveStatement
+                                .getCondition()),
+                        primitiveStatement.getValue());
             } else {
-                throw buildClientError(ApplicationManagementConstants.ErrorMessage
-                        .ERROR_CODE_ERROR_INVALID_SEARCH_FILTER, null);
+                throw buildClientError(
+                        ApplicationManagementConstants.ErrorMessage.ERROR_CODE_ERROR_INVALID_SEARCH_FILTER, null);
             }
         } else {
             List<Condition> conditions = new ArrayList<>();
@@ -1472,34 +1497,28 @@ public class ServerApplicationManagementService {
         }
     }
 
-    private org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.PrimitiveOperator
-    getPrimitiveOperatorFromOdata(org.apache.cxf.jaxrs.ext.search.ConditionType odataConditionType) {
+    private org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.PrimitiveOperator getPrimitiveOperatorFromOdata(
+            org.apache.cxf.jaxrs.ext.search.ConditionType odataConditionType) {
 
-        org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.PrimitiveOperator
-                primitiveConditionType;
+        org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.PrimitiveOperator primitiveConditionType;
         switch (odataConditionType) {
             case EQUALS:
                 primitiveConditionType = EQUALS;
                 break;
             case GREATER_OR_EQUALS:
-                primitiveConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant
-                        .ConditionType.PrimitiveOperator.GREATER_OR_EQUALS;
+                primitiveConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.PrimitiveOperator.GREATER_OR_EQUALS;
                 break;
             case LESS_OR_EQUALS:
-                primitiveConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant
-                        .ConditionType.PrimitiveOperator.LESS_OR_EQUALS;
+                primitiveConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.PrimitiveOperator.LESS_OR_EQUALS;
                 break;
             case GREATER_THAN:
-                primitiveConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant
-                        .ConditionType.PrimitiveOperator.GREATER_THAN;
+                primitiveConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.PrimitiveOperator.GREATER_THAN;
                 break;
             case NOT_EQUALS:
-                primitiveConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant
-                        .ConditionType.PrimitiveOperator.NOT_EQUALS;
+                primitiveConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.PrimitiveOperator.NOT_EQUALS;
                 break;
             case LESS_THAN:
-                primitiveConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant
-                        .ConditionType.PrimitiveOperator.LESS_THAN;
+                primitiveConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.PrimitiveOperator.LESS_THAN;
                 break;
             default:
                 throw buildClientError(ErrorMessage.INVALID_FILTER_OPERATION, odataConditionType.name());
@@ -1507,19 +1526,16 @@ public class ServerApplicationManagementService {
         return primitiveConditionType;
     }
 
-    private org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.ComplexOperator
-    getComplexOperatorFromOdata(org.apache.cxf.jaxrs.ext.search.ConditionType odataConditionType) {
+    private org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.ComplexOperator getComplexOperatorFromOdata(
+            org.apache.cxf.jaxrs.ext.search.ConditionType odataConditionType) {
 
-        org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.ComplexOperator
-                complexConditionType;
+        org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.ComplexOperator complexConditionType;
         switch (odataConditionType) {
             case OR:
-                complexConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType
-                        .ComplexOperator.OR;
+                complexConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.ComplexOperator.OR;
                 break;
             case AND:
-                complexConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType
-                        .ComplexOperator.AND;
+                complexConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.ComplexOperator.AND;
                 break;
             default:
                 throw buildClientError(ErrorMessage.INVALID_FILTER_OPERATION, odataConditionType.name());
@@ -1565,7 +1581,8 @@ public class ServerApplicationManagementService {
     }
 
     /**
-     * Update the application template given the template id and the new ApplicationTemplateModel.
+     * Update the application template given the template id and the new
+     * ApplicationTemplateModel.
      *
      * @param templateId id of the template.
      * @param model      template object to be replaced.
@@ -1629,7 +1646,7 @@ public class ServerApplicationManagementService {
             }
 
             if (!Boolean.parseBoolean(IdentityUtil.getProperty(
-                            ApplicationManagementConstants.SKIP_ENFORCE_AUTHORIZED_API_UPDATE_PERMISSION))) {
+                    ApplicationManagementConstants.SKIP_ENFORCE_AUTHORIZED_API_UPDATE_PERMISSION))) {
                 validateUserCanUpdateAPIResourceType(apiResource);
             }
             validateAPIResourceScopes(apiResource, authorizedAPICreationModel.getScopes());
@@ -1639,7 +1656,8 @@ public class ServerApplicationManagementService {
             // Validate policy identifier.
             String policyIdentifier = validatePolicy(authorizedAPICreationModel.getPolicyIdentifier());
 
-            // If API resource has requiresAuthorization set to true, policy identifier should be RBAC.
+            // If API resource has requiresAuthorization set to true, policy identifier
+            // should be RBAC.
             if (apiResource.isAuthorizationRequired() &&
                     !policyIdentifier.equals(ApplicationManagementConstants.RBAC)) {
                 throw buildClientError(ErrorMessage.INVALID_POLICY_TYPE_FOR_API_RESOURCE, authorizedAPIId,
@@ -1653,7 +1671,8 @@ public class ServerApplicationManagementService {
                             .policyId(policyIdentifier)
                             .scopes(getScopes(authorizedAPICreationModel))
                             .authorizationDetailsTypes(getAuthorizationDetailsTypes(authorizedAPICreationModel))
-                            .build(), tenantDomain);
+                            .build(),
+                    tenantDomain);
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error adding authorized API with id: " + authorizedAPICreationModel.getId() +
                     " to application with id: " + applicationId;
@@ -1706,12 +1725,13 @@ public class ServerApplicationManagementService {
      * @param authorizedAPIPatchModel API resource patch model.
      */
     public void updateAuthorizedAPI(String applicationId, String apiId,
-                                    AuthorizedAPIPatchModel authorizedAPIPatchModel) {
+            AuthorizedAPIPatchModel authorizedAPIPatchModel) {
 
         try {
             String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
 
-            // Validate added scopes and removed scopes sent in the authorized API patch model.
+            // Validate added scopes and removed scopes sent in the authorized API patch
+            // model.
             List<String> addedScopes = Optional.ofNullable(authorizedAPIPatchModel.getAddedScopes())
                     .orElse(Collections.emptyList());
             List<String> removedScopes = Optional.ofNullable(authorizedAPIPatchModel.getRemovedScopes())
@@ -1719,12 +1739,12 @@ public class ServerApplicationManagementService {
             addedScopes.removeAll(removedScopes);
 
             // Validate added and removed authorization details types
-            List<String> addedAuthorizationDetailsTypes =
-                    Optional.ofNullable(authorizedAPIPatchModel.getAddedAuthorizationDetailsTypes())
-                            .orElse(Collections.emptyList());
-            List<String> removedAuthorizationDetailsTypes =
-                    Optional.ofNullable(authorizedAPIPatchModel.getRemovedAuthorizationDetailsTypes())
-                            .orElse(Collections.emptyList());
+            List<String> addedAuthorizationDetailsTypes = Optional
+                    .ofNullable(authorizedAPIPatchModel.getAddedAuthorizationDetailsTypes())
+                    .orElse(Collections.emptyList());
+            List<String> removedAuthorizationDetailsTypes = Optional
+                    .ofNullable(authorizedAPIPatchModel.getRemovedAuthorizationDetailsTypes())
+                    .orElse(Collections.emptyList());
             addedAuthorizationDetailsTypes.removeAll(removedAuthorizationDetailsTypes);
 
             // Validate authorized API patch model.
@@ -1747,8 +1767,8 @@ public class ServerApplicationManagementService {
                 throw buildClientError(ErrorMessage.AUTHORIZED_API_NOT_FOUND, apiId, applicationId);
             }
             if (currentAuthorizedAPI.getScopes() != null) {
-                addedScopes.removeIf(scopeName -> currentAuthorizedAPI.getScopes().stream().anyMatch(scope ->
-                        scope.getName().equals(scopeName)));
+                addedScopes.removeIf(scopeName -> currentAuthorizedAPI.getScopes().stream()
+                        .anyMatch(scope -> scope.getName().equals(scopeName)));
             }
             if (CollectionUtils.isNotEmpty(currentAuthorizedAPI.getAuthorizationDetailsTypes())) {
 
@@ -1795,8 +1815,7 @@ public class ServerApplicationManagementService {
                         .policyId(authorizedAPI.getPolicyId())
                         .type(authorizedAPI.getType())
                         .authorizedAuthorizationDetailsTypes(
-                                toAuthorizedAuthorizationDetailsTypes(authorizedAPI.getAuthorizationDetailsTypes())
-                        )
+                                toAuthorizedAuthorizationDetailsTypes(authorizedAPI.getAuthorizationDetailsTypes()))
                         .authorizedScopes(createAuthorizedScope(authorizedAPI.getScopes())));
             }
             return authorizedAPIResponses;
@@ -1842,8 +1861,8 @@ public class ServerApplicationManagementService {
         }
 
         try {
-            List<org.wso2.carbon.identity.application.common.model.GroupBasicInfo> groupBasicInfos =
-                    applicationManagementService.getGroups(
+            List<org.wso2.carbon.identity.application.common.model.GroupBasicInfo> groupBasicInfos = applicationManagementService
+                    .getGroups(
                             PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(), domain,
                             filterNode);
             return groupBasicInfos.stream().map(groupBasicInfo -> new GroupBasicInfo().id(groupBasicInfo.getId())
@@ -1889,7 +1908,7 @@ public class ServerApplicationManagementService {
         }
 
         if (APIResourceManagementConstants.APIResourceTypes.BUSINESS.equals(apiResource.getType()) ||
-            APIResourceManagementConstants.APIResourceTypes.MCP.equals(apiResource.getType())) {
+                APIResourceManagementConstants.APIResourceTypes.MCP.equals(apiResource.getType())) {
             AuthorizationUtil.validateOperationScopes(
                     ApplicationManagementConstants.UPDATE_BUSINESS_AUTHORIZED_API_OPERATION);
         } else {
@@ -1901,19 +1920,20 @@ public class ServerApplicationManagementService {
     private List<AuthorizedScope> createAuthorizedScope(List<Scope> scope) {
 
         return scope.stream().map(s -> new AuthorizedScope()
-                        .name(s.getName())
-                        .displayName(s.getDisplayName())
-                        .id(s.getId()))
+                .name(s.getName())
+                .displayName(s.getDisplayName())
+                .id(s.getId()))
                 .collect(Collectors.toList());
     }
 
     private <T> T getInbound(String applicationId,
-                             String inboundType,
-                             Function<InboundAuthenticationRequestConfig, T> getInboundApiModelFunction) {
+            String inboundType,
+            Function<InboundAuthenticationRequestConfig, T> getInboundApiModelFunction) {
 
-        InboundAuthenticationRequestConfig inboundAuthenticationRequestConfig =
-                getInboundAuthRequestConfig(applicationId, inboundType);
-        // Apply the function and convert the authentication request config to API model.
+        InboundAuthenticationRequestConfig inboundAuthenticationRequestConfig = getInboundAuthRequestConfig(
+                applicationId, inboundType);
+        // Apply the function and convert the authentication request config to API
+        // model.
         return getInboundApiModelFunction.apply(inboundAuthenticationRequestConfig);
     }
 
@@ -1935,8 +1955,8 @@ public class ServerApplicationManagementService {
 
         ServiceProvider application = getServiceProvider(applicationId);
         // Extract the inbound authentication request config for the given inbound type.
-        InboundAuthenticationRequestConfig inboundAuthenticationRequestConfig =
-                getInboundAuthenticationRequestConfig(application, inboundType);
+        InboundAuthenticationRequestConfig inboundAuthenticationRequestConfig = getInboundAuthenticationRequestConfig(
+                application, inboundType);
 
         if (inboundAuthenticationRequestConfig == null) {
             // This means the inbound is not configured for the particular app.
@@ -1952,7 +1972,8 @@ public class ServerApplicationManagementService {
             appToUpdate = cloneApplication(applicationId);
         } catch (APIError e) {
             if (ErrorMessage.APPLICATION_NOT_FOUND.getCode().equals(e.getCode())) {
-                // Ignoring the delete operation and return 204 response code, since the resource does not exist.
+                // Ignoring the delete operation and return 204 response code, since the
+                // resource does not exist.
                 return;
             }
             throw e;
@@ -1960,14 +1981,16 @@ public class ServerApplicationManagementService {
         InboundAuthenticationConfig inboundAuthConfig = appToUpdate.getInboundAuthenticationConfig();
 
         if (ArrayUtils.isNotEmpty(inboundAuthConfig.getInboundAuthenticationRequestConfigs())) {
-            // Remove the deleted inbound type by filtering it out of the available inbounds and doing an update.
-            InboundAuthenticationRequestConfig[] filteredInbounds =
-                    Arrays.stream(inboundAuthConfig.getInboundAuthenticationRequestConfigs())
-                            .filter(inbound -> !StringUtils.equals(inboundType, inbound.getInboundAuthType()))
-                            .toArray(InboundAuthenticationRequestConfig[]::new);
+            // Remove the deleted inbound type by filtering it out of the available inbounds
+            // and doing an update.
+            InboundAuthenticationRequestConfig[] filteredInbounds = Arrays
+                    .stream(inboundAuthConfig.getInboundAuthenticationRequestConfigs())
+                    .filter(inbound -> !StringUtils.equals(inboundType, inbound.getInboundAuthType()))
+                    .toArray(InboundAuthenticationRequestConfig[]::new);
 
             appToUpdate.getInboundAuthenticationConfig().setInboundAuthenticationRequestConfigs(filteredInbounds);
-            // We don't need to pass the inboundDTO information here since the updated inbound is already removed at
+            // We don't need to pass the inboundDTO information here since the updated
+            // inbound is already removed at
             // this point and also updated in the appToUpdate object.
             updateServiceProvider(applicationId, appToUpdate, null);
         }
@@ -2017,12 +2040,11 @@ public class ServerApplicationManagementService {
     }
 
     private List<ApplicationListItem> getApplicationListItems(List<ServiceProvider> serviceProviderList,
-                                                              List<String> requiredAttributes) {
+            List<String> requiredAttributes) {
 
         List<ApplicationListItem> applicationListItems = new ArrayList<>();
         for (ServiceProvider serviceProvider : serviceProviderList) {
-            ApplicationResponseModel applicationResponseModel =
-                    new ServiceProviderToApiModel().apply(serviceProvider);
+            ApplicationResponseModel applicationResponseModel = new ServiceProviderToApiModel().apply(serviceProvider);
             if (requiredAttributes.stream().noneMatch(attribute -> attribute.equals(TEMPLATE_ID))) {
                 applicationResponseModel.templateId(null);
             }
@@ -2057,14 +2079,16 @@ public class ServerApplicationManagementService {
      * @param <I>               Inbound API model
      * @param applicationId     Unique id of the app
      * @param inboundApiModel   Inbound API model to be created or replaced
-     * @param getUpdatedInbound A function that takes the inbound API model and application as input and provides
+     * @param getUpdatedInbound A function that takes the inbound API model and
+     *                          application as input and provides
      *                          updated inbound details.
      */
     private <I> void putInbound(String applicationId,
-                                I inboundApiModel,
-                                BiFunction<ServiceProvider, I, InboundAuthenticationRequestConfig> getUpdatedInbound) {
+            I inboundApiModel,
+            BiFunction<ServiceProvider, I, InboundAuthenticationRequestConfig> getUpdatedInbound) {
 
-        // We need a cloned copy of the Service Provider so that we changes we do not make cache dirty.
+        // We need a cloned copy of the Service Provider so that we changes we do not
+        // make cache dirty.
         ServiceProvider appToUpdate = cloneApplication(applicationId);
         // Update the service provider with the inbound configuration.
         InboundAuthenticationRequestConfig updatedInbound = getUpdatedInbound.apply(appToUpdate, inboundApiModel);
@@ -2089,19 +2113,23 @@ public class ServerApplicationManagementService {
      *
      * @param applicationId   Resource id of the app.
      * @param inboundApiModel Inbound API model to be created or replaced.
-     * @param getInboundDTO   A function that takes the inbound API model and application as input and provides the
-     *                        InboundProtocolConfigurationDTO that matches with the protocol.
+     * @param getInboundDTO   A function that takes the inbound API model and
+     *                        application as input and provides the
+     *                        InboundProtocolConfigurationDTO that matches with the
+     *                        protocol.
      */
-    private <I> void putApplicationInbound(String applicationId, I inboundApiModel, BiFunction<ServiceProvider, I,
-            InboundProtocolConfigurationDTO> getInboundDTO) {
+    private <I> void putApplicationInbound(String applicationId, I inboundApiModel,
+            BiFunction<ServiceProvider, I, InboundProtocolConfigurationDTO> getInboundDTO) {
 
-        // We need a cloned copy of the Service Provider so that we changes we do not make cache dirty.
+        // We need a cloned copy of the Service Provider so that we changes we do not
+        // make cache dirty.
         ServiceProvider application = cloneApplication(applicationId);
 
         // Update the service provider with the inbound configuration.
         InboundProtocolConfigurationDTO inboundDTO = getInboundDTO.apply(application, inboundApiModel);
         try {
-            // Call the app-mgt service and update the inbound auth configs and application details
+            // Call the app-mgt service and update the inbound auth configs and application
+            // details
             updateServiceProvider(applicationId, application, inboundDTO);
         } catch (APIError error) {
             if (log.isDebugEnabled()) {
@@ -2115,12 +2143,15 @@ public class ServerApplicationManagementService {
     private void doRollback(String applicationId, InboundAuthenticationRequestConfig updatedInbound) {
 
         ServiceProvider serviceProvider = getServiceProvider(applicationId);
-        // Current inbound key. This will give us an idea whether updatedInbound was newly added or not.
+        // Current inbound key. This will give us an idea whether updatedInbound was
+        // newly added or not.
         String previousInboundKey = getInboundAuthKey(serviceProvider, updatedInbound.getInboundAuthType());
         String attemptedInboundKeyForUpdate = updatedInbound.getInboundAuthKey();
         if (!StringUtils.equals(previousInboundKey, attemptedInboundKeyForUpdate)) {
-            // This means the application was updated with a newly created inbound. So the updated inbound details
-            // could have been created before the update. Attempt to rollback by deleting any inbound configs created.
+            // This means the application was updated with a newly created inbound. So the
+            // updated inbound details
+            // could have been created before the update. Attempt to rollback by deleting
+            // any inbound configs created.
             if (log.isDebugEnabled()) {
                 String inboundType = updatedInbound.getInboundAuthType();
                 log.debug("Removing inbound data related to inbound type: " + inboundType + " of application: "
@@ -2136,7 +2167,8 @@ public class ServerApplicationManagementService {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             String username = ContextLoader.getUsernameFromContext();
 
-            // Inbound auth config details are already added to the service provider. Therefore we don't need to pass
+            // Inbound auth config details are already added to the service provider.
+            // Therefore we don't need to pass
             // the inboundDTO information here.
             applicationManagementService.updateApplicationByResourceId(
                     applicationId, updatedApplication, null, tenantDomain, username);
@@ -2147,7 +2179,7 @@ public class ServerApplicationManagementService {
     }
 
     private void updateServiceProvider(String applicationId, ServiceProvider updatedApplication,
-                                       InboundProtocolConfigurationDTO inboundDTO) {
+            InboundProtocolConfigurationDTO inboundDTO) {
 
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
@@ -2181,7 +2213,7 @@ public class ServerApplicationManagementService {
     }
 
     private APIError handleIdentityApplicationManagementException(IdentityApplicationManagementException e,
-                                                                  String msg) {
+            String msg) {
 
         if (e instanceof IdentityApplicationManagementClientException) {
             throw buildClientError(e, msg);
@@ -2275,7 +2307,8 @@ public class ServerApplicationManagementService {
     }
 
     /**
-     * Validate the CORS Origins. This should be moved to the service layer with the CORS adding step on creating
+     * Validate the CORS Origins. This should be moved to the service layer with the
+     * CORS adding step on creating
      * OIDC applications.
      *
      * @param corsOrigins List of the CORS Origins..
@@ -2322,8 +2355,8 @@ public class ServerApplicationManagementService {
         }
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         try {
-            AbstractUserStoreManager userStoreManager =
-                    (AbstractUserStoreManager) realmService.getTenantUserRealm(tenantId).getUserStoreManager();
+            AbstractUserStoreManager userStoreManager = (AbstractUserStoreManager) realmService
+                    .getTenantUserRealm(tenantId).getUserStoreManager();
             return userStoreManager.getUserWithID(userId, null, null);
         } catch (org.wso2.carbon.user.api.UserStoreException e) {
             if (e.getMessage().startsWith(ApplicationManagementConstants.NON_EXISTING_USER_CODE)) {
