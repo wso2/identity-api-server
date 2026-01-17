@@ -45,6 +45,9 @@ public class ActionMapperFactory {
             case PRE_UPDATE_PROFILE:
                 actionMapper = new PreUpdateProfileActionMapper();
                 break;
+            case PRE_ISSUE_ID_TOKEN:
+                actionMapper = new PreIssueIDTokenActionMapper();
+                break;
             default:
                 break;
         }
