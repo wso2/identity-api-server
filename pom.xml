@@ -1025,7 +1025,7 @@
         </org.wso2.carbon.identity.organization.management.core.version.range>
 
         <!-- Organization management service Version -->
-        <org.wso2.carbon.identity.organization.management.version>2.0.46
+        <org.wso2.carbon.identity.organization.management.version>2.0.47
         </org.wso2.carbon.identity.organization.management.version>
 
         <org.wso2.carbon.identity.inbound.provisioning.scim2.version>3.4.146

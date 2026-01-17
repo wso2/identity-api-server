@@ -540,6 +540,10 @@ public class UsersApiServiceCore {
     private Map<String, UserCriteriaType> buildUserCriteriaFromRequest(UserCriteria userCriteria)
             throws UserSharingMgtClientException {
 
+        if (userCriteria == null) {
+            throw makeRequestError(ERROR_MISSING_USER_CRITERIA);
+        }
+
         Map<String, UserCriteriaType> userCriteriaMap = new HashMap<>();
 
         // Populate user IDs criterion (if provided).
