@@ -64,7 +64,9 @@ import org.wso2.carbon.identity.organization.management.organization.user.sharin
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.usercriteria.UserIdList;
 import org.wso2.carbon.identity.organization.resource.sharing.policy.management.constant.PolicyEnum;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 
 import java.util.List;
@@ -76,6 +78,8 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.ERROR_EMPTY_USER_SHARE_PATCH_PATH;
+import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.ERROR_INVALID_CURSOR;
+import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.ERROR_INVALID_LIMIT;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.ERROR_MISSING_USER_CRITERIA;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.ERROR_MISSING_USER_IDS;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.ErrorMessage.ERROR_UNSUPPORTED_USER_SHARE_PATCH_PATH;
@@ -91,6 +95,7 @@ import static org.wso2.carbon.identity.api.server.organization.user.sharing.mana
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.RESPONSE_DETAIL_USER_UNSHARE;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.RESPONSE_STATUS_PROCESSING;
 import static org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.constants.UserSharingMgtConstants.USER_IDS;
+import static org.wso2.carbon.identity.organization.management.service.util.Utils.getOrganizationId;
 
 /**
  * Core service class for handling user sharing management APIs V2.
@@ -259,7 +264,7 @@ public class UsersApiServiceCore {
 
         try {
             UserSharePatchDO userSharePatchDO = populateUserSharePatch(userSharingPatchRequest);
-            userSharingPolicyHandlerServiceV2.updateRoleAssignmentV2(userSharePatchDO);
+            userSharingPolicyHandlerServiceV2.updateSharedUserAttributesV2(userSharePatchDO);
             return Response.status(Response.Status.ACCEPTED)
                     .entity(getProcessSuccessResponse(RESPONSE_DETAIL_USER_SHARE_PATCH))
                     .build();
@@ -295,17 +300,38 @@ public class UsersApiServiceCore {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(buildErrorResponse(makeRequestError(ERROR_MISSING_USER_IDS))).build();
         }
+
         try {
-            UUID.fromString(userId); // Validate UUID format.
+            UUID.fromString(userId);
         } catch (IllegalArgumentException e) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(buildErrorResponse(makeRequestError(INVALID_UUID_FORMAT))).build();
         }
 
+        if (limit != null && limit < 0) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(buildErrorResponse(makeRequestError(ERROR_INVALID_LIMIT))).build();
+        }
+
+        final int resolvedLimit = (limit == null) ? 0 : limit;
+        final boolean recursiveFlag = (recursive == null) || recursive;
+
+        final int afterCursor;
+        final int beforeCursor;
+
+        try {
+            afterCursor = decodeCursor(after);
+            beforeCursor = decodeCursor(before);
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(buildErrorResponse(makeRequestError(ERROR_INVALID_CURSOR))).build();
+        }
+
+        String organizationId = getOrganizationId();
+
         try {
             GetUserSharedOrgsDO getUserSharedOrgsDO =
-                    new GetUserSharedOrgsDO(userId, null, before, after, filter, limit, recursive,
-                            splitAttributes(attributes));
+                    new GetUserSharedOrgsDO(userId, organizationId, beforeCursor, afterCursor, filter, resolvedLimit, recursiveFlag, splitAttributes(attributes));
             ResponseSharedOrgsV2DO result =
                     userSharingPolicyHandlerServiceV2.getUserSharedOrganizationsV2(getUserSharedOrgsDO);
 
@@ -891,6 +917,21 @@ public class UsersApiServiceCore {
             // UTF-8 is guaranteed to be supported
             throw new IllegalStateException("UTF-8 encoding not supported", e);
         }
+    }
+
+    /**
+     * Decodes the given cursor string from the wire format into its numeric value.
+     *
+     * @param cursor Encoded cursor string.
+     * @return Decoded numeric cursor value.
+     */
+    private int decodeCursor(String cursor) {
+
+        if (cursor == null) {
+            return 0;
+        }
+        String decoded = new String(Base64.getDecoder().decode(cursor), StandardCharsets.UTF_8);
+        return Integer.parseInt(decoded);
     }
 
     // Helper methods for building responses and errors.

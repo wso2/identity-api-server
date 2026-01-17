@@ -83,6 +83,12 @@ public class UserSharingMgtConstants {
         ERROR_MISSING_USER_IDS("60010",
                 "Missing user IDs in the request body.",
                 "The user ID is missing in the request body. Please provide the user ID to proceed."),
+        ERROR_INVALID_LIMIT("60011",
+                "Invalid limit value.",
+                "The limit value provided in the request is invalid. Please provide a valid limit value."),
+        ERROR_INVALID_CURSOR("60012",
+                "Invalid cursor value.",
+                "The cursor value provided in the request is invalid. Please provide a valid cursor value."),
 
         // Server errors.
         ERROR_INITIATING_USERS_API_SERVICE("65001",
