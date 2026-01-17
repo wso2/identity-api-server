@@ -72,6 +72,7 @@ public class ServerActionManagementService {
         NOT_IMPLEMENTED_ACTION_TYPES.add(Action.ActionTypes.AUTHENTICATION.getPathParam());
 
         NOT_ALLOWED_ACTION_TYPES_IN_ORG_LEVEL.add(Action.ActionTypes.PRE_ISSUE_ACCESS_TOKEN.getPathParam());
+        NOT_ALLOWED_ACTION_TYPES_IN_ORG_LEVEL.add(Action.ActionTypes.PRE_ISSUE_ID_TOKEN.getPathParam());
     }
 
     public ActionResponse createAction(String actionType, String jsonBody) {
