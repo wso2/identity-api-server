@@ -331,7 +331,8 @@ public class UsersApiServiceCore {
 
         try {
             GetUserSharedOrgsDO getUserSharedOrgsDO =
-                    new GetUserSharedOrgsDO(userId, organizationId, beforeCursor, afterCursor, filter, resolvedLimit, recursiveFlag, splitAttributes(attributes));
+                    new GetUserSharedOrgsDO(userId, organizationId, beforeCursor, afterCursor, filter, resolvedLimit,
+                            recursiveFlag, splitAttributes(attributes));
             ResponseSharedOrgsV2DO result =
                     userSharingPolicyHandlerServiceV2.getUserSharedOrganizationsV2(getUserSharedOrgsDO);
 
