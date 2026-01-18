@@ -26,7 +26,7 @@ import org.wso2.carbon.identity.api.server.credential.management.common.Credenti
 public class CredentialMgtClientException extends CredentialMgtException {
 
     /**
-     * Constructor with {@code message}, {@code errorCode} and {@code description} parameters.
+     * Constructor with message, errorCode and description parameters.
      *
      * @param message     Message to be included in the exception.
      * @param errorCode   Error code of the exception.
@@ -38,7 +38,7 @@ public class CredentialMgtClientException extends CredentialMgtException {
     }
 
     /**
-     * Constructor with {@code message}, {@code errorCode}, {@code description} and {@code cause} parameters.
+     * Constructor with message, errorCode, description and cause parameters.
      *
      * @param message     Message to be included in the exception.
      * @param errorCode   Error code of the exception.
@@ -51,7 +51,7 @@ public class CredentialMgtClientException extends CredentialMgtException {
     }
 
     /**
-     * Constructor with {@code error} parameter.
+     * Constructor with error parameter.
      *
      * @param error Error message.
      */

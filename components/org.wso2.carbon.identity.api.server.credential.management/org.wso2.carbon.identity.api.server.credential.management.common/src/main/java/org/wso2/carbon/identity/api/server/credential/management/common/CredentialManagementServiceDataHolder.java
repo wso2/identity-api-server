@@ -45,7 +45,7 @@ public class CredentialManagementServiceDataHolder {
 
     private static class RealmServiceHolder {
 
-        static final RealmService SERVICE = (RealmService) PrivilegedCarbonContext
+        private static final RealmService SERVICE = (RealmService) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
     }
 

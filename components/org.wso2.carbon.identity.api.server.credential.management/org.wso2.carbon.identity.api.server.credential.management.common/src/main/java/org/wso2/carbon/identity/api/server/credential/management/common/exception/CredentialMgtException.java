@@ -27,7 +27,7 @@ public class CredentialMgtException extends Exception {
     private String description;
 
     /**
-     * Constructor with {@code message}, {@code errorCode} and {@code description} parameters.
+     * Constructor with {message, errorCode and description parameters.
      *
      * @param message     Message to be included in the exception.
      * @param errorCode   Error code of the exception.
@@ -41,7 +41,7 @@ public class CredentialMgtException extends Exception {
     }
 
     /**
-     * Constructor with {@code message}, {@code errorCode}, {@code description} and {@code cause} parameters.
+     * Constructor with message, errorCode, description and cause parameters.
      *
      * @param message     Message to be included in the exception.
      * @param errorCode   Error code of the exception.
@@ -56,9 +56,9 @@ public class CredentialMgtException extends Exception {
     }
 
     /**
-     * Get the {@code description}.
+     * Get the description.
      *
-     * @return Returns the {@code description}.
+     * @return Returns the description.
      */
     public String getDescription() {
 
@@ -66,9 +66,9 @@ public class CredentialMgtException extends Exception {
     }
 
     /**
-     * Get the {@code errorCode}.
+     * Get the errorCode.
      *
-     * @return Returns the {@code errorCode}.
+     * @return Returns the errorCode.
      */
     public String getErrorCode() {
 
@@ -76,9 +76,9 @@ public class CredentialMgtException extends Exception {
     }
 
     /**
-     * Set the {@code errorCode}.
+     * Set the errorCode.
      *
-     * @param errorCode The value to be set as the {@code errorCode}.
+     * @param errorCode The value to be set as the errorCode.
      */
     protected void setErrorCode(String errorCode) {
 
@@ -86,9 +86,9 @@ public class CredentialMgtException extends Exception {
     }
 
     /**
-     * Set the {@code description}.
+     * Set the description.
      *
-     * @param description The value to be set as the {@code description}.
+     * @param description The value to be set as the description.
      */
     protected void setDescription(String description) {
 
