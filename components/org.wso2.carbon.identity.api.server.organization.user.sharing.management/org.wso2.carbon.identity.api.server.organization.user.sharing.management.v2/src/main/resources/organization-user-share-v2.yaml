@@ -411,7 +411,13 @@ paths:
                 organizations:
                   - orgId: "b028ca17-8f89-449c-ae27-fa955e66465d"
                     orgName: "Child Org 1"
-                    sharedUserId: "shared-user-id-1"
+                    orgHandle: "child-org-1"
+                    parentOrgId: "08f8c1d2-4b3e-4c5a-9f6b-7d8e9f0a1b2c"
+                    orgStatus: "ACTIVE"
+                    orgRef: "/t/wso2.com/api/server/v1/organizations/b028ca17-8f89-449c-ae27-fa955e66465d"
+                    hasChildren: true
+                    depthFromRoot: 1
+                    sharedUserId: "550e8400-e29b-41d4-a716-446655440000"
                     sharedType: "SHARED"
                     sharingMode:
                       policy: "SELECTED_ORG_ONLY"
@@ -429,7 +435,13 @@ paths:
                           type: "organization"
                   - orgId: "a17b28ca-9f89-449c-ae27-fa955e66465f"
                     orgName: "Child Org 2"
-                    sharedUserId: "shared-user-id-2"
+                    orgHandle: "child-org-2"
+                    parentOrgId: "08f8c1d2-4b3e-4c5a-9f6b-7d8e9f0a1b2c"
+                    orgStatus: "ACTIVE"
+                    orgRef: "/t/wso2.com/api/server/v1/organizations/a17b28ca-9f89-449c-ae27-fa955e66465f"
+                    hasChildren: false
+                    depthFromRoot: 1
+                    sharedUserId: "3f2504e0-4f89-41d3-9a0c-0305e82c3301"
                     sharedType: "SHARED"
                     sharingMode:
                       policy: "SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN"
@@ -709,7 +721,7 @@ components:
       type: object
       description: |-
         Represents a single organization where the user has shared access,
-        including effective roles.
+        including organization metadata and effective roles.
       properties:
         orgId:
           type: string
@@ -717,6 +729,29 @@ components:
         orgName:
           type: string
           description: "Name of the child organization."
+        orgHandle:
+          type: string
+          description: "Unique, human-readable handle of the organization."
+          example: "sampleOrg"
+        parentOrgId:
+          type: string
+          nullable: true
+          description: ID of the parent organization (if applicable).
+        orgStatus:
+          type: string
+          description: "Current status of the organization."
+          example: "ACTIVE"
+        orgRef:
+          type: string
+          description: "API reference of the organization resource."
+          example: "/t/wso2.com/api/server/v1/organizations/b4526d91-a8bf-43d2-8b14-c548cf73065b"
+        hasChildren:
+          type: boolean
+          description: "Indicates whether the organization has child organizations."
+        depthFromRoot:
+          type: integer
+          description: "Depth of the organization in the hierarchy, where root is 0."
+          example: 1
         sharedUserId:
           type: string
           description: |-
@@ -725,6 +760,7 @@ components:
           type: string
           description: |-
             Shared type of the user. Example values: `SHARED`, `INVITED`.
+          example: "SHARED"
         sharingMode:
           $ref: "#/components/schemas/SharingMode"
         roles:

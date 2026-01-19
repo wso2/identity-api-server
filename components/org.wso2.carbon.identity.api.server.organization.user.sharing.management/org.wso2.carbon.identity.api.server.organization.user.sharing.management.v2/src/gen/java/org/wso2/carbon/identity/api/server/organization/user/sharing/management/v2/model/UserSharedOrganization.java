@@ -29,18 +29,24 @@ import org.wso2.carbon.identity.api.server.organization.user.sharing.management.
 import javax.validation.constraints.*;
 
 /**
- * Represents a single organization where the user has shared access, including effective roles.
+ * Represents a single organization where the user has shared access, including organization metadata and effective roles.
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "Represents a single organization where the user has shared access, including effective roles.")
+@ApiModel(description = "Represents a single organization where the user has shared access, including organization metadata and effective roles.")
 public class UserSharedOrganization  {
   
     private String orgId;
     private String orgName;
+    private String orgHandle;
+    private String parentOrgId;
+    private String orgStatus;
+    private String orgRef;
+    private Boolean hasChildren;
+    private Integer depthFromRoot;
     private String sharedUserId;
     private String sharedType;
     private SharingMode sharingMode;
@@ -86,6 +92,120 @@ public class UserSharedOrganization  {
     }
 
     /**
+    * Unique, human-readable handle of the organization.
+    **/
+    public UserSharedOrganization orgHandle(String orgHandle) {
+
+        this.orgHandle = orgHandle;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "sampleOrg", value = "Unique, human-readable handle of the organization.")
+    @JsonProperty("orgHandle")
+    @Valid
+    public String getOrgHandle() {
+        return orgHandle;
+    }
+    public void setOrgHandle(String orgHandle) {
+        this.orgHandle = orgHandle;
+    }
+
+    /**
+    * ID of the parent organization (if applicable).
+    **/
+    public UserSharedOrganization parentOrgId(String parentOrgId) {
+
+        this.parentOrgId = parentOrgId;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "ID of the parent organization (if applicable).")
+    @JsonProperty("parentOrgId")
+    @Valid
+    public String getParentOrgId() {
+        return parentOrgId;
+    }
+    public void setParentOrgId(String parentOrgId) {
+        this.parentOrgId = parentOrgId;
+    }
+
+    /**
+    * Current status of the organization.
+    **/
+    public UserSharedOrganization orgStatus(String orgStatus) {
+
+        this.orgStatus = orgStatus;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "ACTIVE", value = "Current status of the organization.")
+    @JsonProperty("orgStatus")
+    @Valid
+    public String getOrgStatus() {
+        return orgStatus;
+    }
+    public void setOrgStatus(String orgStatus) {
+        this.orgStatus = orgStatus;
+    }
+
+    /**
+    * API reference of the organization resource.
+    **/
+    public UserSharedOrganization orgRef(String orgRef) {
+
+        this.orgRef = orgRef;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "/t/wso2.com/api/server/v1/organizations/b4526d91-a8bf-43d2-8b14-c548cf73065b", value = "API reference of the organization resource.")
+    @JsonProperty("orgRef")
+    @Valid
+    public String getOrgRef() {
+        return orgRef;
+    }
+    public void setOrgRef(String orgRef) {
+        this.orgRef = orgRef;
+    }
+
+    /**
+    * Indicates whether the organization has child organizations.
+    **/
+    public UserSharedOrganization hasChildren(Boolean hasChildren) {
+
+        this.hasChildren = hasChildren;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "Indicates whether the organization has child organizations.")
+    @JsonProperty("hasChildren")
+    @Valid
+    public Boolean getHasChildren() {
+        return hasChildren;
+    }
+    public void setHasChildren(Boolean hasChildren) {
+        this.hasChildren = hasChildren;
+    }
+
+    /**
+    * Depth of the organization in the hierarchy, where root is 0.
+    **/
+    public UserSharedOrganization depthFromRoot(Integer depthFromRoot) {
+
+        this.depthFromRoot = depthFromRoot;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "1", value = "Depth of the organization in the hierarchy, where root is 0.")
+    @JsonProperty("depthFromRoot")
+    @Valid
+    public Integer getDepthFromRoot() {
+        return depthFromRoot;
+    }
+    public void setDepthFromRoot(Integer depthFromRoot) {
+        this.depthFromRoot = depthFromRoot;
+    }
+
+    /**
     * ID of the **shared user object** in the target organization (if applicable).
     **/
     public UserSharedOrganization sharedUserId(String sharedUserId) {
@@ -113,7 +233,7 @@ public class UserSharedOrganization  {
         return this;
     }
     
-    @ApiModelProperty(value = "Shared type of the user. Example values: `SHARED`, `INVITED`.")
+    @ApiModelProperty(example = "SHARED", value = "Shared type of the user. Example values: `SHARED`, `INVITED`.")
     @JsonProperty("sharedType")
     @Valid
     public String getSharedType() {
@@ -182,6 +302,12 @@ public class UserSharedOrganization  {
         UserSharedOrganization userSharedOrganization = (UserSharedOrganization) o;
         return Objects.equals(this.orgId, userSharedOrganization.orgId) &&
             Objects.equals(this.orgName, userSharedOrganization.orgName) &&
+            Objects.equals(this.orgHandle, userSharedOrganization.orgHandle) &&
+            Objects.equals(this.parentOrgId, userSharedOrganization.parentOrgId) &&
+            Objects.equals(this.orgStatus, userSharedOrganization.orgStatus) &&
+            Objects.equals(this.orgRef, userSharedOrganization.orgRef) &&
+            Objects.equals(this.hasChildren, userSharedOrganization.hasChildren) &&
+            Objects.equals(this.depthFromRoot, userSharedOrganization.depthFromRoot) &&
             Objects.equals(this.sharedUserId, userSharedOrganization.sharedUserId) &&
             Objects.equals(this.sharedType, userSharedOrganization.sharedType) &&
             Objects.equals(this.sharingMode, userSharedOrganization.sharingMode) &&
@@ -190,7 +316,7 @@ public class UserSharedOrganization  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(orgId, orgName, sharedUserId, sharedType, sharingMode, roles);
+        return Objects.hash(orgId, orgName, orgHandle, parentOrgId, orgStatus, orgRef, hasChildren, depthFromRoot, sharedUserId, sharedType, sharingMode, roles);
     }
 
     @Override
@@ -201,6 +327,12 @@ public class UserSharedOrganization  {
         
         sb.append("    orgId: ").append(toIndentedString(orgId)).append("\n");
         sb.append("    orgName: ").append(toIndentedString(orgName)).append("\n");
+        sb.append("    orgHandle: ").append(toIndentedString(orgHandle)).append("\n");
+        sb.append("    parentOrgId: ").append(toIndentedString(parentOrgId)).append("\n");
+        sb.append("    orgStatus: ").append(toIndentedString(orgStatus)).append("\n");
+        sb.append("    orgRef: ").append(toIndentedString(orgRef)).append("\n");
+        sb.append("    hasChildren: ").append(toIndentedString(hasChildren)).append("\n");
+        sb.append("    depthFromRoot: ").append(toIndentedString(depthFromRoot)).append("\n");
         sb.append("    sharedUserId: ").append(toIndentedString(sharedUserId)).append("\n");
         sb.append("    sharedType: ").append(toIndentedString(sharedType)).append("\n");
         sb.append("    sharingMode: ").append(toIndentedString(sharingMode)).append("\n");
