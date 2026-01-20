@@ -20,6 +20,8 @@ package org.wso2.carbon.identity.api.server.action.management.v1.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.action.management.api.model.Action;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
@@ -43,6 +45,8 @@ import javax.ws.rs.core.Response;
  */
 public class ActionDeserializer {
 
+    private static final Log LOG = LogFactory.getLog(ActionDeserializer.class);
+
     /**
      * Deserialize the action model.
      *
@@ -52,6 +56,9 @@ public class ActionDeserializer {
      */
     public static ActionModel deserializeActionModel(Action.ActionTypes actionType, String jsonBody) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deserializing action model for action type: " + actionType);
+        }
         ActionModel actionModel = null;
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -79,6 +86,7 @@ public class ActionDeserializer {
                     break;
             }
         } catch (JsonProcessingException e) {
+            LOG.debug("Error occurred while deserializing action model JSON payload: " + e.getMessage(), e);
             throw ActionMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST,
                     ActionMgtEndpointConstants.ErrorMessage.ERROR_INVALID_PAYLOAD);
         }
@@ -95,6 +103,9 @@ public class ActionDeserializer {
      */
     public static ActionUpdateModel deserializeActionUpdateModel(Action.ActionTypes actionType, String jsonBody) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deserializing action update model for action type: " + actionType);
+        }
         ActionUpdateModel actionUpdateModel = null;
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -122,6 +133,7 @@ public class ActionDeserializer {
                     break;
             }
         } catch (JsonProcessingException e) {
+            LOG.debug("Error occurred while deserializing action update model JSON payload: " + e.getMessage(), e);
             throw ActionMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST,
                     ActionMgtEndpointConstants.ErrorMessage.ERROR_INVALID_PAYLOAD);
         }
