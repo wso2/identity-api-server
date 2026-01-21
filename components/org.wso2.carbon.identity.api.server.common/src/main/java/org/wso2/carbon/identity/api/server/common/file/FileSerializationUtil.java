@@ -184,7 +184,7 @@ public class FileSerializationUtil {
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            if (config.getSubtypes() != null && config.getSubtypes().length > 0) {
+            if (config.getSubtypes().length > 0) {
                 objectMapper.registerSubtypes(config.getSubtypes());
             }
 
@@ -263,7 +263,7 @@ public class FileSerializationUtil {
             ObjectMapper objectMapper = new ObjectMapper();
 
             Class<?>[] subtypes = config.getJsonConfig().getSubtypes();
-            if (subtypes != null && subtypes.length > 0) {
+            if (subtypes.length > 0) {
                 objectMapper.registerSubtypes(subtypes);
             }
 
