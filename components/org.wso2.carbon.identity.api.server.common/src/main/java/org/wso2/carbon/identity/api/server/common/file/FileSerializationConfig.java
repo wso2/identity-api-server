@@ -47,6 +47,9 @@ public class FileSerializationConfig {
     }
 
     public void setXmlConfig(XmlConfig config) {
+        if (config == null) {
+            throw new IllegalArgumentException("XmlConfig cannot be null");
+        }
         this.xmlConfig = config;
     }
 
@@ -55,6 +58,9 @@ public class FileSerializationConfig {
     }
 
     public void setJsonConfig(JsonConfig config) {
+        if (config == null) {
+            throw new IllegalArgumentException("JsonConfig cannot be null");
+        }
         this.jsonConfig = config;
     }
 
@@ -63,6 +69,9 @@ public class FileSerializationConfig {
     }
 
     public void setYamlConfig(YamlConfig config) {
+        if (config == null) {
+            throw new IllegalArgumentException("YamlConfig cannot be null");
+        }
         this.yamlConfig = config;
     }
 
