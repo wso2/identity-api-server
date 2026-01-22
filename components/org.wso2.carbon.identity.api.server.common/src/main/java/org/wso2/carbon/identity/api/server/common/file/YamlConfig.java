@@ -25,6 +25,7 @@ import org.yaml.snakeyaml.representer.Representer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Configuration for YAML serialization/deserialization.
@@ -34,6 +35,7 @@ public class YamlConfig {
     private Consumer<DumperOptions> dumperOptionsCustomizer = null;
     private Consumer<Constructor> constructorCustomizer = null;
     private Consumer<Representer> representerCustomizer = null;
+    private Function<DumperOptions, Representer> representerFactory = null;
     private List<String> additionalTrustedClassNames = new ArrayList<>();
 
     public YamlConfig() {
@@ -61,6 +63,14 @@ public class YamlConfig {
 
     public void setRepresenterCustomizer(Consumer<Representer> customizer) {
         this.representerCustomizer = customizer;
+    }
+
+    public Function<DumperOptions, Representer> getRepresenterFactory() {
+        return representerFactory;
+    }
+
+    public void setRepresenterFactory(Function<DumperOptions, Representer> factory) {
+        this.representerFactory = factory;
     }
 
     public List<String> getAdditionalTrustedClassNames() {

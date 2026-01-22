@@ -216,7 +216,12 @@ public class FileSerializationUtil {
                 config.getDumperOptionsCustomizer().accept(dumperOptions);
             }
 
-            Representer representer = new Representer(dumperOptions);
+            Representer representer;
+            if (config.getRepresenterFactory() != null) {
+                representer = config.getRepresenterFactory().apply(dumperOptions);
+            } else {
+                representer = new Representer(dumperOptions);
+            }
             if (config.getRepresenterCustomizer() != null) {
                 config.getRepresenterCustomizer().accept(representer);
             }

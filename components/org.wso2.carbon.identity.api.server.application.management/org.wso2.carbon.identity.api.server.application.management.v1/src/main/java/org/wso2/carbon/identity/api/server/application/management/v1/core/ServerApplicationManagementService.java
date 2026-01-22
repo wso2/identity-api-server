@@ -631,6 +631,7 @@ public class ServerApplicationManagementService {
                 constructor.addTypeDescription(description);
             }
         });
+        yamlConfig.setRepresenterFactory(CustomRepresenter::new);
         config.setYamlConfig(yamlConfig);
 
         JsonConfig jsonConfig = new JsonConfig();
