@@ -63,6 +63,10 @@ public class FileSerializationUtil {
      */
     public static <T> FileContent serialize(T entity, String fileName, String fileType,
                                             FileSerializationConfig config) throws FileSerializationException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Serializing entity of type %s to file %s with type %s", 
+                    entity.getClass().getSimpleName(), fileName, fileType));
+        }
         if (config == null) {
             config = new FileSerializationConfig();
         }
@@ -107,6 +111,10 @@ public class FileSerializationUtil {
      */
     public static <T> T deserialize(FileContent fileContent, Class<T> targetClass,
                                     FileSerializationConfig config) throws FileSerializationException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Deserializing file %s of type %s to class %s",
+                    fileContent.getFileName(), fileContent.getFileType(), targetClass.getSimpleName()));
+        }
         if (config == null) {
             config = new FileSerializationConfig();
         }
