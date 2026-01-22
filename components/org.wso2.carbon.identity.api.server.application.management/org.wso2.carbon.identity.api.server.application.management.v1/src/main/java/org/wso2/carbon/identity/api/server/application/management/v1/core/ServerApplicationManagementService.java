@@ -638,6 +638,9 @@ public class ServerApplicationManagementService {
         jsonConfig.setSubtypes(INBOUND_CONFIG_PROTOCOLS);
         config.setJsonConfig(jsonConfig);
 
+        config.setSerializeDefault(FileSerializationConfig.DefaultFormat.ERROR);
+        config.setDeserializeDefault(FileSerializationConfig.DefaultFormat.XML);
+
         return config;
     }
 

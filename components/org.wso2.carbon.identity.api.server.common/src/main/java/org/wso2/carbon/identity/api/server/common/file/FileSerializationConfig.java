@@ -23,9 +23,21 @@ package org.wso2.carbon.identity.api.server.common.file;
  */
 public class FileSerializationConfig {
 
+    /**
+     * Enum representing the default format to use when an unsupported media type is encountered.
+     */
+    public enum DefaultFormat {
+        XML,
+        JSON,
+        YAML,
+        ERROR
+    }
+
     private XmlConfig xmlConfig = new XmlConfig();
     private JsonConfig jsonConfig = new JsonConfig();
     private YamlConfig yamlConfig = new YamlConfig();
+    private DefaultFormat serializeDefault = DefaultFormat.YAML;
+    private DefaultFormat deserializeDefault = DefaultFormat.YAML;
 
     public FileSerializationConfig() {
     }
@@ -52,5 +64,21 @@ public class FileSerializationConfig {
 
     public void setYamlConfig(YamlConfig config) {
         this.yamlConfig = config;
+    }
+
+    public DefaultFormat getSerializeDefault() {
+        return serializeDefault;
+    }
+
+    public void setSerializeDefault(DefaultFormat serializeDefault) {
+        this.serializeDefault = serializeDefault;
+    }
+
+    public DefaultFormat getDeserializeDefault() {
+        return deserializeDefault;
+    }
+
+    public void setDeserializeDefault(DefaultFormat deserializeDefault) {
+        this.deserializeDefault = deserializeDefault;
     }
 }

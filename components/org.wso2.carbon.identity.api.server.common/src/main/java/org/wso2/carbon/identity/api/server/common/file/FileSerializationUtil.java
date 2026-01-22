@@ -76,9 +76,7 @@ public class FileSerializationUtil {
             case Constants.MEDIA_TYPE_YAML:
                 return serializeToYaml(entity, fileName, config.getYamlConfig());
             default:
-                LOG.warn(String.format("Unsupported file type %s requested for export. Defaulting to YAML parsing.",
-                        fileType));
-                return serializeToYaml(entity, fileName, config.getYamlConfig());
+                return handleUnsupportedSerialize(entity, fileName, fileType, config);
         }
     }
 
@@ -122,9 +120,7 @@ public class FileSerializationUtil {
             case Constants.MEDIA_TYPE_YAML:
                 return deserializeFromYaml(fileContent, targetClass, config);
             default:
-                LOG.warn(String.format("Unsupported media type %s for file %s. Defaulting to YAML parsing.",
-                        fileContent.getFileType(), fileContent.getFileName()));
-                return deserializeFromYaml(fileContent, targetClass, config);
+                return handleUnsupportedDeserialize(fileContent, targetClass, config);
         }
     }
 
@@ -140,6 +136,69 @@ public class FileSerializationUtil {
     public static <T> T deserialize(FileContent fileContent, Class<T> targetClass)
             throws FileSerializationException {
         return deserialize(fileContent, targetClass, new FileSerializationConfig());
+    }
+
+    /**
+     * Handle unsupported media type during serialization based on config.
+     */
+    private static <T> FileContent handleUnsupportedSerialize(T entity, String fileName, String fileType,
+                                                              FileSerializationConfig config)
+            throws FileSerializationException {
+        FileSerializationConfig.DefaultFormat defaultFormat = config.getSerializeDefault();
+
+        switch (defaultFormat) {
+            case XML:
+                LOG.warn(String.format("Unsupported file type %s requested for export. Defaulting to XML.",
+                        fileType));
+                return serializeToXml(entity, fileName, config.getXmlConfig());
+            case JSON:
+                LOG.warn(String.format("Unsupported file type %s requested for export. Defaulting to JSON.",
+                        fileType));
+                return serializeToJson(entity, fileName, config.getJsonConfig());
+            case YAML:
+                LOG.warn(String.format("Unsupported file type %s requested for export. Defaulting to YAML.",
+                        fileType));
+                return serializeToYaml(entity, fileName, config.getYamlConfig());
+            case ERROR:
+            default:
+                throw new FileSerializationException(
+                        String.format("Unsupported media type: %s. Supported media types are %s, %s, %s",
+                                fileType, Constants.MEDIA_TYPE_XML, Constants.MEDIA_TYPE_YAML,
+                                Constants.MEDIA_TYPE_JSON),
+                        null, fileName, fileType, FileSerializationException.Operation.SERIALIZE);
+        }
+    }
+
+    /**
+     * Handle unsupported media type during deserialization based on config.
+     */
+    private static <T> T handleUnsupportedDeserialize(FileContent fileContent, Class<T> targetClass,
+                                                      FileSerializationConfig config)
+            throws FileSerializationException {
+        FileSerializationConfig.DefaultFormat defaultFormat = config.getDeserializeDefault();
+
+        switch (defaultFormat) {
+            case XML:
+                LOG.warn(String.format("Unsupported media type %s for file %s. Defaulting to XML parsing.",
+                        fileContent.getFileType(), fileContent.getFileName()));
+                return deserializeFromXml(fileContent, targetClass, config);
+            case JSON:
+                LOG.warn(String.format("Unsupported media type %s for file %s. Defaulting to JSON parsing.",
+                        fileContent.getFileType(), fileContent.getFileName()));
+                return deserializeFromJson(fileContent, targetClass, config);
+            case YAML:
+                LOG.warn(String.format("Unsupported media type %s for file %s. Defaulting to YAML parsing.",
+                        fileContent.getFileType(), fileContent.getFileName()));
+                return deserializeFromYaml(fileContent, targetClass, config);
+            case ERROR:
+            default:
+                throw new FileSerializationException(
+                        String.format("Unsupported media type: %s. Supported media types are %s, %s, %s",
+                                fileContent.getFileType(), Constants.MEDIA_TYPE_XML, Constants.MEDIA_TYPE_YAML,
+                                Constants.MEDIA_TYPE_JSON),
+                        null, fileContent.getFileName(), fileContent.getFileType(),
+                        FileSerializationException.Operation.DESERIALIZE);
+        }
     }
 
     /**
