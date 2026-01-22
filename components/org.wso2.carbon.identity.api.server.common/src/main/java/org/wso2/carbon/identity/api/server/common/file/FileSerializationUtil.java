@@ -363,6 +363,9 @@ public class FileSerializationUtil {
             loaderOptions.setTagInspector(tagInspector);
 
             Constructor constructor = new Constructor(targetClass, loaderOptions);
+            if (config.getYamlConfig().getConstructorCustomizer() != null) {
+                config.getYamlConfig().getConstructorCustomizer().accept(constructor);
+            }
             Yaml yaml = new Yaml(constructor);
 
             return yaml.loadAs(fileContent.getContent(), targetClass);
