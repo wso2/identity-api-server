@@ -293,7 +293,7 @@ public class FileSerializationUtil {
                 config.getRepresenterCustomizer().accept(representer);
             }
 
-            Yaml yaml = new Yaml(constructor, representer);
+            Yaml yaml = new Yaml(constructor, representer, dumperOptions);
 
             return new FileContent(fileNameBuilder.toString(), Constants.MEDIA_TYPE_YAML, yaml.dump(entity));
         } catch (Exception e) {
