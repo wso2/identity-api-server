@@ -25,14 +25,15 @@ public class JsonConfig {
 
     private Class<?>[] subtypes = new Class<?>[0];
 
-    public JsonConfig() {
-    }
+    public JsonConfig() {}
 
     public Class<?>[] getSubtypes() {
+
         return subtypes != null ? subtypes.clone() : new Class<?>[0];
     }
 
     public void setSubtypes(Class<?>... classes) {
+
         this.subtypes = classes;
     }
 }

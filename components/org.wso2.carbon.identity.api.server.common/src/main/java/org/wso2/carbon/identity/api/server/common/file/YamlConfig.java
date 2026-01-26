@@ -38,14 +38,14 @@ public class YamlConfig {
     private Function<DumperOptions, Representer> representerFactory = null;
     private List<String> additionalTrustedClassNames = new ArrayList<>();
 
-    public YamlConfig() {
-    }
+    public YamlConfig() {}
 
     public Consumer<DumperOptions> getDumperOptionsCustomizer() {
         return dumperOptionsCustomizer;
     }
 
     public void setDumperOptionsCustomizer(Consumer<DumperOptions> customizer) {
+
         this.dumperOptionsCustomizer = customizer;
     }
 
@@ -54,6 +54,7 @@ public class YamlConfig {
     }
 
     public void setConstructorCustomizer(Consumer<Constructor> customizer) {
+
         this.constructorCustomizer = customizer;
     }
 
@@ -62,6 +63,7 @@ public class YamlConfig {
     }
 
     public void setRepresenterCustomizer(Consumer<Representer> customizer) {
+
         this.representerCustomizer = customizer;
     }
 
@@ -70,14 +72,17 @@ public class YamlConfig {
     }
 
     public void setRepresenterFactory(Function<DumperOptions, Representer> factory) {
+
         this.representerFactory = factory;
     }
 
     public List<String> getAdditionalTrustedClassNames() {
+
         return new ArrayList<>(additionalTrustedClassNames);
     }
 
     public void setAdditionalTrustedClasses(Class<?>... classes) {
+
         this.additionalTrustedClassNames = new ArrayList<>();
         for (Class<?> clazz : classes) {
             this.additionalTrustedClassNames.add(clazz.getName());

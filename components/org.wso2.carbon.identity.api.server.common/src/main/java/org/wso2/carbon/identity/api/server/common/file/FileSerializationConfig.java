@@ -39,14 +39,14 @@ public class FileSerializationConfig {
     private DefaultFormat serializeDefault = DefaultFormat.YAML;
     private DefaultFormat deserializeDefault = DefaultFormat.YAML;
 
-    public FileSerializationConfig() {
-    }
+    public FileSerializationConfig() {}
 
     public XmlConfig getXmlConfig() {
         return xmlConfig;
     }
 
     public void setXmlConfig(XmlConfig config) {
+
         if (config == null) {
             throw new IllegalArgumentException("XmlConfig cannot be null");
         }
@@ -58,6 +58,7 @@ public class FileSerializationConfig {
     }
 
     public void setJsonConfig(JsonConfig config) {
+
         if (config == null) {
             throw new IllegalArgumentException("JsonConfig cannot be null");
         }
@@ -69,6 +70,7 @@ public class FileSerializationConfig {
     }
 
     public void setYamlConfig(YamlConfig config) {
+
         if (config == null) {
             throw new IllegalArgumentException("YamlConfig cannot be null");
         }
@@ -80,6 +82,7 @@ public class FileSerializationConfig {
     }
 
     public void setSerializeDefault(DefaultFormat serializeDefault) {
+
         this.serializeDefault = serializeDefault;
     }
 
@@ -88,6 +91,7 @@ public class FileSerializationConfig {
     }
 
     public void setDeserializeDefault(DefaultFormat deserializeDefault) {
+
         this.deserializeDefault = deserializeDefault;
     }
 }

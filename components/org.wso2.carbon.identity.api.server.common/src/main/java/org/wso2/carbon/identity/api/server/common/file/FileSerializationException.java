@@ -39,6 +39,7 @@ public class FileSerializationException extends Exception {
 
     public FileSerializationException(String message, Throwable cause,
                                       String fileName, String mediaType, Operation operation) {
+
         super(buildMessage(message, fileName, mediaType, operation), cause);
         this.fileName = fileName;
         this.mediaType = mediaType;
@@ -47,6 +48,7 @@ public class FileSerializationException extends Exception {
 
     private static String buildMessage(String message, String fileName,
                                         String mediaType, Operation operation) {
+
         return String.format("Error during %s operation for file '%s' (media type: %s): %s",
                 operation.name().toLowerCase(Locale.ENGLISH), fileName, mediaType, message);
     }

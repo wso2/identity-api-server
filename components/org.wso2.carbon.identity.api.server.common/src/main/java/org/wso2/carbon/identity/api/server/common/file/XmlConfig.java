@@ -30,14 +30,15 @@ public class XmlConfig {
     private Class<?>[] additionalJaxbClasses = new Class<?>[0];
     private Consumer<Marshaller> marshallerCustomizer = null;
 
-    public XmlConfig() {
-    }
+    public XmlConfig() {}
 
     public Class<?>[] getAdditionalJaxbClasses() {
+
         return additionalJaxbClasses != null ? additionalJaxbClasses.clone() : new Class<?>[0];
     }
 
     public void setAdditionalJaxbClasses(Class<?>... classes) {
+
         this.additionalJaxbClasses = classes;
     }
 
@@ -46,6 +47,7 @@ public class XmlConfig {
     }
 
     public void setMarshallerCustomizer(Consumer<Marshaller> customizer) {
+
         this.marshallerCustomizer = customizer;
     }
 }

@@ -63,6 +63,7 @@ public class FileSerializationUtil {
      */
     public static <T> FileContent serialize(T entity, String fileName, String fileType,
                                             FileSerializationConfig config) throws FileSerializationException {
+
         if (LOG.isDebugEnabled()) {
             LOG.debug(String.format("Serializing entity of type %s to file %s with type %s", 
                     entity.getClass().getSimpleName(), fileName, fileType));
@@ -96,6 +97,7 @@ public class FileSerializationUtil {
      */
     public static <T> FileContent serialize(T entity, String fileName, String fileType)
             throws FileSerializationException {
+
         return serialize(entity, fileName, fileType, new FileSerializationConfig());
     }
 
@@ -111,6 +113,7 @@ public class FileSerializationUtil {
      */
     public static <T> T deserialize(FileContent fileContent, Class<T> targetClass,
                                     FileSerializationConfig config) throws FileSerializationException {
+
         if (LOG.isDebugEnabled()) {
             LOG.debug(String.format("Deserializing file %s of type %s to class %s",
                     fileContent.getFileName(), fileContent.getFileType(), targetClass.getSimpleName()));
@@ -143,6 +146,7 @@ public class FileSerializationUtil {
      */
     public static <T> T deserialize(FileContent fileContent, Class<T> targetClass)
             throws FileSerializationException {
+
         return deserialize(fileContent, targetClass, new FileSerializationConfig());
     }
 
@@ -152,6 +156,7 @@ public class FileSerializationUtil {
     private static <T> FileContent handleUnsupportedSerialize(T entity, String fileName, String fileType,
                                                               FileSerializationConfig config)
             throws FileSerializationException {
+
         FileSerializationConfig.DefaultFormat defaultFormat = config.getSerializeDefault();
 
         switch (defaultFormat) {
@@ -183,6 +188,7 @@ public class FileSerializationUtil {
     private static <T> T handleUnsupportedDeserialize(FileContent fileContent, Class<T> targetClass,
                                                       FileSerializationConfig config)
             throws FileSerializationException {
+
         FileSerializationConfig.DefaultFormat defaultFormat = config.getDeserializeDefault();
 
         switch (defaultFormat) {
@@ -214,6 +220,7 @@ public class FileSerializationUtil {
      */
     private static <T> FileContent serializeToXml(T entity, String fileName, XmlConfig config)
             throws FileSerializationException {
+
         StringBuilder fileNameBuilder = new StringBuilder(fileName);
         fileNameBuilder.append(Constants.XML_FILE_EXTENSION);
 
@@ -246,6 +253,7 @@ public class FileSerializationUtil {
      */
     private static <T> FileContent serializeToJson(T entity, String fileName, JsonConfig config)
             throws FileSerializationException {
+
         StringBuilder fileNameBuilder = new StringBuilder(fileName);
         fileNameBuilder.append(Constants.JSON_FILE_EXTENSION);
 
@@ -268,6 +276,7 @@ public class FileSerializationUtil {
      */
     private static <T> FileContent serializeToYaml(T entity, String fileName, YamlConfig config)
             throws FileSerializationException {
+
         StringBuilder fileNameBuilder = new StringBuilder(fileName);
         fileNameBuilder.append(Constants.YAML_FILE_EXTENSION);
 
@@ -307,6 +316,7 @@ public class FileSerializationUtil {
      */
     private static <T> T deserializeFromXml(FileContent fileContent, Class<T> targetClass,
                                             FileSerializationConfig config) throws FileSerializationException {
+
         try {
             List<Class<?>> classList = new ArrayList<>();
             classList.add(targetClass);
@@ -331,6 +341,7 @@ public class FileSerializationUtil {
      */
     private static <T> T deserializeFromJson(FileContent fileContent, Class<T> targetClass,
                                              FileSerializationConfig config) throws FileSerializationException {
+
         try {
             ObjectMapper objectMapper = new ObjectMapper();
 
@@ -352,6 +363,7 @@ public class FileSerializationUtil {
      */
     private static <T> T deserializeFromYaml(FileContent fileContent, Class<T> targetClass,
                                              FileSerializationConfig config) throws FileSerializationException {
+
         try {
             LoaderOptions loaderOptions = new LoaderOptions();
 
