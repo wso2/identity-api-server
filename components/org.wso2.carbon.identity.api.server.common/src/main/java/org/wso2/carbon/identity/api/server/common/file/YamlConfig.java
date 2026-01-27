@@ -84,6 +84,9 @@ public class YamlConfig {
     public void setAdditionalTrustedClasses(Class<?>... classes) {
 
         this.additionalTrustedClassNames = new ArrayList<>();
+        if (classes == null) {
+            return;
+        }
         for (Class<?> clazz : classes) {
             this.additionalTrustedClassNames.add(clazz.getName());
         }

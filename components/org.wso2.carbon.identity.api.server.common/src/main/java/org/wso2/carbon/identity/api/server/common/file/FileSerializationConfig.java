@@ -83,6 +83,9 @@ public class FileSerializationConfig {
 
     public void setSerializeDefault(DefaultFormat serializeDefault) {
 
+        if (serializeDefault == null) {
+            throw new IllegalArgumentException("serializeDefault cannot be null");
+        }
         this.serializeDefault = serializeDefault;
     }
 
@@ -92,6 +95,9 @@ public class FileSerializationConfig {
 
     public void setDeserializeDefault(DefaultFormat deserializeDefault) {
 
+        if (deserializeDefault == null) {
+            throw new IllegalArgumentException("deserializeDefault cannot be null");
+        }
         this.deserializeDefault = deserializeDefault;
     }
 }
