@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.api.server.common;
+package org.wso2.carbon.identity.api.server.common.file;
 
 /**
  * Holds file name, type and content of the uploaded or exported resource file configuration.
