@@ -30,7 +30,18 @@ public class OidcScopeConstants {
 
         INVALID_REQUEST("OAUTH-60001", "Invalid Request."),
         ERROR_CONFLICT_REQUEST("41004", "Scope already exists."),
-        SCOPE_NOT_FOUND("41003", "Scope not found.");
+        SCOPE_NOT_FOUND("41003", "Scope not found."),
+
+        // Server Errors - 650xx
+        ERROR_CODE_ERROR_EXPORTING_SCOPE("65001",
+                "Unable to export the OIDC scope configurations."),
+        ERROR_CODE_ERROR_IMPORTING_SCOPE("65002",
+                "Unable to import the OIDC scope configurations."),
+        ERROR_CODE_ERROR_UPDATING_SCOPE("65003",
+                "Unable to update the OIDC scope configurations."),
+
+        // Client Errors - 600xx
+        ERROR_CODE_INVALID_INPUT("60001", "Invalid Input");
 
         private final String code;
         private final String message;

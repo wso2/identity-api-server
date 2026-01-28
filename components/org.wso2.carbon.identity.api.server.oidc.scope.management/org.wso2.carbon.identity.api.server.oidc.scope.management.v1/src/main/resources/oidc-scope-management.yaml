@@ -90,6 +90,45 @@ paths:
           $ref: '#/components/responses/Conflict'
         500:
           $ref: '#/components/responses/ServerError'
+  /oidc/scopes/import:
+    post:
+      tags:
+        - OIDC Scope Endpoint
+      summary: Import an OIDC Scope from XML, YAML, or JSON file
+      operationId: importScopeFromFile
+      description: This API provides the capability to import an OIDC scope from a file in XML, YAML, or JSON format. <br>
+        <b>Permission required:</b> <br>
+        * /permission/admin/manage/identity/applicationmgt/create <br>
+        <b>Scope required:</b> <br>
+        * internal_application_mgt_create
+      security:
+        - BasicAuth: [ ]
+        - OAuth2: [ ]
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileUpload'
+        description: OIDC scope configuration file
+        required: true
+      responses:
+        201:
+          description: Successfully imported
+          headers:
+            Location:
+              description: Location of the newly created scope
+              schema:
+                type: string
+        400:
+          $ref: '#/components/responses/InvalidInput'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        409:
+          $ref: '#/components/responses/Conflict'
+        500:
+          $ref: '#/components/responses/ServerError'
   /oidc/scopes/{id}:
     get:
       tags:
@@ -194,6 +233,117 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         403:
           $ref: '#/components/responses/Forbidden'
+        500:
+          $ref: '#/components/responses/ServerError'
+  /oidc/scopes/{id}/export:
+    get:
+      tags:
+        - OIDC Scope Endpoint
+      summary: Export an OIDC Scope in XML, YAML, or JSON format
+      operationId: exportScopeToFile
+      description: This API provides the capability to retrieve an OIDC scope for a given scope name as an XML, YAML, or JSON file. <br>
+        <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/view <br>
+        <b>Scope required:</b> <br>
+              * internal_application_mgt_view
+      security:
+        - BasicAuth: []
+        - OAuth2: []
+      parameters:
+        - name: id
+          in: path
+          description: scope name as the ID
+          required: true
+          schema:
+            type: string
+            example: scope1
+        - name: Accept
+          in: header
+          required: false
+          description: |
+            Content type of the file.
+          schema:
+            type: string
+            enum:
+              - application/json
+              - application/xml
+              - application/yaml
+              - application/x-yaml
+              - text/yaml
+              - text/xml
+              - text/json
+            default: application/yaml
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: string
+              example: 'Sample OIDC scope configuration in the requested format'
+            application/xml:
+              schema:
+                type: string
+              example: 'Sample OIDC scope configuration in the requested format'
+            application/yaml:
+              schema:
+                type: string
+              example: 'Sample OIDC scope configuration in the requested format'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/ServerError'
+  /oidc/scopes/{id}/import:
+    put:
+      tags:
+        - OIDC Scope Endpoint
+      summary: Update an OIDC Scope from XML, YAML, or JSON file
+      operationId: updateScopeFromFile
+      description: This API provides the capability to update an existing OIDC scope from a file in XML, YAML, or JSON format. <br>
+        <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/update <br>
+        <b>Scope required:</b> <br>
+              * internal_application_mgt_update
+      security:
+        - BasicAuth: []
+        - OAuth2: []
+      parameters:
+        - name: id
+          in: path
+          description: scope name as the ID
+          required: true
+          schema:
+            type: string
+            example: scope1
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileUpload'
+        description: OIDC scope configuration file
+        required: true
+      responses:
+        200:
+          description: Successfully Updated.
+          headers:
+            Location:
+              description: Location of the updated scope
+              schema:
+                type: string
+        400:
+          $ref: '#/components/responses/InvalidInput'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
         500:
           $ref: '#/components/responses/ServerError'
 
@@ -301,3 +451,12 @@ components:
         traceId:
           type: string
           example: 'e0fbcfeb-3617-43c4-8dd0-7b7d38e13047'
+    FileUpload:
+      type: object
+      required:
+        - file
+      properties:
+        file:
+          type: string
+          format: binary
+          description: File uploaded during import.

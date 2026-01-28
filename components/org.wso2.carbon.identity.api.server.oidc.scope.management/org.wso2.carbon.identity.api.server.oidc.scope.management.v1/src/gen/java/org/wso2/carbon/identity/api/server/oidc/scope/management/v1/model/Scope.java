@@ -30,11 +30,21 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
+@XmlRootElement(name = "Scope")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Scope  {
-  
+
+    @XmlElement(name = "name")
     private String name;
+
+    @XmlElement(name = "displayName")
     private String displayName;
+
+    @XmlElement(name = "description")
     private String description;
+
+    @XmlElementWrapper(name = "claims")
+    @XmlElement(name = "claim")
     private List<String> claims = new ArrayList<>();
 
 
