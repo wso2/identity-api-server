@@ -32,7 +32,7 @@ public class WorkflowRuleMapper {
             return null;
         }
 
-        FlowType temporaryWFType = FlowType.WORKFLOW_RULES; // (later I will do this with workflowOperation passing)
+        FlowType temporaryWFType = FlowType.WORKFLOW_RULES;
         List<ANDRule> andRuleList = workflowORRule.getRules();
 
         RuleBuilder ruleBuilder = RuleBuilder.create(temporaryWFType, tenantDomain);
@@ -121,15 +121,4 @@ public class WorkflowRuleMapper {
             }
         }
     }
-
-//    private static FlowType getFlowType(Operation operation) throws WorkflowClientException {
-//        // Map Workflow Operations to Rule Flow Types
-//        switch (operation) {
-//            case PRE_UPDATE_ROLE:
-//                return FlowType.PRE_UPDATE_ROLE;
-//            default:
-//                throw new WorkflowClientException("Operation " + operation + " does not support rules.");
-//        }
-//    }
-
 }
