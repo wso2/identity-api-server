@@ -32,6 +32,7 @@ import org.wso2.carbon.identity.api.server.common.file.FileSerializationUtil;
 import org.wso2.carbon.identity.api.server.common.file.YamlConfig;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.common.OidcScopeConstants;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.Scope;
+import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.ScopeConfiguration;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.ScopeUpdateRequest;
 import org.wso2.carbon.identity.oauth.IdentityOAuthAdminException;
 import org.wso2.carbon.identity.oauth.IdentityOAuthClientException;
@@ -242,6 +243,8 @@ public class OidcScopeManagementService {
             LOG.debug("Parsing OIDC scope object to file content of type: " + fileType);
         }
 
+        ScopeConfiguration scopeConfig = new ScopeConfiguration(scope);
+
         FileSerializationConfig config = new FileSerializationConfig();
         YamlConfig yamlConfig = new YamlConfig();
         yamlConfig.setDumperOptionsCustomizer(options -> {
@@ -250,7 +253,7 @@ public class OidcScopeManagementService {
         config.setYamlConfig(yamlConfig);
 
         try {
-            return FileSerializationUtil.serialize(scope, scope.getName(), fileType, config);
+            return FileSerializationUtil.serialize(scopeConfig, scope.getName(), fileType, config);
         } catch (FileSerializationException e) {
             throw new IdentityOAuthAdminException("Error when parsing OIDC scope to file.", e);
         }
@@ -283,11 +286,12 @@ public class OidcScopeManagementService {
         }
         if (StringUtils.isEmpty(fileContent.getContent())) {
             throw new IdentityOAuthClientException(String.format(
-                            "Empty Identity Provider configuration file %s uploaded.", fileContent.getFileName()));
+                            "Empty OIDC scope configuration file %s uploaded.", fileContent.getFileName()));
         }
 
         try {
-            return FileSerializationUtil.deserialize(fileContent, Scope.class);
+            ScopeConfiguration scopeConfig = FileSerializationUtil.deserialize(fileContent, ScopeConfiguration.class);
+            return scopeConfig.toScope();
         } catch (FileSerializationException e) {
             throw new IdentityOAuthClientException("Error when generating the OIDC scope model from file", e);
         }
