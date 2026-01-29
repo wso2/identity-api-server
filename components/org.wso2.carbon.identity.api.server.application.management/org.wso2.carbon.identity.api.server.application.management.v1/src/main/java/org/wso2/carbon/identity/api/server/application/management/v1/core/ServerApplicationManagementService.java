@@ -639,7 +639,6 @@ public class ServerApplicationManagementService {
         config.setJsonConfig(jsonConfig);
 
         config.setSerializeDefault(FileSerializationConfig.DefaultFormat.ERROR);
-        config.setDeserializeDefault(FileSerializationConfig.DefaultFormat.XML);
 
         return config;
     }
@@ -764,6 +763,8 @@ public class ServerApplicationManagementService {
         JsonConfig jsonConfig = new JsonConfig();
         jsonConfig.setSubtypes(INBOUND_CONFIG_PROTOCOLS);
         config.setJsonConfig(jsonConfig);
+
+        config.setDeserializeDefault(FileSerializationConfig.DefaultFormat.XML);
 
         return config;
     }
