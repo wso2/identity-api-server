@@ -737,8 +737,6 @@ public class UsersApiServiceCore {
                 roles.add(toApiRole(roleDO));
             }
             org.setRoles(roles);
-        } else {
-            org.setRoles(new ArrayList<>());
         }
 
         return org;
