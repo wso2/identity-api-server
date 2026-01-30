@@ -18,9 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.userstore.v1.core;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.IOUtils;
@@ -32,10 +29,11 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
-import org.wso2.carbon.identity.api.server.common.FileContent;
-import org.wso2.carbon.identity.api.server.common.Util;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.api.server.common.file.FileContent;
+import org.wso2.carbon.identity.api.server.common.file.FileSerializationException;
+import org.wso2.carbon.identity.api.server.common.file.FileSerializationUtil;
 import org.wso2.carbon.identity.api.server.userstore.common.UserStoreConstants;
 import org.wso2.carbon.identity.api.server.userstore.v1.core.functions.userstore.AttributeMappingsToApiModel;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.AddUserStorePropertiesRes;
@@ -77,17 +75,9 @@ import org.wso2.carbon.user.core.UserStoreConfigConstants;
 import org.wso2.carbon.user.core.UserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.user.core.tracker.UserStoreManagerRegistry;
-import org.yaml.snakeyaml.LoaderOptions;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
-import org.yaml.snakeyaml.error.YAMLException;
-import org.yaml.snakeyaml.inspector.TagInspector;
-import org.yaml.snakeyaml.inspector.TrustedPrefixesTagInspector;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -100,20 +90,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_RESOURCE_LIMIT_REACHED;
-import static org.wso2.carbon.identity.api.server.common.Constants.JSON_FILE_EXTENSION;
-import static org.wso2.carbon.identity.api.server.common.Constants.MEDIA_TYPE_JSON;
-import static org.wso2.carbon.identity.api.server.common.Constants.MEDIA_TYPE_XML;
-import static org.wso2.carbon.identity.api.server.common.Constants.MEDIA_TYPE_YAML;
 import static org.wso2.carbon.identity.api.server.common.Constants.REGEX_COMMA;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.common.Constants.XML_FILE_EXTENSION;
-import static org.wso2.carbon.identity.api.server.common.Constants.YAML_FILE_EXTENSION;
 import static org.wso2.carbon.identity.api.server.userstore.common.UserStoreConstants.ErrorMessage.ERROR_CODE_USER_STORE_LIMIT_REACHED;
 import static org.wso2.carbon.identity.core.util.IdentityUtil.isValidFileName;
 
@@ -1557,64 +1537,11 @@ public class ServerUserStoreService {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Parsing userstore object to file content of type: " + fileType);
         }
-        String mediaType = Util.getMediaType(fileType);
-        switch (mediaType) {
-            case MEDIA_TYPE_XML:
-                return parseUserStoreToXml(userStoreConfigs);
-            case MEDIA_TYPE_JSON:
-                return parseUserStoreToJson(userStoreConfigs);
-            case MEDIA_TYPE_YAML:
-                return parseUserStoreToYaml(userStoreConfigs);
-            default:
-                LOG.warn(String.format("Using the default YAML parsing for requested file type: %s for export.",
-                        fileType));
-                return parseUserStoreToYaml(userStoreConfigs);
-        }
-    }
 
-    private FileContent parseUserStoreToYaml(UserStoreConfigurations userStoreConfigs)
-            throws UserStoreException {
-
-        StringBuilder fileNameSB = new StringBuilder(userStoreConfigs.getName());
-        fileNameSB.append(YAML_FILE_EXTENSION);
-        Yaml yaml = new Yaml();
         try {
-            return new FileContent(fileNameSB.toString(), MEDIA_TYPE_YAML, yaml.dump(userStoreConfigs));
-        } catch (YAMLException e) {
-            throw new UserStoreException("Error when parsing userstore to YAML file.", e);
-        }
-    }
-
-    private FileContent parseUserStoreToXml(UserStoreConfigurations userStoreConfigs)
-            throws UserStoreException {
-
-        StringBuilder fileNameSB = new StringBuilder(userStoreConfigs.getName());
-        fileNameSB.append(XML_FILE_EXTENSION);
-
-        JAXBContext jaxbContext;
-        try {
-            jaxbContext = JAXBContext.newInstance(UserStoreConfigurations.class);
-            Marshaller marshaller = jaxbContext.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            StringWriter stringWriter = new StringWriter();
-            marshaller.marshal(userStoreConfigs, stringWriter);
-            return new FileContent(fileNameSB.toString(), MEDIA_TYPE_XML, stringWriter.toString());
-        } catch (JAXBException e) {
-            throw new UserStoreException("Error when parsing userstore to XML file.", e);
-        }
-    }
-
-    private FileContent parseUserStoreToJson(UserStoreConfigurations userStoreConfigs)
-            throws UserStoreException {
-
-        StringBuilder fileNameSB = new StringBuilder(userStoreConfigs.getName());
-        fileNameSB.append(JSON_FILE_EXTENSION);
-        ObjectMapper objectMapper = new ObjectMapper(new JsonFactory());
-        try {
-            return new FileContent(fileNameSB.toString(), MEDIA_TYPE_JSON,
-                    objectMapper.writeValueAsString(userStoreConfigs));
-        } catch (JsonProcessingException e) {
-            throw new UserStoreException("Error when parsing userstore to JSON file.", e);
+            return FileSerializationUtil.serialize(userStoreConfigs, userStoreConfigs.getName(), fileType);
+        } catch (FileSerializationException e) {
+            throw new UserStoreException("Error when parsing userstore to file.", e);
         }
     }
 
@@ -1661,57 +1588,10 @@ public class ServerUserStoreService {
                     UserStoreConstants.ErrorMessage.ERROR_CODE_INVALID_INPUT.getMessage());
         }
 
-        switch (Util.getMediaType(fileContent.getFileType())) {
-            case MEDIA_TYPE_XML:
-                return parseUserStoreFromXml(fileContent);
-            case MEDIA_TYPE_JSON:
-                return parseUserStoreFromJson(fileContent);
-            case MEDIA_TYPE_YAML:
-                return parseUserStoreFromYaml(fileContent);
-            default:
-                LOG.warn(String.format("Unsupported media type %s for file %s. Defaulting to YAML parsing.",
-                        fileContent.getFileType(), fileContent.getFileName()));
-                return parseUserStoreFromYaml(fileContent);
-        }
-    }
-
-    private UserStoreConfigurations parseUserStoreFromXml(FileContent fileContent) throws UserStoreException {
-
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(UserStoreConfigurations.class);
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            return (UserStoreConfigurations) unmarshaller.unmarshal(new StringReader(fileContent.getContent()));
-        } catch (JAXBException e) {
-            throw new UserStoreException(String.format("Error in reading " +
-                    "XML file configuration for the userstore: %s.", fileContent.getFileName()), e);
-        }
-    }
-
-    private UserStoreConfigurations parseUserStoreFromYaml(FileContent fileContent) throws UserStoreException {
-
-        try {
-            // Add trusted tags included in the Userstore YAML files.
-            List<String> trustedTagList = new ArrayList<>();
-            trustedTagList.add(UserStoreConfigurations.class.getName());
-
-            LoaderOptions loaderOptions = new LoaderOptions();
-            TagInspector tagInspector = new TrustedPrefixesTagInspector(trustedTagList);
-            loaderOptions.setTagInspector(tagInspector);
-            Yaml yaml = new Yaml(new Constructor(UserStoreConfigurations.class, loaderOptions));
-            return yaml.loadAs(fileContent.getContent(), UserStoreConfigurations.class);
-        } catch (YAMLException e) {
-            throw new UserStoreException(String.format("Error in reading YAML file " +
-                    "configuration for the userstore: %s.", fileContent.getFileName()), e);
-        }
-    }
-
-    private UserStoreConfigurations parseUserStoreFromJson(FileContent fileContent) throws UserStoreException {
-
-        try {
-            return new ObjectMapper().readValue(fileContent.getContent(), UserStoreConfigurations.class);
-        } catch (JsonProcessingException e) {
-            throw new UserStoreException(String.format("Error in reading JSON " +
-                    "file configuration for the userstore: %s.", fileContent.getFileName()), e);
+            return FileSerializationUtil.deserialize(fileContent, UserStoreConfigurations.class);
+        } catch (FileSerializationException e) {
+            throw new UserStoreException("Error when generating the userstore model from file", e);
         }
     }
 

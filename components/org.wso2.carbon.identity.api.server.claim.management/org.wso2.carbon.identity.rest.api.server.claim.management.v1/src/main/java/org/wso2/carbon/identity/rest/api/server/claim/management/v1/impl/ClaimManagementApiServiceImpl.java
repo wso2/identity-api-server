@@ -20,7 +20,7 @@ package org.wso2.carbon.identity.rest.api.server.claim.management.v1.impl;
 
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.http.HttpHeaders;
-import org.wso2.carbon.identity.api.server.common.FileContent;
+import org.wso2.carbon.identity.api.server.common.file.FileContent;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.ClaimManagementApiService;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.core.ServerClaimManagementService;
 
