@@ -32,7 +32,7 @@ public class WorkflowRuleMapper {
             return null;
         }
 
-        FlowType temporaryWFType = FlowType.WORKFLOW_RULES;
+        FlowType temporaryWFType = FlowType.APPROVAL_WORKFLOW;
         List<ANDRule> andRuleList = workflowORRule.getRules();
 
         RuleBuilder ruleBuilder = RuleBuilder.create(temporaryWFType, tenantDomain);
