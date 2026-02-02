@@ -21,6 +21,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.v1.AccessTokenConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.AllowedIssuer;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthenticationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.HybridFlowConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.IdTokenConfiguration;
@@ -38,6 +39,7 @@ import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
+import org.wso2.carbon.identity.oauth2.config.models.IssuerDetails;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -88,7 +90,7 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         updateSubjectConfigurations(consumerAppDTO, oidcModel.getSubject());
         consumerAppDTO.setFapiConformanceEnabled(oidcModel.getIsFAPIApplication());
         updateSubjectTokenConfigurations(consumerAppDTO, oidcModel.getSubjectToken());
-
+        updateIssuerDetails(consumerAppDTO, oidcModel.getIssuer());
         return consumerAppDTO;
     }
 
@@ -317,6 +319,17 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         if (subjectToken != null) {
             consumerAppDTO.setSubjectTokenEnabled(subjectToken.getEnable());
             consumerAppDTO.setSubjectTokenExpiryTime(subjectToken.getApplicationSubjectTokenExpiryInSeconds());
+        }
+    }
+
+    private void updateIssuerDetails(OAuthConsumerAppDTO consumerAppDTO, AllowedIssuer issuer) {
+
+        if (issuer != null) {
+            IssuerDetails issuerDetails = new IssuerDetails();
+            issuerDetails.setIssuerOrgId(issuer.getOrganizationId());
+            issuerDetails.setIssuerTenantDomain(issuer.getTenantDomain());
+            issuerDetails.setIssuer(issuer.getValue());
+            consumerAppDTO.setIssuerDetails(issuerDetails);
         }
     }
 }
