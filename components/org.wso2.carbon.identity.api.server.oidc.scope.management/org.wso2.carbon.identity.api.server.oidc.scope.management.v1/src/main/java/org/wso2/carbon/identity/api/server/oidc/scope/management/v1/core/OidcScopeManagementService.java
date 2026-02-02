@@ -171,7 +171,7 @@ public class OidcScopeManagementService {
 
         if (scope == null) {
             throw handleException(Response.Status.NOT_FOUND,
-                    OidcScopeConstants.ErrorMessage.ERROR_CODE_ERROR_EXPORTING_SCOPE, scopeName);
+                    OidcScopeConstants.ErrorMessage.ERROR_CODE_ERROR_EXPORTING_SCOPE);
         }
 
         FileContent fileContent;
@@ -179,7 +179,7 @@ public class OidcScopeManagementService {
             fileContent = generateFileFromModel(fileType, scope);
         } catch (IdentityOAuthAdminException e) {
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
-                    OidcScopeConstants.ErrorMessage.ERROR_CODE_ERROR_EXPORTING_SCOPE, scopeName);
+                    OidcScopeConstants.ErrorMessage.ERROR_CODE_ERROR_EXPORTING_SCOPE, e);
         }
 
         if (LOG.isDebugEnabled()) {
@@ -203,7 +203,7 @@ public class OidcScopeManagementService {
             scope = getScopeFromFile(fileInputStream, fileDetail);
         } catch (IdentityOAuthClientException e) {
             throw handleException(Response.Status.BAD_REQUEST,
-                    OidcScopeConstants.ErrorMessage.ERROR_CODE_ERROR_IMPORTING_SCOPE, null);
+                    OidcScopeConstants.ErrorMessage.ERROR_CODE_ERROR_IMPORTING_SCOPE, e);
         }
 
         return addScope(scope);
@@ -224,7 +224,7 @@ public class OidcScopeManagementService {
             scope = getScopeFromFile(fileInputStream, fileDetail);
         } catch (IdentityOAuthClientException e) {
             throw handleException(Response.Status.BAD_REQUEST,
-                    OidcScopeConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_SCOPE, null);
+                    OidcScopeConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_SCOPE, e);
         }
 
         ScopeUpdateRequest updateRequest = new ScopeUpdateRequest();
@@ -359,14 +359,23 @@ public class OidcScopeManagementService {
     }
 
     private APIError handleException(Response.Status status, OidcScopeConstants.ErrorMessage errorMessage,
-                                     String data) {
+                                      IdentityOAuthAdminException e) {
 
         ErrorResponse errorResponse = new ErrorResponse.Builder()
                 .withCode(errorMessage.getCode())
                 .withMessage(errorMessage.getMessage())
-                .withDescription(data != null ? String.format("%s: %s", errorMessage.getMessage(), data) :
-                        errorMessage.getMessage())
+                .withDescription(e.getMessage())
                 .build(LOG, errorMessage.getMessage());
         return new APIError(status, errorResponse);
     }
+
+    private APIError handleException(Response.Status status, OidcScopeConstants.ErrorMessage errorMessage) {
+
+        ErrorResponse errorResponse = new ErrorResponse.Builder()
+                .withCode(errorMessage.getCode())
+                .withMessage(errorMessage.getMessage())
+                .withDescription(errorMessage.getDescription())
+                .build(LOG, errorMessage.getMessage());
+        return new APIError(status, errorResponse);
+   }
 }
