@@ -1198,6 +1198,126 @@ paths:
             schema:
               $ref: '#/components/schemas/FraudDetectionConfig'
         required: true
+  /configs/compatibility-settings:
+    get:
+      tags:
+        - Compatibility Settings
+      summary: Retrieve the tenant compatibility settings.
+      operationId: getCompatibilitySettings
+      description: Retrieve the tenant compatibility settings.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompatibilitySettings'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - Compatibility Settings
+      summary: Patch the tenant compatibility settings.
+      operationId: patchCompatibilitySettings
+      description: Patch the tenant compatibility settings. Supports dynamic groups and attributes.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompatibilitySettings'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompatibilitySettings'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /configs/compatibility-settings/{resource}:
+    get:
+      tags:
+        - Compatibility Settings
+      summary: Retrieve compatibility settings for a specific resource.
+      operationId: getCompatibilitySettingsByResource
+      description: Retrieve compatibility settings for a specific resource (e.g., scim2, oauth).
+      parameters:
+        - name: resource
+          in: path
+          description: Resource name (e.g., scim2, oauth)
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompatibilitySettingsGroup'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 servers:
   - url: 'https://localhost:9443/t/{tenant-domain}/api/server/v1'
     variables:
@@ -1854,3 +1974,20 @@ components:
           description: "Passive STS URL"
           readOnly: true
           example: "https://localhost:9443/passivests"
+    CompatibilitySettings:
+      type: object
+      description: Compatibility settings with dynamic groups and attributes.
+      additionalProperties:
+        type: object
+        additionalProperties: true
+      example:
+        scim2:
+          conflictOnClaimUniquenessViolation: true
+        oauth:
+          enableLegacyGrantTypeValidation: false
+    CompatibilitySettingsGroup:
+      type: object
+      description: Compatibility settings for a specific resource.
+      additionalProperties: true
+      example:
+        conflictOnClaimUniquenessViolation: true

@@ -18,30 +18,21 @@
 
 package org.wso2.carbon.identity.api.server.configs.v1;
 
-import org.wso2.carbon.identity.api.server.configs.v1.*;
 import org.wso2.carbon.identity.api.server.configs.v1.model.*;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import java.io.InputStream;
+
 import java.util.List;
-import org.wso2.carbon.identity.api.server.configs.v1.model.Authenticator;
-import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
-import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
+
+import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettings;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
-import org.wso2.carbon.identity.api.server.configs.v1.model.Error;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch;
-import org.wso2.carbon.identity.api.server.configs.v1.model.JWTValidatorConfig;
-import java.util.List;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfigListItem;
-import org.wso2.carbon.identity.api.server.configs.v1.model.Schema;
-import org.wso2.carbon.identity.api.server.configs.v1.model.SchemaListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ScimConfig;
-import org.wso2.carbon.identity.api.server.configs.v1.model.ServerConfig;
+
 import javax.ws.rs.core.Response;
 
 
@@ -109,4 +100,10 @@ public interface ConfigsApiService {
       public Response updateRemoteLoggingConfigs(List<RemoteLoggingConfigListItem> remoteLoggingConfigListItem);
 
       public Response updateSAMLInboundAuthConfig(InboundAuthSAML2Config inboundAuthSAML2Config);
+
+      public Response getCompatibilitySettings();
+
+      public Response patchCompatibilitySettings(CompatibilitySettings compatibilitySettings);
+
+      public Response getCompatibilitySettingsByGroup(String settingGroup);
 }

@@ -215,7 +215,20 @@ public class Constants {
                 "Server encountered an error while retrieving the Fraud Detection configuration."),
         ERROR_CODE_FRAUD_DETECTION_CONFIG_UPDATE("65024",
                 "Unable to update Fraud Detection configuration.",
-                "Server encountered an error while updating the Fraud Detection configuration.");
+                "Server encountered an error while updating the Fraud Detection configuration."),
+
+        /**
+         * Compatibility Settings errors.
+         */
+        ERROR_CODE_COMPATIBILITY_SETTINGS_RETRIEVE("65025",
+                "Unable to retrieve Compatibility Settings.",
+                "Server encountered an error while retrieving the Compatibility Settings."),
+        ERROR_CODE_COMPATIBILITY_SETTINGS_UPDATE("65026",
+                "Unable to update Compatibility Settings.",
+                "Server encountered an error while updating the Compatibility Settings."),
+        ERROR_CODE_SETTING_GROUP_NOT_FOUND("60007",
+                "Setting group not found.",
+                "Unable to find compatibility settings for the setting group %s.");
 
         private final String code;
         private final String message;

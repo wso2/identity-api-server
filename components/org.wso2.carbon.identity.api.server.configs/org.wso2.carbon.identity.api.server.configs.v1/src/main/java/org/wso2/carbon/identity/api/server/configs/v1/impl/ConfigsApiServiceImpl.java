@@ -22,6 +22,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.ConfigsApiService;
 import org.wso2.carbon.identity.api.server.configs.v1.core.ServerConfigManagementService;
 import org.wso2.carbon.identity.api.server.configs.v1.factories.ServerConfigManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettings;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.FraudDetectionConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
@@ -244,6 +245,26 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
 
         configManagementService.updateSAMLInboundAuthConfig(inboundAuthSAML2Config);
         return Response.ok().build();
+    }
+
+    @Override
+    public Response getCompatibilitySettings() {
+
+        return Response.ok().entity(configManagementService.getCompatibilitySettings()).build();
+    }
+
+    @Override
+    public Response patchCompatibilitySettings(CompatibilitySettings compatibilitySettings) {
+
+        CompatibilitySettings updatedSettings =
+                configManagementService.patchCompatibilitySettings(compatibilitySettings);
+        return Response.ok().entity(updatedSettings).build();
+    }
+
+    @Override
+    public Response getCompatibilitySettingsByGroup(String settingGroup) {
+
+        return Response.ok().entity(configManagementService.getCompatibilitySettingsByGroup(settingGroup)).build();
     }
 
     @Override

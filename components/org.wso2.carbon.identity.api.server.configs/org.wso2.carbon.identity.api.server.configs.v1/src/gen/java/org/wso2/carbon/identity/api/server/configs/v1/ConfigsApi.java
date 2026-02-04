@@ -18,9 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.configs.v1;
 
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import java.io.InputStream;
 import java.util.List;
 
 import org.wso2.carbon.identity.api.server.configs.v1.factories.ConfigsApiServiceFactory;
@@ -28,6 +25,8 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettings;
+import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettingsGroup;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Error;
@@ -38,7 +37,6 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveST
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTValidatorConfig;
-import java.util.List;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfigListItem;
@@ -46,14 +44,11 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.Schema;
 import org.wso2.carbon.identity.api.server.configs.v1.model.SchemaListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ScimConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ServerConfig;
-import org.wso2.carbon.identity.api.server.configs.v1.ConfigsApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
-
-import javax.validation.constraints.*;
 
 @Path("/configs")
 @Api(description = "The configs API")
@@ -828,5 +823,77 @@ public class ConfigsApi  {
     public Response updateSAMLInboundAuthConfig(@ApiParam(value = "" ) @Valid InboundAuthSAML2Config inboundAuthSAML2Config) {
 
         return delegate.updateSAMLInboundAuthConfig(inboundAuthSAML2Config );
+    }
+
+    @Valid
+    @GET
+    @Path("/compatibility-settings")
+
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve the tenant compatibility settings.", notes = "Retrieve the tenant compatibility settings.", response = CompatibilitySettings.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+
+        })
+    }, tags={ "Compatibility Settings", })
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Successful Response", response = CompatibilitySettings.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getCompatibilitySettings() {
+
+        return delegate.getCompatibilitySettings();
+    }
+
+    @Valid
+    @PATCH
+    @Path("/compatibility-settings")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Patch the tenant compatibility settings.", notes = "Patch the tenant compatibility settings. Supports dynamic groups and attributes.", response = CompatibilitySettings.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+
+        })
+    }, tags={ "Compatibility Settings", })
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Successful Response", response = CompatibilitySettings.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response patchCompatibilitySettings(@ApiParam(value = "" ,required=true) @Valid CompatibilitySettings compatibilitySettings) {
+
+        return delegate.patchCompatibilitySettings(compatibilitySettings);
+    }
+
+    @Valid
+    @GET
+    @Path("/compatibility-settings/{setting-group}")
+
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve compatibility settings for a specific setting group.", notes = "Retrieve compatibility settings for a specific setting group (e.g., scim2, oauth).", response = CompatibilitySettingsGroup.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+
+        })
+    }, tags={ "Compatibility Settings" })
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Successful Response", response = CompatibilitySettingsGroup.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getCompatibilitySettingsByGroup(@ApiParam(value = "Setting group name (e.g., scim2, oauth)",required=true) @PathParam("setting-group") String settingGroup) {
+
+        return delegate.getCompatibilitySettingsByGroup(settingGroup);
     }
 }

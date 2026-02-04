@@ -3,6 +3,7 @@ package org.wso2.carbon.identity.api.server.configs.v1.factories;
 import org.wso2.carbon.identity.api.server.configs.common.ConfigsServiceHolder;
 import org.wso2.carbon.identity.api.server.configs.v1.core.ServerConfigManagementService;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
+import org.wso2.carbon.identity.compatibility.settings.core.service.CompatibilitySettingsService;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.fraud.detection.core.service.FraudDetectionConfigsService;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
@@ -33,6 +34,8 @@ public class ServerConfigManagementServiceFactory {
         DCRConfigurationMgtService dcrConfigurationMgtService = ConfigsServiceHolder.getDcrConfigurationMgtService();
         FraudDetectionConfigsService fraudDetectionConfigsService = ConfigsServiceHolder
                 .getFraudDetectionConfigsService();
+        CompatibilitySettingsService compatibilitySettingsService = ConfigsServiceHolder
+                .getIdentityCompatibilitySettingsService();
 
         if (applicationManagementService == null) {
             throw new IllegalStateException("ApplicationManagementService is not available from OSGi context.");
@@ -66,13 +69,19 @@ public class ServerConfigManagementServiceFactory {
             throw new IllegalStateException("FraudDetectionConfigsService is not available from OSGi context.");
         }
 
+        if (compatibilitySettingsService == null) {
+            throw new IllegalStateException("CompatibilitySettingsService is not available from OSGi context.");
+        }
+
         SERVICE = new ServerConfigManagementService(applicationManagementService, identityProviderManager,
                 corsManagementService,
                 remoteLoggingConfigService,
                 impersonationConfigMgtService,
                 dcrConfigurationMgtService,
                 jwtClientAuthenticatorMgtService,
-                fraudDetectionConfigsService);
+                fraudDetectionConfigsService,
+                compatibilitySettingsService
+                );
     }
 
     /**
