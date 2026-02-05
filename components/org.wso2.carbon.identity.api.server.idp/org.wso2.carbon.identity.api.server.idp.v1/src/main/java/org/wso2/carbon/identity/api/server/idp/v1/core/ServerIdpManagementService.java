@@ -3001,6 +3001,10 @@ public class ServerIdpManagementService {
             outboundConnector.setRulesEnabled(config.isRulesEnabled());
 
             boolean isConfidentialDataProtectionEnabled = isOutboundProvisioningConfidentialDataProtectionEnabled();
+            if (log.isDebugEnabled()) {
+                log.debug("Confidential data protection enabled for outbound provisioning: " +
+                        isConfidentialDataProtectionEnabled);
+            }
             List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> properties =
                     Arrays.stream(config.getProvisioningProperties())
                             .filter(property -> !isConfidentialDataProtectionEnabled
