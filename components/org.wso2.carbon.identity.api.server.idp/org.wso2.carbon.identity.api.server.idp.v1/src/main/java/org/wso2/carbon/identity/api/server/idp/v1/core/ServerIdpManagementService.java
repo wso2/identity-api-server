@@ -123,6 +123,7 @@ import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 import org.wso2.carbon.idp.mgt.dao.IdPManagementDAO;
 import org.wso2.carbon.idp.mgt.model.ConnectedAppsResult;
 import org.wso2.carbon.idp.mgt.model.IdpSearchResult;
+import org.wso2.carbon.idp.mgt.util.IdPManagementConstants;
 import org.yaml.snakeyaml.TypeDescription;
 
 import java.io.IOException;
@@ -2998,9 +2999,13 @@ public class ServerIdpManagementService {
             outboundConnector.setIsDefault(isDefaultConnector);
             outboundConnector.setBlockingEnabled(config.isBlocking());
             outboundConnector.setRulesEnabled(config.isRulesEnabled());
+
+            boolean isConfidentialDataProtectionEnabled = isOutboundProvisioningConfidentialDataProtectionEnabled();
             List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> properties =
-                    Arrays.stream(config
-                            .getProvisioningProperties()).map(propertyToExternal)
+                    Arrays.stream(config.getProvisioningProperties())
+                            .filter(property -> !isConfidentialDataProtectionEnabled
+                                    || !property.isConfidential())
+                            .map(propertyToExternal)
                             .collect(Collectors.toList());
             outboundConnector.setProperties(properties);
         }
@@ -3687,5 +3692,17 @@ public class ServerIdpManagementService {
                     Constants.ErrorMessage.ERROR_CODE_MAX_FEDERATED_AUTHENTICATOR_PROPERTY_EXCEEDED,
                     String.valueOf(maxFederatedAuthenticatorPropertyLimit));
         }
+    }
+
+    /**
+     * Check if outbound provisioning confidential data protection is enabled.
+     *
+     * @return true if OUTBOUND_PROVISIONING_CONFIDENTIAL_DATA_PROTECTION_ENABLED is enabled, false otherwise.
+     */
+    private boolean isOutboundProvisioningConfidentialDataProtectionEnabled() {
+
+        String confidentialDataProtectionConfig = IdentityUtil.getProperty(
+                IdPManagementConstants.OUTBOUND_PROVISIONING_CONFIDENTIAL_DATA_PROTECTION_ENABLED);
+        return Boolean.parseBoolean(confidentialDataProtectionConfig);
     }
 }
