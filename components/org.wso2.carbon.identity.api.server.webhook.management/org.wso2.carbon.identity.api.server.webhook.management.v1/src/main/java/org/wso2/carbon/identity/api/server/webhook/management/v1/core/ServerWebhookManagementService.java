@@ -120,6 +120,11 @@ public class ServerWebhookManagementService {
     public WebhookResponse updateWebhook(String webhookId, WebhookRequest webhookRequest) {
 
         try {
+            if (webhookManagementService.getWebhook(webhookId,
+                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain()) == null) {
+                throw WebhookManagementAPIErrorBuilder.buildAPIError(Response.Status.NOT_FOUND,
+                        ERROR_NO_WEBHOOK_FOUND_ON_GIVEN_ID, webhookId);
+            }
             Webhook webhook = buildWebhook(webhookId, webhookRequest);
             return getWebhookResponse(webhookManagementService.updateWebhook(webhookId, webhook,
                     CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
@@ -136,6 +141,11 @@ public class ServerWebhookManagementService {
     public void deleteWebhook(String webhookId) {
 
         try {
+            if (webhookManagementService.getWebhook(webhookId,
+                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain()) == null) {
+                throw WebhookManagementAPIErrorBuilder.buildAPIError(Response.Status.NOT_FOUND,
+                        ERROR_NO_WEBHOOK_FOUND_ON_GIVEN_ID, webhookId);
+            }
             webhookManagementService.deleteWebhook(webhookId,
                     CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
         } catch (WebhookMgtException e) {
@@ -152,6 +162,11 @@ public class ServerWebhookManagementService {
     public WebhookResponse activateWebhook(String webhookId) {
 
         try {
+            if (webhookManagementService.getWebhook(webhookId,
+                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain()) == null) {
+                throw WebhookManagementAPIErrorBuilder.buildAPIError(Response.Status.NOT_FOUND,
+                        ERROR_NO_WEBHOOK_FOUND_ON_GIVEN_ID, webhookId);
+            }
             return getWebhookResponse(webhookManagementService.activateWebhook(webhookId,
                     CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
         } catch (WebhookMgtException e) {
@@ -168,6 +183,11 @@ public class ServerWebhookManagementService {
     public WebhookResponse deactivateWebhook(String webhookId) {
 
         try {
+            if (webhookManagementService.getWebhook(webhookId,
+                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain()) == null) {
+                throw WebhookManagementAPIErrorBuilder.buildAPIError(Response.Status.NOT_FOUND,
+                        ERROR_NO_WEBHOOK_FOUND_ON_GIVEN_ID, webhookId);
+            }
             return getWebhookResponse(webhookManagementService.deactivateWebhook(webhookId,
                     CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
         } catch (WebhookMgtException e) {
@@ -184,6 +204,11 @@ public class ServerWebhookManagementService {
     public WebhookResponse retryWebhook(String webhookId) {
 
         try {
+            if (webhookManagementService.getWebhook(webhookId,
+                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain()) == null) {
+                throw WebhookManagementAPIErrorBuilder.buildAPIError(Response.Status.NOT_FOUND,
+                        ERROR_NO_WEBHOOK_FOUND_ON_GIVEN_ID, webhookId);
+            }
             return getWebhookResponse(webhookManagementService.retryWebhook(webhookId,
                     CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
         } catch (WebhookMgtException e) {

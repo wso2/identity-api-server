@@ -18,9 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.application.management.v1.core;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -35,6 +32,7 @@ import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.resource.mgt.APIResourceMgtException;
+import org.wso2.carbon.identity.api.resource.mgt.constant.APIResourceManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
@@ -48,6 +46,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Application
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesList;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPICreationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIResponse;
@@ -66,6 +65,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApp
 import org.wso2.carbon.identity.api.server.application.management.v1.Role;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
+import org.wso2.carbon.identity.api.server.application.management.v1.ScriptUpdateModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApiModelToServiceProvider;
@@ -88,6 +88,13 @@ import org.wso2.carbon.identity.api.server.application.management.v1.factories.S
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.Util;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
+import org.wso2.carbon.identity.api.server.common.file.FileContent;
+import org.wso2.carbon.identity.api.server.common.file.FileSerializationConfig;
+import org.wso2.carbon.identity.api.server.common.file.FileSerializationException;
+import org.wso2.carbon.identity.api.server.common.file.FileSerializationUtil;
+import org.wso2.carbon.identity.api.server.common.file.JsonConfig;
+import org.wso2.carbon.identity.api.server.common.file.XmlConfig;
+import org.wso2.carbon.identity.api.server.common.file.YamlConfig;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementClientException;
@@ -103,11 +110,13 @@ import org.wso2.carbon.identity.application.common.model.ImportResponse;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.InboundConfigurationProtocol;
+import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.Scope;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.SpFileContent;
 import org.wso2.carbon.identity.application.common.model.User;
+import org.wso2.carbon.identity.application.common.model.script.AuthenticationScriptConfig;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationManagementUtil;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
@@ -115,6 +124,8 @@ import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.application.mgt.AuthorizedAPIManagementService;
 import org.wso2.carbon.identity.application.mgt.inbound.dto.ApplicationDTO;
 import org.wso2.carbon.identity.application.mgt.inbound.dto.InboundProtocolConfigurationDTO;
+import org.wso2.carbon.identity.authorization.common.AuthorizationUtil;
+import org.wso2.carbon.identity.authorization.common.exception.ForbiddenException;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.configuration.mgt.core.model.ResourceSearchBean;
 import org.wso2.carbon.identity.configuration.mgt.core.search.ComplexCondition;
@@ -140,19 +151,10 @@ import org.wso2.carbon.identity.template.mgt.exception.TemplateManagementExcepti
 import org.wso2.carbon.identity.template.mgt.model.Template;
 import org.wso2.carbon.user.core.common.AbstractUserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.TypeDescription;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
-import org.yaml.snakeyaml.error.YAMLException;
-import org.yaml.snakeyaml.inspector.TagInspector;
-import org.yaml.snakeyaml.inspector.TrustedPrefixesTagInspector;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -172,10 +174,7 @@ import java.util.stream.Stream;
 
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ADVANCED_CONFIGURATIONS;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_BASED_OUTBOUND_PROVISIONING_ENABLED;
@@ -187,6 +186,7 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.BLOCK_SYSTEM_RESERVED_APP_CREATION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_APPLICATION_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_PROCESSING_REQUEST;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.FORBIDDEN_OPERATION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.UNSUPPORTED_OUTBOUND_PROVISIONING_CONFIGURATION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.USE_EXTERNAL_CONSENT_PAGE_NOT_SUPPORTED;
@@ -194,6 +194,8 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.NAME;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.TEMPLATE_ID;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.TEMPLATE_VERSION;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.VIEW_APPLICATION_CLIENT_SECRET_OPERATION;
+import static org.wso2.carbon.identity.api.server.application.management.v1.constants.ApplicationManagementEndpointConstants.SCRIPT_UPDATE_OPERATION_SCOPE_NAME;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotImplementedError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.getInboundAuthKey;
@@ -256,6 +258,8 @@ public class ServerApplicationManagementService {
     private static final String[] VALID_MEDIA_TYPES_YAML = {"application/yaml", "text/yaml", "application/x-yaml"};
     private static final String[] VALID_MEDIA_TYPES_JSON = {"application/json", "text/json"};
     private static final Class<?>[] INBOUND_CONFIG_PROTOCOLS = new Class<?>[]{ServiceProvider.class,
+            SAMLSSOServiceProviderDTO.class, OAuthAppDO.class};
+    private static final Class<?>[] ADDITIONAL_INBOUND_CONFIG_PROTOCOLS = new Class<?>[]{
             SAMLSSOServiceProviderDTO.class, OAuthAppDO.class};
 
     static {
@@ -507,11 +511,27 @@ public class ServerApplicationManagementService {
 
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            exportSecrets = hasOperationScopeForSecretExport(exportSecrets);
             return applicationManagementService.exportSPApplicationFromAppID(applicationId, exportSecrets,
                     tenantDomain);
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error exporting application with id: " + applicationId;
             throw handleIdentityApplicationManagementException(e, msg);
+        }
+    }
+
+    private boolean hasOperationScopeForSecretExport(boolean exportSecrets) {
+
+        if (Boolean.parseBoolean(IdentityUtil.getProperty(
+                ApplicationManagementConstants.SKIP_ENFORCE_CLIENT_SECRET_UPDATE_PERMISSION)) || !exportSecrets) {
+            return exportSecrets;
+        }
+
+        try {
+            AuthorizationUtil.validateOperationScopes(VIEW_APPLICATION_CLIENT_SECRET_OPERATION);
+            return true;
+        } catch (ForbiddenException e) {
+            return false;
         }
     }
 
@@ -536,6 +556,7 @@ public class ServerApplicationManagementService {
         ServiceProvider serviceProvider;
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            exportSecrets = hasOperationScopeForSecretExport(exportSecrets);
             serviceProvider = applicationManagementService.exportSPFromAppID(applicationId, exportSecrets,
                     tenantDomain);
         } catch (IdentityApplicationManagementException e) {
@@ -559,90 +580,67 @@ public class ServerApplicationManagementService {
             log.debug("Generating file content from model for application: " + serviceProvider.getApplicationName());
         }
 
-        StringBuilder fileNameSB = new StringBuilder(serviceProvider.getApplicationName());
-        String fileContent;
-
-        if (Arrays.asList(VALID_MEDIA_TYPES_XML).contains(fileType)) {
-            fileContent = parseXmlFromServiceProvider(serviceProvider);
-            fileNameSB.append(XML_FILE_EXTENSION);
-        } else if (Arrays.asList(VALID_MEDIA_TYPES_YAML).contains(fileType)) {
-            fileContent = parseYamlFromServiceProvider(serviceProvider);
-            fileNameSB.append(YML_FILE_EXTENSION);
-        } else if (Arrays.asList(VALID_MEDIA_TYPES_JSON).contains(fileType)) {
-            fileContent = parseJsonFromServiceProvider(serviceProvider);
-            fileNameSB.append(JSON_FILE_EXTENSION);
-        } else {
-            throw Utils.buildServerError("Unsupported media type: " + fileType + "."
-                    + " Supported media types are " + Arrays.toString(VALID_MEDIA_TYPES_XML) + ", "
-                    + Arrays.toString(VALID_MEDIA_TYPES_YAML) + ", " + Arrays.toString(VALID_MEDIA_TYPES_JSON));
-        }
-
         try {
+            FileContent fileContent =
+                    FileSerializationUtil.serialize(
+                            serviceProvider,
+                            serviceProvider.getApplicationName(),
+                            fileType,
+                            buildSerializationConfig()
+                    );
+
             return new TransferResource(
-                    fileNameSB.toString(),
-                    fileContent.getBytes(StandardCharsets.UTF_8),
+                    fileContent.getFileName(),
+                    fileContent.getContent().getBytes(StandardCharsets.UTF_8),
                     new MimeType("application/octet-stream")
             );
+        } catch (FileSerializationException e) {
+            throw Utils.buildServerError("Error exporting application from file.", e);
         } catch (MimeTypeParseException e) {
             throw new RuntimeException("Failed to parse MIME type", e);
         }
     }
 
-    private String parseXmlFromServiceProvider(ServiceProvider serviceProvider) {
+    private FileSerializationConfig buildSerializationConfig() {
 
-        JAXBContext jaxbContext;
-        try {
-            jaxbContext = JAXBContext.newInstance(INBOUND_CONFIG_PROTOCOLS);
-            Marshaller marshaller = jaxbContext.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        FileSerializationConfig config = new FileSerializationConfig();
+
+        XmlConfig xmlConfig = new XmlConfig();
+        xmlConfig.setAdditionalJaxbClasses(ADDITIONAL_INBOUND_CONFIG_PROTOCOLS);
+        xmlConfig.setMarshallerCustomizer(marshaller -> {
             marshaller.setListener(new Marshaller.Listener() {
                 @Override
                 public void beforeMarshal(Object source) {
                     if (source instanceof InboundAuthenticationConfig) {
-                        InboundAuthenticationConfig config = (InboundAuthenticationConfig) source;
+                        InboundAuthenticationConfig authConfig = (InboundAuthenticationConfig) source;
                         for (InboundAuthenticationRequestConfig requestConfig
-                                : config.getInboundAuthenticationRequestConfigs()) {
+                                : authConfig.getInboundAuthenticationRequestConfigs()) {
                             requestConfig.setInboundConfiguration(null);
                         }
                     }
                 }
             });
-            StringWriter stringWriter = new StringWriter();
-            marshaller.marshal(serviceProvider, stringWriter);
-            return stringWriter.toString();
-        } catch (JAXBException e) {
-            throw Utils.buildServerError("Error exporting application from XML file.", e);
-        }
-    }
+        });
+        config.setXmlConfig(xmlConfig);
 
-    private String parseYamlFromServiceProvider(ServiceProvider serviceProvider) {
+        YamlConfig yamlConfig = new YamlConfig();
+        yamlConfig.setConstructorCustomizer(constructor -> {
+            for (Class<?> protocol : INBOUND_CONFIG_PROTOCOLS) {
+                TypeDescription description = new TypeDescription(InboundConfigurationProtocol.class);
+                description.addPropertyParameters("type", protocol);
+                constructor.addTypeDescription(description);
+            }
+        });
+        yamlConfig.setRepresenterFactory(CustomRepresenter::new);
+        config.setYamlConfig(yamlConfig);
 
-        Constructor constructor = new Constructor(new LoaderOptions());
-        CustomRepresenter representer = new CustomRepresenter(new DumperOptions());
+        JsonConfig jsonConfig = new JsonConfig();
+        jsonConfig.setSubtypes(INBOUND_CONFIG_PROTOCOLS);
+        config.setJsonConfig(jsonConfig);
 
-        for (Class<?> protocol : INBOUND_CONFIG_PROTOCOLS) {
-            TypeDescription description = new TypeDescription(InboundConfigurationProtocol.class);
-            description.addPropertyParameters("type", protocol);
-            constructor.addTypeDescription(description);
-        }
+        config.setSerializeDefault(FileSerializationConfig.DefaultFormat.ERROR);
 
-        Yaml yaml = new Yaml(constructor, representer);
-        try {
-            return yaml.dump(serviceProvider);
-        } catch (YAMLException e) {
-            throw Utils.buildServerError("Error exporting application from YAML file.", e);
-        }
-    }
-
-    private String parseJsonFromServiceProvider(ServiceProvider serviceProvider) {
-
-        ObjectMapper objectMapper = new ObjectMapper(new JsonFactory());
-        objectMapper.registerSubtypes(INBOUND_CONFIG_PROTOCOLS);
-        try {
-            return objectMapper.writeValueAsString(serviceProvider);
-        } catch (JsonProcessingException e) {
-            throw Utils.buildServerError("Error exporting application from JSON file.", e);
-        }
+        return config;
     }
 
     /**
@@ -680,6 +678,27 @@ public class ServerApplicationManagementService {
 
             ServiceProvider serviceProvider = parseSP(spFileContent, fileType, tenantDomain);
 
+            /*
+             * internal_application_script_update scope is required when, performing adaptive script related operations.
+             * Validate the permission before allowing the operation.
+             */
+            ServiceProvider existingApp =
+                    applicationManagementService.getServiceProvider(serviceProvider.getApplicationName(), tenantDomain);
+            if (isAppUpdate && existingApp != null) {
+                LocalAndOutboundAuthenticationConfig existingAuthConfig =
+                        existingApp.getLocalAndOutBoundAuthenticationConfig();
+                if (existingAuthConfig != null && existingAuthConfig.getAuthenticationScriptConfig() != null &&
+                        existingAuthConfig.getAuthenticationScriptConfig().getContent() != null) {
+                    validateAuthenticationScriptUpdatePermission();
+                }
+            }
+            LocalAndOutboundAuthenticationConfig updatingAuthConfig =
+                    serviceProvider.getLocalAndOutBoundAuthenticationConfig();
+            if (updatingAuthConfig != null && updatingAuthConfig.getAuthenticationScriptConfig() != null &&
+                    updatingAuthConfig.getAuthenticationScriptConfig().getContent() != null) {
+                validateAuthenticationScriptUpdatePermission();
+            }
+
             ImportResponse importResponse = applicationManagementService.importSPApplication(serviceProvider,
                     tenantDomain, username, isAppUpdate);
 
@@ -710,74 +729,44 @@ public class ServerApplicationManagementService {
                     spFileContent.getFileName(), tenantDomain));
         }
 
-        if (containsValidMediaType(fileType, VALID_MEDIA_TYPES_XML)) {
-            return parseServiceProviderFromXml(spFileContent, tenantDomain);
-        } else if (containsValidMediaType(fileType, VALID_MEDIA_TYPES_YAML)) {
-            return parseServiceProviderFromYaml(spFileContent, tenantDomain);
-        } else if (containsValidMediaType(fileType, VALID_MEDIA_TYPES_JSON)) {
-            return parseServiceProviderFromJson(spFileContent, tenantDomain);
-        } else {
-            log.warn("Unsupported file type " + fileType + " for file " + spFileContent.getFileName() + " . " +
-                    "Defaulting to XML parsing");
-            return parseServiceProviderFromXml(spFileContent, tenantDomain);
-        }
-    }
-
-    private boolean containsValidMediaType(String fileType, String[] mediaTypes) {
-
-        for (String mediaType : mediaTypes) {
-            if (fileType.contains(mediaType)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private ServiceProvider parseServiceProviderFromXml(SpFileContent spFileContent, String tenantDomain)
-            throws IdentityApplicationManagementException {
-
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(INBOUND_CONFIG_PROTOCOLS);
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            return (ServiceProvider) unmarshaller.unmarshal(new StringReader(spFileContent.getContent()));
-        } catch (JAXBException e) {
-            throw new IdentityApplicationManagementException(String.format("Error in reading XML Service Provider " +
+            FileContent fileContent =
+                    new FileContent(
+                            spFileContent.getFileName(),
+                            fileType,
+                            spFileContent.getContent()
+                    );
+
+            return FileSerializationUtil.deserialize(
+                    fileContent,
+                    ServiceProvider.class,
+                    buildDeserializationConfig()
+            );
+        } catch (FileSerializationException e) {
+            throw new IdentityApplicationManagementException(String.format("Error in reading Service Provider " +
                     "configuration file %s uploaded by tenant: %s", spFileContent.getFileName(), tenantDomain), e);
         }
     }
 
-    private ServiceProvider parseServiceProviderFromYaml(SpFileContent spFileContent, String tenantDomain)
-            throws IdentityApplicationManagementException {
+    private FileSerializationConfig buildDeserializationConfig() {
 
-        try {
-            // Add trusted tags included in the SP YAML file.
-            List<String> trustedTagList = new ArrayList<>();
-            trustedTagList.add(ServiceProvider.class.getName());
-            trustedTagList.add(OAuthAppDO.class.getName());
-            trustedTagList.add(SAMLSSOServiceProviderDTO.class.getName());
+        FileSerializationConfig config = new FileSerializationConfig();
 
-            LoaderOptions loaderOptions = new LoaderOptions();
-            TagInspector tagInspector = new TrustedPrefixesTagInspector(trustedTagList);
-            loaderOptions.setTagInspector(tagInspector);
-            Yaml yaml = new Yaml(new Constructor(ServiceProvider.class, loaderOptions));
-            return yaml.loadAs(spFileContent.getContent(), ServiceProvider.class);
-        } catch (YAMLException e) {
-            throw new IdentityApplicationManagementException(String.format("Error in reading YAML Service Provider " +
-                    "configuration file %s uploaded by tenant: %s", spFileContent.getFileName(), tenantDomain), e);
-        }
-    }
+        XmlConfig xmlConfig = new XmlConfig();
+        xmlConfig.setAdditionalJaxbClasses(ADDITIONAL_INBOUND_CONFIG_PROTOCOLS);
+        config.setXmlConfig(xmlConfig);
 
-    private ServiceProvider parseServiceProviderFromJson(SpFileContent spFileContent, String tenantDomain)
-            throws IdentityApplicationManagementException {
+        YamlConfig yamlConfig = new YamlConfig();
+        yamlConfig.setAdditionalTrustedClasses(OAuthAppDO.class, SAMLSSOServiceProviderDTO.class);
+        config.setYamlConfig(yamlConfig);
 
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.registerSubtypes(INBOUND_CONFIG_PROTOCOLS);
-            return objectMapper.readValue(spFileContent.getContent(), ServiceProvider.class);
-        } catch (JsonProcessingException e) {
-            throw new IdentityApplicationManagementException(String.format("Error in reading JSON Service Provider " +
-                    "configuration file %s uploaded by tenant: %s", spFileContent.getFileName(), tenantDomain), e);
-        }
+        JsonConfig jsonConfig = new JsonConfig();
+        jsonConfig.setSubtypes(INBOUND_CONFIG_PROTOCOLS);
+        config.setJsonConfig(jsonConfig);
+
+        config.setDeserializeDefault(FileSerializationConfig.DefaultFormat.XML);
+
+        return config;
     }
 
     private SpFileContent buildSpFileContent(InputStream fileInputStream, Attachment fileDetail) throws IOException {
@@ -802,6 +791,15 @@ public class ServerApplicationManagementService {
     }
 
     public String createApplication(ApplicationModel applicationModel, String template) {
+
+        /*
+         * Create application with the adaptive script requires the internal_application_script_update scope.
+         * Validate the permission before allowing the update.
+         */
+        AuthenticationSequence authSequence = applicationModel.getAuthenticationSequence();
+        if (authSequence != null && authSequence.getScript() != null) {
+            validateAuthenticationScriptUpdatePermission();
+        }
 
         if (StringUtils.isNotBlank(template)) {
             String errorCode = APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED.getCode();
@@ -901,6 +899,14 @@ public class ServerApplicationManagementService {
     public void patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel) {
 
         ServiceProvider appToUpdate = cloneApplication(applicationId);
+        /*
+         * Updating the adaptive script requires the internal_application_script_update scope.
+         * Validate the permission before allowing the update.
+         */
+        if (isScriptUpdating(appToUpdate, applicationPatchModel)) {
+            validateAuthenticationScriptUpdatePermission();
+        }
+
         if (applicationPatchModel != null) {
             blockRenameAppsToSystemReservedApps(applicationPatchModel.getName(), appToUpdate.getApplicationName());
         }
@@ -919,7 +925,6 @@ public class ServerApplicationManagementService {
         if (applicationPatchModel != null) {
             new UpdateServiceProvider().apply(appToUpdate, applicationPatchModel);
         }
-
 
         boolean isAllowUpdateSystemApps = isAllowUpdateSystemApplication(appToUpdate.getApplicationName(),
                 applicationPatchModel);
@@ -942,6 +947,54 @@ public class ServerApplicationManagementService {
         }
     }
 
+    private boolean isScriptUpdating(ServiceProvider existingApp, ApplicationPatchModel appPatchModel) {
+
+        if (appPatchModel == null || appPatchModel.getAuthenticationSequence() == null) {
+            return false;
+        }
+
+        if (appPatchModel.getAuthenticationSequence().getScript() != null) {
+            return true;
+        }
+
+        // Check whether the authentication sequence is reverting to default when current authentication sequence
+        // has a script configured.
+        LocalAndOutboundAuthenticationConfig existingAuthConfig = existingApp.getLocalAndOutBoundAuthenticationConfig();
+        String currentAuthenticationType = existingAuthConfig.getAuthenticationType();
+        boolean isRevertToDefault =
+                appPatchModel.getAuthenticationSequence().getType() == AuthenticationSequence.TypeEnum.DEFAULT &&
+                StringUtils.isNotBlank(currentAuthenticationType) &&
+                !AuthenticationSequence.TypeEnum.DEFAULT.name().equals(currentAuthenticationType);
+
+        return isRevertToDefault && existingAuthConfig.getAuthenticationScriptConfig() != null &&
+                existingAuthConfig.getAuthenticationScriptConfig().getContent() != null;
+    }
+
+    private void validateAuthenticationScriptUpdatePermission() {
+
+        if (isSkippedEnforcingScriptUpdatePermission()) {
+            return;
+        }
+
+        try {
+            AuthorizationUtil.validateOperationScopes(SCRIPT_UPDATE_OPERATION_SCOPE_NAME);
+        } catch (ForbiddenException e) {
+            throw Utils.buildForbiddenError(FORBIDDEN_OPERATION.getCode(), FORBIDDEN_OPERATION.getMessage(),
+                    FORBIDDEN_OPERATION.getDescription());
+        }
+    }
+
+    private boolean isSkippedEnforcingScriptUpdatePermission() {
+
+        String skipEnforceScriptUpdatePermissionValue =
+                IdentityUtil.getProperty("ApplicationMgt.SkipEnforceScriptUpdatePermission");
+        if (StringUtils.isBlank(skipEnforceScriptUpdatePermissionValue)) {
+            return false;
+        }
+
+        return Boolean.parseBoolean(skipEnforceScriptUpdatePermissionValue);
+    }
+
     private void restrictRoleAssociationUpdateInOrgAudience(String applicationId,
                                                             ApplicationPatchModel applicationPatchModel) {
 
@@ -954,6 +1007,62 @@ public class ServerApplicationManagementService {
                 if (associatedRoles != null && !associatedRoles.isEmpty()) {
                     throw buildClientError(ErrorMessage.INVALID_ROLE_ASSOCIATION_FOR_ORGANIZATION_AUDIENCE);
                 }
+            }
+        }
+    }
+
+    /**
+     * Update the authentication script of an application.
+     *
+     * @param applicationId     ID of the application.
+     * @param scriptUpdateModel Script update model.
+     */
+    public void updateAuthenticationScript(String applicationId, ScriptUpdateModel scriptUpdateModel) {
+
+        ServiceProvider updatingApp = cloneApplication(applicationId);
+        LocalAndOutboundAuthenticationConfig authConfig = updatingApp.getLocalAndOutBoundAuthenticationConfig();
+
+        boolean isScriptReverting = StringUtils.isBlank(scriptUpdateModel.getScript());
+        boolean isAuthStepsNotConfigured = authConfig == null || authConfig.getAuthenticationSteps() == null ||
+                authConfig.getAuthenticationSteps().length == 0;
+
+        if (isScriptReverting) {
+            if (isAuthStepsNotConfigured) {
+                return;
+            }
+
+            authConfig.setAuthenticationScriptConfig(null);
+        } else {
+            String authType = authConfig != null ? authConfig.getAuthenticationType() : null;
+            if (ApplicationConstants.AUTH_TYPE_DEFAULT.equals(authType) || isAuthStepsNotConfigured) {
+                throw Utils.buildBadRequestError("Update authentication steps before configuring the script.");
+            }
+
+            AuthenticationScriptConfig adaptiveScript = new AuthenticationScriptConfig();
+            adaptiveScript.setContent(scriptUpdateModel.getScript());
+            adaptiveScript.setEnabled(true);
+            authConfig.setAuthenticationScriptConfig(adaptiveScript);
+        }
+
+        ApplicationPatchModel patchModel = new ApplicationPatchModel()
+                .name(updatingApp.getApplicationName())
+                .authenticationSequence(new AuthenticationSequence().script(scriptUpdateModel.getScript()));
+        boolean isAllowUpdateSystemApps = isAllowUpdateSystemApplication(updatingApp.getApplicationName(), patchModel);
+
+        try {
+            if (isAllowUpdateSystemApps) {
+                IdentityApplicationManagementUtil.setAllowUpdateSystemApplicationThreadLocal(true);
+            }
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            String username = ContextLoader.getUsernameFromContext();
+            applicationManagementService.updateApplicationByResourceId(applicationId, updatingApp, tenantDomain,
+                    username);
+        } catch (IdentityApplicationManagementException e) {
+            String msg = "Error while updating the adaptive script of application with id: " + applicationId;
+            throw handleIdentityApplicationManagementException(e, msg);
+        } finally {
+            if (isAllowUpdateSystemApps) {
+                IdentityApplicationManagementUtil.removeAllowUpdateSystemApplicationThreadLocal();
             }
         }
     }
@@ -1459,6 +1568,11 @@ public class ServerApplicationManagementService {
             if (apiResource == null) {
                 throw buildClientError(ErrorMessage.API_RESOURCE_NOT_FOUND, authorizedAPIId, tenantDomain);
             }
+
+            if (!Boolean.parseBoolean(IdentityUtil.getProperty(
+                            ApplicationManagementConstants.SKIP_ENFORCE_AUTHORIZED_API_UPDATE_PERMISSION))) {
+                validateUserCanUpdateAPIResourceType(apiResource);
+            }
             validateAPIResourceScopes(apiResource, authorizedAPICreationModel.getScopes());
             this.validateAPIResourceAuthorizationDetailsTypes(apiResource,
                     authorizedAPICreationModel.getAuthorizationDetailsTypes());
@@ -1488,6 +1602,9 @@ public class ServerApplicationManagementService {
         } catch (APIResourceMgtException e) {
             String msg = "Error while fetching API resource with id: " + authorizedAPICreationModel.getId();
             throw Utils.buildServerError(msg, e);
+        } catch (ForbiddenException e) {
+            throw Utils.buildForbiddenError(FORBIDDEN_OPERATION.getCode(), FORBIDDEN_OPERATION.getMessage(),
+                    FORBIDDEN_OPERATION.getDescription());
         }
     }
 
@@ -1500,12 +1617,25 @@ public class ServerApplicationManagementService {
     public void deleteAuthorizedAPI(String applicationId, String apiId) {
 
         try {
-            authorizedAPIManagementService.deleteAuthorizedAPI(applicationId, apiId,
-                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            APIResource apiResource = ApplicationManagementServiceHolder.getApiResourceManager()
+                    .getAPIResourceById(apiId, tenantDomain);
+            if (!Boolean.parseBoolean(IdentityUtil.getProperty(
+                    ApplicationManagementConstants.SKIP_ENFORCE_AUTHORIZED_API_UPDATE_PERMISSION))) {
+                validateUserCanUpdateAPIResourceType(apiResource);
+            }
+            authorizedAPIManagementService.deleteAuthorizedAPI(applicationId, apiId, tenantDomain);
+
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error while deleting authorized API with id: " + apiId + " from the application with  id: "
                     + applicationId;
             throw handleIdentityApplicationManagementException(e, msg);
+        } catch (APIResourceMgtException e) {
+            String msg = "Error while fetching API resource with id: " + apiId;
+            throw Utils.buildServerError(msg, e);
+        } catch (ForbiddenException e) {
+            throw Utils.buildForbiddenError(FORBIDDEN_OPERATION.getCode(), FORBIDDEN_OPERATION.getMessage(),
+                    FORBIDDEN_OPERATION.getDescription());
         }
     }
 
@@ -1544,6 +1674,10 @@ public class ServerApplicationManagementService {
             if (apiResource == null) {
                 throw buildClientError(ErrorMessage.API_RESOURCE_NOT_FOUND, apiId, tenantDomain);
             }
+            if (!Boolean.parseBoolean(IdentityUtil.getProperty(
+                    ApplicationManagementConstants.SKIP_ENFORCE_AUTHORIZED_API_UPDATE_PERMISSION))) {
+                validateUserCanUpdateAPIResourceType(apiResource);
+            }
             validateAPIResourceScopes(apiResource, addedScopes);
             validateAPIResourceAuthorizationDetailsTypes(apiResource, addedAuthorizationDetailsTypes);
 
@@ -1573,6 +1707,9 @@ public class ServerApplicationManagementService {
             String msg = "Error while updating authorized API with id: " + apiId + " for the application with  id: "
                     + applicationId;
             throw handleIdentityApplicationManagementException(e, msg);
+        } catch (ForbiddenException e) {
+            throw Utils.buildForbiddenError(FORBIDDEN_OPERATION.getCode(), FORBIDDEN_OPERATION.getMessage(),
+                    FORBIDDEN_OPERATION.getDescription());
         }
     }
 
@@ -1683,6 +1820,22 @@ public class ServerApplicationManagementService {
                 throw buildClientError(ErrorMessage.SCOPES_NOT_FOUND, apiResource.getId(),
                         CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
             }
+        }
+    }
+
+    private void validateUserCanUpdateAPIResourceType(APIResource apiResource) throws ForbiddenException {
+
+        if (apiResource == null) {
+            return;
+        }
+
+        if (APIResourceManagementConstants.APIResourceTypes.BUSINESS.equals(apiResource.getType()) ||
+            APIResourceManagementConstants.APIResourceTypes.MCP.equals(apiResource.getType())) {
+            AuthorizationUtil.validateOperationScopes(
+                    ApplicationManagementConstants.UPDATE_BUSINESS_AUTHORIZED_API_OPERATION);
+        } else {
+            AuthorizationUtil.validateOperationScopes(
+                    ApplicationManagementConstants.UPDATE_INTERNAL_AUTHORIZED_API_OPERATION);
         }
     }
 

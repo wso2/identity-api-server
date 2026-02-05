@@ -557,6 +557,37 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  /workflow-instances/{instance_id}/abort:
+    post:
+      tags:
+        - Workflow Instances Management
+      summary: Abort a workflow instance by ID
+      description: |
+        Abort a workflow instance by providing the instance ID.
+
+        <b>Scope required:</b> internal_workflow_instance_update
+      operationId: abortWorkflowInstance
+      parameters:
+        - name: instance_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully aborted the workflow instance
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InstanceStatus"
+        "400":
+          $ref: "#/components/responses/InvalidInput"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+
   /workflow-engines:
     get:
       tags:
@@ -898,7 +929,7 @@ components:
     WorkflowInstanceListItem:
       type: object
       properties:
-        id:
+        workflowInstanceId:
           type: string
           example: "500"
           description: "Unique id to represent a workflow instance"
@@ -908,17 +939,15 @@ components:
           type: string
         createdAt:
           type: string
-          format: date-time
         updatedAt:
           type: string
-          format: date-time
         status:
           $ref: "#/components/schemas/InstanceStatus"
 
     WorkflowInstanceResponse:
       type: object
       properties:
-        id:
+        workflowInstanceId:
           type: string
           example: "500"
           description: "Unique id to represent a workflow instance"
@@ -926,20 +955,35 @@ components:
           $ref: "#/components/schemas/Operation"
         createdAt:
           type: string
-          format: date-time
         requestInitiator:
           type: string
         updatedAt:
           type: string
-          format: date-time
         status:
           $ref: "#/components/schemas/InstanceStatus"
         requestParameters:
           type: object
+        properties:
+          type: array
+          items:
+            $ref: "#/components/schemas/Property"
+
+    Property:
+      type: object
+      required:
+        - key
+        - value
+      properties:
+        key:
+          type: string
+          example: "some_key"
+        value:
+          type: string
+          example: "some_value"
 
     InstanceStatus:
       type: string
-      enum: [ALL_TASKS, PENDING, APPROVED, REJECTED, FAILED, DELETED]
+      enum: [ALL_TASKS, PENDING, APPROVED, REJECTED, FAILED, DELETED, ABORTED]
 
     Operation:
       type: string

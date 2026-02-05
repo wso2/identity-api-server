@@ -19,6 +19,7 @@ package org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.*;
+import org.apache.commons.lang.StringUtils;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -73,5 +74,15 @@ public class ExternalClaimReqDTO {
         
         sb.append("}\n");
         return sb.toString();
+    }
+
+    public boolean equals(ExternalClaimResDTO externalClaimResDTO) {
+
+        if (externalClaimResDTO == null) {
+            return false;
+        }
+
+        return StringUtils.equals(this.getClaimURI(), externalClaimResDTO.getClaimURI()) &&
+                StringUtils.equals(this.getMappedLocalClaimURI(), externalClaimResDTO.getMappedLocalClaimURI());
     }
 }

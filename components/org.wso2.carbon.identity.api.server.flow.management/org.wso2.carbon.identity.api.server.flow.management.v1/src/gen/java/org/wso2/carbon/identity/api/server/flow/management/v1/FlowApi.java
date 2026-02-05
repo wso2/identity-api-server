@@ -29,11 +29,13 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.factories.FlowApiS
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
@@ -48,6 +50,30 @@ public class FlowApi {
     public FlowApi() {
 
         this.delegate = FlowApiServiceFactory.getFlowApi();
+    }
+
+    @Valid
+    @DELETE
+
+
+    @Produces({"application/json"})
+    @ApiOperation(value = "Delete the flow", notes = "", response = Void.class, authorizations = {
+            @Authorization(value = "BasicAuth"),
+            @Authorization(value = "OAuth2", scopes = {
+
+            })
+    }, tags = {"Flow Composer",})
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Flow successfully deleted", response = Void.class),
+            @ApiResponse(code = 400, message = "Invalid request body or unsupported flow type", response = Error.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+            @ApiResponse(code = 500, message = "Encountered a server error", response = Error.class)
+    })
+    public Response deleteFlow(@Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Type of the " +
+            "flow to delete", required = true, allowableValues = "REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD") @QueryParam("flowType") String flowType) {
+
+        return delegate.deleteFlow(flowType);
     }
 
     @Valid
@@ -140,7 +166,7 @@ public class FlowApi {
 
     @Valid
     @GET
-    @Path("/result")
+    @Path("/result/{operationId}")
 
     @Produces({"application/json"})
     @ApiOperation(value = "Retrieve flow generation result", notes = "", response = FlowGenerateResult.class, authorizations = {
@@ -156,14 +182,15 @@ public class FlowApi {
             @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
             @ApiResponse(code = 500, message = "Encountered a server error", response = Error.class)
     })
-    public Response getFlowGenerationResult(@Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Operation id to get the generation result", required = true) @QueryParam("operationId") String operationId) {
+    public Response getFlowGenerationResult(@ApiParam(value = "Operation id to get the generation result", required =
+            true) @PathParam("operationId") String operationId) {
 
         return delegate.getFlowGenerationResult(operationId);
     }
 
     @Valid
     @GET
-    @Path("/status")
+    @Path("/status/{operationId}")
 
     @Produces({"application/json"})
     @ApiOperation(value = "Retrieve flow generation status", notes = "", response = FlowGenerateStatus.class, authorizations = {
@@ -179,7 +206,8 @@ public class FlowApi {
             @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
             @ApiResponse(code = 500, message = "Encountered a server error", response = Error.class)
     })
-    public Response getFlowGenerationStatus(@Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Operation id to get the generation status", required = true) @QueryParam("operationId") String operationId) {
+    public Response getFlowGenerationStatus(@ApiParam(value = "Operation id to get the generation status", required =
+            true) @PathParam("operationId") String operationId) {
 
         return delegate.getFlowGenerationStatus(operationId);
     }

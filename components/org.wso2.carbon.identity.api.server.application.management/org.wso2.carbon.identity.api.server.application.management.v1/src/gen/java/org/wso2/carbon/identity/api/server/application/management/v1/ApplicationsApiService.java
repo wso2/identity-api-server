@@ -64,6 +64,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApp
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
+import org.wso2.carbon.identity.api.server.application.management.v1.ScriptUpdateModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.SharedApplicationsResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.SharedOrganizationsResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
@@ -180,6 +181,8 @@ public interface ApplicationsApiService {
       public Response unshareApplicationFromAll(ApplicationUnshareAllRequestBody applicationUnshareAllRequestBody);
 
       public Response unshareApplicationFromSelected(ApplicationUnshareSelectedRequestBody applicationUnshareSelectedRequestBody);
+
+      public Response updateAuthenticationScript(String applicationId, ScriptUpdateModel scriptUpdateModel);
 
       public Response updateApplicationTemplate(String templateId, ApplicationTemplateModel applicationTemplateModel);
 

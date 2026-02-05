@@ -22,7 +22,7 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.apache.http.HttpHeaders;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
-import org.wso2.carbon.identity.api.server.common.FileContent;
+import org.wso2.carbon.identity.api.server.common.file.FileContent;
 import org.wso2.carbon.identity.api.server.idp.v1.IdentityProvidersApiService;
 import org.wso2.carbon.identity.api.server.idp.v1.core.ServerIdpManagementService;
 import org.wso2.carbon.identity.api.server.idp.v1.factories.ServerIdpManagementServiceFactory;

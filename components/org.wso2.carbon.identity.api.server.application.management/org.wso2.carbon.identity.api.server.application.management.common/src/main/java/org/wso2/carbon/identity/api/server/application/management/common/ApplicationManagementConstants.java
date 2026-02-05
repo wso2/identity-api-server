@@ -94,6 +94,13 @@ public class ApplicationManagementConstants {
     public static final String AI_RESPONSE_DATA_KEY = "data";
     public static final String AI_RESPONSE_STATUS_KEY = "status";
 
+    public static final String UPDATE_INTERNAL_AUTHORIZED_API_OPERATION = "updateInternalAuthorizedAPI";
+    public static final String UPDATE_BUSINESS_AUTHORIZED_API_OPERATION = "updateBusinessAuthorizedAPI";
+    public static final String VIEW_APPLICATION_CLIENT_SECRET_OPERATION = "viewApplicationClientSecret";
+    public static final String SKIP_ENFORCE_AUTHORIZED_API_UPDATE_PERMISSION =
+            "ApplicationMgt.SkipEnforceAuthorizedAPIUpdatePermission";
+    public static final String SKIP_ENFORCE_CLIENT_SECRET_UPDATE_PERMISSION =
+            "ApplicationMgt.SkipEnforceClientSecretPermission";
     /**
      * Enums for error messages.
      */
@@ -184,6 +191,9 @@ public class ApplicationManagementConstants {
                 "API authorization details types not found.",
                 "One or more authorization detail types in the request were not found for the " +
                         "API resource with ID '%s' in the tenant domain '%s'."),
+        FORBIDDEN_OPERATION("60520",
+                "Forbidden",
+                "Operation is not permitted. You do not have permissions to make this request."),
 
         // Server Errors.
         ERROR_RETRIEVING_SAML_METADATA("65001",

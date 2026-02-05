@@ -54,7 +54,6 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.F
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.MAGIC_LINK_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.OFFICE365_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.OPENID_CONNECT_EXECUTOR;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.PASSWORD_ONBOARD_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.PASSWORD_PROVISIONING_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.SMS_OTP_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.USER_PROVISIONING_EXECUTOR;
@@ -89,6 +88,16 @@ public abstract class AbstractMetaResponseHandler {
     public abstract String getAttributeProfile();
 
     /**
+     * Check if the workflow is enabled for the flow.
+     *
+     * @return True if workflow is enabled, false otherwise.
+     */
+    public boolean getWorkflowEnabled() {
+
+        return false;
+    }
+
+    /**
      * Get the supported executors for the flow.
      *
      * @return List of supported executors.
@@ -97,7 +106,6 @@ public abstract class AbstractMetaResponseHandler {
 
         ArrayList<String> supportedExecutors = new ArrayList<>();
         supportedExecutors.add(PASSWORD_PROVISIONING_EXECUTOR);
-        supportedExecutors.add(PASSWORD_ONBOARD_EXECUTOR);
         supportedExecutors.add(EMAIL_OTP_EXECUTOR);
         supportedExecutors.add(SMS_OTP_EXECUTOR);
         supportedExecutors.add(MAGIC_LINK_EXECUTOR);
@@ -136,6 +144,7 @@ public abstract class AbstractMetaResponseHandler {
         FlowMetaResponse response = new FlowMetaResponse();
         response.setFlowType(getFlowType());
         response.setAttributeProfile(getAttributeProfile());
+        response.setWorkflowEnabled(getWorkflowEnabled());
         response.setAttributeMetadata(getSupportedClaims(getAttributeProfile()));
         response.setSupportedExecutors(getSupportedExecutors());
         response.setConnectorConfigs(getConnectorConfigs());

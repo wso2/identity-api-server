@@ -43,7 +43,7 @@ public class FlowGenerateRequest {
     }
 
     @ApiModelProperty(example = "REGISTRATION", required = true, value = "Type of the flow being updated")
-    @JsonProperty("flowType")
+    @JsonProperty("flow_type")
     @Valid
     @NotNull(message = "Property flowType cannot be null.")
 
@@ -66,9 +66,11 @@ public class FlowGenerateRequest {
         return this;
     }
 
-    @ApiModelProperty(example = "Generate a registration flow with basic details and passkey", value = "User query to generate the flow")
-    @JsonProperty("userQuery")
+    @ApiModelProperty(example = "Generate a registration flow with basic details and passkey", required = true,
+            value = "User query to generate the flow")
+    @JsonProperty("user_query")
     @Valid
+    @NotNull(message = "Property userQuery cannot be null.")
     public String getUserQuery() {
 
         return userQuery;

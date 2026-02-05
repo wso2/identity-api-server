@@ -74,6 +74,7 @@ public enum StatusEnum {
 }
 
     private StatusEnum status;
+    private String version;
     private String createdAt;
     private String updatedAt;
     private List<Link> links = null;
@@ -174,6 +175,25 @@ public enum StatusEnum {
     }
 
     /**
+    * Version of the action.
+    **/
+    public ActionBasicResponse version(String version) {
+
+        this.version = version;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "v1", value = "Version of the action.")
+    @JsonProperty("version")
+    @Valid
+    public String getVersion() {
+        return version;
+    }
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    /**
     * Created time of the action.
     **/
     public ActionBasicResponse createdAt(String createdAt) {
@@ -254,6 +274,7 @@ public enum StatusEnum {
             Objects.equals(this.name, actionBasicResponse.name) &&
             Objects.equals(this.description, actionBasicResponse.description) &&
             Objects.equals(this.status, actionBasicResponse.status) &&
+            Objects.equals(this.version, actionBasicResponse.version) &&
             Objects.equals(this.createdAt, actionBasicResponse.createdAt) &&
             Objects.equals(this.updatedAt, actionBasicResponse.updatedAt) &&
             Objects.equals(this.links, actionBasicResponse.links);
@@ -261,7 +282,7 @@ public enum StatusEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, type, name, description, status, createdAt, updatedAt, links);
+        return Objects.hash(id, type, name, description, status, version, createdAt, updatedAt, links);
     }
 
     @Override
@@ -275,6 +296,7 @@ public enum StatusEnum {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
+        sb.append("    version: ").append(toIndentedString(version)).append("\n");
         sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
         sb.append("    updatedAt: ").append(toIndentedString(updatedAt)).append("\n");
         sb.append("    links: ").append(toIndentedString(links)).append("\n");

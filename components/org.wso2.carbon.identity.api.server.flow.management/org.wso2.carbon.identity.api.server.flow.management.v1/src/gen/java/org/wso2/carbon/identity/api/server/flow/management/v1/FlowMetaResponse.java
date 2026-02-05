@@ -50,6 +50,7 @@ public class FlowMetaResponse  {
 
     private List<ExecutorConnections> executorConnections = null;
 
+    private Boolean workflowEnabled;
 
     /**
     **/
@@ -209,7 +210,25 @@ public class FlowMetaResponse  {
         return this;
     }
 
+        /**
+    **/
+    public FlowMetaResponse workflowEnabled(Boolean workflowEnabled) {
+
+        this.workflowEnabled = workflowEnabled;
+        return this;
+    }
     
+    @ApiModelProperty(example = "false", value = "")
+    @JsonProperty("workflowEnabled")
+    @Valid
+    public Boolean getWorkflowEnabled() {
+        return workflowEnabled;
+    }
+    public void setWorkflowEnabled(Boolean workflowEnabled) {
+        this.workflowEnabled = workflowEnabled;
+    }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -227,12 +246,13 @@ public class FlowMetaResponse  {
             Objects.equals(this.attributeProfile, flowMetaResponse.attributeProfile) &&
             Objects.equals(this.supportedFlowCompletionConfigs, flowMetaResponse.supportedFlowCompletionConfigs) &&
             Objects.equals(this.attributeMetadata, flowMetaResponse.attributeMetadata) &&
-            Objects.equals(this.executorConnections, flowMetaResponse.executorConnections);
+            Objects.equals(this.executorConnections, flowMetaResponse.executorConnections) &&
+            Objects.equals(this.workflowEnabled, flowMetaResponse.workflowEnabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(flowType, supportedExecutors, connectorConfigs, attributeProfile, supportedFlowCompletionConfigs, attributeMetadata, executorConnections);
+        return Objects.hash(flowType, supportedExecutors, connectorConfigs, attributeProfile, supportedFlowCompletionConfigs, attributeMetadata, executorConnections, workflowEnabled);
     }
 
     @Override
@@ -248,6 +268,7 @@ public class FlowMetaResponse  {
         sb.append("    supportedFlowCompletionConfigs: ").append(toIndentedString(supportedFlowCompletionConfigs)).append("\n");
         sb.append("    attributeMetadata: ").append(toIndentedString(attributeMetadata)).append("\n");
         sb.append("    executorConnections: ").append(toIndentedString(executorConnections)).append("\n");
+        sb.append("    workflowEnabled: ").append(toIndentedString(workflowEnabled)).append("\n");
         sb.append("}");
         return sb.toString();
     }

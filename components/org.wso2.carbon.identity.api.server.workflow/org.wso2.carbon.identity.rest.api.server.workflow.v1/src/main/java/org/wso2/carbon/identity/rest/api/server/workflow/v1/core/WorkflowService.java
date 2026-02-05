@@ -30,6 +30,7 @@ import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.InstanceStatus;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Operation;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.OptionDetails;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Property;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationListItem;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationListResponse;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationPatchRequest;
@@ -55,6 +56,7 @@ import org.wso2.carbon.identity.workflow.mgt.dto.Association;
 import org.wso2.carbon.identity.workflow.mgt.dto.WorkflowEvent;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowClientException;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowException;
+import org.wso2.carbon.identity.workflow.mgt.util.WorkflowRequestStatus;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -69,6 +71,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
@@ -235,6 +238,13 @@ public class WorkflowService {
                 throw new WorkflowClientException("An event with ID: " + workflowAssociation.getOperation().toString() +
                         " doesn't exist.");
             }
+            int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+            if (!workflowManagementService.listPaginatedAssociations(tenantId, 1, 0,
+                    "operation eq " + event.getEventId()).isEmpty()) {
+                throw new WorkflowClientException("A workflow association already exists for the event: " +
+                        event.getEventFriendlyName());
+            }
+
             workflowManagementService.addAssociation(workflowAssociation.getAssociationName(),
                     workflowAssociation.getWorkflowId(), workflowAssociation.getOperation().toString(),
                     null);
@@ -354,6 +364,15 @@ public class WorkflowService {
             if (association == null) {
                 throw new WorkflowClientException("A workflow association with ID: " + associationId +
                         "doesn't exist.");
+            }
+
+            // Ensure at least one association exists for the related workflow before allowing deletion.
+            List<Association> associationsForWorkflow =
+                    workflowManagementService.getAssociationsForWorkflow(association.getWorkflowId());
+            if (associationsForWorkflow == null || associationsForWorkflow.size() <= 1) {
+                throw new WorkflowClientException("The workflow association with ID: " + associationId +
+                        " cannot be deleted as it is the only association for the related workflow: " +
+                        association.getWorkflowId());
             }
             workflowManagementService.removeAssociation(Integer.parseInt(associationId));
         } catch (WorkflowClientException e) {
@@ -600,6 +619,29 @@ public class WorkflowService {
         return associationResponse;
     }
 
+    public void abortWorkflowInstance(String instanceId) {
+
+        try {
+            if (StringUtils.isBlank(instanceId)) {
+                throw new WorkflowClientException("Workflow instance ID cannot be null or empty.");
+            }
+            if (!WorkflowRequestStatus.PENDING.name()
+                    .equals(workflowManagementService.getWorkflowRequestBean(instanceId).getStatus())) {
+                throw new WorkflowClientException("Only PENDING workflow instances can be aborted.");
+            }
+            workflowManagementService.abortWorkflowRequest(instanceId);
+            approvalEventService.deletePendingApprovalTasks(instanceId);
+        } catch (WorkflowClientException e) {
+            throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_ABORTING_WORKFLOW_INSTANCE,
+                    instanceId, e);
+        } catch (WorkflowEngineClientException e) {
+            throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_ABORTING_WORKFLOW_INSTANCE,
+                    instanceId, new WorkflowClientException(e.getMessage(), e));
+        } catch (WorkflowException | WorkflowEngineException e) {
+            throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_ABORTING_WORKFLOW_INSTANCE, instanceId, e);
+        }
+    }
+
     /**
      * Deletes a workflow instance by its ID.
      *
@@ -611,7 +653,7 @@ public class WorkflowService {
             if (StringUtils.isBlank(instanceId)) {
                 throw new WorkflowClientException("Workflow instance ID cannot be null or empty.");
             }
-            workflowManagementService.deleteWorkflowRequestCreatedByAnyUser(instanceId);
+            workflowManagementService.permanentlyDeleteWorkflowRequestByAnyUser(instanceId);
             approvalEventService.deletePendingApprovalTasks(instanceId);
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_DELETING_WORKFLOW_INSTANCE,
@@ -690,6 +732,17 @@ public class WorkflowService {
         response.setWorkflowInstanceId(workflowRequest.getRequestId());
         response.setEventType(Operation.fromValue(workflowRequest.getOperationType()));
         response.setRequestInitiator(workflowRequest.getCreatedBy());
+
+        if (workflowRequest.getProperties() != null) {
+
+            List<Property> properties = workflowRequest.getProperties().stream().map(property -> {
+                Property prop = new Property();
+                prop.setKey(property.getKey());
+                prop.setValue(property.getValue());
+                return prop;
+            }).collect(Collectors.toList());
+            response.setProperties(properties);
+        }
         try {
             if (workflowRequest.getCreatedAt() != null) {
                 response.setCreatedAt(workflowRequest.getCreatedAt());

@@ -57,6 +57,7 @@ public class ActionDeserializer {
             ObjectMapper objectMapper = new ObjectMapper();
             switch (actionType) {
                 case PRE_ISSUE_ACCESS_TOKEN:
+                case PRE_ISSUE_ID_TOKEN:
                     actionModel = objectMapper.readValue(jsonBody, ActionModel.class);
                     // Validate the object
                     validateActionModel(actionModel, ActionModel.class);
@@ -99,6 +100,7 @@ public class ActionDeserializer {
             ObjectMapper objectMapper = new ObjectMapper();
             switch (actionType) {
                 case PRE_ISSUE_ACCESS_TOKEN:
+                case PRE_ISSUE_ID_TOKEN:
                     actionUpdateModel = objectMapper.readValue(jsonBody, ActionUpdateModel.class);
                     // Validate the object
                     validateActionModel(actionUpdateModel, ActionUpdateModel.class);
