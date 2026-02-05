@@ -62,7 +62,7 @@ public class UserShareAllRequestBody  {
     }
 
     /**
-    * Global sharing policy.  Possible values: - &#x60;ALL_EXISTING_ORGS_ONLY&#x60; - &#x60;ALL_EXISTING_AND_FUTURE_ORGS&#x60;
+    * Global sharing policy.  Possible values: - &#x60;ALL_EXISTING_AND_FUTURE_ORGS&#x60;
     **/
     public UserShareAllRequestBody policy(String policy) {
 
@@ -70,7 +70,7 @@ public class UserShareAllRequestBody  {
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "Global sharing policy.  Possible values: - `ALL_EXISTING_ORGS_ONLY` - `ALL_EXISTING_AND_FUTURE_ORGS`")
+    @ApiModelProperty(required = true, value = "Global sharing policy.  Possible values: - `ALL_EXISTING_AND_FUTURE_ORGS`")
     @JsonProperty("policy")
     @Valid
     @NotNull(message = "Property policy cannot be null.")

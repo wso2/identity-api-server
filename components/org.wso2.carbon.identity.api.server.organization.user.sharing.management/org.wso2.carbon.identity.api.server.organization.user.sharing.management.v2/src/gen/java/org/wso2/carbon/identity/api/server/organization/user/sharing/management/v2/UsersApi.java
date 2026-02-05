@@ -93,7 +93,7 @@ public class UsersApi  {
     @Path("/share-with-all")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Share users with all organizations", notes = "Share one or more users with **all organizations**, or all immediate child organizations, according to the specified policy.  A common `roleAssignment` can be provided to assign roles in all matching organizations.  This endpoint is treated as a **processing function** and responds with `202 Accepted`.  **Scope required:** `internal_user_share`", response = ProcessSuccessResponse.class, authorizations = {
+    @ApiOperation(value = "Share users with all organizations", notes = "Share one or more users with **all organizations** according to the specified policy.  A common `roleAssignment` can be provided to assign roles in all matching organizations.  This endpoint is treated as a **processing function** and responds with `202 Accepted`.  **Scope required:** `internal_user_share`", response = ProcessSuccessResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             

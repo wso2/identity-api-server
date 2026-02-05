@@ -62,7 +62,7 @@ public class UserOrgShareConfig  {
     }
 
     /**
-    * Sharing scope for this organization.  Possible values: - &#x60;SELECTED_ORG_ONLY&#x60; - &#x60;SELECTED_ORG_WITH_ALL_EXISTING_CHILDREN_ONLY&#x60; - &#x60;SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN&#x60; - &#x60;SELECTED_ORG_WITH_EXISTING_IMMEDIATE_CHILDREN_ONLY&#x60; - &#x60;SELECTED_ORG_WITH_EXISTING_IMMEDIATE_AND_FUTURE_CHILDREN&#x60;
+    * Sharing scope for this organization.  Possible values: - &#x60;SELECTED_ORG_ONLY&#x60; - &#x60;SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN&#x60;
     **/
     public UserOrgShareConfig policy(String policy) {
 
@@ -70,7 +70,7 @@ public class UserOrgShareConfig  {
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "Sharing scope for this organization.  Possible values: - `SELECTED_ORG_ONLY` - `SELECTED_ORG_WITH_ALL_EXISTING_CHILDREN_ONLY` - `SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN` - `SELECTED_ORG_WITH_EXISTING_IMMEDIATE_CHILDREN_ONLY` - `SELECTED_ORG_WITH_EXISTING_IMMEDIATE_AND_FUTURE_CHILDREN`")
+    @ApiModelProperty(required = true, value = "Sharing scope for this organization.  Possible values: - `SELECTED_ORG_ONLY` - `SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN`")
     @JsonProperty("policy")
     @Valid
     @NotNull(message = "Property policy cannot be null.")

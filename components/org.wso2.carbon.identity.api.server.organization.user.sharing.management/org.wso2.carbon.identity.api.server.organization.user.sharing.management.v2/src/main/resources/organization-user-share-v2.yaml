@@ -179,8 +179,7 @@ paths:
         - User Sharing
       summary: Share users with all organizations
       description: |-
-        Share one or more users with **all organizations**, or all immediate child organizations,
-        according to the specified policy.
+        Share one or more users with **all organizations** according to the specified policy.
 
         A common `roleAssignment` can be provided to assign roles in all matching organizations.
 
@@ -420,7 +419,7 @@ paths:
                     sharedUserId: "550e8400-e29b-41d4-a716-446655440000"
                     sharedType: "SHARED"
                     sharingMode:
-                      policy: "SELECTED_ORG_ONLY"
+                      policy: "SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN"
                       roleAssignment:
                         mode: "SELECTED"
                         roles:
@@ -526,10 +525,7 @@ components:
 
             Possible values:
             - `SELECTED_ORG_ONLY`
-            - `SELECTED_ORG_WITH_ALL_EXISTING_CHILDREN_ONLY`
             - `SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN`
-            - `SELECTED_ORG_WITH_EXISTING_IMMEDIATE_CHILDREN_ONLY`
-            - `SELECTED_ORG_WITH_EXISTING_IMMEDIATE_AND_FUTURE_CHILDREN`
         roleAssignment:
           $ref: "#/components/schemas/RoleAssignment"
           description: |-
@@ -552,7 +548,6 @@ components:
             Global sharing policy.
 
             Possible values:
-            - `ALL_EXISTING_ORGS_ONLY`
             - `ALL_EXISTING_AND_FUTURE_ORGS`
         roleAssignment:
           $ref: "#/components/schemas/RoleAssignment"
