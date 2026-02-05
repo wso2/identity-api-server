@@ -29,15 +29,15 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(description = "Debug request for authentication flow and resource testing")
 public class DebugConnectionRequest {
 
-    @ApiModelProperty(value = "Resource ID to debug (e.g., Identity Provider ID)", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
+    @ApiModelProperty(value = "Resource ID to debug", required = true)
     @JsonProperty("resourceId")
     private String resourceId;
 
-    @ApiModelProperty(value = "Resource type to debug (e.g., IDP, APPLICATION, CONNECTOR)", required = true, example = "IDP")
+    @ApiModelProperty(value = "Resource type to debug", required = true)
     @JsonProperty("resourceType")
     private String resourceType;
 
-    @ApiModelProperty(value = "Generic properties for resource debugging as key-value pairs (optional)", example = "{\"authenticatorName\": \"OpenIDConnectAuthenticator\"}")
+    @ApiModelProperty(value = "Generic properties for resource debugging")
     @JsonProperty("properties")
     private java.util.Map<String, String> properties;
 

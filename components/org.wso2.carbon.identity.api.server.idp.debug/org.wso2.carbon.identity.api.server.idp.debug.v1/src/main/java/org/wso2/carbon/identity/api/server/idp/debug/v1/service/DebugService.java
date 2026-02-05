@@ -20,245 +20,289 @@ package org.wso2.carbon.identity.api.server.idp.debug.v1.service;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.wso2.carbon.identity.api.server.idp.debug.common.DebugFrameworkServiceHolder;
+import org.wso2.carbon.identity.debug.framework.core.DebugRequestCoordinator;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Service layer for IdP debug operations.
- * This service provides a clean interface for the API layer and delegates to debug framework components.
- * It follows the OAuth 2.0 flow architecture using debug framework components:
+ * Service layer for debug operations.
+ * 
+ * <p>
+ * This service provides a clean interface for the API layer and delegates
+ * to debug framework components. It handles:
+ * </p>
+ * <ul>
+ * <li>Generic resource debug requests</li>
+ * <li>OAuth 2.0 authorization URL generation for IdP debugging</li>
+ * </ul>
+ * 
+ * <p>
+ * The service uses the {@link DebugRequestCoordinator} for centralized
+ * request routing and protocol-specific handling.
+ * </p>
  */
 public class DebugService {
 
-    private static final Log log = LogFactory.getLog(DebugService.class);
+    private static final Log LOG = LogFactory.getLog(DebugService.class);
+
+    // Request type constants
+    private static final String REQUEST_TYPE_GENERIC = "GENERIC_DEBUG_REQUEST";
+    private static final String REQUEST_TYPE_INITIAL = "INITIAL_DEBUG_REQUEST";
+
+    // Context key constants
+    private static final String KEY_RESOURCE_ID = "resourceId";
+    private static final String KEY_RESOURCE_TYPE = "resourceType";
+    private static final String KEY_PROPERTIES = "properties";
+    private static final String KEY_REQUEST_TYPE = "requestType";
+    private static final String KEY_IDP_ID = "idpId";
+    private static final String KEY_TIMESTAMP = "timestamp";
+    private static final String KEY_STATUS = "status";
+
+    private static final String STATUS_SUCCESS = "SUCCESS";
 
     /**
      * Constructor initializes debug framework service via service holder pattern.
      */
     public DebugService() {
-        // Debug framework services will be loaded on-demand during OAuth URL generation
+        // Debug framework services are loaded on-demand
     }
 
     /**
      * Handles generic debug request for any resource type with properties.
-     * Delegates to the appropriate debug handler based on resource type.
      *
-     * @param resourceId Resource ID to debug.
+     * @param resourceId   Resource ID to debug.
      * @param resourceType Type of resource (IDP, APPLICATION, CONNECTOR, etc.).
-     * @param properties Generic properties map for the debug request (optional).
+     * @param properties   Generic properties map for the debug request (optional).
      * @return Debug result containing session information and status.
+     * @throws RuntimeException if debug request fails.
      */
     public Map<String, Object> handleGenericDebugRequest(String resourceId, String resourceType,
-                                                         java.util.Map<String, String> properties) {
+            Map<String, String> properties) {
+
+        // Build request context
+        Map<String, Object> debugRequestContext = new HashMap<>();
+        debugRequestContext.put(KEY_RESOURCE_ID, resourceId);
+        debugRequestContext.put(KEY_RESOURCE_TYPE, resourceType);
+        debugRequestContext.put(KEY_PROPERTIES, properties != null ? properties : new HashMap<String, String>());
+        debugRequestContext.put(KEY_REQUEST_TYPE, REQUEST_TYPE_GENERIC);
+
+        // Execute and get result
+        Map<String, Object> resultMap = executeDebugRequest("handleResourceDebugRequest", debugRequestContext);
+
+        // Add metadata
+        resultMap.put(KEY_TIMESTAMP, System.currentTimeMillis());
+        resultMap.put(KEY_RESOURCE_ID, resourceId);
+        resultMap.put(KEY_RESOURCE_TYPE, resourceType);
+        resultMap.putIfAbsent(KEY_STATUS, STATUS_SUCCESS);
+
+        return resultMap;
+    }
+
+    /**
+     * Generates OAuth 2.0 authorization URL for debug flow.
+     *
+     * @param idpId      Identity Provider resource ID.
+     * @param properties Optional properties for OAuth 2.0 configuration.
+     * @return OAuth 2.0 authorization URL and session information.
+     * @throws RuntimeException if URL generation fails.
+     */
+    public Map<String, Object> generateOAuth2AuthorizationUrl(String idpId, Map<String, String> properties) {
+
+        // Build request context
+        Map<String, Object> debugRequestContext = new HashMap<>();
+        debugRequestContext.put(KEY_IDP_ID, idpId);
+        debugRequestContext.put(KEY_PROPERTIES, properties != null ? properties : new HashMap<String, String>());
+        debugRequestContext.put(KEY_REQUEST_TYPE, REQUEST_TYPE_INITIAL);
+
+        // Execute and get result
+        Map<String, Object> resultMap = executeDebugRequest("handleInitialDebugRequest", debugRequestContext);
+
+        // Add metadata
+        resultMap.put(KEY_TIMESTAMP, System.currentTimeMillis());
+        resultMap.put(KEY_IDP_ID, idpId);
+        resultMap.put(KEY_STATUS, STATUS_SUCCESS);
+
+        return resultMap;
+    }
+
+    // =========================================================================
+    // Private Helper Methods
+    // =========================================================================
+
+    /**
+     * Executes a debug request via the DebugRequestCoordinator.
+     *
+     * @param methodName The coordinator method to invoke.
+     * @param context    The request context.
+     * @return The extracted result map.
+     * @throws RuntimeException if execution fails.
+     */
+    private Map<String, Object> executeDebugRequest(String methodName, Map<String, Object> context) {
+
         try {
-            // Check if debug framework is available.
-            if (!DebugFrameworkServiceHolder.isDebugFrameworkAvailable()) {
-                throw new RuntimeException("Debug framework services are not available");
-            }
-            
-            // Get the DebugRequestCoordinator for centralized request handling.
-            Object requestCoordinator = DebugFrameworkServiceHolder.getDebugRequestCoordinator();
-            if (requestCoordinator == null) {
-                throw new RuntimeException("DebugRequestCoordinator not available");
-            }
-            
-            // Build generic debug request context.
-            Map<String, Object> debugRequestContext = new HashMap<>();
-            debugRequestContext.put("resourceId", resourceId);
-            debugRequestContext.put("resourceType", resourceType);
-            debugRequestContext.put("properties", properties != null ? properties : new HashMap<String, String>());
-            debugRequestContext.put("requestType", "GENERIC_DEBUG_REQUEST");
-            
-            // Delegate to DebugRequestCoordinator to handle the debug request.
-            // The coordinator will detect the resource type and route to appropriate handler.
-            Object debugResult = DebugFrameworkServiceHolder.invokeDebugRequestCoordinatorMethod(
-                requestCoordinator,
-                "handleResourceDebugRequest",
-                new Class<?>[]{Map.class},
-                debugRequestContext
-            );
-            
-            if (debugResult == null) {
+            // Ensure debug framework is available
+            DebugRequestCoordinator coordinator = getCoordinatorOrThrow();
+
+            // Invoke the coordinator method
+            Object result = DebugFrameworkServiceHolder.invokeDebugRequestCoordinatorMethod(
+                    coordinator, methodName, new Class<?>[] { Map.class }, context);
+
+            if (result == null) {
                 throw new RuntimeException("Debug request returned null result");
             }
-            
-            // Extract the result details using reflection.
-            Map<String, Object> resultMap = extractDebugResultData(debugResult);
-            
-            // Add additional metadata.
-            resultMap.put("timestamp", System.currentTimeMillis());
-            resultMap.put("resourceId", resourceId);
-            resultMap.put("resourceType", resourceType);
-            resultMap.put("status", resultMap.getOrDefault("status", "SUCCESS"));
-            
-            return resultMap;
-            
+
+            return extractDebugResultData(result);
+
         } catch (RuntimeException e) {
-            String sanitizedMessage = e.getMessage() != null ? e.getMessage().replaceAll("[\r\n]", "") : "";
-            log.error("Runtime error in generic debug request for resource: " + sanitizedMessage, e);
+            logError("Runtime error in debug request", e);
             throw e;
         } catch (Exception e) {
-            String sanitizedMessage = e.getMessage() != null ? e.getMessage().replaceAll("[\r\n]", "") : "";
-            log.error("Unexpected error in generic debug request: " + sanitizedMessage, e);
-            throw new RuntimeException("Failed to process generic debug request: " + sanitizedMessage, e);
+            logError("Unexpected error in debug request", e);
+            throw new RuntimeException("Failed to process debug request: " + sanitize(e.getMessage()), e);
         }
     }
 
     /**
-     * Generates OAuth 2.0 authorization URL for debug flow using headless browser simulation.
-     * This method delegates to the debug framework's DebugRequestCoordinator which handles
-     * protocol-agnostic request routing and coordinates context resolution and execution.
+     * Gets the DebugRequestCoordinator or throws if unavailable.
      *
-     * @param idpId Identity Provider resource ID.
-     * @param properties Optional properties for OAuth 2.0 configuration.
-     * @return OAuth 2.0 authorization URL and session information.
+     * @return The coordinator instance.
+     * @throws RuntimeException if coordinator is not available.
      */
-    public Map<String, Object> generateOAuth2AuthorizationUrl(String idpId, 
-                                                              Map<String, String> properties) {
-        try {
-            // Check if debug framework is available.
-            if (!DebugFrameworkServiceHolder.isDebugFrameworkAvailable()) {
-                throw new RuntimeException("Debug framework services are not available");
-            }
-            
-            // Get the DebugRequestCoordinator for centralized request handling.
-            Object requestCoordinator = DebugFrameworkServiceHolder.getDebugRequestCoordinator();
-            if (requestCoordinator == null) {
-                throw new RuntimeException("DebugRequestCoordinator not available");
-            }
-            
-            // Build debug request context with IdP and OAuth2 configuration.
-            Map<String, Object> debugRequestContext = new HashMap<>();
-            debugRequestContext.put("idpId", idpId);
-            debugRequestContext.put("properties", properties != null ? properties : new HashMap<String, String>());
-            debugRequestContext.put("requestType", "INITIAL_DEBUG_REQUEST");
-            
-            // Delegate to DebugRequestCoordinator to handle protocol-specific routing.
-            // The coordinator will detect the protocol, load appropriate context resolver,
-            // execute the flow, and return the authorization URL.
-            Object authUrlResult = DebugFrameworkServiceHolder.invokeDebugRequestCoordinatorMethod(
-                requestCoordinator,
-                "handleInitialDebugRequest",
-                new Class<?>[]{Map.class},
-                debugRequestContext
-            );
-            
-            if (authUrlResult == null) {
-                throw new RuntimeException("Authorization URL generation returned null result");
-            }
-            
-            // Extract the result details using reflection.
-            Map<String, Object> resultMap = extractDebugResultData(authUrlResult);
-            
-            // Add additional metadata.
-            resultMap.put("timestamp", System.currentTimeMillis());
-            resultMap.put("idpId", idpId);
-            resultMap.put("status", "SUCCESS");
-            
-            return resultMap;
-            
-        } catch (RuntimeException e) {
-            String sanitizedMessage = e.getMessage() != null ? e.getMessage().replaceAll("[\r\n]", "") : "";
-            log.error("Runtime error generating OAuth 2.0 URL: " + sanitizedMessage, e);
-            throw e;
-        } catch (Exception e) {
-            String sanitizedMessage = e.getMessage() != null ? e.getMessage().replaceAll("[\r\n]", "") : "";
-            log.error("Unexpected error generating OAuth 2.0 URL: " + sanitizedMessage, e);
-            throw new RuntimeException("Failed to generate OAuth 2.0 authorization URL: " + sanitizedMessage, e);
+    private DebugRequestCoordinator getCoordinatorOrThrow() {
+
+        if (!DebugFrameworkServiceHolder.isDebugFrameworkAvailable()) {
+            throw new RuntimeException("Debug framework services are not available");
         }
+
+        DebugRequestCoordinator coordinator = DebugFrameworkServiceHolder.getDebugRequestCoordinator();
+        if (coordinator == null) {
+            throw new RuntimeException("DebugRequestCoordinator not available");
+        }
+
+        return coordinator;
     }
-    
+
     /**
-     * Extracts debug result data using reflection.
-     * This method avoids compile-time dependency on DebugResult class.
-     * DebugResult has getResultData() and getMetadata() methods that return Maps.
+     * Extracts debug result data from the result object.
+     * Handles both Map results and DebugResult objects.
      *
-     * @param authUrlResult The result from OAuth2Executor.execute().
+     * @param result The result object.
      * @return Map containing extracted result data.
      */
-    private Map<String, Object> extractDebugResultData(Object authUrlResult) {
-        Map<String, Object> result = new HashMap<>();
-        
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> extractDebugResultData(Object result) {
+
+        Map<String, Object> extractedData = new HashMap<>();
+
         try {
-            // If the result is already a Map, use it directly.
-            if (authUrlResult instanceof Map) {
-                Map<?, ?> resultMap = (Map<?, ?>) authUrlResult;
-                for (Map.Entry<?, ?> entry : resultMap.entrySet()) {
-                    if (entry.getKey() != null && entry.getValue() != null) {
-                        result.put(entry.getKey().toString(), entry.getValue());
+            if (result instanceof Map) {
+                // Direct Map result
+                Map<?, ?> resultMap = (Map<?, ?>) result;
+                resultMap.forEach((key, value) -> {
+                    if (key != null && value != null) {
+                        extractedData.put(key.toString(), value);
                     }
-                }
+                });
             } else {
-                // Try to extract from DebugResult using getResultData() and getMetadata()
-                Object resultDataObj = invokeMethodViaReflection(authUrlResult, "getResultData", new Class<?>[]{});
-                if (resultDataObj instanceof Map) {
-                    Map<?, ?> resultDataMap = (Map<?, ?>) resultDataObj;
-                    for (Map.Entry<?, ?> entry : resultDataMap.entrySet()) {
-                        if (entry.getKey() != null && entry.getValue() != null) {
-                            result.put(entry.getKey().toString(), entry.getValue());
-                        }
-                    }
-                }
-                
-                Object metadataObj = invokeMethodViaReflection(authUrlResult, "getMetadata", new Class<?>[]{});
-                if (metadataObj instanceof Map) {
-                    Map<?, ?> metadataMap = (Map<?, ?>) metadataObj;
-                    for (Map.Entry<?, ?> entry : metadataMap.entrySet()) {
-                        if (entry.getKey() != null && entry.getValue() != null) {
-                            // Don't overwrite existing result data with metadata
-                            String key = entry.getKey().toString();
-                            if (!result.containsKey(key)) {
-                                result.put(key, entry.getValue());
-                            }
-                        }
-                    }
-                }
-                
-                // Extract basic DebugResult fields if not already present
-                if (!result.containsKey("status")) {
-                    Object status = invokeMethodViaReflection(authUrlResult, "getStatus", new Class<?>[]{});
-                    if (status != null) {
-                        result.put("status", status.toString());
-                    }
-                }
-                
-                if (!result.containsKey("timestamp")) {
-                    Object timestamp = invokeMethodViaReflection(authUrlResult, "getTimestamp", new Class<?>[]{});
-                    if (timestamp != null) {
-                        result.put("timestamp", timestamp);
-                    }
-                }
+                // DebugResult object - extract via reflection
+                extractFromDebugResult(result, extractedData);
             }
         } catch (Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Error extracting debug result data: " + e.getMessage());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Error extracting debug result data: " + e.getMessage());
             }
         }
-        
-        return result;
+
+        return extractedData;
     }
-    
+
     /**
-     * Invokes a method on an object using reflection.
+     * Extracts data from a DebugResult object using reflection.
      *
-     * @param object The object on which to invoke the method.
-     * @param methodName The name of the method to invoke.
-     * @param parameterTypes The parameter types of the method.
-     * @return The result of the method invocation, or null if the method is not found or returns null.
+     * @param debugResult The DebugResult object.
+     * @param target      The target map to populate.
      */
-    private Object invokeMethodViaReflection(Object object, String methodName, Class<?>[] parameterTypes) {
+    private void extractFromDebugResult(Object debugResult, Map<String, Object> target) {
+
+        // Extract resultData
+        Object resultData = invokeMethod(debugResult, "getResultData");
+        if (resultData instanceof Map) {
+            ((Map<?, ?>) resultData).forEach((key, value) -> {
+                if (key != null && value != null) {
+                    target.put(key.toString(), value);
+                }
+            });
+        }
+
+        // Extract metadata (don't overwrite existing data)
+        Object metadata = invokeMethod(debugResult, "getMetadata");
+        if (metadata instanceof Map) {
+            ((Map<?, ?>) metadata).forEach((key, value) -> {
+                if (key != null && value != null) {
+                    target.putIfAbsent(key.toString(), value);
+                }
+            });
+        }
+
+        // Extract status if not present
+        if (!target.containsKey(KEY_STATUS)) {
+            Object status = invokeMethod(debugResult, "getStatus");
+            if (status != null) {
+                target.put(KEY_STATUS, status.toString());
+            }
+        }
+
+        // Extract timestamp if not present
+        if (!target.containsKey(KEY_TIMESTAMP)) {
+            Object timestamp = invokeMethod(debugResult, "getTimestamp");
+            if (timestamp != null) {
+                target.put(KEY_TIMESTAMP, timestamp);
+            }
+        }
+    }
+
+    /**
+     * Invokes a no-arg method on an object using reflection.
+     *
+     * @param object     The target object.
+     * @param methodName The method name.
+     * @return The method result, or null if invocation fails.
+     */
+    private Object invokeMethod(Object object, String methodName) {
+
         try {
-            java.lang.reflect.Method method = object.getClass().getMethod(methodName, parameterTypes);
+            Method method = object.getClass().getMethod(methodName);
             return method.invoke(object);
         } catch (Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Method " + methodName + " not found on object " + object.getClass().getName());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Method " + methodName + " not found on " + object.getClass().getName());
             }
             return null;
         }
     }
-}
 
+    /**
+     * Logs an error with sanitized message.
+     *
+     * @param context Error context description.
+     * @param e       The exception.
+     */
+    private void logError(String context, Exception e) {
+
+        LOG.error(context + ": " + sanitize(e.getMessage()), e);
+    }
+
+    /**
+     * Sanitizes a string for logging (removes newlines).
+     *
+     * @param value The value to sanitize.
+     * @return Sanitized string.
+     */
+    private String sanitize(String value) {
+
+        return value != null ? value.replaceAll("[\\r\\n]", "") : "";
+    }
+}
