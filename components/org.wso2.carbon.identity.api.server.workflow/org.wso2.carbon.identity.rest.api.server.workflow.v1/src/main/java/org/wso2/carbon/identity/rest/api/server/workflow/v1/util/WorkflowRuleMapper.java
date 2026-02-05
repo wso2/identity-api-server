@@ -15,7 +15,6 @@ import java.util.List;
 /**
  * Utility class for mapping between Workflow API rule models and the generic Rule Management service models.
  */
-
 public class WorkflowRuleMapper {
 
     /**

@@ -182,11 +182,6 @@
             <artifactId>org.wso2.carbon.identity.api.server.workflow.common</artifactId>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.identity.server.api</groupId>
-            <artifactId>org.wso2.carbon.identity.api.server.action.management.v1</artifactId>
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
 
 </project>

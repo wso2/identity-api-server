@@ -57,6 +57,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
@@ -71,12 +72,25 @@ public class WorkflowService {
     private final ApprovalTaskService approvalEventService;
     private final RuleManagementService ruleManagementService;
 
+    private static final Pattern UUID_PATTERN = Pattern.compile(
+            "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
+
     public WorkflowService(WorkflowManagementService workflowManagementService,
                            ApprovalTaskService approvalEventService,RuleManagementService ruleManagementService) {
 
         this.workflowManagementService = workflowManagementService;
         this.approvalEventService = approvalEventService;
         this.ruleManagementService = ruleManagementService;
+    }
+
+    /**
+     * Check if a string is a valid UUID.
+     *
+     * @param value String to validate.
+     * @return True if the string is a valid UUID, false otherwise.
+     */
+    private boolean isValidUUID(String value) {
+        return value != null && UUID_PATTERN.matcher(value).matches();
     }
 
     /**
@@ -673,15 +687,12 @@ public class WorkflowService {
             associationListItem.setOperation(Operation.valueOf(association.getEventId()));
             associationListItem.setWorkflowName(association.getWorkflowName());
             associationListItem.setIsEnabled(association.isEnabled());
-
-            ORRuleResponse emptyRule = new ORRuleResponse();
-            associationListItem.setRule(emptyRule);
+            associationListItem.setRule(new ORRuleResponse());
         }
 
-        assert association != null : "Association should not be null when mapping rule.";
         String ruleId = association.getCondition();
 
-        if( ! ruleId.equals("boolean(1)")){
+        if (isValidUUID(ruleId)) {
             try{
                 String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
 
@@ -711,9 +722,7 @@ public class WorkflowService {
             associationResponse.setOperation(Operation.valueOf(association.getEventId()));
             associationResponse.setWorkflowName(association.getWorkflowName());
             associationResponse.setIsEnabled(association.isEnabled());
-
-            ORRuleResponse emptyRule = new ORRuleResponse();
-            associationResponse.setRule(emptyRule);
+            associationResponse.setRule(new ORRuleResponse());
         }
 
         String ruleId = null;
@@ -721,8 +730,7 @@ public class WorkflowService {
             ruleId = association.getCondition();
         }
 
-        assert ruleId != null : "Rule ID should not be null when mapping rule.";
-        if(! ruleId.equals("boolean(1)")){
+        if (isValidUUID(ruleId)) {
             try {
                 String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
 
