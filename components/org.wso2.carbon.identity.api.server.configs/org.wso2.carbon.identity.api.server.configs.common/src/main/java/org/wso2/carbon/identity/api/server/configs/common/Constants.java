@@ -33,6 +33,8 @@ public class Constants {
     // PATCH operation paths.
     public static final String IDLE_SESSION_PATH = "/idleSessionTimeoutPeriod";
     public static final String REMEMBER_ME_PATH = "/rememberMePeriod";
+    public static final String ENABLE_MAXIMUM_SESSION_TIMEOUT_PATH = "/enableMaximumSessionTimeoutPeriod";
+    public static final String MAXIMUM_SESSION_TIMEOUT_PATH = "/maximumSessionTimeoutPeriod";
     public static final String HOME_REALM_PATH_REGEX = "/homeRealmIdentifiers/[0-9]+";
 
     /**

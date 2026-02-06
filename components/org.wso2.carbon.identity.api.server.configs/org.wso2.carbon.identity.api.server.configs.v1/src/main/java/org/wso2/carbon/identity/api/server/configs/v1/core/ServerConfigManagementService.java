@@ -271,6 +271,22 @@ public class ServerConfigManagementService {
             rememberMePeriod = rememberMeProp.getValue();
         }
 
+        String enableMaximumSessionTimeoutPeriod = null;
+        IdentityProviderProperty enableMaximumSessionTimeoutProp =
+                IdentityApplicationManagementUtil.getProperty(residentIdP.getIdpProperties(),
+                        IdentityApplicationConstants.ENABLE_MAXIMUM_SESSION_TIME_OUT);
+        if (enableMaximumSessionTimeoutProp != null) {
+            enableMaximumSessionTimeoutPeriod = enableMaximumSessionTimeoutProp.getValue();
+        }
+
+        String maximumSessionTimeoutPeriod = null;
+        IdentityProviderProperty maximumSessionTimeoutProp =
+                IdentityApplicationManagementUtil.getProperty(residentIdP.getIdpProperties(),
+                        IdentityApplicationConstants.MAXIMUM_SESSION_TIME_OUT);
+        if (maximumSessionTimeoutProp != null) {
+            maximumSessionTimeoutPeriod = maximumSessionTimeoutProp.getValue();
+        }
+
         String homeRealmIdStr = residentIdP.getHomeRealmId();
         List<String> homeRealmIdentifiers = null;
         if (StringUtils.isNotBlank(homeRealmIdStr)) {
@@ -281,6 +297,8 @@ public class ServerConfigManagementService {
         serverConfig.setRealmConfig(realmConfig);
         serverConfig.setIdleSessionTimeoutPeriod(idleSessionTimeout);
         serverConfig.setRememberMePeriod(rememberMePeriod);
+        serverConfig.setEnableMaximumSessionTimeoutPeriod(enableMaximumSessionTimeoutPeriod);
+        serverConfig.setMaximumSessionTimeoutPeriod(maximumSessionTimeoutPeriod);
         serverConfig.setHomeRealmIdentifiers(homeRealmIdentifiers);
         serverConfig.setProvisioning(buildProvisioningConfig());
         serverConfig.setAuthenticators(getAuthenticators(null));
@@ -1009,11 +1027,23 @@ public class ServerConfigManagementService {
                     switch (path) {
                         case Constants.IDLE_SESSION_PATH:
                             updateIdPProperty(idpToUpdate, existingIdpProperties,
-                                    IdentityApplicationConstants.SESSION_IDLE_TIME_OUT, value);
+                                    IdentityApplicationConstants.SESSION_IDLE_TIME_OUT, value,
+                                    this::validateNumericPositiveValue);
                             break;
                         case Constants.REMEMBER_ME_PATH:
                             updateIdPProperty(idpToUpdate, existingIdpProperties,
-                                    IdentityApplicationConstants.REMEMBER_ME_TIME_OUT, value);
+                                    IdentityApplicationConstants.REMEMBER_ME_TIME_OUT, value,
+                                    this::validateNumericPositiveValue);
+                            break;
+                        case Constants.ENABLE_MAXIMUM_SESSION_TIMEOUT_PATH:
+                            updateIdPProperty(idpToUpdate, existingIdpProperties,
+                                    IdentityApplicationConstants.ENABLE_MAXIMUM_SESSION_TIME_OUT, value,
+                                    this::validateBooleanValue);
+                            break;
+                        case Constants.MAXIMUM_SESSION_TIMEOUT_PATH:
+                            updateIdPProperty(idpToUpdate, existingIdpProperties,
+                                    IdentityApplicationConstants.MAXIMUM_SESSION_TIME_OUT, value,
+                                    this::validateNumericPositiveValue);
                             break;
                         default:
                             throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
@@ -1057,6 +1087,12 @@ public class ServerConfigManagementService {
                         case Constants.REMEMBER_ME_PATH:
                             propertiesToRemove.add(IdentityApplicationConstants.REMEMBER_ME_TIME_OUT);
                             break;
+                        case Constants.ENABLE_MAXIMUM_SESSION_TIMEOUT_PATH:
+                            propertiesToRemove.add(IdentityApplicationConstants.ENABLE_MAXIMUM_SESSION_TIME_OUT);
+                            break;
+                        case Constants.MAXIMUM_SESSION_TIMEOUT_PATH:
+                            propertiesToRemove.add(IdentityApplicationConstants.MAXIMUM_SESSION_TIME_OUT);
+                            break;
                         default:
                             throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
                                     .ERROR_CODE_INVALID_INPUT, "Unsupported value for 'path' attribute");
@@ -1071,6 +1107,17 @@ public class ServerConfigManagementService {
     }
 
     /**
+     * Functional interface to validate the input value of a patch operation.
+     * The implementation should throw an APIError with appropriate error code
+     * and description if the input value is invalid.
+     */
+    @FunctionalInterface
+    private interface InputValidationFunction {
+
+        void apply(String value) throws APIError;
+    }
+
+    /**
      * Build the IDP property list of the IDP to update by adding or updating the given key and value.
      *
      * @param identityProvider      Identity Provider to be updated.
@@ -1079,14 +1126,10 @@ public class ServerConfigManagementService {
      * @param value                 Value of the property to be updated.
      */
     private void updateIdPProperty(IdentityProvider identityProvider, IdentityProviderProperty[] existingIdpProperties,
-                                   String key, String value) {
+                                   String key, String value, InputValidationFunction validationFunction) {
 
         List<IdentityProviderProperty> updatedIdpProperties = new ArrayList<>();
-        if (StringUtils.isBlank(value) || !StringUtils.isNumeric(value) || Integer.parseInt(value) <= 0) {
-            String message = "Value should be numeric and positive";
-            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT,
-                    message);
-        }
+        validationFunction.apply(value);
         boolean isPropertyFound = false;
 
         for (IdentityProviderProperty property : existingIdpProperties) {
@@ -1113,6 +1156,36 @@ public class ServerConfigManagementService {
         }
 
         identityProvider.setIdpProperties(updatedIdpProperties.toArray(new IdentityProviderProperty[0]));
+    }
+
+    /**
+     * Validate the given value is numeric and positive.
+     * If not, throw an APIError with appropriate error code and description.
+     *
+     * @param value Value to be validated.
+     */
+    private void validateNumericPositiveValue(String value) {
+
+        if (StringUtils.isBlank(value) || !StringUtils.isNumeric(value) || Integer.parseInt(value) <= 0) {
+            String message = "Value should be numeric and positive";
+            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT,
+                    message);
+        }
+    }
+
+    /**
+     * Validate the given value is boolean.
+     *
+     * @param value Value to be validated.
+     */
+    private void validateBooleanValue(String value) {
+
+        if (StringUtils.isBlank(value) || (!StringUtils.equalsIgnoreCase(Boolean.TRUE.toString(), value) &&
+                !StringUtils.equalsIgnoreCase(Boolean.FALSE.toString(), value))) {
+            String message = "Value should be boolean";
+            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT,
+                    message);
+        }
     }
 
     private IdentityProvider getResidentIdP() {
