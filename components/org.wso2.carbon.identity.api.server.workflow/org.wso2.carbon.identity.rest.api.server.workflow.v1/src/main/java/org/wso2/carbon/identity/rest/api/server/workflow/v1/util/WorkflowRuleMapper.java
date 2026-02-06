@@ -18,7 +18,13 @@
 
 package org.wso2.carbon.identity.rest.api.server.workflow.v1.util;
 
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.*;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.ANDRule;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.ANDRuleResponse;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Expression;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.ExpressionResponse;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.ORRule;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.ORRuleResponse;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Operation;
 import org.wso2.carbon.identity.rule.management.api.exception.RuleManagementException;
 import org.wso2.carbon.identity.rule.management.api.model.ANDCombinedRule;
 import org.wso2.carbon.identity.rule.management.api.model.FlowType;
@@ -89,7 +95,8 @@ public class WorkflowRuleMapper {
 
                     // Map Expressions
                     if (andCombinedRule.getExpressions() != null) {
-                        for (org.wso2.carbon.identity.rule.management.api.model.Expression expr : andCombinedRule.getExpressions()) {
+                        for (org.wso2.carbon.identity.rule.management.api.model.Expression expr :
+                                andCombinedRule.getExpressions()) {
                             ExpressionResponse exprResponse = new ExpressionResponse();
                             exprResponse.setField(expr.getField());
                             exprResponse.setOperator(expr.getOperator());

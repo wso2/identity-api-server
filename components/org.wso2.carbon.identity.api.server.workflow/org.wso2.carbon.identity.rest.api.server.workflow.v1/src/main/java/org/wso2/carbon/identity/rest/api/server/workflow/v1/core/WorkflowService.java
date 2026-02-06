@@ -27,7 +27,26 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.workflow.common.Constants;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.*;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.InstanceStatus;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.ORRuleResponse;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Operation;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.OptionDetails;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Property;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationListItem;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationListResponse;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationPatchRequest;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationRequest;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowAssociationResponse;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowInstanceListItem;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowInstanceListResponse;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowInstanceResponse;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowListItem;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowListResponse;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowRequest;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowResponse;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowTemplateBase;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowTemplateParameters;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowTemplateParametersBase;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.util.WorkflowRuleMapper;
 import org.wso2.carbon.identity.rule.management.api.exception.RuleManagementException;
 import org.wso2.carbon.identity.rule.management.api.model.Rule;
@@ -254,7 +273,8 @@ public class WorkflowService {
                 try {
                     String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
                     // convert API rule to service rule
-                    Rule serviceRule = WorkflowRuleMapper.mapApiRuleToServiceRule(workflowAssociation.getRule(),tenantDomain, workflowAssociation.getOperation());
+                    Rule serviceRule = WorkflowRuleMapper.mapApiRuleToServiceRule(
+                            workflowAssociation.getRule(), tenantDomain, workflowAssociation.getOperation());
                     Rule createdRule = ruleManagementService.addRule(serviceRule, tenantDomain);
 
                     if (createdRule != null) {
@@ -336,7 +356,8 @@ public class WorkflowService {
                             workflowAssociation.getRule(), tenantDomain, operation);
 
                     Rule resultRule;
-                    // Update existing rule if it exists and is not the default condition "boolean(1)", otherwise create new rule.
+                    // Update existing rule if it exists and is not the default condition "boolean(1)",
+                    // otherwise create new rule.
                     if (StringUtils.isNotBlank(existingRuleId) && isValidUUID(existingRuleId)) {
                         serviceRule.setId(existingRuleId);
                         resultRule = ruleManagementService.updateRule(serviceRule, tenantDomain);
@@ -677,10 +698,14 @@ public class WorkflowService {
             associationListItem.setRule(new ORRuleResponse());
         }
 
-        String ruleId = association.getCondition();
+        String ruleId = null;
+        if (association != null) {
+            ruleId = association.getCondition();
+        }
+
 
         if (isValidUUID(ruleId)) {
-            try{
+            try {
                 String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
 
                 Rule rule = ruleManagementService.getRuleByRuleId(ruleId, tenantDomain);
@@ -688,7 +713,7 @@ public class WorkflowService {
 
                 associationListItem.setRule(ruleResponse);
 
-            } catch(RuleManagementException e){
+            } catch (RuleManagementException e) {
                 // Log the error but do not throw it.
                 // This allows the Association details to be returned even if the Rule fetch fails.
                 log.error("Error while retrieving rule details for association ID: " +
