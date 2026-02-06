@@ -1033,7 +1033,7 @@ components:
       properties:
         condition:
           type: string
-          description: The logical condition for combining the su-rules. For ORRule, the value 
+          description: The logical condition for combining the sub-rules. For ORRule, the value 
             must always be "OR".
           enum: ["OR"]
         rules:
@@ -1103,7 +1103,7 @@ components:
           example: application
         operator:
           type: string
-          description: The comparison operator used to evaluate the the field and value. Common operators include "equals", "contains", "startsWith", etc.
+          description: The comparison operator used to evaluate the field and value. Common operators include "equals", "contains", "startsWith", etc.
           example: equals
         value:
           type: string
