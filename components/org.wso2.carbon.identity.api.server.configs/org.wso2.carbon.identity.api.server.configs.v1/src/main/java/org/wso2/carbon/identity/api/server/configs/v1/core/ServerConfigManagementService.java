@@ -2062,6 +2062,9 @@ public class ServerConfigManagementService {
                 inboundAuthConfig.setPreserveSessionAtPasswordUpdate(Boolean.parseBoolean(
                         IdentityApplicationManagementUtil.getPropertyValue(idpProperties,
                                 IdentityApplicationConstants.Authenticator.OIDC.PRESERVE_SESSION_AT_PASSWORD_UPDATE)));
+                inboundAuthConfig.setEnableJwtScopeAsArray(Boolean.parseBoolean(
+                        IdentityApplicationManagementUtil.getPropertyValue(idpProperties,
+                                IdentityApplicationConstants.Authenticator.OIDC.ENABLE_JWT_SCOPE_AS_ARRAY)));
             } else {
                 throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                         Constants.ErrorMessage.ERROR_CODE_RESIDENT_IDP_NOT_FOUND, tenantDomain);
@@ -2195,6 +2198,12 @@ public class ServerConfigManagementService {
                     IdentityApplicationConstants.Authenticator.OIDC.PRESERVE_SESSION_AT_PASSWORD_UPDATE)) {
                 if (authConfigToUpdate.getPreserveSessionAtPasswordUpdate() != null) {
                     property.setValue(Boolean.toString(authConfigToUpdate.getPreserveSessionAtPasswordUpdate()));
+                }
+                updatedPropertyList.add(property);
+            } else if (property.getName().equals(
+                    IdentityApplicationConstants.Authenticator.OIDC.ENABLE_JWT_SCOPE_AS_ARRAY)) {
+                if (authConfigToUpdate.getEnableJwtScopeAsArray() != null) {
+                    property.setValue(Boolean.toString(authConfigToUpdate.getEnableJwtScopeAsArray()));
                 }
                 updatedPropertyList.add(property);
             }

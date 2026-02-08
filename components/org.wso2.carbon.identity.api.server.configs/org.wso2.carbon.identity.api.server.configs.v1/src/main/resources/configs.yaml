@@ -1957,4 +1957,8 @@ components:
           type: boolean
           description: "Preserve logged in session after password update"
           example: true
+        enableJwtScopeAsArray:
+          type: boolean
+          description: "Enable formatting scope claim in JWT access tokens as a JSON array instead of a space-separated string."
+          example: false
 
