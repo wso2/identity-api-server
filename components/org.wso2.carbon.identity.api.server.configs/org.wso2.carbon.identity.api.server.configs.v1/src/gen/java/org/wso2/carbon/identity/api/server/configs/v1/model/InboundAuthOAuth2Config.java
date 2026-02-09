@@ -32,27 +32,7 @@ import javax.xml.bind.annotation.*;
 
 public class InboundAuthOAuth2Config  {
   
-    private Boolean preserveSessionAtPasswordUpdate;
     private Boolean enableJwtScopeAsArray;
-
-    /**
-    * Preserve logged in session after password update
-    **/
-    public InboundAuthOAuth2Config preserveSessionAtPasswordUpdate(Boolean preserveSessionAtPasswordUpdate) {
-
-        this.preserveSessionAtPasswordUpdate = preserveSessionAtPasswordUpdate;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "true", value = "Preserve logged in session after password update")
-    @JsonProperty("preserveSessionAtPasswordUpdate")
-    @Valid
-    public Boolean getPreserveSessionAtPasswordUpdate() {
-        return preserveSessionAtPasswordUpdate;
-    }
-    public void setPreserveSessionAtPasswordUpdate(Boolean preserveSessionAtPasswordUpdate) {
-        this.preserveSessionAtPasswordUpdate = preserveSessionAtPasswordUpdate;
-    }
 
     /**
     * Enable formatting scope claim in JWT access tokens as a JSON array instead of a space-separated string.
@@ -85,13 +65,12 @@ public class InboundAuthOAuth2Config  {
             return false;
         }
         InboundAuthOAuth2Config inboundAuthOAuth2Config = (InboundAuthOAuth2Config) o;
-        return Objects.equals(this.preserveSessionAtPasswordUpdate, inboundAuthOAuth2Config.preserveSessionAtPasswordUpdate) &&
-            Objects.equals(this.enableJwtScopeAsArray, inboundAuthOAuth2Config.enableJwtScopeAsArray);
+        return Objects.equals(this.enableJwtScopeAsArray, inboundAuthOAuth2Config.enableJwtScopeAsArray);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(preserveSessionAtPasswordUpdate, enableJwtScopeAsArray);
+        return Objects.hash(enableJwtScopeAsArray);
     }
 
     @Override
@@ -100,7 +79,6 @@ public class InboundAuthOAuth2Config  {
         StringBuilder sb = new StringBuilder();
         sb.append("class InboundAuthOAuth2Config {\n");
         
-        sb.append("    preserveSessionAtPasswordUpdate: ").append(toIndentedString(preserveSessionAtPasswordUpdate)).append("\n");
         sb.append("    enableJwtScopeAsArray: ").append(toIndentedString(enableJwtScopeAsArray)).append("\n");
         sb.append("}");
         return sb.toString();
