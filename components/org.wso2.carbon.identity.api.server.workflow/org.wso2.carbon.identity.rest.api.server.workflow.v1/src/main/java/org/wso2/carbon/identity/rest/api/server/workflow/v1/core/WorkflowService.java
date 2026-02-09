@@ -76,6 +76,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -348,7 +349,6 @@ public class WorkflowService {
                 String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
 
                 try {
-
                     Rule serviceRule = WorkflowRuleMapper.mapApiRuleToServiceRule(
                             workflowAssociation.getRule(), tenantDomain);
 
@@ -454,7 +454,7 @@ public class WorkflowService {
             }
 
             String ruleId = association.getCondition();
-            if (StringUtils.isNotBlank(ruleId)) {
+            if (StringUtils.isNotBlank(ruleId) && isValidUUID(ruleId)) {
                 try {
                     String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
                     ruleManagementService.deleteRule(ruleId, tenantDomain);
@@ -683,32 +683,56 @@ public class WorkflowService {
 
     private WorkflowAssociationListItem getAssociation(Association association) {
 
-        WorkflowAssociationListItem associationListItem = null;
-
-        if (association != null) {
-            associationListItem = new WorkflowAssociationListItem();
-            associationListItem.setId(association.getAssociationId());
-            associationListItem.setAssociationName(association.getAssociationName());
-            associationListItem.setOperation(Operation.valueOf(association.getEventId()));
-            associationListItem.setWorkflowName(association.getWorkflowName());
-            associationListItem.setIsEnabled(association.isEnabled());
-            associationListItem.setRule(new ORRuleResponse());
+        if (association == null) {
+            return null;
         }
 
-        String ruleId = null;
-        if (association != null) {
-            ruleId = association.getCondition();
+        WorkflowAssociationListItem associationListItem = new WorkflowAssociationListItem();
+        associationListItem.setId(association.getAssociationId());
+        associationListItem.setAssociationName(association.getAssociationName());
+        associationListItem.setOperation(Operation.valueOf(association.getEventId()));
+        associationListItem.setWorkflowName(association.getWorkflowName());
+        associationListItem.setIsEnabled(association.isEnabled());
+        associationListItem.setRule(new ORRuleResponse());
+
+        populateRuleResponse(association, associationListItem::setRule);
+        return associationListItem;
+    }
+
+    private WorkflowAssociationResponse getAssociationDetails(Association association) {
+
+        if (association == null) {
+            return null;
         }
 
+        WorkflowAssociationResponse associationResponse = new WorkflowAssociationResponse();
+        associationResponse.setId(association.getAssociationId());
+        associationResponse.setAssociationName(association.getAssociationName());
+        associationResponse.setOperation(Operation.valueOf(association.getEventId()));
+        associationResponse.setWorkflowName(association.getWorkflowName());
+        associationResponse.setIsEnabled(association.isEnabled());
+        associationResponse.setRule(new ORRuleResponse());
+
+        populateRuleResponse(association, associationResponse::setRule);
+        return associationResponse;
+    }
+
+    /**
+     * Populates the rule response for an association if the rule ID is valid.
+     *
+     * @param association   The association object.
+     * @param ruleSetter    Consumer to set the rule response.
+     */
+    private void populateRuleResponse(Association association, Consumer<ORRuleResponse> ruleSetter) {
+
+        String ruleId = association.getCondition();
 
         if (isValidUUID(ruleId)) {
             try {
                 String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-
                 Rule rule = ruleManagementService.getRuleByRuleId(ruleId, tenantDomain);
                 ORRuleResponse ruleResponse = WorkflowRuleMapper.mapServiceRuleToApiRule(rule);
-
-                associationListItem.setRule(ruleResponse);
+                ruleSetter.accept(ruleResponse);
 
             } catch (RuleManagementException e) {
                 // Log the error but do not throw it.
@@ -717,45 +741,6 @@ public class WorkflowService {
                         association.getAssociationId(), e);
             }
         }
-        return associationListItem;
-    }
-
-    private WorkflowAssociationResponse getAssociationDetails(Association association) {
-
-        WorkflowAssociationResponse associationResponse = null;
-
-        if (association != null) {
-            associationResponse = new WorkflowAssociationResponse();
-            associationResponse.setId(association.getAssociationId());
-            associationResponse.setAssociationName(association.getAssociationName());
-            associationResponse.setOperation(Operation.valueOf(association.getEventId()));
-            associationResponse.setWorkflowName(association.getWorkflowName());
-            associationResponse.setIsEnabled(association.isEnabled());
-            associationResponse.setRule(new ORRuleResponse());
-        }
-
-        String ruleId = null;
-        if (association != null) {
-            ruleId = association.getCondition();
-        }
-
-        if (isValidUUID(ruleId)) {
-            try {
-                String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-
-                Rule rule = ruleManagementService.getRuleByRuleId(ruleId, tenantDomain);
-                ORRuleResponse ruleResponse = WorkflowRuleMapper.mapServiceRuleToApiRule(rule);
-
-                associationResponse.setRule(ruleResponse);
-
-            } catch (RuleManagementException e) {
-                // log the error but do not throw it.
-                // This allows the Association details to be returned even if the Rule fetch fails.
-                log.error("Error while retrieving rule details for association ID: " +
-                        association.getAssociationId(), e);
-            }
-        }
-        return associationResponse;
     }
 
     public void abortWorkflowInstance(String instanceId) {

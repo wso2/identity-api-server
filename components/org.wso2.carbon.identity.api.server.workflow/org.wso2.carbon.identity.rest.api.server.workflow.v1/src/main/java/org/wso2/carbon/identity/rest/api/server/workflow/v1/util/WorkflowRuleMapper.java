@@ -53,16 +53,12 @@ public class WorkflowRuleMapper {
     public static Rule mapApiRuleToServiceRule(ORRule workflowORRule, String tenantDomain)
             throws RuleManagementException, WorkflowClientException {
 
-        if (workflowORRule == null || workflowORRule.getRules() == null || workflowORRule.getRules().isEmpty()){
+        if (workflowORRule == null || workflowORRule.getRules() == null || workflowORRule.getRules().isEmpty()) {
             log.debug("Invalid ORRule provided for mapping. Returning null.");
             return null;
         }
-
-        FlowType flowType = FlowType.APPROVAL_WORKFLOW;
         List<ANDRule> andRuleList = workflowORRule.getRules();
-
-        RuleBuilder ruleBuilder = RuleBuilder.create(flowType, tenantDomain);
-
+        RuleBuilder ruleBuilder = RuleBuilder.create(FlowType.APPROVAL_WORKFLOW, tenantDomain);
         addExpressionsToRuleBuilder(andRuleList, ruleBuilder);
 
         return ruleBuilder.build();
