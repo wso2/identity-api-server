@@ -18,13 +18,14 @@
 
 package org.wso2.carbon.identity.rest.api.server.workflow.v1.util;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.ANDRule;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.ANDRuleResponse;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Expression;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.ExpressionResponse;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.ORRule;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.ORRuleResponse;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Operation;
 import org.wso2.carbon.identity.rule.management.api.exception.RuleManagementException;
 import org.wso2.carbon.identity.rule.management.api.model.ANDCombinedRule;
 import org.wso2.carbon.identity.rule.management.api.model.FlowType;
@@ -41,24 +42,26 @@ import java.util.List;
  */
 public class WorkflowRuleMapper {
 
+    private static final Log log = LogFactory.getLog(WorkflowRuleMapper.class);
+
     /**
      * Maps the API ORRule model to the generic Service Rule model.
      * @param workflowORRule The ORRule from the Workflow API.
      * @param tenantDomain The tenant domain.
-     * @param workflowOperation The workflow operation.
      * @return The mapped Service Rule.
      */
-    public static Rule mapApiRuleToServiceRule(ORRule workflowORRule, String tenantDomain, Operation workflowOperation)
+    public static Rule mapApiRuleToServiceRule(ORRule workflowORRule, String tenantDomain)
             throws RuleManagementException, WorkflowClientException {
 
-        if (workflowORRule == null || workflowORRule.getRules() == null) {
+        if (workflowORRule == null || workflowORRule.getRules() == null || workflowORRule.getRules().isEmpty()){
+            log.debug("Invalid ORRule provided for mapping. Returning null.");
             return null;
         }
 
-        FlowType temporaryWFType = FlowType.APPROVAL_WORKFLOW;
+        FlowType flowType = FlowType.APPROVAL_WORKFLOW;
         List<ANDRule> andRuleList = workflowORRule.getRules();
 
-        RuleBuilder ruleBuilder = RuleBuilder.create(temporaryWFType, tenantDomain);
+        RuleBuilder ruleBuilder = RuleBuilder.create(flowType, tenantDomain);
 
         addExpressionsToRuleBuilder(andRuleList, ruleBuilder);
 
@@ -72,7 +75,7 @@ public class WorkflowRuleMapper {
      */
     public static ORRuleResponse mapServiceRuleToApiRule(Rule serviceRule) {
 
-        // Validation and Casting (Same as Action Service)
+        // Validation and Casting
         if (serviceRule == null || !(serviceRule instanceof ORCombinedRule)) {
             return null;
         }
@@ -128,7 +131,7 @@ public class WorkflowRuleMapper {
                 ruleBuilder.addOrCondition();
             }
 
-            // Use the Expression class from YOUR Workflow API model package
+            // Add AND condition for the current set of expressions.
             List<Expression> expressionList = andRuleList.get(i).getExpressions();
 
             if (expressionList != null) {

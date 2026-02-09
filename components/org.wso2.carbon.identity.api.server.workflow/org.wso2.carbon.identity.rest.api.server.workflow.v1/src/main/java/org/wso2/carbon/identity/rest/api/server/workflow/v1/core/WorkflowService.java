@@ -274,7 +274,7 @@ public class WorkflowService {
                     String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
                     // convert API rule to service rule
                     Rule serviceRule = WorkflowRuleMapper.mapApiRuleToServiceRule(
-                            workflowAssociation.getRule(), tenantDomain, workflowAssociation.getOperation());
+                            workflowAssociation.getRule(), tenantDomain);
                     Rule createdRule = ruleManagementService.addRule(serviceRule, tenantDomain);
 
                     if (createdRule != null) {
@@ -348,12 +348,9 @@ public class WorkflowService {
                 String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
 
                 try {
-                    Operation operation = workflowAssociation.getOperation() != null ?
-                            workflowAssociation.getOperation() :
-                            Operation.valueOf(existingAssociation.getEventId());
 
                     Rule serviceRule = WorkflowRuleMapper.mapApiRuleToServiceRule(
-                            workflowAssociation.getRule(), tenantDomain, operation);
+                            workflowAssociation.getRule(), tenantDomain);
 
                     Rule resultRule;
                     // Update existing rule if it exists and is not the default condition "boolean(1)",
