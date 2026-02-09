@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.identity.rest.api.server.claim.management.v1.core;
 
-import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
@@ -34,12 +33,16 @@ import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.claim.management.common.Constant;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
-import org.wso2.carbon.identity.api.server.common.FileContent;
 import org.wso2.carbon.identity.api.server.common.Util;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.common.error.bulk.BulkAPIError;
 import org.wso2.carbon.identity.api.server.common.error.bulk.BulkErrorResponse;
+import org.wso2.carbon.identity.api.server.common.file.FileContent;
+import org.wso2.carbon.identity.api.server.common.file.FileSerializationConfig;
+import org.wso2.carbon.identity.api.server.common.file.FileSerializationException;
+import org.wso2.carbon.identity.api.server.common.file.FileSerializationUtil;
+import org.wso2.carbon.identity.api.server.common.file.YamlConfig;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataClientException;
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
@@ -74,17 +77,9 @@ import org.wso2.carbon.identity.scim2.common.utils.SCIMCommonUtils;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.core.UserStoreManager;
 import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.LoaderOptions;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
-import org.yaml.snakeyaml.error.YAMLException;
-import org.yaml.snakeyaml.inspector.TagInspector;
-import org.yaml.snakeyaml.inspector.TrustedPrefixesTagInspector;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -101,10 +96,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 
 import static org.wso2.carbon.identity.api.server.claim.management.common.ClaimManagementDataHolder.getClaimMetadataManagementService;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.CMT_PATH_COMPONENT;
@@ -167,15 +158,10 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_SUPPORTED_BY_DEFAULT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_UNIQUENESS_SCOPE;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.RETURN_PREVIOUS_ADDITIONAL_PROPERTIES;
-import static org.wso2.carbon.identity.api.server.common.Constants.JSON_FILE_EXTENSION;
-import static org.wso2.carbon.identity.api.server.common.Constants.MEDIA_TYPE_JSON;
-import static org.wso2.carbon.identity.api.server.common.Constants.MEDIA_TYPE_XML;
-import static org.wso2.carbon.identity.api.server.common.Constants.MEDIA_TYPE_YAML;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.common.Constants.XML_FILE_EXTENSION;
-import static org.wso2.carbon.identity.api.server.common.Constants.YAML_FILE_EXTENSION;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIForBody;
 import static org.wso2.carbon.identity.claim.metadata.mgt.util.ClaimConstants.IS_SYSTEM_CLAIM;
+import static org.wso2.carbon.identity.claim.metadata.mgt.util.ClaimConstants.MANAGED_IN_USER_STORE_PROPERTY;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_ORGANIZATION_NOT_FOUND_FOR_TENANT;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
@@ -434,16 +420,15 @@ public class ServerClaimManagementService {
     public LocalClaimResDTO getLocalClaim(String claimId) {
 
         try {
-            List<LocalClaim> localClaimList = claimMetadataManagementService.getLocalClaims(ContextLoader
-                    .getTenantDomainFromContext());
+            String claimURI = base64DecodeId(claimId);
+            Optional<LocalClaim> localClaim = claimMetadataManagementService.getLocalClaim(claimURI, ContextLoader
+                    .getTenantDomainFromContext(), true);
 
-            LocalClaim localClaim = extractLocalClaimFromClaimList(base64DecodeId(claimId), localClaimList);
-
-            if (localClaim == null) {
+            if (!localClaim.isPresent()) {
                 throw handleClaimManagementClientError(ERROR_CODE_LOCAL_CLAIM_NOT_FOUND, NOT_FOUND, claimId);
             }
 
-            return getLocalClaimResDTO(localClaim);
+            return getLocalClaimResDTO(localClaim.get());
 
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_RETRIEVING_LOCAL_CLAIM, claimId);
@@ -763,18 +748,19 @@ public class ServerClaimManagementService {
 
         String fileName = getFormattedFileName(dialectConfiguration.getDialectURI());
 
-        String mediaType = Util.getMediaType(fileType);
-        switch (mediaType) {
-            case MEDIA_TYPE_XML:
-                return parseClaimDialectToXml(dialectConfiguration, fileName);
-            case MEDIA_TYPE_JSON:
-                return parseClaimDialectToJson(dialectConfiguration, fileName);
-            case MEDIA_TYPE_YAML:
-                return parseClaimDialectToYaml(dialectConfiguration, fileName);
-            default:
-                LOG.warn(String.format("Unsupported file type: %s requested for export. Defaulting to YAML parsing.",
-                        fileType));
-                return parseClaimDialectToYaml(dialectConfiguration, fileName);
+        FileSerializationConfig config = new FileSerializationConfig();
+        YamlConfig yamlConfig = new YamlConfig();
+        yamlConfig.setDumperOptionsCustomizer(options -> {
+            options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        });
+        config.setYamlConfig(yamlConfig);
+
+        try {
+            return FileSerializationUtil.serialize(dialectConfiguration, fileName, fileType, config);
+        } catch (FileSerializationException e) {
+            throw new ClaimMetadataException(String.format(
+                    Constant.ErrorMessage.ERROR_CODE_ERROR_PARSING_CLAIM_DIALECT.toString(),
+                    Util.getMediaType(fileType)), e);
         }
     }
 
@@ -783,57 +769,6 @@ public class ServerClaimManagementService {
         String formattedFileName = fileName.replaceAll("[^\\w\\d]+", "_");
         formattedFileName = StringUtils.abbreviate(formattedFileName, 255);
         return formattedFileName;
-    }
-
-    private FileContent parseClaimDialectToXml(ClaimDialectConfiguration dialectConfiguration, String fileName)
-            throws ClaimMetadataException {
-
-        StringBuilder fileNameSB = new StringBuilder(fileName);
-        fileNameSB.append(XML_FILE_EXTENSION);
-
-        try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(dialectConfiguration.getClass());
-            Marshaller marshaller = jaxbContext.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            StringWriter writer = new StringWriter();
-            marshaller.marshal(dialectConfiguration, writer);
-            String xmlContent = writer.toString();
-            return new FileContent(fileNameSB.toString(), MEDIA_TYPE_XML, xmlContent);
-        } catch (JAXBException e) {
-            throw new ClaimMetadataException(String.format(
-                      Constant.ErrorMessage.ERROR_CODE_ERROR_PARSING_CLAIM_DIALECT.toString(), MEDIA_TYPE_XML), e);
-        }
-    }
-
-    private FileContent parseClaimDialectToJson(ClaimDialectConfiguration dialectConfiguration, String fileName)
-            throws ClaimMetadataException {
-
-        StringBuilder fileNameSB = new StringBuilder(fileName);
-        fileNameSB.append(JSON_FILE_EXTENSION);
-        ObjectMapper objectMapper = new ObjectMapper(new JsonFactory());
-        try {
-            return new FileContent(fileNameSB.toString(), MEDIA_TYPE_JSON,
-                    objectMapper.writeValueAsString(dialectConfiguration));
-        } catch (JsonProcessingException e) {
-            throw new ClaimMetadataException(String.format(
-                      Constant.ErrorMessage.ERROR_CODE_ERROR_PARSING_CLAIM_DIALECT.toString(), MEDIA_TYPE_JSON), e);
-        }
-    }
-
-    private FileContent parseClaimDialectToYaml(ClaimDialectConfiguration dialectConfiguration, String fileName)
-            throws ClaimMetadataException {
-
-        StringBuilder fileNameSB = new StringBuilder(fileName);
-        fileNameSB.append(YAML_FILE_EXTENSION);
-        DumperOptions options = new DumperOptions();
-        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        Yaml yaml = new Yaml(options);
-        try {
-            return new FileContent(fileNameSB.toString(), MEDIA_TYPE_YAML, yaml.dump(dialectConfiguration));
-        } catch (YAMLException e) {
-            throw new ClaimMetadataException(String.format(
-                      Constant.ErrorMessage.ERROR_CODE_ERROR_PARSING_CLAIM_DIALECT.toString(), MEDIA_TYPE_YAML), e);
-        }
     }
 
     /**
@@ -1208,6 +1143,10 @@ public class ServerClaimManagementService {
             }
         }
 
+        String managedInUserStore =
+                claimProperties.remove(ClaimConstants.MANAGED_IN_USER_STORE_PROPERTY);
+        localClaimResDTO.setManagedInUserStore(Boolean.valueOf(managedInUserStore));
+
         List<AttributeMappingDTO> attributeMappingDTOs = new ArrayList<>();
         for (AttributeMapping attributeMapping : localClaim.getMappedAttributes()) {
             AttributeMappingDTO attributeMappingDTO = new AttributeMappingDTO();
@@ -1304,6 +1243,12 @@ public class ServerClaimManagementService {
 
         if (StringUtils.isNotBlank(localClaimReqDTO.getRegEx())) {
             claimProperties.put(PROP_REG_EX, localClaimReqDTO.getRegEx());
+        }
+
+        Boolean managedInUserStore = localClaimReqDTO.getManagedInUserStoreEnabled();
+        if (managedInUserStore != null) {
+            claimProperties.put(ClaimConstants.MANAGED_IN_USER_STORE_PROPERTY,
+                    String.valueOf(managedInUserStore));
         }
 
         if (localClaimReqDTO.getDisplayOrder() != null) {
@@ -1485,59 +1430,20 @@ public class ServerClaimManagementService {
                     fileContent.getFileName());
         }
 
-        switch (Util.getMediaType(fileContent.getFileType())) {
-            case MEDIA_TYPE_XML:
-                return parseClaimDialectFromXml(fileContent);
-            case MEDIA_TYPE_JSON:
-                return parseClaimDialectFromJson(fileContent);
-            case MEDIA_TYPE_YAML:
-                return parseClaimDialectFromYaml(fileContent);
-            default:
-                LOG.warn(String.format("Unsupported media type %s for file %s. Defaulting to YAML parsing.",
-                        fileContent.getFileType(), fileContent.getFileName()));
-                return parseClaimDialectFromYaml(fileContent);
-        }
-    }
-
-    private ClaimDialectConfiguration parseClaimDialectFromXml(FileContent fileContent) throws ClaimMetadataException {
+        FileSerializationConfig config = new FileSerializationConfig();
+        YamlConfig yamlConfig = new YamlConfig();
+        yamlConfig.setAdditionalTrustedClasses(
+                ExternalClaimResDTO.class,
+                LocalClaimResDTO.class
+        );
+        config.setYamlConfig(yamlConfig);
 
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(ClaimDialectConfiguration.class);
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            return (ClaimDialectConfiguration) unmarshaller.unmarshal(new StringReader(fileContent.getContent()));
-        } catch (JAXBException e) {
+            return FileSerializationUtil.deserialize(fileContent, ClaimDialectConfiguration.class, config);
+        } catch (FileSerializationException e) {
             throw new ClaimMetadataException(String.format(
-                      Constant.ErrorMessage.ERROR_CODE_ERROR_READING_FILE_CONTENT.toString(), MEDIA_TYPE_XML), e);
-        }
-    }
-
-    private ClaimDialectConfiguration parseClaimDialectFromJson(FileContent fileContent) throws ClaimMetadataException {
-
-        try {
-            return mapper.readValue(fileContent.getContent(), ClaimDialectConfiguration.class);
-        } catch (JsonProcessingException e) {
-            throw new ClaimMetadataException(String.format(
-                      Constant.ErrorMessage.ERROR_CODE_ERROR_READING_FILE_CONTENT.toString(), MEDIA_TYPE_JSON), e);
-        }
-    }
-
-    private ClaimDialectConfiguration parseClaimDialectFromYaml(FileContent fileContent) throws ClaimMetadataException {
-
-        try {
-            // Add trusted tags included in the Claims YAML files.
-            List<String> trustedTagList = new ArrayList<>();
-            trustedTagList.add(ClaimDialectConfiguration.class.getName());
-            trustedTagList.add(ExternalClaimResDTO.class.getName());
-            trustedTagList.add(LocalClaimResDTO.class.getName());
-
-            LoaderOptions loaderOptions = new LoaderOptions();
-            TagInspector tagInspector = new TrustedPrefixesTagInspector(trustedTagList);
-            loaderOptions.setTagInspector(tagInspector);
-            Yaml yaml = new Yaml(new Constructor(ClaimDialectConfiguration.class, loaderOptions));
-            return yaml.loadAs(fileContent.getContent(), ClaimDialectConfiguration.class);
-        } catch (YAMLException e) {
-            throw new ClaimMetadataException(String.format(
-                      Constant.ErrorMessage.ERROR_CODE_ERROR_READING_FILE_CONTENT.toString(), MEDIA_TYPE_YAML), e);
+                    Constant.ErrorMessage.ERROR_CODE_ERROR_READING_FILE_CONTENT.toString(),
+                    Util.getMediaType(fileContent.getFileType())), e);
         }
     }
 
@@ -2038,9 +1944,11 @@ public class ServerClaimManagementService {
     private void validateLocalClaimUpdate(String claimID, LocalClaim incomingLocalClaim)
             throws ClaimMetadataException {
 
+        boolean fetchManagedInUserStoreProperty =
+                incomingLocalClaim.getClaimProperties().containsKey(MANAGED_IN_USER_STORE_PROPERTY);
         Optional<LocalClaim>
                 existingLocalClaim = getClaimMetadataManagementService().getLocalClaim(base64DecodeId(claimID),
-                ContextLoader.getTenantDomainFromContext());
+                ContextLoader.getTenantDomainFromContext(), fetchManagedInUserStoreProperty);
 
         if (!existingLocalClaim.isPresent()) {
             throw handleClaimManagementClientError(ERROR_CODE_LOCAL_CLAIM_NOT_FOUND, BAD_REQUEST, claimID);
@@ -2129,6 +2037,16 @@ public class ServerClaimManagementService {
                 throw new ClaimMetadataException(String.valueOf(Constant.ErrorMessage
                         .ERROR_CODE_ERROR_SERIALIZING_INPUT_FORMAT), e);
             }
+        }
+
+        if (!incomingLocalClaim.getClaimProperties().containsKey(MANAGED_IN_USER_STORE_PROPERTY)
+                && localClaim.getClaimProperties().containsKey(MANAGED_IN_USER_STORE_PROPERTY)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(String.format("Populating the '%s' property from the existing local claim for claim URI: %s",
+                        MANAGED_IN_USER_STORE_PROPERTY, localClaim.getClaimURI()));
+            }
+            incomingLocalClaim.setClaimProperty(MANAGED_IN_USER_STORE_PROPERTY,
+                    localClaim.getClaimProperty(MANAGED_IN_USER_STORE_PROPERTY));
         }
     }
 

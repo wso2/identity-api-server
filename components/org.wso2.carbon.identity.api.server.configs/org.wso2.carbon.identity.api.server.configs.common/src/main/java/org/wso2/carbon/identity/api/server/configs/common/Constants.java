@@ -208,7 +208,14 @@ public class Constants {
                 "Server encountered an error while deleting the Passive STS inbound auth configs."),
         ERROR_CODE_IMP_CONFIG_DELETE("65022",
                 "Unable to delete Impersonation configuration.",
-                "Server encountered an error while deleting the Impersonation configuration of %s.");
+                "Server encountered an error while deleting the Impersonation configuration of %s."),
+
+        ERROR_CODE_FRAUD_DETECTION_CONFIG_RETRIEVE("65023",
+                "Unable to retrieve Fraud Detection configuration.",
+                "Server encountered an error while retrieving the Fraud Detection configuration."),
+        ERROR_CODE_FRAUD_DETECTION_CONFIG_UPDATE("65024",
+                "Unable to update Fraud Detection configuration.",
+                "Server encountered an error while updating the Fraud Detection configuration.");
 
         private final String code;
         private final String message;

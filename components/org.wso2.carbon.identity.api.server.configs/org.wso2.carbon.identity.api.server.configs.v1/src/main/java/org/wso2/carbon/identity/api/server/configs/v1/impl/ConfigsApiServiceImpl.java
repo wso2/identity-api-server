@@ -23,6 +23,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.core.ServerConfigManagemen
 import org.wso2.carbon.identity.api.server.configs.v1.factories.ServerConfigManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.FraudDetectionConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
@@ -132,6 +133,12 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     }
 
     @Override
+    public Response getFraudDetectionConfigs() {
+
+        return Response.ok().entity(configManagementService.getFraudDetectionConfigs()).build();
+    }
+
+    @Override
     public Response patchPrivatKeyJWTValidationConfiguration(List<JWTKeyValidatorPatch> jwTKeyValidatorPatch) {
 
         configManagementService.patchPrivateKeyJWTValidatorSConfig(jwTKeyValidatorPatch);
@@ -218,6 +225,12 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
 
         configManagementService.updateRemoteLoggingConfigs(remoteLoggingConfigListItem);
         return Response.accepted().build();
+    }
+
+    @Override
+    public Response updateFraudDetectionConfigs(FraudDetectionConfig fraudDetectionConfig) {
+
+        return Response.ok().entity(configManagementService.updateFraudDetectionConfigs(fraudDetectionConfig)).build();
     }
 
     @Override
