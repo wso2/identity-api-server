@@ -33,6 +33,7 @@ import javax.xml.bind.annotation.*;
 public class InboundAuthOAuth2Config  {
   
     private Boolean preserveSessionAtPasswordUpdate;
+    private Boolean enableJwtScopeAsArray;
 
     /**
     * Preserve logged in session after password update
@@ -53,6 +54,25 @@ public class InboundAuthOAuth2Config  {
         this.preserveSessionAtPasswordUpdate = preserveSessionAtPasswordUpdate;
     }
 
+    /**
+    * Enable formatting scope claim in JWT access tokens as a JSON array instead of a space-separated string.
+    **/
+    public InboundAuthOAuth2Config enableJwtScopeAsArray(Boolean enableJwtScopeAsArray) {
+
+        this.enableJwtScopeAsArray = enableJwtScopeAsArray;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "Enable formatting scope claim in JWT access tokens as a JSON array instead of a space-separated string.")
+    @JsonProperty("enableJwtScopeAsArray")
+    @Valid
+    public Boolean getEnableJwtScopeAsArray() {
+        return enableJwtScopeAsArray;
+    }
+    public void setEnableJwtScopeAsArray(Boolean enableJwtScopeAsArray) {
+        this.enableJwtScopeAsArray = enableJwtScopeAsArray;
+    }
+
 
 
     @Override
@@ -65,12 +85,13 @@ public class InboundAuthOAuth2Config  {
             return false;
         }
         InboundAuthOAuth2Config inboundAuthOAuth2Config = (InboundAuthOAuth2Config) o;
-        return Objects.equals(this.preserveSessionAtPasswordUpdate, inboundAuthOAuth2Config.preserveSessionAtPasswordUpdate);
+        return Objects.equals(this.preserveSessionAtPasswordUpdate, inboundAuthOAuth2Config.preserveSessionAtPasswordUpdate) &&
+            Objects.equals(this.enableJwtScopeAsArray, inboundAuthOAuth2Config.enableJwtScopeAsArray);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(preserveSessionAtPasswordUpdate);
+        return Objects.hash(preserveSessionAtPasswordUpdate, enableJwtScopeAsArray);
     }
 
     @Override
@@ -80,6 +101,7 @@ public class InboundAuthOAuth2Config  {
         sb.append("class InboundAuthOAuth2Config {\n");
         
         sb.append("    preserveSessionAtPasswordUpdate: ").append(toIndentedString(preserveSessionAtPasswordUpdate)).append("\n");
+        sb.append("    enableJwtScopeAsArray: ").append(toIndentedString(enableJwtScopeAsArray)).append("\n");
         sb.append("}");
         return sb.toString();
     }
