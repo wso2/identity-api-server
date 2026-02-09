@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.idp.v1.core;
 
-import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -35,10 +34,13 @@ import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
-import org.wso2.carbon.identity.api.server.common.FileContent;
-import org.wso2.carbon.identity.api.server.common.Util;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.api.server.common.file.FileContent;
+import org.wso2.carbon.identity.api.server.common.file.FileSerializationConfig;
+import org.wso2.carbon.identity.api.server.common.file.FileSerializationException;
+import org.wso2.carbon.identity.api.server.common.file.FileSerializationUtil;
+import org.wso2.carbon.identity.api.server.common.file.YamlConfig;
 import org.wso2.carbon.identity.api.server.idp.common.Constants;
 import org.wso2.carbon.identity.api.server.idp.v1.impl.FederatedAuthenticatorConfigBuilderFactory;
 import org.wso2.carbon.identity.api.server.idp.v1.model.AccountLookupAttributeMapping;
@@ -121,20 +123,10 @@ import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 import org.wso2.carbon.idp.mgt.dao.IdPManagementDAO;
 import org.wso2.carbon.idp.mgt.model.ConnectedAppsResult;
 import org.wso2.carbon.idp.mgt.model.IdpSearchResult;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.TypeDescription;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
-import org.yaml.snakeyaml.error.YAMLException;
-import org.yaml.snakeyaml.inspector.TagInspector;
-import org.yaml.snakeyaml.inspector.TrustedPrefixesTagInspector;
-import org.yaml.snakeyaml.representer.Representer;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URLEncoder;
@@ -151,20 +143,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_RESOURCE_LIMIT_REACHED;
-import static org.wso2.carbon.identity.api.server.common.Constants.JSON_FILE_EXTENSION;
 import static org.wso2.carbon.identity.api.server.common.Constants.MASKING_VALUE;
-import static org.wso2.carbon.identity.api.server.common.Constants.MEDIA_TYPE_JSON;
-import static org.wso2.carbon.identity.api.server.common.Constants.MEDIA_TYPE_XML;
-import static org.wso2.carbon.identity.api.server.common.Constants.MEDIA_TYPE_YAML;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.common.Constants.XML_FILE_EXTENSION;
-import static org.wso2.carbon.identity.api.server.common.Constants.YAML_FILE_EXTENSION;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLDecode;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.ErrorMessage.ERROR_CODE_IDP_LIMIT_REACHED;
@@ -3588,74 +3570,22 @@ public class ServerIdpManagementService {
         if (log.isDebugEnabled()) {
             log.debug("Parsing IdP object to file content of type: " + fileType);
         }
-        String mediaType = Util.getMediaType(fileType);
-        switch (mediaType) {
-            case MEDIA_TYPE_XML:
-                return parseIdpToXml(identityProvider);
-            case MEDIA_TYPE_JSON:
-                return parseIdpToJson(identityProvider);
-            case MEDIA_TYPE_YAML:
-                return parseIdpToYaml(identityProvider);
-            default:
-                log.warn(String.format("Unsupported file type: %s requested for export. Defaulting to YAML parsing.",
-                        fileType));
-                return parseIdpToYaml(identityProvider);
-        }
-    }
 
-    private FileContent parseIdpToXml(IdentityProvider identityProvider)
-            throws IdentityProviderManagementException {
+        FileSerializationConfig config = new FileSerializationConfig();
+        YamlConfig yamlConfig = new YamlConfig();
+        yamlConfig.setRepresenterCustomizer(representer -> {
+            TypeDescription typeDescription = new TypeDescription(IdentityProvider.class);
+            typeDescription.setExcludes("id", "resourceId");
+            representer.addTypeDescription(typeDescription);
+            representer.getPropertyUtils().setSkipMissingProperties(true);
+        });
+        config.setYamlConfig(yamlConfig);
 
-        StringBuilder fileNameSB = new StringBuilder(identityProvider.getIdentityProviderName());
-        fileNameSB.append(XML_FILE_EXTENSION);
-
-        JAXBContext jaxbContext;
         try {
-            jaxbContext = JAXBContext.newInstance(IdentityProvider.class);
-            Marshaller marshaller = jaxbContext.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            StringWriter stringWriter = new StringWriter();
-            marshaller.marshal(identityProvider, stringWriter);
-            return new FileContent(fileNameSB.toString(), MEDIA_TYPE_XML, stringWriter.toString());
-        } catch (JAXBException e) {
-            throw new IdentityProviderManagementException(
-                    "Error when parsing identity provider to XML file.", e);
-        }
-    }
-
-    private FileContent parseIdpToJson(IdentityProvider identityProvider)
-            throws IdentityProviderManagementException {
-
-        StringBuilder fileNameSB = new StringBuilder(identityProvider.getIdentityProviderName());
-        fileNameSB.append(JSON_FILE_EXTENSION);
-        ObjectMapper objectMapper = new ObjectMapper(new JsonFactory());
-        try {
-            return new FileContent(fileNameSB.toString(), MEDIA_TYPE_JSON,
-                    objectMapper.writeValueAsString(identityProvider));
-        } catch (JsonProcessingException e) {
-            throw new IdentityProviderManagementClientException(
-                    "Error when parsing identity provider to JSON file.", e);
-        }
-    }
-
-    private FileContent parseIdpToYaml(IdentityProvider identityProvider)
-            throws IdentityProviderManagementException {
-
-        StringBuilder fileNameSB = new StringBuilder(identityProvider.getIdentityProviderName());
-        fileNameSB.append(YAML_FILE_EXTENSION);
-
-        Representer representer = new Representer(new DumperOptions());
-        TypeDescription typeDescription = new TypeDescription(IdentityProvider.class);
-        typeDescription.setExcludes("id", "resourceId");
-        representer.addTypeDescription(typeDescription);
-        representer.getPropertyUtils().setSkipMissingProperties(true);
-
-        Yaml yaml = new Yaml(representer);
-        try {
-            return new FileContent(fileNameSB.toString(), MEDIA_TYPE_YAML, yaml.dump(identityProvider));
-        } catch (YAMLException e) {
-            throw new IdentityProviderManagementException(
-                    "Error when parsing identity provider to YAML file.", e);
+            return FileSerializationUtil.serialize(identityProvider,
+                    identityProvider.getIdentityProviderName(), fileType, config);
+        } catch (FileSerializationException e) {
+            throw new IdentityProviderManagementException("Error when parsing identity provider to file.", e);
         }
     }
 
@@ -3687,60 +3617,12 @@ public class ServerIdpManagementService {
                     "Empty Identity Provider configuration file %s uploaded.", fileContent.getFileName()));
         }
 
-        switch (Util.getMediaType(fileContent.getFileType())) {
-            case MEDIA_TYPE_XML:
-                return parseIdpFromXml(fileContent);
-            case MEDIA_TYPE_JSON:
-                return parseIdpFromJson(fileContent);
-            case MEDIA_TYPE_YAML:
-                return parseIdpFromYaml(fileContent);
-            default:
-                log.warn(String.format("Unsupported media type %s for file %s. Defaulting to YAML parsing.",
-                        fileContent.getFileType(), fileContent.getFileName()));
-                return parseIdpFromYaml(fileContent);
-        }
-    }
-
-    private IdentityProvider parseIdpFromXml(FileContent fileContent)
-            throws IdentityProviderManagementClientException {
-
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(IdentityProvider.class);
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            return (IdentityProvider) unmarshaller.unmarshal(new StringReader(fileContent.getContent()));
-        } catch (JAXBException e) {
-            throw new IdentityProviderManagementClientException(String.format("Error in reading " +
-                    "XML file configuration for Identity Provider: %s.", fileContent.getFileName()), e);
-        }
-    }
-
-    private IdentityProvider parseIdpFromYaml(FileContent fileContent)
-            throws IdentityProviderManagementClientException {
-
-        try {
-            // Add trusted tags included in the IDP YAML files.
-            List<String> trustedTagList = new ArrayList<>();
-            trustedTagList.add(IdentityProvider.class.getName());
-
-            LoaderOptions loaderOptions = new LoaderOptions();
-            TagInspector tagInspector = new TrustedPrefixesTagInspector(trustedTagList);
-            loaderOptions.setTagInspector(tagInspector);
-            Yaml yaml = new Yaml(new Constructor(IdentityProvider.class, loaderOptions));
-            return yaml.loadAs(fileContent.getContent(), IdentityProvider.class);
-        } catch (YAMLException e) {
-            throw new IdentityProviderManagementClientException(String.format("Error in reading YAML file " +
-                    "configuration for Identity Provider: %s.", fileContent.getFileName()), e);
-        }
-    }
-
-    private IdentityProvider parseIdpFromJson(FileContent fileContent)
-            throws IdentityProviderManagementClientException {
-
-        try {
-            return new ObjectMapper().readValue(fileContent.getContent(), IdentityProvider.class);
-        } catch (JsonProcessingException e) {
-            throw new IdentityProviderManagementClientException(String.format("Error in reading JSON " +
-                    "file configuration for Identity Provider: %s.", fileContent.getFileName()), e);
+            return FileSerializationUtil.deserialize(fileContent, IdentityProvider.class,
+                    new FileSerializationConfig());
+        } catch (FileSerializationException e) {
+            throw new IdentityProviderManagementClientException(
+                    "Error when generating the identity provider model from file", e);
         }
     }
 

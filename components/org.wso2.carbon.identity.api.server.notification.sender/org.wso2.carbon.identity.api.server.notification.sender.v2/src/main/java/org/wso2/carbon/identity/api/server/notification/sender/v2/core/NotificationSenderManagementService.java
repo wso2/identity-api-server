@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderServiceHolder;
+import org.wso2.carbon.identity.api.server.notification.sender.v2.model.Authentication;
 import org.wso2.carbon.identity.api.server.notification.sender.v2.model.EmailSender;
 import org.wso2.carbon.identity.api.server.notification.sender.v2.model.EmailSenderAdd;
 import org.wso2.carbon.identity.api.server.notification.sender.v2.model.EmailSenderUpdateRequest;
@@ -34,6 +35,7 @@ import org.wso2.carbon.identity.api.server.notification.sender.v2.model.PushSend
 import org.wso2.carbon.identity.api.server.notification.sender.v2.model.SMSSender;
 import org.wso2.carbon.identity.api.server.notification.sender.v2.model.SMSSenderAdd;
 import org.wso2.carbon.identity.api.server.notification.sender.v2.model.SMSSenderUpdateRequest;
+import org.wso2.carbon.identity.notification.sender.tenant.config.dto.Authentication.Property;
 import org.wso2.carbon.identity.notification.sender.tenant.config.dto.EmailSenderDTO;
 import org.wso2.carbon.identity.notification.sender.tenant.config.dto.PushSenderDTO;
 import org.wso2.carbon.identity.notification.sender.tenant.config.dto.SMSSenderDTO;
@@ -44,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -98,8 +101,8 @@ public class NotificationSenderManagementService {
      */
     public SMSSender addSMSSender(SMSSenderAdd smsSenderAdd) {
 
-        SMSSenderDTO dto = buildSMSSenderDTO(smsSenderAdd);
         try {
+            SMSSenderDTO dto = buildSMSSenderDTO(smsSenderAdd);
             SMSSenderDTO smsSenderDTO = notificationSenderManagementService.addSMSSender(dto);
             return buildSMSSenderFromDTO(smsSenderDTO);
         } catch (NotificationSenderManagementException e) {
@@ -261,8 +264,8 @@ public class NotificationSenderManagementService {
      */
     public SMSSender updateSMSSender(String senderName, SMSSenderUpdateRequest smsSenderUpdateRequest) {
 
-        SMSSenderDTO dto = buildSMSSenderDTO(senderName, smsSenderUpdateRequest);
         try {
+            SMSSenderDTO dto = buildSMSSenderDTO(senderName, smsSenderUpdateRequest);
             SMSSenderDTO smsSenderDTO = notificationSenderManagementService.updateSMSSender(dto);
             return buildSMSSenderFromDTO(smsSenderDTO);
         } catch (NotificationSenderManagementException e) {
@@ -368,39 +371,53 @@ public class NotificationSenderManagementService {
         return emailSender;
     }
 
-    private SMSSenderDTO buildSMSSenderDTO(SMSSenderAdd smsSenderAdd) {
+    private SMSSenderDTO buildSMSSenderDTO(SMSSenderAdd smsSenderAdd) throws NotificationSenderManagementException {
 
-        SMSSenderDTO dto = new SMSSenderDTO();
-        dto.setName(smsSenderAdd.getName());
-        dto.setProvider(smsSenderAdd.getProvider());
-        dto.setProviderURL(smsSenderAdd.getProviderURL());
-        dto.setKey(smsSenderAdd.getKey());
-        dto.setSecret(smsSenderAdd.getSecret());
-        dto.setSender(smsSenderAdd.getSender());
-        dto.setContentType(smsSenderAdd.getContentType().toString());
+        SMSSenderDTO.Builder builder = new SMSSenderDTO.Builder();
+        builder.name(smsSenderAdd.getName());
+        builder.provider(smsSenderAdd.getProvider());
+        builder.providerURL(smsSenderAdd.getProviderURL());
+        builder.key(smsSenderAdd.getKey());
+        builder.secret(smsSenderAdd.getSecret());
+        builder.sender(smsSenderAdd.getSender());
+        builder.contentType(smsSenderAdd.getContentType().toString());
+        buildNotificationSenderAuthentication(builder, smsSenderAdd.getAuthentication());
         List<Properties> properties = smsSenderAdd.getProperties();
         if (properties != null) {
-            properties.forEach((prop) -> dto.getProperties().put(prop.getKey(), prop.getValue()));
+            properties.forEach((prop) -> builder.addProperty(prop.getKey(), prop.getValue()));
         }
-        return dto;
+        return builder.build();
     }
 
 
-    private SMSSenderDTO buildSMSSenderDTO(String senderName, SMSSenderUpdateRequest smsSenderUpdateRequest) {
+    private SMSSenderDTO buildSMSSenderDTO(String senderName, SMSSenderUpdateRequest smsSenderUpdateRequest)
+            throws NotificationSenderManagementException {
 
-        SMSSenderDTO dto = new SMSSenderDTO();
-        dto.setName(senderName);
-        dto.setProvider(smsSenderUpdateRequest.getProvider());
-        dto.setProviderURL(smsSenderUpdateRequest.getProviderURL());
-        dto.setKey(smsSenderUpdateRequest.getKey());
-        dto.setSecret(smsSenderUpdateRequest.getSecret());
-        dto.setSender(smsSenderUpdateRequest.getSender());
-        dto.setContentType(smsSenderUpdateRequest.getContentType().toString());
+        SMSSenderDTO.Builder builder = new SMSSenderDTO.Builder();
+        builder.name(senderName);
+        builder.provider(smsSenderUpdateRequest.getProvider());
+        builder.providerURL(smsSenderUpdateRequest.getProviderURL());
+        builder.key(smsSenderUpdateRequest.getKey());
+        builder.secret(smsSenderUpdateRequest.getSecret());
+        builder.sender(smsSenderUpdateRequest.getSender());
+        builder.contentType(smsSenderUpdateRequest.getContentType().toString());
         List<Properties> properties = smsSenderUpdateRequest.getProperties();
+        buildNotificationSenderAuthentication(builder, smsSenderUpdateRequest.getAuthentication());
         if (properties != null) {
-            properties.forEach((prop) -> dto.getProperties().put(prop.getKey(), prop.getValue()));
+            properties.forEach((prop) -> builder.addProperty(prop.getKey(), prop.getValue()));
         }
-        return dto;
+        return builder.build();
+    }
+
+    private void buildNotificationSenderAuthentication(SMSSenderDTO.Builder builder, Authentication authentication) {
+
+        if (authentication != null && authentication.getType() != null) {
+            builder.authType(authentication.getType().toString());
+            if (authentication.getProperties() != null) {
+                authentication.getProperties().forEach(
+                        (propKey, propValue) -> builder.addAuthProperty(propKey, (String) propValue));
+            }
+        }
     }
 
     private APIError handleException(NotificationSenderManagementException e) {
@@ -413,6 +430,9 @@ public class NotificationSenderManagementService {
 
     private SMSSender buildSMSSenderFromDTO(SMSSenderDTO dto) {
 
+        Set<Property> authPropToExclude = new HashSet<>(
+                Arrays.asList(Property.PASSWORD, Property.CLIENT_SECRET, Property.ACCESS_TOKEN, Property.VALUE));
+
         SMSSender smsSender = new SMSSender();
         smsSender.setName(dto.getName());
         smsSender.setProvider(dto.getProvider());
@@ -421,6 +441,16 @@ public class NotificationSenderManagementService {
         smsSender.setSecret(dto.getSecret());
         smsSender.setSender(dto.getSender());
         smsSender.setContentType(SMSSender.ContentTypeEnum.valueOf(dto.getContentType()));
+
+        if (dto.getAuthentication() != null) {
+            Map<String, Object> filteredAuthProp = dto.getAuthentication().getProperties().entrySet().stream()
+                .filter(entry -> !authPropToExclude.contains(Property.valueOfName(entry.getKey())))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            smsSender.setAuthentication(new Authentication()
+                    .type(Authentication.TypeEnum.fromValue(dto.getAuthentication().getType().getName()))
+                    .properties(filteredAuthProp));
+        }
+
         List<Properties> properties = new ArrayList<>();
         dto.getProperties().forEach((key, value) -> {
             Properties prop = new Properties();
