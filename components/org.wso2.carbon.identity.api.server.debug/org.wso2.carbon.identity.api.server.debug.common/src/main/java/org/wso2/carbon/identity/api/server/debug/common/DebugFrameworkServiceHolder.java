@@ -1,17 +1,17 @@
-/*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+/**
+ * Copyright (c) 2026, WSO2 LLC. (https://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
+ * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
  */
@@ -117,6 +117,7 @@ public final class DebugFrameworkServiceHolder {
      * @return Method result or null if invocation fails.
      */
     public static Map<String, Object> invokeDebugRequestCoordinatorMethod(
+
             Object coordinator,
             String methodName,
             Class<?>[] parameterTypes,
@@ -135,6 +136,7 @@ public final class DebugFrameworkServiceHolder {
      * @return Method result or null if invocation fails.
      */
     public static Object invokeDebugExecutorMethod(
+
             Object executor,
             String methodName,
             Class<?>[] parameterTypes,
@@ -153,6 +155,7 @@ public final class DebugFrameworkServiceHolder {
      * @return Method result or null if invocation fails.
      */
     public static Object invokeDebugContextResolverMethod(
+
             Object contextProvider,
             String methodName,
             Class<?>[] parameterTypes,
@@ -186,7 +189,7 @@ public final class DebugFrameworkServiceHolder {
             return service;
 
         } catch (Exception e) {
-            LOG.error("Error retrieving " + serviceClass.getSimpleName() + ": " + e.getMessage(), e);
+            LOG.error("Error retrieving OSGi service.", e);
             return null;
         }
     }
@@ -222,6 +225,7 @@ public final class DebugFrameworkServiceHolder {
      * @return Method result or null if invocation fails.
      */
     private static <T> T invokeMethod(
+
             Object target,
             String methodName,
             Class<?>[] parameterTypes,
@@ -236,10 +240,9 @@ public final class DebugFrameworkServiceHolder {
             Method method = target.getClass().getMethod(methodName, parameterTypes);
             return (T) method.invoke(target, arguments);
         } catch (NoSuchMethodException e) {
-            LOG.error("Method '" + methodName + "' not found on " + target.getClass().getSimpleName(), e);
+            LOG.error("Requested method not found on target object.", e);
         } catch (Exception e) {
-            LOG.error("Error invoking '" + methodName + "' on " + target.getClass().getSimpleName() +
-                    ": " + e.getMessage(), e);
+            LOG.error("Error invoking method on target object.", e);
         }
         return null;
     }

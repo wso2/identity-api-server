@@ -1,17 +1,17 @@
-/*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+/**
+ * Copyright (c) 2026, WSO2 LLC. (https://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
+ * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
  */
@@ -51,8 +51,9 @@ public class DebugRequest {
     private Map<String, String> testClaims;
 
     @JsonProperty("debugMode")
-    @ApiModelProperty(value = "Debug mode level", example = "DETAILED",
-                      allowableValues = "BASIC,DETAILED,COMPREHENSIVE")
+    @ApiModelProperty(value = "Debug mode level", 
+        example = "DETAILED", 
+        allowableValues = "BASIC,DETAILED,COMPREHENSIVE")
     private String debugMode = "DETAILED";
 
     @JsonProperty("enableEventCapture")
@@ -65,60 +66,86 @@ public class DebugRequest {
     private Map<String, Object> analysisConfig;
 
     // Getters and Setters
-    
+
     public String getTargetIdp() {
+
         return targetIdp;
     }
 
     public void setTargetIdp(String targetIdp) {
+
         this.targetIdp = targetIdp;
     }
 
     public String getTargetAuthenticator() {
+
         return targetAuthenticator;
     }
 
     public void setTargetAuthenticator(String targetAuthenticator) {
+
         this.targetAuthenticator = targetAuthenticator;
     }
 
     public String getTestUser() {
+
         return testUser;
     }
 
     public void setTestUser(String testUser) {
+
         this.testUser = testUser;
     }
 
     public Map<String, String> getTestClaims() {
+
         return testClaims;
     }
 
     public void setTestClaims(Map<String, String> testClaims) {
+
         this.testClaims = testClaims;
     }
 
     public String getDebugMode() {
+
         return debugMode;
     }
 
     public void setDebugMode(String debugMode) {
+
         this.debugMode = debugMode;
     }
 
     public Boolean getEnableEventCapture() {
+
         return enableEventCapture;
     }
 
     public void setEnableEventCapture(Boolean enableEventCapture) {
+
         this.enableEventCapture = enableEventCapture;
     }
 
     public Map<String, Object> getAnalysisConfig() {
+
         return analysisConfig;
     }
 
     public void setAnalysisConfig(Map<String, Object> analysisConfig) {
+
         this.analysisConfig = analysisConfig;
+    }
+
+    @Override
+    public String toString() {
+        
+        return "DebugRequest{" +
+                "targetIdp='" + targetIdp + '\'' +
+                ", targetAuthenticator='" + targetAuthenticator + '\'' +
+                ", testUser='" + testUser + '\'' +
+                ", debugMode='" + debugMode + '\'' +
+                ", enableEventCapture=" + enableEventCapture +
+                '}';
     }
 }

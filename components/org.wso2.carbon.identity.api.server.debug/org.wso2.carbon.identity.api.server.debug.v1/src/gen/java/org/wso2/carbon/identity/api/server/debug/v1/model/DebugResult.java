@@ -26,7 +26,8 @@ import java.util.Map;
 
 /**
  * Debug result object containing the actual debug operation result data.
- * Wraps debugId, authorizationUrl, status, and metadata for flexible response structures.
+ * Wraps debugId, authorizationUrl, status, and metadata for flexible response
+ * structures.
  */
 @ApiModel(description = "Debug result object containing the debug operation result data")
 public class DebugResult {
@@ -35,12 +36,11 @@ public class DebugResult {
     @JsonProperty("debugId")
     private String debugId;
 
-    @ApiModelProperty(value = "OAuth 2.0 authorization URL for user authentication") 
+    @ApiModelProperty(value = "OAuth 2.0 authorization URL for user authentication")
     @JsonProperty("authorizationUrl")
     private String authorizationUrl;
 
-    @ApiModelProperty(value = "Status of the debug operation", example = "SUCCESS", 
-                      notes = "Possible values: SUCCESS, IN_PROGRESS, FAILURE, DIRECT_RESULT")
+    @ApiModelProperty(value = "Status of the debug operation", example = "SUCCESS", notes = "Possible values: SUCCESS, IN_PROGRESS, FAILURE, DIRECT_RESULT")
     @JsonProperty("status")
     private String status;
 

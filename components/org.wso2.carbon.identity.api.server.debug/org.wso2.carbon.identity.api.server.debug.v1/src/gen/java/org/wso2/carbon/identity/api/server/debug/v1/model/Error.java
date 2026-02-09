@@ -29,7 +29,7 @@ import javax.validation.Valid;
  */
 @ApiModel(description = "Error model for debug API responses")
 public class Error {
-    
+
     private String code;
     private String message;
     private String description;
@@ -46,7 +46,7 @@ public class Error {
         this.code = code;
         return this;
     }
-    
+
     @ApiModelProperty(example = "DEBUG-00000", value = "Error code")
     @JsonProperty("code")
     @Valid
@@ -54,7 +54,7 @@ public class Error {
 
         return code;
     }
-    
+
     public void setCode(String code) {
 
         this.code = code;
@@ -71,7 +71,7 @@ public class Error {
         this.message = message;
         return this;
     }
-    
+
     @ApiModelProperty(example = "Debug operation failed", value = "Error message")
     @JsonProperty("message")
     @Valid
@@ -79,7 +79,7 @@ public class Error {
 
         return message;
     }
-    
+
     public void setMessage(String message) {
 
         this.message = message;
@@ -96,7 +96,7 @@ public class Error {
         this.description = description;
         return this;
     }
-    
+
     @ApiModelProperty(example = "The debug operation failed due to invalid credentials", value = "Error description")
     @JsonProperty("description")
     @Valid
@@ -104,7 +104,7 @@ public class Error {
 
         return description;
     }
-    
+
     public void setDescription(String description) {
 
         this.description = description;
@@ -121,7 +121,7 @@ public class Error {
         this.traceId = traceId;
         return this;
     }
-    
+
     @ApiModelProperty(example = "e0fbcfeb-3617-43c4-8dd0-7b7d38e13047", value = "Trace ID")
     @JsonProperty("traceId")
     @Valid
@@ -129,7 +129,7 @@ public class Error {
 
         return traceId;
     }
-    
+
     public void setTraceId(String traceId) {
 
         this.traceId = traceId;

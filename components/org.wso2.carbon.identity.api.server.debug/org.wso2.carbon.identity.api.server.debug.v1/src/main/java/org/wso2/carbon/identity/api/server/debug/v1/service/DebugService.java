@@ -1,17 +1,17 @@
-/*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+/**
+ * Copyright (c) 2026, WSO2 LLC. (https://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
+ * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
  */
@@ -20,6 +20,7 @@ package org.wso2.carbon.identity.api.server.debug.v1.service;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.identity.api.server.debug.common.Constants;
 import org.wso2.carbon.identity.api.server.debug.common.DebugFrameworkServiceHolder;
 import org.wso2.carbon.identity.debug.framework.core.DebugRequestCoordinator;
 
@@ -30,20 +31,15 @@ import java.util.Map;
 /**
  * Service layer for debug operations.
  * 
- * <p>
  * This service provides a clean interface for the API layer and delegates
  * to debug framework components. It handles:
- * </p>
- * <ul>
- * <li>Generic resource debug requests</li>
- * <li>OAuth 2.0 authorization URL generation for debugging</li>
- * </ul>
- * 
- * <p>
+ * Generic resource debug requests
+ * OAuth 2.0 authorization URL generation for debugging
+ *
  * The service uses the {@link DebugRequestCoordinator} for centralized
  * request routing and protocol-specific handling.
- * </p>
  */
+
 public class DebugService {
 
     private static final Log LOG = LogFactory.getLog(DebugService.class);
@@ -61,12 +57,11 @@ public class DebugService {
     private static final String KEY_TIMESTAMP = "timestamp";
     private static final String KEY_STATUS = "status";
 
-    private static final String STATUS_SUCCESS = "SUCCESS";
-
     /**
      * Constructor initializes debug framework service via service holder pattern.
      */
     public DebugService() {
+
         // Debug framework services are loaded on-demand
     }
 
@@ -96,7 +91,7 @@ public class DebugService {
         resultMap.put(KEY_TIMESTAMP, System.currentTimeMillis());
         resultMap.put(KEY_RESOURCE_ID, resourceId);
         resultMap.put(KEY_RESOURCE_TYPE, resourceType);
-        resultMap.putIfAbsent(KEY_STATUS, STATUS_SUCCESS);
+        resultMap.putIfAbsent(KEY_STATUS, Constants.Status.SUCCESS);
 
         return resultMap;
     }
@@ -123,7 +118,7 @@ public class DebugService {
         // Add metadata
         resultMap.put(KEY_TIMESTAMP, System.currentTimeMillis());
         resultMap.put(KEY_IDP_ID, idpId);
-        resultMap.put(KEY_STATUS, STATUS_SUCCESS);
+        resultMap.put(KEY_STATUS, Constants.Status.SUCCESS);
 
         return resultMap;
     }
@@ -136,7 +131,7 @@ public class DebugService {
      * @return The extracted result map.
      * @throws RuntimeException if execution fails.
      */
-    private Map<String, Object> executeDebugRequest(String methodName, Map<String, Object> context) {
+    protected Map<String, Object> executeDebugRequest(String methodName, Map<String, Object> context) {
 
         try {
             // Ensure debug framework is available
@@ -167,7 +162,7 @@ public class DebugService {
      * @return The coordinator instance.
      * @throws RuntimeException if coordinator is not available.
      */
-    private DebugRequestCoordinator getCoordinatorOrThrow() {
+    protected DebugRequestCoordinator getCoordinatorOrThrow() {
 
         if (!DebugFrameworkServiceHolder.isDebugFrameworkAvailable()) {
             throw new RuntimeException("Debug framework services are not available");
@@ -188,7 +183,7 @@ public class DebugService {
      * @param result The result object.
      * @return Map containing extracted result data.
      */
-    private Map<String, Object> extractDebugResultData(Object result) {
+    protected Map<String, Object> extractDebugResultData(Object result) {
 
         Map<String, Object> extractedData = new HashMap<>();
 
@@ -207,7 +202,7 @@ public class DebugService {
             }
         } catch (Exception e) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Error extracting debug result data: " + e.getMessage());
+                LOG.debug("Error extracting debug result data.", e);
             }
         }
 
@@ -220,7 +215,7 @@ public class DebugService {
      * @param debugResult The DebugResult object.
      * @param target      The target map to populate.
      */
-    private void extractFromDebugResult(Object debugResult, Map<String, Object> target) {
+    protected void extractFromDebugResult(Object debugResult, Map<String, Object> target) {
 
         // Extract resultData
         Object resultData = invokeMethod(debugResult, "getResultData");
@@ -266,14 +261,14 @@ public class DebugService {
      * @param methodName The method name.
      * @return The method result, or null if invocation fails.
      */
-    private Object invokeMethod(Object object, String methodName) {
+    protected Object invokeMethod(Object object, String methodName) {
 
         try {
             Method method = object.getClass().getMethod(methodName);
             return method.invoke(object);
         } catch (Exception e) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Method " + methodName + " not found on " + object.getClass().getName());
+                LOG.debug("Reflection method invocation failed.", e);
             }
             return null;
         }
@@ -285,9 +280,9 @@ public class DebugService {
      * @param context Error context description.
      * @param e       The exception.
      */
-    private void logError(String context, Exception e) {
+    protected void logError(String context, Exception e) {
 
-        LOG.error(context + ": " + sanitize(e.getMessage()), e);
+        LOG.error("Error during debug request processing.", e);
     }
 
     /**
@@ -296,8 +291,11 @@ public class DebugService {
      * @param value The value to sanitize.
      * @return Sanitized string.
      */
-    private String sanitize(String value) {
+    protected String sanitize(String value) {
 
-        return value != null ? value.replaceAll("[\\r\\n]", "") : "";
+        if (value == null) {
+            return "";
+        }
+        return value.replaceAll("[\r\n]", "_");
     }
 }

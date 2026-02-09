@@ -26,8 +26,10 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.Map;
 
 /**
- * Debug connection response model for IdP OAuth 2.0 authentication testing results.
- * Wraps the debug operation result in a 'result' object for consistent structure.
+ * Debug connection response model for IdP OAuth 2.0 authentication testing
+ * results.
+ * Wraps the debug operation result in a 'result' object for consistent
+ * structure.
  */
 @ApiModel(description = "Debug connection response for IdP OAuth 2.0 authentication testing results")
 public class DebugConnectionResponse {

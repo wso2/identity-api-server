@@ -24,7 +24,8 @@ import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Debug request model for testing authentication flows and resources.
- * Supports both IdP OAuth 2.0 authentication testing and generic resource debugging.
+ * Supports both IdP OAuth 2.0 authentication testing and generic resource
+ * debugging.
  */
 @ApiModel(description = "Debug request for authentication flow and resource testing")
 public class DebugConnectionRequest {
@@ -52,7 +53,7 @@ public class DebugConnectionRequest {
     /**
      * Constructor with resource ID and type.
      *
-     * @param resourceId The resource ID to debug.
+     * @param resourceId   The resource ID to debug.
      * @param resourceType The type of resource to debug.
      */
     public DebugConnectionRequest(String resourceId, String resourceType) {
@@ -64,9 +65,9 @@ public class DebugConnectionRequest {
     /**
      * Constructor with all fields.
      *
-     * @param resourceId The resource ID to debug.
+     * @param resourceId   The resource ID to debug.
      * @param resourceType The type of resource to debug.
-     * @param properties Generic properties for debugging.
+     * @param properties   Generic properties for debugging.
      */
     public DebugConnectionRequest(String resourceId, String resourceType, java.util.Map<String, String> properties) {
 
@@ -145,4 +146,3 @@ public class DebugConnectionRequest {
                 '}';
     }
 }
-

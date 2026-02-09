@@ -31,12 +31,12 @@ paths:
       tags:
         - "Debug"
       requestBody:
-        description: "Generic debug request with resource ID, resource type, and properties."
+        description: "Debug request with resource ID, resource type, and properties."
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/GenericDebugRequest"
+              $ref: "#/components/schemas/DebugConnectionRequest"
       responses:
         '200':
           description: "Debug flow initiated successfully."
@@ -171,32 +171,6 @@ paths:
 
 components:
   schemas:
-    # ---------------
-    # Generic Debug
-    # ---------------
-    GenericDebugRequest:
-      type: object
-      required:
-        - resourceId
-        - resourceType
-      description: "Generic debug request for testing various resource types and properties."
-      properties:
-        resourceId:
-          type: string
-          description: "Resource ID to debug (e.g., Identity Provider ID, Application ID)."
-          example: "123e4567-e89b-12d3-a456-426614174000"
-        resourceType:
-          type: string
-          description: "Type of resource to debug (e.g., IDP, APPLICATION, CONNECTOR)."
-          example: "IDP"
-        properties:
-          type: object
-          additionalProperties:
-            type: string
-          description: "Generic properties for resource debugging as key-value pairs (optional)."
-          example:
-            "authenticatorName": "OpenIDConnectAuthenticator"
-
     # -------------
     # Common Error
     # -------------
@@ -224,33 +198,35 @@ components:
           description: "Trace identifier for error correlation."
 
     # ---------------------------------
-    # POST /debug/connection/{idp-id}
+    # POST /debug and /debug/connection/{idp-id}
     # ---------------------------------
     DebugConnectionRequest:
       type: object
+      required:
+        - resourceId
+        - resourceType
       description: "Request body for starting a debug session."
       properties:
-        authenticatorName:
+        resourceId:
           type: string
-          description: "Optional authenticator name to use for testing."
-          example: "OpenIDConnectAuthenticator"
-        redirectUri:
+          description: "Resource ID to debug (e.g., Identity Provider ID, Application ID)."
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        resourceType:
           type: string
-          description: "Custom redirect URI for OAuth 2.0 callback (optional)."
-          example: "https://localhost:9443/commonauth"
-        scope:
-          type: string
-          description: "Custom OAuth 2.0 scope (optional)."
-          example: "openid profile email"
-        timeoutSeconds:
-          type: integer
-          description: "Request timeout in seconds."
-          example: 30
-        additionalParams:
+          description: "Type of resource to debug. Allowed values: IDP, APPLICATION, CONNECTOR, AUTHENTICATOR."
+          example: "IDP"
+          enum:
+            - "IDP"
+            - "APPLICATION"
+            - "CONNECTOR"
+            - "AUTHENTICATOR"
+        properties:
           type: object
           additionalProperties:
             type: string
-          description: "Additional OAuth 2.0 parameters as key-value pairs."
+          description: "Generic properties for resource debugging as key-value pairs (optional). Can include authenticatorName, redirectUri, scope, etc."
+          example:
+            "authenticatorName": "OpenIDConnectAuthenticator"
 
     DebugConnectionResponse:
       type: object

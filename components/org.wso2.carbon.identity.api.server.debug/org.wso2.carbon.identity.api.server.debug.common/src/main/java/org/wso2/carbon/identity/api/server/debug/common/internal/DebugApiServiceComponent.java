@@ -1,17 +1,17 @@
-/*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+/**
+ * Copyright (c) 2026, WSO2 LLC. (https://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
+ * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
  */
@@ -43,6 +43,7 @@ public class DebugApiServiceComponent {
 
     @Activate
     protected void activate(ComponentContext context) {
+
         try {
             log.info("API Debug Service Component activated successfully");
             log.info("Ready to provide debug framework service lookup for API layer");
@@ -54,6 +55,7 @@ public class DebugApiServiceComponent {
 
     @Deactivate
     protected void deactivate(ComponentContext context) {
+
         try {
             log.info("API Debug Service Component deactivated successfully");
         } catch (Exception e) {
@@ -74,6 +76,7 @@ public class DebugApiServiceComponent {
             unbind = "unsetDebugService"
     )
     protected void setDebugService(Object debugService) {
+
         try {
             DebugApiServiceDataHolder.getInstance().setDebugService(debugService);
             log.info("Debug framework service set in API Debug Service Component");
@@ -83,6 +86,7 @@ public class DebugApiServiceComponent {
     }
 
     protected void unsetDebugService(Object debugService) {
+
         try {
             DebugApiServiceDataHolder.getInstance().setDebugService(null);
             log.info("Debug framework service unset from API Debug Service Component");
