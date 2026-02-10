@@ -25,6 +25,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.FraudDetectionConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthOAuth2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch;
@@ -280,6 +281,42 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     public Response deleteSAMLInboundAuthConfig() {
 
         configManagementService.deleteSAMLInboundAuthConfig();
+        return Response.noContent().build();
+    }
+
+    /**
+     * Gets the OAuth2 inbound authentication configuration of an organization.
+     * 
+     * @return Response containing the OAuth2 inbound authentication configuration.
+     */
+    @Override
+    public Response getOAuth2InboundAuthConfig() {
+
+        return Response.ok().entity(configManagementService.getOAuth2InboundAuthConfig()).build();
+    }
+
+    /**
+     * Updates the OAuth2 inbound authentication configuration of an organization.
+     * @param inboundAuthOAuth2Config InboundAuthOAuth2Config object containing the updated configuration.
+     * 
+     * @return Response indicating the result of the operation.
+     */
+    @Override
+    public Response updateOAuth2InboundAuthConfig(InboundAuthOAuth2Config inboundAuthOAuth2Config) {
+
+        configManagementService.updateOAuth2InboundAuthConfig(inboundAuthOAuth2Config);
+        return Response.ok().build();
+    }
+
+    /**
+     * Deletes the OAuth2 inbound authentication configuration of an organization.
+     * 
+     * @return Response indicating the result of the operation.
+     */
+    @Override
+    public Response deleteOAuth2InboundAuthConfig() {
+
+        configManagementService.deleteOAuth2InboundAuthConfig();
         return Response.noContent().build();
     }
     

@@ -53,6 +53,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.EventProperty;
 import org.wso2.carbon.identity.api.server.configs.v1.model.FraudDetectionConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationConfiguration;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthOAuth2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundConfig;
@@ -2029,6 +2030,176 @@ public class ServerConfigManagementService {
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     Constants.ErrorMessage.ERROR_CODE_ERROR_PASSIVE_STS_INBOUND_AUTH_CONFIG_DELETE, null);
         }
+    }
+
+    /**
+     * Get the OAuth2 inbound authentication configuration for the tenant.
+     */
+    public InboundAuthOAuth2Config getOAuth2InboundAuthConfig() {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        InboundAuthOAuth2Config inboundAuthConfig = new InboundAuthOAuth2Config();
+        try {
+            IdentityProvider residentIdp = idpManager.getResidentIdP(tenantDomain);
+            if (residentIdp != null) {
+                FederatedAuthenticatorConfig federatedAuthConfig = IdentityApplicationManagementUtil
+                        .getFederatedAuthenticator(residentIdp.getFederatedAuthenticatorConfigs(),
+                                IdentityApplicationConstants.Authenticator.OIDC.NAME);
+                if (federatedAuthConfig == null) {
+                    throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                            Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_CONFIG_NOT_FOUND,
+                            IdentityApplicationConstants.Authenticator.OIDC.NAME);
+                }
+
+                Property[] idpProperties = federatedAuthConfig.getProperties();
+                if (idpProperties == null || idpProperties.length == 0) {
+                    throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                            Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_PROPERTIES_NOT_FOUND,
+                            IdentityApplicationConstants.Authenticator.OIDC.NAME);
+                }
+
+                // Extract OAuth2-specific configuration properties
+                inboundAuthConfig.setEnableJwtScopeAsArray(Boolean.parseBoolean(
+                        IdentityApplicationManagementUtil.getPropertyValue(idpProperties,
+                                IdentityApplicationConstants.Authenticator.OIDC.ENABLE_JWT_SCOPE_AS_ARRAY)));
+            } else {
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                        Constants.ErrorMessage.ERROR_CODE_RESIDENT_IDP_NOT_FOUND, tenantDomain);
+            }
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_OAUTH2_INBOUND_AUTH_CONFIG_RETRIEVE, null);
+        }
+
+        return inboundAuthConfig;
+    }
+
+    /**
+     * Update the OAuth2 inbound authentication configuration for the tenant.
+     *
+     * @param authConfigToUpdate OAuth2 inbound authentication configs to update.
+     */
+    public void updateOAuth2InboundAuthConfig(InboundAuthOAuth2Config authConfigToUpdate) {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+
+        try {
+            IdentityProvider residentIdp = idpManager.getResidentIdP(tenantDomain);
+            if (residentIdp != null) {
+                FederatedAuthenticatorConfig federatedAuthConfig = IdentityApplicationManagementUtil
+                        .getFederatedAuthenticator(residentIdp.getFederatedAuthenticatorConfigs(),
+                                IdentityApplicationConstants.Authenticator.OIDC.NAME);
+                if (federatedAuthConfig == null) {
+                    throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                            Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_CONFIG_NOT_FOUND,
+                            IdentityApplicationConstants.Authenticator.OIDC.NAME);
+                }
+
+                Property[] idpProperties = federatedAuthConfig.getProperties();
+                if (idpProperties == null) {
+                    throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                            Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_PROPERTIES_NOT_FOUND,
+                            IdentityApplicationConstants.Authenticator.OIDC.NAME);
+                }
+                Property[] updatedIdpProperties = getUpdatedOAuth2FederatedAuthConfigProperties(idpProperties,
+                        authConfigToUpdate);
+                federatedAuthConfig.setProperties(updatedIdpProperties);
+                residentIdp.setFederatedAuthenticatorConfigs(new FederatedAuthenticatorConfig[]{federatedAuthConfig});
+                if (OrganizationManagementUtil.isOrganization(tenantDomain)) {
+                    /* Not sending existing resident IDP properties to update since only OAuth2 inbound auth configs
+                     * are updated.
+                     */
+                    residentIdp.setIdpProperties(new IdentityProviderProperty[0]);
+                }
+
+                idpManager.updateResidentIdP(residentIdp, tenantDomain);
+            } else {
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                        Constants.ErrorMessage.ERROR_CODE_RESIDENT_IDP_NOT_FOUND, tenantDomain);
+            }
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_OAUTH2_INBOUND_AUTH_CONFIG_UPDATE, null);
+        } catch (OrganizationManagementException e) {
+            log.error("Server encountered an error while updating the OAuth2 " +
+                    "inbound authentication configuration for the tenant: " + tenantDomain, e);
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_OAUTH2_INBOUND_AUTH_CONFIG_UPDATE, null);
+        }
+    }
+
+    /**
+     * Delete the OAuth2 inbound authentication configuration of an organization.
+     */
+    public void deleteOAuth2InboundAuthConfig() {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            IdentityProvider residentIdp = idpManager.getResidentIdP(tenantDomain);
+            if (residentIdp == null) {
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                        Constants.ErrorMessage.ERROR_CODE_RESIDENT_IDP_NOT_FOUND, tenantDomain);
+            }
+
+            IdentityProvider idpToUpdate = createIdPClone(residentIdp);
+            FederatedAuthenticatorConfig federatedAuthConfig = IdentityApplicationManagementUtil
+                    .getFederatedAuthenticator(idpToUpdate.getFederatedAuthenticatorConfigs(),
+                            IdentityApplicationConstants.Authenticator.OIDC.NAME);
+            if (federatedAuthConfig == null) {
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                        Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_CONFIG_NOT_FOUND,
+                        IdentityApplicationConstants.Authenticator.OIDC.NAME);
+            }
+
+            Property[] authenticatorProperties = federatedAuthConfig.getProperties();
+            if (authenticatorProperties == null) {
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                        Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_PROPERTIES_NOT_FOUND,
+                        IdentityApplicationConstants.Authenticator.OIDC.NAME);
+            }
+
+            // Filter out the inherited properties so that they would be deleted.
+            List<Property> filteredProperties = new ArrayList<>();
+            for (Property property : authenticatorProperties) {
+                if (!IdPManagementConstants.INHERITED_FEDERATED_AUTHENTICATOR_PROPERTIES.contains(property.getName())) {
+                    filteredProperties.add(property);
+                }
+            }
+
+            federatedAuthConfig.setProperties(filteredProperties.toArray(new Property[0]));
+            idpToUpdate.setFederatedAuthenticatorConfigs(new FederatedAuthenticatorConfig[]{federatedAuthConfig});
+            if (OrganizationManagementUtil.isOrganization(tenantDomain)) {
+                // To make sure that no resident IDP properties are sent to update.
+                idpToUpdate.setIdpProperties(new IdentityProviderProperty[0]);
+            }
+
+            idpManager.updateResidentIdP(idpToUpdate, tenantDomain);
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_OAUTH2_INBOUND_AUTH_CONFIG_DELETE, null);
+        } catch (OrganizationManagementException e) {
+            log.error("Server encountered an error while deleting the OAuth2 inbound authentication " +
+                    "configuration for the tenant: " + tenantDomain, e);
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_OAUTH2_INBOUND_AUTH_CONFIG_DELETE, null);
+        }
+    }
+
+    private Property[] getUpdatedOAuth2FederatedAuthConfigProperties(Property[] properties,
+                                                                   InboundAuthOAuth2Config authConfigToUpdate) {
+
+        List<Property> updatedPropertyList = new ArrayList<>();
+
+        for (Property property : properties) {
+            if (property.getName().equals(
+                    IdentityApplicationConstants.Authenticator.OIDC.ENABLE_JWT_SCOPE_AS_ARRAY)) {
+                if (authConfigToUpdate.getEnableJwtScopeAsArray() != null) {
+                    property.setValue(Boolean.toString(authConfigToUpdate.getEnableJwtScopeAsArray()));
+                }
+                updatedPropertyList.add(property);
+            }
+        }
+        return updatedPropertyList.toArray(new Property[0]);
     }
 
     public FraudDetectionConfig getFraudDetectionConfigs() {
