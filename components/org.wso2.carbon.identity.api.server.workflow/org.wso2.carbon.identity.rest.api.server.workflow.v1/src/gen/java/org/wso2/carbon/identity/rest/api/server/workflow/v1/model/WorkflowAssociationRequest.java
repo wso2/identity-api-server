@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.ORRule;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Operation;
 import javax.validation.constraints.*;
 
@@ -37,6 +38,7 @@ public class WorkflowAssociationRequest  {
     private Operation operation;
     private String workflowId;
     private Boolean isEnabled = true;
+    private ORRule rule;
 
     /**
     * Name of the workflow association
@@ -119,6 +121,24 @@ public class WorkflowAssociationRequest  {
         this.isEnabled = isEnabled;
     }
 
+    /**
+    **/
+    public WorkflowAssociationRequest rule(ORRule rule) {
+
+        this.rule = rule;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("rule")
+    @Valid
+    public ORRule getRule() {
+        return rule;
+    }
+    public void setRule(ORRule rule) {
+        this.rule = rule;
+    }
+
 
 
     @Override
@@ -134,12 +154,13 @@ public class WorkflowAssociationRequest  {
         return Objects.equals(this.associationName, workflowAssociationRequest.associationName) &&
             Objects.equals(this.operation, workflowAssociationRequest.operation) &&
             Objects.equals(this.workflowId, workflowAssociationRequest.workflowId) &&
-            Objects.equals(this.isEnabled, workflowAssociationRequest.isEnabled);
+            Objects.equals(this.isEnabled, workflowAssociationRequest.isEnabled) &&
+            Objects.equals(this.rule, workflowAssociationRequest.rule);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(associationName, operation, workflowId, isEnabled);
+        return Objects.hash(associationName, operation, workflowId, isEnabled, rule);
     }
 
     @Override
@@ -152,6 +173,7 @@ public class WorkflowAssociationRequest  {
         sb.append("    operation: ").append(toIndentedString(operation)).append("\n");
         sb.append("    workflowId: ").append(toIndentedString(workflowId)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
+        sb.append("    rule: ").append(toIndentedString(rule)).append("\n");
         sb.append("}");
         return sb.toString();
     }

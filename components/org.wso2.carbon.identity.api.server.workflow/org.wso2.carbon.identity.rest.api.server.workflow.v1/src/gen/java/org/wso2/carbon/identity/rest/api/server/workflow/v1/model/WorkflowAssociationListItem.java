@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.ORRuleResponse;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Operation;
 import javax.validation.constraints.*;
 
@@ -38,6 +39,7 @@ public class WorkflowAssociationListItem  {
     private Operation operation;
     private String workflowName;
     private Boolean isEnabled;
+    private ORRuleResponse rule;
 
     /**
     * Unique id to represent a workflow association
@@ -133,6 +135,24 @@ public class WorkflowAssociationListItem  {
         this.isEnabled = isEnabled;
     }
 
+    /**
+    **/
+    public WorkflowAssociationListItem rule(ORRuleResponse rule) {
+
+        this.rule = rule;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("rule")
+    @Valid
+    public ORRuleResponse getRule() {
+        return rule;
+    }
+    public void setRule(ORRuleResponse rule) {
+        this.rule = rule;
+    }
+
 
 
     @Override
@@ -149,12 +169,13 @@ public class WorkflowAssociationListItem  {
             Objects.equals(this.associationName, workflowAssociationListItem.associationName) &&
             Objects.equals(this.operation, workflowAssociationListItem.operation) &&
             Objects.equals(this.workflowName, workflowAssociationListItem.workflowName) &&
-            Objects.equals(this.isEnabled, workflowAssociationListItem.isEnabled);
+            Objects.equals(this.isEnabled, workflowAssociationListItem.isEnabled) &&
+            Objects.equals(this.rule, workflowAssociationListItem.rule);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, associationName, operation, workflowName, isEnabled);
+        return Objects.hash(id, associationName, operation, workflowName, isEnabled, rule);
     }
 
     @Override
@@ -168,6 +189,7 @@ public class WorkflowAssociationListItem  {
         sb.append("    operation: ").append(toIndentedString(operation)).append("\n");
         sb.append("    workflowName: ").append(toIndentedString(workflowName)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
+        sb.append("    rule: ").append(toIndentedString(rule)).append("\n");
         sb.append("}");
         return sb.toString();
     }
