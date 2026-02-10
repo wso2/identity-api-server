@@ -693,9 +693,10 @@ public class WorkflowService {
         associationListItem.setOperation(Operation.valueOf(association.getEventId()));
         associationListItem.setWorkflowName(association.getWorkflowName());
         associationListItem.setIsEnabled(association.isEnabled());
-        associationListItem.setRule(new ORRuleResponse());
 
-        populateRuleResponse(association, associationListItem::setRule);
+        ORRuleResponse ruleResponse = getRuleResponse(association);
+        associationListItem.setRule(ruleResponse != null ? ruleResponse : new ORRuleResponse());
+
         return associationListItem;
     }
 
@@ -711,19 +712,20 @@ public class WorkflowService {
         associationResponse.setOperation(Operation.valueOf(association.getEventId()));
         associationResponse.setWorkflowName(association.getWorkflowName());
         associationResponse.setIsEnabled(association.isEnabled());
-        associationResponse.setRule(new ORRuleResponse());
 
-        populateRuleResponse(association, associationResponse::setRule);
+        ORRuleResponse ruleResponse = getRuleResponse(association);
+        associationResponse.setRule(ruleResponse != null ? ruleResponse : new ORRuleResponse());
+
         return associationResponse;
     }
 
     /**
-     * Populates the rule response for an association if the rule ID is valid.
+     * Retrieves the rule response for an association if the rule ID is valid.
      *
-     * @param association   The association object.
-     * @param ruleSetter    Consumer to set the rule response.
+     * @param association The association object.
+     * @return ORRuleResponse if rule exists, null otherwise.
      */
-    private void populateRuleResponse(Association association, Consumer<ORRuleResponse> ruleSetter) {
+    private ORRuleResponse getRuleResponse(Association association) {
 
         String ruleId = association.getCondition();
 
@@ -731,8 +733,7 @@ public class WorkflowService {
             try {
                 String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
                 Rule rule = ruleManagementService.getRuleByRuleId(ruleId, tenantDomain);
-                ORRuleResponse ruleResponse = WorkflowRuleMapper.mapServiceRuleToApiRule(rule);
-                ruleSetter.accept(ruleResponse);
+                return WorkflowRuleMapper.mapServiceRuleToApiRule(rule);
 
             } catch (RuleManagementException e) {
                 // Log the error but do not throw it.
@@ -741,6 +742,7 @@ public class WorkflowService {
                         association.getAssociationId(), e);
             }
         }
+        return null;
     }
 
     public void abortWorkflowInstance(String instanceId) {
