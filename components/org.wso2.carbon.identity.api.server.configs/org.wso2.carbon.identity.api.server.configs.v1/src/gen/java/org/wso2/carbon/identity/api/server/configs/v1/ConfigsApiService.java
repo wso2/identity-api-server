@@ -30,6 +30,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Error;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthOAuth2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch;
@@ -46,6 +47,8 @@ import javax.ws.rs.core.Response;
 
 
 public interface ConfigsApiService {
+
+      public Response deleteOAuth2InboundAuthConfig();
 
       public Response deletePassiveSTSInboundAuthConfig();
 
@@ -64,6 +67,8 @@ public interface ConfigsApiService {
       public Response getImpersonationConfiguration();
 
       public Response getInboundScimConfigs();
+
+      public Response getOAuth2InboundAuthConfig();
 
       public Response getPassiveSTSInboundAuthConfig();
 
@@ -101,6 +106,8 @@ public interface ConfigsApiService {
       public Response updateFraudDetectionConfigs(FraudDetectionConfig fraudDetectionConfig);
 
       public Response updateInboundScimConfigs(ScimConfig scimConfig);
+
+      public Response updateOAuth2InboundAuthConfig(InboundAuthOAuth2Config inboundAuthOAuth2Config);
 
       public Response updatePassiveSTSInboundAuthConfig(InboundAuthPassiveSTSConfig inboundAuthPassiveSTSConfig);
 
