@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2020-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -68,6 +68,8 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.Schema;
 import org.wso2.carbon.identity.api.server.configs.v1.model.SchemaListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ScimConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ServerConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.UsageScopePatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.UsageScopePayload;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementClientException;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementServerException;
@@ -101,6 +103,10 @@ import org.wso2.carbon.identity.fraud.detection.core.model.FraudDetectionConfigD
 import org.wso2.carbon.identity.fraud.detection.core.service.FraudDetectionConfigsService;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
 import org.wso2.carbon.identity.oauth.dcr.exception.DCRMException;
+import org.wso2.carbon.identity.oauth2.config.exceptions.OAuth2OIDCConfigOrgUsageScopeMgtException;
+import org.wso2.carbon.identity.oauth2.config.models.IssuerUsageScopeConfig;
+import org.wso2.carbon.identity.oauth2.config.models.UsageScope;
+import org.wso2.carbon.identity.oauth2.config.services.OAuth2OIDCConfigOrgUsageScopeMgtService;
 import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationConfigMgtClientException;
 import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationConfigMgtException;
 import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationConfigMgtServerException;
@@ -158,6 +164,7 @@ public class ServerConfigManagementService {
     private final ImpersonationConfigMgtService impersonationConfigMgtService;
     private final JWTClientAuthenticatorMgtService jwtClientAuthenticatorMgtService;
     private final DCRConfigurationMgtService dcrConfigurationMgtService;
+    private final OAuth2OIDCConfigOrgUsageScopeMgtService oAuth2OIDCConfigOrgUsageScopeMgtService;
 
     private static final Log log = LogFactory.getLog(ServerConfigManagementService.class);
 
@@ -168,7 +175,8 @@ public class ServerConfigManagementService {
                                          ImpersonationConfigMgtService impersonationConfigMgtService,
                                          DCRConfigurationMgtService dcrConfigurationMgtService,
                                          JWTClientAuthenticatorMgtService jwtClientAuthenticatorMgtService,
-                                         FraudDetectionConfigsService fraudDetectionConfigsService) {
+                                         FraudDetectionConfigsService fraudDetectionConfigsService,
+                                         OAuth2OIDCConfigOrgUsageScopeMgtService oAuth2OIDCConfigOrgUsageScopeMgtService) {
 
         this.applicationManagementService = applicationManagementService;
         this.idpManager = idpManager;
@@ -178,6 +186,7 @@ public class ServerConfigManagementService {
         this.dcrConfigurationMgtService = dcrConfigurationMgtService;
         this.jwtClientAuthenticatorMgtService = jwtClientAuthenticatorMgtService;
         this.fraudDetectionConfigsService = fraudDetectionConfigsService;
+        this.oAuth2OIDCConfigOrgUsageScopeMgtService = oAuth2OIDCConfigOrgUsageScopeMgtService;
     }
 
     /**
@@ -2229,6 +2238,52 @@ public class ServerConfigManagementService {
         }
     }
 
+    /**
+     * Get issuer usage scope configuration.
+     *
+     * @return usage scope payload with issuer usage scope.
+     */
+    public UsageScopePayload getIssuerUsageScopeConfig() {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        IssuerUsageScopeConfig issuerUsageScopeConfig;
+        try {
+            issuerUsageScopeConfig = oAuth2OIDCConfigOrgUsageScopeMgtService.getIssuerUsageScope(tenantDomain);
+        } catch (OAuth2OIDCConfigOrgUsageScopeMgtException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_ISSUER_USAGE_CONFIG_RETRIEVE, e.getMessage());
+        }
+        return buildIssuerUsageScopeConfig(issuerUsageScopeConfig);
+    }
+
+    /**
+     * Update the issuer usage scope configuration of the tenant.
+     *
+     * @param usageScopePatchPayload payload that contains the updated usage scope.
+     * @return usage scope payload with the updated issuer usage scope configuration.
+     */
+    public UsageScopePayload updateIssuerUsageScopeConfig(UsageScopePatch usageScopePatchPayload) {
+
+        if (usageScopePatchPayload.getUsageScope() == null) {
+            throw handleException(Response.Status.BAD_REQUEST,
+                    Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT, "Usage scope is required");
+        }
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        IssuerUsageScopeConfig updatedConfig;
+        try {
+            IssuerUsageScopeConfig configToUpdate = new IssuerUsageScopeConfig();
+            UsageScope usageScope = UsageScope.fromValue(usageScopePatchPayload.getUsageScope().value());
+            configToUpdate.setUsageScope(usageScope);
+            updatedConfig = oAuth2OIDCConfigOrgUsageScopeMgtService.updateIssuerUsageScope(tenantDomain,
+                    configToUpdate);
+        } catch (OAuth2OIDCConfigOrgUsageScopeMgtException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_ISSUER_USAGE_CONFIG_UPDATE, e.getMessage());
+        }
+        return buildIssuerUsageScopeConfig(updatedConfig);
+    }
+
     private FraudDetectionConfig buildFraudDetectionConfig(FraudDetectionConfigDTO dto) {
 
         FraudDetectionConfig fraudDetectionConfig = new FraudDetectionConfig();
@@ -2320,5 +2375,15 @@ public class ServerConfigManagementService {
         }
 
         return new APIError(status, errorResponse);
+    }
+
+    private UsageScopePayload buildIssuerUsageScopeConfig(IssuerUsageScopeConfig config) {
+
+        UsageScopePayload usageScopePayload = new UsageScopePayload();
+        if (config != null && config.getUsageScope() != null) {
+            usageScopePayload.setUsageScope(UsageScopePayload.UsageScopeEnum.valueOf(
+                    config.getUsageScope().getValue()));
+        }
+        return usageScopePayload;
     }
 }
