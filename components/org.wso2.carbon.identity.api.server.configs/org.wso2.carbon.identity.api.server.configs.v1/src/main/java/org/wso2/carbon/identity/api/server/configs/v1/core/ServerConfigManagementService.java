@@ -272,6 +272,14 @@ public class ServerConfigManagementService {
             rememberMePeriod = rememberMeProp.getValue();
         }
 
+        Boolean preserveCurrentSessionAtPasswordUpdate = null;
+        IdentityProviderProperty preserveSessionProp = IdentityApplicationManagementUtil.getProperty(
+                residentIdP.getIdpProperties(),
+                IdentityApplicationConstants.PRESERVE_CURRENT_SESSION_AT_PASSWORD_UPDATE);
+        if (preserveSessionProp != null) {
+            preserveCurrentSessionAtPasswordUpdate = Boolean.parseBoolean(preserveSessionProp.getValue());
+        }
+
         String homeRealmIdStr = residentIdP.getHomeRealmId();
         List<String> homeRealmIdentifiers = null;
         if (StringUtils.isNotBlank(homeRealmIdStr)) {
@@ -282,6 +290,7 @@ public class ServerConfigManagementService {
         serverConfig.setRealmConfig(realmConfig);
         serverConfig.setIdleSessionTimeoutPeriod(idleSessionTimeout);
         serverConfig.setRememberMePeriod(rememberMePeriod);
+        serverConfig.setPreserveCurrentSessionAtPasswordUpdate(preserveCurrentSessionAtPasswordUpdate);
         serverConfig.setHomeRealmIdentifiers(homeRealmIdentifiers);
         serverConfig.setProvisioning(buildProvisioningConfig());
         serverConfig.setAuthenticators(getAuthenticators(null));
@@ -1016,6 +1025,10 @@ public class ServerConfigManagementService {
                             updateIdPProperty(idpToUpdate, existingIdpProperties,
                                     IdentityApplicationConstants.REMEMBER_ME_TIME_OUT, value);
                             break;
+                        case Constants.PRESERVE_CURRENT_SESSION_AT_PASSWORD_UPDATE_PATH:
+                            updateIdPProperty(idpToUpdate, existingIdpProperties,
+                                    IdentityApplicationConstants.PRESERVE_CURRENT_SESSION_AT_PASSWORD_UPDATE, value);
+                            break;
                         default:
                             throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
                                     .ERROR_CODE_INVALID_INPUT, "Unsupported value for 'path' attribute");
@@ -1057,6 +1070,10 @@ public class ServerConfigManagementService {
                             break;
                         case Constants.REMEMBER_ME_PATH:
                             propertiesToRemove.add(IdentityApplicationConstants.REMEMBER_ME_TIME_OUT);
+                            break;
+                        case Constants.PRESERVE_CURRENT_SESSION_AT_PASSWORD_UPDATE_PATH:
+                            propertiesToRemove.add(
+                                    IdentityApplicationConstants.PRESERVE_CURRENT_SESSION_AT_PASSWORD_UPDATE);
                             break;
                         default:
                             throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
