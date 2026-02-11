@@ -1018,14 +1018,17 @@ public class ServerConfigManagementService {
                 } else {
                     switch (path) {
                         case Constants.IDLE_SESSION_PATH:
+                            validateNumericIdPProperty(value);
                             updateIdPProperty(idpToUpdate, existingIdpProperties,
                                     IdentityApplicationConstants.SESSION_IDLE_TIME_OUT, value);
                             break;
                         case Constants.REMEMBER_ME_PATH:
+                            validateNumericIdPProperty(value);
                             updateIdPProperty(idpToUpdate, existingIdpProperties,
                                     IdentityApplicationConstants.REMEMBER_ME_TIME_OUT, value);
                             break;
                         case Constants.PRESERVE_CURRENT_SESSION_AT_PASSWORD_UPDATE_PATH:
+                            validateBooleanIdPProperty(value);
                             updateIdPProperty(idpToUpdate, existingIdpProperties,
                                     IdentityApplicationConstants.PRESERVE_CURRENT_SESSION_AT_PASSWORD_UPDATE, value);
                             break;
@@ -1100,11 +1103,6 @@ public class ServerConfigManagementService {
                                    String key, String value) {
 
         List<IdentityProviderProperty> updatedIdpProperties = new ArrayList<>();
-        if (StringUtils.isBlank(value) || !StringUtils.isNumeric(value) || Integer.parseInt(value) <= 0) {
-            String message = "Value should be numeric and positive";
-            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT,
-                    message);
-        }
         boolean isPropertyFound = false;
 
         for (IdentityProviderProperty property : existingIdpProperties) {
@@ -1131,6 +1129,24 @@ public class ServerConfigManagementService {
         }
 
         identityProvider.setIdpProperties(updatedIdpProperties.toArray(new IdentityProviderProperty[0]));
+    }
+
+    private void validateBooleanIdPProperty(String value) {
+
+        if (!"true".equals(value) && !"false".equals(value)) {
+            String message = "Value should be boolean";
+            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT,
+                    message);
+        }
+    }
+
+    private void validateNumericIdPProperty(String value) {
+
+        if (StringUtils.isBlank(value) || !StringUtils.isNumeric(value) || Integer.parseInt(value) <= 0) {
+            String message = "Value should be numeric and positive";
+            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT,
+                    message);
+        }
     }
 
     private IdentityProvider getResidentIdP() {
