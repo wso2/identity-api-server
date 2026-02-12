@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2026, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -28,6 +28,7 @@ import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.workflow.common.Constants;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.InstanceStatus;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.ORRule;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.ORRuleResponse;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Operation;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.OptionDetails;
@@ -61,6 +62,7 @@ import org.wso2.carbon.identity.workflow.mgt.dto.Association;
 import org.wso2.carbon.identity.workflow.mgt.dto.WorkflowEvent;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowClientException;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowException;
+import org.wso2.carbon.identity.workflow.mgt.util.WFConstant;
 import org.wso2.carbon.identity.workflow.mgt.util.WorkflowRequestStatus;
 
 import java.io.UnsupportedEncodingException;
@@ -348,27 +350,43 @@ public class WorkflowService {
                 String existingRuleId = existingAssociation.getCondition();
                 String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
 
-                try {
-                    Rule serviceRule = WorkflowRuleMapper.mapApiRuleToServiceRule(
-                            workflowAssociation.getRule(), tenantDomain);
-
-                    Rule resultRule;
-                    // Update existing rule if it exists and is not the default condition "boolean(1)",
-                    // otherwise create new rule.
+                // Check if the rule is empty
+                ORRule rule = workflowAssociation.getRule();
+                if (rule.getRules() == null || rule.getRules().isEmpty()) {
                     if (StringUtils.isNotBlank(existingRuleId) && isValidUUID(existingRuleId)) {
-                        serviceRule.setId(existingRuleId);
-                        resultRule = ruleManagementService.updateRule(serviceRule, tenantDomain);
-                    } else {
-                        resultRule = ruleManagementService.addRule(serviceRule, tenantDomain);
+                        try {
+                            ruleManagementService.deleteRule(existingRuleId, tenantDomain);
+                        } catch (RuleManagementException e) {
+                            // Log the error but continue with setting default condition.
+                            log.error("Error while deleting rule with ID: " + existingRuleId +
+                                    " for association ID: " + associationId + ". Proceeding with default condition.", e);
+                        }
                     }
+                    ruleId = WFConstant.DEFAULT_ASSOCIATION_CONDITION;
+                } else {
+                    // Process non-empty rule (update or create).
+                    try {
+                        Rule serviceRule = WorkflowRuleMapper.mapApiRuleToServiceRule(
+                                workflowAssociation.getRule(), tenantDomain);
 
-                    if (resultRule != null) {
-                        ruleId = resultRule.getId();
+                        Rule resultRule;
+                        // Update existing rule if it exists and is not the default condition "boolean(1)",
+                        // otherwise create new rule.
+                        if (StringUtils.isNotBlank(existingRuleId) && isValidUUID(existingRuleId)) {
+                            serviceRule.setId(existingRuleId);
+                            resultRule = ruleManagementService.updateRule(serviceRule, tenantDomain);
+                        } else {
+                            resultRule = ruleManagementService.addRule(serviceRule, tenantDomain);
+                        }
+
+                        if (resultRule != null) {
+                            ruleId = resultRule.getId();
+                        }
+                    } catch (RuleManagementException e) {
+                        String operation = StringUtils.isNotBlank(existingRuleId) && isValidUUID(existingRuleId) ?
+                                "updating" : "creating";
+                        throw new WorkflowException("Error while " + operation + " rule for workflow association.", e);
                     }
-                } catch (RuleManagementException e) {
-                    String operation = StringUtils.isNotBlank(existingRuleId) && isValidUUID(existingRuleId) ? 
-                            "updating" : "creating";
-                    throw new WorkflowException("Error while " + operation + " rule for workflow association.", e);
                 }
             }
             workflowManagementService.updateAssociation(associationId, workflowAssociation.getAssociationName(),
@@ -734,7 +752,6 @@ public class WorkflowService {
                 String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
                 Rule rule = ruleManagementService.getRuleByRuleId(ruleId, tenantDomain);
                 return WorkflowRuleMapper.mapServiceRuleToApiRule(rule);
-
             } catch (RuleManagementException e) {
                 // Log the error but do not throw it.
                 // This allows the Association details to be returned even if the Rule fetch fails.
