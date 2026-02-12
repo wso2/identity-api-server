@@ -1,11 +1,11 @@
 openapi: 3.0.0
 info:
   description: >
-    This document specifies an **Identity Provider Debug RESTful API** for
-    **WSO2 Identity Server**. This supports Restful APIs for debugging identity provider authentication flows.
-    The APIs provide the capability to start and retrieve debug sessions for identity provider authentication.
+    This document specifies a **Debug RESTful API** for **WSO2 Identity Server**.
+    This API supports debugging of various authentication flows and resource configurations.
+    The APIs provide the capability to start and retrieve debug sessions for different resource types.
   version: "v1"
-  title: WSO2 Identity Server - Identity Provider Debug API definition
+  title: WSO2 Identity Server - Debug API
   termsOfService: 'http://swagger.io/terms/'
   contact:
     name: WSO2
@@ -25,9 +25,9 @@ servers:
 paths:
   /debug:
     post:
-      summary: "Start Generic Debug Flow"
-      description: "Initiates a generalized debug flow for any resource type with configurable properties."
-      operationId: "startGenericDebug"
+      summary: "Start Debug Session"
+      description: "Initiates a debug session for any resource type (IDP, Application, etc.) with configurable properties."
+      operationId: "startDebugSession"
       tags:
         - "Debug"
       requestBody:
@@ -39,61 +39,7 @@ paths:
               $ref: "#/components/schemas/DebugConnectionRequest"
       responses:
         '200':
-          description: "Debug flow initiated successfully."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/DebugConnectionResponse"
-        '400':
-          description: "Bad Request"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        '401':
-          description: "Unauthorized"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        '403':
-          description: "Forbidden"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        '500':
-          description: "Server Error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-
-  /debug/connection/{idp-id}:
-    post:
-      summary: "Start IDP Debug Flow"
-      description: "Initiates the debug flow for a specific Identity Provider. (Deprecated: Use POST /debug for generic testing)"
-      operationId: "startIdpDebug"
-      tags:
-        - "Debug"
-      parameters:
-        - name: "idp-id"
-          in: "path"
-          description: "The resource ID of the Identity Provider to debug."
-          required: true
-          schema:
-            type: "string"
-            example: "123e4567-e89b-12d3-a456-426614174000"
-      requestBody:
-        description: "Optional: Specify a particular authenticator to debug."
-        required: false
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/DebugConnectionRequest"
-      responses:
-        '200':
-          description: "Debug flow initiated successfully."
+          description: "Debug session initiated successfully."
           content:
             application/json:
               schema:
@@ -198,7 +144,7 @@ components:
           description: "Trace identifier for error correlation."
 
     # ---------------------------------
-    # POST /debug and /debug/connection/{idp-id}
+    # Debug Request/Response Models
     # ---------------------------------
     DebugConnectionRequest:
       type: object

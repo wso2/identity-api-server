@@ -69,7 +69,7 @@ public class DebugApiServiceImpl extends DebugApiService {
      * Constructor initializes the service layer.
      */
     public DebugApiServiceImpl() {
-        
+
         this.debugService = new DebugService();
     }
 
@@ -108,52 +108,55 @@ public class DebugApiServiceImpl extends DebugApiService {
     }
 
     /**
-     * Debug IdP connection with OAuth 2.0 flow.
-     * Generates authorization URL for user authentication.
-     *
-     * @param idpId                  Identity Provider ID from path parameter.
-     * @param debugConnectionRequest Debug connection request (optional).
-     * @return Response containing OAuth 2.0 authorization URL and session
-     *         information.
-     */
-    @Override
-    public Response debugConnection(String idpId, DebugConnectionRequest debugConnectionRequest) {
-
-        try {
-            // Input validation
-            if (idpId == null || idpId.trim().isEmpty()) {
-                return createErrorResponse("INVALID_REQUEST", "Identity Provider ID is required",
-                        Response.Status.BAD_REQUEST);
-            }
-
-            // Extract properties from request if available
-            Map<String, String> properties = null;
-            if (debugConnectionRequest != null) {
-                properties = debugConnectionRequest.getProperties();
-            }
-
-            // Generate OAuth 2.0 authorization URL using the service layer
-            Map<String, Object> oauth2Result = debugService.generateOAuth2AuthorizationUrl(idpId, properties);
-
-            // Create and return response
-            DebugConnectionResponse response = createDebugResponse(oauth2Result);
-            return Response.ok(response).build();
-
-        } catch (Exception e) {
-            return handleException(e);
-        }
-    }
-
-    /**
      * Retrieves a previous debug result by session ID.
      *
      * @param sessionId The debug session ID.
      * @return Response containing the debug result or an error.
      */
+    private static final com.fasterxml.jackson.databind.ObjectMapper OBJECT_MAPPER 
+        = new com.fasterxml.jackson.databind.ObjectMapper();
+    private static final String[] STEP_STATUS_KEYS = {
+            "step_connection_status",
+            "step_authentication_status",
+            "step_claim_mapping_status"
+    };
+
     @Override
     public Response getDebugResult(String sessionId) {
 
-        throw new UnsupportedOperationException("Method not implemented");
+        String resultJson = debugService.getDebugResult(sessionId);
+
+        if (resultJson == null) {
+            return createErrorResponse("DEBUG_RESULT_NOT_FOUND", "Debug result not found", Response.Status.NOT_FOUND);
+        }
+
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> resultMap = OBJECT_MAPPER.readValue(resultJson, Map.class);
+
+            // Ensure metadata exists
+            @SuppressWarnings("unchecked")
+            Map<String, Object> metadata = (Map<String, Object>) resultMap.get("metadata");
+            if (metadata == null) {
+                metadata = new java.util.HashMap<>();
+                resultMap.put("metadata", metadata);
+            }
+
+            // Copy step status fields to metadata
+            for (String key : STEP_STATUS_KEYS) {
+                if (resultMap.containsKey(key)) {
+                    metadata.put(key, resultMap.get(key));
+                }
+            }
+
+            String enrichedJson = OBJECT_MAPPER.writeValueAsString(resultMap);
+            return Response.ok(enrichedJson).build();
+
+        } catch (java.io.IOException e) {
+            LOG.error("Failed to process debug result.", e);
+            return createErrorResponse("PROCESSING_ERROR", "Failed to process debug result",
+                    Response.Status.INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**

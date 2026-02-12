@@ -23,7 +23,7 @@ import javax.ws.rs.core.Response;
 
 /**
  * Abstract service class for handling debug API operations.
- * Defines the contract for starting debug sessions, retrieving debug results, and debugging connections.
+ * Defines the contract for starting debug sessions and retrieving debug results.
  * Implementations should provide the actual logic for these operations.
  */
 
@@ -44,13 +44,4 @@ public abstract class DebugApiService {
      * @return The response containing the debug result.
      */
     public abstract Response getDebugResult(String sessionId);
-
-    /**
-     * Starts a debug connection for a given IdP ID and debug connection request.
-     *
-     * @param idpId The identity provider ID.
-     * @param debugConnectionRequest The debug connection request.
-     * @return The response containing debug connection information.
-     */
-    public abstract Response debugConnection(String idpId, DebugConnectionRequest debugConnectionRequest);
 }

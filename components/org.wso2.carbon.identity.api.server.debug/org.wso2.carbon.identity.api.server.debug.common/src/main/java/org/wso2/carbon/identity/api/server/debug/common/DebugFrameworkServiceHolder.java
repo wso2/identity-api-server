@@ -22,11 +22,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.debug.framework.core.DebugRequestCoordinator;
-import org.wso2.carbon.identity.debug.framework.core.extension.DebugContextProvider;
-import org.wso2.carbon.identity.debug.framework.core.extension.DebugExecutor;
-
-import java.lang.reflect.Method;
-import java.util.Map;
+import org.wso2.carbon.identity.debug.framework.extension.DebugContextProvider;
+import org.wso2.carbon.identity.debug.framework.extension.DebugExecutor;
 
 /**
  * Service holder for debug framework OSGi services.
@@ -42,9 +39,6 @@ import java.util.Map;
 public final class DebugFrameworkServiceHolder {
 
     private static final Log LOG = LogFactory.getLog(DebugFrameworkServiceHolder.class);
-
-    private static final String COORDINATOR_CLASS_NAME 
-        = "org.wso2.carbon.identity.debug.framework.core.DebugRequestCoordinator";
 
     private DebugFrameworkServiceHolder() {
         // Private constructor to prevent instantiation
@@ -72,20 +66,20 @@ public final class DebugFrameworkServiceHolder {
 
     /**
      * Gets a DebugRequestCoordinator instance via OSGi service lookup.
-     * Falls back to reflection-based instantiation if OSGi lookup fails.
+     * Falls back to direct instantiation if OSGi lookup fails.
      *
      * @return DebugRequestCoordinator instance if available, null otherwise.
      */
     public static DebugRequestCoordinator getDebugRequestCoordinator() {
 
-        // First, try OSGi service lookup
+        // First, try OSGi service lookup.
         DebugRequestCoordinator service = getOSGiService(DebugRequestCoordinator.class);
         if (service != null) {
             return service;
         }
 
-        // Fallback: Try to instantiate via reflection
-        return instantiateViaReflection();
+        // Fallback: Try to instantiate directly.
+        return instantiateDirectly();
     }
 
     /**
@@ -105,63 +99,6 @@ public final class DebugFrameworkServiceHolder {
             LOG.debug("Debug framework is available");
         }
         return true;
-    }
-
-    /**
-     * Invokes a method on the DebugRequestCoordinator.
-     *
-     * @param coordinator    The coordinator instance.
-     * @param methodName     Method name to invoke.
-     * @param parameterTypes Parameter types for the method.
-     * @param arguments      Arguments to pass to the method.
-     * @return Method result or null if invocation fails.
-     */
-    public static Map<String, Object> invokeDebugRequestCoordinatorMethod(
-
-            Object coordinator,
-            String methodName,
-            Class<?>[] parameterTypes,
-            Object... arguments) {
-
-        return invokeMethod(coordinator, methodName, parameterTypes, arguments);
-    }
-
-    /**
-     * Invokes a method on the DebugExecutor.
-     *
-     * @param executor       The executor instance.
-     * @param methodName     Method name to invoke.
-     * @param parameterTypes Parameter types for the method.
-     * @param arguments      Arguments to pass to the method.
-     * @return Method result or null if invocation fails.
-     */
-    public static Object invokeDebugExecutorMethod(
-
-            Object executor,
-            String methodName,
-            Class<?>[] parameterTypes,
-            Object... arguments) {
-
-        return invokeMethod(executor, methodName, parameterTypes, arguments);
-    }
-
-    /**
-     * Invokes a method on the DebugContextProvider.
-     *
-     * @param contextProvider The context provider instance.
-     * @param methodName      Method name to invoke.
-     * @param parameterTypes  Parameter types for the method.
-     * @param arguments       Arguments to pass to the method.
-     * @return Method result or null if invocation fails.
-     */
-    public static Object invokeDebugContextResolverMethod(
-
-            Object contextProvider,
-            String methodName,
-            Class<?>[] parameterTypes,
-            Object... arguments) {
-
-        return invokeMethod(contextProvider, methodName, parameterTypes, arguments);
     }
 
     /**
@@ -195,54 +132,18 @@ public final class DebugFrameworkServiceHolder {
     }
 
     /**
-     * Instantiates DebugRequestCoordinator via reflection as a fallback.
+     * Instantiates DebugRequestCoordinator directly as a fallback.
      *
      * @return DebugRequestCoordinator instance or null if failed.
      */
-    private static DebugRequestCoordinator instantiateViaReflection() {
+    private static DebugRequestCoordinator instantiateDirectly() {
 
         try {
-            Class<?> coordinatorClass = Class.forName(COORDINATOR_CLASS_NAME);
-            Object coordinator = coordinatorClass.getDeclaredConstructor().newInstance();
-            logDebug("DebugRequestCoordinator instantiated via reflection");
-            return (DebugRequestCoordinator) coordinator;
-        } catch (ClassNotFoundException e) {
-            logDebug("DebugRequestCoordinator class not found: " + e.getMessage());
+            DebugRequestCoordinator coordinator = new DebugRequestCoordinator();
+            logDebug("DebugRequestCoordinator instantiated directly.");
+            return coordinator;
         } catch (Exception e) {
             logDebug("Failed to instantiate DebugRequestCoordinator: " + e.getMessage());
-        }
-        return null;
-    }
-
-    /**
-     * Generic method invocation helper using reflection.
-     *
-     * @param target         The target object.
-     * @param methodName     Method name to invoke.
-     * @param parameterTypes Parameter types.
-     * @param arguments      Method arguments.
-     * @param <T>            Return type.
-     * @return Method result or null if invocation fails.
-     */
-    private static <T> T invokeMethod(
-
-            Object target,
-            String methodName,
-            Class<?>[] parameterTypes,
-            Object... arguments) {
-
-        if (target == null) {
-            LOG.warn("Target object not available for method invocation: " + methodName);
-            return null;
-        }
-
-        try {
-            Method method = target.getClass().getMethod(methodName, parameterTypes);
-            return (T) method.invoke(target, arguments);
-        } catch (NoSuchMethodException e) {
-            LOG.error("Requested method not found on target object.", e);
-        } catch (Exception e) {
-            LOG.error("Error invoking method on target object.", e);
         }
         return null;
     }

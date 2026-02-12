@@ -24,7 +24,6 @@ import org.wso2.carbon.identity.api.server.debug.common.Constants;
 import org.wso2.carbon.identity.api.server.debug.common.DebugFrameworkServiceHolder;
 import org.wso2.carbon.identity.debug.framework.core.DebugRequestCoordinator;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -124,7 +123,29 @@ public class DebugService {
     }
 
     /**
+     * Retrieves the debug result for the given session ID.
+     * Uses direct access to the debug framework cache.
+     *
+     * @param sessionId The session ID to look up.
+     * @return The debug result JSON string, or null if not found.
+     */
+    public String getDebugResult(String sessionId) {
+
+        try {
+            return org.wso2.carbon.identity.debug.framework.cache.DebugResultCache.get(sessionId);
+        } catch (NoClassDefFoundError e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("DebugResultCache class not available - debug framework may not be deployed.");
+            }
+        } catch (Exception e) {
+            LOG.error("Error retrieving debug result.", e);
+        }
+        return null;
+    }
+
+    /**
      * Executes a debug request via the DebugRequestCoordinator.
+     * Uses direct method invocation instead of reflection for type safety.
      *
      * @param methodName The coordinator method to invoke.
      * @param context    The request context.
@@ -134,12 +155,18 @@ public class DebugService {
     protected Map<String, Object> executeDebugRequest(String methodName, Map<String, Object> context) {
 
         try {
-            // Ensure debug framework is available
+            // Ensure debug framework is available.
             DebugRequestCoordinator coordinator = getCoordinatorOrThrow();
 
-            // Invoke the coordinator method
-            Object result = DebugFrameworkServiceHolder.invokeDebugRequestCoordinatorMethod(
-                    coordinator, methodName, new Class<?>[] { Map.class }, context);
+            // Invoke the coordinator method directly.
+            Map<String, Object> result;
+            if ("handleResourceDebugRequest".equals(methodName)) {
+                result = coordinator.handleResourceDebugRequest(context);
+            } else if ("handleInitialDebugRequest".equals(methodName)) {
+                result = coordinator.handleInitialDebugRequest(context);
+            } else {
+                throw new RuntimeException("Unknown coordinator method: " + methodName);
+            }
 
             if (result == null) {
                 throw new RuntimeException("Debug request returned null result");
@@ -177,29 +204,21 @@ public class DebugService {
     }
 
     /**
-     * Extracts debug result data from the result object.
-     * Handles both Map results and DebugResult objects.
+     * Extracts debug result data from the result map.
      *
-     * @param result The result object.
+     * @param result The result map from the coordinator.
      * @return Map containing extracted result data.
      */
-    protected Map<String, Object> extractDebugResultData(Object result) {
+    protected Map<String, Object> extractDebugResultData(Map<String, Object> result) {
 
         Map<String, Object> extractedData = new HashMap<>();
 
         try {
-            if (result instanceof Map) {
-                // Direct Map result
-                Map<?, ?> resultMap = (Map<?, ?>) result;
-                resultMap.forEach((key, value) -> {
-                    if (key != null && value != null) {
-                        extractedData.put(key.toString(), value);
-                    }
-                });
-            } else {
-                // DebugResult object - extract via reflection
-                extractFromDebugResult(result, extractedData);
-            }
+            result.forEach((key, value) -> {
+                if (key != null && value != null) {
+                    extractedData.put(key, value);
+                }
+            });
         } catch (Exception e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Error extracting debug result data.", e);
@@ -207,71 +226,6 @@ public class DebugService {
         }
 
         return extractedData;
-    }
-
-    /**
-     * Extracts data from a DebugResult object using reflection.
-     *
-     * @param debugResult The DebugResult object.
-     * @param target      The target map to populate.
-     */
-    protected void extractFromDebugResult(Object debugResult, Map<String, Object> target) {
-
-        // Extract resultData
-        Object resultData = invokeMethod(debugResult, "getResultData");
-        if (resultData instanceof Map) {
-            ((Map<?, ?>) resultData).forEach((key, value) -> {
-                if (key != null && value != null) {
-                    target.put(key.toString(), value);
-                }
-            });
-        }
-
-        // Extract metadata (don't overwrite existing data)
-        Object metadata = invokeMethod(debugResult, "getMetadata");
-        if (metadata instanceof Map) {
-            ((Map<?, ?>) metadata).forEach((key, value) -> {
-                if (key != null && value != null) {
-                    target.putIfAbsent(key.toString(), value);
-                }
-            });
-        }
-
-        // Extract status if not present
-        if (!target.containsKey(KEY_STATUS)) {
-            Object status = invokeMethod(debugResult, "getStatus");
-            if (status != null) {
-                target.put(KEY_STATUS, status.toString());
-            }
-        }
-
-        // Extract timestamp if not present
-        if (!target.containsKey(KEY_TIMESTAMP)) {
-            Object timestamp = invokeMethod(debugResult, "getTimestamp");
-            if (timestamp != null) {
-                target.put(KEY_TIMESTAMP, timestamp);
-            }
-        }
-    }
-
-    /**
-     * Invokes a no-arg method on an object using reflection.
-     *
-     * @param object     The target object.
-     * @param methodName The method name.
-     * @return The method result, or null if invocation fails.
-     */
-    protected Object invokeMethod(Object object, String methodName) {
-
-        try {
-            Method method = object.getClass().getMethod(methodName);
-            return method.invoke(object);
-        } catch (Exception e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Reflection method invocation failed.", e);
-            }
-            return null;
-        }
     }
 
     /**

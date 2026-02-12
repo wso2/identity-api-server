@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.debug.v1;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,9 +32,6 @@ import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionRequest
 import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionResponse;
 import org.wso2.carbon.identity.api.server.debug.v1.model.Error;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -63,17 +59,9 @@ import javax.ws.rs.core.Response;
 public class DebugApi {
 
     private static final Log LOG = LogFactory.getLog(DebugApi.class);
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     // Session ID validation pattern: alphanumeric with hyphens, max 128 characters
     private static final Pattern SESSION_ID_PATTERN = Pattern.compile("^[a-zA-Z0-9\\-_]{1,128}$");
-
-    // Step status keys for result enrichment
-    private static final String[] STEP_STATUS_KEYS = {
-            "step_connection_status",
-            "step_authentication_status",
-            "step_claim_mapping_status"
-    };
 
     private final DebugApiService delegate;
 
@@ -105,20 +93,15 @@ public class DebugApi {
     @SuppressFBWarnings("JAXRS_ENDPOINT")
     public Response getDebugResult(
 
-            @ApiParam(value = "Session ID (state)", required = true) @PathParam("session-id") String sessionId) {
+            @ApiParam(value = "Session ID (state)", required = true) 
+            @PathParam("session-id") String sessionId) {
 
         // Validate session ID format to prevent injection attacks
         if (!isValidSessionId(sessionId)) {
             return createBadRequestResponse("Invalid session ID format");
         }
 
-        String resultJson = getDebugResultFromDatabase(sessionId);
-
-        if (resultJson == null) {
-            return createNotFoundResponse();
-        }
-
-        return enrichAndReturnResult(resultJson);
+        return delegate.getDebugResult(sessionId);
     }
 
     /**
@@ -159,8 +142,8 @@ public class DebugApi {
     @ApiOperation(value = "Start debug session", 
         notes = "Initiates a debug session for any resource type and properties.", 
         response = DebugConnectionResponse.class, authorizations = {
-            @Authorization(value = "BasicAuth"),
-            @Authorization(value = "OAuth2", scopes = {})
+    @Authorization(value = "BasicAuth"),
+    @Authorization(value = "OAuth2", scopes = {})
     }, tags = { "Debug" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successful response", response = DebugConnectionResponse.class),
@@ -172,95 +155,11 @@ public class DebugApi {
     })
     @SuppressFBWarnings("JAXRS_ENDPOINT")
     public Response startDebugSession(
-        
+
             @ApiParam(value = "Debug request with resourceId, resourceType, and properties", required = true) 
             @Valid DebugConnectionRequest debugRequest) {
 
         return delegate.startDebugSession(debugRequest);
-    }
-
-    /**
-     * Retrieves debug result from database using reflection.
-     * Uses reflection to avoid direct OSGi dependency in the API module.
-     *
-     * @param sessionId The session ID to look up.
-     * @return The debug result JSON or null if not found.
-     */
-    private String getDebugResultFromDatabase(String sessionId) {
-
-        try {
-            Class<?> cacheClass = Class.forName(
-                    "org.wso2.carbon.identity.debug.framework.core.cache.DebugResultCache");
-            java.lang.reflect.Method getMethod = cacheClass.getMethod("get", String.class);
-            Object result = getMethod.invoke(null, sessionId);
-
-            return (String) result;
-
-        } catch (ClassNotFoundException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("DebugResultCache class not found - debug framework may not be deployed.", e);
-            }
-            return null;
-        } catch (Exception e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Error retrieving debug result.", e);
-            }
-            return null;
-        }
-    }
-
-    /**
-     * Enriches the result with metadata and returns it.
-     *
-     * @param resultJson The raw result JSON.
-     * @return Response with enriched result or error.
-     */
-    private Response enrichAndReturnResult(String resultJson) {
-
-        try {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> resultMap = OBJECT_MAPPER.readValue(resultJson, Map.class);
-
-            // Ensure metadata exists
-            @SuppressWarnings("unchecked")
-            Map<String, Object> metadata = (Map<String, Object>) resultMap.get("metadata");
-            if (metadata == null) {
-                metadata = new HashMap<>();
-                resultMap.put("metadata", metadata);
-            }
-
-            // Copy step status fields to metadata
-            for (String key : STEP_STATUS_KEYS) {
-                if (resultMap.containsKey(key)) {
-                    metadata.put(key, resultMap.get(key));
-                }
-            }
-
-            String enrichedJson = OBJECT_MAPPER.writeValueAsString(resultMap);
-            return Response.ok(enrichedJson).build();
-
-        } catch (IOException e) {
-            LOG.error("Failed to process debug result.", e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity(createError("PROCESSING_ERROR", "Failed to process debug result"))
-                    .build();
-        }
-    }
-
-    /**
-     * Creates a not-found error response.
-     * Note: Session ID is intentionally not included in the response
-     * to prevent information disclosure.
-     *
-     * @return Error response with 404 status.
-     */
-    private Response createNotFoundResponse() {
-
-        Error errorResponse = createError("DEBUG_RESULT_NOT_FOUND", "Debug result not found");
-        errorResponse.setDescription("The debug session may have expired or the session ID is invalid.");
-        errorResponse.setTraceId(UUID.randomUUID().toString());
-
-        return Response.status(Response.Status.NOT_FOUND).entity(errorResponse).build();
     }
 
     /**
