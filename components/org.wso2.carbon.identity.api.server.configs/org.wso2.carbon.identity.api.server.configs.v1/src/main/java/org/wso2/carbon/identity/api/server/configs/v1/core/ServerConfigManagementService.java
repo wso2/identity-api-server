@@ -1036,13 +1036,11 @@ public class ServerConfigManagementService {
                 } else {
                     switch (path) {
                         case Constants.IDLE_SESSION_PATH:
-                            validateNumericIdPProperty(value);
                             updateIdPProperty(idpToUpdate, existingIdpProperties,
                                     IdentityApplicationConstants.SESSION_IDLE_TIME_OUT, value,
                                     this::validateNumericPositiveValue);
                             break;
                         case Constants.REMEMBER_ME_PATH:
-                            validateNumericIdPProperty(value);
                             updateIdPProperty(idpToUpdate, existingIdpProperties,
                                     IdentityApplicationConstants.REMEMBER_ME_TIME_OUT, value,
                                     this::validateNumericPositiveValue);
@@ -1058,9 +1056,9 @@ public class ServerConfigManagementService {
                                     this::validateNumericPositiveValue);
                             break;
                         case Constants.PRESERVE_CURRENT_SESSION_AT_PASSWORD_UPDATE_PATH:
-                            validateBooleanIdPProperty(value);
                             updateIdPProperty(idpToUpdate, existingIdpProperties,
-                                    IdentityApplicationConstants.PRESERVE_CURRENT_SESSION_AT_PASSWORD_UPDATE, value);
+                                    IdentityApplicationConstants.PRESERVE_CURRENT_SESSION_AT_PASSWORD_UPDATE, value,
+                                    this::validateBooleanValue);
                             break;
                         default:
                             throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
