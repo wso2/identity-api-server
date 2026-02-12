@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.idle.account.identification.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.idle.account.identification.services.IdleAccountIdentificationService;
 
@@ -25,6 +27,8 @@ import org.wso2.carbon.identity.idle.account.identification.services.IdleAccount
  * Service holder class for idle account identification.
  */
 public class IdleAccountIdentificationServiceHolder {
+
+    private static final Log LOG = LogFactory.getLog(IdleAccountIdentificationServiceHolder.class);
 
     private IdleAccountIdentificationServiceHolder() {}
 
@@ -42,6 +46,13 @@ public class IdleAccountIdentificationServiceHolder {
      */
     public static IdleAccountIdentificationService getIdleAccountIdentificationService() {
 
-        return IdleAccountServiceHolder.SERVICE;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving IdleAccountIdentificationService from OSGi service registry.");
+        }
+        IdleAccountIdentificationService service = IdleAccountServiceHolder.SERVICE;
+        if (service == null) {
+            LOG.warn("IdleAccountIdentificationService is not available in the OSGi service registry.");
+        }
+        return service;
     }
 }

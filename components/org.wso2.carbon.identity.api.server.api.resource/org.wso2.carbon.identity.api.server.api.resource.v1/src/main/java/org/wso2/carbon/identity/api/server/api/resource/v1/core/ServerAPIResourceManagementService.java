@@ -80,6 +80,7 @@ public class ServerAPIResourceManagementService {
     public ServerAPIResourceManagementService(APIResourceManager apiResourceManager) {
 
         this.apiResourceManager = apiResourceManager;
+        LOG.info("Server API resource management service initialized successfully.");
     }
 
     /**
@@ -102,6 +103,8 @@ public class ServerAPIResourceManagementService {
                 throw APIResourceMgtEndpointUtil.handleException(Response.Status.INTERNAL_SERVER_ERROR,
                         ErrorMessage.ERROR_CODE_ADD_API_RESOURCE);
             }
+            LOG.info("Successfully added API resource with ID: " + createdAPIResource.getId() +
+                    " and identifier: " + createdAPIResource.getIdentifier());
             return buildAPIResourceResponse(createdAPIResource);
         } catch (APIResourceMgtException e) {
             throw APIResourceMgtEndpointUtil.handleAPIResourceMgtException(e);
@@ -119,6 +122,9 @@ public class ServerAPIResourceManagementService {
     public APIResourceListResponse getAPIResources(String before, String after, String filter, Integer limit,
                                                    String requiredAttributes) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Request received to get API resources with filter: " + filter + ", limit: " + limit);
+        }
         APIResourceListResponse apiResourceListResponse = new APIResourceListResponse();
 
         try {
@@ -291,6 +297,7 @@ public class ServerAPIResourceManagementService {
             }
             handleSystemAPI(apiResource);
             apiResourceManager.deleteAPIResourceById(apiResourceID, tenantDomain);
+            LOG.info("Successfully deleted API resource with ID: " + apiResourceID);
         } catch (APIResourceMgtException e) {
             throw APIResourceMgtEndpointUtil.handleAPIResourceMgtException(e);
         }
@@ -361,6 +368,7 @@ public class ServerAPIResourceManagementService {
             handleSystemAPI(apiResource);
             apiResourceManager.deleteAPIScopeByScopeName(apiResourceId,
                     scopeName, tenantDomain);
+            LOG.info("Successfully deleted scope '" + scopeName + "' for API resource ID: " + apiResourceId);
         } catch (APIResourceMgtException e) {
             throw APIResourceMgtEndpointUtil.handleAPIResourceMgtException(e);
         }
