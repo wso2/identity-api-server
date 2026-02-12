@@ -1,0 +1,255 @@
+/**
+ * Copyright (c) 2026, WSO2 LLC. (https://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+package org.wso2.carbon.identity.api.server.debug.v1.service;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.identity.api.server.debug.common.Constants;
+import org.wso2.carbon.identity.api.server.debug.common.DebugFrameworkServiceHolder;
+import org.wso2.carbon.identity.debug.framework.core.DebugRequestCoordinator;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Service layer for debug operations.
+ * 
+ * This service provides a clean interface for the API layer and delegates
+ * to debug framework components. It handles:
+ * Generic resource debug requests
+ * OAuth 2.0 authorization URL generation for debugging
+ *
+ * The service uses the {@link DebugRequestCoordinator} for centralized
+ * request routing and protocol-specific handling.
+ */
+
+public class DebugService {
+
+    private static final Log LOG = LogFactory.getLog(DebugService.class);
+
+    // Request type constants
+    private static final String REQUEST_TYPE_GENERIC = "GENERIC_DEBUG_REQUEST";
+    private static final String REQUEST_TYPE_INITIAL = "INITIAL_DEBUG_REQUEST";
+
+    // Context key constants
+    private static final String KEY_RESOURCE_ID = "resourceId";
+    private static final String KEY_RESOURCE_TYPE = "resourceType";
+    private static final String KEY_PROPERTIES = "properties";
+    private static final String KEY_REQUEST_TYPE = "requestType";
+    private static final String KEY_IDP_ID = "idpId";
+    private static final String KEY_TIMESTAMP = "timestamp";
+    private static final String KEY_STATUS = "status";
+
+    /**
+     * Constructor initializes debug framework service via service holder pattern.
+     */
+    public DebugService() {
+
+        // Debug framework services are loaded on-demand
+    }
+
+    /**
+     * Handles generic debug request for any resource type with properties.
+     *
+     * @param resourceId   Resource ID to debug.
+     * @param resourceType Type of resource (IDP, APPLICATION, CONNECTOR, etc.).
+     * @param properties   Generic properties map for the debug request (optional).
+     * @return Debug result containing session information and status.
+     * @throws RuntimeException if debug request fails.
+     */
+    public Map<String, Object> handleGenericDebugRequest(String resourceId, String resourceType,
+            Map<String, String> properties) {
+
+        // Build request context
+        Map<String, Object> debugRequestContext = new HashMap<>();
+        debugRequestContext.put(KEY_RESOURCE_ID, resourceId);
+        debugRequestContext.put(KEY_RESOURCE_TYPE, resourceType);
+        debugRequestContext.put(KEY_PROPERTIES, properties != null ? properties : new HashMap<String, String>());
+        debugRequestContext.put(KEY_REQUEST_TYPE, REQUEST_TYPE_GENERIC);
+
+        // Execute and get result
+        Map<String, Object> resultMap = executeDebugRequest("handleResourceDebugRequest", debugRequestContext);
+
+        // Add metadata
+        resultMap.put(KEY_TIMESTAMP, System.currentTimeMillis());
+        resultMap.put(KEY_RESOURCE_ID, resourceId);
+        resultMap.put(KEY_RESOURCE_TYPE, resourceType);
+        resultMap.putIfAbsent(KEY_STATUS, Constants.Status.SUCCESS);
+
+        return resultMap;
+    }
+
+    /**
+     * Generates OAuth 2.0 authorization URL for debug flow.
+     *
+     * @param idpId      Identity Provider resource ID.
+     * @param properties Optional properties for OAuth 2.0 configuration.
+     * @return OAuth 2.0 authorization URL and session information.
+     * @throws RuntimeException if URL generation fails.
+     */
+    public Map<String, Object> generateOAuth2AuthorizationUrl(String idpId, Map<String, String> properties) {
+
+        // Build request context
+        Map<String, Object> debugRequestContext = new HashMap<>();
+        debugRequestContext.put(KEY_IDP_ID, idpId);
+        debugRequestContext.put(KEY_PROPERTIES, properties != null ? properties : new HashMap<String, String>());
+        debugRequestContext.put(KEY_REQUEST_TYPE, REQUEST_TYPE_INITIAL);
+
+        // Execute and get result
+        Map<String, Object> resultMap = executeDebugRequest("handleInitialDebugRequest", debugRequestContext);
+
+        // Add metadata
+        resultMap.put(KEY_TIMESTAMP, System.currentTimeMillis());
+        resultMap.put(KEY_IDP_ID, idpId);
+        resultMap.put(KEY_STATUS, Constants.Status.SUCCESS);
+
+        return resultMap;
+    }
+
+    /**
+     * Retrieves the debug result for the given session ID.
+     * Uses direct access to the debug framework cache.
+     *
+     * @param sessionId The session ID to look up.
+     * @return The debug result JSON string, or null if not found.
+     */
+    public String getDebugResult(String sessionId) {
+
+        try {
+            return org.wso2.carbon.identity.debug.framework.cache.DebugResultCache.get(sessionId);
+        } catch (NoClassDefFoundError e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("DebugResultCache class not available - debug framework may not be deployed.");
+            }
+        } catch (Exception e) {
+            LOG.error("Error retrieving debug result.", e);
+        }
+        return null;
+    }
+
+    /**
+     * Executes a debug request via the DebugRequestCoordinator.
+     * Uses direct method invocation instead of reflection for type safety.
+     *
+     * @param methodName The coordinator method to invoke.
+     * @param context    The request context.
+     * @return The extracted result map.
+     * @throws RuntimeException if execution fails.
+     */
+    protected Map<String, Object> executeDebugRequest(String methodName, Map<String, Object> context) {
+
+        try {
+            // Ensure debug framework is available.
+            DebugRequestCoordinator coordinator = getCoordinatorOrThrow();
+
+            // Invoke the coordinator method directly.
+            Map<String, Object> result;
+            if ("handleResourceDebugRequest".equals(methodName)) {
+                result = coordinator.handleResourceDebugRequest(context);
+            } else if ("handleInitialDebugRequest".equals(methodName)) {
+                result = coordinator.handleInitialDebugRequest(context);
+            } else {
+                throw new RuntimeException("Unknown coordinator method: " + methodName);
+            }
+
+            if (result == null) {
+                throw new RuntimeException("Debug request returned null result");
+            }
+
+            return extractDebugResultData(result);
+
+        } catch (RuntimeException e) {
+            logError("Runtime error in debug request", e);
+            throw e;
+        } catch (Exception e) {
+            logError("Unexpected error in debug request", e);
+            throw new RuntimeException("Failed to process debug request: " + sanitize(e.getMessage()), e);
+        }
+    }
+
+    /**
+     * Gets the DebugRequestCoordinator or throws if unavailable.
+     *
+     * @return The coordinator instance.
+     * @throws RuntimeException if coordinator is not available.
+     */
+    protected DebugRequestCoordinator getCoordinatorOrThrow() {
+
+        if (!DebugFrameworkServiceHolder.isDebugFrameworkAvailable()) {
+            throw new RuntimeException("Debug framework services are not available");
+        }
+
+        DebugRequestCoordinator coordinator = DebugFrameworkServiceHolder.getDebugRequestCoordinator();
+        if (coordinator == null) {
+            throw new RuntimeException("DebugRequestCoordinator not available");
+        }
+
+        return coordinator;
+    }
+
+    /**
+     * Extracts debug result data from the result map.
+     *
+     * @param result The result map from the coordinator.
+     * @return Map containing extracted result data.
+     */
+    protected Map<String, Object> extractDebugResultData(Map<String, Object> result) {
+
+        Map<String, Object> extractedData = new HashMap<>();
+
+        try {
+            result.forEach((key, value) -> {
+                if (key != null && value != null) {
+                    extractedData.put(key, value);
+                }
+            });
+        } catch (Exception e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Error extracting debug result data.", e);
+            }
+        }
+
+        return extractedData;
+    }
+
+    /**
+     * Logs an error with sanitized message.
+     *
+     * @param context Error context description.
+     * @param e       The exception.
+     */
+    protected void logError(String context, Exception e) {
+
+        LOG.error("Error during debug request processing.", e);
+    }
+
+    /**
+     * Sanitizes a string for logging (removes newlines).
+     *
+     * @param value The value to sanitize.
+     * @return Sanitized string.
+     */
+    protected String sanitize(String value) {
+
+        if (value == null) {
+            return "";
+        }
+        return value.replaceAll("[\r\n]", "_");
+    }
+}
