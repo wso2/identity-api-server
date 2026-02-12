@@ -1,18 +1,20 @@
 /*
-* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2020-2026, WSO2 LLC. (http://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 package org.wso2.carbon.identity.api.server.configs.v1.model;
 
@@ -40,6 +42,7 @@ public class ServerConfig  {
 
     private RealmConfig realmConfig;
     private String idleSessionTimeoutPeriod = "15";
+    private Boolean preserveCurrentSessionAtPasswordUpdate = false;
     private String rememberMePeriod = "20160";
     private String enableMaximumSessionTimeoutPeriod = "false";
     private String maximumSessionTimeoutPeriod = "43200";
@@ -111,6 +114,25 @@ public class ServerConfig  {
     }
     public void setIdleSessionTimeoutPeriod(String idleSessionTimeoutPeriod) {
         this.idleSessionTimeoutPeriod = idleSessionTimeoutPeriod;
+    }
+
+    /**
+    * Whether to preserve the current session when the user updates their password
+    **/
+    public ServerConfig preserveCurrentSessionAtPasswordUpdate(Boolean preserveCurrentSessionAtPasswordUpdate) {
+
+        this.preserveCurrentSessionAtPasswordUpdate = preserveCurrentSessionAtPasswordUpdate;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "Whether to preserve the current session when the user updates their password")
+    @JsonProperty("preserveCurrentSessionAtPasswordUpdate")
+    @Valid
+    public Boolean getPreserveCurrentSessionAtPasswordUpdate() {
+        return preserveCurrentSessionAtPasswordUpdate;
+    }
+    public void setPreserveCurrentSessionAtPasswordUpdate(Boolean preserveCurrentSessionAtPasswordUpdate) {
+        this.preserveCurrentSessionAtPasswordUpdate = preserveCurrentSessionAtPasswordUpdate;
     }
 
     /**
@@ -265,6 +287,7 @@ public class ServerConfig  {
         return Objects.equals(this.homeRealmIdentifiers, serverConfig.homeRealmIdentifiers) &&
             Objects.equals(this.realmConfig, serverConfig.realmConfig) &&
             Objects.equals(this.idleSessionTimeoutPeriod, serverConfig.idleSessionTimeoutPeriod) &&
+            Objects.equals(this.preserveCurrentSessionAtPasswordUpdate, serverConfig.preserveCurrentSessionAtPasswordUpdate) &&
             Objects.equals(this.rememberMePeriod, serverConfig.rememberMePeriod) &&
             Objects.equals(this.enableMaximumSessionTimeoutPeriod, serverConfig.enableMaximumSessionTimeoutPeriod) &&
             Objects.equals(this.maximumSessionTimeoutPeriod, serverConfig.maximumSessionTimeoutPeriod) &&
@@ -275,7 +298,7 @@ public class ServerConfig  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(homeRealmIdentifiers, realmConfig, idleSessionTimeoutPeriod, rememberMePeriod, enableMaximumSessionTimeoutPeriod, maximumSessionTimeoutPeriod, provisioning, authenticators, cors);
+        return Objects.hash(homeRealmIdentifiers, realmConfig, idleSessionTimeoutPeriod, preserveCurrentSessionAtPasswordUpdate, rememberMePeriod, enableMaximumSessionTimeoutPeriod, maximumSessionTimeoutPeriod, provisioning, authenticators, cors);
     }
 
     @Override
@@ -287,6 +310,7 @@ public class ServerConfig  {
         sb.append("    homeRealmIdentifiers: ").append(toIndentedString(homeRealmIdentifiers)).append("\n");
         sb.append("    realmConfig: ").append(toIndentedString(realmConfig)).append("\n");
         sb.append("    idleSessionTimeoutPeriod: ").append(toIndentedString(idleSessionTimeoutPeriod)).append("\n");
+        sb.append("    preserveCurrentSessionAtPasswordUpdate: ").append(toIndentedString(preserveCurrentSessionAtPasswordUpdate)).append("\n");
         sb.append("    rememberMePeriod: ").append(toIndentedString(rememberMePeriod)).append("\n");
         sb.append("    enableMaximumSessionTimeoutPeriod: ").append(toIndentedString(enableMaximumSessionTimeoutPeriod)).append("\n");
         sb.append("    maximumSessionTimeoutPeriod: ").append(toIndentedString(maximumSessionTimeoutPeriod)).append("\n");

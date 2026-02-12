@@ -36,6 +36,8 @@ public class Constants {
     public static final String ENABLE_MAXIMUM_SESSION_TIMEOUT_PATH = "/enableMaximumSessionTimeoutPeriod";
     public static final String MAXIMUM_SESSION_TIMEOUT_PATH = "/maximumSessionTimeoutPeriod";
     public static final String HOME_REALM_PATH_REGEX = "/homeRealmIdentifiers/[0-9]+";
+    public static final String PRESERVE_CURRENT_SESSION_AT_PASSWORD_UPDATE_PATH
+            = "/preserveCurrentSessionAtPasswordUpdate";
 
     /**
      * PATCH operation path for CORS configuration.
