@@ -34,6 +34,8 @@ public class Constants {
     public static final String IDLE_SESSION_PATH = "/idleSessionTimeoutPeriod";
     public static final String REMEMBER_ME_PATH = "/rememberMePeriod";
     public static final String HOME_REALM_PATH_REGEX = "/homeRealmIdentifiers/[0-9]+";
+    public static final String PRESERVE_CURRENT_SESSION_AT_PASSWORD_UPDATE_PATH
+            = "/preserveCurrentSessionAtPasswordUpdate";
 
     /**
      * PATCH operation path for CORS configuration.
