@@ -30,15 +30,34 @@ public class OidcScopeConstants {
 
         INVALID_REQUEST("OAUTH-60001", "Invalid Request."),
         ERROR_CONFLICT_REQUEST("41004", "Scope already exists."),
-        SCOPE_NOT_FOUND("41003", "Scope not found.");
+        SCOPE_NOT_FOUND("41003", "Scope not found."),
+
+        // Server Errors - 650xx
+        ERROR_CODE_ERROR_EXPORTING_SCOPE("65001",
+                "Unable to export the OIDC scope configurations.",
+                "Server Encountered an error while exporting the OIDC scope configurations."),
+        ERROR_CODE_ERROR_IMPORTING_SCOPE("65002",
+                "Unable to import the OIDC scope configurations.",
+                "Server Encountered an error while importing the OIDC scope configurations."),
+        ERROR_CODE_ERROR_UPDATING_SCOPE("65003",
+                "Unable to update the OIDC scope configurations.",
+                "Server Encountered an error while updating the OIDC scope configurations.");
 
         private final String code;
         private final String message;
+        private String description;
 
         ErrorMessage(String code, String message) {
 
             this.code = code;
             this.message = message;
+        }
+
+        ErrorMessage(String code, String message, String description) {
+
+            this.code = code;
+            this.message = message;
+            this.description = description;
         }
 
         public String getCode() {
@@ -49,6 +68,11 @@ public class OidcScopeConstants {
         public String getMessage() {
 
             return message;
+        }
+
+        public String getDescription() {
+
+            return description;
         }
 
         @Override
