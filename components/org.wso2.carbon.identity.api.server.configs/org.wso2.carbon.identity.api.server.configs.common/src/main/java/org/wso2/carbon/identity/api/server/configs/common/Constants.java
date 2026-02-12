@@ -217,7 +217,16 @@ public class Constants {
                 "Server encountered an error while retrieving the Fraud Detection configuration."),
         ERROR_CODE_FRAUD_DETECTION_CONFIG_UPDATE("65024",
                 "Unable to update Fraud Detection configuration.",
-                "Server encountered an error while updating the Fraud Detection configuration.");
+                "Server encountered an error while updating the Fraud Detection configuration."),
+        ERROR_CODE_ERROR_OAUTH2_INBOUND_AUTH_CONFIG_RETRIEVE("65025",
+                "Unable to retrieve OAuth2 inbound auth configs.",
+                "Server encountered an error while retrieving the OAuth2 inbound auth configs."),
+        ERROR_CODE_ERROR_OAUTH2_INBOUND_AUTH_CONFIG_UPDATE("65026",
+                "Unable to update OAuth2 inbound auth configs.",
+                "Server encountered an error while updating the OAuth2 inbound auth configs."),
+        ERROR_CODE_ERROR_OAUTH2_INBOUND_AUTH_CONFIG_DELETE("65027",
+                "Unable to delete OAuth2 inbound auth configs.",
+                "Server encountered an error while deleting the OAuth2 inbound auth configs.");
 
         private final String code;
         private final String message;
