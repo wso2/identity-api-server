@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -43,6 +43,8 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.Schema;
 import org.wso2.carbon.identity.api.server.configs.v1.model.SchemaListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ScimConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ServerConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.UsageScopePatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.UsageScopePayload;
 import javax.ws.rs.core.Response;
 
 
@@ -67,6 +69,8 @@ public interface ConfigsApiService {
       public Response getImpersonationConfiguration();
 
       public Response getInboundScimConfigs();
+
+      public Response getIssuerUsageScopeConfig();
 
       public Response getOAuth2InboundAuthConfig();
 
@@ -106,6 +110,8 @@ public interface ConfigsApiService {
       public Response updateFraudDetectionConfigs(FraudDetectionConfig fraudDetectionConfig);
 
       public Response updateInboundScimConfigs(ScimConfig scimConfig);
+
+      public Response updateIssuerUsageScopeConfig(UsageScopePatch usageScopePatch);
 
       public Response updateOAuth2InboundAuthConfig(InboundAuthOAuth2Config inboundAuthOAuth2Config);
 
