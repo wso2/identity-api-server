@@ -576,7 +576,7 @@ public class WorkflowService {
 
             Parameter channelsParam = setWorkflowImplParameters(workflowId, Constants.NOTIFICATION,
                     String.join(Constants.PARAMETER_VALUE_SEPARATOR, channels),
-                    qNamePrefix + Constants.STEP_NAME_DELIMITER + "channels",
+                    qNamePrefix + Constants.STEP_NAME_DELIMITER + CHANNELS,
                     holder);
             parameterList.add(channelsParam);
         }
@@ -601,7 +601,7 @@ public class WorkflowService {
 
             Parameter eventsParam = setWorkflowImplParameters(workflowId, Constants.NOTIFICATION,
                     String.join(Constants.PARAMETER_VALUE_SEPARATOR, events),
-                    qNamePrefix + Constants.STEP_NAME_DELIMITER + "events",
+                    qNamePrefix + Constants.STEP_NAME_DELIMITER + EVENTS,
                     holder);
             parameterList.add(eventsParam);
         }

@@ -833,22 +833,6 @@ components:
             example: "123"
             description: "Identifier of the selected entity"
 
-    NotificationSettings:
-      type: object
-      properties:
-        channels:
-          type: array
-          items:
-            type: string
-          example: ["email", "sms"]
-          description: "Notification channels to be used (e.g., email, sms)"
-        events:
-          type: array
-          items:
-            type: string
-          example: ["onApproval", "onRejection"]
-          description: "Events that trigger notifications"
-
     InitiatorNotifications:
       type: object
       properties:

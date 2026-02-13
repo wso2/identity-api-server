@@ -44,14 +44,14 @@ public class NotificationConstants {
         // Build initiator event set from enum
         Set<String> initiatorEvents = new HashSet<>();
         for (InitiatorEvent event : InitiatorEvent.values()) {
-            initiatorEvents.add(event.getValue().toLowerCase(Locale.ROOT));
+            initiatorEvents.add(event.getValue());
         }
         VALID_INITIATOR_EVENTS = Collections.unmodifiableSet(initiatorEvents);
 
         // Build approver event set from enum
         Set<String> approverEvents = new HashSet<>();
         for (ApproverEvent event : ApproverEvent.values()) {
-            approverEvents.add(event.getValue().toLowerCase(Locale.ROOT));
+            approverEvents.add(event.getValue());
         }
         VALID_APPROVER_EVENTS = Collections.unmodifiableSet(approverEvents);
     }
@@ -79,7 +79,7 @@ public class NotificationConstants {
      */
     public static boolean isValidInitiatorEvent(String event) {
 
-        return event != null && VALID_INITIATOR_EVENTS.contains(event.toLowerCase(Locale.ROOT));
+        return event != null && VALID_INITIATOR_EVENTS.contains(event);
     }
 
     /**
@@ -90,7 +90,7 @@ public class NotificationConstants {
      */
     public static boolean isValidApproverEvent(String event) {
 
-        return event != null && VALID_APPROVER_EVENTS.contains(event.toLowerCase(Locale.ROOT));
+        return event != null && VALID_APPROVER_EVENTS.contains(event);
     }
 
     /**
@@ -136,22 +136,32 @@ public class NotificationConstants {
             this.value = value;
         }
 
-        public static Channel fromValue(String value) {
+        /**
+         * Parse Channel enum from string value.
+         * Accepts: "email", "EMAIL", "sms", "SMS"
+         *
+         * @param value The channel value
+         * @return Channel enum or null if not found
+         */
+        public static Channel parse(String value) {
 
             if (value == null) {
                 return null;
             }
-            for (Channel channel : values()) {
-                if (channel.value.equalsIgnoreCase(value)) {
-                    return channel;
-                }
+
+            // Support only lowercase and uppercase variations
+            if ("email".equals(value) || "EMAIL".equals(value)) {
+                return EMAIL;
+            } else if ("sms".equals(value) || "SMS".equals(value)) {
+                return SMS;
             }
+
             return null;
         }
 
         public static boolean isValid(String value) {
 
-            return fromValue(value) != null;
+            return parse(value) != null;
         }
 
         public String getValue() {
@@ -172,13 +182,20 @@ public class NotificationConstants {
             this.value = value;
         }
 
-        public static InitiatorEvent fromValue(String value) {
+        /**
+         * Parse InitiatorEvent enum from exact string value (case-sensitive).
+         * Must match exactly: "onApproval", "onRejection"
+         *
+         * @param value The event value
+         * @return InitiatorEvent enum or null if not found
+         */
+        public static InitiatorEvent parse(String value) {
 
             if (value == null) {
                 return null;
             }
             for (InitiatorEvent event : values()) {
-                if (event.value.equalsIgnoreCase(value)) {
+                if (event.value.equals(value)) {
                     return event;
                 }
             }
@@ -186,7 +203,7 @@ public class NotificationConstants {
         }
 
         public static boolean isValid(String value) {
-            return fromValue(value) != null;
+            return parse(value) != null;
         }
 
         public String getValue() {
@@ -207,13 +224,20 @@ public class NotificationConstants {
             this.value = value;
         }
 
-        public static ApproverEvent fromValue(String value) {
+        /**
+         * Parse ApproverEvent enum from exact string value (case-sensitive).
+         * Must match exactly: "onAssignment", "onRelease"
+         *
+         * @param value The event value
+         * @return ApproverEvent enum or null if not found
+         */
+        public static ApproverEvent parse(String value) {
 
             if (value == null) {
                 return null;
             }
             for (ApproverEvent event : values()) {
-                if (event.value.equalsIgnoreCase(value)) {
+                if (event.value.equals(value)) {
                     return event;
                 }
             }
@@ -222,7 +246,7 @@ public class NotificationConstants {
 
         public static boolean isValid(String value) {
 
-            return fromValue(value) != null;
+            return parse(value) != null;
         }
 
         public String getValue() {
