@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -22,6 +22,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.application.management.v1.AllowedIssuer;
+import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthenticationMethodMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.FapiMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.GrantTypeMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.MetadataProperty;
@@ -54,6 +58,8 @@ public class OIDCMetaData  {
     private MetadataProperty requestObjectEncryptionMethod;
     private MetadataProperty subjectType;
     private FapiMetadata fapiMetadata;
+    private List<AllowedIssuer> allowedIssuers = null;
+
 
     /**
     **/
@@ -404,6 +410,32 @@ public class OIDCMetaData  {
         this.fapiMetadata = fapiMetadata;
     }
 
+    /**
+    **/
+    public OIDCMetaData allowedIssuers(List<AllowedIssuer> allowedIssuers) {
+
+        this.allowedIssuers = allowedIssuers;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("allowedIssuers")
+    @Valid
+    public List<AllowedIssuer> getAllowedIssuers() {
+        return allowedIssuers;
+    }
+    public void setAllowedIssuers(List<AllowedIssuer> allowedIssuers) {
+        this.allowedIssuers = allowedIssuers;
+    }
+
+    public OIDCMetaData addAllowedIssuersItem(AllowedIssuer allowedIssuersItem) {
+        if (this.allowedIssuers == null) {
+            this.allowedIssuers = new ArrayList<>();
+        }
+        this.allowedIssuers.add(allowedIssuersItem);
+        return this;
+    }
+
 
 
     @Override
@@ -434,12 +466,13 @@ public class OIDCMetaData  {
             Objects.equals(this.tokenEndpointSignatureAlgorithm, oiDCMetaData.requestObjectEncryptionAlgorithm) &&
             Objects.equals(this.tokenEndpointSignatureAlgorithm, oiDCMetaData.requestObjectEncryptionMethod) &&
             Objects.equals(this.subjectType, oiDCMetaData.subjectType) &&
-            Objects.equals(this.fapiMetadata, oiDCMetaData.fapiMetadata);
+            Objects.equals(this.fapiMetadata, oiDCMetaData.fapiMetadata) &&
+            Objects.equals(this.allowedIssuers, oiDCMetaData.allowedIssuers);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(allowedGrantTypes, defaultUserAccessTokenExpiryTime, defaultApplicationAccessTokenExpiryTime, defaultRefreshTokenExpiryTime, defaultIdTokenExpiryTime, idTokenEncryptionAlgorithm, idTokenEncryptionMethod, scopeValidators, accessTokenType, accessTokenBindingType, tokenEndpointAuthMethod, tokenEndpointSignatureAlgorithm, idTokenSignatureAlgorithm, requestObjectSignatureAlgorithm, requestObjectEncryptionAlgorithm, requestObjectEncryptionMethod, subjectType, fapiMetadata);
+        return Objects.hash(allowedGrantTypes, defaultUserAccessTokenExpiryTime, defaultApplicationAccessTokenExpiryTime, defaultRefreshTokenExpiryTime, defaultIdTokenExpiryTime, idTokenEncryptionAlgorithm, idTokenEncryptionMethod, scopeValidators, accessTokenType, accessTokenBindingType, tokenEndpointAuthMethod, tokenEndpointSignatureAlgorithm, idTokenSignatureAlgorithm, requestObjectSignatureAlgorithm, requestObjectEncryptionAlgorithm, requestObjectEncryptionMethod, subjectType, fapiMetadata, allowedIssuers);
     }
 
     @Override
@@ -468,6 +501,7 @@ public class OIDCMetaData  {
         sb.append("    requestObjectEncryptionMethod: ").append(toIndentedString(requestObjectEncryptionMethod)).append("\n");
         sb.append("    subjectType: ").append(toIndentedString(subjectType)).append("\n");
         sb.append("    fapiMetadata: ").append(toIndentedString(fapiMetadata)).append("\n");
+        sb.append("    allowedIssuers: ").append(toIndentedString(allowedIssuers)).append("\n");
         sb.append("}");
         return sb.toString();
     }

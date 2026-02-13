@@ -28,6 +28,7 @@ import org.wso2.carbon.identity.application.mgt.ai.LoginFlowAIManager;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
+import org.wso2.carbon.identity.oauth2.config.services.OAuth2OIDCConfigOrgUsageScopeMgtService;
 import org.wso2.carbon.identity.organization.management.application.OrgApplicationManager;
 import org.wso2.carbon.identity.sso.saml.SAMLSSOConfigServiceImpl;
 import org.wso2.carbon.identity.template.mgt.TemplateManager;
@@ -133,6 +134,14 @@ public class ApplicationManagementServiceHolder {
 
         static final OrgApplicationManager SERVICE = (OrgApplicationManager) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(OrgApplicationManager.class, null);
+    }
+
+    private static class OAuthOIDCConfigManagerHolder {
+
+        static final OAuth2OIDCConfigOrgUsageScopeMgtService SERVICE =
+                (OAuth2OIDCConfigOrgUsageScopeMgtService) PrivilegedCarbonContext
+                        .getThreadLocalCarbonContext()
+                        .getOSGiService(OAuth2OIDCConfigOrgUsageScopeMgtService.class, null);
     }
 
     /**
@@ -252,5 +261,10 @@ public class ApplicationManagementServiceHolder {
     public static LoginFlowAIManager getLoginFlowAIManagementService() {
 
         return LoginFlowAIManagerServiceHolder.SERVICE;
+    }
+
+    public static OAuth2OIDCConfigOrgUsageScopeMgtService getOAuth2OIDCConfigManagementService() {
+
+        return OAuthOIDCConfigManagerHolder.SERVICE;
     }
 }

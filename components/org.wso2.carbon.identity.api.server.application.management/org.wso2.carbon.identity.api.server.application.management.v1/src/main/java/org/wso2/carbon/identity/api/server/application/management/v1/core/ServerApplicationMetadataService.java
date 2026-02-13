@@ -23,7 +23,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage;
+import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdaptiveAuthTemplates;
+import org.wso2.carbon.identity.api.server.application.management.v1.AllowedIssuer;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthenticationMethod;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthenticationMethodMetadata;
@@ -47,6 +49,9 @@ import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.dto.OAuthIDTokenAlgorithmDTO;
 import org.wso2.carbon.identity.oauth.dto.TokenBindingMetaDataDTO;
+import org.wso2.carbon.identity.oauth2.config.exceptions.OAuth2OIDCConfigOrgUsageScopeMgtException;
+import org.wso2.carbon.identity.oauth2.config.models.IssuerDetails;
+import org.wso2.carbon.identity.oauth2.config.services.OAuth2OIDCConfigOrgUsageScopeMgtService;
 import org.wso2.carbon.identity.oauth2.model.ClientAuthenticationMethodModel;
 import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
 import org.wso2.carbon.identity.sso.saml.SAMLSSOConfigServiceImpl;
@@ -241,6 +246,10 @@ public class ServerApplicationMetadataService {
         fapiMetadata.setTokenEndpointAuthMethod(new ClientAuthenticationMethodMetadata()
                 .options(supportedFapiClientAuthenticationMethods));
         oidcMetaData.setFapiMetadata(fapiMetadata);
+        List<AllowedIssuer> allowedIssuers = getAllowedIssuersForOrganization();
+        if (allowedIssuers != null && !allowedIssuers.isEmpty()) {
+            oidcMetaData.setAllowedIssuers(allowedIssuers);
+        }
         List<String> supportedGrantTypes = new LinkedList<>(Arrays.asList(oAuthAdminService.getAllowedGrantTypes()));
         List<String> publicClientSupportedGrantTypes = Arrays.asList(
                 oAuthAdminService.getPublicClientSupportedGrantTypes());
@@ -462,5 +471,30 @@ public class ServerApplicationMetadataService {
             supportedClientAuthMethods.add(clientAuthenticationMethod);
         }
         return supportedClientAuthMethods;
+    }
+
+    private List<AllowedIssuer> getAllowedIssuersForOrganization() {
+
+        OAuth2OIDCConfigOrgUsageScopeMgtService oauth2OIDCConfigMgtService = ApplicationManagementServiceHolder.
+                getOAuth2OIDCConfigManagementService();
+        List<AllowedIssuer> allowedIssuers = new ArrayList<>();
+        try {
+            List<IssuerDetails> issuerDetailsList = oauth2OIDCConfigMgtService.getAllowedIssuerDetails();
+            if (issuerDetailsList == null || issuerDetailsList.isEmpty()) {
+                return null;
+            }
+
+            for (IssuerDetails issuer : issuerDetailsList) {
+                AllowedIssuer allowedIssuer = new AllowedIssuer();
+                allowedIssuer.setValue(issuer.getIssuer());
+                allowedIssuer.setOrganizationId(issuer.getIssuerOrgId());
+                allowedIssuer.setTenantDomain(issuer.getIssuerTenantDomain());
+                allowedIssuers.add(allowedIssuer);
+            }
+            return allowedIssuers;
+        } catch (OAuth2OIDCConfigOrgUsageScopeMgtException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }
