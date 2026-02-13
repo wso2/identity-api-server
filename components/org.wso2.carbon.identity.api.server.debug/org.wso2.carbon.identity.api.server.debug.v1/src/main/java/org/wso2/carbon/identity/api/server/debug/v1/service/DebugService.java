@@ -23,6 +23,8 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.debug.common.Constants;
 import org.wso2.carbon.identity.api.server.debug.common.DebugFrameworkServiceHolder;
 import org.wso2.carbon.identity.debug.framework.core.DebugRequestCoordinator;
+import org.wso2.carbon.identity.debug.framework.model.DebugRequest;
+import org.wso2.carbon.identity.debug.framework.model.DebugResponse;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -76,17 +78,20 @@ public class DebugService {
     public Map<String, Object> handleGenericDebugRequest(String resourceId, String resourceType,
             Map<String, String> properties) {
 
-        // Build request context
-        Map<String, Object> debugRequestContext = new HashMap<>();
-        debugRequestContext.put(KEY_RESOURCE_ID, resourceId);
-        debugRequestContext.put(KEY_RESOURCE_TYPE, resourceType);
-        debugRequestContext.put(KEY_PROPERTIES, properties != null ? properties : new HashMap<String, String>());
-        debugRequestContext.put(KEY_REQUEST_TYPE, REQUEST_TYPE_GENERIC);
+        // Build typed request.
+        DebugRequest debugRequest = new DebugRequest(resourceId, resourceType);
+        if (properties != null) {
+            for (Map.Entry<String, String> entry : properties.entrySet()) {
+                debugRequest.addContextProperty(entry.getKey(), entry.getValue());
+            }
+        }
+        debugRequest.addContextProperty(KEY_REQUEST_TYPE, REQUEST_TYPE_GENERIC);
 
-        // Execute and get result
-        Map<String, Object> resultMap = executeDebugRequest("handleResourceDebugRequest", debugRequestContext);
+        // Execute and get result.
+        DebugResponse response = executeDebugRequest("handleResourceDebugRequest", debugRequest);
 
-        // Add metadata
+        // Convert to Map and add metadata.
+        Map<String, Object> resultMap = response.getData();
         resultMap.put(KEY_TIMESTAMP, System.currentTimeMillis());
         resultMap.put(KEY_RESOURCE_ID, resourceId);
         resultMap.put(KEY_RESOURCE_TYPE, resourceType);
@@ -111,10 +116,16 @@ public class DebugService {
         debugRequestContext.put(KEY_PROPERTIES, properties != null ? properties : new HashMap<String, String>());
         debugRequestContext.put(KEY_REQUEST_TYPE, REQUEST_TYPE_INITIAL);
 
-        // Execute and get result
-        Map<String, Object> resultMap = executeDebugRequest("handleInitialDebugRequest", debugRequestContext);
+        // Convert to typed request.
+        DebugRequest debugRequest = DebugRequest.fromMap(debugRequestContext);
 
-        // Add metadata
+        // Execute and get result.
+        DebugResponse response = executeDebugRequest("handleInitialDebugRequest", debugRequest);
+
+        // Get response data as map.
+        Map<String, Object> resultMap = response.getData();
+
+        // Add metadata.
         resultMap.put(KEY_TIMESTAMP, System.currentTimeMillis());
         resultMap.put(KEY_IDP_ID, idpId);
         resultMap.put(KEY_STATUS, Constants.Status.SUCCESS);
@@ -144,35 +155,34 @@ public class DebugService {
     }
 
     /**
-     * Executes a debug request via the DebugRequestCoordinator.
-     * Uses direct method invocation instead of reflection for type safety.
+     * Executes a debug request via the DebugRequestCoordinator using typed classes.
      *
-     * @param methodName The coordinator method to invoke.
-     * @param context    The request context.
-     * @return The extracted result map.
+     * @param methodName   The coordinator method to invoke.
+     * @param debugRequest The typed debug request.
+     * @return The debug response.
      * @throws RuntimeException if execution fails.
      */
-    protected Map<String, Object> executeDebugRequest(String methodName, Map<String, Object> context) {
+    protected DebugResponse executeDebugRequest(String methodName, DebugRequest debugRequest) {
 
         try {
             // Ensure debug framework is available.
             DebugRequestCoordinator coordinator = getCoordinatorOrThrow();
 
             // Invoke the coordinator method directly.
-            Map<String, Object> result;
+            DebugResponse response;
             if ("handleResourceDebugRequest".equals(methodName)) {
-                result = coordinator.handleResourceDebugRequest(context);
+                response = coordinator.handleResourceDebugRequest(debugRequest);
             } else if ("handleInitialDebugRequest".equals(methodName)) {
-                result = coordinator.handleInitialDebugRequest(context);
+                response = coordinator.handleInitialDebugRequest(debugRequest);
             } else {
                 throw new RuntimeException("Unknown coordinator method: " + methodName);
             }
 
-            if (result == null) {
+            if (response == null) {
                 throw new RuntimeException("Debug request returned null result");
             }
 
-            return extractDebugResultData(result);
+            return response;
 
         } catch (RuntimeException e) {
             logError("Runtime error in debug request", e);
