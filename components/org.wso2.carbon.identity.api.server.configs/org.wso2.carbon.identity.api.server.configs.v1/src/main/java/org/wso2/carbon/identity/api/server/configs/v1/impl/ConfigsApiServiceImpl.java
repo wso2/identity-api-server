@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -33,6 +33,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfigListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ScimConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.UsageScopePatch;
 import org.wso2.carbon.logging.service.data.RemoteServerLoggerData;
 
 import java.util.List;
@@ -89,6 +90,12 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     public Response getInboundScimConfigs() {
 
         return Response.ok().entity(configManagementService.getInboundScimConfig()).build();
+    }
+
+    @Override
+    public Response getIssuerUsageScopeConfig() {
+
+        return Response.ok().entity(configManagementService.getIssuerUsageScopeConfig()).build();
     }
 
     @Override
@@ -245,6 +252,12 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
 
         configManagementService.updateSAMLInboundAuthConfig(inboundAuthSAML2Config);
         return Response.ok().build();
+    }
+
+    @Override
+    public Response updateIssuerUsageScopeConfig(UsageScopePatch usageScopePatch) {
+
+        return Response.ok().entity(configManagementService.updateIssuerUsageScopeConfig(usageScopePatch)).build();
     }
 
     @Override
