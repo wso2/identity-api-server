@@ -26,7 +26,10 @@ import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.workflow.common.Constants;
+import org.wso2.carbon.identity.api.server.workflow.common.NotificationConstants;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.ApproverNotifications;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.InitiatorNotifications;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.InstanceStatus;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Operation;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.OptionDetails;
@@ -56,6 +59,7 @@ import org.wso2.carbon.identity.workflow.mgt.dto.Association;
 import org.wso2.carbon.identity.workflow.mgt.dto.WorkflowEvent;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowClientException;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowException;
+import org.wso2.carbon.identity.workflow.mgt.util.WFConstant;
 import org.wso2.carbon.identity.workflow.mgt.util.WorkflowRequestStatus;
 
 import java.io.UnsupportedEncodingException;
@@ -81,6 +85,8 @@ import javax.ws.rs.core.Response;
 public class WorkflowService {
 
     private static final Log log = LogFactory.getLog(WorkflowService.class);
+    private static final String CHANNELS = "channels";
+    private static final String EVENTS = "events";
     private final WorkflowManagementService workflowManagementService;
     private final ApprovalTaskService approvalEventService;
 
@@ -109,6 +115,10 @@ public class WorkflowService {
             currentWorkflow = createWorkflow(workflow, workflowId);
             List<WorkflowTemplateParameters> templateProperties = workflow.getTemplate().getSteps();
             List<Parameter> parameterList = createParameterList(workflowId, templateProperties);
+
+            // Add notification parameters for both initiator and approvers
+            addNotificationParameters(parameterList, workflowId, workflow);
+
             workflowManagementService.addWorkflow(currentWorkflow, parameterList,
                     CarbonContext.getThreadLocalCarbonContext().getTenantId());
             return getWorkflow(workflowId);
@@ -138,6 +148,10 @@ public class WorkflowService {
             currentWorkflow = createWorkflow(workflow, workflowId);
             List<WorkflowTemplateParameters> templateProperties = workflow.getTemplate().getSteps();
             List<Parameter> parameterList = createParameterList(workflowId, templateProperties);
+
+            // Add notification parameters for both initiator and approvers
+            addNotificationParameters(parameterList, workflowId, workflow);
+
             List<Parameter> oldPrameterList =
                     workflowManagementService.getWorkflowParameters(workflowId);
             workflowManagementService.addWorkflow(currentWorkflow, parameterList,
@@ -492,6 +506,107 @@ public class WorkflowService {
         return parameterList;
     }
 
+    /**
+     * Add notification parameters to the parameter list.
+     *
+     * @param parameterList      List of parameters to add to
+     * @param workflowId         Workflow ID
+     * @param workflow           Workflow request containing notification settings
+     * @throws WorkflowClientException if validation fails
+     */
+    private void addNotificationParameters(List<Parameter> parameterList, String workflowId,
+                                           WorkflowRequest workflow) throws WorkflowClientException {
+
+        // Add notification parameters for initiator
+        if (workflow.getNotificationsForInitiator() != null) {
+            InitiatorNotifications initiatorNotifications = workflow.getNotificationsForInitiator();
+
+            addNotificationChannelsAndEvents(
+                    parameterList,
+                    workflowId,
+                    initiatorNotifications.getChannels(),
+                    initiatorNotifications.getEvents(),
+                    Constants.NOTIFICATION_FOR_INITIATOR,
+                    WFConstant.ParameterHolder.WORKFLOW_IMPL
+            );
+        }
+
+        // Add notification parameters for approvers
+        if (workflow.getTemplate() != null && workflow.getTemplate().getNotificationsForApprovers() != null) {
+            ApproverNotifications approverNotifications = workflow.getTemplate().getNotificationsForApprovers();
+
+            addNotificationChannelsAndEvents(
+                    parameterList,
+                    workflowId,
+                    approverNotifications.getChannels(),
+                    approverNotifications.getEvents(),
+                    Constants.NOTIFICATION_FOR_APPROVER,
+                    Constants.TEMPLATE
+            );
+        }
+    }
+
+    /**
+     * Helper method to add notification channels and events as parameters.
+     *
+     * @param parameterList      List of parameters to add to
+     * @param workflowId         Workflow ID
+     * @param channels           List of channel strings
+     * @param events             List of event strings
+     * @param qNamePrefix        Prefix for qName (e.g., NotificationForInitiator)
+     * @param holder             Parameter holder (e.g., Workflow or Template)
+     * @throws WorkflowClientException if validation fails
+     */
+    private void addNotificationChannelsAndEvents(List<Parameter> parameterList, String workflowId,
+                                                   List<String> channels, List<String> events,
+                                                   String qNamePrefix, String holder)
+                                                   throws WorkflowClientException {
+
+        boolean isInitiator = Constants.NOTIFICATION_FOR_INITIATOR.equals(qNamePrefix);
+
+        // Validate and add channels parameter
+        if (channels != null && !channels.isEmpty()) {
+            // Validate channels
+            for (String channel : channels) {
+                if (!NotificationConstants.isValidChannel(channel)) {
+                    throw new WorkflowClientException("Invalid notification channel: " + channel +
+                            ". Supported channels: " + NotificationConstants.getSupportedChannels());
+                }
+            }
+
+            Parameter channelsParam = setWorkflowImplParameters(workflowId, Constants.NOTIFICATION,
+                    String.join(Constants.PARAMETER_VALUE_SEPARATOR, channels),
+                    qNamePrefix + Constants.STEP_NAME_DELIMITER + CHANNELS,
+                    holder);
+            parameterList.add(channelsParam);
+        }
+
+        // Validate and add events parameter
+        if (events != null && !events.isEmpty()) {
+            // Validate events based on context (initiator vs approver)
+            for (String event : events) {
+                boolean isValid = isInitiator
+                        ? NotificationConstants.isValidInitiatorEvent(event)
+                        : NotificationConstants.isValidApproverEvent(event);
+
+                if (!isValid) {
+                    String supportedEvents = isInitiator
+                            ? NotificationConstants.getSupportedInitiatorEvents().toString()
+                            : NotificationConstants.getSupportedApproverEvents().toString();
+                    throw new WorkflowClientException("Invalid notification event: " + event +
+                            " for " + (isInitiator ? "initiator" : "approver") +
+                            ". Supported events: " + supportedEvents);
+                }
+            }
+
+            Parameter eventsParam = setWorkflowImplParameters(workflowId, Constants.NOTIFICATION,
+                    String.join(Constants.PARAMETER_VALUE_SEPARATOR, events),
+                    qNamePrefix + Constants.STEP_NAME_DELIMITER + EVENTS,
+                    holder);
+            parameterList.add(eventsParam);
+        }
+    }
+
     private Parameter setWorkflowImplParameters(String workflowId, String paramName, String paramValue, String qName,
             String holder) {
 
@@ -536,36 +651,98 @@ public class WorkflowService {
         workflowTemplate.setName(currentWorkflow.getTemplateId());
 
         Map<Integer, WorkflowTemplateParametersBase> templateParamsMap = new HashMap<>();
+        List<String> initiatorChannels = new ArrayList<>();
+        List<String> initiatorEvents = new ArrayList<>();
+        List<String> approverChannels = new ArrayList<>();
+        List<String> approverEvents = new ArrayList<>();
+        boolean hasInitiatorNotifications = false;
+        boolean hasApproverNotifications = false;
 
         for (Parameter parameter : workflowParameters) {
 
             if (Constants.TEMPLATE.equals(parameter.getHolder())) {
-                String[] params = parameter.getqName().split(Constants.STEP_NAME_DELIMITER);
-                int stepNumber = Integer.parseInt(params[1]);
+                String qName = parameter.getqName();
 
-                // Check if there's already a WorkflowTemplateParameters object for this step
-                WorkflowTemplateParametersBase templateParameters = templateParamsMap.getOrDefault(stepNumber,
-                        new WorkflowTemplateParametersBase());
-                templateParameters.setStep(stepNumber);
+                // Handle notification parameters for approvers
+                if (qName.startsWith(Constants.NOTIFICATION_FOR_APPROVER)) {
+                    hasApproverNotifications = true;
+                    if (qName.endsWith(CHANNELS)) {
+                        approverChannels.addAll(Arrays.asList(parameter.getParamValue().
+                                split(Constants.PARAMETER_VALUE_SEPARATOR)));
+                    } else if (qName.endsWith(EVENTS)) {
+                        approverEvents.addAll(Arrays.asList(parameter.getParamValue().
+                                split(Constants.PARAMETER_VALUE_SEPARATOR)));
+                    }
+                } else {
+                    // Handle approval step parameters
+                    String[] params = qName.split(Constants.STEP_NAME_DELIMITER);
+                    int stepNumber = Integer.parseInt(params[1]);
 
-                // Create and add new OptionDetails
-                OptionDetails details = new OptionDetails();
-                details.setEntity(params[2]);
-                details.setValues(Arrays.asList(parameter.getParamValue().split(Constants.PARAMETER_VALUE_SEPARATOR)));
+                    // Check if there's already a WorkflowTemplateParameters object for this step
+                    WorkflowTemplateParametersBase templateParameters = templateParamsMap.getOrDefault(stepNumber,
+                            new WorkflowTemplateParametersBase());
+                    templateParameters.setStep(stepNumber);
 
-                // Ensure the list exists and add new details
-                if (templateParameters.getOptions() == null) {
-                    templateParameters.setOptions(new ArrayList<>());
+                    // Create and add new OptionDetails
+                    OptionDetails details = new OptionDetails();
+                    details.setEntity(params[2]);
+                    details.setValues(Arrays.asList(parameter.getParamValue().
+                            split(Constants.PARAMETER_VALUE_SEPARATOR)));
+
+                    // Ensure the list exists and add new details
+                    if (templateParameters.getOptions() == null) {
+                        templateParameters.setOptions(new ArrayList<>());
+                    }
+                    templateParameters.getOptions().add(details);
+
+                    // Update the map
+                    templateParamsMap.put(stepNumber, templateParameters);
                 }
-                templateParameters.getOptions().add(details);
-
-                // Update the map
-                templateParamsMap.put(stepNumber, templateParameters);
+            } else if (WFConstant.ParameterHolder.WORKFLOW_IMPL.equals(parameter.getHolder())) {
+                // Handle notification parameters for initiator
+                String qName = parameter.getqName();
+                if (qName.startsWith(Constants.NOTIFICATION_FOR_INITIATOR)) {
+                    hasInitiatorNotifications = true;
+                    if (qName.endsWith(CHANNELS)) {
+                        initiatorChannels.addAll(Arrays.asList(parameter.getParamValue().
+                                split(Constants.PARAMETER_VALUE_SEPARATOR)));
+                    } else if (qName.endsWith(EVENTS)) {
+                        initiatorEvents.addAll(Arrays.asList(parameter.getParamValue().
+                                split(Constants.PARAMETER_VALUE_SEPARATOR)));
+                    }
+                }
             }
         }
+
         List<WorkflowTemplateParametersBase> templateParams = new ArrayList<>(templateParamsMap.values());
         workflowTemplate.setSteps(templateParams);
+
+        // Set approver notifications if present
+        if (hasApproverNotifications) {
+            ApproverNotifications approverNotifications = new ApproverNotifications();
+            if (!approverChannels.isEmpty()) {
+                approverNotifications.setChannels(approverChannels);
+            }
+            if (!approverEvents.isEmpty()) {
+                approverNotifications.setEvents(approverEvents);
+            }
+            workflowTemplate.setNotificationsForApprovers(approverNotifications);
+        }
+
         detailedWorkflow.setTemplate(workflowTemplate);
+
+        // Set initiator notifications if present
+        if (hasInitiatorNotifications) {
+            InitiatorNotifications initiatorNotifications = new InitiatorNotifications();
+            if (!initiatorChannels.isEmpty()) {
+                initiatorNotifications.setChannels(initiatorChannels);
+            }
+            if (!initiatorEvents.isEmpty()) {
+                initiatorNotifications.setEvents(initiatorEvents);
+            }
+            detailedWorkflow.setNotificationsForInitiator(initiatorNotifications);
+        }
+
         detailedWorkflow.setEngine(currentWorkflow.getWorkflowImplId());
         return detailedWorkflow;
     }
