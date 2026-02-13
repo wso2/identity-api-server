@@ -44,17 +44,18 @@ public class NotificationConstants {
         // Build initiator event set from enum
         Set<String> initiatorEvents = new HashSet<>();
         for (InitiatorEvent event : InitiatorEvent.values()) {
-            initiatorEvents.add(event.getValue());
+            initiatorEvents.add(event.getValue().toLowerCase(Locale.ROOT));
         }
         VALID_INITIATOR_EVENTS = Collections.unmodifiableSet(initiatorEvents);
 
         // Build approver event set from enum
         Set<String> approverEvents = new HashSet<>();
         for (ApproverEvent event : ApproverEvent.values()) {
-            approverEvents.add(event.getValue());
+            approverEvents.add(event.getValue().toLowerCase(Locale.ROOT));
         }
         VALID_APPROVER_EVENTS = Collections.unmodifiableSet(approverEvents);
     }
+
     private NotificationConstants() {
         // Private constructor to prevent instantiation
     }
@@ -66,6 +67,7 @@ public class NotificationConstants {
      * @return true if valid, false otherwise
      */
     public static boolean isValidChannel(String channel) {
+
         return channel != null && VALID_CHANNELS.contains(channel.toLowerCase(Locale.ROOT));
     }
 
@@ -76,7 +78,8 @@ public class NotificationConstants {
      * @return true if valid, false otherwise
      */
     public static boolean isValidInitiatorEvent(String event) {
-        return event != null && VALID_INITIATOR_EVENTS.contains(event);
+
+        return event != null && VALID_INITIATOR_EVENTS.contains(event.toLowerCase(Locale.ROOT));
     }
 
     /**
@@ -86,7 +89,8 @@ public class NotificationConstants {
      * @return true if valid, false otherwise
      */
     public static boolean isValidApproverEvent(String event) {
-        return event != null && VALID_APPROVER_EVENTS.contains(event);
+
+        return event != null && VALID_APPROVER_EVENTS.contains(event.toLowerCase(Locale.ROOT));
     }
 
     /**
@@ -95,6 +99,7 @@ public class NotificationConstants {
      * @return Set of valid channel names
      */
     public static Set<String> getSupportedChannels() {
+
         return VALID_CHANNELS;
     }
 
@@ -104,6 +109,7 @@ public class NotificationConstants {
      * @return Set of valid initiator event names
      */
     public static Set<String> getSupportedInitiatorEvents() {
+
         return VALID_INITIATOR_EVENTS;
     }
 
@@ -113,6 +119,7 @@ public class NotificationConstants {
      * @return Set of valid approver event names
      */
     public static Set<String> getSupportedApproverEvents() {
+
         return VALID_APPROVER_EVENTS;
     }
 
@@ -130,11 +137,12 @@ public class NotificationConstants {
         }
 
         public static Channel fromValue(String value) {
+
             if (value == null) {
                 return null;
             }
             for (Channel channel : values()) {
-                if (channel.value.equals(value)) {
+                if (channel.value.equalsIgnoreCase(value)) {
                     return channel;
                 }
             }
@@ -142,6 +150,7 @@ public class NotificationConstants {
         }
 
         public static boolean isValid(String value) {
+
             return fromValue(value) != null;
         }
 
@@ -164,11 +173,12 @@ public class NotificationConstants {
         }
 
         public static InitiatorEvent fromValue(String value) {
+
             if (value == null) {
                 return null;
             }
             for (InitiatorEvent event : values()) {
-                if (event.value.equals(value)) {
+                if (event.value.equalsIgnoreCase(value)) {
                     return event;
                 }
             }
@@ -198,11 +208,12 @@ public class NotificationConstants {
         }
 
         public static ApproverEvent fromValue(String value) {
+
             if (value == null) {
                 return null;
             }
             for (ApproverEvent event : values()) {
-                if (event.value.equals(value)) {
+                if (event.value.equalsIgnoreCase(value)) {
                     return event;
                 }
             }

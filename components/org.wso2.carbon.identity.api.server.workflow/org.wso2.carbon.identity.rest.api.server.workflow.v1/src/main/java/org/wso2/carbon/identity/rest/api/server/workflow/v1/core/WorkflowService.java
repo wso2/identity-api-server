@@ -703,10 +703,10 @@ public class WorkflowService {
                 String qName = parameter.getqName();
                 if (qName.startsWith(Constants.NOTIFICATION_FOR_INITIATOR)) {
                     hasInitiatorNotifications = true;
-                    if (qName.endsWith("channels")) {
+                    if (qName.endsWith(CHANNELS)) {
                         initiatorChannels.addAll(Arrays.asList(parameter.getParamValue().
                                 split(Constants.PARAMETER_VALUE_SEPARATOR)));
-                    } else if (qName.endsWith("events")) {
+                    } else if (qName.endsWith(EVENTS)) {
                         initiatorEvents.addAll(Arrays.asList(parameter.getParamValue().
                                 split(Constants.PARAMETER_VALUE_SEPARATOR)));
                     }
