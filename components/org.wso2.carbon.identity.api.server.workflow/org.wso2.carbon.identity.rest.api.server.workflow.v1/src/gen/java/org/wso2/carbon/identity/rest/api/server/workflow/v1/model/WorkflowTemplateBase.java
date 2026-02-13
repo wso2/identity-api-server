@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.ApproverNotifications;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowTemplateParametersBase;
 import javax.validation.constraints.*;
 
@@ -36,6 +37,7 @@ import javax.xml.bind.annotation.*;
 public class WorkflowTemplateBase  {
   
     private String name;
+    private ApproverNotifications notificationsForApprovers;
     private List<WorkflowTemplateParametersBase> steps = null;
 
 
@@ -56,6 +58,24 @@ public class WorkflowTemplateBase  {
     }
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+    **/
+    public WorkflowTemplateBase notificationsForApprovers(ApproverNotifications notificationsForApprovers) {
+
+        this.notificationsForApprovers = notificationsForApprovers;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("notificationsForApprovers")
+    @Valid
+    public ApproverNotifications getNotificationsForApprovers() {
+        return notificationsForApprovers;
+    }
+    public void setNotificationsForApprovers(ApproverNotifications notificationsForApprovers) {
+        this.notificationsForApprovers = notificationsForApprovers;
     }
 
     /**
@@ -97,12 +117,13 @@ public class WorkflowTemplateBase  {
         }
         WorkflowTemplateBase workflowTemplateBase = (WorkflowTemplateBase) o;
         return Objects.equals(this.name, workflowTemplateBase.name) &&
+            Objects.equals(this.notificationsForApprovers, workflowTemplateBase.notificationsForApprovers) &&
             Objects.equals(this.steps, workflowTemplateBase.steps);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, steps);
+        return Objects.hash(name, notificationsForApprovers, steps);
     }
 
     @Override
@@ -112,6 +133,7 @@ public class WorkflowTemplateBase  {
         sb.append("class WorkflowTemplateBase {\n");
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    notificationsForApprovers: ").append(toIndentedString(notificationsForApprovers)).append("\n");
         sb.append("    steps: ").append(toIndentedString(steps)).append("\n");
         sb.append("}");
         return sb.toString();

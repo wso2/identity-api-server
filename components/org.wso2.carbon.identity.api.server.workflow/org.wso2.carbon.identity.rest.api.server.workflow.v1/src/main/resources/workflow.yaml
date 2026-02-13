@@ -98,8 +98,14 @@ paths:
                 name: User Approval Workflow
                 description: Workflow to approve user role related requests
                 engine: Simple Workflow Engine
+                notificationsForInitiator:
+                  channels: ["email", "sms"]
+                  events: ["onApproval", "onRejection"]
                 template:
                   name: MultiStepApprovalTemplate
+                  notificationsForApprovers:
+                    channels: ["email", "sms"]
+                    events: ["onAssignment", "onRelease"]
                   steps:
                     - step: 1
                       options:
@@ -183,8 +189,14 @@ paths:
                 name: User Approval Workflow
                 description: Workflow to approve user role related requests
                 engine: Simple Workflow Engine
+                notificationsForInitiator:
+                  channels: ["email", "sms"]
+                  events: ["onApproval", "onRejection"]
                 template:
                   name: MultiStepApprovalTemplate
+                  notificationsForApprovers:
+                    channels: ["email", "sms"]
+                    events: ["onAssignment", "onRelease"]
                   steps:
                     - step: 1
                       options:
@@ -215,8 +227,14 @@ paths:
               name: User Approval Workflow
               description: Workflow to approve user role related requests
               engine: Simple Workflow Engine
+              notificationsForInitiator:
+                channels: ["email", "sms"]
+                events: ["onApproval", "onRejection"]
               template:
                 name: MultiStepApprovalTemplate
+                notificationsForApprovers:
+                  channels: ["email", "sms"]
+                  events: ["onAssignment", "onRelease"]
                 steps:
                   - step: 1
                     options:
@@ -701,6 +719,8 @@ components:
           type: string
           example: "Simple Workflow Engine"
           description: "Name of the selected workflow engine"
+        notificationsForInitiator:
+          $ref: "#/components/schemas/InitiatorNotifications"
         template:
           $ref: "#/components/schemas/WorkflowTemplateBase"
 
@@ -722,6 +742,8 @@ components:
           type: string
           example: "Simple Workflow Engine"
           description: "Name of the selected workflow engine"
+        notificationsForInitiator:
+          $ref: "#/components/schemas/InitiatorNotifications"
         template:
           type: object
           allOf:
@@ -735,6 +757,8 @@ components:
           type: string
           example: "MultiStepApprovalTemplate"
           description: "Name of the workflow template"
+        notificationsForApprovers:
+          $ref: "#/components/schemas/ApproverNotifications"
         steps:
           type: array
           minItems: 1
@@ -771,6 +795,8 @@ components:
           type: string
           example: "MultiStepApproval"
           description: "Name of the workflow template"
+        notificationsForApprovers:
+          $ref: "#/components/schemas/ApproverNotifications"
         steps:
           type: array
           minItems: 1
@@ -806,6 +832,54 @@ components:
             type: string
             example: "123"
             description: "Identifier of the selected entity"
+
+    NotificationSettings:
+      type: object
+      properties:
+        channels:
+          type: array
+          items:
+            type: string
+          example: ["email", "sms"]
+          description: "Notification channels to be used (e.g., email, sms)"
+        events:
+          type: array
+          items:
+            type: string
+          example: ["onApproval", "onRejection"]
+          description: "Events that trigger notifications"
+
+    InitiatorNotifications:
+      type: object
+      properties:
+        channels:
+          type: array
+          items:
+            type: string
+          example: ["email", "sms"]
+          description: "Notification channels to be used for initiator (e.g., email, sms)"
+        events:
+          type: array
+          items:
+            type: string
+          example: ["onApproval", "onRejection"]
+          description: "Events that trigger notifications for initiator (e.g., onApproval, onRejection)"
+
+    ApproverNotifications:
+      type: object
+      properties:
+        channels:
+          type: array
+          items:
+            type: string
+          example: ["email", "sms"]
+          description: "Notification channels to be used for approvers (e.g., email, sms)"
+        events:
+          type: array
+          items:
+            type: string
+          example: ["onAssignment", "onRelease"]
+          description: "Events that trigger notifications for approvers (e.g., onAssignment, onRelease)"
 
     WorkflowAssociationListResponse:
       type: object
