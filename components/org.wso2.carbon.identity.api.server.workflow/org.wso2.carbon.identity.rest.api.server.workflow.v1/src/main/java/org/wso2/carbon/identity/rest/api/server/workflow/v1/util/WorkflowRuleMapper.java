@@ -43,7 +43,6 @@ import java.util.List;
 public class WorkflowRuleMapper {
 
     private static final Log log = LogFactory.getLog(WorkflowRuleMapper.class);
-
     /**
      * Maps the API ORRule model to the generic Service Rule model.
      * @param workflowORRule The ORRule from the Workflow API.
@@ -76,7 +75,6 @@ public class WorkflowRuleMapper {
             return null;
         }
         ORCombinedRule orCombinedRule = (ORCombinedRule) serviceRule;
-
         // Prepare the Response Object
         ORRuleResponse orRuleResponse = new ORRuleResponse();
         orRuleResponse.setCondition(ORRuleResponse.ConditionEnum.OR);
@@ -87,7 +85,6 @@ public class WorkflowRuleMapper {
             for (Rule rule : orCombinedRule.getRules()) {
                 if (rule instanceof ANDCombinedRule) {
                     ANDCombinedRule andCombinedRule = (ANDCombinedRule) rule;
-
                     ANDRuleResponse andRuleResponse = new ANDRuleResponse();
                     andRuleResponse.setCondition(ANDRuleResponse.ConditionEnum.AND);
                     List<ExpressionResponse> apiExpressions = new ArrayList<>();
@@ -104,7 +101,6 @@ public class WorkflowRuleMapper {
                             if (expr.getValue() != null) {
                                 exprResponse.setValue(expr.getValue().getFieldValue());
                             }
-
                             apiExpressions.add(exprResponse);
                         }
                     }
@@ -113,7 +109,6 @@ public class WorkflowRuleMapper {
                 }
             }
         }
-
         orRuleResponse.setRules(apiAndRules);
         return orRuleResponse;
     }
@@ -126,7 +121,6 @@ public class WorkflowRuleMapper {
                 // Add OR condition between AND conditions.
                 ruleBuilder.addOrCondition();
             }
-
             // Add AND condition for the current set of expressions.
             List<Expression> expressionList = andRuleList.get(i).getExpressions();
 

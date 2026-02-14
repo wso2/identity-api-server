@@ -62,7 +62,6 @@ import org.wso2.carbon.identity.workflow.mgt.dto.Association;
 import org.wso2.carbon.identity.workflow.mgt.dto.WorkflowEvent;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowClientException;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowException;
-import org.wso2.carbon.identity.workflow.mgt.util.WFConstant;
 import org.wso2.carbon.identity.workflow.mgt.util.WorkflowRequestStatus;
 
 import java.io.UnsupportedEncodingException;
@@ -78,7 +77,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -113,6 +111,7 @@ public class WorkflowService {
      * @return True if the string is a valid UUID, false otherwise.
      */
     private boolean isValidUUID(String value) {
+
         return value != null && UUID_PATTERN.matcher(value).matches();
     }
 
@@ -357,28 +356,26 @@ public class WorkflowService {
                         try {
                             ruleManagementService.deleteRule(existingRuleId, tenantDomain);
                         } catch (RuleManagementException e) {
-                            // Log the error but continue with setting default condition.
+                            // Log the error but continue with removing the rule from association.
                             log.error("Error while deleting rule with ID: " + existingRuleId +
-                                    " for association ID: " + associationId + ". Proceeding with default condition.", e);
+                                    " for association ID: " + associationId + ". Proceeding with removing rule from association.", e);
                         }
                     }
-                    ruleId = WFConstant.DEFAULT_ASSOCIATION_CONDITION;
+                    // Use empty string to signal 'remove rule' to service layer.
+                    ruleId = "";
                 } else {
                     // Process non-empty rule (update or create).
                     try {
                         Rule serviceRule = WorkflowRuleMapper.mapApiRuleToServiceRule(
                                 workflowAssociation.getRule(), tenantDomain);
-
                         Rule resultRule;
-                        // Update existing rule if it exists and is not the default condition "boolean(1)",
-                        // otherwise create new rule.
+                        // Update existing rule if it exists, otherwise create new rule.
                         if (StringUtils.isNotBlank(existingRuleId) && isValidUUID(existingRuleId)) {
                             serviceRule.setId(existingRuleId);
                             resultRule = ruleManagementService.updateRule(serviceRule, tenantDomain);
                         } else {
                             resultRule = ruleManagementService.addRule(serviceRule, tenantDomain);
                         }
-
                         if (resultRule != null) {
                             ruleId = resultRule.getId();
                         }
@@ -746,8 +743,7 @@ public class WorkflowService {
     private ORRuleResponse getRuleResponse(Association association) {
 
         String ruleId = association.getCondition();
-
-        if (isValidUUID(ruleId)) {
+        if (StringUtils.isNotBlank(ruleId) && isValidUUID(ruleId)) {
             try {
                 String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
                 Rule rule = ruleManagementService.getRuleByRuleId(ruleId, tenantDomain);
