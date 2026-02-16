@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.rest.api.server.workflow.v1.core;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,7 +29,6 @@ import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.workflow.common.Constants;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.InstanceStatus;
-import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.ORRule;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.ORRuleResponse;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Operation;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.OptionDetails;
@@ -58,10 +58,12 @@ import org.wso2.carbon.identity.workflow.engine.exception.WorkflowEngineExceptio
 import org.wso2.carbon.identity.workflow.mgt.WorkflowManagementService;
 import org.wso2.carbon.identity.workflow.mgt.bean.Parameter;
 import org.wso2.carbon.identity.workflow.mgt.bean.Workflow;
+import org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequestFilterResponse;
 import org.wso2.carbon.identity.workflow.mgt.dto.Association;
 import org.wso2.carbon.identity.workflow.mgt.dto.WorkflowEvent;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowClientException;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowException;
+import org.wso2.carbon.identity.workflow.mgt.util.WorkflowManagementUtil;
 import org.wso2.carbon.identity.workflow.mgt.util.WorkflowRequestStatus;
 
 import java.io.UnsupportedEncodingException;
@@ -77,7 +79,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
@@ -92,9 +93,6 @@ public class WorkflowService {
     private final ApprovalTaskService approvalEventService;
     private final RuleManagementService ruleManagementService;
 
-    private static final Pattern UUID_PATTERN = Pattern.compile(
-            "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
-
     public WorkflowService(WorkflowManagementService workflowManagementService,
                            ApprovalTaskService approvalEventService,
                            RuleManagementService ruleManagementService) {
@@ -102,17 +100,6 @@ public class WorkflowService {
         this.workflowManagementService = workflowManagementService;
         this.approvalEventService = approvalEventService;
         this.ruleManagementService = ruleManagementService;
-    }
-
-    /**
-     * Check if a string is a valid UUID.
-     *
-     * @param value String to validate.
-     * @return True if the string is a valid UUID, false otherwise.
-     */
-    private boolean isValidUUID(String value) {
-
-        return value != null && UUID_PATTERN.matcher(value).matches();
     }
 
     /**
@@ -304,7 +291,7 @@ public class WorkflowService {
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_ADDING_ASSOCIATION,
                     workflowAssociation.getAssociationName(), e);
-        } catch (WorkflowException e) {
+        } catch (WorkflowException | RuleManagementException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_ASSOCIATION,
                     workflowAssociation.getAssociationName(), e);
         }
@@ -324,14 +311,6 @@ public class WorkflowService {
         String eventId;
         String ruleId = null;
         try {
-            // Validate existing association.
-            Association existingAssociation = workflowManagementService.getAssociation(associationId);
-
-            if (existingAssociation == null) {
-                throw new WorkflowClientException("A workflow association with ID: " + associationId +
-                        " doesn't exist.");
-            }
-
             if (workflowAssociation.getIsEnabled() == null) {
                 isEnable = workflowManagementService.getAssociation(associationId).isEnabled();
             } else {
@@ -344,25 +323,18 @@ public class WorkflowService {
                 eventId = workflowAssociation.getOperation().toString();
             }
 
-            // Handle rule update.
-            if (workflowAssociation.getRule() != null) {
-                String existingRuleId = existingAssociation.getCondition();
+            if (workflowAssociation.getRule() == null) {
+                ruleId = workflowManagementService.getAssociation(associationId).getCondition();
+            } else {
+                String existingRuleId = workflowManagementService.getAssociation(associationId).getCondition();
                 String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
 
-                // Check if the rule is empty
-                ORRule rule = workflowAssociation.getRule();
-                if (rule.getRules() == null || rule.getRules().isEmpty()) {
-                    if (StringUtils.isNotBlank(existingRuleId) && isValidUUID(existingRuleId)) {
-                        try {
-                            ruleManagementService.deleteRule(existingRuleId, tenantDomain);
-                        } catch (RuleManagementException e) {
-                            // Log the error but continue with removing the rule from association.
-                            log.error("Error while deleting rule with ID: " + existingRuleId +
-                                    " for association ID: " + associationId + ". Proceeding with removing rule from association.", e);
-                        }
+                // Check if the request contains an empty rule.
+                if (CollectionUtils.isEmpty(workflowAssociation.getRule().getRules())) {
+                    if (StringUtils.isNotBlank(existingRuleId) && WorkflowManagementUtil.isUUID(existingRuleId)) {
+                        ruleManagementService.deleteRule(existingRuleId, tenantDomain);
+                        ruleId = null;
                     }
-                    // Use empty string to signal 'remove rule' to service layer.
-                    ruleId = "";
                 } else {
                     // Process non-empty rule (update or create).
                     try {
@@ -370,7 +342,7 @@ public class WorkflowService {
                                 workflowAssociation.getRule(), tenantDomain);
                         Rule resultRule;
                         // Update existing rule if it exists, otherwise create new rule.
-                        if (StringUtils.isNotBlank(existingRuleId) && isValidUUID(existingRuleId)) {
+                        if (StringUtils.isNotBlank(existingRuleId) && WorkflowManagementUtil.isUUID(existingRuleId)) {
                             serviceRule.setId(existingRuleId);
                             resultRule = ruleManagementService.updateRule(serviceRule, tenantDomain);
                         } else {
@@ -380,8 +352,8 @@ public class WorkflowService {
                             ruleId = resultRule.getId();
                         }
                     } catch (RuleManagementException e) {
-                        String operation = StringUtils.isNotBlank(existingRuleId) && isValidUUID(existingRuleId) ?
-                                "updating" : "creating";
+                        String operation = StringUtils.isNotBlank(existingRuleId) &&
+                                WorkflowManagementUtil.isUUID(existingRuleId) ? "updating" : "creating";
                         throw new WorkflowException("Error while " + operation + " rule for workflow association.", e);
                     }
                 }
@@ -392,7 +364,7 @@ public class WorkflowService {
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_UPDATING_ASSOCIATION,
                     associationId, e);
-        } catch (WorkflowException e) {
+        } catch (WorkflowException | RuleManagementException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_ASSOCIATION, associationId, e);
         }
     }
@@ -411,7 +383,7 @@ public class WorkflowService {
         } catch (WorkflowClientException e) {
             throw handleClientError(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_ASSOCIATION_NOT_FOUND,
                     associationId, e);
-        } catch (WorkflowException e) {
+        } catch (WorkflowException | RuleManagementException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_ASSOCIATION, associationId, e);
         }
     }
@@ -440,7 +412,7 @@ public class WorkflowService {
                     associations.toArray(new WorkflowAssociationListItem[associations.size()]), offset, filter);
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_LISTING_ASSOCIATIONS, null, e);
-        } catch (WorkflowException e) {
+        } catch (WorkflowException | RuleManagementException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_ASSOCIATIONS, null, e);
         }
     }
@@ -469,22 +441,15 @@ public class WorkflowService {
             }
 
             String ruleId = association.getCondition();
-            if (StringUtils.isNotBlank(ruleId) && isValidUUID(ruleId)) {
-                try {
-                    String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-                    ruleManagementService.deleteRule(ruleId, tenantDomain);
-                } catch (RuleManagementException e) {
-                    // Log the error but continue with association deletion.
-                    log.error("Error while deleting rule with ID: " + ruleId + " for association ID: " +
-                            associationId + ". Proceeding with association deletion.", e);
-                }
+            if (StringUtils.isNotBlank(ruleId) && WorkflowManagementUtil.isUUID(ruleId)) {
+                String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+                ruleManagementService.deleteRule(ruleId, tenantDomain);
             }
 
             workflowManagementService.removeAssociation(Integer.parseInt(associationId));
-
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_ASSOCIATION_NOT_FOUND, associationId, e);
-        } catch (WorkflowException e) {
+        } catch (WorkflowException | RuleManagementException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_REMOVING_ASSOCIATION, associationId, e);
         }
     }
@@ -696,7 +661,7 @@ public class WorkflowService {
         return workflowAssociationListResponse;
     }
 
-    private WorkflowAssociationListItem getAssociation(Association association) {
+    private WorkflowAssociationListItem getAssociation(Association association) throws RuleManagementException {
 
         if (association == null) {
             return null;
@@ -715,7 +680,7 @@ public class WorkflowService {
         return associationListItem;
     }
 
-    private WorkflowAssociationResponse getAssociationDetails(Association association) {
+    private WorkflowAssociationResponse getAssociationDetails(Association association) throws RuleManagementException {
 
         if (association == null) {
             return null;
@@ -739,21 +704,15 @@ public class WorkflowService {
      *
      * @param association The association object.
      * @return ORRuleResponse if rule exists, null otherwise.
+     * @throws RuleManagementException If an error occurs while retrieving the rule.
      */
-    private ORRuleResponse getRuleResponse(Association association) {
+    private ORRuleResponse getRuleResponse(Association association) throws RuleManagementException {
 
         String ruleId = association.getCondition();
-        if (StringUtils.isNotBlank(ruleId) && isValidUUID(ruleId)) {
-            try {
-                String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-                Rule rule = ruleManagementService.getRuleByRuleId(ruleId, tenantDomain);
-                return WorkflowRuleMapper.mapServiceRuleToApiRule(rule);
-            } catch (RuleManagementException e) {
-                // Log the error but do not throw it.
-                // This allows the Association details to be returned even if the Rule fetch fails.
-                log.error("Error while retrieving rule details for association ID: " +
-                        association.getAssociationId(), e);
-            }
+        if (StringUtils.isNotBlank(ruleId) && WorkflowManagementUtil.isUUID(ruleId)) {
+            String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            Rule rule = ruleManagementService.getRuleByRuleId(ruleId, tenantDomain);
+            return WorkflowRuleMapper.mapServiceRuleToApiRule(rule);
         }
         return null;
     }
@@ -980,7 +939,7 @@ public class WorkflowService {
             operationType = filterMap.get(Constants.WORKFLOW_INSTANCE_OPERATION_TYPE_KEY);
         }
 
-        org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequestFilterResponse response = workflowManagementService
+        WorkflowRequestFilterResponse response = workflowManagementService
                 .getRequestsFromFilter(user, operationType, beginDate, endDate, dateCategory, tenantId, status, limit,
                         offset);
 

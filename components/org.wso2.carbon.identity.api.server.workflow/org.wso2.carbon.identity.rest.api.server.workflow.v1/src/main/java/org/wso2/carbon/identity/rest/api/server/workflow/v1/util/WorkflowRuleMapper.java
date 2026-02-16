@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.rest.api.server.workflow.v1.util;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.ANDRule;
@@ -52,7 +53,7 @@ public class WorkflowRuleMapper {
     public static Rule mapApiRuleToServiceRule(ORRule workflowORRule, String tenantDomain)
             throws RuleManagementException, WorkflowClientException {
 
-        if (workflowORRule == null || workflowORRule.getRules() == null || workflowORRule.getRules().isEmpty()) {
+        if (workflowORRule == null || CollectionUtils.isEmpty(workflowORRule.getRules())) {
             log.debug("Invalid ORRule provided for mapping. Returning null.");
             return null;
         }
@@ -81,7 +82,7 @@ public class WorkflowRuleMapper {
         List<ANDRuleResponse> apiAndRules = new ArrayList<>();
 
         // Iterate through the AND Rules
-        if (orCombinedRule.getRules() != null) {
+        if (CollectionUtils.isNotEmpty(orCombinedRule.getRules())) {
             for (Rule rule : orCombinedRule.getRules()) {
                 if (rule instanceof ANDCombinedRule) {
                     ANDCombinedRule andCombinedRule = (ANDCombinedRule) rule;
