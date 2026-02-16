@@ -1048,7 +1048,7 @@
         <spotbugs.findsecbugs.version>1.13.0</spotbugs.findsecbugs.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
         <identity.event.handler.version>1.9.75</identity.event.handler.version>
-        <identity.inbound.oauth2.version>7.0.425</identity.inbound.oauth2.version>
+        <identity.inbound.oauth2.version>7.2.0</identity.inbound.oauth2.version>
         <identity.inbound.saml2.version>5.11.51</identity.inbound.saml2.version>
         <identity.x509Certificate.validation.version>1.1.19</identity.x509Certificate.validation.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
