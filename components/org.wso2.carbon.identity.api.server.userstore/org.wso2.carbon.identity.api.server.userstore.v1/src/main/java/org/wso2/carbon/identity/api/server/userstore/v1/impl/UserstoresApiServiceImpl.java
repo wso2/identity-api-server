@@ -21,7 +21,7 @@ package org.wso2.carbon.identity.api.server.userstore.v1.impl;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.http.HttpHeaders;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
-import org.wso2.carbon.identity.api.server.common.FileContent;
+import org.wso2.carbon.identity.api.server.common.file.FileContent;
 import org.wso2.carbon.identity.api.server.userstore.v1.UserstoresApiService;
 import org.wso2.carbon.identity.api.server.userstore.v1.core.ServerUserStoreService;
 import org.wso2.carbon.identity.api.server.userstore.v1.factories.ServerUserStoreServiceFactory;
