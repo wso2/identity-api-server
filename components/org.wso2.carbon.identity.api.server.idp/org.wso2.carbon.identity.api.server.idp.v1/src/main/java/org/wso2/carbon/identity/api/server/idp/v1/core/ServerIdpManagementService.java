@@ -1820,7 +1820,10 @@ public class ServerIdpManagementService {
             for (OutboundConnector connector : outboundConnectors) {
                 ProvisioningConnectorConfig connectorConfig = new ProvisioningConnectorConfig();
                 String connectorName = base64URLDecode(connector.getConnectorId());
+                connectorConfig.setName(connectorName);
                 connectorConfig.setEnabled(connector.getIsEnabled());
+                connectorConfig.setBlocking(connector.getBlockingEnabled());
+                connectorConfig.setRulesEnabled(connector.getRulesEnabled());
 
                 List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> connectorProperties = connector
                         .getProperties();
