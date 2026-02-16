@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.5.1</version>
+    <version>1.5.2-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -41,7 +41,7 @@
         <developerConnection>scm:git:https://github.com/wso2/identity-api-server.git
         </developerConnection>
         <connection>scm:git:https://github.com/wso2/identity-api-server.git</connection>
-        <tag>v1.5.1</tag>
+        <tag>HEAD</tag>
     </scm>
 
 
