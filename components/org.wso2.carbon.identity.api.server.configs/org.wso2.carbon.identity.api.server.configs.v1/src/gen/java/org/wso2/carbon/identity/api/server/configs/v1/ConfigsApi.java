@@ -31,8 +31,10 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Error;
+import org.wso2.carbon.identity.api.server.configs.v1.model.FraudDetectionConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationConfiguration;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthOAuth2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch;
@@ -64,6 +66,28 @@ public class ConfigsApi  {
     public ConfigsApi() {
 
         this.delegate = ConfigsApiServiceFactory.getConfigsApi();
+    }
+
+    @Valid
+    @DELETE
+    @Path("/authentication/inbound/oauth2")
+
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Delete OAuth2 inbound authentication configurations.", notes = "Delete all OAuth2 inbound authentication configurations of the tenant.<br><br> <b>Scope (Permission) required:</b> <br>   * internal_config_update ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+
+        })
+    }, tags={ "Inbound Authentication Configurations", })
+    @ApiResponses(value = {
+        @ApiResponse(code = 204, message = "Successful deletion", response = Void.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response deleteOAuth2InboundAuthConfig() {
+
+        return delegate.deleteOAuth2InboundAuthConfig();
     }
 
     @Valid
@@ -184,6 +208,30 @@ public class ConfigsApi  {
 
     @Valid
     @GET
+    @Path("/fraud-detection")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Get fraud detection configs.", notes = "Retrieve fraud detection related configurations of a tenant.", response = FraudDetectionConfig.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Fraud Detection", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successfully retrieved.", response = FraudDetectionConfig.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getFraudDetectionConfigs() {
+
+        return delegate.getFraudDetectionConfigs();
+    }
+
+    @Valid
+    @GET
     @Path("/home-realm-identifiers")
     
     @Produces({ "application/json" })
@@ -252,6 +300,30 @@ public class ConfigsApi  {
     public Response getInboundScimConfigs() {
 
         return delegate.getInboundScimConfigs();
+    }
+
+    @Valid
+    @GET
+    @Path("/authentication/inbound/oauth2")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve OAuth2 inbound authentication configurations.", notes = "Retrieve server OAuth2 inbound authentication configurations. ", response = InboundAuthOAuth2Config.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Inbound Authentication Configurations", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = InboundAuthOAuth2Config.class),
+        @ApiResponse(code = 400, message = "Bad request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getOAuth2InboundAuthConfig() {
+
+        return delegate.getOAuth2InboundAuthConfig();
     }
 
     @Valid
@@ -642,15 +714,15 @@ public class ConfigsApi  {
     @Valid
     @DELETE
     @Path("/impersonation")
-    
+
     @Produces({ "application/json" })
     @ApiOperation(value = "Revert the tenant impersonation configuration.", notes = "Revert the tenant impersonation configuration. <b>Scope (Permission) required:</b> <br>   * internal_config_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Impersonation Configurations", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 204, message = "Successful deletion", response = Void.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
@@ -659,6 +731,30 @@ public class ConfigsApi  {
     public Response deleteImpersonationConfiguration() {
 
         return delegate.deleteImpersonationConfiguration();
+    }
+
+    @Valid
+    @PUT
+    @Path("/fraud-detection")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update fraud detection configs.", notes = "Update fraud detection related configuration of a tenant.", response = FraudDetectionConfig.class, authorizations = {
+            @Authorization(value = "BasicAuth"),
+            @Authorization(value = "OAuth2", scopes = {
+
+            })
+    }, tags={ "Fraud Detection", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully updated.", response = FraudDetectionConfig.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+            @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response updateFraudDetectionConfigs(@ApiParam(value = "" ,required=true) @Valid FraudDetectionConfig fraudDetectionConfig) {
+
+        return delegate.updateFraudDetectionConfigs(fraudDetectionConfig );
     }
 
     @Valid
@@ -683,6 +779,30 @@ public class ConfigsApi  {
     public Response updateInboundScimConfigs(@ApiParam(value = "" ,required=true) @Valid ScimConfig scimConfig) {
 
         return delegate.updateInboundScimConfigs(scimConfig );
+    }
+
+    @Valid
+    @PATCH
+    @Path("/authentication/inbound/oauth2")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update OAuth2 inbound authentication configurations.", notes = "Patch server OAuth2 inbound authentication configurations. ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Inbound Authentication Configurations", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response updateOAuth2InboundAuthConfig(@ApiParam(value = "" ) @Valid InboundAuthOAuth2Config inboundAuthOAuth2Config) {
+
+        return delegate.updateOAuth2InboundAuthConfig(inboundAuthOAuth2Config );
     }
 
     @Valid

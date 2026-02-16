@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2019-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -109,7 +109,8 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
                 .revokeTokensWhenIDPSessionTerminated(oAuthConsumerAppDTO
                         .isTokenRevocationWithIDPSessionTerminationEnabled())
                 .validateTokenBinding(oAuthConsumerAppDTO.isTokenBindingValidationEnabled())
-                .accessTokenAttributes(getAccessTokenAttributes(oAuthConsumerAppDTO));
+                .accessTokenAttributes(getAccessTokenAttributes(oAuthConsumerAppDTO))
+                .enableJwtScopeAsArray(oAuthConsumerAppDTO.isJwtScopeAsArrayEnabled());
     }
 
     private List<String> getAccessTokenAttributes(OAuthConsumerAppDTO oauthAppDTO) {
