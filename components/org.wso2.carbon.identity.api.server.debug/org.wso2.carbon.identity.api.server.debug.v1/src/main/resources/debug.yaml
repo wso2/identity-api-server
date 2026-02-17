@@ -149,16 +149,13 @@ components:
     DebugConnectionRequest:
       type: object
       required:
-        - resourceId
         - resourceType
-      description: "Request body for starting a debug session."
+      description: "Request body for starting a debug session. The connectionId is optional at the top level and can be provided inside the properties map for resource types that require it (e.g., IDP)."
       properties:
-        resourceId:
-          type: string
-          description: "Resource ID to debug (e.g., Identity Provider ID, Application ID)."
-          example: "123e4567-e89b-12d3-a456-426614174000"
         resourceType:
           type: string
+          minLength: 1
+          maxLength: 50
           description: "Type of resource to debug. Allowed values: IDP, APPLICATION, CONNECTOR, AUTHENTICATOR."
           example: "IDP"
           enum:
@@ -168,30 +165,23 @@ components:
             - "AUTHENTICATOR"
         properties:
           type: object
+          maxProperties: 50
           additionalProperties:
             type: string
-          description: "Generic properties for resource debugging as key-value pairs (optional). Can include authenticatorName, redirectUri, scope, etc."
+            maxLength: 2048
+          description: "Generic properties for resource debugging as key-value pairs. Maximum 50 properties allowed. Each property value can be up to 2048 characters. For IDP resource type, the connectionId property is required."
           example:
+            "connectionId": "123e4567-e89b-12d3-a456-426614174000"
             "authenticatorName": "OpenIDConnectAuthenticator"
 
     DebugConnectionResponse:
       type: object
-      properties:
-        result:
-          $ref: "#/components/schemas/DebugResult"
-      description: "Debug connection response wrapping the debug result object."
-
-    DebugResult:
-      type: object
+      description: "Debug connection response containing generic debug information and resource-specific metadata."
       properties:
         debugId:
           type: string
           description: "Debug session ID."
           example: "debug-496f5a3f-0094-42f2-8188-d2baa9a1287c"
-        authorizationUrl:
-          type: string
-          description: "OAuth 2.0 authorization URL for user authentication."
-          example: "https://api.asgardeo.io/t/linuka/oauth2/authorize?response_type=code&client_id=lfrTEyDGHBEUbeBKoiaosz1y8Aca&redirect_uri=https%3A%2F%2Flocalhost%3A9443%2Fcommonauth"
         status:
           type: string
           description: "Status of the debug operation."
@@ -199,13 +189,21 @@ components:
           example: "SUCCESS"
         message:
           type: string
-          description: "Response message."
-          example: "OAuth 2.0 authorization URL generated successfully"
+          description: "Generic response message."
+          example: "Debug session initiated successfully"
         timestamp:
           type: integer
           format: int64
-          description: "Timestamp when the debug operation was processed."
-          example: 1763700680541
+          description: "Timestamp when the debug operation was processed (in milliseconds)."
+          example: 1771217107937
+        metadata:
+          type: object
+          description: "Resource-specific metadata. For IDP OAuth debugging, includes 'authorizationUrl'."
+          properties:
+            authorizationUrl:
+              type: string
+              description: "OAuth 2.0 authorization URL for IDP debugging."
+              example: "https://api.asgardeo.io/t/linuka/oauth2/authorize?response_type=code&client_id=lfrTEyDGHBEUbeBKoiaosz1y8Aca&redirect_uri=https%3A%2F%2Flocalhost%3A9443%2Fcommonauth"
 
     # -----------------------------
     # GET /debug/result/{session-id}

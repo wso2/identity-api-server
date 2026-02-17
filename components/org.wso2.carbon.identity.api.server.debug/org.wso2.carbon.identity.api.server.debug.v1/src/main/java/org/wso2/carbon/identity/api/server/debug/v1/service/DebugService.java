@@ -68,8 +68,9 @@ public class DebugService {
 
     /**
      * Handles generic debug request for any resource type with properties.
+     * The resourceId is optional at this level and may be null for resource types that don't require it.
      *
-     * @param resourceId   Resource ID to debug.
+     * @param resourceId   Resource ID to debug (can be null for some resource types).
      * @param resourceType Type of resource (IDP, APPLICATION, CONNECTOR, etc.).
      * @param properties   Generic properties map for the debug request (optional).
      * @return Debug result containing session information and status.
@@ -78,8 +79,12 @@ public class DebugService {
     public Map<String, Object> handleGenericDebugRequest(String resourceId, String resourceType,
             Map<String, String> properties) {
 
-        // Build typed request.
-        DebugRequest debugRequest = new DebugRequest(resourceId, resourceType);
+        // Build typed request. resourceId can be null for resource types that don't need it.
+        DebugRequest debugRequest = new DebugRequest();
+        debugRequest.setResourceType(resourceType);
+        if (resourceId != null) {
+            debugRequest.setResourceId(resourceId);
+        }
         if (properties != null) {
             for (Map.Entry<String, String> entry : properties.entrySet()) {
                 debugRequest.addContextProperty(entry.getKey(), entry.getValue());
@@ -93,7 +98,9 @@ public class DebugService {
         // Convert to Map and add metadata.
         Map<String, Object> resultMap = response.getData();
         resultMap.put(KEY_TIMESTAMP, System.currentTimeMillis());
-        resultMap.put(KEY_RESOURCE_ID, resourceId);
+        if (resourceId != null) {
+            resultMap.put(KEY_RESOURCE_ID, resourceId);
+        }
         resultMap.put(KEY_RESOURCE_TYPE, resourceType);
         resultMap.putIfAbsent(KEY_STATUS, Constants.Status.SUCCESS);
 

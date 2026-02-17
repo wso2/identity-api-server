@@ -26,7 +26,7 @@ import java.util.Map;
 
 /**
  * Debug result object containing the actual debug operation result data.
- * Wraps debugId, authorizationUrl, status, and metadata for flexible response structures.
+ * Contains generic fields (debugId, status, message, timestamp) and resource-specific metadata.
  */
 @ApiModel(description = "Debug result object containing the debug operation result data")
 public class DebugResult {
@@ -34,10 +34,6 @@ public class DebugResult {
     @ApiModelProperty(value = "Debug session ID")
     @JsonProperty("debugId")
     private String debugId;
-
-    @ApiModelProperty(value = "OAuth 2.0 authorization URL for user authentication") 
-    @JsonProperty("authorizationUrl")
-    private String authorizationUrl;
 
     @ApiModelProperty(value = "Status of the debug operation", example = "SUCCESS", 
                       notes = "Possible values: SUCCESS, IN_PROGRESS, FAILURE, DIRECT_RESULT")
@@ -48,13 +44,13 @@ public class DebugResult {
     @JsonProperty("message")
     private String message;
 
-    @ApiModelProperty(value = "Additional metadata about the debug operation")
-    @JsonProperty("metadata")
-    private Map<String, Object> metadata;
-
     @ApiModelProperty(value = "Timestamp when the debug operation was processed", example = "1763700680541")
     @JsonProperty("timestamp")
     private Long timestamp;
+
+    @ApiModelProperty(value = "Resource-specific metadata (e.g., 'authorizationUrl' for IDP OAuth debugging)")
+    @JsonProperty("metadata")
+    private Map<String, Object> metadata;
 
     /**
      * Default constructor.
@@ -82,26 +78,6 @@ public class DebugResult {
     public void setDebugId(String debugId) {
 
         this.debugId = debugId;
-    }
-
-    /**
-     * Gets the authorization URL.
-     *
-     * @return Authorization URL.
-     */
-    public String getAuthorizationUrl() {
-
-        return authorizationUrl;
-    }
-
-    /**
-     * Sets the authorization URL.
-     *
-     * @param authorizationUrl Authorization URL to set.
-     */
-    public void setAuthorizationUrl(String authorizationUrl) {
-
-        this.authorizationUrl = authorizationUrl;
     }
 
     /**
@@ -189,11 +165,10 @@ public class DebugResult {
         
         return "DebugResult{" +
                 "debugId='" + debugId + '\'' +
-                ", authorizationUrl='" + authorizationUrl + '\'' +
                 ", status='" + status + '\'' +
                 ", message='" + message + '\'' +
-                ", metadata=" + metadata +
                 ", timestamp=" + timestamp +
+                ", metadata=" + metadata +
                 '}';
     }
 }

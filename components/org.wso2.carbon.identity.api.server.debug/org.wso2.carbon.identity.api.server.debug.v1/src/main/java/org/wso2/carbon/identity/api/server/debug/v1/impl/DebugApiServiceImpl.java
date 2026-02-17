@@ -55,6 +55,13 @@ public class DebugApiServiceImpl extends DebugApiService {
             Constants.ResourceType.CONNECTOR,
             Constants.ResourceType.AUTHENTICATOR));
 
+    // Validation constants.
+    private static final int MAX_PROPERTIES_SIZE = 50;
+    private static final int MAX_PROPERTY_KEY_LENGTH = 100;
+    private static final int MAX_PROPERTY_VALUE_LENGTH = 2048;
+    private static final int MAX_RESOURCE_TYPE_LENGTH = 50;
+    private static final String SESSION_ID_PATTERN = "^[a-zA-Z0-9_-]+$";
+
     // Constants for result map keys
     private static final String KEY_SESSION_ID = "sessionId";
     private static final String KEY_STATE = "state";
@@ -77,24 +84,25 @@ public class DebugApiServiceImpl extends DebugApiService {
      * Starts a debug session for any resource type with custom properties.
      * This is the primary entry point for debug requests.
      *
-     * @param debugRequest Debug request containing resourceId, resourceType, and
-     *                     properties.
+     * @param debugRequest Debug request containing resourceType and properties.
      * @return Response containing debug result and session information.
      */
     @Override
     public Response startDebugSession(DebugConnectionRequest debugRequest) {
 
         try {
-            // Input validation
+            // Input validation.
             Response validationError = validateDebugRequest(debugRequest);
             if (validationError != null) {
                 return validationError;
             }
 
-            String resourceId = debugRequest.getResourceId();
             String resourceType = debugRequest.getResourceType();
+            
+            // Map connectionId from properties to resourceId for framework compatibility.
+            String resourceId = extractResourceIdFromProperties(debugRequest.getProperties());
 
-            // Delegate to DebugService for resource-type-specific handling
+            // Delegate to DebugService for resource-type-specific handling.
             Map<String, Object> debugResult = debugService.handleGenericDebugRequest(
                     resourceId, resourceType, debugRequest.getProperties());
 
@@ -123,6 +131,26 @@ public class DebugApiServiceImpl extends DebugApiService {
 
     @Override
     public Response getDebugResult(String sessionId) {
+
+        // Validate session ID.
+        if (sessionId == null || sessionId.trim().isEmpty()) {
+            return createErrorResponse("INVALID_REQUEST", "Session ID is required.",
+                    Response.Status.BAD_REQUEST);
+        }
+
+        // Validate session ID format (alphanumeric, hyphens, and underscores only).
+        if (!sessionId.matches(SESSION_ID_PATTERN)) {
+            return createErrorResponse("INVALID_REQUEST",
+                    "Invalid session ID format. Only alphanumeric characters, hyphens, and underscores are allowed.",
+                    Response.Status.BAD_REQUEST);
+        }
+
+        // Validate session ID length.
+        if (sessionId.length() > MAX_PROPERTY_VALUE_LENGTH) {
+            return createErrorResponse("INVALID_REQUEST",
+                    "Session ID exceeds maximum length.",
+                    Response.Status.BAD_REQUEST);
+        }
 
         String resultJson = debugService.getDebugResult(sessionId);
 
@@ -161,6 +189,7 @@ public class DebugApiServiceImpl extends DebugApiService {
 
     /**
      * Validates the debug request for required fields.
+     * Resource type is always required. Resource ID is validated based on the resource type.
      *
      * @param debugRequest The request to validate.
      * @return Error response if validation fails, null if valid.
@@ -168,29 +197,134 @@ public class DebugApiServiceImpl extends DebugApiService {
     protected Response validateDebugRequest(DebugConnectionRequest debugRequest) {
 
         if (debugRequest == null) {
-            return createErrorResponse("INVALID_REQUEST", "Debug request is required",
-                    Response.Status.BAD_REQUEST);
-        }
-
-        if (debugRequest.getResourceId() == null || debugRequest.getResourceId().trim().isEmpty()) {
-            return createErrorResponse("INVALID_REQUEST", "Resource ID is required",
+            return createErrorResponse("INVALID_REQUEST", "Debug request is required.",
                     Response.Status.BAD_REQUEST);
         }
 
         String resourceType = debugRequest.getResourceType();
         if (resourceType == null || resourceType.trim().isEmpty()) {
-            return createErrorResponse("INVALID_REQUEST", "Resource type is required",
+            return createErrorResponse("INVALID_REQUEST", "Resource type is required.",
                     Response.Status.BAD_REQUEST);
         }
 
-        // Validate resource type against allowed values
+        // Validate resource type length.
+        if (resourceType.length() > MAX_RESOURCE_TYPE_LENGTH) {
+            return createErrorResponse("INVALID_REQUEST",
+                    "Resource type exceeds maximum length of " + MAX_RESOURCE_TYPE_LENGTH + " characters.",
+                    Response.Status.BAD_REQUEST);
+        }
+
+        // Validate resource type against allowed values.
         if (!ALLOWED_RESOURCE_TYPES.contains(resourceType.toUpperCase(java.util.Locale.ENGLISH))) {
             return createErrorResponse("INVALID_REQUEST",
                     "Invalid resource type. Allowed values: " + ALLOWED_RESOURCE_TYPES,
                     Response.Status.BAD_REQUEST);
         }
 
+        // Validate properties map.
+        Response propertiesValidation = validateProperties(debugRequest.getProperties());
+        if (propertiesValidation != null) {
+            return propertiesValidation;
+        }
+
+        // Resource-type-specific validation.
+        return validateResourceTypeSpecificFields(debugRequest, resourceType);
+    }
+
+    /**
+     * Validates the properties map for size and content.
+     *
+     * @param properties The properties map to validate.
+     * @return Error response if validation fails, null if valid.
+     */
+    private Response validateProperties(java.util.Map<String, String> properties) {
+
+        if (properties == null) {
+            return null; // Properties are optional.
+        }
+
+        // Validate properties map size.
+        if (properties.size() > MAX_PROPERTIES_SIZE) {
+            return createErrorResponse("INVALID_REQUEST",
+                    "Properties map exceeds maximum size of " + MAX_PROPERTIES_SIZE + " entries.",
+                    Response.Status.BAD_REQUEST);
+        }
+
+        // Validate each property key and value.
+        for (java.util.Map.Entry<String, String> entry : properties.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+
+            // Validate key.
+            if (key == null || key.trim().isEmpty()) {
+                return createErrorResponse("INVALID_REQUEST",
+                        "Property key cannot be null or empty.",
+                        Response.Status.BAD_REQUEST);
+            }
+
+            if (key.length() > MAX_PROPERTY_KEY_LENGTH) {
+                return createErrorResponse("INVALID_REQUEST",
+                        "Property key '" + key + "' exceeds maximum length of " 
+                        + MAX_PROPERTY_KEY_LENGTH + " characters.", Response.Status.BAD_REQUEST);
+            }
+
+            // Validate value.
+            if (value != null && value.length() > MAX_PROPERTY_VALUE_LENGTH) {
+                return createErrorResponse("INVALID_REQUEST",
+                        "Property value for key '" + key + "' exceeds maximum length of " + MAX_PROPERTY_VALUE_LENGTH
+                        + " characters.", Response.Status.BAD_REQUEST);
+            }
+        }
+
         return null;
+    }
+
+    /**
+     * Validates fields that are required based on the resource type.
+     * For example, IDP resource type requires a connectionId in the properties.
+     *
+     * @param debugRequest The request to validate.
+     * @param resourceType The resource type (expected to be uppercase).
+     * @return Error response if validation fails, null if valid.
+     */
+    private Response validateResourceTypeSpecificFields(DebugConnectionRequest debugRequest, String resourceType) {
+
+        // Check for IDP resource type.
+        if (Constants.ResourceType.IDP.equals(resourceType)) {
+            java.util.Map<String, String> properties = debugRequest.getProperties();
+            String connectionId = properties != null ? properties.get("connectionId") : null;
+            if (connectionId == null || connectionId.trim().isEmpty()) {
+                return createErrorResponse("INVALID_REQUEST",
+                        "Connection ID is required in properties for IDP resource type.",
+                        Response.Status.BAD_REQUEST);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Extracts resourceId from properties map.
+     * Maps connectionId → resourceId for framework compatibility.
+     *
+     * @param properties The properties map.
+     * @return The resourceId, or null if not found.
+     */
+    private String extractResourceIdFromProperties(java.util.Map<String, String> properties) {
+
+        if (properties == null) {
+            return null;
+        }
+        
+        // Check for connectionId first (API layer naming).
+        String connectionId = properties.get("connectionId");
+        if (connectionId != null) {
+            // Map connectionId to resourceId for framework layer.
+            return connectionId;
+        }
+        
+        // Fallback to resourceId for backward compatibility.
+        return properties.get("resourceId");
     }
 
     /**
@@ -223,22 +357,32 @@ public class DebugApiServiceImpl extends DebugApiService {
 
         DebugConnectionResponse response = new DebugConnectionResponse();
 
-        // Extract or generate debug ID (state parameter)
+        // Extract or generate debug ID (state parameter).
         String debugId = extractDebugId(debugResult);
         response.setDebugId(debugId);
 
-        // Set authorization URL if available
+        // Set generic status (always SUCCESS for successfully generated debug sessions).
+        response.setStatus(Constants.Status.SUCCESS);
+        
+        // Set generic message.
+        response.setMessage("Debug session initiated successfully");
+
+        // Set timestamp.
+        response.setTimestamp(extractTimestamp(debugResult));
+
+        // Create metadata map for resource-specific fields.
+        java.util.Map<String, Object> metadata = new java.util.HashMap<>();
+        
+        // For IDP resources, only add authorization URL to metadata.
         Object authUrl = debugResult.get(KEY_AUTHORIZATION_URL);
         if (authUrl != null) {
-            response.setAuthorizationUrl(authUrl.toString());
+            metadata.put("authorizationUrl", authUrl.toString());
         }
 
-        // Set status and message
-        response.setStatus(getStringOrDefault(debugResult, KEY_STATUS, Constants.Status.SUCCESS));
-        response.setMessage(getStringOrDefault(debugResult, KEY_MESSAGE, "Debug request processed successfully"));
-
-        // Set timestamp
-        response.setTimestamp(extractTimestamp(debugResult));
+        // Only set metadata if it has content.
+        if (!metadata.isEmpty()) {
+            response.setMetadata(metadata);
+        }
 
         return response;
     }

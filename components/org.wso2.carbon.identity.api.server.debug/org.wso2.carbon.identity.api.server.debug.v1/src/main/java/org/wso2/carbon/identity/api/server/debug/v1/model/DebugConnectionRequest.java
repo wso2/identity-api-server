@@ -22,22 +22,24 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 /**
  * Debug request model for testing authentication flows and resources.
- * Supports both IdP OAuth 2.0 authentication testing and generic resource debugging.
+ * The resourceId is no longer a top-level required field. It can be provided
+ * inside the properties map for resource types that require it (e.g., IDP).
  */
 @ApiModel(description = "Debug request for authentication flow and resource testing")
 public class DebugConnectionRequest {
 
-    @ApiModelProperty(value = "Resource ID to debug", required = true)
-    @JsonProperty("resourceId")
-    private String resourceId;
-
-    @ApiModelProperty(value = "Resource type to debug", required = true)
+    @NotNull(message = "Resource type is required")
+    @Size(min = 1, max = 50, message = "Resource type must be between 1 and 50 characters")
+    @ApiModelProperty(value = "Resource type to debug", required = true, example = "IDP")
     @JsonProperty("resourceType")
     private String resourceType;
 
-    @ApiModelProperty(value = "Generic properties for resource debugging")
+    @ApiModelProperty(value = "Generic properties for resource debugging, can include resourceId for types")
     @JsonProperty("properties")
     private java.util.Map<String, String> properties;
 
@@ -50,49 +52,25 @@ public class DebugConnectionRequest {
     }
 
     /**
-     * Constructor with resource ID and type.
+     * Constructor with resource type.
      *
-     * @param resourceId The resource ID to debug.
      * @param resourceType The type of resource to debug.
      */
-    public DebugConnectionRequest(String resourceId, String resourceType) {
+    public DebugConnectionRequest(String resourceType) {
 
-        this.resourceId = resourceId;
         this.resourceType = resourceType;
     }
 
     /**
-     * Constructor with all fields.
+     * Constructor with resource type and properties.
      *
-     * @param resourceId The resource ID to debug.
      * @param resourceType The type of resource to debug.
-     * @param properties Generic properties for debugging.
+     * @param properties   Generic properties for debugging.
      */
-    public DebugConnectionRequest(String resourceId, String resourceType, java.util.Map<String, String> properties) {
+    public DebugConnectionRequest(String resourceType, java.util.Map<String, String> properties) {
 
-        this.resourceId = resourceId;
         this.resourceType = resourceType;
         this.properties = properties;
-    }
-
-    /**
-     * Gets the resource ID.
-     *
-     * @return Resource ID.
-     */
-    public String getResourceId() {
-
-        return resourceId;
-    }
-
-    /**
-     * Sets the resource ID.
-     *
-     * @param resourceId Resource ID to set.
-     */
-    public void setResourceId(String resourceId) {
-
-        this.resourceId = resourceId;
     }
 
     /**
@@ -135,12 +113,24 @@ public class DebugConnectionRequest {
         this.properties = properties;
     }
 
+    /**
+     * Gets the resourceId from the properties map if present.
+     *
+     * @return Resource ID from properties, or null if not set.
+     */
+    public String getResourceId() {
+
+        if (properties != null) {
+            return properties.get("resourceId");
+        }
+        return null;
+    }
+
     @Override
     public String toString() {
         
         return "DebugConnectionRequest{" +
-                "resourceId='" + resourceId + '\'' +
-                ", resourceType='" + resourceType + '\'' +
+                "resourceType='" + resourceType + '\'' +
                 ", properties=" + properties +
                 '}';
     }
