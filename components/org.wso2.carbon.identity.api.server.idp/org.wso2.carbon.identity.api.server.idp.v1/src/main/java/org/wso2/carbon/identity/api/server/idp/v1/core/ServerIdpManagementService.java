@@ -124,6 +124,7 @@ import org.wso2.carbon.idp.mgt.dao.IdPManagementDAO;
 import org.wso2.carbon.idp.mgt.model.ConnectedAppsResult;
 import org.wso2.carbon.idp.mgt.model.IdpSearchResult;
 import org.wso2.carbon.idp.mgt.util.IdPManagementConstants;
+import org.wso2.carbon.idp.mgt.util.IdPManagementUtil;
 import org.yaml.snakeyaml.TypeDescription;
 
 import java.io.IOException;
@@ -3035,7 +3036,8 @@ public class ServerIdpManagementService {
             outboundConnector.setBlockingEnabled(config.isBlocking());
             outboundConnector.setRulesEnabled(config.isRulesEnabled());
 
-            boolean isConfidentialDataProtectionEnabled = isOutboundProvisioningConfidentialDataProtectionEnabled();
+            boolean isConfidentialDataProtectionEnabled =
+                    IdPManagementUtil.isProvisioningConfidentialConfigProtectionEnabled();
             if (log.isDebugEnabled()) {
                 log.debug("Confidential data protection enabled for outbound provisioning: " +
                         isConfidentialDataProtectionEnabled);
