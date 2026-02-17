@@ -68,9 +68,11 @@ public class DebugService {
 
     /**
      * Handles generic debug request for any resource type with properties.
-     * The resourceId is optional at this level and may be null for resource types that don't require it.
+     * The resourceId is optional at this level and may be null for resource types
+     * that don't require it.
      *
-     * @param resourceId   Resource ID to debug (can be null for some resource types).
+     * @param resourceId   Resource ID to debug (can be null for some resource
+     *                     types).
      * @param resourceType Type of resource (IDP, APPLICATION, CONNECTOR, etc.).
      * @param properties   Generic properties map for the debug request (optional).
      * @return Debug result containing session information and status.
@@ -79,7 +81,8 @@ public class DebugService {
     public Map<String, Object> handleGenericDebugRequest(String resourceId, String resourceType,
             Map<String, String> properties) {
 
-        // Build typed request. resourceId can be null for resource types that don't need it.
+        // Build typed request. resourceId can be null for resource types that don't
+        // need it.
         DebugRequest debugRequest = new DebugRequest();
         debugRequest.setResourceType(resourceType);
         if (resourceId != null) {
@@ -148,15 +151,18 @@ public class DebugService {
      * @return The debug result JSON string, or null if not found.
      */
     public String getDebugResult(String sessionId) {
-
         try {
-            return org.wso2.carbon.identity.debug.framework.cache.DebugResultCache.get(sessionId);
-        } catch (NoClassDefFoundError e) {
+            // Delegate to coordinator which handles listeners and cleanup.
+            DebugRequestCoordinator coordinator = getCoordinatorOrThrow();
+            return coordinator.getDebugResult(sessionId);
+
+        } catch (RuntimeException e) {
+            // Coordinator not available (framework not deployed/active).
             if (LOG.isDebugEnabled()) {
-                LOG.debug("DebugResultCache class not available - debug framework may not be deployed.");
+                LOG.debug("Debug framework not available for result retrieval.");
             }
         } catch (Exception e) {
-            LOG.error("Error retrieving debug result.", e);
+            LOG.error("Error retrieving debug result via service.", e);
         }
         return null;
     }
