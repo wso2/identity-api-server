@@ -107,6 +107,9 @@ public class Constants {
         ERROR_CODE_CONFIG_UPDATE_NOT_ALLOWED("60005",
                 "Configuration update not allowed.",
                 "The requested update is not allowed for the organization."),
+        ERROR_CODE_CONFIG_RETRIEVE_NOT_ALLOWED("60006",
+                "Configuration retrieve not allowed.",
+                "The requested configuration retrieve is not allowed for the organization."),
 
         /**
          * CORS errors.
@@ -226,7 +229,18 @@ public class Constants {
                 "Server encountered an error while updating the OAuth2 inbound auth configs."),
         ERROR_CODE_ERROR_OAUTH2_INBOUND_AUTH_CONFIG_DELETE("65027",
                 "Unable to delete OAuth2 inbound auth configs.",
-                "Server encountered an error while deleting the OAuth2 inbound auth configs.");
+                "Server encountered an error while deleting the OAuth2 inbound auth configs."),
+
+        // Issuer usage scope configuration errors.
+        ERROR_CODE_ERROR_ISSUER_USAGE_SCOPE_EMPTY("65028",
+                "Unable to retrieve issuer usage scope configuration.",
+                "The issuer usage scope configuration is empty for the tenant domain %s."),
+        ERROR_CODE_ERROR_ISSUER_USAGE_SCOPE_RETRIEVE("65029",
+                "Unable to retrieve issuer usage scope configuration.",
+                "Server encountered an error while extracting issuer usage scope configuration. %s"),
+        ERROR_CODE_ERROR_ISSUER_USAGE_SCOPE_UPDATE("65030",
+                "Unable to update issuer usage scope configuration.",
+                "Server encountered an error while updating issuer usage scope configuration. %s");
 
         private final String code;
         private final String message;
