@@ -1467,10 +1467,10 @@ components:
           example: "20160"
           default: "20160"
         enableMaximumSessionTimeoutPeriod:
-          type: string
+          type: boolean
           description: "Whether to enable maximum session timeout"
-          example: "true"
-          default: "false"
+          example: true
+          default: false
         maximumSessionTimeoutPeriod:
           type: string
           description: "The maximum session timeout in minutes. This property becomes only applicable if the enableMaximumSessionTimeoutPeriod config is set to true."

@@ -44,7 +44,7 @@ public class ServerConfig  {
     private String idleSessionTimeoutPeriod = "15";
     private Boolean preserveCurrentSessionAtPasswordUpdate = false;
     private String rememberMePeriod = "20160";
-    private String enableMaximumSessionTimeoutPeriod = "false";
+    private Boolean enableMaximumSessionTimeoutPeriod = false;
     private String maximumSessionTimeoutPeriod = "43200";
     private ProvisioningConfig provisioning;
     private List<AuthenticatorListItem> authenticators = null;
@@ -157,7 +157,7 @@ public class ServerConfig  {
     /**
     * Whether to enable maximum session timeout
     **/
-    public ServerConfig enableMaximumSessionTimeoutPeriod(String enableMaximumSessionTimeoutPeriod) {
+    public ServerConfig enableMaximumSessionTimeoutPeriod(Boolean enableMaximumSessionTimeoutPeriod) {
 
         this.enableMaximumSessionTimeoutPeriod = enableMaximumSessionTimeoutPeriod;
         return this;
@@ -166,10 +166,10 @@ public class ServerConfig  {
     @ApiModelProperty(example = "true", value = "Whether to enable maximum session timeout")
     @JsonProperty("enableMaximumSessionTimeoutPeriod")
     @Valid
-    public String getEnableMaximumSessionTimeoutPeriod() {
+    public Boolean getEnableMaximumSessionTimeoutPeriod() {
         return enableMaximumSessionTimeoutPeriod;
     }
-    public void setEnableMaximumSessionTimeoutPeriod(String enableMaximumSessionTimeoutPeriod) {
+    public void setEnableMaximumSessionTimeoutPeriod(Boolean enableMaximumSessionTimeoutPeriod) {
         this.enableMaximumSessionTimeoutPeriod = enableMaximumSessionTimeoutPeriod;
     }
 

@@ -282,12 +282,12 @@ public class ServerConfigManagementService {
             rememberMePeriod = rememberMeProp.getValue();
         }
 
-        String enableMaximumSessionTimeoutPeriod = null;
+        Boolean enableMaximumSessionTimeoutPeriod = null;
         IdentityProviderProperty enableMaximumSessionTimeoutProp =
                 IdentityApplicationManagementUtil.getProperty(residentIdP.getIdpProperties(),
                         IdentityApplicationConstants.ENABLE_MAXIMUM_SESSION_TIME_OUT);
         if (enableMaximumSessionTimeoutProp != null) {
-            enableMaximumSessionTimeoutPeriod = enableMaximumSessionTimeoutProp.getValue();
+            enableMaximumSessionTimeoutPeriod = Boolean.parseBoolean(enableMaximumSessionTimeoutProp.getValue());
         }
 
         String maximumSessionTimeoutPeriod = null;
