@@ -71,17 +71,17 @@ public class WorkflowRuleMapper {
      */
     public static ORRuleResponse mapServiceRuleToApiRule(Rule serviceRule) {
 
-        // Validation and Casting
+        // Validation and Casting.
         if (serviceRule == null || !(serviceRule instanceof ORCombinedRule)) {
             return null;
         }
         ORCombinedRule orCombinedRule = (ORCombinedRule) serviceRule;
-        // Prepare the Response Object
+        // Prepare the Response Object.
         ORRuleResponse orRuleResponse = new ORRuleResponse();
         orRuleResponse.setCondition(ORRuleResponse.ConditionEnum.OR);
         List<ANDRuleResponse> apiAndRules = new ArrayList<>();
 
-        // Iterate through the AND Rules
+        // Iterate through the AND Rules.
         if (CollectionUtils.isNotEmpty(orCombinedRule.getRules())) {
             for (Rule rule : orCombinedRule.getRules()) {
                 if (rule instanceof ANDCombinedRule) {
@@ -90,7 +90,7 @@ public class WorkflowRuleMapper {
                     andRuleResponse.setCondition(ANDRuleResponse.ConditionEnum.AND);
                     List<ExpressionResponse> apiExpressions = new ArrayList<>();
 
-                    // Map Expressions
+                    // Map Expressions.
                     if (andCombinedRule.getExpressions() != null) {
                         for (org.wso2.carbon.identity.rule.management.api.model.Expression expr :
                                 andCombinedRule.getExpressions()) {
@@ -98,7 +98,7 @@ public class WorkflowRuleMapper {
                             exprResponse.setField(expr.getField());
                             exprResponse.setOperator(expr.getOperator());
 
-                            // Get the raw value string
+                            // Get the raw value string.
                             if (expr.getValue() != null) {
                                 exprResponse.setValue(expr.getValue().getFieldValue());
                             }
@@ -127,7 +127,7 @@ public class WorkflowRuleMapper {
 
             if (expressionList != null) {
                 for (Expression expression : expressionList) {
-                    // Map to Backend Expression Builder
+                    // Map to Backend Expression Builder.
                     ruleBuilder.addAndExpression(
                             new org.wso2.carbon.identity.rule.management.api.model.Expression.Builder()
                                     .field(expression.getField())

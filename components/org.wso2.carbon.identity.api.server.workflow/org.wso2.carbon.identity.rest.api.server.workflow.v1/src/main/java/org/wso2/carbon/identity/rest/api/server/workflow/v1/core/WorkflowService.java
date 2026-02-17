@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2026, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -255,13 +255,13 @@ public class WorkflowService {
                 throw new WorkflowClientException("A workflow association already exists for the event: " +
                         event.getEventFriendlyName());
             }
-
             // Pass the rule to rule management service to persist the rule and get the corresponding rule ID.
             String ruleId = null;
-            if (workflowAssociation.getRule() != null) {
+            if (workflowAssociation.getRule() != null &&
+                    CollectionUtils.isNotEmpty(workflowAssociation.getRule().getRules())) {
                 try {
                     String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-                    // convert API rule to service rule
+                    // Convert API rule to service rule.
                     Rule serviceRule = WorkflowRuleMapper.mapApiRuleToServiceRule(
                             workflowAssociation.getRule(), tenantDomain);
                     Rule createdRule = ruleManagementService.addRule(serviceRule, tenantDomain);
