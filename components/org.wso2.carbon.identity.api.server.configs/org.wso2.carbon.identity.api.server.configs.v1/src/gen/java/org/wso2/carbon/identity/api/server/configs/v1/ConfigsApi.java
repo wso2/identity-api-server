@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -47,6 +47,8 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.Schema;
 import org.wso2.carbon.identity.api.server.configs.v1.model.SchemaListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ScimConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ServerConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.UsageScopePatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.UsageScopePayload;
 import org.wso2.carbon.identity.api.server.configs.v1.ConfigsApiService;
 
 import javax.validation.Valid;
@@ -300,6 +302,30 @@ public class ConfigsApi  {
     public Response getInboundScimConfigs() {
 
         return delegate.getInboundScimConfigs();
+    }
+
+    @Valid
+    @GET
+    @Path("/authentication/inbound/oauth2/issuer/usage-scope")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve issuer usage scope configurations.", notes = "Retrieve the issuer usage scope configuration for the tenant.  The usage scope determines how the issuer can be utilized across organizations: - `ALL_EXISTING_AND_FUTURE_ORGS`: Issuer is shared with all existing and future organizations - `NONE`: Issuer is not shared with any organizations  **Note:** This operation is only allowed for root tenants and will return 403 Forbidden when called from an organization context.  <b>Scope (Permission) required:</b> `internal_config_view` ", response = UsageScopePayload.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Issuer Usage Scope Configuration", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = UsageScopePayload.class),
+        @ApiResponse(code = 400, message = "Bad request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getIssuerUsageScopeConfig() {
+
+        return delegate.getIssuerUsageScopeConfig();
     }
 
     @Valid
@@ -779,6 +805,30 @@ public class ConfigsApi  {
     public Response updateInboundScimConfigs(@ApiParam(value = "" ,required=true) @Valid ScimConfig scimConfig) {
 
         return delegate.updateInboundScimConfigs(scimConfig );
+    }
+
+    @Valid
+    @PATCH
+    @Path("/authentication/inbound/oauth2/issuer/usage-scope")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update issuer usage scope configurations.", notes = "Update the issuer usage scope configuration for the tenant.  The usage scope determines how the issuer can be utilized across organizations: - `ALL_EXISTING_AND_FUTURE_ORGS`: Issuer is shared with all existing and future organizations - `NONE`: Issuer is not shared with any organizations  **Note:** This operation is only allowed for root tenants and will return 403 Forbidden when called from an organization context.  <b>Scope (Permission) required:</b> `internal_config_update` ", response = UsageScopePayload.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Issuer Usage Scope Configuration", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = UsageScopePayload.class),
+        @ApiResponse(code = 400, message = "Bad request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response updateIssuerUsageScopeConfig(@ApiParam(value = "" ,required=true) @Valid UsageScopePatch usageScopePatch) {
+
+        return delegate.updateIssuerUsageScopeConfig(usageScopePatch );
     }
 
     @Valid
