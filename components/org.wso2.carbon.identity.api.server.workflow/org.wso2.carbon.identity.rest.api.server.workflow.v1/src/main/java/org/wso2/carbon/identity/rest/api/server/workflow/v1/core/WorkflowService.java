@@ -265,7 +265,6 @@ public class WorkflowService {
                     Rule serviceRule = WorkflowRuleMapper.mapApiRuleToServiceRule(
                             workflowAssociation.getRule(), tenantDomain);
                     Rule createdRule = ruleManagementService.addRule(serviceRule, tenantDomain);
-
                     if (createdRule != null) {
                         ruleId = createdRule.getId();
                     }
@@ -439,13 +438,11 @@ public class WorkflowService {
                         " cannot be deleted as it is the only association for the related workflow: " +
                         association.getWorkflowId());
             }
-
             String ruleId = association.getCondition();
             if (StringUtils.isNotBlank(ruleId) && WorkflowManagementUtil.isUUID(ruleId)) {
                 String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
                 ruleManagementService.deleteRule(ruleId, tenantDomain);
             }
-
             workflowManagementService.removeAssociation(Integer.parseInt(associationId));
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_ASSOCIATION_NOT_FOUND, associationId, e);
