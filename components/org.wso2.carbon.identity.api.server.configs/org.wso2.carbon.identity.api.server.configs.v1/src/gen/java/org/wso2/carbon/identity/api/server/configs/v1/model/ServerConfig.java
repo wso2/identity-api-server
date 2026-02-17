@@ -44,6 +44,8 @@ public class ServerConfig  {
     private String idleSessionTimeoutPeriod = "15";
     private Boolean preserveCurrentSessionAtPasswordUpdate = false;
     private String rememberMePeriod = "20160";
+    private Boolean enableMaximumSessionTimeoutPeriod = false;
+    private String maximumSessionTimeoutPeriod = "43200";
     private ProvisioningConfig provisioning;
     private List<AuthenticatorListItem> authenticators = null;
 
@@ -153,6 +155,44 @@ public class ServerConfig  {
     }
 
     /**
+    * Whether to enable maximum session timeout
+    **/
+    public ServerConfig enableMaximumSessionTimeoutPeriod(Boolean enableMaximumSessionTimeoutPeriod) {
+
+        this.enableMaximumSessionTimeoutPeriod = enableMaximumSessionTimeoutPeriod;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "true", value = "Whether to enable maximum session timeout")
+    @JsonProperty("enableMaximumSessionTimeoutPeriod")
+    @Valid
+    public Boolean getEnableMaximumSessionTimeoutPeriod() {
+        return enableMaximumSessionTimeoutPeriod;
+    }
+    public void setEnableMaximumSessionTimeoutPeriod(Boolean enableMaximumSessionTimeoutPeriod) {
+        this.enableMaximumSessionTimeoutPeriod = enableMaximumSessionTimeoutPeriod;
+    }
+
+    /**
+    * The maximum session timeout in minutes. This property becomes only applicable if the enableMaximumSessionTimeoutPeriod config is set to true.
+    **/
+    public ServerConfig maximumSessionTimeoutPeriod(String maximumSessionTimeoutPeriod) {
+
+        this.maximumSessionTimeoutPeriod = maximumSessionTimeoutPeriod;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "20160", value = "The maximum session timeout in minutes. This property becomes only applicable if the enableMaximumSessionTimeoutPeriod config is set to true.")
+    @JsonProperty("maximumSessionTimeoutPeriod")
+    @Valid
+    public String getMaximumSessionTimeoutPeriod() {
+        return maximumSessionTimeoutPeriod;
+    }
+    public void setMaximumSessionTimeoutPeriod(String maximumSessionTimeoutPeriod) {
+        this.maximumSessionTimeoutPeriod = maximumSessionTimeoutPeriod;
+    }
+
+    /**
     **/
     public ServerConfig provisioning(ProvisioningConfig provisioning) {
 
@@ -249,6 +289,8 @@ public class ServerConfig  {
             Objects.equals(this.idleSessionTimeoutPeriod, serverConfig.idleSessionTimeoutPeriod) &&
             Objects.equals(this.preserveCurrentSessionAtPasswordUpdate, serverConfig.preserveCurrentSessionAtPasswordUpdate) &&
             Objects.equals(this.rememberMePeriod, serverConfig.rememberMePeriod) &&
+            Objects.equals(this.enableMaximumSessionTimeoutPeriod, serverConfig.enableMaximumSessionTimeoutPeriod) &&
+            Objects.equals(this.maximumSessionTimeoutPeriod, serverConfig.maximumSessionTimeoutPeriod) &&
             Objects.equals(this.provisioning, serverConfig.provisioning) &&
             Objects.equals(this.authenticators, serverConfig.authenticators) &&
             Objects.equals(this.cors, serverConfig.cors);
@@ -256,7 +298,7 @@ public class ServerConfig  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(homeRealmIdentifiers, realmConfig, idleSessionTimeoutPeriod, preserveCurrentSessionAtPasswordUpdate, rememberMePeriod, provisioning, authenticators, cors);
+        return Objects.hash(homeRealmIdentifiers, realmConfig, idleSessionTimeoutPeriod, preserveCurrentSessionAtPasswordUpdate, rememberMePeriod, enableMaximumSessionTimeoutPeriod, maximumSessionTimeoutPeriod, provisioning, authenticators, cors);
     }
 
     @Override
@@ -270,6 +312,8 @@ public class ServerConfig  {
         sb.append("    idleSessionTimeoutPeriod: ").append(toIndentedString(idleSessionTimeoutPeriod)).append("\n");
         sb.append("    preserveCurrentSessionAtPasswordUpdate: ").append(toIndentedString(preserveCurrentSessionAtPasswordUpdate)).append("\n");
         sb.append("    rememberMePeriod: ").append(toIndentedString(rememberMePeriod)).append("\n");
+        sb.append("    enableMaximumSessionTimeoutPeriod: ").append(toIndentedString(enableMaximumSessionTimeoutPeriod)).append("\n");
+        sb.append("    maximumSessionTimeoutPeriod: ").append(toIndentedString(maximumSessionTimeoutPeriod)).append("\n");
         sb.append("    provisioning: ").append(toIndentedString(provisioning)).append("\n");
         sb.append("    authenticators: ").append(toIndentedString(authenticators)).append("\n");
         sb.append("    cors: ").append(toIndentedString(cors)).append("\n");

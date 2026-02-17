@@ -1,6 +1,5 @@
 openapi: 3.0.0
 info:
-  version: "1.0.0"
   title: 'WSO2 Identity Server - Configurations API Definition'
   description: 'This document specifies a **RESTful API** for **WSO2 Identity Server Configurations**'
   contact:
@@ -10,9 +9,20 @@ info:
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  version: v1
+
+servers:
+  - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
+    variables:
+      server-url:
+        default: "localhost:9443"
+      tenant-domain:
+        default: "carbon.super"
+
 security:
   - OAuth2: []
   - BasicAuth: []
+
 paths:
   /configs:
     get:
@@ -1391,11 +1401,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-servers:
-  - url: 'https://localhost:9443/t/{tenant-domain}/api/server/v1'
-    variables:
-      tenant-domain:
-        default: carbon.super
+
 components:
   securitySchemes:
     BasicAuth:
@@ -1460,6 +1466,16 @@ components:
           description: "The remember me period in minutes"
           example: "20160"
           default: "20160"
+        enableMaximumSessionTimeoutPeriod:
+          type: boolean
+          description: "Whether to enable maximum session timeout"
+          example: true
+          default: false
+        maximumSessionTimeoutPeriod:
+          type: string
+          description: "The maximum session timeout in minutes. This property becomes only applicable if the enableMaximumSessionTimeoutPeriod config is set to true."
+          example: "20160"
+          default: "43200"
         provisioning:
           $ref: '#/components/schemas/ProvisioningConfig'
         authenticators:
