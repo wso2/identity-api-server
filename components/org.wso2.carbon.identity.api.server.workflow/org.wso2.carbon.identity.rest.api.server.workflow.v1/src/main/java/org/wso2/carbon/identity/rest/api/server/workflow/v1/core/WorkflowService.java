@@ -438,10 +438,11 @@ public class WorkflowService {
                         " cannot be deleted as it is the only association for the related workflow: " +
                         association.getWorkflowId());
             }
-            String ruleId = association.getCondition();
-            if (StringUtils.isNotBlank(ruleId) && WorkflowManagementUtil.isUUID(ruleId)) {
+            // Condition can either be null, a UUID or a XPath expression.
+            String condition = association.getCondition();
+            if (StringUtils.isNotBlank(condition) && WorkflowManagementUtil.isUUID(condition)) {
                 String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-                ruleManagementService.deleteRule(ruleId, tenantDomain);
+                ruleManagementService.deleteRule(condition, tenantDomain);
             }
             workflowManagementService.removeAssociation(Integer.parseInt(associationId));
         } catch (WorkflowClientException e) {
