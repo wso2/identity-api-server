@@ -17,12 +17,14 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.common;
 
+import org.wso2.carbon.identity.oauth.ciba.common.CibaConstants;
 import org.wso2.carbon.identity.oauth.common.GrantType;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth2.device.constants.Constants;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +49,7 @@ public class ApplicationManagementConstants {
     public static final String APPLICATION_SHARE_PATH_COMPONENT = "/share";
 
     private static final Map<String, String> OAUTH_GRANT_TYPE_NAMES = new LinkedHashMap<>();
+    private static final Map<String, String> CIBA_NOTIFICATION_CHANNELS_NAMES = new HashMap<>();
     public static final String DEFAULT_NAME_ID_FORMAT = "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified";
     public static final String DEFAULT_CERTIFICATE_ALIAS = "wso2carbon";
     public static final String ADVANCED_CONFIGURATIONS = "advancedConfigurations";
@@ -288,11 +291,21 @@ public class ApplicationManagementConstants {
         OAUTH_GRANT_TYPE_NAMES.put("organization_switch", "Organization Switch");
         OAUTH_GRANT_TYPE_NAMES.put(Constants.DEVICE_FLOW_GRANT_TYPE, "Device Code");
         OAUTH_GRANT_TYPE_NAMES.put("urn:ietf:params:oauth:grant-type:token-exchange", "Token Exchange");
+        OAUTH_GRANT_TYPE_NAMES.put(OAuthConstants.GrantTypes.CIBA, "Client Initiated Backchannel Authentication");
+
+        CIBA_NOTIFICATION_CHANNELS_NAMES.put(CibaConstants.CibaNotificationChannel.EMAIL, "Email");
+        CIBA_NOTIFICATION_CHANNELS_NAMES.put(CibaConstants.CibaNotificationChannel.SMS, "SMS");
+        CIBA_NOTIFICATION_CHANNELS_NAMES.put(CibaConstants.CibaNotificationChannel.EXTERNAL, "External");
     }
 
     public static Map<String, String> getOAuthGrantTypeNames() {
 
         return OAUTH_GRANT_TYPE_NAMES;
+    }
+
+    public static Map<String, String> getCibaNotificationChannelNames() {
+
+        return CIBA_NOTIFICATION_CHANNELS_NAMES;
     }
 
     /**
