@@ -3289,6 +3289,12 @@ components:
             - NONE
             - PRESERVE_LOCAL
           default: OVERRIDE_ALL
+        idpGroupSyncMethod:
+          type: string
+          enum:
+            - OVERRIDE_ALL
+            - MERGE_WITH_EXISTING
+          default: MERGE_WITH_EXISTING
     AccountLookupAttributeMapping:
       type: object
       properties:
