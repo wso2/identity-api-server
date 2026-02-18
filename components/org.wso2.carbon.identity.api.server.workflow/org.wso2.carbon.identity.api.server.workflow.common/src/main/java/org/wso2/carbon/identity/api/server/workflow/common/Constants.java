@@ -27,7 +27,10 @@ public class Constants {
 
     public static final String WORKFLOW_PREFIX = "WF-";
     public static final String APPROVAL_STEPS = "ApprovalSteps";
+    public static final String NOTIFICATION = "Notification";
     public static final String APPROVAL_STEP = "Step-";
+    public static final String NOTIFICATION_FOR_APPROVER = "NotificationForApprovers";
+    public static final String NOTIFICATION_FOR_INITIATOR = "NotificationForInitiator";
     public static final String TEMPLATE = "Template";
     public static final String STEP_NAME_DELIMITER = "-";
     public static final String PARAMETER_VALUE_SEPARATOR = ",";

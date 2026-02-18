@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.ApproverNotifications;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowTemplateParameters;
 import javax.validation.constraints.*;
 
@@ -36,6 +37,7 @@ import javax.xml.bind.annotation.*;
 public class WorkflowTemplate  {
   
     private String name;
+    private ApproverNotifications notificationsForApprovers;
     private List<WorkflowTemplateParameters> steps = null;
 
 
@@ -56,6 +58,24 @@ public class WorkflowTemplate  {
     }
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+    **/
+    public WorkflowTemplate notificationsForApprovers(ApproverNotifications notificationsForApprovers) {
+
+        this.notificationsForApprovers = notificationsForApprovers;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("notificationsForApprovers")
+    @Valid
+    public ApproverNotifications getNotificationsForApprovers() {
+        return notificationsForApprovers;
+    }
+    public void setNotificationsForApprovers(ApproverNotifications notificationsForApprovers) {
+        this.notificationsForApprovers = notificationsForApprovers;
     }
 
     /**
@@ -97,12 +117,13 @@ public class WorkflowTemplate  {
         }
         WorkflowTemplate workflowTemplate = (WorkflowTemplate) o;
         return Objects.equals(this.name, workflowTemplate.name) &&
+            Objects.equals(this.notificationsForApprovers, workflowTemplate.notificationsForApprovers) &&
             Objects.equals(this.steps, workflowTemplate.steps);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, steps);
+        return Objects.hash(name, notificationsForApprovers, steps);
     }
 
     @Override
@@ -112,6 +133,7 @@ public class WorkflowTemplate  {
         sb.append("class WorkflowTemplate {\n");
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    notificationsForApprovers: ").append(toIndentedString(notificationsForApprovers)).append("\n");
         sb.append("    steps: ").append(toIndentedString(steps)).append("\n");
         sb.append("}");
         return sb.toString();

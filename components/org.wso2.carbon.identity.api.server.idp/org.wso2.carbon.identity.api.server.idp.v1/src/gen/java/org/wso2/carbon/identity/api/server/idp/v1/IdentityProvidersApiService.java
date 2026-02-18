@@ -70,7 +70,7 @@ public interface IdentityProvidersApiService {
 
       public Response getClaimConfig(String identityProviderId);
 
-      public Response getConnectedApps(String identityProviderId, Integer limit, Integer offset);
+      public Response getConnectedApps(String identityProviderId, Integer limit, Integer offset, String filter);
 
       public Response getFederatedAssociationConfig(String identityProviderId);
 

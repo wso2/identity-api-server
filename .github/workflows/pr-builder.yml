@@ -1,7 +1,7 @@
 # This workflow will build the project on pull requests with tests
 # Uses:
 #   OS: ubuntu-latest
-#   JDK: Adopt JDK 8, Adopt JDK 11 and Adopt JDK 17
+#   JDK: Adopt JDK 21
 
 name: PR Builder
 
@@ -17,16 +17,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        java-version: [ 8, 11, 17 ]
-
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Adopt JDK
+      - name: Set up Adopt JDK 21
         uses: actions/setup-java@v2
         with:
-          java-version: ${{ matrix.java-version }}
+          java-version: 21
           distribution: "adopt"
       - name: Cache local Maven repository
         id: cache-maven-m2

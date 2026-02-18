@@ -68,6 +68,8 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.Schema;
 import org.wso2.carbon.identity.api.server.configs.v1.model.SchemaListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ScimConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ServerConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.UsageScopePatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.UsageScopePayload;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementClientException;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementServerException;
@@ -101,6 +103,10 @@ import org.wso2.carbon.identity.fraud.detection.core.model.FraudDetectionConfigD
 import org.wso2.carbon.identity.fraud.detection.core.service.FraudDetectionConfigsService;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
 import org.wso2.carbon.identity.oauth.dcr.exception.DCRMException;
+import org.wso2.carbon.identity.oauth2.config.exceptions.OAuth2OIDCConfigOrgUsageScopeMgtException;
+import org.wso2.carbon.identity.oauth2.config.models.IssuerUsageScopeConfig;
+import org.wso2.carbon.identity.oauth2.config.models.UsageScope;
+import org.wso2.carbon.identity.oauth2.config.services.OAuth2OIDCConfigOrgUsageScopeMgtService;
 import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationConfigMgtClientException;
 import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationConfigMgtException;
 import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationConfigMgtServerException;
@@ -158,6 +164,7 @@ public class ServerConfigManagementService {
     private final ImpersonationConfigMgtService impersonationConfigMgtService;
     private final JWTClientAuthenticatorMgtService jwtClientAuthenticatorMgtService;
     private final DCRConfigurationMgtService dcrConfigurationMgtService;
+    private final OAuth2OIDCConfigOrgUsageScopeMgtService oauth2OIDCConfigOrgUsageScopeMgtService;
 
     private static final Log log = LogFactory.getLog(ServerConfigManagementService.class);
 
@@ -168,7 +175,9 @@ public class ServerConfigManagementService {
                                          ImpersonationConfigMgtService impersonationConfigMgtService,
                                          DCRConfigurationMgtService dcrConfigurationMgtService,
                                          JWTClientAuthenticatorMgtService jwtClientAuthenticatorMgtService,
-                                         FraudDetectionConfigsService fraudDetectionConfigsService) {
+                                         FraudDetectionConfigsService fraudDetectionConfigsService,
+                                         OAuth2OIDCConfigOrgUsageScopeMgtService
+                                                 oauth2OIDCConfigOrgUsageScopeMgtService) {
 
         this.applicationManagementService = applicationManagementService;
         this.idpManager = idpManager;
@@ -178,6 +187,7 @@ public class ServerConfigManagementService {
         this.dcrConfigurationMgtService = dcrConfigurationMgtService;
         this.jwtClientAuthenticatorMgtService = jwtClientAuthenticatorMgtService;
         this.fraudDetectionConfigsService = fraudDetectionConfigsService;
+        this.oauth2OIDCConfigOrgUsageScopeMgtService = oauth2OIDCConfigOrgUsageScopeMgtService;
     }
 
     /**
@@ -272,6 +282,22 @@ public class ServerConfigManagementService {
             rememberMePeriod = rememberMeProp.getValue();
         }
 
+        Boolean enableMaximumSessionTimeoutPeriod = null;
+        IdentityProviderProperty enableMaximumSessionTimeoutProp =
+                IdentityApplicationManagementUtil.getProperty(residentIdP.getIdpProperties(),
+                        IdentityApplicationConstants.ENABLE_MAXIMUM_SESSION_TIME_OUT);
+        if (enableMaximumSessionTimeoutProp != null) {
+            enableMaximumSessionTimeoutPeriod = Boolean.parseBoolean(enableMaximumSessionTimeoutProp.getValue());
+        }
+
+        String maximumSessionTimeoutPeriod = null;
+        IdentityProviderProperty maximumSessionTimeoutProp =
+                IdentityApplicationManagementUtil.getProperty(residentIdP.getIdpProperties(),
+                        IdentityApplicationConstants.MAXIMUM_SESSION_TIME_OUT);
+        if (maximumSessionTimeoutProp != null) {
+            maximumSessionTimeoutPeriod = maximumSessionTimeoutProp.getValue();
+        }
+      
         Boolean preserveCurrentSessionAtPasswordUpdate = null;
         IdentityProviderProperty preserveSessionProp = IdentityApplicationManagementUtil.getProperty(
                 residentIdP.getIdpProperties(),
@@ -290,6 +316,8 @@ public class ServerConfigManagementService {
         serverConfig.setRealmConfig(realmConfig);
         serverConfig.setIdleSessionTimeoutPeriod(idleSessionTimeout);
         serverConfig.setRememberMePeriod(rememberMePeriod);
+        serverConfig.setEnableMaximumSessionTimeoutPeriod(enableMaximumSessionTimeoutPeriod);
+        serverConfig.setMaximumSessionTimeoutPeriod(maximumSessionTimeoutPeriod);
         serverConfig.setPreserveCurrentSessionAtPasswordUpdate(preserveCurrentSessionAtPasswordUpdate);
         serverConfig.setHomeRealmIdentifiers(homeRealmIdentifiers);
         serverConfig.setProvisioning(buildProvisioningConfig());
@@ -1018,19 +1046,29 @@ public class ServerConfigManagementService {
                 } else {
                     switch (path) {
                         case Constants.IDLE_SESSION_PATH:
-                            validateNumericIdPProperty(value);
                             updateIdPProperty(idpToUpdate, existingIdpProperties,
-                                    IdentityApplicationConstants.SESSION_IDLE_TIME_OUT, value);
+                                    IdentityApplicationConstants.SESSION_IDLE_TIME_OUT, value,
+                                    this::validateNumericPositiveValue);
                             break;
                         case Constants.REMEMBER_ME_PATH:
-                            validateNumericIdPProperty(value);
                             updateIdPProperty(idpToUpdate, existingIdpProperties,
-                                    IdentityApplicationConstants.REMEMBER_ME_TIME_OUT, value);
+                                    IdentityApplicationConstants.REMEMBER_ME_TIME_OUT, value,
+                                    this::validateNumericPositiveValue);
+                            break;
+                        case Constants.ENABLE_MAXIMUM_SESSION_TIMEOUT_PATH:
+                            updateIdPProperty(idpToUpdate, existingIdpProperties,
+                                    IdentityApplicationConstants.ENABLE_MAXIMUM_SESSION_TIME_OUT, value,
+                                    this::validateBooleanValue);
+                            break;
+                        case Constants.MAXIMUM_SESSION_TIMEOUT_PATH:
+                            updateIdPProperty(idpToUpdate, existingIdpProperties,
+                                    IdentityApplicationConstants.MAXIMUM_SESSION_TIME_OUT, value,
+                                    this::validateNumericPositiveValue);
                             break;
                         case Constants.PRESERVE_CURRENT_SESSION_AT_PASSWORD_UPDATE_PATH:
-                            validateBooleanIdPProperty(value);
                             updateIdPProperty(idpToUpdate, existingIdpProperties,
-                                    IdentityApplicationConstants.PRESERVE_CURRENT_SESSION_AT_PASSWORD_UPDATE, value);
+                                    IdentityApplicationConstants.PRESERVE_CURRENT_SESSION_AT_PASSWORD_UPDATE, value,
+                                    this::validateBooleanValue);
                             break;
                         default:
                             throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
@@ -1074,6 +1112,12 @@ public class ServerConfigManagementService {
                         case Constants.REMEMBER_ME_PATH:
                             propertiesToRemove.add(IdentityApplicationConstants.REMEMBER_ME_TIME_OUT);
                             break;
+                        case Constants.ENABLE_MAXIMUM_SESSION_TIMEOUT_PATH:
+                            propertiesToRemove.add(IdentityApplicationConstants.ENABLE_MAXIMUM_SESSION_TIME_OUT);
+                            break;
+                        case Constants.MAXIMUM_SESSION_TIMEOUT_PATH:
+                            propertiesToRemove.add(IdentityApplicationConstants.MAXIMUM_SESSION_TIME_OUT);
+                            break;
                         case Constants.PRESERVE_CURRENT_SESSION_AT_PASSWORD_UPDATE_PATH:
                             propertiesToRemove.add(
                                     IdentityApplicationConstants.PRESERVE_CURRENT_SESSION_AT_PASSWORD_UPDATE);
@@ -1092,6 +1136,17 @@ public class ServerConfigManagementService {
     }
 
     /**
+     * Functional interface to validate the input value of a patch operation.
+     * The implementation should throw an APIError with appropriate error code
+     * and description if the input value is invalid.
+     */
+    @FunctionalInterface
+    private interface InputValidationFunction {
+
+        void apply(String value) throws APIError;
+    }
+
+    /**
      * Build the IDP property list of the IDP to update by adding or updating the given key and value.
      *
      * @param identityProvider      Identity Provider to be updated.
@@ -1100,9 +1155,10 @@ public class ServerConfigManagementService {
      * @param value                 Value of the property to be updated.
      */
     private void updateIdPProperty(IdentityProvider identityProvider, IdentityProviderProperty[] existingIdpProperties,
-                                   String key, String value) {
+                                   String key, String value, InputValidationFunction validationFunction) {
 
         List<IdentityProviderProperty> updatedIdpProperties = new ArrayList<>();
+        validationFunction.apply(value);
         boolean isPropertyFound = false;
 
         for (IdentityProviderProperty property : existingIdpProperties) {
@@ -1131,19 +1187,31 @@ public class ServerConfigManagementService {
         identityProvider.setIdpProperties(updatedIdpProperties.toArray(new IdentityProviderProperty[0]));
     }
 
-    private void validateBooleanIdPProperty(String value) {
+    /**
+     * Validate the given value is numeric and positive.
+     * If not, throw an APIError with appropriate error code and description.
+     *
+     * @param value Value to be validated.
+     */
+    private void validateNumericPositiveValue(String value) {
 
-        if (!"true".equals(value) && !"false".equals(value)) {
-            String message = "Value should be boolean";
+        if (StringUtils.isBlank(value) || !StringUtils.isNumeric(value) || Integer.parseInt(value) <= 0) {
+            String message = "Value should be numeric and positive";
             throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT,
                     message);
         }
     }
 
-    private void validateNumericIdPProperty(String value) {
+    /**
+     * Validate the given value is boolean.
+     *
+     * @param value Value to be validated.
+     */
+    private void validateBooleanValue(String value) {
 
-        if (StringUtils.isBlank(value) || !StringUtils.isNumeric(value) || Integer.parseInt(value) <= 0) {
-            String message = "Value should be numeric and positive";
+        if (StringUtils.isBlank(value) || (!StringUtils.equalsIgnoreCase(Boolean.TRUE.toString(), value) &&
+                !StringUtils.equalsIgnoreCase(Boolean.FALSE.toString(), value))) {
+            String message = "Value should be boolean";
             throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT,
                     message);
         }
@@ -2262,6 +2330,64 @@ public class ServerConfigManagementService {
         }
     }
 
+    /**
+     * Retrieve the issuer usage scope configuration for the tenant.
+     * This configuration determines how the issuer of this tenant can be used across organizations.
+     *
+     * @return UsageScopePayload containing the current usage scope configuration of the tenant.
+     */
+    public UsageScopePayload getIssuerUsageScopeConfig() {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+
+        try {
+            if (OrganizationManagementUtil.isOrganization(tenantDomain)) {
+                throw handleException(Response.Status.FORBIDDEN, Constants.ErrorMessage
+                        .ERROR_CODE_CONFIG_RETRIEVE_NOT_ALLOWED, null);
+            }
+
+            IssuerUsageScopeConfig issuerUsageScopeConfig = oauth2OIDCConfigOrgUsageScopeMgtService.
+                    getIssuerUsageScopeConfig(tenantDomain);
+            return buildIssuerUsageScopeConfig(issuerUsageScopeConfig, tenantDomain);
+        } catch (OAuth2OIDCConfigOrgUsageScopeMgtException | OrganizationManagementException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_ISSUER_USAGE_SCOPE_RETRIEVE, e.getMessage());
+        }
+    }
+
+    /**
+     * Update the issuer usage scope configuration for the tenant.
+     * This configuration determines how the issuer of this tenant can be used across organizations.
+     *
+     * @param usageScopePatch usage scope configuration to be updated for the tenant.
+     * @return UsageScopePayload containing the updated usage scope configuration of the tenant.
+     */
+    public UsageScopePayload updateIssuerUsageScopeConfig(UsageScopePatch usageScopePatch) {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+
+        try {
+            if (OrganizationManagementUtil.isOrganization(tenantDomain)) {
+                throw handleException(Response.Status.FORBIDDEN, Constants.ErrorMessage
+                        .ERROR_CODE_CONFIG_UPDATE_NOT_ALLOWED, null);
+            }
+
+            if (usageScopePatch == null || usageScopePatch.getUsageScope() == null) {
+                throw handleException(Response.Status.BAD_REQUEST,
+                        Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT, "Usage scope value is required");
+            }
+
+            IssuerUsageScopeConfig issuerUsageScopeConfig = new IssuerUsageScopeConfig();
+            issuerUsageScopeConfig.setUsageScope(UsageScope.fromValue(usageScopePatch.getUsageScope().value()));
+            IssuerUsageScopeConfig updateIssuerUsageScopeConfig = oauth2OIDCConfigOrgUsageScopeMgtService.
+                    updateIssuerUsageScopeConfig(tenantDomain, issuerUsageScopeConfig);
+            return buildIssuerUsageScopeConfig(updateIssuerUsageScopeConfig, tenantDomain);
+        } catch (OAuth2OIDCConfigOrgUsageScopeMgtException | OrganizationManagementException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_ISSUER_USAGE_SCOPE_UPDATE, e.getMessage());
+        }
+    }
+
     private FraudDetectionConfig buildFraudDetectionConfig(FraudDetectionConfigDTO dto) {
 
         FraudDetectionConfig fraudDetectionConfig = new FraudDetectionConfig();
@@ -2353,5 +2479,17 @@ public class ServerConfigManagementService {
         }
 
         return new APIError(status, errorResponse);
+    }
+
+    private UsageScopePayload buildIssuerUsageScopeConfig(IssuerUsageScopeConfig config, String tenantDomain) {
+
+        if (config == null || config.getUsageScope() == null) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_ISSUER_USAGE_SCOPE_EMPTY, tenantDomain);
+        }
+        UsageScopePayload issuerUsageScopePayload = new UsageScopePayload();
+        issuerUsageScopePayload.setUsageScope(UsageScopePayload.UsageScopeEnum.fromValue(
+                config.getUsageScope().getValue()));
+        return issuerUsageScopePayload;
     }
 }
