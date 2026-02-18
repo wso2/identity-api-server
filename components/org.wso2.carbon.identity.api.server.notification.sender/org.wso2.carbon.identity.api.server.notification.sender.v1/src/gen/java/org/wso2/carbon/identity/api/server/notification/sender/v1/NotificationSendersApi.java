@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2020-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -28,6 +28,7 @@ import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSen
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSenderAdd;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSenderUpdateRequest;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.Error;
+import java.util.Map;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.PushSender;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.PushSenderAdd;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.PushSenderUpdateRequest;
@@ -259,6 +260,30 @@ public class NotificationSendersApi  {
 
     @Valid
     @GET
+    @Path("/configs/{publisher-type}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Get notification sender configurations by publisher type", notes = "This API provides the capability to retrieve notification sender configurations by publisher type. <br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/configmgt/view <br>   <b>Scope required:</b> <br>     * internal_config_mgt_view ", response = String.class, responseContainer = "Map", authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Notification Sender Configurations", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = Map.class, responseContainer = "Map"),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getNotiSenderConfigurations(@ApiParam(value = "Type of the notification publisher (e.g., email, sms, push)",required=true) @PathParam("publisher-type") String publisherType) {
+
+        return delegate.getNotiSenderConfigurations(publisherType );
+    }
+
+    @Valid
+    @GET
     @Path("/push/{sender-name}")
     
     @Produces({ "application/json" })
@@ -355,6 +380,30 @@ public class NotificationSendersApi  {
     public Response getSMSSenders() {
 
         return delegate.getSMSSenders();
+    }
+
+    @Valid
+    @PUT
+    @Path("/configs/{publisher-type}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update notification sender configurations by publisher type", notes = "This API provides the capability to update notification sender configurations by publisher type. <br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/configmgt/update <br>   <b>Scope required:</b> <br>     * internal_config_mgt_update ", response = String.class, responseContainer = "Map", authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Notification Sender Configurations", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = Map.class, responseContainer = "Map"),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response setNotiSenderConfigurations(@ApiParam(value = "Type of the notification publisher (e.g., email, sms, push)",required=true) @PathParam("publisher-type") String publisherType, @ApiParam(value = "" ,required=true) @Valid Map<String, String> requestBody) {
+
+        return delegate.setNotiSenderConfigurations(publisherType,  requestBody );
     }
 
     @Valid

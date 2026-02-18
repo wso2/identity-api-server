@@ -41,6 +41,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
@@ -170,6 +171,12 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     }
 
     @Override
+    public Response getNotiSenderConfigurations(String publisherType) {
+        return Response.ok().entity(notificationSenderManagementService
+                .getNotiSenderConfigurations(publisherType)).build();
+    }
+
+    @Override
     public Response getPushSender(String senderName) {
 
         return Response.ok().entity(notificationSenderManagementService.getPushSender(senderName)).build();
@@ -191,6 +198,13 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     public Response getSMSSenders() {
 
         return Response.ok().entity(notificationSenderManagementService.getSMSSenders()).build();
+    }
+
+    @Override
+    public Response setNotiSenderConfigurations(String publisherType, Map<String, String> requestBody) {
+        return Response.ok()
+                .entity(notificationSenderManagementService.setNotiSenderConfigurations(publisherType, requestBody))
+                .build();
     }
 
     @Override
