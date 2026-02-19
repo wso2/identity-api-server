@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.debug.v1.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.debug.common.Constants;
@@ -51,9 +53,7 @@ public class DebugApiServiceImpl extends DebugApiService {
     // Allowed resource types for validation (using constants from common module)
     private static final Set<String> ALLOWED_RESOURCE_TYPES = new HashSet<>(Arrays.asList(
             Constants.ResourceType.IDP,
-            Constants.ResourceType.APPLICATION,
-            Constants.ResourceType.CONNECTOR,
-            Constants.ResourceType.AUTHENTICATOR));
+            Constants.ResourceType.FRAUD_DETECTION));
 
     // Validation constants.
     private static final int MAX_PROPERTIES_SIZE = 50;
@@ -98,13 +98,13 @@ public class DebugApiServiceImpl extends DebugApiService {
             }
 
             String resourceType = debugRequest.getResourceType();
-            
-            // Map connectionId from properties to resourceId for framework compatibility.
-            String resourceId = extractResourceIdFromProperties(debugRequest.getProperties());
+
+            // Map connectionId from properties to connectionId for framework compatibility.
+            String connectionId = extractConnectionIdFromProperties(debugRequest.getProperties());
 
             // Delegate to DebugService for resource-type-specific handling.
             Map<String, Object> debugResult = debugService.handleGenericDebugRequest(
-                    resourceId, resourceType, debugRequest.getProperties());
+                    connectionId, resourceType, debugRequest.getProperties());
 
             // Create and return response
             DebugConnectionResponse response = createDebugResponse(debugResult);
@@ -121,8 +121,7 @@ public class DebugApiServiceImpl extends DebugApiService {
      * @param sessionId The debug session ID.
      * @return Response containing the debug result or an error.
      */
-    private static final com.fasterxml.jackson.databind.ObjectMapper OBJECT_MAPPER 
-        = new com.fasterxml.jackson.databind.ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String[] STEP_STATUS_KEYS = {
             "step_connection_status",
             "step_authentication_status",
@@ -159,25 +158,12 @@ public class DebugApiServiceImpl extends DebugApiService {
         }
 
         try {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> resultMap = OBJECT_MAPPER.readValue(resultJson, Map.class);
+            Map<String, Object> protocolResult = OBJECT_MAPPER.readValue(resultJson, Map.class);
 
-            // Ensure metadata exists
-            @SuppressWarnings("unchecked")
-            Map<String, Object> metadata = (Map<String, Object>) resultMap.get("metadata");
-            if (metadata == null) {
-                metadata = new java.util.HashMap<>();
-                resultMap.put("metadata", metadata);
-            }
+            // Restructure protocol-specific result to generic API format.
+            Map<String, Object> apiResponse = restructureForGenericApi(protocolResult);
 
-            // Copy step status fields to metadata
-            for (String key : STEP_STATUS_KEYS) {
-                if (resultMap.containsKey(key)) {
-                    metadata.put(key, resultMap.get(key));
-                }
-            }
-
-            String enrichedJson = OBJECT_MAPPER.writeValueAsString(resultMap);
+            String enrichedJson = OBJECT_MAPPER.writeValueAsString(apiResponse);
             return Response.ok(enrichedJson).build();
 
         } catch (java.io.IOException e) {
@@ -188,8 +174,53 @@ public class DebugApiServiceImpl extends DebugApiService {
     }
 
     /**
+     * Restructures protocol-specific debug result to generic API contract.
+     * Ensures only sessionId and success are at top level, everything else goes to
+     * metadata.
+     * This makes the API response generic and independent of protocol
+     * implementation.
+     *
+     * @param protocolResult Debug result from protocol processor (may have mixed
+     *                       structure).
+     * @return Restructured result following generic API contract.
+     */
+    private Map<String, Object> restructureForGenericApi(Map<String, Object> protocolResult) {
+
+        Map<String, Object> apiResponse = new java.util.HashMap<>();
+
+        // First-class properties (generic, always present).
+        String sessionId = (String) protocolResult.getOrDefault("sessionId", "");
+        boolean success = (boolean) protocolResult.getOrDefault("success", false);
+
+        apiResponse.put("sessionId", sessionId);
+        apiResponse.put("success", success);
+
+        // All other fields go to metadata.
+        Map<String, Object> metadata = new java.util.HashMap<>();
+
+        for (java.util.Map.Entry<String, Object> entry : protocolResult.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+
+            // Skip first-class properties and null values.
+            if (!key.equals("sessionId") && !key.equals("success") && value != null) {
+                metadata.put(key, value);
+            }
+        }
+
+        apiResponse.put("metadata", metadata);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Restructured debug result for generic API response with metadata");
+        }
+
+        return apiResponse;
+    }
+
+    /**
      * Validates the debug request for required fields.
-     * Resource type is always required. Resource ID is validated based on the resource type.
+     * Resource type is always required. Resource ID is validated based on the
+     * resource type.
      *
      * @param debugRequest The request to validate.
      * @return Error response if validation fails, null if valid.
@@ -264,15 +295,17 @@ public class DebugApiServiceImpl extends DebugApiService {
 
             if (key.length() > MAX_PROPERTY_KEY_LENGTH) {
                 return createErrorResponse("INVALID_REQUEST",
-                        "Property key '" + key + "' exceeds maximum length of " 
-                        + MAX_PROPERTY_KEY_LENGTH + " characters.", Response.Status.BAD_REQUEST);
+                        "Property key '" + key + "' exceeds maximum length of "
+                                + MAX_PROPERTY_KEY_LENGTH + " characters.",
+                        Response.Status.BAD_REQUEST);
             }
 
             // Validate value.
             if (value != null && value.length() > MAX_PROPERTY_VALUE_LENGTH) {
                 return createErrorResponse("INVALID_REQUEST",
                         "Property value for key '" + key + "' exceeds maximum length of " + MAX_PROPERTY_VALUE_LENGTH
-                        + " characters.", Response.Status.BAD_REQUEST);
+                                + " characters.",
+                        Response.Status.BAD_REQUEST);
             }
         }
 
@@ -304,27 +337,27 @@ public class DebugApiServiceImpl extends DebugApiService {
     }
 
     /**
-     * Extracts resourceId from properties map.
-     * Maps connectionId → resourceId for framework compatibility.
+     * Extracts connectionId from properties map.
+     * Maps connectionId → connectionId for framework compatibility.
      *
      * @param properties The properties map.
-     * @return The resourceId, or null if not found.
+     * @return The connectionId, or null if not found.
      */
-    private String extractResourceIdFromProperties(java.util.Map<String, String> properties) {
+    private String extractConnectionIdFromProperties(java.util.Map<String, String> properties) {
 
         if (properties == null) {
             return null;
         }
-        
+
         // Check for connectionId first (API layer naming).
         String connectionId = properties.get("connectionId");
         if (connectionId != null) {
-            // Map connectionId to resourceId for framework layer.
+            // Map connectionId to connectionId for framework layer.
             return connectionId;
         }
-        
-        // Fallback to resourceId for backward compatibility.
-        return properties.get("resourceId");
+
+        // Fallback to connectionId for backward compatibility.
+        return properties.get("connectionId");
     }
 
     /**
@@ -361,18 +394,19 @@ public class DebugApiServiceImpl extends DebugApiService {
         String debugId = extractDebugId(debugResult);
         response.setDebugId(debugId);
 
-        // Set generic status (always SUCCESS for successfully generated debug sessions).
+        // Set generic status (always SUCCESS for successfully generated debug
+        // sessions).
         response.setStatus(Constants.Status.SUCCESS);
-        
+
         // Set generic message.
-        response.setMessage("Debug session initiated successfully");
+        response.setMessage("Debug session executed successfully");
 
         // Set timestamp.
         response.setTimestamp(extractTimestamp(debugResult));
 
         // Create metadata map for resource-specific fields.
         java.util.Map<String, Object> metadata = new java.util.HashMap<>();
-        
+
         // For IDP resources, only add authorization URL to metadata.
         Object authUrl = debugResult.get(KEY_AUTHORIZATION_URL);
         if (authUrl != null) {

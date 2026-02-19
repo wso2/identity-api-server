@@ -27,4 +27,10 @@
     <Match>
         <Class name="~.*\.gen\..*"/>
     </Match>
+    
+    <!-- Exclude IMPROPER_UNICODE bug in DebugApiServiceImpl (equalsIgnoreCase is safe for ASCII resource types) -->
+    <Match>
+        <Class name="org.wso2.carbon.identity.api.server.debug.v1.impl.DebugApiServiceImpl"/>
+        <Bug code="IMPROPER_UNICODE"/>
+    </Match>
 </FindBugsFilter>

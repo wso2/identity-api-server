@@ -50,7 +50,7 @@ public class DebugService {
     private static final String REQUEST_TYPE_INITIAL = "INITIAL_DEBUG_REQUEST";
 
     // Context key constants
-    private static final String KEY_RESOURCE_ID = "resourceId";
+    private static final String KEY_CONNECTION_ID = "connectionId";
     private static final String KEY_RESOURCE_TYPE = "resourceType";
     private static final String KEY_PROPERTIES = "properties";
     private static final String KEY_REQUEST_TYPE = "requestType";
@@ -68,25 +68,25 @@ public class DebugService {
 
     /**
      * Handles generic debug request for any resource type with properties.
-     * The resourceId is optional at this level and may be null for resource types
+     * The connectionId is optional at this level and may be null for resource types
      * that don't require it.
      *
-     * @param resourceId   Resource ID to debug (can be null for some resource
+     * @param connectionId   Connection ID to debug (can be null for some resource
      *                     types).
      * @param resourceType Type of resource (IDP, APPLICATION, CONNECTOR, etc.).
      * @param properties   Generic properties map for the debug request (optional).
      * @return Debug result containing session information and status.
      * @throws RuntimeException if debug request fails.
      */
-    public Map<String, Object> handleGenericDebugRequest(String resourceId, String resourceType,
+    public Map<String, Object> handleGenericDebugRequest(String connectionId, String resourceType,
             Map<String, String> properties) {
 
-        // Build typed request. resourceId can be null for resource types that don't
+        // Build typed request. connectionId can be null for resource types that don't
         // need it.
         DebugRequest debugRequest = new DebugRequest();
         debugRequest.setResourceType(resourceType);
-        if (resourceId != null) {
-            debugRequest.setResourceId(resourceId);
+        if (connectionId != null) {
+            debugRequest.setConnectionId(connectionId);
         }
         if (properties != null) {
             for (Map.Entry<String, String> entry : properties.entrySet()) {
@@ -101,8 +101,8 @@ public class DebugService {
         // Convert to Map and add metadata.
         Map<String, Object> resultMap = response.getData();
         resultMap.put(KEY_TIMESTAMP, System.currentTimeMillis());
-        if (resourceId != null) {
-            resultMap.put(KEY_RESOURCE_ID, resourceId);
+        if (connectionId != null) {
+            resultMap.put(KEY_CONNECTION_ID, connectionId);
         }
         resultMap.put(KEY_RESOURCE_TYPE, resourceType);
         resultMap.putIfAbsent(KEY_STATUS, Constants.Status.SUCCESS);

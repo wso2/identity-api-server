@@ -51,9 +51,7 @@ public final class Constants {
         public static class ResourceType {
 
                 public static final String IDP = "IDP";
-                public static final String APPLICATION = "APPLICATION";
-                public static final String CONNECTOR = "CONNECTOR";
-                public static final String AUTHENTICATOR = "AUTHENTICATOR";
+                public static final String FRAUD_DETECTION = "FRAUD_DETECTION";
 
                 private ResourceType() {
                         // Prevent instantiation

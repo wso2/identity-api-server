@@ -39,7 +39,7 @@ paths:
               $ref: "#/components/schemas/DebugConnectionRequest"
       responses:
         '200':
-          description: "Debug session initiated successfully."
+          description: "Debug session executed successfully."
           content:
             application/json:
               schema:
@@ -150,19 +150,17 @@ components:
       type: object
       required:
         - resourceType
-      description: "Request body for starting a debug session. The connectionId is optional at the top level and can be provided inside the properties map for resource types that require it (e.g., IDP)."
+      description: "Request body for starting a debug session. The connectionId is required in properties for IDP resource type."
       properties:
         resourceType:
           type: string
           minLength: 1
           maxLength: 50
-          description: "Type of resource to debug. Allowed values: IDP, APPLICATION, CONNECTOR, AUTHENTICATOR."
+          description: "Type of resource to debug. Allowed values: IDP, FRAUD_DETECTION."
           example: "IDP"
           enum:
             - "IDP"
-            - "APPLICATION"
-            - "CONNECTOR"
-            - "AUTHENTICATOR"
+            - "FRAUD_DETECTION"
         properties:
           type: object
           maxProperties: 50
@@ -190,7 +188,7 @@ components:
         message:
           type: string
           description: "Generic response message."
-          example: "Debug session initiated successfully"
+          example: "Debug session executed successfully"
         timestamp:
           type: integer
           format: int64
@@ -210,130 +208,36 @@ components:
     # -----------------------------
     DebugResponse:
       type: object
+      required:
+        - sessionId
+        - success
+      description: "Debug response containing sessionId and success at top level, with all protocol-specific data in metadata."
       properties:
         sessionId:
           type: string
-          description: "Debug session identifier."
+          description: "Debug session identifier. Used to retrieve debug results via the GET endpoint."
           example: "debug-session-12345"
-        status:
-          type: string
-          description: "Debug operation status."
-          enum: ["SUCCESS", "FAILURE", "IN_PROGRESS"]
-        targetIdp:
-          type: string
-          description: "Target Identity Provider that was tested."
-          example: "Google"
-        authenticatorUsed:
-          type: string
-          description: "Authenticator that was used."
-          example: "GoogleOIDCAuthenticator"
-        authenticationResult:
-          $ref: "#/components/schemas/AuthenticationResult"
-        claimsAnalysis:
-          $ref: "#/components/schemas/ClaimsAnalysis"
-        flowEvents:
-          type: array
-          items:
-            $ref: "#/components/schemas/FlowEvent"
-          description: "Authentication flow events captured by event listeners."
-        errors:
-          type: array
-          items:
-            $ref: "#/components/schemas/DebugError"
+        success:
+          type: boolean
+          description: "Whether the debug operation was successful."
+          example: true
         metadata:
           type: object
-          additionalProperties:
-            type: string
-          description: "Additional debug metadata."
-    
-    AuthenticationResult:
-      type: "object"
-      properties:
-        isAuthenticated:
-          type: "boolean"
-          description: "Indicates if the user authentication was successful."
-        username:
-          type: "string"
-          description: "The username of the authenticated user."
-          example: "alex@wso2.com"
-        subjectId:
-          type: "string"
-          description: "The unique subject identifier."
-          example: "a123-b456-c789"
-        mappedAttributes:
-          type: "object"
-          additionalProperties:
-            type: "string"
-          description: "Key-value pairs of locally mapped user attributes."
+          description: "Protocol-specific and resource-specific debug data. For IDP OAuth debugging, includes userAttributes, mappedClaims, steps, tokens, URLs, and diagnostic information."
+          additionalProperties: true
           example:
-            "http://wso2.org/claims/emailaddress": "alex@wso2.com"
-
-    ClaimsAnalysis:
-      type: "object"
-      properties:
-        idpClaims:
-          type: "object"
-          additionalProperties:
-            type: "string"
-          description: "Claims received from the Identity Provider."
-          example:
-            "sub": "a123-b456-c789"
-            "email": "alex@wso2.com"
-        mappedLocalClaims:
-          type: "object"
-          additionalProperties:
-            type: "string"
-          description: "Claims successfully mapped to local dialect."
-          example:
-            "http://wso2.org/claims/emailaddress": "alex@wso2.com"
-        missingMandatoryClaims:
-          type: "array"
-          items:
-            type: "string"
-          description: "A list of mandatory local claims that were not found."
-          example:
-            - "http://wso2.org/claims/role"
-
-    FlowEvent:
-      type: "object"
-      properties:
-        timestamp:
-          type: "string"
-          description: "Timestamp of the event."
-          example: "2025-10-21T10:30:01Z"
-        type:
-          type: "string"
-          description: "Type of the flow event."
-          example: "TOKEN_EXCHANGE"
-        details:
-          type: "object"
-          additionalProperties:
-            type: "string"
-          description: "Key-value details of the event."
-          example:
-            endpoint: "https://idp.example.com/oauth2/token"
-            status: "200"
-
-    DebugError:
-      type: "object"
-      properties:
-        timestamp:
-          type: "string"
-          description: "Timestamp when the error occurred."
-          example: "2025-10-21T10:30:02Z"
-        code:
-          type: "string"
-          description: "Error code."
-          example: "TOKEN_EXCHANGE_FAILURE"
-        message:
-          type: "string"
-          description: "A short error message."
-          example: "Failed to exchange token"
-        details:
-          type: "object"
-          additionalProperties:
-            type: "string"
-          description: "Key-value details of the error."
-          example:
-            "http_status": "500"
-            "response_body": "invalid_grant"
+            state: "debug-session-12345"
+            userAttributes:
+              sub: "9d5ddf10-d814-4000-9bf7-35f3eef9b86e"
+              email: "user@example.com"
+            mappedClaims:
+              - idpClaim: "sub"
+                isClaim: "http://wso2.org/claims/sub"
+                value: "9d5ddf10-d814-4000-9bf7-35f3eef9b86e"
+                status: "Auto-Discovered"
+            steps:
+              claimMappingStatus: "success"
+              authenticationStatus: "success"
+              connectionStatus: "success"
+            idToken: "eyJ..."
+            externalRedirectUrl: "https://..."

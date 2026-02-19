@@ -21,9 +21,9 @@ package org.wso2.carbon.identity.api.server.debug.common;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.debug.framework.core.DebugContextProvider;
+import org.wso2.carbon.identity.debug.framework.core.DebugExecutor;
 import org.wso2.carbon.identity.debug.framework.core.DebugRequestCoordinator;
-import org.wso2.carbon.identity.debug.framework.extension.DebugContextProvider;
-import org.wso2.carbon.identity.debug.framework.extension.DebugExecutor;
 
 /**
  * Service holder for debug framework OSGi services.

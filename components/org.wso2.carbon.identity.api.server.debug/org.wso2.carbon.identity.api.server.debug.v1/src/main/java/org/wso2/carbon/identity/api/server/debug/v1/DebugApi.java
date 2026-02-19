@@ -131,7 +131,7 @@ public class DebugApi {
     /**
      * Starts a debug session for any resource type.
      *
-     * @param debugRequest Debug request with resourceId, resourceType, and
+     * @param debugRequest Debug request with connectionId, resourceType, and
      *                     properties.
      * @return Response containing debug session information.
      */
@@ -156,7 +156,7 @@ public class DebugApi {
     @SuppressFBWarnings("JAXRS_ENDPOINT")
     public Response startDebugSession(
 
-            @ApiParam(value = "Debug request with resourceId, resourceType, and properties", required = true) 
+            @ApiParam(value = "Debug request with connectionId, resourceType, and properties", required = true) 
             @Valid DebugConnectionRequest debugRequest) {
 
         return delegate.startDebugSession(debugRequest);

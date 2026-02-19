@@ -27,7 +27,7 @@ import javax.validation.constraints.Size;
 
 /**
  * Debug request model for testing authentication flows and resources.
- * The resourceId is no longer a top-level required field. It can be provided
+ * The connectionId is no longer a top-level required field. It can be provided
  * inside the properties map for resource types that require it (e.g., IDP).
  */
 @ApiModel(description = "Debug request for authentication flow and resource testing")
@@ -39,7 +39,7 @@ public class DebugConnectionRequest {
     @JsonProperty("resourceType")
     private String resourceType;
 
-    @ApiModelProperty(value = "Generic properties for resource debugging, can include resourceId for types")
+    @ApiModelProperty(value = "Generic properties for resource debugging, can include connectionId for types")
     @JsonProperty("properties")
     private java.util.Map<String, String> properties;
 
@@ -114,14 +114,14 @@ public class DebugConnectionRequest {
     }
 
     /**
-     * Gets the resourceId from the properties map if present.
+     * Gets the connectionId from the properties map if present.
      *
      * @return Resource ID from properties, or null if not set.
      */
-    public String getResourceId() {
+    public String getConnectionId() {
 
         if (properties != null) {
-            return properties.get("resourceId");
+            return properties.get("connectionId");
         }
         return null;
     }
