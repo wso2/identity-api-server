@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.organization.user.sharing.management</artifactId>
-        <version>1.3.231-SNAPSHOT</version>
+        <version>1.5.7-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
