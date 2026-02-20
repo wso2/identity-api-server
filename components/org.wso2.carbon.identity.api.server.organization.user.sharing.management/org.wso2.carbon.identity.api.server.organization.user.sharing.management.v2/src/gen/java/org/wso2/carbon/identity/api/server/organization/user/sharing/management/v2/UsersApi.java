@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -71,7 +71,7 @@ public class UsersApi  {
     @Path("/share")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Perform incremental role assignment operations for already shared users", notes = "Perform **incremental updates** to the role assignments of already shared users.  This endpoint supports **SCIM-like PATCH semantics**: - `op: \"add\"`    → assign additional roles. - `op: \"remove\"` → remove specific roles.  > **Note:**   > Only **role assignments** are managed here. Sharing/unsharing organizations > is handled via `/users/share`, `/users/share-with-all`, `/users/unshare`, > and `/users/unshare-with-all`.  **Scope required:** `internal_user_share`", response = ProcessSuccessResponse.class, authorizations = {
+    @ApiOperation(value = "Perform incremental role assignment operations for already shared users", notes = "Perform **incremental updates** to the shared attributes (eg: role assignments) update of already shared users.  This endpoint supports **SCIM-like PATCH semantics**: - `op: \"add\"`    → assign additional roles. - `op: \"remove\"` → remove specific roles.  > **Note:**   > Only **role assignments** updates are managed here as of now. Sharing/unsharing organizations > is handled via `/users/share`, `/users/share-with-all`, `/users/unshare`, > and `/users/unshare-with-all`.  **Scope required:** `internal_user_shared_access_update`", response = ProcessSuccessResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             

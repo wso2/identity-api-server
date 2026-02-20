@@ -95,18 +95,18 @@ paths:
         - User Sharing
       summary: Perform incremental role assignment operations for already shared users
       description: |-
-        Perform **incremental updates** to the role assignments of already shared users.
+        Perform **incremental updates** to the shared attributes (eg: role assignments) update of already shared users.
 
         This endpoint supports **SCIM-like PATCH semantics**:
         - `op: "add"`    → assign additional roles.
         - `op: "remove"` → remove specific roles.
 
         > **Note:**  
-        > Only **role assignments** are managed here. Sharing/unsharing organizations
+        > Only **role assignments** updates are managed here as of now. Sharing/unsharing organizations
         > is handled via `/users/share`, `/users/share-with-all`, `/users/unshare`,
         > and `/users/unshare-with-all`.
 
-        **Scope required:** `internal_user_share`
+        **Scope required:** `internal_user_shared_access_update`
       operationId: patchUserSharing
       requestBody:
         required: true
@@ -475,6 +475,7 @@ components:
             internal_user_share: "Share users across organizations."
             internal_user_unshare: "Unshare users from organizations."
             internal_user_shared_access_view: "View shared organizations and roles for a user."
+            internal_user_shared_access_update: "Update shared attributes (e.g., roles) for shared users."
 
   schemas:
 
