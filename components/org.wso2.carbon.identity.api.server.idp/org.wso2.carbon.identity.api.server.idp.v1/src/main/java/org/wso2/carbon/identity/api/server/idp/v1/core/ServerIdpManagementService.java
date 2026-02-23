@@ -1179,13 +1179,21 @@ public class ServerIdpManagementService {
      * @param resourceId    IDP resource ID.
      * @param limit         Limit parameter.
      * @param offset        Offset parameter.
+     * @param filter        Filter parameter.
      * @return  ConnectedApps.
      */
-    public ConnectedApps getConnectedApps(String resourceId, Integer limit, Integer offset) {
+    public ConnectedApps getConnectedApps(String resourceId, Integer limit, Integer offset, String filter) {
 
         try {
-            ConnectedAppsResult connectedAppsResult = identityProviderManager.getConnectedApplications(resourceId,
-                    limit, offset, ContextLoader.getTenantDomainFromContext());
+            ConnectedAppsResult connectedAppsResult;
+            if (StringUtils.isBlank(filter)) {
+                connectedAppsResult = identityProviderManager.getConnectedApplications(resourceId, limit, offset,
+                        ContextLoader.getTenantDomainFromContext());
+            } else {
+                connectedAppsResult =
+                        identityProviderManager.getConnectedApplications(resourceId, limit, offset, filter,
+                                ContextLoader.getTenantDomainFromContext());
+            }
             return createConnectedAppsResponse(resourceId, connectedAppsResult);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_CONNECTED_APPS,
@@ -1876,6 +1884,7 @@ public class ServerIdpManagementService {
             jitConfig.setAccountLookupAttributeMappings(createAccountLookupAttributeMappingsConfig(
                     jit.getAccountLookupAttributeMappings()));
             jitConfig.setAttributeSyncMethod(jit.getAttributeSyncMethod().toString());
+            jitConfig.setIdpGroupSyncMethod(jit.getIdpGroupSyncMethod().toString());
             identityProvider.setJustInTimeProvisioningConfig(jitConfig);
         }
     }
@@ -2494,6 +2503,10 @@ public class ServerIdpManagementService {
                     jitProvisionConfig.getAttributeSyncMethod() : FrameworkConstants.OVERRIDE_ALL;
             jitConfig.setAttributeSyncMethod(JustInTimeProvisioning.AttributeSyncMethodEnum
                     .valueOf(attributeSyncMethod));
+            String idpGroupSyncMethod = StringUtils.isNotBlank(jitProvisionConfig.getIdpGroupSyncMethod()) ?
+                    jitProvisionConfig.getIdpGroupSyncMethod() : FrameworkConstants.MERGE_WITH_EXISTING;
+            jitConfig.setIdpGroupSyncMethod(JustInTimeProvisioning.IdpGroupSyncMethodEnum
+                    .valueOf(idpGroupSyncMethod));
         }
         return jitConfig;
     }

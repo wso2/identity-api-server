@@ -1,0 +1,164 @@
+<!--
+  ~ Copyright (c) 2020-2026, WSO2 LLC. (http://www.wso2.com).
+  ~
+  ~ WSO2 LLC. licenses this file to you under the Apache License,
+  ~ Version 2.0 (the "License"); you may not use this file except
+  ~ in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+  -->
+
+<FindBugsFilter>
+    <!-- Exclude ALL bugs from auto-generated code by source path -->
+    <Match>
+        <Source name="~.*/src/gen/java/.*" />
+    </Match>
+    <!-- Exclude ALL bugs from generated model classes by class name -->
+    <Match>
+        <Class name="~org\.wso2\.carbon\.identity\.api\.server\..*\.v[0-9]+\.model\..*" />
+    </Match>
+
+    <!-- Exclude common patterns in API service implementations -->
+    <!-- Constructor exceptions in API service implementations -->
+    <Match>
+        <Class name="~.*ApiServiceImpl$" />
+        <Method name="&lt;init&gt;" />
+        <Or>
+            <Bug pattern="CT_CONSTRUCTOR_THROW" />
+            <Bug pattern="THROWS_METHOD_THROWS_RUNTIMEEXCEPTION" />
+        </Or>
+    </Match>
+
+    <!-- Singleton factory patterns - MS_EXPOSE_REP is acceptable for singletons -->
+    <Match>
+        <Class name="~.*Factory$" />
+        <Bug pattern="MS_EXPOSE_REP" />
+    </Match>
+
+    <!-- Constructor parameter storage - EI_EXPOSE_REP2 is acceptable for dependency injection -->
+    <Match>
+        <Class name="~org\.wso2\.carbon\.identity\.api\.server\..*\.core\.Server.*Service$" />
+        <Method name="&lt;init&gt;" />
+        <Bug pattern="EI_EXPOSE_REP2" />
+    </Match>
+
+    <Match>
+        <Bug pattern="CRLF_INJECTION_LOGS" />
+    </Match>
+    <Match>
+        <Bug pattern="FORMAT_STRING_MANIPULATION" />
+    </Match>
+    <Match>
+        <Bug pattern="JAXRS_ENDPOINT" />
+    </Match>
+    <!-- Excluded since this bug is fixed in Java 8+ versions :
+    https://find-sec-bugs.github.io/bugs.htm#WEAK_FILENAMEUTILS -->
+    <Match>
+        <Bug pattern="WEAK_FILENAMEUTILS" />
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants" />
+        <Bug pattern="HARD_CODE_PASSWORD" />
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.identity.api.server.keystore.management.v1.core.KeyStoreService" />
+        <Bug pattern="PATH_TRAVERSAL_IN" />
+    </Match>
+    <!-- Excluded since false positive. -->
+    <Match>
+        <Class name="org.wso2.carbon.identity.api.server.configs.common.SchemaConfigParser" />
+        <Bug pattern="PATH_TRAVERSAL_IN" />
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.identity.rest.api.server.challenge.v1.core.ServerChallengeService" />
+        <Method name="patchChallengeSet" />
+        <Bug pattern="IMPROPER_UNICODE" />
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ServiceProviderToApiModel" />
+        <Method name="isResidentSp" />
+        <Bug pattern="IMPROPER_UNICODE" />
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.UpdateAuthenticationSequence" />
+        <Method name="isRevertToDefaultSequence" />
+        <Bug pattern="IMPROPER_UNICODE" />
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.identity.api.server.tenant.management.v1.core.ServerTenantManagementService" />
+        <Method name="createTenantInfoBean" />
+        <Bug pattern="IMPROPER_UNICODE" />
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.identity.api.server.tenant.management.v1.core.ServerTenantManagementService" />
+        <Method name="validateInputAgainstCode" />
+        <Bug pattern="IMPROPER_UNICODE" />
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.identity.rest.api.server.claim.management.v1.core.ServerClaimManagementService" />
+        <Method name="validateAttributeMappings" />
+        <Bug pattern="IMPROPER_UNICODE" />
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils" />
+        <Method name="deepCopyApplication" />
+        <Bug pattern="OBJECT_DESERIALIZATION" />
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.identity.api.server.script.library.v1.core.ServerScriptLibrariesService" />
+        <Or>
+            <Method name="addScriptLibrary" />
+            <Method name="updateScriptLibrary" />
+        </Or>
+        <Bug pattern="PATH_TRAVERSAL_IN" />
+    </Match>
+    <!--
+       The following exclusions are added as in java 11 and java 17,
+       findbugs shows the bug of unused fields, but the unused fields
+       cannot be removed as they are used inside unused but public classes.
+    -->
+    <Match>
+        <Class name="org.wso2.carbon.identity.rest.api.server.challenge.v1.ApiException" />
+        <Bug pattern="URF_UNREAD_FIELD"/>
+    </Match>
+    <!--
+        The following exclusions added because the find bug issue is false positive.
+        while using "toUpperCase" & "equalsIgnoreCase" functions, ENGLISH locale is already specified to avoid
+        non-ASCII characters.
+    -->
+    <Match>
+        <Class name="org.wso2.carbon.identity.api.server.configs.v1.core.ServerConfigManagementService" />
+        <Method name="resetRemoteServerConfig" />
+        <Bug pattern="IMPROPER_UNICODE" />
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.identity.rest.api.server.notification.template.v1.core.TemplateTypeService"/>
+        <Method name="resetTemplateType"/>
+        <Bug pattern="IMPROPER_UNICODE"/>
+    </Match>
+    <!--
+        Suppress SERVLET_HEADER false positive for Accept header access.
+        The Accept header is already validated by JAX-RS against the @Produces annotation.
+        Only specified content types are allowed through JAX-RS filtering, and the header is
+        only used for additional JSON rejection in certificate download endpoints.
+    -->
+    <Match>
+        <Class name="org.wso2.carbon.identity.api.server.keystore.management.v1.impl.KeystoresApiServiceImpl" />
+        <Method name="getCurrentAcceptHeader" />
+        <Bug pattern="SERVLET_HEADER" />
+    </Match>
+    <!-- Suppress MS_EXPOSE_REP for singleton service factory pattern -->
+    <Match>
+        <Class name="org.wso2.carbon.identity.api.server.rule.metadata.v1.factories.ServerRuleMetadataServiceFactory" />
+        <Method name="getServerRuleMetadataService" />
+        <Bug pattern="MS_EXPOSE_REP" />
+    </Match>
+</FindBugsFilter>

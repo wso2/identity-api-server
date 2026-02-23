@@ -1777,6 +1777,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/limitQueryParam'
         - $ref: '#/components/parameters/offsetQueryParam'
+        - $ref: '#/components/parameters/filterQueryParam'
         - name: identity-provider-id
           in: path
           description: ID of the identity provider.
@@ -3288,6 +3289,12 @@ components:
             - NONE
             - PRESERVE_LOCAL
           default: OVERRIDE_ALL
+        idpGroupSyncMethod:
+          type: string
+          enum:
+            - OVERRIDE_ALL
+            - MERGE_WITH_EXISTING
+          default: MERGE_WITH_EXISTING
     AccountLookupAttributeMapping:
       type: object
       properties:
