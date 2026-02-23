@@ -66,8 +66,8 @@ import org.wso2.carbon.identity.workflow.mgt.dto.Association;
 import org.wso2.carbon.identity.workflow.mgt.dto.WorkflowEvent;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowClientException;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowException;
-import org.wso2.carbon.identity.workflow.mgt.util.WorkflowManagementUtil;
 import org.wso2.carbon.identity.workflow.mgt.util.WFConstant;
+import org.wso2.carbon.identity.workflow.mgt.util.WorkflowManagementUtil;
 import org.wso2.carbon.identity.workflow.mgt.util.WorkflowRequestStatus;
 
 import java.io.UnsupportedEncodingException;
