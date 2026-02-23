@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -25,10 +25,17 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.application.management.v1.AccessTokenConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.CIBAAuthenticationRequestConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthenticationConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.HybridFlowConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.IdTokenConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.OAuth2PKCEConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCLogoutConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.PushAuthorizationRequestConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RefreshTokenConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.RequestObjectConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.SubjectTokenConfiguration;
 import javax.validation.constraints.*;
 
 
@@ -97,6 +104,7 @@ public enum StateEnum {
     private SubjectConfiguration subject;
     private Boolean isFAPIApplication = false;
     private FapiMetadata fapiMetadata;
+    private CIBAAuthenticationRequestConfiguration cibaAuthenticationRequest;
 
     /**
     **/
@@ -293,7 +301,7 @@ public enum StateEnum {
         this.accessToken = accessToken;
         return this;
     }
-    
+
     @ApiModelProperty(value = "")
     @JsonProperty("accessToken")
     @Valid
@@ -529,6 +537,26 @@ public enum StateEnum {
         this.fapiMetadata = fapiMetadata;
     }
 
+    /**
+    **/
+    public OpenIDConnectConfiguration cibaAuthenticationRequest(CIBAAuthenticationRequestConfiguration cibaAuthenticationRequest) {
+
+        this.cibaAuthenticationRequest = cibaAuthenticationRequest;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("cibaAuthenticationRequest")
+    @Valid
+    public CIBAAuthenticationRequestConfiguration getCibaAuthenticationRequest() {
+        return cibaAuthenticationRequest;
+    }
+    public void setCibaAuthenticationRequest(CIBAAuthenticationRequestConfiguration cibaAuthenticationRequest) {
+        this.cibaAuthenticationRequest = cibaAuthenticationRequest;
+    }
+
+
+
     @Override
     public boolean equals(java.lang.Object o) {
 
@@ -560,13 +588,14 @@ public enum StateEnum {
             Objects.equals(this.pushAuthorizationRequest, openIDConnectConfiguration.pushAuthorizationRequest) &&
             Objects.equals(this.subject, openIDConnectConfiguration.subject) &&
             Objects.equals(this.isFAPIApplication, openIDConnectConfiguration.isFAPIApplication) &&
-            Objects.equals(this.fapiMetadata, openIDConnectConfiguration.fapiMetadata);
+            Objects.equals(this.fapiMetadata, openIDConnectConfiguration.fapiMetadata) &&
+            Objects.equals(this.cibaAuthenticationRequest, openIDConnectConfiguration.cibaAuthenticationRequest);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(clientId, clientSecret, state, grantTypes, callbackURLs, allowedOrigins, publicClient, pkce, hybridFlow, accessToken, refreshToken, subjectToken, idToken, logout, validateRequestObjectSignature, scopeValidators, clientAuthentication, requestObject, pushAuthorizationRequest, subject, isFAPIApplication, fapiMetadata);
+        return Objects.hash(clientId, clientSecret, state, grantTypes, callbackURLs, allowedOrigins, publicClient, pkce, accessToken, hybridFlow, refreshToken, subjectToken, idToken, logout, validateRequestObjectSignature, scopeValidators, clientAuthentication, requestObject, pushAuthorizationRequest, subject, isFAPIApplication, fapiMetadata, cibaAuthenticationRequest);
     }
 
     @Override
@@ -597,6 +626,7 @@ public enum StateEnum {
         sb.append("    subject: ").append(toIndentedString(subject)).append("\n");
         sb.append("    isFAPIApplication: ").append(toIndentedString(isFAPIApplication)).append("\n");
         sb.append("    fapiMetadata: ").append(toIndentedString(fapiMetadata)).append("\n");
+        sb.append("    cibaAuthenticationRequest: ").append(toIndentedString(cibaAuthenticationRequest)).append("\n");
         sb.append("}");
         return sb.toString();
     }
