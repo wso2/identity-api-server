@@ -16,14 +16,14 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.api.server.debug.common;
+package org.wso2.carbon.identity.api.server.debug.v1.constants;
 
 /**
  * Contains constants for Debug Flow Data Provider API.
  */
-public final class Constants {
+public final class DebugConstants {
 
-        private Constants() {
+        private DebugConstants() {
                 // Prevent instantiation
         }
 

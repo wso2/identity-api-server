@@ -34,7 +34,6 @@ import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
@@ -46,7 +45,7 @@ public class DebugApi {
     private final DebugApiService delegate;
 
     public DebugApi() {
-        
+
         this.delegate = DebugApiServiceFactory.getDebugApi();
     }
 
@@ -84,25 +83,7 @@ public class DebugApi {
             @ApiResponse(code = 500, message = "Internal server error", response = Error.class)
     })
     public Response getDebugResult(@PathParam("session-id") String sessionId) {
+
         return delegate.getDebugResult(sessionId);
-    }
-
-    @POST
-    @Path("/connection/{idp-id}")
-    @Consumes({ "application/json" })
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Start IDP Debug Flow", notes = "Initiates the debug flow for a specific Identity Provider. (Deprecated: Use POST /debug for generic testing)", response = DebugConnectionResponse.class, tags = {
-            "Debug" })
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Debug flow initiated successfully.", response = DebugConnectionResponse.class),
-            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-            @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-            @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-            @ApiResponse(code = 500, message = "Server Error", response = Error.class)
-    })
-    public Response debugConnection(@PathParam("idp-id") String idpId,
-            @Valid DebugConnectionRequest debugConnectionRequest) {
-
-        return delegate.debugConnection(idpId, debugConnectionRequest);
     }
 }

@@ -18,115 +18,138 @@
 
 package org.wso2.carbon.identity.api.server.debug.v1.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.validation.constraints.*;
+import javax.validation.Valid;
+
 import io.swagger.annotations.ApiModelProperty;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlEnum;
+import javax.xml.bind.annotation.XmlEnumValue;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Debug request model for testing authentication flows and resources.
- * The resourceId is no longer a top-level required field. It can be provided
- * inside the properties map for resource types that require it (e.g., IDP).
- */
-@ApiModel(description = "Debug request for authentication flow and resource testing")
-public class DebugConnectionRequest {
+  * Request body for starting a debug session. The connectionId is required in properties for IDP resource type.
+ **/
+@ApiModel(description="Request body for starting a debug session. The connectionId is required in properties for IDP resource type.")
+public class DebugConnectionRequest  {
+  
+@XmlType(name="ResourceTypeEnum")
+@XmlEnum(String.class)
+public enum ResourceTypeEnum {
 
-    @ApiModelProperty(value = "Resource type to debug", required = true)
-    @JsonProperty("resourceType")
-    private String resourceType;
+@XmlEnumValue("IDP") IDP(String.valueOf("IDP")), @XmlEnumValue("FRAUD_DETECTION") FRAUD_DETECTION(String.valueOf("FRAUD_DETECTION"));
 
-    @ApiModelProperty(value = "Generic properties for resource debugging, can include resourceId for types that need it")
-    @JsonProperty("properties")
-    private java.util.Map<String, String> properties;
 
-    /**
-     * Default constructor.
-     */
-    public DebugConnectionRequest() {
+    private String value;
 
-        // Default constructor.
+    ResourceTypeEnum (String v) {
+        value = v;
     }
 
-    /**
-     * Constructor with resource type.
-     *
-     * @param resourceType The type of resource to debug.
-     */
-    public DebugConnectionRequest(String resourceType) {
-
-        this.resourceType = resourceType;
-    }
-
-    /**
-     * Constructor with resource type and properties.
-     *
-     * @param resourceType The type of resource to debug.
-     * @param properties   Generic properties for debugging.
-     */
-    public DebugConnectionRequest(String resourceType, java.util.Map<String, String> properties) {
-
-        this.resourceType = resourceType;
-        this.properties = properties;
-    }
-
-    /**
-     * Gets the resource type.
-     *
-     * @return Resource type.
-     */
-    public String getResourceType() {
-
-        return resourceType;
-    }
-
-    /**
-     * Sets the resource type.
-     *
-     * @param resourceType Resource type to set.
-     */
-    public void setResourceType(String resourceType) {
-
-        this.resourceType = resourceType;
-    }
-
-    /**
-     * Gets the properties map.
-     *
-     * @return Properties map.
-     */
-    public java.util.Map<String, String> getProperties() {
-
-        return properties;
-    }
-
-    /**
-     * Sets the properties map.
-     *
-     * @param properties Properties map to set.
-     */
-    public void setProperties(java.util.Map<String, String> properties) {
-
-        this.properties = properties;
-    }
-
-    /**
-     * Gets the resourceId from the properties map if present.
-     *
-     * @return Resource ID from properties, or null if not set.
-     */
-    public String getResourceId() {
-
-        if (properties != null) {
-            return properties.get("resourceId");
-        }
-        return null;
+    public String value() {
+        return value;
     }
 
     @Override
     public String toString() {
-        
-        return "DebugConnectionRequest{" +
-                "resourceType='" + resourceType + '\'' +
-                ", properties=" + properties +
-                '}';
+        return String.valueOf(value);
+    }
+
+    public static ResourceTypeEnum fromValue(String value) {
+        for (ResourceTypeEnum b : ResourceTypeEnum.values()) {
+            if (b.value.equals(value)) {
+                return b;
+            }
+        }
+        throw new IllegalArgumentException("Unexpected value '" + value + "'");
     }
 }
+
+  @ApiModelProperty(example = "IDP", required = true, value = "Type of resource to debug. Allowed values: IDP, FRAUD_DETECTION.")
+ /**
+   * Type of resource to debug. Allowed values: IDP, FRAUD_DETECTION.
+  **/
+  private ResourceTypeEnum resourceType;
+
+  @ApiModelProperty(example = "{\"connectionId\":\"123e4567-e89b-12d3-a456-426614174000\",\"authenticatorName\":\"OpenIDConnectAuthenticator\"}", value = "Generic properties for resource debugging as key-value pairs. Maximum 50 properties allowed. Each property value can be up to 2048 characters. For IDP resource type, the connectionId property is required.")
+ /**
+   * Generic properties for resource debugging as key-value pairs. Maximum 50 properties allowed. Each property value can be up to 2048 characters. For IDP resource type, the connectionId property is required.
+  **/
+  private Map<String, String> properties = null;
+ /**
+   * Type of resource to debug. Allowed values: IDP, FRAUD_DETECTION.
+   * @return resourceType
+  **/
+  @JsonProperty("resourceType")
+  @NotNull
+ @Size(min=1,max=50)  public String getResourceType() {
+    if (resourceType == null) {
+      return null;
+    }
+    return resourceType.value();
+  }
+
+  public void setResourceType(ResourceTypeEnum resourceType) {
+    this.resourceType = resourceType;
+  }
+
+  public DebugConnectionRequest resourceType(ResourceTypeEnum resourceType) {
+    this.resourceType = resourceType;
+    return this;
+  }
+
+ /**
+   * Generic properties for resource debugging as key-value pairs. Maximum 50 properties allowed. Each property value can be up to 2048 characters. For IDP resource type, the connectionId property is required.
+   * @return properties
+  **/
+  @JsonProperty("properties")
+ @Size(max=50)  public Map<String, String> getProperties() {
+    return properties;
+  }
+
+  public void setProperties(Map<String, String> properties) {
+    this.properties = properties;
+  }
+
+  public DebugConnectionRequest properties(Map<String, String> properties) {
+    this.properties = properties;
+    return this;
+  }
+
+  public DebugConnectionRequest putPropertiesItem(String key, String propertiesItem) {
+    this.properties.put(key, propertiesItem);
+    return this;
+  }
+
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("class DebugConnectionRequest {\n");
+    
+    sb.append("    resourceType: ").append(toIndentedString(resourceType)).append("\n");
+    sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
+    sb.append("}");
+    return sb.toString();
+  }
+
+  /**
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
+   */
+  private static String toIndentedString(java.lang.Object o) {
+    if (o == null) {
+      return "null";
+    }
+    return o.toString().replace("\n", "\n    ");
+  }
+}
+

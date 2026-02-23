@@ -16,15 +16,20 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.api.server.debug.v1;
+package org.wso2.carbon.identity.api.server.debug.v1.factories;
 
-import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionRequest;
+import org.wso2.carbon.identity.api.server.debug.v1.core.DebugServiceCore;
+import org.wso2.carbon.identity.api.server.debug.v1.service.DebugService;
 
-import javax.ws.rs.core.Response;
+/**
+ * Factory for debug service core.
+ */
+public class DebugServiceCoreFactory {
 
-public interface DebugApiService {
+    private static final DebugServiceCore SERVICE = new DebugServiceCore(new DebugService());
 
-    Response startDebugSession(DebugConnectionRequest debugConnectionRequest);
+    public static DebugServiceCore getDebugServiceCore() {
 
-    Response getDebugResult(String sessionId);
+        return SERVICE;
+    }
 }

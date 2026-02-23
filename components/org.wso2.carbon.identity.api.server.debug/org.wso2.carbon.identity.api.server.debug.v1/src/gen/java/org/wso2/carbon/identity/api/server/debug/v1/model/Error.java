@@ -18,131 +18,141 @@
 
 package org.wso2.carbon.identity.api.server.debug.v1.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-
+import javax.validation.constraints.*;
 import javax.validation.Valid;
 
-/**
- * Error model for debug API responses.
- */
-@ApiModel(description = "Error model for debug API responses")
-public class Error {
+import io.swagger.annotations.ApiModelProperty;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlEnum;
+import javax.xml.bind.annotation.XmlEnumValue;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    private String code;
-    private String message;
-    private String description;
-    private String traceId;
+public class Error  {
+  
+  @ApiModelProperty(example = "IDP-60001", required = true, value = "An error code.")
+ /**
+   * An error code.
+  **/
+  private String code;
 
-    /**
-     * Error code.
-     * 
-     * @param code Error code
-     * @return Error instance
-     */
-    public Error code(String code) {
+  @ApiModelProperty(example = "Error message.", required = true, value = "An error message.")
+ /**
+   * An error message.
+  **/
+  private String message;
 
-        this.code = code;
-        return this;
+  @ApiModelProperty(example = "Detailed error description.", value = "A detailed error description.")
+ /**
+   * A detailed error description.
+  **/
+  private String description;
+
+  @ApiModelProperty(example = "trace-123456", value = "Trace identifier for error correlation.")
+ /**
+   * Trace identifier for error correlation.
+  **/
+  private String traceId;
+ /**
+   * An error code.
+   * @return code
+  **/
+  @JsonProperty("code")
+  @NotNull
+  public String getCode() {
+    return code;
+  }
+
+  public void setCode(String code) {
+    this.code = code;
+  }
+
+  public Error code(String code) {
+    this.code = code;
+    return this;
+  }
+
+ /**
+   * An error message.
+   * @return message
+  **/
+  @JsonProperty("message")
+  @NotNull
+  public String getMessage() {
+    return message;
+  }
+
+  public void setMessage(String message) {
+    this.message = message;
+  }
+
+  public Error message(String message) {
+    this.message = message;
+    return this;
+  }
+
+ /**
+   * A detailed error description.
+   * @return description
+  **/
+  @JsonProperty("description")
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public Error description(String description) {
+    this.description = description;
+    return this;
+  }
+
+ /**
+   * Trace identifier for error correlation.
+   * @return traceId
+  **/
+  @JsonProperty("traceId")
+  public String getTraceId() {
+    return traceId;
+  }
+
+  public void setTraceId(String traceId) {
+    this.traceId = traceId;
+  }
+
+  public Error traceId(String traceId) {
+    this.traceId = traceId;
+    return this;
+  }
+
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("class Error {\n");
+    
+    sb.append("    code: ").append(toIndentedString(code)).append("\n");
+    sb.append("    message: ").append(toIndentedString(message)).append("\n");
+    sb.append("    description: ").append(toIndentedString(description)).append("\n");
+    sb.append("    traceId: ").append(toIndentedString(traceId)).append("\n");
+    sb.append("}");
+    return sb.toString();
+  }
+
+  /**
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
+   */
+  private static String toIndentedString(java.lang.Object o) {
+    if (o == null) {
+      return "null";
     }
-
-    @ApiModelProperty(example = "DEBUG-00000", value = "Error code")
-    @JsonProperty("code")
-    @Valid
-    public String getCode() {
-
-        return code;
-    }
-
-    public void setCode(String code) {
-
-        this.code = code;
-    }
-
-    /**
-     * Error message.
-     * 
-     * @param message Error message
-     * @return Error instance
-     */
-    public Error message(String message) {
-
-        this.message = message;
-        return this;
-    }
-
-    @ApiModelProperty(example = "Debug operation failed", value = "Error message")
-    @JsonProperty("message")
-    @Valid
-    public String getMessage() {
-
-        return message;
-    }
-
-    public void setMessage(String message) {
-
-        this.message = message;
-    }
-
-    /**
-     * Error description.
-     * 
-     * @param description Error description
-     * @return Error instance
-     */
-    public Error description(String description) {
-
-        this.description = description;
-        return this;
-    }
-
-    @ApiModelProperty(example = "The debug operation failed due to invalid credentials", value = "Error description")
-    @JsonProperty("description")
-    @Valid
-    public String getDescription() {
-
-        return description;
-    }
-
-    public void setDescription(String description) {
-
-        this.description = description;
-    }
-
-    /**
-     * Trace ID.
-     * 
-     * @param traceId Trace ID
-     * @return Error instance
-     */
-    public Error traceId(String traceId) {
-
-        this.traceId = traceId;
-        return this;
-    }
-
-    @ApiModelProperty(example = "e0fbcfeb-3617-43c4-8dd0-7b7d38e13047", value = "Trace ID")
-    @JsonProperty("traceId")
-    @Valid
-    public String getTraceId() {
-
-        return traceId;
-    }
-
-    public void setTraceId(String traceId) {
-
-        this.traceId = traceId;
-    }
-
-    @Override
-    public String toString() {
-        
-        return "Error{" +
-                "code='" + code + '\'' +
-                ", message='" + message + '\'' +
-                ", description='" + description + '\'' +
-                ", traceId='" + traceId + '\'' +
-                '}';
-    }
+    return o.toString().replace("\n", "\n    ");
+  }
 }
+
