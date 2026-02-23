@@ -19,6 +19,7 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.AccessTokenConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.CIBAAuthenticationRequestConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthenticationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.HybridFlowConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.IdTokenConfiguration;
@@ -69,7 +70,8 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
                 .pushAuthorizationRequest(buildPARAuthenticationConfiguration(oauthAppDTO))
                 .subject(buildSubjectConfiguration(oauthAppDTO))
                 .isFAPIApplication(oauthAppDTO.isFapiConformanceEnabled())
-                .subjectToken(buildSubjectTokenConfiguration(oauthAppDTO));
+                .subjectToken(buildSubjectTokenConfiguration(oauthAppDTO))
+                .cibaAuthenticationRequest(buildCIBAAuthenticationRequestConfiguration(oauthAppDTO));
     }
 
     private List<String> getScopeValidators(OAuthConsumerAppDTO oauthAppDTO) {
@@ -230,5 +232,22 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
         return new SubjectTokenConfiguration()
                 .enable(oAuthConsumerAppDTO.isSubjectTokenEnabled())
                 .applicationSubjectTokenExpiryInSeconds(oAuthConsumerAppDTO.getSubjectTokenExpiryTime());
+    }
+
+    private CIBAAuthenticationRequestConfiguration buildCIBAAuthenticationRequestConfiguration(
+            OAuthConsumerAppDTO oAuthConsumerAppDTO) {
+
+        return new CIBAAuthenticationRequestConfiguration()
+                .authReqExpiryTime(oAuthConsumerAppDTO.getCibaAuthReqExpiryTime())
+                .notificationChannels(getCibaNotificationChannels(oAuthConsumerAppDTO));
+    }
+
+    private List<String> getCibaNotificationChannels(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
+
+        if (StringUtils.isBlank(oAuthConsumerAppDTO.getCibaNotificationChannels())) {
+            return Collections.emptyList();
+        } else {
+            return Arrays.asList(oAuthConsumerAppDTO.getCibaNotificationChannels().split(","));
+        }
     }
 }

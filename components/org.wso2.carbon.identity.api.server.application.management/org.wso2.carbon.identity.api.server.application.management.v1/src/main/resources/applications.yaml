@@ -3962,6 +3962,8 @@ components:
           default: false
           description: Enabling this option will make the application FAPI conformant.
           example: false
+        cibaAuthenticationRequest:
+          $ref: '#/components/schemas/CIBAAuthenticationRequestConfiguration'
     OAuth2PKCEConfiguration:
       type: object
       properties:
@@ -4278,6 +4280,22 @@ components:
           $ref: '#/components/schemas/MetadataProperty'
         tokenEndpointAuthMethod:
           $ref: '#/components/schemas/ClientAuthenticationMethodMetadata'
+    CIBAMetadata:
+      type: object
+      properties:
+        supportedNotificationChannels:
+          type: array
+          items:
+            $ref: '#/components/schemas/CIBANotificationChannel'
+    CIBANotificationChannel:
+      type: object
+      properties:
+        name:
+          type: string
+          example: email
+        displayName:
+          type: string
+          example: Email
     ClientAuthenticationMethod:
       type: object
       properties:
@@ -4368,6 +4386,8 @@ components:
           $ref: '#/components/schemas/MetadataProperty'
         fapiMetadata:
           $ref: '#/components/schemas/FapiMetadata'
+        cibaMetadata:
+          $ref: '#/components/schemas/CIBAMetadata'
     WSTrustMetaData:
       type: object
       properties:
@@ -4996,6 +5016,22 @@ components:
             - For IN_PROGRESS status, an empty JSON object is returned.
             - For COMPLETED status, the authentication sequence is returned.
             - For FAILED status, an error message is returned.
+    CIBAAuthenticationRequestConfiguration:
+      type: object
+      properties:
+        authReqExpiryTime:
+          type: integer
+          format: int64
+          description: "CIBA authentication request expiry time in seconds."
+          example: 600
+        notificationChannels:
+          type: array
+          items:
+            type: string
+          description: "List of allowed notification channels."
+          example:
+            - "email"
+            - "sms"
 servers:
   - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
     variables:
