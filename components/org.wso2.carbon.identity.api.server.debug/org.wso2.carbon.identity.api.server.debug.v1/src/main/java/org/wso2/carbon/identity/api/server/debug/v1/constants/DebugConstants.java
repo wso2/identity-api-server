@@ -27,9 +27,6 @@ public final class DebugConstants {
                 // Prevent instantiation
         }
 
-        public static final String DFDP_ERROR_CODE_DELIMITER = "-";
-        public static final String DFDP_ERROR_PREFIX = "DFDP";
-
         /**
          * Status constants for debug operations.
          */
@@ -59,20 +56,25 @@ public final class DebugConstants {
         }
 
         /**
-         * API path constants.
+         * Keys expected in responses emitted by the debug framework.
          */
-        public static class V1 {
+        public static class ResponseKeys {
 
-                public static final String API_PATH_COMPONENT = "/v1";
-                public static final String DFDP_API_PATH_COMPONENT = "/debug";
+                public static final String SESSION_ID = "sessionId";
+                public static final String STATE = "state";
+                public static final String SUCCESS = "success";
+                public static final String STATUS = "status";
+                public static final String MESSAGE = "message";
+                public static final String AUTHORIZATION_URL = "authorizationUrl";
+                public static final String TIMESTAMP = "timestamp";
 
-                private V1() {
+                private ResponseKeys() {
                         // Prevent instantiation
                 }
         }
 
         /**
-         * Error constants for Debug Flow Data Provider.
+         * Error constants for debug flow.
          */
         public enum ErrorMessage {
 
@@ -85,7 +87,7 @@ public final class DebugConstants {
                 ERROR_CODE_ERROR_RETRIEVING_AUTHENTICATORS("10004", "Error retrieving authenticators.",
                                 "Error occurred while retrieving authenticators for identity provider."),
                 ERROR_CODE_ERROR_PROCESSING_REQUEST("10005", "Error processing request.",
-                                "Error occurred while processing the DFDP request."),
+                                "Error occurred while processing the Debug request."),
                 ERROR_CODE_INVALID_IDP("10006", "Invalid identity provider.",
                                 "The specified identity provider does not exist."),
                 ERROR_CODE_INVALID_AUTHENTICATOR("10007", "Invalid authenticator.",
@@ -95,7 +97,9 @@ public final class DebugConstants {
                 ERROR_CODE_CLAIMS_EXTRACTION_FAILED("10009", "Claims extraction failed.",
                                 "Failed to extract claims from authentication response."),
                 ERROR_CODE_UNSUPPORTED_FORMAT("10010", "Unsupported response format.",
-                                "The requested response format is not supported.");
+                                "The requested response format is not supported."),
+                ERROR_CODE_RESULT_NOT_FOUND("10011", "Debug result not found.",
+                                "No debug result exists for the provided session id.");
 
                 private final String code;
                 private final String message;
@@ -108,9 +112,9 @@ public final class DebugConstants {
                         this.description = description;
                 }
 
-                public String getCode() {
 
-                        return DFDP_ERROR_PREFIX + DFDP_ERROR_CODE_DELIMITER + code;
+                public String getCode() {
+                        return code;
                 }
 
                 public String getMessage() {

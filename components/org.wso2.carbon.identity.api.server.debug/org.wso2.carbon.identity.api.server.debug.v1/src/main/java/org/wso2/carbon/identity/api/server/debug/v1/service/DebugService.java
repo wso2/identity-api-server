@@ -99,20 +99,23 @@ public class DebugService {
      * @param sessionId The session ID to look up.
      * @return The debug result JSON string, or null if not found.
      */
-    public String getDebugResult(String sessionId) {
+    public String getDebugResult(String sessionId) throws DebugFrameworkClientException {
 
         try {
             DebugRequestCoordinator coordinator = getCoordinatorOrThrow();
             return coordinator.getDebugResult(sessionId);
+        } catch (DebugFrameworkClientException e) {
+            throw e;
 
         } catch (RuntimeException e) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Debug framework not available for result retrieval.");
+                LOG.debug("Debug framework not available for result retrieval.", e);
             }
+            throw new IllegalStateException("Debug framework not available for result retrieval.", e);
         } catch (Exception e) {
             LOG.error("Error retrieving debug result.", e);
+            throw new RuntimeException("Error retrieving debug result.", e);
         }
-        return null;
     }
 
     /**
@@ -122,9 +125,10 @@ public class DebugService {
      * @throws RuntimeException if coordinator is not available.
      */
     private DebugRequestCoordinator getCoordinatorOrThrow() {
+
         DebugRequestCoordinator coordinator = DebugServiceHolder.getDebugRequestCoordinator();
         if (coordinator == null) {
-            throw new RuntimeException("DebugRequestCoordinator not available");
+            throw new IllegalStateException("DebugRequestCoordinator not available");
         }
 
         return coordinator;

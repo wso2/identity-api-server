@@ -26,12 +26,12 @@ paths:
   /debug:
     post:
       summary: "Start Debug Session"
-      description: "Initiates a debug session for any resource type (IDP, Application, etc.) with configurable properties."
+      description: "Initiates a debug session for supported resource types with configurable properties."
       operationId: "startDebugSession"
       tags:
         - "Debug"
       requestBody:
-        description: "Debug request with resource ID, resource type, and properties."
+        description: "Debug request with resource type and properties."
         required: true
         content:
           application/json:
@@ -150,7 +150,7 @@ components:
       type: object
       required:
         - resourceType
-      description: "Request body for starting a debug session. The connectionId is required in properties for IDP resource type."
+      description: "Request body for starting a debug session."
       properties:
         resourceType:
           type: string
@@ -167,7 +167,7 @@ components:
           additionalProperties:
             type: string
             maxLength: 2048
-          description: "Generic properties for resource debugging as key-value pairs. Maximum 50 properties allowed. Each property value can be up to 2048 characters. For IDP resource type, the connectionId property is required."
+          description: "Generic properties for resource debugging as key-value pairs. Maximum 50 properties allowed. Each property value can be up to 2048 characters."
           example:
             "connectionId": "123e4567-e89b-12d3-a456-426614174000"
             "authenticatorName": "OpenIDConnectAuthenticator"

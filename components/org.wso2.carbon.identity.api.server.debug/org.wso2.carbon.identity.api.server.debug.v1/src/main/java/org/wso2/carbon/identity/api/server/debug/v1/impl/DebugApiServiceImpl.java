@@ -21,19 +21,22 @@ package org.wso2.carbon.identity.api.server.debug.v1.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.wso2.carbon.identity.api.server.debug.v1.DebugApiService;
+import org.wso2.carbon.identity.api.server.debug.v1.constants.DebugConstants;
 import org.wso2.carbon.identity.api.server.debug.v1.core.DebugServiceCore;
 import org.wso2.carbon.identity.api.server.debug.v1.factories.DebugServiceCoreFactory;
 import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionRequest;
 import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionResponse;
 import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionResponseMetadata;
 import org.wso2.carbon.identity.api.server.debug.v1.model.DebugResponse;
+import org.wso2.carbon.identity.api.server.debug.v1.model.Error;
 import org.wso2.carbon.identity.debug.framework.exception.DebugFrameworkClientException;
 import org.wso2.carbon.identity.debug.framework.exception.DebugFrameworkServerException;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
@@ -46,11 +49,12 @@ public class DebugApiServiceImpl implements DebugApiService {
     private static final TypeReference<Map<String, Object>> MAP_TYPE_REFERENCE =
             new TypeReference<Map<String, Object>>() {
             };
-    private static final String SESSION_ID = "sessionId";
-    private static final String STATE = "state";
-    private static final String SUCCESS = "success";
-    private static final String AUTHORIZATION_URL = "authorizationUrl";
-    private static final String TIMESTAMP = "timestamp";
+    private static final DebugConstants.ErrorMessage REQUEST_VALIDATION_ERROR =
+            DebugConstants.ErrorMessage.ERROR_CODE_ERROR_VALIDATING_REQUEST;
+    private static final DebugConstants.ErrorMessage PROCESSING_ERROR =
+            DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST;
+    private static final DebugConstants.ErrorMessage RESULT_NOT_FOUND_ERROR =
+            DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND;
 
     private final DebugServiceCore debugServiceCore;
 
@@ -66,28 +70,42 @@ public class DebugApiServiceImpl implements DebugApiService {
             Map<String, Object> debugResult = debugServiceCore.processStartSession(debugConnectionRequest);
             return Response.ok().entity(buildDebugConnectionResponse(debugResult)).build();
         } catch (DebugFrameworkClientException e) {
-            return buildErrorResponse(Response.Status.BAD_REQUEST, e.getMessage());
+            return buildErrorResponse(Response.Status.BAD_REQUEST, REQUEST_VALIDATION_ERROR.getCode(), e.getMessage(),
+                    "Invalid debug request.");
         } catch (DebugFrameworkServerException e) {
-            return buildErrorResponse(Response.Status.INTERNAL_SERVER_ERROR, e.getMessage());
+            return buildErrorResponse(Response.Status.INTERNAL_SERVER_ERROR, PROCESSING_ERROR.getCode(), e.getMessage(),
+                    "Error occurred while processing debug request.");
+        } catch (IllegalArgumentException e) {
+            return buildErrorResponse(Response.Status.BAD_REQUEST, REQUEST_VALIDATION_ERROR.getCode(), e.getMessage(),
+                    "Invalid debug request.");
+        } catch (RuntimeException e) {
+            return buildErrorResponse(Response.Status.INTERNAL_SERVER_ERROR, PROCESSING_ERROR.getCode(),
+                    "Error occurred while processing debug request.", e.getMessage());
         }
     }
 
     @Override
     public Response getDebugResult(String sessionId) {
 
-        String result = debugServiceCore.processGetResult(sessionId);
-        if (result == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-
         try {
+            String result = debugServiceCore.processGetResult(sessionId);
+            if (result == null) {
+                return buildErrorResponse(Response.Status.NOT_FOUND, RESULT_NOT_FOUND_ERROR.getCode(),
+                        RESULT_NOT_FOUND_ERROR.getMessage(), RESULT_NOT_FOUND_ERROR.getDescription());
+            }
             Map<String, Object> frameworkResponse =
                     OBJECT_MAPPER.readValue(result, MAP_TYPE_REFERENCE);
             DebugResponse apiResponse = buildDebugResponse(frameworkResponse, sessionId);
             return Response.ok().entity(apiResponse).build();
         } catch (JsonProcessingException e) {
-            return buildErrorResponse(Response.Status.INTERNAL_SERVER_ERROR,
-                    "Failed to process debug result.");
+            return buildErrorResponse(Response.Status.INTERNAL_SERVER_ERROR, PROCESSING_ERROR.getCode(),
+                    "Failed to process debug result.", "Framework response is not valid JSON.");
+        } catch (DebugFrameworkClientException e) {
+            return buildErrorResponse(Response.Status.BAD_REQUEST, REQUEST_VALIDATION_ERROR.getCode(), e.getMessage(),
+                    "Invalid debug result request.");
+        } catch (RuntimeException e) {
+            return buildErrorResponse(Response.Status.INTERNAL_SERVER_ERROR, PROCESSING_ERROR.getCode(),
+                    "Error retrieving debug result.", e.getMessage());
         }
     }
 
@@ -95,28 +113,26 @@ public class DebugApiServiceImpl implements DebugApiService {
 
         DebugConnectionResponse response = new DebugConnectionResponse();
 
-        Object sessionId = debugResult.get(SESSION_ID);
+        Object sessionId = debugResult.get(DebugConstants.ResponseKeys.SESSION_ID);
         if (sessionId == null) {
-            sessionId = debugResult.get(STATE);
+            sessionId = debugResult.get(DebugConstants.ResponseKeys.STATE);
         }
-
         if (sessionId == null) {
-            response.setDebugId("debug-" + UUID.randomUUID());
+            response.setDebugId("debug-" + System.currentTimeMillis());
         } else {
             response.setDebugId(sessionId.toString());
         }
-
-        response.setStatus(DebugConnectionResponse.StatusEnum.SUCCESS);
-        response.setMessage("Debug session executed successfully");
-
-        Object timestamp = debugResult.get(TIMESTAMP);
+        DebugConnectionResponse.StatusEnum status 
+            = resolveConnectionStatus(debugResult.get(DebugConstants.ResponseKeys.STATUS));
+        response.setStatus(status);
+        response.setMessage(resolveConnectionMessage(status, debugResult.get(DebugConstants.ResponseKeys.MESSAGE)));
+        Object timestamp = debugResult.get(DebugConstants.ResponseKeys.TIMESTAMP);
         if (timestamp instanceof Number) {
             response.setTimestamp(((Number) timestamp).longValue());
         } else {
             response.setTimestamp(System.currentTimeMillis());
         }
-
-        Object authorizationUrl = debugResult.get(AUTHORIZATION_URL);
+        Object authorizationUrl = debugResult.get(DebugConstants.ResponseKeys.AUTHORIZATION_URL);
         if (authorizationUrl != null) {
             DebugConnectionResponseMetadata metadata = new DebugConnectionResponseMetadata();
             metadata.setAuthorizationUrl(authorizationUrl.toString());
@@ -126,37 +142,67 @@ public class DebugApiServiceImpl implements DebugApiService {
         return response;
     }
 
-    private Response buildErrorResponse(Response.Status status, String message) {
+    private DebugConnectionResponse.StatusEnum resolveConnectionStatus(Object status) {
 
-        DebugConnectionResponse response = new DebugConnectionResponse();
-        response.setDebugId("debug-" + UUID.randomUUID());
-        response.setStatus(DebugConnectionResponse.StatusEnum.FAILURE);
-        response.setMessage(message);
-        response.setTimestamp(System.currentTimeMillis());
-        return Response.status(status).entity(response).build();
+        if (status == null) {
+            return DebugConnectionResponse.StatusEnum.SUCCESS;
+        }
+        try {
+            return DebugConnectionResponse.StatusEnum.valueOf(status.toString().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            return DebugConnectionResponse.StatusEnum.SUCCESS;
+        }
+    }
+
+    private String resolveConnectionMessage(DebugConnectionResponse.StatusEnum status, Object frameworkMessage) {
+
+        if (frameworkMessage != null && !frameworkMessage.toString().trim().isEmpty()) {
+            return frameworkMessage.toString();
+        }
+        switch (status) {
+            case IN_PROGRESS:
+                return "Debug session is in progress";
+            case FAILURE:
+                return "Debug session execution failed";
+            case DIRECT_RESULT:
+                return "Debug session completed with direct result";
+            case SUCCESS:
+            default:
+                return "Debug session executed successfully";
+        }
+    }
+
+    private Response buildErrorResponse(Response.Status status, String code, String message, String description) {
+
+        Error error = new Error();
+        error.setCode(code);
+        error.setMessage(message);
+        error.setDescription(description);
+        return Response.status(status).entity(error).build();
     }
 
     private DebugResponse buildDebugResponse(Map<String, Object> frameworkResponse,
                                              String requestedSessionId) {
 
         DebugResponse response = new DebugResponse();
-
-        Object sessionId = frameworkResponse.get(SESSION_ID);
+        
+        Object sessionId = frameworkResponse.get(DebugConstants.ResponseKeys.SESSION_ID);
         if (sessionId == null) {
-            sessionId = frameworkResponse.get(STATE);
+            sessionId = frameworkResponse.get(DebugConstants.ResponseKeys.STATE);
         }
         if (sessionId == null) {
             sessionId = requestedSessionId;
         }
         response.setSessionId(sessionId != null ? sessionId.toString() : null);
 
-        Object success = frameworkResponse.get(SUCCESS);
+        Object success = frameworkResponse.get(DebugConstants.ResponseKeys.SUCCESS);
         response.setSuccess(success instanceof Boolean ? (Boolean) success : false);
 
         Map<String, Object> metadata = new HashMap<>();
         for (Map.Entry<String, Object> entry : frameworkResponse.entrySet()) {
             String key = entry.getKey();
-            if (!SESSION_ID.equals(key) && !SUCCESS.equals(key)) {
+            if (!DebugConstants.ResponseKeys.SESSION_ID.equals(key) && !DebugConstants.ResponseKeys.SUCCESS.equals(key)
+                && !DebugConstants.ResponseKeys.STATE.equals(key)) {
                 metadata.put(key, entry.getValue());
             }
         }

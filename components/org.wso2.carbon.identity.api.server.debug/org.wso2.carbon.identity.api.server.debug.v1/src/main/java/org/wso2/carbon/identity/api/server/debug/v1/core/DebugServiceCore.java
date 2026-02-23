@@ -50,13 +50,23 @@ public class DebugServiceCore {
     public Map<String, Object> processStartSession(DebugConnectionRequest debugConnectionRequest)
             throws DebugFrameworkClientException, DebugFrameworkServerException {
 
-        Map<String, String> properties = debugConnectionRequest != null
-                ? debugConnectionRequest.getProperties() : null;
-        String resourceType = debugConnectionRequest != null
-                ? debugConnectionRequest.getResourceType() : null;
+        validateRequest(debugConnectionRequest);
+        Map<String, String> properties = debugConnectionRequest.getProperties();
+        String resourceType = debugConnectionRequest.getResourceType();
         String connectionId = properties != null ? properties.get(CONNECTION_ID) : null;
 
         return debugService.handleGenericDebugRequest(connectionId, resourceType, properties);
+    }
+
+    private void validateRequest(DebugConnectionRequest debugConnectionRequest) {
+
+        if (debugConnectionRequest == null) {
+            throw new IllegalArgumentException("Debug request body cannot be null.");
+        }
+        String resourceType = debugConnectionRequest.getResourceType();
+        if (resourceType == null || resourceType.trim().isEmpty()) {
+            throw new IllegalArgumentException("Resource type is required.");
+        }
     }
 
     /**
@@ -65,7 +75,7 @@ public class DebugServiceCore {
      * @param sessionId Debug session id.
      * @return Debug result json.
      */
-    public String processGetResult(String sessionId) {
+    public String processGetResult(String sessionId) throws DebugFrameworkClientException {
 
         return debugService.getDebugResult(sessionId);
     }

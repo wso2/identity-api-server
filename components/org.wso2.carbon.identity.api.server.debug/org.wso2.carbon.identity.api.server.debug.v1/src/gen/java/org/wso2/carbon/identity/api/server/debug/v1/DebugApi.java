@@ -21,6 +21,7 @@ package org.wso2.carbon.identity.api.server.debug.v1;
 import org.wso2.carbon.identity.api.server.debug.v1.factories.DebugApiServiceFactory;
 import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionRequest;
 import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionResponse;
+import org.wso2.carbon.identity.api.server.debug.v1.model.DebugResponse;
 import org.wso2.carbon.identity.api.server.debug.v1.model.Error;
 
 import javax.validation.Valid;
@@ -75,10 +76,11 @@ public class DebugApi {
     @GET
     @Path("/result/{session-id}")
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get debug result by session ID", notes = "Fetches the debug result for the given session ID (state).", response = String.class, tags = {
+    @ApiOperation(value = "Get debug result by session ID", notes = "Fetches the debug result for the given session ID (state).", response = DebugResponse.class, tags = {
             "Debug" })
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Debug result found", response = String.class),
+            @ApiResponse(code = 200, message = "Debug result found", response = DebugResponse.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
             @ApiResponse(code = 404, message = "Debug result not found", response = Error.class),
             @ApiResponse(code = 500, message = "Internal server error", response = Error.class)
     })
