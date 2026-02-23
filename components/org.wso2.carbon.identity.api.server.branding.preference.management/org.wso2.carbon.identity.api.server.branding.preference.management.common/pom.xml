@@ -24,7 +24,7 @@
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.branding.preference.management</artifactId>
         <relativePath>../pom.xml</relativePath>
-        <version>1.5.8</version>
+        <version>1.5.9-SNAPSHOT</version>
     </parent>
 
     <groupId>org.wso2.carbon.identity.server.api</groupId>
