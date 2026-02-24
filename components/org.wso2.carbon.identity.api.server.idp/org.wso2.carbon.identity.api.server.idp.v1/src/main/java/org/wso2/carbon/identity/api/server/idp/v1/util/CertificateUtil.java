@@ -41,7 +41,7 @@ public final class CertificateUtil {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final Pattern PEM_INNER_BASE64 =
             Pattern.compile("-----BEGIN CERTIFICATE-----(.*?)-----END CERTIFICATE-----", Pattern.DOTALL);
-    private static final Log log = LogFactory.getLog(CertificateUtil.class);
+    private static final Log LOG = LogFactory.getLog(CertificateUtil.class);
 
     /**
      * Convert incoming `Certificate` model (containing certificates list) to a JSON array string
@@ -57,8 +57,8 @@ public final class CertificateUtil {
     public static String convertCertificateJsonString(Certificate certificate)
             throws IdentityProviderManagementClientException {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Converting certificate to JSON string format");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Converting certificate to JSON string format");
         }
 
         if (certificate == null) {
@@ -88,15 +88,15 @@ public final class CertificateUtil {
             byte[] derBytes = getDerBytesFromPem(pemText);
             if (derBytes == null || derBytes.length == 0) {
                 throw new IdentityProviderManagementClientException(
-                        "Invalid certificate format. Unable to extract DER bytes from certificate");
+                        "Invalid certificate format. Unable to extract DER bytes from certificate.");
             }
 
             String thumbPrint;
             try {
                 thumbPrint = sha256Hex(derBytes);
             } catch (NoSuchAlgorithmException e) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Failed to generate SHA-256 thumbprint for certificate: " + e.getMessage());
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Failed to generate SHA-256 thumbprint for certificate: " + e.getMessage());
                 }
                 throw new IdentityProviderManagementClientException("Error while generating certificate thumbprint.",
                         e);
