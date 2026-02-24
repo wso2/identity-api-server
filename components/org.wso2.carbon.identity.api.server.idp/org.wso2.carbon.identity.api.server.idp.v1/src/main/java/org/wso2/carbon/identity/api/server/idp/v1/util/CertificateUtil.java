@@ -86,9 +86,11 @@ public final class CertificateUtil {
 
             String pemText = new String(outerDecoded, StandardCharsets.UTF_8);
             byte[] derBytes = getDerBytesFromPem(pemText);
-            if (derBytes.length == 0) {
-                derBytes = outerDecoded;
+            if (derBytes == null || derBytes.length == 0) {
+                throw new IdentityProviderManagementClientException(
+                        "Invalid certificate format. Unable to extract DER bytes from certificate");
             }
+
             String thumbPrint;
             try {
                 thumbPrint = sha256Hex(derBytes);

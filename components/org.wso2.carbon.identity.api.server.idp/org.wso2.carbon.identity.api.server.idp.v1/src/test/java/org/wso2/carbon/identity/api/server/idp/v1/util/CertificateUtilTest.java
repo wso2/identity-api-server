@@ -76,7 +76,8 @@ public class CertificateUtilTest {
         JsonNode result = toJsonArray(CertificateUtil.convertCertificateJsonString(certificate));
         Assert.assertEquals(result.size(), 1);
         Assert.assertEquals(result.get(0).get("certValue").asText(), certValue);
-        Assert.assertEquals(result.get(0).get("thumbPrint").asText(), sha256Hex(certValue.getBytes(StandardCharsets.UTF_8)));
+        Assert.assertEquals(result.get(0).get("thumbPrint").asText(),
+                sha256Hex(certValue.getBytes(StandardCharsets.UTF_8)));
     }
 
     @Test
@@ -119,7 +120,8 @@ public class CertificateUtilTest {
         JsonNode result = toJsonArray(CertificateUtil.convertCertificateJsonString(certificate));
         Assert.assertEquals(result.size(), 1);
         Assert.assertEquals(result.get(0).get("certValue").asText(), certValue);
-        Assert.assertEquals(result.get(0).get("thumbPrint").asText(), sha256Hex(certValue.getBytes(StandardCharsets.UTF_8)));
+        Assert.assertEquals(result.get(0).get("thumbPrint").asText(),
+                sha256Hex(certValue.getBytes(StandardCharsets.UTF_8)));
     }
 
     private static JsonNode toJsonArray(String json) throws Exception {
