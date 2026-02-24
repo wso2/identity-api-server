@@ -66,32 +66,27 @@ public class CertificateUtilTest {
         Assert.assertEquals(CertificateUtil.convertCertificateJsonString(certificate), "[]");
     }
 
-    @Test
-    public void testConvertCertificateJsonStringWithNonBase64CertificateUsesRawBytes()
+    @Test(expectedExceptions = IdentityProviderManagementClientException.class)
+    public void testConvertCertificateJsonStringWithNonBase64CertificateThrows()
             throws Exception {
 
         String certValue = "plain-certificate-value";
         Certificate certificate = new Certificate().certificates(Collections.singletonList(certValue));
 
-        JsonNode result = toJsonArray(CertificateUtil.convertCertificateJsonString(certificate));
-        Assert.assertEquals(result.size(), 1);
-        Assert.assertEquals(result.get(0).get("certValue").asText(), certValue);
-        Assert.assertEquals(result.get(0).get("thumbPrint").asText(),
-                sha256Hex(certValue.getBytes(StandardCharsets.UTF_8)));
+        // CertificateUtil requires PEM content; non-PEM input should cause a client exception
+        CertificateUtil.convertCertificateJsonString(certificate);
     }
 
-    @Test
-    public void testConvertCertificateJsonStringWithBase64NonPemFallsBackToOuterDecodedBytes()
+    @Test(expectedExceptions = IdentityProviderManagementClientException.class)
+    public void testConvertCertificateJsonStringWithBase64NonPemThrows()
             throws Exception {
 
         byte[] decodedBytes = "decoded-certificate-text".getBytes(StandardCharsets.UTF_8);
         String certValue = Base64.getEncoder().encodeToString(decodedBytes);
         Certificate certificate = new Certificate().certificates(Collections.singletonList(certValue));
 
-        JsonNode result = toJsonArray(CertificateUtil.convertCertificateJsonString(certificate));
-        Assert.assertEquals(result.size(), 1);
-        Assert.assertEquals(result.get(0).get("certValue").asText(), certValue);
-        Assert.assertEquals(result.get(0).get("thumbPrint").asText(), sha256Hex(decodedBytes));
+        // Decoded content is not PEM; CertificateUtil should fail to extract DER and throw
+        CertificateUtil.convertCertificateJsonString(certificate);
     }
 
     @Test
@@ -110,18 +105,15 @@ public class CertificateUtilTest {
         Assert.assertEquals(result.get(0).get("thumbPrint").asText(), sha256Hex(derBytes));
     }
 
-    @Test
-    public void testConvertCertificateJsonStringSkipsNullEntries()
+    @Test(expectedExceptions = IdentityProviderManagementClientException.class)
+    public void testConvertCertificateJsonStringSkipsNullEntriesThrowsWhenNoPemPresent()
             throws Exception {
 
         String certValue = "plain-cert";
         Certificate certificate = new Certificate().certificates(Arrays.asList(null, certValue, null));
 
-        JsonNode result = toJsonArray(CertificateUtil.convertCertificateJsonString(certificate));
-        Assert.assertEquals(result.size(), 1);
-        Assert.assertEquals(result.get(0).get("certValue").asText(), certValue);
-        Assert.assertEquals(result.get(0).get("thumbPrint").asText(),
-                sha256Hex(certValue.getBytes(StandardCharsets.UTF_8)));
+        // Only non-PEM entries -> should result in exception
+        CertificateUtil.convertCertificateJsonString(certificate);
     }
 
     private static JsonNode toJsonArray(String json) throws Exception {
