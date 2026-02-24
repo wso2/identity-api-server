@@ -898,6 +898,24 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.vc.presentation.definition.common</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.openid4vc</groupId>
+                <artifactId>org.wso2.carbon.identity.openid4vc.presentation.definition</artifactId>
+                <version>${carbon.identity.openid4vc.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.openid4vc</groupId>
+                <artifactId>org.wso2.carbon.identity.openid4vc.presentation.common</artifactId>
+                <version>${carbon.identity.openid4vc.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
                 <artifactId>org.wso2.carbon.identity.api.server.credential.management.common</artifactId>
                 <version>${project.version}</version>
                 <scope>provided</scope>
@@ -1091,7 +1109,7 @@
         </org.wso2.carbon.identity.inbound.provisioning.scim2.version>
 
         <!-- VC related versions -->
-        <carbon.identity.openid4vc.version>1.0.0</carbon.identity.openid4vc.version>
+        <carbon.identity.openid4vc.version>1.0.0-SNAPSHOT</carbon.identity.openid4vc.version>
 
         <!-- Unit test versions -->
         <testng.version>6.9.10</testng.version>
@@ -1144,6 +1162,7 @@
         <module>components/org.wso2.carbon.identity.api.server.workflow</module>
         <module>components/org.wso2.carbon.identity.api.server.asynchronous.operation.status.management</module>
         <module>components/org.wso2.carbon.identity.api.server.vc.template.management</module>
+        <module>components/org.wso2.carbon.identity.api.server.vc.presentation.definition</module>
         <module>components/org.wso2.carbon.identity.api.server.credential.management</module>
     </modules>
 
