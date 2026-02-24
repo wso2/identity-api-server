@@ -93,6 +93,9 @@ public final class CertificateUtil {
             try {
                 thumbPrint = sha256Hex(derBytes);
             } catch (NoSuchAlgorithmException e) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Failed to generate SHA-256 thumbprint for certificate: " + e.getMessage());
+                }
                 throw new IdentityProviderManagementClientException("Error while generating certificate thumbprint.",
                         e);
             }

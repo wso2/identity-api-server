@@ -448,6 +448,7 @@ public class ServerIdpManagementService {
     /**
      * This exclusion strategy is to skip the 'certificate' field derived from the IdentityProvider class while
      * keeping the new 'certificate' type declared in IdentityProviderExportResponse class.
+     * This line will never get executed if the object class is not IdentityProviderExportResponse.
      */
     private static class CertificateSkippingExclusionStrategy implements ExclusionStrategy {
 
@@ -466,7 +467,7 @@ public class ServerIdpManagementService {
     private IdentityProvider createIDPExportResponse(IdentityProvider identityProvider, String fileType) {
 
         if (!(Boolean.parseBoolean(IdentityUtil.getProperty(IDP_EXPORT_SUPPORT_MULTIPLE_CERT))
-                && MEDIA_TYPE_JSON.equals(fileType))) {
+                && StringUtils.startsWithIgnoreCase(fileType, MEDIA_TYPE_JSON))) {
             log.debug("IDP export/import with multiple certificates is not enabled. Exporting the IDP as is.");
             return identityProvider;
         }
@@ -502,7 +503,7 @@ public class ServerIdpManagementService {
             throws IdentityProviderManagementClientException {
 
         if (!(Boolean.parseBoolean(IdentityUtil.getProperty(IDP_EXPORT_SUPPORT_MULTIPLE_CERT))
-                && MEDIA_TYPE_JSON.equals(contentType))) {
+                && StringUtils.startsWithIgnoreCase(contentType, MEDIA_TYPE_JSON))) {
             log.debug("IDP export/import with multiple certificates is not enabled. Importing the IDP as is.");
             return identityProvider;
         }
@@ -3718,7 +3719,7 @@ public class ServerIdpManagementService {
 
         try {
             if (!(Boolean.parseBoolean(IdentityUtil.getProperty(IDP_EXPORT_SUPPORT_MULTIPLE_CERT))
-                    && MEDIA_TYPE_JSON.equals(fileContent.getFileType()))) {
+                    && StringUtils.startsWithIgnoreCase(fileContent.getFileType(), MEDIA_TYPE_JSON))) {
                 log.debug("IDP export/import with multiple certificates is not enabled. Importing the IDP as is.");
                 return FileSerializationUtil.deserialize(fileContent, IdentityProvider.class,
                         new FileSerializationConfig());
