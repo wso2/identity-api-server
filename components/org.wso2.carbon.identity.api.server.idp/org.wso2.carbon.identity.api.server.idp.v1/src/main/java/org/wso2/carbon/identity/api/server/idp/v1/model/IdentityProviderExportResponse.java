@@ -31,15 +31,15 @@ import java.util.Objects;
 public class IdentityProviderExportResponse extends IdentityProvider {
 
     private static final long serialVersionUID = 1L;
-    private static final Log log = LogFactory.getLog(IdentityProviderExportResponse.class);
+    private static final Log LOG = LogFactory.getLog(IdentityProviderExportResponse.class);
 
     private Certificate certificate;
 
     @JsonProperty("certificate")
     public Certificate getCertificates() {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Retrieving certificate from IdentityProviderExportResponse");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving certificate from IdentityProviderExportResponse");
         }
         return certificate;
     }
@@ -47,8 +47,8 @@ public class IdentityProviderExportResponse extends IdentityProvider {
     @JsonProperty("certificate")
     public void setCertificate(Certificate certificate) {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Setting certificate in IdentityProviderExportResponse");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Setting certificate in IdentityProviderExportResponse");
         }
         this.certificate = certificate;
     }

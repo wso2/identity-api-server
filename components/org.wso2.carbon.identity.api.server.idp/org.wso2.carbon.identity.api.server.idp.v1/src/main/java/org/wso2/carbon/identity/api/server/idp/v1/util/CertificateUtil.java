@@ -23,15 +23,15 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Certificate;
+import org.wso2.carbon.identity.oauth2.IdentityOAuth2Exception;
+import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
 
+import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Utility class for Certificate related operations.
@@ -39,9 +39,10 @@ import java.util.regex.Pattern;
 public final class CertificateUtil {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final Pattern PEM_INNER_BASE64 =
-            Pattern.compile("-----BEGIN CERTIFICATE-----(.*?)-----END CERTIFICATE-----", Pattern.DOTALL);
     private static final Log LOG = LogFactory.getLog(CertificateUtil.class);
+    private static final String CERT_VALUE_KEY = "certValue";
+    private static final String THUMB_PRINT_KEY = "thumbPrint";
+    private static final String CERT_TYPE = "X.509";
 
     /**
      * Convert incoming `Certificate` model (containing certificates list) to a JSON array string
@@ -50,9 +51,8 @@ public final class CertificateUtil {
      * Example return:
      * [ {"certValue":"...","thumbPrint":"..."}, {"certValue":"...","thumbPrint":"..."} ]
      *
-     * @param certificate incoming Certificate model object
+     * @param certificate incoming Certificate model object.
      * @return JSON array string
-     * @throws IdentityProviderManagementClientException on digest errors
      */
     public static String convertCertificateJsonString(Certificate certificate)
             throws IdentityProviderManagementClientException {
@@ -76,61 +76,32 @@ public final class CertificateUtil {
             if (certValue == null) {
                 continue;
             }
-
-            byte[] outerDecoded;
             try {
-                outerDecoded = Base64.getDecoder().decode(certValue);
-            } catch (IllegalArgumentException iae) {
-                outerDecoded = certValue.getBytes(StandardCharsets.UTF_8);
-            }
+                CertificateFactory certificateFactory = CertificateFactory.getInstance(CERT_TYPE);
+                java.security.cert.Certificate cert = certificateFactory.generateCertificate(
+                        new ByteArrayInputStream(certValue.getBytes(StandardCharsets.UTF_8)));
+                String thumbPrint = OAuth2Util.getThumbPrint(cert);
 
-            String pemText = new String(outerDecoded, StandardCharsets.UTF_8);
-            byte[] derBytes = getDerBytesFromPem(pemText);
-            if (derBytes == null || derBytes.length == 0) {
-                throw new IdentityProviderManagementClientException(
-                        "Invalid certificate format. Unable to extract DER bytes from certificate.");
-            }
-
-            String thumbPrint;
-            try {
-                thumbPrint = sha256Hex(derBytes);
-            } catch (NoSuchAlgorithmException e) {
+                resultArray.addObject()
+                        .put(CERT_VALUE_KEY, certValue)
+                        .put(THUMB_PRINT_KEY, thumbPrint);
+            } catch (CertificateException e) {
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("Failed to generate SHA-256 thumbprint for certificate: " + e.getMessage());
+                    LOG.debug("Exception occurred while generating certificate from the provided " +
+                            "certificate value", e);
                 }
-                throw new IdentityProviderManagementClientException("Error while generating certificate thumbprint.",
-                        e);
+                throw new IdentityProviderManagementClientException(
+                        "Error while generating certificate.", e);
+            } catch (IdentityOAuth2Exception e) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Exception occurred while calculating thumbprint for the provided " +
+                            "certificate", e);
+                }
+                throw new IdentityProviderManagementClientException(
+                        "Error while calculating thumbprint for the provided certificate.", e);
             }
-            resultArray.addObject()
-                    .put("certValue", certValue)
-                    .put("thumbPrint", thumbPrint);
         }
 
         return resultArray.toString();
-    }
-
-    private static byte[] getDerBytesFromPem(String pemText) {
-
-        Matcher m = PEM_INNER_BASE64.matcher(pemText);
-        if (m.find()) {
-            String innerBase64 = m.group(1);
-            innerBase64 = innerBase64.replaceAll("\\s+", "");
-            try {
-                return Base64.getDecoder().decode(innerBase64);
-            } catch (IllegalArgumentException ignored) {
-            }
-        }
-        return new byte[0];
-    }
-
-    private static String sha256Hex(byte[] data) throws NoSuchAlgorithmException {
-
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        byte[] digest = md.digest(data);
-        StringBuilder sb = new StringBuilder(digest.length * 2);
-        for (byte b : digest) {
-            sb.append(String.format("%02x", b & 0xff));
-        }
-        return sb.toString();
     }
 }
