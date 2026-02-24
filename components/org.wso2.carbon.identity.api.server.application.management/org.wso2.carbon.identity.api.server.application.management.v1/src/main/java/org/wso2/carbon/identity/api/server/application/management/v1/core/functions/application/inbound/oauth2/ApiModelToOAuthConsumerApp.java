@@ -21,6 +21,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.v1.AccessTokenConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.AllowedIssuer;
 import org.wso2.carbon.identity.api.server.application.management.v1.CIBAAuthenticationRequestConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthenticationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.HybridFlowConfiguration;
@@ -39,6 +40,7 @@ import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
+import org.wso2.carbon.identity.oauth2.config.models.IssuerDetails;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -90,6 +92,7 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         consumerAppDTO.setFapiConformanceEnabled(oidcModel.getIsFAPIApplication());
         updateSubjectTokenConfigurations(consumerAppDTO, oidcModel.getSubjectToken());
         updateCIBAAuthenticationRequestConfigurations(consumerAppDTO, oidcModel.getCibaAuthenticationRequest());
+        updateIssuerDetails(consumerAppDTO, oidcModel.getIssuer());
         return consumerAppDTO;
     }
 
@@ -333,6 +336,17 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
             } else {
                 consumerAppDTO.setCibaNotificationChannels(StringUtils.EMPTY);
             }
+        }
+    }
+
+    private void updateIssuerDetails(OAuthConsumerAppDTO consumerAppDTO, AllowedIssuer issuer) {
+
+        if (issuer != null) {
+            IssuerDetails issuerDetails = new IssuerDetails();
+            issuerDetails.setIssuerOrgId(issuer.getOrganizationId());
+            issuerDetails.setIssuerTenantDomain(issuer.getTenantDomain());
+            issuerDetails.setIssuer(issuer.getValue());
+            consumerAppDTO.setIssuerDetails(issuerDetails);
         }
     }
 }

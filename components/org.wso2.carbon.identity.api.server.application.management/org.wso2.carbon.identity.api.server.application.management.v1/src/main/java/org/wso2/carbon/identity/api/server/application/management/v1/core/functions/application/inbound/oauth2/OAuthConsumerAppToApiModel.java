@@ -19,6 +19,7 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.AccessTokenConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.AllowedIssuer;
 import org.wso2.carbon.identity.api.server.application.management.v1.CIBAAuthenticationRequestConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthenticationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.HybridFlowConfiguration;
@@ -34,6 +35,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.RequestObje
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectTokenConfiguration;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
+import org.wso2.carbon.identity.oauth2.config.models.IssuerDetails;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -71,7 +73,8 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
                 .subject(buildSubjectConfiguration(oauthAppDTO))
                 .isFAPIApplication(oauthAppDTO.isFapiConformanceEnabled())
                 .subjectToken(buildSubjectTokenConfiguration(oauthAppDTO))
-                .cibaAuthenticationRequest(buildCIBAAuthenticationRequestConfiguration(oauthAppDTO));
+                .cibaAuthenticationRequest(buildCIBAAuthenticationRequestConfiguration(oauthAppDTO))
+                .issuer(buildIssuerOrganizationConfiguration(oauthAppDTO));
     }
 
     private List<String> getScopeValidators(OAuthConsumerAppDTO oauthAppDTO) {
@@ -249,5 +252,18 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
         } else {
             return Arrays.asList(oAuthConsumerAppDTO.getCibaNotificationChannels().split(","));
         }
+    }
+
+    private AllowedIssuer buildIssuerOrganizationConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
+
+        if (oAuthConsumerAppDTO.getIssuerDetails() != null) {
+            IssuerDetails issuerDetails = oAuthConsumerAppDTO.getIssuerDetails();
+            AllowedIssuer allowedIssuer = new AllowedIssuer();
+            allowedIssuer.setTenantDomain(issuerDetails.getIssuerTenantDomain());
+            allowedIssuer.setOrganizationId(issuerDetails.getIssuerOrgId());
+            allowedIssuer.setValue(issuerDetails.getIssuer());
+            return allowedIssuer;
+        }
+        return null;
     }
 }

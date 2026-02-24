@@ -3964,6 +3964,8 @@ components:
           example: false
         cibaAuthenticationRequest:
           $ref: '#/components/schemas/CIBAAuthenticationRequestConfiguration'
+        issuer:
+          $ref: '#/components/schemas/AllowedIssuer'
     OAuth2PKCEConfiguration:
       type: object
       properties:
@@ -4296,6 +4298,27 @@ components:
         displayName:
           type: string
           example: Email
+    AllowedIssuers:
+      type: array
+      items:
+        $ref: '#/components/schemas/AllowedIssuer'
+    AllowedIssuer:
+      type: object
+      properties:
+        value:
+          type: string
+          readOnly: true
+          description: Issuer detail that can be used for tokens.
+          example: "https://localhost:9443/oauth2/token"
+        organizationId:
+          type: string
+          description: Organization ID of the allowed issuer.
+          example: "bdece142-646b-45c0-9385-a4159f1ea219"
+        tenantDomain:
+          type: string
+          readOnly: true
+          description: Tenant domain of the allowed issuer.
+          example: "wso2.com"
     ClientAuthenticationMethod:
       type: object
       properties:
@@ -4388,6 +4411,8 @@ components:
           $ref: '#/components/schemas/FapiMetadata'
         cibaMetadata:
           $ref: '#/components/schemas/CIBAMetadata'
+        allowedIssuers:
+          $ref: '#/components/schemas/AllowedIssuers'
     WSTrustMetaData:
       type: object
       properties:

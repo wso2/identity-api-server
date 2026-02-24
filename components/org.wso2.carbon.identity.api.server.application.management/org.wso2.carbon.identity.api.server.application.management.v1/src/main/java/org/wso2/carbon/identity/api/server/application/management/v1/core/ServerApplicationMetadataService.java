@@ -25,6 +25,7 @@ import org.wso2.carbon.identity.api.server.application.management.common.Applica
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdaptiveAuthTemplates;
+import org.wso2.carbon.identity.api.server.application.management.v1.AllowedIssuer;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.CIBAMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.CIBANotificationChannel;
@@ -51,6 +52,9 @@ import org.wso2.carbon.identity.oauth.ciba.api.CibaAuthServiceImpl;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.dto.OAuthIDTokenAlgorithmDTO;
 import org.wso2.carbon.identity.oauth.dto.TokenBindingMetaDataDTO;
+import org.wso2.carbon.identity.oauth2.config.exceptions.OAuth2OIDCConfigOrgUsageScopeMgtException;
+import org.wso2.carbon.identity.oauth2.config.models.IssuerDetails;
+import org.wso2.carbon.identity.oauth2.config.services.OAuth2OIDCConfigOrgUsageScopeMgtService;
 import org.wso2.carbon.identity.oauth2.model.ClientAuthenticationMethodModel;
 import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
 import org.wso2.carbon.identity.sso.saml.SAMLSSOConfigServiceImpl;
@@ -69,6 +73,7 @@ import java.util.stream.Collectors;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.DEFAULT_CERTIFICATE_ALIAS;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.DEFAULT_NAME_ID_FORMAT;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_RETRIEVING_ALLOWED_ISSUERS;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_RETRIEVING_SAML_METADATA;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_WS_TRUST_METADATA_SERVICE_NOT_FOUND;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.getCibaNotificationChannelNames;
@@ -261,6 +266,10 @@ public class ServerApplicationMetadataService {
         fapiMetadata.setTokenEndpointAuthMethod(new ClientAuthenticationMethodMetadata()
                 .options(supportedFapiClientAuthenticationMethods));
         oidcMetaData.setFapiMetadata(fapiMetadata);
+        List<AllowedIssuer> allowedIssuers = getAllowedIssuersForOrganization();
+        if (allowedIssuers != null && !allowedIssuers.isEmpty()) {
+            oidcMetaData.setAllowedIssuers(allowedIssuers);
+        }
         List<String> supportedGrantTypes = new LinkedList<>(Arrays.asList(oAuthAdminService.getAllowedGrantTypes()));
         List<String> publicClientSupportedGrantTypes = Arrays.asList(
                 oAuthAdminService.getPublicClientSupportedGrantTypes());
@@ -492,5 +501,45 @@ public class ServerApplicationMetadataService {
             supportedClientAuthMethods.add(clientAuthenticationMethod);
         }
         return supportedClientAuthMethods;
+    }
+
+    private List<AllowedIssuer> getAllowedIssuersForOrganization() {
+
+        OAuth2OIDCConfigOrgUsageScopeMgtService oauth2OIDCConfigOrgUsageScopeMgtService =
+                ApplicationManagementServiceHolder.getOAuth2OIDCConfigOrgUsageScopeMgtService();
+        List<AllowedIssuer> allowedIssuers = new ArrayList<>();
+        try {
+            List<IssuerDetails> issuerDetailsList = oauth2OIDCConfigOrgUsageScopeMgtService.getAllowedIssuerDetails();
+            if (issuerDetailsList == null || issuerDetailsList.isEmpty()) {
+                return null;
+            }
+
+            for (IssuerDetails issuer : issuerDetailsList) {
+                AllowedIssuer allowedIssuer = new AllowedIssuer();
+                allowedIssuer.setValue(issuer.getIssuer());
+                allowedIssuer.setOrganizationId(issuer.getIssuerOrgId());
+                allowedIssuer.setTenantDomain(issuer.getIssuerTenantDomain());
+                allowedIssuers.add(allowedIssuer);
+            }
+            return allowedIssuers;
+        } catch (OAuth2OIDCConfigOrgUsageScopeMgtException e) {
+            throw handleServerError(ERROR_RETRIEVING_ALLOWED_ISSUERS, e);
+        }
+    }
+
+    /**
+     * Handles the server errors and build APIError response with the given error message and exception.
+     *
+     * @param errorMessageEnum Error message enum to get the error code and message for the response.
+     * @param e Exception caught.
+     * @return APIError with exception code, message and description.
+     */
+    private APIError handleServerError(ErrorMessage errorMessageEnum, Exception e) {
+
+        String errorCode = errorMessageEnum.getCode();
+        String errorMessage = errorMessageEnum.getMessage();
+        String errorDescription = e.getMessage();
+
+        return Utils.buildServerError(errorCode, errorMessage, errorDescription, e);
     }
 }

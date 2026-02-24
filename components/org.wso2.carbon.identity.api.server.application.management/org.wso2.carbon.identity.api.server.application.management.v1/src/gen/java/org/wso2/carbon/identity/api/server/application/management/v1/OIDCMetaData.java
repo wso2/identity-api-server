@@ -23,6 +23,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.CIBAMetadata;
+import java.util.ArrayList;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.application.management.v1.AllowedIssuer;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthenticationMethodMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.FapiMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.GrantTypeMetaData;
@@ -57,6 +60,7 @@ public class OIDCMetaData  {
     private MetadataProperty subjectType;
     private FapiMetadata fapiMetadata;
     private CIBAMetadata cibaMetadata;
+    private List<AllowedIssuer> allowedIssuers = null;
 
     /**
     **/
@@ -425,7 +429,29 @@ public class OIDCMetaData  {
         this.cibaMetadata = cibaMetadata;
     }
 
+    public OIDCMetaData allowedIssuers(List<AllowedIssuer> allowedIssuers) {
 
+        this.allowedIssuers = allowedIssuers;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("allowedIssuers")
+    @Valid
+    public List<AllowedIssuer> getAllowedIssuers() {
+        return allowedIssuers;
+    }
+    public void setAllowedIssuers(List<AllowedIssuer> allowedIssuers) {
+        this.allowedIssuers = allowedIssuers;
+    }
+
+    public OIDCMetaData addAllowedIssuersItem(AllowedIssuer allowedIssuersItem) {
+        if (this.allowedIssuers == null) {
+            this.allowedIssuers = new ArrayList<>();
+        }
+        this.allowedIssuers.add(allowedIssuersItem);
+        return this;
+    }
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -456,12 +482,13 @@ public class OIDCMetaData  {
             Objects.equals(this.tokenEndpointSignatureAlgorithm, oiDCMetaData.requestObjectEncryptionMethod) &&
             Objects.equals(this.subjectType, oiDCMetaData.subjectType) &&
             Objects.equals(this.fapiMetadata, oiDCMetaData.fapiMetadata) &&
-            Objects.equals(this.cibaMetadata, oiDCMetaData.cibaMetadata);
+            Objects.equals(this.cibaMetadata, oiDCMetaData.cibaMetadata) &&
+            Objects.equals(this.allowedIssuers, oiDCMetaData.allowedIssuers);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(allowedGrantTypes, defaultUserAccessTokenExpiryTime, defaultApplicationAccessTokenExpiryTime, defaultRefreshTokenExpiryTime, defaultIdTokenExpiryTime, idTokenEncryptionAlgorithm, idTokenEncryptionMethod, scopeValidators, accessTokenType, accessTokenBindingType, tokenEndpointAuthMethod, tokenEndpointSignatureAlgorithm, idTokenSignatureAlgorithm, requestObjectSignatureAlgorithm, requestObjectEncryptionAlgorithm, requestObjectEncryptionMethod, subjectType, fapiMetadata, cibaMetadata);
+        return Objects.hash(allowedGrantTypes, defaultUserAccessTokenExpiryTime, defaultApplicationAccessTokenExpiryTime, defaultRefreshTokenExpiryTime, defaultIdTokenExpiryTime, idTokenEncryptionAlgorithm, idTokenEncryptionMethod, scopeValidators, accessTokenType, accessTokenBindingType, tokenEndpointAuthMethod, tokenEndpointSignatureAlgorithm, idTokenSignatureAlgorithm, requestObjectSignatureAlgorithm, requestObjectEncryptionAlgorithm, requestObjectEncryptionMethod, subjectType, fapiMetadata, cibaMetadata, allowedIssuers);
     }
 
     @Override
@@ -491,6 +518,7 @@ public class OIDCMetaData  {
         sb.append("    subjectType: ").append(toIndentedString(subjectType)).append("\n");
         sb.append("    fapiMetadata: ").append(toIndentedString(fapiMetadata)).append("\n");
         sb.append("    cibaMetadata: ").append(toIndentedString(cibaMetadata)).append("\n");
+        sb.append("    allowedIssuers: ").append(toIndentedString(allowedIssuers)).append("\n");
         sb.append("}");
         return sb.toString();
     }
