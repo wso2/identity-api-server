@@ -30,12 +30,6 @@ public final class DebugServiceHolder {
 
     }
 
-    private static class DebugRequestCoordinatorHolder {
-
-        private static final DebugRequestCoordinator SERVICE = (DebugRequestCoordinator) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext().getOSGiService(DebugRequestCoordinator.class, null);
-    }
-
     /**
      * Get DebugRequestCoordinator OSGi service.
      *
@@ -43,6 +37,7 @@ public final class DebugServiceHolder {
      */
     public static DebugRequestCoordinator getDebugRequestCoordinator() {
 
-        return DebugRequestCoordinatorHolder.SERVICE;
+        return (DebugRequestCoordinator) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                .getOSGiService(DebugRequestCoordinator.class, null);
     }
 }

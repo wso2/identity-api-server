@@ -27,6 +27,7 @@ import org.wso2.carbon.identity.debug.framework.exception.DebugFrameworkServerEx
 import org.wso2.carbon.identity.debug.framework.model.DebugRequest;
 import org.wso2.carbon.identity.debug.framework.model.DebugResponse;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -85,7 +86,8 @@ public class DebugService {
         DebugResponse response = coordinator.handleResourceDebugRequest(debugRequest);
 
         // Convert framework response to Map for API layer.
-        Map<String, Object> resultMap = response.getData();
+        Map<String, Object> resultMap = response.getData() != null ?
+        new HashMap<>(response.getData()) : new HashMap<>();
         resultMap.put("timestamp", System.currentTimeMillis());
         resultMap.putIfAbsent("status", "SUCCESS");
 

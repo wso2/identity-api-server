@@ -31,6 +31,7 @@ import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionRespons
 import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionResponseMetadata;
 import org.wso2.carbon.identity.api.server.debug.v1.model.DebugResponse;
 import org.wso2.carbon.identity.api.server.debug.v1.model.Error;
+import org.wso2.carbon.identity.debug.framework.DebugFrameworkConstants;
 import org.wso2.carbon.identity.debug.framework.exception.DebugFrameworkClientException;
 import org.wso2.carbon.identity.debug.framework.exception.DebugFrameworkServerException;
 
@@ -69,15 +70,12 @@ public class DebugApiServiceImpl implements DebugApiService {
         try {
             Map<String, Object> debugResult = debugServiceCore.processStartSession(debugConnectionRequest);
             return Response.ok().entity(buildDebugConnectionResponse(debugResult)).build();
-        } catch (DebugFrameworkClientException e) {
+        } catch (DebugFrameworkClientException | IllegalArgumentException e) {
             return buildErrorResponse(Response.Status.BAD_REQUEST, REQUEST_VALIDATION_ERROR.getCode(), e.getMessage(),
                     "Invalid debug request.");
         } catch (DebugFrameworkServerException e) {
             return buildErrorResponse(Response.Status.INTERNAL_SERVER_ERROR, PROCESSING_ERROR.getCode(), e.getMessage(),
                     "Error occurred while processing debug request.");
-        } catch (IllegalArgumentException e) {
-            return buildErrorResponse(Response.Status.BAD_REQUEST, REQUEST_VALIDATION_ERROR.getCode(), e.getMessage(),
-                    "Invalid debug request.");
         } catch (RuntimeException e) {
             return buildErrorResponse(Response.Status.INTERNAL_SERVER_ERROR, PROCESSING_ERROR.getCode(),
                     "Error occurred while processing debug request.", e.getMessage());
@@ -101,6 +99,10 @@ public class DebugApiServiceImpl implements DebugApiService {
             return buildErrorResponse(Response.Status.INTERNAL_SERVER_ERROR, PROCESSING_ERROR.getCode(),
                     "Failed to process debug result.", "Framework response is not valid JSON.");
         } catch (DebugFrameworkClientException e) {
+            if (DebugFrameworkConstants.ErrorMessages.ERROR_CODE_RESULT_NOT_FOUND.getCode().equals(e.getErrorCode())) {
+                return buildErrorResponse(Response.Status.NOT_FOUND, RESULT_NOT_FOUND_ERROR.getCode(),
+                        RESULT_NOT_FOUND_ERROR.getMessage(), RESULT_NOT_FOUND_ERROR.getDescription());
+            }
             return buildErrorResponse(Response.Status.BAD_REQUEST, REQUEST_VALIDATION_ERROR.getCode(), e.getMessage(),
                     "Invalid debug result request.");
         } catch (RuntimeException e) {
