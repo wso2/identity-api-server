@@ -38,18 +38,14 @@ public class IdentityProviderExportResponse extends IdentityProvider {
     @JsonProperty("certificate")
     public Certificate getCertificates() {
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Retrieving certificate from IdentityProviderExportResponse");
-        }
+        LOG.debug("Retrieving certificate from IdentityProviderExportResponse");
         return certificate;
     }
 
     @JsonProperty("certificate")
     public void setCertificate(Certificate certificate) {
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Setting certificate in IdentityProviderExportResponse");
-        }
+        LOG.debug("Setting certificate in IdentityProviderExportResponse");
         this.certificate = certificate;
     }
 
