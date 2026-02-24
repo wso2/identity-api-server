@@ -23,8 +23,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage;
+import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdaptiveAuthTemplates;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
+import org.wso2.carbon.identity.api.server.application.management.v1.CIBAMetadata;
+import org.wso2.carbon.identity.api.server.application.management.v1.CIBANotificationChannel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthenticationMethod;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthenticationMethodMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
@@ -44,6 +47,7 @@ import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
+import org.wso2.carbon.identity.oauth.ciba.api.CibaAuthServiceImpl;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.dto.OAuthIDTokenAlgorithmDTO;
 import org.wso2.carbon.identity.oauth.dto.TokenBindingMetaDataDTO;
@@ -67,6 +71,7 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.DEFAULT_NAME_ID_FORMAT;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_RETRIEVING_SAML_METADATA;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_WS_TRUST_METADATA_SERVICE_NOT_FOUND;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.getCibaNotificationChannelNames;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.getOAuthGrantTypeNames;
 
 /**
@@ -78,7 +83,9 @@ public class ServerApplicationMetadataService {
     private final SAMLSSOConfigServiceImpl samlSSOConfigService;
     private final OAuthAdminServiceImpl oAuthAdminService;
     private final STSAdminServiceInterface sTSAdminServiceInterface;
+    private final CibaAuthServiceImpl cibaAuthService;
 
+    @Deprecated
     public ServerApplicationMetadataService(ApplicationManagementService applicationManagementService,
                                             SAMLSSOConfigServiceImpl samlSSOConfigService,
                                             OAuthAdminServiceImpl oAuthAdminService,
@@ -88,8 +95,21 @@ public class ServerApplicationMetadataService {
         this.samlSSOConfigService = samlSSOConfigService;
         this.oAuthAdminService = oAuthAdminService;
         this.sTSAdminServiceInterface = sTSAdminServiceInterface;
+        this.cibaAuthService = ApplicationManagementServiceHolder.getCibaAuthService();
     }
 
+    public ServerApplicationMetadataService(ApplicationManagementService applicationManagementService,
+                                            SAMLSSOConfigServiceImpl samlSSOConfigService,
+                                            OAuthAdminServiceImpl oAuthAdminService,
+                                            STSAdminServiceInterface sTSAdminServiceInterface,
+                                            CibaAuthServiceImpl cibaAuthService) {
+
+        this.applicationManagementService = applicationManagementService;
+        this.samlSSOConfigService = samlSSOConfigService;
+        this.oAuthAdminService = oAuthAdminService;
+        this.sTSAdminServiceInterface = sTSAdminServiceInterface;
+        this.cibaAuthService = cibaAuthService;
+    }
 
     private static final Log LOG = LogFactory.getLog(ServerApplicationMetadataService.class);
 
@@ -302,6 +322,16 @@ public class ServerApplicationMetadataService {
                 new MetadataProperty()
                         .defaultValue("None")
                         .options(supportedTokenBindingTypes));
+        List<String> supportedNotificationChannels = cibaAuthService.getSupportedNotificationChannels();
+        CIBAMetadata cibaMetadata = new CIBAMetadata();
+        for (String notificationChannel : supportedNotificationChannels) {
+            CIBANotificationChannel ciBANotificationChannel = new CIBANotificationChannel();
+            ciBANotificationChannel.setName(notificationChannel);
+            ciBANotificationChannel.setDisplayName(getCibaNotificationChannelNames().getOrDefault(notificationChannel,
+                    notificationChannel));
+            cibaMetadata.addSupportedNotificationChannelsItem(ciBANotificationChannel);
+        }
+        oidcMetaData.cibaMetadata(cibaMetadata);
         return oidcMetaData;
     }
 

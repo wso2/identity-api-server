@@ -1916,6 +1916,7 @@ public class ServerIdpManagementService {
             jitConfig.setAccountLookupAttributeMappings(createAccountLookupAttributeMappingsConfig(
                     jit.getAccountLookupAttributeMappings()));
             jitConfig.setAttributeSyncMethod(jit.getAttributeSyncMethod().toString());
+            jitConfig.setIdpGroupSyncMethod(jit.getIdpGroupSyncMethod().toString());
             identityProvider.setJustInTimeProvisioningConfig(jitConfig);
         }
     }
@@ -2534,6 +2535,10 @@ public class ServerIdpManagementService {
                     jitProvisionConfig.getAttributeSyncMethod() : FrameworkConstants.OVERRIDE_ALL;
             jitConfig.setAttributeSyncMethod(JustInTimeProvisioning.AttributeSyncMethodEnum
                     .valueOf(attributeSyncMethod));
+            String idpGroupSyncMethod = StringUtils.isNotBlank(jitProvisionConfig.getIdpGroupSyncMethod()) ?
+                    jitProvisionConfig.getIdpGroupSyncMethod() : FrameworkConstants.MERGE_WITH_EXISTING;
+            jitConfig.setIdpGroupSyncMethod(JustInTimeProvisioning.IdpGroupSyncMethodEnum
+                    .valueOf(idpGroupSyncMethod));
         }
         return jitConfig;
     }

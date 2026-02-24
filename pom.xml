@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.5.4-SNAPSHOT</version>
+    <version>1.5.9-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -350,6 +350,12 @@
             <dependency>
                 <groupId>org.wso2.carbon.identity.inbound.auth.oauth2</groupId>
                 <artifactId>org.wso2.carbon.identity.oauth</artifactId>
+                <scope>provided</scope>
+                <version>${identity.inbound.oauth2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.inbound.auth.oauth2</groupId>
+                <artifactId>org.wso2.carbon.identity.oauth.ciba</artifactId>
                 <scope>provided</scope>
                 <version>${identity.inbound.oauth2.version}</version>
             </dependency>
@@ -1048,7 +1054,7 @@
         <spotbugs.findsecbugs.version>1.13.0</spotbugs.findsecbugs.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
         <identity.event.handler.version>1.10.1</identity.event.handler.version>
-        <identity.inbound.oauth2.version>7.2.0</identity.inbound.oauth2.version>
+        <identity.inbound.oauth2.version>7.4.10</identity.inbound.oauth2.version>
         <identity.inbound.saml2.version>5.11.51</identity.inbound.saml2.version>
         <identity.x509Certificate.validation.version>1.1.19</identity.x509Certificate.validation.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
@@ -1078,7 +1084,7 @@
         </org.wso2.carbon.identity.organization.management.core.version.range>
 
         <!-- Organization management service Version -->
-        <org.wso2.carbon.identity.organization.management.version>2.0.8
+        <org.wso2.carbon.identity.organization.management.version>2.0.47
         </org.wso2.carbon.identity.organization.management.version>
 
         <org.wso2.carbon.identity.inbound.provisioning.scim2.version>3.4.146

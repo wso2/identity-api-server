@@ -21,6 +21,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.v1.AccessTokenConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.CIBAAuthenticationRequestConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthenticationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.HybridFlowConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.IdTokenConfiguration;
@@ -88,7 +89,7 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         updateSubjectConfigurations(consumerAppDTO, oidcModel.getSubject());
         consumerAppDTO.setFapiConformanceEnabled(oidcModel.getIsFAPIApplication());
         updateSubjectTokenConfigurations(consumerAppDTO, oidcModel.getSubjectToken());
-
+        updateCIBAAuthenticationRequestConfigurations(consumerAppDTO, oidcModel.getCibaAuthenticationRequest());
         return consumerAppDTO;
     }
 
@@ -317,6 +318,21 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         if (subjectToken != null) {
             consumerAppDTO.setSubjectTokenEnabled(subjectToken.getEnable());
             consumerAppDTO.setSubjectTokenExpiryTime(subjectToken.getApplicationSubjectTokenExpiryInSeconds());
+        }
+    }
+
+    private void updateCIBAAuthenticationRequestConfigurations(OAuthConsumerAppDTO consumerAppDTO,
+                                                  CIBAAuthenticationRequestConfiguration cibaAuthReq) {
+
+        if (consumerAppDTO.getGrantTypes().contains(OAuthConstants.GrantTypes.CIBA)) {
+            consumerAppDTO.setCibaAuthReqExpiryTime(cibaAuthReq.getAuthReqExpiryTime());
+            List<String> cibaNotificationChannels = cibaAuthReq.getNotificationChannels();
+            if (CollectionUtils.isNotEmpty(cibaNotificationChannels)) {
+                consumerAppDTO.setCibaNotificationChannels(String.join(
+                        ",", cibaNotificationChannels));
+            } else {
+                consumerAppDTO.setCibaNotificationChannels(StringUtils.EMPTY);
+            }
         }
     }
 }
