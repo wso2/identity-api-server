@@ -57,9 +57,7 @@ public final class CertificateUtil {
     public static String convertCertificateJsonString(Certificate certificate)
             throws IdentityProviderManagementClientException {
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Converting certificate to JSON string format");
-        }
+        LOG.debug("Converting certificate to JSON string format");
 
         if (certificate == null) {
             return "[]";
