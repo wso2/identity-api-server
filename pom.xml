@@ -898,7 +898,7 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
-                <artifactId>org.wso2.carbon.identity.api.server.vc.presentation.definition.common</artifactId>
+                <artifactId>org.wso2.carbon.identity.api.server.vp.template.management.common</artifactId>
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>
@@ -1162,7 +1162,7 @@
         <module>components/org.wso2.carbon.identity.api.server.workflow</module>
         <module>components/org.wso2.carbon.identity.api.server.asynchronous.operation.status.management</module>
         <module>components/org.wso2.carbon.identity.api.server.vc.template.management</module>
-        <module>components/org.wso2.carbon.identity.api.server.vc.presentation.definition</module>
+        <module>components/org.wso2.carbon.identity.api.server.vp.template.management</module>
         <module>components/org.wso2.carbon.identity.api.server.credential.management</module>
     </modules>
 
