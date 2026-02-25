@@ -52,6 +52,10 @@ public interface ApiResourcesApiService {
 
       public Response apiResourcesApiResourceIdScopesGet(String apiResourceId);
 
+      public Response apiResourcesApiResourceIdScopesIdScopeIdDelete(String apiResourceId, String scopeId);
+
+      public Response apiResourcesApiResourceIdScopesIdScopeIdPatch(String apiResourceId, String scopeId, ScopePatchModel scopePatchModel);
+
       public Response apiResourcesApiResourceIdScopesPut(String apiResourceId, List<ScopeCreationModel> scopeCreationModel);
 
       public Response apiResourcesApiResourceIdScopesScopeNameDelete(String apiResourceId, String scopeName);
