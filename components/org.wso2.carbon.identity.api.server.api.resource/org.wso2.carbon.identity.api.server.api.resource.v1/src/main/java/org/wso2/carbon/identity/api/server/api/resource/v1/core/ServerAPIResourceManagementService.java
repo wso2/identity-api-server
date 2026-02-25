@@ -463,7 +463,7 @@ public class ServerAPIResourceManagementService {
                     .orElse(null);
             if (scopeWithMetadata == null) {
                 throw APIResourceMgtEndpointUtil.handleException(Response.Status.NOT_FOUND,
-                        APIResourceMgtEndpointConstants.ErrorMessage.ERROR_CODE_INVALID_SCOPE_NAME);
+                        APIResourceMgtEndpointConstants.ErrorMessage.ERROR_CODE_INVALID_SCOPE_ID);
             }
             String displayName = StringUtils.isBlank(scopePatchModel.getDisplayName()) ?
                     scopeWithMetadata.getDisplayName() : scopePatchModel.getDisplayName();
