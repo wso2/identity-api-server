@@ -110,6 +110,7 @@ public class ClaimDialectConfiguration extends ClaimDialectResDTO {
                 localClaimReqDTO.setDataType(localClaimResDTO.getDataType());
                 localClaimReqDTO.setCanonicalValues(localClaimResDTO.getCanonicalValues());
                 localClaimReqDTO.setMultiValued(localClaimResDTO.getMultiValued());
+                localClaimReqDTO.setExtendedValued(localClaimResDTO.getExtendedValued());
                 localClaimReqDTO.setAttributeMapping(localClaimResDTO.getAttributeMapping());
                 localClaimReqDTO.setProperties(localClaimResDTO.getProperties());
                 localClaimReqDTO.setSharedProfileValueResolvingMethod(

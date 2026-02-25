@@ -148,6 +148,7 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DESCRIPTION;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DISPLAY_NAME;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DISPLAY_ORDER;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_EXTENDED_VALUED;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_INPUT_FORMAT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_MULTI_VALUED;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_PROFILES_PREFIX;
@@ -531,6 +532,10 @@ public class ServerClaimManagementService {
             validateSystemClaimUpdate(localClaimReqDTO, claimId);
             validateDataTypeUpdates(localClaimReqDTO);
             validateAttributeInputFormat(localClaimReqDTO);
+            String claimURI = base64DecodeId(claimId);
+            Optional<LocalClaim> localClaim = claimMetadataManagementService.getLocalClaim(claimURI, ContextLoader
+                    .getTenantDomainFromContext(), true);
+            localClaim.ifPresent(claim -> setMandatoryProperties(localClaimReqDTO, claim));
 
             claimMetadataManagementService.updateLocalClaim(createLocalClaim(localClaimReqDTO),
                     ContextLoader.getTenantDomainFromContext());
@@ -621,6 +626,14 @@ public class ServerClaimManagementService {
         if (!errors.isEmpty()) {
             throw handleClaimManagementBulkClientError(Constant.ErrorMessage.ERROR_CODE_UPDATING_LOCAL_CLAIMS,
                     BAD_REQUEST, errors, String.valueOf(errors.size()), String.valueOf(localClaimReqDTOList.size()));
+        }
+    }
+
+    private void setMandatoryProperties(LocalClaimReqDTO localClaimReqDTO, LocalClaim localClaim) {
+
+        if (localClaimReqDTO.getExtendedValued() == null) {
+            String extendedValued = localClaim.getClaimProperty(PROP_EXTENDED_VALUED);
+            localClaimReqDTO.setExtendedValued(Boolean.parseBoolean(extendedValued));
         }
     }
 
@@ -1119,6 +1132,9 @@ public class ServerClaimManagementService {
         String multiValued = handleAdditionalProperties(claimProperties, PROP_MULTI_VALUED);
         localClaimResDTO.setMultiValued(Boolean.valueOf(multiValued));
 
+        String extendedValued = handleAdditionalProperties(claimProperties, PROP_EXTENDED_VALUED);
+        localClaimResDTO.setExtendedValued(Boolean.valueOf(extendedValued));
+
         String uniquenessScope = claimProperties.remove(PROP_UNIQUENESS_SCOPE);
         if (StringUtils.isNotBlank(uniquenessScope)) {
             try {
@@ -1308,6 +1324,10 @@ public class ServerClaimManagementService {
 
         if (localClaimReqDTO.getMultiValued() != null) {
             claimProperties.put(PROP_MULTI_VALUED, String.valueOf(localClaimReqDTO.getMultiValued()));
+        }
+
+        if (localClaimReqDTO.getExtendedValued() != null) {
+            claimProperties.put(PROP_EXTENDED_VALUED, String.valueOf(localClaimReqDTO.getExtendedValued()));
         }
 
         claimProperties.putAll(propertiesToMap(localClaimReqDTO.getProperties()));
@@ -1803,6 +1823,12 @@ public class ServerClaimManagementService {
                 && Boolean.TRUE.equals(localClaimReqDTO.getMultiValued())) {
             throw handleClaimManagementClientError(Constant.ErrorMessage
                     .ERROR_CODE_BOOLEAN_ATTRIBUTE_CANNOT_BE_MULTI_VALUED, BAD_REQUEST, localClaimReqDTO.getClaimURI());
+        }
+        if (DataType.BOOLEAN.equals(localClaimReqDTO.getDataType())
+                && Boolean.TRUE.equals(localClaimReqDTO.getExtendedValued())) {
+            throw handleClaimManagementClientError(Constant.ErrorMessage
+                    .ERROR_CODE_BOOLEAN_ATTRIBUTE_CANNOT_BE_EXTENDED_VALUED, BAD_REQUEST,
+                    localClaimReqDTO.getClaimURI());
         }
         if (ArrayUtils.isNotEmpty(localClaimReqDTO.getCanonicalValues()) &&
                 !DataType.STRING.equals(localClaimReqDTO.getDataType())) {
