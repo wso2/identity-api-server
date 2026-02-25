@@ -367,6 +367,30 @@ public class ServerAPIResourceManagementService {
     }
 
     /**
+     * Delete scopes by the scope ID.
+     *
+     * @param apiResourceId API Resource ID.
+     * @param scopeId       Scope ID.
+     */
+    public void deleteScopeByScopeId(String apiResourceId, String scopeId) {
+
+        try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Deleting scope with ID: " + scopeId + " of API Resource ID: " + apiResourceId);
+            }
+            String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            APIResource apiResource = apiResourceManager.getAPIResourceById(apiResourceId, tenantDomain);
+            if (apiResource == null) {
+                return;
+            }
+            handleSystemAPI(apiResource);
+            apiResourceManager.deleteAPIScopeByScopeId(apiResourceId, scopeId, tenantDomain);
+        } catch (APIResourceMgtException e) {
+            throw APIResourceMgtEndpointUtil.handleAPIResourceMgtException(e);
+        }
+    }
+
+    /**
      * Patch scope metadata by the scope name.
      *
      * @param apiResourceId     API Resource ID.
@@ -407,6 +431,55 @@ public class ServerAPIResourceManagementService {
                     .orgID(scopeWithMetadata.getOrgID());
             Scope scopeForUpdate = scopeBuilder.build();
             apiResourceManager.updateScopeMetadata(scopeForUpdate, apiResource, tenantDomain);
+        } catch (APIResourceMgtException e) {
+            throw APIResourceMgtEndpointUtil.handleAPIResourceMgtException(e);
+        }
+    }
+
+    /**
+     * Patch scope metadata by the scope id.
+     *
+     * @param apiResourceId   API Resource ID.
+     * @param scopeId         Scope Id.
+     * @param scopePatchModel Parameters to be updated.
+     */
+    public void patchScopeMetadataByScopeId(String apiResourceId, String scopeId, ScopePatchModel scopePatchModel) {
+
+        try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Updating scope with id: " + scopeId + " of API Resource ID: " + apiResourceId);
+            }
+            String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+
+            APIResource apiResource = apiResourceManager.getAPIResourceById(apiResourceId, tenantDomain);
+            if (apiResource == null) {
+                throw APIResourceMgtEndpointUtil.handleException(Response.Status.NOT_FOUND,
+                        APIResourceMgtEndpointConstants.ErrorMessage.ERROR_CODE_API_RESOURCE_NOT_FOUND, apiResourceId);
+            }
+
+            Scope scopeWithMetadata = apiResource.getScopes().stream()
+                    .filter(scope -> scope.getId().equals(scopeId))
+                    .findFirst()
+                    .orElse(null);
+            if (scopeWithMetadata == null) {
+                throw APIResourceMgtEndpointUtil.handleException(Response.Status.NOT_FOUND,
+                        APIResourceMgtEndpointConstants.ErrorMessage.ERROR_CODE_INVALID_SCOPE_NAME);
+            }
+            String displayName = StringUtils.isBlank(scopePatchModel.getDisplayName()) ?
+                    scopeWithMetadata.getDisplayName() : scopePatchModel.getDisplayName();
+            String description = scopePatchModel.getDescription() == null ? scopeWithMetadata.getDescription() :
+                    scopePatchModel.getDescription();
+
+            handleSystemAPI(apiResource);
+            Scope.ScopeBuilder scopeBuilder = new Scope.ScopeBuilder()
+                    .id(scopeId)
+                    .name(scopeWithMetadata.getName())
+                    .displayName(displayName)
+                    .description(description)
+                    .apiID(scopeWithMetadata.getApiID())
+                    .orgID(scopeWithMetadata.getOrgID());
+            Scope scopeForUpdate = scopeBuilder.build();
+            apiResourceManager.updateScopeMetadataById(scopeForUpdate, apiResource, tenantDomain);
         } catch (APIResourceMgtException e) {
             throw APIResourceMgtEndpointUtil.handleAPIResourceMgtException(e);
         }
