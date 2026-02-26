@@ -26,6 +26,7 @@ import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.vc.template.management.common.VCTemplateManagementConstants;
+import org.wso2.carbon.identity.api.server.vc.template.management.v1.Claim;
 import org.wso2.carbon.identity.api.server.vc.template.management.v1.PaginationLink;
 import org.wso2.carbon.identity.api.server.vc.template.management.v1.VCTemplate;
 import org.wso2.carbon.identity.api.server.vc.template.management.v1.VCTemplateCreationModel;
@@ -305,9 +306,11 @@ public class ServerVCTemplateManagementService {
         apiModel.setDisplayName(model.getDisplayName());
         apiModel.setFormat(model.getFormat());
 
-        List<String> claims = model.getClaims();
+        List<org.wso2.carbon.identity.openid4vc.template.management.model.Claim> claims = model.getClaims();
         if (claims != null) {
-            apiModel.setClaims(claims);
+            apiModel.setClaims(claims.stream()
+                    .map(this::toApiClaim)
+                    .collect(Collectors.toList()));
         } else {
             apiModel.setClaims(new ArrayList<>());
         }
@@ -328,7 +331,9 @@ public class ServerVCTemplateManagementService {
         internalModel.setDisplayName(model.getDisplayName());
         internalModel.setFormat(model.getFormat());
         if (model.getClaims() != null) {
-            internalModel.setClaims(model.getClaims());
+            internalModel.setClaims(model.getClaims().stream()
+                    .map(this::toInternalClaim)
+                    .collect(Collectors.toList()));
         }
         internalModel.setExpiresIn(model.getExpiresIn());
         return internalModel;
@@ -342,10 +347,31 @@ public class ServerVCTemplateManagementService {
         internalModel.setDisplayName(model.getDisplayName());
         internalModel.setFormat(model.getFormat());
         if (model.getClaims() != null) {
-            internalModel.setClaims(model.getClaims());
+            internalModel.setClaims(model.getClaims().stream()
+                    .map(this::toInternalClaim)
+                    .collect(Collectors.toList()));
         }
         internalModel.setExpiresIn(model.getExpiresIn());
         return internalModel;
+    }
+
+    private Claim toApiClaim(org.wso2.carbon.identity.openid4vc.template.management.model.Claim claim) {
+
+        Claim apiClaim = new Claim();
+        apiClaim.setName(claim.getName());
+        apiClaim.setType(claim.getType());
+        apiClaim.setClaimUri(claim.getClaimUri());
+        return apiClaim;
+    }
+
+    private org.wso2.carbon.identity.openid4vc.template.management.model.Claim toInternalClaim(Claim claim) {
+
+        org.wso2.carbon.identity.openid4vc.template.management.model.Claim internalClaim =
+                new org.wso2.carbon.identity.openid4vc.template.management.model.Claim();
+        internalClaim.setName(claim.getName());
+        internalClaim.setType(claim.getType());
+        internalClaim.setClaimUri(claim.getClaimUri());
+        return internalClaim;
     }
 
     private APIError notFound(String data) {
