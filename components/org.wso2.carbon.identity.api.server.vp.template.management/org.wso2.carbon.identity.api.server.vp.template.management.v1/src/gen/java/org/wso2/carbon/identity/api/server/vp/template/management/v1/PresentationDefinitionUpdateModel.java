@@ -23,6 +23,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.util.List;
+
 /**
  * Update model for presentation definition.
  */
@@ -31,7 +33,7 @@ public class PresentationDefinitionUpdateModel {
 
     private String name;
     private String description;
-    private Object definition;
+    private List<RequestedCredentialModel> requestedCredentials;
 
     @ApiModelProperty(value = "Name of the presentation definition.")
     @JsonProperty("name")
@@ -53,13 +55,13 @@ public class PresentationDefinitionUpdateModel {
         this.description = description;
     }
 
-    @ApiModelProperty(value = "The full presentation definition JSON object.")
-    @JsonProperty("definition")
-    public Object getDefinition() {
-        return definition;
+    @ApiModelProperty(value = "The requested credentials to construct the definition.")
+    @JsonProperty("requested_credentials")
+    public List<RequestedCredentialModel> getRequestedCredentials() {
+        return requestedCredentials;
     }
 
-    public void setDefinition(Object definition) {
-        this.definition = definition;
+    public void setRequestedCredentials(List<RequestedCredentialModel> requestedCredentials) {
+        this.requestedCredentials = requestedCredentials;
     }
 }

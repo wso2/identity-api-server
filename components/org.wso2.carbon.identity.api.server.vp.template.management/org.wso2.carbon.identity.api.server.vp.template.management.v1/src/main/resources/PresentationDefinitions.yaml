@@ -237,11 +237,34 @@ components:
           type: object
           description: The full presentation definition JSON object.
 
+    RequestedCredentialModel:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          description: Type of the requested credential.
+          example: "EmployeeBadge"
+        purpose:
+          type: string
+          description: Purpose of requesting the credential.
+          example: "Please share your employee badge to prove employment."
+        issuer:
+          type: string
+          description: The trusted issuer for this credential.
+        requested_claims:
+          type: array
+          description: List of claims requested from this credential.
+          items:
+            type: string
+            example: "email"
+
     PresentationDefinitionCreationModel:
       type: object
       required:
         - name
-        - definition
+        - requested_credentials
       properties:
         name:
           type: string
@@ -251,9 +274,11 @@ components:
           type: string
           description: Description of the presentation definition.
           example: "Verifies employee credentials"
-        definition:
-          type: object
-          description: The full presentation definition JSON object.
+        requested_credentials:
+          type: array
+          description: The requested credentials to construct the definition.
+          items:
+            $ref: '#/components/schemas/RequestedCredentialModel'
 
     PresentationDefinitionUpdateModel:
       type: object
@@ -265,9 +290,11 @@ components:
         description:
           type: string
           description: Description of the presentation definition.
-        definition:
-          type: object
-          description: The full presentation definition JSON object.
+        requested_credentials:
+          type: array
+          description: The requested credentials to construct the definition.
+          items:
+            $ref: '#/components/schemas/RequestedCredentialModel'
 
     PresentationDefinitionList:
       type: object
