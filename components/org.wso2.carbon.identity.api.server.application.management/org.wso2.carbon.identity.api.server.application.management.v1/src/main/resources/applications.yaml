@@ -3962,6 +3962,10 @@ components:
           default: false
           description: Enabling this option will make the application FAPI conformant.
           example: false
+        cibaAuthenticationRequest:
+          $ref: '#/components/schemas/CIBAAuthenticationRequestConfiguration'
+        issuer:
+          $ref: '#/components/schemas/AllowedIssuer'
     OAuth2PKCEConfiguration:
       type: object
       properties:
@@ -4278,6 +4282,43 @@ components:
           $ref: '#/components/schemas/MetadataProperty'
         tokenEndpointAuthMethod:
           $ref: '#/components/schemas/ClientAuthenticationMethodMetadata'
+    CIBAMetadata:
+      type: object
+      properties:
+        supportedNotificationChannels:
+          type: array
+          items:
+            $ref: '#/components/schemas/CIBANotificationChannel'
+    CIBANotificationChannel:
+      type: object
+      properties:
+        name:
+          type: string
+          example: email
+        displayName:
+          type: string
+          example: Email
+    AllowedIssuers:
+      type: array
+      items:
+        $ref: '#/components/schemas/AllowedIssuer'
+    AllowedIssuer:
+      type: object
+      properties:
+        value:
+          type: string
+          readOnly: true
+          description: Issuer detail that can be used for tokens.
+          example: "https://localhost:9443/oauth2/token"
+        organizationId:
+          type: string
+          description: Organization ID of the allowed issuer.
+          example: "bdece142-646b-45c0-9385-a4159f1ea219"
+        tenantDomain:
+          type: string
+          readOnly: true
+          description: Tenant domain of the allowed issuer.
+          example: "wso2.com"
     ClientAuthenticationMethod:
       type: object
       properties:
@@ -4368,6 +4409,10 @@ components:
           $ref: '#/components/schemas/MetadataProperty'
         fapiMetadata:
           $ref: '#/components/schemas/FapiMetadata'
+        cibaMetadata:
+          $ref: '#/components/schemas/CIBAMetadata'
+        allowedIssuers:
+          $ref: '#/components/schemas/AllowedIssuers'
     WSTrustMetaData:
       type: object
       properties:
@@ -4996,6 +5041,22 @@ components:
             - For IN_PROGRESS status, an empty JSON object is returned.
             - For COMPLETED status, the authentication sequence is returned.
             - For FAILED status, an error message is returned.
+    CIBAAuthenticationRequestConfiguration:
+      type: object
+      properties:
+        authReqExpiryTime:
+          type: integer
+          format: int64
+          description: "CIBA authentication request expiry time in seconds."
+          example: 600
+        notificationChannels:
+          type: array
+          items:
+            type: string
+          description: "List of allowed notification channels."
+          example:
+            - "email"
+            - "sms"
 servers:
   - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
     variables:
