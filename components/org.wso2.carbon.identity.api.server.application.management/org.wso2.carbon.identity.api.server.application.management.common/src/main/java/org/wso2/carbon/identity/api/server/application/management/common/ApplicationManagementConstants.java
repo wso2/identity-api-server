@@ -296,7 +296,7 @@ public class ApplicationManagementConstants {
         OAUTH_GRANT_TYPE_NAMES.put("organization_switch", "Organization Switch");
         OAUTH_GRANT_TYPE_NAMES.put(Constants.DEVICE_FLOW_GRANT_TYPE, "Device Code");
         OAUTH_GRANT_TYPE_NAMES.put("urn:ietf:params:oauth:grant-type:token-exchange", "Token Exchange");
-        OAUTH_GRANT_TYPE_NAMES.put(OAuthConstants.GrantTypes.CIBA, "Client Initiated Backchannel Authentication");
+        OAUTH_GRANT_TYPE_NAMES.put(OAuthConstants.GrantTypes.CIBA, "CIBA");
 
         CIBA_NOTIFICATION_CHANNELS_NAMES.put(CibaConstants.CibaNotificationChannel.EMAIL, "Email");
         CIBA_NOTIFICATION_CHANNELS_NAMES.put(CibaConstants.CibaNotificationChannel.SMS, "SMS");
