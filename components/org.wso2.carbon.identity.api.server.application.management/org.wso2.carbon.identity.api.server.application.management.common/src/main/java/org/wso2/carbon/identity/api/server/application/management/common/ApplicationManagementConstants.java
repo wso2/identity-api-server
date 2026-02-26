@@ -240,7 +240,12 @@ public class ApplicationManagementConstants {
                 "Error occurred while getting the Login Flow AI result."),
         ERROR_WHILE_CONVERTING_LOGINFLOW_AI_SERVER_RESPONSE("65602",
                 "Error occurred while converting the AI server response.",
-                "Could not convert the AI server response to a valid response.");
+                "Could not convert the AI server response to a valid response."),
+
+        // Organization application based issuer configuration related error messages.
+        ERROR_RETRIEVING_ALLOWED_ISSUERS("65603",
+                "Error occurred while retrieving allowed issuers for the tenant.",
+                "Unexpected error occurred while retrieving allowed issuers for the tenant.");
 
         private final String code;
         private final String message;
