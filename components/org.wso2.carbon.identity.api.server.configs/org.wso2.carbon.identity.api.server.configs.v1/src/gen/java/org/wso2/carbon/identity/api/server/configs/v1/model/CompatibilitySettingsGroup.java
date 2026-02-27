@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -109,7 +109,7 @@ public class CompatibilitySettingsGroup {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("class GroupCompatibilitySettings {\n");
+        sb.append("class CompatibilitySettingsGroup {\n");
         sb.append("    ").append(toIndentedString(additionalProperties)).append("\n");
         sb.append("}");
         return sb.toString();

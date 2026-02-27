@@ -1479,17 +1479,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /configs/compatibility-settings/{resource}:
+  /configs/compatibility-settings/{setting-group}:
     get:
       tags:
         - Compatibility Settings
-      summary: Retrieve compatibility settings for a specific resource.
-      operationId: getCompatibilitySettingsByResource
-      description: Retrieve compatibility settings for a specific resource (e.g., scim2, oauth).
+      summary: Retrieve compatibility settings for a specific group.
+      operationId: getCompatibilitySettingsByGroup
+      description: Retrieve compatibility settings for a specific group (e.g., scim2, oauth).
       parameters:
-        - name: resource
+        - name: setting-group
           in: path
-          description: Resource name (e.g., scim2, oauth)
+          description: Setting group name (e.g., scim2, oauth)
           required: true
           schema:
             type: string
@@ -2228,7 +2228,7 @@ components:
           enableLegacyGrantTypeValidation: false
     CompatibilitySettingsGroup:
       type: object
-      description: Compatibility settings for a specific resource.
+      description: Compatibility settings for a specific group.
       additionalProperties: true
       example:
         conflictOnClaimUniquenessViolation: true

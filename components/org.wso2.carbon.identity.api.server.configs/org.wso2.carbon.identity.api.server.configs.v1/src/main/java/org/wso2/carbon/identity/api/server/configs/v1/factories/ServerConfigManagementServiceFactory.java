@@ -88,8 +88,7 @@ public class ServerConfigManagementServiceFactory {
                 dcrConfigurationMgtService,
                 jwtClientAuthenticatorMgtService,
                 fraudDetectionConfigsService,
-                oAuth2OIDCConfigOrgUsageScopeMgtService);
-                fraudDetectionConfigsService,
+                oAuth2OIDCConfigOrgUsageScopeMgtService,
                 compatibilitySettingsService
                 );
     }

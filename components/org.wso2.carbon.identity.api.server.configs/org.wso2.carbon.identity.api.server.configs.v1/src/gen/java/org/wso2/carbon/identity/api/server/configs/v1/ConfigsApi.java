@@ -1006,12 +1006,12 @@ public class ConfigsApi  {
     @Path("/compatibility-settings/{setting-group}")
 
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve compatibility settings for a specific setting group.", notes = "Retrieve compatibility settings for a specific setting group (e.g., scim2, oauth).", response = CompatibilitySettingsGroup.class, authorizations = {
+    @ApiOperation(value = "Retrieve compatibility settings for a specific settings group.", notes = "Retrieve compatibility settings for a specific settings group (e.g., scim2, oauth).", response = CompatibilitySettingsGroup.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
 
         })
-    }, tags={ "Compatibility Settings" })
+    }, tags={ "Compatibility Settings", })
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful Response", response = CompatibilitySettingsGroup.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),

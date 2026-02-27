@@ -184,8 +184,7 @@ public class ServerConfigManagementService {
                                          JWTClientAuthenticatorMgtService jwtClientAuthenticatorMgtService,
                                          FraudDetectionConfigsService fraudDetectionConfigsService,
                                          OAuth2OIDCConfigOrgUsageScopeMgtService
-                                                 oauth2OIDCConfigOrgUsageScopeMgtService) {
-                                         FraudDetectionConfigsService fraudDetectionConfigsService,
+                                                 oauth2OIDCConfigOrgUsageScopeMgtService,
                                          CompatibilitySettingsService identityCompatibilitySettingsService) {
 
         this.applicationManagementService = applicationManagementService;
@@ -2544,7 +2543,7 @@ public class ServerConfigManagementService {
      * Get compatibility settings for a specific setting group.
      *
      * @param settingGroup Setting group name (e.g., "scim2", "oauth").
-     * @return GroupCompatibilitySettings for the specified setting group.
+     * @return CompatibilitySettingsGroup for the specified setting group.
      */
     public CompatibilitySettingsGroup getCompatibilitySettingsByGroup(String settingGroup) {
 
