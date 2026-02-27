@@ -27,6 +27,7 @@ import org.wso2.carbon.identity.api.server.configs.common.Constants;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettings;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettingsGroup;
 import org.wso2.carbon.identity.compatibility.settings.core.exception.CompatibilitySettingClientException;
+import org.wso2.carbon.identity.compatibility.settings.core.exception.CompatibilitySettingServerException;
 import org.wso2.carbon.identity.compatibility.settings.core.model.CompatibilitySetting;
 import org.wso2.carbon.identity.compatibility.settings.core.model.CompatibilitySettingGroup;
 
@@ -107,7 +108,8 @@ public class CompatibilitySettingUtil {
             return setting;
         }
 
-        for (Map.Entry<String, Map<String, Object>> entry : compatibilitySettings.getAdditionalProperties().entrySet()) {
+        for (Map.Entry<String, Map<String, Object>> entry :
+                compatibilitySettings.getAdditionalProperties().entrySet()) {
             CompatibilitySettingGroup group = new CompatibilitySettingGroup();
             group.setSettingGroup(entry.getKey());
 
@@ -122,29 +124,6 @@ public class CompatibilitySettingUtil {
             setting.addCompatibilitySetting(group);
         }
         return setting;
-    }
-
-    /**
-     * Convert setting group specific settings to CompatibilitySettingGroup (backend model).
-     *
-     * @param settingGroupName Setting group name.
-     * @param settings Setting group settings map.
-     * @return CompatibilitySettingGroup for service layer.
-     */
-    public static CompatibilitySettingGroup toBackendSettingGroup(String settingGroupName, Map<String, Object> settings) {
-
-        CompatibilitySettingGroup group = new CompatibilitySettingGroup();
-        group.setSettingGroup(settingGroupName);
-
-        if (settings != null) {
-            Map<String, String> stringSettings = new HashMap<>();
-            for (Map.Entry<String, Object> entry : settings.entrySet()) {
-                stringSettings.put(entry.getKey(),
-                        entry.getValue() != null ? String.valueOf(entry.getValue()) : null);
-            }
-            group.addSettings(stringSettings);
-        }
-        return group;
     }
 
     /**
@@ -189,7 +168,26 @@ public class CompatibilitySettingUtil {
 
         if (e instanceof CompatibilitySettingClientException) {
             errorResponse = getErrorBuilder(errorEnum, data).build(LOG, e.getMessage());
+            if (((CompatibilitySettingClientException) e).getErrorCode() != null) {
+                String errorCode = ((CompatibilitySettingClientException) e).getErrorCode();
+                errorCode =
+                        errorCode.contains(org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER) ?
+                        errorCode : Constants.CONFIG_ERROR_PREFIX + errorCode;
+                errorResponse.setCode(errorCode);
+            }
+            errorResponse.setDescription(e.getMessage());
             status = Response.Status.BAD_REQUEST;
+        } else if (e instanceof CompatibilitySettingServerException) {
+            errorResponse = getErrorBuilder(errorEnum, data).build(LOG, e, errorEnum.description());
+            if (((CompatibilitySettingServerException) e).getErrorCode() != null) {
+                String errorCode = ((CompatibilitySettingServerException) e).getErrorCode();
+                errorCode =
+                        errorCode.contains(org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER) ?
+                        errorCode : Constants.CONFIG_ERROR_PREFIX + errorCode;
+                errorResponse.setCode(errorCode);
+            }
+            errorResponse.setDescription(e.getMessage());
+            status = Response.Status.INTERNAL_SERVER_ERROR;
         } else if (e instanceof IllegalArgumentException) {
             errorResponse = getErrorBuilder(errorEnum, data).build(LOG, e.getMessage());
             status = Response.Status.BAD_REQUEST;

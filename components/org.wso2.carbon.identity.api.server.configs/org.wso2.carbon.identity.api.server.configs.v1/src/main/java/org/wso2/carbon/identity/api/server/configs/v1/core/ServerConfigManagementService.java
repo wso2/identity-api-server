@@ -36,8 +36,8 @@ import org.wso2.carbon.identity.api.server.configs.common.ConfigsServiceHolder;
 import org.wso2.carbon.identity.api.server.configs.common.Constants;
 import org.wso2.carbon.identity.api.server.configs.common.SchemaConfigParser;
 import org.wso2.carbon.identity.api.server.configs.v1.exception.JWTClientAuthenticatorException;
-import org.wso2.carbon.identity.api.server.configs.v1.function.CompatibilitySettingUtil;
 import org.wso2.carbon.identity.api.server.configs.v1.function.CORSConfigurationToCORSConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.function.CompatibilitySettingUtil;
 import org.wso2.carbon.identity.api.server.configs.v1.function.DCRConnectorUtil;
 import org.wso2.carbon.identity.api.server.configs.v1.function.JWTConnectorUtil;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticationType;
@@ -2216,7 +2216,7 @@ public class ServerConfigManagementService {
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             CompatibilitySetting setting =
-                    compatibilitySettingsService.getCompatibilitySettings(tenantDomain, settingGroup);
+                    compatibilitySettingsService.getCompatibilitySettingsByGroup(tenantDomain, settingGroup);
 
             if (!CompatibilitySettingUtil.hasSettingGroup(setting, settingGroup)) {
                 throw handleCompatibilitySettingsError(
