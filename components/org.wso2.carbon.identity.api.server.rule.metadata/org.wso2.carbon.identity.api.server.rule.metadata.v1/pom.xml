@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.rule.metadata</artifactId>
-        <version>1.5.13-SNAPSHOT</version>
+        <version>1.5.13</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
