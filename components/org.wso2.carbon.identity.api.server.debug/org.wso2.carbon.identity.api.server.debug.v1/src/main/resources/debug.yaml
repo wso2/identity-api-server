@@ -1,0 +1,243 @@
+openapi: 3.0.0
+info:
+  description: >
+    This document specifies a **Debug RESTful API** for **WSO2 Identity Server**.
+    This API supports debugging of various authentication flows and resource configurations.
+    The APIs provide the capability to start and retrieve debug sessions for different resource types.
+  version: "v1"
+  title: WSO2 Identity Server - Debug API
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    name: WSO2
+    url: 'http://wso2.com/products/identity-server/'
+    email: architecture@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+
+servers:
+  - url: "/t/{tenant-domain}/api/server/v1"
+    variables:
+      tenant-domain:
+        default: "carbon.super"
+        description: "The tenant domain."
+
+paths:
+  /debug:
+    post:
+      summary: "Start Debug Session"
+      description: "Initiates a debug session for supported resource types with configurable properties."
+      operationId: "startDebugSession"
+      tags:
+        - "Debug"
+      requestBody:
+        description: "Debug request with resource type and properties."
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DebugConnectionRequest"
+      responses:
+        '200':
+          description: "Debug session executed successfully."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DebugConnectionResponse"
+        '400':
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '401':
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '403':
+          description: "Forbidden"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '500':
+          description: "Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /debug/result/{session-id}:
+    get:
+      summary: "Get Debug Result"
+      description: "Retrieves the debug results for a specific session ID."
+      operationId: "getDebugResult"
+      tags:
+        - "Debug"
+      parameters:
+        - name: "session-id"
+          in: "path"
+          description: "The unique session ID for the debug flow."
+          required: true
+          schema:
+            type: "string"
+      responses:
+        '200':
+          description: "Debug result retrieved successfully."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DebugResponse"
+        '400':
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '401':
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '404':
+          description: "Not Found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '500':
+          description: "Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    # -------------
+    # Common Error
+    # -------------
+    Error:
+      type: "object"
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          example: "IDP-60001"
+          description: "An error code."
+        message:
+          type: string
+          example: "Error message."
+          description: "An error message."
+        description:
+          type: string
+          example: "Detailed error description."
+          description: "A detailed error description."
+        traceId:
+          type: string
+          example: "trace-123456"
+          description: "Trace identifier for error correlation."
+
+    # ---------------------------------
+    # Debug Request/Response Models
+    # ---------------------------------
+    DebugConnectionRequest:
+      type: object
+      required:
+        - resourceType
+      description: "Request body for starting a debug session."
+      properties:
+        resourceType:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: "Type of resource to debug. Allowed values: IDP, FRAUD_DETECTION."
+          example: "IDP"
+          enum:
+            - "IDP"
+            - "FRAUD_DETECTION"
+        properties:
+          type: object
+          maxProperties: 50
+          additionalProperties:
+            type: string
+            maxLength: 2048
+          description: "Generic properties for resource debugging as key-value pairs. Maximum 50 properties allowed. Each property value can be up to 2048 characters."
+          example:
+            "connectionId": "123e4567-e89b-12d3-a456-426614174000"
+            "authenticatorName": "OpenIDConnectAuthenticator"
+
+    DebugConnectionResponse:
+      type: object
+      description: "Debug connection response containing generic debug information and resource-specific metadata."
+      properties:
+        debugId:
+          type: string
+          description: "Debug session ID."
+          example: "debug-496f5a3f-0094-42f2-8188-d2baa9a1287c"
+        status:
+          type: string
+          description: "Status of the debug operation."
+          enum: ["SUCCESS", "IN_PROGRESS", "FAILURE", "DIRECT_RESULT"]
+          example: "SUCCESS"
+        message:
+          type: string
+          description: "Generic response message."
+          example: "Debug session executed successfully"
+        timestamp:
+          type: integer
+          format: int64
+          description: "Timestamp when the debug operation was processed (in milliseconds)."
+          example: 1771217107937
+        metadata:
+          type: object
+          description: "Resource-specific metadata. For IDP OAuth debugging, includes 'authorizationUrl'."
+          properties:
+            authorizationUrl:
+              type: string
+              description: "OAuth 2.0 authorization URL for IDP debugging."
+              example: "https://api.asgardeo.io/t/linuka/oauth2/authorize?response_type=code&client_id=lfrTEyDGHBEUbeBKoiaosz1y8Aca&redirect_uri=https%3A%2F%2Flocalhost%3A9443%2Fcommonauth"
+
+    # -----------------------------
+    # GET /debug/result/{session-id}
+    # -----------------------------
+    DebugResponse:
+      type: object
+      required:
+        - sessionId
+        - success
+      description: "Debug response containing sessionId and success at top level, with all protocol-specific data in metadata."
+      properties:
+        sessionId:
+          type: string
+          description: "Debug session identifier. Used to retrieve debug results via the GET endpoint."
+          example: "debug-session-12345"
+        success:
+          type: boolean
+          description: "Whether the debug operation was successful."
+          example: true
+        metadata:
+          type: object
+          description: "Protocol-specific and resource-specific debug data. For IDP OAuth debugging, includes userAttributes, mappedClaims, steps, tokens, URLs, and diagnostic information."
+          additionalProperties: true
+          example:
+            state: "debug-session-12345"
+            userAttributes:
+              sub: "9d5ddf10-d814-4000-9bf7-35f3eef9b86e"
+              email: "user@example.com"
+            mappedClaims:
+              - idpClaim: "sub"
+                isClaim: "http://wso2.org/claims/sub"
+                value: "9d5ddf10-d814-4000-9bf7-35f3eef9b86e"
+                status: "Auto-Discovered"
+            steps:
+              claimMappingStatus: "success"
+              authenticationStatus: "success"
+              connectionStatus: "success"
+            idToken: "eyJ..."
+            externalRedirectUrl: "https://..."
