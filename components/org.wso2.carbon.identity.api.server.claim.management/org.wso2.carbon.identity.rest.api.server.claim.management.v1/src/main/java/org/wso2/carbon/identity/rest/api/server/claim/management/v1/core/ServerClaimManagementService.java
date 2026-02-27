@@ -527,15 +527,12 @@ public class ServerClaimManagementService {
                         Constant.ErrorMessage.ERROR_CODE_CLAIM_DISPLAY_NAME_NOT_SPECIFIED,
                         BAD_REQUEST);
             }
+            applyExtendedValuedUpdateRules(localClaimReqDTO, claimId);
             validateAttributeMappings(localClaimReqDTO.getAttributeMapping());
             validateSubAttributeUpdate(localClaimReqDTO);
             validateSystemClaimUpdate(localClaimReqDTO, claimId);
             validateDataTypeUpdates(localClaimReqDTO);
             validateAttributeInputFormat(localClaimReqDTO);
-            String claimURI = base64DecodeId(claimId);
-            Optional<LocalClaim> localClaim = claimMetadataManagementService.getLocalClaim(claimURI, ContextLoader
-                    .getTenantDomainFromContext(), true);
-            localClaim.ifPresent(claim -> setMandatoryProperties(localClaimReqDTO, claim));
 
             claimMetadataManagementService.updateLocalClaim(createLocalClaim(localClaimReqDTO),
                     ContextLoader.getTenantDomainFromContext());
@@ -1824,11 +1821,17 @@ public class ServerClaimManagementService {
             throw handleClaimManagementClientError(Constant.ErrorMessage
                     .ERROR_CODE_BOOLEAN_ATTRIBUTE_CANNOT_BE_MULTI_VALUED, BAD_REQUEST, localClaimReqDTO.getClaimURI());
         }
-        if (DataType.BOOLEAN.equals(localClaimReqDTO.getDataType())
-                && Boolean.TRUE.equals(localClaimReqDTO.getExtendedValued())) {
-            throw handleClaimManagementClientError(Constant.ErrorMessage
-                    .ERROR_CODE_BOOLEAN_ATTRIBUTE_CANNOT_BE_EXTENDED_VALUED, BAD_REQUEST,
-                    localClaimReqDTO.getClaimURI());
+        if (Boolean.TRUE.equals(localClaimReqDTO.getExtendedValued())) {
+            if (DataType.BOOLEAN.equals(localClaimReqDTO.getDataType())) {
+                throw handleClaimManagementClientError(Constant.ErrorMessage
+                        .ERROR_CODE_BOOLEAN_ATTRIBUTE_CANNOT_BE_EXTENDED_VALUED, BAD_REQUEST,
+                        localClaimReqDTO.getClaimURI());
+            }
+            if (Boolean.TRUE.equals(localClaimReqDTO.getMultiValued())) {
+                throw handleClaimManagementClientError(Constant.ErrorMessage
+                        .ERROR_CODE_ATTRIBUTE_CANNOT_BE_MULTI_VALUED_AND_EXTENDED_VALUED, BAD_REQUEST,
+                        localClaimReqDTO.getClaimURI());
+            }
         }
         if (ArrayUtils.isNotEmpty(localClaimReqDTO.getCanonicalValues()) &&
                 !DataType.STRING.equals(localClaimReqDTO.getDataType())) {
@@ -2082,5 +2085,20 @@ public class ServerClaimManagementService {
             return claimProperties.get(propertyName);
         }
         return claimProperties.remove(propertyName);
+    }
+
+    private void applyExtendedValuedUpdateRules(LocalClaimReqDTO localClaimReqDTO, String claimId)
+            throws ClaimMetadataException {
+
+        LocalClaimResDTO existingClaim = getLocalClaim(claimId);
+        Boolean existing = existingClaim.getExtendedValued();
+        Boolean requested = localClaimReqDTO.getExtendedValued();
+        if (requested == null) {
+            localClaimReqDTO.setExtendedValued(existing);
+        } else if (existing && !requested) {
+            throw handleClaimManagementClientError(Constant.ErrorMessage
+                    .ERROR_CODE_EXTENDED_VALUED_PROPERTY_UPDATE_NOT_ALLOWED, BAD_REQUEST,
+                    localClaimReqDTO.getClaimURI());
+        }
     }
 }

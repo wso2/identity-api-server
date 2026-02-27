@@ -246,12 +246,15 @@ public class Constant {
                 "Canonical values are only supported for string data type.",
                 "The attribute: %s is not a string data type and canonical values are only supported for " +
                         "string data type."),
-        ERROR_CODE_SYSTEM_ATTRIBUTE_EXTENDED_VALUED_STATE_UPDATE("CMT-60020", "Cannot update the " +
-                "extended-valued state of system attributes.", "The extended-valued attribute metadata " +
-                "is not allowed to be modified for system attributes."),
-        ERROR_CODE_BOOLEAN_ATTRIBUTE_CANNOT_BE_EXTENDED_VALUED("CMT-60021",
+        ERROR_CODE_BOOLEAN_ATTRIBUTE_CANNOT_BE_EXTENDED_VALUED("CMT-60020",
                 "Boolean attributes cannot be extended-valued.",
-                "The attribute: %s is a boolean attribute and cannot be extended-valued.");
+                "The attribute: %s is a boolean attribute and cannot be extended-valued."),
+        ERROR_CODE_EXTENDED_VALUED_PROPERTY_UPDATE_NOT_ALLOWED("CMT-60021",
+                "Cannot update the extended-valued property for this attribute.",
+                "The extended-valued property cannot be updated for the attribute: %s."),
+        ERROR_CODE_ATTRIBUTE_CANNOT_BE_MULTI_VALUED_AND_EXTENDED_VALUED("CMT-60022",
+                "An attribute cannot be multi-valued and extended-valued at the same time.",
+                "The attribute: %s cannot be multi-valued and extended-valued at the same time.");
 
         private final String code;
         private final String message;
