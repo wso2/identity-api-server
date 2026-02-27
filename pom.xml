@@ -1091,7 +1091,7 @@
         </org.wso2.carbon.identity.inbound.provisioning.scim2.version>
 
         <!-- VC related versions -->
-        <carbon.identity.openid4vc.version>1.1.5-SNAPSHOT</carbon.identity.openid4vc.version>
+        <carbon.identity.openid4vc.version>1.1.5</carbon.identity.openid4vc.version>
 
         <!-- Unit test versions -->
         <testng.version>6.9.10</testng.version>
