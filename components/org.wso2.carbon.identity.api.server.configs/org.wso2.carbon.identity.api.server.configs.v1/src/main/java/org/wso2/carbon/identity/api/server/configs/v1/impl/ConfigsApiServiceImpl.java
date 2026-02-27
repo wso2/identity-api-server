@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -26,6 +26,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySetting
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.FraudDetectionConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthOAuth2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch;
@@ -33,6 +34,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfigListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ScimConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.UsageScopePatch;
 import org.wso2.carbon.logging.service.data.RemoteServerLoggerData;
 
 import java.util.List;
@@ -89,6 +91,12 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     public Response getInboundScimConfigs() {
 
         return Response.ok().entity(configManagementService.getInboundScimConfig()).build();
+    }
+
+    @Override
+    public Response getIssuerUsageScopeConfig() {
+
+        return Response.ok().entity(configManagementService.getIssuerUsageScopeConfig()).build();
     }
 
     @Override
@@ -248,6 +256,12 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     }
 
     @Override
+    public Response updateIssuerUsageScopeConfig(UsageScopePatch usageScopePatch) {
+
+        return Response.ok().entity(configManagementService.updateIssuerUsageScopeConfig(usageScopePatch)).build();
+    }
+
+    @Override
     public Response getCompatibilitySettings() {
 
         return Response.ok().entity(configManagementService.getCompatibilitySettings()).build();
@@ -303,7 +317,43 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
         configManagementService.deleteSAMLInboundAuthConfig();
         return Response.noContent().build();
     }
-    
+
+    /**
+     * Gets the OAuth2 inbound authentication configuration of an organization.
+     *
+     * @return Response containing the OAuth2 inbound authentication configuration.
+     */
+    @Override
+    public Response getOAuth2InboundAuthConfig() {
+
+        return Response.ok().entity(configManagementService.getOAuth2InboundAuthConfig()).build();
+    }
+
+    /**
+     * Updates the OAuth2 inbound authentication configuration of an organization.
+     * @param inboundAuthOAuth2Config InboundAuthOAuth2Config object containing the updated configuration.
+     *
+     * @return Response indicating the result of the operation.
+     */
+    @Override
+    public Response updateOAuth2InboundAuthConfig(InboundAuthOAuth2Config inboundAuthOAuth2Config) {
+
+        configManagementService.updateOAuth2InboundAuthConfig(inboundAuthOAuth2Config);
+        return Response.ok().build();
+    }
+
+    /**
+     * Deletes the OAuth2 inbound authentication configuration of an organization.
+     *
+     * @return Response indicating the result of the operation.
+     */
+    @Override
+    public Response deleteOAuth2InboundAuthConfig() {
+
+        configManagementService.deleteOAuth2InboundAuthConfig();
+        return Response.noContent().build();
+    }
+
     private RemoteLoggingConfigListItem createRemoteLoggingConfigListItem(
             RemoteServerLoggerData remoteServerLoggerData) {
 

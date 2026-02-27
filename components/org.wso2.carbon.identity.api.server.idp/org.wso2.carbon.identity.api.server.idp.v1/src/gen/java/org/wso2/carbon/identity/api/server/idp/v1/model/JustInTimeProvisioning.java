@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -109,6 +109,41 @@ public enum AttributeSyncMethodEnum {
 }
 
     private AttributeSyncMethodEnum attributeSyncMethod = AttributeSyncMethodEnum.OVERRIDE_ALL;
+
+
+@XmlType(name="IdpGroupSyncMethodEnum")
+@XmlEnum(String.class)
+public enum IdpGroupSyncMethodEnum {
+
+    @XmlEnumValue("OVERRIDE_ALL") OVERRIDE_ALL(String.valueOf("OVERRIDE_ALL")), @XmlEnumValue("MERGE_WITH_EXISTING") MERGE_WITH_EXISTING(String.valueOf("MERGE_WITH_EXISTING"));
+
+
+    private String value;
+
+    IdpGroupSyncMethodEnum(String v) {
+        value = v;
+    }
+
+    public String value() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    public static IdpGroupSyncMethodEnum fromValue(String value) {
+        for (IdpGroupSyncMethodEnum b : IdpGroupSyncMethodEnum.values()) {
+            if (b.value.equals(value)) {
+                return b;
+            }
+        }
+        throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+}
+
+    private IdpGroupSyncMethodEnum idpGroupSyncMethod = IdpGroupSyncMethodEnum.MERGE_WITH_EXISTING;
 
     /**
     **/
@@ -247,6 +282,24 @@ public enum AttributeSyncMethodEnum {
         this.attributeSyncMethod = attributeSyncMethod;
     }
 
+        /**
+    **/
+    public JustInTimeProvisioning idpGroupSyncMethod(IdpGroupSyncMethodEnum idpGroupSyncMethod) {
+
+        this.idpGroupSyncMethod = idpGroupSyncMethod;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("idpGroupSyncMethod")
+    @Valid
+    public IdpGroupSyncMethodEnum getIdpGroupSyncMethod() {
+        return idpGroupSyncMethod;
+    }
+    public void setIdpGroupSyncMethod(IdpGroupSyncMethodEnum idpGroupSyncMethod) {
+        this.idpGroupSyncMethod = idpGroupSyncMethod;
+    }
+
 
 
     @Override
@@ -265,12 +318,13 @@ public enum AttributeSyncMethodEnum {
             Objects.equals(this.associateLocalUser, justInTimeProvisioning.associateLocalUser) &&
             Objects.equals(this.skipJITForLookupFailure, justInTimeProvisioning.skipJITForLookupFailure) &&
             Objects.equals(this.accountLookupAttributeMappings, justInTimeProvisioning.accountLookupAttributeMappings) &&
-            Objects.equals(this.attributeSyncMethod, justInTimeProvisioning.attributeSyncMethod);
+            Objects.equals(this.attributeSyncMethod, justInTimeProvisioning.attributeSyncMethod) &&
+            Objects.equals(this.idpGroupSyncMethod, justInTimeProvisioning.idpGroupSyncMethod);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(isEnabled, scheme, userstore, associateLocalUser, skipJITForLookupFailure, accountLookupAttributeMappings, attributeSyncMethod);
+        return Objects.hash(isEnabled, scheme, userstore, associateLocalUser, skipJITForLookupFailure, accountLookupAttributeMappings, attributeSyncMethod, idpGroupSyncMethod);
     }
 
     @Override
@@ -286,6 +340,7 @@ public enum AttributeSyncMethodEnum {
         sb.append("    skipJITForLookupFailure: ").append(toIndentedString(skipJITForLookupFailure)).append("\n");
         sb.append("    accountLookupAttributeMappings: ").append(toIndentedString(accountLookupAttributeMappings)).append("\n");
         sb.append("    attributeSyncMethod: ").append(toIndentedString(attributeSyncMethod)).append("\n");
+        sb.append("    idpGroupSyncMethod: ").append(toIndentedString(idpGroupSyncMethod)).append("\n");
         sb.append("}");
         return sb.toString();
     }

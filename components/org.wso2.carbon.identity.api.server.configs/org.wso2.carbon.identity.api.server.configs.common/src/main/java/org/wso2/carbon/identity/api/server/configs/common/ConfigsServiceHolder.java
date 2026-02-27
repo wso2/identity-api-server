@@ -26,6 +26,7 @@ import org.wso2.carbon.identity.compatibility.settings.core.service.Compatibilit
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.fraud.detection.core.service.FraudDetectionConfigsService;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
+import org.wso2.carbon.identity.oauth2.config.services.OAuth2OIDCConfigOrgUsageScopeMgtService;
 import org.wso2.carbon.identity.oauth2.impersonation.services.ImpersonationConfigMgtService;
 import org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.core.JWTClientAuthenticatorMgtService;
 import org.wso2.carbon.idp.mgt.IdentityProviderManager;
@@ -101,6 +102,13 @@ public class ConfigsServiceHolder {
         static final FraudDetectionConfigsService SERVICE =
                 (FraudDetectionConfigsService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                         .getOSGiService(FraudDetectionConfigsService.class, null);
+    }
+
+    private static class OAuth2OIDCConfigOrgUsageScopeMgtServiceHolder {
+
+        static final OAuth2OIDCConfigOrgUsageScopeMgtService SERVICE =
+                (OAuth2OIDCConfigOrgUsageScopeMgtService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(OAuth2OIDCConfigOrgUsageScopeMgtService.class, null);
     }
 
     private static class IdentityCompatibilitySettingsServiceHolder {
@@ -208,6 +216,16 @@ public class ConfigsServiceHolder {
     public static FraudDetectionConfigsService getFraudDetectionConfigsService() {
 
         return FraudDetectionConfigsServiceHolder.SERVICE;
+    }
+
+    /**
+     * Get OAuth2OIDCConfigOrgUsageScopeMgtService osgi service.
+     *
+     * @return OAuth2OIDCConfigOrgUsageScopeMgtService
+     */
+    public static OAuth2OIDCConfigOrgUsageScopeMgtService getOAuth2OIDCConfigOrgUsageScopeMgtService() {
+
+        return OAuth2OIDCConfigOrgUsageScopeMgtServiceHolder.SERVICE;
     }
 
     /**

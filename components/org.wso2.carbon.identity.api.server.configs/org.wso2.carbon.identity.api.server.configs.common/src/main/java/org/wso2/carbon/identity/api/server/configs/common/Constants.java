@@ -33,7 +33,11 @@ public class Constants {
     // PATCH operation paths.
     public static final String IDLE_SESSION_PATH = "/idleSessionTimeoutPeriod";
     public static final String REMEMBER_ME_PATH = "/rememberMePeriod";
+    public static final String ENABLE_MAXIMUM_SESSION_TIMEOUT_PATH = "/enableMaximumSessionTimeoutPeriod";
+    public static final String MAXIMUM_SESSION_TIMEOUT_PATH = "/maximumSessionTimeoutPeriod";
     public static final String HOME_REALM_PATH_REGEX = "/homeRealmIdentifiers/[0-9]+";
+    public static final String PRESERVE_CURRENT_SESSION_AT_PASSWORD_UPDATE_PATH
+            = "/preserveCurrentSessionAtPasswordUpdate";
 
     /**
      * PATCH operation path for CORS configuration.
@@ -105,6 +109,9 @@ public class Constants {
         ERROR_CODE_CONFIG_UPDATE_NOT_ALLOWED("60005",
                 "Configuration update not allowed.",
                 "The requested update is not allowed for the organization."),
+        ERROR_CODE_CONFIG_RETRIEVE_NOT_ALLOWED("60006",
+                "Configuration retrieve not allowed.",
+                "The requested configuration retrieve is not allowed for the organization."),
 
         /**
          * CORS errors.
@@ -215,6 +222,27 @@ public class Constants {
                 "Server encountered an error while retrieving the Fraud Detection configuration."),
         ERROR_CODE_FRAUD_DETECTION_CONFIG_UPDATE("65024",
                 "Unable to update Fraud Detection configuration.",
+                "Server encountered an error while updating the Fraud Detection configuration."),
+        ERROR_CODE_ERROR_OAUTH2_INBOUND_AUTH_CONFIG_RETRIEVE("65025",
+                "Unable to retrieve OAuth2 inbound auth configs.",
+                "Server encountered an error while retrieving the OAuth2 inbound auth configs."),
+        ERROR_CODE_ERROR_OAUTH2_INBOUND_AUTH_CONFIG_UPDATE("65026",
+                "Unable to update OAuth2 inbound auth configs.",
+                "Server encountered an error while updating the OAuth2 inbound auth configs."),
+        ERROR_CODE_ERROR_OAUTH2_INBOUND_AUTH_CONFIG_DELETE("65027",
+                "Unable to delete OAuth2 inbound auth configs.",
+                "Server encountered an error while deleting the OAuth2 inbound auth configs."),
+
+        // Issuer usage scope configuration errors.
+        ERROR_CODE_ERROR_ISSUER_USAGE_SCOPE_EMPTY("65028",
+                "Unable to retrieve issuer usage scope configuration.",
+                "The issuer usage scope configuration is empty for the tenant domain %s."),
+        ERROR_CODE_ERROR_ISSUER_USAGE_SCOPE_RETRIEVE("65029",
+                "Unable to retrieve issuer usage scope configuration.",
+                "Server encountered an error while extracting issuer usage scope configuration. %s"),
+        ERROR_CODE_ERROR_ISSUER_USAGE_SCOPE_UPDATE("65030",
+                "Unable to update issuer usage scope configuration.",
+                "Server encountered an error while updating issuer usage scope configuration. %s");
                 "Server encountered an error while updating the Fraud Detection configuration."),
 
         /**
