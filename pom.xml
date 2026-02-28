@@ -558,6 +558,12 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.identity.compatibility.settings.core</artifactId>
+                <version>${carbon.identity.framework.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.identity.fetch.remote</groupId>
                 <artifactId>org.wso2.carbon.identity.remotefetch.core</artifactId>
                 <version>${org.wso2.carbon.identity.remotefetch.version}</version>

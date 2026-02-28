@@ -22,6 +22,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.ConfigsApiService;
 import org.wso2.carbon.identity.api.server.configs.v1.core.ServerConfigManagementService;
 import org.wso2.carbon.identity.api.server.configs.v1.factories.ServerConfigManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettings;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.FraudDetectionConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
@@ -261,6 +262,26 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     }
 
     @Override
+    public Response getCompatibilitySettings() {
+
+        return Response.ok().entity(configManagementService.getCompatibilitySettings()).build();
+    }
+
+    @Override
+    public Response patchCompatibilitySettings(CompatibilitySettings compatibilitySettings) {
+
+        CompatibilitySettings updatedSettings =
+                configManagementService.patchCompatibilitySettings(compatibilitySettings);
+        return Response.ok().entity(updatedSettings).build();
+    }
+
+    @Override
+    public Response getCompatibilitySettingsByGroup(String settingGroup) {
+
+        return Response.ok().entity(configManagementService.getCompatibilitySettingsByGroup(settingGroup)).build();
+    }
+
+    @Override
     public Response getPassiveSTSInboundAuthConfig() {
 
         return Response.ok().entity(configManagementService.getPassiveSTSInboundAuthConfig()).build();
@@ -299,7 +320,7 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
 
     /**
      * Gets the OAuth2 inbound authentication configuration of an organization.
-     * 
+     *
      * @return Response containing the OAuth2 inbound authentication configuration.
      */
     @Override
@@ -311,7 +332,7 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     /**
      * Updates the OAuth2 inbound authentication configuration of an organization.
      * @param inboundAuthOAuth2Config InboundAuthOAuth2Config object containing the updated configuration.
-     * 
+     *
      * @return Response indicating the result of the operation.
      */
     @Override
@@ -323,7 +344,7 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
 
     /**
      * Deletes the OAuth2 inbound authentication configuration of an organization.
-     * 
+     *
      * @return Response indicating the result of the operation.
      */
     @Override
@@ -332,7 +353,7 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
         configManagementService.deleteOAuth2InboundAuthConfig();
         return Response.noContent().build();
     }
-    
+
     private RemoteLoggingConfigListItem createRemoteLoggingConfigListItem(
             RemoteServerLoggerData remoteServerLoggerData) {
 

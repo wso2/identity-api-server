@@ -242,7 +242,19 @@ public class Constants {
                 "Server encountered an error while extracting issuer usage scope configuration. %s"),
         ERROR_CODE_ERROR_ISSUER_USAGE_SCOPE_UPDATE("65030",
                 "Unable to update issuer usage scope configuration.",
-                "Server encountered an error while updating issuer usage scope configuration. %s");
+                "Server encountered an error while updating issuer usage scope configuration. %s"),
+        /**
+         * Compatibility Settings errors.
+         */
+        ERROR_CODE_COMPATIBILITY_SETTINGS_RETRIEVE("65031",
+                "Unable to retrieve Compatibility Settings.",
+                "Server encountered an error while retrieving the Compatibility Settings."),
+        ERROR_CODE_COMPATIBILITY_SETTINGS_UPDATE("65032",
+                "Unable to update Compatibility Settings.",
+                "Server encountered an error while updating the Compatibility Settings."),
+        ERROR_CODE_SETTING_GROUP_NOT_FOUND("60007",
+                "Setting group not found.",
+                "Unable to find compatibility settings for the setting group %s.");
 
         private final String code;
         private final String message;
