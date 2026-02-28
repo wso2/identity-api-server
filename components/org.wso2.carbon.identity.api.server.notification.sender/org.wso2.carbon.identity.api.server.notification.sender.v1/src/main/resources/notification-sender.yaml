@@ -893,6 +893,114 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /notification-senders/configs/{publisher-type}:
+    get:
+      tags:
+        - Notification Sender Configurations
+      summary: Get notification sender configurations by publisher type
+      description: |
+        This API provides the capability to retrieve notification sender configurations by publisher type. <br>
+          <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/configmgt/view <br>
+          <b>Scope required:</b> <br>
+            * internal_config_mgt_view
+      operationId: getNotiSenderConfigurations
+      parameters:
+        - name: publisher-type
+          in: path
+          description: Type of the notification publisher (e.g., email, sms, push)
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationSenderConfigurations'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - Notification Sender Configurations
+      summary: Update notification sender configurations by publisher type
+      description: |
+        This API provides the capability to update notification sender configurations by publisher type. <br>
+          <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/configmgt/update <br>
+          <b>Scope required:</b> <br>
+            * internal_config_mgt_update
+      operationId: setNotiSenderConfigurations
+      parameters:
+        - name: publisher-type
+          in: path
+          description: Type of the notification publisher (e.g., email, sms, push)
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationSenderConfigurations'
+            example:
+              configKey1: "configValue1"
+              configKey2: "configValue2"
+        required: true
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationSenderConfigurations'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
     Error:
@@ -1191,6 +1299,13 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/PushSender'
+    NotificationSenderConfigurations:
+      type: object
+      additionalProperties:
+        type: string
+      example:
+        configKey1: "configValue1"
+        configKey2: "configValue2"
   parameters:
     typeQueryParam:
       name: type

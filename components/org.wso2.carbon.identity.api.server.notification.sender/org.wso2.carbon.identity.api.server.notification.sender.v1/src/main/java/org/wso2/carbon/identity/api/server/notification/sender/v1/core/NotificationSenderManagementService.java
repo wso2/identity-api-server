@@ -41,6 +41,7 @@ import org.wso2.carbon.identity.notification.sender.tenant.config.exception.Noti
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
@@ -275,6 +276,24 @@ public class NotificationSenderManagementService {
             PushSenderDTO pushSenderDTO = NotificationSenderServiceHolder.getNotificationSenderManagementService()
                     .updatePushSender(dto);
             return buildPushSenderFromDTO(pushSenderDTO);
+        } catch (NotificationSenderManagementException e) {
+            throw handleException(e);
+        }
+    }
+
+    public Map<String, String> setNotiSenderConfigurations(String publisherType, Map<String, String> configs) {
+
+        try {
+            return notificationSenderManagementService.setNotiSenderConfigurations(publisherType, configs);
+        } catch (NotificationSenderManagementException e) {
+            throw handleException(e);
+        }
+    }
+
+    public Map<String, String> getNotiSenderConfigurations(String publisherType) {
+
+        try {
+            return notificationSenderManagementService.getNotiSenderConfigurations(publisherType, false);
         } catch (NotificationSenderManagementException e) {
             throw handleException(e);
         }
