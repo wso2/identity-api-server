@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.rest.api.server.workflow.v1.core;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,6 +32,7 @@ import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.ApproverNotifications;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.InitiatorNotifications;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.InstanceStatus;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.ORRuleResponse;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Operation;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.OptionDetails;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Property;
@@ -49,17 +51,23 @@ import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowRespon
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowTemplateBase;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowTemplateParameters;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowTemplateParametersBase;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.util.WorkflowRuleMapper;
+import org.wso2.carbon.identity.rule.management.api.exception.RuleManagementException;
+import org.wso2.carbon.identity.rule.management.api.model.Rule;
+import org.wso2.carbon.identity.rule.management.api.service.RuleManagementService;
 import org.wso2.carbon.identity.workflow.engine.ApprovalTaskService;
 import org.wso2.carbon.identity.workflow.engine.exception.WorkflowEngineClientException;
 import org.wso2.carbon.identity.workflow.engine.exception.WorkflowEngineException;
 import org.wso2.carbon.identity.workflow.mgt.WorkflowManagementService;
 import org.wso2.carbon.identity.workflow.mgt.bean.Parameter;
 import org.wso2.carbon.identity.workflow.mgt.bean.Workflow;
+import org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequestFilterResponse;
 import org.wso2.carbon.identity.workflow.mgt.dto.Association;
 import org.wso2.carbon.identity.workflow.mgt.dto.WorkflowEvent;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowClientException;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowException;
 import org.wso2.carbon.identity.workflow.mgt.util.WFConstant;
+import org.wso2.carbon.identity.workflow.mgt.util.WorkflowManagementUtil;
 import org.wso2.carbon.identity.workflow.mgt.util.WorkflowRequestStatus;
 
 import java.io.UnsupportedEncodingException;
@@ -89,12 +97,15 @@ public class WorkflowService {
     private static final String EVENTS = "events";
     private final WorkflowManagementService workflowManagementService;
     private final ApprovalTaskService approvalEventService;
+    private final RuleManagementService ruleManagementService;
 
     public WorkflowService(WorkflowManagementService workflowManagementService,
-                           ApprovalTaskService approvalEventService) {
+                           ApprovalTaskService approvalEventService,
+                           RuleManagementService ruleManagementService) {
 
         this.workflowManagementService = workflowManagementService;
         this.approvalEventService = approvalEventService;
+        this.ruleManagementService = ruleManagementService;
     }
 
     /**
@@ -258,10 +269,27 @@ public class WorkflowService {
                 throw new WorkflowClientException("A workflow association already exists for the event: " +
                         event.getEventFriendlyName());
             }
+            // Pass the rule to rule management service to persist the rule and get the corresponding rule ID.
+            String ruleId = null;
+            if (workflowAssociation.getRule() != null &&
+                    CollectionUtils.isNotEmpty(workflowAssociation.getRule().getRules())) {
+                try {
+                    String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+                    // Convert API rule to service rule.
+                    Rule serviceRule = WorkflowRuleMapper.mapApiRuleToServiceRule(
+                            workflowAssociation.getRule(), tenantDomain);
+                    Rule createdRule = ruleManagementService.addRule(serviceRule, tenantDomain);
+                    if (createdRule != null) {
+                        ruleId = createdRule.getId();
+                    }
+                } catch (RuleManagementException e) {
+                    throw new WorkflowException("Error while creating rule for workflow association.", e);
+                }
+            }
 
             workflowManagementService.addAssociation(workflowAssociation.getAssociationName(),
                     workflowAssociation.getWorkflowId(), workflowAssociation.getOperation().toString(),
-                    null);
+                    ruleId);
             Association createdAssociations = workflowManagementService
                     .getAssociationsForWorkflow(workflowAssociation.getWorkflowId()).stream()
                     .filter(association -> association.getAssociationName()
@@ -276,7 +304,7 @@ public class WorkflowService {
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_ADDING_ASSOCIATION,
                     workflowAssociation.getAssociationName(), e);
-        } catch (WorkflowException e) {
+        } catch (WorkflowException | RuleManagementException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_ASSOCIATION,
                     workflowAssociation.getAssociationName(), e);
         }
@@ -294,6 +322,7 @@ public class WorkflowService {
 
         boolean isEnable;
         String eventId;
+        String ruleId = null;
         try {
             if (workflowAssociation.getIsEnabled() == null) {
                 isEnable = workflowManagementService.getAssociation(associationId).isEnabled();
@@ -306,14 +335,49 @@ public class WorkflowService {
             } else {
                 eventId = workflowAssociation.getOperation().toString();
             }
+
+            if (workflowAssociation.getRule() == null) {
+                ruleId = workflowManagementService.getAssociation(associationId).getCondition();
+            } else {
+                String existingRuleId = workflowManagementService.getAssociation(associationId).getCondition();
+                String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+
+                // Check if the request contains an empty rule.
+                if (CollectionUtils.isEmpty(workflowAssociation.getRule().getRules())) {
+                    if (StringUtils.isNotBlank(existingRuleId) && WorkflowManagementUtil.isUUID(existingRuleId)) {
+                        ruleManagementService.deleteRule(existingRuleId, tenantDomain);
+                        ruleId = null;
+                    }
+                } else {
+                    // Process non-empty rule (update or create).
+                    try {
+                        Rule serviceRule = WorkflowRuleMapper.mapApiRuleToServiceRule(
+                                workflowAssociation.getRule(), tenantDomain);
+                        Rule resultRule;
+                        // Update existing rule if it exists, otherwise create new rule.
+                        if (StringUtils.isNotBlank(existingRuleId) && WorkflowManagementUtil.isUUID(existingRuleId)) {
+                            serviceRule.setId(existingRuleId);
+                            resultRule = ruleManagementService.updateRule(serviceRule, tenantDomain);
+                        } else {
+                            resultRule = ruleManagementService.addRule(serviceRule, tenantDomain);
+                        }
+                        if (resultRule != null) {
+                            ruleId = resultRule.getId();
+                        }
+                    } catch (RuleManagementException e) {
+                        String operation = StringUtils.isNotBlank(existingRuleId) &&
+                                WorkflowManagementUtil.isUUID(existingRuleId) ? "updating" : "creating";
+                        throw new WorkflowException("Error while " + operation + " rule for workflow association.", e);
+                    }
+                }
+            }
             workflowManagementService.updateAssociation(associationId, workflowAssociation.getAssociationName(),
-                    workflowAssociation.getWorkflowId(), eventId,
-                    null, isEnable);
+                    workflowAssociation.getWorkflowId(), eventId, ruleId, isEnable);
             return getAssociation(associationId);
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_UPDATING_ASSOCIATION,
                     associationId, e);
-        } catch (WorkflowException e) {
+        } catch (WorkflowException | RuleManagementException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_ASSOCIATION, associationId, e);
         }
     }
@@ -332,7 +396,7 @@ public class WorkflowService {
         } catch (WorkflowClientException e) {
             throw handleClientError(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_ASSOCIATION_NOT_FOUND,
                     associationId, e);
-        } catch (WorkflowException e) {
+        } catch (WorkflowException | RuleManagementException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_ASSOCIATION, associationId, e);
         }
     }
@@ -361,7 +425,7 @@ public class WorkflowService {
                     associations.toArray(new WorkflowAssociationListItem[associations.size()]), offset, filter);
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_LISTING_ASSOCIATIONS, null, e);
-        } catch (WorkflowException e) {
+        } catch (WorkflowException | RuleManagementException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_ASSOCIATIONS, null, e);
         }
     }
@@ -388,10 +452,16 @@ public class WorkflowService {
                         " cannot be deleted as it is the only association for the related workflow: " +
                         association.getWorkflowId());
             }
+            // Condition can either be null, a UUID or a XPath expression.
+            String condition = association.getCondition();
+            if (StringUtils.isNotBlank(condition) && WorkflowManagementUtil.isUUID(condition)) {
+                String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+                ruleManagementService.deleteRule(condition, tenantDomain);
+            }
             workflowManagementService.removeAssociation(Integer.parseInt(associationId));
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_ASSOCIATION_NOT_FOUND, associationId, e);
-        } catch (WorkflowException e) {
+        } catch (WorkflowException | RuleManagementException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_REMOVING_ASSOCIATION, associationId, e);
         }
     }
@@ -766,34 +836,60 @@ public class WorkflowService {
         return workflowAssociationListResponse;
     }
 
-    private WorkflowAssociationListItem getAssociation(Association association) {
+    private WorkflowAssociationListItem getAssociation(Association association) throws RuleManagementException {
 
-        WorkflowAssociationListItem associationListItem = null;
-
-        if (association != null) {
-            associationListItem = new WorkflowAssociationListItem();
-            associationListItem.setId(association.getAssociationId());
-            associationListItem.setAssociationName(association.getAssociationName());
-            associationListItem.setOperation(Operation.valueOf(association.getEventId()));
-            associationListItem.setWorkflowName(association.getWorkflowName());
-            associationListItem.setIsEnabled(association.isEnabled());
+        if (association == null) {
+            return null;
         }
+
+        WorkflowAssociationListItem associationListItem = new WorkflowAssociationListItem();
+        associationListItem.setId(association.getAssociationId());
+        associationListItem.setAssociationName(association.getAssociationName());
+        associationListItem.setOperation(Operation.valueOf(association.getEventId()));
+        associationListItem.setWorkflowName(association.getWorkflowName());
+        associationListItem.setIsEnabled(association.isEnabled());
+
+        ORRuleResponse ruleResponse = getRuleResponse(association);
+        associationListItem.setRule(ruleResponse != null ? ruleResponse : new ORRuleResponse());
+
         return associationListItem;
     }
 
-    private WorkflowAssociationResponse getAssociationDetails(Association association) {
+    private WorkflowAssociationResponse getAssociationDetails(Association association) throws RuleManagementException {
 
-        WorkflowAssociationResponse associationResponse = null;
-
-        if (association != null) {
-            associationResponse = new WorkflowAssociationResponse();
-            associationResponse.setId(association.getAssociationId());
-            associationResponse.setAssociationName(association.getAssociationName());
-            associationResponse.setOperation(Operation.valueOf(association.getEventId()));
-            associationResponse.setWorkflowName(association.getWorkflowName());
-            associationResponse.setIsEnabled(association.isEnabled());
+        if (association == null) {
+            return null;
         }
+
+        WorkflowAssociationResponse associationResponse = new WorkflowAssociationResponse();
+        associationResponse.setId(association.getAssociationId());
+        associationResponse.setAssociationName(association.getAssociationName());
+        associationResponse.setOperation(Operation.valueOf(association.getEventId()));
+        associationResponse.setWorkflowName(association.getWorkflowName());
+        associationResponse.setIsEnabled(association.isEnabled());
+
+        ORRuleResponse ruleResponse = getRuleResponse(association);
+        associationResponse.setRule(ruleResponse != null ? ruleResponse : new ORRuleResponse());
+
         return associationResponse;
+    }
+
+    /**
+     * Retrieves the rule response for an association if the rule ID is valid.
+     *
+     * @param association The association object.
+     * @return ORRuleResponse if rule exists, null otherwise.
+     * @throws RuleManagementException If an error occurs while retrieving the rule.
+     */
+    private ORRuleResponse getRuleResponse(Association association) throws RuleManagementException {
+
+        String ruleId = association.getCondition();
+        if (StringUtils.isNotBlank(ruleId) && WorkflowManagementUtil.isUUID(ruleId)) {
+            String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            Rule rule = ruleManagementService.getRuleByRuleId(ruleId, tenantDomain);
+            return WorkflowRuleMapper.mapServiceRuleToApiRule(rule);
+        }
+        return null;
     }
 
     public void abortWorkflowInstance(String instanceId) {
@@ -1018,7 +1114,7 @@ public class WorkflowService {
             operationType = filterMap.get(Constants.WORKFLOW_INSTANCE_OPERATION_TYPE_KEY);
         }
 
-        org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequestFilterResponse response = workflowManagementService
+        WorkflowRequestFilterResponse response = workflowManagementService
                 .getRequestsFromFilter(user, operationType, beginDate, endDate, dateCategory, tenantId, status, limit,
                         offset);
 
