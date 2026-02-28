@@ -914,12 +914,85 @@ components:
           type: string
           example: e0fbcfeb-3617-43c4-8dd0-7b7d38e13047
     EmailSenderAdd:
+      description: |
+        SMTP and HTTP-based email providers are supported. Configure the payload based on the provider you are adding.
+        
+        - SMTP: SMTP Based Email Provider.<br>
+            ```json
+            {
+              "name": "EmailPublisher",
+              "provider": "SMTP",
+              "fromAddress": "iam@gmail.com",
+              "smtpServerHost": "smtp.gmail.com",
+              "smtpPort": 587,
+              "authType": "BASIC",
+              "properties": [
+                {
+                  "key": "mail.smtp.starttls.enable",
+                  "value": true
+                },
+                {
+                  "key": "userName",
+                  "value": "iam"
+                },
+                {
+                  "key": "password",
+                  "value": "iam123"
+                }
+              ]
+          }
+          ```
+        - HTTP: HTTP Based Email Provider.<br>
+            ```json
+            {
+              "name": "EmailPublisher",
+              "provider": "HTTP",
+              "providerURL": "https://webhook.site/3c538899-e860-4a67-bd3f-03d09dd3fffd",
+              "fromAddress": "iam@gmail.com",
+              "authType": "BASIC",
+              "properties": [
+                {
+                  "key": "http.client.method",
+                  "value": "POST"
+                },
+                {
+                  "key": "http.headers",
+                  "value": "X-Version: 1, Authorization: bearer ,Accept: application/json ,Content-Type: application/json"
+                },
+                {
+                  "key": "contentType",
+                  "value": "JSON"
+                },
+                {
+                  "key": "body",
+                  "value": "{\"eventData\":{\"source\":\"{{subject}}\",\"content\":{{body}}},\"messages\":{\"email\":[{\"to\":{\"email\":\"{{send-to}}\"}}]}}"
+                },
+                {
+                  "key": "userName",
+                  "value": "iam"
+                },
+                {
+                  "key": "password",
+                  "value": "iam123"
+                }
+              ]
+          }
+          ```
       required:
         - fromAddress
       type: object
       properties:
         name:
           type: string
+        provider:
+          type: string
+          enum:
+            - SMTP
+            - HTTP
+          default: SMTP
+        providerURL:
+          type: string
+          description: URL of the email provider endpoint. Required when `provider` is `HTTP`.
         smtpServerHost:
           type: string
         smtpPort:
@@ -1011,6 +1084,16 @@ components:
         name:
           type: string
           example: EmailPublisher
+        provider:
+          type: string
+          enum:
+            - SMTP
+            - HTTP
+          default: SMTP
+          example: SMTP
+        providerURL:
+          type: string
+          description: URL of the email provider endpoint. Required when `provider` is `HTTP`.
         smtpServerHost:
           type: string
           example: smtp.gmail.com
@@ -1101,6 +1184,16 @@ components:
         - fromAddress
       type: object
       properties:
+        provider:
+          type: string
+          enum:
+            - SMTP
+            - HTTP
+          default: SMTP
+          example: SMTP
+        providerURL:
+          type: string
+          description: URL of the email provider. Required when the provider is HTTP.
         smtpServerHost:
           type: string
           example: smtp.gmail.com
