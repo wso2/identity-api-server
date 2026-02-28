@@ -18,18 +18,31 @@
 
 package org.wso2.carbon.identity.api.server.oidc.scope.management.v1.core;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.api.server.common.file.FileContent;
+import org.wso2.carbon.identity.api.server.common.file.FileSerializationConfig;
+import org.wso2.carbon.identity.api.server.common.file.FileSerializationException;
+import org.wso2.carbon.identity.api.server.common.file.FileSerializationUtil;
+import org.wso2.carbon.identity.api.server.common.file.YamlConfig;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.common.OidcScopeConstants;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.Scope;
+import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.ScopeConfiguration;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.ScopeUpdateRequest;
 import org.wso2.carbon.identity.oauth.IdentityOAuthAdminException;
 import org.wso2.carbon.identity.oauth.IdentityOAuthClientException;
 import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
 import org.wso2.carbon.identity.oauth.dto.ScopeDTO;
+import org.yaml.snakeyaml.DumperOptions;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -139,6 +152,152 @@ public class OidcScopeManagementService {
     }
 
     /**
+     * Export an OIDC scope identified by the scopeName, in the given format.
+     *
+     * @param scopeName Scope name.
+     * @param fileType  File type (Accept header value).
+     * @return FileContent with scope data.
+     */
+    public FileContent exportScopeToFile(String scopeName, String fileType) {
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Exporting OIDC scope from the scope name: " + scopeName);
+        }
+        if (StringUtils.isBlank(fileType)) {
+            throw new UnsupportedOperationException("No valid media type found");
+        }
+
+        Scope scope = getScope(scopeName);
+
+        if (scope == null) {
+            throw handleException(Response.Status.NOT_FOUND,
+                    OidcScopeConstants.ErrorMessage.ERROR_CODE_ERROR_EXPORTING_SCOPE);
+        }
+
+        FileContent fileContent;
+        try {
+            fileContent = generateFileFromModel(fileType, scope);
+        } catch (IdentityOAuthAdminException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    OidcScopeConstants.ErrorMessage.ERROR_CODE_ERROR_EXPORTING_SCOPE, e);
+        }
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Successfully exported OIDC scope: %s as a file type of %s.",
+                    scope.getName(), fileType));
+        }
+        return fileContent;
+    }
+
+    /**
+     * Create a new OIDC scope by importing an YAML, JSON or XML configuration file.
+     *
+     * @param fileInputStream File to be imported as an input stream.
+     * @param fileDetail      File details.
+     * @return Scope name of the imported scope.
+     */
+    public String importScopeFromFile(InputStream fileInputStream, Attachment fileDetail) {
+
+        Scope scope;
+        try {
+            scope = getScopeFromFile(fileInputStream, fileDetail);
+        } catch (IdentityOAuthClientException e) {
+            throw handleException(Response.Status.BAD_REQUEST,
+                    OidcScopeConstants.ErrorMessage.ERROR_CODE_ERROR_IMPORTING_SCOPE, e);
+        }
+
+        return addScope(scope);
+    }
+
+    /**
+     * Update an existing OIDC scope from an YAML, JSON or XML configuration file.
+     *
+     * @param scopeName       Scope name to update.
+     * @param fileInputStream File to be imported as an input stream.
+     * @param fileDetail      File details.
+     * @return Scope name of the updated scope.
+     */
+    public String updateScopeFromFile(String scopeName, InputStream fileInputStream, Attachment fileDetail) {
+
+        Scope scope;
+        try {
+            scope = getScopeFromFile(fileInputStream, fileDetail);
+        } catch (IdentityOAuthClientException e) {
+            throw handleException(Response.Status.BAD_REQUEST,
+                    OidcScopeConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_SCOPE, e);
+        }
+
+        ScopeUpdateRequest updateRequest = new ScopeUpdateRequest();
+        updateRequest.setDisplayName(scope.getDisplayName());
+        updateRequest.setDescription(scope.getDescription());
+        updateRequest.setClaims(scope.getClaims());
+
+        updateScope(scopeName, updateRequest);
+        return scopeName;
+    }
+
+    private FileContent generateFileFromModel(String fileType, Scope scope)
+            throws IdentityOAuthAdminException {
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Parsing OIDC scope object to file content of type: " + fileType);
+        }
+
+        ScopeConfiguration scopeConfig = new ScopeConfiguration(scope);
+
+        FileSerializationConfig config = new FileSerializationConfig();
+        YamlConfig yamlConfig = new YamlConfig();
+        yamlConfig.setDumperOptionsCustomizer(options -> {
+            options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        });
+        config.setYamlConfig(yamlConfig);
+
+        try {
+            return FileSerializationUtil.serialize(scopeConfig, scope.getName(), fileType, config);
+        } catch (FileSerializationException e) {
+            throw new IdentityOAuthAdminException("Error when parsing OIDC scope to file.", e);
+        }
+    }
+
+    private Scope getScopeFromFile(InputStream fileInputStream, Attachment fileDetail)
+            throws IdentityOAuthClientException {
+
+        Scope scope;
+        try {
+            FileContent scopeFileContent = new FileContent(fileDetail.getDataHandler().getName(),
+                    fileDetail.getDataHandler().getContentType(),
+                    IOUtils.toString(fileInputStream, StandardCharsets.UTF_8.name()));
+            scope = generateModelFromFile(scopeFileContent);
+        } catch (IOException | IdentityOAuthClientException e) {
+            throw new IdentityOAuthClientException("Provided input file is not in the correct format", e);
+        } finally {
+            IOUtils.closeQuietly(fileInputStream);
+        }
+
+        return scope;
+    }
+
+    private Scope generateModelFromFile(FileContent fileContent)
+            throws IdentityOAuthClientException {
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Parsing OIDC scope from file: %s of type: %s.", fileContent.getFileName(),
+                    fileContent.getFileType()));
+        }
+        if (StringUtils.isEmpty(fileContent.getContent())) {
+            throw new IdentityOAuthClientException(String.format(
+                            "Empty OIDC scope configuration file %s uploaded.", fileContent.getFileName()));
+        }
+
+        try {
+            ScopeConfiguration scopeConfig = FileSerializationUtil.deserialize(fileContent, ScopeConfiguration.class);
+            return scopeConfig.toScope();
+        } catch (FileSerializationException e) {
+            throw new IdentityOAuthClientException("Error when generating the OIDC scope model from file", e);
+        }
+    }
+
+    /**
      * Build scope list.
      *
      * @param scopeDTOS ScopeDTOs.
@@ -198,4 +357,25 @@ public class OidcScopeManagementService {
         }
         return new APIError(status, errorResponse);
     }
+
+    private APIError handleException(Response.Status status, OidcScopeConstants.ErrorMessage errorMessage,
+                                      IdentityOAuthAdminException e) {
+
+        ErrorResponse errorResponse = new ErrorResponse.Builder()
+                .withCode(errorMessage.getCode())
+                .withMessage(errorMessage.getMessage())
+                .withDescription(e.getMessage())
+                .build(LOG, errorMessage.getMessage());
+        return new APIError(status, errorResponse);
+    }
+
+    private APIError handleException(Response.Status status, OidcScopeConstants.ErrorMessage errorMessage) {
+
+        ErrorResponse errorResponse = new ErrorResponse.Builder()
+                .withCode(errorMessage.getCode())
+                .withMessage(errorMessage.getMessage())
+                .withDescription(errorMessage.getDescription())
+                .build(LOG, errorMessage.getMessage());
+        return new APIError(status, errorResponse);
+   }
 }
