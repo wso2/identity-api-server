@@ -125,10 +125,12 @@ public enum ResourceTypeEnum {
   }
 
   public DebugConnectionRequest putPropertiesItem(String key, String propertiesItem) {
+    if (this.properties == null) {
+      this.properties = new HashMap<>();
+    }
     this.properties.put(key, propertiesItem);
     return this;
   }
-
 
   @Override
   public String toString() {
@@ -152,4 +154,3 @@ public enum ResourceTypeEnum {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

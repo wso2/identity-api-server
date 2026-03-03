@@ -115,6 +115,9 @@ public class DebugResponse  {
   }
 
   public DebugResponse putMetadataItem(String key, Object metadataItem) {
+    if (this.metadata == null) {
+      this.metadata = new HashMap<>();
+    }
     this.metadata.put(key, metadataItem);
     return this;
   }
@@ -143,4 +146,3 @@ public class DebugResponse  {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

@@ -22,6 +22,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.debug.v1.DebugApiService;
 import org.wso2.carbon.identity.api.server.debug.v1.constants.DebugConstants;
 import org.wso2.carbon.identity.api.server.debug.v1.core.DebugServiceCore;
@@ -41,11 +43,14 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.api.server.common.Util.getCorrelation;
+
 /**
  * Implementation of the DebugApiService interface.
  */
 public class DebugApiServiceImpl implements DebugApiService {
 
+    private static final Log LOG = LogFactory.getLog(DebugApiServiceImpl.class);
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final TypeReference<Map<String, Object>> MAP_TYPE_REFERENCE =
             new TypeReference<Map<String, Object>>() {
@@ -56,6 +61,8 @@ public class DebugApiServiceImpl implements DebugApiService {
             DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST;
     private static final DebugConstants.ErrorMessage RESULT_NOT_FOUND_ERROR =
             DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND;
+    private static final String ERROR_MESSAGE_MISSING_SESSION_ID =
+            "Debug framework response does not contain sessionId or state.";
 
     private final DebugServiceCore debugServiceCore;
 
@@ -71,14 +78,19 @@ public class DebugApiServiceImpl implements DebugApiService {
             Map<String, Object> debugResult = debugServiceCore.processStartSession(debugConnectionRequest);
             return Response.ok().entity(buildDebugConnectionResponse(debugResult)).build();
         } catch (DebugFrameworkClientException | IllegalArgumentException e) {
-            return buildErrorResponse(Response.Status.BAD_REQUEST, REQUEST_VALIDATION_ERROR.getCode(), e.getMessage(),
-                    "Invalid debug request.");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Invalid debug request.", e);
+            }
+            return buildErrorResponse(Response.Status.BAD_REQUEST, REQUEST_VALIDATION_ERROR.getCode(),
+                    REQUEST_VALIDATION_ERROR.getMessage(), REQUEST_VALIDATION_ERROR.getDescription());
         } catch (DebugFrameworkServerException e) {
-            return buildErrorResponse(Response.Status.INTERNAL_SERVER_ERROR, PROCESSING_ERROR.getCode(), e.getMessage(),
-                    "Error occurred while processing debug request.");
-        } catch (RuntimeException e) {
+            LOG.error("Error occurred while processing debug request.", e);
             return buildErrorResponse(Response.Status.INTERNAL_SERVER_ERROR, PROCESSING_ERROR.getCode(),
-                    "Error occurred while processing debug request.", e.getMessage());
+                    PROCESSING_ERROR.getMessage(), PROCESSING_ERROR.getDescription());
+        } catch (RuntimeException e) {
+            LOG.error("Unexpected error occurred while processing debug request.", e);
+            return buildErrorResponse(Response.Status.INTERNAL_SERVER_ERROR, PROCESSING_ERROR.getCode(),
+                    PROCESSING_ERROR.getMessage(), PROCESSING_ERROR.getDescription());
         }
     }
 
@@ -103,11 +115,15 @@ public class DebugApiServiceImpl implements DebugApiService {
                 return buildErrorResponse(Response.Status.NOT_FOUND, RESULT_NOT_FOUND_ERROR.getCode(),
                         RESULT_NOT_FOUND_ERROR.getMessage(), RESULT_NOT_FOUND_ERROR.getDescription());
             }
-            return buildErrorResponse(Response.Status.BAD_REQUEST, REQUEST_VALIDATION_ERROR.getCode(), e.getMessage(),
-                    "Invalid debug result request.");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Invalid debug result request.", e);
+            }
+            return buildErrorResponse(Response.Status.BAD_REQUEST, REQUEST_VALIDATION_ERROR.getCode(),
+                    REQUEST_VALIDATION_ERROR.getMessage(), REQUEST_VALIDATION_ERROR.getDescription());
         } catch (RuntimeException e) {
+            LOG.error("Unexpected error occurred while retrieving debug result.", e);
             return buildErrorResponse(Response.Status.INTERNAL_SERVER_ERROR, PROCESSING_ERROR.getCode(),
-                    "Error retrieving debug result.", e.getMessage());
+                    PROCESSING_ERROR.getMessage(), PROCESSING_ERROR.getDescription());
         }
     }
 
@@ -120,10 +136,9 @@ public class DebugApiServiceImpl implements DebugApiService {
             sessionId = debugResult.get(DebugConstants.ResponseKeys.STATE);
         }
         if (sessionId == null) {
-            response.setDebugId("debug-" + System.currentTimeMillis());
-        } else {
-            response.setDebugId(sessionId.toString());
+            throw new IllegalStateException(ERROR_MESSAGE_MISSING_SESSION_ID);
         }
+        response.setDebugId(sessionId.toString());
         DebugConnectionResponse.StatusEnum status 
             = resolveConnectionStatus(debugResult.get(DebugConstants.ResponseKeys.STATUS));
         response.setStatus(status);
@@ -152,6 +167,7 @@ public class DebugApiServiceImpl implements DebugApiService {
         try {
             return DebugConnectionResponse.StatusEnum.valueOf(status.toString().toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
+            LOG.warn("Unrecognized debug status from framework: " + status + ". Falling back to SUCCESS.");
             return DebugConnectionResponse.StatusEnum.SUCCESS;
         }
     }
@@ -180,6 +196,7 @@ public class DebugApiServiceImpl implements DebugApiService {
         error.setCode(code);
         error.setMessage(message);
         error.setDescription(description);
+        error.setTraceId(getCorrelation());
         return Response.status(status).entity(error).build();
     }
 

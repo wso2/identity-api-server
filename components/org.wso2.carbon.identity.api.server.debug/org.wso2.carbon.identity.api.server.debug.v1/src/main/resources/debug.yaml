@@ -69,17 +69,17 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /debug/result/{session-id}:
+  /debug/result/{debugId}:
     get:
       summary: "Get Debug Result"
-      description: "Retrieves the debug results for a specific session ID."
+      description: "Retrieves the debug results for a specific debug ID"
       operationId: "getDebugResult"
       tags:
         - "Debug"
       parameters:
         - name: "session-id"
           in: "path"
-          description: "The unique session ID for the debug flow."
+          description: "The debug session identifier. Use the `debugId` value returned by POST /debug."
           required: true
           schema:
             type: "string"
@@ -178,7 +178,7 @@ components:
       properties:
         debugId:
           type: string
-          description: "Debug session ID."
+          description: "Debug session identifier."
           example: "debug-496f5a3f-0094-42f2-8188-d2baa9a1287c"
         status:
           type: string
@@ -204,16 +204,16 @@ components:
               example: "https://api.asgardeo.io/t/linuka/oauth2/authorize?response_type=code&client_id=lfrTEyDGHBEUbeBKoiaosz1y8Aca&redirect_uri=https%3A%2F%2Flocalhost%3A9443%2Fcommonauth"
 
     # -----------------------------
-    # GET /debug/result/{session-id}
+    # GET /debug/result/{debugId}
     # -----------------------------
     DebugResponse:
       type: object
       required:
-        - sessionId
+        - debugId
         - success
-      description: "Debug response containing sessionId and success at top level, with all protocol-specific data in metadata."
+      description: "Debug response containing debugId and success at top level, with all protocol-specific data in metadata."
       properties:
-        sessionId:
+        debugId:
           type: string
           description: "Debug session identifier. Used to retrieve debug results via the GET endpoint."
           example: "debug-session-12345"

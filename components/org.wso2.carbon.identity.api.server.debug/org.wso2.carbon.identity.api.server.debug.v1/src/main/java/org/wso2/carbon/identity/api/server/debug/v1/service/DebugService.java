@@ -108,15 +108,14 @@ public class DebugService {
             return coordinator.getDebugResult(sessionId);
         } catch (DebugFrameworkClientException e) {
             throw e;
-
+        } catch (DebugFrameworkServerException e) {
+            LOG.error("Error retrieving debug result.", e);
+            throw new RuntimeException("Error retrieving debug result.", e);
         } catch (RuntimeException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Debug framework not available for result retrieval.", e);
             }
             throw new IllegalStateException("Debug framework not available for result retrieval.", e);
-        } catch (Exception e) {
-            LOG.error("Error retrieving debug result.", e);
-            throw new RuntimeException("Error retrieving debug result.", e);
         }
     }
 
