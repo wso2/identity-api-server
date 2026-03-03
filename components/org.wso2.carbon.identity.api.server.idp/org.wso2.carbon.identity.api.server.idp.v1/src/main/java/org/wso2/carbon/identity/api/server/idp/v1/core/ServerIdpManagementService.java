@@ -129,6 +129,8 @@ import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 import org.wso2.carbon.idp.mgt.dao.IdPManagementDAO;
 import org.wso2.carbon.idp.mgt.model.ConnectedAppsResult;
 import org.wso2.carbon.idp.mgt.model.IdpSearchResult;
+import org.wso2.carbon.idp.mgt.util.IdPManagementConstants;
+import org.wso2.carbon.idp.mgt.util.IdPManagementUtil;
 import org.yaml.snakeyaml.TypeDescription;
 
 import java.io.IOException;
@@ -144,6 +146,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -982,6 +985,11 @@ public class ServerIdpManagementService {
                     .getProvisioningConnectorConfigs());
             int configPos = getExistingProvConfigPosition(provConnectorConfigs, connectorId);
             if (configPos != -1) {
+                // Preserve confidential property values from existing config if not provided in the update request.
+                Property[] updatedProperties = preserveConfidentialProperties(
+                        provConnectorConfigs[configPos].getProvisioningProperties(),
+                        connectorConfig.getProvisioningProperties());
+                connectorConfig.setProvisioningProperties(updatedProperties);
                 provConnectorConfigs[configPos] = connectorConfig;
             } else {
                 // if configPos is -1 add new authenticator to the list.
@@ -1901,10 +1909,17 @@ public class ServerIdpManagementService {
             String defaultConnectorId = outboundProvisioningRequest.getDefaultConnectorId();
             ProvisioningConnectorConfig defaultConnectorConfig = null;
             List<ProvisioningConnectorConfig> connectorConfigs = new ArrayList<>();
+
+            // Get existing connector configs for confidential property preservation.
+            ProvisioningConnectorConfig[] existingConnectorConfigs = idp.getProvisioningConnectorConfigs();
+
             for (OutboundConnector connector : outboundConnectors) {
                 ProvisioningConnectorConfig connectorConfig = new ProvisioningConnectorConfig();
-                connectorConfig.setName(base64URLDecode(connector.getConnectorId()));
+                String connectorName = base64URLDecode(connector.getConnectorId());
+                connectorConfig.setName(connectorName);
                 connectorConfig.setEnabled(connector.getIsEnabled());
+                connectorConfig.setBlocking(connector.getBlockingEnabled());
+                connectorConfig.setRulesEnabled(connector.getRulesEnabled());
 
                 List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> connectorProperties = connector
                         .getProperties();
@@ -1918,6 +1933,23 @@ public class ServerIdpManagementService {
                             .map(propertyToInternal)
                             .collect(Collectors.toList());
                     connectorConfig.setProvisioningProperties(properties.toArray(new Property[0]));
+
+                    // Preserve confidential property values from existing config if not provided in update request.
+                    if (existingConnectorConfigs != null) {
+                        ProvisioningConnectorConfig existingConfig =
+                                Arrays.stream(existingConnectorConfigs)
+                                        .filter(config ->
+                                                StringUtils.equals(config.getName(), connectorName))
+                                        .findFirst()
+                                        .orElse(null);
+
+                        if (existingConfig != null && existingConfig.getProvisioningProperties() != null) {
+                            Property[] updatedProperties = preserveConfidentialProperties(
+                                    existingConfig.getProvisioningProperties(),
+                                    connectorConfig.getProvisioningProperties());
+                            connectorConfig.setProvisioningProperties(updatedProperties);
+                        }
+                    }
                 }
                 connectorConfigs.add(connectorConfig);
 
@@ -2907,6 +2939,11 @@ public class ServerIdpManagementService {
             throw handleException(Response.Status.BAD_REQUEST,
                     Constants.ErrorMessage.ERROR_CODE_OUTBOUND_PROVISIONING_CONFIG_NOT_FOUND, connectorName);
         }
+        if (!areAllDistinct(connector.getProperties())) {
+            throw handleException(Response.Status.BAD_REQUEST,
+                    Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT, " Duplicate properties are found in " +
+                            "the request.");
+        }
         List<Property> properties = connector.getProperties().stream()
                 .map(propertyToInternal)
                 .collect(Collectors.toList());
@@ -3098,9 +3135,27 @@ public class ServerIdpManagementService {
             outboundConnector.setIsDefault(isDefaultConnector);
             outboundConnector.setBlockingEnabled(config.isBlocking());
             outboundConnector.setRulesEnabled(config.isRulesEnabled());
+
+            boolean isConfidentialDataProtectionEnabled =
+                    IdPManagementUtil.isProvisioningConfidentialConfigProtectionEnabled();
+            if (log.isDebugEnabled()) {
+                log.debug("Confidential data protection enabled for outbound provisioning: " +
+                        isConfidentialDataProtectionEnabled);
+            }
             List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> properties =
-                    Arrays.stream(config
-                            .getProvisioningProperties()).map(propertyToExternal)
+                    Arrays.stream(config.getProvisioningProperties())
+                            .map(property -> {
+                                if (isConfidentialDataProtectionEnabled && property.isConfidential() &&
+                                        StringUtils.isNotBlank(property.getValue())) {
+                                    Property maskedProperty = new Property();
+                                    maskedProperty.setName(property.getName());
+                                    maskedProperty.setValue(MASKING_VALUE);
+                                    maskedProperty.setConfidential(property.isConfidential());
+                                    return maskedProperty;
+                                }
+                                return property;
+                            })
+                            .map(propertyToExternal)
                             .collect(Collectors.toList());
             outboundConnector.setProperties(properties);
         }
@@ -3793,5 +3848,58 @@ public class ServerIdpManagementService {
                     Constants.ErrorMessage.ERROR_CODE_MAX_FEDERATED_AUTHENTICATOR_PROPERTY_EXCEEDED,
                     String.valueOf(maxFederatedAuthenticatorPropertyLimit));
         }
+    }
+
+    /**
+     * Preserve confidential property values from existing configuration if not provided in update request.
+     * This ensures that confidential properties (like passwords, secrets) are not lost during updates
+     * when they are filtered out in GET responses for security reasons.
+     *
+     * @param existingProperties Array of existing provisioning properties
+     * @param updatedProperties  Array of updated provisioning properties from the request
+     * @return Updated properties array with confidential values preserved
+     */
+    private Property[] preserveConfidentialProperties(Property[] existingProperties, Property[] updatedProperties) {
+
+        if (existingProperties == null || updatedProperties == null) {
+            return updatedProperties;
+        }
+
+        List<Property> updatedList =
+                new ArrayList<>(Arrays.asList(Optional.of(updatedProperties).orElse(new Property[0])));
+
+        for (Property existingProperty : existingProperties) {
+            if (existingProperty.isConfidential() &&
+                    StringUtils.isNotBlank(existingProperty.getValue())) {
+
+                Optional<Property> matchingUpdatedProperty = Arrays.stream(updatedProperties)
+                        .filter(updatedProperty -> StringUtils.equals(updatedProperty.getName(),
+                                existingProperty.getName()))
+                        .findFirst();
+
+                if (!matchingUpdatedProperty.isPresent()) {
+                    // Property not present in update → add it.
+                    Property newProperty = new Property();
+                    newProperty.setName(existingProperty.getName());
+                    newProperty.setValue(existingProperty.getValue());
+                    newProperty.setConfidential(existingProperty.isConfidential());
+
+                    updatedList.add(newProperty);
+                }
+            }
+        }
+        return updatedList.toArray(new Property[0]);
+    }
+
+    /**
+     * Check if outbound provisioning confidential data protection is enabled.
+     *
+     * @return true if OUTBOUND_PROVISIONING_CONFIDENTIAL_DATA_PROTECTION_ENABLED is enabled, false otherwise.
+     */
+    private boolean isOutboundProvisioningConfidentialDataProtectionEnabled() {
+
+        String confidentialDataProtectionConfig = IdentityUtil.getProperty(
+                IdPManagementConstants.OUTBOUND_PROVISIONING_CONFIDENTIAL_DATA_PROTECTION_ENABLED);
+        return Boolean.parseBoolean(confidentialDataProtectionConfig);
     }
 }

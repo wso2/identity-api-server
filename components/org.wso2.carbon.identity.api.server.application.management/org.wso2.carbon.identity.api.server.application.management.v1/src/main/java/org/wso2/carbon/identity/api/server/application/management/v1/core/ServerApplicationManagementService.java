@@ -188,7 +188,6 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_PROCESSING_REQUEST;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.FORBIDDEN_OPERATION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
-import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.UNSUPPORTED_OUTBOUND_PROVISIONING_CONFIGURATION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.USE_EXTERNAL_CONSENT_PAGE_NOT_SUPPORTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ISSUER;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.NAME;
@@ -830,14 +829,6 @@ public class ServerApplicationManagementService {
             }
         }
 
-        // Validate whether application-based outbound provisioning support is enabled.
-        if (applicationModel.getProvisioningConfigurations() != null &&
-                applicationModel.getProvisioningConfigurations().getOutboundProvisioningIdps() != null &&
-                !isApplicationBasedOutboundProvisioningEnabled()) {
-            throw buildBadRequestError(UNSUPPORTED_OUTBOUND_PROVISIONING_CONFIGURATION.getCode(),
-                    UNSUPPORTED_OUTBOUND_PROVISIONING_CONFIGURATION.getDescription());
-        }
-
         // Block application creation with name Console or MyAccount.
         if (FrameworkConstants.Application.CONSOLE_APP.equals(applicationModel.getName()) ||
                 FrameworkConstants.Application.MY_ACCOUNT_APP.equals(applicationModel.getName())) {
@@ -912,14 +903,6 @@ public class ServerApplicationManagementService {
         }
         if (!isLegacyAuthzRuntime()) {
             restrictRoleAssociationUpdateInOrgAudience(applicationId, applicationPatchModel);
-        }
-
-        // Validate whether application-based outbound provisioning support is enabled.
-        if (applicationPatchModel != null && applicationPatchModel.getProvisioningConfigurations() != null &&
-                applicationPatchModel.getProvisioningConfigurations().getOutboundProvisioningIdps() != null &&
-                !isApplicationBasedOutboundProvisioningEnabled()) {
-            throw buildBadRequestError(UNSUPPORTED_OUTBOUND_PROVISIONING_CONFIGURATION.getCode(),
-                    UNSUPPORTED_OUTBOUND_PROVISIONING_CONFIGURATION.getDescription());
         }
 
         if (applicationPatchModel != null) {
