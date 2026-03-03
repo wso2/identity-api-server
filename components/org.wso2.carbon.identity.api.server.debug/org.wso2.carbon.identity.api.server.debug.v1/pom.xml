@@ -17,7 +17,7 @@
   ~ under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
@@ -33,6 +33,10 @@
     <packaging>jar</packaging>
     <name>WSO2 Identity Server - Identity Provider Debug API v1.0</name>
     <description>WSO2 Identity Server - Identity Provider Debug API v1.0</description>
+
+    <properties>
+        <mavan.findbugsplugin.exclude.file>${project.basedir}/../../../findbugs-exclude-filter.xml</mavan.findbugsplugin.exclude.file>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -77,12 +81,12 @@
         <dependency>
             <groupId>org.wso2.carbon.identity.framework</groupId>
             <artifactId>org.wso2.carbon.identity.debug.framework</artifactId>
-            <version>7.8.615-SNAPSHOT</version>
+            <version>7.10.37-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.identity.framework</groupId>
             <artifactId>org.wso2.carbon.identity.debug.idp</artifactId>
-            <version>7.8.615-SNAPSHOT</version>
+            <version>7.10.37-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>javax.ws.rs</groupId>
@@ -118,20 +122,30 @@
                         </goals>
                         <configuration>
                             <inputSpec>${project.basedir}/src/main/resources/debug.yaml</inputSpec>
-                            <generatorName>jaxrs-cxf</generatorName>
+                            <generatorName>org.wso2.carbon.codegen.CxfWso2Generator</generatorName>
                             <configOptions>
                                 <sourceFolder>src/gen/java</sourceFolder>
                                 <apiPackage>org.wso2.carbon.identity.api.server.debug.v1</apiPackage>
                                 <modelPackage>org.wso2.carbon.identity.api.server.debug.v1.model</modelPackage>
                                 <packageName>org.wso2.carbon.identity.api.server.debug.v1</packageName>
-                                <dateLibrary>java8</dateLibrary>
+                                <dateLibrary>java17</dateLibrary>
                                 <hideGenerationTimestamp>true</hideGenerationTimestamp>
-                                <generateSupportingFiles>false</generateSupportingFiles>
+                                <ignoreFileOverride>${project.basedir}/.openapi-generator-ignore</ignoreFileOverride>
                             </configOptions>
+                            <output>.</output>
+                            <skipOverwrite>false</skipOverwrite>
                         </configuration>
                     </execution>
                 </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.openapitools</groupId>
+                        <artifactId>cxf-wso2-openapi-generator</artifactId>
+                        <version>1.0.0</version>
+                    </dependency>
+                </dependencies>
             </plugin>
+            -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
@@ -145,13 +159,12 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>target/generated-sources/openapi/src/gen/java</source>
+                                <source>src/gen/java</source>
                             </sources>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-            -->
         </plugins>
     </build>
 </project>

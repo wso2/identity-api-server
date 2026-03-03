@@ -33,6 +33,10 @@
     <name>WSO2 Identity Server - Debug</name>
     <description>WSO2 Identity Server - REST API for Debug </description>
 
+    <properties>
+        <mavan.findbugsplugin.exclude.file>${project.basedir}/../../../findbugs-exclude-filter.xml</mavan.findbugsplugin.exclude.file>
+    </properties>
+
     <modules>
         <module>org.wso2.carbon.identity.api.server.debug.common</module>
         <module>org.wso2.carbon.identity.api.server.debug.v1</module>
