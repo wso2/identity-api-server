@@ -193,6 +193,17 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     }
 
     @Override
+    public Response patchEmailSender(String senderName, EmailSenderUpdateRequest emailSenderUpdateRequest) {
+
+        if (StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+            return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
+        }
+        return Response.ok()
+                .entity(notificationSenderManagementService.patchEmailSender(senderName, emailSenderUpdateRequest))
+                .build();
+    }
+
+    @Override
     public Response updateEmailSender(String senderName, EmailSenderUpdateRequest emailSenderUpdateRequest) {
 
         if (StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
