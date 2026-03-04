@@ -53,6 +53,7 @@ public class AuthorizationDetailsTypeManagementService {
 
         this.apiResourceManager = apiResourceManager;
         this.authorizationDetailsTypeManager = authorizationDetailsTypeManager;
+        LOG.info("Authorization details type management service initialized successfully.");
     }
 
     /**
@@ -72,11 +73,14 @@ public class AuthorizationDetailsTypeManagementService {
         try {
             this.assertApiResourceIdExistence(apiResourceId);
 
-            return this.authorizationDetailsTypeManager.addAuthorizationDetailsTypes(
+            List<AuthorizationDetailsType> result = this.authorizationDetailsTypeManager.addAuthorizationDetailsTypes(
                     apiResourceId,
                     AuthorizationDetailsTypeMgtUtil.toAuthorizationDetailsTypes(creationModels),
                     getThreadLocalCarbonContext().getTenantDomain()
             );
+            LOG.info("Successfully added " + (result != null ? result.size() : 0) +
+                    " authorization details types for API resource ID: " + apiResourceId);
+            return result;
         } catch (APIResourceMgtException e) {
             throw APIResourceMgtEndpointUtil.handleAPIResourceMgtException(e);
         }
@@ -100,6 +104,8 @@ public class AuthorizationDetailsTypeManagementService {
                     authorizationDetailsTypeId,
                     getThreadLocalCarbonContext().getTenantDomain()
             );
+            LOG.info("Successfully deleted authorization details type with ID: " + authorizationDetailsTypeId +
+                    " for API resource ID: " + apiResourceId);
         } catch (APIResourceMgtException e) {
             throw APIResourceMgtEndpointUtil.handleAPIResourceMgtException(e);
         }
@@ -195,6 +201,8 @@ public class AuthorizationDetailsTypeManagementService {
                     toAuthorizationDetailsType(authorizationDetailsTypeId, creationModel),
                     getThreadLocalCarbonContext().getTenantDomain()
             );
+            LOG.info("Successfully updated authorization details type with ID: " + authorizationDetailsTypeId +
+                    " for API resource ID: " + apiResourceId);
         } catch (APIResourceMgtException e) {
             throw APIResourceMgtEndpointUtil.handleAPIResourceMgtException(e);
         }
