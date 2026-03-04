@@ -28,10 +28,9 @@ import javax.validation.constraints.*;
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
-import javax.xml.bind.annotation.*;
 
 public class Scope  {
-  
+
     private String name;
     private String displayName;
     private String description;

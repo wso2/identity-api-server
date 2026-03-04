@@ -18,8 +18,11 @@
 
 package org.wso2.carbon.identity.api.server.oidc.scope.management.v1.impl;
 
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.http.HttpHeaders;
 import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
+import org.wso2.carbon.identity.api.server.common.file.FileContent;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.common.OidcScopeConstants;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.OidcApiService;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.core.OidcScopeManagementService;
@@ -27,7 +30,9 @@ import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.factories.Oi
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.Scope;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.ScopeUpdateRequest;
 
+import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 
 import javax.ws.rs.core.Response;
 
@@ -62,6 +67,22 @@ public class OidcApiServiceImpl implements OidcApiService {
     }
 
     @Override
+    public Response exportScopeToFile(String id, String accept) {
+
+        FileContent fileContent = oidcScopeManagementService.exportScopeToFile(id, accept);
+
+        return Response.ok()
+                .type(fileContent.getFileType())
+                .header("Content-Disposition", "attachment; filename=\""
+                        + fileContent.getFileName() + "\"")
+                .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate")
+                .header(HttpHeaders.PRAGMA, "no-cache")
+                .header(HttpHeaders.EXPIRES, "0")
+                .entity(fileContent.getContent().getBytes(StandardCharsets.UTF_8))
+                .build();
+    }
+
+    @Override
     public Response getScope(String id) {
 
         return Response.ok().entity(oidcScopeManagementService.getScope(id)).build();
@@ -74,10 +95,26 @@ public class OidcApiServiceImpl implements OidcApiService {
     }
 
     @Override
+    public Response importScopeFromFile(InputStream fileInputStream, Attachment fileDetail) {
+
+        String scopeName = oidcScopeManagementService.importScopeFromFile(fileInputStream, fileDetail);
+        return Response.created(getResourceLocation(scopeName)).build();
+    }
+
+    @Override
     public Response updateScope(String id, ScopeUpdateRequest scopeUpdateRequest) {
 
         oidcScopeManagementService.updateScope(id, scopeUpdateRequest);
         return Response.ok().build();
+    }
+
+    @Override
+    public Response updateScopeFromFile(String id, InputStream fileInputStream,
+                                        Attachment fileDetail) {
+
+        String resourceId =
+                oidcScopeManagementService.updateScopeFromFile(id, fileInputStream, fileDetail);
+        return Response.ok().location(getResourceLocation(resourceId)).build();
     }
 
     private URI getResourceLocation(String resourceId) {
