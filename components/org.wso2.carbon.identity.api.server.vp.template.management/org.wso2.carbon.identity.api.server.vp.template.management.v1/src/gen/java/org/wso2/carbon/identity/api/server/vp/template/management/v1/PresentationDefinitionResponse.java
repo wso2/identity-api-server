@@ -32,7 +32,7 @@ public class PresentationDefinitionResponse {
     private String id;
     private String name;
     private String description;
-    private Object definition;
+    private java.util.List<RequestedCredentialModel> credentials;
 
     @ApiModelProperty(value = "Unique identifier of the presentation definition.")
     @JsonProperty("id")
@@ -64,13 +64,13 @@ public class PresentationDefinitionResponse {
         this.description = description;
     }
 
-    @ApiModelProperty(value = "The full presentation definition JSON object.")
-    @JsonProperty("definition")
-    public Object getDefinition() {
-        return definition;
+    @ApiModelProperty(value = "The list of requested credentials in this presentation definition.")
+    @JsonProperty("credentials")
+    public java.util.List<RequestedCredentialModel> getCredentials() {
+        return credentials;
     }
 
-    public void setDefinition(Object definition) {
-        this.definition = definition;
+    public void setCredentials(java.util.List<RequestedCredentialModel> credentials) {
+        this.credentials = credentials;
     }
 }
