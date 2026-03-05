@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2019-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -2618,8 +2618,16 @@ public class ServerIdpManagementService {
             jitConfig.setAssociateLocalUser(jitProvisionConfig.isAssociateLocalUserEnabled());
             jitConfig.setSkipJITForLookupFailure(jitProvisionConfig.isSkipJITOnAttrAccLookUpFailureEnabled());
             jitConfig.setAccountLookupAttributeMappings(createAccountLookupAttributeMapping(jitProvisionConfig));
-            String attributeSyncMethod = StringUtils.isNotBlank(jitProvisionConfig.getAttributeSyncMethod()) ?
-                    jitProvisionConfig.getAttributeSyncMethod() : FrameworkConstants.OVERRIDE_ALL;
+            String attributeSyncMethod = jitProvisionConfig.getAttributeSyncMethod();
+            if (StringUtils.isBlank(attributeSyncMethod)) {
+                attributeSyncMethod = IdPManagementUtil.isPreserveLocallyAddedClaims()
+                        ? FrameworkConstants.PRESERVE_LOCAL
+                        : FrameworkConstants.OVERRIDE_ALL;
+                if (log.isDebugEnabled() && FrameworkConstants.PRESERVE_LOCAL.equals(attributeSyncMethod)) {
+                    log.debug("Attribute sync method not specified for IDP: " + idp.getIdentityProviderName() +
+                            ", setting PRESERVE_LOCAL based on server configuration.");
+                }
+            }
             jitConfig.setAttributeSyncMethod(JustInTimeProvisioning.AttributeSyncMethodEnum
                     .valueOf(attributeSyncMethod));
             String idpGroupSyncMethod = StringUtils.isNotBlank(jitProvisionConfig.getIdpGroupSyncMethod()) ?
