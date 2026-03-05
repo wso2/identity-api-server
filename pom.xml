@@ -812,13 +812,9 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
-                <artifactId>common</artifactId>
+                <artifactId>org.wso2.carbon.identity.api.server.vp.template.management.v1</artifactId>
                 <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.identity.server.api</groupId>
-                <artifactId>v1</artifactId>
-                <version>${project.version}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.inbound.auth.oauth2</groupId>
