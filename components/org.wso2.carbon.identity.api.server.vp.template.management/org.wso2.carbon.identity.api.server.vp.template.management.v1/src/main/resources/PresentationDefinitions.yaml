@@ -253,7 +253,7 @@ components:
         issuer:
           type: string
           description: The trusted issuer for this credential.
-        requested_claims:
+        claims:
           type: array
           description: List of claims requested from this credential.
           items:
@@ -264,7 +264,7 @@ components:
       type: object
       required:
         - name
-        - requested_credentials
+        - credentials
       properties:
         name:
           type: string
@@ -274,7 +274,7 @@ components:
           type: string
           description: Description of the presentation definition.
           example: "Verifies employee credentials"
-        requested_credentials:
+        credentials:
           type: array
           description: The requested credentials to construct the definition.
           items:
@@ -290,7 +290,7 @@ components:
         description:
           type: string
           description: Description of the presentation definition.
-        requested_credentials:
+        credentials:
           type: array
           description: The requested credentials to construct the definition.
           items:

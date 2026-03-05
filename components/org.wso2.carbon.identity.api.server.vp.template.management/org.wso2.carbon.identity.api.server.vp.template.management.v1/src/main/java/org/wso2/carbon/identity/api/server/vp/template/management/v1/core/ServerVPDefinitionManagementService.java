@@ -90,7 +90,7 @@ public class ServerVPDefinitionManagementService {
                     .definitionId(definitionId)
                     .name(creationModel.getName())
                     .description(creationModel.getDescription())
-                    .requestedCredentials(toRequestedCredentials(creationModel.getRequestedCredentials()))
+                    .requestedCredentials(toRequestedCredentials(creationModel.getCredentials()))
                     .tenantId(tenantId)
                     .build();
 
@@ -147,8 +147,8 @@ public class ServerVPDefinitionManagementService {
             int tenantId = getTenantId();
             PresentationDefinitionService service = getService();
 
-            List<RequestedCredential> credentials = updateModel.getRequestedCredentials() != null
-                    ? toRequestedCredentials(updateModel.getRequestedCredentials())
+            List<RequestedCredential> credentials = updateModel.getCredentials() != null
+                    ? toRequestedCredentials(updateModel.getCredentials())
                     : null;
 
             PresentationDefinition definition = new PresentationDefinition.Builder()
@@ -207,7 +207,7 @@ public class ServerVPDefinitionManagementService {
             cred.setType(apiModel.getType());
             cred.setPurpose(apiModel.getPurpose());
             cred.setIssuer(apiModel.getIssuer());
-            cred.setClaims(apiModel.getRequestedClaims());
+            cred.setClaims(apiModel.getClaims());
             result.add(cred);
         }
         return result;
@@ -228,7 +228,7 @@ public class ServerVPDefinitionManagementService {
             model.setType(cred.getType());
             model.setPurpose(cred.getPurpose());
             model.setIssuer(cred.getIssuer());
-            model.setRequestedClaims(cred.getClaims());
+            model.setClaims(cred.getClaims());
             result.add(model);
         }
         return result;

@@ -17,7 +17,7 @@ public class RequestedCredentialModel {
     private String type;
     private String purpose;
     private String issuer;
-    private List<String> requestedClaims;
+    private List<String> claims;
 
     @ApiModelProperty(required = true, value = "Type of the requested credential.")
     @JsonProperty("type")
@@ -50,12 +50,12 @@ public class RequestedCredentialModel {
     }
 
     @ApiModelProperty(value = "List of claims requested from this credential.")
-    @JsonProperty("requested_claims")
-    public List<String> getRequestedClaims() {
-        return requestedClaims;
+    @JsonProperty("claims")
+    public List<String> getClaims() {
+        return claims;
     }
 
-    public void setRequestedClaims(List<String> requestedClaims) {
-        this.requestedClaims = requestedClaims;
+    public void setClaims(List<String> claims) {
+        this.claims = claims;
     }
 }

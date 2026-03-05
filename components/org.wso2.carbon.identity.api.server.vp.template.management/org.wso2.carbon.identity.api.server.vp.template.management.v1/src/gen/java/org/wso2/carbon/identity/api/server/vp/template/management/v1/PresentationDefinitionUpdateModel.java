@@ -33,7 +33,7 @@ public class PresentationDefinitionUpdateModel {
 
     private String name;
     private String description;
-    private List<RequestedCredentialModel> requestedCredentials;
+    private List<RequestedCredentialModel> credentials;
 
     @ApiModelProperty(value = "Name of the presentation definition.")
     @JsonProperty("name")
@@ -56,12 +56,12 @@ public class PresentationDefinitionUpdateModel {
     }
 
     @ApiModelProperty(value = "The requested credentials to construct the definition.")
-    @JsonProperty("requested_credentials")
-    public List<RequestedCredentialModel> getRequestedCredentials() {
-        return requestedCredentials;
+    @JsonProperty("credentials")
+    public List<RequestedCredentialModel> getCredentials() {
+        return credentials;
     }
 
-    public void setRequestedCredentials(List<RequestedCredentialModel> requestedCredentials) {
-        this.requestedCredentials = requestedCredentials;
+    public void setCredentials(List<RequestedCredentialModel> credentials) {
+        this.credentials = credentials;
     }
 }
