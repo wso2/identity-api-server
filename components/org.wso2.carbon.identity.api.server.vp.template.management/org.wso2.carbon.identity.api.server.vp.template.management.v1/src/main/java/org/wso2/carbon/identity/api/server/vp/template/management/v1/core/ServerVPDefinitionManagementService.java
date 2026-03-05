@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.vp.template.management.v1.core;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.vp.template.management.common.VPDefinitionManagementConstants.ErrorMessage;
 import org.wso2.carbon.identity.api.server.vp.template.management.common.VPDefinitionManagementServiceHolder;
@@ -32,7 +31,7 @@ import org.wso2.carbon.identity.api.server.vp.template.management.v1.RequestedCr
 import org.wso2.carbon.identity.openid4vc.presentation.common.exception.PresentationDefinitionNotFoundException;
 import org.wso2.carbon.identity.openid4vc.presentation.common.exception.VPException;
 import org.wso2.carbon.identity.openid4vc.presentation.common.model.PresentationDefinition;
-import org.wso2.carbon.identity.openid4vc.presentation.common.util.PresentationDefinitionUtil;
+import org.wso2.carbon.identity.openid4vc.presentation.common.model.PresentationDefinition.RequestedCredential;
 import org.wso2.carbon.identity.openid4vc.presentation.definition.service.PresentationDefinitionService;
 
 import java.util.ArrayList;
@@ -46,8 +45,6 @@ import javax.ws.rs.core.Response;
  * Handles business logic, model conversion, and error mapping.
  */
 public class ServerVPDefinitionManagementService {
-
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     /**
      * List all presentation definitions for the current tenant.
@@ -88,36 +85,12 @@ public class ServerVPDefinitionManagementService {
             PresentationDefinitionService service = getService();
 
             String definitionId = UUID.randomUUID().toString();
-            List<RequestedCredentialModel> requestedCredentials = creationModel.getRequestedCredentials();
-            List<String> inputDescriptors = new ArrayList<>();
-            int descIndex = 1;
-            if (requestedCredentials != null) {
-                for (RequestedCredentialModel reqCred : requestedCredentials) {
-                    String descId = reqCred.getType() != null ? 
-                            reqCred.getType().toLowerCase() + "_descriptor" + descIndex : 
-                            "descriptor_" + descIndex;
-                    inputDescriptors.add(
-                            PresentationDefinitionUtil.buildInputDescriptorFromRequestedCredential(
-                                    descId, reqCred.getType(), reqCred.getPurpose(), reqCred.getIssuer(),
-                                    reqCred.getRequestedClaims()));
-                    descIndex++;
-                }
-            }
-
-            String definitionJson = null;
-            if (!inputDescriptors.isEmpty()) {
-                definitionJson = PresentationDefinitionUtil.buildPresentationDefinition(
-                        definitionId, creationModel.getName(), creationModel.getDescription(),
-                        inputDescriptors.toArray(new String[0]));
-            } else {
-                definitionJson = "{}"; // Will fail validation in service layer
-            }
 
             PresentationDefinition definition = new PresentationDefinition.Builder()
                     .definitionId(definitionId)
                     .name(creationModel.getName())
                     .description(creationModel.getDescription())
-                    .definitionJson(definitionJson)
+                    .requestedCredentials(toRequestedCredentials(creationModel.getRequestedCredentials()))
                     .tenantId(tenantId)
                     .build();
 
@@ -174,30 +147,15 @@ public class ServerVPDefinitionManagementService {
             int tenantId = getTenantId();
             PresentationDefinitionService service = getService();
 
-            String definitionJson = null;
-            if (updateModel.getRequestedCredentials() != null && !updateModel.getRequestedCredentials().isEmpty()) {
-                List<String> inputDescriptors = new ArrayList<>();
-                int descIndex = 1;
-                for (RequestedCredentialModel reqCred : updateModel.getRequestedCredentials()) {
-                    String descId = reqCred.getType() != null ? 
-                            reqCred.getType().toLowerCase() + "_descriptor" + descIndex : 
-                            "descriptor_" + descIndex;
-                    inputDescriptors.add(
-                            PresentationDefinitionUtil.buildInputDescriptorFromRequestedCredential(
-                                    descId, reqCred.getType(), reqCred.getPurpose(), reqCred.getIssuer(),
-                                    reqCred.getRequestedClaims()));
-                    descIndex++;
-                }
-                definitionJson = PresentationDefinitionUtil.buildPresentationDefinition(
-                        definitionId, updateModel.getName(), updateModel.getDescription(),
-                        inputDescriptors.toArray(new String[0]));
-            }
+            List<RequestedCredential> credentials = updateModel.getRequestedCredentials() != null
+                    ? toRequestedCredentials(updateModel.getRequestedCredentials())
+                    : null;
 
             PresentationDefinition definition = new PresentationDefinition.Builder()
                     .definitionId(definitionId)
                     .name(updateModel.getName())
                     .description(updateModel.getDescription())
-                    .definitionJson(definitionJson)
+                    .requestedCredentials(credentials)
                     .tenantId(tenantId)
                     .build();
 
@@ -207,10 +165,6 @@ public class ServerVPDefinitionManagementService {
         } catch (PresentationDefinitionNotFoundException e) {
             throw handleNotFound(definitionId);
         } catch (VPException e) {
-            if (e.getMessage() != null && e.getMessage().contains("Invalid")) {
-                throw handleClientError(ErrorMessage.ERROR_CODE_INVALID_INPUT, e,
-                        Response.Status.BAD_REQUEST, e.getMessage());
-            }
             throw handleServerError(ErrorMessage.ERROR_CODE_ERROR_UPDATING_DEFINITION, e,
                     definitionId);
         }
@@ -238,21 +192,55 @@ public class ServerVPDefinitionManagementService {
 
     // --- Conversion helpers ---
 
+    /**
+     * Convert API RequestedCredentialModel list to domain RequestedCredential list.
+     */
+    private List<RequestedCredential> toRequestedCredentials(
+            List<RequestedCredentialModel> apiModels) {
+
+        if (apiModels == null) {
+            return null;
+        }
+        List<RequestedCredential> result = new ArrayList<>();
+        for (RequestedCredentialModel apiModel : apiModels) {
+            RequestedCredential cred = new RequestedCredential();
+            cred.setType(apiModel.getType());
+            cred.setPurpose(apiModel.getPurpose());
+            cred.setIssuer(apiModel.getIssuer());
+            cred.setClaims(apiModel.getRequestedClaims());
+            result.add(cred);
+        }
+        return result;
+    }
+
+    /**
+     * Convert domain RequestedCredential list to API RequestedCredentialModel list.
+     */
+    private List<RequestedCredentialModel> toCredentialModels(
+            List<RequestedCredential> domainCredentials) {
+
+        if (domainCredentials == null) {
+            return null;
+        }
+        List<RequestedCredentialModel> result = new ArrayList<>();
+        for (RequestedCredential cred : domainCredentials) {
+            RequestedCredentialModel model = new RequestedCredentialModel();
+            model.setType(cred.getType());
+            model.setPurpose(cred.getPurpose());
+            model.setIssuer(cred.getIssuer());
+            model.setRequestedClaims(cred.getClaims());
+            result.add(model);
+        }
+        return result;
+    }
+
     private PresentationDefinitionResponse toResponse(PresentationDefinition definition) {
 
         PresentationDefinitionResponse response = new PresentationDefinitionResponse();
         response.setId(definition.getDefinitionId());
         response.setName(definition.getName());
         response.setDescription(definition.getDescription());
-
-        if (definition.getDefinitionJson() != null) {
-            try {
-                response.setDefinition(
-                        OBJECT_MAPPER.readValue(definition.getDefinitionJson(), Object.class));
-            } catch (Exception e) {
-                response.setDefinition(definition.getDefinitionJson());
-            }
-        }
+        response.setDefinition(toCredentialModels(definition.getRequestedCredentials()));
         return response;
     }
 
