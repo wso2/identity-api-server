@@ -219,7 +219,7 @@ components:
       required:
         - id
         - name
-        - definition
+        - credentials
       properties:
         id:
           type: string
@@ -233,9 +233,11 @@ components:
           type: string
           description: Description of the presentation definition.
           example: "Verifies employee credentials"
-        definition:
-          type: object
-          description: The full presentation definition JSON object.
+        credentials:
+          type: array
+          description: The list of requested credentials in this presentation definition.
+          items:
+            $ref: '#/components/schemas/RequestedCredentialModel'
 
     RequestedCredentialModel:
       type: object

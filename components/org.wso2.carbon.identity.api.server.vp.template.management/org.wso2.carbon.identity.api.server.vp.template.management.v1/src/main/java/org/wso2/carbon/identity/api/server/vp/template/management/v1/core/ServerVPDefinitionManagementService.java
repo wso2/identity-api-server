@@ -240,7 +240,7 @@ public class ServerVPDefinitionManagementService {
         response.setId(definition.getDefinitionId());
         response.setName(definition.getName());
         response.setDescription(definition.getDescription());
-        response.setDefinition(toCredentialModels(definition.getRequestedCredentials()));
+        response.setCredentials(toCredentialModels(definition.getRequestedCredentials()));
         return response;
     }
 
