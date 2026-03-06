@@ -108,7 +108,6 @@ public final class DebugConstants {
             this.description = description;
         }
 
-
         public String getCode() {
             return code;
         }

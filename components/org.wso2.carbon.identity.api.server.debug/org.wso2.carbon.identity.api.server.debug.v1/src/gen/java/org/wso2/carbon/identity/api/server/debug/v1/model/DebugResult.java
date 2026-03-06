@@ -1,17 +1,17 @@
-/*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+/**
+ * Copyright (c) 2026, WSO2 LLC. (https://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
+ * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
  */
@@ -46,7 +46,6 @@ public enum StatusEnum {
 
     @XmlEnumValue("SUCCESS") SUCCESS(String.valueOf("SUCCESS")), @XmlEnumValue("IN_PROGRESS") IN_PROGRESS(String.valueOf("IN_PROGRESS")), @XmlEnumValue("FAILURE") FAILURE(String.valueOf("FAILURE")), @XmlEnumValue("DIRECT_RESULT") DIRECT_RESULT(String.valueOf("DIRECT_RESULT"));
 
-
     private String value;
 
     StatusEnum(String v) {
@@ -74,7 +73,6 @@ public enum StatusEnum {
 
     private StatusEnum status;
     private Map<String, Object> metadata = null;
-
 
     /**
     * Debug session identifier. Used to retrieve debug results via the GET endpoint.
@@ -137,7 +135,6 @@ public enum StatusEnum {
         this.metadata = metadata;
     }
 
-
     public DebugResult putMetadataItem(String key, Object metadataItem) {
         if (this.metadata == null) {
             this.metadata = new HashMap<String, Object>();
@@ -145,8 +142,6 @@ public enum StatusEnum {
         this.metadata.put(key, metadataItem);
         return this;
     }
-
-    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -193,4 +188,3 @@ public enum StatusEnum {
         return o.toString().replace("\n", "\n");
     }
 }
-
