@@ -23,12 +23,12 @@
     <parent>
         <artifactId>identity-api-server</artifactId>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
-        <version>1.3.233-SNAPSHOT</version>
+        <version>1.5.18-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>org.wso2.carbon.identity.api.server.debug</artifactId>
-    <version>1.3.233-SNAPSHOT</version>
+    <version>1.5.18-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Identity Server - Debug</name>
     <description>WSO2 Identity Server - REST API for Debug </description>
