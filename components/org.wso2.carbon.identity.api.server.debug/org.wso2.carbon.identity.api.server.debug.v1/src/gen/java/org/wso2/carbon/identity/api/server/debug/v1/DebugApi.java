@@ -54,10 +54,10 @@ public class DebugApi  {
     @Path("/{debugId}/result")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get Debug Result", notes = "Retrieves the debug results for a specific debug ID. Requires OAuth2 scope `internal_debug_mgt_view`.", response = DebugResult.class, authorizations = {
+    @ApiOperation(value = "Get Debug Result", notes = "Retrieves the debug results for a specific debug ID.", response = DebugResult.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+            @AuthorizationScope(scope = "internal_debug_mgt_view", description = "View debug sessions and results")
         })
     }, tags={ "Debug", })
     @ApiResponses(value = { 
@@ -77,10 +77,10 @@ public class DebugApi  {
     @Path("/{resourceType}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Start Debug Session", notes = "Initiates a debug session for supported resource types with configurable properties. Requires OAuth2 scope `internal_debug_mgt_update`.", response = DebugConnectionResponse.class, authorizations = {
+    @ApiOperation(value = "Start Debug Session", notes = "Initiates a debug session for supported resource types with configurable properties.", response = DebugConnectionResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+            @AuthorizationScope(scope = "internal_debug_mgt_update", description = "Create and manage debug sessions")
         })
     }, tags={ "Debug" })
     @ApiResponses(value = { 
@@ -90,7 +90,7 @@ public class DebugApi  {
         @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response startDebugSession( @Size(min=1,max=50)@ApiParam(value = "Type of resource to debug. Allowed values: idp, fraud_detection.",required=true) @PathParam("resourceType") String resourceType, @ApiParam(value = "Debug request with connection identifier and optional properties." ,required=true) @Valid DebugConnectionRequest debugConnectionRequest) {
+    public Response startDebugSession( @Size(min=1,max=50)@ApiParam(value = "Type of resource to debug. Allowed values: idp, fraud_detection.",required=true, allowableValues="idp, fraud_detection") @PathParam("resourceType") String resourceType, @ApiParam(value = "Debug request with connection identifier and optional properties." ,required=true) @Valid DebugConnectionRequest debugConnectionRequest) {
 
         return delegate.startDebugSession(resourceType,  debugConnectionRequest );
     }
