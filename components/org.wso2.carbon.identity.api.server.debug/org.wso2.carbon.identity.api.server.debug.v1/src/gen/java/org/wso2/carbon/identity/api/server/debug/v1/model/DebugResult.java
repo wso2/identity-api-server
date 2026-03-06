@@ -22,19 +22,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionResponseMetadata;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.validation.constraints.*;
 
 /**
- * Debug connection response containing generic debug information and resource-specific metadata.
+ * Debug response containing debugId and status at top level, with all protocol-specific data in metadata.
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "Debug connection response containing generic debug information and resource-specific metadata.")
-public class DebugConnectionResponse  {
+@ApiModel(description = "Debug response containing debugId and status at top level, with all protocol-specific data in metadata.")
+public class DebugResult  {
   
     private String debugId;
 
@@ -71,22 +73,23 @@ public enum StatusEnum {
 }
 
     private StatusEnum status;
-    private String message;
-    private Long timestamp;
-    private DebugConnectionResponseMetadata metadata;
+    private Map<String, Object> metadata = null;
+
 
     /**
-    * Debug session identifier.
+    * Debug session identifier. Used to retrieve debug results via the GET endpoint.
     **/
-    public DebugConnectionResponse debugId(String debugId) {
+    public DebugResult debugId(String debugId) {
 
         this.debugId = debugId;
         return this;
     }
     
-    @ApiModelProperty(example = "debug-496f5a3f-0094-42f2-8188-d2baa9a1287c", value = "Debug session identifier.")
+    @ApiModelProperty(example = "debug-12345", required = true, value = "Debug session identifier. Used to retrieve debug results via the GET endpoint.")
     @JsonProperty("debugId")
     @Valid
+    @NotNull(message = "Property debugId cannot be null.")
+
     public String getDebugId() {
         return debugId;
     }
@@ -97,15 +100,17 @@ public enum StatusEnum {
     /**
     * Status of the debug operation.
     **/
-    public DebugConnectionResponse status(StatusEnum status) {
+    public DebugResult status(StatusEnum status) {
 
         this.status = status;
         return this;
     }
     
-    @ApiModelProperty(example = "SUCCESS", value = "Status of the debug operation.")
+    @ApiModelProperty(example = "SUCCESS", required = true, value = "Status of the debug operation.")
     @JsonProperty("status")
     @Valid
+    @NotNull(message = "Property status cannot be null.")
+
     public StatusEnum getStatus() {
         return status;
     }
@@ -114,62 +119,34 @@ public enum StatusEnum {
     }
 
     /**
-    * Generic response message.
+    * Protocol-specific and resource-specific debug data. For IDP OAuth debugging, includes userAttributes, mappedClaims, steps, tokens, URLs, and diagnostic information.
     **/
-    public DebugConnectionResponse message(String message) {
-
-        this.message = message;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "Debug session executed successfully", value = "Generic response message.")
-    @JsonProperty("message")
-    @Valid
-    public String getMessage() {
-        return message;
-    }
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    /**
-    * Timestamp when the debug operation was processed (in milliseconds).
-    **/
-    public DebugConnectionResponse timestamp(Long timestamp) {
-
-        this.timestamp = timestamp;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "1771217107937", value = "Timestamp when the debug operation was processed (in milliseconds).")
-    @JsonProperty("timestamp")
-    @Valid
-    public Long getTimestamp() {
-        return timestamp;
-    }
-    public void setTimestamp(Long timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    /**
-    **/
-    public DebugConnectionResponse metadata(DebugConnectionResponseMetadata metadata) {
+    public DebugResult metadata(Map<String, Object> metadata) {
 
         this.metadata = metadata;
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(example = "{\"state\":\"debug-12345\",\"userAttributes\":{\"sub\":\"9d5ddf10-d814-4000-9bf7-35f3eef9b86e\",\"email\":\"user@example.com\"},\"mappedClaims\":[{\"idpClaim\":\"sub\",\"isClaim\":\"http://wso2.org/claims/sub\",\"value\":\"9d5ddf10-d814-4000-9bf7-35f3eef9b86e\",\"status\":\"Auto-Discovered\"}],\"steps\":{\"claimMappingStatus\":\"success\",\"authenticationStatus\":\"success\",\"connectionStatus\":\"success\"},\"idToken\":\"eyJ...\",\"externalRedirectUrl\":\"https://...\"}", value = "Protocol-specific and resource-specific debug data. For IDP OAuth debugging, includes userAttributes, mappedClaims, steps, tokens, URLs, and diagnostic information.")
     @JsonProperty("metadata")
     @Valid
-    public DebugConnectionResponseMetadata getMetadata() {
+    public Map<String, Object> getMetadata() {
         return metadata;
     }
-    public void setMetadata(DebugConnectionResponseMetadata metadata) {
+    public void setMetadata(Map<String, Object> metadata) {
         this.metadata = metadata;
     }
 
 
+    public DebugResult putMetadataItem(String key, Object metadataItem) {
+        if (this.metadata == null) {
+            this.metadata = new HashMap<String, Object>();
+        }
+        this.metadata.put(key, metadataItem);
+        return this;
+    }
+
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -180,29 +157,25 @@ public enum StatusEnum {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        DebugConnectionResponse debugConnectionResponse = (DebugConnectionResponse) o;
-        return Objects.equals(this.debugId, debugConnectionResponse.debugId) &&
-            Objects.equals(this.status, debugConnectionResponse.status) &&
-            Objects.equals(this.message, debugConnectionResponse.message) &&
-            Objects.equals(this.timestamp, debugConnectionResponse.timestamp) &&
-            Objects.equals(this.metadata, debugConnectionResponse.metadata);
+        DebugResult debugResult = (DebugResult) o;
+        return Objects.equals(this.debugId, debugResult.debugId) &&
+            Objects.equals(this.status, debugResult.status) &&
+            Objects.equals(this.metadata, debugResult.metadata);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(debugId, status, message, timestamp, metadata);
+        return Objects.hash(debugId, status, metadata);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class DebugConnectionResponse {\n");
+        sb.append("class DebugResult {\n");
         
         sb.append("    debugId: ").append(toIndentedString(debugId)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
-        sb.append("    message: ").append(toIndentedString(message)).append("\n");
-        sb.append("    timestamp: ").append(toIndentedString(timestamp)).append("\n");
         sb.append("    metadata: ").append(toIndentedString(metadata)).append("\n");
         sb.append("}");
         return sb.toString();

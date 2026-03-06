@@ -4,9 +4,10 @@ info:
     This document specifies a **Debug RESTful API** for **WSO2 Identity Server**.
     This API supports debugging of various authentication flows and resource configurations.
     The APIs provide the capability to start and retrieve debug sessions for different resource types.
-  version: "v1"
+    OAuth2 scopes: `internal_debug_mgt_view` (read) and `internal_debug_mgt_update` (write).
+
+  version: "1.0"
   title: WSO2 Identity Server - Debug API
-  termsOfService: 'http://swagger.io/terms/'
   contact:
     name: WSO2
     url: 'http://wso2.com/products/identity-server/'
@@ -14,6 +15,10 @@ info:
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+
+security:
+  - OAuth2: []
+  - BasicAuth: []
 
 servers:
   - url: "/t/{tenant-domain}/api/server/v1"
@@ -23,15 +28,25 @@ servers:
         description: "The tenant domain."
 
 paths:
-  /debug:
+  /debug/{resourceType}:
     post:
       summary: "Start Debug Session"
-      description: "Initiates a debug session for supported resource types with configurable properties."
+      description: "Initiates a debug session for supported resource types with configurable properties. Requires OAuth2 scope `internal_debug_mgt_update`."
       operationId: "startDebugSession"
       tags:
         - "Debug"
+      parameters:
+        - name: "resourceType"
+          in: "path"
+          description: "Type of resource to debug. Allowed values: idp, fraud_detection."
+          required: true
+          schema:
+            type: "string"
+            minLength: 1
+            maxLength: 50
+            example: "idp"
       requestBody:
-        description: "Debug request with resource type and properties."
+        description: "Debug request with connection identifier and optional properties."
         required: true
         content:
           application/json:
@@ -69,17 +84,17 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /debug/result/{debugId}:
+  /debug/{debugId}/result:
     get:
       summary: "Get Debug Result"
-      description: "Retrieves the debug results for a specific debug ID"
+      description: "Retrieves the debug results for a specific debug ID. Requires OAuth2 scope `internal_debug_mgt_view`."
       operationId: "getDebugResult"
       tags:
         - "Debug"
       parameters:
         - name: "debugId"
           in: "path"
-          description: "The debug session identifier. Use the `debugId` value returned by POST /debug."
+          description: "The debug session identifier."
           required: true
           schema:
             type: "string"
@@ -89,7 +104,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DebugResponse"
+                $ref: "#/components/schemas/DebugResult"
         '400':
           description: "Bad Request"
           content:
@@ -116,7 +131,22 @@ paths:
                 $ref: "#/components/schemas/Error"
 
 components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://localhost:9443/oauth2/authorize
+          tokenUrl: https://localhost:9443/oauth2/token
+          scopes:
+            read: internal_debug_mgt_view
+            write: internal_debug_mgt_update
+
   schemas:
+
     # -------------
     # Common Error
     # -------------
@@ -128,7 +158,7 @@ components:
       properties:
         code:
           type: string
-          example: "IDP-60001"
+          example: "10001"
           description: "An error code."
         message:
           type: string
@@ -148,30 +178,14 @@ components:
     # ---------------------------------
     DebugConnectionRequest:
       type: object
-      required:
-        - resourceType
       description: "Request body for starting a debug session."
       properties:
-        resourceType:
+        connectionId:
           type: string
           minLength: 1
-          maxLength: 50
-          description: "Type of resource to debug. Allowed values: IDP, FRAUD_DETECTION."
-          example: "IDP"
-          enum:
-            - "IDP"
-            - "FRAUD_DETECTION"
-        properties:
-          type: object
-          maxProperties: 50
-          additionalProperties:
-            type: string
-            maxLength: 2048
-          description: "Generic properties for resource debugging as key-value pairs. Maximum 50 properties allowed. Each property value can be up to 2048 characters."
-          example:
-            "connectionId": "123e4567-e89b-12d3-a456-426614174000"
-            "authenticatorName": "OpenIDConnectAuthenticator"
-
+          maxLength: 255
+          description: "Connection identifier for the selected resource type."
+          example: "11cb1448-2c30-4f9f-af8e-426614174000"
     DebugConnectionResponse:
       type: object
       description: "Debug connection response containing generic debug information and resource-specific metadata."
@@ -204,23 +218,24 @@ components:
               example: "https://api.asgardeo.io/t/linuka/oauth2/authorize?response_type=code&client_id=lfrTEyDGHBEUbeBKoiaosz1y8Aca&redirect_uri=https%3A%2F%2Flocalhost%3A9443%2Fcommonauth"
 
     # -----------------------------
-    # GET /debug/result/{debugId}
+    # GET /debug/{debugId}/result
     # -----------------------------
-    DebugResponse:
+    DebugResult:
       type: object
       required:
         - debugId
-        - success
-      description: "Debug response containing debugId and success at top level, with all protocol-specific data in metadata."
+        - status
+      description: "Debug response containing debugId and status at top level, with all protocol-specific data in metadata."
       properties:
         debugId:
           type: string
           description: "Debug session identifier. Used to retrieve debug results via the GET endpoint."
           example: "debug-12345"
-        success:
-          type: boolean
-          description: "Whether the debug operation was successful."
-          example: true
+        status:
+          type: string
+          description: "Status of the debug operation."
+          enum: ["SUCCESS", "IN_PROGRESS", "FAILURE", "DIRECT_RESULT"]
+          example: "SUCCESS"
         metadata:
           type: object
           description: "Protocol-specific and resource-specific debug data. For IDP OAuth debugging, includes userAttributes, mappedClaims, steps, tokens, URLs, and diagnostic information."

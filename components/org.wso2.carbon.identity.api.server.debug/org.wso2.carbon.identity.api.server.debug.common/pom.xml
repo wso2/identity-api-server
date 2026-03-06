@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.debug</artifactId>
-        <version>1.3.218-SNAPSHOT</version>
+        <version>1.5.16-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -69,7 +69,7 @@
         <dependency>
             <groupId>org.wso2.carbon.identity.framework</groupId>
             <artifactId>org.wso2.carbon.identity.debug.framework</artifactId>
-            <version>7.8.615-SNAPSHOT</version>
+            <version>7.10.35</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

@@ -18,17 +18,20 @@
 
 package org.wso2.carbon.identity.api.server.debug.v1.factories;
 
-import org.wso2.carbon.identity.api.server.debug.v1.core.DebugServiceCore;
-import org.wso2.carbon.identity.api.server.debug.v1.service.DebugService;
+import org.wso2.carbon.identity.api.server.debug.v1.core.DebugService;
 
 /**
- * Factory for debug service core.
+ * Factory for debug service.
  */
-public class DebugServiceCoreFactory {
+public final class DebugServiceFactory {
 
-    private static final DebugServiceCore SERVICE = new DebugServiceCore(new DebugService());
+    private static final DebugService SERVICE = new DebugService();
 
-    public static DebugServiceCore getDebugServiceCore() {
+    private DebugServiceFactory() {
+
+    }
+
+    public static DebugService getDebugService() {
 
         return SERVICE;
     }
