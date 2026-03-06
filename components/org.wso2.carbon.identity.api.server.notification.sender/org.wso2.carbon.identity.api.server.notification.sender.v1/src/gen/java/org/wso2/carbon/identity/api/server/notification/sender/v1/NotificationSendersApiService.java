@@ -56,7 +56,7 @@ public interface NotificationSendersApiService {
 
       public Response getEmailSenders();
 
-      public Response getNotiSenderConfigurations(String publisherType);
+      public Response getNotificationSenderConfigurations(String publisherType);
 
       public Response getPushSender(String senderName);
 
@@ -66,7 +66,7 @@ public interface NotificationSendersApiService {
 
       public Response getSMSSenders();
 
-      public Response setNotiSenderConfigurations(String publisherType, Map<String, String> requestBody);
+      public Response setNotificationSenderConfigurations(String publisherType, Map<String, String> requestBody);
 
       public Response updateEmailSender(String senderName, EmailSenderUpdateRequest emailSenderUpdateRequest);
 

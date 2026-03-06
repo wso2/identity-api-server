@@ -277,9 +277,9 @@ public class NotificationSendersApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getNotiSenderConfigurations(@ApiParam(value = "Type of the notification publisher (e.g., email, sms, push)",required=true) @PathParam("publisher-type") String publisherType) {
+    public Response getNotificationSenderConfigurations(@ApiParam(value = "Type of the notification publisher (e.g., email, sms, push)",required=true, allowableValues="email, sms, push") @PathParam("publisher-type") String publisherType) {
 
-        return delegate.getNotiSenderConfigurations(publisherType );
+        return delegate.getNotificationSenderConfigurations(publisherType );
     }
 
     @Valid
@@ -401,9 +401,9 @@ public class NotificationSendersApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response setNotiSenderConfigurations(@ApiParam(value = "Type of the notification publisher (e.g., email, sms, push)",required=true) @PathParam("publisher-type") String publisherType, @ApiParam(value = "" ,required=true) @Valid Map<String, String> requestBody) {
+    public Response setNotificationSenderConfigurations(@ApiParam(value = "Type of the notification publisher (e.g., email, sms, push)",required=true, allowableValues="email, sms, push") @PathParam("publisher-type") String publisherType, @ApiParam(value = "" ,required=true) @Valid Map<String, String> requestBody) {
 
-        return delegate.setNotiSenderConfigurations(publisherType,  requestBody );
+        return delegate.setNotificationSenderConfigurations(publisherType,  requestBody );
     }
 
     @Valid

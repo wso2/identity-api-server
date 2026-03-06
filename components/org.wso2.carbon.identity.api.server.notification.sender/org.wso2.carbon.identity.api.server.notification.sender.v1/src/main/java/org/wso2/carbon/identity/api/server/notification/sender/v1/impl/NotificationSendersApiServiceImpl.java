@@ -171,9 +171,10 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     }
 
     @Override
-    public Response getNotiSenderConfigurations(String publisherType) {
+    public Response getNotificationSenderConfigurations(String publisherType) {
+
         return Response.ok().entity(notificationSenderManagementService
-                .getNotiSenderConfigurations(publisherType)).build();
+                .getNotificationSenderConfigurations(publisherType)).build();
     }
 
     @Override
@@ -201,9 +202,11 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     }
 
     @Override
-    public Response setNotiSenderConfigurations(String publisherType, Map<String, String> requestBody) {
+    public Response setNotificationSenderConfigurations(String publisherType, Map<String, String> requestBody) {
+
         return Response.ok()
-                .entity(notificationSenderManagementService.setNotiSenderConfigurations(publisherType, requestBody))
+                .entity(notificationSenderManagementService
+                        .setNotificationSenderConfigurations(publisherType, requestBody))
                 .build();
     }
 

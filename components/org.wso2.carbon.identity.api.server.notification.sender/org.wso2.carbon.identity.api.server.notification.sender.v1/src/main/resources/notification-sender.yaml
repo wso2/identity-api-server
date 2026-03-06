@@ -904,7 +904,7 @@ paths:
             * /permission/admin/manage/identity/configmgt/view <br>
           <b>Scope required:</b> <br>
             * internal_config_mgt_view
-      operationId: getNotiSenderConfigurations
+      operationId: getNotificationSenderConfigurations
       parameters:
         - name: publisher-type
           in: path
@@ -914,6 +914,10 @@ paths:
           explode: false
           schema:
             type: string
+            enum:
+              - email
+              - sms
+              - push
       responses:
         "200":
           description: Successful Response
@@ -953,7 +957,7 @@ paths:
             * /permission/admin/manage/identity/configmgt/update <br>
           <b>Scope required:</b> <br>
             * internal_config_mgt_update
-      operationId: setNotiSenderConfigurations
+      operationId: setNotificationSenderConfigurations
       parameters:
         - name: publisher-type
           in: path
@@ -963,14 +967,17 @@ paths:
           explode: false
           schema:
             type: string
+            enum:
+              - email
+              - sms
+              - push
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/NotificationSenderConfigurations'
             example:
-              configKey1: "configValue1"
-              configKey2: "configValue2"
+              defaultPushProvider: "FCM"
         required: true
       responses:
         "200":

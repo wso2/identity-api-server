@@ -281,19 +281,19 @@ public class NotificationSenderManagementService {
         }
     }
 
-    public Map<String, String> setNotiSenderConfigurations(String publisherType, Map<String, String> configs) {
+    public Map<String, String> setNotificationSenderConfigurations(String publisherType, Map<String, String> configs) {
 
         try {
-            return notificationSenderManagementService.setNotiSenderConfigurations(publisherType, configs);
+            return notificationSenderManagementService.setNotificationSenderConfigurations(publisherType, configs);
         } catch (NotificationSenderManagementException e) {
             throw handleException(e);
         }
     }
 
-    public Map<String, String> getNotiSenderConfigurations(String publisherType) {
+    public Map<String, String> getNotificationSenderConfigurations(String publisherType) {
 
         try {
-            return notificationSenderManagementService.getNotiSenderConfigurations(publisherType, false);
+            return notificationSenderManagementService.getNotificationSenderConfigurations(publisherType, false);
         } catch (NotificationSenderManagementException e) {
             throw handleException(e);
         }
@@ -312,7 +312,6 @@ public class NotificationSenderManagementService {
         properties.forEach((prop) -> dto.getProperties().put(prop.getKey(), prop.getValue()));
         return dto;
     }
-
 
     private EmailSenderDTO buildEmailSenderDTO(String senderName, EmailSenderUpdateRequest emailSenderUpdateRequest) {
 
