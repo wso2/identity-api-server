@@ -31,10 +31,13 @@ paths:
   /debug/{resourceType}:
     post:
       summary: "Start Debug Session"
-      description: "Initiates a debug session for supported resource types with configurable properties. Requires OAuth2 scope `internal_debug_mgt_update`."
+      description: "Initiates a debug session for supported resource types with configurable properties."
       operationId: "startDebugSession"
       tags:
         - "Debug"
+      security:
+        - OAuth2: [internal_debug_mgt_update]
+        - BasicAuth: []
       parameters:
         - name: "resourceType"
           in: "path"
@@ -87,10 +90,13 @@ paths:
   /debug/{debugId}/result:
     get:
       summary: "Get Debug Result"
-      description: "Retrieves the debug results for a specific debug ID. Requires OAuth2 scope `internal_debug_mgt_view`."
+      description: "Retrieves the debug results for a specific debug ID."
       operationId: "getDebugResult"
       tags:
         - "Debug"
+      security:
+        - OAuth2: [internal_debug_mgt_view]
+        - BasicAuth: []
       parameters:
         - name: "debugId"
           in: "path"
@@ -142,8 +148,8 @@ components:
           authorizationUrl: https://localhost:9443/oauth2/authorize
           tokenUrl: https://localhost:9443/oauth2/token
           scopes:
-            read: internal_debug_mgt_view
-            write: internal_debug_mgt_update
+            internal_debug_mgt_view: View debug sessions and results
+            internal_debug_mgt_update: Create and manage debug sessions
 
   schemas:
 

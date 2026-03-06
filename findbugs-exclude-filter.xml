@@ -154,4 +154,11 @@
             <Bug pattern="SERVLET_HEADER" />
         </Match>
     </FindBugsFilter>
+    <!-- Excluded since false positive. Using Locale.ROOT for security-sensitive case transformations. -->
+    <FindBugsFilter>
+        <Match>
+            <Class name="org.wso2.carbon.identity.api.server.debug.v1.impl.DebugApiServiceImpl" />
+            <Bug pattern="IMPROPER_UNICODE" />
+        </Match>
+    </FindBugsFilter>
 </FindBugsFilter>

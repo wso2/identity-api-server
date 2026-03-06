@@ -23,7 +23,7 @@ import org.wso2.carbon.identity.api.server.debug.v1.impl.DebugApiServiceImpl;
 
 public class DebugApiServiceFactory {
 
-   private final static DebugApiService SERVICE = new DebugApiServiceImpl();
+   private static final DebugApiService SERVICE = new DebugApiServiceImpl();
 
    public static DebugApiService getDebugApi() {
 

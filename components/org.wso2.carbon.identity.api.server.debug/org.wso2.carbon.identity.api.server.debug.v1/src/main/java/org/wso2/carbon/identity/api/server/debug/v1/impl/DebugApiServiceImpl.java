@@ -42,7 +42,7 @@ import javax.ws.rs.core.Response;
 import static org.wso2.carbon.identity.api.server.common.Util.getCorrelation;
 
 /**
- * Implementation of the DebugAService interface.
+ * Implementation of the DebugApiService interface.
  */
 public class DebugApiServiceImpl implements DebugApiService {
     private static final Log LOG = LogFactory.getLog(DebugApiServiceImpl.class);

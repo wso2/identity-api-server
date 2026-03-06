@@ -35,9 +35,9 @@
     <description>WSO2 Identity Server - Identity Provider Debug API v1.0</description>
 
     <properties>
-        <mavan.findbugsplugin.exclude.file>${project.basedir}/../../../../findbugs-exclude-filter.xml</mavan.findbugsplugin.exclude.file>
+        <maven.findbugsplugin.exclude.file>${project.basedir}/../../../findbugs-exclude-filter.xml</maven.findbugsplugin.exclude.file>
     </properties>
-
+    
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon.identity.server.api</groupId>

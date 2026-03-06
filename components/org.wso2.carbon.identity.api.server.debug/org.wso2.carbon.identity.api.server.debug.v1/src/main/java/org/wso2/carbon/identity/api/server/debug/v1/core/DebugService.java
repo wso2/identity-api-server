@@ -70,11 +70,19 @@ public class DebugService {
      * @param debugId Debug session id.
      * @return Debug result map.
      * @throws DebugFrameworkClientException if request is invalid.
+     * @throws DebugFrameworkServerException if server error occurs.
      */
     public Map<String, Object> processGetResult(String debugId)
             throws DebugFrameworkClientException, DebugFrameworkServerException {
 
-        return getDebugResult(debugId);
+        if (debugId == null || debugId.trim().isEmpty()) {
+            throw new DebugFrameworkClientException(
+                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getCode(),
+                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getMessage(),
+                    "Debug ID cannot be null or empty.");
+        }
+
+        return getDebugResult(debugId.trim());
     }
 
     /**
@@ -110,7 +118,7 @@ public class DebugService {
 
         Map<String, Object> resultMap = response.getData() != null ?
                 new HashMap<>(response.getData()) : new HashMap<>();
-        resultMap.put(DebugConstants.ResponseKeys.TIMESTAMP, System.currentTimeMillis());
+        resultMap.putIfAbsent(DebugConstants.ResponseKeys.TIMESTAMP, System.currentTimeMillis());
         resultMap.putIfAbsent(DebugConstants.ResponseKeys.STATUS, deriveStatus(resultMap));
 
         return resultMap;
