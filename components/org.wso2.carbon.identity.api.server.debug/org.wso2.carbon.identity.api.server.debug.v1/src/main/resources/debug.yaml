@@ -45,6 +45,7 @@ paths:
           required: true
           schema:
             type: "string"
+            enum: ["idp", "fraud_detection"]
             minLength: 1
             maxLength: 50
             example: "idp"

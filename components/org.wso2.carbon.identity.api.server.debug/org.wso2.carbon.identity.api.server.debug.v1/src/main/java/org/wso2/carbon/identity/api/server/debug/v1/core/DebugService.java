@@ -54,6 +54,10 @@ public class DebugService {
             throws DebugFrameworkClientException, DebugFrameworkServerException {
 
         validateRequest(resourceType, debugConnectionRequest);
+        
+        // Trim resourceType before passing downstream to prevent lookup misses.
+        String trimmedResourceType = resourceType != null ? resourceType.trim() : null;
+        
         Map<String, String> properties = new HashMap<>();
         if (debugConnectionRequest.getConnectionId() != null
                 && !debugConnectionRequest.getConnectionId().trim().isEmpty()) {
@@ -61,7 +65,7 @@ public class DebugService {
             properties.put(DebugConstants.RequestKeys.CONNECTION_ID, debugConnectionRequest.getConnectionId().trim());
         }
 
-        return handleGenericDebugRequest(resourceType, properties);
+        return handleGenericDebugRequest(trimmedResourceType, properties);
     }
 
     /**
@@ -190,14 +194,17 @@ public class DebugService {
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_MISSING_RESOURCE_TYPE.getDescription());
         }
 
-        if (!DebugConstants.ResourceType.IDP.equals(resourceType)
-                && !DebugConstants.ResourceType.FRAUD_DETECTION.equals(resourceType)) {
+        // Trim resourceType to prevent false validation failures from whitespace.
+        String trimmedResourceType = resourceType.trim();
+
+        if (!DebugConstants.ResourceType.IDP.equals(trimmedResourceType)
+                && !DebugConstants.ResourceType.FRAUD_DETECTION.equals(trimmedResourceType)) {
             throw new DebugFrameworkClientException(
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getCode(),
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getMessage(),
                     "Invalid resource type. Supported values are idp and fraud_detection.");
         }
-        if (DebugConstants.ResourceType.IDP.equals(resourceType)
+        if (DebugConstants.ResourceType.IDP.equals(trimmedResourceType)
                 && (debugConnectionRequest.getConnectionId() == null
                 || debugConnectionRequest.getConnectionId().trim().isEmpty())) {
             throw new DebugFrameworkClientException(
