@@ -73,10 +73,7 @@ public class ExtensionMgtUtils {
      * @param error Error message.
      * @param data Data to be added to the error message.
      * @return APIError.
-     * @deprecated Use {@link #handleServerException(Response.Status, ExtensionMgtConstants.ErrorMessage,
-     * ExtensionManagementException, String...)} instead.
      */
-    @Deprecated
     public static APIError handleServerException(Response.Status status, ExtensionMgtConstants.ErrorMessage error,
                                                   String... data) {
 
