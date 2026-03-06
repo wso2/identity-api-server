@@ -59,8 +59,8 @@ public final class DebugConstants {
      */
     public static final class ResourceType {
 
-        public static final String IDP = "IDP";
-        public static final String FRAUD_DETECTION = "FRAUD_DETECTION";
+        public static final String IDP = "idp";
+        public static final String FRAUD_DETECTION = "fraud_detection";
 
         private ResourceType() {
             // Prevent instantiation.
@@ -72,7 +72,7 @@ public final class DebugConstants {
      */
     public static final class ResponseKeys {
 
-        public static final String SESSION_ID = "sessionId";
+        public static final String DEBUG_ID = "debugId";
         public static final String STATE = "state";
         public static final String SUCCESS = "success";
         public static final String STATUS = "status";

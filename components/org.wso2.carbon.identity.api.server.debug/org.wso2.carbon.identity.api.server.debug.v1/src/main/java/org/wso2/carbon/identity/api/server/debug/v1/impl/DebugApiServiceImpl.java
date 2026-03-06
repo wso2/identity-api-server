@@ -116,7 +116,7 @@ public class DebugApiServiceImpl implements DebugApiService {
 
         DebugConnectionResponse response = new DebugConnectionResponse();
 
-        Object debugId = debugResult.get(DebugConstants.ResponseKeys.SESSION_ID);
+        Object debugId = debugResult.get(DebugConstants.ResponseKeys.DEBUG_ID);
         if (debugId == null) {
             debugId = debugResult.get(DebugConstants.ResponseKeys.STATE);
         }
@@ -209,7 +209,7 @@ public class DebugApiServiceImpl implements DebugApiService {
 
         DebugResult response = new DebugResult();
 
-        Object debugId = frameworkResponse.get(DebugConstants.ResponseKeys.SESSION_ID);
+        Object debugId = frameworkResponse.get(DebugConstants.ResponseKeys.DEBUG_ID);
         if (debugId == null) {
             debugId = frameworkResponse.get(DebugConstants.ResponseKeys.STATE);
         }
@@ -226,15 +226,12 @@ public class DebugApiServiceImpl implements DebugApiService {
         response.setStatus(status);
 
         Map<String, Object> metadata = new LinkedHashMap<>();
-        if (debugId != null) {
-            metadata.put(DebugConstants.ResponseKeys.SESSION_ID, debugId.toString());
-        }
+        // Preserve original framework response keys in metadata to maintain semantic accuracy.
         for (Map.Entry<String, Object> entry : frameworkResponse.entrySet()) {
             String key = entry.getKey();
-            if (!DebugConstants.ResponseKeys.SESSION_ID.equals(key)
-                    && !DebugConstants.ResponseKeys.STATUS.equals(key)
-                    && !DebugConstants.ResponseKeys.SUCCESS.equals(key)
-                    && !DebugConstants.ResponseKeys.STATE.equals(key)) {
+            // Only filter out status and success fields; preserve DEBUG_ID and STATE as-is.
+            if (!DebugConstants.ResponseKeys.STATUS.equals(key)
+                    && !DebugConstants.ResponseKeys.SUCCESS.equals(key)) {
                 metadata.put(key, entry.getValue());
             }
         }

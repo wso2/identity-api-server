@@ -31,7 +31,6 @@ import org.wso2.carbon.identity.debug.framework.model.DebugRequest;
 import org.wso2.carbon.identity.debug.framework.model.DebugResponse;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -54,15 +53,15 @@ public class DebugService {
                                                    DebugConnectionRequest debugConnectionRequest)
             throws DebugFrameworkClientException, DebugFrameworkServerException {
 
-        String normalizedResourceType = normalizeResourceType(resourceType);
-        validateRequest(normalizedResourceType, debugConnectionRequest);
+        validateRequest(resourceType, debugConnectionRequest);
         Map<String, String> properties = new HashMap<>();
         if (debugConnectionRequest.getConnectionId() != null
                 && !debugConnectionRequest.getConnectionId().trim().isEmpty()) {
-            properties.put(DebugConstants.RequestKeys.CONNECTION_ID, debugConnectionRequest.getConnectionId());
+            // Trim connectionId before passing downstream to prevent lookup misses.
+            properties.put(DebugConstants.RequestKeys.CONNECTION_ID, debugConnectionRequest.getConnectionId().trim());
         }
 
-        return handleGenericDebugRequest(normalizedResourceType, properties);
+        return handleGenericDebugRequest(resourceType, properties);
     }
 
     /**
@@ -188,7 +187,7 @@ public class DebugService {
             throw new DebugFrameworkClientException(
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getCode(),
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getMessage(),
-                    "Invalid resource type. Supported values are IDP and FRAUD_DETECTION.");
+                    "Invalid resource type. Supported values are idp and fraud_detection.");
         }
         if (DebugConstants.ResourceType.IDP.equals(resourceType)
                 && (debugConnectionRequest.getConnectionId() == null
@@ -198,14 +197,6 @@ public class DebugService {
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_MISSING_CONNECTION_ID.getMessage(),
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_MISSING_CONNECTION_ID.getDescription());
         }
-    }
-
-    private String normalizeResourceType(String resourceType) {
-
-        if (resourceType == null) {
-            return null;
-        }
-        return resourceType.trim().toUpperCase(Locale.ROOT);
     }
 
     private <T> T executeWithServerErrorHandling(DebugOperation<T> operation, String logMessage,
