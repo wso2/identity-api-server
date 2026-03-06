@@ -20,7 +20,11 @@ package org.wso2.carbon.identity.api.server.idp.v1.core;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
@@ -57,6 +61,7 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorLi
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorPUTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdPGroup;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderExportResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListItem;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPOSTRequest;
@@ -80,6 +85,7 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.idp.v1.model.ProvisioningClaim;
 import org.wso2.carbon.identity.api.server.idp.v1.model.ProvisioningResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Roles;
+import org.wso2.carbon.identity.api.server.idp.v1.util.CertificateUtil;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.common.ApplicationAuthenticatorService;
 import org.wso2.carbon.identity.application.common.model.AccountLookupAttributeMappingConfig;
@@ -123,6 +129,8 @@ import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 import org.wso2.carbon.idp.mgt.dao.IdPManagementDAO;
 import org.wso2.carbon.idp.mgt.model.ConnectedAppsResult;
 import org.wso2.carbon.idp.mgt.model.IdpSearchResult;
+import org.wso2.carbon.idp.mgt.util.IdPManagementConstants;
+import org.wso2.carbon.idp.mgt.util.IdPManagementUtil;
 import org.yaml.snakeyaml.TypeDescription;
 
 import java.io.IOException;
@@ -138,6 +146,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -146,6 +155,7 @@ import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_RESOURCE_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.common.Constants.MASKING_VALUE;
+import static org.wso2.carbon.identity.api.server.common.Constants.MEDIA_TYPE_JSON;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLDecode;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
@@ -172,6 +182,8 @@ public class ServerIdpManagementService {
     private final TemplateManager templateManager;
 
     private static final Log log = LogFactory.getLog(ServerIdpManagementService.class);
+
+    private static final String IDP_EXPORT_SUPPORT_MULTIPLE_CERT = "IdentityProviders.SupportMultipleCertificateExport";
 
     public ServerIdpManagementService(IdentityProviderManager identityProviderManager, TemplateManager templateManager,
                                       ClaimMetadataManagementService claimMetadataManagementService) {
@@ -378,7 +390,7 @@ public class ServerIdpManagementService {
 
         FileContent fileContent;
         try {
-            fileContent = generateFileFromModel(fileType, idpToExport);
+            fileContent = generateFileFromModel(fileType, createIDPExportResponse(idpToExport, fileType));
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_EXPORTING_IDP, idpId);
         }
@@ -402,8 +414,9 @@ public class ServerIdpManagementService {
         IdentityProvider identityProvider;
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            String contentType = fileDetail.getContentType().toString();
             identityProvider = identityProviderManager.addIdPWithResourceId(
-                    getIDPFromFile(fileInputStream, fileDetail), tenantDomain);
+                    createIDPImportRequest(getIDPFromFile(fileInputStream, fileDetail), contentType), tenantDomain);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_IMPORTING_IDP, null);
         }
@@ -421,7 +434,8 @@ public class ServerIdpManagementService {
 
         IdentityProvider identityProvider;
         try {
-            identityProvider = getIDPFromFile(fileInputStream, fileDetail);
+            String contentType = fileDetail.getContentType().toString();
+            identityProvider = createIDPImportRequest(getIDPFromFile(fileInputStream, fileDetail), contentType);
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             if (RESIDENT_IDP_RESERVED_NAME.equals(identityProviderId)) {
                 processFederatedAuthenticatorsForResidentIDPUpdate(identityProvider);
@@ -432,6 +446,82 @@ public class ServerIdpManagementService {
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP, null);
         }
+    }
+
+    /**
+     * This exclusion strategy is to skip the 'certificate' field derived from the IdentityProvider class while
+     * keeping the new 'certificate' type declared in IdentityProviderExportResponse class.
+     * This line will never get executed if the object class is not IdentityProviderExportResponse.
+     */
+    private static class CertificateSkippingExclusionStrategy implements ExclusionStrategy {
+
+        @Override
+        public boolean shouldSkipField(FieldAttributes f) {
+            return f.getName().equals("certificate") &&
+                    f.getDeclaringClass() == IdentityProviderExportResponse.class;
+        }
+
+        @Override
+        public boolean shouldSkipClass(Class<?> clazz) {
+            return false;
+        }
+    }
+
+    private IdentityProvider createIDPExportResponse(IdentityProvider identityProvider, String fileType) {
+
+        if (!(Boolean.parseBoolean(IdentityUtil.getProperty(IDP_EXPORT_SUPPORT_MULTIPLE_CERT))
+                && StringUtils.startsWithIgnoreCase(fileType, MEDIA_TYPE_JSON))) {
+            log.debug("IDP export/import with multiple certificates is not enabled. Exporting the IDP as is.");
+            return identityProvider;
+        }
+
+        Gson gson = new GsonBuilder()
+                .setExclusionStrategies(new CertificateSkippingExclusionStrategy())
+                .create();
+        JsonObject json = gson.toJsonTree(identityProvider).getAsJsonObject();
+        IdentityProviderExportResponse exportResponse = gson.fromJson(json, IdentityProviderExportResponse.class);
+
+        Certificate certificate = null;
+        IdentityProviderProperty[] idpProperties = identityProvider.getIdpProperties();
+        for (IdentityProviderProperty property : idpProperties) {
+            if (Constants.JWKS_URI.equals(property.getName())) {
+                certificate = new Certificate().jwksUri(property.getValue());
+                break;
+            }
+        }
+        if (certificate == null && ArrayUtils.isNotEmpty(identityProvider.getCertificateInfoArray())) {
+            List<String> certificates = new ArrayList<>();
+            for (CertificateInfo certInfo : identityProvider.getCertificateInfoArray()) {
+                certificates.add(certInfo.getCertValue());
+            }
+            certificate = new Certificate().certificates(certificates);
+        }
+
+        exportResponse.setCertificate(certificate);
+
+        return exportResponse;
+    }
+
+    private IdentityProvider createIDPImportRequest(IdentityProvider identityProvider, String contentType)
+            throws IdentityProviderManagementClientException {
+
+        if (!(Boolean.parseBoolean(IdentityUtil.getProperty(IDP_EXPORT_SUPPORT_MULTIPLE_CERT))
+                && StringUtils.startsWithIgnoreCase(contentType, MEDIA_TYPE_JSON))) {
+            log.debug("IDP export/import with multiple certificates is not enabled. Importing the IDP as is.");
+            return identityProvider;
+        }
+
+        Gson gson = new GsonBuilder()
+                .setExclusionStrategies(new CertificateSkippingExclusionStrategy())
+                .create();
+        JsonObject json = gson.toJsonTree(identityProvider).getAsJsonObject();
+        IdentityProvider importRequest = gson.fromJson(json, IdentityProvider.class);
+
+        String certificates = CertificateUtil.convertCertificateJsonString(((
+                (IdentityProviderExportResponse) identityProvider).getCertificates()));
+        importRequest.setCertificate(certificates);
+
+        return importRequest;
     }
 
     private void processFederatedAuthenticatorsForResidentIDPUpdate(IdentityProvider newIdentityProvider) {
@@ -895,6 +985,11 @@ public class ServerIdpManagementService {
                     .getProvisioningConnectorConfigs());
             int configPos = getExistingProvConfigPosition(provConnectorConfigs, connectorId);
             if (configPos != -1) {
+                // Preserve confidential property values from existing config if not provided in the update request.
+                Property[] updatedProperties = preserveConfidentialProperties(
+                        provConnectorConfigs[configPos].getProvisioningProperties(),
+                        connectorConfig.getProvisioningProperties());
+                connectorConfig.setProvisioningProperties(updatedProperties);
                 provConnectorConfigs[configPos] = connectorConfig;
             } else {
                 // if configPos is -1 add new authenticator to the list.
@@ -1179,13 +1274,21 @@ public class ServerIdpManagementService {
      * @param resourceId    IDP resource ID.
      * @param limit         Limit parameter.
      * @param offset        Offset parameter.
+     * @param filter        Filter parameter.
      * @return  ConnectedApps.
      */
-    public ConnectedApps getConnectedApps(String resourceId, Integer limit, Integer offset) {
+    public ConnectedApps getConnectedApps(String resourceId, Integer limit, Integer offset, String filter) {
 
         try {
-            ConnectedAppsResult connectedAppsResult = identityProviderManager.getConnectedApplications(resourceId,
-                    limit, offset, ContextLoader.getTenantDomainFromContext());
+            ConnectedAppsResult connectedAppsResult;
+            if (StringUtils.isBlank(filter)) {
+                connectedAppsResult = identityProviderManager.getConnectedApplications(resourceId, limit, offset,
+                        ContextLoader.getTenantDomainFromContext());
+            } else {
+                connectedAppsResult =
+                        identityProviderManager.getConnectedApplications(resourceId, limit, offset, filter,
+                                ContextLoader.getTenantDomainFromContext());
+            }
             return createConnectedAppsResponse(resourceId, connectedAppsResult);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_CONNECTED_APPS,
@@ -1806,10 +1909,17 @@ public class ServerIdpManagementService {
             String defaultConnectorId = outboundProvisioningRequest.getDefaultConnectorId();
             ProvisioningConnectorConfig defaultConnectorConfig = null;
             List<ProvisioningConnectorConfig> connectorConfigs = new ArrayList<>();
+
+            // Get existing connector configs for confidential property preservation.
+            ProvisioningConnectorConfig[] existingConnectorConfigs = idp.getProvisioningConnectorConfigs();
+
             for (OutboundConnector connector : outboundConnectors) {
                 ProvisioningConnectorConfig connectorConfig = new ProvisioningConnectorConfig();
-                connectorConfig.setName(base64URLDecode(connector.getConnectorId()));
+                String connectorName = base64URLDecode(connector.getConnectorId());
+                connectorConfig.setName(connectorName);
                 connectorConfig.setEnabled(connector.getIsEnabled());
+                connectorConfig.setBlocking(connector.getBlockingEnabled());
+                connectorConfig.setRulesEnabled(connector.getRulesEnabled());
 
                 List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> connectorProperties = connector
                         .getProperties();
@@ -1823,6 +1933,23 @@ public class ServerIdpManagementService {
                             .map(propertyToInternal)
                             .collect(Collectors.toList());
                     connectorConfig.setProvisioningProperties(properties.toArray(new Property[0]));
+
+                    // Preserve confidential property values from existing config if not provided in update request.
+                    if (existingConnectorConfigs != null) {
+                        ProvisioningConnectorConfig existingConfig =
+                                Arrays.stream(existingConnectorConfigs)
+                                        .filter(config ->
+                                                StringUtils.equals(config.getName(), connectorName))
+                                        .findFirst()
+                                        .orElse(null);
+
+                        if (existingConfig != null && existingConfig.getProvisioningProperties() != null) {
+                            Property[] updatedProperties = preserveConfidentialProperties(
+                                    existingConfig.getProvisioningProperties(),
+                                    connectorConfig.getProvisioningProperties());
+                            connectorConfig.setProvisioningProperties(updatedProperties);
+                        }
+                    }
                 }
                 connectorConfigs.add(connectorConfig);
 
@@ -1876,6 +2003,7 @@ public class ServerIdpManagementService {
             jitConfig.setAccountLookupAttributeMappings(createAccountLookupAttributeMappingsConfig(
                     jit.getAccountLookupAttributeMappings()));
             jitConfig.setAttributeSyncMethod(jit.getAttributeSyncMethod().toString());
+            jitConfig.setIdpGroupSyncMethod(jit.getIdpGroupSyncMethod().toString());
             identityProvider.setJustInTimeProvisioningConfig(jitConfig);
         }
     }
@@ -2494,6 +2622,10 @@ public class ServerIdpManagementService {
                     jitProvisionConfig.getAttributeSyncMethod() : FrameworkConstants.OVERRIDE_ALL;
             jitConfig.setAttributeSyncMethod(JustInTimeProvisioning.AttributeSyncMethodEnum
                     .valueOf(attributeSyncMethod));
+            String idpGroupSyncMethod = StringUtils.isNotBlank(jitProvisionConfig.getIdpGroupSyncMethod()) ?
+                    jitProvisionConfig.getIdpGroupSyncMethod() : FrameworkConstants.MERGE_WITH_EXISTING;
+            jitConfig.setIdpGroupSyncMethod(JustInTimeProvisioning.IdpGroupSyncMethodEnum
+                    .valueOf(idpGroupSyncMethod));
         }
         return jitConfig;
     }
@@ -2807,6 +2939,11 @@ public class ServerIdpManagementService {
             throw handleException(Response.Status.BAD_REQUEST,
                     Constants.ErrorMessage.ERROR_CODE_OUTBOUND_PROVISIONING_CONFIG_NOT_FOUND, connectorName);
         }
+        if (!areAllDistinct(connector.getProperties())) {
+            throw handleException(Response.Status.BAD_REQUEST,
+                    Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT, " Duplicate properties are found in " +
+                            "the request.");
+        }
         List<Property> properties = connector.getProperties().stream()
                 .map(propertyToInternal)
                 .collect(Collectors.toList());
@@ -2998,9 +3135,27 @@ public class ServerIdpManagementService {
             outboundConnector.setIsDefault(isDefaultConnector);
             outboundConnector.setBlockingEnabled(config.isBlocking());
             outboundConnector.setRulesEnabled(config.isRulesEnabled());
+
+            boolean isConfidentialDataProtectionEnabled =
+                    IdPManagementUtil.isProvisioningConfidentialConfigProtectionEnabled();
+            if (log.isDebugEnabled()) {
+                log.debug("Confidential data protection enabled for outbound provisioning: " +
+                        isConfidentialDataProtectionEnabled);
+            }
             List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> properties =
-                    Arrays.stream(config
-                            .getProvisioningProperties()).map(propertyToExternal)
+                    Arrays.stream(config.getProvisioningProperties())
+                            .map(property -> {
+                                if (isConfidentialDataProtectionEnabled && property.isConfidential() &&
+                                        StringUtils.isNotBlank(property.getValue())) {
+                                    Property maskedProperty = new Property();
+                                    maskedProperty.setName(property.getName());
+                                    maskedProperty.setValue(MASKING_VALUE);
+                                    maskedProperty.setConfidential(property.isConfidential());
+                                    return maskedProperty;
+                                }
+                                return property;
+                            })
+                            .map(propertyToExternal)
                             .collect(Collectors.toList());
             outboundConnector.setProperties(properties);
         }
@@ -3618,7 +3773,13 @@ public class ServerIdpManagementService {
         }
 
         try {
-            return FileSerializationUtil.deserialize(fileContent, IdentityProvider.class,
+            if (!(Boolean.parseBoolean(IdentityUtil.getProperty(IDP_EXPORT_SUPPORT_MULTIPLE_CERT))
+                    && StringUtils.startsWithIgnoreCase(fileContent.getFileType(), MEDIA_TYPE_JSON))) {
+                log.debug("IDP export/import with multiple certificates is not enabled. Importing the IDP as is.");
+                return FileSerializationUtil.deserialize(fileContent, IdentityProvider.class,
+                        new FileSerializationConfig());
+            }
+            return FileSerializationUtil.deserialize(fileContent, IdentityProviderExportResponse.class,
                     new FileSerializationConfig());
         } catch (FileSerializationException e) {
             throw new IdentityProviderManagementClientException(
@@ -3687,5 +3848,58 @@ public class ServerIdpManagementService {
                     Constants.ErrorMessage.ERROR_CODE_MAX_FEDERATED_AUTHENTICATOR_PROPERTY_EXCEEDED,
                     String.valueOf(maxFederatedAuthenticatorPropertyLimit));
         }
+    }
+
+    /**
+     * Preserve confidential property values from existing configuration if not provided in update request.
+     * This ensures that confidential properties (like passwords, secrets) are not lost during updates
+     * when they are filtered out in GET responses for security reasons.
+     *
+     * @param existingProperties Array of existing provisioning properties
+     * @param updatedProperties  Array of updated provisioning properties from the request
+     * @return Updated properties array with confidential values preserved
+     */
+    private Property[] preserveConfidentialProperties(Property[] existingProperties, Property[] updatedProperties) {
+
+        if (existingProperties == null || updatedProperties == null) {
+            return updatedProperties;
+        }
+
+        List<Property> updatedList =
+                new ArrayList<>(Arrays.asList(Optional.of(updatedProperties).orElse(new Property[0])));
+
+        for (Property existingProperty : existingProperties) {
+            if (existingProperty.isConfidential() &&
+                    StringUtils.isNotBlank(existingProperty.getValue())) {
+
+                Optional<Property> matchingUpdatedProperty = Arrays.stream(updatedProperties)
+                        .filter(updatedProperty -> StringUtils.equals(updatedProperty.getName(),
+                                existingProperty.getName()))
+                        .findFirst();
+
+                if (!matchingUpdatedProperty.isPresent()) {
+                    // Property not present in update → add it.
+                    Property newProperty = new Property();
+                    newProperty.setName(existingProperty.getName());
+                    newProperty.setValue(existingProperty.getValue());
+                    newProperty.setConfidential(existingProperty.isConfidential());
+
+                    updatedList.add(newProperty);
+                }
+            }
+        }
+        return updatedList.toArray(new Property[0]);
+    }
+
+    /**
+     * Check if outbound provisioning confidential data protection is enabled.
+     *
+     * @return true if OUTBOUND_PROVISIONING_CONFIDENTIAL_DATA_PROTECTION_ENABLED is enabled, false otherwise.
+     */
+    private boolean isOutboundProvisioningConfidentialDataProtectionEnabled() {
+
+        String confidentialDataProtectionConfig = IdentityUtil.getProperty(
+                IdPManagementConstants.OUTBOUND_PROVISIONING_CONFIDENTIAL_DATA_PROTECTION_ENABLED);
+        return Boolean.parseBoolean(confidentialDataProtectionConfig);
     }
 }

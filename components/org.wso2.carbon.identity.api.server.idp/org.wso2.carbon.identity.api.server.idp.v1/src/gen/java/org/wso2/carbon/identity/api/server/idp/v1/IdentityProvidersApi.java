@@ -237,9 +237,9 @@ public class IdentityProvidersApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getConnectedApps(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId,     @Valid@ApiParam(value = "Maximum number of records to return. ")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Number of records to skip for pagination. ")  @QueryParam("offset") Integer offset) {
+    public Response getConnectedApps(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId,     @Valid@ApiParam(value = "Maximum number of records to return. ")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Number of records to skip for pagination. ")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations and also complex queries with 'and' operations. E.g. /identity-providers?filter=name+sw+\"google\"+and+isEnabled+eq+\"true\" ")  @QueryParam("filter") String filter) {
 
-        return delegate.getConnectedApps(identityProviderId,  limit,  offset );
+        return delegate.getConnectedApps(identityProviderId,  limit,  offset,  filter );
     }
 
     @Valid

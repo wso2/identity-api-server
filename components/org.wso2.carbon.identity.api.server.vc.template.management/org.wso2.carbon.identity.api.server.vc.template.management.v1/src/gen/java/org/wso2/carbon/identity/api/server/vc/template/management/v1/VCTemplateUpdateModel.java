@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.vc.template.management.v1.Claim;
 import javax.validation.constraints.*;
 
 /**
@@ -39,7 +40,7 @@ public class VCTemplateUpdateModel  {
   
     private String displayName;
     private String format;
-    private List<String> claims = null;
+    private List<Claim> claims = null;
 
     private Integer expiresIn;
 
@@ -82,25 +83,25 @@ public class VCTemplateUpdateModel  {
 
     /**
     **/
-    public VCTemplateUpdateModel claims(List<String> claims) {
+    public VCTemplateUpdateModel claims(List<Claim> claims) {
 
         this.claims = claims;
         return this;
     }
     
-    @ApiModelProperty(example = "[\"givenname\",\"surname\",\"email\"]", value = "")
+    @ApiModelProperty(value = "")
     @JsonProperty("claims")
     @Valid
-    public List<String> getClaims() {
+    public List<Claim> getClaims() {
         return claims;
     }
-    public void setClaims(List<String> claims) {
+    public void setClaims(List<Claim> claims) {
         this.claims = claims;
     }
 
-    public VCTemplateUpdateModel addClaimsItem(String claimsItem) {
+    public VCTemplateUpdateModel addClaimsItem(Claim claimsItem) {
         if (this.claims == null) {
-            this.claims = new ArrayList<String>();
+            this.claims = new ArrayList<Claim>();
         }
         this.claims.add(claimsItem);
         return this;

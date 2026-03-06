@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.rest.api.server.workflow.v1.core;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,8 +27,12 @@ import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.workflow.common.Constants;
+import org.wso2.carbon.identity.api.server.workflow.common.NotificationConstants;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.ApproverNotifications;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.InitiatorNotifications;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.InstanceStatus;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.ORRuleResponse;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Operation;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.OptionDetails;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.Property;
@@ -46,16 +51,23 @@ import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowRespon
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowTemplateBase;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowTemplateParameters;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowTemplateParametersBase;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.util.WorkflowRuleMapper;
+import org.wso2.carbon.identity.rule.management.api.exception.RuleManagementException;
+import org.wso2.carbon.identity.rule.management.api.model.Rule;
+import org.wso2.carbon.identity.rule.management.api.service.RuleManagementService;
 import org.wso2.carbon.identity.workflow.engine.ApprovalTaskService;
 import org.wso2.carbon.identity.workflow.engine.exception.WorkflowEngineClientException;
 import org.wso2.carbon.identity.workflow.engine.exception.WorkflowEngineException;
 import org.wso2.carbon.identity.workflow.mgt.WorkflowManagementService;
 import org.wso2.carbon.identity.workflow.mgt.bean.Parameter;
 import org.wso2.carbon.identity.workflow.mgt.bean.Workflow;
+import org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequestFilterResponse;
 import org.wso2.carbon.identity.workflow.mgt.dto.Association;
 import org.wso2.carbon.identity.workflow.mgt.dto.WorkflowEvent;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowClientException;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowException;
+import org.wso2.carbon.identity.workflow.mgt.util.WFConstant;
+import org.wso2.carbon.identity.workflow.mgt.util.WorkflowManagementUtil;
 import org.wso2.carbon.identity.workflow.mgt.util.WorkflowRequestStatus;
 
 import java.io.UnsupportedEncodingException;
@@ -81,14 +93,19 @@ import javax.ws.rs.core.Response;
 public class WorkflowService {
 
     private static final Log log = LogFactory.getLog(WorkflowService.class);
+    private static final String CHANNELS = "channels";
+    private static final String EVENTS = "events";
     private final WorkflowManagementService workflowManagementService;
     private final ApprovalTaskService approvalEventService;
+    private final RuleManagementService ruleManagementService;
 
     public WorkflowService(WorkflowManagementService workflowManagementService,
-                           ApprovalTaskService approvalEventService) {
+                           ApprovalTaskService approvalEventService,
+                           RuleManagementService ruleManagementService) {
 
         this.workflowManagementService = workflowManagementService;
         this.approvalEventService = approvalEventService;
+        this.ruleManagementService = ruleManagementService;
     }
 
     /**
@@ -109,6 +126,10 @@ public class WorkflowService {
             currentWorkflow = createWorkflow(workflow, workflowId);
             List<WorkflowTemplateParameters> templateProperties = workflow.getTemplate().getSteps();
             List<Parameter> parameterList = createParameterList(workflowId, templateProperties);
+
+            // Add notification parameters for both initiator and approvers
+            addNotificationParameters(parameterList, workflowId, workflow);
+
             workflowManagementService.addWorkflow(currentWorkflow, parameterList,
                     CarbonContext.getThreadLocalCarbonContext().getTenantId());
             return getWorkflow(workflowId);
@@ -138,6 +159,10 @@ public class WorkflowService {
             currentWorkflow = createWorkflow(workflow, workflowId);
             List<WorkflowTemplateParameters> templateProperties = workflow.getTemplate().getSteps();
             List<Parameter> parameterList = createParameterList(workflowId, templateProperties);
+
+            // Add notification parameters for both initiator and approvers
+            addNotificationParameters(parameterList, workflowId, workflow);
+
             List<Parameter> oldPrameterList =
                     workflowManagementService.getWorkflowParameters(workflowId);
             workflowManagementService.addWorkflow(currentWorkflow, parameterList,
@@ -244,10 +269,27 @@ public class WorkflowService {
                 throw new WorkflowClientException("A workflow association already exists for the event: " +
                         event.getEventFriendlyName());
             }
+            // Pass the rule to rule management service to persist the rule and get the corresponding rule ID.
+            String ruleId = null;
+            if (workflowAssociation.getRule() != null &&
+                    CollectionUtils.isNotEmpty(workflowAssociation.getRule().getRules())) {
+                try {
+                    String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+                    // Convert API rule to service rule.
+                    Rule serviceRule = WorkflowRuleMapper.mapApiRuleToServiceRule(
+                            workflowAssociation.getRule(), tenantDomain);
+                    Rule createdRule = ruleManagementService.addRule(serviceRule, tenantDomain);
+                    if (createdRule != null) {
+                        ruleId = createdRule.getId();
+                    }
+                } catch (RuleManagementException e) {
+                    throw new WorkflowException("Error while creating rule for workflow association.", e);
+                }
+            }
 
             workflowManagementService.addAssociation(workflowAssociation.getAssociationName(),
                     workflowAssociation.getWorkflowId(), workflowAssociation.getOperation().toString(),
-                    null);
+                    ruleId);
             Association createdAssociations = workflowManagementService
                     .getAssociationsForWorkflow(workflowAssociation.getWorkflowId()).stream()
                     .filter(association -> association.getAssociationName()
@@ -262,7 +304,7 @@ public class WorkflowService {
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_ADDING_ASSOCIATION,
                     workflowAssociation.getAssociationName(), e);
-        } catch (WorkflowException e) {
+        } catch (WorkflowException | RuleManagementException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_ASSOCIATION,
                     workflowAssociation.getAssociationName(), e);
         }
@@ -280,6 +322,7 @@ public class WorkflowService {
 
         boolean isEnable;
         String eventId;
+        String ruleId = null;
         try {
             if (workflowAssociation.getIsEnabled() == null) {
                 isEnable = workflowManagementService.getAssociation(associationId).isEnabled();
@@ -292,14 +335,49 @@ public class WorkflowService {
             } else {
                 eventId = workflowAssociation.getOperation().toString();
             }
+
+            if (workflowAssociation.getRule() == null) {
+                ruleId = workflowManagementService.getAssociation(associationId).getCondition();
+            } else {
+                String existingRuleId = workflowManagementService.getAssociation(associationId).getCondition();
+                String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+
+                // Check if the request contains an empty rule.
+                if (CollectionUtils.isEmpty(workflowAssociation.getRule().getRules())) {
+                    if (StringUtils.isNotBlank(existingRuleId) && WorkflowManagementUtil.isUUID(existingRuleId)) {
+                        ruleManagementService.deleteRule(existingRuleId, tenantDomain);
+                        ruleId = null;
+                    }
+                } else {
+                    // Process non-empty rule (update or create).
+                    try {
+                        Rule serviceRule = WorkflowRuleMapper.mapApiRuleToServiceRule(
+                                workflowAssociation.getRule(), tenantDomain);
+                        Rule resultRule;
+                        // Update existing rule if it exists, otherwise create new rule.
+                        if (StringUtils.isNotBlank(existingRuleId) && WorkflowManagementUtil.isUUID(existingRuleId)) {
+                            serviceRule.setId(existingRuleId);
+                            resultRule = ruleManagementService.updateRule(serviceRule, tenantDomain);
+                        } else {
+                            resultRule = ruleManagementService.addRule(serviceRule, tenantDomain);
+                        }
+                        if (resultRule != null) {
+                            ruleId = resultRule.getId();
+                        }
+                    } catch (RuleManagementException e) {
+                        String operation = StringUtils.isNotBlank(existingRuleId) &&
+                                WorkflowManagementUtil.isUUID(existingRuleId) ? "updating" : "creating";
+                        throw new WorkflowException("Error while " + operation + " rule for workflow association.", e);
+                    }
+                }
+            }
             workflowManagementService.updateAssociation(associationId, workflowAssociation.getAssociationName(),
-                    workflowAssociation.getWorkflowId(), eventId,
-                    null, isEnable);
+                    workflowAssociation.getWorkflowId(), eventId, ruleId, isEnable);
             return getAssociation(associationId);
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_UPDATING_ASSOCIATION,
                     associationId, e);
-        } catch (WorkflowException e) {
+        } catch (WorkflowException | RuleManagementException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_ASSOCIATION, associationId, e);
         }
     }
@@ -318,7 +396,7 @@ public class WorkflowService {
         } catch (WorkflowClientException e) {
             throw handleClientError(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_ASSOCIATION_NOT_FOUND,
                     associationId, e);
-        } catch (WorkflowException e) {
+        } catch (WorkflowException | RuleManagementException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_ASSOCIATION, associationId, e);
         }
     }
@@ -347,7 +425,7 @@ public class WorkflowService {
                     associations.toArray(new WorkflowAssociationListItem[associations.size()]), offset, filter);
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_LISTING_ASSOCIATIONS, null, e);
-        } catch (WorkflowException e) {
+        } catch (WorkflowException | RuleManagementException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_ASSOCIATIONS, null, e);
         }
     }
@@ -374,10 +452,16 @@ public class WorkflowService {
                         " cannot be deleted as it is the only association for the related workflow: " +
                         association.getWorkflowId());
             }
+            // Condition can either be null, a UUID or a XPath expression.
+            String condition = association.getCondition();
+            if (StringUtils.isNotBlank(condition) && WorkflowManagementUtil.isUUID(condition)) {
+                String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+                ruleManagementService.deleteRule(condition, tenantDomain);
+            }
             workflowManagementService.removeAssociation(Integer.parseInt(associationId));
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_ASSOCIATION_NOT_FOUND, associationId, e);
-        } catch (WorkflowException e) {
+        } catch (WorkflowException | RuleManagementException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_REMOVING_ASSOCIATION, associationId, e);
         }
     }
@@ -492,6 +576,107 @@ public class WorkflowService {
         return parameterList;
     }
 
+    /**
+     * Add notification parameters to the parameter list.
+     *
+     * @param parameterList      List of parameters to add to
+     * @param workflowId         Workflow ID
+     * @param workflow           Workflow request containing notification settings
+     * @throws WorkflowClientException if validation fails
+     */
+    private void addNotificationParameters(List<Parameter> parameterList, String workflowId,
+                                           WorkflowRequest workflow) throws WorkflowClientException {
+
+        // Add notification parameters for initiator
+        if (workflow.getNotificationsForInitiator() != null) {
+            InitiatorNotifications initiatorNotifications = workflow.getNotificationsForInitiator();
+
+            addNotificationChannelsAndEvents(
+                    parameterList,
+                    workflowId,
+                    initiatorNotifications.getChannels(),
+                    initiatorNotifications.getEvents(),
+                    Constants.NOTIFICATION_FOR_INITIATOR,
+                    WFConstant.ParameterHolder.WORKFLOW_IMPL
+            );
+        }
+
+        // Add notification parameters for approvers
+        if (workflow.getTemplate() != null && workflow.getTemplate().getNotificationsForApprovers() != null) {
+            ApproverNotifications approverNotifications = workflow.getTemplate().getNotificationsForApprovers();
+
+            addNotificationChannelsAndEvents(
+                    parameterList,
+                    workflowId,
+                    approverNotifications.getChannels(),
+                    approverNotifications.getEvents(),
+                    Constants.NOTIFICATION_FOR_APPROVER,
+                    Constants.TEMPLATE
+            );
+        }
+    }
+
+    /**
+     * Helper method to add notification channels and events as parameters.
+     *
+     * @param parameterList      List of parameters to add to
+     * @param workflowId         Workflow ID
+     * @param channels           List of channel strings
+     * @param events             List of event strings
+     * @param qNamePrefix        Prefix for qName (e.g., NotificationForInitiator)
+     * @param holder             Parameter holder (e.g., Workflow or Template)
+     * @throws WorkflowClientException if validation fails
+     */
+    private void addNotificationChannelsAndEvents(List<Parameter> parameterList, String workflowId,
+                                                   List<String> channels, List<String> events,
+                                                   String qNamePrefix, String holder)
+                                                   throws WorkflowClientException {
+
+        boolean isInitiator = Constants.NOTIFICATION_FOR_INITIATOR.equals(qNamePrefix);
+
+        // Validate and add channels parameter
+        if (channels != null && !channels.isEmpty()) {
+            // Validate channels
+            for (String channel : channels) {
+                if (!NotificationConstants.isValidChannel(channel)) {
+                    throw new WorkflowClientException("Invalid notification channel: " + channel +
+                            ". Supported channels: " + NotificationConstants.getSupportedChannels());
+                }
+            }
+
+            Parameter channelsParam = setWorkflowImplParameters(workflowId, Constants.NOTIFICATION,
+                    String.join(Constants.PARAMETER_VALUE_SEPARATOR, channels),
+                    qNamePrefix + Constants.STEP_NAME_DELIMITER + CHANNELS,
+                    holder);
+            parameterList.add(channelsParam);
+        }
+
+        // Validate and add events parameter
+        if (events != null && !events.isEmpty()) {
+            // Validate events based on context (initiator vs approver)
+            for (String event : events) {
+                boolean isValid = isInitiator
+                        ? NotificationConstants.isValidInitiatorEvent(event)
+                        : NotificationConstants.isValidApproverEvent(event);
+
+                if (!isValid) {
+                    String supportedEvents = isInitiator
+                            ? NotificationConstants.getSupportedInitiatorEvents().toString()
+                            : NotificationConstants.getSupportedApproverEvents().toString();
+                    throw new WorkflowClientException("Invalid notification event: " + event +
+                            " for " + (isInitiator ? "initiator" : "approver") +
+                            ". Supported events: " + supportedEvents);
+                }
+            }
+
+            Parameter eventsParam = setWorkflowImplParameters(workflowId, Constants.NOTIFICATION,
+                    String.join(Constants.PARAMETER_VALUE_SEPARATOR, events),
+                    qNamePrefix + Constants.STEP_NAME_DELIMITER + EVENTS,
+                    holder);
+            parameterList.add(eventsParam);
+        }
+    }
+
     private Parameter setWorkflowImplParameters(String workflowId, String paramName, String paramValue, String qName,
             String holder) {
 
@@ -536,36 +721,98 @@ public class WorkflowService {
         workflowTemplate.setName(currentWorkflow.getTemplateId());
 
         Map<Integer, WorkflowTemplateParametersBase> templateParamsMap = new HashMap<>();
+        List<String> initiatorChannels = new ArrayList<>();
+        List<String> initiatorEvents = new ArrayList<>();
+        List<String> approverChannels = new ArrayList<>();
+        List<String> approverEvents = new ArrayList<>();
+        boolean hasInitiatorNotifications = false;
+        boolean hasApproverNotifications = false;
 
         for (Parameter parameter : workflowParameters) {
 
             if (Constants.TEMPLATE.equals(parameter.getHolder())) {
-                String[] params = parameter.getqName().split(Constants.STEP_NAME_DELIMITER);
-                int stepNumber = Integer.parseInt(params[1]);
+                String qName = parameter.getqName();
 
-                // Check if there's already a WorkflowTemplateParameters object for this step
-                WorkflowTemplateParametersBase templateParameters = templateParamsMap.getOrDefault(stepNumber,
-                        new WorkflowTemplateParametersBase());
-                templateParameters.setStep(stepNumber);
+                // Handle notification parameters for approvers
+                if (qName.startsWith(Constants.NOTIFICATION_FOR_APPROVER)) {
+                    hasApproverNotifications = true;
+                    if (qName.endsWith(CHANNELS)) {
+                        approverChannels.addAll(Arrays.asList(parameter.getParamValue().
+                                split(Constants.PARAMETER_VALUE_SEPARATOR)));
+                    } else if (qName.endsWith(EVENTS)) {
+                        approverEvents.addAll(Arrays.asList(parameter.getParamValue().
+                                split(Constants.PARAMETER_VALUE_SEPARATOR)));
+                    }
+                } else {
+                    // Handle approval step parameters
+                    String[] params = qName.split(Constants.STEP_NAME_DELIMITER);
+                    int stepNumber = Integer.parseInt(params[1]);
 
-                // Create and add new OptionDetails
-                OptionDetails details = new OptionDetails();
-                details.setEntity(params[2]);
-                details.setValues(Arrays.asList(parameter.getParamValue().split(Constants.PARAMETER_VALUE_SEPARATOR)));
+                    // Check if there's already a WorkflowTemplateParameters object for this step
+                    WorkflowTemplateParametersBase templateParameters = templateParamsMap.getOrDefault(stepNumber,
+                            new WorkflowTemplateParametersBase());
+                    templateParameters.setStep(stepNumber);
 
-                // Ensure the list exists and add new details
-                if (templateParameters.getOptions() == null) {
-                    templateParameters.setOptions(new ArrayList<>());
+                    // Create and add new OptionDetails
+                    OptionDetails details = new OptionDetails();
+                    details.setEntity(params[2]);
+                    details.setValues(Arrays.asList(parameter.getParamValue().
+                            split(Constants.PARAMETER_VALUE_SEPARATOR)));
+
+                    // Ensure the list exists and add new details
+                    if (templateParameters.getOptions() == null) {
+                        templateParameters.setOptions(new ArrayList<>());
+                    }
+                    templateParameters.getOptions().add(details);
+
+                    // Update the map
+                    templateParamsMap.put(stepNumber, templateParameters);
                 }
-                templateParameters.getOptions().add(details);
-
-                // Update the map
-                templateParamsMap.put(stepNumber, templateParameters);
+            } else if (WFConstant.ParameterHolder.WORKFLOW_IMPL.equals(parameter.getHolder())) {
+                // Handle notification parameters for initiator
+                String qName = parameter.getqName();
+                if (qName.startsWith(Constants.NOTIFICATION_FOR_INITIATOR)) {
+                    hasInitiatorNotifications = true;
+                    if (qName.endsWith(CHANNELS)) {
+                        initiatorChannels.addAll(Arrays.asList(parameter.getParamValue().
+                                split(Constants.PARAMETER_VALUE_SEPARATOR)));
+                    } else if (qName.endsWith(EVENTS)) {
+                        initiatorEvents.addAll(Arrays.asList(parameter.getParamValue().
+                                split(Constants.PARAMETER_VALUE_SEPARATOR)));
+                    }
+                }
             }
         }
+
         List<WorkflowTemplateParametersBase> templateParams = new ArrayList<>(templateParamsMap.values());
         workflowTemplate.setSteps(templateParams);
+
+        // Set approver notifications if present
+        if (hasApproverNotifications) {
+            ApproverNotifications approverNotifications = new ApproverNotifications();
+            if (!approverChannels.isEmpty()) {
+                approverNotifications.setChannels(approverChannels);
+            }
+            if (!approverEvents.isEmpty()) {
+                approverNotifications.setEvents(approverEvents);
+            }
+            workflowTemplate.setNotificationsForApprovers(approverNotifications);
+        }
+
         detailedWorkflow.setTemplate(workflowTemplate);
+
+        // Set initiator notifications if present
+        if (hasInitiatorNotifications) {
+            InitiatorNotifications initiatorNotifications = new InitiatorNotifications();
+            if (!initiatorChannels.isEmpty()) {
+                initiatorNotifications.setChannels(initiatorChannels);
+            }
+            if (!initiatorEvents.isEmpty()) {
+                initiatorNotifications.setEvents(initiatorEvents);
+            }
+            detailedWorkflow.setNotificationsForInitiator(initiatorNotifications);
+        }
+
         detailedWorkflow.setEngine(currentWorkflow.getWorkflowImplId());
         return detailedWorkflow;
     }
@@ -589,34 +836,60 @@ public class WorkflowService {
         return workflowAssociationListResponse;
     }
 
-    private WorkflowAssociationListItem getAssociation(Association association) {
+    private WorkflowAssociationListItem getAssociation(Association association) throws RuleManagementException {
 
-        WorkflowAssociationListItem associationListItem = null;
-
-        if (association != null) {
-            associationListItem = new WorkflowAssociationListItem();
-            associationListItem.setId(association.getAssociationId());
-            associationListItem.setAssociationName(association.getAssociationName());
-            associationListItem.setOperation(Operation.valueOf(association.getEventId()));
-            associationListItem.setWorkflowName(association.getWorkflowName());
-            associationListItem.setIsEnabled(association.isEnabled());
+        if (association == null) {
+            return null;
         }
+
+        WorkflowAssociationListItem associationListItem = new WorkflowAssociationListItem();
+        associationListItem.setId(association.getAssociationId());
+        associationListItem.setAssociationName(association.getAssociationName());
+        associationListItem.setOperation(Operation.valueOf(association.getEventId()));
+        associationListItem.setWorkflowName(association.getWorkflowName());
+        associationListItem.setIsEnabled(association.isEnabled());
+
+        ORRuleResponse ruleResponse = getRuleResponse(association);
+        associationListItem.setRule(ruleResponse != null ? ruleResponse : new ORRuleResponse());
+
         return associationListItem;
     }
 
-    private WorkflowAssociationResponse getAssociationDetails(Association association) {
+    private WorkflowAssociationResponse getAssociationDetails(Association association) throws RuleManagementException {
 
-        WorkflowAssociationResponse associationResponse = null;
-
-        if (association != null) {
-            associationResponse = new WorkflowAssociationResponse();
-            associationResponse.setId(association.getAssociationId());
-            associationResponse.setAssociationName(association.getAssociationName());
-            associationResponse.setOperation(Operation.valueOf(association.getEventId()));
-            associationResponse.setWorkflowName(association.getWorkflowName());
-            associationResponse.setIsEnabled(association.isEnabled());
+        if (association == null) {
+            return null;
         }
+
+        WorkflowAssociationResponse associationResponse = new WorkflowAssociationResponse();
+        associationResponse.setId(association.getAssociationId());
+        associationResponse.setAssociationName(association.getAssociationName());
+        associationResponse.setOperation(Operation.valueOf(association.getEventId()));
+        associationResponse.setWorkflowName(association.getWorkflowName());
+        associationResponse.setIsEnabled(association.isEnabled());
+
+        ORRuleResponse ruleResponse = getRuleResponse(association);
+        associationResponse.setRule(ruleResponse != null ? ruleResponse : new ORRuleResponse());
+
         return associationResponse;
+    }
+
+    /**
+     * Retrieves the rule response for an association if the rule ID is valid.
+     *
+     * @param association The association object.
+     * @return ORRuleResponse if rule exists, null otherwise.
+     * @throws RuleManagementException If an error occurs while retrieving the rule.
+     */
+    private ORRuleResponse getRuleResponse(Association association) throws RuleManagementException {
+
+        String ruleId = association.getCondition();
+        if (StringUtils.isNotBlank(ruleId) && WorkflowManagementUtil.isUUID(ruleId)) {
+            String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            Rule rule = ruleManagementService.getRuleByRuleId(ruleId, tenantDomain);
+            return WorkflowRuleMapper.mapServiceRuleToApiRule(rule);
+        }
+        return null;
     }
 
     public void abortWorkflowInstance(String instanceId) {
@@ -841,7 +1114,7 @@ public class WorkflowService {
             operationType = filterMap.get(Constants.WORKFLOW_INSTANCE_OPERATION_TYPE_KEY);
         }
 
-        org.wso2.carbon.identity.workflow.mgt.bean.WorkflowRequestFilterResponse response = workflowManagementService
+        WorkflowRequestFilterResponse response = workflowManagementService
                 .getRequestsFromFilter(user, operationType, beginDate, endDate, dateCategory, tenantId, status, limit,
                         offset);
 

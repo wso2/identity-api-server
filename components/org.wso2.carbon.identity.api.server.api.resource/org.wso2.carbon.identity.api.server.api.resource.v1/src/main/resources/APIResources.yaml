@@ -405,6 +405,79 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /api-resources/{apiResourceId}/scopes/id/{scopeId}:
+    patch:
+      tags:
+        - API Resource Scopes
+      summary: Patch scope specified by the id
+      description: >
+        Patch scope specified by the id. Patch operation only supports "displayName" and "description" fields at the moment.
+        <b>Permission required:</b> <br>
+          * /permission/admin/manage/identity/apiresourcemgt/update <br>
+        <b>Scope required:</b> <br>
+          * internal_api_resource_update
+      parameters:
+        - $ref: '#/components/parameters/apiResourceId'
+        - $ref: '#/components/parameters/scopeId'
+      responses:
+        204:
+          description: Not Content
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScopePatchModel'
+        description: This represents the scopes to be patched.
+        required: true
+
+    delete:
+      tags:
+        - API Resource Scopes
+      summary: Delete API scope specified by the id
+      description: >
+        Delete API scope specified by the id
+        <b>Permission required:</b> <br>
+          * /permission/admin/manage/identity/apiresourcemgt/delete <br>
+        <b>Scope required:</b> <br>
+          * internal_api_resource_delete
+      parameters:
+        - $ref: '#/components/parameters/apiResourceId'
+        - $ref: '#/components/parameters/scopeId'
+      responses:
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   /scopes:
     get:
       tags:
@@ -828,6 +901,14 @@ components:
       name: scopeName
       in: path
       description: Name of the Scope.
+      required: true
+      schema:
+        type: string
+
+    scopeId:
+      name: scopeId
+      in: path
+      description: Id of the Scope.
       required: true
       schema:
         type: string

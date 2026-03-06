@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2019-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -21,6 +21,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.v1.AccessTokenConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.AllowedIssuer;
+import org.wso2.carbon.identity.api.server.application.management.v1.CIBAAuthenticationRequestConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthenticationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.HybridFlowConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.IdTokenConfiguration;
@@ -38,6 +40,7 @@ import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
+import org.wso2.carbon.identity.oauth2.config.models.IssuerDetails;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -88,7 +91,8 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         updateSubjectConfigurations(consumerAppDTO, oidcModel.getSubject());
         consumerAppDTO.setFapiConformanceEnabled(oidcModel.getIsFAPIApplication());
         updateSubjectTokenConfigurations(consumerAppDTO, oidcModel.getSubjectToken());
-
+        updateCIBAAuthenticationRequestConfigurations(consumerAppDTO, oidcModel.getCibaAuthenticationRequest());
+        updateIssuerDetails(consumerAppDTO, oidcModel.getIssuer());
         return consumerAppDTO;
     }
 
@@ -178,6 +182,9 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
                 consumerAppDTO.setTokenBindingValidationEnabled(false);
             }
             consumerAppDTO.setAccessTokenClaims(getAccessTokenClaims(accessToken));
+            if (accessToken.getEnableJwtScopeAsArray() != null) {
+                consumerAppDTO.setJwtScopeAsArrayEnabled(accessToken.getEnableJwtScopeAsArray());
+            }
         }
     }
 
@@ -314,6 +321,32 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         if (subjectToken != null) {
             consumerAppDTO.setSubjectTokenEnabled(subjectToken.getEnable());
             consumerAppDTO.setSubjectTokenExpiryTime(subjectToken.getApplicationSubjectTokenExpiryInSeconds());
+        }
+    }
+
+    private void updateCIBAAuthenticationRequestConfigurations(OAuthConsumerAppDTO consumerAppDTO,
+                                                  CIBAAuthenticationRequestConfiguration cibaAuthReq) {
+
+        if (consumerAppDTO.getGrantTypes().contains(OAuthConstants.GrantTypes.CIBA)) {
+            consumerAppDTO.setCibaAuthReqExpiryTime(cibaAuthReq.getAuthReqExpiryTime());
+            List<String> cibaNotificationChannels = cibaAuthReq.getNotificationChannels();
+            if (CollectionUtils.isNotEmpty(cibaNotificationChannels)) {
+                consumerAppDTO.setCibaNotificationChannels(String.join(
+                        ",", cibaNotificationChannels));
+            } else {
+                consumerAppDTO.setCibaNotificationChannels(StringUtils.EMPTY);
+            }
+        }
+    }
+
+    private void updateIssuerDetails(OAuthConsumerAppDTO consumerAppDTO, AllowedIssuer issuer) {
+
+        if (issuer != null) {
+            IssuerDetails issuerDetails = new IssuerDetails();
+            issuerDetails.setIssuerOrgId(issuer.getOrganizationId());
+            issuerDetails.setIssuerTenantDomain(issuer.getTenantDomain());
+            issuerDetails.setIssuer(issuer.getValue());
+            consumerAppDTO.setIssuerDetails(issuerDetails);
         }
     }
 }

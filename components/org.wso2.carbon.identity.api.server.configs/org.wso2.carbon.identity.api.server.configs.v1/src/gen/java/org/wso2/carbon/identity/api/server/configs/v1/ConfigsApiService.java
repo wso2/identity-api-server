@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,34 +18,28 @@
 
 package org.wso2.carbon.identity.api.server.configs.v1;
 
-import org.wso2.carbon.identity.api.server.configs.v1.*;
 import org.wso2.carbon.identity.api.server.configs.v1.model.*;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import java.io.InputStream;
+
 import java.util.List;
-import org.wso2.carbon.identity.api.server.configs.v1.model.Authenticator;
-import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
-import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
+
+import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettings;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
-import org.wso2.carbon.identity.api.server.configs.v1.model.Error;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthOAuth2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch;
-import org.wso2.carbon.identity.api.server.configs.v1.model.JWTValidatorConfig;
-import java.util.List;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfigListItem;
-import org.wso2.carbon.identity.api.server.configs.v1.model.Schema;
-import org.wso2.carbon.identity.api.server.configs.v1.model.SchemaListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ScimConfig;
-import org.wso2.carbon.identity.api.server.configs.v1.model.ServerConfig;
+
 import javax.ws.rs.core.Response;
 
 
 public interface ConfigsApiService {
+
+      public Response deleteOAuth2InboundAuthConfig();
 
       public Response deletePassiveSTSInboundAuthConfig();
 
@@ -64,6 +58,10 @@ public interface ConfigsApiService {
       public Response getImpersonationConfiguration();
 
       public Response getInboundScimConfigs();
+
+      public Response getIssuerUsageScopeConfig();
+
+      public Response getOAuth2InboundAuthConfig();
 
       public Response getPassiveSTSInboundAuthConfig();
 
@@ -102,6 +100,10 @@ public interface ConfigsApiService {
 
       public Response updateInboundScimConfigs(ScimConfig scimConfig);
 
+      public Response updateIssuerUsageScopeConfig(UsageScopePatch usageScopePatch);
+
+      public Response updateOAuth2InboundAuthConfig(InboundAuthOAuth2Config inboundAuthOAuth2Config);
+
       public Response updatePassiveSTSInboundAuthConfig(InboundAuthPassiveSTSConfig inboundAuthPassiveSTSConfig);
 
       public Response updateRemoteLoggingConfig(String logType, RemoteLoggingConfig remoteLoggingConfig);
@@ -109,4 +111,10 @@ public interface ConfigsApiService {
       public Response updateRemoteLoggingConfigs(List<RemoteLoggingConfigListItem> remoteLoggingConfigListItem);
 
       public Response updateSAMLInboundAuthConfig(InboundAuthSAML2Config inboundAuthSAML2Config);
+
+      public Response getCompatibilitySettings();
+
+      public Response patchCompatibilitySettings(CompatibilitySettings compatibilitySettings);
+
+      public Response getCompatibilitySettingsByGroup(String settingGroup);
 }

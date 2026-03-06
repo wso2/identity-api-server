@@ -22,9 +22,11 @@ import org.wso2.carbon.base.api.ServerConfigurationService;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
+import org.wso2.carbon.identity.compatibility.settings.core.service.CompatibilitySettingsService;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.fraud.detection.core.service.FraudDetectionConfigsService;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
+import org.wso2.carbon.identity.oauth2.config.services.OAuth2OIDCConfigOrgUsageScopeMgtService;
 import org.wso2.carbon.identity.oauth2.impersonation.services.ImpersonationConfigMgtService;
 import org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.core.JWTClientAuthenticatorMgtService;
 import org.wso2.carbon.idp.mgt.IdentityProviderManager;
@@ -100,6 +102,20 @@ public class ConfigsServiceHolder {
         static final FraudDetectionConfigsService SERVICE =
                 (FraudDetectionConfigsService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                         .getOSGiService(FraudDetectionConfigsService.class, null);
+    }
+
+    private static class OAuth2OIDCConfigOrgUsageScopeMgtServiceHolder {
+
+        static final OAuth2OIDCConfigOrgUsageScopeMgtService SERVICE =
+                (OAuth2OIDCConfigOrgUsageScopeMgtService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(OAuth2OIDCConfigOrgUsageScopeMgtService.class, null);
+    }
+
+    private static class IdentityCompatibilitySettingsServiceHolder {
+
+        static final CompatibilitySettingsService SERVICE =
+                (CompatibilitySettingsService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(CompatibilitySettingsService.class, null);
     }
 
     /**
@@ -200,5 +216,25 @@ public class ConfigsServiceHolder {
     public static FraudDetectionConfigsService getFraudDetectionConfigsService() {
 
         return FraudDetectionConfigsServiceHolder.SERVICE;
+    }
+
+    /**
+     * Get OAuth2OIDCConfigOrgUsageScopeMgtService osgi service.
+     *
+     * @return OAuth2OIDCConfigOrgUsageScopeMgtService
+     */
+    public static OAuth2OIDCConfigOrgUsageScopeMgtService getOAuth2OIDCConfigOrgUsageScopeMgtService() {
+
+        return OAuth2OIDCConfigOrgUsageScopeMgtServiceHolder.SERVICE;
+    }
+
+    /**
+     * Get IdentityCompatibilitySettingsService osgi service.
+     *
+     * @return IdentityCompatibilitySettingsService
+     */
+    public static CompatibilitySettingsService getIdentityCompatibilitySettingsService() {
+
+        return IdentityCompatibilitySettingsServiceHolder.SERVICE;
     }
 }

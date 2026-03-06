@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.InitiatorNotifications;
 import org.wso2.carbon.identity.rest.api.server.workflow.v1.model.WorkflowTemplate;
 import javax.validation.constraints.*;
 
@@ -36,6 +37,7 @@ public class WorkflowRequest  {
     private String name;
     private String description;
     private String engine;
+    private InitiatorNotifications notificationsForInitiator;
     private WorkflowTemplate template;
 
     /**
@@ -101,6 +103,24 @@ public class WorkflowRequest  {
 
     /**
     **/
+    public WorkflowRequest notificationsForInitiator(InitiatorNotifications notificationsForInitiator) {
+
+        this.notificationsForInitiator = notificationsForInitiator;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("notificationsForInitiator")
+    @Valid
+    public InitiatorNotifications getNotificationsForInitiator() {
+        return notificationsForInitiator;
+    }
+    public void setNotificationsForInitiator(InitiatorNotifications notificationsForInitiator) {
+        this.notificationsForInitiator = notificationsForInitiator;
+    }
+
+    /**
+    **/
     public WorkflowRequest template(WorkflowTemplate template) {
 
         this.template = template;
@@ -132,12 +152,13 @@ public class WorkflowRequest  {
         return Objects.equals(this.name, workflowRequest.name) &&
             Objects.equals(this.description, workflowRequest.description) &&
             Objects.equals(this.engine, workflowRequest.engine) &&
+            Objects.equals(this.notificationsForInitiator, workflowRequest.notificationsForInitiator) &&
             Objects.equals(this.template, workflowRequest.template);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, engine, template);
+        return Objects.hash(name, description, engine, notificationsForInitiator, template);
     }
 
     @Override
@@ -149,6 +170,7 @@ public class WorkflowRequest  {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    engine: ").append(toIndentedString(engine)).append("\n");
+        sb.append("    notificationsForInitiator: ").append(toIndentedString(notificationsForInitiator)).append("\n");
         sb.append("    template: ").append(toIndentedString(template)).append("\n");
         sb.append("}");
         return sb.toString();

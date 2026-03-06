@@ -130,6 +130,21 @@ public class ApiResourcesApiServiceImpl implements ApiResourcesApiService {
     }
 
     @Override
+    public Response apiResourcesApiResourceIdScopesIdScopeIdDelete(String apiResourceId, String scopeId) {
+
+        serverAPIResourceManagementService.deleteScopeByScopeId(apiResourceId, scopeId);
+        return Response.noContent().build();
+    }
+
+    @Override
+    public Response apiResourcesApiResourceIdScopesIdScopeIdPatch(String apiResourceId, String scopeId,
+                                                                  ScopePatchModel scopePatchModel) {
+
+        serverAPIResourceManagementService.patchScopeMetadataByScopeId(apiResourceId, scopeId, scopePatchModel);
+        return Response.ok().build();
+    }
+
+    @Override
     public Response deleteAuthorizationDetailsType(String apiResourceId, String authorizationDetailsTypeId) {
 
         typeMgtService.deleteAuthorizationDetailsTypeById(apiResourceId, authorizationDetailsTypeId);

@@ -88,6 +88,8 @@ public class APIResourceMgtEndpointConstants {
                 "Invalid API resource identifier provided.", "API resource identifier is required."),
         ERROR_CODE_INVALID_SCOPE_NAME("60005",
                 "Invalid scope name provided.", "Scope name is required."),
+        ERROR_CODE_INVALID_SCOPE_ID("60017",
+                "Invalid scope id provided.", "Scope id is required."),
         ERROR_CODE_REMOVED_SCOPES_PATCH_NOT_SUPPORTED("60006",
                 "Removed scopes patching is not supported yet.",
                 "Removed scopes patching is not supported yet for API resources."),

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2019-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -27,7 +27,10 @@ import org.wso2.carbon.identity.application.mgt.AuthorizedAPIManagementService;
 import org.wso2.carbon.identity.application.mgt.ai.LoginFlowAIManager;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
+import org.wso2.carbon.identity.oauth.ciba.api.CibaAuthService;
+import org.wso2.carbon.identity.oauth.ciba.api.CibaAuthServiceImpl;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
+import org.wso2.carbon.identity.oauth2.config.services.OAuth2OIDCConfigOrgUsageScopeMgtService;
 import org.wso2.carbon.identity.organization.management.application.OrgApplicationManager;
 import org.wso2.carbon.identity.sso.saml.SAMLSSOConfigServiceImpl;
 import org.wso2.carbon.identity.template.mgt.TemplateManager;
@@ -133,6 +136,19 @@ public class ApplicationManagementServiceHolder {
 
         static final OrgApplicationManager SERVICE = (OrgApplicationManager) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(OrgApplicationManager.class, null);
+    }
+
+    private static class CibaAuthServiceHolder {
+
+        static final CibaAuthServiceImpl SERVICE = (CibaAuthServiceImpl) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(CibaAuthService.class, null);
+    }
+
+    private static class OAuthOIDCConfigOrgUsageScopeMgtServiceHolder {
+
+        static final OAuth2OIDCConfigOrgUsageScopeMgtService SERVICE =
+                (OAuth2OIDCConfigOrgUsageScopeMgtService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(OAuth2OIDCConfigOrgUsageScopeMgtService.class, null);
     }
 
     /**
@@ -252,5 +268,25 @@ public class ApplicationManagementServiceHolder {
     public static LoginFlowAIManager getLoginFlowAIManagementService() {
 
         return LoginFlowAIManagerServiceHolder.SERVICE;
+    }
+
+    /**
+     * Get CibaAuthService.
+     *
+     * @return CibaAuthService.
+     */
+    public static CibaAuthServiceImpl getCibaAuthService() {
+
+        return CibaAuthServiceHolder.SERVICE;
+    }
+
+
+    /**
+     * Get OAuth2OIDCConfigOrgUsageScopeMgtService.
+     * @return OAuth2OIDCConfigOrgUsageScopeMgtService.
+     */
+    public static OAuth2OIDCConfigOrgUsageScopeMgtService getOAuth2OIDCConfigOrgUsageScopeMgtService() {
+
+        return OAuthOIDCConfigOrgUsageScopeMgtServiceHolder.SERVICE;
     }
 }
