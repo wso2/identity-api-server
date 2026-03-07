@@ -19,14 +19,11 @@
 package org.wso2.carbon.identity.api.server.extension.management.common.utils;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.extension.management.common.ExtensionManagementServiceHolder;
-import org.wso2.carbon.identity.extension.mgt.exception.ExtensionManagementException;
 
 import javax.ws.rs.core.Response;
 
@@ -36,8 +33,6 @@ import static org.wso2.carbon.identity.api.server.extension.management.common.ut
  * Utility class for extension management.
  */
 public class ExtensionMgtUtils {
-
-    private static final Log LOG = LogFactory.getLog(ExtensionMgtUtils.class);
 
     /**
      * Get the path of the extension type.
@@ -77,13 +72,6 @@ public class ExtensionMgtUtils {
     public static APIError handleServerException(Response.Status status, ExtensionMgtConstants.ErrorMessage error,
                                                   String... data) {
 
-        return new APIError(status, getErrorBuilder(error, data).build());
-    }
-
-    public static APIError handleServerException(Response.Status status, ExtensionMgtConstants.ErrorMessage error,
-                                                 ExtensionManagementException e, String... data) {
-
-        LOG.error("Server error occurred while extension management.", e);
         return new APIError(status, getErrorBuilder(error, data).build());
     }
 
