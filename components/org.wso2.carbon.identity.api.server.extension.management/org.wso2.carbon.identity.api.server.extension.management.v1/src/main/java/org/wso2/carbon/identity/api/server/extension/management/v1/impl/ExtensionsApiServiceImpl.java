@@ -72,7 +72,7 @@ public class ExtensionsApiServiceImpl implements ExtensionsApiService {
                     ExtensionListItemBuilder()).collect(Collectors.toList())).build();
         } catch (ExtensionManagementException e) {
             throw ExtensionMgtUtils.handleServerException(Response.Status.INTERNAL_SERVER_ERROR,
-                    ExtensionMgtConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_EXTENSIONS_BY_TYPE, e, extensionType);
+                    ExtensionMgtConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_EXTENSIONS_BY_TYPE, extensionType);
         }
     }
 
@@ -97,8 +97,7 @@ public class ExtensionsApiServiceImpl implements ExtensionsApiService {
             return Response.ok().entity(new ExtensionResponseModelBuilder().apply(extensionInfo)).build();
         } catch (ExtensionManagementException e) {
             throw ExtensionMgtUtils.handleServerException(Response.Status.INTERNAL_SERVER_ERROR,
-                    ExtensionMgtConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_EXTENSION, e, extensionId,
-                    extensionType);
+                    ExtensionMgtConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_EXTENSION, extensionId, extensionType);
         }
     }
 
@@ -123,8 +122,7 @@ public class ExtensionsApiServiceImpl implements ExtensionsApiService {
             return Response.ok().entity(template.toString()).build();
         } catch (ExtensionManagementException e) {
             throw ExtensionMgtUtils.handleServerException(Response.Status.INTERNAL_SERVER_ERROR,
-                    ExtensionMgtConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_TEMPLATE, e, extensionId,
-                    extensionType);
+                    ExtensionMgtConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_TEMPLATE, extensionId, extensionType);
         }
     }
 
@@ -149,8 +147,7 @@ public class ExtensionsApiServiceImpl implements ExtensionsApiService {
             return Response.ok().entity(metadata.toString()).build();
         } catch (ExtensionManagementException e) {
             throw ExtensionMgtUtils.handleServerException(Response.Status.INTERNAL_SERVER_ERROR,
-                    ExtensionMgtConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_METADATA, e, extensionId,
-                    extensionType);
+                    ExtensionMgtConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_METADATA, extensionId, extensionType);
         }
     }
 }
