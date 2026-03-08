@@ -188,9 +188,11 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_PROCESSING_REQUEST;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.FORBIDDEN_OPERATION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.UNSUPPORTED_NEW_B2B_LOGIN_ENABLED_CONFIGURATION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.USE_EXTERNAL_CONSENT_PAGE_NOT_SUPPORTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ISSUER;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.NAME;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.NEW_B2B_LOGIN_FEATURE_ENABLED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.TEMPLATE_ID;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.TEMPLATE_VERSION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.VIEW_APPLICATION_CLIENT_SECRET_OPERATION;
@@ -829,6 +831,11 @@ public class ServerApplicationManagementService {
             }
         }
 
+        if (!isNewB2BLoginFeatureEnabled() && Boolean.TRUE.equals(applicationModel.getIsNewB2BLoginEnabled())) {
+            throw buildBadRequestError(UNSUPPORTED_NEW_B2B_LOGIN_ENABLED_CONFIGURATION.getCode(),
+                    UNSUPPORTED_NEW_B2B_LOGIN_ENABLED_CONFIGURATION.getDescription());
+        }
+
         // Block application creation with name Console or MyAccount.
         if (FrameworkConstants.Application.CONSOLE_APP.equals(applicationModel.getName()) ||
                 FrameworkConstants.Application.MY_ACCOUNT_APP.equals(applicationModel.getName())) {
@@ -890,6 +897,12 @@ public class ServerApplicationManagementService {
     public void patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel) {
 
         ServiceProvider appToUpdate = cloneApplication(applicationId);
+
+        if (!isNewB2BLoginFeatureEnabled() && Boolean.TRUE.equals(applicationPatchModel.getIsNewB2BLoginEnabled())) {
+            throw buildBadRequestError(UNSUPPORTED_NEW_B2B_LOGIN_ENABLED_CONFIGURATION.getCode(),
+                    UNSUPPORTED_NEW_B2B_LOGIN_ENABLED_CONFIGURATION.getDescription());
+        }
+
         /*
          * Updating the adaptive script requires the internal_application_script_update scope.
          * Validate the permission before allowing the update.
@@ -2276,6 +2289,17 @@ public class ServerApplicationManagementService {
                     .parseBoolean(IdentityUtil.getProperty(APPLICATION_BASED_OUTBOUND_PROVISIONING_ENABLED));
         }
         return applicationBasedOutboundProvisioningEnabled;
+    }
+
+    private boolean isNewB2BLoginFeatureEnabled() {
+
+        boolean newB2BLoginEnabled = false;
+        if (StringUtils.isNotEmpty(
+                IdentityUtil.getProperty(NEW_B2B_LOGIN_FEATURE_ENABLED))) {
+            newB2BLoginEnabled = Boolean
+                    .parseBoolean(IdentityUtil.getProperty(NEW_B2B_LOGIN_FEATURE_ENABLED));
+        }
+        return newB2BLoginEnabled;
     }
 
     private void blockRenameAppsToSystemReservedApps(String newAppName, String oldAppName) {
