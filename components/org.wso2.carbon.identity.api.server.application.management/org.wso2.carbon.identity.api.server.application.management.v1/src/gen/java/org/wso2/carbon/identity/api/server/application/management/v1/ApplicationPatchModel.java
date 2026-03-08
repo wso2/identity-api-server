@@ -45,6 +45,7 @@ public class ApplicationPatchModel  {
     private String logoutReturnUrl;
     private String templateId;
     private String templateVersion;
+    private Boolean isNewB2BLoginEnabled;
     private Boolean applicationEnabled;
     private AssociatedRolesConfig associatedRoles;
     private ClaimConfiguration claimConfiguration;
@@ -198,6 +199,25 @@ public class ApplicationPatchModel  {
     }
 
     /**
+    * Decides whether the new B2B login experience is enabled for the application.
+    **/
+    public ApplicationPatchModel isNewB2BLoginEnabled(Boolean isNewB2BLoginEnabled) {
+
+        this.isNewB2BLoginEnabled = isNewB2BLoginEnabled;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "Decides whether the new B2B login experience is enabled for the application.")
+    @JsonProperty("isNewB2BLoginEnabled")
+    @Valid
+    public Boolean getIsNewB2BLoginEnabled() {
+        return isNewB2BLoginEnabled;
+    }
+    public void setIsNewB2BLoginEnabled(Boolean isNewB2BLoginEnabled) {
+        this.isNewB2BLoginEnabled = isNewB2BLoginEnabled;
+    }
+
+    /**
     * Decides whether the application is enabled.
     **/
     public ApplicationPatchModel applicationEnabled(Boolean applicationEnabled) {
@@ -325,6 +345,7 @@ public class ApplicationPatchModel  {
             Objects.equals(this.logoutReturnUrl, applicationPatchModel.logoutReturnUrl) &&
             Objects.equals(this.templateId, applicationPatchModel.templateId) &&
             Objects.equals(this.templateVersion, applicationPatchModel.templateVersion) &&
+            Objects.equals(this.isNewB2BLoginEnabled, applicationPatchModel.isNewB2BLoginEnabled) &&
             Objects.equals(this.applicationEnabled, applicationPatchModel.applicationEnabled) &&
             Objects.equals(this.associatedRoles, applicationPatchModel.associatedRoles) &&
             Objects.equals(this.claimConfiguration, applicationPatchModel.claimConfiguration) &&
@@ -335,7 +356,7 @@ public class ApplicationPatchModel  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, imageUrl, accessUrl, logoutReturnUrl, templateId, templateVersion, applicationEnabled, associatedRoles, claimConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
+        return Objects.hash(name, description, applicationVersion, imageUrl, accessUrl, logoutReturnUrl, templateId, templateVersion, isNewB2BLoginEnabled, applicationEnabled, associatedRoles, claimConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
     }
 
     @Override
@@ -351,6 +372,7 @@ public class ApplicationPatchModel  {
         sb.append("    logoutReturnUrl: ").append(toIndentedString(logoutReturnUrl)).append("\n");
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    templateVersion: ").append(toIndentedString(templateVersion)).append("\n");
+        sb.append("    isNewB2BLoginEnabled: ").append(toIndentedString(isNewB2BLoginEnabled)).append("\n");
         sb.append("    applicationEnabled: ").append(toIndentedString(applicationEnabled)).append("\n");
         sb.append("    associatedRoles: ").append(toIndentedString(associatedRoles)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");

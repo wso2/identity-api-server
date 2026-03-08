@@ -82,6 +82,7 @@ public enum AccessEnum {
     private String templateId;
     private String templateVersion;
     private AssociatedRolesConfig associatedRoles;
+    private Boolean isNewB2BLoginEnabled;
     private Boolean applicationEnabled;
 
     /**
@@ -357,6 +358,24 @@ public enum AccessEnum {
 
     /**
     **/
+    public ApplicationListItem isNewB2BLoginEnabled(Boolean isNewB2BLoginEnabled) {
+
+        this.isNewB2BLoginEnabled = isNewB2BLoginEnabled;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "")
+    @JsonProperty("isNewB2BLoginEnabled")
+    @Valid
+    public Boolean getIsNewB2BLoginEnabled() {
+        return isNewB2BLoginEnabled;
+    }
+    public void setIsNewB2BLoginEnabled(Boolean isNewB2BLoginEnabled) {
+        this.isNewB2BLoginEnabled = isNewB2BLoginEnabled;
+    }
+
+    /**
+    **/
     public ApplicationListItem applicationEnabled(Boolean applicationEnabled) {
 
         this.applicationEnabled = applicationEnabled;
@@ -400,12 +419,13 @@ public enum AccessEnum {
             Objects.equals(this.templateId, applicationListItem.templateId) &&
             Objects.equals(this.templateVersion, applicationListItem.templateVersion) &&
             Objects.equals(this.associatedRoles, applicationListItem.associatedRoles) &&
+            Objects.equals(this.isNewB2BLoginEnabled, applicationListItem.isNewB2BLoginEnabled) &&
             Objects.equals(this.applicationEnabled, applicationListItem.applicationEnabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, applicationVersion, image, accessUrl, clientId, issuer, realm, access, self, advancedConfigurations, templateId, templateVersion, associatedRoles, applicationEnabled);
+        return Objects.hash(id, name, description, applicationVersion, image, accessUrl, clientId, issuer, realm, access, self, advancedConfigurations, templateId, templateVersion, associatedRoles, isNewB2BLoginEnabled, applicationEnabled);
     }
 
     @Override
@@ -429,6 +449,7 @@ public enum AccessEnum {
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    templateVersion: ").append(toIndentedString(templateVersion)).append("\n");
         sb.append("    associatedRoles: ").append(toIndentedString(associatedRoles)).append("\n");
+        sb.append("    isNewB2BLoginEnabled: ").append(toIndentedString(isNewB2BLoginEnabled)).append("\n");
         sb.append("    applicationEnabled: ").append(toIndentedString(applicationEnabled)).append("\n");
         sb.append("}");
         return sb.toString();

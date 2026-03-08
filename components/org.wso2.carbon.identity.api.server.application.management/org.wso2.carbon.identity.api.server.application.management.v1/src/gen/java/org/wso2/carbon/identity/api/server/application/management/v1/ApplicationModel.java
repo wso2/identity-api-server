@@ -48,6 +48,7 @@ public class ApplicationModel  {
     private String templateVersion;
     private Boolean isManagementApp = false;
     private Boolean isB2BSelfServiceApp = false;
+    private Boolean isNewB2BLoginEnabled = false;
     private Boolean applicationEnabled = true;
     private AssociatedRolesConfig associatedRoles;
     private ClaimConfiguration claimConfiguration;
@@ -242,6 +243,25 @@ public class ApplicationModel  {
     }
 
     /**
+    * Decides whether the new B2B login experience is enabled for the application.
+    **/
+    public ApplicationModel isNewB2BLoginEnabled(Boolean isNewB2BLoginEnabled) {
+
+        this.isNewB2BLoginEnabled = isNewB2BLoginEnabled;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "Decides whether the new B2B login experience is enabled for the application.")
+    @JsonProperty("isNewB2BLoginEnabled")
+    @Valid
+    public Boolean getIsNewB2BLoginEnabled() {
+        return isNewB2BLoginEnabled;
+    }
+    public void setIsNewB2BLoginEnabled(Boolean isNewB2BLoginEnabled) {
+        this.isNewB2BLoginEnabled = isNewB2BLoginEnabled;
+    }
+
+    /**
     * Decides whether the application is enabled.
     **/
     public ApplicationModel applicationEnabled(Boolean applicationEnabled) {
@@ -390,6 +410,7 @@ public class ApplicationModel  {
             Objects.equals(this.templateVersion, applicationModel.templateVersion) &&
             Objects.equals(this.isManagementApp, applicationModel.isManagementApp) &&
             Objects.equals(this.isB2BSelfServiceApp, applicationModel.isB2BSelfServiceApp) &&
+            Objects.equals(this.isNewB2BLoginEnabled, applicationModel.isNewB2BLoginEnabled) &&
             Objects.equals(this.applicationEnabled, applicationModel.applicationEnabled) &&
             Objects.equals(this.associatedRoles, applicationModel.associatedRoles) &&
             Objects.equals(this.claimConfiguration, applicationModel.claimConfiguration) &&
@@ -401,7 +422,7 @@ public class ApplicationModel  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, imageUrl, accessUrl, logoutReturnUrl, templateId, templateVersion, isManagementApp, isB2BSelfServiceApp, applicationEnabled, associatedRoles, claimConfiguration, inboundProtocolConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
+        return Objects.hash(id, name, description, imageUrl, accessUrl, logoutReturnUrl, templateId, templateVersion, isManagementApp, isB2BSelfServiceApp, isNewB2BLoginEnabled, applicationEnabled, associatedRoles, claimConfiguration, inboundProtocolConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
     }
 
     @Override
@@ -420,6 +441,7 @@ public class ApplicationModel  {
         sb.append("    templateVersion: ").append(toIndentedString(templateVersion)).append("\n");
         sb.append("    isManagementApp: ").append(toIndentedString(isManagementApp)).append("\n");
         sb.append("    isB2BSelfServiceApp: ").append(toIndentedString(isB2BSelfServiceApp)).append("\n");
+        sb.append("    isNewB2BLoginEnabled: ").append(toIndentedString(isNewB2BLoginEnabled)).append("\n");
         sb.append("    applicationEnabled: ").append(toIndentedString(applicationEnabled)).append("\n");
         sb.append("    associatedRoles: ").append(toIndentedString(associatedRoles)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");
