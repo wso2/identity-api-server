@@ -1085,7 +1085,7 @@
 
         <tenant.resource.manager.version>1.5.55</tenant.resource.manager.version>
         <identity.verification.version>1.0.15</identity.verification.version>
-        <identity.local.auth.fido.version>5.4.31</identity.local.auth.fido.version>
+        <identity.local.auth.fido.version>6.0.3</identity.local.auth.fido.version>
         <identity.notification.push.version>1.0.9</identity.notification.push.version>
 
         <!-- Organization management core Version -->
