@@ -54,7 +54,7 @@ public class ApplicationResponseModel  {
     private String templateVersion;
     private Boolean isManagementApp;
     private Boolean isB2BSelfServiceApp;
-    private Boolean isNewB2BLoginEnabled;
+    private Boolean isEnhancedB2BLoginEnabled;
     private Boolean applicationEnabled;
     private AssociatedRolesConfig associatedRoles;
     private ClaimConfiguration claimConfiguration;
@@ -356,22 +356,22 @@ public enum AccessEnum {
     }
 
     /**
-    * Decides whether the new B2B login experience is enabled for the application.
+    * Decides whether the enhanced B2B login experience is enabled for the application.
     **/
-    public ApplicationResponseModel isNewB2BLoginEnabled(Boolean isNewB2BLoginEnabled) {
+    public ApplicationResponseModel isEnhancedB2BLoginEnabled(Boolean isEnhancedB2BLoginEnabled) {
 
-        this.isNewB2BLoginEnabled = isNewB2BLoginEnabled;
+        this.isEnhancedB2BLoginEnabled = isEnhancedB2BLoginEnabled;
         return this;
     }
     
-    @ApiModelProperty(example = "false", value = "Decides whether the new B2B login experience is enabled for the application.")
-    @JsonProperty("isNewB2BLoginEnabled")
+    @ApiModelProperty(example = "false", value = "Decides whether the enhanced B2B login experience is enabled for the application.")
+    @JsonProperty("isEnhancedB2BLoginEnabled")
     @Valid
-    public Boolean getIsNewB2BLoginEnabled() {
-        return isNewB2BLoginEnabled;
+    public Boolean getIsEnhancedB2BLoginEnabled() {
+        return isEnhancedB2BLoginEnabled;
     }
-    public void setIsNewB2BLoginEnabled(Boolean isNewB2BLoginEnabled) {
-        this.isNewB2BLoginEnabled = isNewB2BLoginEnabled;
+    public void setIsEnhancedB2BLoginEnabled(Boolean isEnhancedB2BLoginEnabled) {
+        this.isEnhancedB2BLoginEnabled = isEnhancedB2BLoginEnabled;
     }
 
     /**
@@ -553,7 +553,7 @@ public enum AccessEnum {
             Objects.equals(this.templateVersion, applicationResponseModel.templateVersion) &&
             Objects.equals(this.isManagementApp, applicationResponseModel.isManagementApp) &&
             Objects.equals(this.isB2BSelfServiceApp, applicationResponseModel.isB2BSelfServiceApp) &&
-            Objects.equals(this.isNewB2BLoginEnabled, applicationResponseModel.isNewB2BLoginEnabled) &&
+            Objects.equals(this.isEnhancedB2BLoginEnabled, applicationResponseModel.isEnhancedB2BLoginEnabled) &&
             Objects.equals(this.applicationEnabled, applicationResponseModel.applicationEnabled) &&
             Objects.equals(this.associatedRoles, applicationResponseModel.associatedRoles) &&
             Objects.equals(this.claimConfiguration, applicationResponseModel.claimConfiguration) &&
@@ -566,7 +566,7 @@ public enum AccessEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, applicationVersion, imageUrl, accessUrl, logoutReturnUrl, clientId, issuer, realm, templateId, templateVersion, isManagementApp, isB2BSelfServiceApp, isNewB2BLoginEnabled, applicationEnabled, associatedRoles, claimConfiguration, inboundProtocols, authenticationSequence, advancedConfigurations, provisioningConfigurations, access);
+        return Objects.hash(id, name, description, applicationVersion, imageUrl, accessUrl, logoutReturnUrl, clientId, issuer, realm, templateId, templateVersion, isManagementApp, isB2BSelfServiceApp, isEnhancedB2BLoginEnabled, applicationEnabled, associatedRoles, claimConfiguration, inboundProtocols, authenticationSequence, advancedConfigurations, provisioningConfigurations, access);
     }
 
     @Override
@@ -589,7 +589,7 @@ public enum AccessEnum {
         sb.append("    templateVersion: ").append(toIndentedString(templateVersion)).append("\n");
         sb.append("    isManagementApp: ").append(toIndentedString(isManagementApp)).append("\n");
         sb.append("    isB2BSelfServiceApp: ").append(toIndentedString(isB2BSelfServiceApp)).append("\n");
-        sb.append("    isNewB2BLoginEnabled: ").append(toIndentedString(isNewB2BLoginEnabled)).append("\n");
+        sb.append("    isEnhancedB2BLoginEnabled: ").append(toIndentedString(isEnhancedB2BLoginEnabled)).append("\n");
         sb.append("    applicationEnabled: ").append(toIndentedString(applicationEnabled)).append("\n");
         sb.append("    associatedRoles: ").append(toIndentedString(associatedRoles)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");

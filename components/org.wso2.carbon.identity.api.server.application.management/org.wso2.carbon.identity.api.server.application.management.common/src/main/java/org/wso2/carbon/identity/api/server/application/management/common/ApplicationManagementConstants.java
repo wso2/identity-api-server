@@ -87,7 +87,7 @@ public class ApplicationManagementConstants {
     public static final String NON_EXISTING_USER_CODE = "30007 - ";
     public static final String APPLICATION_BASED_OUTBOUND_PROVISIONING_ENABLED =
             "OutboundProvisioning.enableApplicationBasedOutboundProvisioning";
-    public static final String NEW_B2B_LOGIN_FEATURE_ENABLED = "NewB2BLoginFeatureEnabled";
+    public static final String ENHANCED_B2B_LOGIN_FEATURE_ENABLED = "EnhancedB2BLoginFeatureEnabled";
     public static final String CODE_TOKEN = "code token";
     public static final String CODE_IDTOKEN = "code id_token";
     public static final String CODE_IDTOKEN_TOKEN = "code id_token token";
@@ -198,9 +198,9 @@ public class ApplicationManagementConstants {
         FORBIDDEN_OPERATION("60520",
                 "Forbidden",
                 "Operation is not permitted. You do not have permissions to make this request."),
-        UNSUPPORTED_NEW_B2B_LOGIN_ENABLED_CONFIGURATION("60521",
-                "New B2B login enabled property is not supported.",
-                "The 'isNewB2BLoginEnabled' property is not yet supported."),
+        UNSUPPORTED_ENHANCED_B2B_LOGIN_ENABLED_CONFIGURATION("60521",
+                "Enhanced B2B login enabled property is not supported.",
+                "The 'isEnhancedB2BLoginEnabled' property is not yet supported."),
 
         // Server Errors.
         ERROR_RETRIEVING_SAML_METADATA("65001",
