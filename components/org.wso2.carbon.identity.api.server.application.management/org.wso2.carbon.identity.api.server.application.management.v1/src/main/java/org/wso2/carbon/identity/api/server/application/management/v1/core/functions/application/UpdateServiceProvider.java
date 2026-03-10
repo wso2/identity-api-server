@@ -45,7 +45,8 @@ public class UpdateServiceProvider implements UpdateFunction<ServiceProvider, Ap
         setIfNotNull(applicationPatchModel.getTemplateId(), serviceProvider::setTemplateId);
         setIfNotNull(applicationPatchModel.getTemplateVersion(), serviceProvider::setTemplateVersion);
         setIfNotNull(applicationPatchModel.getApplicationEnabled(), serviceProvider::setApplicationEnabled);
-        setIfNotNull(applicationPatchModel.getIsEnhancedB2BLoginEnabled(), serviceProvider::setEnhancedB2BLoginEnabled);
+        setIfNotNull(applicationPatchModel.getIsEnhancedOrganizationAuthenticationEnabled(),
+                serviceProvider::setEnhancedOrganizationAuthenticationEnabled);
 
         patchAssociatedRolesConfigurations(serviceProvider, applicationPatchModel.getAssociatedRoles());
         patchClaimConfiguration(serviceProvider, applicationPatchModel.getClaimConfiguration());

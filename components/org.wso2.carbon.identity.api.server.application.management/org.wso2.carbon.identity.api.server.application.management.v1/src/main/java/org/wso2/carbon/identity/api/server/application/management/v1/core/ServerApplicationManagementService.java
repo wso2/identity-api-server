@@ -181,7 +181,7 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_ENABLED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_MANAGEMENT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.CLIENT_ID;
-import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ENHANCED_B2B_LOGIN_FEATURE_ENABLED;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ENHANCED_ORGANIZATION_AUTHENTICATION_FEATURE_ENABLED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.BLOCK_RENAME_APP_NAME_TO_RESERVED_APP_NAME;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.BLOCK_SYSTEM_RESERVED_APP_CREATION;
@@ -189,7 +189,7 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_PROCESSING_REQUEST;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.FORBIDDEN_OPERATION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
-import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.UNSUPPORTED_ENHANCED_B2B_LOGIN_ENABLED_CONFIGURATION;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.UNSUPPORTED_ENHANCED_ORGANIZATION_AUTHENTICATION_ENABLED_CONFIGURATION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.USE_EXTERNAL_CONSENT_PAGE_NOT_SUPPORTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ISSUER;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.NAME;
@@ -831,10 +831,10 @@ public class ServerApplicationManagementService {
             }
         }
 
-        if (!isEnhancedB2BLoginFeatureEnabled() &&
-                Boolean.TRUE.equals(applicationModel.getIsEnhancedB2BLoginEnabled())) {
-            throw buildBadRequestError(UNSUPPORTED_ENHANCED_B2B_LOGIN_ENABLED_CONFIGURATION.getCode(),
-                    UNSUPPORTED_ENHANCED_B2B_LOGIN_ENABLED_CONFIGURATION.getDescription());
+        if (!isEnhancedOrganizationAuthenticationFeatureEnabled() &&
+                Boolean.TRUE.equals(applicationModel.getIsEnhancedOrganizationAuthenticationEnabled())) {
+            throw buildBadRequestError(UNSUPPORTED_ENHANCED_ORGANIZATION_AUTHENTICATION_ENABLED_CONFIGURATION.getCode(),
+                    UNSUPPORTED_ENHANCED_ORGANIZATION_AUTHENTICATION_ENABLED_CONFIGURATION.getDescription());
         }
 
         // Block application creation with name Console or MyAccount.
@@ -899,10 +899,10 @@ public class ServerApplicationManagementService {
 
         ServiceProvider appToUpdate = cloneApplication(applicationId);
 
-        if (!isEnhancedB2BLoginFeatureEnabled() &&
-                Boolean.TRUE.equals(applicationPatchModel.getIsEnhancedB2BLoginEnabled())) {
-            throw buildBadRequestError(UNSUPPORTED_ENHANCED_B2B_LOGIN_ENABLED_CONFIGURATION.getCode(),
-                    UNSUPPORTED_ENHANCED_B2B_LOGIN_ENABLED_CONFIGURATION.getDescription());
+        if (!isEnhancedOrganizationAuthenticationFeatureEnabled() &&
+                Boolean.TRUE.equals(applicationPatchModel.getIsEnhancedOrganizationAuthenticationEnabled())) {
+            throw buildBadRequestError(UNSUPPORTED_ENHANCED_ORGANIZATION_AUTHENTICATION_ENABLED_CONFIGURATION.getCode(),
+                    UNSUPPORTED_ENHANCED_ORGANIZATION_AUTHENTICATION_ENABLED_CONFIGURATION.getDescription());
         }
 
         /*
@@ -2293,15 +2293,15 @@ public class ServerApplicationManagementService {
         return applicationBasedOutboundProvisioningEnabled;
     }
 
-    private boolean isEnhancedB2BLoginFeatureEnabled() {
+    private boolean isEnhancedOrganizationAuthenticationFeatureEnabled() {
 
-        boolean enhancedB2BLoginEnabled = false;
+        boolean enhancedOrganizationAuthenticationEnabled = false;
         if (StringUtils.isNotEmpty(
-                IdentityUtil.getProperty(ENHANCED_B2B_LOGIN_FEATURE_ENABLED))) {
-            enhancedB2BLoginEnabled = Boolean
-                    .parseBoolean(IdentityUtil.getProperty(ENHANCED_B2B_LOGIN_FEATURE_ENABLED));
+                IdentityUtil.getProperty(ENHANCED_ORGANIZATION_AUTHENTICATION_FEATURE_ENABLED))) {
+            enhancedOrganizationAuthenticationEnabled = Boolean
+                    .parseBoolean(IdentityUtil.getProperty(ENHANCED_ORGANIZATION_AUTHENTICATION_FEATURE_ENABLED));
         }
-        return enhancedB2BLoginEnabled;
+        return enhancedOrganizationAuthenticationEnabled;
     }
 
     private void blockRenameAppsToSystemReservedApps(String newAppName, String oldAppName) {

@@ -52,7 +52,8 @@ public class ApiModelToServiceProvider implements ModelToDTO<ApplicationModel, A
         setIfNotNull(applicationModel.getIsManagementApp(), application::setManagementApp);
         setIfNotNull(applicationModel.getIsB2BSelfServiceApp(), application::setB2BSelfServiceApp);
         setIfNotNull(applicationModel.getApplicationEnabled(), application::setApplicationEnabled);
-        setIfNotNull(applicationModel.getIsEnhancedB2BLoginEnabled(), application::setEnhancedB2BLoginEnabled);
+        setIfNotNull(applicationModel.getIsEnhancedOrganizationAuthenticationEnabled(),
+                application::setEnhancedOrganizationAuthenticationEnabled);
 
         addAdvancedConfigurationToApplication(application, applicationModel.getAdvancedConfigurations());
         addClaimConfigurationToApplication(application, applicationModel.getClaimConfiguration());

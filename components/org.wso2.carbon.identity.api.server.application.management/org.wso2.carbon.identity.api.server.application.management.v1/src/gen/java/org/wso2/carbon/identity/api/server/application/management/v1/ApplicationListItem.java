@@ -82,7 +82,7 @@ public enum AccessEnum {
     private String templateId;
     private String templateVersion;
     private AssociatedRolesConfig associatedRoles;
-    private Boolean isEnhancedB2BLoginEnabled;
+    private Boolean isEnhancedOrganizationAuthenticationEnabled;
     private Boolean applicationEnabled;
 
     /**
@@ -358,20 +358,20 @@ public enum AccessEnum {
 
     /**
     **/
-    public ApplicationListItem isEnhancedB2BLoginEnabled(Boolean isEnhancedB2BLoginEnabled) {
+    public ApplicationListItem isEnhancedOrganizationAuthenticationEnabled(Boolean isEnhancedOrganizationAuthenticationEnabled) {
 
-        this.isEnhancedB2BLoginEnabled = isEnhancedB2BLoginEnabled;
+        this.isEnhancedOrganizationAuthenticationEnabled = isEnhancedOrganizationAuthenticationEnabled;
         return this;
     }
     
     @ApiModelProperty(example = "false", value = "")
-    @JsonProperty("isEnhancedB2BLoginEnabled")
+    @JsonProperty("isEnhancedOrganizationAuthenticationEnabled")
     @Valid
-    public Boolean getIsEnhancedB2BLoginEnabled() {
-        return isEnhancedB2BLoginEnabled;
+    public Boolean getIsEnhancedOrganizationAuthenticationEnabled() {
+        return isEnhancedOrganizationAuthenticationEnabled;
     }
-    public void setIsEnhancedB2BLoginEnabled(Boolean isEnhancedB2BLoginEnabled) {
-        this.isEnhancedB2BLoginEnabled = isEnhancedB2BLoginEnabled;
+    public void setIsEnhancedOrganizationAuthenticationEnabled(Boolean isEnhancedOrganizationAuthenticationEnabled) {
+        this.isEnhancedOrganizationAuthenticationEnabled = isEnhancedOrganizationAuthenticationEnabled;
     }
 
     /**
@@ -419,13 +419,13 @@ public enum AccessEnum {
             Objects.equals(this.templateId, applicationListItem.templateId) &&
             Objects.equals(this.templateVersion, applicationListItem.templateVersion) &&
             Objects.equals(this.associatedRoles, applicationListItem.associatedRoles) &&
-            Objects.equals(this.isEnhancedB2BLoginEnabled, applicationListItem.isEnhancedB2BLoginEnabled) &&
+            Objects.equals(this.isEnhancedOrganizationAuthenticationEnabled, applicationListItem.isEnhancedOrganizationAuthenticationEnabled) &&
             Objects.equals(this.applicationEnabled, applicationListItem.applicationEnabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, applicationVersion, image, accessUrl, clientId, issuer, realm, access, self, advancedConfigurations, templateId, templateVersion, associatedRoles, isEnhancedB2BLoginEnabled, applicationEnabled);
+        return Objects.hash(id, name, description, applicationVersion, image, accessUrl, clientId, issuer, realm, access, self, advancedConfigurations, templateId, templateVersion, associatedRoles, isEnhancedOrganizationAuthenticationEnabled, applicationEnabled);
     }
 
     @Override
@@ -449,7 +449,7 @@ public enum AccessEnum {
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    templateVersion: ").append(toIndentedString(templateVersion)).append("\n");
         sb.append("    associatedRoles: ").append(toIndentedString(associatedRoles)).append("\n");
-        sb.append("    isEnhancedB2BLoginEnabled: ").append(toIndentedString(isEnhancedB2BLoginEnabled)).append("\n");
+        sb.append("    isEnhancedOrganizationAuthenticationEnabled: ").append(toIndentedString(isEnhancedOrganizationAuthenticationEnabled)).append("\n");
         sb.append("    applicationEnabled: ").append(toIndentedString(applicationEnabled)).append("\n");
         sb.append("}");
         return sb.toString();
