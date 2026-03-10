@@ -35,6 +35,7 @@ public class Certificate  {
     private List<String> certificates = null;
 
     private String jwksUri;
+    private String samlMetadataUri;
 
     /**
     **/
@@ -80,6 +81,24 @@ public class Certificate  {
         this.jwksUri = jwksUri;
     }
 
+    /**
+    **/
+    public Certificate samlMetadataUri(String samlMetadataUri) {
+
+        this.samlMetadataUri = samlMetadataUri;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "https://localhost:9444/samlsso/metadata", value = "")
+    @JsonProperty("samlMetadataUri")
+    @Valid
+    public String getSamlMetadataUri() {
+        return samlMetadataUri;
+    }
+    public void setSamlMetadataUri(String samlMetadataUri) {
+        this.samlMetadataUri = samlMetadataUri;
+    }
+
 
 
     @Override
@@ -93,12 +112,13 @@ public class Certificate  {
         }
         Certificate certificate = (Certificate) o;
         return Objects.equals(this.certificates, certificate.certificates) &&
-            Objects.equals(this.jwksUri, certificate.jwksUri);
+            Objects.equals(this.jwksUri, certificate.jwksUri) &&
+            Objects.equals(this.samlMetadataUri, certificate.samlMetadataUri);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(certificates, jwksUri);
+        return Objects.hash(certificates, jwksUri, samlMetadataUri);
     }
 
     @Override
@@ -109,6 +129,7 @@ public class Certificate  {
         
         sb.append("    certificates: ").append(toIndentedString(certificates)).append("\n");
         sb.append("    jwksUri: ").append(toIndentedString(jwksUri)).append("\n");
+        sb.append("    samlMetadataUri: ").append(toIndentedString(samlMetadataUri)).append("\n");
         sb.append("}");
         return sb.toString();
     }

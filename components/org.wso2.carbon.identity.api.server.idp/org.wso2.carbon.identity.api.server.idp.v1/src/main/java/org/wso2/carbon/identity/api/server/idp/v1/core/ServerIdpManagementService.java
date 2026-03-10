@@ -487,6 +487,9 @@ public class ServerIdpManagementService {
             if (Constants.JWKS_URI.equals(property.getName())) {
                 certificate = new Certificate().jwksUri(property.getValue());
                 break;
+            } else if (Constants.SAML_METADATA_URI.equals(property.getName())) {
+                certificate = new Certificate().samlMetadataUri(property.getValue());
+                break;
             }
         }
         if (certificate == null && ArrayUtils.isNotEmpty(identityProvider.getCertificateInfoArray())) {
@@ -2178,6 +2181,7 @@ public class ServerIdpManagementService {
             throws IdentityProviderManagementClientException {
 
         String idpJWKSUri = null;
+        String idpSamlMetadataUri = null;
         IdentityProvider idp = new IdentityProvider();
         idp.setIdentityProviderName(identityProviderPOSTRequest.getName());
         idp.setAlias(identityProviderPOSTRequest.getAlias());
@@ -2189,6 +2193,9 @@ public class ServerIdpManagementService {
         if (identityProviderPOSTRequest.getCertificate() != null && StringUtils.isNotBlank(identityProviderPOSTRequest
                 .getCertificate().getJwksUri())) {
             idpJWKSUri = identityProviderPOSTRequest.getCertificate().getJwksUri();
+        } else if (identityProviderPOSTRequest.getCertificate() != null && StringUtils.isNotBlank(
+            identityProviderPOSTRequest.getCertificate().getSamlMetadataUri())) {
+            idpSamlMetadataUri = identityProviderPOSTRequest.getCertificate().getSamlMetadataUri();
         } else if (identityProviderPOSTRequest.getCertificate() != null && identityProviderPOSTRequest.getCertificate()
                 .getCertificates() != null) {
             List<String> certificates = new ArrayList<>();
@@ -2233,6 +2240,12 @@ public class ServerIdpManagementService {
             jwksProperty.setName(Constants.JWKS_URI);
             jwksProperty.setValue(idpJWKSUri);
             idpProperties.add(jwksProperty);
+        }
+        if (StringUtils.isNotBlank(idpSamlMetadataUri)) {
+            IdentityProviderProperty samlMetadataUriProperty = new IdentityProviderProperty();
+            samlMetadataUriProperty.setName(Constants.SAML_METADATA_URI);
+            samlMetadataUriProperty.setValue(idpSamlMetadataUri);
+            idpProperties.add(samlMetadataUriProperty);
         }
         // IDP issuer name can be empty. Hence, no need to check for blank value.
         IdentityProviderProperty idpIssuerProperty = new IdentityProviderProperty();
@@ -2424,6 +2437,9 @@ public class ServerIdpManagementService {
         for (IdentityProviderProperty property : idpProperties) {
             if (Constants.JWKS_URI.equals(property.getName())) {
                 certificate = new Certificate().jwksUri(property.getValue());
+                break;
+            } else if (Constants.SAML_METADATA_URI.equals(property.getName())) {
+                certificate = new Certificate().samlMetadataUri(property.getValue());
                 break;
             }
         }
@@ -3244,6 +3260,9 @@ public class ServerIdpManagementService {
                         case Constants.CERTIFICATE_JWKSURI_PATH:
                             patchIdpProperties(idpToUpdate, Constants.JWKS_URI, value);
                             break;
+                        case Constants.CERTIFICATE_SAML_METADATA_URI_PATH:
+                            patchIdpProperties(idpToUpdate, Constants.SAML_METADATA_URI, value);
+                            break;
                         default:
                             throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
                                     .ERROR_CODE_INVALID_INPUT, null);
@@ -3284,8 +3303,9 @@ public class ServerIdpManagementService {
                     IdentityProviderProperty[] propertyDTOS = idpToUpdate.getIdpProperties();
                     List<IdentityProviderProperty> idpNewProperties = new ArrayList<>();
                     for (IdentityProviderProperty propertyDTO : propertyDTOS) {
-                        // Add properties to new list omitting the JWKS URI property.
-                        if (!Constants.JWKS_URI.equals(propertyDTO.getName())) {
+                        // Add properties to new list omitting the JWKS URI and SAML Metadata URI properties.
+                        if (!Constants.JWKS_URI.equals(propertyDTO.getName()) && 
+                            !Constants.SAML_METADATA_URI.equals(propertyDTO.getName())) {
                             idpNewProperties.add(propertyDTO);
                         }
                     }
@@ -3301,7 +3321,12 @@ public class ServerIdpManagementService {
                         }
                     }
 
-                    List<IdentityProviderProperty> idpProperties = new ArrayList<>(Arrays.asList(propertyDTOS));
+                    // If SAML Metadata URI property exists, it needs to be removed when adding JWKS URI as they
+                    // are alternate options of the property Certificate Type.
+                    List<IdentityProviderProperty> idpProperties = new ArrayList<>(
+                        Arrays.stream(propertyDTOS)
+                            .filter(property -> !Constants.SAML_METADATA_URI.equals(property.getName()))
+                            .collect(Collectors.toList()));
                     IdentityProviderProperty jwksProperty = new IdentityProviderProperty();
                     jwksProperty.setName(Constants.JWKS_URI);
                     jwksProperty.setValue(value);
@@ -3309,6 +3334,33 @@ public class ServerIdpManagementService {
                     idpToUpdate.setIdpProperties(idpProperties.toArray(new IdentityProviderProperty[0]));
                     // Need to remove certificates, if any, when adding JWKS URI as they are alternate options of the
                     // property Certificate Type.
+                    if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray())) {
+                        idpToUpdate.setCertificate(null);
+                    }
+                } else if (Constants.CERTIFICATE_SAML_METADATA_URI_PATH.equals(path)) {
+
+                    IdentityProviderProperty[] propertyDTOS = idpToUpdate.getIdpProperties();
+                    for (IdentityProviderProperty propertyDTO : propertyDTOS) {
+                        if (Constants.SAML_METADATA_URI.equals(propertyDTO.getName())) {
+                            throw handleException(Response.Status.BAD_REQUEST,
+                                    Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP,
+                                    "Cannot add SAML Metadata URI as it already exists");
+                        }
+                    }
+
+                    // If JWKS URI property exists, it needs to be removed when adding SAML Metadata URI as they are
+                    // alternate options of the property Certificate Type.
+                    List<IdentityProviderProperty> idpProperties = new ArrayList<>(
+                        Arrays.stream(propertyDTOS)
+                            .filter(property -> !Constants.JWKS_URI.equals(property.getName()))
+                            .collect(Collectors.toList()));
+                    IdentityProviderProperty samlMetadataUriProperty = new IdentityProviderProperty();
+                    samlMetadataUriProperty.setName(Constants.SAML_METADATA_URI);
+                    samlMetadataUriProperty.setValue(value);
+                    idpProperties.add(samlMetadataUriProperty);
+                    idpToUpdate.setIdpProperties(idpProperties.toArray(new IdentityProviderProperty[0]));
+                    // Need to remove certificates, if any, when adding SAML Metadata URI as they are alternate
+                    // options of the property Certificate Type.
                     if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray())) {
                         idpToUpdate.setCertificate(null);
                     }
@@ -3368,6 +3420,26 @@ public class ServerIdpManagementService {
                         throw handleException(Response.Status.NOT_FOUND,
                                 Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP,
                                 "Cannot remove JWKS URI as it does not exist.");
+                    }
+
+                    idpToUpdate.setIdpProperties(idpNewProperties.toArray(new IdentityProviderProperty[0]));
+                } else if (Constants.CERTIFICATE_SAML_METADATA_URI_PATH.equals(path)) {
+
+                    IdentityProviderProperty[] propertyDTOS = idpToUpdate.getIdpProperties();
+                    List<IdentityProviderProperty> idpNewProperties = new ArrayList<>();
+                    for (IdentityProviderProperty propertyDTO : propertyDTOS) {
+                        // Add properties to new list omitting the SAML Metadata URI property.
+                        if (!Constants.SAML_METADATA_URI.equals(propertyDTO.getName())) {
+                            idpNewProperties.add(propertyDTO);
+                        }
+                    }
+
+                    // If the sizes of original and new property lists are equal, then the SAML Metadata URI property
+                    // has not been available.
+                    if (propertyDTOS.length == idpNewProperties.size()) {
+                        throw handleException(Response.Status.NOT_FOUND,
+                                Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP,
+                                "Cannot remove SAML Metadata URI as it does not exist.");
                     }
 
                     idpToUpdate.setIdpProperties(idpNewProperties.toArray(new IdentityProviderProperty[0]));
