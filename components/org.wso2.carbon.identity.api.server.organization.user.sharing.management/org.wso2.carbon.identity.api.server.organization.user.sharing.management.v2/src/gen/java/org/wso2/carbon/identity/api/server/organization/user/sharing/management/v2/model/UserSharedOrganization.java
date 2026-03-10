@@ -39,6 +39,7 @@ import javax.xml.bind.annotation.*;
 @ApiModel(description = "Represents a single organization where the user has shared access, including organization metadata and effective roles.")
 public class UserSharedOrganization  {
   
+    private String userId;
     private String orgId;
     private String orgName;
     private String orgHandle;
@@ -52,6 +53,25 @@ public class UserSharedOrganization  {
     private SharingMode sharingMode;
     private List<RoleShareConfig> roles = null;
 
+
+    /**
+    * ID of the original user in the home organization.
+    **/
+    public UserSharedOrganization userId(String userId) {
+
+        this.userId = userId;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "ID of the original user in the home organization.")
+    @JsonProperty("userId")
+    @Valid
+    public String getUserId() {
+        return userId;
+    }
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     /**
     * ID of the child organization.
@@ -300,7 +320,8 @@ public class UserSharedOrganization  {
             return false;
         }
         UserSharedOrganization userSharedOrganization = (UserSharedOrganization) o;
-        return Objects.equals(this.orgId, userSharedOrganization.orgId) &&
+        return Objects.equals(this.userId, userSharedOrganization.userId) &&
+            Objects.equals(this.orgId, userSharedOrganization.orgId) &&
             Objects.equals(this.orgName, userSharedOrganization.orgName) &&
             Objects.equals(this.orgHandle, userSharedOrganization.orgHandle) &&
             Objects.equals(this.parentOrgId, userSharedOrganization.parentOrgId) &&
@@ -316,7 +337,7 @@ public class UserSharedOrganization  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(orgId, orgName, orgHandle, parentOrgId, orgStatus, orgRef, hasChildren, depthFromRoot, sharedUserId, sharedType, sharingMode, roles);
+        return Objects.hash(userId, orgId, orgName, orgHandle, parentOrgId, orgStatus, orgRef, hasChildren, depthFromRoot, sharedUserId, sharedType, sharingMode, roles);
     }
 
     @Override
@@ -325,6 +346,7 @@ public class UserSharedOrganization  {
         StringBuilder sb = new StringBuilder();
         sb.append("class UserSharedOrganization {\n");
         
+        sb.append("    userId: ").append(toIndentedString(userId)).append("\n");
         sb.append("    orgId: ").append(toIndentedString(orgId)).append("\n");
         sb.append("    orgName: ").append(toIndentedString(orgName)).append("\n");
         sb.append("    orgHandle: ").append(toIndentedString(orgHandle)).append("\n");
