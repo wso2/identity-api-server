@@ -45,7 +45,7 @@ public class UsersApiServiceImpl implements UsersApiService {
 
         try {
             this.usersApiServiceCore = UsersApiServiceCoreFactory.getUsersApiServiceCore();
-            LOG.info("UsersApiServiceImpl V2 initialized successfully.");
+            LOG.debug("UsersApiServiceImpl V2 initialized successfully.");
         } catch (IllegalStateException e) {
             LOG.error("Failed to initialize UsersApiServiceImpl: " + e.getMessage());
             throw new RuntimeException(ERROR_INITIATING_USERS_API_SERVICE.getMessage(), e);
