@@ -32,6 +32,7 @@ public class Constants {
     public static final String IDP_TEMPLATE_PATH_COMPONENT = "/templates";
     public static final String PATH_SEPERATOR = "/";
     public static final String JWKS_URI = "jwksUri";
+    public static final String SAML_METADATA_URI = "samlMetadataUri";
     public static final String IDP_ISSUER_NAME = "idpIssuerName";
     public static final String TEMPLATE_ID = "templateId";
     public static final String META_DATA_SAML = "meta_data_saml";
@@ -53,6 +54,7 @@ public class Constants {
     public static final String IDP_ISSUER_NAME_PATH = "/idpIssuerName";
     public static final String ALIAS_PATH = "/alias";
     public static final String CERTIFICATE_JWKSURI_PATH = "/certificate/jwksUri";
+    public static final String CERTIFICATE_SAML_METADATA_URI_PATH = "/certificate/samlMetadataUri";
     public static final String CERTIFICATE_PATH_REGEX = "/certificate/certificates/[0-9]+";
 
     // IdP pagination constants.

@@ -2603,6 +2603,9 @@ components:
         jwksUri:
           type: string
           example: "https://localhost:9444/oauth2/jwks"
+        samlMetadataUri:
+          type: string
+          example: "https://localhost:9444/samlsso/metadata"
     IdentityProviderPOSTRequest:
       type: object
       required:
