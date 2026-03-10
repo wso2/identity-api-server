@@ -356,7 +356,7 @@ public enum AccessEnum {
     }
 
     /**
-    * Decides whether the enhanced B2B login experience is enabled for the application.
+    * Decides whether the enhanced organization authentication is enabled for the application.
     **/
     public ApplicationResponseModel enhancedOrgAuthenticationEnabled(Boolean enhancedOrgAuthenticationEnabled) {
 
@@ -364,7 +364,7 @@ public enum AccessEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "false", value = "Decides whether the enhanced B2B login experience is enabled for the application.")
+    @ApiModelProperty(example = "false", value = "Decides whether the enhanced organization authentication is enabled for the application.")
     @JsonProperty("enhancedOrgAuthenticationEnabled")
     @Valid
     public Boolean getEnhancedOrgAuthenticationEnabled() {

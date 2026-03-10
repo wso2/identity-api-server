@@ -199,7 +199,7 @@ public class ApplicationPatchModel  {
     }
 
     /**
-    * Decides whether the enhanced B2B login experience is enabled for the application.
+    * Decides whether the enhanced organization authentication is enabled for the application.
     **/
     public ApplicationPatchModel enhancedOrgAuthenticationEnabled(Boolean enhancedOrgAuthenticationEnabled) {
 
@@ -207,7 +207,7 @@ public class ApplicationPatchModel  {
         return this;
     }
     
-    @ApiModelProperty(example = "false", value = "Decides whether the enhanced B2B login experience is enabled for the application.")
+    @ApiModelProperty(example = "false", value = "Decides whether the enhanced organization authentication is enabled for the application.")
     @JsonProperty("enhancedOrgAuthenticationEnabled")
     @Valid
     public Boolean getEnhancedOrgAuthenticationEnabled() {
@@ -356,7 +356,7 @@ public class ApplicationPatchModel  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, applicationVersion, imageUrl, accessUrl, logoutReturnUrl, templateId, templateVersion, enhancedOrgAuthenticationEnabled, applicationEnabled, associatedRoles, claimConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
+        return Objects.hash(name, description, imageUrl, accessUrl, logoutReturnUrl, templateId, templateVersion, enhancedOrgAuthenticationEnabled, applicationEnabled, associatedRoles, claimConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
     }
 
     @Override

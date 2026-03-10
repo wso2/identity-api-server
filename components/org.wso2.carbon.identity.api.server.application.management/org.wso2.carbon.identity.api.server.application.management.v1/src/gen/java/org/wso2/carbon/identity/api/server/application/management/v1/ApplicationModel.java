@@ -48,7 +48,7 @@ public class ApplicationModel  {
     private String templateVersion;
     private Boolean isManagementApp = false;
     private Boolean isB2BSelfServiceApp = false;
-    private Boolean enhancedOrgAuthenticationEnabled = false;
+    private Boolean enhancedOrgAuthenticationEnabled;
     private Boolean applicationEnabled = true;
     private AssociatedRolesConfig associatedRoles;
     private ClaimConfiguration claimConfiguration;
@@ -243,7 +243,7 @@ public class ApplicationModel  {
     }
 
     /**
-    * Decides whether the enhanced B2B login experience is enabled for the application.
+    * Decides whether the enhanced organization authentication is enabled for the application.
     **/
     public ApplicationModel enhancedOrgAuthenticationEnabled(Boolean enhancedOrgAuthenticationEnabled) {
 
@@ -251,7 +251,7 @@ public class ApplicationModel  {
         return this;
     }
     
-    @ApiModelProperty(example = "false", value = "Decides whether the enhanced B2B login experience is enabled for the application.")
+    @ApiModelProperty(example = "false", value = "Decides whether the enhanced organization authentication is enabled for the application.")
     @JsonProperty("enhancedOrgAuthenticationEnabled")
     @Valid
     public Boolean getEnhancedOrgAuthenticationEnabled() {
