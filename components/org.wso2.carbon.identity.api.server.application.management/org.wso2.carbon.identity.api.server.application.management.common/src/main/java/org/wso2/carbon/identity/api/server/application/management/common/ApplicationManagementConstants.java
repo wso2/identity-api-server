@@ -201,7 +201,7 @@ public class ApplicationManagementConstants {
                 "Operation is not permitted. You do not have permissions to make this request."),
         UNSUPPORTED_ENHANCED_ORGANIZATION_AUTHENTICATION_ENABLED_CONFIGURATION("60521",
                 "Enhanced organization authentication enabled property is not supported.",
-                "The 'isEnhancedOrganizationAuthenticationEnabled' property is not yet supported."),
+                "The 'enhancedOrgAuthenticationEnabled' property is not yet supported."),
 
         // Server Errors.
         ERROR_RETRIEVING_SAML_METADATA("65001",

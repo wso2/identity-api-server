@@ -832,7 +832,7 @@ public class ServerApplicationManagementService {
         }
 
         if (!isEnhancedOrganizationAuthenticationFeatureEnabled() &&
-                Boolean.TRUE.equals(applicationModel.getIsEnhancedOrganizationAuthenticationEnabled())) {
+                Boolean.TRUE.equals(applicationModel.getEnhancedOrgAuthenticationEnabled())) {
             throw buildBadRequestError(UNSUPPORTED_ENHANCED_ORGANIZATION_AUTHENTICATION_ENABLED_CONFIGURATION.getCode(),
                     UNSUPPORTED_ENHANCED_ORGANIZATION_AUTHENTICATION_ENABLED_CONFIGURATION.getDescription());
         }
@@ -900,7 +900,7 @@ public class ServerApplicationManagementService {
         ServiceProvider appToUpdate = cloneApplication(applicationId);
 
         if (!isEnhancedOrganizationAuthenticationFeatureEnabled() &&
-                Boolean.TRUE.equals(applicationPatchModel.getIsEnhancedOrganizationAuthenticationEnabled())) {
+                Boolean.TRUE.equals(applicationPatchModel.getEnhancedOrgAuthenticationEnabled())) {
             throw buildBadRequestError(UNSUPPORTED_ENHANCED_ORGANIZATION_AUTHENTICATION_ENABLED_CONFIGURATION.getCode(),
                     UNSUPPORTED_ENHANCED_ORGANIZATION_AUTHENTICATION_ENABLED_CONFIGURATION.getDescription());
         }

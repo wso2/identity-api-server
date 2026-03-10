@@ -45,7 +45,7 @@ public class ApplicationPatchModel  {
     private String logoutReturnUrl;
     private String templateId;
     private String templateVersion;
-    private Boolean isEnhancedOrganizationAuthenticationEnabled;
+    private Boolean enhancedOrgAuthenticationEnabled;
     private Boolean applicationEnabled;
     private AssociatedRolesConfig associatedRoles;
     private ClaimConfiguration claimConfiguration;
@@ -201,20 +201,20 @@ public class ApplicationPatchModel  {
     /**
     * Decides whether the enhanced B2B login experience is enabled for the application.
     **/
-    public ApplicationPatchModel isEnhancedOrganizationAuthenticationEnabled(Boolean isEnhancedOrganizationAuthenticationEnabled) {
+    public ApplicationPatchModel enhancedOrgAuthenticationEnabled(Boolean enhancedOrgAuthenticationEnabled) {
 
-        this.isEnhancedOrganizationAuthenticationEnabled = isEnhancedOrganizationAuthenticationEnabled;
+        this.enhancedOrgAuthenticationEnabled = enhancedOrgAuthenticationEnabled;
         return this;
     }
     
     @ApiModelProperty(example = "false", value = "Decides whether the enhanced B2B login experience is enabled for the application.")
-    @JsonProperty("isEnhancedOrganizationAuthenticationEnabled")
+    @JsonProperty("enhancedOrgAuthenticationEnabled")
     @Valid
-    public Boolean getIsEnhancedOrganizationAuthenticationEnabled() {
-        return isEnhancedOrganizationAuthenticationEnabled;
+    public Boolean getEnhancedOrgAuthenticationEnabled() {
+        return enhancedOrgAuthenticationEnabled;
     }
-    public void setIsEnhancedOrganizationAuthenticationEnabled(Boolean isEnhancedOrganizationAuthenticationEnabled) {
-        this.isEnhancedOrganizationAuthenticationEnabled = isEnhancedOrganizationAuthenticationEnabled;
+    public void setEnhancedOrgAuthenticationEnabled(Boolean enhancedOrgAuthenticationEnabled) {
+        this.enhancedOrgAuthenticationEnabled = enhancedOrgAuthenticationEnabled;
     }
 
     /**
@@ -345,7 +345,7 @@ public class ApplicationPatchModel  {
             Objects.equals(this.logoutReturnUrl, applicationPatchModel.logoutReturnUrl) &&
             Objects.equals(this.templateId, applicationPatchModel.templateId) &&
             Objects.equals(this.templateVersion, applicationPatchModel.templateVersion) &&
-            Objects.equals(this.isEnhancedOrganizationAuthenticationEnabled, applicationPatchModel.isEnhancedOrganizationAuthenticationEnabled) &&
+            Objects.equals(this.enhancedOrgAuthenticationEnabled, applicationPatchModel.enhancedOrgAuthenticationEnabled) &&
             Objects.equals(this.applicationEnabled, applicationPatchModel.applicationEnabled) &&
             Objects.equals(this.associatedRoles, applicationPatchModel.associatedRoles) &&
             Objects.equals(this.claimConfiguration, applicationPatchModel.claimConfiguration) &&
@@ -356,7 +356,7 @@ public class ApplicationPatchModel  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, applicationVersion, imageUrl, accessUrl, logoutReturnUrl, templateId, templateVersion, isEnhancedOrganizationAuthenticationEnabled, applicationEnabled, associatedRoles, claimConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
+        return Objects.hash(name, description, applicationVersion, imageUrl, accessUrl, logoutReturnUrl, templateId, templateVersion, enhancedOrgAuthenticationEnabled, applicationEnabled, associatedRoles, claimConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
     }
 
     @Override
@@ -372,7 +372,7 @@ public class ApplicationPatchModel  {
         sb.append("    logoutReturnUrl: ").append(toIndentedString(logoutReturnUrl)).append("\n");
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    templateVersion: ").append(toIndentedString(templateVersion)).append("\n");
-        sb.append("    isEnhancedOrganizationAuthenticationEnabled: ").append(toIndentedString(isEnhancedOrganizationAuthenticationEnabled)).append("\n");
+        sb.append("    enhancedOrgAuthenticationEnabled: ").append(toIndentedString(enhancedOrgAuthenticationEnabled)).append("\n");
         sb.append("    applicationEnabled: ").append(toIndentedString(applicationEnabled)).append("\n");
         sb.append("    associatedRoles: ").append(toIndentedString(associatedRoles)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");
