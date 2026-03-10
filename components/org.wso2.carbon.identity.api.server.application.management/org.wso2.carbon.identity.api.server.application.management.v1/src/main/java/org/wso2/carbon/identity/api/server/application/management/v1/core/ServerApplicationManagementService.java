@@ -831,7 +831,8 @@ public class ServerApplicationManagementService {
             }
         }
 
-        if (!isEnhancedB2BLoginFeatureEnabled() && Boolean.TRUE.equals(applicationModel.getIsEnhancedB2BLoginEnabled())) {
+        if (!isEnhancedB2BLoginFeatureEnabled() &&
+                Boolean.TRUE.equals(applicationModel.getIsEnhancedB2BLoginEnabled())) {
             throw buildBadRequestError(UNSUPPORTED_ENHANCED_B2B_LOGIN_ENABLED_CONFIGURATION.getCode(),
                     UNSUPPORTED_ENHANCED_B2B_LOGIN_ENABLED_CONFIGURATION.getDescription());
         }
@@ -898,7 +899,8 @@ public class ServerApplicationManagementService {
 
         ServiceProvider appToUpdate = cloneApplication(applicationId);
 
-        if (!isEnhancedB2BLoginFeatureEnabled() && Boolean.TRUE.equals(applicationPatchModel.getIsEnhancedB2BLoginEnabled())) {
+        if (!isEnhancedB2BLoginFeatureEnabled() &&
+                Boolean.TRUE.equals(applicationPatchModel.getIsEnhancedB2BLoginEnabled())) {
             throw buildBadRequestError(UNSUPPORTED_ENHANCED_B2B_LOGIN_ENABLED_CONFIGURATION.getCode(),
                     UNSUPPORTED_ENHANCED_B2B_LOGIN_ENABLED_CONFIGURATION.getDescription());
         }
