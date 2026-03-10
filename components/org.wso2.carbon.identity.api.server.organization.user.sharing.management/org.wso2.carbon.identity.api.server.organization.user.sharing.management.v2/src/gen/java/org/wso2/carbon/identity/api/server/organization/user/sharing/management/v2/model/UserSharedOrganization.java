@@ -39,39 +39,20 @@ import javax.xml.bind.annotation.*;
 @ApiModel(description = "Represents a single organization where the user has shared access, including organization metadata and effective roles.")
 public class UserSharedOrganization  {
   
-    private String userId;
     private String orgId;
     private String orgName;
     private String orgHandle;
-    private String parentOrgId;
     private String orgStatus;
     private String orgRef;
     private Boolean hasChildren;
     private Integer depthFromRoot;
+    private String parentOrgId;
+    private String parentUserId;
     private String sharedUserId;
     private String sharedType;
     private SharingMode sharingMode;
     private List<RoleShareConfig> roles = null;
 
-
-    /**
-    * ID of the original user in the home organization.
-    **/
-    public UserSharedOrganization userId(String userId) {
-
-        this.userId = userId;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "ID of the original user in the home organization.")
-    @JsonProperty("userId")
-    @Valid
-    public String getUserId() {
-        return userId;
-    }
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
 
     /**
     * ID of the child organization.
@@ -128,25 +109,6 @@ public class UserSharedOrganization  {
     }
     public void setOrgHandle(String orgHandle) {
         this.orgHandle = orgHandle;
-    }
-
-    /**
-    * ID of the parent organization (if applicable).
-    **/
-    public UserSharedOrganization parentOrgId(String parentOrgId) {
-
-        this.parentOrgId = parentOrgId;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "ID of the parent organization (if applicable).")
-    @JsonProperty("parentOrgId")
-    @Valid
-    public String getParentOrgId() {
-        return parentOrgId;
-    }
-    public void setParentOrgId(String parentOrgId) {
-        this.parentOrgId = parentOrgId;
     }
 
     /**
@@ -223,6 +185,44 @@ public class UserSharedOrganization  {
     }
     public void setDepthFromRoot(Integer depthFromRoot) {
         this.depthFromRoot = depthFromRoot;
+    }
+
+    /**
+    * ID of the parent organization (if applicable).
+    **/
+    public UserSharedOrganization parentOrgId(String parentOrgId) {
+
+        this.parentOrgId = parentOrgId;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "ID of the parent organization (if applicable).")
+    @JsonProperty("parentOrgId")
+    @Valid
+    public String getParentOrgId() {
+        return parentOrgId;
+    }
+    public void setParentOrgId(String parentOrgId) {
+        this.parentOrgId = parentOrgId;
+    }
+
+    /**
+    * ID of the original user in the home organization.
+    **/
+    public UserSharedOrganization parentUserId(String parentUserId) {
+
+        this.parentUserId = parentUserId;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "ID of the original user in the home organization.")
+    @JsonProperty("parentUserId")
+    @Valid
+    public String getParentUserId() {
+        return parentUserId;
+    }
+    public void setParentUserId(String parentUserId) {
+        this.parentUserId = parentUserId;
     }
 
     /**
@@ -320,15 +320,15 @@ public class UserSharedOrganization  {
             return false;
         }
         UserSharedOrganization userSharedOrganization = (UserSharedOrganization) o;
-        return Objects.equals(this.userId, userSharedOrganization.userId) &&
-            Objects.equals(this.orgId, userSharedOrganization.orgId) &&
+        return Objects.equals(this.orgId, userSharedOrganization.orgId) &&
             Objects.equals(this.orgName, userSharedOrganization.orgName) &&
             Objects.equals(this.orgHandle, userSharedOrganization.orgHandle) &&
-            Objects.equals(this.parentOrgId, userSharedOrganization.parentOrgId) &&
             Objects.equals(this.orgStatus, userSharedOrganization.orgStatus) &&
             Objects.equals(this.orgRef, userSharedOrganization.orgRef) &&
             Objects.equals(this.hasChildren, userSharedOrganization.hasChildren) &&
             Objects.equals(this.depthFromRoot, userSharedOrganization.depthFromRoot) &&
+            Objects.equals(this.parentOrgId, userSharedOrganization.parentOrgId) &&
+            Objects.equals(this.parentUserId, userSharedOrganization.parentUserId) &&
             Objects.equals(this.sharedUserId, userSharedOrganization.sharedUserId) &&
             Objects.equals(this.sharedType, userSharedOrganization.sharedType) &&
             Objects.equals(this.sharingMode, userSharedOrganization.sharingMode) &&
@@ -337,7 +337,7 @@ public class UserSharedOrganization  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(userId, orgId, orgName, orgHandle, parentOrgId, orgStatus, orgRef, hasChildren, depthFromRoot, sharedUserId, sharedType, sharingMode, roles);
+        return Objects.hash(orgId, orgName, orgHandle, orgStatus, orgRef, hasChildren, depthFromRoot, parentOrgId, parentUserId, sharedUserId, sharedType, sharingMode, roles);
     }
 
     @Override
@@ -346,15 +346,15 @@ public class UserSharedOrganization  {
         StringBuilder sb = new StringBuilder();
         sb.append("class UserSharedOrganization {\n");
         
-        sb.append("    userId: ").append(toIndentedString(userId)).append("\n");
         sb.append("    orgId: ").append(toIndentedString(orgId)).append("\n");
         sb.append("    orgName: ").append(toIndentedString(orgName)).append("\n");
         sb.append("    orgHandle: ").append(toIndentedString(orgHandle)).append("\n");
-        sb.append("    parentOrgId: ").append(toIndentedString(parentOrgId)).append("\n");
         sb.append("    orgStatus: ").append(toIndentedString(orgStatus)).append("\n");
         sb.append("    orgRef: ").append(toIndentedString(orgRef)).append("\n");
         sb.append("    hasChildren: ").append(toIndentedString(hasChildren)).append("\n");
         sb.append("    depthFromRoot: ").append(toIndentedString(depthFromRoot)).append("\n");
+        sb.append("    parentOrgId: ").append(toIndentedString(parentOrgId)).append("\n");
+        sb.append("    parentUserId: ").append(toIndentedString(parentUserId)).append("\n");
         sb.append("    sharedUserId: ").append(toIndentedString(sharedUserId)).append("\n");
         sb.append("    sharedType: ").append(toIndentedString(sharedType)).append("\n");
         sb.append("    sharingMode: ").append(toIndentedString(sharingMode)).append("\n");
