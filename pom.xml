@@ -1053,7 +1053,7 @@
         <findsecbugs-plugin.version>1.12.0</findsecbugs-plugin.version>
         <spotbugs.findsecbugs.version>1.13.0</spotbugs.findsecbugs.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
-        <identity.event.handler.version>1.10.1</identity.event.handler.version>
+        <identity.event.handler.version>1.12.4</identity.event.handler.version>
         <identity.inbound.oauth2.version>7.4.11</identity.inbound.oauth2.version>
         <identity.inbound.saml2.version>5.11.51</identity.inbound.saml2.version>
         <identity.x509Certificate.validation.version>1.1.19</identity.x509Certificate.validation.version>
@@ -1075,7 +1075,7 @@
         <tenant.resource.manager.version>1.5.55</tenant.resource.manager.version>
         <identity.verification.version>1.0.15</identity.verification.version>
         <identity.local.auth.fido.version>5.4.31</identity.local.auth.fido.version>
-        <identity.notification.push.version>1.0.9</identity.notification.push.version>
+        <identity.notification.push.version>1.1.2</identity.notification.push.version>
 
         <!-- Organization management core Version -->
         <org.wso2.carbon.identity.organization.management.core.version>1.1.41
