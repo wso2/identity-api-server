@@ -3136,6 +3136,9 @@ components:
         associatedRoles:
           type: object
           $ref: '#/components/schemas/AssociatedRolesConfig'
+        enhancedOrgAuthenticationEnabled:
+          type: boolean
+          example: false
         applicationEnabled:
           type: boolean
           example: true
@@ -3180,6 +3183,10 @@ components:
           type: boolean
           example: false
           description: Decides whether the application used to for B2B self service
+        enhancedOrgAuthenticationEnabled:
+          type: boolean
+          example: false
+          description: Decides whether the enhanced organization authentication is enabled for the application.
         applicationEnabled:
           default: true
           type: boolean
@@ -3248,6 +3255,10 @@ components:
           type: boolean
           example: false
           description: Decides whether the application used to for B2B self service
+        enhancedOrgAuthenticationEnabled:
+          type: boolean
+          example: false
+          description: Decides whether the enhanced organization authentication is enabled for the application.
         applicationEnabled:
           type: boolean
           example: true
@@ -3298,6 +3309,10 @@ components:
           type: string
           example: "v1.0.1"
           description: Version of the template used to create the application.
+        enhancedOrgAuthenticationEnabled:
+          type: boolean
+          example: false
+          description: Decides whether the enhanced organization authentication is enabled for the application.
         applicationEnabled:
           type: boolean
           example: true

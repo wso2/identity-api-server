@@ -89,6 +89,7 @@ import static org.wso2.carbon.identity.application.common.util.IdentityApplicati
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.IS_API_BASED_AUTHENTICATION_ENABLED_PROPERTY_NAME;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.IS_APPLICATION_ENABLED_PROPERTY_NAME;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.IS_ATTESTATION_ENABLED_PROPERTY_NAME;
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.IS_ENHANCED_ORGANIZATION_AUTHENTICATION_ENABLED_SP_PROPERTY_NAME;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.IS_MANAGEMENT_APP_SP_PROPERTY_NAME;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.TEMPLATE_ID_SP_PROPERTY_NAME;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.USE_USER_ID_FOR_DEFAULT_SUBJECT;
@@ -136,6 +137,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .templateVersion(application.getTemplateVersion())
                     .isManagementApp(application.isManagementApp())
                     .applicationEnabled(application.isApplicationEnabled())
+                    .enhancedOrgAuthenticationEnabled(application.isEnhancedOrganizationAuthenticationEnabled())
                     .associatedRoles(buildAssociatedRoles(application))
                     .claimConfiguration(buildClaimConfiguration(application))
                     .inboundProtocols(buildInboundProtocols(application))
@@ -595,6 +597,8 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 ANDROID_PACKAGE_NAME_PROPERTY_NAME.equals(property.getName()));
         spPropertyList.removeIf(property ->
                 APPLE_APP_ID_PROPERTY_NAME.equals(property.getName()));
+        spPropertyList.removeIf(property ->
+                IS_ENHANCED_ORGANIZATION_AUTHENTICATION_ENABLED_SP_PROPERTY_NAME.equals(property.getName()));
         spPropertyList.removeIf(property -> ALLOWED_ROLE_AUDIENCE_PROPERTY_NAME.equals(property.getName()));
         return spPropertyList.toArray(new ServiceProviderProperty[0]);
     }

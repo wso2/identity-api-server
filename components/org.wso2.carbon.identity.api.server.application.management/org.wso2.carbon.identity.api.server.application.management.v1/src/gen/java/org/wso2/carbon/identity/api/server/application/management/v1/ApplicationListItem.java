@@ -82,6 +82,7 @@ public enum AccessEnum {
     private String templateId;
     private String templateVersion;
     private AssociatedRolesConfig associatedRoles;
+    private Boolean enhancedOrgAuthenticationEnabled;
     private Boolean applicationEnabled;
 
     /**
@@ -357,6 +358,24 @@ public enum AccessEnum {
 
     /**
     **/
+    public ApplicationListItem enhancedOrgAuthenticationEnabled(Boolean enhancedOrgAuthenticationEnabled) {
+
+        this.enhancedOrgAuthenticationEnabled = enhancedOrgAuthenticationEnabled;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "")
+    @JsonProperty("enhancedOrgAuthenticationEnabled")
+    @Valid
+    public Boolean getEnhancedOrgAuthenticationEnabled() {
+        return enhancedOrgAuthenticationEnabled;
+    }
+    public void setEnhancedOrgAuthenticationEnabled(Boolean enhancedOrgAuthenticationEnabled) {
+        this.enhancedOrgAuthenticationEnabled = enhancedOrgAuthenticationEnabled;
+    }
+
+    /**
+    **/
     public ApplicationListItem applicationEnabled(Boolean applicationEnabled) {
 
         this.applicationEnabled = applicationEnabled;
@@ -400,12 +419,13 @@ public enum AccessEnum {
             Objects.equals(this.templateId, applicationListItem.templateId) &&
             Objects.equals(this.templateVersion, applicationListItem.templateVersion) &&
             Objects.equals(this.associatedRoles, applicationListItem.associatedRoles) &&
+            Objects.equals(this.enhancedOrgAuthenticationEnabled, applicationListItem.enhancedOrgAuthenticationEnabled) &&
             Objects.equals(this.applicationEnabled, applicationListItem.applicationEnabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, applicationVersion, image, accessUrl, clientId, issuer, realm, access, self, advancedConfigurations, templateId, templateVersion, associatedRoles, applicationEnabled);
+        return Objects.hash(id, name, description, applicationVersion, image, accessUrl, clientId, issuer, realm, access, self, advancedConfigurations, templateId, templateVersion, associatedRoles, enhancedOrgAuthenticationEnabled, applicationEnabled);
     }
 
     @Override
@@ -429,6 +449,7 @@ public enum AccessEnum {
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    templateVersion: ").append(toIndentedString(templateVersion)).append("\n");
         sb.append("    associatedRoles: ").append(toIndentedString(associatedRoles)).append("\n");
+        sb.append("    enhancedOrgAuthenticationEnabled: ").append(toIndentedString(enhancedOrgAuthenticationEnabled)).append("\n");
         sb.append("    applicationEnabled: ").append(toIndentedString(applicationEnabled)).append("\n");
         sb.append("}");
         return sb.toString();
