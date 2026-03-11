@@ -786,6 +786,10 @@ definitions:
         type: boolean
         description: Specifies if the claim can hold multiple values or not.
         example: true
+      extendedValued:
+        type: boolean
+        description: Specifies if the claim value can hold extended values or not.
+        example: true
       inputFormat:
         $ref: '#/definitions/InputFormat'
       uniquenessScope:

@@ -245,7 +245,16 @@ public class Constant {
         ERROR_CODE_CANONICAL_VALUES_NOT_SUPPORTED_FOR_NON_STRING_DATA_TYPES("CMT-60019",
                 "Canonical values are only supported for string data type.",
                 "The attribute: %s is not a string data type and canonical values are only supported for " +
-                        "string data type.");
+                        "string data type."),
+        ERROR_CODE_BOOLEAN_ATTRIBUTE_CANNOT_BE_EXTENDED_VALUED("CMT-60020",
+                "Boolean attributes cannot be extended-valued.",
+                "The attribute: %s is a boolean attribute and cannot be extended-valued."),
+        ERROR_CODE_EXTENDED_VALUED_PROPERTY_UPDATE_NOT_ALLOWED("CMT-60021",
+                "Cannot update the extended-valued property for this attribute.",
+                "The extended-valued property cannot be updated for the attribute: %s."),
+        ERROR_CODE_ATTRIBUTE_CANNOT_BE_MULTI_VALUED_AND_EXTENDED_VALUED("CMT-60022",
+                "An attribute cannot be multi-valued and extended-valued at the same time.",
+                "The attribute: %s cannot be multi-valued and extended-valued at the same time.");
 
         private final String code;
         private final String message;
@@ -323,6 +332,7 @@ public class Constant {
     public static final String PROP_INPUT_FORMAT = "inputFormat";
 
     public static final String PROP_MULTI_VALUED = "multiValued";
+    public static final String PROP_EXTENDED_VALUED = "extendedValued";
     public static final String PROP_UNIQUENESS_SCOPE = "UniquenessScope";
     public static final String PROP_PROFILES_PREFIX = "Profiles.";
     public static final String PROP_EXCLUDED_USER_STORES = "ExcludedUserStores";

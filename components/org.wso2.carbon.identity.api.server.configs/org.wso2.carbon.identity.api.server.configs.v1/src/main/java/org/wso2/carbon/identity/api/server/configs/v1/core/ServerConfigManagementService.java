@@ -37,6 +37,7 @@ import org.wso2.carbon.identity.api.server.configs.common.Constants;
 import org.wso2.carbon.identity.api.server.configs.common.SchemaConfigParser;
 import org.wso2.carbon.identity.api.server.configs.v1.exception.JWTClientAuthenticatorException;
 import org.wso2.carbon.identity.api.server.configs.v1.function.CORSConfigurationToCORSConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.function.CompatibilitySettingUtil;
 import org.wso2.carbon.identity.api.server.configs.v1.function.DCRConnectorUtil;
 import org.wso2.carbon.identity.api.server.configs.v1.function.JWTConnectorUtil;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticationType;
@@ -45,6 +46,8 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListIte
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorProperty;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettings;
+import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettingsGroup;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Endpoint;
@@ -88,6 +91,9 @@ import org.wso2.carbon.identity.application.common.util.IdentityApplicationManag
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.base.AuthenticatorPropertyConstants;
+import org.wso2.carbon.identity.compatibility.settings.core.exception.CompatibilitySettingException;
+import org.wso2.carbon.identity.compatibility.settings.core.model.CompatibilitySetting;
+import org.wso2.carbon.identity.compatibility.settings.core.service.CompatibilitySettingsService;
 import org.wso2.carbon.identity.core.ServiceURLBuilder;
 import org.wso2.carbon.identity.core.URLBuilderException;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
@@ -165,6 +171,7 @@ public class ServerConfigManagementService {
     private final JWTClientAuthenticatorMgtService jwtClientAuthenticatorMgtService;
     private final DCRConfigurationMgtService dcrConfigurationMgtService;
     private final OAuth2OIDCConfigOrgUsageScopeMgtService oauth2OIDCConfigOrgUsageScopeMgtService;
+    private final CompatibilitySettingsService compatibilitySettingsService;
 
     private static final Log log = LogFactory.getLog(ServerConfigManagementService.class);
 
@@ -177,7 +184,8 @@ public class ServerConfigManagementService {
                                          JWTClientAuthenticatorMgtService jwtClientAuthenticatorMgtService,
                                          FraudDetectionConfigsService fraudDetectionConfigsService,
                                          OAuth2OIDCConfigOrgUsageScopeMgtService
-                                                 oauth2OIDCConfigOrgUsageScopeMgtService) {
+                                                 oauth2OIDCConfigOrgUsageScopeMgtService,
+                                         CompatibilitySettingsService identityCompatibilitySettingsService) {
 
         this.applicationManagementService = applicationManagementService;
         this.idpManager = idpManager;
@@ -188,6 +196,7 @@ public class ServerConfigManagementService {
         this.jwtClientAuthenticatorMgtService = jwtClientAuthenticatorMgtService;
         this.fraudDetectionConfigsService = fraudDetectionConfigsService;
         this.oauth2OIDCConfigOrgUsageScopeMgtService = oauth2OIDCConfigOrgUsageScopeMgtService;
+        this.compatibilitySettingsService = identityCompatibilitySettingsService;
     }
 
     /**
@@ -297,7 +306,7 @@ public class ServerConfigManagementService {
         if (maximumSessionTimeoutProp != null) {
             maximumSessionTimeoutPeriod = maximumSessionTimeoutProp.getValue();
         }
-      
+
         Boolean preserveCurrentSessionAtPasswordUpdate = null;
         IdentityProviderProperty preserveSessionProp = IdentityApplicationManagementUtil.getProperty(
                 residentIdP.getIdpProperties(),
@@ -2491,5 +2500,91 @@ public class ServerConfigManagementService {
         issuerUsageScopePayload.setUsageScope(UsageScopePayload.UsageScopeEnum.fromValue(
                 config.getUsageScope().getValue()));
         return issuerUsageScopePayload;
+    }
+
+    /**
+     * Get all compatibility settings for the tenant.
+     *
+     * @return CompatibilitySettings with all resource settings.
+     */
+    public CompatibilitySettings getCompatibilitySettings() {
+
+        try {
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            CompatibilitySetting setting = compatibilitySettingsService.getCompatibilitySettings(tenantDomain);
+            return CompatibilitySettingUtil.toCompatibilitySettings(setting);
+        } catch (CompatibilitySettingException e) {
+            throw handleCompatibilitySettingsError(e, Constants.ErrorMessage.ERROR_CODE_COMPATIBILITY_SETTINGS_RETRIEVE,
+                    null);
+        }
+    }
+
+    /**
+     * Update compatibility settings for the tenant.
+     *
+     * @param compatibilitySettings CompatibilitySettings to update.
+     * @return Updated CompatibilitySettings.
+     */
+    public CompatibilitySettings patchCompatibilitySettings(CompatibilitySettings compatibilitySettings) {
+
+        try {
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            CompatibilitySetting setting = CompatibilitySettingUtil.toBackendModel(compatibilitySettings);
+            CompatibilitySetting updatedSetting =
+                    compatibilitySettingsService.updateCompatibilitySettings(tenantDomain, setting);
+            return CompatibilitySettingUtil.toCompatibilitySettings(updatedSetting);
+        } catch (CompatibilitySettingException e) {
+            throw handleCompatibilitySettingsError(e, Constants.ErrorMessage.ERROR_CODE_COMPATIBILITY_SETTINGS_UPDATE,
+                    null);
+        }
+    }
+
+    /**
+     * Get compatibility settings for a specific setting group.
+     *
+     * @param settingGroup Setting group name (e.g., "scim2", "oauth").
+     * @return CompatibilitySettingsGroup for the specified setting group.
+     */
+    public CompatibilitySettingsGroup getCompatibilitySettingsByGroup(String settingGroup) {
+
+        if (!CompatibilitySettingUtil.isValidSettingGroupName(settingGroup)) {
+            throw handleCompatibilitySettingsError(
+                    new IllegalArgumentException("Invalid setting group name: " + settingGroup),
+                    Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT,
+                    settingGroup
+            );
+        }
+
+        try {
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            CompatibilitySetting setting =
+                    compatibilitySettingsService.getCompatibilitySettingsByGroup(tenantDomain, settingGroup);
+
+            if (!CompatibilitySettingUtil.hasSettingGroup(setting, settingGroup)) {
+                throw handleCompatibilitySettingsError(
+                        new IllegalArgumentException("Setting group not found: " + settingGroup),
+                        Constants.ErrorMessage.ERROR_CODE_SETTING_GROUP_NOT_FOUND,
+                        settingGroup
+                );
+            }
+
+            return CompatibilitySettingUtil.toCompatibilitySettingsGroup(setting, settingGroup);
+        } catch (CompatibilitySettingException e) {
+            throw handleCompatibilitySettingsError(e, Constants.ErrorMessage.ERROR_CODE_COMPATIBILITY_SETTINGS_RETRIEVE,
+                    settingGroup);
+        }
+    }
+
+    /**
+     * Handle compatibility settings errors.
+     *
+     * @param e         Exception.
+     * @param errorEnum Error enum.
+     * @param data      Additional data.
+     * @return APIError.
+     */
+    private APIError handleCompatibilitySettingsError(Exception e, Constants.ErrorMessage errorEnum, String data) {
+
+        return CompatibilitySettingUtil.handleCompatibilitySettingsException(e, errorEnum, data);
     }
 }

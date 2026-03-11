@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.configs</artifactId>
-        <version>1.5.12-SNAPSHOT</version>
+        <version>1.5.24-SNAPSHOT</version>
     </parent>
 
     <artifactId>org.wso2.carbon.identity.api.server.configs.common</artifactId>
@@ -85,6 +85,11 @@
         <dependency>
             <groupId>org.wso2.carbon.identity.framework</groupId>
             <artifactId>org.wso2.carbon.identity.fraud.detection.core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <artifactId>org.wso2.carbon.identity.compatibility.settings.core</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>

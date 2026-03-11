@@ -87,6 +87,8 @@ public class ApplicationManagementConstants {
     public static final String NON_EXISTING_USER_CODE = "30007 - ";
     public static final String APPLICATION_BASED_OUTBOUND_PROVISIONING_ENABLED =
             "OutboundProvisioning.enableApplicationBasedOutboundProvisioning";
+    public static final String ENHANCED_ORGANIZATION_AUTHENTICATION_FEATURE_ENABLED =
+            "EnhancedOrganizationAuthenticationFeatureEnabled";
     public static final String CODE_TOKEN = "code token";
     public static final String CODE_IDTOKEN = "code id_token";
     public static final String CODE_IDTOKEN_TOKEN = "code id_token token";
@@ -197,6 +199,9 @@ public class ApplicationManagementConstants {
         FORBIDDEN_OPERATION("60520",
                 "Forbidden",
                 "Operation is not permitted. You do not have permissions to make this request."),
+        UNSUPPORTED_ENHANCED_ORGANIZATION_AUTHENTICATION_ENABLED_CONFIGURATION("60521",
+                "Enhanced organization authentication enabled property is not supported.",
+                "The 'enhancedOrgAuthenticationEnabled' property is not yet supported."),
 
         // Server Errors.
         ERROR_RETRIEVING_SAML_METADATA("65001",
@@ -296,7 +301,7 @@ public class ApplicationManagementConstants {
         OAUTH_GRANT_TYPE_NAMES.put("organization_switch", "Organization Switch");
         OAUTH_GRANT_TYPE_NAMES.put(Constants.DEVICE_FLOW_GRANT_TYPE, "Device Code");
         OAUTH_GRANT_TYPE_NAMES.put("urn:ietf:params:oauth:grant-type:token-exchange", "Token Exchange");
-        OAUTH_GRANT_TYPE_NAMES.put(OAuthConstants.GrantTypes.CIBA, "Client Initiated Backchannel Authentication");
+        OAUTH_GRANT_TYPE_NAMES.put(OAuthConstants.GrantTypes.CIBA, "CIBA");
 
         CIBA_NOTIFICATION_CHANNELS_NAMES.put(CibaConstants.CibaNotificationChannel.EMAIL, "Email");
         CIBA_NOTIFICATION_CHANNELS_NAMES.put(CibaConstants.CibaNotificationChannel.SMS, "SMS");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.workflow.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.rule.management.api.service.RuleManagementService;
 import org.wso2.carbon.identity.workflow.engine.ApprovalTaskService;
 import org.wso2.carbon.identity.workflow.engine.ApprovalTaskServiceImpl;
 import org.wso2.carbon.identity.workflow.impl.WorkflowImplServiceImpl;
@@ -32,6 +34,13 @@ public class WorkflowServiceHolder {
     private static final WorkflowManagementService workflowService = new WorkflowManagementServiceImpl();
     private static final ApprovalTaskService approvalTaskService = new ApprovalTaskServiceImpl();
 
+    private static class RuleManagementServiceHolder {
+
+        private static final RuleManagementService INSTANCE = (RuleManagementService)
+                PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(RuleManagementService.class, null);
+    }
+
     public static WorkflowManagementService getWorkflowManagementService() {
 
         return workflowService;
@@ -40,6 +49,16 @@ public class WorkflowServiceHolder {
     public static ApprovalTaskService getApprovalTaskService() {
 
         return approvalTaskService;
+    }
+
+    /**
+     * Get RuleManagementService.
+     *
+     * @return RuleManagementService.
+     */
+    public static RuleManagementService getRuleManagementService() {
+
+        return RuleManagementServiceHolder.INSTANCE;
     }
 
     // This is a placeholder for the actual implementation of WorkflowImplServiceImpl.

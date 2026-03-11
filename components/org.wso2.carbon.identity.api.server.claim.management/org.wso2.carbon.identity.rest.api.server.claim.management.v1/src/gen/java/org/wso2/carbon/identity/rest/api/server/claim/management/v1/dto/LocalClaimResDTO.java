@@ -79,6 +79,9 @@ public class LocalClaimResDTO extends ClaimResDTO {
     @Valid
     private Boolean multiValued = null;
 
+    @Valid
+    private Boolean extendedValued = null;
+
     public enum UniquenessScopeEnum {
          NONE,  WITHIN_USERSTORE,  ACROSS_USERSTORES, 
     };
@@ -293,6 +296,18 @@ public class LocalClaimResDTO extends ClaimResDTO {
     }
 
     /**
+     * Specifies if the claim value can hold extended values or not.
+     **/
+    @ApiModelProperty(value = "Specifies if the claim value can hold extended values or not.")
+    @JsonProperty("extendedValued")
+    public Boolean getExtendedValued() {
+        return extendedValued;
+    }
+    public void setExtendedValued(Boolean extendedValued) {
+        this.extendedValued = extendedValued;
+    }
+
+    /**
     * Specifies the scope of uniqueness validation for the claim value.
     **/
     @ApiModelProperty(value = "Specifies the scope of uniqueness validation for the claim value.")
@@ -385,6 +400,7 @@ public class LocalClaimResDTO extends ClaimResDTO {
         sb.append("    subAttributes: ").append(Arrays.toString(subAttributes)).append("\n");
         sb.append("    canonicalValues: ").append(Arrays.toString(canonicalValues)).append("\n");
         sb.append("    multiValued: ").append(multiValued).append("\n");
+        sb.append("    extendedValued: ").append(extendedValued).append("\n");
         sb.append("    uniquenessScope: ").append(uniquenessScope).append("\n");
         sb.append("    sharedProfileValueResolvingMethod: ").append(sharedProfileValueResolvingMethod).append("\n");
         sb.append("    attributeMapping: ").append(attributeMapping).append("\n");

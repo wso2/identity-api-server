@@ -45,6 +45,7 @@ public class ApplicationPatchModel  {
     private String logoutReturnUrl;
     private String templateId;
     private String templateVersion;
+    private Boolean enhancedOrgAuthenticationEnabled;
     private Boolean applicationEnabled;
     private AssociatedRolesConfig associatedRoles;
     private ClaimConfiguration claimConfiguration;
@@ -198,6 +199,25 @@ public class ApplicationPatchModel  {
     }
 
     /**
+    * Decides whether the enhanced organization authentication is enabled for the application.
+    **/
+    public ApplicationPatchModel enhancedOrgAuthenticationEnabled(Boolean enhancedOrgAuthenticationEnabled) {
+
+        this.enhancedOrgAuthenticationEnabled = enhancedOrgAuthenticationEnabled;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "Decides whether the enhanced organization authentication is enabled for the application.")
+    @JsonProperty("enhancedOrgAuthenticationEnabled")
+    @Valid
+    public Boolean getEnhancedOrgAuthenticationEnabled() {
+        return enhancedOrgAuthenticationEnabled;
+    }
+    public void setEnhancedOrgAuthenticationEnabled(Boolean enhancedOrgAuthenticationEnabled) {
+        this.enhancedOrgAuthenticationEnabled = enhancedOrgAuthenticationEnabled;
+    }
+
+    /**
     * Decides whether the application is enabled.
     **/
     public ApplicationPatchModel applicationEnabled(Boolean applicationEnabled) {
@@ -325,6 +345,7 @@ public class ApplicationPatchModel  {
             Objects.equals(this.logoutReturnUrl, applicationPatchModel.logoutReturnUrl) &&
             Objects.equals(this.templateId, applicationPatchModel.templateId) &&
             Objects.equals(this.templateVersion, applicationPatchModel.templateVersion) &&
+            Objects.equals(this.enhancedOrgAuthenticationEnabled, applicationPatchModel.enhancedOrgAuthenticationEnabled) &&
             Objects.equals(this.applicationEnabled, applicationPatchModel.applicationEnabled) &&
             Objects.equals(this.associatedRoles, applicationPatchModel.associatedRoles) &&
             Objects.equals(this.claimConfiguration, applicationPatchModel.claimConfiguration) &&
@@ -335,7 +356,7 @@ public class ApplicationPatchModel  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, imageUrl, accessUrl, logoutReturnUrl, templateId, templateVersion, applicationEnabled, associatedRoles, claimConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
+        return Objects.hash(name, description, imageUrl, accessUrl, logoutReturnUrl, templateId, templateVersion, enhancedOrgAuthenticationEnabled, applicationEnabled, associatedRoles, claimConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
     }
 
     @Override
@@ -351,6 +372,7 @@ public class ApplicationPatchModel  {
         sb.append("    logoutReturnUrl: ").append(toIndentedString(logoutReturnUrl)).append("\n");
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    templateVersion: ").append(toIndentedString(templateVersion)).append("\n");
+        sb.append("    enhancedOrgAuthenticationEnabled: ").append(toIndentedString(enhancedOrgAuthenticationEnabled)).append("\n");
         sb.append("    applicationEnabled: ").append(toIndentedString(applicationEnabled)).append("\n");
         sb.append("    associatedRoles: ").append(toIndentedString(associatedRoles)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");

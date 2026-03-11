@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2019-2025, WSO2 LLC. (http://www.wso2.com).
+  ~ Copyright (c) 2019-2026, WSO2 LLC. (http://www.wso2.com).
   ~
   ~ WSO2 LLC. licenses this file to you under the Apache License,
   ~ Version 2.0 (the "License"); you may not use this file except
@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.5.12-SNAPSHOT</version>
+    <version>1.5.24-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -307,6 +307,11 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.identity.rule.management</artifactId>
+                <version>${carbon.identity.framework.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
                 <artifactId>org.wso2.carbon.identity.api.server.workflow.common</artifactId>
                 <version>${project.version}</version>
@@ -554,6 +559,12 @@
             <dependency>
                 <groupId>org.wso2.carbon.identity.framework</groupId>
                 <artifactId>org.wso2.carbon.identity.fraud.detection.core</artifactId>
+                <version>${carbon.identity.framework.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.identity.compatibility.settings.core</artifactId>
                 <version>${carbon.identity.framework.version}</version>
                 <scope>provided</scope>
             </dependency>
@@ -1046,7 +1057,7 @@
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
         <identity.governance.version>1.11.103</identity.governance.version>
-        <carbon.identity.framework.version>7.10.28</carbon.identity.framework.version>
+        <carbon.identity.framework.version>7.10.68</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
         <spotbugs.maven.plugin.version>4.9.8.2</spotbugs.maven.plugin.version>
         <spotbugs.annotations.version>4.9.8</spotbugs.annotations.version>
@@ -1074,8 +1085,8 @@
 
         <tenant.resource.manager.version>1.5.55</tenant.resource.manager.version>
         <identity.verification.version>1.0.15</identity.verification.version>
-        <identity.local.auth.fido.version>5.4.31</identity.local.auth.fido.version>
         <identity.notification.push.version>1.1.2</identity.notification.push.version>
+        <identity.local.auth.fido.version>6.0.3</identity.local.auth.fido.version>
 
         <!-- Organization management core Version -->
         <org.wso2.carbon.identity.organization.management.core.version>1.1.41
@@ -1084,14 +1095,14 @@
         </org.wso2.carbon.identity.organization.management.core.version.range>
 
         <!-- Organization management service Version -->
-        <org.wso2.carbon.identity.organization.management.version>2.0.47
+        <org.wso2.carbon.identity.organization.management.version>2.4.5
         </org.wso2.carbon.identity.organization.management.version>
 
         <org.wso2.carbon.identity.inbound.provisioning.scim2.version>3.4.146
         </org.wso2.carbon.identity.inbound.provisioning.scim2.version>
 
         <!-- VC related versions -->
-        <carbon.identity.openid4vc.version>1.0.0</carbon.identity.openid4vc.version>
+        <carbon.identity.openid4vc.version>1.1.5</carbon.identity.openid4vc.version>
 
         <!-- Unit test versions -->
         <testng.version>6.9.10</testng.version>

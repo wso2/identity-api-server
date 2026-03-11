@@ -3,6 +3,7 @@ package org.wso2.carbon.identity.api.server.configs.v1.factories;
 import org.wso2.carbon.identity.api.server.configs.common.ConfigsServiceHolder;
 import org.wso2.carbon.identity.api.server.configs.v1.core.ServerConfigManagementService;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
+import org.wso2.carbon.identity.compatibility.settings.core.service.CompatibilitySettingsService;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.fraud.detection.core.service.FraudDetectionConfigsService;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
@@ -36,6 +37,8 @@ public class ServerConfigManagementServiceFactory {
                 .getFraudDetectionConfigsService();
         OAuth2OIDCConfigOrgUsageScopeMgtService oAuth2OIDCConfigOrgUsageScopeMgtService =
                 ConfigsServiceHolder.getOAuth2OIDCConfigOrgUsageScopeMgtService();
+        CompatibilitySettingsService compatibilitySettingsService = ConfigsServiceHolder
+                .getIdentityCompatibilitySettingsService();
 
         if (applicationManagementService == null) {
             throw new IllegalStateException("ApplicationManagementService is not available from OSGi context.");
@@ -74,6 +77,10 @@ public class ServerConfigManagementServiceFactory {
                     "OSGi context.");
         }
 
+        if (compatibilitySettingsService == null) {
+            throw new IllegalStateException("CompatibilitySettingsService is not available from OSGi context.");
+        }
+
         SERVICE = new ServerConfigManagementService(applicationManagementService, identityProviderManager,
                 corsManagementService,
                 remoteLoggingConfigService,
@@ -81,7 +88,9 @@ public class ServerConfigManagementServiceFactory {
                 dcrConfigurationMgtService,
                 jwtClientAuthenticatorMgtService,
                 fraudDetectionConfigsService,
-                oAuth2OIDCConfigOrgUsageScopeMgtService);
+                oAuth2OIDCConfigOrgUsageScopeMgtService,
+                compatibilitySettingsService
+                );
     }
 
     /**

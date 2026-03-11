@@ -28,6 +28,8 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettings;
+import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettingsGroup;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Error;
@@ -307,15 +309,15 @@ public class ConfigsApi  {
     @Valid
     @GET
     @Path("/authentication/inbound/oauth2/issuer/usage-scope")
-    
+
     @Produces({ "application/json" })
     @ApiOperation(value = "Retrieve issuer usage scope configurations.", notes = "Retrieve the issuer usage scope configuration for the tenant.  The usage scope determines how the issuer can be utilized across organizations: - `ALL_EXISTING_AND_FUTURE_ORGS`: Issuer is shared with all existing and future organizations - `NONE`: Issuer is not shared with any organizations  **Note:** This operation is only allowed for root tenants and will return 403 Forbidden when called from an organization context.  <b>Scope (Permission) required:</b> `internal_config_view` ", response = UsageScopePayload.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Issuer Usage Scope Configuration", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful response", response = UsageScopePayload.class),
         @ApiResponse(code = 400, message = "Bad request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -331,15 +333,15 @@ public class ConfigsApi  {
     @Valid
     @GET
     @Path("/authentication/inbound/oauth2")
-    
+
     @Produces({ "application/json" })
     @ApiOperation(value = "Retrieve OAuth2 inbound authentication configurations.", notes = "Retrieve server OAuth2 inbound authentication configurations. ", response = InboundAuthOAuth2Config.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Inbound Authentication Configurations", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful response", response = InboundAuthOAuth2Config.class),
         @ApiResponse(code = 400, message = "Bad request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -815,10 +817,10 @@ public class ConfigsApi  {
     @ApiOperation(value = "Update issuer usage scope configurations.", notes = "Update the issuer usage scope configuration for the tenant.  The usage scope determines how the issuer can be utilized across organizations: - `ALL_EXISTING_AND_FUTURE_ORGS`: Issuer is shared with all existing and future organizations - `NONE`: Issuer is not shared with any organizations  **Note:** This operation is only allowed for root tenants and will return 403 Forbidden when called from an organization context.  <b>Scope (Permission) required:</b> `internal_config_update` ", response = UsageScopePayload.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Issuer Usage Scope Configuration", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful response", response = UsageScopePayload.class),
         @ApiResponse(code = 400, message = "Bad request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -839,10 +841,10 @@ public class ConfigsApi  {
     @ApiOperation(value = "Update OAuth2 inbound authentication configurations.", notes = "Patch server OAuth2 inbound authentication configurations. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Inbound Authentication Configurations", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful response", response = Void.class),
         @ApiResponse(code = 400, message = "Bad request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -949,5 +951,77 @@ public class ConfigsApi  {
     public Response updateSAMLInboundAuthConfig(@ApiParam(value = "" ) @Valid InboundAuthSAML2Config inboundAuthSAML2Config) {
 
         return delegate.updateSAMLInboundAuthConfig(inboundAuthSAML2Config );
+    }
+
+    @Valid
+    @GET
+    @Path("/compatibility-settings")
+
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve the tenant compatibility settings.", notes = "Retrieve the tenant compatibility settings.", response = CompatibilitySettings.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+
+        })
+    }, tags={ "Compatibility Settings", })
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Successful Response", response = CompatibilitySettings.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getCompatibilitySettings() {
+
+        return delegate.getCompatibilitySettings();
+    }
+
+    @Valid
+    @PATCH
+    @Path("/compatibility-settings")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Patch the tenant compatibility settings.", notes = "Patch the tenant compatibility settings. Supports dynamic groups and attributes.", response = CompatibilitySettings.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+
+        })
+    }, tags={ "Compatibility Settings", })
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Successful Response", response = CompatibilitySettings.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response patchCompatibilitySettings(@ApiParam(value = "" ,required=true) @Valid CompatibilitySettings compatibilitySettings) {
+
+        return delegate.patchCompatibilitySettings(compatibilitySettings);
+    }
+
+    @Valid
+    @GET
+    @Path("/compatibility-settings/{setting-group}")
+
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve compatibility settings for a specific settings group.", notes = "Retrieve compatibility settings for a specific settings group (e.g., scim2, oauth).", response = CompatibilitySettingsGroup.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+
+        })
+    }, tags={ "Compatibility Settings", })
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Successful Response", response = CompatibilitySettingsGroup.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getCompatibilitySettingsByGroup(@ApiParam(value = "Setting group name (e.g., scim2, oauth)",required=true) @PathParam("setting-group") String settingGroup) {
+
+        return delegate.getCompatibilitySettingsByGroup(settingGroup);
     }
 }

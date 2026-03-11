@@ -78,6 +78,9 @@ public class LocalClaimReqDTO {
     @Valid
     private Boolean multiValued = null;
 
+    @Valid
+    private Boolean extendedValued = null;
+
     public enum UniquenessScopeEnum {
          NONE,  WITHIN_USERSTORE,  ACROSS_USERSTORES, 
     };
@@ -270,6 +273,18 @@ public class LocalClaimReqDTO {
     }
 
     /**
+     * Specifies if the claim value can hold extended values or not.
+     **/
+    @ApiModelProperty(value = "Specifies if the claim value can hold extended values or not.")
+    @JsonProperty("extendedValued")
+    public Boolean getExtendedValued() {
+        return extendedValued;
+    }
+    public void setExtendedValued(Boolean extendedValued) {
+        this.extendedValued = extendedValued;
+    }
+
+    /**
     * Specifies the scope of uniqueness validation for the claim value.
     **/
     @ApiModelProperty(value = "Specifies the scope of uniqueness validation for the claim value.")
@@ -358,6 +373,7 @@ public class LocalClaimReqDTO {
         sb.append("    subAttributes: ").append(Arrays.toString(subAttributes)).append("\n");
         sb.append("    canonicalValues: ").append(Arrays.toString(canonicalValues)).append("\n");
         sb.append("    multiValued: ").append(multiValued).append("\n");
+        sb.append("    extendedValued: ").append(extendedValued).append("\n");
         sb.append("    uniquenessScope: ").append(uniquenessScope).append("\n");
         sb.append("    sharedProfileValueResolvingMethod: ").append(sharedProfileValueResolvingMethod).append("\n");
         sb.append("    attributeMapping: ").append(attributeMapping).append("\n");
@@ -391,7 +407,8 @@ public class LocalClaimReqDTO {
                 Objects.equals(this.getRequired(), localClaimResDTO.getRequired()) &&
                 Objects.equals(this.getSupportedByDefault(), localClaimResDTO.getSupportedByDefault()) &&
                 Objects.equals(this.getManagedInUserStoreEnabled(), localClaimResDTO.getManagedInUserStoreEnabled()) &&
-                Objects.equals(this.getMultiValued(), localClaimResDTO.getMultiValued());
+                Objects.equals(this.getMultiValued(), localClaimResDTO.getMultiValued()) &&
+                Objects.equals(this.getExtendedValued(), localClaimResDTO.getExtendedValued());
 
         if (!basicFieldsMatch) {
             return false;
