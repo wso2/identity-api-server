@@ -32,7 +32,7 @@ import org.wso2.carbon.identity.openid4vc.presentation.common.exception.Presenta
 import org.wso2.carbon.identity.openid4vc.presentation.common.exception.VPException;
 import org.wso2.carbon.identity.openid4vc.presentation.common.model.PresentationDefinition;
 import org.wso2.carbon.identity.openid4vc.presentation.common.model.PresentationDefinition.RequestedCredential;
-import org.wso2.carbon.identity.openid4vc.presentation.definition.service.PresentationDefinitionService;
+import org.wso2.carbon.identity.openid4vc.presentation.management.service.PresentationDefinitionService;
 
 import java.util.ArrayList;
 import java.util.List;

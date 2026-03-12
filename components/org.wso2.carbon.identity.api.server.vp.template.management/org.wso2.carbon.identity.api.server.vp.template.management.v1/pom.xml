@@ -87,7 +87,7 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.identity.openid4vc</groupId>
-            <artifactId>org.wso2.carbon.identity.openid4vc.presentation.definition</artifactId>
+            <artifactId>org.wso2.carbon.identity.openid4vc.presentation.management</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
