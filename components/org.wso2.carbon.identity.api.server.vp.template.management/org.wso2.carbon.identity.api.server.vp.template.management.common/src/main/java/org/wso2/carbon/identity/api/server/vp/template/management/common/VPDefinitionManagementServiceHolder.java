@@ -19,7 +19,7 @@
 package org.wso2.carbon.identity.api.server.vp.template.management.common;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.openid4vc.presentation.definition.service.PresentationDefinitionService;
+import org.wso2.carbon.identity.openid4vc.presentation.management.service.PresentationDefinitionService;
 
 /**
  * Service holder for VP Definition Management.
