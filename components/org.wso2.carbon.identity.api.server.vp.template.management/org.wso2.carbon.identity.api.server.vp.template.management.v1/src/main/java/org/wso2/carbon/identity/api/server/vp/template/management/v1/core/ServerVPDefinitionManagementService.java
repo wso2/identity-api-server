@@ -28,10 +28,10 @@ import org.wso2.carbon.identity.api.server.vp.template.management.v1.Presentatio
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionResponse;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionUpdateModel;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.RequestedCredentialModel;
-import org.wso2.carbon.identity.openid4vc.presentation.common.exception.PresentationDefinitionNotFoundException;
 import org.wso2.carbon.identity.openid4vc.presentation.common.exception.VPException;
-import org.wso2.carbon.identity.openid4vc.presentation.common.model.PresentationDefinition;
-import org.wso2.carbon.identity.openid4vc.presentation.common.model.PresentationDefinition.RequestedCredential;
+import org.wso2.carbon.identity.openid4vc.presentation.management.exception.PresentationDefinitionNotFoundException;
+import org.wso2.carbon.identity.openid4vc.presentation.management.model.PresentationDefinition;
+import org.wso2.carbon.identity.openid4vc.presentation.management.model.PresentationDefinition.RequestedCredential;
 import org.wso2.carbon.identity.openid4vc.presentation.management.service.PresentationDefinitionService;
 
 import java.util.ArrayList;
