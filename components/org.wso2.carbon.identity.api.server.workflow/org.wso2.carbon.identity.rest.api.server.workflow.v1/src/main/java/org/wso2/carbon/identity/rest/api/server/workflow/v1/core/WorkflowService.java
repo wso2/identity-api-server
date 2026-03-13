@@ -263,12 +263,8 @@ public class WorkflowService {
                 throw new WorkflowClientException("An event with ID: " + workflowAssociation.getOperation().toString() +
                         " doesn't exist.");
             }
-            int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
-            if (!workflowManagementService.listPaginatedAssociations(tenantId, 1, 0,
-                    "operation eq " + event.getEventId()).isEmpty()) {
-                throw new WorkflowClientException("A workflow association already exists for the event: " +
-                        event.getEventFriendlyName());
-            }
+            checkForDuplicateAssociation(
+                    workflowAssociation.getWorkflowId(), workflowAssociation.getOperation().toString());
             // Pass the rule to rule management service to persist the rule and get the corresponding rule ID.
             String ruleId = null;
             if (workflowAssociation.getRule() != null &&
@@ -322,24 +318,39 @@ public class WorkflowService {
 
         boolean isEnable;
         String eventId;
+        String workflowId;
         String ruleId = null;
         try {
+            Association existingAssociation = workflowManagementService.getAssociation(associationId);
+
             if (workflowAssociation.getIsEnabled() == null) {
-                isEnable = workflowManagementService.getAssociation(associationId).isEnabled();
+                isEnable = existingAssociation.isEnabled();
             } else {
                 isEnable = workflowAssociation.getIsEnabled();
             }
 
             if (workflowAssociation.getOperation() == null) {
-                eventId = null;
+                eventId = existingAssociation.getEventId();
             } else {
                 eventId = workflowAssociation.getOperation().toString();
             }
 
-            if (workflowAssociation.getRule() == null) {
-                ruleId = workflowManagementService.getAssociation(associationId).getCondition();
+            if (workflowAssociation.getWorkflowId() == null) {
+                workflowId = existingAssociation.getWorkflowId();
             } else {
-                String existingRuleId = workflowManagementService.getAssociation(associationId).getCondition();
+                workflowId = workflowAssociation.getWorkflowId();
+            }
+
+            // If workflow ID or event ID is being updated, check for duplicate associations in the workflow.
+            if (!StringUtils.equals(existingAssociation.getWorkflowId(), workflowId) ||
+                !StringUtils.equals(existingAssociation.getEventId(), eventId)) {
+                checkForDuplicateAssociation(workflowId, eventId);
+            }
+
+            if (workflowAssociation.getRule() == null) {
+                ruleId = existingAssociation.getCondition();
+            } else {
+                String existingRuleId = existingAssociation.getCondition();
                 String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
 
                 // Check if the request contains an empty rule.
@@ -372,13 +383,34 @@ public class WorkflowService {
                 }
             }
             workflowManagementService.updateAssociation(associationId, workflowAssociation.getAssociationName(),
-                    workflowAssociation.getWorkflowId(), eventId, ruleId, isEnable);
+                    workflowId, eventId, ruleId, isEnable);
             return getAssociation(associationId);
         } catch (WorkflowClientException e) {
             throw handleClientError(Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_UPDATING_ASSOCIATION,
                     associationId, e);
         } catch (WorkflowException | RuleManagementException e) {
             throw handleServerError(Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_ASSOCIATION, associationId, e);
+        }
+    }
+
+    /**
+     * Check for duplicate associations for the same workflow when updating the workflow ID or
+     * event ID of an association.
+     * @param workflowId
+     * @param eventId
+     * @throws WorkflowException
+     */
+    private void checkForDuplicateAssociation(String workflowId, String eventId)
+            throws WorkflowException {
+
+        if (StringUtils.isNotBlank(workflowId) && StringUtils.isNotBlank(eventId)) {
+            boolean duplicateExists = workflowManagementService
+                    .getAssociationsForWorkflow(workflowId).stream()
+                    .anyMatch(a -> StringUtils.equals(a.getEventId(), eventId));
+            if (duplicateExists) {
+                throw new WorkflowClientException("A workflow association for the event: " +
+                        eventId + " already exists in this workflow: " + workflowId + ".");
+            }
         }
     }
 
