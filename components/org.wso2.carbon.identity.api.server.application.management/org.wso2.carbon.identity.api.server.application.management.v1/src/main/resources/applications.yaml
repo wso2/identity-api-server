@@ -5072,6 +5072,16 @@ components:
           example:
             - "email"
             - "sms"
+        skipUserValidation:
+          type: boolean
+          description: "Skip validation that the authenticated user matches the resolved user from login_hint during token issuance."
+          default: false
+          example: false
+        allowFederatedUsers:
+          type: boolean
+          description: "Allow sending CIBA notifications to users not found in the local user store. When enabled, the notification is sent directly to the login_hint value using the notification_channel to determine if it is an email or phone number. Requires skipUserValidation to be enabled."
+          default: false
+          example: false
 servers:
   - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
     variables:
