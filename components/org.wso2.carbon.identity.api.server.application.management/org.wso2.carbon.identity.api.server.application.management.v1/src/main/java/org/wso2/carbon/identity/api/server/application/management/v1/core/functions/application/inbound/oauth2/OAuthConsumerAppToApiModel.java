@@ -242,7 +242,9 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
 
         return new CIBAAuthenticationRequestConfiguration()
                 .authReqExpiryTime(oAuthConsumerAppDTO.getCibaAuthReqExpiryTime())
-                .notificationChannels(getCibaNotificationChannels(oAuthConsumerAppDTO));
+                .notificationChannels(getCibaNotificationChannels(oAuthConsumerAppDTO))
+                .skipUserValidation(oAuthConsumerAppDTO.isCibaSkipUserValidation())
+                .allowFederatedUsers(oAuthConsumerAppDTO.isCibaAllowFederatedUsers());
     }
 
     private List<String> getCibaNotificationChannels(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
