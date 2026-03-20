@@ -67,7 +67,10 @@ public class ActionMgtEndpointConstants {
                 "Rules are not supported for the specified action type by the server."),
         ERROR_WHILE_INITIALIZING_RULE_BUILDER("650017",
                 "Unable to perform the operation.",
-                "Error while retrieving rule metadata for rule validations.");
+                "Error while retrieving rule metadata for rule validations."),
+        ERROR_NOT_IMPLEMENTED_ATTRIBUTES("650018",
+                "Unable to perform the operation.",
+                "Attributes are not currently supported for the action type: %s.");
 
         private final String code;
         private final String message;
