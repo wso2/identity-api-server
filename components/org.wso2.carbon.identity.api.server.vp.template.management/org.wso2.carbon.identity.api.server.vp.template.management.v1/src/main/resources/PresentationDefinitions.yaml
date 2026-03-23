@@ -1,0 +1,357 @@
+openapi: 3.0.0
+info:
+  title: "WSO2 IS Presentation Definition Management API"
+  version: "v1"
+  description: "Admin API for managing presentation definitions in WSO2 Identity Server."
+  contact:
+    name: WSO2
+    url: 'http://wso2.com/products/identity-server/'
+    email: architecture@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+
+servers:
+  - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
+    variables:
+      server-url:
+        default: localhost:9443
+      tenant-domain:
+        default: carbon.super
+
+security:
+  - OAuth2: []
+  - BasicAuth: []
+
+paths:
+  /vp/template:
+    get:
+      tags:
+        - Presentation Definitions
+      summary: List Presentation Definitions
+      description: |
+        Returns a list of all presentation definitions for the tenant.
+      operationId: listPresentationDefinitions
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresentationDefinitionList'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - Presentation Definitions
+      summary: Create a Presentation Definition
+      description: |
+        Creates a new presentation definition.
+      operationId: createPresentationDefinition
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PresentationDefinitionCreationModel'
+        required: true
+      responses:
+        '201':
+          description: Created
+          headers:
+            Location:
+              description: URI of the created resource.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresentationDefinitionResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /vp/template/{definition-id}:
+    get:
+      tags:
+        - Presentation Definitions
+      summary: Get a Presentation Definition
+      description: |
+        Retrieves a presentation definition by its ID.
+      operationId: getPresentationDefinition
+      parameters:
+        - $ref: '#/components/parameters/definitionIdPathParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresentationDefinitionResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - Presentation Definitions
+      summary: Update a Presentation Definition
+      description: |
+        Updates an existing presentation definition.
+      operationId: updatePresentationDefinition
+      parameters:
+        - $ref: '#/components/parameters/definitionIdPathParam'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PresentationDefinitionUpdateModel'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresentationDefinitionResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - Presentation Definitions
+      summary: Delete a Presentation Definition
+      description: |
+        Deletes a presentation definition by its ID.
+      operationId: deletePresentationDefinition
+      parameters:
+        - $ref: '#/components/parameters/definitionIdPathParam'
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  parameters:
+    definitionIdPathParam:
+      name: definition-id
+      in: path
+      description: Unique identifier of the presentation definition.
+      required: true
+      schema:
+        type: string
+
+  schemas:
+    PresentationDefinitionResponse:
+      type: object
+      required:
+        - id
+        - name
+        - credentials
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the presentation definition.
+          example: "pd-001"
+        name:
+          type: string
+          description: Name of the presentation definition.
+          example: "Employee Credential Verification"
+        description:
+          type: string
+          description: Description of the presentation definition.
+          example: "Verifies employee credentials"
+        credentials:
+          type: array
+          description: The list of requested credentials in this presentation definition.
+          items:
+            $ref: '#/components/schemas/RequestedCredentialModel'
+
+    RequestedCredentialModel:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          description: Type of the requested credential.
+          example: "EmployeeBadge"
+        purpose:
+          type: string
+          description: Purpose of requesting the credential.
+          example: "Please share your employee badge to prove employment."
+        issuer:
+          type: string
+          description: The trusted issuer for this credential.
+        claims:
+          type: array
+          description: List of claims requested from this credential.
+          items:
+            type: string
+            example: "email"
+
+    PresentationDefinitionCreationModel:
+      type: object
+      required:
+        - name
+        - credentials
+      properties:
+        name:
+          type: string
+          description: Name of the presentation definition.
+          example: "Employee Credential Verification"
+        description:
+          type: string
+          description: Description of the presentation definition.
+          example: "Verifies employee credentials"
+        credentials:
+          type: array
+          description: The requested credentials to construct the definition.
+          items:
+            $ref: '#/components/schemas/RequestedCredentialModel'
+
+    PresentationDefinitionUpdateModel:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the presentation definition.
+          example: "Updated Employee Credential Verification"
+        description:
+          type: string
+          description: Description of the presentation definition.
+        credentials:
+          type: array
+          description: The requested credentials to construct the definition.
+          items:
+            $ref: '#/components/schemas/RequestedCredentialModel'
+
+    PresentationDefinitionList:
+      type: object
+      properties:
+        totalResults:
+          type: integer
+          description: Total number of presentation definitions.
+          example: 2
+        presentationDefinitions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PresentationDefinitionListItem'
+
+    PresentationDefinitionListItem:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the presentation definition.
+          example: "pd-001"
+        name:
+          type: string
+          description: Name of the presentation definition.
+          example: "Employee Credential Verification"
+        description:
+          type: string
+          description: Description of the presentation definition.
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          example: "VPD-60001"
+        message:
+          type: string
+          example: "Some error message"
+        description:
+          type: string
+          example: "Some error description"
+        traceId:
+          type: string
+          example: "e0fbcfeb-3617-43c4-8dd0-7b7d38e13047"
+
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://localhost:9443/oauth2/authorize'
+          tokenUrl: 'https://localhost:9443/oauth2/token'
+          scopes: {}
