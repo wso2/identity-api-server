@@ -154,7 +154,8 @@ public class ActionMapperUtil {
                         .allowedHeaders(action.getEndpoint().getAllowedHeaders())
                         .allowedParameters(action.getEndpoint().getAllowedParameters()))
                 .rule((action.getActionRule() != null) ? RuleMapper.toORRuleResponse(action.getActionRule()) :
-                        null);
+                        null)
+                .attributes(action.getAttributes());
     }
 
     /**

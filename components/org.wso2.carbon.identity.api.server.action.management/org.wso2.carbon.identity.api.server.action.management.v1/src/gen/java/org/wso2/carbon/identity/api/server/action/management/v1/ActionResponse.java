@@ -29,6 +29,7 @@ import javax.validation.constraints.*;
 
 
 import io.swagger.annotations.*;
+import java.util.List;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
@@ -78,6 +79,7 @@ public enum StatusEnum {
     private String updatedAt;
     private EndpointResponse endpoint;
     private ORRuleResponse rule;
+    private List<String> attributes;
 
     /**
     * Unique identifier of the action.
@@ -266,7 +268,24 @@ public enum StatusEnum {
         this.rule = rule;
     }
 
+    /**
+     * Attributes required for the action.
+     **/
+    public ActionResponse attributes(List<String> attributes) {
 
+        this.attributes = attributes;
+        return this;
+    }
+
+    @ApiModelProperty(value = "Attributes required for the action.")
+    @JsonProperty("attributes")
+    @Valid
+    public List<String> getAttributes() {
+        return attributes;
+    }
+    public void setAttributes(List<String> attributes) {
+        this.attributes = attributes;
+    }
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -279,20 +298,21 @@ public enum StatusEnum {
         }
         ActionResponse actionResponse = (ActionResponse) o;
         return Objects.equals(this.id, actionResponse.id) &&
-            Objects.equals(this.type, actionResponse.type) &&
-            Objects.equals(this.name, actionResponse.name) &&
-            Objects.equals(this.description, actionResponse.description) &&
-            Objects.equals(this.status, actionResponse.status) &&
-            Objects.equals(this.version, actionResponse.version) &&
-            Objects.equals(this.createdAt, actionResponse.createdAt) &&
-            Objects.equals(this.updatedAt, actionResponse.updatedAt) &&
-            Objects.equals(this.endpoint, actionResponse.endpoint) &&
-            Objects.equals(this.rule, actionResponse.rule);
+                Objects.equals(this.type, actionResponse.type) &&
+                Objects.equals(this.name, actionResponse.name) &&
+                Objects.equals(this.description, actionResponse.description) &&
+                Objects.equals(this.status, actionResponse.status) &&
+                Objects.equals(this.version, actionResponse.version) &&
+                Objects.equals(this.createdAt, actionResponse.createdAt) &&
+                Objects.equals(this.updatedAt, actionResponse.updatedAt) &&
+                Objects.equals(this.endpoint, actionResponse.endpoint) &&
+                Objects.equals(this.attributes, actionResponse.attributes) &&
+                Objects.equals(this.rule, actionResponse.rule);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, type, name, description, status, version, createdAt, updatedAt, endpoint, rule);
+        return Objects.hash(id, type, name, description, status, version, createdAt, updatedAt, endpoint, attributes, rule);
     }
 
     @Override
@@ -310,6 +330,7 @@ public enum StatusEnum {
         sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
         sb.append("    updatedAt: ").append(toIndentedString(updatedAt)).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
+        sb.append("    attributes: ").append(toIndentedString(attributes)).append("\n");
         sb.append("    rule: ").append(toIndentedString(rule)).append("\n");
         sb.append("}");
         return sb.toString();
