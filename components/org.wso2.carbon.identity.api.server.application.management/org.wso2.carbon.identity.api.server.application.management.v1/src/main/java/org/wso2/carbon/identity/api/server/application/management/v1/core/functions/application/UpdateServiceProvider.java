@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
 
+import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AssociatedRolesConfig;
@@ -41,7 +42,7 @@ public class UpdateServiceProvider implements UpdateFunction<ServiceProvider, Ap
         setIfNotNull(applicationPatchModel.getDescription(), serviceProvider::setDescription);
         setIfNotNull(applicationPatchModel.getApplicationVersion(), serviceProvider::setApplicationVersion);
         setIfNotNull(applicationPatchModel.getImageUrl(), serviceProvider::setImageUrl);
-        setIfNotNull(applicationPatchModel.getAccessUrl(), serviceProvider::setAccessUrl);
+        setIfNotNull(StringUtils.trim(applicationPatchModel.getAccessUrl()), serviceProvider::setAccessUrl);
         setIfNotNull(applicationPatchModel.getTemplateId(), serviceProvider::setTemplateId);
         setIfNotNull(applicationPatchModel.getTemplateVersion(), serviceProvider::setTemplateVersion);
         setIfNotNull(applicationPatchModel.getApplicationEnabled(), serviceProvider::setApplicationEnabled);
