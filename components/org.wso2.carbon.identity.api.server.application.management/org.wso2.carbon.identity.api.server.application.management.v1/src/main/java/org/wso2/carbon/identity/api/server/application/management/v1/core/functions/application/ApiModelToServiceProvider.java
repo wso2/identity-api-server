@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
 
+import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AssociatedRolesConfig;
@@ -46,7 +47,7 @@ public class ApiModelToServiceProvider implements ModelToDTO<ApplicationModel, A
         application.setApplicationName(applicationModel.getName());
         application.setDescription(applicationModel.getDescription());
         application.setImageUrl(applicationModel.getImageUrl());
-        application.setAccessUrl(applicationModel.getAccessUrl());
+        application.setAccessUrl(StringUtils.trim(applicationModel.getAccessUrl()));
         application.setTemplateId(applicationModel.getTemplateId());
         application.setTemplateVersion(applicationModel.getTemplateVersion());
         setIfNotNull(applicationModel.getIsManagementApp(), application::setManagementApp);

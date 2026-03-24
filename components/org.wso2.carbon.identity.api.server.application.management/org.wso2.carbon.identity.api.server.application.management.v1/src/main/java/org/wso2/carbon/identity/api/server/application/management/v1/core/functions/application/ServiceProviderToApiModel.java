@@ -128,7 +128,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .description(application.getDescription())
                     .applicationVersion(application.getApplicationVersion())
                     .imageUrl(application.getImageUrl())
-                    .accessUrl(application.getAccessUrl())
+                    .accessUrl(StringUtils.trim(application.getAccessUrl()))
                     .logoutReturnUrl(getLogoutReturnUrl(application))
                     .clientId(getInboundKey(application, "oauth2"))
                     .issuer(getInboundKey(application, "samlsso"))
