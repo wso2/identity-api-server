@@ -56,6 +56,11 @@ paths:
                   description: This action invokes before issuing an ID token.
                   count: 1
                   self: "/api/server/v1/actions/preIssueIdToken"
+                - type: IN_FLOW_EXTENSION
+                  displayName: In-Flow Extension
+                  description: This action invokes during flow execution.
+                  count: 1
+                  self: "/api/server/v1/actions/inFlowExtension"
         '401':
           description: Unauthorized
         '403':
@@ -92,6 +97,7 @@ paths:
               - preUpdateProfile
               - preRegistration
               - preIssueIdToken
+              - inFlowExtension
       requestBody:
         content:
           application/json:
@@ -229,6 +235,39 @@ paths:
                           - field: flow
                             operator: equals
                             value: userInitiatedProfileUpdate
+              inFlowExtension:
+                summary: Sample payload for in-flow extension action
+                value:
+                  name: Risk Assessment Extension
+                  description: This action invokes during flow execution to assess risk.
+                  endpoint:
+                    uri: https://myextension.com/in-flow-extension
+                    authentication:
+                      properties:
+                        header: x-api-key
+                        value: e12595c1-1435-4bf2-94e8-445135ab505a
+                      type: API_KEY
+                  accessConfig:
+                    expose:
+                      - /user/userId
+                      - path: /user/claims/
+                        encrypted: true
+                      - path: /user/credentials/password
+                        encrypted: true
+                      - /properties/
+                      - /input/
+                      - /flow/tenantDomain
+                      - /flow/applicationId
+                      - /flow/flowType
+                    modify:
+                      - /properties/riskScore
+                      - /properties/riskLevel
+                      - /properties/riskFactors[]
+                      - /user/claims/http://wso2.org/claims/country
+                      - path: /user/claims/http://wso2.org/claims/emailaddress
+                        encrypted: true
+                  encryption:
+                    certificate: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURxRENDQXBDZ0F3SUJBZ0l...
         description: This represents the information of the action to be created.
         required: true
       responses:
@@ -373,6 +412,41 @@ paths:
                             - field: flow
                               operator: equals
                               value: userInitiatedProfileUpdate
+                inFlowExtension:
+                  summary: Sample response for in-flow extension action
+                  value:
+                    id: 24f64d17-9824-4e28-8413-de45728d8e84
+                    name: Risk Assessment Extension
+                    description: This action invokes during flow execution to assess risk.
+                    status: INACTIVE
+                    version: v1
+                    createdAt: 2025-08-01T12:00:00Z
+                    updatedAt: 2025-09-01T13:00:00Z
+                    endpoint:
+                      uri: https://myextension.com/in-flow-extension
+                      authentication:
+                        type: API_KEY
+                    accessConfig:
+                      expose:
+                        - /user/userId
+                        - path: /user/claims/
+                          encrypted: true
+                        - path: /user/credentials/password
+                          encrypted: true
+                        - /properties/
+                        - /input/
+                        - /flow/tenantDomain
+                        - /flow/applicationId
+                        - /flow/flowType
+                      modify:
+                        - /properties/riskScore
+                        - /properties/riskLevel
+                        - /properties/riskFactors[]
+                        - /user/claims/http://wso2.org/claims/country
+                        - path: /user/claims/http://wso2.org/claims/emailaddress
+                          encrypted: true
+                    encryption:
+                      certificate: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURxRENDQXBDZ0F3SUJBZ0l...
         '400':
           description: Bad Request
           content:
@@ -483,6 +557,42 @@ paths:
                 },
                 "attributes": ["http://wso2.org/claims/givenname", "http://wso2.org/claims/dob"]
             }'
+        - lang: Curl - inFlowExtension
+          source: |
+            curl --location 'https://localhost:9443/api/server/v1/actions/inFlowExtension' \
+            -H 'Authorization: Basic YWRtaW46YWRtaW4=' \
+            -H 'Content-Type: application/json' \
+            -d '{
+                "name": "Risk Assessment Extension",
+                "description": "This action invokes during flow execution to assess risk.",
+                "endpoint": {
+                    "uri": "https://myextension.com/in-flow-extension",
+                    "authentication": {
+                        "properties": {
+                            "header": "x-api-key",
+                            "value": "e12595c1-1435-4bf2-94e8-445135ab505a"
+                        },
+                        "type": "API_KEY"
+                    }
+                },
+                "accessConfig": {
+                    "expose": [
+                        "/user/userId",
+                        { "path": "/user/claims/", "encrypted": true },
+                        "/properties/",
+                        "/input/"
+                    ],
+                    "modify": [
+                        "/properties/riskScore",
+                        "/properties/riskLevel",
+                        "/properties/riskFactors[]",
+                        "/user/claims/http://wso2.org/claims/country"
+                    ]
+                },
+                "encryption": {
+                    "certificate": "LS0tLS1CRUdJTi..."
+                }
+            }'
       x-codegen-request-body-name: body
 
     get:
@@ -504,6 +614,7 @@ paths:
               - preUpdateProfile
               - preRegistration
               - preIssueIdToken
+              - inFlowExtension
       responses:
         '200':
           description: OK
@@ -572,6 +683,21 @@ paths:
                         - href: "/api/server/v1/actions/preUpdateProfile/24f64d17-9824-4e28-8413-de45728d8e84"
                           method: GET
                           rel: self
+                inFlowExtension:
+                  summary: Sample response for in-flow extension action
+                  value:
+                    - id: 24f64d17-9824-4e28-8413-de45728d8e84
+                      type: IN_FLOW_EXTENSION
+                      name: Risk Assessment Extension
+                      description: This action invokes during flow execution to assess risk.
+                      status: ACTIVE
+                      version: v1
+                      createdAt: 2025-08-01T12:00:00Z
+                      updatedAt: 2025-09-01T13:00:00Z
+                      links:
+                        - href: "/api/server/v1/actions/inFlowExtension/24f64d17-9824-4e28-8413-de45728d8e84"
+                          method: GET
+                          rel: self
         '400':
           description: Bad Request
           content:
@@ -606,6 +732,57 @@ paths:
             curl --location 'https://localhost:9443/api/server/v1/actions/{actionType}' \
             -H 'Authorization: Basic YWRtaW46YWRtaW4='
 
+  /actions/{actionType}/check-name:
+    post:
+      tags:
+        - Actions
+      summary: Check Action Name Availability
+      description: "This API checks whether the given action name is available (unique) within the specified action type.\n\n
+        <b>Scope (Permission) required:</b> ``internal_action_mgt_view``\n\n"
+      operationId: checkActionName
+      parameters:
+        - name: actionType
+          in: path
+          description: Name of the Action Type.
+          required: true
+          schema:
+            enum:
+              - preIssueAccessToken
+              - preUpdatePassword
+              - preUpdateProfile
+              - preRegistration
+              - preIssueIdToken
+              - inFlowExtension
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActionNameCheckRequest'
+        required: true
+      responses:
+        '200':
+          description: Name availability check result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionNameCheckResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   /actions/{actionType}/{actionId}:
     get:
       tags:
@@ -626,6 +803,7 @@ paths:
               - preUpdateProfile
               - preRegistration
               - preIssueIdToken
+              - inFlowExtension
         - name: actionId
           in: path
           description: Unique identifier of the action.
@@ -778,6 +956,21 @@ paths:
                             - field: flow
                               operator: equals
                               value: userInitiatedProfileUpdate
+                inFlowExtension:
+                  summary: Sample response for in-flow extension action
+                  value:
+                    id: 24f64d17-9824-4e28-8413-de45728d8e84
+                    type: IN_FLOW_EXTENSION
+                    name: Risk Assessment Extension
+                    description: This action invokes during flow execution to assess risk.
+                    status: ACTIVE
+                    version: v1
+                    createdAt: 2025-08-01T12:00:00Z
+                    updatedAt: 2025-09-01T13:00:00Z
+                    endpoint:
+                      uri: https://myextension.com/in-flow-extension
+                      authentication:
+                        type: API_KEY
         '400':
           description: Bad Request
           content:
@@ -830,6 +1023,7 @@ paths:
               - preUpdateProfile
               - preRegistration
               - preIssueIdToken
+              - inFlowExtension
         - name: actionId
           in: path
           description: Unique identifier of the action.
@@ -949,6 +1143,29 @@ paths:
                           - field: claim
                             operator: notEquals
                             value: http://wso2.org/claims/postalcode
+              inFlowExtension:
+                summary: Sample payload for in-flow extension action update
+                value:
+                  name: Updated Risk Assessment Extension
+                  description: This action invokes during flow execution to assess risk.
+                  version: v2
+                  endpoint:
+                    uri: https://myextension.com/external/in-flow-extension
+                    authentication:
+                      properties:
+                        token: 346dfbb5-6a8c-447a-9aaa-88fa2dd95962
+                      type: BEARER
+                  accessConfig:
+                    expose:
+                      - /user/userId
+                      - path: /user/claims/
+                        encrypted: true
+                      - /properties/
+                    modify:
+                      - /properties/riskScore
+                      - /properties/riskLevel
+                  encryption:
+                    certificate: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURxRENDQXBDZ0F3SUJBZ0l...
         description: This represents the action to be updated.
         required: true
       responses:
@@ -1076,6 +1293,31 @@ paths:
                             - field: claim
                               operator: notEquals
                               value: http://wso2.org/claims/postalcode
+                inFlowExtension:
+                  summary: Sample response for in-flow extension action update
+                  value:
+                    id: 24f64d17-9824-4e28-8413-de45728d8e84
+                    name: Updated Risk Assessment Extension
+                    description: This action invokes during flow execution to assess risk.
+                    status: ACTIVE
+                    version: v1
+                    createdAt: 2025-08-01T12:00:00Z
+                    updatedAt: 2025-09-01T13:00:00Z
+                    endpoint:
+                      uri: https://myextension.com/external/in-flow-extension
+                      authentication:
+                        type: BEARER
+                    accessConfig:
+                      expose:
+                        - /user/userId
+                        - path: /user/claims/
+                          encrypted: true
+                        - /properties/
+                      modify:
+                        - /properties/riskScore
+                        - /properties/riskLevel
+                    encryption:
+                      certificate: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURxRENDQXBDZ0F3SUJBZ0l...
         '400':
           description: Bad Request
           content:
@@ -1189,6 +1431,39 @@ paths:
                 },
                 "attributes": ["http://wso2.org/claims/dob"]
             }'
+        - lang: Curl - inFlowExtension
+          source: |
+            curl --location --request PATCH 'https://localhost:9443/api/server/v1/actions/inFlowExtension/{actionId}' \
+            -H 'Content-Type: application/json' \
+            -H 'Accept: application/json' \
+            -H 'Authorization: Basic YWRtaW46YWRtaW4=' \
+            -d '{
+                "name": "Updated Risk Assessment Extension",
+                "description": "This is the configuration of in-flow extension for risk assessment",
+                "endpoint": {
+                    "uri": "http://myextensions.com/in-flow-extension",
+                    "authentication": {
+                        "type": "BEARER",
+                        "properties": {
+                            "token": "346dfbb5-6a8c-447a-9aaa-88fa2dd95962"
+                        }
+                    }
+                },
+                "accessConfig": {
+                    "expose": [
+                        "/user/userId",
+                        { "path": "/user/claims/", "encrypted": true },
+                        "/properties/"
+                    ],
+                    "modify": [
+                        "/properties/riskScore",
+                        "/properties/riskLevel"
+                    ]
+                },
+                "encryption": {
+                    "certificate": "LS0tLS1CRUdJTi..."
+                }
+            }'
       x-codegen-request-body-name: body
 
     delete:
@@ -1210,6 +1485,7 @@ paths:
               - preUpdateProfile
               - preRegistration
               - preIssueIdToken
+              - inFlowExtension
         - name: actionId
           in: path
           description: Unique identifier of the action.
@@ -1518,6 +1794,7 @@ components:
         - PRE_UPDATE_PROFILE
         - PRE_REGISTRATION
         - PRE_ISSUE_ID_TOKEN
+        - IN_FLOW_EXTENSION
     ActionModel:
       type: object
       required:
@@ -1952,6 +2229,74 @@ components:
           type: string
           example: myapp
 
+    AccessConfig:
+      type: object
+      description: Access configuration specific to In-Flow Extension actions. Defines what context data is exposed to the extension, what operations the extension is allowed to perform, and which paths have encryption enabled.
+      properties:
+        expose:
+          type: array
+          description: |
+            List of expose entries defining which parts of the flow context are exposed to the external service.
+            Each entry can be a plain string (path prefix, no encryption) or an object with `path` and `encrypted` fields.
+            When `encrypted: true`, the corresponding values are JWE-encrypted before sending to the external service.
+          items:
+            oneOf:
+              - type: string
+                description: A plain path prefix (encryption defaults to false).
+              - $ref: '#/components/schemas/ContextPath'
+          example:
+            - /user/userId
+            - path: /user/claims/
+              encrypted: true
+            - path: /user/credentials/password
+              encrypted: true
+            - /properties/
+            - /input/
+            - /flow/tenantDomain
+        modify:
+          type: array
+          description: |
+            List of context paths the extension is allowed to modify (REPLACE).
+            Accepts both plain strings (encryption defaults to false) and objects with path and encrypted fields.
+          items:
+            oneOf:
+              - type: string
+                description: A plain path (encryption defaults to false).
+              - $ref: '#/components/schemas/ContextPath'
+          example:
+            - /properties/riskScore
+            - /properties/riskLevel
+            - path: /user/claims/http://wso2.org/claims/emailaddress
+              encrypted: true
+
+    ContextPath:
+      type: object
+      description: A context path entry with an explicit path and optional encryption flag.
+      required:
+        - path
+      properties:
+        path:
+          type: string
+          description: The JSON path prefix.
+          example: /user/claims/
+        encrypted:
+          type: boolean
+          description: Whether values under this path should be JWE-encrypted before sending to the external service.
+          default: false
+          example: true
+
+    Encryption:
+      type: object
+      description: |
+        Encryption configuration for In-Flow Extension actions.
+        Contains the external service's X.509 certificate used for JWE encryption (RSA-OAEP-256 + A256GCM).
+        This follows the same pattern as `passwordSharing.certificate` in Pre Update Password actions.
+      properties:
+        certificate:
+          type: string
+          description: The external service's X.509 certificate in Base64-encoded PEM format, used for outbound JWE encryption.
+          example: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURxRENDQXBDZ0F3SUJBZ0l...
+
     Error:
       type: object
       properties:
@@ -1967,3 +2312,23 @@ components:
         traceId:
           type: string
           example: e0fbcfeb-3617-43c4-8dd0-7b7d38e13047
+
+    ActionNameCheckRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: The action name to check for availability.
+          example: Risk Assessment Extension
+
+    ActionNameCheckResponse:
+      type: object
+      properties:
+        available:
+          type: boolean
+          description: Whether the action name is available (unique) within the action type.
+          example: true

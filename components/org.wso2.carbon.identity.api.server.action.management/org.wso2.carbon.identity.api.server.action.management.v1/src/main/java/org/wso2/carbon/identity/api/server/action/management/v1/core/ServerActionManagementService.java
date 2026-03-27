@@ -27,6 +27,7 @@ import org.wso2.carbon.identity.action.management.api.model.Action;
 import org.wso2.carbon.identity.action.management.api.service.ActionManagementService;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionBasicResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
+import org.wso2.carbon.identity.api.server.action.management.v1.ActionNameCheckResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionType;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionTypesResponseItem;
@@ -147,7 +148,8 @@ public class ServerActionManagementService {
     public ActionBasicResponse activateAction(String actionType, String actionId) {
 
         try {
-            validateActionType(actionType);
+            Action.ActionTypes validatedActionType = validateActionType(actionType);
+            validateStatusToggleAllowed(validatedActionType);
             return buildActionBasicResponse(actionManagementService.activateAction(actionType, actionId,
                             CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
         } catch (ActionMgtException e) {
@@ -158,11 +160,38 @@ public class ServerActionManagementService {
     public ActionBasicResponse deactivateAction(String actionType, String actionId) {
 
         try {
-            validateActionType(actionType);
+            Action.ActionTypes validatedActionType = validateActionType(actionType);
+            validateStatusToggleAllowed(validatedActionType);
             return buildActionBasicResponse(actionManagementService.deactivateAction(actionType, actionId,
                             CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
         } catch (ActionMgtException e) {
             throw ActionMgtEndpointUtil.handleActionMgtException(e);
+        }
+    }
+
+    public ActionNameCheckResponse checkActionName(String actionType, String name) {
+
+        try {
+            validateActionType(actionType);
+            String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            boolean available = actionManagementService.isActionNameAvailable(actionType, name, tenantDomain);
+            return new ActionNameCheckResponse().available(available);
+        } catch (ActionMgtException e) {
+            throw ActionMgtEndpointUtil.handleActionMgtException(e);
+        }
+    }
+
+    /**
+     * Validate that status toggle (activate/deactivate) is allowed for the given action type.
+     * EXTENSION category actions are always active and do not support status toggle.
+     *
+     * @param actionType The action type.
+     */
+    private void validateStatusToggleAllowed(Action.ActionTypes actionType) {
+
+        if (Action.ActionTypes.Category.EXTENSION.equals(actionType.getCategory())) {
+            throw ActionMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST,
+                    ERROR_INVALID_ACTION_TYPE);
         }
     }
 
@@ -176,8 +205,42 @@ public class ServerActionManagementService {
                     .getThreadLocalCarbonContext().getTenantDomain());
 
             List<ActionTypesResponseItem> actionTypesResponseItems = new ArrayList<>();
+            
+            // Process PRE_POST category action types
             for (Action.ActionTypes actionType : Action.ActionTypes.filterByCategory(
                     Action.ActionTypes.Category.PRE_POST)) {
+                if (NOT_IMPLEMENTED_ACTION_TYPES.contains(actionType.getPathParam()) || (isOrganization() &&
+                        NOT_ALLOWED_ACTION_TYPES_IN_ORG_LEVEL.contains(actionType.getPathParam()))) {
+                    continue;
+                }
+
+                actionTypesResponseItems.add(new ActionTypesResponseItem()
+                        .type(ActionType.valueOf(actionType.getActionType()))
+                        .displayName(actionType.getDisplayName())
+                        .description(actionType.getDescription())
+                        .count(actionsCountPerType.getOrDefault(actionType.getActionType(), 0))
+                        .self(ActionMgtEndpointUtil.buildURIForActionType(actionType.getActionType())));
+            }
+            
+            // Process IN_FLOW category action types
+            for (Action.ActionTypes actionType : Action.ActionTypes.filterByCategory(
+                    Action.ActionTypes.Category.IN_FLOW)) {
+                if (NOT_IMPLEMENTED_ACTION_TYPES.contains(actionType.getPathParam()) || (isOrganization() &&
+                        NOT_ALLOWED_ACTION_TYPES_IN_ORG_LEVEL.contains(actionType.getPathParam()))) {
+                    continue;
+                }
+
+                actionTypesResponseItems.add(new ActionTypesResponseItem()
+                        .type(ActionType.valueOf(actionType.getActionType()))
+                        .displayName(actionType.getDisplayName())
+                        .description(actionType.getDescription())
+                        .count(actionsCountPerType.getOrDefault(actionType.getActionType(), 0))
+                        .self(ActionMgtEndpointUtil.buildURIForActionType(actionType.getActionType())));
+            }
+
+            // Process EXTENSION category action types
+            for (Action.ActionTypes actionType : Action.ActionTypes.filterByCategory(
+                    Action.ActionTypes.Category.EXTENSION)) {
                 if (NOT_IMPLEMENTED_ACTION_TYPES.contains(actionType.getPathParam()) || (isOrganization() &&
                         NOT_ALLOWED_ACTION_TYPES_IN_ORG_LEVEL.contains(actionType.getPathParam()))) {
                     continue;
@@ -273,11 +336,34 @@ public class ServerActionManagementService {
 
     private Action.ActionTypes getActionTypeFromPath(String actionType) {
 
-        return Arrays.stream(Action.ActionTypes.filterByCategory(Action.ActionTypes.Category.PRE_POST))
+        // Check in PRE_POST category
+        Action.ActionTypes result = Arrays.stream(Action.ActionTypes.filterByCategory(
+                        Action.ActionTypes.Category.PRE_POST))
                 .filter(actionTypeObj -> actionTypeObj.getPathParam().equals(actionType))
                 .findFirst()
-                .orElseThrow(() -> ActionMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST,
-                        ERROR_INVALID_ACTION_TYPE));
+                .orElse(null);
+        
+        // If not found, check in IN_FLOW category
+        if (result == null) {
+            result = Arrays.stream(Action.ActionTypes.filterByCategory(Action.ActionTypes.Category.IN_FLOW))
+                    .filter(actionTypeObj -> actionTypeObj.getPathParam().equals(actionType))
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        // If not found, check in EXTENSION category
+        if (result == null) {
+            result = Arrays.stream(Action.ActionTypes.filterByCategory(Action.ActionTypes.Category.EXTENSION))
+                    .filter(actionTypeObj -> actionTypeObj.getPathParam().equals(actionType))
+                    .findFirst()
+                    .orElse(null);
+        }
+        
+        if (result == null) {
+            throw ActionMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST, ERROR_INVALID_ACTION_TYPE);
+        }
+        
+        return result;
     }
 
     private boolean isOrganization() throws ActionMgtException {

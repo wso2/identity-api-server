@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.action.management.v1.impl;
 
+import org.wso2.carbon.identity.api.server.action.management.v1.ActionNameCheckRequest;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionsApiService;
 import org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants;
@@ -51,6 +52,13 @@ public class ActionsApiServiceImpl implements ActionsApiService {
     public Response activateAction(String actionType, String actionId) {
 
         return Response.ok().entity(serverActionManagementService.activateAction(actionType, actionId)).build();
+    }
+
+    @Override
+    public Response checkActionName(String actionType, ActionNameCheckRequest actionNameCheckRequest) {
+
+        return Response.ok().entity(serverActionManagementService.checkActionName(actionType,
+                actionNameCheckRequest.getName())).build();
     }
 
     @Override
