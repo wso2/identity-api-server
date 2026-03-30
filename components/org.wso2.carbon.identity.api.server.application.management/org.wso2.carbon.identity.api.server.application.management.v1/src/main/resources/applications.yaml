@@ -3977,6 +3977,14 @@ components:
           default: false
           description: Enabling this option will make the application FAPI conformant.
           example: false
+        fapiProfile:
+          description: |
+            The FAPI security profile applied to the application. Applicable only when isFAPIApplication is true.
+            If isFAPIApplication is true and this property is omitted, `FAPI1_ADVANCED` will be applied by default.
+          allOf:
+            - $ref: '#/components/schemas/FapiProfile'
+          default: FAPI1_ADVANCED
+          example: FAPI1_ADVANCED
         cibaAuthenticationRequest:
           $ref: '#/components/schemas/CIBAAuthenticationRequestConfiguration'
         issuer:
@@ -4291,12 +4299,23 @@ components:
     FapiMetadata:
       type: object
       properties:
+        allowedFapiProfiles:
+          $ref: '#/components/schemas/MetadataProperty'
         allowedSignatureAlgorithms:
           $ref: '#/components/schemas/MetadataProperty'
         allowedEncryptionAlgorithms:
           $ref: '#/components/schemas/MetadataProperty'
         tokenEndpointAuthMethod:
           $ref: '#/components/schemas/ClientAuthenticationMethodMetadata'
+    FapiProfile:
+      type: string
+      description: |
+        FAPI security profile.
+        - `FAPI1_ADVANCED`: FAPI 1.0 Advanced Security Profile.
+        - `FAPI2_SECURITY`: FAPI 2.0 Security Profile.
+      enum:
+        - FAPI1_ADVANCED
+        - FAPI2_SECURITY
     CIBAMetadata:
       type: object
       properties:

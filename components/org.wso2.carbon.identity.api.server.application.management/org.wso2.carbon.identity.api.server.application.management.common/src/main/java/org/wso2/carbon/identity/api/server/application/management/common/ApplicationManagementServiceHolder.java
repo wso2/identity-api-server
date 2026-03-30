@@ -31,6 +31,7 @@ import org.wso2.carbon.identity.oauth.ciba.api.CibaAuthService;
 import org.wso2.carbon.identity.oauth.ciba.api.CibaAuthServiceImpl;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.identity.oauth2.config.services.OAuth2OIDCConfigOrgUsageScopeMgtService;
+import org.wso2.carbon.identity.oauth2.fapi.services.FapiConfigMgtService;
 import org.wso2.carbon.identity.organization.management.application.OrgApplicationManager;
 import org.wso2.carbon.identity.sso.saml.SAMLSSOConfigServiceImpl;
 import org.wso2.carbon.identity.template.mgt.TemplateManager;
@@ -149,6 +150,12 @@ public class ApplicationManagementServiceHolder {
         static final OAuth2OIDCConfigOrgUsageScopeMgtService SERVICE =
                 (OAuth2OIDCConfigOrgUsageScopeMgtService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                         .getOSGiService(OAuth2OIDCConfigOrgUsageScopeMgtService.class, null);
+    }
+
+    private static class FapiConfigMgtServiceHolder {
+
+        static final FapiConfigMgtService SERVICE = (FapiConfigMgtService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(FapiConfigMgtService.class, null);
     }
 
     /**
@@ -288,5 +295,15 @@ public class ApplicationManagementServiceHolder {
     public static OAuth2OIDCConfigOrgUsageScopeMgtService getOAuth2OIDCConfigOrgUsageScopeMgtService() {
 
         return OAuthOIDCConfigOrgUsageScopeMgtServiceHolder.SERVICE;
+    }
+
+    /**
+     * Get FapiConfigMgtService.
+     *
+     * @return FapiConfigMgtService.
+     */
+    public static FapiConfigMgtService getFapiConfigMgtService() {
+
+        return FapiConfigMgtServiceHolder.SERVICE;
     }
 }

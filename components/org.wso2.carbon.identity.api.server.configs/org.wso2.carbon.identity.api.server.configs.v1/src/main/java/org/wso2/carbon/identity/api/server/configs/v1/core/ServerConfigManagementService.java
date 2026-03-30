@@ -39,6 +39,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.exception.JWTClientAuthent
 import org.wso2.carbon.identity.api.server.configs.v1.function.CORSConfigurationToCORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.function.CompatibilitySettingUtil;
 import org.wso2.carbon.identity.api.server.configs.v1.function.DCRConnectorUtil;
+import org.wso2.carbon.identity.api.server.configs.v1.function.FAPIConnectorUtil;
 import org.wso2.carbon.identity.api.server.configs.v1.function.JWTConnectorUtil;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticationType;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Authenticator;
@@ -53,6 +54,8 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Endpoint;
 import org.wso2.carbon.identity.api.server.configs.v1.model.EventConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.EventProperty;
+import org.wso2.carbon.identity.api.server.configs.v1.model.FapiConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.FapiProfile;
 import org.wso2.carbon.identity.api.server.configs.v1.model.FraudDetectionConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationConfiguration;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
@@ -114,6 +117,10 @@ import org.wso2.carbon.identity.oauth2.config.exceptions.OAuth2OIDCConfigOrgUsag
 import org.wso2.carbon.identity.oauth2.config.models.IssuerUsageScopeConfig;
 import org.wso2.carbon.identity.oauth2.config.models.UsageScope;
 import org.wso2.carbon.identity.oauth2.config.services.OAuth2OIDCConfigOrgUsageScopeMgtService;
+import org.wso2.carbon.identity.oauth2.fapi.exceptions.FapiConfigMgtClientException;
+import org.wso2.carbon.identity.oauth2.fapi.exceptions.FapiConfigMgtException;
+import org.wso2.carbon.identity.oauth2.fapi.exceptions.FapiConfigMgtServerException;
+import org.wso2.carbon.identity.oauth2.fapi.services.FapiConfigMgtService;
 import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationConfigMgtClientException;
 import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationConfigMgtException;
 import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationConfigMgtServerException;
@@ -173,6 +180,7 @@ public class ServerConfigManagementService {
     private final DCRConfigurationMgtService dcrConfigurationMgtService;
     private final OAuth2OIDCConfigOrgUsageScopeMgtService oauth2OIDCConfigOrgUsageScopeMgtService;
     private final CompatibilitySettingsService compatibilitySettingsService;
+    private final FapiConfigMgtService fapiConfigMgtService;
 
     private static final Log log = LogFactory.getLog(ServerConfigManagementService.class);
 
@@ -186,7 +194,8 @@ public class ServerConfigManagementService {
                                          FraudDetectionConfigsService fraudDetectionConfigsService,
                                          OAuth2OIDCConfigOrgUsageScopeMgtService
                                                  oauth2OIDCConfigOrgUsageScopeMgtService,
-                                         CompatibilitySettingsService identityCompatibilitySettingsService) {
+                                         CompatibilitySettingsService identityCompatibilitySettingsService,
+                                         FapiConfigMgtService fapiConfigMgtService) {
 
         this.applicationManagementService = applicationManagementService;
         this.idpManager = idpManager;
@@ -198,6 +207,7 @@ public class ServerConfigManagementService {
         this.fraudDetectionConfigsService = fraudDetectionConfigsService;
         this.oauth2OIDCConfigOrgUsageScopeMgtService = oauth2OIDCConfigOrgUsageScopeMgtService;
         this.compatibilitySettingsService = identityCompatibilitySettingsService;
+        this.fapiConfigMgtService = fapiConfigMgtService;
     }
 
     /**
@@ -514,6 +524,52 @@ public class ServerConfigManagementService {
         } catch (ImpersonationConfigMgtException e) {
             throw handleImpersonationConfigException(e, Constants.ErrorMessage.ERROR_CODE_IMP_CONFIG_DELETE,
                     tenantDomain);
+        }
+    }
+
+    /**
+     * Get the FAPI configuration for the current tenant.
+     *
+     * @return FapiConfig API model.
+     */
+    public FapiConfig getFAPIConfiguration() {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            org.wso2.carbon.identity.oauth2.fapi.models.FapiConfig fapiConfig =
+                    fapiConfigMgtService.getFapiConfig(tenantDomain);
+            return FAPIConnectorUtil.toApiModel(fapiConfig);
+        } catch (FapiConfigMgtClientException e) {
+            log.error(Constants.ErrorMessage.ERROR_CODE_FAPI_CONFIG_RETRIEVE.message(), e);
+            throw new APIError(Response.Status.BAD_REQUEST, this.getFapiConfigErrorResponse(e,
+                    Constants.ErrorMessage.ERROR_CODE_FAPI_CONFIG_RETRIEVE, tenantDomain));
+        } catch (FapiConfigMgtException e) {
+            log.error(Constants.ErrorMessage.ERROR_CODE_FAPI_CONFIG_RETRIEVE.message(), e);
+            throw new APIError(Response.Status.INTERNAL_SERVER_ERROR, this.getFapiConfigErrorResponse(e,
+                    Constants.ErrorMessage.ERROR_CODE_FAPI_CONFIG_RETRIEVE, tenantDomain));
+        }
+    }
+
+    /**
+     * Update the FAPI configuration for the current tenant.
+     *
+     * @param fapiConfig the API model to persist.
+     * @return the updated FapiConfig API model.
+     */
+    public FapiConfig updateFAPIConfiguration(FapiConfig fapiConfig) {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            fapiConfigMgtService.setFapiConfig(FAPIConnectorUtil.toOAuthModel(fapiConfig), tenantDomain);
+            return fapiConfig;
+        } catch (FapiConfigMgtClientException e) {
+            log.error(Constants.ErrorMessage.ERROR_CODE_FAPI_CONFIG_UPDATE.message(), e);
+            throw new APIError(Response.Status.BAD_REQUEST, this.getFapiConfigErrorResponse(e,
+                    Constants.ErrorMessage.ERROR_CODE_FAPI_CONFIG_UPDATE, tenantDomain));
+        } catch (FapiConfigMgtException e) {
+            log.error(Constants.ErrorMessage.ERROR_CODE_FAPI_CONFIG_UPDATE.message(), e);
+            throw new APIError(Response.Status.INTERNAL_SERVER_ERROR, this.getFapiConfigErrorResponse(e,
+                    Constants.ErrorMessage.ERROR_CODE_FAPI_CONFIG_UPDATE, tenantDomain));
         }
     }
 
@@ -1457,6 +1513,22 @@ public class ServerConfigManagementService {
         return new APIError(status, errorResponse);
     }
 
+
+    private ErrorResponse getFapiConfigErrorResponse(FapiConfigMgtException e,
+                                                     Constants.ErrorMessage errorEnum, String data) {
+
+        final ErrorResponse errorResponse = getErrorBuilder(errorEnum, data).build(log, e.getMessage());
+        errorResponse.setDescription(e.getMessage());
+        if (e.getErrorCode() != null) {
+            String errorCode = e.getErrorCode();
+            errorCode = errorCode.contains(
+                    org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER)
+                    ? errorCode : Constants.CONFIG_ERROR_PREFIX + errorCode;
+            errorResponse.setCode(errorCode);
+        }
+        return errorResponse;
+    }
+
     /**
      * Handle exceptions generated in API.
      *
@@ -1671,6 +1743,13 @@ public class ServerConfigManagementService {
                     } else if (path.matches(Constants.DCR_CONFIG_SSA_JWKS)) {
                         String value = dcrPatch.getValue();
                         dcrConfig.setSsaJwks(value);
+                    } else if (path.matches(Constants.DCR_CONFIG_FAPI_PROFILE)) {
+                        FapiProfile fapiProfile = FapiProfile.fromValue(dcrPatch.getValue());
+                        if (fapiProfile == null) {
+                            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                                    .ERROR_CODE_INVALID_INPUT, "Unsupported patch value for the given path");
+                        }
+                        dcrConfig.setFapiProfile(fapiProfile);
                     } else {
                         // Throw an error if any other patch operations are sent in the request.
                         throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage

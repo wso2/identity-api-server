@@ -90,6 +90,13 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         updatePARConfigurations(consumerAppDTO, oidcModel.getPushAuthorizationRequest());
         updateSubjectConfigurations(consumerAppDTO, oidcModel.getSubject());
         consumerAppDTO.setFapiConformanceEnabled(oidcModel.getIsFAPIApplication());
+        // Map the FAPI profile enum to its String representation for storage.
+        // A null value means the caller did not specify a profile; the default will
+        // be applied by validateFapiProfile() in ServerApplicationManagementService
+        // before this mapper is reached.
+        if (oidcModel.getFapiProfile() != null) {
+            consumerAppDTO.setFapiProfile(oidcModel.getFapiProfile().toString());
+        }
         updateSubjectTokenConfigurations(consumerAppDTO, oidcModel.getSubjectToken());
         updateCIBAAuthenticationRequestConfigurations(consumerAppDTO, oidcModel.getCibaAuthenticationRequest());
         updateIssuerDetails(consumerAppDTO, oidcModel.getIssuer());

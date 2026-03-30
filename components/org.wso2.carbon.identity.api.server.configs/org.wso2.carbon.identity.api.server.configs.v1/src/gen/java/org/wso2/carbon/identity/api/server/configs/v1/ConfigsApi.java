@@ -33,6 +33,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySetting
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Error;
+import org.wso2.carbon.identity.api.server.configs.v1.model.FapiConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.FraudDetectionConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationConfiguration;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
@@ -1023,5 +1024,53 @@ public class ConfigsApi  {
     public Response getCompatibilitySettingsByGroup(@ApiParam(value = "Setting group name (e.g., scim2, oauth)",required=true) @PathParam("setting-group") String settingGroup) {
 
         return delegate.getCompatibilitySettingsByGroup(settingGroup);
+    }
+
+    @Valid
+    @GET
+    @Path("/fapi")
+
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve the tenant FAPI configuration.", notes = "Retrieve the tenant Financial-grade API (FAPI) configuration.", response = FapiConfig.class, authorizations = {
+            @Authorization(value = "BasicAuth"),
+            @Authorization(value = "OAuth2", scopes = {
+
+            })
+    }, tags={ "FAPI Configurations", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful Response", response = FapiConfig.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+            @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getFAPIConfiguration() {
+
+        return delegate.getFAPIConfiguration();
+    }
+
+    @Valid
+    @PATCH
+    @Path("/fapi")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Patch the tenant FAPI configuration.", notes = "Patch the tenant Financial-grade API (FAPI) configuration. <b>Scope (Permission) required:</b> <br>   * internal_config_update ", response = FapiConfig.class, authorizations = {
+            @Authorization(value = "BasicAuth"),
+            @Authorization(value = "OAuth2", scopes = {
+
+            })
+    }, tags={ "FAPI Configurations", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful Response", response = FapiConfig.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+            @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response patchFAPIConfiguration(@ApiParam(value = "" ,required=true) @Valid FapiConfig fapiConfig) {
+
+        return delegate.patchFAPIConfiguration(fapiConfig );
     }
 }
