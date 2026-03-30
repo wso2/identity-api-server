@@ -116,7 +116,7 @@ public class DebugService {
 
         DebugRequestCoordinator coordinator = getCoordinatorOrThrow();
         DebugResponse response = executeWithServerErrorHandling(
-                () -> coordinator.handleResourceDebugRequest(debugRequest),
+                () -> coordinator.handleDebugRequest(debugRequest),
                 "Error processing start debug session request.",
                 "Error occurred while processing debug request.");
 
