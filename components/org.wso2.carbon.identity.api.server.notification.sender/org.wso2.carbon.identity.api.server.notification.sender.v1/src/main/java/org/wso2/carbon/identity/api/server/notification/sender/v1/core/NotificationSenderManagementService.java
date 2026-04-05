@@ -33,6 +33,7 @@ import org.wso2.carbon.identity.api.server.notification.sender.v1.model.PushSend
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.SMSSender;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.SMSSenderAdd;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.SMSSenderUpdateRequest;
+import org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants;
 import org.wso2.carbon.identity.notification.sender.tenant.config.dto.EmailSenderDTO;
 import org.wso2.carbon.identity.notification.sender.tenant.config.dto.PushSenderDTO;
 import org.wso2.carbon.identity.notification.sender.tenant.config.dto.SMSSenderDTO;
@@ -60,7 +61,7 @@ public class NotificationSenderManagementService {
 
     public NotificationSenderManagementService(
             org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementService
-                                                       notificationSenderManagementService) {
+                    notificationSenderManagementService) {
 
         this.notificationSenderManagementService = notificationSenderManagementService;
     }
@@ -127,7 +128,7 @@ public class NotificationSenderManagementService {
         try {
             notificationSenderManagementService.deleteNotificationSender(notificationSenderName);
         } catch (NotificationSenderManagementException e) {
-                throw handleException(e);
+            throw handleException(e);
         }
     }
 
@@ -265,7 +266,7 @@ public class NotificationSenderManagementService {
     /**
      * Update push sender details by name.
      *
-     * @param senderName               Push sender's name.
+     * @param senderName              Push sender's name.
      * @param pushSenderUpdateRequest Push sender's updated configurations.
      * @return Updated push sender.
      */
@@ -338,6 +339,10 @@ public class NotificationSenderManagementService {
         emailSender.setSmtpServerHost(dto.getSmtpServerHost());
         List<Properties> properties = new ArrayList<>();
         dto.getProperties().forEach((key, value) -> {
+            if (NotificationSenderManagementConstants.CLIENT_SECRET.equalsIgnoreCase(key)) {
+                log.debug("Skipping client secret property from email sender configuration");
+                return;
+            }
             Properties prop = new Properties();
             prop.setKey(key);
             prop.setValue(value);
