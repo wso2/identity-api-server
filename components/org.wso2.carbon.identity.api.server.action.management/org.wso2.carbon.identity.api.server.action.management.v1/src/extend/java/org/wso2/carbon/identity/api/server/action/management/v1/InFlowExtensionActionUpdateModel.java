@@ -33,6 +33,7 @@ public class InFlowExtensionActionUpdateModel extends ActionUpdateModel {
 
     private AccessConfigModel accessConfig;
     private EncryptionModel encryption;
+    private String iconUrl;
 
     public InFlowExtensionActionUpdateModel() {
         // Default constructor required for Jackson
@@ -84,6 +85,24 @@ public class InFlowExtensionActionUpdateModel extends ActionUpdateModel {
         this.encryption = encryption;
     }
 
+    public InFlowExtensionActionUpdateModel iconUrl(String iconUrl) {
+
+        this.iconUrl = iconUrl;
+        return this;
+    }
+
+    @ApiModelProperty()
+    @JsonProperty("iconUrl")
+    public String getIconUrl() {
+
+        return iconUrl;
+    }
+
+    public void setIconUrl(String iconUrl) {
+
+        this.iconUrl = iconUrl;
+    }
+
     @Override
     public boolean equals(java.lang.Object o) {
 
@@ -99,13 +118,14 @@ public class InFlowExtensionActionUpdateModel extends ActionUpdateModel {
                 Objects.equals(this.getEndpoint(), that.getEndpoint()) &&
                 Objects.equals(this.accessConfig, that.accessConfig) &&
                 Objects.equals(this.encryption, that.encryption) &&
+                Objects.equals(this.iconUrl, that.iconUrl) &&
                 Objects.equals(this.getRule(), that.getRule());
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(getName(), getDescription(), getEndpoint(), accessConfig, encryption, getRule());
+        return Objects.hash(getName(), getDescription(), getEndpoint(), accessConfig, encryption, iconUrl, getRule());
     }
 
     @Override
@@ -118,6 +138,7 @@ public class InFlowExtensionActionUpdateModel extends ActionUpdateModel {
         sb.append("    endpoint: ").append(toIndentedString(getEndpoint())).append("\n");
         sb.append("    accessConfig: ").append(toIndentedString(accessConfig)).append("\n");
         sb.append("    encryption: ").append(toIndentedString(encryption)).append("\n");
+        sb.append("    iconUrl: ").append(toIndentedString(iconUrl)).append("\n");
         sb.append("    rule: ").append(toIndentedString(getRule())).append("\n");
         sb.append("}");
         return sb.toString();

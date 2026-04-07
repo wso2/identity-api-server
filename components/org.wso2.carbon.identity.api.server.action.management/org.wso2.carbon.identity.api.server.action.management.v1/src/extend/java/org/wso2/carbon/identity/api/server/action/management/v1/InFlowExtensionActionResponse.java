@@ -33,6 +33,7 @@ public class InFlowExtensionActionResponse extends ActionResponse {
 
     private AccessConfigModel accessConfig;
     private EncryptionModel encryption;
+    private String iconUrl;
 
     public InFlowExtensionActionResponse(ActionResponse actionResponse) {
 
@@ -86,6 +87,24 @@ public class InFlowExtensionActionResponse extends ActionResponse {
         this.encryption = encryption;
     }
 
+    public InFlowExtensionActionResponse iconUrl(String iconUrl) {
+
+        this.iconUrl = iconUrl;
+        return this;
+    }
+
+    @ApiModelProperty()
+    @JsonProperty("iconUrl")
+    public String getIconUrl() {
+
+        return iconUrl;
+    }
+
+    public void setIconUrl(String iconUrl) {
+
+        this.iconUrl = iconUrl;
+    }
+
     @Override
     public boolean equals(java.lang.Object o) {
 
@@ -104,6 +123,7 @@ public class InFlowExtensionActionResponse extends ActionResponse {
                 Objects.equals(this.getEndpoint(), that.getEndpoint()) &&
                 Objects.equals(this.accessConfig, that.accessConfig) &&
                 Objects.equals(this.encryption, that.encryption) &&
+                Objects.equals(this.iconUrl, that.iconUrl) &&
                 Objects.equals(this.getRule(), that.getRule());
     }
 
@@ -111,7 +131,7 @@ public class InFlowExtensionActionResponse extends ActionResponse {
     public int hashCode() {
 
         return Objects.hash(getId(), getType(), getName(), getDescription(), getStatus(), getEndpoint(),
-                accessConfig, encryption, getRule());
+                accessConfig, encryption, iconUrl, getRule());
     }
 
     @Override
@@ -127,6 +147,7 @@ public class InFlowExtensionActionResponse extends ActionResponse {
         sb.append("    endpoint: ").append(toIndentedString(getEndpoint())).append("\n");
         sb.append("    accessConfig: ").append(toIndentedString(accessConfig)).append("\n");
         sb.append("    encryption: ").append(toIndentedString(encryption)).append("\n");
+        sb.append("    iconUrl: ").append(toIndentedString(iconUrl)).append("\n");
         sb.append("    rule: ").append(toIndentedString(getRule())).append("\n");
         sb.append("}");
         return sb.toString();

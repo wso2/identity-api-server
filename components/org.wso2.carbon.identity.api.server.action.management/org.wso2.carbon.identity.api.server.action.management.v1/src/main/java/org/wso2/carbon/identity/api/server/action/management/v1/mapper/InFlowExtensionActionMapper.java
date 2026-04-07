@@ -67,6 +67,7 @@ public class InFlowExtensionActionMapper implements ActionMapper {
         return new InFlowExtensionAction.RequestBuilder(basicAction)
                 .accessConfig(accessConfig)
                 .encryption(encryption)
+                .iconUrl(extModel.getIconUrl())
                 .build();
     }
 
@@ -86,6 +87,7 @@ public class InFlowExtensionActionMapper implements ActionMapper {
         return new InFlowExtensionAction.RequestBuilder(basicUpdatingAction)
                 .accessConfig(accessConfig)
                 .encryption(encryption)
+                .iconUrl(extUpdateModel.getIconUrl())
                 .build();
     }
 
@@ -106,6 +108,9 @@ public class InFlowExtensionActionMapper implements ActionMapper {
                 .accessConfig(configModel);
         if (encryptionModel != null) {
             response.encryption(encryptionModel);
+        }
+        if (extAction.getIconUrl() != null) {
+            response.iconUrl(extAction.getIconUrl());
         }
         return response;
     }

@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.action.management.v1.core;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.CarbonContext;
@@ -169,12 +170,18 @@ public class ServerActionManagementService {
         }
     }
 
-    public ActionNameCheckResponse checkActionName(String actionType, String name) {
+    public ActionNameCheckResponse checkActionName(String actionType, String name, String excludeId) {
 
         try {
             validateActionType(actionType);
             String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-            boolean available = actionManagementService.isActionNameAvailable(actionType, name, tenantDomain);
+            boolean available;
+            if (StringUtils.isNotBlank(excludeId)) {
+                available = actionManagementService.isActionNameAvailable(
+                        actionType, name, excludeId, tenantDomain);
+            } else {
+                available = actionManagementService.isActionNameAvailable(actionType, name, tenantDomain);
+            }
             return new ActionNameCheckResponse().available(available);
         } catch (ActionMgtException e) {
             throw ActionMgtEndpointUtil.handleActionMgtException(e);

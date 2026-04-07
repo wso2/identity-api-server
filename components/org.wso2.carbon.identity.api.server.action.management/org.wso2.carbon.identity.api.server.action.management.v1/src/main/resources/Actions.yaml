@@ -2324,6 +2324,9 @@ components:
           maxLength: 255
           description: The action name to check for availability.
           example: Risk Assessment Extension
+        excludeId:
+          type: string
+          description: Action ID to exclude from the uniqueness check (used during update).
 
     ActionNameCheckResponse:
       type: object

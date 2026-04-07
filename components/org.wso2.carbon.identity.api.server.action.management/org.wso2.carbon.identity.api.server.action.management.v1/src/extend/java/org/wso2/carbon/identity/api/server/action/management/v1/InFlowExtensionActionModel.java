@@ -33,6 +33,7 @@ public class InFlowExtensionActionModel extends ActionModel {
 
     private AccessConfigModel accessConfig;
     private EncryptionModel encryption;
+    private String iconUrl;
 
     public InFlowExtensionActionModel() {
         // Default constructor required for Jackson
@@ -84,6 +85,24 @@ public class InFlowExtensionActionModel extends ActionModel {
         this.encryption = encryption;
     }
 
+    public InFlowExtensionActionModel iconUrl(String iconUrl) {
+
+        this.iconUrl = iconUrl;
+        return this;
+    }
+
+    @ApiModelProperty()
+    @JsonProperty("iconUrl")
+    public String getIconUrl() {
+
+        return iconUrl;
+    }
+
+    public void setIconUrl(String iconUrl) {
+
+        this.iconUrl = iconUrl;
+    }
+
     @Override
     public boolean equals(java.lang.Object o) {
 
@@ -99,13 +118,14 @@ public class InFlowExtensionActionModel extends ActionModel {
                 Objects.equals(this.getEndpoint(), actionModel.getEndpoint()) &&
                 Objects.equals(this.accessConfig, actionModel.accessConfig) &&
                 Objects.equals(this.encryption, actionModel.encryption) &&
+                Objects.equals(this.iconUrl, actionModel.iconUrl) &&
                 Objects.equals(this.getRule(), actionModel.getRule());
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(getName(), getDescription(), getEndpoint(), accessConfig, encryption, getRule());
+        return Objects.hash(getName(), getDescription(), getEndpoint(), accessConfig, encryption, iconUrl, getRule());
     }
 
     @Override
@@ -118,6 +138,7 @@ public class InFlowExtensionActionModel extends ActionModel {
         sb.append("    endpoint: ").append(toIndentedString(getEndpoint())).append("\n");
         sb.append("    accessConfig: ").append(toIndentedString(accessConfig)).append("\n");
         sb.append("    encryption: ").append(toIndentedString(encryption)).append("\n");
+        sb.append("    iconUrl: ").append(toIndentedString(iconUrl)).append("\n");
         sb.append("    rule: ").append(toIndentedString(getRule())).append("\n");
         sb.append("}");
         return sb.toString();

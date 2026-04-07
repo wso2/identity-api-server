@@ -58,7 +58,7 @@ public class ActionsApiServiceImpl implements ActionsApiService {
     public Response checkActionName(String actionType, ActionNameCheckRequest actionNameCheckRequest) {
 
         return Response.ok().entity(serverActionManagementService.checkActionName(actionType,
-                actionNameCheckRequest.getName())).build();
+                actionNameCheckRequest.getName(), actionNameCheckRequest.getExcludeId())).build();
     }
 
     @Override

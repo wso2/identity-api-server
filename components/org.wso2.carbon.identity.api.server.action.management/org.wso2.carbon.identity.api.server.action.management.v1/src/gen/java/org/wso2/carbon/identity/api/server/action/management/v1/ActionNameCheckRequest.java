@@ -28,6 +28,7 @@ import javax.validation.Valid;
 public class ActionNameCheckRequest  {
 
     private String name;
+    private String excludeId;
 
     /**
     **/
@@ -49,6 +50,24 @@ public class ActionNameCheckRequest  {
         this.name = name;
     }
 
+    /**
+    **/
+    public ActionNameCheckRequest excludeId(String excludeId) {
+
+        this.excludeId = excludeId;
+        return this;
+    }
+
+    @ApiModelProperty(value = "Action ID to exclude from the uniqueness check (used during update).")
+    @JsonProperty("excludeId")
+    @Valid
+    public String getExcludeId() {
+        return excludeId;
+    }
+    public void setExcludeId(String excludeId) {
+        this.excludeId = excludeId;
+    }
+
     @Override
     public boolean equals(java.lang.Object o) {
 
@@ -59,12 +78,13 @@ public class ActionNameCheckRequest  {
             return false;
         }
         ActionNameCheckRequest actionNameCheckRequest = (ActionNameCheckRequest) o;
-        return Objects.equals(this.name, actionNameCheckRequest.name);
+        return Objects.equals(this.name, actionNameCheckRequest.name) &&
+                Objects.equals(this.excludeId, actionNameCheckRequest.excludeId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return Objects.hash(name, excludeId);
     }
 
     @Override
@@ -73,6 +93,7 @@ public class ActionNameCheckRequest  {
         StringBuilder sb = new StringBuilder();
         sb.append("class ActionNameCheckRequest {\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    excludeId: ").append(toIndentedString(excludeId)).append("\n");
         sb.append("}");
         return sb.toString();
     }
