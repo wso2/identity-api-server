@@ -1062,8 +1062,10 @@ components:
         - DELETE_ROLE
         - UPDATE_ROLE_NAME
         - UPDATE_USERS_OF_ROLES
+        - UPDATE_GROUPS_OF_USERS
         - DELETE_USER_CLAIMS
         - UPDATE_USER_CLAIMS
+        - SET_MULTIPLE_USER_CLAIMS
       description: "Name of the user operation"
 
     Error:
