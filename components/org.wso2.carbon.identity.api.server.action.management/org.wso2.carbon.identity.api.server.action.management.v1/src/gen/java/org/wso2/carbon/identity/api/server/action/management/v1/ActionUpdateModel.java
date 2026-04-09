@@ -39,6 +39,7 @@ public class ActionUpdateModel  {
     private String version;
     private EndpointUpdateModel endpoint;
     private ORRule rule;
+    private java.util.List<String> attributes;
 
     /**
     * Updating name of the action.
@@ -133,7 +134,24 @@ public class ActionUpdateModel  {
         this.rule = rule;
     }
 
+    /**
+     * Attributes required for the action.
+     **/
+    public ActionUpdateModel attributes(java.util.List<String> attributes) {
+        this.attributes = attributes;
+        return this;
+    }
 
+    @ApiModelProperty(value = "Attributes required for the action.")
+    @JsonProperty("attributes")
+    @Valid
+    public java.util.List<String> getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(java.util.List<String> attributes) {
+        this.attributes = attributes;
+    }
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -146,15 +164,16 @@ public class ActionUpdateModel  {
         }
         ActionUpdateModel actionUpdateModel = (ActionUpdateModel) o;
         return Objects.equals(this.name, actionUpdateModel.name) &&
-            Objects.equals(this.description, actionUpdateModel.description) &&
-            Objects.equals(this.version, actionUpdateModel.version) &&
-            Objects.equals(this.endpoint, actionUpdateModel.endpoint) &&
-            Objects.equals(this.rule, actionUpdateModel.rule);
+                Objects.equals(this.description, actionUpdateModel.description) &&
+                Objects.equals(this.version, actionUpdateModel.version) &&
+                Objects.equals(this.endpoint, actionUpdateModel.endpoint) &&
+                Objects.equals(this.attributes, actionUpdateModel.attributes) &&
+                Objects.equals(this.rule, actionUpdateModel.rule);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, version, endpoint, rule);
+        return Objects.hash(name, description, version, endpoint, attributes, rule);
     }
 
     @Override
@@ -167,6 +186,7 @@ public class ActionUpdateModel  {
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    version: ").append(toIndentedString(version)).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
+        sb.append("    attributes: ").append(toIndentedString(attributes)).append("\n");
         sb.append("    rule: ").append(toIndentedString(rule)).append("\n");
         sb.append("}");
         return sb.toString();
