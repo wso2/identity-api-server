@@ -50,6 +50,7 @@ import javax.ws.rs.core.Response;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_INVALID_ACTION_TYPE;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_NOT_ALLOWED_ACTION_TYPE_IN_ORG_LEVEL;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_NOT_IMPLEMENTED_ACTION_TYPE;
+import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_NOT_IMPLEMENTED_ATTRIBUTES;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_NO_ACTION_FOUND_ON_GIVEN_ACTION_TYPE_AND_ID;
 
 /**
@@ -61,6 +62,7 @@ public class ServerActionManagementService {
     private static final Log LOG = LogFactory.getLog(ServerActionManagementService.class);
     private static final Set<String> NOT_IMPLEMENTED_ACTION_TYPES = new HashSet<>();
     private static final Set<String> NOT_ALLOWED_ACTION_TYPES_IN_ORG_LEVEL = new HashSet<>();
+    private static final Set<String> ATTRIBUTES_NOT_IMPLEMENTED_ACTION_TYPES = new HashSet<>();
 
     public ServerActionManagementService(ActionManagementService actionManagementService) {
 
@@ -73,6 +75,9 @@ public class ServerActionManagementService {
 
         NOT_ALLOWED_ACTION_TYPES_IN_ORG_LEVEL.add(Action.ActionTypes.PRE_ISSUE_ACCESS_TOKEN.getPathParam());
         NOT_ALLOWED_ACTION_TYPES_IN_ORG_LEVEL.add(Action.ActionTypes.PRE_ISSUE_ID_TOKEN.getPathParam());
+
+        ATTRIBUTES_NOT_IMPLEMENTED_ACTION_TYPES.add(Action.ActionTypes.PRE_ISSUE_ACCESS_TOKEN.getActionType());
+        ATTRIBUTES_NOT_IMPLEMENTED_ACTION_TYPES.add(Action.ActionTypes.PRE_ISSUE_ID_TOKEN.getActionType());
     }
 
     public ActionResponse createAction(String actionType, String jsonBody) {
@@ -80,6 +85,7 @@ public class ServerActionManagementService {
         try {
             Action.ActionTypes validatedActionType = validateActionType(actionType);
             Action action = buildAction(validatedActionType, jsonBody);
+            validateAttributes(validatedActionType, action.getAttributes());
             String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             return buildActionResponse(actionManagementService.addAction(actionType, action, tenantDomain));
         } catch (ActionMgtException e) {
@@ -125,6 +131,7 @@ public class ServerActionManagementService {
         try {
             Action.ActionTypes validatedActionType = validateActionType(actionType);
             Action updatingAction = buildUpdatingAction(validatedActionType, jsonBody);
+            validateAttributes(validatedActionType, updatingAction.getAttributes());
             String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             return buildActionResponse(actionManagementService.updateAction(actionType, actionId, updatingAction, 
                     tenantDomain));
@@ -269,6 +276,15 @@ public class ServerActionManagementService {
         }
 
         return actionTypeEnum;
+    }
+
+    private void validateAttributes(Action.ActionTypes actionType, List<String> attributes) {
+
+        if (attributes != null && !attributes.isEmpty() &&
+                ATTRIBUTES_NOT_IMPLEMENTED_ACTION_TYPES.contains(actionType.getActionType())) {
+            throw ActionMgtEndpointUtil.handleException(Response.Status.NOT_IMPLEMENTED,
+                    ERROR_NOT_IMPLEMENTED_ATTRIBUTES, actionType.getActionType());
+        }
     }
 
     private Action.ActionTypes getActionTypeFromPath(String actionType) {

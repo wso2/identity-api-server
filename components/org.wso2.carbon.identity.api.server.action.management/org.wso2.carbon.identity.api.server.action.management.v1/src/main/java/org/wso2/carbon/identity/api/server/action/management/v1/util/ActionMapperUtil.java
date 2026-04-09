@@ -80,6 +80,7 @@ public class ActionMapperUtil {
                         .allowedParameters(actionModel.getEndpoint().getAllowedParameters())
                         .build())
                 .rule(actionRule)
+                .attributes(actionModel.getAttributes())
                 .build();
     }
 
@@ -123,6 +124,7 @@ public class ActionMapperUtil {
                 .actionVersion(actionUpdateModel.getVersion())
                 .endpoint(endpointConfig)
                 .rule(actionRule)
+                .attributes(actionUpdateModel.getAttributes())
                 .build();
     }
 
@@ -152,7 +154,8 @@ public class ActionMapperUtil {
                         .allowedHeaders(action.getEndpoint().getAllowedHeaders())
                         .allowedParameters(action.getEndpoint().getAllowedParameters()))
                 .rule((action.getActionRule() != null) ? RuleMapper.toORRuleResponse(action.getActionRule()) :
-                        null);
+                        null)
+                .attributes(action.getAttributes());
     }
 
     /**
@@ -201,7 +204,7 @@ public class ActionMapperUtil {
      * @return Authentication object.
      */
     private static Authentication buildAuthentication(Authentication.Type authType,
-                                                     Map<String, Object> authPropertiesMap)
+                                                      Map<String, Object> authPropertiesMap)
             throws ActionMgtClientException {
 
         switch (authType) {
