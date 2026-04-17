@@ -21,6 +21,7 @@ package org.wso2.carbon.identity.api.server.action.management.v1;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.util.Map;
 import java.util.Objects;
 
 import javax.validation.Valid;
@@ -34,6 +35,7 @@ public class InFlowExtensionActionResponse extends ActionResponse {
     private AccessConfigModel accessConfig;
     private EncryptionModel encryption;
     private String iconUrl;
+    private Map<String, AccessConfigModel> flowTypeOverrides;
 
     public InFlowExtensionActionResponse(ActionResponse actionResponse) {
 
@@ -105,6 +107,25 @@ public class InFlowExtensionActionResponse extends ActionResponse {
         this.iconUrl = iconUrl;
     }
 
+    public InFlowExtensionActionResponse flowTypeOverrides(Map<String, AccessConfigModel> flowTypeOverrides) {
+
+        this.flowTypeOverrides = flowTypeOverrides;
+        return this;
+    }
+
+    @ApiModelProperty()
+    @JsonProperty("flowTypeOverrides")
+    @Valid
+    public Map<String, AccessConfigModel> getFlowTypeOverrides() {
+
+        return flowTypeOverrides;
+    }
+
+    public void setFlowTypeOverrides(Map<String, AccessConfigModel> flowTypeOverrides) {
+
+        this.flowTypeOverrides = flowTypeOverrides;
+    }
+
     @Override
     public boolean equals(java.lang.Object o) {
 
@@ -124,6 +145,7 @@ public class InFlowExtensionActionResponse extends ActionResponse {
                 Objects.equals(this.accessConfig, that.accessConfig) &&
                 Objects.equals(this.encryption, that.encryption) &&
                 Objects.equals(this.iconUrl, that.iconUrl) &&
+                Objects.equals(this.flowTypeOverrides, that.flowTypeOverrides) &&
                 Objects.equals(this.getRule(), that.getRule());
     }
 
@@ -131,7 +153,7 @@ public class InFlowExtensionActionResponse extends ActionResponse {
     public int hashCode() {
 
         return Objects.hash(getId(), getType(), getName(), getDescription(), getStatus(), getEndpoint(),
-                accessConfig, encryption, iconUrl, getRule());
+                accessConfig, encryption, iconUrl, flowTypeOverrides, getRule());
     }
 
     @Override
@@ -148,6 +170,7 @@ public class InFlowExtensionActionResponse extends ActionResponse {
         sb.append("    accessConfig: ").append(toIndentedString(accessConfig)).append("\n");
         sb.append("    encryption: ").append(toIndentedString(encryption)).append("\n");
         sb.append("    iconUrl: ").append(toIndentedString(iconUrl)).append("\n");
+        sb.append("    flowTypeOverrides: ").append(toIndentedString(flowTypeOverrides)).append("\n");
         sb.append("    rule: ").append(toIndentedString(getRule())).append("\n");
         sb.append("}");
         return sb.toString();

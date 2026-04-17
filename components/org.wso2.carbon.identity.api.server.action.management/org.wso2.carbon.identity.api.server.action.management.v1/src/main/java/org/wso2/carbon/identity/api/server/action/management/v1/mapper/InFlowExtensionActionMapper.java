@@ -21,6 +21,7 @@ package org.wso2.carbon.identity.api.server.action.management.v1.mapper;
 import org.wso2.carbon.identity.action.management.api.exception.ActionMgtException;
 import org.wso2.carbon.identity.action.management.api.model.Action;
 import org.wso2.carbon.identity.api.server.action.management.v1.AccessConfigModel;
+import org.wso2.carbon.identity.api.server.action.management.v1.ActionBasicResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
@@ -28,6 +29,7 @@ import org.wso2.carbon.identity.api.server.action.management.v1.EncryptionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.InFlowExtensionActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.InFlowExtensionActionResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.InFlowExtensionActionUpdateModel;
+import org.wso2.carbon.identity.api.server.action.management.v1.InFlowExtensionBasicResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.util.ActionMapperUtil;
 import org.wso2.carbon.identity.certificate.management.model.Certificate;
 import org.wso2.carbon.identity.flow.execution.engine.inflow.extension.model.AccessConfig;
@@ -84,11 +86,37 @@ public class InFlowExtensionActionMapper implements ActionMapper {
         AccessConfig accessConfig = toAccessConfig(extUpdateModel.getAccessConfig());
         Encryption encryption = toEncryption(extUpdateModel.getEncryption());
 
+        Map<String, AccessConfig> flowTypeOverrides = null;
+        if (extUpdateModel.getFlowTypeOverrides() != null) {
+            flowTypeOverrides = new HashMap<>();
+            for (Map.Entry<String, AccessConfigModel> entry : extUpdateModel.getFlowTypeOverrides().entrySet()) {
+                flowTypeOverrides.put(entry.getKey(), toAccessConfig(entry.getValue()));
+            }
+        }
+
         return new InFlowExtensionAction.RequestBuilder(basicUpdatingAction)
                 .accessConfig(accessConfig)
                 .encryption(encryption)
                 .iconUrl(extUpdateModel.getIconUrl())
+                .flowTypeOverrides(flowTypeOverrides)
                 .build();
+    }
+
+    @Override
+    public ActionBasicResponse toActionBasicResponse(Action action) throws ActionMgtException {
+
+        ActionBasicResponse basicResponse = ActionMapperUtil.buildActionBasicResponse(action);
+
+        if (!(action instanceof InFlowExtensionAction)) {
+            return basicResponse;
+        }
+
+        InFlowExtensionAction extAction = (InFlowExtensionAction) action;
+        if (extAction.getIconUrl() != null) {
+            return new InFlowExtensionBasicResponse(basicResponse)
+                    .iconUrl(extAction.getIconUrl());
+        }
+        return basicResponse;
     }
 
     @Override
@@ -111,6 +139,13 @@ public class InFlowExtensionActionMapper implements ActionMapper {
         }
         if (extAction.getIconUrl() != null) {
             response.iconUrl(extAction.getIconUrl());
+        }
+        if (extAction.getFlowTypeOverrides() != null && !extAction.getFlowTypeOverrides().isEmpty()) {
+            Map<String, AccessConfigModel> overridesModel = new HashMap<>();
+            for (Map.Entry<String, AccessConfig> entry : extAction.getFlowTypeOverrides().entrySet()) {
+                overridesModel.put(entry.getKey(), toAccessConfigModel(entry.getValue()));
+            }
+            response.flowTypeOverrides(overridesModel);
         }
         return response;
     }
@@ -165,9 +200,13 @@ public class InFlowExtensionActionMapper implements ActionMapper {
 
     private Encryption toEncryption(EncryptionModel encryptionModel) {
 
-        if (encryptionModel == null || encryptionModel.getCertificate() == null
-                || encryptionModel.getCertificate().isEmpty()) {
+        if (encryptionModel == null || encryptionModel.getCertificate() == null) {
             return null;
+        }
+
+        // Empty certificate string signals explicit removal of the existing certificate.
+        if (encryptionModel.getCertificate().isEmpty()) {
+            return new Encryption(null);
         }
 
         Certificate certificate = new Certificate.Builder()
