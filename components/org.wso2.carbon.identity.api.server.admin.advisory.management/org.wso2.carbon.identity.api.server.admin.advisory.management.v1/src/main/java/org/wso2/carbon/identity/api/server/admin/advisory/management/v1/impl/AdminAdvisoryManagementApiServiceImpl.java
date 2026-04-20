@@ -18,9 +18,12 @@
 
 package org.wso2.carbon.identity.api.server.admin.advisory.management.v1.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.admin.advisory.management.v1.AdminAdvisoryManagementApiService;
 import org.wso2.carbon.identity.api.server.admin.advisory.management.v1.core.ServerAdminAdvisoryManagementService;
-import org.wso2.carbon.identity.api.server.admin.advisory.management.v1.factories.ServerAdminAdvisoryManagementServiceFactory;
+import org.wso2.carbon.identity.api.server.admin.advisory.management.v1.factories
+        .ServerAdminAdvisoryManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.admin.advisory.management.v1.model.AdminAdvisoryConfig;
 
 import javax.ws.rs.core.Response;
@@ -30,14 +33,18 @@ import javax.ws.rs.core.Response;
  **/
 public class AdminAdvisoryManagementApiServiceImpl implements AdminAdvisoryManagementApiService {
 
+    private static final Log LOG = LogFactory.getLog(AdminAdvisoryManagementApiServiceImpl.class);
     private final ServerAdminAdvisoryManagementService adminAdvisoryManagementService;
 
     public AdminAdvisoryManagementApiServiceImpl() {
 
         try {
+            LOG.debug("Initializing AdminAdvisoryManagementApiServiceImpl.");
             this.adminAdvisoryManagementService = ServerAdminAdvisoryManagementServiceFactory
                     .getServerAdminAdvisoryManagementService();
+            LOG.debug("AdminAdvisoryManagementApiServiceImpl initialized successfully.");
         } catch (Exception e) {
+            LOG.error("Error occurred while initiating admin advisory management service.", e);
             throw new RuntimeException("Error occurred while initiating admin advisory management service.", e);
         }
     }
@@ -50,6 +57,7 @@ public class AdminAdvisoryManagementApiServiceImpl implements AdminAdvisoryManag
     @Override
     public Response getAdminAdvisoryConfig() {
 
+        LOG.debug("Retrieving admin advisory banner configuration.");
         return Response.ok().entity(adminAdvisoryManagementService.getAdminAdvisoryConfig()).build();
     }
 
@@ -63,7 +71,9 @@ public class AdminAdvisoryManagementApiServiceImpl implements AdminAdvisoryManag
     @Override
     public Response updateAdminAdvisoryConfig(AdminAdvisoryConfig adminAdvisoryConfig) {
 
+        LOG.debug("Updating admin advisory banner configuration.");
         adminAdvisoryManagementService.saveAdminAdvisoryConfig(adminAdvisoryConfig);
+        LOG.debug("Admin advisory banner configuration updated successfully.");
         return Response.ok().build();
     }
 }

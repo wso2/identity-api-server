@@ -39,9 +39,21 @@ public class ContextLoader {
     public static String getTenantDomainFromContext() {
 
         String tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
-        if (IdentityUtil.threadLocalProperties.get().get(IdentityCoreConstants.TENANT_NAME_FROM_CONTEXT) != null) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving tenant domain from carbon context. Default tenant domain: " + tenantDomain);
+        }
+        
+        if (IdentityUtil.threadLocalProperties.get() != null && 
+            IdentityUtil.threadLocalProperties.get().get(IdentityCoreConstants.TENANT_NAME_FROM_CONTEXT) != null) {
             tenantDomain = (String) IdentityUtil.threadLocalProperties.get()
                     .get(IdentityCoreConstants.TENANT_NAME_FROM_CONTEXT);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Retrieved tenant domain from context: " + tenantDomain);
+            }
+        } else {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("No tenant domain found in context. Using default tenant domain: " + tenantDomain);
+            }
         }
         return tenantDomain;
     }
