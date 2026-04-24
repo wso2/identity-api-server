@@ -142,6 +142,9 @@ import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceCli
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceException;
 import org.wso2.carbon.identity.cors.mgt.core.model.CORSOrigin;
 import org.wso2.carbon.identity.oauth.dao.OAuthAppDO;
+import org.wso2.carbon.identity.oauth2.fapi.exceptions.FapiConfigMgtException;
+import org.wso2.carbon.identity.oauth2.fapi.models.FapiProfileEnum;
+import org.wso2.carbon.identity.oauth2.fapi.services.FapiConfigMgtService;
 import org.wso2.carbon.identity.role.v2.mgt.core.RoleConstants;
 import org.wso2.carbon.identity.sso.saml.dto.SAMLSSOServiceProviderDTO;
 import org.wso2.carbon.identity.template.mgt.TemplateManager;
@@ -188,6 +191,7 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_PROCESSING_REQUEST;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.FORBIDDEN_OPERATION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.UNSUPPORTED_FAPI_PROFILE;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.USE_EXTERNAL_CONSENT_PAGE_NOT_SUPPORTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ISSUER;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.NAME;
@@ -813,7 +817,10 @@ public class ServerApplicationManagementService {
          */
         if (applicationModel.getInboundProtocolConfiguration() != null &&
                 applicationModel.getInboundProtocolConfiguration().getOidc() != null) {
-            validateCORSOrigins(applicationModel.getInboundProtocolConfiguration().getOidc().getAllowedOrigins());
+            OpenIDConnectConfiguration oidcConfig =
+                    applicationModel.getInboundProtocolConfiguration().getOidc();
+            validateCORSOrigins(oidcConfig.getAllowedOrigins());
+            validateFapiProfile(oidcConfig);
         }
 
         /*
@@ -1220,6 +1227,7 @@ public class ServerApplicationManagementService {
          * But for now we are handling the validation here.
          */
         validateCORSOrigins(oidcConfigModel.getAllowedOrigins());
+        validateFapiProfile(oidcConfigModel);
         putApplicationInbound(applicationId, oidcConfigModel, OAuthInboundFunctions::getInboundProtocolConfig);
     }
 
@@ -2201,6 +2209,56 @@ public class ServerApplicationManagementService {
             return String.format(description, formatData);
         } else {
             return description;
+        }
+    }
+
+    /**
+     * Validates the FAPI profile in the given OIDC configuration.
+     *
+     * <p>Validation: checks the resolved profile against the organisation's allowed list from
+     * {@link FapiConfigMgtService}. Throws a 400 error if the profile is not supported.
+     * No-ops when {@code oidcConfig} is null, FAPI is disabled, or {@link FapiConfigMgtService}
+     * is unavailable (treated as optional OSGi service).
+     *
+     * @param oidcConfig the OIDC configuration from the incoming request; may be null.
+     */
+    private void validateFapiProfile(OpenIDConnectConfiguration oidcConfig) {
+
+        // Validate — only needed when a profile is present.
+        if (oidcConfig.getFapiProfile() == null) {
+            return;
+        }
+
+        FapiConfigMgtService fapiConfigMgtService = ApplicationManagementServiceHolder.getFapiConfigMgtService();
+        if (fapiConfigMgtService == null) {
+            // FapiConfigMgtService is optional. Skip validation rather than blocking all OIDC updates.
+            log.debug("FapiConfigMgtService is unavailable. Skipping fapiProfile validation.");
+            return;
+        }
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            List<FapiProfileEnum> supportedProfiles =
+                    fapiConfigMgtService.getFapiConfig(tenantDomain).getSupportedProfiles();
+            String requestedProfileValue = oidcConfig.getFapiProfile().toString();
+
+            boolean isSupported = supportedProfiles.stream()
+                    .anyMatch(p -> p.value().equals(requestedProfileValue));
+
+            if (!isSupported) {
+                String supportedProfilesStr = supportedProfiles.stream()
+                        .map(FapiProfileEnum::value)
+                        .collect(Collectors.joining(", "));
+                if (log.isDebugEnabled()) {
+                    log.debug(String.format("Rejected fapiProfile '%s' for tenant '%s'. Supported: [%s]",
+                            requestedProfileValue, tenantDomain, supportedProfilesStr));
+                }
+                throw buildClientError(UNSUPPORTED_FAPI_PROFILE, requestedProfileValue, supportedProfilesStr);
+            }
+        } catch (FapiConfigMgtException e) {
+            throw Utils.buildServerError(
+                    String.format("Error while retrieving FAPI configuration for tenant '%s' during fapiProfile " +
+                            "validation.", tenantDomain), e);
         }
     }
 

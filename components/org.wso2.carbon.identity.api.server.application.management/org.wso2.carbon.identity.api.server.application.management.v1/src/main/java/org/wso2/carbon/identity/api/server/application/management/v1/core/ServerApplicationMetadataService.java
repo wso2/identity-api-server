@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.application.management.v1.core;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,6 +42,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaDat
 import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
+import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.application.mgt.AbstractInboundAuthenticatorConfig;
@@ -55,6 +57,10 @@ import org.wso2.carbon.identity.oauth.dto.TokenBindingMetaDataDTO;
 import org.wso2.carbon.identity.oauth2.config.exceptions.OAuth2OIDCConfigOrgUsageScopeMgtException;
 import org.wso2.carbon.identity.oauth2.config.models.IssuerDetails;
 import org.wso2.carbon.identity.oauth2.config.services.OAuth2OIDCConfigOrgUsageScopeMgtService;
+import org.wso2.carbon.identity.oauth2.fapi.exceptions.FapiConfigMgtException;
+import org.wso2.carbon.identity.oauth2.fapi.models.FapiConfig;
+import org.wso2.carbon.identity.oauth2.fapi.models.FapiProfileEnum;
+import org.wso2.carbon.identity.oauth2.fapi.services.FapiConfigMgtService;
 import org.wso2.carbon.identity.oauth2.model.ClientAuthenticationMethodModel;
 import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
 import org.wso2.carbon.identity.sso.saml.SAMLSSOConfigServiceImpl;
@@ -64,6 +70,7 @@ import org.wso2.carbon.security.sts.service.STSAdminServiceInterface;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -89,6 +96,7 @@ public class ServerApplicationMetadataService {
     private final OAuthAdminServiceImpl oAuthAdminService;
     private final STSAdminServiceInterface sTSAdminServiceInterface;
     private final CibaAuthServiceImpl cibaAuthService;
+    private final FapiConfigMgtService fapiConfigMgtService;
 
     @Deprecated
     public ServerApplicationMetadataService(ApplicationManagementService applicationManagementService,
@@ -101,8 +109,10 @@ public class ServerApplicationMetadataService {
         this.oAuthAdminService = oAuthAdminService;
         this.sTSAdminServiceInterface = sTSAdminServiceInterface;
         this.cibaAuthService = ApplicationManagementServiceHolder.getCibaAuthService();
+        this.fapiConfigMgtService = ApplicationManagementServiceHolder.getFapiConfigMgtService();
     }
 
+    @Deprecated
     public ServerApplicationMetadataService(ApplicationManagementService applicationManagementService,
                                             SAMLSSOConfigServiceImpl samlSSOConfigService,
                                             OAuthAdminServiceImpl oAuthAdminService,
@@ -114,6 +124,22 @@ public class ServerApplicationMetadataService {
         this.oAuthAdminService = oAuthAdminService;
         this.sTSAdminServiceInterface = sTSAdminServiceInterface;
         this.cibaAuthService = cibaAuthService;
+        this.fapiConfigMgtService = ApplicationManagementServiceHolder.getFapiConfigMgtService();
+    }
+
+    public ServerApplicationMetadataService(ApplicationManagementService applicationManagementService,
+                                            SAMLSSOConfigServiceImpl samlSSOConfigService,
+                                            OAuthAdminServiceImpl oAuthAdminService,
+                                            STSAdminServiceInterface sTSAdminServiceInterface,
+                                            CibaAuthServiceImpl cibaAuthService,
+                                            FapiConfigMgtService fapiConfigMgtService) {
+
+        this.applicationManagementService = applicationManagementService;
+        this.samlSSOConfigService = samlSSOConfigService;
+        this.oAuthAdminService = oAuthAdminService;
+        this.sTSAdminServiceInterface = sTSAdminServiceInterface;
+        this.cibaAuthService = cibaAuthService;
+        this.fapiConfigMgtService = fapiConfigMgtService;
     }
 
     private static final Log LOG = LogFactory.getLog(ServerApplicationMetadataService.class);
@@ -261,6 +287,7 @@ public class ServerApplicationMetadataService {
                 supportedClientAuthMethods.stream().filter(clientAuthenticationMethod ->
                 fapiAllowedAuthMethods.contains(clientAuthenticationMethod.getName())).collect(Collectors.toList());
         FapiMetadata fapiMetadata = new FapiMetadata();
+        fapiMetadata.allowedFapiProfiles(new MetadataProperty().options(getAllowedFapiProfiles()));
         fapiMetadata.allowedSignatureAlgorithms(new MetadataProperty().options(fapiAllowedSignatureAlgorithms));
         fapiMetadata.allowedEncryptionAlgorithms(new MetadataProperty().options(fapiAllowedEncryptionAlgorithms));
         fapiMetadata.setTokenEndpointAuthMethod(new ClientAuthenticationMethodMetadata()
@@ -524,6 +551,35 @@ public class ServerApplicationMetadataService {
             return allowedIssuers;
         } catch (OAuth2OIDCConfigOrgUsageScopeMgtException e) {
             throw handleServerError(ERROR_RETRIEVING_ALLOWED_ISSUERS, e);
+        }
+    }
+
+    /**
+     * Retrieves the list of allowed FAPI profiles for the current tenant from FapiConfigMgtService.
+     * Returns an empty list if the service is unavailable or no profiles are configured.
+     *
+     * @return List of allowed FAPI profile string values.
+     */
+    private List<String> getAllowedFapiProfiles() {
+
+        if (fapiConfigMgtService == null) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("FapiConfigMgtService is not available. Returning empty FAPI profiles list.");
+            }
+            return Collections.emptyList();
+        }
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            FapiConfig fapiConfig = fapiConfigMgtService.getFapiConfig(tenantDomain);
+            List<FapiProfileEnum> supportedProfiles = fapiConfig.getSupportedProfiles();
+            if (CollectionUtils.isEmpty(supportedProfiles)) {
+                return Collections.emptyList();
+            }
+            return supportedProfiles.stream()
+                    .map(FapiProfileEnum::value)
+                    .collect(Collectors.toList());
+        } catch (FapiConfigMgtException e) {
+            throw handleServerError(ErrorMessage.ERROR_RETRIEVING_FAPI_METADATA, e);
         }
     }
 

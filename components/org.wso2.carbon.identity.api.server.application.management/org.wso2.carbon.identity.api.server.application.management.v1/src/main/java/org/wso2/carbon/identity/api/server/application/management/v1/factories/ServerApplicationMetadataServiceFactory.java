@@ -23,6 +23,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.core.Server
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
 import org.wso2.carbon.identity.oauth.ciba.api.CibaAuthServiceImpl;
+import org.wso2.carbon.identity.oauth2.fapi.services.FapiConfigMgtService;
 import org.wso2.carbon.identity.sso.saml.SAMLSSOConfigServiceImpl;
 import org.wso2.carbon.security.sts.service.STSAdminServiceInterface;
 
@@ -40,6 +41,7 @@ public class ServerApplicationMetadataServiceFactory {
         OAuthAdminServiceImpl oAuthAdminService = ApplicationManagementServiceHolder.getOAuthAdminService();
         STSAdminServiceInterface sTSAdminServiceInterface = ApplicationManagementServiceHolder.getStsAdminService();
         CibaAuthServiceImpl cibaAuthService = ApplicationManagementServiceHolder.getCibaAuthService();
+        FapiConfigMgtService fapiConfigMgtService = ApplicationManagementServiceHolder.getFapiConfigMgtService();
 
         if (applicationManagementService == null) {
             throw new IllegalStateException("ApplicationManagementService is not available from OSGi context.");
@@ -56,7 +58,7 @@ public class ServerApplicationMetadataServiceFactory {
         // Null check for STSAdminServiceInterface is not mandatory as per the previous implementation.
 
         SERVICE = new ServerApplicationMetadataService(applicationManagementService, samlSSOConfigService,
-                oAuthAdminService, sTSAdminServiceInterface, cibaAuthService);
+                oAuthAdminService, sTSAdminServiceInterface, cibaAuthService, fapiConfigMgtService);
     }
 
     /**
