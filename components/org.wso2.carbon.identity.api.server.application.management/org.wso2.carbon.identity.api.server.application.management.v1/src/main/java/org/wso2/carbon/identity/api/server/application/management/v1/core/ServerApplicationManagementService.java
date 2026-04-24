@@ -66,7 +66,6 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Role;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.ScriptUpdateModel;
-import org.wso2.carbon.identity.api.server.application.management.v1.FapiProfile;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApiModelToServiceProvider;
@@ -144,7 +143,6 @@ import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceExc
 import org.wso2.carbon.identity.cors.mgt.core.model.CORSOrigin;
 import org.wso2.carbon.identity.oauth.dao.OAuthAppDO;
 import org.wso2.carbon.identity.oauth2.fapi.exceptions.FapiConfigMgtException;
-import org.wso2.carbon.identity.oauth2.fapi.models.FapiConfig;
 import org.wso2.carbon.identity.oauth2.fapi.models.FapiProfileEnum;
 import org.wso2.carbon.identity.oauth2.fapi.services.FapiConfigMgtService;
 import org.wso2.carbon.identity.role.v2.mgt.core.RoleConstants;

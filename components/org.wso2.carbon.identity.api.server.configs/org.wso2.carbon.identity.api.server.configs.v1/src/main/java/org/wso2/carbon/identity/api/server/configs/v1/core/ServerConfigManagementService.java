@@ -119,7 +119,6 @@ import org.wso2.carbon.identity.oauth2.config.models.UsageScope;
 import org.wso2.carbon.identity.oauth2.config.services.OAuth2OIDCConfigOrgUsageScopeMgtService;
 import org.wso2.carbon.identity.oauth2.fapi.exceptions.FapiConfigMgtClientException;
 import org.wso2.carbon.identity.oauth2.fapi.exceptions.FapiConfigMgtException;
-import org.wso2.carbon.identity.oauth2.fapi.exceptions.FapiConfigMgtServerException;
 import org.wso2.carbon.identity.oauth2.fapi.services.FapiConfigMgtService;
 import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationConfigMgtClientException;
 import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationConfigMgtException;

@@ -41,6 +41,7 @@ import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 import org.wso2.carbon.identity.oauth2.config.models.IssuerDetails;
+import org.wso2.carbon.identity.oauth2.fapi.models.FapiProfileEnum;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -90,12 +91,10 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         updatePARConfigurations(consumerAppDTO, oidcModel.getPushAuthorizationRequest());
         updateSubjectConfigurations(consumerAppDTO, oidcModel.getSubject());
         consumerAppDTO.setFapiConformanceEnabled(oidcModel.getIsFAPIApplication());
-        // Map the FAPI profile enum to its String representation for storage.
-        // A null value means the caller did not specify a profile; the default will
-        // be applied by validateFapiProfile() in ServerApplicationManagementService
-        // before this mapper is reached.
-        if (oidcModel.getFapiProfile() != null) {
-            consumerAppDTO.setFapiProfile(oidcModel.getFapiProfile().toString());
+        // Convert FAPI profile enum to String for storage. If no profile specified; default is set to FAPI1_ADVANCED.
+        if (oidcModel.getIsFAPIApplication()) {
+            consumerAppDTO.setFapiProfile(oidcModel.getFapiProfile() != null
+                    ? oidcModel.getFapiProfile().toString() : FapiProfileEnum.FAPI1_ADVANCED.value());
         }
         updateSubjectTokenConfigurations(consumerAppDTO, oidcModel.getSubjectToken());
         updateCIBAAuthenticationRequestConfigurations(consumerAppDTO, oidcModel.getCibaAuthenticationRequest());
@@ -163,7 +162,7 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
     }
 
     private void updateAllowedOrigins(OAuthConsumerAppDTO consumerAppDTO, List<String> allowedOrigins) {
-        
+
         // Setting the allowed origins since now the cors origin services will be called and handle by the Oauth2
         // Inbound config handler
         consumerAppDTO.setAllowedOrigins(allowedOrigins);
