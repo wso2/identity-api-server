@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -22,6 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.validation.constraints.*;
 
 /**
@@ -40,7 +43,7 @@ public class AuthenticationTypeResponse  {
 @XmlEnum(String.class)
 public enum TypeEnum {
 
-    @XmlEnumValue("NONE") NONE(String.valueOf("NONE")), @XmlEnumValue("BEARER") BEARER(String.valueOf("BEARER")), @XmlEnumValue("API_KEY") API_KEY(String.valueOf("API_KEY")), @XmlEnumValue("BASIC") BASIC(String.valueOf("BASIC"));
+    @XmlEnumValue("NONE") NONE(String.valueOf("NONE")), @XmlEnumValue("BEARER") BEARER(String.valueOf("BEARER")), @XmlEnumValue("API_KEY") API_KEY(String.valueOf("API_KEY")), @XmlEnumValue("BASIC") BASIC(String.valueOf("BASIC")), @XmlEnumValue("CLIENT_CREDENTIAL") CLIENT_CREDENTIAL(String.valueOf("CLIENT_CREDENTIAL"));
 
 
     private String value;
@@ -69,6 +72,7 @@ public enum TypeEnum {
 }
 
     private TypeEnum type;
+    private Map<String, Object> properties = null;
 
     /**
     * Type of the authentication.
@@ -91,6 +95,34 @@ public enum TypeEnum {
         this.type = type;
     }
 
+    /**
+     * Authentication properties(without secrets) specific to the selected type.
+     **/
+    public AuthenticationTypeResponse properties(Map<String, Object> properties) {
+
+        this.properties = properties;
+        return this;
+    }
+
+    @ApiModelProperty(example = "{\"type\":\"BASIC\",\"properties\":{\"username\":\"auth_username\"}}", value = "Authentication properties(without secrets) specific to the selected type.")
+    @JsonProperty("properties")
+    @Valid
+    public Map<String, Object> getProperties() {
+        return properties;
+    }
+    public void setProperties(Map<String, Object> properties) {
+        this.properties = properties;
+    }
+
+
+    public AuthenticationTypeResponse putPropertiesItem(String key, Object propertiesItem) {
+        if (this.properties == null) {
+            this.properties = new HashMap<String, Object>();
+        }
+        this.properties.put(key, propertiesItem);
+        return this;
+    }
+
 
 
     @Override
@@ -103,12 +135,13 @@ public enum TypeEnum {
             return false;
         }
         AuthenticationTypeResponse authenticationTypeResponse = (AuthenticationTypeResponse) o;
-        return Objects.equals(this.type, authenticationTypeResponse.type);
+        return Objects.equals(this.type, authenticationTypeResponse.type) &&
+                Objects.equals(this.properties, authenticationTypeResponse.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type);
+        return Objects.hash(type, properties);
     }
 
     @Override
@@ -118,6 +151,7 @@ public enum TypeEnum {
         sb.append("class AuthenticationTypeResponse {\n");
         
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
+        sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");
         return sb.toString();
     }
