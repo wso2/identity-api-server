@@ -18,11 +18,12 @@
 
 package org.wso2.carbon.identity.api.server.debug.v1.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import javax.validation.constraints.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Request body for starting a debug session.
@@ -31,31 +32,51 @@ import javax.validation.constraints.*;
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
-import javax.xml.bind.annotation.*;
-
 @ApiModel(description = "Request body for starting a debug session.")
 public class DebugConnectionRequest  {
   
-    private String connectionId;
+    private Map<String, String> properties = null;
+
 
     /**
-    * Connection identifier for the selected resource type.
+    * Resource-specific properties for the selected resource type.
     **/
-    public DebugConnectionRequest connectionId(String connectionId) {
+    public DebugConnectionRequest properties(Map<String, String> properties) {
 
-        this.connectionId = connectionId;
+        this.properties = properties;
         return this;
     }
     
-    @ApiModelProperty(example = "11cb1448-2c30-4f9f-af8e-426614174000", value = "Connection identifier for the selected resource type.")
-    @JsonProperty("connectionId")
-    @Valid @Size(min=1,max=255)
-    public String getConnectionId() {
-        return connectionId;
+    @ApiModelProperty(example = "{\"sampleKey\":\"sampleValue\"}", value = "Resource-specific properties for the selected resource type.")
+    @JsonAnyGetter
+    @Valid
+    public Map<String, String> getProperties() {
+
+        return properties;
     }
-    public void setConnectionId(String connectionId) {
-        this.connectionId = connectionId;
+
+    public void setProperties(Map<String, String> properties) {
+
+        this.properties = properties;
     }
+
+
+    public DebugConnectionRequest putPropertiesItem(String key, String propertiesItem) {
+
+        if (this.properties == null) {
+            this.properties = new HashMap<String, String>();
+        }
+        this.properties.put(key, propertiesItem);
+        return this;
+    }
+
+    @JsonAnySetter
+    public void putProperty(String key, String value) {
+
+        putPropertiesItem(key, value);
+    }
+
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -67,12 +88,12 @@ public class DebugConnectionRequest  {
             return false;
         }
         DebugConnectionRequest debugConnectionRequest = (DebugConnectionRequest) o;
-        return Objects.equals(this.connectionId, debugConnectionRequest.connectionId);
+        return Objects.equals(this.properties, debugConnectionRequest.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(connectionId);
+        return Objects.hash(properties);
     }
 
     @Override
@@ -81,7 +102,7 @@ public class DebugConnectionRequest  {
         StringBuilder sb = new StringBuilder();
         sb.append("class DebugConnectionRequest {\n");
         
-        sb.append("    connectionId: ").append(toIndentedString(connectionId)).append("\n");
+        sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");
         return sb.toString();
     }

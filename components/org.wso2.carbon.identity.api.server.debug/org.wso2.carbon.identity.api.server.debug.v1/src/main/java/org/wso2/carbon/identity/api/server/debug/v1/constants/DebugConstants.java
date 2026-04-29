@@ -21,37 +21,13 @@ package org.wso2.carbon.identity.api.server.debug.v1.constants;
 /**
  * Contains constants for Debug Flow Data Provider API.
  */
-public final class DebugConstants {
+public class DebugConstants {
+
+    public static final String DEBUG_PREFIX = "DBG-";
+    public static final String CONNECTION_ID_KEY = "connectionId";
 
     private DebugConstants() {
         // Prevent instantiation.
-    }
-
-    /**
-     * Status constants for debug operations.
-     */
-    public static final class Status {
-
-        public static final String SUCCESS = "SUCCESS";
-        public static final String FAILURE = "FAILURE";
-        public static final String IN_PROGRESS = "IN_PROGRESS";
-        public static final String DIRECT_RESULT = "DIRECT_RESULT";
-
-        private Status() {
-            // Prevent instantiation.
-        }
-    }
-
-    /**
-     * Request property keys used by debug API.
-     */
-    public static final class RequestKeys {
-
-        public static final String CONNECTION_ID = "connectionId";
-
-        private RequestKeys() {
-            // Prevent instantiation.
-        }
     }
 
     /**
@@ -60,7 +36,6 @@ public final class DebugConstants {
     public static final class ResourceType {
 
         public static final String IDP = "idp";
-        public static final String FRAUD_DETECTION = "fraud_detection";
 
         private ResourceType() {
             // Prevent instantiation.
@@ -78,7 +53,6 @@ public final class DebugConstants {
         public static final String STATUS = "status";
         public static final String MESSAGE = "message";
         public static final String AUTHORIZATION_URL = "authorizationUrl";
-        public static final String TIMESTAMP = "timestamp";
 
         private ResponseKeys() {
             // Prevent instantiation.
@@ -109,7 +83,8 @@ public final class DebugConstants {
         }
 
         public String getCode() {
-            return code;
+
+            return DEBUG_PREFIX + code;
         }
 
         public String getMessage() {

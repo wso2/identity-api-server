@@ -18,11 +18,16 @@
 
 package org.wso2.carbon.identity.api.server.debug.v1.core;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.identity.api.server.debug.common.DebugServiceHolder;
+import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.debug.v1.constants.DebugConstants;
 import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionRequest;
+import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionResponse;
+import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionResponseMetadata;
+import org.wso2.carbon.identity.api.server.debug.v1.model.DebugResult;
+import org.wso2.carbon.identity.api.server.debug.v1.utils.Utils;
 import org.wso2.carbon.identity.debug.framework.DebugFrameworkConstants;
 import org.wso2.carbon.identity.debug.framework.core.DebugRequestCoordinator;
 import org.wso2.carbon.identity.debug.framework.exception.DebugFrameworkClientException;
@@ -31,7 +36,11 @@ import org.wso2.carbon.identity.debug.framework.model.DebugRequest;
 import org.wso2.carbon.identity.debug.framework.model.DebugResponse;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
+
+import javax.ws.rs.core.Response;
 
 /**
  * Core service for debug API request handling.
@@ -39,145 +48,353 @@ import java.util.Map;
 public class DebugService {
 
     private static final Log LOG = LogFactory.getLog(DebugService.class);
+    private final DebugRequestCoordinator coordinator;
 
-    /**
-     * Process a start debug session request.
-     *
-     * @param resourceType Path parameter resource type.
-     * @param debugConnectionRequest Debug request payload.
-     * @return Debug result map.
-     * @throws DebugFrameworkClientException Client exceptions from framework.
-     * @throws DebugFrameworkServerException Server exceptions from framework.
-     */
-    public Map<String, Object> processStartSession(String resourceType,
-                                                   DebugConnectionRequest debugConnectionRequest)
-            throws DebugFrameworkClientException, DebugFrameworkServerException {
+    public DebugService(DebugRequestCoordinator coordinator) {
 
-        validateRequest(resourceType, debugConnectionRequest);
-        
-        // Trim resourceType before passing downstream to prevent lookup misses.
-        String trimmedResourceType = resourceType != null ? resourceType.trim() : null;
-        
-        Map<String, String> properties = new HashMap<>();
-        if (debugConnectionRequest.getConnectionId() != null
-                && !debugConnectionRequest.getConnectionId().trim().isEmpty()) {
-            // Trim connectionId before passing downstream to prevent lookup misses.
-            properties.put(DebugConstants.RequestKeys.CONNECTION_ID, debugConnectionRequest.getConnectionId().trim());
-        }
-
-        return handleGenericDebugRequest(trimmedResourceType, properties);
+        this.coordinator = coordinator;
     }
 
     /**
-     * Process a debug result retrieval request.
+     * Process a start debug session request and return a typed response DTO.
+     * All framework exceptions are caught here and converted to APIError.
+     *
+     * @param resourceType           Path parameter resource type.
+     * @param debugConnectionRequest Debug request payload.
+     * @return DebugConnectionResponse DTO.
+     */
+    public DebugConnectionResponse processStartSession(String resourceType,
+                                                       DebugConnectionRequest debugConnectionRequest) {
+
+        try {
+            String normalizedResourceType = normalizeInput(resourceType);
+            Map<String, String> properties = getNormalizedProperties(debugConnectionRequest);
+            validateRequest(normalizedResourceType, debugConnectionRequest, properties);
+            Map<String, Object> responseData = handleDebugRequest(normalizedResourceType, properties);
+            return buildDebugConnectionResponse(responseData);
+        } catch (DebugFrameworkClientException e) {
+            throw Utils.handleException(
+                    Response.Status.BAD_REQUEST,
+                    DebugConstants.ErrorMessage.ERROR_CODE_ERROR_VALIDATING_REQUEST.getCode(),
+                    DebugConstants.ErrorMessage.ERROR_CODE_ERROR_VALIDATING_REQUEST.getMessage(),
+                    Utils.resolveClientErrorDescription(e,
+                            DebugConstants.ErrorMessage.ERROR_CODE_ERROR_VALIDATING_REQUEST.getDescription()));
+        } catch (DebugFrameworkServerException e) {
+            throw Utils.handleException(
+                    Response.Status.INTERNAL_SERVER_ERROR,
+                    DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST.getCode(),
+                    DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST.getMessage(),
+                    DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST.getDescription());
+        }
+    }
+
+    /**
+     * Process a debug result retrieval request and return a typed response DTO.
+     * All framework exceptions are caught here and converted to APIError.
      *
      * @param debugId Debug session id.
-     * @return Debug result map.
-     * @throws DebugFrameworkClientException if request is invalid.
-     * @throws DebugFrameworkServerException if server error occurs.
+     * @return DebugResult DTO.
      */
-    public Map<String, Object> processGetResult(String debugId)
-            throws DebugFrameworkClientException, DebugFrameworkServerException {
+    public DebugResult processGetResult(String debugId) {
 
-        if (debugId == null || debugId.trim().isEmpty()) {
-            throw new DebugFrameworkClientException(
-                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getCode(),
-                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getMessage(),
-                    "Debug ID cannot be null or empty.");
+        try {
+            String normalizedDebugId = normalizeInput(debugId);
+            if (normalizedDebugId == null) {
+                throw new DebugFrameworkClientException(
+                        DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getCode(),
+                        DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getMessage(),
+                        "Debug ID cannot be null or empty.");
+            }
+            Map<String, Object> frameworkResponse = coordinator.getDebugResult(normalizedDebugId);
+            if (frameworkResponse == null) {
+                throw Utils.handleException(
+                        Response.Status.NOT_FOUND,
+                        DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND.getCode(),
+                        DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND.getMessage(),
+                        DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND.getDescription());
+            }
+            return buildDebugResult(frameworkResponse, normalizedDebugId);
+        } catch (APIError e) {
+            throw e;
+        } catch (DebugFrameworkClientException e) {
+            if (DebugFrameworkConstants.ErrorMessages.ERROR_CODE_RESULT_NOT_FOUND.getCode()
+                    .equals(e.getErrorCode())) {
+                throw Utils.handleException(
+                        Response.Status.NOT_FOUND,
+                        DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND.getCode(),
+                        DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND.getMessage(),
+                        DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND.getDescription());
+            }
+            throw Utils.handleException(
+                    Response.Status.BAD_REQUEST,
+                    DebugConstants.ErrorMessage.ERROR_CODE_ERROR_VALIDATING_REQUEST.getCode(),
+                    DebugConstants.ErrorMessage.ERROR_CODE_ERROR_VALIDATING_REQUEST.getMessage(),
+                    Utils.resolveClientErrorDescription(e,
+                            DebugConstants.ErrorMessage.ERROR_CODE_ERROR_VALIDATING_REQUEST.getDescription()));
+        } catch (DebugFrameworkServerException e) {
+            throw Utils.handleException(
+                    Response.Status.INTERNAL_SERVER_ERROR,
+                    DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST.getCode(),
+                    DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST.getMessage(),
+                    DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST.getDescription());
+        } catch (RuntimeException e) {
+            throw Utils.handleException(
+                    Response.Status.INTERNAL_SERVER_ERROR,
+                    DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST.getCode(),
+                    DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST.getMessage(),
+                    DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST.getDescription());
         }
-
-        return getDebugResult(debugId.trim());
     }
 
     /**
-     * Handles a generic debug request using request properties and path resourceType.
+     * Sends a debug request to the coordinator and returns a safe copy of the response data.
      *
      * @param resourceType Resource type from path parameter.
-     * @param properties Generic properties map for the debug request.
-     * @return Debug result containing session information and status.
+     * @param properties   Normalized properties map.
+     * @return Response data map (safe copy, never null).
      * @throws DebugFrameworkClientException if the framework encounters a client error.
      * @throws DebugFrameworkServerException if the framework encounters a server error.
      */
-    private Map<String, Object> handleGenericDebugRequest(String resourceType,
-                                                          Map<String, String> properties)
+    private Map<String, Object> handleDebugRequest(String resourceType,
+                                                    Map<String, String> properties)
             throws DebugFrameworkClientException, DebugFrameworkServerException {
 
         DebugRequest debugRequest = new DebugRequest();
         debugRequest.setResourceType(resourceType);
+        debugRequest.setConnectionId(properties.get(DebugConstants.CONNECTION_ID_KEY));
 
-        if (properties != null) {
-            for (Map.Entry<String, String> entry : properties.entrySet()) {
-                if (entry.getKey() != null && entry.getValue() != null) {
-                    debugRequest.addContextProperty(entry.getKey(), entry.getValue());
-                }
-            }
-            debugRequest.setConnectionId(properties.get(DebugConstants.RequestKeys.CONNECTION_ID));
+        for (Map.Entry<String, String> entry : properties.entrySet()) {
+            debugRequest.addContextProperty(entry.getKey(), entry.getValue());
         }
 
-        DebugRequestCoordinator coordinator = getCoordinatorOrThrow();
-        DebugResponse response = executeWithServerErrorHandling(
-                () -> coordinator.handleDebugRequest(debugRequest),
-                "Error processing start debug session request.",
-                "Error occurred while processing debug request.");
-
-        Map<String, Object> resultMap = response.getData() != null ?
-                new HashMap<>(response.getData()) : new HashMap<>();
-        resultMap.putIfAbsent(DebugConstants.ResponseKeys.TIMESTAMP, System.currentTimeMillis());
-        resultMap.putIfAbsent(DebugConstants.ResponseKeys.STATUS, deriveStatus(resultMap));
-
-        return resultMap;
-    }
-
-    /**
-     * Derives status when the framework omits the explicit status field.
-     *
-     * @param responseMap Framework response map.
-     * @return SUCCESS or FAILURE.
-     */
-    private String deriveStatus(Map<String, Object> responseMap) {
-
-        Object success = responseMap.get(DebugConstants.ResponseKeys.SUCCESS);
-        if (success instanceof Boolean) {
-            return Boolean.TRUE.equals(success) ? DebugConstants.Status.SUCCESS : DebugConstants.Status.FAILURE;
+        DebugResponse response;
+        try {
+            response = coordinator.handleDebugRequest(debugRequest);
+        } catch (RuntimeException e) {
+            throw Utils.handleServerException(e,
+                    "Error processing start debug session request.",
+                    "Error occurred while processing debug request.");
         }
-        return DebugConstants.Status.SUCCESS;
+
+        // Copy framework response into a new map to avoid mutating framework-owned data.
+        Map<String, Object> responseData = new HashMap<>();
+        if (response.getData() != null) {
+            responseData.putAll(response.getData());
+        }
+        responseData.putIfAbsent(DebugConstants.ResponseKeys.STATUS,
+                deriveStatus(response.isSuccess()));
+
+        return responseData;
     }
 
     /**
-     * Retrieves the debug result for the given session ID.
+     * Builds a DebugConnectionResponse DTO from the framework response data map.
      *
-     * @param debugId The debug session ID to look up.
-     * @return The debug result map, or null if not found.
-     * @throws DebugFrameworkClientException if request is invalid.
+     * @param responseData Framework response data.
+     * @return DebugConnectionResponse DTO.
+     * @throws DebugFrameworkServerException if required fields are missing.
      */
-    private Map<String, Object> getDebugResult(String debugId)
-            throws DebugFrameworkClientException, DebugFrameworkServerException {
+    private DebugConnectionResponse buildDebugConnectionResponse(Map<String, Object> responseData)
+            throws DebugFrameworkServerException {
 
-        DebugRequestCoordinator coordinator = getCoordinatorOrThrow();
-        return executeWithServerErrorHandling(() -> coordinator.getDebugResult(debugId),
-                "Error retrieving debug result.",
-                "Error occurred while retrieving debug result.");
-    }
+        DebugConnectionResponse response = new DebugConnectionResponse();
 
-    /**
-     * Gets the DebugRequestCoordinator or throws if unavailable.
-     *
-     * @return The coordinator instance.
-     */
-    private DebugRequestCoordinator getCoordinatorOrThrow() throws DebugFrameworkServerException {
-
-        DebugRequestCoordinator coordinator = DebugServiceHolder.getDebugRequestCoordinator();
-        if (coordinator == null) {
+        Object debugId = responseData.get(DebugConstants.ResponseKeys.DEBUG_ID);
+        if (debugId == null) {
+            debugId = responseData.get(DebugConstants.ResponseKeys.STATE);
+        }
+        if (debugId == null) {
             throw new DebugFrameworkServerException(
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_SERVER_ERROR.getCode(),
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_SERVER_ERROR.getMessage(),
-                    "Debug request coordinator not available.");
+                    "Debug framework response does not contain debugId or state.");
+        }
+        response.setDebugId(debugId.toString());
+
+        DebugConnectionResponse.StatusEnum status =
+                resolveConnectionStatus(responseData.get(DebugConstants.ResponseKeys.STATUS));
+        response.setStatus(status);
+        response.setMessage(resolveConnectionMessage(
+                status, responseData.get(DebugConstants.ResponseKeys.MESSAGE)));
+
+        Object authorizationUrl = responseData.get(DebugConstants.ResponseKeys.AUTHORIZATION_URL);
+        if (authorizationUrl != null) {
+            DebugConnectionResponseMetadata metadata = new DebugConnectionResponseMetadata();
+            metadata.setAuthorizationUrl(authorizationUrl.toString());
+            response.setMetadata(metadata);
         }
 
-        return coordinator;
+        return response;
     }
 
-    private void validateRequest(String resourceType, DebugConnectionRequest debugConnectionRequest)
+    /**
+     * Builds a DebugResult DTO from the framework response data map.
+     *
+     * @param frameworkResponse Framework response data.
+     * @param requestedDebugId  The originally requested debug ID (used as fallback).
+     * @return DebugResult DTO.
+     */
+    private DebugResult buildDebugResult(Map<String, Object> frameworkResponse,
+                                         String requestedDebugId) {
+
+        DebugResult response = new DebugResult();
+
+        Object debugId = frameworkResponse.get(DebugConstants.ResponseKeys.DEBUG_ID);
+        if (debugId == null) {
+            debugId = frameworkResponse.get(DebugConstants.ResponseKeys.STATE);
+        }
+        if (debugId == null) {
+            debugId = requestedDebugId;
+        }
+        if (debugId != null) {
+            response.setDebugId(debugId.toString());
+        }
+
+        DebugResult.StatusEnum status = resolveResultStatus(
+                frameworkResponse.get(DebugConstants.ResponseKeys.STATUS),
+                frameworkResponse.get(DebugConstants.ResponseKeys.SUCCESS));
+        response.setStatus(status);
+        response.setMessage(resolveResultMessage(
+                status, frameworkResponse.get(DebugConstants.ResponseKeys.MESSAGE)));
+
+        // Build metadata: preserve all keys except the extracted status/success fields.
+        Map<String, Object> metadata = new LinkedHashMap<>();
+        for (Map.Entry<String, Object> entry : frameworkResponse.entrySet()) {
+            String key = entry.getKey();
+            if (!DebugConstants.ResponseKeys.STATUS.equals(key)
+                    && !DebugConstants.ResponseKeys.SUCCESS.equals(key)) {
+                metadata.put(key, entry.getValue());
+            }
+        }
+        response.setMetadata(metadata);
+
+        return response;
+    }
+
+    /**
+     * Resolves the StatusEnum from the raw status object, defaulting to SUCCESS.
+     *
+     * @param status Raw status object from framework response.
+     * @return Resolved StatusEnum.
+     */
+    private DebugConnectionResponse.StatusEnum resolveConnectionStatus(Object status) {
+
+        if (status == null) {
+            return DebugConnectionResponse.StatusEnum.SUCCESS;
+        }
+        String statusValue = status.toString().toUpperCase(Locale.ROOT);
+        for (DebugConnectionResponse.StatusEnum candidate : DebugConnectionResponse.StatusEnum.values()) {
+            if (candidate.name().equals(statusValue)) {
+                return candidate;
+            }
+        }
+        LOG.warn("Unrecognized debug connection status from framework: " + status
+                + ". Falling back to SUCCESS.");
+        return DebugConnectionResponse.StatusEnum.SUCCESS;
+    }
+
+    /**
+     * Resolves the result StatusEnum from both status string and boolean success flag.
+     *
+     * @param status  Raw status object from framework response.
+     * @param success Raw success flag object from framework response.
+     * @return Resolved StatusEnum.
+     */
+    private DebugResult.StatusEnum resolveResultStatus(Object status, Object success) {
+
+        if (status != null) {
+            String statusValue = status.toString().toUpperCase(Locale.ROOT);
+            for (DebugResult.StatusEnum candidate : DebugResult.StatusEnum.values()) {
+                if (candidate.name().equals(statusValue)) {
+                    return candidate;
+                }
+            }
+            LOG.warn("Unrecognized debug result status from framework: " + status + ". Falling back.");
+        }
+
+        if (success instanceof Boolean) {
+            return (Boolean) success ? DebugResult.StatusEnum.SUCCESS : DebugResult.StatusEnum.FAILURE;
+        }
+
+        return DebugResult.StatusEnum.FAILURE;
+    }
+
+    /**
+     * Resolves the response message for a connection response.
+     *
+     * @param status           Resolved status enum.
+     * @param frameworkMessage Raw message from framework.
+     * @return Message string.
+     */
+    private String resolveConnectionMessage(DebugConnectionResponse.StatusEnum status,
+                                            Object frameworkMessage) {
+
+        String normalizedMessage = Utils.normalizeText(frameworkMessage);
+        if (normalizedMessage != null) {
+            return normalizedMessage;
+        }
+        switch (status) {
+            case IN_PROGRESS:
+                return "Debug session is in progress";
+            case FAILURE:
+                return "Debug session execution failed";
+            case DIRECT_RESULT:
+                return "Debug session completed with direct result";
+            case SUCCESS:
+            default:
+                return "Debug session executed successfully";
+        }
+    }
+
+    /**
+     * Resolves the response message for a debug result.
+     *
+     * @param status           Resolved status enum.
+     * @param frameworkMessage Raw message from framework.
+     * @return Message string.
+     */
+    private String resolveResultMessage(DebugResult.StatusEnum status, Object frameworkMessage) {
+
+        String normalizedMessage = Utils.normalizeText(frameworkMessage);
+        if (normalizedMessage != null) {
+            return normalizedMessage;
+        }
+        switch (status) {
+            case IN_PROGRESS:
+                return "Debug session is in progress";
+            case DIRECT_RESULT:
+                return "Debug session completed with direct result";
+            case SUCCESS:
+                return "Debug session retrieved successfully.";
+            case FAILURE:
+            default:
+                return "Debug session retrieval failed.";
+        }
+    }
+
+    /**
+     * Derives a status string when the framework omits the explicit status field.
+     *
+     * @param success Framework response success flag.
+     * @return SUCCESS or FAILURE string.
+     */
+    private String deriveStatus(boolean success) {
+
+        return success ? DebugConnectionResponse.StatusEnum.SUCCESS.name()
+                : DebugConnectionResponse.StatusEnum.FAILURE.name();
+    }
+
+    /**
+     * Validates the debug start session request.
+     *
+     * @param resourceType           Normalized resource type.
+     * @param debugConnectionRequest Request body.
+     * @param properties             Normalized properties map.
+     * @throws DebugFrameworkClientException if validation fails.
+     */
+    private void validateRequest(String resourceType,
+                                 DebugConnectionRequest debugConnectionRequest,
+                                 Map<String, String> properties)
             throws DebugFrameworkClientException {
 
         if (debugConnectionRequest == null) {
@@ -187,26 +404,16 @@ public class DebugService {
                     "Debug request body cannot be null.");
         }
 
-        if (resourceType == null || resourceType.trim().isEmpty()) {
+        if (StringUtils.isBlank(resourceType)) {
             throw new DebugFrameworkClientException(
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_MISSING_RESOURCE_TYPE.getCode(),
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_MISSING_RESOURCE_TYPE.getMessage(),
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_MISSING_RESOURCE_TYPE.getDescription());
         }
 
-        // Trim resourceType to prevent false validation failures from whitespace.
-        String trimmedResourceType = resourceType.trim();
-
-        if (!DebugConstants.ResourceType.IDP.equals(trimmedResourceType)
-                && !DebugConstants.ResourceType.FRAUD_DETECTION.equals(trimmedResourceType)) {
-            throw new DebugFrameworkClientException(
-                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getCode(),
-                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getMessage(),
-                    "Invalid resource type. Supported values are idp and fraud_detection.");
-        }
-        if (DebugConstants.ResourceType.IDP.equals(trimmedResourceType)
-                && (debugConnectionRequest.getConnectionId() == null
-                || debugConnectionRequest.getConnectionId().trim().isEmpty())) {
+        // Resource type is passed from the path and should be extensible.
+        if (DebugConstants.ResourceType.IDP.equals(resourceType)
+                && !properties.containsKey(DebugConstants.CONNECTION_ID_KEY)) {
             throw new DebugFrameworkClientException(
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_MISSING_CONNECTION_ID.getCode(),
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_MISSING_CONNECTION_ID.getMessage(),
@@ -214,24 +421,31 @@ public class DebugService {
         }
     }
 
-    private <T> T executeWithServerErrorHandling(DebugOperation<T> operation, String logMessage,
-                                                 String description)
-            throws DebugFrameworkClientException, DebugFrameworkServerException {
+    /**
+     * Normalizes and filters properties from the request, removing null/blank keys and values.
+     *
+     * @param debugConnectionRequest Request body.
+     * @return Normalized properties map, never null.
+     */
+    private Map<String, String> getNormalizedProperties(DebugConnectionRequest debugConnectionRequest) {
 
-        try {
-            return operation.execute();
-        } catch (RuntimeException e) {
-            LOG.error(logMessage, e);
-            throw new DebugFrameworkServerException(
-                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_SERVER_ERROR.getCode(),
-                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_SERVER_ERROR.getMessage(),
-                    description, e);
+        if (debugConnectionRequest == null || debugConnectionRequest.getProperties() == null) {
+            return new HashMap<>();
         }
+
+        Map<String, String> normalized = new HashMap<>();
+        for (Map.Entry<String, String> entry : debugConnectionRequest.getProperties().entrySet()) {
+            String key = normalizeInput(entry.getKey());
+            String value = normalizeInput(entry.getValue());
+            if (key != null && value != null) {
+                normalized.put(key, value);
+            }
+        }
+        return normalized;
     }
 
-    @FunctionalInterface
-    private interface DebugOperation<T> {
+    private String normalizeInput(String value) {
 
-        T execute() throws DebugFrameworkClientException, DebugFrameworkServerException;
+        return StringUtils.trimToNull(value);
     }
 }

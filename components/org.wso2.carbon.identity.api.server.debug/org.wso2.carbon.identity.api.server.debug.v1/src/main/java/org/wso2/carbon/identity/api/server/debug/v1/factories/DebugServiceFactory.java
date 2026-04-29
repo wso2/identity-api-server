@@ -18,19 +18,35 @@
 
 package org.wso2.carbon.identity.api.server.debug.v1.factories;
 
+import org.wso2.carbon.identity.api.server.debug.common.DebugServiceHolder;
 import org.wso2.carbon.identity.api.server.debug.v1.core.DebugService;
+import org.wso2.carbon.identity.debug.framework.core.DebugRequestCoordinator;
 
 /**
- * Factory for debug service.
+ * Factory class for DebugService.
  */
-public final class DebugServiceFactory {
+public class DebugServiceFactory {
 
-    private static final DebugService SERVICE = new DebugService();
+    private static final DebugService SERVICE;
+
+    static {
+        DebugRequestCoordinator coordinator = DebugServiceHolder.getDebugRequestCoordinator();
+        if (coordinator == null) {
+            throw new IllegalStateException(
+                    "DebugRequestCoordinator is not available from OSGi context.");
+        }
+        SERVICE = new DebugService(coordinator);
+    }
 
     private DebugServiceFactory() {
 
     }
 
+    /**
+     * Get DebugService instance.
+     *
+     * @return DebugService instance.
+     */
     public static DebugService getDebugService() {
 
         return SERVICE;

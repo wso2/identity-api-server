@@ -23,10 +23,10 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 
-import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionRequest;
 import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionResponse;
 import org.wso2.carbon.identity.api.server.debug.v1.model.DebugResult;
 import org.wso2.carbon.identity.api.server.debug.v1.model.Error;
+import java.util.Map;
 import org.wso2.carbon.identity.api.server.debug.v1.DebugApiService;
 import org.wso2.carbon.identity.api.server.debug.v1.factories.DebugApiServiceFactory;
 
@@ -90,9 +90,9 @@ public class DebugApi  {
         @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response startDebugSession( @Size(min=1,max=50)@ApiParam(value = "Type of resource to debug. Allowed values: idp, fraud_detection.",required=true, allowableValues="idp, fraud_detection") @PathParam("resourceType") String resourceType, @ApiParam(value = "Debug request with connection identifier and optional properties." ,required=true) @Valid DebugConnectionRequest debugConnectionRequest) {
+    public Response startDebugSession( @Size(min=1,max=50)@ApiParam(value = "Type of resource to debug. Allowed values: idp",required=true, allowableValues="idp") @PathParam("resourceType") String resourceType, @ApiParam(value = "Debug request with resource-specific properties." ,required=true) @Valid Map<String, String> requestBody) {
 
-        return delegate.startDebugSession(resourceType,  debugConnectionRequest );
+        return delegate.startDebugSession(resourceType,  requestBody );
     }
 
 }

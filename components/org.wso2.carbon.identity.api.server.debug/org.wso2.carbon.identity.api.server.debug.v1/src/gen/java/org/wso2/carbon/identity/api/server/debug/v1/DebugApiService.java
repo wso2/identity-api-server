@@ -24,15 +24,15 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionRequest;
 import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionResponse;
 import org.wso2.carbon.identity.api.server.debug.v1.model.DebugResult;
 import org.wso2.carbon.identity.api.server.debug.v1.model.Error;
+import java.util.Map;
 import javax.ws.rs.core.Response;
 
 public interface DebugApiService {
 
       public Response getDebugResult(String debugId);
 
-      public Response startDebugSession(String resourceType, DebugConnectionRequest debugConnectionRequest);
+      public Response startDebugSession(String resourceType, Map<String, String> requestBody);
 }

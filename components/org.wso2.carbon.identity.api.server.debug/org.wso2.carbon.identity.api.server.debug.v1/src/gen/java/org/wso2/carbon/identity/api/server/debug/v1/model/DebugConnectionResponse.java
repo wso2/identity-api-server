@@ -72,7 +72,6 @@ public enum StatusEnum {
 
     private StatusEnum status;
     private String message;
-    private Long timestamp;
     private DebugConnectionResponseMetadata metadata;
 
     /**
@@ -133,25 +132,6 @@ public enum StatusEnum {
     }
 
     /**
-    * Timestamp when the debug operation was processed (in milliseconds).
-    **/
-    public DebugConnectionResponse timestamp(Long timestamp) {
-
-        this.timestamp = timestamp;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "1771217107937", value = "Timestamp when the debug operation was processed (in milliseconds).")
-    @JsonProperty("timestamp")
-    @Valid
-    public Long getTimestamp() {
-        return timestamp;
-    }
-    public void setTimestamp(Long timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    /**
     **/
     public DebugConnectionResponse metadata(DebugConnectionResponseMetadata metadata) {
 
@@ -169,6 +149,8 @@ public enum StatusEnum {
         this.metadata = metadata;
     }
 
+
+
     @Override
     public boolean equals(java.lang.Object o) {
 
@@ -182,13 +164,12 @@ public enum StatusEnum {
         return Objects.equals(this.debugId, debugConnectionResponse.debugId) &&
             Objects.equals(this.status, debugConnectionResponse.status) &&
             Objects.equals(this.message, debugConnectionResponse.message) &&
-            Objects.equals(this.timestamp, debugConnectionResponse.timestamp) &&
             Objects.equals(this.metadata, debugConnectionResponse.metadata);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(debugId, status, message, timestamp, metadata);
+        return Objects.hash(debugId, status, message, metadata);
     }
 
     @Override
@@ -200,7 +181,6 @@ public enum StatusEnum {
         sb.append("    debugId: ").append(toIndentedString(debugId)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("    message: ").append(toIndentedString(message)).append("\n");
-        sb.append("    timestamp: ").append(toIndentedString(timestamp)).append("\n");
         sb.append("    metadata: ").append(toIndentedString(metadata)).append("\n");
         sb.append("}");
         return sb.toString();

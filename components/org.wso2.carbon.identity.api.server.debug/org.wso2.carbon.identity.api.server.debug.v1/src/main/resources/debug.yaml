@@ -41,16 +41,16 @@ paths:
       parameters:
         - name: "resourceType"
           in: "path"
-          description: "Type of resource to debug. Allowed values: idp, fraud_detection."
+          description: "Type of resource to debug. Allowed values: idp"
           required: true
           schema:
             type: "string"
-            enum: ["idp", "fraud_detection"]
+            enum: ["idp"]
             minLength: 1
             maxLength: 50
             example: "idp"
       requestBody:
-        description: "Debug request with connection identifier and optional properties."
+        description: "Debug request with resource-specific properties."
         required: true
         content:
           application/json:
@@ -186,13 +186,12 @@ components:
     DebugConnectionRequest:
       type: object
       description: "Request body for starting a debug session."
-      properties:
-        connectionId:
-          type: string
-          minLength: 1
-          maxLength: 255
-          description: "Connection identifier for the selected resource type."
-          example: "11cb1448-2c30-4f9f-af8e-426614174000"
+      additionalProperties:
+        type: string
+        minLength: 1
+        maxLength: 255
+      example:
+        sampleKey: "sampleValue"
     DebugConnectionResponse:
       type: object
       description: "Debug connection response containing generic debug information and resource-specific metadata."
@@ -210,11 +209,6 @@ components:
           type: string
           description: "Generic response message."
           example: "Debug session executed successfully"
-        timestamp:
-          type: integer
-          format: int64
-          description: "Timestamp when the debug operation was processed (in milliseconds)."
-          example: 1771217107937
         metadata:
           type: object
           description: "Resource-specific metadata. For IDP OAuth debugging, includes 'authorizationUrl'."
@@ -243,6 +237,10 @@ components:
           description: "Status of the debug operation."
           enum: ["SUCCESS", "IN_PROGRESS", "FAILURE", "DIRECT_RESULT"]
           example: "SUCCESS"
+        message:
+          type: string
+          description: "Generic response message."
+          example: "Debug session retrieved successfully."
         metadata:
           type: object
           description: "Protocol-specific and resource-specific debug data. For IDP OAuth debugging, includes userAttributes, mappedClaims, steps, tokens, URLs, and diagnostic information."

@@ -24,10 +24,17 @@ import org.wso2.carbon.identity.debug.framework.core.DebugRequestCoordinator;
 /**
  * Holder class for Debug Framework OSGi services.
  */
-public final class DebugServiceHolder {
+public class DebugServiceHolder {
 
     private DebugServiceHolder() {
 
+    }
+
+    private static class DebugRequestCoordinatorHolder {
+
+        private static final DebugRequestCoordinator INSTANCE = (DebugRequestCoordinator)
+                PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(DebugRequestCoordinator.class, null);
     }
 
     /**
@@ -36,7 +43,7 @@ public final class DebugServiceHolder {
      * @return DebugRequestCoordinator
      */
     public static DebugRequestCoordinator getDebugRequestCoordinator() {
-        return (DebugRequestCoordinator) PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                .getOSGiService(DebugRequestCoordinator.class, null);
+
+        return DebugRequestCoordinatorHolder.INSTANCE;
     }
 }

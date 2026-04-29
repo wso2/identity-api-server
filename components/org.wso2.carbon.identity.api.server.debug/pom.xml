@@ -34,7 +34,7 @@
     <description>WSO2 Identity Server - REST API for Debug </description>
 
     <properties>
-        <mavan.findbugsplugin.exclude.file>${project.basedir}/../../../findbugs-exclude-filter.xml</mavan.findbugsplugin.exclude.file>
+        <maven.findbugsplugin.exclude.file>${project.basedir}/../../../findbugs-exclude-filter.xml</maven.findbugsplugin.exclude.file>
     </properties>
 
     <modules>

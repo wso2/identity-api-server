@@ -72,6 +72,7 @@ public enum StatusEnum {
 }
 
     private StatusEnum status;
+    private String message;
     private Map<String, Object> metadata = null;
 
     /**
@@ -117,6 +118,25 @@ public enum StatusEnum {
     }
 
     /**
+    * Generic response message.
+    **/
+    public DebugResult message(String message) {
+
+        this.message = message;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "Debug session retrieved successfully.", value = "Generic response message.")
+    @JsonProperty("message")
+    @Valid
+    public String getMessage() {
+        return message;
+    }
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    /**
     * Protocol-specific and resource-specific debug data. For IDP OAuth debugging, includes userAttributes, mappedClaims, steps, tokens, URLs, and diagnostic information.
     **/
     public DebugResult metadata(Map<String, Object> metadata) {
@@ -155,12 +175,13 @@ public enum StatusEnum {
         DebugResult debugResult = (DebugResult) o;
         return Objects.equals(this.debugId, debugResult.debugId) &&
             Objects.equals(this.status, debugResult.status) &&
+            Objects.equals(this.message, debugResult.message) &&
             Objects.equals(this.metadata, debugResult.metadata);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(debugId, status, metadata);
+        return Objects.hash(debugId, status, message, metadata);
     }
 
     @Override
@@ -171,6 +192,7 @@ public enum StatusEnum {
         
         sb.append("    debugId: ").append(toIndentedString(debugId)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
+        sb.append("    message: ").append(toIndentedString(message)).append("\n");
         sb.append("    metadata: ").append(toIndentedString(metadata)).append("\n");
         sb.append("}");
         return sb.toString();
