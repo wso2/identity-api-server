@@ -39,6 +39,8 @@ public interface FlowApiService {
 
     public Response getFlowMeta(String flowType);
 
+    public Response getInFlowExtensionContextTree(String flowType);
+
     public Response updateFlow(FlowRequest flowRequest);
 
     public Response updateFlowConfig(FlowConfigPatchModel flowConfigPatchModel);

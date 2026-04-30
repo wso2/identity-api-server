@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.flow.management.v1.AttributeMetadata;
 import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorConnections;
+import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionConnectionInfo;
 import javax.validation.constraints.*;
 
 /**
@@ -49,6 +50,8 @@ public class FlowMetaResponse  {
     private List<AttributeMetadata> attributeMetadata = null;
 
     private List<ExecutorConnections> executorConnections = null;
+
+    private List<InFlowExtensionConnectionInfo> inflowExtensionConnections = null;
 
     private Boolean workflowEnabled;
 
@@ -212,6 +215,32 @@ public class FlowMetaResponse  {
 
         /**
     **/
+    public FlowMetaResponse inflowExtensionConnections(List<InFlowExtensionConnectionInfo> inflowExtensionConnections) {
+
+        this.inflowExtensionConnections = inflowExtensionConnections;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("inflowExtensionConnections")
+    @Valid
+    public List<InFlowExtensionConnectionInfo> getInflowExtensionConnections() {
+        return inflowExtensionConnections;
+    }
+    public void setInflowExtensionConnections(List<InFlowExtensionConnectionInfo> inflowExtensionConnections) {
+        this.inflowExtensionConnections = inflowExtensionConnections;
+    }
+
+    public FlowMetaResponse addInflowExtensionConnectionsItem(InFlowExtensionConnectionInfo item) {
+        if (this.inflowExtensionConnections == null) {
+            this.inflowExtensionConnections = new ArrayList<InFlowExtensionConnectionInfo>();
+        }
+        this.inflowExtensionConnections.add(item);
+        return this;
+    }
+
+        /**
+    **/
     public FlowMetaResponse workflowEnabled(Boolean workflowEnabled) {
 
         this.workflowEnabled = workflowEnabled;
@@ -247,12 +276,13 @@ public class FlowMetaResponse  {
             Objects.equals(this.supportedFlowCompletionConfigs, flowMetaResponse.supportedFlowCompletionConfigs) &&
             Objects.equals(this.attributeMetadata, flowMetaResponse.attributeMetadata) &&
             Objects.equals(this.executorConnections, flowMetaResponse.executorConnections) &&
+            Objects.equals(this.inflowExtensionConnections, flowMetaResponse.inflowExtensionConnections) &&
             Objects.equals(this.workflowEnabled, flowMetaResponse.workflowEnabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(flowType, supportedExecutors, connectorConfigs, attributeProfile, supportedFlowCompletionConfigs, attributeMetadata, executorConnections, workflowEnabled);
+        return Objects.hash(flowType, supportedExecutors, connectorConfigs, attributeProfile, supportedFlowCompletionConfigs, attributeMetadata, executorConnections, inflowExtensionConnections, workflowEnabled);
     }
 
     @Override
@@ -268,6 +298,7 @@ public class FlowMetaResponse  {
         sb.append("    supportedFlowCompletionConfigs: ").append(toIndentedString(supportedFlowCompletionConfigs)).append("\n");
         sb.append("    attributeMetadata: ").append(toIndentedString(attributeMetadata)).append("\n");
         sb.append("    executorConnections: ").append(toIndentedString(executorConnections)).append("\n");
+        sb.append("    inflowExtensionConnections: ").append(toIndentedString(inflowExtensionConnections)).append("\n");
         sb.append("    workflowEnabled: ").append(toIndentedString(workflowEnabled)).append("\n");
         sb.append("}");
         return sb.toString();

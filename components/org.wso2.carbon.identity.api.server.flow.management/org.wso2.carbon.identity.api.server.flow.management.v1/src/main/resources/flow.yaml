@@ -207,6 +207,53 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /flow/in-flow-extension/context-tree:
+    get:
+      summary: Retrieve the controlled In-Flow Extension context tree
+      description: >
+        Returns the canonical context tree filtered by the deployment.toml whitelist
+        ([identity.in_flow_extension.context.{flow_type}]) for the given flow type.
+        When `flowType` is omitted the default tree is returned. Used by the Console UI
+        to render the In-Flow Extension access-config editor without offering paths
+        the deployment has switched off, and to drive per-flow-type policy flags such
+        as `redirectionEnabled` and `allowReadOnlyClaimsModification`.
+      operationId: getInFlowExtensionContextTree
+      tags:
+        - Flow Composer
+      parameters:
+        - in: query
+          name: flowType
+          required: false
+          schema:
+            type: string
+            enum: [REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION, ASK_PASSWORD]
+          description: Optional flow type. When omitted, the default tree is returned.
+      responses:
+        '200':
+          description: Successfully retrieved the context tree
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InFlowExtensionContextTreeResponse'
+        '400':
+          description: Invalid flow type specified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   /flow/configs:
     get:
       summary: Retrieve flow management configuration
@@ -785,6 +832,78 @@ components:
         y:
           type: number
           example: 200.22
+
+    InFlowExtensionContextTreeResponse:
+      type: object
+      description: >
+        Controlled In-Flow Extension context tree for a given flow type, plus per-flow-type
+        policy flags consumed by the Console UI.
+      properties:
+        flowType:
+          type: string
+          description: Echoed flow type. `null` when no flowType was supplied (default tree).
+          example: PASSWORD_RECOVERY
+        contextTree:
+          type: array
+          description: >
+            Tree of context fields available for the active flow type. Fields disabled at
+            the deployment.toml whitelist level are omitted entirely.
+          items:
+            $ref: '#/components/schemas/InFlowExtensionContextTreeNode'
+        redirectionEnabled:
+          type: boolean
+          description: Whether REDIRECT is advertised in `allowedOperations` for this flow type.
+          example: true
+        allowReadOnlyClaimsModification:
+          type: boolean
+          description: >
+            Whether the Console UI may permit MODIFY on read-only claims for this flow type.
+            Hardcoded enumerative mapping in the engine.
+          example: true
+
+    InFlowExtensionContextTreeNode:
+      type: object
+      description: One node in the controlled In-Flow Extension context tree.
+      properties:
+        key:
+          type: string
+          example: userId
+        title:
+          type: string
+          example: User ID
+        path:
+          type: string
+          example: /user/userId
+        dataType:
+          type: string
+          example: String
+        nodeType:
+          type: string
+          description: Tree node type.
+          enum: [OBJECT, LEAF, MAP, COMPLEX_MAP]
+          example: LEAF
+        allowedOperations:
+          type: array
+          description: Operations the admin may configure on this node.
+          items:
+            type: string
+            enum: [EXPOSE, MODIFY]
+        readOnly:
+          type: boolean
+          example: false
+        replaceable:
+          type: boolean
+          example: false
+        dynamicEntryAllowed:
+          type: boolean
+          example: true
+        dynamicEntryType:
+          type: string
+          example: String
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/InFlowExtensionContextTreeNode'
 
     Error:
       type: object
