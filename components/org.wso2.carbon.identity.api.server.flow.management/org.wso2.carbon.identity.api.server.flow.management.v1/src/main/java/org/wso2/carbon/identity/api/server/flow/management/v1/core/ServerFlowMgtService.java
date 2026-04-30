@@ -24,12 +24,16 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfigPatchMod
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRequest;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionContextTreeResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Step;
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.AbstractMetaResponseHandler;
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.AskPasswordFlowMetaHandler;
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.PasswordRecoveryFlowMetaHandler;
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.RegistrationFlowMetaHandler;
+import org.wso2.carbon.identity.api.server.flow.management.v1.utils.InFlowExtensionContextTreeMapper;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
+import org.wso2.carbon.identity.flow.execution.engine.inflow.extension.metadata.InFlowExtensionContextTreeMetadata;
+import org.wso2.carbon.identity.flow.execution.engine.inflow.extension.metadata.InFlowExtensionContextTreeService;
 import org.wso2.carbon.identity.flow.mgt.Constants;
 import org.wso2.carbon.identity.flow.mgt.FlowMgtService;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtFrameworkException;
@@ -94,6 +98,30 @@ public class ServerFlowMgtService {
         Utils.validateFlowType(flowType);
         AbstractMetaResponseHandler metaResponseHandler = resolveHandler(flowType);
         return metaResponseHandler.createResponse();
+    }
+
+    /**
+     * Retrieve the controlled In-Flow Extension context tree for the given flow type. When
+     * {@code flowType} is null/blank, the default tree is returned. The tree is filtered
+     * server-side per the {@code [identity.in_flow_extension.context.*]} whitelist in
+     * {@code deployment.toml} so the Console UI only offers paths the deployment allows.
+     *
+     * @param flowType optional flow type (null → default tree).
+     * @return the tree response.
+     */
+    public InFlowExtensionContextTreeResponse getInFlowExtensionContextTree(String flowType) {
+
+        String resolvedFlowType = (flowType != null && !flowType.trim().isEmpty()) ? flowType : null;
+        if (resolvedFlowType != null) {
+            // Reuse the same flow-type validation used by the other endpoints.
+            Utils.validateFlowType(resolvedFlowType);
+        }
+        // Goes through the engine's PUBLIC metadata service rather than reaching into the
+        // engine's internal DataHolder — the latter lives in a Private-Package and isn't
+        // visible to other OSGi bundles at runtime.
+        InFlowExtensionContextTreeMetadata metadata =
+                InFlowExtensionContextTreeService.getInstance().buildContextTree(resolvedFlowType);
+        return InFlowExtensionContextTreeMapper.toResponse(metadata);
     }
 
     /**

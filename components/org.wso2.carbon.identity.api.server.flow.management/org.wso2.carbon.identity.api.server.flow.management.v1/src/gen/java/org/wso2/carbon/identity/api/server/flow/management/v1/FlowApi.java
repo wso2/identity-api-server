@@ -236,6 +236,36 @@ public class FlowApi {
     }
 
     @Valid
+    @GET
+    @Path("/in-flow-extension/context-tree")
+    @Produces({"application/json"})
+    @ApiOperation(value = "Retrieve the controlled In-Flow Extension context tree",
+            notes = "Returns the canonical context tree filtered by the deployment.toml whitelist " +
+                    "for the given flow type. When flowType is omitted the default tree is returned. " +
+                    "Used by the Console UI to render the access-config editor without offering paths " +
+                    "the deployment has switched off.",
+            response = InFlowExtensionContextTreeResponse.class, authorizations = {
+            @Authorization(value = "BasicAuth"),
+            @Authorization(value = "OAuth2", scopes = {
+
+            })
+    }, tags = {"Flow Composer",})
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully retrieved the context tree",
+                    response = InFlowExtensionContextTreeResponse.class),
+            @ApiResponse(code = 400, message = "Invalid flow type specified", response = Error.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = Error.class)
+    })
+    public Response getInFlowExtensionContextTree(
+            @ApiParam(value = "Optional flow type. When omitted, the default tree is returned.",
+                    allowableValues = "REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION, ASK_PASSWORD")
+            @QueryParam("flowType") String flowType) {
+
+        return delegate.getInFlowExtensionContextTree(flowType);
+    }
+
+    @Valid
     @PUT
 
     @Consumes({"application/json"})
