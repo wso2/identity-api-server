@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: v1
+  version: 1.0.0
   title: WSO2 Identity Server - Action Management Rest API
   description: >
     The Action Management REST API provides a comprehensive interface to manage actions
@@ -9,6 +9,9 @@ info:
     This API helps developers and administrators to define and manage actions to meet specific
     business needs.
 servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/udesh/Actions/1.0.0
   - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
     variables:
       server-url:
@@ -1767,6 +1770,17 @@ components:
               "accessToken": "0d6fed02-eac0-332b-8998-213a543139a0"
             }
           }``
+        
+        - CLIENT_CREDENTIAL: OAuth2 client credentials grant based authentication.<br/>
+          ``{
+            "type": "CLIENT_CREDENTIAL",
+            "properties": {
+              "clientId": "3e172dd2-901b-43a9-a26a-728466795f01",
+              "clientSecret": "83cdc120-ccf6-4163-a4a8-c1ba3e872daa",
+              "tokenEndpoint": "https://custom.idp.com/todos",
+              "scopes": "send_scope"
+            }
+          }``
       required:
         - type
       properties:
@@ -1777,6 +1791,7 @@ components:
             - BEARER
             - API_KEY
             - BASIC
+            - CLIENT_CREDENTIAL
           example: BASIC
         properties:
           type: object
@@ -1801,8 +1816,17 @@ components:
             - BEARER
             - API_KEY
             - BASIC
+            - CLIENT_CREDENTIAL
           description: Type of the authentication.
           example: BASIC
+        properties:
+          type: object
+          description: Authentication properties(without secrets) specific to the selected type.
+          additionalProperties: true
+          example:
+            type: BASIC
+            properties:
+              username: "auth_username"
 
     ActionUpdateModel:
       type: object

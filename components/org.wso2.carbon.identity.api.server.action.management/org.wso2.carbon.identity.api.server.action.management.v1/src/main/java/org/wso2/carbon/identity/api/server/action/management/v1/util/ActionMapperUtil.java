@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -37,6 +37,7 @@ import org.wso2.carbon.identity.api.server.action.management.v1.Link;
 import org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -146,13 +147,49 @@ public class ActionMapperUtil {
                 .updatedAt(action.getUpdatedAt() != null ? action.getUpdatedAt().toInstant().toString() : null)
                 .endpoint(new EndpointResponse()
                         .uri(action.getEndpoint().getUri())
-                        .authentication(new AuthenticationTypeResponse()
-                                .type(AuthenticationTypeResponse.TypeEnum.valueOf(action.getEndpoint()
-                                        .getAuthentication().getType().toString())))
+                        .authentication(buildAuthenticationTypeResponse(action.getEndpoint().getAuthentication(),
+                                action.getId()))
                         .allowedHeaders(action.getEndpoint().getAllowedHeaders())
                         .allowedParameters(action.getEndpoint().getAllowedParameters()))
                 .rule((action.getActionRule() != null) ? RuleMapper.toORRuleResponse(action.getActionRule()) :
                         null);
+    }
+
+    public static AuthenticationTypeResponse buildAuthenticationTypeResponse(Authentication authentication,
+                                                                             String actionId) {
+
+        AuthenticationTypeResponse authenticationTypeResponse = new AuthenticationTypeResponse()
+                .type(AuthenticationTypeResponse.TypeEnum.valueOf(authentication.getType().toString()));
+        Map<String, Object> authenticationProperties = new HashMap<>();
+
+        switch (authentication.getType()) {
+            case BASIC:
+                authenticationProperties.put(Authentication.Property.USERNAME.getName(),
+                        authentication.getPropertyWithDecryptedValue(
+                                actionId, Authentication.Property.USERNAME.getName()).getValue());
+                authenticationTypeResponse.setProperties(authenticationProperties);
+                break;
+            case BEARER:
+                break;
+            case API_KEY:
+                authenticationProperties.put(Authentication.Property.HEADER.getName(),
+                        authentication.getProperty(Authentication.Property.HEADER).getValue());
+                authenticationTypeResponse.setProperties(authenticationProperties);
+                break;
+            case CLIENT_CREDENTIAL:
+                authenticationProperties.put(Authentication.Property.CLIENT_ID.getName(),
+                        authentication.getPropertyWithDecryptedValue(
+                                actionId, Authentication.Property.CLIENT_ID.getName()).getValue());
+                authenticationProperties.put(Authentication.Property.TOKEN_ENDPOINT.getName(),
+                        authentication.getProperty(Authentication.Property.TOKEN_ENDPOINT).getValue());
+                authenticationProperties.put(Authentication.Property.SCOPES.getName(),
+                        authentication.getProperty(Authentication.Property.SCOPES).getValue());
+                authenticationTypeResponse.setProperties(authenticationProperties);
+                break;
+            case NONE:
+                break;
+        }
+        return authenticationTypeResponse;
     }
 
     /**
@@ -253,6 +290,30 @@ public class ActionMapperUtil {
                 }
 
                 return new Authentication.APIKeyAuthBuilder(header, value).build();
+            case CLIENT_CREDENTIAL:
+                if (authPropertiesMap == null
+                        || !authPropertiesMap.containsKey(Authentication.Property.CLIENT_ID.getName())
+                        || !authPropertiesMap.containsKey(Authentication.Property.CLIENT_SECRET.getName())
+                        || !authPropertiesMap.containsKey(Authentication.Property.TOKEN_ENDPOINT.getName())) {
+                    throw ActionMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST,
+                            ERROR_INVALID_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES);
+                }
+                String clientId = (String) authPropertiesMap.get(Authentication.Property.CLIENT_ID.getName());
+                String clientSecret = (String) authPropertiesMap.get(Authentication.Property.CLIENT_SECRET.getName());
+                String tokenEndpoint = (String) authPropertiesMap.get(Authentication.Property.TOKEN_ENDPOINT.getName());
+                String scopes = StringUtils.EMPTY;
+                if (authPropertiesMap.containsKey(Authentication.Property.SCOPES.getName())) {
+                    scopes = (String) authPropertiesMap.get(Authentication.Property.SCOPES.getName());
+                }
+
+                if (StringUtils.isEmpty(clientId) || StringUtils.isEmpty(clientSecret) ||
+                        StringUtils.isEmpty(tokenEndpoint)) {
+                    throw ActionMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST,
+                            ERROR_EMPTY_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES);
+                }
+
+                return new Authentication.ClientCredentialAuthBuilder(clientId, clientSecret, tokenEndpoint,
+                        scopes).build();
             case NONE:
                 return new Authentication.NoneAuthBuilder().build();
             default:
