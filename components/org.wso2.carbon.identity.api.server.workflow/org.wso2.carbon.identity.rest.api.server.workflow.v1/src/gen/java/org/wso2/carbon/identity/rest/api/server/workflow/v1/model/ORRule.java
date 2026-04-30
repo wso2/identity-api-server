@@ -76,7 +76,7 @@ public enum ConditionEnum {
 
 
     /**
-    * The logical condition for combining the su-rules. For ORRule, the value must always be \&quot;OR\&quot;.
+    * The logical condition for combining the sub-rules. For ORRule, the value must always be \&quot;OR\&quot;.
     **/
     public ORRule condition(ConditionEnum condition) {
 
@@ -84,7 +84,7 @@ public enum ConditionEnum {
         return this;
     }
     
-    @ApiModelProperty(value = "The logical condition for combining the su-rules. For ORRule, the value must always be \"OR\".")
+    @ApiModelProperty(value = "The logical condition for combining the sub-rules. For ORRule, the value must always be \"OR\".")
     @JsonProperty("condition")
     @Valid
     public ConditionEnum getCondition() {
