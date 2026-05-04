@@ -19,7 +19,7 @@
 package org.wso2.carbon.identity.api.server.debug.v1.constants;
 
 /**
- * Contains constants for Debug Flow Data Provider API.
+ * Contains constants for Debug API.
  */
 public class DebugConstants {
 

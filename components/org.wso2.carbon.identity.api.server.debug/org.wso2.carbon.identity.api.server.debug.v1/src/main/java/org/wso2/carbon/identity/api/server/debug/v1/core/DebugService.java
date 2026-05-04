@@ -21,7 +21,6 @@ package org.wso2.carbon.identity.api.server.debug.v1.core;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.debug.v1.constants.DebugConstants;
 import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionRequest;
 import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionResponse;
@@ -31,12 +30,16 @@ import org.wso2.carbon.identity.api.server.debug.v1.utils.Utils;
 import org.wso2.carbon.identity.debug.framework.DebugFrameworkConstants;
 import org.wso2.carbon.identity.debug.framework.core.DebugRequestCoordinator;
 import org.wso2.carbon.identity.debug.framework.exception.DebugFrameworkClientException;
+import org.wso2.carbon.identity.debug.framework.exception.DebugFrameworkException;
 import org.wso2.carbon.identity.debug.framework.exception.DebugFrameworkServerException;
 import org.wso2.carbon.identity.debug.framework.model.DebugRequest;
 import org.wso2.carbon.identity.debug.framework.model.DebugResponse;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -48,6 +51,8 @@ import javax.ws.rs.core.Response;
 public class DebugService {
 
     private static final Log LOG = LogFactory.getLog(DebugService.class);
+    private static final Map<String, List<String>> REQUIRED_PROPERTIES_BY_RESOURCE_TYPE =
+            createRequiredPropertiesByResourceType();
     private final DebugRequestCoordinator coordinator;
 
     public DebugService(DebugRequestCoordinator coordinator) {
@@ -59,7 +64,7 @@ public class DebugService {
      * Process a start debug session request and return a typed response DTO.
      * All framework exceptions are caught here and converted to APIError.
      *
-     * @param resourceType           Path parameter resource type.
+     * @param resourceType Path parameter resource type.
      * @param debugConnectionRequest Debug request payload.
      * @return DebugConnectionResponse DTO.
      */
@@ -72,19 +77,8 @@ public class DebugService {
             validateRequest(normalizedResourceType, debugConnectionRequest, properties);
             Map<String, Object> responseData = handleDebugRequest(normalizedResourceType, properties);
             return buildDebugConnectionResponse(responseData);
-        } catch (DebugFrameworkClientException e) {
-            throw Utils.handleException(
-                    Response.Status.BAD_REQUEST,
-                    DebugConstants.ErrorMessage.ERROR_CODE_ERROR_VALIDATING_REQUEST.getCode(),
-                    DebugConstants.ErrorMessage.ERROR_CODE_ERROR_VALIDATING_REQUEST.getMessage(),
-                    Utils.resolveClientErrorDescription(e,
-                            DebugConstants.ErrorMessage.ERROR_CODE_ERROR_VALIDATING_REQUEST.getDescription()));
-        } catch (DebugFrameworkServerException e) {
-            throw Utils.handleException(
-                    Response.Status.INTERNAL_SERVER_ERROR,
-                    DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST.getCode(),
-                    DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST.getMessage(),
-                    DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST.getDescription());
+        } catch (DebugFrameworkException e) {
+            throw Utils.handleDebugException(e);
         }
     }
 
@@ -114,35 +108,17 @@ public class DebugService {
                         DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND.getDescription());
             }
             return buildDebugResult(frameworkResponse, normalizedDebugId);
-        } catch (APIError e) {
-            throw e;
-        } catch (DebugFrameworkClientException e) {
-            if (DebugFrameworkConstants.ErrorMessages.ERROR_CODE_RESULT_NOT_FOUND.getCode()
-                    .equals(e.getErrorCode())) {
+        } catch (DebugFrameworkException e) {
+            if (e instanceof DebugFrameworkClientException
+                    && DebugFrameworkConstants.ErrorMessages.ERROR_CODE_RESULT_NOT_FOUND.getCode()
+                            .equals(e.getErrorCode())) {
                 throw Utils.handleException(
                         Response.Status.NOT_FOUND,
                         DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND.getCode(),
                         DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND.getMessage(),
                         DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND.getDescription());
             }
-            throw Utils.handleException(
-                    Response.Status.BAD_REQUEST,
-                    DebugConstants.ErrorMessage.ERROR_CODE_ERROR_VALIDATING_REQUEST.getCode(),
-                    DebugConstants.ErrorMessage.ERROR_CODE_ERROR_VALIDATING_REQUEST.getMessage(),
-                    Utils.resolveClientErrorDescription(e,
-                            DebugConstants.ErrorMessage.ERROR_CODE_ERROR_VALIDATING_REQUEST.getDescription()));
-        } catch (DebugFrameworkServerException e) {
-            throw Utils.handleException(
-                    Response.Status.INTERNAL_SERVER_ERROR,
-                    DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST.getCode(),
-                    DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST.getMessage(),
-                    DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST.getDescription());
-        } catch (RuntimeException e) {
-            throw Utils.handleException(
-                    Response.Status.INTERNAL_SERVER_ERROR,
-                    DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST.getCode(),
-                    DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST.getMessage(),
-                    DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST.getDescription());
+            throw Utils.handleDebugException(e);
         }
     }
 
@@ -150,7 +126,7 @@ public class DebugService {
      * Sends a debug request to the coordinator and returns a safe copy of the response data.
      *
      * @param resourceType Resource type from path parameter.
-     * @param properties   Normalized properties map.
+     * @param properties Normalized properties map.
      * @return Response data map (safe copy, never null).
      * @throws DebugFrameworkClientException if the framework encounters a client error.
      * @throws DebugFrameworkServerException if the framework encounters a server error.
@@ -167,14 +143,7 @@ public class DebugService {
             debugRequest.addContextProperty(entry.getKey(), entry.getValue());
         }
 
-        DebugResponse response;
-        try {
-            response = coordinator.handleDebugRequest(debugRequest);
-        } catch (RuntimeException e) {
-            throw Utils.handleServerException(e,
-                    "Error processing start debug session request.",
-                    "Error occurred while processing debug request.");
-        }
+        DebugResponse response = coordinator.handleDebugRequest(debugRequest);
 
         // Copy framework response into a new map to avoid mutating framework-owned data.
         Map<String, Object> responseData = new HashMap<>();
@@ -199,10 +168,7 @@ public class DebugService {
 
         DebugConnectionResponse response = new DebugConnectionResponse();
 
-        Object debugId = responseData.get(DebugConstants.ResponseKeys.DEBUG_ID);
-        if (debugId == null) {
-            debugId = responseData.get(DebugConstants.ResponseKeys.STATE);
-        }
+        Object debugId = resolveDebugId(responseData, null);
         if (debugId == null) {
             throw new DebugFrameworkServerException(
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_SERVER_ERROR.getCode(),
@@ -239,13 +205,7 @@ public class DebugService {
 
         DebugResult response = new DebugResult();
 
-        Object debugId = frameworkResponse.get(DebugConstants.ResponseKeys.DEBUG_ID);
-        if (debugId == null) {
-            debugId = frameworkResponse.get(DebugConstants.ResponseKeys.STATE);
-        }
-        if (debugId == null) {
-            debugId = requestedDebugId;
-        }
+        Object debugId = resolveDebugId(frameworkResponse, requestedDebugId);
         if (debugId != null) {
             response.setDebugId(debugId.toString());
         }
@@ -257,12 +217,14 @@ public class DebugService {
         response.setMessage(resolveResultMessage(
                 status, frameworkResponse.get(DebugConstants.ResponseKeys.MESSAGE)));
 
-        // Build metadata: preserve all keys except the extracted status/success fields.
+        // Build metadata: preserve framework-specific keys except fields extracted to the top level.
         Map<String, Object> metadata = new LinkedHashMap<>();
         for (Map.Entry<String, Object> entry : frameworkResponse.entrySet()) {
             String key = entry.getKey();
             if (!DebugConstants.ResponseKeys.STATUS.equals(key)
-                    && !DebugConstants.ResponseKeys.SUCCESS.equals(key)) {
+                    && !DebugConstants.ResponseKeys.SUCCESS.equals(key)
+                    && !DebugConstants.ResponseKeys.DEBUG_ID.equals(key)
+                    && !DebugConstants.ResponseKeys.STATE.equals(key)) {
                 metadata.put(key, entry.getValue());
             }
         }
@@ -296,7 +258,7 @@ public class DebugService {
     /**
      * Resolves the result StatusEnum from both status string and boolean success flag.
      *
-     * @param status  Raw status object from framework response.
+     * @param status Raw status object from framework response.
      * @param success Raw success flag object from framework response.
      * @return Resolved StatusEnum.
      */
@@ -322,7 +284,7 @@ public class DebugService {
     /**
      * Resolves the response message for a connection response.
      *
-     * @param status           Resolved status enum.
+     * @param status Resolved status enum.
      * @param frameworkMessage Raw message from framework.
      * @return Message string.
      */
@@ -349,7 +311,7 @@ public class DebugService {
     /**
      * Resolves the response message for a debug result.
      *
-     * @param status           Resolved status enum.
+     * @param status Resolved status enum.
      * @param frameworkMessage Raw message from framework.
      * @return Message string.
      */
@@ -384,12 +346,32 @@ public class DebugService {
                 : DebugConnectionResponse.StatusEnum.FAILURE.name();
     }
 
+    private Object resolveDebugId(Map<String, Object> responseData, String fallbackDebugId) {
+
+        Object debugId = responseData.get(DebugConstants.ResponseKeys.DEBUG_ID);
+        if (debugId == null) {
+            debugId = responseData.get(DebugConstants.ResponseKeys.STATE);
+        }
+        if (debugId == null) {
+            debugId = fallbackDebugId;
+        }
+        return debugId;
+    }
+
+    private static Map<String, List<String>> createRequiredPropertiesByResourceType() {
+
+        Map<String, List<String>> requiredPropertiesByResourceType = new HashMap<>();
+        requiredPropertiesByResourceType.put(DebugConstants.ResourceType.IDP,
+                Arrays.asList(DebugConstants.CONNECTION_ID_KEY));
+        return Collections.unmodifiableMap(requiredPropertiesByResourceType);
+    }
+
     /**
      * Validates the debug start session request.
      *
-     * @param resourceType           Normalized resource type.
+     * @param resourceType Normalized resource type.
      * @param debugConnectionRequest Request body.
-     * @param properties             Normalized properties map.
+     * @param properties Normalized properties map.
      * @throws DebugFrameworkClientException if validation fails.
      */
     private void validateRequest(String resourceType,
@@ -411,13 +393,22 @@ public class DebugService {
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_MISSING_RESOURCE_TYPE.getDescription());
         }
 
-        // Resource type is passed from the path and should be extensible.
-        if (DebugConstants.ResourceType.IDP.equals(resourceType)
-                && !properties.containsKey(DebugConstants.CONNECTION_ID_KEY)) {
+        List<String> requiredProperties = REQUIRED_PROPERTIES_BY_RESOURCE_TYPE.get(resourceType);
+        if (requiredProperties == null) {
             throw new DebugFrameworkClientException(
-                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_MISSING_CONNECTION_ID.getCode(),
-                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_MISSING_CONNECTION_ID.getMessage(),
-                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_MISSING_CONNECTION_ID.getDescription());
+                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getCode(),
+                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getMessage(),
+                    "Invalid resource type. Supported values are: "
+                            + String.join(", ", REQUIRED_PROPERTIES_BY_RESOURCE_TYPE.keySet()) + ".");
+        }
+
+        for (String requiredProperty : requiredProperties) {
+            if (!properties.containsKey(requiredProperty)) {
+                throw new DebugFrameworkClientException(
+                        DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getCode(),
+                        DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getMessage(),
+                        "Missing required property: " + requiredProperty + ".");
+            }
         }
     }
 

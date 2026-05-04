@@ -24,7 +24,7 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
 import org.wso2.carbon.identity.api.server.debug.v1.constants.DebugConstants;
 import org.wso2.carbon.identity.debug.framework.exception.DebugFrameworkClientException;
-import org.wso2.carbon.identity.debug.framework.exception.DebugFrameworkServerException;
+import org.wso2.carbon.identity.debug.framework.exception.DebugFrameworkException;
 
 import javax.ws.rs.core.Response;
 
@@ -42,14 +42,14 @@ public class Utils {
     /**
      * Builds an APIError for an explicit HTTP status.
      *
-     * @param status      HTTP status.
-     * @param errorCode   Error code.
-     * @param message     Error message.
+     * @param status HTTP status.
+     * @param errorCode Error code.
+     * @param message Error message.
      * @param description Error description.
      * @return APIError.
      */
     public static APIError handleException(Response.Status status, String errorCode,
-                                           String message, String description) {
+            String message, String description) {
 
         return new APIError(status, getError(errorCode, message, description));
     }
@@ -57,8 +57,8 @@ public class Utils {
     /**
      * Builds an ErrorDTO.
      *
-     * @param errorCode        Error code.
-     * @param errorMessage     Error message.
+     * @param errorCode Error code.
+     * @param errorMessage Error message.
      * @param errorDescription Error description.
      * @return ErrorDTO.
      */
@@ -87,45 +87,30 @@ public class Utils {
     }
 
     /**
-     * Resolves a client exception's description, falling back to message, then to the provided fallback.
+     * Handles a DebugFrameworkException by mapping it to an APIError.
      *
-     * @param exception Client exception.
-     * @param fallback  Fallback description.
-     * @return Resolved description string.
+     * @param e Debug framework exception.
+     * @return APIError with the appropriate HTTP status and error details.
      */
-    public static String resolveClientErrorDescription(DebugFrameworkClientException exception,
-                                                       String fallback) {
+    public static APIError handleDebugException(DebugFrameworkException e) {
 
-        if (exception == null) {
-            return fallback;
+        Response.Status status;
+        if (e instanceof DebugFrameworkClientException) {
+            LOG.debug(e.getMessage(), e);
+            status = Response.Status.BAD_REQUEST;
+        } else {
+            LOG.error(e.getMessage(), e);
+            status = Response.Status.INTERNAL_SERVER_ERROR;
         }
-        String normalizedDescription = normalizeText(exception.getDescription());
-        if (normalizedDescription != null) {
-            return normalizedDescription;
+
+        String errorCode = e.getErrorCode();
+        if (errorCode == null) {
+            errorCode = DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST.getCode();
+        } else if (!errorCode.contains("-")) {
+            errorCode = DebugConstants.DEBUG_PREFIX + errorCode;
         }
-        String normalizedMessage = normalizeText(exception.getMessage());
-        if (normalizedMessage != null) {
-            return normalizedMessage;
-        }
-        return fallback;
+
+        return handleException(status, errorCode, e.getMessage(), e.getDescription());
     }
 
-    /**
-     * Handles a RuntimeException by wrapping it into a DebugFrameworkServerException and logging.
-     *
-     * @param e           Runtime exception.
-     * @param logMessage  Log message.
-     * @param description Error description.
-     * @return DebugFrameworkServerException.
-     */
-    public static DebugFrameworkServerException handleServerException(RuntimeException e,
-                                                                      String logMessage,
-                                                                      String description) {
-
-        LOG.error(logMessage, e);
-        return new DebugFrameworkServerException(
-                DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST.getCode(),
-                DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST.getMessage(),
-                description, e);
-    }
 }

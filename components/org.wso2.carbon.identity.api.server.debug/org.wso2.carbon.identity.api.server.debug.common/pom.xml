@@ -29,8 +29,8 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.identity.api.server.debug.common</artifactId>
     <packaging>jar</packaging>
-    <name>WSO2 Identity Server - Debug Flow Data Provider API Common</name>
-    <description>WSO2 Identity Server - Common classes for Debug Flow Data Provider API</description>
+    <name>WSO2 Identity Server - Debug API Common</name>
+    <description>WSO2 Identity Server - Common classes for Debug API</description>
 
     <build>
         <plugins>

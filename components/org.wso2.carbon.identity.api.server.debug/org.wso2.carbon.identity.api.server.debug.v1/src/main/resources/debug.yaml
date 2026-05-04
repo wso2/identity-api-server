@@ -165,8 +165,9 @@ components:
       properties:
         code:
           type: string
-          example: "10001"
-          description: "An error code."
+          pattern: "^DBG-[0-9]{5}$"
+          example: "DBG-10001"
+          description: "An error code in DBG-prefixed format."
         message:
           type: string
           example: "Error message."
