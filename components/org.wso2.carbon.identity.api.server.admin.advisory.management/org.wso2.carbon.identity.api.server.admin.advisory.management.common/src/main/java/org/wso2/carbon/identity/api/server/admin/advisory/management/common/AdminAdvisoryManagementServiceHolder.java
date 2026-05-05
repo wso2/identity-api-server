@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.admin.advisory.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.admin.advisory.mgt.service.AdminAdvisoryManagementService;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 
@@ -25,6 +27,8 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
  * Service holder class for admin advisory management.
  */
 public class AdminAdvisoryManagementServiceHolder {
+
+    private static final Log LOG = LogFactory.getLog(AdminAdvisoryManagementServiceHolder.class);
 
     public AdminAdvisoryManagementServiceHolder() {}
 
@@ -39,6 +43,13 @@ public class AdminAdvisoryManagementServiceHolder {
      */
     public static AdminAdvisoryManagementService getAdminAdvisoryManagementService() {
 
-        return AdminAdvisoryServiceHolder.SERVICE;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving AdminAdvisoryManagementService from OSGi service registry.");
+        }
+        AdminAdvisoryManagementService service = AdminAdvisoryServiceHolder.SERVICE;
+        if (service == null && LOG.isWarnEnabled()) {
+            LOG.warn("AdminAdvisoryManagementService is not available.");
+        }
+        return service;
     }
 }
