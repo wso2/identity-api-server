@@ -1,0 +1,818 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: "Connection Sharing API"
+  description: |-
+    This document defines the **Connection Sharing REST API** for organizations in **WSO2 Identity Server**.
+    It follows the same pattern as **User Sharing (v2)** and enables organization administrators to:
+    - Share federated identity provider connections with child organizations.
+    - Manage and revoke shared connection access.
+    - Retrieve the organizations a connection has been shared with.
+  contact:
+    name: WSO2
+    url: 'https://wso2.com/identity-platform/access-manager/'
+    email: iam-dev@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+servers:
+  - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
+    variables:
+      tenant-domain:
+        default: "carbon.super"
+      server-url:
+        default: "localhost:9443"
+
+security:
+  - OAuth2: []
+  - BasicAuth: []
+
+paths:
+
+  /connections/share:
+    post:
+      tags:
+        - Connection Sharing
+      summary: Share connections with specific organizations
+      description: |-
+        Share one or more federated identity provider connections with a selected set of
+        child organizations.
+
+        Once shared, a shadow connection is created in each target sub-organization.
+        Sub-organization users can then add the shared connection to their application
+        login flows and authenticate through it.
+
+        This endpoint is treated as a **processing function**:
+        it triggers a sharing process and responds with `202 Accepted`.
+
+        **Scope required:** `internal_connection_share`
+      operationId: shareConnectionsWithSelected
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConnectionShareSelectedRequestBody"
+            example:
+              connectionCriteria:
+                connectionIds:
+                  - "7a1b7d63-8cfc-4dc9-9332-3f84641b72d8"
+                  - "5d2a1c84-9f7a-43cd-b12e-6e52d7f87e16"
+                connectionNames:
+                  - "Google"
+                  - "Facebook"
+              organizations:
+                - orgId: "b028ca17-8f89-449c-ae27-fa955e66465d"
+                  policy: "SELECTED_ORG_ONLY"
+                - orgId: "a17b28ca-9f89-449c-ae27-fa955e66465f"
+                  policy: "SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN"
+      responses:
+        "202":
+          description: Connection sharing process triggered successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProcessSuccessResponse"
+              example:
+                status: "Processing"
+                details: "Connection sharing process triggered successfully."
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      x-codeSamples:
+        - lang: Curl
+          source: |
+            curl --location 'https://localhost:9443/t/carbon.super/api/server/v1/connections/share' \
+            -H 'Content-Type: application/json' \
+            -H 'Accept: application/json' \
+            -H 'Authorization: Bearer {bearer_token}' \
+            -d '{
+              "connectionCriteria": {
+                "connectionIds": [
+                  "7a1b7d63-8cfc-4dc9-9332-3f84641b72d8",
+                  "5d2a1c84-9f7a-43cd-b12e-6e52d7f87e16"
+                ],
+                "connectionNames": [
+                  "Google",
+                  "Facebook"
+                ]
+              },
+              "organizations": [
+                {
+                  "orgId": "b028ca17-8f89-449c-ae27-fa955e66465d",
+                  "policy": "SELECTED_ORG_ONLY"
+                },
+                {
+                  "orgId": "a17b28ca-9f89-449c-ae27-fa955e66465f",
+                  "policy": "SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN"
+                }
+              ]
+            }'
+
+  /connections/share-with-all:
+    post:
+      tags:
+        - Connection Sharing
+      summary: Share connections with all organizations
+      description: |-
+        Share one or more federated identity provider connections with **all child organizations**
+        according to the specified policy.
+
+        Once shared, a shadow connection is created in each matching sub-organization.
+        Sub-organization users can then add the shared connection to their application
+        login flows and authenticate through it.
+
+        This endpoint is treated as a **processing function** and responds with `202 Accepted`.
+
+        **Scope required:** `internal_connection_share`
+      operationId: shareConnectionsWithAll
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConnectionShareWithAllRequestBody"
+            example:
+              connectionCriteria:
+                connectionIds:
+                  - "7a1b7d63-8cfc-4dc9-9332-3f84641b72d8"
+                  - "5d2a1c84-9f7a-43cd-b12e-6e52d7f87e16"
+                connectionNames:
+                  - "Google"
+                  - "Facebook"
+              policy: "ALL_EXISTING_AND_FUTURE_ORGS"
+      responses:
+        "202":
+          description: Connection share-with-all process triggered successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProcessSuccessResponse"
+              example:
+                status: "Processing"
+                details: "Connection share-with-all process triggered successfully."
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      x-codeSamples:
+        - lang: Curl
+          source: |
+            curl --location 'https://localhost:9443/t/carbon.super/api/server/v1/connections/share-with-all' \
+            -H 'Content-Type: application/json' \
+            -H 'Accept: application/json' \
+            -H 'Authorization: Bearer {bearer_token}' \
+            -d '{
+              "connectionCriteria": {
+                "connectionIds": [
+                  "7a1b7d63-8cfc-4dc9-9332-3f84641b72d8",
+                  "5d2a1c84-9f7a-43cd-b12e-6e52d7f87e16"
+                ],
+                "connectionNames": [
+                  "Google",
+                  "Facebook"
+                ]
+              },
+              "policy": "ALL_EXISTING_AND_FUTURE_ORGS"
+            }'
+
+  /connections/unshare:
+    post:
+      tags:
+        - Connection Sharing
+      summary: Unshare connections from specific organizations
+      description: |-
+        Unshare one or more federated identity provider connections from a selected set of
+        child organizations.
+
+        > **Note:**
+        > This only removes the shared connection from the specified organizations. If a connection
+        > was shared with a parent org and its children via a broader policy, you must explicitly
+        > include all relevant organization IDs when unsharing.
+
+        This endpoint is treated as a **processing function** and responds with `202 Accepted`.
+
+        **Scope required:** `internal_connection_unshare`
+      operationId: unshareConnectionsFromSelected
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConnectionUnshareSelectedRequestBody"
+            example:
+              connectionCriteria:
+                connectionIds:
+                  - "7a1b7d63-8cfc-4dc9-9332-3f84641b72d8"
+                  - "5d2a1c84-9f7a-43cd-b12e-6e52d7f87e16"
+                connectionNames:
+                  - "Google"
+                  - "Facebook"
+              orgIds:
+                - "b028ca17-8f89-449c-ae27-fa955e66465d"
+                - "a17b28ca-9f89-449c-ae27-fa955e66465f"
+      responses:
+        "202":
+          description: Connection unsharing process triggered successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProcessSuccessResponse"
+              example:
+                status: "Processing"
+                details: "Connection unsharing process triggered successfully."
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      x-codeSamples:
+        - lang: Curl
+          source: |
+            curl --location 'https://localhost:9443/t/carbon.super/api/server/v1/connections/unshare' \
+            -H 'Content-Type: application/json' \
+            -H 'Accept: application/json' \
+            -H 'Authorization: Bearer {bearer_token}' \
+            -d '{
+              "connectionCriteria": {
+                "connectionIds": [
+                  "7a1b7d63-8cfc-4dc9-9332-3f84641b72d8",
+                  "5d2a1c84-9f7a-43cd-b12e-6e52d7f87e16"
+                ],
+                "connectionNames": [
+                  "Google",
+                  "Facebook"
+                ]
+              },
+              "orgIds": [
+                "b028ca17-8f89-449c-ae27-fa955e66465d",
+                "a17b28ca-9f89-449c-ae27-fa955e66465f"
+              ]
+            }'
+
+  /connections/unshare-with-all:
+    post:
+      tags:
+        - Connection Sharing
+      summary: Unshare connections from all organizations
+      description: |-
+        Completely remove shared access for one or more federated identity provider connections
+        from **all child organizations**.
+
+        This endpoint is treated as a **processing function** and responds with `202 Accepted`.
+
+        **Scope required:** `internal_connection_unshare`
+      operationId: unshareConnectionsFromAll
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConnectionUnshareWithAllRequestBody"
+            example:
+              connectionCriteria:
+                connectionIds:
+                  - "7a1b7d63-8cfc-4dc9-9332-3f84641b72d8"
+                  - "5d2a1c84-9f7a-43cd-b12e-6e52d7f87e16"
+                connectionNames:
+                  - "Google"
+                  - "Facebook"
+      responses:
+        "202":
+          description: Connection unshare-with-all process triggered successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProcessSuccessResponse"
+              example:
+                status: "Processing"
+                details: "Connection unshare-with-all process triggered successfully."
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      x-codeSamples:
+        - lang: Curl
+          source: |
+            curl --location 'https://localhost:9443/t/carbon.super/api/server/v1/connections/unshare-with-all' \
+            -H 'Content-Type: application/json' \
+            -H 'Accept: application/json' \
+            -H 'Authorization: Bearer {bearer_token}' \
+            -d '{
+              "connectionCriteria": {
+                "connectionIds": [
+                  "7a1b7d63-8cfc-4dc9-9332-3f84641b72d8",
+                  "5d2a1c84-9f7a-43cd-b12e-6e52d7f87e16"
+                ],
+                "connectionNames": [
+                  "Google",
+                  "Facebook"
+                ]
+              }
+            }'
+
+  /connections/{connectionId}/share:
+    get:
+      tags:
+        - Connection Shared Organizations
+      summary: List organizations a connection has been shared with
+      description: |-
+        Retrieve the list of organizations that the specified connection has been shared with,
+        including per-organization sharing mode where applicable.
+
+        The response shape depends on how the connection was shared:
+        - If the connection was shared via **`ALL_EXISTING_AND_FUTURE_ORGS`** policy → a top-level
+          `sharingMode` is returned in the response (only when `attributes=sharingMode` is requested),
+          and no per-org `sharingMode` is present on each organization entry.
+        - If the connection was shared via **`SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN`**
+          policy → no top-level `sharingMode` is returned, and each matching organization entry
+          includes its own `sharingMode` (only when `attributes=sharingMode` is requested).
+        - If the connection was shared via **`SELECTED_ORG_ONLY`** policy → no `sharingMode` is
+          returned at either level, even if `attributes=sharingMode` is requested.
+
+        **Scope required:** `internal_connection_shared_access_view`
+      operationId: getConnectionSharedOrganizations
+      parameters:
+        - in: path
+          name: connectionId
+          required: true
+          schema:
+            type: string
+          description: The unique identifier (UUID) of the connection.
+        - in: query
+          name: before
+          required: false
+          schema:
+            type: string
+          example: "Ng=="
+          description: Base64 encoded cursor value for backward pagination.
+        - in: query
+          name: after
+          required: false
+          schema:
+            type: string
+          example: "Ng=="
+          description: Base64 encoded cursor value for forward pagination.
+        - in: query
+          name: filter
+          required: false
+          schema:
+            type: string
+          example: "orgId eq b028ca17-8f89-449c-ae27-fa955e66465d"
+          description: |-
+            Condition to filter the retrieval of records.
+            Supports `sw`, `co`, `ew`, and `eq` operations.
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+          example: 10
+          description: |-
+            Maximum number of records to return. If not specified, all shared organizations
+            are returned.
+        - in: query
+          name: recursive
+          required: false
+          schema:
+            type: boolean
+          description: |-
+            Determines whether a recursive search should happen.
+            If set to `true`, includes shared organizations at all levels of the hierarchy;
+            if set to `false`, includes only shared organizations at the next level of the hierarchy.
+        - in: query
+          name: attributes
+          required: false
+          schema:
+            type: string
+          example: "sharingMode"
+          description: |-
+            Specifies the additional parameters to include in the response.
+            Supported value: `sharingMode`.
+
+            When `sharingMode` is requested:
+            - For connections shared via `ALL_EXISTING_AND_FUTURE_ORGS`, a top-level `sharingMode`
+              is included in the response.
+            - For connections shared via `SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN`,
+              a `sharingMode` is included on each applicable organization entry.
+            - For connections shared via `SELECTED_ORG_ONLY`, no `sharingMode` is returned.
+      responses:
+        "200":
+          description: Successful response with the list of organizations the connection is shared with.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConnectionSharedOrganizationsResponse"
+              examples:
+                sharedWithAll:
+                  summary: Connection shared with all organizations (attributes=sharingMode requested)
+                  value:
+                    links:
+                      - href: "/t/{tenant-domain}/api/server/v1/connections/7a1b7d63-8cfc-4dc9-9332-3f84641b72d8/share?limit=10&after=MTA="
+                        rel: "next"
+                    sharingMode:
+                      policy: "ALL_EXISTING_AND_FUTURE_ORGS"
+                    organizations:
+                      - orgId: "b028ca17-8f89-449c-ae27-fa955e66465d"
+                        orgName: "Child Org 1"
+                        orgHandle: "child-org-1"
+                        orgStatus: "ACTIVE"
+                        orgRef: "/t/wso2.com/api/server/v1/organizations/b028ca17-8f89-449c-ae27-fa955e66465d"
+                        hasChildren: true
+                        depthFromRoot: 1
+                        parentOrgId: "08f8c1d2-4b3e-4c5a-9f6b-7d8e9f0a1b2c"
+                        parentConnectionId: "7a1b7d63-8cfc-4dc9-9332-3f84641b72d8"
+                        sharedConnectionId: "550e8400-e29b-41d4-a716-446655440000"
+                sharedWithSelected:
+                  summary: Connection shared with selected organizations (attributes=sharingMode requested)
+                  value:
+                    links:
+                      - href: "/t/{tenant-domain}/api/server/v1/connections/7a1b7d63-8cfc-4dc9-9332-3f84641b72d8/share?limit=10&after=MTA="
+                        rel: "next"
+                    organizations:
+                      - orgId: "b028ca17-8f89-449c-ae27-fa955e66465d"
+                        orgName: "Child Org 1"
+                        orgHandle: "child-org-1"
+                        orgStatus: "ACTIVE"
+                        orgRef: "/t/wso2.com/api/server/v1/organizations/b028ca17-8f89-449c-ae27-fa955e66465d"
+                        hasChildren: true
+                        depthFromRoot: 1
+                        parentOrgId: "08f8c1d2-4b3e-4c5a-9f6b-7d8e9f0a1b2c"
+                        parentConnectionId: "7a1b7d63-8cfc-4dc9-9332-3f84641b72d8"
+                        sharedConnectionId: "550e8400-e29b-41d4-a716-446655440000"
+                        sharingMode:
+                          policy: "SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN"
+                      - orgId: "a17b28ca-9f89-449c-ae27-fa955e66465f"
+                        orgName: "Child Org 2"
+                        orgHandle: "child-org-2"
+                        orgStatus: "ACTIVE"
+                        orgRef: "/t/wso2.com/api/server/v1/organizations/a17b28ca-9f89-449c-ae27-fa955e66465f"
+                        hasChildren: false
+                        depthFromRoot: 1
+                        parentOrgId: "08f8c1d2-4b3e-4c5a-9f6b-7d8e9f0a1b2c"
+                        parentConnectionId: "7a1b7d63-8cfc-4dc9-9332-3f84641b72d8"
+                        sharedConnectionId: "3f2504e0-4f89-41d3-9a0c-0305e82c3301"
+                        sharingMode:
+                          policy: "SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Not Found — the specified connection does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      x-codeSamples:
+        - lang: Curl
+          label: Basic
+          source: |
+            curl --location 'https://localhost:9443/t/carbon.super/api/server/v1/connections/{connectionId}/share' \
+            -H 'Accept: application/json' \
+            -H 'Authorization: Bearer {bearer_token}'
+        - lang: Curl
+          label: With pagination and sharingMode
+          source: |
+            curl --location 'https://localhost:9443/t/carbon.super/api/server/v1/connections/{connectionId}/share?limit=10&after=Ng==&attributes=sharingMode&recursive=true' \
+            -H 'Accept: application/json' \
+            -H 'Authorization: Bearer {bearer_token}'
+        - lang: Curl
+          label: With filter
+          source: |
+            curl --location 'https://localhost:9443/t/carbon.super/api/server/v1/connections/{connectionId}/share?filter=orgId+eq+b028ca17-8f89-449c-ae27-fa955e66465d' \
+            -H 'Accept: application/json' \
+            -H 'Authorization: Bearer {bearer_token}'
+
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: "https://localhost:9443/oauth2/authorize"
+          tokenUrl: "https://localhost:9443/oauth2/token"
+          scopes:
+            internal_connection_share: "Share connections with child organizations."
+            internal_connection_unshare: "Unshare connections from child organizations."
+            internal_connection_shared_access_view: "View organizations a connection has been shared with."
+
+  schemas:
+
+    # ===== Core request models =====
+
+    ConnectionCriteria:
+      type: object
+      description: |-
+        Criteria for selecting the connections to share or unshare.
+
+        At least one of `connectionIds` or `connectionNames` must be provided.
+        Both can be supplied simultaneously, in which case the union of matched
+        connections is used. Validation that at least one field is populated
+        is enforced at the service layer.
+      properties:
+        connectionIds:
+          type: array
+          description: List of connection UUIDs.
+          items:
+            type: string
+          example:
+            - "7a1b7d63-8cfc-4dc9-9332-3f84641b72d8"
+            - "5d2a1c84-9f7a-43cd-b12e-6e52d7f87e16"
+        connectionNames:
+          type: array
+          description: List of connection names.
+          items:
+            type: string
+          example:
+            - "Google"
+            - "Facebook"
+
+    ConnectionShareSelectedRequestBody:
+      type: object
+      description: |-
+        Request body for sharing connections with a **selected set of organizations**.
+      required:
+        - connectionCriteria
+        - organizations
+      properties:
+        connectionCriteria:
+          $ref: "#/components/schemas/ConnectionCriteria"
+        organizations:
+          type: array
+          description: |-
+            List of organizations to share the connections with, along with the
+            sharing policy for each organization.
+          items:
+            $ref: "#/components/schemas/ConnectionOrgShareConfig"
+
+    ConnectionOrgShareConfig:
+      type: object
+      description: Per-organization sharing configuration for selected organizations.
+      required:
+        - orgId
+        - policy
+      properties:
+        orgId:
+          type: string
+          description: The ID of the organization to share the connection with.
+          example: "b028ca17-8f89-449c-ae27-fa955e66465d"
+        policy:
+          type: string
+          description: |-
+            Sharing scope for this organization.
+
+            Possible values:
+            - `SELECTED_ORG_ONLY` — Share with only this specific organization. Sub-organizations
+              created under it will not automatically receive the shared connection.
+            - `SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN` — Share with this organization
+              and all of its child organizations, including those created in the future.
+          enum:
+            - SELECTED_ORG_ONLY
+            - SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN
+          example: "SELECTED_ORG_ONLY"
+
+    ConnectionShareWithAllRequestBody:
+      type: object
+      description: |-
+        Request body for sharing connections with **all child organizations**
+        controlled by the specified policy.
+      required:
+        - connectionCriteria
+        - policy
+      properties:
+        connectionCriteria:
+          $ref: "#/components/schemas/ConnectionCriteria"
+        policy:
+          type: string
+          description: |-
+            Global sharing policy.
+
+            Possible values:
+            - `ALL_EXISTING_AND_FUTURE_ORGS` — Share with all sub-organizations that currently
+              exist **and** any sub-organizations created in the future. This is the recommended
+              policy for connections intended to be used across the entire organization hierarchy.
+          enum:
+            - ALL_EXISTING_AND_FUTURE_ORGS
+          example: "ALL_EXISTING_AND_FUTURE_ORGS"
+
+    ConnectionUnshareSelectedRequestBody:
+      type: object
+      description: |-
+        Request body for unsharing connections from a selected set of organizations.
+      required:
+        - connectionCriteria
+        - orgIds
+      properties:
+        connectionCriteria:
+          $ref: "#/components/schemas/ConnectionCriteria"
+        orgIds:
+          type: array
+          description: List of organization IDs from which the connections should be unshared.
+          items:
+            type: string
+          example:
+            - "b028ca17-8f89-449c-ae27-fa955e66465d"
+            - "a17b28ca-9f89-449c-ae27-fa955e66465f"
+
+    ConnectionUnshareWithAllRequestBody:
+      type: object
+      description: |-
+        Request body for unsharing connections from **all child organizations**.
+      required:
+        - connectionCriteria
+      properties:
+        connectionCriteria:
+          $ref: "#/components/schemas/ConnectionCriteria"
+
+    # ===== Response models =====
+
+    ConnectionSharingMode:
+      type: object
+      description: |-
+        Represents the sharing policy under which a connection has been shared.
+        Only returned when `attributes=sharingMode` is explicitly requested in the GET call.
+
+        - When present at the **top level** of the response, the policy is always
+          `ALL_EXISTING_AND_FUTURE_ORGS`.
+        - When present **per organization**, the policy is always
+          `SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN`.
+        - Connections shared via `SELECTED_ORG_ONLY` will not have a `sharingMode`
+          returned at either level.
+      required:
+        - policy
+      properties:
+        policy:
+          type: string
+          description: |-
+            The sharing policy under which this connection was shared.
+
+            Possible values:
+            - `ALL_EXISTING_AND_FUTURE_ORGS`
+            - `SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN`
+          enum:
+            - ALL_EXISTING_AND_FUTURE_ORGS
+            - SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN
+          example: "ALL_EXISTING_AND_FUTURE_ORGS"
+
+    ConnectionSharedOrganization:
+      type: object
+      description: |-
+        Represents a single organization that a connection has been shared with,
+        including organization metadata and optionally the sharing mode.
+      properties:
+        orgId:
+          type: string
+          description: ID of the child organization.
+          example: "b028ca17-8f89-449c-ae27-fa955e66465d"
+        orgName:
+          type: string
+          description: Name of the child organization.
+          example: "Child Org 1"
+        orgHandle:
+          type: string
+          description: Unique, human-readable handle of the organization.
+          example: "child-org-1"
+        orgStatus:
+          type: string
+          description: Current status of the organization.
+          example: "ACTIVE"
+        orgRef:
+          type: string
+          description: API reference URL of the organization resource.
+          example: "/t/wso2.com/api/server/v1/organizations/b028ca17-8f89-449c-ae27-fa955e66465d"
+        hasChildren:
+          type: boolean
+          description: Indicates whether the organization has child organizations.
+          example: true
+        depthFromRoot:
+          type: integer
+          description: Depth of the organization in the hierarchy, where the root organization is 0.
+          example: 1
+        parentOrgId:
+          type: string
+          nullable: true
+          description: ID of the parent (sharing-initiated) organization.
+          example: "08f8c1d2-4b3e-4c5a-9f6b-7d8e9f0a1b2c"
+        parentConnectionId:
+          type: string
+          description: UUID of the original connection in the parent (sharing-initiated) organization.
+          example: "7a1b7d63-8cfc-4dc9-9332-3f84641b72d8"
+        sharedConnectionId:
+          type: string
+          description: UUID of the shadow connection created in this child organization.
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        sharingMode:
+          $ref: "#/components/schemas/ConnectionSharingMode"
+
+    ConnectionSharedOrganizationsResponse:
+      type: object
+      description: |-
+        Response listing the organizations that a connection has been shared with.
+
+        - `sharingMode` at the top level is only present when the connection was shared
+          via `ALL_EXISTING_AND_FUTURE_ORGS` policy **and** `attributes=sharingMode`
+          was requested.
+        - `sharingMode` on each organization entry is only present when the connection
+          was shared via `SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN` policy
+          **and** `attributes=sharingMode` was requested.
+      properties:
+        links:
+          type: array
+          items:
+            $ref: "#/components/schemas/Link"
+        sharingMode:
+          $ref: "#/components/schemas/ConnectionSharingMode"
+        organizations:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConnectionSharedOrganization"
+
+    # ===== Common models =====
+
+    Link:
+      type: object
+      properties:
+        href:
+          type: string
+          example: "/t/{tenant-domain}/api/server/v1/connections/7a1b7d63-8cfc-4dc9-9332-3f84641b72d8/share?limit=10&after=MTA="
+        rel:
+          type: string
+          example: "next"
+
+    ProcessSuccessResponse:
+      type: object
+      description: |-
+        Indicates that a sharing or unsharing process has been triggered successfully.
+      properties:
+        status:
+          type: string
+          example: "Processing"
+        details:
+          type: string
+          example: "Connection sharing process triggered successfully."
+
+    Error:
+      type: object
+      description: |-
+        Error response model with a code, message, description, and trace ID.
+      required:
+        - code
+        - message
+        - traceId
+      properties:
+        code:
+          type: string
+          example: "CSM-00000"
+        message:
+          type: string
+          example: "Some error message."
+        description:
+          type: string
+          example: "Some error description."
+        traceId:
+          type: string
+          example: "e0fbcfeb-7fc2-4b62-8b82-72d3c5fbcdeb"
