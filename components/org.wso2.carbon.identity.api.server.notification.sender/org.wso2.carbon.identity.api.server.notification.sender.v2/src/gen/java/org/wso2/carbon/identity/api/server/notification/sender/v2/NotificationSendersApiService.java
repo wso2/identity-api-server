@@ -63,6 +63,8 @@ public interface NotificationSendersApiService {
 
       public Response getSMSSenders();
 
+      public Response patchEmailSender(String senderName, EmailSenderUpdateRequest emailSenderUpdateRequest);
+
       public Response updateEmailSender(String senderName, EmailSenderUpdateRequest emailSenderUpdateRequest);
 
       public Response updatePushSender(String senderName, PushSenderUpdateRequest pushSenderUpdateRequest);

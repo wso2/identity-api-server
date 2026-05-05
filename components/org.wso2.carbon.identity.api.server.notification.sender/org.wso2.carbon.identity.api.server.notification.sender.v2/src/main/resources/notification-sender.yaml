@@ -259,6 +259,73 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - Email Senders
+      summary: Update an email sender
+      description: |
+        This API provides the capability to update an email sender by name.
+        The URL encoded email sender name is used as sender-name.<br>
+          <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/configmgt/update <br>
+          <b>Scope required:</b> <br>
+            * internal_config_mgt_update
+      operationId: patchEmailSender
+      parameters:
+        - name: sender-name
+          in: path
+          description: name of the email sender
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailSenderUpdateRequest'
+            example:
+              fromAddress: iam@gmail.com
+              properties:
+                - key: mail.smtp.starttls.enable
+                  value: true
+        required: true
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailSender'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "405":
+          description: Method Not Allowed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     delete:
       tags:
         - Email Senders
