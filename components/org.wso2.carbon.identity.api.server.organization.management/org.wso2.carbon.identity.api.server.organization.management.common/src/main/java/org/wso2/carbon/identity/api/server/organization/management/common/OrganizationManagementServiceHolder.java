@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.organization.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.organization.discovery.service.OrganizationDiscoveryManager;
 import org.wso2.carbon.identity.organization.management.application.OrgApplicationManager;
@@ -27,6 +29,8 @@ import org.wso2.carbon.identity.organization.management.service.OrganizationMana
  * Service holder class for organization management related services.
  */
 public class OrganizationManagementServiceHolder {
+
+    private static final Log log = LogFactory.getLog(OrganizationManagementServiceHolder.class);
 
     private OrganizationManagementServiceHolder() {}
 
@@ -55,6 +59,12 @@ public class OrganizationManagementServiceHolder {
      */
     public static OrgApplicationManager getOrgApplicationManager() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving OrgApplicationManager service.");
+        }
+        if (OrgApplicationManagerHolder.SERVICE == null) {
+            log.warn("OrgApplicationManager service is not available.");
+        }
         return OrgApplicationManagerHolder.SERVICE;
     }
 
@@ -65,6 +75,12 @@ public class OrganizationManagementServiceHolder {
      */
     public static OrganizationManager getOrganizationManager() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving OrganizationManager service.");
+        }
+        if (OrganizationManagerHolder.SERVICE == null) {
+            log.warn("OrganizationManager service is not available.");
+        }
         return OrganizationManagerHolder.SERVICE;
     }
 
@@ -75,6 +91,12 @@ public class OrganizationManagementServiceHolder {
      */
     public static OrganizationDiscoveryManager getOrganizationDiscoveryManager() {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving OrganizationDiscoveryManager service.");
+        }
+        if (OrganizationDiscoveryManagerHolder.SERVICE == null) {
+            log.warn("OrganizationDiscoveryManager service is not available.");
+        }
         return OrganizationDiscoveryManagerHolder.SERVICE;
     }
 }

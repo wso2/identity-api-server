@@ -56,6 +56,10 @@ public class OrganizationManagementEndpointUtil {
      */
     public static Response handleClientErrorResponse(OrganizationManagementClientException e, Log log) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Handling client error with code: " + e.getErrorCode());
+        }
+        
         if (isNotFoundError(e)) {
             throw buildException(Response.Status.NOT_FOUND, log, e);
         }
@@ -76,6 +80,9 @@ public class OrganizationManagementEndpointUtil {
      */
     public static Response handleServerErrorResponse(OrganizationManagementException e, Log log) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Handling server error with code: " + e.getErrorCode());
+        }
         throw buildException(Response.Status.INTERNAL_SERVER_ERROR, log, e);
     }
 
