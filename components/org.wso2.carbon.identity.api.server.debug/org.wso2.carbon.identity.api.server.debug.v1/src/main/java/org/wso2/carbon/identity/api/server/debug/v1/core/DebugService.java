@@ -144,6 +144,12 @@ public class DebugService {
         }
 
         DebugResponse response = coordinator.handleDebugRequest(debugRequest);
+        if (response == null) {
+            throw new DebugFrameworkServerException(
+                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_SERVER_ERROR.getCode(),
+                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_SERVER_ERROR.getMessage(),
+                    "Debug framework returned an empty response.");
+        }
 
         // Copy framework response into a new map to avoid mutating framework-owned data.
         Map<String, Object> responseData = new HashMap<>();
@@ -173,7 +179,7 @@ public class DebugService {
             throw new DebugFrameworkServerException(
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_SERVER_ERROR.getCode(),
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_SERVER_ERROR.getMessage(),
-                    "Debug framework response does not contain debugId or state.");
+                    "Debug framework response does not contain debugId");
         }
         response.setDebugId(debugId.toString());
 
@@ -223,8 +229,7 @@ public class DebugService {
             String key = entry.getKey();
             if (!DebugConstants.ResponseKeys.STATUS.equals(key)
                     && !DebugConstants.ResponseKeys.SUCCESS.equals(key)
-                    && !DebugConstants.ResponseKeys.DEBUG_ID.equals(key)
-                    && !DebugConstants.ResponseKeys.STATE.equals(key)) {
+                    && !DebugConstants.ResponseKeys.DEBUG_ID.equals(key)) {
                 metadata.put(key, entry.getValue());
             }
         }
@@ -349,9 +354,6 @@ public class DebugService {
     private Object resolveDebugId(Map<String, Object> responseData, String fallbackDebugId) {
 
         Object debugId = responseData.get(DebugConstants.ResponseKeys.DEBUG_ID);
-        if (debugId == null) {
-            debugId = responseData.get(DebugConstants.ResponseKeys.STATE);
-        }
         if (debugId == null) {
             debugId = fallbackDebugId;
         }

@@ -18,9 +18,9 @@
 
 package org.wso2.carbon.identity.api.server.debug.v1.impl;
 
+import org.wso2.carbon.identity.api.server.debug.common.DebugServiceHolder;
 import org.wso2.carbon.identity.api.server.debug.v1.DebugApiService;
 import org.wso2.carbon.identity.api.server.debug.v1.core.DebugService;
-import org.wso2.carbon.identity.api.server.debug.v1.factories.DebugServiceFactory;
 import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionRequest;
 
 import javax.ws.rs.core.Response;
@@ -34,7 +34,7 @@ public class DebugApiServiceImpl implements DebugApiService {
 
     public DebugApiServiceImpl() {
 
-        this.debugService = DebugServiceFactory.getDebugService();
+        this.debugService = new DebugService(DebugServiceHolder.getDebugRequestCoordinator());
     }
 
     @Override

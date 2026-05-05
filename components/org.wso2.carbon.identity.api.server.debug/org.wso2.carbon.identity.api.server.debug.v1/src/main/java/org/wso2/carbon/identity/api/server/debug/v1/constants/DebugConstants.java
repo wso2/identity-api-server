@@ -64,12 +64,15 @@ public class DebugConstants {
      */
     public enum ErrorMessage {
 
-        ERROR_CODE_ERROR_VALIDATING_REQUEST("10001", "Invalid request.",
+        // Client error codes.
+        ERROR_CODE_ERROR_VALIDATING_REQUEST("60101", "Invalid request.",
                 "Request validation failed."),
-        ERROR_CODE_ERROR_PROCESSING_REQUEST("10005", "Error processing request.",
-                "Error occurred while processing the debug request."),
-        ERROR_CODE_RESULT_NOT_FOUND("10011", "Debug result not found.",
-                "No debug result exists for the provided session id.");
+        ERROR_CODE_RESULT_NOT_FOUND("60102", "Debug result not found.",
+                "No debug result exists for the provided session id."),
+
+        // Server error codes.
+        ERROR_CODE_ERROR_PROCESSING_REQUEST("65101", "Error processing request.",
+                "Error occurred while processing the debug request.");
 
         private final String code;
         private final String message;

@@ -103,14 +103,28 @@ public class Utils {
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
 
-        String errorCode = e.getErrorCode();
-        if (errorCode == null) {
-            errorCode = DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST.getCode();
-        } else if (!errorCode.contains("-")) {
-            errorCode = DebugConstants.DEBUG_PREFIX + errorCode;
-        }
+        String errorCode = normalizeDebugErrorCode(e.getErrorCode());
 
         return handleException(status, errorCode, e.getMessage(), e.getDescription());
+    }
+
+    private static String normalizeDebugErrorCode(String rawErrorCode) {
+
+        String defaultErrorCode = DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST.getCode();
+        String errorCode = normalizeText(rawErrorCode);
+        if (errorCode == null) {
+            return defaultErrorCode;
+        }
+
+        if (errorCode.startsWith(DebugConstants.DEBUG_PREFIX)) {
+            return errorCode.matches(DebugConstants.DEBUG_PREFIX + "\\d+") ? errorCode : defaultErrorCode;
+        }
+
+        if (errorCode.matches("\\d+")) {
+            return DebugConstants.DEBUG_PREFIX + errorCode;
+        }
+
+        return defaultErrorCode;
     }
 
 }
