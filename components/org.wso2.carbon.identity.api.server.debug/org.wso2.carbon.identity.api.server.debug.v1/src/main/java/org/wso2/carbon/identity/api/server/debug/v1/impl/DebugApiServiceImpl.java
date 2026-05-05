@@ -21,7 +21,8 @@ package org.wso2.carbon.identity.api.server.debug.v1.impl;
 import org.wso2.carbon.identity.api.server.debug.common.DebugServiceHolder;
 import org.wso2.carbon.identity.api.server.debug.v1.DebugApiService;
 import org.wso2.carbon.identity.api.server.debug.v1.core.DebugService;
-import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionRequest;
+
+import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
@@ -38,10 +39,10 @@ public class DebugApiServiceImpl implements DebugApiService {
     }
 
     @Override
-    public Response startDebugSession(String resourceType, DebugConnectionRequest debugConnectionRequest) {
+    public Response startDebugSession(String resourceType, Map<String, String> requestBody) {
 
         return Response.ok()
-                .entity(debugService.processStartSession(resourceType, debugConnectionRequest))
+                .entity(debugService.processStartSession(resourceType, requestBody))
                 .build();
     }
 

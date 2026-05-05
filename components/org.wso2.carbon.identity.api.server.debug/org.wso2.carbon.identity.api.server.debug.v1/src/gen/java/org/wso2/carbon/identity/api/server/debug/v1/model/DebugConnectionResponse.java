@@ -42,7 +42,7 @@ public class DebugConnectionResponse  {
 @XmlEnum(String.class)
 public enum StatusEnum {
 
-    @XmlEnumValue("SUCCESS") SUCCESS(String.valueOf("SUCCESS")), @XmlEnumValue("IN_PROGRESS") IN_PROGRESS(String.valueOf("IN_PROGRESS")), @XmlEnumValue("FAILURE") FAILURE(String.valueOf("FAILURE")), @XmlEnumValue("DIRECT_RESULT") DIRECT_RESULT(String.valueOf("DIRECT_RESULT"));
+    @XmlEnumValue("SUCCESS") SUCCESS(String.valueOf("SUCCESS")), @XmlEnumValue("FAILURE") FAILURE(String.valueOf("FAILURE"));
 
 
     private String value;

@@ -35,10 +35,9 @@ public class Error  {
     private String code;
     private String message;
     private String description;
-    private String traceId;
 
     /**
-    * An error code.
+    * An error code in DBG-prefixed format.
     **/
     public Error code(String code) {
 
@@ -46,11 +45,11 @@ public class Error  {
         return this;
     }
     
-    @ApiModelProperty(example = "10001", required = true, value = "An error code.")
+    @ApiModelProperty(example = "DBG-60101", required = true, value = "An error code in DBG-prefixed format.")
     @JsonProperty("code")
     @Valid
     @NotNull(message = "Property code cannot be null.")
-
+ @Pattern(regexp="^DBG-[0-9]{5}$")
     public String getCode() {
         return code;
     }
@@ -67,7 +66,7 @@ public class Error  {
         return this;
     }
     
-    @ApiModelProperty(example = "Error message.", required = true, value = "An error message.")
+    @ApiModelProperty(example = "Invalid request.", required = true, value = "An error message.")
     @JsonProperty("message")
     @Valid
     @NotNull(message = "Property message cannot be null.")
@@ -88,7 +87,7 @@ public class Error  {
         return this;
     }
     
-    @ApiModelProperty(example = "Detailed error description.", value = "A detailed error description.")
+    @ApiModelProperty(example = "Request validation failed.", value = "A detailed error description.")
     @JsonProperty("description")
     @Valid
     public String getDescription() {
@@ -98,24 +97,7 @@ public class Error  {
         this.description = description;
     }
 
-    /**
-    * Trace identifier for error correlation.
-    **/
-    public Error traceId(String traceId) {
 
-        this.traceId = traceId;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "trace-123456", value = "Trace identifier for error correlation.")
-    @JsonProperty("traceId")
-    @Valid
-    public String getTraceId() {
-        return traceId;
-    }
-    public void setTraceId(String traceId) {
-        this.traceId = traceId;
-    }
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -129,13 +111,12 @@ public class Error  {
         Error error = (Error) o;
         return Objects.equals(this.code, error.code) &&
             Objects.equals(this.message, error.message) &&
-            Objects.equals(this.description, error.description) &&
-            Objects.equals(this.traceId, error.traceId);
+            Objects.equals(this.description, error.description);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(code, message, description, traceId);
+        return Objects.hash(code, message, description);
     }
 
     @Override
@@ -147,7 +128,6 @@ public class Error  {
         sb.append("    code: ").append(toIndentedString(code)).append("\n");
         sb.append("    message: ").append(toIndentedString(message)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
-        sb.append("    traceId: ").append(toIndentedString(traceId)).append("\n");
         sb.append("}");
         return sb.toString();
     }

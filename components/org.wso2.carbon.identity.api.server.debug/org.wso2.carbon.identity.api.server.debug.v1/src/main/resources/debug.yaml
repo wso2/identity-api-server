@@ -10,7 +10,7 @@ info:
   title: WSO2 Identity Server - Debug API
   contact:
     name: WSO2
-    url: 'http://wso2.com/products/identity-server/'
+    url: 'https://wso2.com/identity-platform/'
     email: architecture@wso2.org
   license:
     name: Apache 2.0
@@ -51,7 +51,6 @@ paths:
             example: "idp"
       requestBody:
         description: "Debug request with resource-specific properties."
-        required: true
         content:
           application/json:
             schema:
@@ -69,6 +68,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+              example:
+                code: "DBG-60101"
+                message: "Invalid request."
+                description: "Request validation failed."
         '401':
           description: "Unauthorized"
           content:
@@ -87,6 +90,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+              example:
+                code: "DBG-65101"
+                message: "Error processing request."
+                description: "Error occurred while processing the debug request."
 
   /debug/{debugId}/result:
     get:
@@ -119,6 +126,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+              example:
+                code: "DBG-60101"
+                message: "Invalid request."
+                description: "Request validation failed."
         '401':
           description: "Unauthorized"
           content:
@@ -131,12 +142,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+              example:
+                code: "DBG-60102"
+                message: "Debug result not found."
+                description: "No debug result exists for the provided session id."
         '500':
           description: "Server Error"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+              example:
+                code: "DBG-65101"
+                message: "Error processing request."
+                description: "Error occurred while processing the debug request."
 
 components:
   securitySchemes:
@@ -167,20 +186,16 @@ components:
         code:
           type: string
           pattern: "^DBG-[0-9]{5}$"
-          example: "DBG-10001"
+          example: "DBG-60101"
           description: "An error code in DBG-prefixed format."
         message:
           type: string
-          example: "Error message."
+          example: "Invalid request."
           description: "An error message."
         description:
           type: string
-          example: "Detailed error description."
+          example: "Request validation failed."
           description: "A detailed error description."
-        traceId:
-          type: string
-          example: "trace-123456"
-          description: "Trace identifier for error correlation."
 
     # ---------------------------------
     # Debug Request/Response Models
@@ -193,7 +208,7 @@ components:
         minLength: 1
         maxLength: 255
       example:
-        sampleKey: "sampleValue"
+        connectionId: "11cb1448-2c30-4f9f-af8e-f82be20e0bbf"
     DebugConnectionResponse:
       type: object
       description: "Debug connection response containing generic debug information and resource-specific metadata."
@@ -205,7 +220,7 @@ components:
         status:
           type: string
           description: "Status of the debug operation."
-          enum: ["SUCCESS", "IN_PROGRESS", "FAILURE", "DIRECT_RESULT"]
+          enum: ["SUCCESS", "FAILURE"]
           example: "SUCCESS"
         message:
           type: string
@@ -228,7 +243,7 @@ components:
       required:
         - debugId
         - status
-      description: "Debug response containing debugId and status at top level, with all protocol-specific data in metadata."
+      description: "Debug response containing debugId and status and message at top level, with all protocol-specific data in metadata."
       properties:
         debugId:
           type: string
@@ -237,7 +252,7 @@ components:
         status:
           type: string
           description: "Status of the debug operation."
-          enum: ["SUCCESS", "IN_PROGRESS", "FAILURE", "DIRECT_RESULT"]
+          enum: ["SUCCESS", "IN_PROGRESS", "FAILURE"]
           example: "SUCCESS"
         message:
           type: string
@@ -248,18 +263,7 @@ components:
           description: "Protocol-specific and resource-specific debug data. For IDP OAuth debugging, includes userAttributes, mappedClaims, steps, tokens, URLs, and diagnostic information."
           additionalProperties: true
           example:
-            state: "debug-12345"
-            userAttributes:
-              sub: "9d5ddf10-d814-4000-9bf7-35f3eef9b86e"
-              email: "user@example.com"
-            mappedClaims:
-              - idpClaim: "sub"
-                isClaim: "http://wso2.org/claims/sub"
-                value: "9d5ddf10-d814-4000-9bf7-35f3eef9b86e"
-                status: "Auto-Discovered"
-            steps:
-              claimMappingStatus: "success"
-              authenticationStatus: "success"
-              connectionStatus: "success"
-            idToken: "eyJ..."
-            externalRedirectUrl: "https://..."
+            debugId: "debug-496f5a3f-0094-42f2-8188-d2baa9a1287c"
+            status: "SUCCESS"
+            "message": "Debug session retrieved successfully."
+            "metadata": "{...}"

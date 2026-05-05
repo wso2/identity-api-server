@@ -28,14 +28,14 @@ import java.util.Map;
 import javax.validation.constraints.*;
 
 /**
- * Debug response containing debugId and status at top level, with all protocol-specific data in metadata.
+ * Debug response containing debugId and status and message at top level, with all protocol-specific data in metadata.
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "Debug response containing debugId and status at top level, with all protocol-specific data in metadata.")
+@ApiModel(description = "Debug response containing debugId and status and message at top level, with all protocol-specific data in metadata.")
 public class DebugResult  {
   
     private String debugId;
@@ -44,7 +44,7 @@ public class DebugResult  {
 @XmlEnum(String.class)
 public enum StatusEnum {
 
-    @XmlEnumValue("SUCCESS") SUCCESS(String.valueOf("SUCCESS")), @XmlEnumValue("IN_PROGRESS") IN_PROGRESS(String.valueOf("IN_PROGRESS")), @XmlEnumValue("FAILURE") FAILURE(String.valueOf("FAILURE")), @XmlEnumValue("DIRECT_RESULT") DIRECT_RESULT(String.valueOf("DIRECT_RESULT"));
+    @XmlEnumValue("SUCCESS") SUCCESS(String.valueOf("SUCCESS")), @XmlEnumValue("IN_PROGRESS") IN_PROGRESS(String.valueOf("IN_PROGRESS")), @XmlEnumValue("FAILURE") FAILURE(String.valueOf("FAILURE"));
 
     private String value;
 
@@ -145,7 +145,7 @@ public enum StatusEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "{\"state\":\"debug-12345\",\"userAttributes\":{\"sub\":\"9d5ddf10-d814-4000-9bf7-35f3eef9b86e\",\"email\":\"user@example.com\"},\"mappedClaims\":[{\"idpClaim\":\"sub\",\"isClaim\":\"http://wso2.org/claims/sub\",\"value\":\"9d5ddf10-d814-4000-9bf7-35f3eef9b86e\",\"status\":\"Auto-Discovered\"}],\"steps\":{\"claimMappingStatus\":\"success\",\"authenticationStatus\":\"success\",\"connectionStatus\":\"success\"},\"idToken\":\"eyJ...\",\"externalRedirectUrl\":\"https://...\"}", value = "Protocol-specific and resource-specific debug data. For IDP OAuth debugging, includes userAttributes, mappedClaims, steps, tokens, URLs, and diagnostic information.")
+    @ApiModelProperty(example = "{\"debugId\":\"debug-496f5a3f-0094-42f2-8188-d2baa9a1287c\",\"status\":\"SUCCESS\",\"message\":\"Debug session retrieved successfully.\",\"metadata\":\"{...}\"}", value = "Protocol-specific and resource-specific debug data. For IDP OAuth debugging, includes userAttributes, mappedClaims, steps, tokens, URLs, and diagnostic information.")
     @JsonProperty("metadata")
     @Valid
     public Map<String, Object> getMetadata() {

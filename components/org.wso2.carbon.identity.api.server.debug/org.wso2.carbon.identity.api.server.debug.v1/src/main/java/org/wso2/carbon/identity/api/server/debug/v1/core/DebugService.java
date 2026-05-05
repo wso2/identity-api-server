@@ -22,7 +22,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.debug.v1.constants.DebugConstants;
-import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionRequest;
 import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionResponse;
 import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionResponseMetadata;
 import org.wso2.carbon.identity.api.server.debug.v1.model.DebugResult;
@@ -65,16 +64,16 @@ public class DebugService {
      * All framework exceptions are caught here and converted to APIError.
      *
      * @param resourceType Path parameter resource type.
-     * @param debugConnectionRequest Debug request payload.
+     * @param requestBody Debug request payload.
      * @return DebugConnectionResponse DTO.
      */
     public DebugConnectionResponse processStartSession(String resourceType,
-                                                       DebugConnectionRequest debugConnectionRequest) {
+                                                       Map<String, String> requestBody) {
 
         try {
             String normalizedResourceType = normalizeInput(resourceType);
-            Map<String, String> properties = getNormalizedProperties(debugConnectionRequest);
-            validateRequest(normalizedResourceType, debugConnectionRequest, properties);
+            Map<String, String> properties = getNormalizedProperties(requestBody);
+            validateRequest(normalizedResourceType, requestBody, properties);
             Map<String, Object> responseData = handleDebugRequest(normalizedResourceType, properties);
             return buildDebugConnectionResponse(responseData);
         } catch (DebugFrameworkException e) {
@@ -301,12 +300,8 @@ public class DebugService {
             return normalizedMessage;
         }
         switch (status) {
-            case IN_PROGRESS:
-                return "Debug session is in progress";
             case FAILURE:
                 return "Debug session execution failed";
-            case DIRECT_RESULT:
-                return "Debug session completed with direct result";
             case SUCCESS:
             default:
                 return "Debug session executed successfully";
@@ -329,8 +324,6 @@ public class DebugService {
         switch (status) {
             case IN_PROGRESS:
                 return "Debug session is in progress";
-            case DIRECT_RESULT:
-                return "Debug session completed with direct result";
             case SUCCESS:
                 return "Debug session retrieved successfully.";
             case FAILURE:
@@ -372,21 +365,14 @@ public class DebugService {
      * Validates the debug start session request.
      *
      * @param resourceType Normalized resource type.
-     * @param debugConnectionRequest Request body.
+     * @param requestBody Request body.
      * @param properties Normalized properties map.
      * @throws DebugFrameworkClientException if validation fails.
      */
     private void validateRequest(String resourceType,
-                                 DebugConnectionRequest debugConnectionRequest,
+                                 Map<String, String> requestBody,
                                  Map<String, String> properties)
             throws DebugFrameworkClientException {
-
-        if (debugConnectionRequest == null) {
-            throw new DebugFrameworkClientException(
-                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getCode(),
-                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getMessage(),
-                    "Debug request body cannot be null.");
-        }
 
         if (StringUtils.isBlank(resourceType)) {
             throw new DebugFrameworkClientException(
@@ -404,6 +390,13 @@ public class DebugService {
                             + String.join(", ", REQUIRED_PROPERTIES_BY_RESOURCE_TYPE.keySet()) + ".");
         }
 
+        if (requestBody == null && !requiredProperties.isEmpty()) {
+            throw new DebugFrameworkClientException(
+                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getCode(),
+                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getMessage(),
+                    "Debug request body cannot be null for resource type: " + resourceType + ".");
+        }
+
         for (String requiredProperty : requiredProperties) {
             if (!properties.containsKey(requiredProperty)) {
                 throw new DebugFrameworkClientException(
@@ -417,17 +410,17 @@ public class DebugService {
     /**
      * Normalizes and filters properties from the request, removing null/blank keys and values.
      *
-     * @param debugConnectionRequest Request body.
+     * @param requestBody Request body.
      * @return Normalized properties map, never null.
      */
-    private Map<String, String> getNormalizedProperties(DebugConnectionRequest debugConnectionRequest) {
+    private Map<String, String> getNormalizedProperties(Map<String, String> requestBody) {
 
-        if (debugConnectionRequest == null || debugConnectionRequest.getProperties() == null) {
+        if (requestBody == null) {
             return new HashMap<>();
         }
 
         Map<String, String> normalized = new HashMap<>();
-        for (Map.Entry<String, String> entry : debugConnectionRequest.getProperties().entrySet()) {
+        for (Map.Entry<String, String> entry : requestBody.entrySet()) {
             String key = normalizeInput(entry.getKey());
             String value = normalizeInput(entry.getValue());
             if (key != null && value != null) {
