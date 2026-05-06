@@ -54,7 +54,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/DebugConnectionRequest"
+              type: object
+              description: "Resource-specific properties for the selected resource type."
+              additionalProperties:
+                type: string
+                minLength: 1
+                maxLength: 255
+              example:
+                connectionId: "11cb1448-2c30-4f9f-af8e-f82be20e0bbf"
       responses:
         '200':
           description: "Debug session executed successfully."
@@ -200,15 +207,6 @@ components:
     # ---------------------------------
     # Debug Request/Response Models
     # ---------------------------------
-    DebugConnectionRequest:
-      type: object
-      description: "Request body for starting a debug session."
-      additionalProperties:
-        type: string
-        minLength: 1
-        maxLength: 255
-      example:
-        connectionId: "11cb1448-2c30-4f9f-af8e-f82be20e0bbf"
     DebugConnectionResponse:
       type: object
       description: "Debug connection response containing generic debug information and resource-specific metadata."

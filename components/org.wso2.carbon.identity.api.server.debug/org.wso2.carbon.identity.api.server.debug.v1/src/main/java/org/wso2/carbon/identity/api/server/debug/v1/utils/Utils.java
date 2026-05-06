@@ -72,21 +72,6 @@ public class Utils {
     }
 
     /**
-     * Trims and returns null if the resulting string is empty.
-     *
-     * @param value Object to normalize.
-     * @return Trimmed string or null.
-     */
-    public static String normalizeText(Object value) {
-
-        if (value == null) {
-            return null;
-        }
-        String stringValue = value.toString().trim();
-        return stringValue.isEmpty() ? null : stringValue;
-    }
-
-    /**
      * Handles a DebugFrameworkException by mapping it to an APIError.
      *
      * @param e Debug framework exception.
@@ -103,28 +88,12 @@ public class Utils {
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
 
-        String errorCode = normalizeDebugErrorCode(e.getErrorCode());
+        String errorCode = e.getErrorCode();
+        if (errorCode == null) {
+            errorCode = DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST.getCode();
+        }
 
         return handleException(status, errorCode, e.getMessage(), e.getDescription());
-    }
-
-    private static String normalizeDebugErrorCode(String rawErrorCode) {
-
-        String defaultErrorCode = DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST.getCode();
-        String errorCode = normalizeText(rawErrorCode);
-        if (errorCode == null) {
-            return defaultErrorCode;
-        }
-
-        if (errorCode.startsWith(DebugConstants.DEBUG_PREFIX)) {
-            return errorCode.matches(DebugConstants.DEBUG_PREFIX + "\\d+") ? errorCode : defaultErrorCode;
-        }
-
-        if (errorCode.matches("\\d+")) {
-            return DebugConstants.DEBUG_PREFIX + errorCode;
-        }
-
-        return defaultErrorCode;
     }
 
 }

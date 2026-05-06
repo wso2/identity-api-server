@@ -100,23 +100,23 @@ public class DebugService {
             }
             Map<String, Object> frameworkResponse = coordinator.getDebugResult(normalizedDebugId);
             if (frameworkResponse == null) {
-                throw Utils.handleException(
-                        Response.Status.NOT_FOUND,
-                        DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND.getCode(),
-                        DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND.getMessage(),
-                        DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND.getDescription());
+                throw new DebugFrameworkClientException(
+                        DebugFrameworkConstants.ErrorMessages.ERROR_CODE_RESULT_NOT_FOUND.getCode(),
+                        DebugFrameworkConstants.ErrorMessages.ERROR_CODE_RESULT_NOT_FOUND.getMessage(),
+                        "Debug result not found for session id: " + normalizedDebugId + ".");
             }
             return buildDebugResult(frameworkResponse, normalizedDebugId);
-        } catch (DebugFrameworkException e) {
-            if (e instanceof DebugFrameworkClientException
-                    && DebugFrameworkConstants.ErrorMessages.ERROR_CODE_RESULT_NOT_FOUND.getCode()
-                            .equals(e.getErrorCode())) {
+        } catch (DebugFrameworkClientException e) {
+            if (DebugFrameworkConstants.ErrorMessages.ERROR_CODE_RESULT_NOT_FOUND.getCode()
+                    .equals(e.getErrorCode())) {
                 throw Utils.handleException(
                         Response.Status.NOT_FOUND,
                         DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND.getCode(),
                         DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND.getMessage(),
                         DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND.getDescription());
             }
+            throw Utils.handleDebugException(e);
+        } catch (DebugFrameworkException e) {
             throw Utils.handleDebugException(e);
         }
     }
@@ -238,7 +238,7 @@ public class DebugService {
     }
 
     /**
-     * Resolves the StatusEnum from the raw status object, defaulting to SUCCESS.
+     * Resolves the StatusEnum from the raw status object, defaulting to FAILURE for unknown values.
      *
      * @param status Raw status object from framework response.
      * @return Resolved StatusEnum.
@@ -255,12 +255,13 @@ public class DebugService {
             }
         }
         LOG.warn("Unrecognized debug connection status from framework: " + status
-                + ". Falling back to SUCCESS.");
-        return DebugConnectionResponse.StatusEnum.SUCCESS;
+                + ". Falling back to FAILURE.");
+        return DebugConnectionResponse.StatusEnum.FAILURE;
     }
 
     /**
      * Resolves the result StatusEnum from both status string and boolean success flag.
+     * FAILURE is the safer default for unrecognized statuses to avoid masking errors.
      *
      * @param status Raw status object from framework response.
      * @param success Raw success flag object from framework response.
@@ -275,7 +276,7 @@ public class DebugService {
                     return candidate;
                 }
             }
-            LOG.warn("Unrecognized debug result status from framework: " + status + ". Falling back.");
+            LOG.warn("Unrecognized debug result status from framework: " + status + ". Falling back to FAILURE.");
         }
 
         if (success instanceof Boolean) {
@@ -295,7 +296,7 @@ public class DebugService {
     private String resolveConnectionMessage(DebugConnectionResponse.StatusEnum status,
                                             Object frameworkMessage) {
 
-        String normalizedMessage = Utils.normalizeText(frameworkMessage);
+        String normalizedMessage = frameworkMessage != null ? StringUtils.trimToNull(frameworkMessage.toString()) : null;
         if (normalizedMessage != null) {
             return normalizedMessage;
         }
@@ -317,7 +318,7 @@ public class DebugService {
      */
     private String resolveResultMessage(DebugResult.StatusEnum status, Object frameworkMessage) {
 
-        String normalizedMessage = Utils.normalizeText(frameworkMessage);
+        String normalizedMessage = frameworkMessage != null ? StringUtils.trimToNull(frameworkMessage.toString()) : null;
         if (normalizedMessage != null) {
             return normalizedMessage;
         }
