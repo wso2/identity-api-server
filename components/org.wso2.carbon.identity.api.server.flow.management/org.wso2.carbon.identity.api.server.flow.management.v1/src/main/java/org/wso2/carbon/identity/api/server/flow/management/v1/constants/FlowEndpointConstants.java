@@ -95,7 +95,23 @@ public class FlowEndpointConstants {
 
         ERROR_CODE_REQUIRED_EXECUTOR_MISSING("10013",
                 "Required executor is missing in the flow.",
-                "The flow must contain the required executors.");
+                "The flow must contain the required executors."),
+
+        ERROR_CODE_INFLOW_EXTENSION_NOT_FOUND("10020",
+                "In-Flow Extension not found.",
+                "No In-Flow Extension was found with the provided ID."),
+
+        ERROR_CODE_INFLOW_EXTENSION_NAME_CONFLICT("10021",
+                "In-Flow Extension name already in use.",
+                "An In-Flow Extension with the name '%s' already exists."),
+
+        ERROR_CODE_INVALID_ENDPOINT_AUTH_PROPERTIES("10022",
+                "Invalid endpoint authentication properties.",
+                "Required authentication properties are missing or empty for the given authentication type."),
+
+        ERROR_CODE_EMPTY_ENDPOINT_AUTH_PROPERTIES("10023",
+                "Empty endpoint authentication properties.",
+                "Endpoint authentication properties cannot be empty.");
 
         private final String code;
         private final String message;
@@ -153,6 +169,7 @@ public class FlowEndpointConstants {
         public static final String MAGIC_LINK_EXECUTOR = "MagicLinkExecutor";
         public static final String CONFIRMATION_CODE_VALIDATION_EXECUTOR = "ConfirmationCodeValidationExecutor";
         public static final String USER_PROVISIONING_EXECUTOR = "UserProvisioningExecutor";
+        public static final String IN_FLOW_EXTENSION_EXECUTOR = "InFlowExtensionExecutor";
     }
 
     /**

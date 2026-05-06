@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.impl;
 
+import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowApiService;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfig;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfigPatchModel;
@@ -28,14 +29,22 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateStatus
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRequest;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionBasicResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionModel;
+import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionNameCheckRequest;
+import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionNameCheckResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionUpdateModel;
 import org.wso2.carbon.identity.api.server.flow.management.v1.core.FlowAIServiceCore;
 import org.wso2.carbon.identity.api.server.flow.management.v1.core.ServerFlowMgtService;
 import org.wso2.carbon.identity.api.server.flow.management.v1.factories.FlowAIServiceFactory;
 import org.wso2.carbon.identity.api.server.flow.management.v1.factories.ServerFlowMgtServiceFactory;
-
+import java.net.URI;
 import java.util.List;
 
 import javax.ws.rs.core.Response;
+
+import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 
 /**
  * Implementation of the Flow API.
@@ -54,11 +63,34 @@ public class FlowApiServiceImpl implements FlowApiService {
             throw new RuntimeException("Error occurred while initiating flow management service.", e);
         }
     }
+    @Override
+    public Response checkInFlowExtensionName(InFlowExtensionNameCheckRequest inFlowExtensionNameCheckRequest) {
+
+        InFlowExtensionNameCheckResponse result =
+                flowMgtService.checkInFlowExtensionName(inFlowExtensionNameCheckRequest);
+        return Response.ok().entity(result).build();
+    }
+
+    @Override
+    public Response createInFlowExtension(InFlowExtensionModel inFlowExtensionModel) {
+
+        InFlowExtensionResponse created = flowMgtService.createInFlowExtension(inFlowExtensionModel);
+        URI location = ContextLoader.buildURIForHeader(
+                V1_API_PATH_COMPONENT + "/flow/in-flow-extensions/" + created.getId());
+        return Response.created(location).entity(created).build();
+    }
 
     @Override
     public Response deleteFlow(String flowType) {
 
         flowMgtService.deleteFlow(flowType);
+        return Response.noContent().build();
+    }
+
+    @Override
+    public Response deleteInFlowExtension(String extensionId) {
+
+        flowMgtService.deleteInFlowExtension(extensionId);
         return Response.noContent().build();
     }
 
@@ -112,6 +144,27 @@ public class FlowApiServiceImpl implements FlowApiService {
     }
 
     @Override
+    public Response getInFlowExtensionById(String extensionId) {
+
+        InFlowExtensionResponse extension = flowMgtService.getInFlowExtensionById(extensionId);
+        return Response.ok().entity(extension).build();
+    }
+
+    @Override
+    public Response getInFlowExtensionContextTree(String flowType) {
+
+        return Response.ok().entity(
+                flowMgtService.getInFlowExtensionContextTree(flowType)).build();
+    }
+
+    @Override
+    public Response getInFlowExtensions() {
+
+        List<InFlowExtensionBasicResponse> extensions = flowMgtService.getInFlowExtensions();
+        return Response.ok().entity(extensions).build();
+    }
+
+    @Override
     public Response updateFlow(FlowRequest flowRequest) {
 
         flowMgtService.updateFlow(flowRequest);
@@ -123,5 +176,14 @@ public class FlowApiServiceImpl implements FlowApiService {
 
         FlowConfig flowConfig = flowMgtService.updateFlowConfig(flowConfigPatchModel);
         return Response.ok().entity(flowConfig).build();
+    }
+
+    @Override
+    public Response updateInFlowExtension(String extensionId,
+                                          InFlowExtensionUpdateModel inFlowExtensionUpdateModel) {
+
+        InFlowExtensionResponse updated =
+                flowMgtService.updateInFlowExtension(extensionId, inFlowExtensionUpdateModel);
+        return Response.ok().entity(updated).build();
     }
 }

@@ -18,28 +18,18 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1;
 
-import org.wso2.carbon.identity.api.server.flow.management.v1.*;
-import org.wso2.carbon.identity.api.server.flow.management.v1.*;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import java.io.InputStream;
-import java.util.List;
-import org.wso2.carbon.identity.api.server.flow.management.v1.Error;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfig;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfigPatchModel;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateRequest;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateResponse;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateResult;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateStatus;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRequest;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowResponse;
 import javax.ws.rs.core.Response;
 
 
 public interface FlowApiService {
 
+      public Response checkInFlowExtensionName(InFlowExtensionNameCheckRequest inFlowExtensionNameCheckRequest);
+
+      public Response createInFlowExtension(InFlowExtensionModel inFlowExtensionModel);
+
       public Response deleteFlow(String flowType);
+
+      public Response deleteInFlowExtension(String extensionId);
 
       public Response generateFlow(FlowGenerateRequest flowGenerateRequest);
 
@@ -55,7 +45,15 @@ public interface FlowApiService {
 
       public Response getFlowMeta(String flowType);
 
+      public Response getInFlowExtensionById(String extensionId);
+
+      public Response getInFlowExtensionContextTree(String flowType);
+
+      public Response getInFlowExtensions();
+
       public Response updateFlow(FlowRequest flowRequest);
 
       public Response updateFlowConfig(FlowConfigPatchModel flowConfigPatchModel);
+
+      public Response updateInFlowExtension(String extensionId, InFlowExtensionUpdateModel inFlowExtensionUpdateModel);
 }

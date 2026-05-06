@@ -133,6 +133,12 @@
             <groupId>org.wso2.carbon.identity.server.api</groupId>
             <artifactId>org.wso2.carbon.identity.api.server.claim.management.common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>4.0.4</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -146,41 +152,41 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
-<!--                                                <plugin>-->
-<!--                                                    <groupId>org.openapitools</groupId>-->
-<!--                                                    <artifactId>openapi-generator-maven-plugin</artifactId>-->
-<!--                                                    <version>4.1.2</version>-->
-<!--                                                    <executions>-->
-<!--                                                        <execution>-->
-<!--                                                            <goals>-->
-<!--                                                                <goal>generate</goal>-->
-<!--                                                            </goals>-->
-<!--                                                            <configuration>-->
-<!--                                                                <inputSpec>${project.basedir}/src/main/resources/flow.yaml</inputSpec>-->
-<!--                                                                <generatorName>org.wso2.carbon.codegen.CxfWso2Generator</generatorName>-->
-<!--                                                                <configOptions>-->
-<!--                                                                    <sourceFolder>src/gen/java</sourceFolder>-->
-<!--                                                                    <apiPackage>org.wso2.carbon.identity.api.server.flow.management.v1</apiPackage>-->
-<!--                                                                    <modelPackage>org.wso2.carbon.identity.api.server.flow.management.v1-->
-<!--                                                                    </modelPackage>-->
-<!--                                                                    <packageName>org.wso2.carbon.identity.api.server.flow.management.v1</packageName>-->
-<!--                                                                    <dateLibrary>java17</dateLibrary>-->
-<!--                                                                    <hideGenerationTimestamp>true</hideGenerationTimestamp>-->
-<!--                                                                    <ignoreFileOverride>${project.basedir}/.openapi-generator-ignore</ignoreFileOverride>-->
-<!--                                                                </configOptions>-->
-<!--                                                                <output>.</output>-->
-<!--                                                                <skipOverwrite>false</skipOverwrite>-->
-<!--                                                            </configuration>-->
-<!--                                                        </execution>-->
-<!--                                                    </executions>-->
-<!--                                                    <dependencies>-->
-<!--                                                        <dependency>-->
-<!--                                                            <groupId>org.openapitools</groupId>-->
-<!--                                                            <artifactId>cxf-wso2-openapi-generator</artifactId>-->
-<!--                                                            <version>1.0.0</version>-->
-<!--                                                        </dependency>-->
-<!--                                                    </dependencies>-->
-<!--                                                </plugin>-->
+                                                <plugin>
+                                                    <groupId>org.openapitools</groupId>
+                                                    <artifactId>openapi-generator-maven-plugin</artifactId>
+                                                    <version>4.1.2</version>
+                                                    <executions>
+                                                        <execution>
+                                                            <goals>
+                                                                <goal>generate</goal>
+                                                            </goals>
+                                                            <configuration>
+                                                                <inputSpec>${project.basedir}/src/main/resources/flow.yaml</inputSpec>
+                                                                <generatorName>org.wso2.carbon.codegen.CxfWso2Generator</generatorName>
+                                                                <configOptions>
+                                                                    <sourceFolder>src/gen/java</sourceFolder>
+                                                                    <apiPackage>org.wso2.carbon.identity.api.server.flow.management.v1</apiPackage>
+                                                                    <modelPackage>org.wso2.carbon.identity.api.server.flow.management.v1
+                                                                    </modelPackage>
+                                                                    <packageName>org.wso2.carbon.identity.api.server.flow.management.v1</packageName>
+                                                                    <dateLibrary>java17</dateLibrary>
+                                                                    <hideGenerationTimestamp>true</hideGenerationTimestamp>
+                                                                    <ignoreFileOverride>${project.basedir}/.openapi-generator-ignore</ignoreFileOverride>
+                                                                </configOptions>
+                                                                <output>.</output>
+                                                                <skipOverwrite>false</skipOverwrite>
+                                                            </configuration>
+                                                        </execution>
+                                                    </executions>
+                                                    <dependencies>
+                                                        <dependency>
+                                                            <groupId>org.openapitools</groupId>
+                                                            <artifactId>cxf-wso2-openapi-generator</artifactId>
+                                                            <version>1.0.0</version>
+                                                        </dependency>
+                                                    </dependencies>
+                                                </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>

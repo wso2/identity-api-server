@@ -19,17 +19,31 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1.core;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.action.management.api.exception.ActionMgtException;
+import org.wso2.carbon.identity.action.management.api.model.Action;
+import org.wso2.carbon.identity.action.management.api.service.ActionManagementService;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfig;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfigPatchModel;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRequest;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionBasicResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionContextTreeResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionModel;
+import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionNameCheckRequest;
+import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionNameCheckResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionUpdateModel;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Step;
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.AbstractMetaResponseHandler;
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.AskPasswordFlowMetaHandler;
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.PasswordRecoveryFlowMetaHandler;
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.RegistrationFlowMetaHandler;
+import org.wso2.carbon.identity.api.server.flow.management.v1.utils.InFlowExtensionContextTreeMapper;
+import org.wso2.carbon.identity.api.server.flow.management.v1.utils.InFlowExtensionMapper;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
+import org.wso2.carbon.identity.flow.execution.engine.inflow.extension.metadata.InFlowExtensionContextTreeMetadata;
+import org.wso2.carbon.identity.flow.execution.engine.inflow.extension.metadata.InFlowExtensionContextTreeService;
 import org.wso2.carbon.identity.flow.mgt.Constants;
 import org.wso2.carbon.identity.flow.mgt.FlowMgtService;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtFrameworkException;
@@ -52,11 +66,17 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils
  */
 public class ServerFlowMgtService {
 
-    private final FlowMgtService flowMgtService;
+    private static final String IN_FLOW_EXTENSION_ACTION_TYPE =
+            Action.ActionTypes.IN_FLOW_EXTENSION.getPathParam();
 
-    public ServerFlowMgtService(FlowMgtService flowMgtService) {
+    private final FlowMgtService flowMgtService;
+    private final ActionManagementService actionManagementService;
+
+    public ServerFlowMgtService(FlowMgtService flowMgtService,
+                                ActionManagementService actionManagementService) {
 
         this.flowMgtService = flowMgtService;
+        this.actionManagementService = actionManagementService;
     }
 
     /**
@@ -94,6 +114,30 @@ public class ServerFlowMgtService {
         Utils.validateFlowType(flowType);
         AbstractMetaResponseHandler metaResponseHandler = resolveHandler(flowType);
         return metaResponseHandler.createResponse();
+    }
+
+    /**
+     * Retrieve the controlled In-Flow Extension context tree for the given flow type. When
+     * {@code flowType} is null/blank, the default tree is returned. The tree is filtered
+     * server-side per the {@code [identity.in_flow_extension.context.*]} whitelist in
+     * {@code deployment.toml} so the Console UI only offers paths the deployment allows.
+     *
+     * @param flowType optional flow type (null → default tree).
+     * @return the tree response.
+     */
+    public InFlowExtensionContextTreeResponse getInFlowExtensionContextTree(String flowType) {
+
+        String resolvedFlowType = (flowType != null && !flowType.trim().isEmpty()) ? flowType : null;
+        if (resolvedFlowType != null) {
+            // Reuse the same flow-type validation used by the other endpoints.
+            Utils.validateFlowType(resolvedFlowType);
+        }
+        // Goes through the engine's PUBLIC metadata service rather than reaching into the
+        // engine's internal DataHolder — the latter lives in a Private-Package and isn't
+        // visible to other OSGi bundles at runtime.
+        InFlowExtensionContextTreeMetadata metadata =
+                InFlowExtensionContextTreeService.getInstance().buildContextTree(resolvedFlowType);
+        return InFlowExtensionContextTreeMapper.toResponse(metadata);
     }
 
     /**
@@ -216,6 +260,131 @@ public class ServerFlowMgtService {
             return Utils.convertToFlowConfig(updatedFlowConfig);
         } catch (FlowMgtFrameworkException e) {
             throw Utils.handleFlowMgtException(e);
+        }
+    }
+
+    // =========================================================================
+    // InFlow Extension CRUD
+    // =========================================================================
+
+    /**
+     * Create a new InFlow extension action.
+     *
+     * @param model the create request model.
+     * @return the full response of the created extension.
+     */
+    public InFlowExtensionResponse createInFlowExtension(InFlowExtensionModel model) {
+
+        try {
+            Action domainAction = InFlowExtensionMapper.toInFlowExtensionAction(model);
+            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            Action created = actionManagementService.addAction(
+                    IN_FLOW_EXTENSION_ACTION_TYPE, domainAction, tenantDomain);
+            return InFlowExtensionMapper.toInFlowExtensionResponse(created);
+        } catch (ActionMgtException e) {
+            throw Utils.handleActionMgtException(e);
+        }
+    }
+
+    /**
+     * List all InFlow extension actions for the current tenant.
+     *
+     * @return list of basic response items.
+     */
+    public List<InFlowExtensionBasicResponse> getInFlowExtensions() {
+
+        try {
+            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            List<Action> actions = actionManagementService.getActionsByActionType(
+                    IN_FLOW_EXTENSION_ACTION_TYPE, tenantDomain);
+            return actions.stream()
+                    .map(InFlowExtensionMapper::toInFlowExtensionBasicResponse)
+                    .collect(Collectors.toList());
+        } catch (ActionMgtException e) {
+            throw Utils.handleActionMgtException(e);
+        }
+    }
+
+    /**
+     * Get a single InFlow extension by its ID.
+     *
+     * @param extensionId the action ID.
+     * @return the full response model.
+     */
+    public InFlowExtensionResponse getInFlowExtensionById(String extensionId) {
+
+        try {
+            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            Action action = actionManagementService.getActionByActionId(
+                    IN_FLOW_EXTENSION_ACTION_TYPE, extensionId, tenantDomain);
+            return InFlowExtensionMapper.toInFlowExtensionResponse(action);
+        } catch (ActionMgtException e) {
+            throw Utils.handleActionMgtException(e);
+        }
+    }
+
+    /**
+     * Update (PATCH) an InFlow extension.
+     *
+     * @param extensionId the action ID to update.
+     * @param model       the update request model.
+     * @return the full updated response model.
+     */
+    public InFlowExtensionResponse updateInFlowExtension(String extensionId,
+                                                         InFlowExtensionUpdateModel model) {
+
+        try {
+            Action domainAction = InFlowExtensionMapper.toInFlowExtensionAction(model);
+            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            Action updated = actionManagementService.updateAction(
+                    IN_FLOW_EXTENSION_ACTION_TYPE, extensionId, domainAction, tenantDomain);
+            return InFlowExtensionMapper.toInFlowExtensionResponse(updated);
+        } catch (ActionMgtException e) {
+            throw Utils.handleActionMgtException(e);
+        }
+    }
+
+    /**
+     * Delete an InFlow extension by its ID.
+     *
+     * @param extensionId the action ID to delete.
+     */
+    public void deleteInFlowExtension(String extensionId) {
+
+        try {
+            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            actionManagementService.deleteAction(
+                    IN_FLOW_EXTENSION_ACTION_TYPE, extensionId, tenantDomain);
+        } catch (ActionMgtException e) {
+            throw Utils.handleActionMgtException(e);
+        }
+    }
+
+    /**
+     * Check whether the given InFlow extension name is available (unique) for the current tenant.
+     * When {@code request.getExcludeId()} is non-null the check excludes that action ID (update
+     * scenario).
+     *
+     * @param request the name-check request model.
+     * @return a response model with {@code available = true/false}.
+     */
+    public InFlowExtensionNameCheckResponse checkInFlowExtensionName(
+            InFlowExtensionNameCheckRequest request) {
+
+        try {
+            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            boolean available;
+            if (request.getExcludeId() != null && !request.getExcludeId().isEmpty()) {
+                available = actionManagementService.isActionNameAvailable(
+                        IN_FLOW_EXTENSION_ACTION_TYPE, request.getName(),
+                        request.getExcludeId(), tenantDomain);
+            } else {
+                available = actionManagementService.isActionNameAvailable(
+                        IN_FLOW_EXTENSION_ACTION_TYPE, request.getName(), tenantDomain);
+            }
+            return new InFlowExtensionNameCheckResponse().available(available);
+        } catch (ActionMgtException e) {
+            throw Utils.handleActionMgtException(e);
         }
     }
 
