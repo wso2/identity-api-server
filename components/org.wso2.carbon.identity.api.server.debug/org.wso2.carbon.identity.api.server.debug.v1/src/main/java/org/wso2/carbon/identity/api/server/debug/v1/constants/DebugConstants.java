@@ -48,7 +48,6 @@ public class DebugConstants {
     public static final class ResponseKeys {
 
         public static final String DEBUG_ID = "debugId";
-        public static final String STATE = "state";
         public static final String SUCCESS = "success";
         public static final String STATUS = "status";
         public static final String MESSAGE = "message";

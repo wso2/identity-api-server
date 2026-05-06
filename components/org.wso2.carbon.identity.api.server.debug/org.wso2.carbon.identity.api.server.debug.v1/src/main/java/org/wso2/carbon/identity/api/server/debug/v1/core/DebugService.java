@@ -228,7 +228,8 @@ public class DebugService {
             String key = entry.getKey();
             if (!DebugConstants.ResponseKeys.STATUS.equals(key)
                     && !DebugConstants.ResponseKeys.SUCCESS.equals(key)
-                    && !DebugConstants.ResponseKeys.DEBUG_ID.equals(key)) {
+                    && !DebugConstants.ResponseKeys.DEBUG_ID.equals(key)
+                    && !DebugConstants.ResponseKeys.MESSAGE.equals(key)) {
                 metadata.put(key, entry.getValue());
             }
         }
@@ -296,7 +297,8 @@ public class DebugService {
     private String resolveConnectionMessage(DebugConnectionResponse.StatusEnum status,
                                             Object frameworkMessage) {
 
-        String normalizedMessage = frameworkMessage != null ? StringUtils.trimToNull(frameworkMessage.toString()) : null;
+        String normalizedMessage = frameworkMessage != null
+                ? StringUtils.trimToNull(frameworkMessage.toString()) : null;
         if (normalizedMessage != null) {
             return normalizedMessage;
         }
@@ -318,7 +320,8 @@ public class DebugService {
      */
     private String resolveResultMessage(DebugResult.StatusEnum status, Object frameworkMessage) {
 
-        String normalizedMessage = frameworkMessage != null ? StringUtils.trimToNull(frameworkMessage.toString()) : null;
+        String normalizedMessage = frameworkMessage != null
+                ? StringUtils.trimToNull(frameworkMessage.toString()) : null;
         if (normalizedMessage != null) {
             return normalizedMessage;
         }
