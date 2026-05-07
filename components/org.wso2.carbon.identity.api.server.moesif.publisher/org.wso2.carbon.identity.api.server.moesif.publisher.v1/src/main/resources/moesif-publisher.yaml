@@ -1,0 +1,201 @@
+openapi: 3.0.0
+info:
+  description: >
+    This is the RESTful API for managing Moesif event publisher configurations in WSO2 Identity Server.
+  version: "v1"
+  title: WSO2 Identity Server - Moesif Publisher Management API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+
+paths:
+  /moesif-publishers:
+    post:
+      tags:
+        - Moesif Publishers
+      summary: Create a Moesif event publisher
+      operationId: createMoesifPublisher
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MoesifPublisherAdd'
+        required: true
+      responses:
+        '201':
+          description: Successfully created
+          headers:
+            Location:
+              description: Location of the newly created resource.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MoesifPublisher'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    get:
+      tags:
+        - Moesif Publishers
+      summary: Get all Moesif event publishers
+      operationId: getMoesifPublishers
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MoesifPublisher'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /moesif-publishers/{publisher-name}:
+    get:
+      tags:
+        - Moesif Publishers
+      summary: Get a Moesif event publisher by name
+      operationId: getMoesifPublisher
+      parameters:
+        - $ref: '#/components/parameters/PublisherNameParam'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MoesifPublisher'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    patch:
+      tags:
+        - Moesif Publishers
+      summary: Update the API key of a Moesif event publisher
+      operationId: patchMoesifPublisher
+      parameters:
+        - $ref: '#/components/parameters/PublisherNameParam'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MoesifPublisherUpdate'
+        required: true
+      responses:
+        '200':
+          description: Successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MoesifPublisher'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    delete:
+      tags:
+        - Moesif Publishers
+      summary: Delete a Moesif event publisher
+      operationId: deleteMoesifPublisher
+      parameters:
+        - $ref: '#/components/parameters/PublisherNameParam'
+      responses:
+        '204':
+          description: Successfully deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  parameters:
+    PublisherNameParam:
+      name: publisher-name
+      in: path
+      required: true
+      description: Name of the Moesif publisher.
+      schema:
+        type: string
+
+  schemas:
+    MoesifPublisherAdd:
+      type: object
+      required:
+        - name
+        - apiKeyValue
+      properties:
+        name:
+          type: string
+          example: moesifPublisher
+          description: Name of the Moesif publisher.
+        apiKeyValue:
+          type: string
+          description: Moesif API key value.
+
+    MoesifPublisherUpdate:
+      type: object
+      required:
+        - apiKeyValue
+      properties:
+        apiKeyValue:
+          type: string
+          description: Moesif API key value.
+
+    MoesifPublisher:
+      type: object
+      properties:
+        name:
+          type: string
+
+    Properties:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        description:
+          type: string
+
+  responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    ServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
