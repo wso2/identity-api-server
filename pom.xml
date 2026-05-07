@@ -146,6 +146,12 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.identity.datapublisher.authentication</groupId>
+                <artifactId>org.wso2.carbon.identity.data.publisher.authentication.moesif</artifactId>
+                <version>${identity.data.publisher.authentication.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.identity.framework</groupId>
                 <artifactId>org.wso2.carbon.identity.mgt</artifactId>
                 <version>${carbon.identity.framework.version}</version>
@@ -1065,6 +1071,7 @@
         <spotbugs.findsecbugs.version>1.13.0</spotbugs.findsecbugs.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
         <identity.event.handler.version>1.12.4</identity.event.handler.version>
+        <identity.data.publisher.authentication.version>5.10.1</identity.data.publisher.authentication.version>
         <identity.inbound.oauth2.version>7.4.57</identity.inbound.oauth2.version>
         <identity.inbound.saml2.version>5.11.51</identity.inbound.saml2.version>
         <identity.x509Certificate.validation.version>1.1.19</identity.x509Certificate.validation.version>
@@ -1156,6 +1163,7 @@
         <module>components/org.wso2.carbon.identity.api.server.asynchronous.operation.status.management</module>
         <module>components/org.wso2.carbon.identity.api.server.vc.template.management</module>
         <module>components/org.wso2.carbon.identity.api.server.credential.management</module>
+        <module>components/org.wso2.carbon.identity.api.server.moesif.publisher</module>
     </modules>
 
 </project>
