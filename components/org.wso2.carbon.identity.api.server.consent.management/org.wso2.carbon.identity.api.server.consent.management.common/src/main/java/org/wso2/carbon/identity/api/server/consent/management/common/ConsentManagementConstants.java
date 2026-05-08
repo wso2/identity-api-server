@@ -39,4 +39,7 @@ public class ConsentManagementConstants {
     public static final String STATUS_CONFLICT_MESSAGE_DEFAULT = "Conflict";
     public static final String STATUS_UNAUTHORIZED_MESSAGE_DEFAULT = "Unauthorized";
     public static final String STATUS_FORBIDDEN_MESSAGE_DEFAULT = "Forbidden";
+    // Pagination Link Relations
+    public static final String LINK_REL_PREVIOUS = "previous";
+    public static final String LINK_REL_NEXT = "next";
 }

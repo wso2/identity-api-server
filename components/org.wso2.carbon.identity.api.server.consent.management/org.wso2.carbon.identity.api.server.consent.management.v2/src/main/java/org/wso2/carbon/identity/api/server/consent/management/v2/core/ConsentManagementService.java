@@ -35,8 +35,9 @@ import org.wso2.carbon.consent.mgt.core.model.Receipt;
 import org.wso2.carbon.consent.mgt.core.model.ReceiptInput;
 import org.wso2.carbon.consent.mgt.core.model.ReceiptService;
 import org.wso2.carbon.consent.mgt.core.util.ConsentReceiptUtils;
-import org.wso2.carbon.consent.mgt.core.util.FilterQueriesUtil;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.api.server.common.ContextLoader;
+import org.wso2.carbon.identity.api.server.consent.management.common.ConsentManagementConstants;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.AuthorizationCreateRequest;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.AuthorizationDTO;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentCreateRequest;
@@ -52,17 +53,21 @@ import org.wso2.carbon.identity.api.server.consent.management.v2.model.ElementTe
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.PaginationLink;
 import org.wso2.carbon.identity.api.server.consent.management.v2.util.ConsentMgtEndpointUtil;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ACTIVE_STATE;
+import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.DEFAULT_LIMIT;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_CONSENT_INVALID_STATE_FOR_AUTHORIZE;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_CONSENT_REJECTED_WITH_AUTHORIZATIONS;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_CONSENT_SUBJECT_MISMATCH;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_CONSENT_USER_NOT_IN_AUTHORIZATION_LIST;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_ELEMENT_UUID_NOT_FOUND;
+import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_INVALID_QUERY_PARAM;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.FilterConstants;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.PENDING_STATE;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.REVOKE_STATE;
@@ -182,56 +187,75 @@ public class ConsentManagementService {
                                                      UUID purposeVersionId, Integer limit, String after, String before)
             throws ConsentManagementException {
 
-        List<Receipt> receipts = consentManager.listReceipts(
-                subjectId,
-                serviceId,
-                state,
-                purposeId != null ? purposeId.toString() : null,
-                purposeVersionId != null ? purposeVersionId.toString() : null,
-                after, before, limit + 1);
+        ConsentListResponse result = new ConsentListResponse();
 
-        if (receipts == null) {
-            receipts = Collections.emptyList();
+        try {
+            // Set default values if the parameters are not set.
+            limit = validatedLimit(limit);
+
+            // Validate before and after parameters.
+            if (StringUtils.isNotBlank(before) && StringUtils.isNotBlank(after)) {
+                throw handleClientException(ERROR_CODE_INVALID_QUERY_PARAM,
+                        "Both 'before' and 'after' parameters are provided.");
+            }
+
+            List<Receipt> receipts = consentManager.listReceipts(
+                    subjectId,
+                    serviceId,
+                    state,
+                    purposeId != null ? purposeId.toString() : null,
+                    purposeVersionId != null ? purposeVersionId.toString() : null,
+                    after, before, limit + 1);
+
+            if (receipts == null || receipts.isEmpty()) {
+                result.setTotalResults(0);
+                result.setConsents(new ArrayList<>());
+                return result;
+            }
+
+            List<ConsentSummaryDTO> summaries = new ArrayList<>();
+            boolean hasMoreItems = receipts.size() > limit;
+            boolean needsReverse = StringUtils.isNotBlank(before);
+            boolean isFirstPage = (StringUtils.isBlank(before) && StringUtils.isBlank(after)) ||
+                    (StringUtils.isNotBlank(before) && !hasMoreItems);
+            boolean isLastPage = !hasMoreItems && (StringUtils.isNotBlank(after) || StringUtils.isBlank(before));
+
+            String url = "?limit=" + limit;
+
+            if (hasMoreItems) {
+                receipts = receipts.subList(0, limit);
+            }
+            if (needsReverse) {
+                Collections.reverse(receipts);
+            }
+
+            for (Receipt receipt : receipts) {
+                summaries.add(toConsentSummaryDTO(receipt));
+            }
+
+            List<PaginationLink> links = new ArrayList<>();
+
+            if (!isFirstPage && !summaries.isEmpty()) {
+                String encodedString = Base64.getEncoder().encodeToString(
+                        summaries.get(0).getId().getBytes(StandardCharsets.UTF_8));
+                String prevUrl = url + "&" + FilterConstants.FILTER_ATTR_BEFORE + "=" + encodedString;
+                links.add(buildPaginationLink(prevUrl, ConsentManagementConstants.LINK_REL_PREVIOUS));
+            }
+
+            if (!isLastPage && !summaries.isEmpty()) {
+                String encodedString = Base64.getEncoder().encodeToString(
+                        summaries.get(summaries.size() - 1).getId().getBytes(StandardCharsets.UTF_8));
+                String nextUrl = url + "&" + FilterConstants.FILTER_ATTR_AFTER + "=" + encodedString;
+                links.add(buildPaginationLink(nextUrl, ConsentManagementConstants.LINK_REL_NEXT));
+            }
+
+            result.setTotalResults(summaries.size());
+            result.setLinks(links);
+            result.setConsents(summaries);
+            return result;
+        } catch (ConsentManagementException e) {
+            throw e;
         }
-
-        List<ConsentSummaryDTO> summaries = new ArrayList<>();
-        for (Receipt receipt : receipts) {
-            summaries.add(toConsentSummaryDTO(receipt));
-        }
-
-        boolean hasNextPage = summaries.size() > limit;
-        if (hasNextPage) {
-            summaries = summaries.subList(0, limit);
-        }
-
-        List<PaginationLink> links = new ArrayList<>();
-        String basePath = "/api/identity/consent-mgt/v2.0/consents";
-
-        if (hasNextPage && !summaries.isEmpty()) {
-            String nextCursor = FilterQueriesUtil.encodeCursor(summaries.get(summaries.size() - 1).getId());
-            PaginationLink nextLink = new PaginationLink();
-            nextLink.setRel(FilterConstants.LINK_REL_NEXT);
-            String nextHref = basePath + "?" + FilterConstants.FILTER_ATTR_AFTER + "=" + nextCursor + "&"
-                    + FilterConstants.PARAM_LIMIT + "=" + limit;
-            nextLink.setHref(nextHref);
-            links.add(nextLink);
-        }
-
-        if (StringUtils.isNotBlank(after) && !summaries.isEmpty()) {
-            String prevCursor = FilterQueriesUtil.encodeCursor(summaries.get(0).getId());
-            PaginationLink prevLink = new PaginationLink();
-            prevLink.setRel(FilterConstants.LINK_REL_PREVIOUS);
-            String prevHref = basePath + "?" + FilterConstants.FILTER_ATTR_BEFORE + "=" + prevCursor + "&"
-                    + FilterConstants.PARAM_LIMIT + "=" + limit;
-            prevLink.setHref(prevHref);
-            links.add(prevLink);
-        }
-
-        ConsentListResponse listResponse = new ConsentListResponse();
-        listResponse.setTotalResults(summaries.size());
-        listResponse.setLinks(links);
-        listResponse.setConsents(summaries);
-        return listResponse;
     }
 
     /**
@@ -488,5 +512,22 @@ public class ConsentManagementService {
             dto.setServiceId(receipt.getServices().get(0).getService());
         }
         return dto;
+    }
+
+    private Integer validatedLimit(Integer limit) throws ConsentManagementException {
+
+        limit = limit == null ? DEFAULT_LIMIT : limit;
+        if (limit <= 0) {
+            throw handleClientException(ERROR_CODE_INVALID_QUERY_PARAM, limit.toString());
+        }
+        return limit;
+    }
+
+    private PaginationLink buildPaginationLink(String url, String rel) {
+
+        return new PaginationLink()
+                .href(ContextLoader.buildURIForHeader(ConsentManagementConstants.V2_API_PATH_COMPONENT +
+                        ConsentManagementConstants.CONSENTS_PATH + url).toString())
+                .rel(rel);
     }
 }

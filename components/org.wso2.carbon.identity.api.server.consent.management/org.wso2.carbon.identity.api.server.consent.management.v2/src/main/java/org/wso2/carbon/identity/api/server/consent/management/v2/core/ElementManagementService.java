@@ -26,6 +26,8 @@ import org.wso2.carbon.consent.mgt.core.exception.ConsentManagementException;
 import org.wso2.carbon.consent.mgt.core.model.PIICategory;
 import org.wso2.carbon.consent.mgt.core.util.ConsentUtils;
 import org.wso2.carbon.consent.mgt.core.util.FilterQueriesUtil;
+import org.wso2.carbon.identity.api.server.common.ContextLoader;
+import org.wso2.carbon.identity.api.server.consent.management.common.ConsentManagementConstants;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ElementCreateRequest;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ElementDTO;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ElementListResponse;
@@ -37,14 +39,18 @@ import org.wso2.carbon.identity.core.model.ExpressionNode;
 import org.wso2.carbon.identity.core.model.FilterTreeBuilder;
 import org.wso2.carbon.identity.core.model.Node;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.DEFAULT_LIMIT;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_ELEMENT_UUID_NOT_FOUND;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_INVALID_FILTER_EXPRESSION;
+import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_INVALID_QUERY_PARAM;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.FilterConstants;
 import static org.wso2.carbon.consent.mgt.core.util.ConsentUtils.handleClientException;
 
@@ -117,6 +123,15 @@ public class ElementManagementService {
     public ElementListResponse listElements(String filterExpression, Integer limit, String after, String before) {
 
         try {
+            // Set default values if the parameters are not set.
+            limit = validatedLimit(limit);
+
+            // Validate before and after parameters.
+            if (StringUtils.isNotBlank(before) && StringUtils.isNotBlank(after)) {
+                throw handleClientException(ERROR_CODE_INVALID_QUERY_PARAM,
+                        "Both 'before' and 'after' parameters are provided.");
+            }
+
             if (StringUtils.isNotBlank(filterExpression)) {
                 try {
                     FilterTreeBuilder filterTreeBuilder = new FilterTreeBuilder(filterExpression);
@@ -132,39 +147,40 @@ public class ElementManagementService {
             List<ExpressionNode> expressionNodes =
                     FilterQueriesUtil.getExpressionNodes(filterExpression, after, before);
             List<PIICategory> categories = consentManager.listPIICategories(expressionNodes, limit + 1);
+
             List<ElementDTO> items = new ArrayList<>();
+            boolean hasMoreItems = categories != null && categories.size() > limit;
+            boolean needsReverse = StringUtils.isNotBlank(before);
+            boolean isFirstPage = (StringUtils.isBlank(before) && StringUtils.isBlank(after)) ||
+                    (StringUtils.isNotBlank(before) && !hasMoreItems);
+            boolean isLastPage = !hasMoreItems && (StringUtils.isNotBlank(after) || StringUtils.isBlank(before));
+
             if (categories != null) {
+                if (hasMoreItems) {
+                    categories = categories.subList(0, limit);
+                }
+                if (needsReverse) {
+                    java.util.Collections.reverse(categories);
+                }
                 for (PIICategory cat : categories) {
                     items.add(toElementDTO(cat));
                 }
             }
 
-            boolean hasNextPage = items.size() > limit;
-            if (hasNextPage) {
-                items = items.subList(0, limit);
-            }
-
             List<PaginationLink> links = new ArrayList<>();
-            String basePath = "/api/identity/consent-mgt/v2.0/elements";
 
-            if (hasNextPage && !items.isEmpty()) {
-                String nextCursor = FilterQueriesUtil.encodeCursor(items.get(items.size() - 1).getId().toString());
-                PaginationLink nextLink = new PaginationLink();
-                nextLink.setRel(FilterConstants.LINK_REL_NEXT);
-                String nextHref = basePath + "?" + FilterConstants.FILTER_ATTR_AFTER + "=" + nextCursor + "&"
-                        + FilterConstants.PARAM_LIMIT + "=" + limit;
-                nextLink.setHref(nextHref);
-                links.add(nextLink);
+            if (!isFirstPage && !items.isEmpty()) {
+                String prevCursor = Base64.getEncoder().encodeToString(
+                        items.get(0).getId().toString().getBytes(StandardCharsets.UTF_8));
+                String prevUrl = "?limit=" + limit + "&" + FilterConstants.FILTER_ATTR_BEFORE + "=" + prevCursor;
+                links.add(buildPaginationLink(prevUrl, ConsentManagementConstants.LINK_REL_PREVIOUS));
             }
 
-            if (StringUtils.isNotBlank(after) && !items.isEmpty()) {
-                String prevCursor = FilterQueriesUtil.encodeCursor(items.get(0).getId().toString());
-                PaginationLink prevLink = new PaginationLink();
-                prevLink.setRel(FilterConstants.LINK_REL_PREVIOUS);
-                String prevHref = basePath + "?" + FilterConstants.FILTER_ATTR_BEFORE + "=" + prevCursor + "&"
-                        + FilterConstants.PARAM_LIMIT + "=" + limit;
-                prevLink.setHref(prevHref);
-                links.add(prevLink);
+            if (!isLastPage && !items.isEmpty()) {
+                String nextCursor = Base64.getEncoder().encodeToString(
+                        items.get(items.size() - 1).getId().toString().getBytes(StandardCharsets.UTF_8));
+                String nextUrl = "?limit=" + limit + "&" + FilterConstants.FILTER_ATTR_AFTER + "=" + nextCursor;
+                links.add(buildPaginationLink(nextUrl, ConsentManagementConstants.LINK_REL_NEXT));
             }
 
             ElementListResponse listResponse = new ElementListResponse();
@@ -202,5 +218,22 @@ public class ElementManagementService {
         dto.setDisplayName(cat.getDisplayName());
         dto.setDescription(cat.getDescription());
         return dto;
+    }
+
+    private Integer validatedLimit(Integer limit) throws ConsentManagementException {
+
+        limit = limit == null ? DEFAULT_LIMIT : limit;
+        if (limit <= 0) {
+            throw handleClientException(ERROR_CODE_INVALID_QUERY_PARAM, limit.toString());
+        }
+        return limit;
+    }
+
+    private PaginationLink buildPaginationLink(String url, String rel) {
+
+        return new PaginationLink()
+                .href(ContextLoader.buildURIForHeader(ConsentManagementConstants.V2_API_PATH_COMPONENT +
+                        ConsentManagementConstants.ELEMENTS_PATH + url).toString())
+                .rel(rel);
     }
 }

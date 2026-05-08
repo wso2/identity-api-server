@@ -29,6 +29,8 @@ import org.wso2.carbon.consent.mgt.core.model.PurposePIICategory;
 import org.wso2.carbon.consent.mgt.core.model.PurposeVersion;
 import org.wso2.carbon.consent.mgt.core.util.ConsentUtils;
 import org.wso2.carbon.consent.mgt.core.util.FilterQueriesUtil;
+import org.wso2.carbon.identity.api.server.common.ContextLoader;
+import org.wso2.carbon.identity.api.server.consent.management.common.ConsentManagementConstants;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.PaginationLink;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.PurposeCreateRequest;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.PurposeDTO;
@@ -49,17 +51,21 @@ import org.wso2.carbon.identity.core.model.ExpressionNode;
 import org.wso2.carbon.identity.core.model.FilterTreeBuilder;
 import org.wso2.carbon.identity.core.model.Node;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.DEFAULT_LIMIT;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.DEFAULT_PURPOSE_GROUP;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_ELEMENT_UUID_NOT_FOUND;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_INVALID_FILTER_EXPRESSION;
+import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_INVALID_QUERY_PARAM;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_PII_CATEGORY_ID_REQUIRED;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_PURPOSE_UUID_NOT_FOUND;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_PURPOSE_VERSION_NOT_FOUND;
@@ -143,6 +149,15 @@ public class PurposeManagementService {
     public PurposeListResponse listPurposes(String filterExpression, Integer limit, String after, String before) {
 
         try {
+            // Set default values if the parameters are not set.
+            limit = validatedLimit(limit);
+
+            // Validate before and after parameters.
+            if (StringUtils.isNotBlank(before) && StringUtils.isNotBlank(after)) {
+                throw handleClientException(ERROR_CODE_INVALID_QUERY_PARAM,
+                        "Both 'before' and 'after' parameters are provided.");
+            }
+
             if (StringUtils.isNotBlank(filterExpression)) {
                 try {
                     FilterTreeBuilder filterTreeBuilder = new FilterTreeBuilder(filterExpression);
@@ -162,7 +177,19 @@ public class PurposeManagementService {
             List<Purpose> purposes = consentManager.listPurposes(expressionNodes, limit + 1);
 
             List<PurposeSummaryDTO> items = new ArrayList<>();
+            boolean hasMoreItems = purposes != null && purposes.size() > limit;
+            boolean needsReverse = StringUtils.isNotBlank(before);
+            boolean isFirstPage = (StringUtils.isBlank(before) && StringUtils.isBlank(after)) ||
+                    (StringUtils.isNotBlank(before) && !hasMoreItems);
+            boolean isLastPage = !hasMoreItems && (StringUtils.isNotBlank(after) || StringUtils.isBlank(before));
+
             if (purposes != null) {
+                if (hasMoreItems) {
+                    purposes = purposes.subList(0, limit);
+                }
+                if (needsReverse) {
+                    Collections.reverse(purposes);
+                }
                 for (Purpose p : purposes) {
                     if (StringUtils.isBlank(p.getUuid())) {
                         continue;
@@ -171,32 +198,22 @@ public class PurposeManagementService {
                 }
             }
 
-            boolean hasNextPage = items.size() > limit;
-            if (hasNextPage) {
-                items = items.subList(0, limit);
-            }
-
             List<PaginationLink> links = new ArrayList<>();
-            String basePath = "/api/identity/consent-mgt/v2.0/purposes";
 
-            if (hasNextPage && !items.isEmpty()) {
-                String nextCursor = FilterQueriesUtil.encodeCursor(items.get(items.size() - 1).getId().toString());
-                PaginationLink nextLink = new PaginationLink();
-                nextLink.setRel(FilterConstants.LINK_REL_NEXT);
-                String nextHref = basePath + "?" + FilterConstants.FILTER_ATTR_AFTER + "=" + nextCursor + "&"
-                        + FilterConstants.PARAM_LIMIT + "=" + limit;
-                nextLink.setHref(nextHref);
-                links.add(nextLink);
+            if (!isFirstPage && !items.isEmpty()) {
+                String prevCursor = Base64.getEncoder().encodeToString(
+                        items.get(0).getId().toString().getBytes(StandardCharsets.UTF_8));
+                String prevUrl = "?limit=" + limit + "&" + FilterConstants.FILTER_ATTR_BEFORE + "=" + prevCursor;
+                links.add(buildPaginationLink(ConsentManagementConstants.PURPOSES_PATH, prevUrl,
+                        ConsentManagementConstants.LINK_REL_PREVIOUS));
             }
 
-            if (StringUtils.isNotBlank(after) && !items.isEmpty()) {
-                String prevCursor = FilterQueriesUtil.encodeCursor(items.get(0).getId().toString());
-                PaginationLink prevLink = new PaginationLink();
-                prevLink.setRel(FilterConstants.LINK_REL_PREVIOUS);
-                String prevHref = basePath + "?" + FilterConstants.FILTER_ATTR_BEFORE + "=" + prevCursor + "&"
-                        + FilterConstants.PARAM_LIMIT + "=" + limit;
-                prevLink.setHref(prevHref);
-                links.add(prevLink);
+            if (!isLastPage && !items.isEmpty()) {
+                String nextCursor = Base64.getEncoder().encodeToString(
+                        items.get(items.size() - 1).getId().toString().getBytes(StandardCharsets.UTF_8));
+                String nextUrl = "?limit=" + limit + "&" + FilterConstants.FILTER_ATTR_AFTER + "=" + nextCursor;
+                links.add(buildPaginationLink(ConsentManagementConstants.PURPOSES_PATH, nextUrl,
+                        ConsentManagementConstants.LINK_REL_NEXT));
             }
 
             PurposeListResponse listResponse = new PurposeListResponse();
@@ -283,6 +300,15 @@ public class PurposeManagementService {
     public PurposeVersionListResponse listPurposeVersions(UUID purposeId, Integer limit, String after, String before) {
 
         try {
+            // Set default values if the parameters are not set.
+            limit = validatedLimit(limit);
+
+            // Validate before and after parameters.
+            if (StringUtils.isNotBlank(before) && StringUtils.isNotBlank(after)) {
+                throw handleClientException(ERROR_CODE_INVALID_QUERY_PARAM,
+                        "Both 'before' and 'after' parameters are provided.");
+            }
+
             List<PurposeVersion> all = consentManager.listPurposeVersions(purposeId.toString());
             if (all == null) {
                 all = Collections.emptyList();
@@ -290,7 +316,7 @@ public class PurposeManagementService {
 
             List<PurposeVersion> filtered;
             if (after != null) {
-                String afterId = FilterQueriesUtil.decodeCursor(after);
+                String afterId = new String(Base64.getDecoder().decode(after), StandardCharsets.UTF_8);
                 int afterIdx = -1;
                 for (int i = 0; i < all.size(); i++) {
                     if (afterId.equals(all.get(i).getUuid())) {
@@ -300,7 +326,7 @@ public class PurposeManagementService {
                 }
                 filtered = afterIdx >= 0 ? all.subList(afterIdx + 1, all.size()) : all;
             } else if (before != null) {
-                String beforeId = FilterQueriesUtil.decodeCursor(before);
+                String beforeId = new String(Base64.getDecoder().decode(before), StandardCharsets.UTF_8);
                 int beforeIdx = all.size();
                 for (int i = 0; i < all.size(); i++) {
                     if (beforeId.equals(all.get(i).getUuid())) {
@@ -313,15 +339,37 @@ public class PurposeManagementService {
                 filtered = all;
             }
 
+            boolean hasMoreItems = filtered.size() > limit;
             List<PurposeVersion> page = filtered.subList(0, Math.min(limit, filtered.size()));
             List<PurposeVersionSummaryDTO> dtos = new ArrayList<>();
             for (PurposeVersion v : page) {
                 dtos.add(toPurposeVersionSummaryDTO(v));
             }
 
+            List<PaginationLink> links = new ArrayList<>();
+            String versionsPath = ConsentManagementConstants.PURPOSES_PATH + "/" + purposeId +
+                    ConsentManagementConstants.VERSIONS_PATH;
+            boolean isFirstPage = (StringUtils.isBlank(before) && StringUtils.isBlank(after)) ||
+                    (StringUtils.isNotBlank(before) && !hasMoreItems);
+            boolean isLastPage = !hasMoreItems && (StringUtils.isNotBlank(after) || StringUtils.isBlank(before));
+
+            if (!isFirstPage && !dtos.isEmpty()) {
+                String prevCursor = Base64.getEncoder().encodeToString(
+                        dtos.get(0).getId().toString().getBytes(StandardCharsets.UTF_8));
+                String prevUrl = "?limit=" + limit + "&" + FilterConstants.FILTER_ATTR_BEFORE + "=" + prevCursor;
+                links.add(buildPaginationLink(versionsPath, prevUrl, ConsentManagementConstants.LINK_REL_PREVIOUS));
+            }
+
+            if (!isLastPage && !dtos.isEmpty()) {
+                String nextCursor = Base64.getEncoder().encodeToString(
+                        dtos.get(dtos.size() - 1).getId().toString().getBytes(StandardCharsets.UTF_8));
+                String nextUrl = "?limit=" + limit + "&" + FilterConstants.FILTER_ATTR_AFTER + "=" + nextCursor;
+                links.add(buildPaginationLink(versionsPath, nextUrl, ConsentManagementConstants.LINK_REL_NEXT));
+            }
+
             PurposeVersionListResponse listResponse = new PurposeVersionListResponse();
             listResponse.setTotalResults(dtos.size());
-            listResponse.setLinks(Collections.emptyList());
+            listResponse.setLinks(links);
             listResponse.setVersions(dtos);
             return listResponse;
         } catch (ConsentManagementException e) {
@@ -484,6 +532,23 @@ public class PurposeManagementService {
         dto.setDescription(cat.getDescription());
         dto.setMandatory(cat.getMandatory());
         return dto;
+    }
+
+    private Integer validatedLimit(Integer limit) throws ConsentManagementException {
+
+        limit = limit == null ? DEFAULT_LIMIT : limit;
+        if (limit <= 0) {
+            throw handleClientException(ERROR_CODE_INVALID_QUERY_PARAM, limit.toString());
+        }
+        return limit;
+    }
+
+    private PaginationLink buildPaginationLink(String resourcePath, String url, String rel) {
+
+        return new PaginationLink()
+                .href(ContextLoader.buildURIForHeader(ConsentManagementConstants.V2_API_PATH_COMPONENT +
+                        resourcePath + url).toString())
+                .rel(rel);
     }
 
 }
