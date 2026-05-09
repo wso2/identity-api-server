@@ -51,6 +51,8 @@ import org.wso2.carbon.identity.core.model.ExpressionNode;
 import org.wso2.carbon.identity.core.model.FilterTreeBuilder;
 import org.wso2.carbon.identity.core.model.Node;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -176,20 +178,49 @@ public class PurposeManagementService {
                     FilterQueriesUtil.getExpressionNodes(filterExpression, after, before);
             List<Purpose> purposes = consentManager.listPurposes(expressionNodes, limit + 1);
 
-            List<PurposeSummaryDTO> items = new ArrayList<>();
-            boolean hasMoreItems = purposes != null && purposes.size() > limit;
-            boolean needsReverse = StringUtils.isNotBlank(before);
-            boolean isFirstPage = (StringUtils.isBlank(before) && StringUtils.isBlank(after)) ||
-                    (StringUtils.isNotBlank(before) && !hasMoreItems);
-            boolean isLastPage = !hasMoreItems && (StringUtils.isNotBlank(after) || StringUtils.isBlank(before));
+            PurposeListResponse listResponse = new PurposeListResponse();
+            List<PaginationLink> links = new ArrayList<>();
 
-            if (purposes != null) {
+            if (purposes != null && !purposes.isEmpty()) {
+                boolean hasMoreItems = purposes.size() > limit;
+                boolean needsReverse = StringUtils.isNotBlank(before);
+                boolean isFirstPage = (StringUtils.isBlank(before) && StringUtils.isBlank(after)) ||
+                        (StringUtils.isNotBlank(before) && !hasMoreItems);
+                boolean isLastPage = !hasMoreItems && (StringUtils.isNotBlank(after) || StringUtils.isBlank(before));
+
+                String url = "?limit=" + limit;
+                if (StringUtils.isNotBlank(filterExpression)) {
+                    try {
+                        url += "&filter=" + URLEncoder.encode(filterExpression, StandardCharsets.UTF_8.name());
+                    } catch (UnsupportedEncodingException e) {
+                        LOG.error("Server encountered an error while building pagination URL for the response.", e);
+                    }
+                }
+
                 if (hasMoreItems) {
-                    purposes = purposes.subList(0, limit);
+                    purposes = new ArrayList<>(purposes.subList(0, limit));
                 }
                 if (needsReverse) {
                     Collections.reverse(purposes);
                 }
+                if (!isFirstPage) {
+                    String prevCursor = Base64.getEncoder().encodeToString(
+                            purposes.get(0).getUuid().getBytes(StandardCharsets.UTF_8));
+                    links.add(buildPaginationLink(ConsentManagementConstants.PURPOSES_PATH,
+                            url + "&" + FilterConstants.FILTER_ATTR_BEFORE + "=" + prevCursor,
+                            ConsentManagementConstants.LINK_REL_PREVIOUS));
+                }
+                if (!isLastPage) {
+                    String nextCursor = Base64.getEncoder().encodeToString(
+                            purposes.get(purposes.size() - 1).getUuid().getBytes(StandardCharsets.UTF_8));
+                    links.add(buildPaginationLink(ConsentManagementConstants.PURPOSES_PATH,
+                            url + "&" + FilterConstants.FILTER_ATTR_AFTER + "=" + nextCursor,
+                            ConsentManagementConstants.LINK_REL_NEXT));
+                }
+            }
+
+            List<PurposeSummaryDTO> items = new ArrayList<>();
+            if (purposes != null) {
                 for (Purpose p : purposes) {
                     if (StringUtils.isBlank(p.getUuid())) {
                         continue;
@@ -198,25 +229,6 @@ public class PurposeManagementService {
                 }
             }
 
-            List<PaginationLink> links = new ArrayList<>();
-
-            if (!isFirstPage && !items.isEmpty()) {
-                String prevCursor = Base64.getEncoder().encodeToString(
-                        items.get(0).getId().toString().getBytes(StandardCharsets.UTF_8));
-                String prevUrl = "?limit=" + limit + "&" + FilterConstants.FILTER_ATTR_BEFORE + "=" + prevCursor;
-                links.add(buildPaginationLink(ConsentManagementConstants.PURPOSES_PATH, prevUrl,
-                        ConsentManagementConstants.LINK_REL_PREVIOUS));
-            }
-
-            if (!isLastPage && !items.isEmpty()) {
-                String nextCursor = Base64.getEncoder().encodeToString(
-                        items.get(items.size() - 1).getId().toString().getBytes(StandardCharsets.UTF_8));
-                String nextUrl = "?limit=" + limit + "&" + FilterConstants.FILTER_ATTR_AFTER + "=" + nextCursor;
-                links.add(buildPaginationLink(ConsentManagementConstants.PURPOSES_PATH, nextUrl,
-                        ConsentManagementConstants.LINK_REL_NEXT));
-            }
-
-            PurposeListResponse listResponse = new PurposeListResponse();
             listResponse.setTotalResults(items.size());
             listResponse.setLinks(links);
             listResponse.setPurposes(items);
@@ -314,8 +326,8 @@ public class PurposeManagementService {
                 all = Collections.emptyList();
             }
 
-            List<PurposeVersion> filtered;
-            if (after != null) {
+            List<PurposeVersion> page;
+            if (StringUtils.isNotBlank(after)) {
                 String afterId = new String(Base64.getDecoder().decode(after), StandardCharsets.UTF_8);
                 int afterIdx = -1;
                 for (int i = 0; i < all.size(); i++) {
@@ -324,8 +336,8 @@ public class PurposeManagementService {
                         break;
                     }
                 }
-                filtered = afterIdx >= 0 ? all.subList(afterIdx + 1, all.size()) : all;
-            } else if (before != null) {
+                page = new ArrayList<>(afterIdx >= 0 ? all.subList(afterIdx + 1, all.size()) : all);
+            } else if (StringUtils.isNotBlank(before)) {
                 String beforeId = new String(Base64.getDecoder().decode(before), StandardCharsets.UTF_8);
                 int beforeIdx = all.size();
                 for (int i = 0; i < all.size(); i++) {
@@ -334,40 +346,50 @@ public class PurposeManagementService {
                         break;
                     }
                 }
-                filtered = all.subList(0, beforeIdx);
+                page = new ArrayList<>(all.subList(0, beforeIdx));
             } else {
-                filtered = all;
+                page = new ArrayList<>(all);
             }
 
-            boolean hasMoreItems = filtered.size() > limit;
-            List<PurposeVersion> page = filtered.subList(0, Math.min(limit, filtered.size()));
+            PurposeVersionListResponse listResponse = new PurposeVersionListResponse();
+            List<PaginationLink> links = new ArrayList<>();
+            String versionsPath = ConsentManagementConstants.PURPOSES_PATH + "/" + purposeId +
+                    ConsentManagementConstants.VERSIONS_PATH;
+
+            if (!page.isEmpty()) {
+                boolean hasMoreItems = page.size() > limit;
+                boolean needsReverse = StringUtils.isNotBlank(before);
+                boolean isFirstPage = (StringUtils.isBlank(before) && StringUtils.isBlank(after)) ||
+                        (StringUtils.isNotBlank(before) && !hasMoreItems);
+                boolean isLastPage = !hasMoreItems && (StringUtils.isNotBlank(after) || StringUtils.isBlank(before));
+
+                if (hasMoreItems) {
+                    page.remove(page.size() - 1);
+                }
+                if (needsReverse) {
+                    Collections.reverse(page);
+                }
+                if (!isFirstPage) {
+                    String prevCursor = Base64.getEncoder().encodeToString(
+                            page.get(0).getUuid().getBytes(StandardCharsets.UTF_8));
+                    links.add(buildPaginationLink(versionsPath,
+                            "?limit=" + limit + "&" + FilterConstants.FILTER_ATTR_BEFORE + "=" + prevCursor,
+                            ConsentManagementConstants.LINK_REL_PREVIOUS));
+                }
+                if (!isLastPage) {
+                    String nextCursor = Base64.getEncoder().encodeToString(
+                            page.get(page.size() - 1).getUuid().getBytes(StandardCharsets.UTF_8));
+                    links.add(buildPaginationLink(versionsPath,
+                            "?limit=" + limit + "&" + FilterConstants.FILTER_ATTR_AFTER + "=" + nextCursor,
+                            ConsentManagementConstants.LINK_REL_NEXT));
+                }
+            }
+
             List<PurposeVersionSummaryDTO> dtos = new ArrayList<>();
             for (PurposeVersion v : page) {
                 dtos.add(toPurposeVersionSummaryDTO(v));
             }
 
-            List<PaginationLink> links = new ArrayList<>();
-            String versionsPath = ConsentManagementConstants.PURPOSES_PATH + "/" + purposeId +
-                    ConsentManagementConstants.VERSIONS_PATH;
-            boolean isFirstPage = (StringUtils.isBlank(before) && StringUtils.isBlank(after)) ||
-                    (StringUtils.isNotBlank(before) && !hasMoreItems);
-            boolean isLastPage = !hasMoreItems && (StringUtils.isNotBlank(after) || StringUtils.isBlank(before));
-
-            if (!isFirstPage && !dtos.isEmpty()) {
-                String prevCursor = Base64.getEncoder().encodeToString(
-                        dtos.get(0).getId().toString().getBytes(StandardCharsets.UTF_8));
-                String prevUrl = "?limit=" + limit + "&" + FilterConstants.FILTER_ATTR_BEFORE + "=" + prevCursor;
-                links.add(buildPaginationLink(versionsPath, prevUrl, ConsentManagementConstants.LINK_REL_PREVIOUS));
-            }
-
-            if (!isLastPage && !dtos.isEmpty()) {
-                String nextCursor = Base64.getEncoder().encodeToString(
-                        dtos.get(dtos.size() - 1).getId().toString().getBytes(StandardCharsets.UTF_8));
-                String nextUrl = "?limit=" + limit + "&" + FilterConstants.FILTER_ATTR_AFTER + "=" + nextCursor;
-                links.add(buildPaginationLink(versionsPath, nextUrl, ConsentManagementConstants.LINK_REL_NEXT));
-            }
-
-            PurposeVersionListResponse listResponse = new PurposeVersionListResponse();
             listResponse.setTotalResults(dtos.size());
             listResponse.setLinks(links);
             listResponse.setVersions(dtos);

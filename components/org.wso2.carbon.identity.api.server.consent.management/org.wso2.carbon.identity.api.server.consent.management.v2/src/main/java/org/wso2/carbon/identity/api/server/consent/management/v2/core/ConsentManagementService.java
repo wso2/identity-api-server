@@ -53,6 +53,8 @@ import org.wso2.carbon.identity.api.server.consent.management.v2.model.ElementTe
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.PaginationLink;
 import org.wso2.carbon.identity.api.server.consent.management.v2.util.ConsentMgtEndpointUtil;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -187,33 +189,25 @@ public class ConsentManagementService {
                                                      UUID purposeVersionId, Integer limit, String after, String before)
             throws ConsentManagementException {
 
+        limit = validatedLimit(limit);
+
+        if (StringUtils.isNotBlank(before) && StringUtils.isNotBlank(after)) {
+            throw handleClientException(ERROR_CODE_INVALID_QUERY_PARAM,
+                    "Both 'before' and 'after' parameters are provided.");
+        }
+
+        List<Receipt> receipts = consentManager.listReceipts(
+                subjectId,
+                serviceId,
+                state,
+                purposeId != null ? purposeId.toString() : null,
+                purposeVersionId != null ? purposeVersionId.toString() : null,
+                after, before, limit + 1);
+
         ConsentListResponse result = new ConsentListResponse();
+        List<PaginationLink> links = new ArrayList<>();
 
-        try {
-            // Set default values if the parameters are not set.
-            limit = validatedLimit(limit);
-
-            // Validate before and after parameters.
-            if (StringUtils.isNotBlank(before) && StringUtils.isNotBlank(after)) {
-                throw handleClientException(ERROR_CODE_INVALID_QUERY_PARAM,
-                        "Both 'before' and 'after' parameters are provided.");
-            }
-
-            List<Receipt> receipts = consentManager.listReceipts(
-                    subjectId,
-                    serviceId,
-                    state,
-                    purposeId != null ? purposeId.toString() : null,
-                    purposeVersionId != null ? purposeVersionId.toString() : null,
-                    after, before, limit + 1);
-
-            if (receipts == null || receipts.isEmpty()) {
-                result.setTotalResults(0);
-                result.setConsents(new ArrayList<>());
-                return result;
-            }
-
-            List<ConsentSummaryDTO> summaries = new ArrayList<>();
+        if (receipts != null && !receipts.isEmpty()) {
             boolean hasMoreItems = receipts.size() > limit;
             boolean needsReverse = StringUtils.isNotBlank(before);
             boolean isFirstPage = (StringUtils.isBlank(before) && StringUtils.isBlank(after)) ||
@@ -221,41 +215,57 @@ public class ConsentManagementService {
             boolean isLastPage = !hasMoreItems && (StringUtils.isNotBlank(after) || StringUtils.isBlank(before));
 
             String url = "?limit=" + limit;
+            try {
+                if (StringUtils.isNotBlank(subjectId)) {
+                    url += "&subjectId=" + URLEncoder.encode(subjectId, StandardCharsets.UTF_8.name());
+                }
+                if (StringUtils.isNotBlank(serviceId)) {
+                    url += "&serviceId=" + URLEncoder.encode(serviceId, StandardCharsets.UTF_8.name());
+                }
+                if (StringUtils.isNotBlank(state)) {
+                    url += "&state=" + URLEncoder.encode(state, StandardCharsets.UTF_8.name());
+                }
+            } catch (UnsupportedEncodingException e) {
+                LOG.error("Server encountered an error while building pagination URL for the response.", e);
+            }
+            if (purposeId != null) {
+                url += "&purposeId=" + purposeId;
+            }
+            if (purposeVersionId != null) {
+                url += "&purposeVersionId=" + purposeVersionId;
+            }
 
             if (hasMoreItems) {
-                receipts = receipts.subList(0, limit);
+                receipts = new ArrayList<>(receipts.subList(0, limit));
             }
             if (needsReverse) {
                 Collections.reverse(receipts);
             }
+            if (!isFirstPage) {
+                String encodedString = Base64.getEncoder().encodeToString(
+                        receipts.get(0).getConsentReceiptId().getBytes(StandardCharsets.UTF_8));
+                links.add(buildPaginationLink(url + "&" + FilterConstants.FILTER_ATTR_BEFORE + "=" + encodedString,
+                        ConsentManagementConstants.LINK_REL_PREVIOUS));
+            }
+            if (!isLastPage) {
+                String encodedString = Base64.getEncoder().encodeToString(
+                        receipts.get(receipts.size() - 1).getConsentReceiptId().getBytes(StandardCharsets.UTF_8));
+                links.add(buildPaginationLink(url + "&" + FilterConstants.FILTER_ATTR_AFTER + "=" + encodedString,
+                        ConsentManagementConstants.LINK_REL_NEXT));
+            }
+        }
 
+        List<ConsentSummaryDTO> summaries = new ArrayList<>();
+        if (receipts != null) {
             for (Receipt receipt : receipts) {
                 summaries.add(toConsentSummaryDTO(receipt));
             }
-
-            List<PaginationLink> links = new ArrayList<>();
-
-            if (!isFirstPage && !summaries.isEmpty()) {
-                String encodedString = Base64.getEncoder().encodeToString(
-                        summaries.get(0).getId().getBytes(StandardCharsets.UTF_8));
-                String prevUrl = url + "&" + FilterConstants.FILTER_ATTR_BEFORE + "=" + encodedString;
-                links.add(buildPaginationLink(prevUrl, ConsentManagementConstants.LINK_REL_PREVIOUS));
-            }
-
-            if (!isLastPage && !summaries.isEmpty()) {
-                String encodedString = Base64.getEncoder().encodeToString(
-                        summaries.get(summaries.size() - 1).getId().getBytes(StandardCharsets.UTF_8));
-                String nextUrl = url + "&" + FilterConstants.FILTER_ATTR_AFTER + "=" + encodedString;
-                links.add(buildPaginationLink(nextUrl, ConsentManagementConstants.LINK_REL_NEXT));
-            }
-
-            result.setTotalResults(summaries.size());
-            result.setLinks(links);
-            result.setConsents(summaries);
-            return result;
-        } catch (ConsentManagementException e) {
-            throw e;
         }
+
+        result.setTotalResults(summaries.size());
+        result.setLinks(links);
+        result.setConsents(summaries);
+        return result;
     }
 
     /**

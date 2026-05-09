@@ -39,9 +39,12 @@ import org.wso2.carbon.identity.core.model.ExpressionNode;
 import org.wso2.carbon.identity.core.model.FilterTreeBuilder;
 import org.wso2.carbon.identity.core.model.Node;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -148,42 +151,54 @@ public class ElementManagementService {
                     FilterQueriesUtil.getExpressionNodes(filterExpression, after, before);
             List<PIICategory> categories = consentManager.listPIICategories(expressionNodes, limit + 1);
 
-            List<ElementDTO> items = new ArrayList<>();
-            boolean hasMoreItems = categories != null && categories.size() > limit;
-            boolean needsReverse = StringUtils.isNotBlank(before);
-            boolean isFirstPage = (StringUtils.isBlank(before) && StringUtils.isBlank(after)) ||
-                    (StringUtils.isNotBlank(before) && !hasMoreItems);
-            boolean isLastPage = !hasMoreItems && (StringUtils.isNotBlank(after) || StringUtils.isBlank(before));
+            ElementListResponse listResponse = new ElementListResponse();
+            List<PaginationLink> links = new ArrayList<>();
 
-            if (categories != null) {
+            if (categories != null && !categories.isEmpty()) {
+                boolean hasMoreItems = categories.size() > limit;
+                boolean needsReverse = StringUtils.isNotBlank(before);
+                boolean isFirstPage = (StringUtils.isBlank(before) && StringUtils.isBlank(after)) ||
+                        (StringUtils.isNotBlank(before) && !hasMoreItems);
+                boolean isLastPage = !hasMoreItems && (StringUtils.isNotBlank(after) || StringUtils.isBlank(before));
+
+                String url = "?limit=" + limit;
+                if (StringUtils.isNotBlank(filterExpression)) {
+                    try {
+                        url += "&filter=" + URLEncoder.encode(filterExpression, StandardCharsets.UTF_8.name());
+                    } catch (UnsupportedEncodingException e) {
+                        LOG.error("Server encountered an error while building pagination URL for the response.", e);
+                    }
+                }
+
                 if (hasMoreItems) {
-                    categories = categories.subList(0, limit);
+                    categories = new ArrayList<>(categories.subList(0, limit));
                 }
                 if (needsReverse) {
-                    java.util.Collections.reverse(categories);
+                    Collections.reverse(categories);
                 }
+                if (!isFirstPage) {
+                    String prevCursor = Base64.getEncoder().encodeToString(
+                            categories.get(0).getUuid().getBytes(StandardCharsets.UTF_8));
+                    links.add(buildPaginationLink(
+                            url + "&" + FilterConstants.FILTER_ATTR_BEFORE + "=" + prevCursor,
+                            ConsentManagementConstants.LINK_REL_PREVIOUS));
+                }
+                if (!isLastPage) {
+                    String nextCursor = Base64.getEncoder().encodeToString(
+                            categories.get(categories.size() - 1).getUuid().getBytes(StandardCharsets.UTF_8));
+                    links.add(buildPaginationLink(
+                            url + "&" + FilterConstants.FILTER_ATTR_AFTER + "=" + nextCursor,
+                            ConsentManagementConstants.LINK_REL_NEXT));
+                }
+            }
+
+            List<ElementDTO> items = new ArrayList<>();
+            if (categories != null) {
                 for (PIICategory cat : categories) {
                     items.add(toElementDTO(cat));
                 }
             }
 
-            List<PaginationLink> links = new ArrayList<>();
-
-            if (!isFirstPage && !items.isEmpty()) {
-                String prevCursor = Base64.getEncoder().encodeToString(
-                        items.get(0).getId().toString().getBytes(StandardCharsets.UTF_8));
-                String prevUrl = "?limit=" + limit + "&" + FilterConstants.FILTER_ATTR_BEFORE + "=" + prevCursor;
-                links.add(buildPaginationLink(prevUrl, ConsentManagementConstants.LINK_REL_PREVIOUS));
-            }
-
-            if (!isLastPage && !items.isEmpty()) {
-                String nextCursor = Base64.getEncoder().encodeToString(
-                        items.get(items.size() - 1).getId().toString().getBytes(StandardCharsets.UTF_8));
-                String nextUrl = "?limit=" + limit + "&" + FilterConstants.FILTER_ATTR_AFTER + "=" + nextCursor;
-                links.add(buildPaginationLink(nextUrl, ConsentManagementConstants.LINK_REL_NEXT));
-            }
-
-            ElementListResponse listResponse = new ElementListResponse();
             listResponse.setTotalResults(items.size());
             listResponse.setLinks(links);
             listResponse.setElements(items);
