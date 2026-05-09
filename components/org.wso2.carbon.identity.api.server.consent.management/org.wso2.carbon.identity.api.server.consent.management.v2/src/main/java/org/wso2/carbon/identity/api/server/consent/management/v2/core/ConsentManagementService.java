@@ -359,11 +359,12 @@ public class ConsentManagementService {
         if (auths != null) {
             for (ConsentAuthorization auth : auths) {
                 // Skip PENDING authorizations — they are not exposed in the API response DTO
-                if (PENDING_STATE.equals(auth.getStatus())) {
+                if (PENDING_STATE.equals(auth.getStatus().name())) {
                     continue;
                 }
                 try {
-                    AuthorizationDTO.StateEnum stateEnum = AuthorizationDTO.StateEnum.fromValue(auth.getStatus());
+                    AuthorizationDTO.StateEnum stateEnum =
+                            AuthorizationDTO.StateEnum.fromValue(auth.getStatus().name());
                     AuthorizationDTO authDTO = new AuthorizationDTO();
                     authDTO.setUserId(auth.getUserId());
                     authDTO.setState(stateEnum);
@@ -475,7 +476,7 @@ public class ConsentManagementService {
             AuthorizationDTO dto = new AuthorizationDTO();
             dto.setUserId(callingUser);
             if (updated != null) {
-                dto.setState(AuthorizationDTO.StateEnum.fromValue(updated.getStatus()));
+                dto.setState(AuthorizationDTO.StateEnum.fromValue(updated.getStatus().name()));
                 dto.setUpdatedTime(updated.getUpdatedTime());
             }
             return dto;

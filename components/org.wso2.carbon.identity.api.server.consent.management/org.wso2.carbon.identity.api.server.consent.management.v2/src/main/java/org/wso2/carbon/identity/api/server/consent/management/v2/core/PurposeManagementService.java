@@ -103,16 +103,10 @@ public class PurposeManagementService {
             Purpose purpose = new Purpose(request.getName(), request.getDescription(),
                     DEFAULT_PURPOSE_GROUP, request.getType(), purposePIICategories);
             purpose.setTenantId(ConsentUtils.getTenantIdFromCarbonContext());
-
-            PurposeVersion firstVersion = new PurposeVersion();
-            firstVersion.setVersion(request.getVersion());
-            firstVersion.setDescription(request.getDescription());
-            firstVersion.setTenantId(ConsentUtils.getTenantIdFromCarbonContext());
-            firstVersion.setPurposePIICategories(purposePIICategories);
-            firstVersion.setProperties(request.getProperties());
-            Object[] result = consentManager.addPurpose(purpose, firstVersion);
-            Purpose created = (Purpose) result[0];
-            return toPurposeDTO(created);
+            purpose.setVersion(request.getVersion());
+            purpose.setProperties(request.getProperties());
+            Purpose result = consentManager.addPurposeWithUuid(purpose);
+            return toPurposeDTO(result);
         } catch (ConsentManagementException e) {
             throw ConsentMgtEndpointUtil.handleConsentManagementException(e);
         }
@@ -433,7 +427,7 @@ public class PurposeManagementService {
             if (version == null) {
                 throw handleClientException(ERROR_CODE_PURPOSE_VERSION_NOT_FOUND, request.getId().toString());
             }
-            consentManager.setLatestPurposeVersion(version.getPurposeId(), version.getVersion());
+            consentManager.setLatestPurposeVersion(purposeId.toString(), version.getVersion());
         } catch (ConsentManagementException e) {
             throw ConsentMgtEndpointUtil.handleConsentManagementException(e);
         }
