@@ -188,6 +188,21 @@ public class ActionMapperUtil {
                 }
                 authenticationTypeResponse.setProperties(authenticationProperties);
                 break;
+            case PASSWORD_CREDENTIAL:
+                authenticationProperties.put(Authentication.Property.CLIENT_ID.getName(),
+                        authentication.getPropertyWithDecryptedValue(
+                                actionId, Authentication.Property.CLIENT_ID.getName()).getValue());
+                authenticationProperties.put(Authentication.Property.TOKEN_ENDPOINT.getName(),
+                        authentication.getProperty(Authentication.Property.TOKEN_ENDPOINT).getValue());
+                authenticationProperties.put(Authentication.Property.USERNAME.getName(),
+                        authentication.getPropertyWithDecryptedValue(
+                                actionId, Authentication.Property.USERNAME.getName()).getValue());
+                if (authentication.getProperty(Authentication.Property.SCOPES) != null) {
+                    authenticationProperties.put(Authentication.Property.SCOPES.getName(),
+                            authentication.getProperty(Authentication.Property.SCOPES).getValue());
+                }
+                authenticationTypeResponse.setProperties(authenticationProperties);
+                break;
             case NONE:
                 break;
         }
@@ -316,6 +331,40 @@ public class ActionMapperUtil {
 
                 return new Authentication.ClientCredentialAuthBuilder(clientId, clientSecret, tokenEndpoint,
                         scopes).build();
+            case PASSWORD_CREDENTIAL:
+                if (authPropertiesMap == null
+                        || !authPropertiesMap.containsKey(Authentication.Property.CLIENT_ID.getName())
+                        || !authPropertiesMap.containsKey(Authentication.Property.CLIENT_SECRET.getName())
+                        || !authPropertiesMap.containsKey(Authentication.Property.TOKEN_ENDPOINT.getName())
+                        || !authPropertiesMap.containsKey(Authentication.Property.USERNAME.getName())
+                        || !authPropertiesMap.containsKey(Authentication.Property.PASSWORD.getName())) {
+                    throw ActionMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST,
+                            ERROR_INVALID_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES);
+                }
+                String pwdGrantClientId = (String) authPropertiesMap.get(
+                        Authentication.Property.CLIENT_ID.getName());
+                String pwdGrantClientSecret = (String) authPropertiesMap.get(
+                        Authentication.Property.CLIENT_SECRET.getName());
+                String pwdGrantTokenEndpoint = (String) authPropertiesMap.get(
+                        Authentication.Property.TOKEN_ENDPOINT.getName());
+                String pwdGrantUsername = (String) authPropertiesMap.get(
+                        Authentication.Property.USERNAME.getName());
+                String pwdGrantPassword = (String) authPropertiesMap.get(
+                        Authentication.Property.PASSWORD.getName());
+                String pwdGrantScopes = StringUtils.EMPTY;
+                if (authPropertiesMap.containsKey(Authentication.Property.SCOPES.getName())) {
+                    pwdGrantScopes = (String) authPropertiesMap.get(Authentication.Property.SCOPES.getName());
+                }
+
+                if (StringUtils.isEmpty(pwdGrantClientId) || StringUtils.isEmpty(pwdGrantClientSecret) ||
+                        StringUtils.isEmpty(pwdGrantTokenEndpoint) || StringUtils.isEmpty(pwdGrantUsername) ||
+                        StringUtils.isEmpty(pwdGrantPassword)) {
+                    throw ActionMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST,
+                            ERROR_EMPTY_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES);
+                }
+
+                return new Authentication.PasswordCredentialAuthBuilder(pwdGrantClientId, pwdGrantClientSecret,
+                        pwdGrantTokenEndpoint, pwdGrantScopes, pwdGrantUsername, pwdGrantPassword).build();
             case NONE:
                 return new Authentication.NoneAuthBuilder().build();
             default:
