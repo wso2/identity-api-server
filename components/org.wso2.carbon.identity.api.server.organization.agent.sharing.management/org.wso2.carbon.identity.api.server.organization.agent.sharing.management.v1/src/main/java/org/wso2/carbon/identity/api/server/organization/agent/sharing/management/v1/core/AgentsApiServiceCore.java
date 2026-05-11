@@ -496,11 +496,9 @@ public class AgentsApiServiceCore {
                     RoleWithAudienceDO roleDO = new RoleWithAudienceDO();
                     roleDO.setRoleName(role.getDisplayName());
                     RoleShareConfigAudience audience = role.getAudience();
-                    if (audience != null) {
-                        roleDO.setAudienceName(audience.getDisplay());
-                        roleDO.setAudienceType(audience.getType());
-                        rolesList.add(roleDO);
-                    }
+                    roleDO.setAudienceName(audience.getDisplay());
+                    roleDO.setAudienceType(audience.getType());
+                    rolesList.add(roleDO);
                 }
             }
         }
@@ -573,8 +571,12 @@ public class AgentsApiServiceCore {
         if (cursor == null) {
             return 0;
         }
-        String decoded = new String(Base64.getDecoder().decode(cursor), StandardCharsets.UTF_8);
-        return Integer.parseInt(decoded);
+        try {
+            String decoded = new String(Base64.getDecoder().decode(cursor), StandardCharsets.UTF_8);
+            return Integer.parseInt(decoded);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid cursor value: " + cursor, e);
+        }
     }
 
     private ProcessSuccessResponse getProcessSuccessResponse(String details) {

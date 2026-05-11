@@ -128,7 +128,7 @@ public class AgentSharingMgtConstants {
         @Override
         public String toString() {
 
-            return code + " | " + message;
+            return getCode() + " | " + message;
         }
     }
 }
