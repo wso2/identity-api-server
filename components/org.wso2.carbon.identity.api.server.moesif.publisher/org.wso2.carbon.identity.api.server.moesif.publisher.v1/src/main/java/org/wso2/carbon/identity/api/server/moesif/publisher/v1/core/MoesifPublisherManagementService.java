@@ -23,14 +23,11 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.MoesifPublisher;
-import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.MoesifPublisherAdd;
+import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.MoesifPublisherReq;
 import org.wso2.carbon.identity.data.publisher.authentication.moesif.MoesifConfigurationManagementService;
 import org.wso2.carbon.identity.data.publisher.authentication.moesif.dto.MoesifPublisherDTO;
 import org.wso2.carbon.identity.data.publisher.authentication.moesif.exception.MoesifConfigurationManagementClientException;
 import org.wso2.carbon.identity.data.publisher.authentication.moesif.exception.MoesifConfigurationManagementException;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
@@ -48,52 +45,42 @@ public class MoesifPublisherManagementService {
         this.moesifConfigurationManagementService = moesifConfigurationManagementService;
     }
 
-    public MoesifPublisher addMoesifPublisher(MoesifPublisherAdd moesifPublisherAdd) {
+    public MoesifPublisher addMoesifPublisher(MoesifPublisherReq moesifPublisherReq) {
 
         try {
             MoesifPublisherDTO result = moesifConfigurationManagementService
-                    .addMoesifPublisher(moesifPublisherAdd.getName(), moesifPublisherAdd.getApiKeyValue());
+                    .addMoesifPublisher(moesifPublisherReq.getApiKeyValue());
             return buildResponse(result);
         } catch (MoesifConfigurationManagementException e) {
             throw handleException(e);
         }
     }
 
-    public MoesifPublisher getMoesifPublisher(String publisherName) {
+    public MoesifPublisher getMoesifPublisher() {
 
         try {
-            MoesifPublisherDTO result = moesifConfigurationManagementService.getMoesifPublisher(publisherName);
+            MoesifPublisherDTO result = moesifConfigurationManagementService.getMoesifPublisher();
             return buildResponse(result);
         } catch (MoesifConfigurationManagementException e) {
             throw handleException(e);
         }
     }
 
-    public List<MoesifPublisher> getMoesifPublishers() {
-
-        try {
-            List<MoesifPublisherDTO> results = moesifConfigurationManagementService.getMoesifPublishers();
-            return results.stream().map(this::buildResponse).collect(Collectors.toList());
-        } catch (MoesifConfigurationManagementException e) {
-            throw handleException(e);
-        }
-    }
-
-    public MoesifPublisher updateMoesifPublisherApiKey(String publisherName, String apiKeyValue) {
+    public MoesifPublisher updateMoesifPublisherApiKey(String apiKeyValue) {
 
         try {
             MoesifPublisherDTO result = moesifConfigurationManagementService
-                    .updateMoesifPublisherApiKey(publisherName, apiKeyValue);
+                    .updateMoesifPublisherApiKey(apiKeyValue);
             return buildResponse(result);
         } catch (MoesifConfigurationManagementException e) {
             throw handleException(e);
         }
     }
 
-    public void deleteMoesifPublisher(String publisherName) {
+    public void deleteMoesifPublisher() {
 
         try {
-            moesifConfigurationManagementService.deleteMoesifPublisher(publisherName);
+            moesifConfigurationManagementService.deleteMoesifPublisher();
         } catch (MoesifConfigurationManagementException e) {
             throw handleException(e);
         }

@@ -30,14 +30,14 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class MoesifPublisherUpdate  {
+public class MoesifPublisherReq  {
   
     private String apiKeyValue;
 
     /**
     * Moesif API key value.
     **/
-    public MoesifPublisherUpdate apiKeyValue(String apiKeyValue) {
+    public MoesifPublisherReq apiKeyValue(String apiKeyValue) {
 
         this.apiKeyValue = apiKeyValue;
         return this;
@@ -66,8 +66,8 @@ public class MoesifPublisherUpdate  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        MoesifPublisherUpdate moesifPublisherUpdate = (MoesifPublisherUpdate) o;
-        return Objects.equals(this.apiKeyValue, moesifPublisherUpdate.apiKeyValue);
+        MoesifPublisherReq moesifPublisherReq = (MoesifPublisherReq) o;
+        return Objects.equals(this.apiKeyValue, moesifPublisherReq.apiKeyValue);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class MoesifPublisherUpdate  {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class MoesifPublisherUpdate {\n");
+        sb.append("class MoesifPublisherReq {\n");
         
         sb.append("    apiKeyValue: ").append(toIndentedString(apiKeyValue)).append("\n");
         sb.append("}");

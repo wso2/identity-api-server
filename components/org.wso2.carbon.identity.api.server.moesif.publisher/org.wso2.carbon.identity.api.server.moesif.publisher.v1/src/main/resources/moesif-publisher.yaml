@@ -19,7 +19,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MoesifPublisherAdd'
+              $ref: '#/components/schemas/MoesifPublisherReq'
         required: true
       responses:
         '201':
@@ -42,28 +42,8 @@ paths:
     get:
       tags:
         - Moesif Publishers
-      summary: Get all Moesif event publishers
-      operationId: getMoesifPublishers
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/MoesifPublisher'
-        '500':
-          $ref: '#/components/responses/ServerError'
-
-  /moesif-publishers/{publisher-name}:
-    get:
-      tags:
-        - Moesif Publishers
       summary: Get a Moesif event publisher by name
       operationId: getMoesifPublisher
-      parameters:
-        - $ref: '#/components/parameters/PublisherNameParam'
       responses:
         '200':
           description: Successful operation
@@ -80,13 +60,11 @@ paths:
         - Moesif Publishers
       summary: Update the API key of a Moesif event publisher
       operationId: patchMoesifPublisher
-      parameters:
-        - $ref: '#/components/parameters/PublisherNameParam'
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MoesifPublisherUpdate'
+              $ref: '#/components/schemas/MoesifPublisherReq'
         required: true
       responses:
         '200':
@@ -106,8 +84,6 @@ paths:
         - Moesif Publishers
       summary: Delete a Moesif event publisher
       operationId: deleteMoesifPublisher
-      parameters:
-        - $ref: '#/components/parameters/PublisherNameParam'
       responses:
         '204':
           description: Successfully deleted
@@ -117,31 +93,8 @@ paths:
           $ref: '#/components/responses/ServerError'
 
 components:
-  parameters:
-    PublisherNameParam:
-      name: publisher-name
-      in: path
-      required: true
-      description: Name of the Moesif publisher.
-      schema:
-        type: string
-
   schemas:
-    MoesifPublisherAdd:
-      type: object
-      required:
-        - name
-        - apiKeyValue
-      properties:
-        name:
-          type: string
-          example: moesifPublisher
-          description: Name of the Moesif publisher.
-        apiKeyValue:
-          type: string
-          description: Moesif API key value.
-
-    MoesifPublisherUpdate:
+    MoesifPublisherReq:
       type: object
       required:
         - apiKeyValue
@@ -149,19 +102,10 @@ components:
         apiKeyValue:
           type: string
           description: Moesif API key value.
-
     MoesifPublisher:
       type: object
       properties:
         name:
-          type: string
-
-    Properties:
-      type: object
-      properties:
-        key:
-          type: string
-        value:
           type: string
 
     Error:
