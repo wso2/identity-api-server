@@ -26,6 +26,8 @@ import java.io.InputStream;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionBasicResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
+import org.wso2.carbon.identity.api.server.action.management.v1.ActionNameCheckRequest;
+import org.wso2.carbon.identity.api.server.action.management.v1.ActionNameCheckResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionTypesResponseItem;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
@@ -36,6 +38,8 @@ import javax.ws.rs.core.Response;
 public interface ActionsApiService {
 
       public Response activateAction(String actionType, String actionId);
+
+      public Response checkActionName(String actionType, ActionNameCheckRequest actionNameCheckRequest);
 
       public Response createAction(String actionType, String body);
 

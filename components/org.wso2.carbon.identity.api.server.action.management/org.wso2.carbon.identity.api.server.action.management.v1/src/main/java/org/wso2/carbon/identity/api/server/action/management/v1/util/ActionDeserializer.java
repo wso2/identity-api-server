@@ -23,6 +23,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.wso2.carbon.identity.action.management.api.model.Action;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
+import org.wso2.carbon.identity.api.server.action.management.v1.InFlowExtensionActionModel;
+import org.wso2.carbon.identity.api.server.action.management.v1.InFlowExtensionActionUpdateModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.PreUpdatePasswordActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.PreUpdatePasswordActionUpdateModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.PreUpdateProfileActionModel;
@@ -61,6 +63,13 @@ public class ActionDeserializer {
                     actionModel = objectMapper.readValue(jsonBody, ActionModel.class);
                     // Validate the object
                     validateActionModel(actionModel, ActionModel.class);
+                    break;
+                case IN_FLOW_EXTENSION:
+                    InFlowExtensionActionModel inFlowExtensionActionModel = objectMapper.readValue(jsonBody,
+                            InFlowExtensionActionModel.class);
+                    // Validate the object
+                    validateActionModel(inFlowExtensionActionModel, InFlowExtensionActionModel.class);
+                    actionModel = inFlowExtensionActionModel;
                     break;
                 case PRE_UPDATE_PASSWORD:
                     PreUpdatePasswordActionModel preUpdatePasswordActionModel = objectMapper.readValue(jsonBody,
@@ -104,6 +113,14 @@ public class ActionDeserializer {
                     actionUpdateModel = objectMapper.readValue(jsonBody, ActionUpdateModel.class);
                     // Validate the object
                     validateActionModel(actionUpdateModel, ActionUpdateModel.class);
+                    break;
+                case IN_FLOW_EXTENSION:
+                    InFlowExtensionActionUpdateModel inFlowExtensionActionUpdateModel =
+                            objectMapper.readValue(jsonBody, InFlowExtensionActionUpdateModel.class);
+                    // Validate the object
+                    validateActionModel(inFlowExtensionActionUpdateModel,
+                            InFlowExtensionActionUpdateModel.class);
+                    actionUpdateModel = inFlowExtensionActionUpdateModel;
                     break;
                 case PRE_UPDATE_PASSWORD:
                     PreUpdatePasswordActionUpdateModel preUpdatePasswordActionUpdateModel =

@@ -48,6 +48,9 @@ public class ActionMapperFactory {
             case PRE_ISSUE_ID_TOKEN:
                 actionMapper = new PreIssueIDTokenActionMapper();
                 break;
+            case IN_FLOW_EXTENSION:
+                actionMapper = new InFlowExtensionActionMapper();
+                break;
             default:
                 break;
         }
