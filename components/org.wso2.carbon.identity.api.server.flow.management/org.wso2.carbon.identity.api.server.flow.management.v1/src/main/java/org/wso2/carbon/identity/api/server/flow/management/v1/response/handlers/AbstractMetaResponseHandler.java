@@ -34,7 +34,7 @@ import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
 import org.wso2.carbon.identity.claim.metadata.mgt.model.LocalClaim;
-import org.wso2.carbon.identity.flow.execution.engine.inflow.extension.model.InFlowExtensionAction;
+import org.wso2.carbon.identity.flow.inflow.extensions.model.InFlowExtensionAction;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
 import org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
@@ -58,6 +58,7 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.F
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.FACEBOOK_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.GITHUB_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.GOOGLE_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.IN_FLOW_EXTENSION_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.MAGIC_LINK_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.OFFICE365_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.OPENID_CONNECT_EXECUTOR;
@@ -118,7 +119,7 @@ public abstract class AbstractMetaResponseHandler {
         supportedExecutors.add(SMS_OTP_EXECUTOR);
         supportedExecutors.add(MAGIC_LINK_EXECUTOR);
         supportedExecutors.add(USER_PROVISIONING_EXECUTOR);
-        supportedExecutors.add(EXTENSION_EXECUTOR);
+        supportedExecutors.add(IN_FLOW_EXTENSION_EXECUTOR);
         return supportedExecutors;
     }
 
@@ -225,6 +226,41 @@ public abstract class AbstractMetaResponseHandler {
             fields.add(FlowEndpointConstants.USERNAME_IDENTIFIER);
         }
         return fields;
+    }
+
+    /**
+     * Returns the list of InFlow extension connection info for this flow.
+     * Fetches all ACTIVE InFlow Extension actions from ActionManagementService.
+     *
+     * @return list of InFlow extension connections, or empty list if none.
+     */
+    protected List<InFlowExtensionConnectionInfo> getInflowExtensionConnections() {
+
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        try {
+            List<Action> actions = FlowMgtServiceHolder.getActionManagementService()
+                    .getActionsByActionType(Action.ActionTypes.IN_FLOW_EXTENSION.getPathParam(), tenantDomain);
+            if (actions == null) {
+                return Collections.emptyList();
+            }
+            List<InFlowExtensionConnectionInfo> connections = new ArrayList<>();
+            for (Action action : actions) {
+                if (!Action.Status.ACTIVE.equals(action.getStatus())) {
+                    continue;
+                }
+                InFlowExtensionConnectionInfo info = new InFlowExtensionConnectionInfo()
+                        .actionId(action.getId())
+                        .name(action.getName());
+                if (action instanceof InFlowExtensionAction) {
+                    info.iconUrl(((InFlowExtensionAction) action).getIconUrl());
+                }
+                connections.add(info);
+            }
+            return connections;
+        } catch (ActionMgtException e) {
+            log.warn("Failed to fetch InFlow Extension connections for flow meta.", e);
+            return Collections.emptyList();
+        }
     }
 
     protected List<ExecutorConnections> getExecutorConnections() {

@@ -217,6 +217,7 @@ import static org.wso2.carbon.identity.application.mgt.ApplicationConstants.Erro
 import static org.wso2.carbon.identity.application.mgt.ApplicationConstants.FILTER_CO;
 import static org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.PrimitiveOperator.EQUALS;
 import static org.wso2.carbon.identity.cors.mgt.core.constant.ErrorMessages.ERROR_CODE_INVALID_APP_ID;
+import static org.wso2.carbon.identity.organization.management.service.util.Utils.isEnhancedOrgAuthEnabledByDefaultForNewApps;
 import static org.wso2.carbon.identity.organization.management.service.util.Utils.isLegacyAuthzRuntime;
 
 /**
@@ -835,6 +836,11 @@ public class ServerApplicationManagementService {
                 Boolean.TRUE.equals(applicationModel.getEnhancedOrgAuthenticationEnabled())) {
             throw buildBadRequestError(UNSUPPORTED_ENHANCED_ORGANIZATION_AUTHENTICATION_ENABLED_CONFIGURATION.getCode(),
                     UNSUPPORTED_ENHANCED_ORGANIZATION_AUTHENTICATION_ENABLED_CONFIGURATION.getDescription());
+        }
+
+        if (applicationModel.getEnhancedOrgAuthenticationEnabled() == null
+                && isEnhancedOrganizationAuthenticationFeatureEnabled()) {
+            applicationModel.setEnhancedOrgAuthenticationEnabled(isEnhancedOrgAuthEnabledByDefaultForNewApps());
         }
 
         // Block application creation with name Console or MyAccount.

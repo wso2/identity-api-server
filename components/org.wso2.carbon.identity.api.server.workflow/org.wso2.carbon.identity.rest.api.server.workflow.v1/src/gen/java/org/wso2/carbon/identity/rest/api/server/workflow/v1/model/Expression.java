@@ -61,7 +61,7 @@ public class Expression  {
     }
 
     /**
-    * The comparison operator used to evaluate the the field and value. Common operators include \&quot;equals\&quot;, \&quot;contains\&quot;, \&quot;startsWith\&quot;, etc.
+    * The comparison operator used to evaluate the field and value. Common operators include \&quot;equals\&quot;, \&quot;contains\&quot;, \&quot;startsWith\&quot;, etc.
     **/
     public Expression operator(String operator) {
 
@@ -69,7 +69,7 @@ public class Expression  {
         return this;
     }
     
-    @ApiModelProperty(example = "equals", required = true, value = "The comparison operator used to evaluate the the field and value. Common operators include \"equals\", \"contains\", \"startsWith\", etc.")
+    @ApiModelProperty(example = "equals", required = true, value = "The comparison operator used to evaluate the field and value. Common operators include \"equals\", \"contains\", \"startsWith\", etc.")
     @JsonProperty("operator")
     @Valid
     @NotNull(message = "Property operator cannot be null.")
