@@ -37,7 +37,7 @@ public class AuthenticationTypeResponse  {
 @XmlEnum(String.class)
 public enum TypeEnum {
 
-    @XmlEnumValue("NONE") NONE(String.valueOf("NONE")), @XmlEnumValue("BEARER") BEARER(String.valueOf("BEARER")), @XmlEnumValue("API_KEY") API_KEY(String.valueOf("API_KEY")), @XmlEnumValue("BASIC") BASIC(String.valueOf("BASIC"));
+    @XmlEnumValue("NONE") NONE(String.valueOf("NONE")), @XmlEnumValue("BEARER") BEARER(String.valueOf("BEARER")), @XmlEnumValue("API_KEY") API_KEY(String.valueOf("API_KEY")), @XmlEnumValue("BASIC") BASIC(String.valueOf("BASIC")), @XmlEnumValue("CLIENT_CREDENTIAL") CLIENT_CREDENTIAL(String.valueOf("CLIENT_CREDENTIAL"));
 
 
     private String value;

@@ -39,8 +39,6 @@ public class Endpoint  {
     private AuthenticationType authentication;
     private List<String> allowedHeaders = null;
 
-    private List<String> allowedParameters = null;
-
 
     /**
     **/
@@ -108,33 +106,7 @@ public class Endpoint  {
         return this;
     }
 
-        /**
-    **/
-    public Endpoint allowedParameters(List<String> allowedParameters) {
 
-        this.allowedParameters = allowedParameters;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "")
-    @JsonProperty("allowedParameters")
-    @Valid
-    public List<String> getAllowedParameters() {
-        return allowedParameters;
-    }
-    public void setAllowedParameters(List<String> allowedParameters) {
-        this.allowedParameters = allowedParameters;
-    }
-
-    public Endpoint addAllowedParametersItem(String allowedParametersItem) {
-        if (this.allowedParameters == null) {
-            this.allowedParameters = new ArrayList<String>();
-        }
-        this.allowedParameters.add(allowedParametersItem);
-        return this;
-    }
-
-    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -148,13 +120,12 @@ public class Endpoint  {
         Endpoint endpoint = (Endpoint) o;
         return Objects.equals(this.uri, endpoint.uri) &&
             Objects.equals(this.authentication, endpoint.authentication) &&
-            Objects.equals(this.allowedHeaders, endpoint.allowedHeaders) &&
-            Objects.equals(this.allowedParameters, endpoint.allowedParameters);
+            Objects.equals(this.allowedHeaders, endpoint.allowedHeaders);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uri, authentication, allowedHeaders, allowedParameters);
+        return Objects.hash(uri, authentication, allowedHeaders);
     }
 
     @Override
@@ -162,11 +133,10 @@ public class Endpoint  {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class Endpoint {\n");
-        
+
         sb.append("    uri: ").append(toIndentedString(uri)).append("\n");
         sb.append("    authentication: ").append(toIndentedString(authentication)).append("\n");
         sb.append("    allowedHeaders: ").append(toIndentedString(allowedHeaders)).append("\n");
-        sb.append("    allowedParameters: ").append(toIndentedString(allowedParameters)).append("\n");
         sb.append("}");
         return sb.toString();
     }

@@ -42,8 +42,8 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.InFlowExtensionContextTreeMapper;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.InFlowExtensionMapper;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
-import org.wso2.carbon.identity.flow.execution.engine.inflow.extension.metadata.InFlowExtensionContextTreeMetadata;
-import org.wso2.carbon.identity.flow.execution.engine.inflow.extension.metadata.InFlowExtensionContextTreeService;
+import org.wso2.carbon.identity.flow.inflow.extensions.metadata.InFlowExtensionContextTreeMetadata;
+import org.wso2.carbon.identity.flow.inflow.extensions.metadata.InFlowExtensionContextTreeService;
 import org.wso2.carbon.identity.flow.mgt.Constants;
 import org.wso2.carbon.identity.flow.mgt.FlowMgtService;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtFrameworkException;
@@ -263,10 +263,6 @@ public class ServerFlowMgtService {
         }
     }
 
-    // =========================================================================
-    // InFlow Extension CRUD
-    // =========================================================================
-
     /**
      * Create a new InFlow extension action.
      *
@@ -373,15 +369,11 @@ public class ServerFlowMgtService {
 
         try {
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-            boolean available;
-            if (request.getExcludeId() != null && !request.getExcludeId().isEmpty()) {
-                available = actionManagementService.isActionNameAvailable(
-                        IN_FLOW_EXTENSION_ACTION_TYPE, request.getName(),
-                        request.getExcludeId(), tenantDomain);
-            } else {
-                available = actionManagementService.isActionNameAvailable(
-                        IN_FLOW_EXTENSION_ACTION_TYPE, request.getName(), tenantDomain);
-            }
+            // Pass excludeId as-is; null or empty means creation scenario (no exclusion).
+            String excludeId = (request.getExcludeId() != null && !request.getExcludeId().isEmpty())
+                    ? request.getExcludeId() : null;
+            boolean available = actionManagementService.isActionNameAvailable(
+                    IN_FLOW_EXTENSION_ACTION_TYPE, request.getName(), excludeId, tenantDomain);
             return new InFlowExtensionNameCheckResponse().available(available);
         } catch (ActionMgtException e) {
             throw Utils.handleActionMgtException(e);

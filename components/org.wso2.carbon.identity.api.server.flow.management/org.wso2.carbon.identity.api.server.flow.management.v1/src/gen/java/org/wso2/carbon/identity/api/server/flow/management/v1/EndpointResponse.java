@@ -39,8 +39,6 @@ public class EndpointResponse  {
     private AuthenticationTypeResponse authentication;
     private List<String> allowedHeaders = null;
 
-    private List<String> allowedParameters = null;
-
 
     /**
     **/
@@ -104,33 +102,7 @@ public class EndpointResponse  {
         return this;
     }
 
-        /**
-    **/
-    public EndpointResponse allowedParameters(List<String> allowedParameters) {
 
-        this.allowedParameters = allowedParameters;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "")
-    @JsonProperty("allowedParameters")
-    @Valid
-    public List<String> getAllowedParameters() {
-        return allowedParameters;
-    }
-    public void setAllowedParameters(List<String> allowedParameters) {
-        this.allowedParameters = allowedParameters;
-    }
-
-    public EndpointResponse addAllowedParametersItem(String allowedParametersItem) {
-        if (this.allowedParameters == null) {
-            this.allowedParameters = new ArrayList<String>();
-        }
-        this.allowedParameters.add(allowedParametersItem);
-        return this;
-    }
-
-    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -144,13 +116,12 @@ public class EndpointResponse  {
         EndpointResponse endpointResponse = (EndpointResponse) o;
         return Objects.equals(this.uri, endpointResponse.uri) &&
             Objects.equals(this.authentication, endpointResponse.authentication) &&
-            Objects.equals(this.allowedHeaders, endpointResponse.allowedHeaders) &&
-            Objects.equals(this.allowedParameters, endpointResponse.allowedParameters);
+            Objects.equals(this.allowedHeaders, endpointResponse.allowedHeaders);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uri, authentication, allowedHeaders, allowedParameters);
+        return Objects.hash(uri, authentication, allowedHeaders);
     }
 
     @Override
@@ -158,11 +129,10 @@ public class EndpointResponse  {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class EndpointResponse {\n");
-        
+
         sb.append("    uri: ").append(toIndentedString(uri)).append("\n");
         sb.append("    authentication: ").append(toIndentedString(authentication)).append("\n");
         sb.append("    allowedHeaders: ").append(toIndentedString(allowedHeaders)).append("\n");
-        sb.append("    allowedParameters: ").append(toIndentedString(allowedParameters)).append("\n");
         sb.append("}");
         return sb.toString();
     }

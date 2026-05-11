@@ -1154,10 +1154,6 @@ components:
           type: array
           items:
             type: string
-        allowedParameters:
-          type: array
-          items:
-            type: string
 
     EndpointUpdateModel:
       type: object
@@ -1168,10 +1164,6 @@ components:
         authentication:
           $ref: '#/components/schemas/AuthenticationType'
         allowedHeaders:
-          type: array
-          items:
-            type: string
-        allowedParameters:
           type: array
           items:
             type: string
@@ -1187,10 +1179,6 @@ components:
           type: array
           items:
             type: string
-        allowedParameters:
-          type: array
-          items:
-            type: string
 
     AuthenticationType:
       type: object
@@ -1199,7 +1187,7 @@ components:
       properties:
         type:
           type: string
-          enum: [ NONE, BEARER, API_KEY, BASIC ]
+          enum: [ NONE, BEARER, API_KEY, BASIC, CLIENT_CREDENTIAL ]
         properties:
           type: object
           additionalProperties: true
@@ -1209,7 +1197,7 @@ components:
       properties:
         type:
           type: string
-          enum: [ NONE, BEARER, API_KEY, BASIC ]
+          enum: [ NONE, BEARER, API_KEY, BASIC, CLIENT_CREDENTIAL ]
 
     Link:
       type: object

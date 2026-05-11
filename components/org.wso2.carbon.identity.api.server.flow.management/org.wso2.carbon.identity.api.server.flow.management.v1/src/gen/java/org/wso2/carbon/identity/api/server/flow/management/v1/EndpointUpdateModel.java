@@ -39,8 +39,6 @@ public class EndpointUpdateModel  {
     private AuthenticationType authentication;
     private List<String> allowedHeaders = null;
 
-    private List<String> allowedParameters = null;
-
 
     /**
     **/
@@ -104,33 +102,7 @@ public class EndpointUpdateModel  {
         return this;
     }
 
-        /**
-    **/
-    public EndpointUpdateModel allowedParameters(List<String> allowedParameters) {
 
-        this.allowedParameters = allowedParameters;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "")
-    @JsonProperty("allowedParameters")
-    @Valid
-    public List<String> getAllowedParameters() {
-        return allowedParameters;
-    }
-    public void setAllowedParameters(List<String> allowedParameters) {
-        this.allowedParameters = allowedParameters;
-    }
-
-    public EndpointUpdateModel addAllowedParametersItem(String allowedParametersItem) {
-        if (this.allowedParameters == null) {
-            this.allowedParameters = new ArrayList<String>();
-        }
-        this.allowedParameters.add(allowedParametersItem);
-        return this;
-    }
-
-    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -144,13 +116,12 @@ public class EndpointUpdateModel  {
         EndpointUpdateModel endpointUpdateModel = (EndpointUpdateModel) o;
         return Objects.equals(this.uri, endpointUpdateModel.uri) &&
             Objects.equals(this.authentication, endpointUpdateModel.authentication) &&
-            Objects.equals(this.allowedHeaders, endpointUpdateModel.allowedHeaders) &&
-            Objects.equals(this.allowedParameters, endpointUpdateModel.allowedParameters);
+            Objects.equals(this.allowedHeaders, endpointUpdateModel.allowedHeaders);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uri, authentication, allowedHeaders, allowedParameters);
+        return Objects.hash(uri, authentication, allowedHeaders);
     }
 
     @Override
@@ -158,11 +129,10 @@ public class EndpointUpdateModel  {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class EndpointUpdateModel {\n");
-        
+
         sb.append("    uri: ").append(toIndentedString(uri)).append("\n");
         sb.append("    authentication: ").append(toIndentedString(authentication)).append("\n");
         sb.append("    allowedHeaders: ").append(toIndentedString(allowedHeaders)).append("\n");
-        sb.append("    allowedParameters: ").append(toIndentedString(allowedParameters)).append("\n");
         sb.append("}");
         return sb.toString();
     }
