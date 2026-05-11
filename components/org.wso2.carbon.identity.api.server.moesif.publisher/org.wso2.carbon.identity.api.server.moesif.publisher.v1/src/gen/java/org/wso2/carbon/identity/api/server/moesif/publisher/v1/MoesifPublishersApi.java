@@ -25,8 +25,7 @@ import java.util.List;
 
 import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.Error;
 import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.MoesifPublisher;
-import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.MoesifPublisherAdd;
-import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.MoesifPublisherUpdate;
+import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.MoesifPublisherReq;
 import org.wso2.carbon.identity.api.server.moesif.publisher.v1.MoesifPublishersApiService;
 import org.wso2.carbon.identity.api.server.moesif.publisher.v1.factories.MoesifPublishersApiServiceFactory;
 
@@ -61,14 +60,14 @@ public class MoesifPublishersApi  {
         @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response createMoesifPublisher(@ApiParam(value = "" ,required=true) @Valid MoesifPublisherAdd moesifPublisherAdd) {
+    public Response createMoesifPublisher(@ApiParam(value = "" ,required=true) @Valid MoesifPublisherReq moesifPublisherReq) {
 
-        return delegate.createMoesifPublisher(moesifPublisherAdd );
+        return delegate.createMoesifPublisher(moesifPublisherReq );
     }
 
     @Valid
     @DELETE
-    @Path("/{publisher-name}")
+    
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Delete a Moesif event publisher", notes = "", response = Void.class, tags={ "Moesif Publishers", })
@@ -77,14 +76,14 @@ public class MoesifPublishersApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response deleteMoesifPublisher(@ApiParam(value = "Name of the Moesif publisher.",required=true) @PathParam("publisher-name") String publisherName) {
+    public Response deleteMoesifPublisher() {
 
-        return delegate.deleteMoesifPublisher(publisherName );
+        return delegate.deleteMoesifPublisher();
     }
 
     @Valid
     @GET
-    @Path("/{publisher-name}")
+    
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Get a Moesif event publisher by name", notes = "", response = MoesifPublisher.class, tags={ "Moesif Publishers", })
@@ -93,29 +92,14 @@ public class MoesifPublishersApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response getMoesifPublisher(@ApiParam(value = "Name of the Moesif publisher.",required=true) @PathParam("publisher-name") String publisherName) {
+    public Response getMoesifPublisher() {
 
-        return delegate.getMoesifPublisher(publisherName );
-    }
-
-    @Valid
-    @GET
-    
-    
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Get all Moesif event publishers", notes = "", response = MoesifPublisher.class, responseContainer = "List", tags={ "Moesif Publishers", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful operation", response = MoesifPublisher.class, responseContainer = "List"),
-        @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
-    })
-    public Response getMoesifPublishers() {
-
-        return delegate.getMoesifPublishers();
+        return delegate.getMoesifPublisher();
     }
 
     @Valid
     @PATCH
-    @Path("/{publisher-name}")
+    
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @ApiOperation(value = "Update the API key of a Moesif event publisher", notes = "", response = MoesifPublisher.class, tags={ "Moesif Publishers" })
@@ -125,9 +109,9 @@ public class MoesifPublishersApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response patchMoesifPublisher(@ApiParam(value = "Name of the Moesif publisher.",required=true) @PathParam("publisher-name") String publisherName, @ApiParam(value = "" ,required=true) @Valid MoesifPublisherUpdate moesifPublisherUpdate) {
+    public Response patchMoesifPublisher(@ApiParam(value = "" ,required=true) @Valid MoesifPublisherReq moesifPublisherReq) {
 
-        return delegate.patchMoesifPublisher(publisherName,  moesifPublisherUpdate );
+        return delegate.patchMoesifPublisher(moesifPublisherReq );
     }
 
 }

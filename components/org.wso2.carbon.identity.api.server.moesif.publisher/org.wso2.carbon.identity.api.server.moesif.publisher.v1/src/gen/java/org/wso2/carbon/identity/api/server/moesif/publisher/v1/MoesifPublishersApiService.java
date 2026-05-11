@@ -26,20 +26,17 @@ import java.io.InputStream;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.Error;
 import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.MoesifPublisher;
-import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.MoesifPublisherAdd;
-import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.MoesifPublisherUpdate;
+import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.MoesifPublisherReq;
 import javax.ws.rs.core.Response;
 
 
 public interface MoesifPublishersApiService {
 
-      public Response createMoesifPublisher(MoesifPublisherAdd moesifPublisherAdd);
+      public Response createMoesifPublisher(MoesifPublisherReq moesifPublisherReq);
 
-      public Response deleteMoesifPublisher(String publisherName);
+      public Response deleteMoesifPublisher();
 
-      public Response getMoesifPublisher(String publisherName);
+      public Response getMoesifPublisher();
 
-      public Response getMoesifPublishers();
-
-      public Response patchMoesifPublisher(String publisherName, MoesifPublisherUpdate moesifPublisherUpdate);
+      public Response patchMoesifPublisher(MoesifPublisherReq moesifPublisherReq);
 }

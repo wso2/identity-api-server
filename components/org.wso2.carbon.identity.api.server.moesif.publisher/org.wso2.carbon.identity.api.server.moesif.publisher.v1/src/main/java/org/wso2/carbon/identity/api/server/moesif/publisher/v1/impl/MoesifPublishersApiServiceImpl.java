@@ -22,11 +22,9 @@ import org.wso2.carbon.identity.api.server.moesif.publisher.v1.MoesifPublishersA
 import org.wso2.carbon.identity.api.server.moesif.publisher.v1.core.MoesifPublisherManagementService;
 import org.wso2.carbon.identity.api.server.moesif.publisher.v1.factories.MoesifPublisherManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.MoesifPublisher;
-import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.MoesifPublisherAdd;
-import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.MoesifPublisherUpdate;
+import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.MoesifPublisherReq;
 
 import java.net.URI;
-import java.util.List;
 
 import javax.ws.rs.core.Response;
 
@@ -48,39 +46,32 @@ public class MoesifPublishersApiServiceImpl implements MoesifPublishersApiServic
     }
 
     @Override
-    public Response createMoesifPublisher(MoesifPublisherAdd moesifPublisherAdd) {
+    public Response createMoesifPublisher(MoesifPublisherReq moesifPublisherReq) {
 
-        MoesifPublisher created = moesifPublisherManagementService.addMoesifPublisher(moesifPublisherAdd);
+        MoesifPublisher created = moesifPublisherManagementService.addMoesifPublisher(moesifPublisherReq);
         URI location = URI.create("moesif-publishers/" + created.getName());
         return Response.created(location).entity(created).build();
     }
 
     @Override
-    public Response deleteMoesifPublisher(String publisherName) {
+    public Response deleteMoesifPublisher() {
 
-        moesifPublisherManagementService.deleteMoesifPublisher(publisherName);
+        moesifPublisherManagementService.deleteMoesifPublisher();
         return Response.noContent().build();
     }
 
     @Override
-    public Response getMoesifPublisher(String publisherName) {
+    public Response getMoesifPublisher() {
 
-        MoesifPublisher publisher = moesifPublisherManagementService.getMoesifPublisher(publisherName);
+        MoesifPublisher publisher = moesifPublisherManagementService.getMoesifPublisher();
         return Response.ok().entity(publisher).build();
     }
 
     @Override
-    public Response getMoesifPublishers() {
-
-        List<MoesifPublisher> publishers = moesifPublisherManagementService.getMoesifPublishers();
-        return Response.ok().entity(publishers).build();
-    }
-
-    @Override
-    public Response patchMoesifPublisher(String publisherName, MoesifPublisherUpdate moesifPublisherUpdate) {
+    public Response patchMoesifPublisher(MoesifPublisherReq moesifPublisherReq) {
 
         MoesifPublisher updated = moesifPublisherManagementService
-                .updateMoesifPublisherApiKey(publisherName, moesifPublisherUpdate.getApiKeyValue());
+                .updateMoesifPublisherApiKey(moesifPublisherReq.getApiKeyValue());
         return Response.ok().entity(updated).build();
     }
 
