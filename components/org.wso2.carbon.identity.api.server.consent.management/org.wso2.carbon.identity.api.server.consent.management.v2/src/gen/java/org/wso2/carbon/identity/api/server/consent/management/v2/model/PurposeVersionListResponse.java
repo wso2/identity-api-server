@@ -46,7 +46,7 @@ public class PurposeVersionListResponse  {
 
 
     /**
-    * Total number of results matching the query
+    * Number of results returned in the current page
     **/
     public PurposeVersionListResponse totalResults(Integer totalResults) {
 
@@ -54,7 +54,7 @@ public class PurposeVersionListResponse  {
         return this;
     }
     
-    @ApiModelProperty(example = "2", value = "Total number of results matching the query")
+    @ApiModelProperty(example = "2", value = "Number of results returned in the current page")
     @JsonProperty("totalResults")
     @Valid
     public Integer getTotalResults() {

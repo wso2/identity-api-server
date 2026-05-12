@@ -1090,7 +1090,7 @@ components:
       properties:
         totalResults:
           type: integer
-          description: Total number of results matching the query
+          description: Number of results returned in the current page
           example: 2
         links:
           type: array
@@ -1237,7 +1237,7 @@ components:
       properties:
         totalResults:
           type: integer
-          description: Total number of results matching the query
+          description: Number of results returned in the current page
           example: 2
         links:
           type: array
@@ -1286,7 +1286,7 @@ components:
       properties:
         totalResults:
           type: integer
-          description: Total number of results matching the query
+          description: Number of results returned in the current page
           example: 2
         links:
           type: array
@@ -1333,19 +1333,13 @@ components:
           enum: [PENDING, ACTIVE, REJECTED, REVOKED, EXPIRED]
           description: PENDING if awaiting approvals, ACTIVE if all accepted, REJECTED if any rejected before activation, REVOKED if any user revoked after activation, EXPIRED if validityTime has passed.
           example: "ACTIVE"
-        validityTime:
-          type: integer
-          format: int64
-          nullable: true
-          description: Milliseconds since epoch until which the consent is valid. Null if no expiry.
-          example: 1766383796000
 
     ConsentListResponse:
       type: object
       properties:
         totalResults:
           type: integer
-          description: Total number of results matching the query
+          description: Number of results returned in the current page
           example: 2
         links:
           type: array

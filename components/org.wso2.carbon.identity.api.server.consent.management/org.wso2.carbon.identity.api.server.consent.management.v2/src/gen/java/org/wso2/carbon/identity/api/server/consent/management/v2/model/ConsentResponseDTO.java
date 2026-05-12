@@ -73,7 +73,6 @@ public enum StateEnum {
 }
 
     private StateEnum state;
-    private Long validityTime;
 
     /**
     * Unique identifier for this consent
@@ -170,27 +169,6 @@ public enum StateEnum {
         this.state = state;
     }
 
-    /**
-    * Milliseconds since epoch until which the consent is valid. Null if no expiry.
-    **/
-    public ConsentResponseDTO validityTime(Long validityTime) {
-
-        this.validityTime = validityTime;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "1766383796000", value = "Milliseconds since epoch until which the consent is valid. Null if no expiry.")
-    @JsonProperty("validityTime")
-    @Valid
-    public Long getValidityTime() {
-        return validityTime;
-    }
-    public void setValidityTime(Long validityTime) {
-        this.validityTime = validityTime;
-    }
-
-
-
     @Override
     public boolean equals(java.lang.Object o) {
 
@@ -205,13 +183,12 @@ public enum StateEnum {
             Objects.equals(this.language, consentResponseDTO.language) &&
             Objects.equals(this.subjectId, consentResponseDTO.subjectId) &&
             Objects.equals(this.tenantDomain, consentResponseDTO.tenantDomain) &&
-            Objects.equals(this.state, consentResponseDTO.state) &&
-            Objects.equals(this.validityTime, consentResponseDTO.validityTime);
+            Objects.equals(this.state, consentResponseDTO.state);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, language, subjectId, tenantDomain, state, validityTime);
+        return Objects.hash(id, language, subjectId, tenantDomain, state);
     }
 
     @Override
@@ -225,7 +202,6 @@ public enum StateEnum {
         sb.append("    subjectId: ").append(toIndentedString(subjectId)).append("\n");
         sb.append("    tenantDomain: ").append(toIndentedString(tenantDomain)).append("\n");
         sb.append("    state: ").append(toIndentedString(state)).append("\n");
-        sb.append("    validityTime: ").append(toIndentedString(validityTime)).append("\n");
         sb.append("}");
         return sb.toString();
     }
