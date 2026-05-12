@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.PurposeElementDTO;
 import javax.validation.constraints.*;
 
@@ -38,7 +37,7 @@ import javax.xml.bind.annotation.*;
 
 public class PurposeVersionDTO  {
   
-    private UUID id;
+    private String id;
     private String version;
     private String description;
     private List<PurposeElementDTO> elements = null;
@@ -49,7 +48,7 @@ public class PurposeVersionDTO  {
     /**
     * ID of the purpose version
     **/
-    public PurposeVersionDTO id(UUID id) {
+    public PurposeVersionDTO id(String id) {
 
         this.id = id;
         return this;
@@ -58,10 +57,10 @@ public class PurposeVersionDTO  {
     @ApiModelProperty(example = "f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2", value = "ID of the purpose version")
     @JsonProperty("id")
     @Valid
-    public UUID getId() {
+    public String getId() {
         return id;
     }
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 

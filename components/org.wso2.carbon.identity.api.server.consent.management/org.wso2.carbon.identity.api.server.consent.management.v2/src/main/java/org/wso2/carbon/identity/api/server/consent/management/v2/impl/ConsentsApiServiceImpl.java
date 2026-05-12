@@ -27,7 +27,6 @@ import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentCr
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentResponseDTO;
 
 import java.net.URI;
-import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
@@ -70,8 +69,8 @@ public class ConsentsApiServiceImpl implements ConsentsApiService {
     }
 
     @Override
-    public Response consentsList(String subjectId, String serviceId, String state, UUID purposeId,
-                                 UUID purposeVersionId, Integer limit, String after, String before) {
+    public Response consentsList(String subjectId, String serviceId, String state, String purposeId,
+                                     String purposeVersionId, Integer limit, String after, String before) {
 
         return Response.ok().entity(
                 consentService.listConsents(subjectId, serviceId, state, purposeId, purposeVersionId, limit, after,

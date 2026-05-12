@@ -32,7 +32,6 @@ import org.wso2.carbon.identity.api.server.consent.management.v2.model.PurposeVe
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.PurposeVersionDTO;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.PurposeVersionListResponse;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.SetLatestVersionRequest;
-import java.util.UUID;
 import javax.ws.rs.core.Response;
 
 
@@ -40,19 +39,19 @@ public interface PurposesApiService {
 
       public Response purposesCreate(PurposeCreateRequest purposeCreateRequest);
 
-      public Response purposesDelete(UUID purposeId);
+      public Response purposesDelete(String purposeId);
 
-      public Response purposesGet(UUID purposeId);
+      public Response purposesGet(String purposeId);
 
       public Response purposesList(String filter, Integer limit, String after, String before);
 
-      public Response purposesSetLatestVersion(UUID purposeId, SetLatestVersionRequest setLatestVersionRequest);
+      public Response purposesSetLatestVersion(String purposeId, SetLatestVersionRequest setLatestVersionRequest);
 
-      public Response purposesVersionsCreate(UUID purposeId, PurposeVersionCreateRequest purposeVersionCreateRequest);
+      public Response purposesVersionsCreate(String purposeId, PurposeVersionCreateRequest purposeVersionCreateRequest);
 
-      public Response purposesVersionsDelete(UUID purposeId, UUID versionId);
+      public Response purposesVersionsDelete(String purposeId, String versionId);
 
-      public Response purposesVersionsGet(UUID purposeId, UUID versionId);
+      public Response purposesVersionsGet(String purposeId, String versionId);
 
-      public Response purposesVersionsList(UUID purposeId, Integer limit, String after, String before);
+      public Response purposesVersionsList(String purposeId, Integer limit, String after, String before);
 }

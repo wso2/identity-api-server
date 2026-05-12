@@ -32,7 +32,6 @@ import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentLi
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentResponseDTO;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentValidateResponse;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ErrorDTO;
-import java.util.UUID;
 import javax.ws.rs.core.Response;
 
 
@@ -44,7 +43,7 @@ public interface ConsentsApiService {
 
       public Response consentsGet(String consentId);
 
-      public Response consentsList(String subjectId, String serviceId, String state, UUID purposeId, UUID purposeVersionId, Integer limit, String after, String before);
+      public Response consentsList(String subjectId, String serviceId, String state, String purposeId, String purposeVersionId, Integer limit, String after, String before);
 
       public Response consentsRevoke(String consentId);
 

@@ -22,8 +22,6 @@ import org.wso2.carbon.identity.api.server.consent.management.v2.model.ElementCr
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ElementDTO;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ElementListResponse;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ErrorDTO;
-import java.util.UUID;
-
 import org.wso2.carbon.identity.api.server.consent.management.v2.factories.ElementsApiServiceFactory;
 
 import javax.validation.Valid;
@@ -89,7 +87,7 @@ public class ElementsApi  {
         @ApiResponse(code = 409, message = "Conflict", response = ErrorDTO.class),
         @ApiResponse(code = 500, message = "Server Error", response = ErrorDTO.class)
     })
-    public Response elementsDelete(@ApiParam(value = "ID of the consent element.",required=true) @PathParam("elementId") UUID elementId) {
+    public Response elementsDelete(@ApiParam(value = "ID of the consent element.",required=true) @PathParam("elementId") String elementId) {
 
         return delegate.elementsDelete(elementId );
     }
@@ -112,7 +110,7 @@ public class ElementsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = ErrorDTO.class),
         @ApiResponse(code = 500, message = "Server Error", response = ErrorDTO.class)
     })
-    public Response elementsGet(@ApiParam(value = "ID of the consent element.",required=true) @PathParam("elementId") UUID elementId) {
+    public Response elementsGet(@ApiParam(value = "ID of the consent element.",required=true) @PathParam("elementId") String elementId) {
 
         return delegate.elementsGet(elementId );
     }

@@ -26,8 +26,6 @@ import org.wso2.carbon.identity.api.server.consent.management.v2.model.PurposeVe
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.PurposeVersionDTO;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.PurposeVersionListResponse;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.SetLatestVersionRequest;
-import java.util.UUID;
-
 import org.wso2.carbon.identity.api.server.consent.management.v2.factories.PurposesApiServiceFactory;
 
 import javax.validation.Valid;
@@ -93,7 +91,7 @@ public class PurposesApi  {
         @ApiResponse(code = 409, message = "Conflict", response = ErrorDTO.class),
         @ApiResponse(code = 500, message = "Server Error", response = ErrorDTO.class)
     })
-    public Response purposesDelete(@ApiParam(value = "ID of the purpose.",required=true) @PathParam("purposeId") UUID purposeId) {
+    public Response purposesDelete(@ApiParam(value = "ID of the purpose.",required=true) @PathParam("purposeId") String purposeId) {
 
         return delegate.purposesDelete(purposeId );
     }
@@ -116,7 +114,7 @@ public class PurposesApi  {
         @ApiResponse(code = 404, message = "Not Found", response = ErrorDTO.class),
         @ApiResponse(code = 500, message = "Server Error", response = ErrorDTO.class)
     })
-    public Response purposesGet(@ApiParam(value = "ID of the purpose.",required=true) @PathParam("purposeId") UUID purposeId) {
+    public Response purposesGet(@ApiParam(value = "ID of the purpose.",required=true) @PathParam("purposeId") String purposeId) {
 
         return delegate.purposesGet(purposeId );
     }
@@ -162,7 +160,7 @@ public class PurposesApi  {
         @ApiResponse(code = 404, message = "Not Found", response = ErrorDTO.class),
         @ApiResponse(code = 500, message = "Server Error", response = ErrorDTO.class)
     })
-    public Response purposesSetLatestVersion(@ApiParam(value = "ID of the purpose.",required=true) @PathParam("purposeId") UUID purposeId, @ApiParam(value = "" ,required=true) @Valid SetLatestVersionRequest setLatestVersionRequest) {
+    public Response purposesSetLatestVersion(@ApiParam(value = "ID of the purpose.",required=true) @PathParam("purposeId") String purposeId, @ApiParam(value = "" ,required=true) @Valid SetLatestVersionRequest setLatestVersionRequest) {
 
         return delegate.purposesSetLatestVersion(purposeId,  setLatestVersionRequest );
     }
@@ -187,7 +185,7 @@ public class PurposesApi  {
         @ApiResponse(code = 409, message = "Conflict", response = ErrorDTO.class),
         @ApiResponse(code = 500, message = "Server Error", response = ErrorDTO.class)
     })
-    public Response purposesVersionsCreate(@ApiParam(value = "ID of the purpose.",required=true) @PathParam("purposeId") UUID purposeId, @ApiParam(value = "" ,required=true) @Valid PurposeVersionCreateRequest purposeVersionCreateRequest) {
+    public Response purposesVersionsCreate(@ApiParam(value = "ID of the purpose.",required=true) @PathParam("purposeId") String purposeId, @ApiParam(value = "" ,required=true) @Valid PurposeVersionCreateRequest purposeVersionCreateRequest) {
 
         return delegate.purposesVersionsCreate(purposeId,  purposeVersionCreateRequest );
     }
@@ -212,7 +210,7 @@ public class PurposesApi  {
         @ApiResponse(code = 409, message = "Conflict", response = ErrorDTO.class),
         @ApiResponse(code = 500, message = "Server Error", response = ErrorDTO.class)
     })
-    public Response purposesVersionsDelete(@ApiParam(value = "ID of the purpose.",required=true) @PathParam("purposeId") UUID purposeId, @ApiParam(value = "ID of the purpose version.",required=true) @PathParam("versionId") UUID versionId) {
+    public Response purposesVersionsDelete(@ApiParam(value = "ID of the purpose.",required=true) @PathParam("purposeId") String purposeId, @ApiParam(value = "ID of the purpose version.",required=true) @PathParam("versionId") String versionId) {
 
         return delegate.purposesVersionsDelete(purposeId,  versionId );
     }
@@ -235,7 +233,7 @@ public class PurposesApi  {
         @ApiResponse(code = 404, message = "Not Found", response = ErrorDTO.class),
         @ApiResponse(code = 500, message = "Server Error", response = ErrorDTO.class)
     })
-    public Response purposesVersionsGet(@ApiParam(value = "ID of the purpose.",required=true) @PathParam("purposeId") UUID purposeId, @ApiParam(value = "ID of the purpose version.",required=true) @PathParam("versionId") UUID versionId) {
+    public Response purposesVersionsGet(@ApiParam(value = "ID of the purpose.",required=true) @PathParam("purposeId") String purposeId, @ApiParam(value = "ID of the purpose version.",required=true) @PathParam("versionId") String versionId) {
 
         return delegate.purposesVersionsGet(purposeId,  versionId );
     }
@@ -258,7 +256,7 @@ public class PurposesApi  {
         @ApiResponse(code = 404, message = "Not Found", response = ErrorDTO.class),
         @ApiResponse(code = 500, message = "Server Error", response = ErrorDTO.class)
     })
-    public Response purposesVersionsList(@ApiParam(value = "ID of the purpose.",required=true) @PathParam("purposeId") UUID purposeId,     @Valid @Min(1)@ApiParam(value = "Maximum number of records to return.", defaultValue="10") @DefaultValue("10")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Cursor for forward pagination. Pass the base64-encoded UUID of the last item received from the previous page to retrieve the next page of results. ")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Cursor for backward pagination. Pass the base64-encoded UUID of the first item received from the current page to retrieve the previous page of results. ")  @QueryParam("before") String before) {
+    public Response purposesVersionsList(@ApiParam(value = "ID of the purpose.",required=true) @PathParam("purposeId") String purposeId,     @Valid @Min(1)@ApiParam(value = "Maximum number of records to return.", defaultValue="10") @DefaultValue("10")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Cursor for forward pagination. Pass the base64-encoded UUID of the last item received from the previous page to retrieve the next page of results. ")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Cursor for backward pagination. Pass the base64-encoded UUID of the first item received from the current page to retrieve the previous page of results. ")  @QueryParam("before") String before) {
 
         return delegate.purposesVersionsList(purposeId,  limit,  after,  before );
     }

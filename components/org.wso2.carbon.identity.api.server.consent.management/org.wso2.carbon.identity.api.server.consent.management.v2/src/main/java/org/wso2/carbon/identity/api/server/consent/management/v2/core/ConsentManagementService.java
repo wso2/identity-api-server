@@ -60,7 +60,6 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ACTIVE_STATE;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.DEFAULT_LIMIT;
@@ -167,16 +166,16 @@ public class ConsentManagementService {
      * @param subjectId        Filter by subject user ID.
      * @param serviceId        Filter by service ID.
      * @param state            Filter by consent state.
-     * @param purposeId        Filter by purpose UUID.
-     * @param purposeVersionId Filter by specific purpose version UUID.
+     * @param purposeId        Filter by purpose ID.
+     * @param purposeVersionId Filter by specific purpose version ID.
      * @param limit            Maximum results.
      * @param after            Cursor for pagination (results after this cursor).
      * @param before           Cursor for pagination (results before this cursor).
      * @return Response with list of ConsentSummaryDTOs.
      * @throws ConsentManagementException if listing fails.
      */
-    public ConsentListResponse listConsents(String subjectId, String serviceId, String state, UUID purposeId,
-                                            UUID purposeVersionId, Integer limit, String after, String before) {
+    public ConsentListResponse listConsents(String subjectId, String serviceId, String state, String purposeId,
+                                            String purposeVersionId, Integer limit, String after, String before) {
 
         try {
             return listConsentsInternal(subjectId, serviceId, state, purposeId, purposeVersionId, limit, after, before);
@@ -185,8 +184,9 @@ public class ConsentManagementService {
         }
     }
 
-    private ConsentListResponse listConsentsInternal(String subjectId, String serviceId, String state, UUID purposeId,
-                                                     UUID purposeVersionId, Integer limit, String after, String before)
+    private ConsentListResponse listConsentsInternal(String subjectId, String serviceId, String state,
+                                                     String purposeId, String purposeVersionId, Integer limit,
+                                                     String after, String before)
             throws ConsentManagementException {
 
         limit = validatedLimit(limit);
@@ -226,7 +226,7 @@ public class ConsentManagementService {
                     url += "&state=" + URLEncoder.encode(state, StandardCharsets.UTF_8.name());
                 }
             } catch (UnsupportedEncodingException e) {
-                LOG.error("Server encountered an error while building pagination URL for the response.", e);
+                LOG.debug("Server encountered an error while building pagination URL for the response.", e);
             }
             if (purposeId != null) {
                 url += "&purposeId=" + purposeId;
@@ -372,7 +372,9 @@ public class ConsentManagementService {
                     authDTOs.add(authDTO);
                 } catch (IllegalArgumentException e) {
                     // Skip unrecognized authorization states
-                    LOG.warn("Skipping unrecognized authorization state: " + auth.getStatus(), e);
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Skipping unrecognized authorization state: " + auth.getStatus(), e);
+                    }
                 }
             }
         }
@@ -390,18 +392,20 @@ public class ConsentManagementService {
         try {
             Purpose purpose = consentManager.getPurposeByUuid(consentPurpose.getUuid());
             if (purpose == null) {
-                LOG.warn("Could not resolve purpose UUID for purposeId: " + consentPurpose.getUuid());
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Could not resolve purpose UUID for purposeId: " + consentPurpose.getUuid());
+                }
             } else {
                 if (StringUtils.isNotBlank(purpose.getUuid())) {
-                    dto.setId(UUID.fromString(purpose.getUuid()));
+                    dto.setId(purpose.getUuid());
                 }
                 if (StringUtils.isNotBlank(versionUuid)) {
-                    dto.setVersionId(UUID.fromString(versionUuid));
+                    dto.setVersionId(versionUuid);
                     PurposeVersion latestVersion = purpose.getLatestVersion();
                     if (latestVersion != null && versionUuid.equals(latestVersion.getUuid())) {
                         dto.setVersion(latestVersion.getVersion());
                     } else if (dto.getId() != null) {
-                        PurposeVersion pv = consentManager.getPurposeVersion(dto.getId().toString(), versionUuid);
+                        PurposeVersion pv = consentManager.getPurposeVersion(dto.getId(), versionUuid);
                         if (pv != null) {
                             dto.setVersion(pv.getVersion());
                         }
@@ -409,7 +413,9 @@ public class ConsentManagementService {
                 }
             }
         } catch (ConsentManagementException e) {
-            LOG.warn("Could not resolve purpose UUID for purposeId: " + consentPurpose.getPurposeId(), e);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Could not resolve purpose UUID for purposeId: " + consentPurpose.getPurposeId(), e);
+            }
         }
 
         List<ConsentedElementDTO> elementDTOs = new ArrayList<>();
@@ -422,14 +428,18 @@ public class ConsentManagementService {
                 try {
                     PIICategory element = consentManager.getPIICategoryByUuid(piiCategoryValidity.getUuid());
                     if (element == null) {
-                        LOG.warn("Could not resolve element UUID for elementId: " + piiCategoryValidity.getUuid());
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("Could not resolve element UUID for elementId: " + piiCategoryValidity.getUuid());
+                        }
                     } else {
                         if (StringUtils.isNotBlank(element.getUuid())) {
-                            elementDTO.setId(UUID.fromString(element.getUuid()));
+                            elementDTO.setId(element.getUuid());
                         }
                     }
                 } catch (ConsentManagementException e) {
-                    LOG.warn("Could not resolve element UUID for elementId: " + piiCategoryValidity.getId(), e);
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Could not resolve element UUID for elementId: " + piiCategoryValidity.getId(), e);
+                    }
                 }
                 elementDTOs.add(elementDTO);
             }

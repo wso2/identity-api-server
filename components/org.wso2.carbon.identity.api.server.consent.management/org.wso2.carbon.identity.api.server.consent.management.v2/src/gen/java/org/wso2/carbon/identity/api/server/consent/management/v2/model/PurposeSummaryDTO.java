@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.UUID;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.PurposeDTOLatestVersion;
 import javax.validation.constraints.*;
 
@@ -37,7 +36,7 @@ import javax.xml.bind.annotation.*;
 @ApiModel(description = "Minimal purpose information for list responses")
 public class PurposeSummaryDTO  {
   
-    private UUID id;
+    private String id;
     private String name;
     private String description;
     private String type;
@@ -45,7 +44,7 @@ public class PurposeSummaryDTO  {
 
     /**
     **/
-    public PurposeSummaryDTO id(UUID id) {
+    public PurposeSummaryDTO id(String id) {
 
         this.id = id;
         return this;
@@ -54,10 +53,10 @@ public class PurposeSummaryDTO  {
     @ApiModelProperty(example = "f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2", value = "")
     @JsonProperty("id")
     @Valid
-    public UUID getId() {
+    public String getId() {
         return id;
     }
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 

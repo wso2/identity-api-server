@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.UUID;
 import javax.validation.constraints.*;
 
 /**
@@ -36,14 +35,14 @@ import javax.xml.bind.annotation.*;
 @ApiModel(description = "Minimal purpose version information for list responses")
 public class PurposeVersionSummaryDTO  {
   
-    private UUID id;
+    private String id;
     private String version;
     private String description;
 
     /**
     * ID of the purpose version
     **/
-    public PurposeVersionSummaryDTO id(UUID id) {
+    public PurposeVersionSummaryDTO id(String id) {
 
         this.id = id;
         return this;
@@ -52,10 +51,10 @@ public class PurposeVersionSummaryDTO  {
     @ApiModelProperty(example = "f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2", value = "ID of the purpose version")
     @JsonProperty("id")
     @Valid
-    public UUID getId() {
+    public String getId() {
         return id;
     }
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 

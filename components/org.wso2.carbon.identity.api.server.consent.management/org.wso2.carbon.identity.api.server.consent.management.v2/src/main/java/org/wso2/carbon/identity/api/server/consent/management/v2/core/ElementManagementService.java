@@ -48,7 +48,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.DEFAULT_LIMIT;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_ELEMENT_UUID_NOT_FOUND;
@@ -100,12 +99,12 @@ public class ElementManagementService {
      * @return Response with ElementDTO.
      * @throws ConsentManagementException if retrieval fails.
      */
-    public ElementDTO getElement(UUID elementId) {
+    public ElementDTO getElement(String elementId) {
 
         try {
-            PIICategory piiCategory = consentManager.getPIICategoryByUuid(elementId.toString());
+            PIICategory piiCategory = consentManager.getPIICategoryByUuid(elementId);
             if (piiCategory == null) {
-                throw handleClientException(ERROR_CODE_ELEMENT_UUID_NOT_FOUND, elementId.toString());
+                throw handleClientException(ERROR_CODE_ELEMENT_UUID_NOT_FOUND, elementId);
             }
             return toElementDTO(piiCategory);
         } catch (ConsentManagementException e) {
@@ -166,7 +165,7 @@ public class ElementManagementService {
                     try {
                         url += "&filter=" + URLEncoder.encode(filterExpression, StandardCharsets.UTF_8.name());
                     } catch (UnsupportedEncodingException e) {
-                        LOG.error("Server encountered an error while building pagination URL for the response.", e);
+                        LOG.debug("Server encountered an error while building pagination URL for the response.", e);
                     }
                 }
 
@@ -214,10 +213,10 @@ public class ElementManagementService {
      * @param elementId Element ID.
      * @throws ConsentManagementException if deletion fails.
      */
-    public void deleteElement(UUID elementId) {
+    public void deleteElement(String elementId) {
 
         try {
-            consentManager.deletePIICategory(elementId.toString());
+            consentManager.deletePIICategory(elementId);
         } catch (ConsentManagementException e) {
             throw ConsentMgtEndpointUtil.handleConsentManagementException(e);
         }
@@ -227,7 +226,7 @@ public class ElementManagementService {
 
         ElementDTO dto = new ElementDTO();
         if (StringUtils.isNotBlank(cat.getUuid())) {
-            dto.setId(UUID.fromString(cat.getUuid()));
+            dto.setId(cat.getUuid());
         }
         dto.setName(cat.getName());
         dto.setDisplayName(cat.getDisplayName());

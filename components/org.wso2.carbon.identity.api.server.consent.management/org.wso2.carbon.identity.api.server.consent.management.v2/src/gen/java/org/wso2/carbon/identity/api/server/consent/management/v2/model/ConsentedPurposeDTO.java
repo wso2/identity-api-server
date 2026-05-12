@@ -24,7 +24,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentedElementDTO;
 import javax.validation.constraints.*;
 
@@ -40,8 +39,8 @@ import javax.xml.bind.annotation.*;
 public class ConsentedPurposeDTO  {
   
     private String name;
-    private UUID id;
-    private UUID versionId;
+    private String id;
+    private String versionId;
     private String version;
     private List<ConsentedElementDTO> elements = null;
 
@@ -66,7 +65,7 @@ public class ConsentedPurposeDTO  {
 
     /**
     **/
-    public ConsentedPurposeDTO id(UUID id) {
+    public ConsentedPurposeDTO id(String id) {
 
         this.id = id;
         return this;
@@ -75,17 +74,17 @@ public class ConsentedPurposeDTO  {
     @ApiModelProperty(example = "f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2", value = "")
     @JsonProperty("id")
     @Valid
-    public UUID getId() {
+    public String getId() {
         return id;
     }
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
     /**
     * UUID of the purpose version that was consented
     **/
-    public ConsentedPurposeDTO versionId(UUID versionId) {
+    public ConsentedPurposeDTO versionId(String versionId) {
 
         this.versionId = versionId;
         return this;
@@ -94,10 +93,10 @@ public class ConsentedPurposeDTO  {
     @ApiModelProperty(example = "f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2", value = "UUID of the purpose version that was consented")
     @JsonProperty("versionId")
     @Valid
-    public UUID getVersionId() {
+    public String getVersionId() {
         return versionId;
     }
-    public void setVersionId(UUID versionId) {
+    public void setVersionId(String versionId) {
         this.versionId = versionId;
     }
 

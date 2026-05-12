@@ -26,7 +26,6 @@ import org.wso2.carbon.identity.api.server.consent.management.v2.model.ElementCr
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ElementDTO;
 
 import java.net.URI;
-import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
@@ -57,14 +56,14 @@ public class ElementsApiServiceImpl implements ElementsApiService {
     }
 
     @Override
-    public Response elementsDelete(UUID elementId) {
+    public Response elementsDelete(String elementId) {
 
         elementsService.deleteElement(elementId);
         return Response.noContent().build();
     }
 
     @Override
-    public Response elementsGet(UUID elementId) {
+    public Response elementsGet(String elementId) {
 
         return Response.ok().entity(elementsService.getElement(elementId)).build();
     }

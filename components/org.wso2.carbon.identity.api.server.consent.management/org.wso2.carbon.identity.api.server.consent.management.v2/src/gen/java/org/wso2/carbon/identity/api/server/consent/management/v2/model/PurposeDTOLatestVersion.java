@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.UUID;
 import javax.validation.constraints.*;
 
 /**
@@ -36,13 +35,13 @@ import javax.xml.bind.annotation.*;
 @ApiModel(description = "Latest version of this purpose")
 public class PurposeDTOLatestVersion  {
   
-    private UUID id;
+    private String id;
     private String version;
 
     /**
     * ID of the latest version
     **/
-    public PurposeDTOLatestVersion id(UUID id) {
+    public PurposeDTOLatestVersion id(String id) {
 
         this.id = id;
         return this;
@@ -51,10 +50,10 @@ public class PurposeDTOLatestVersion  {
     @ApiModelProperty(example = "a1b2c3d4-1234-5678-abcd-ef1234567890", value = "ID of the latest version")
     @JsonProperty("id")
     @Valid
-    public UUID getId() {
+    public String getId() {
         return id;
     }
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 

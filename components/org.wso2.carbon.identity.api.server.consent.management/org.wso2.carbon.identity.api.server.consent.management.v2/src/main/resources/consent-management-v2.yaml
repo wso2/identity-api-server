@@ -704,7 +704,6 @@ components:
       required: true
       schema:
         type: string
-        format: uuid
       description: ID of the purpose.
 
     versionId:
@@ -713,7 +712,6 @@ components:
       required: true
       schema:
         type: string
-        format: uuid
       description: ID of the purpose version.
 
     elementId:
@@ -722,7 +720,6 @@ components:
       required: true
       schema:
         type: string
-        format: uuid
       description: ID of the consent element.
 
     consentId:
@@ -768,7 +765,6 @@ components:
       required: false
       schema:
         type: string
-        format: uuid
       description: Filter consents by purpose ID.
 
     purposeVersionIdQuery:
@@ -777,7 +773,6 @@ components:
       required: false
       schema:
         type: string
-        format: uuid
       description: Filter consents by specific purpose version ID.
 
     consentState:
@@ -868,7 +863,7 @@ components:
       properties:
         id:
           type: string
-          format: uuid
+
           description: ID of the consent element
           example: "f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2"
         mandatory:
@@ -917,7 +912,7 @@ components:
       properties:
         id:
           type: string
-          format: uuid
+
           description: ID of the purpose version to set as the latest version
           example: "f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2"
 
@@ -1014,7 +1009,7 @@ components:
       properties:
         id:
           type: string
-          format: uuid
+
           description: ID of the purpose (will use latest version)
           example: "f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2"
         elements:
@@ -1031,7 +1026,7 @@ components:
       properties:
         id:
           type: string
-          format: uuid
+
           description: ID of the consent element
           example: "f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2"
 
@@ -1044,7 +1039,7 @@ components:
       properties:
         id:
           type: string
-          format: uuid
+
           nullable: true
           description: ID of the purpose
           example: "f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2"
@@ -1068,7 +1063,7 @@ components:
           properties:
             id:
               type: string
-              format: uuid
+    
               description: ID of the latest version
               example: "a1b2c3d4-1234-5678-abcd-ef1234567890"
             version:
@@ -1129,7 +1124,7 @@ components:
       properties:
         id:
           type: string
-          format: uuid
+
           nullable: true
           example: "f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2"
         name:
@@ -1149,7 +1144,7 @@ components:
           properties:
             id:
               type: string
-              format: uuid
+    
               description: ID of the latest version
               example: "a1b2c3d4-1234-5678-abcd-ef1234567890"
             version:
@@ -1162,7 +1157,7 @@ components:
       properties:
         id:
           type: string
-          format: uuid
+
           nullable: true
           description: ID of the element
           example: "f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2"
@@ -1190,7 +1185,7 @@ components:
       properties:
         id:
           type: string
-          format: uuid
+
           description: ID of the purpose version
           example: "f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2"
         version:
@@ -1223,7 +1218,7 @@ components:
       properties:
         id:
           type: string
-          format: uuid
+
           description: ID of the purpose version
           example: "f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2"
         version:
@@ -1267,7 +1262,7 @@ components:
       properties:
         id:
           type: string
-          format: uuid
+
           nullable: true
           description: ID of the element
           example: "f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2"
@@ -1469,11 +1464,11 @@ components:
           example: "Privacy Policy"
         id:
           type: string
-          format: uuid
+
           example: "f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2"
         versionId:
           type: string
-          format: uuid
+
           description: UUID of the purpose version that was consented
           example: "f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2"
         version:
@@ -1493,7 +1488,7 @@ components:
       properties:
         id:
           type: string
-          format: uuid
+
           example: "f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2"
         name:
           type: string

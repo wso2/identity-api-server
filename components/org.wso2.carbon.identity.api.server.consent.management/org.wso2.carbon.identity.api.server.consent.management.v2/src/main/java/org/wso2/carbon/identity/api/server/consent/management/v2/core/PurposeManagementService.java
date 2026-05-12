@@ -61,7 +61,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.DEFAULT_LIMIT;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.DEFAULT_PURPOSE_GROUP;
@@ -119,12 +118,12 @@ public class PurposeManagementService {
      * @return Response with PurposeDTO.
      * @throws ConsentManagementException if retrieval fails.
      */
-    public PurposeDTO getPurpose(UUID purposeId) {
+    public PurposeDTO getPurpose(String purposeId) {
 
         try {
-            Purpose purpose = consentManager.getPurposeByUuid(purposeId.toString());
+            Purpose purpose = consentManager.getPurposeByUuid(purposeId);
             if (purpose == null) {
-                throw handleClientException(ERROR_CODE_PURPOSE_UUID_NOT_FOUND, purposeId.toString());
+                throw handleClientException(ERROR_CODE_PURPOSE_UUID_NOT_FOUND, purposeId);
             }
             return toPurposeDTO(purpose);
         } catch (ConsentManagementException e) {
@@ -187,7 +186,7 @@ public class PurposeManagementService {
                     try {
                         url += "&filter=" + URLEncoder.encode(filterExpression, StandardCharsets.UTF_8.name());
                     } catch (UnsupportedEncodingException e) {
-                        LOG.error("Server encountered an error while building pagination URL for the response.", e);
+                        LOG.debug("Server encountered an error while building pagination URL for the response.", e);
                     }
                 }
 
@@ -238,10 +237,10 @@ public class PurposeManagementService {
      * @param purposeId Purpose ID.
      * @throws ConsentManagementException if deletion fails.
      */
-    public void deletePurpose(UUID purposeId) {
+    public void deletePurpose(String purposeId) {
 
         try {
-            consentManager.deletePurpose(purposeId.toString());
+            consentManager.deletePurpose(purposeId);
         } catch (ConsentManagementException e) {
             throw ConsentMgtEndpointUtil.handleConsentManagementException(e);
         }
@@ -255,7 +254,7 @@ public class PurposeManagementService {
      * @return PurposeVersionDTO with created version details.
      * @throws ConsentManagementException if creation fails.
      */
-    public PurposeVersionDTO createPurposeVersion(UUID purposeId, PurposeVersionCreateRequest request) {
+    public PurposeVersionDTO createPurposeVersion(String purposeId, PurposeVersionCreateRequest request) {
 
         try {
             PurposeVersion version = new PurposeVersion();
@@ -264,7 +263,7 @@ public class PurposeManagementService {
             version.setPurposePIICategories(buildPurposePIICategories(request.getElements()));
             version.setProperties(request.getProperties());
 
-            PurposeVersion created = consentManager.addPurposeVersion(purposeId.toString(), version,
+            PurposeVersion created = consentManager.addPurposeVersion(purposeId, version,
                     Boolean.TRUE.equals(request.getSetAsLatest()));
             return toPurposeVersionDTO(created);
         } catch (ConsentManagementException e) {
@@ -280,12 +279,12 @@ public class PurposeManagementService {
      * @return Response with PurposeVersionDTO.
      * @throws ConsentManagementException if retrieval fails.
      */
-    public PurposeVersionDTO getPurposeVersion(UUID purposeId, UUID versionId) {
+    public PurposeVersionDTO getPurposeVersion(String purposeId, String versionId) {
 
         try {
-            PurposeVersion version = consentManager.getPurposeVersion(purposeId.toString(), versionId.toString());
+            PurposeVersion version = consentManager.getPurposeVersion(purposeId, versionId);
             if (version == null) {
-                throw handleClientException(ERROR_CODE_PURPOSE_VERSION_NOT_FOUND, versionId.toString());
+                throw handleClientException(ERROR_CODE_PURPOSE_VERSION_NOT_FOUND, versionId);
             }
             return toPurposeVersionDTO(version);
         } catch (ConsentManagementException e) {
@@ -303,7 +302,8 @@ public class PurposeManagementService {
      * @return Response with list of PurposeVersionDTOs.
      * @throws ConsentManagementException if listing fails.
      */
-    public PurposeVersionListResponse listPurposeVersions(UUID purposeId, Integer limit, String after, String before) {
+    public PurposeVersionListResponse listPurposeVersions(String purposeId, Integer limit, String after,
+                                                           String before) {
 
         try {
             // Set default values if the parameters are not set.
@@ -315,7 +315,7 @@ public class PurposeManagementService {
                         "Both 'before' and 'after' parameters are provided.");
             }
 
-            List<PurposeVersion> all = consentManager.listPurposeVersions(purposeId.toString());
+            List<PurposeVersion> all = consentManager.listPurposeVersions(purposeId);
             if (all == null) {
                 all = Collections.emptyList();
             }
@@ -400,10 +400,10 @@ public class PurposeManagementService {
      * @param versionId Version UUID.
      * @throws ConsentManagementException if deletion fails.
      */
-    public void deletePurposeVersion(UUID purposeId, UUID versionId) {
+    public void deletePurposeVersion(String purposeId, String versionId) {
 
         try {
-            consentManager.deletePurposeVersion(purposeId.toString(), versionId.toString());
+            consentManager.deletePurposeVersion(purposeId, versionId);
         } catch (ConsentManagementException e) {
             throw ConsentMgtEndpointUtil.handleConsentManagementException(e);
         }
@@ -416,18 +416,18 @@ public class PurposeManagementService {
      * @param request   SetLatestVersionRequest containing the target versionId UUID.
      * @throws ConsentManagementException if operation fails.
      */
-    public void setLatestVersion(UUID purposeId, SetLatestVersionRequest request) {
+    public void setLatestVersion(String purposeId, SetLatestVersionRequest request) {
 
         try {
             if (request == null || request.getId() == null) {
                 throw handleClientException(ERROR_CODE_PURPOSE_VERSION_REQUIRED, "id is required");
             }
 
-            PurposeVersion version = consentManager.getPurposeVersion(purposeId.toString(), request.getId().toString());
+            PurposeVersion version = consentManager.getPurposeVersion(purposeId, request.getId());
             if (version == null) {
-                throw handleClientException(ERROR_CODE_PURPOSE_VERSION_NOT_FOUND, request.getId().toString());
+                throw handleClientException(ERROR_CODE_PURPOSE_VERSION_NOT_FOUND, request.getId());
             }
-            consentManager.setLatestPurposeVersion(purposeId.toString(), version.getVersion());
+            consentManager.setLatestPurposeVersion(purposeId, version.getVersion());
         } catch (ConsentManagementException e) {
             throw ConsentMgtEndpointUtil.handleConsentManagementException(e);
         }
@@ -444,9 +444,9 @@ public class PurposeManagementService {
             if (binding == null || binding.getId() == null) {
                 throw handleClientException(ERROR_CODE_PII_CATEGORY_ID_REQUIRED, "PII Category ID is required");
             }
-            PIICategory element = consentManager.getPIICategoryByUuid(binding.getId().toString());
+            PIICategory element = consentManager.getPIICategoryByUuid(binding.getId());
             if (element == null) {
-                throw handleClientException(ERROR_CODE_ELEMENT_UUID_NOT_FOUND, binding.getId().toString());
+                throw handleClientException(ERROR_CODE_ELEMENT_UUID_NOT_FOUND, binding.getId());
             }
             Boolean mandatory = Boolean.TRUE.equals(binding.getMandatory());
             result.add(new PurposePIICategory(element, mandatory));
@@ -457,7 +457,7 @@ public class PurposeManagementService {
     private PurposeSummaryDTO toPurposeSummaryDTO(Purpose purpose) {
 
         PurposeSummaryDTO dto = new PurposeSummaryDTO();
-        dto.setId(UUID.fromString(purpose.getUuid()));
+        dto.setId(purpose.getUuid());
         dto.setName(purpose.getName());
         dto.setDescription(purpose.getDescription());
         dto.setType(purpose.getGroupType());
@@ -465,7 +465,7 @@ public class PurposeManagementService {
         if (latestVersion != null) {
             PurposeDTOLatestVersion lv = new PurposeDTOLatestVersion();
             if (StringUtils.isNotBlank(latestVersion.getUuid())) {
-                lv.setId(UUID.fromString(latestVersion.getUuid()));
+                lv.setId(latestVersion.getUuid());
             }
             lv.setVersion(latestVersion.getVersion());
             dto.setLatestVersion(lv);
@@ -476,7 +476,7 @@ public class PurposeManagementService {
     private PurposeDTO toPurposeDTO(Purpose purpose) {
 
         PurposeDTO dto = new PurposeDTO();
-        dto.setId(UUID.fromString(purpose.getUuid()));
+        dto.setId(purpose.getUuid());
         dto.setName(purpose.getName());
         dto.setDescription(purpose.getDescription());
         dto.setType(purpose.getGroupType());
@@ -485,7 +485,7 @@ public class PurposeManagementService {
         if (latestVersion != null) {
             PurposeDTOLatestVersion lv = new PurposeDTOLatestVersion();
             if (StringUtils.isNotBlank(latestVersion.getUuid())) {
-                lv.setId(UUID.fromString(latestVersion.getUuid()));
+                lv.setId(latestVersion.getUuid());
             }
             lv.setVersion(latestVersion.getVersion());
             dto.setLatestVersion(lv);
@@ -510,7 +510,7 @@ public class PurposeManagementService {
 
         PurposeVersionDTO dto = new PurposeVersionDTO();
         if (StringUtils.isNotBlank(version.getUuid())) {
-            dto.setId(UUID.fromString(version.getUuid()));
+            dto.setId(version.getUuid());
         }
         dto.setVersion(version.getVersion());
         dto.setDescription(version.getDescription());
@@ -530,7 +530,7 @@ public class PurposeManagementService {
 
         PurposeVersionSummaryDTO dto = new PurposeVersionSummaryDTO();
         if (StringUtils.isNotBlank(version.getUuid())) {
-            dto.setId(UUID.fromString(version.getUuid()));
+            dto.setId(version.getUuid());
         }
         dto.setVersion(version.getVersion());
         dto.setDescription(version.getDescription());
@@ -541,7 +541,7 @@ public class PurposeManagementService {
 
         PurposeElementDTO dto = new PurposeElementDTO();
         if (StringUtils.isNotBlank(cat.getUuid())) {
-            dto.setId(UUID.fromString(cat.getUuid()));
+            dto.setId(cat.getUuid());
         }
         dto.setName(cat.getName());
         dto.setDisplayName(cat.getDisplayName());

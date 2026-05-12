@@ -28,7 +28,6 @@ import org.wso2.carbon.identity.api.server.consent.management.v2.model.ElementCr
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ElementDTO;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ElementListResponse;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ErrorDTO;
-import java.util.UUID;
 import javax.ws.rs.core.Response;
 
 
@@ -36,9 +35,9 @@ public interface ElementsApiService {
 
       public Response elementsCreate(ElementCreateRequest elementCreateRequest);
 
-      public Response elementsDelete(UUID elementId);
+      public Response elementsDelete(String elementId);
 
-      public Response elementsGet(UUID elementId);
+      public Response elementsGet(String elementId);
 
       public Response elementsList(String filter, Integer limit, String after, String before);
 }

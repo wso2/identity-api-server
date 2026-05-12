@@ -29,7 +29,6 @@ import org.wso2.carbon.identity.api.server.consent.management.v2.model.PurposeVe
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.SetLatestVersionRequest;
 
 import java.net.URI;
-import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
@@ -61,14 +60,14 @@ public class PurposesApiServiceImpl implements PurposesApiService {
     }
 
     @Override
-    public Response purposesDelete(UUID purposeId) {
+    public Response purposesDelete(String purposeId) {
 
         purposesService.deletePurpose(purposeId);
         return Response.noContent().build();
     }
 
     @Override
-    public Response purposesGet(UUID purposeId) {
+    public Response purposesGet(String purposeId) {
 
         return Response.ok().entity(purposesService.getPurpose(purposeId)).build();
     }
@@ -80,14 +79,14 @@ public class PurposesApiServiceImpl implements PurposesApiService {
     }
 
     @Override
-    public Response purposesSetLatestVersion(UUID purposeId, SetLatestVersionRequest setLatestVersionRequest) {
+    public Response purposesSetLatestVersion(String purposeId, SetLatestVersionRequest setLatestVersionRequest) {
 
         purposesService.setLatestVersion(purposeId, setLatestVersionRequest);
         return Response.noContent().build();
     }
 
     @Override
-    public Response purposesVersionsCreate(UUID purposeId, PurposeVersionCreateRequest purposeVersionCreateRequest) {
+    public Response purposesVersionsCreate(String purposeId, PurposeVersionCreateRequest purposeVersionCreateRequest) {
 
         PurposeVersionDTO dto = purposesService.createPurposeVersion(purposeId, purposeVersionCreateRequest);
         URI location = ContextLoader.buildURIForHeader(PURPOSES_PATH + "/" + purposeId + VERSIONS_PATH + "/"
@@ -96,20 +95,20 @@ public class PurposesApiServiceImpl implements PurposesApiService {
     }
 
     @Override
-    public Response purposesVersionsDelete(UUID purposeId, UUID versionId) {
+    public Response purposesVersionsDelete(String purposeId, String versionId) {
 
         purposesService.deletePurposeVersion(purposeId, versionId);
         return Response.noContent().build();
     }
 
     @Override
-    public Response purposesVersionsGet(UUID purposeId, UUID versionId) {
+    public Response purposesVersionsGet(String purposeId, String versionId) {
 
         return Response.ok().entity(purposesService.getPurposeVersion(purposeId, versionId)).build();
     }
 
     @Override
-    public Response purposesVersionsList(UUID purposeId, Integer limit, String after, String before) {
+    public Response purposesVersionsList(String purposeId, Integer limit, String after, String before) {
 
         return Response.ok().entity(purposesService.listPurposeVersions(purposeId, limit, after, before)).build();
     }

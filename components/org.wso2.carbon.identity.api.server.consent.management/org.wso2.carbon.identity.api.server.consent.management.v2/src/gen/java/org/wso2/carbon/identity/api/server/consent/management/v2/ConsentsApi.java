@@ -27,7 +27,6 @@ import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentLi
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentResponseDTO;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentValidateResponse;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ErrorDTO;
-import java.util.UUID;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -137,7 +136,7 @@ public class ConsentsApi  {
         @ApiResponse(code = 401, message = "Unauthorized", response = ErrorDTO.class),
         @ApiResponse(code = 500, message = "Server Error", response = ErrorDTO.class)
     })
-    public Response consentsList(    @Valid @Size(max=255)@ApiParam(value = "Filter by subject username.")  @QueryParam("subjectId") String subjectId,     @Valid @Size(max=255)@ApiParam(value = "Filter by service ID.")  @QueryParam("serviceId") String serviceId,     @Valid@ApiParam(value = "Filter consents by state.", allowableValues="PENDING, ACTIVE, REJECTED, REVOKED, EXPIRED")  @QueryParam("state") String state,     @Valid@ApiParam(value = "Filter consents by purpose ID.")  @QueryParam("purposeId") UUID purposeId,     @Valid@ApiParam(value = "Filter consents by specific purpose version ID.")  @QueryParam("purposeVersionId") UUID purposeVersionId,     @Valid @Min(1)@ApiParam(value = "Maximum number of records to return.", defaultValue="10") @DefaultValue("10")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Cursor for forward pagination. Pass the base64-encoded UUID of the last item received from the previous page to retrieve the next page of results. ")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Cursor for backward pagination. Pass the base64-encoded UUID of the first item received from the current page to retrieve the previous page of results. ")  @QueryParam("before") String before) {
+    public Response consentsList(    @Valid @Size(max=255)@ApiParam(value = "Filter by subject username.")  @QueryParam("subjectId") String subjectId,     @Valid @Size(max=255)@ApiParam(value = "Filter by service ID.")  @QueryParam("serviceId") String serviceId,     @Valid@ApiParam(value = "Filter consents by state.", allowableValues="PENDING, ACTIVE, REJECTED, REVOKED, EXPIRED")  @QueryParam("state") String state,     @Valid@ApiParam(value = "Filter consents by purpose ID.")  @QueryParam("purposeId") String purposeId,     @Valid@ApiParam(value = "Filter consents by specific purpose version ID.")  @QueryParam("purposeVersionId") String purposeVersionId,     @Valid @Min(1)@ApiParam(value = "Maximum number of records to return.", defaultValue="10") @DefaultValue("10")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Cursor for forward pagination. Pass the base64-encoded UUID of the last item received from the previous page to retrieve the next page of results. ")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Cursor for backward pagination. Pass the base64-encoded UUID of the first item received from the current page to retrieve the previous page of results. ")  @QueryParam("before") String before) {
 
         return delegate.consentsList(subjectId,  serviceId,  state,  purposeId,  purposeVersionId,  limit,  after,  before );
     }

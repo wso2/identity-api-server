@@ -24,7 +24,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ElementTerminationInfo;
 import javax.validation.constraints.*;
 
@@ -36,14 +35,14 @@ import javax.xml.bind.annotation.*;
 
 public class ConsentPurposeBinding  {
   
-    private UUID id;
+    private String id;
     private List<ElementTerminationInfo> elements = new ArrayList<>();
 
 
     /**
     * ID of the purpose (will use latest version)
     **/
-    public ConsentPurposeBinding id(UUID id) {
+    public ConsentPurposeBinding id(String id) {
 
         this.id = id;
         return this;
@@ -54,10 +53,10 @@ public class ConsentPurposeBinding  {
     @Valid
     @NotNull(message = "Property id cannot be null.")
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 

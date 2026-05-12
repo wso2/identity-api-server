@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.UUID;
 import javax.validation.constraints.*;
 
 
@@ -33,12 +32,12 @@ import javax.xml.bind.annotation.*;
 
 public class SetLatestVersionRequest  {
   
-    private UUID id;
+    private String id;
 
     /**
     * ID of the purpose version to set as the latest version
     **/
-    public SetLatestVersionRequest id(UUID id) {
+    public SetLatestVersionRequest id(String id) {
 
         this.id = id;
         return this;
@@ -49,10 +48,10 @@ public class SetLatestVersionRequest  {
     @Valid
     @NotNull(message = "Property id cannot be null.")
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
