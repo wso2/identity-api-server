@@ -19,7 +19,7 @@
 package org.wso2.carbon.identity.api.server.moesif.publisher.common;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.data.publisher.authentication.moesif.MoesifConfigurationManagementService;
+import org.wso2.carbon.identity.moesif.configuration.MoesifConfigurationManagementService;
 
 /**
  * Service holder class for Moesif publisher configurations.

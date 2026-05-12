@@ -45,8 +45,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.wso2.carbon.identity.datapublisher.authentication</groupId>
-            <artifactId>org.wso2.carbon.identity.data.publisher.authentication.moesif</artifactId>
+            <groupId>org.wso2.carbon.identity.moesif</groupId>
+            <artifactId>org.wso2.carbon.identity.moesif.configuration</artifactId>
         </dependency>
     </dependencies>
 </project>

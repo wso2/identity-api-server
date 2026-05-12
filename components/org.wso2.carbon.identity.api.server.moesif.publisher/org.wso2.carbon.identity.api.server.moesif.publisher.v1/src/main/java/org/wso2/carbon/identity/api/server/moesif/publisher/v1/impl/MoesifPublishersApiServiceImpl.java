@@ -68,10 +68,11 @@ public class MoesifPublishersApiServiceImpl implements MoesifPublishersApiServic
     }
 
     @Override
-    public Response patchMoesifPublisher(MoesifPublisherReq moesifPublisherReq) {
+    public Response updateMoesifPublisher(MoesifPublisherReq moesifPublisherReq) {
 
-        MoesifPublisher updated = moesifPublisherManagementService
-                .updateMoesifPublisherApiKey(moesifPublisherReq.getApiKeyValue());
+        MoesifPublisher updated = moesifPublisherManagementService.updateMoesifPublisher(
+                moesifPublisherReq.getApiKeyValue(),
+                moesifPublisherReq.getPublisherTypes());
         return Response.ok().entity(updated).build();
     }
 

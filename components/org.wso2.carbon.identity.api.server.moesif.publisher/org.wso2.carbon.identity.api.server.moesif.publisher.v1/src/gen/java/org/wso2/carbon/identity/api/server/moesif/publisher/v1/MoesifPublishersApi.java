@@ -98,20 +98,20 @@ public class MoesifPublishersApi  {
     }
 
     @Valid
-    @PATCH
+    @PUT
     
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update the API key of a Moesif event publisher", notes = "", response = MoesifPublisher.class, tags={ "Moesif Publishers" })
+    @ApiOperation(value = "Update the Moesif event publisher configuration", notes = "", response = MoesifPublisher.class, tags={ "Moesif Publishers" })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successfully updated", response = MoesifPublisher.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response patchMoesifPublisher(@ApiParam(value = "" ,required=true) @Valid MoesifPublisherReq moesifPublisherReq) {
+    public Response updateMoesifPublisher(@ApiParam(value = "" ,required=true) @Valid MoesifPublisherReq moesifPublisherReq) {
 
-        return delegate.patchMoesifPublisher(moesifPublisherReq );
+        return delegate.updateMoesifPublisher(moesifPublisherReq );
     }
 
 }

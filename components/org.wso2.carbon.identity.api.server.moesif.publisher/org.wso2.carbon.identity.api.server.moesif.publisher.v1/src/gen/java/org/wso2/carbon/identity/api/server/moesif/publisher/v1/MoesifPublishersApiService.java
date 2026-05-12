@@ -38,5 +38,5 @@ public interface MoesifPublishersApiService {
 
       public Response getMoesifPublisher();
 
-      public Response patchMoesifPublisher(MoesifPublisherReq moesifPublisherReq);
+      public Response updateMoesifPublisher(MoesifPublisherReq moesifPublisherReq);
 }

@@ -20,7 +20,7 @@ package org.wso2.carbon.identity.api.server.moesif.publisher.v1.factories;
 
 import org.wso2.carbon.identity.api.server.moesif.publisher.common.MoesifPublisherServiceHolder;
 import org.wso2.carbon.identity.api.server.moesif.publisher.v1.core.MoesifPublisherManagementService;
-import org.wso2.carbon.identity.data.publisher.authentication.moesif.MoesifConfigurationManagementService;
+import org.wso2.carbon.identity.moesif.configuration.MoesifConfigurationManagementService;
 
 /**
  * Factory for creating MoesifPublisherManagementService instances.

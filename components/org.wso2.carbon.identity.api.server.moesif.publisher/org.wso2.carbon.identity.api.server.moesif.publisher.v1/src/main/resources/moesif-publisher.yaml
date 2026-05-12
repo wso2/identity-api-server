@@ -55,11 +55,11 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-    patch:
+    put:
       tags:
         - Moesif Publishers
-      summary: Update the API key of a Moesif event publisher
-      operationId: patchMoesifPublisher
+      summary: Update the Moesif event publisher configuration
+      operationId: updateMoesifPublisher
       requestBody:
         content:
           application/json:
@@ -101,12 +101,25 @@ components:
       properties:
         apiKeyValue:
           type: string
-          description: Moesif API key value.
+          description: Moesif collector API key value.
+        publisherTypes:
+          type: object
+          additionalProperties:
+            type: boolean
+          description: >
+            Map of publisher type key to enabled flag (e.g. {"login": true, "registration": false}).
+            Keys absent from the map default to false (replace-all semantics).
+            Known keys: "login", "registration", "flow".
     MoesifPublisher:
       type: object
       properties:
         name:
           type: string
+        publisherTypes:
+          type: object
+          additionalProperties:
+            type: boolean
+          description: Map of publisher type key to current enabled flag.
 
     Error:
       type: object
