@@ -22,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.HashMap;
+import java.util.Map;
 import javax.validation.constraints.*;
 
 
@@ -33,9 +35,10 @@ import javax.xml.bind.annotation.*;
 public class MoesifPublisherReq  {
   
     private String apiKeyValue;
+    private Map<String, Boolean> publisherTypes = new HashMap<>();
 
     /**
-    * Moesif API key value.
+    * Moesif collector API key value.
     **/
     public MoesifPublisherReq apiKeyValue(String apiKeyValue) {
 
@@ -43,7 +46,7 @@ public class MoesifPublisherReq  {
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "Moesif API key value.")
+    @ApiModelProperty(required = true, value = "Moesif collector API key value.")
     @JsonProperty("apiKeyValue")
     @Valid
     @NotNull(message = "Property apiKeyValue cannot be null.")
@@ -55,7 +58,24 @@ public class MoesifPublisherReq  {
         this.apiKeyValue = apiKeyValue;
     }
 
+    /**
+    * Map of publisher type key to enabled flag. Keys absent default to false.
+    **/
+    public MoesifPublisherReq publisherTypes(Map<String, Boolean> publisherTypes) {
 
+        this.publisherTypes = publisherTypes;
+        return this;
+    }
+
+    @ApiModelProperty(value = "Map of publisher type key to enabled flag. Keys absent default to false.")
+    @JsonProperty("publisherTypes")
+    @Valid
+    public Map<String, Boolean> getPublisherTypes() {
+        return publisherTypes;
+    }
+    public void setPublisherTypes(Map<String, Boolean> publisherTypes) {
+        this.publisherTypes = publisherTypes;
+    }
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -67,12 +87,13 @@ public class MoesifPublisherReq  {
             return false;
         }
         MoesifPublisherReq moesifPublisherReq = (MoesifPublisherReq) o;
-        return Objects.equals(this.apiKeyValue, moesifPublisherReq.apiKeyValue);
+        return Objects.equals(this.apiKeyValue, moesifPublisherReq.apiKeyValue) &&
+                Objects.equals(this.publisherTypes, moesifPublisherReq.publisherTypes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(apiKeyValue);
+        return Objects.hash(apiKeyValue, publisherTypes);
     }
 
     @Override
@@ -81,7 +102,8 @@ public class MoesifPublisherReq  {
         StringBuilder sb = new StringBuilder();
         sb.append("class MoesifPublisherReq {\n");
         
-        sb.append("    apiKeyValue: ").append(toIndentedString(apiKeyValue)).append("\n");
+        sb.append("    apiKeyValue: ").append(toIndentedString("[REDACTED]")).append("\n");
+        sb.append("    publisherTypes: ").append(toIndentedString(publisherTypes)).append("\n");
         sb.append("}");
         return sb.toString();
     }

@@ -156,9 +156,5 @@
             <artifactId>org.wso2.carbon.identity.api.server.moesif.publisher.common</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.identity.datapublisher.authentication</groupId>
-            <artifactId>org.wso2.carbon.identity.data.publisher.authentication.moesif</artifactId>
-        </dependency>
     </dependencies>
 </project>

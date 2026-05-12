@@ -24,10 +24,13 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.MoesifPublisher;
 import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.MoesifPublisherReq;
-import org.wso2.carbon.identity.data.publisher.authentication.moesif.MoesifConfigurationManagementService;
-import org.wso2.carbon.identity.data.publisher.authentication.moesif.dto.MoesifPublisherDTO;
-import org.wso2.carbon.identity.data.publisher.authentication.moesif.exception.MoesifConfigurationManagementClientException;
-import org.wso2.carbon.identity.data.publisher.authentication.moesif.exception.MoesifConfigurationManagementException;
+import org.wso2.carbon.identity.moesif.configuration.MoesifConfigurationManagementService;
+import org.wso2.carbon.identity.moesif.configuration.exception.MoesifConfigurationManagementClientException;
+import org.wso2.carbon.identity.moesif.configuration.exception.MoesifConfigurationManagementException;
+import org.wso2.carbon.identity.moesif.configuration.model.MoesifPublisherDTO;
+
+import java.util.Collections;
+import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
@@ -49,7 +52,7 @@ public class MoesifPublisherManagementService {
 
         try {
             MoesifPublisherDTO result = moesifConfigurationManagementService
-                    .addMoesifPublisher(moesifPublisherReq.getApiKeyValue());
+                    .addMoesifPublisher(moesifPublisherReq.getApiKeyValue(), moesifPublisherReq.getPublisherTypes());
             return buildResponse(result);
         } catch (MoesifConfigurationManagementException e) {
             throw handleException(e);
@@ -66,11 +69,12 @@ public class MoesifPublisherManagementService {
         }
     }
 
-    public MoesifPublisher updateMoesifPublisherApiKey(String apiKeyValue) {
+    public MoesifPublisher updateMoesifPublisher(String apiKeyValue, Map<String, Boolean> publisherTypes) {
 
         try {
             MoesifPublisherDTO result = moesifConfigurationManagementService
-                    .updateMoesifPublisherApiKey(apiKeyValue);
+                    .updateMoesifPublisher(apiKeyValue,
+                            publisherTypes != null ? publisherTypes : Collections.emptyMap());
             return buildResponse(result);
         } catch (MoesifConfigurationManagementException e) {
             throw handleException(e);
@@ -90,6 +94,9 @@ public class MoesifPublisherManagementService {
 
         MoesifPublisher publisher = new MoesifPublisher();
         publisher.setName(dto.getName());
+        if (dto.getPublisherTypes() != null) {
+            publisher.setPublisherTypes(dto.getPublisherTypes());
+        }
         return publisher;
     }
 

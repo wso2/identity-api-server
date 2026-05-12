@@ -22,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.HashMap;
+import java.util.Map;
 import javax.validation.constraints.*;
 
 
@@ -33,6 +35,7 @@ import javax.xml.bind.annotation.*;
 public class MoesifPublisher  {
   
     private String name;
+    private Map<String, Boolean> publisherTypes = new HashMap<>();
 
     /**
     **/
@@ -52,7 +55,24 @@ public class MoesifPublisher  {
         this.name = name;
     }
 
+    /**
+    * Map of publisher type key to current enabled flag.
+    **/
+    public MoesifPublisher publisherTypes(Map<String, Boolean> publisherTypes) {
 
+        this.publisherTypes = publisherTypes;
+        return this;
+    }
+
+    @ApiModelProperty(value = "Map of publisher type key to current enabled flag.")
+    @JsonProperty("publisherTypes")
+    @Valid
+    public Map<String, Boolean> getPublisherTypes() {
+        return publisherTypes;
+    }
+    public void setPublisherTypes(Map<String, Boolean> publisherTypes) {
+        this.publisherTypes = publisherTypes;
+    }
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -64,12 +84,13 @@ public class MoesifPublisher  {
             return false;
         }
         MoesifPublisher moesifPublisher = (MoesifPublisher) o;
-        return Objects.equals(this.name, moesifPublisher.name);
+        return Objects.equals(this.name, moesifPublisher.name) &&
+                Objects.equals(this.publisherTypes, moesifPublisher.publisherTypes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return Objects.hash(name, publisherTypes);
     }
 
     @Override
@@ -79,6 +100,7 @@ public class MoesifPublisher  {
         sb.append("class MoesifPublisher {\n");
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    publisherTypes: ").append(toIndentedString(publisherTypes)).append("\n");
         sb.append("}");
         return sb.toString();
     }

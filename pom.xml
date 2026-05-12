@@ -146,12 +146,6 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.identity.datapublisher.authentication</groupId>
-                <artifactId>org.wso2.carbon.identity.data.publisher.authentication.moesif</artifactId>
-                <version>${identity.data.publisher.authentication.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
                 <groupId>org.wso2.carbon.identity.framework</groupId>
                 <artifactId>org.wso2.carbon.identity.mgt</artifactId>
                 <version>${carbon.identity.framework.version}</version>
@@ -724,6 +718,11 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.identity.moesif</groupId>
+                <artifactId>org.wso2.carbon.identity.moesif.configuration</artifactId>
+                <version>${org.wso2.carbon.identity.moesif.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
                 <artifactId>org.wso2.carbon.identity.api.server.organization.management.common</artifactId>
                 <version>${project.version}</version>
@@ -1100,6 +1099,8 @@
         </org.wso2.carbon.identity.organization.management.core.version>
         <org.wso2.carbon.identity.organization.management.core.version.range>[1.0.0, 2.0.0)
         </org.wso2.carbon.identity.organization.management.core.version.range>
+
+        <org.wso2.carbon.identity.moesif.version>1.0.0</org.wso2.carbon.identity.moesif.version>
 
         <!-- Organization management service Version -->
         <org.wso2.carbon.identity.organization.management.version>2.4.5
