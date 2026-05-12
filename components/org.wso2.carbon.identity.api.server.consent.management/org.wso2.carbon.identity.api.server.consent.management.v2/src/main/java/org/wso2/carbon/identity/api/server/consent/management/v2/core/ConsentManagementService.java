@@ -64,7 +64,6 @@ import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ACTIVE_
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.DEFAULT_LIMIT;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_CONSENT_INVALID_STATE_FOR_AUTHORIZE;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_CONSENT_REJECTED_WITH_AUTHORIZATIONS;
-import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_CONSENT_SUBJECT_MISMATCH;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_CONSENT_USER_NOT_IN_AUTHORIZATION_LIST;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_ELEMENT_UUID_NOT_FOUND;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_INVALID_QUERY_PARAM;
@@ -113,9 +112,6 @@ public class ConsentManagementService {
         boolean rejected = ConsentCreateRequest.StateEnum.REJECTED.equals(request.getState());
         if (rejected && hasAuthorizations) {
             throw handleClientException(ERROR_CODE_CONSENT_REJECTED_WITH_AUTHORIZATIONS, null);
-        }
-        if (!subjectId.equals(currentUser) && !hasAuthorizations) {
-            throw handleClientException(ERROR_CODE_CONSENT_SUBJECT_MISMATCH, subjectId);
         }
 
         ReceiptInput receiptInput = buildReceiptInput(request, subjectId);
@@ -283,13 +279,6 @@ public class ConsentManagementService {
                 return;
             }
             String callingUser = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername();
-            List<ConsentAuthorization> auths = consentManager.getConsentAuthorizations(receiptId);
-            if (auths != null && !auths.isEmpty()) {
-                boolean callingUserInList = auths.stream().anyMatch(a -> callingUser.equals(a.getUserId()));
-                if (!callingUserInList) {
-                    throw handleClientException(ERROR_CODE_CONSENT_USER_NOT_IN_AUTHORIZATION_LIST, callingUser);
-                }
-            }
             consentManager.authorizeConsent(receiptId, callingUser, REVOKE_STATE);
         } catch (ConsentManagementException e) {
             throw ConsentMgtEndpointUtil.handleConsentManagementException(e);
