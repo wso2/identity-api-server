@@ -723,6 +723,11 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.identity.moesif</groupId>
+                <artifactId>org.wso2.carbon.identity.moesif.configuration</artifactId>
+                <version>${org.wso2.carbon.identity.moesif.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
                 <artifactId>org.wso2.carbon.identity.api.server.organization.management.common</artifactId>
                 <version>${project.version}</version>
@@ -1088,6 +1093,7 @@
         <spotbugs.findsecbugs.version>1.13.0</spotbugs.findsecbugs.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
         <identity.event.handler.version>1.12.4</identity.event.handler.version>
+        <identity.data.publisher.authentication.version>5.10.1</identity.data.publisher.authentication.version>
         <identity.inbound.oauth2.version>7.4.57</identity.inbound.oauth2.version>
         <identity.inbound.saml2.version>5.11.51</identity.inbound.saml2.version>
         <identity.x509Certificate.validation.version>1.1.19</identity.x509Certificate.validation.version>
@@ -1117,6 +1123,8 @@
         </org.wso2.carbon.identity.organization.management.core.version>
         <org.wso2.carbon.identity.organization.management.core.version.range>[1.0.0, 2.0.0)
         </org.wso2.carbon.identity.organization.management.core.version.range>
+
+        <org.wso2.carbon.identity.moesif.version>1.0.0</org.wso2.carbon.identity.moesif.version>
 
         <!-- Organization management service Version -->
         <org.wso2.carbon.identity.organization.management.version>2.5.5
@@ -1182,6 +1190,7 @@
         <module>components/org.wso2.carbon.identity.api.server.asynchronous.operation.status.management</module>
         <module>components/org.wso2.carbon.identity.api.server.vc.template.management</module>
         <module>components/org.wso2.carbon.identity.api.server.credential.management</module>
+        <module>components/org.wso2.carbon.identity.api.server.moesif.publisher</module>
     </modules>
 
 </project>
