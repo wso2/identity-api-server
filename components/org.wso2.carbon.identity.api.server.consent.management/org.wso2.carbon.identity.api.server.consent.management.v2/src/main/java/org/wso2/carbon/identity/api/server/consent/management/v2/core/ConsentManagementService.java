@@ -36,7 +36,6 @@ import org.wso2.carbon.consent.mgt.core.model.ReceiptInput;
 import org.wso2.carbon.consent.mgt.core.model.ReceiptService;
 import org.wso2.carbon.consent.mgt.core.util.ConsentReceiptUtils;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.consent.management.common.ConsentManagementConstants;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.AuthorizationCreateRequest;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.AuthorizationDTO;
@@ -243,13 +242,14 @@ public class ConsentManagementService {
             }
             if (!isFirstPage) {
                 String encodedString = Base64.getEncoder().encodeToString(
-                        receipts.get(0).getConsentReceiptId().getBytes(StandardCharsets.UTF_8));
+                        String.valueOf(receipts.get(0).getConsentTimestamp()).getBytes(StandardCharsets.UTF_8));
                 links.add(buildPaginationLink(url + "&" + FilterConstants.FILTER_ATTR_BEFORE + "=" + encodedString,
                         ConsentManagementConstants.LINK_REL_PREVIOUS));
             }
             if (!isLastPage) {
                 String encodedString = Base64.getEncoder().encodeToString(
-                        receipts.get(receipts.size() - 1).getConsentReceiptId().getBytes(StandardCharsets.UTF_8));
+                        String.valueOf(receipts.get(receipts.size() - 1).getConsentTimestamp())
+                                .getBytes(StandardCharsets.UTF_8));
                 links.add(buildPaginationLink(url + "&" + FilterConstants.FILTER_ATTR_AFTER + "=" + encodedString,
                         ConsentManagementConstants.LINK_REL_NEXT));
             }
@@ -547,7 +547,7 @@ public class ConsentManagementService {
     private PaginationLink buildPaginationLink(String url, String rel) {
 
         return new PaginationLink()
-                .href(ContextLoader.buildURIForHeader(ConsentManagementConstants.V2_API_PATH_COMPONENT +
+                .href(ConsentMgtEndpointUtil.buildURIForHeader(ConsentManagementConstants.V2_API_PATH_COMPONENT +
                         ConsentManagementConstants.CONSENTS_PATH + url).toString())
                 .rel(rel);
     }

@@ -29,7 +29,6 @@ import org.wso2.carbon.consent.mgt.core.model.PurposePIICategory;
 import org.wso2.carbon.consent.mgt.core.model.PurposeVersion;
 import org.wso2.carbon.consent.mgt.core.util.ConsentUtils;
 import org.wso2.carbon.consent.mgt.core.util.FilterQueriesUtil;
-import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.consent.management.common.ConsentManagementConstants;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.PaginationLink;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.PurposeCreateRequest;
@@ -198,14 +197,14 @@ public class PurposeManagementService {
                 }
                 if (!isFirstPage) {
                     String prevCursor = Base64.getEncoder().encodeToString(
-                            purposes.get(0).getUuid().getBytes(StandardCharsets.UTF_8));
+                            String.valueOf(purposes.get(0).getId()).getBytes(StandardCharsets.UTF_8));
                     links.add(buildPaginationLink(ConsentManagementConstants.PURPOSES_PATH,
                             url + "&" + FilterConstants.FILTER_ATTR_BEFORE + "=" + prevCursor,
                             ConsentManagementConstants.LINK_REL_PREVIOUS));
                 }
                 if (!isLastPage) {
                     String nextCursor = Base64.getEncoder().encodeToString(
-                            purposes.get(purposes.size() - 1).getUuid().getBytes(StandardCharsets.UTF_8));
+                            String.valueOf(purposes.get(purposes.size() - 1).getId()).getBytes(StandardCharsets.UTF_8));
                     links.add(buildPaginationLink(ConsentManagementConstants.PURPOSES_PATH,
                             url + "&" + FilterConstants.FILTER_ATTR_AFTER + "=" + nextCursor,
                             ConsentManagementConstants.LINK_REL_NEXT));
@@ -215,9 +214,6 @@ public class PurposeManagementService {
             List<PurposeSummaryDTO> items = new ArrayList<>();
             if (purposes != null) {
                 for (Purpose p : purposes) {
-                    if (StringUtils.isBlank(p.getUuid())) {
-                        continue;
-                    }
                     items.add(toPurposeSummaryDTO(p));
                 }
             }
@@ -562,7 +558,7 @@ public class PurposeManagementService {
     private PaginationLink buildPaginationLink(String resourcePath, String url, String rel) {
 
         return new PaginationLink()
-                .href(ContextLoader.buildURIForHeader(ConsentManagementConstants.V2_API_PATH_COMPONENT +
+                .href(ConsentMgtEndpointUtil.buildURIForHeader(ConsentManagementConstants.V2_API_PATH_COMPONENT +
                         resourcePath + url).toString())
                 .rel(rel);
     }

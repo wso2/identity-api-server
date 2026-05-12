@@ -26,7 +26,6 @@ import org.wso2.carbon.consent.mgt.core.exception.ConsentManagementException;
 import org.wso2.carbon.consent.mgt.core.model.PIICategory;
 import org.wso2.carbon.consent.mgt.core.util.ConsentUtils;
 import org.wso2.carbon.consent.mgt.core.util.FilterQueriesUtil;
-import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.consent.management.common.ConsentManagementConstants;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ElementCreateRequest;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ElementDTO;
@@ -177,14 +176,15 @@ public class ElementManagementService {
                 }
                 if (!isFirstPage) {
                     String prevCursor = Base64.getEncoder().encodeToString(
-                            categories.get(0).getUuid().getBytes(StandardCharsets.UTF_8));
+                            String.valueOf(categories.get(0).getId()).getBytes(StandardCharsets.UTF_8));
                     links.add(buildPaginationLink(
                             url + "&" + FilterConstants.FILTER_ATTR_BEFORE + "=" + prevCursor,
                             ConsentManagementConstants.LINK_REL_PREVIOUS));
                 }
                 if (!isLastPage) {
                     String nextCursor = Base64.getEncoder().encodeToString(
-                            categories.get(categories.size() - 1).getUuid().getBytes(StandardCharsets.UTF_8));
+                            String.valueOf(categories.get(categories.size() - 1).getId())
+                                    .getBytes(StandardCharsets.UTF_8));
                     links.add(buildPaginationLink(
                             url + "&" + FilterConstants.FILTER_ATTR_AFTER + "=" + nextCursor,
                             ConsentManagementConstants.LINK_REL_NEXT));
@@ -246,7 +246,7 @@ public class ElementManagementService {
     private PaginationLink buildPaginationLink(String url, String rel) {
 
         return new PaginationLink()
-                .href(ContextLoader.buildURIForHeader(ConsentManagementConstants.V2_API_PATH_COMPONENT +
+                .href(ConsentMgtEndpointUtil.buildURIForHeader(ConsentManagementConstants.V2_API_PATH_COMPONENT +
                         ConsentManagementConstants.ELEMENTS_PATH + url).toString())
                 .rel(rel);
     }
