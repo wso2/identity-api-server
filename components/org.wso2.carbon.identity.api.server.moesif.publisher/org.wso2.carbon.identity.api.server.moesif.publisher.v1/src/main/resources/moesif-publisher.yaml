@@ -42,7 +42,7 @@ paths:
     get:
       tags:
         - Moesif Publishers
-      summary: Get a Moesif event publisher by name
+      summary: Get Moesif event publisher
       operationId: getMoesifPublisher
       responses:
         '200':
@@ -102,24 +102,37 @@ components:
         apiKeyValue:
           type: string
           description: Moesif collector API key value.
-        publisherTypes:
+          example: mzf_live_1234567890abcdef
+        eventPublisherEnablement:
           type: object
           additionalProperties:
             type: boolean
           description: >
-            Map of publisher type key to enabled flag (e.g. {"login": true, "registration": false}).
+            Map of event publisher key to enabled flag
+            (e.g. {"moesif-authentication-publisher": true, "moesif-registration-publisher": false, "flow": true, "moesif-oauth2-token-publisher": true}).
             Keys absent from the map default to false (replace-all semantics).
-            Known keys: "login", "registration", "flow".
+            Known keys: "moesif-authentication-publisher", "moesif-registration-publisher", "moesif-flow-publisher", "moesif-oauth2-token-publisher".
+          example:
+            moesif-authentication-publisher: true
+            moesif-registration-publisher: false
+            moesif-flow-publisher: true
+            moesif-oauth2-token-publisher: true
     MoesifPublisher:
       type: object
       properties:
         name:
           type: string
-        publisherTypes:
+          example: default
+        eventPublisherEnablement:
           type: object
           additionalProperties:
             type: boolean
-          description: Map of publisher type key to current enabled flag.
+          description: Map of event publisher key to current enabled flag.
+          example:
+            authentication: true
+            registration: false
+            flow: true
+            oauthToken: true
 
     Error:
       type: object

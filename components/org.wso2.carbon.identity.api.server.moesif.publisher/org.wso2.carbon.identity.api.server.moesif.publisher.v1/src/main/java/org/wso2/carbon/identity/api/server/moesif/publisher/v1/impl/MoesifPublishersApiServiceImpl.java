@@ -72,7 +72,7 @@ public class MoesifPublishersApiServiceImpl implements MoesifPublishersApiServic
 
         MoesifPublisher updated = moesifPublisherManagementService.updateMoesifPublisher(
                 moesifPublisherReq.getApiKeyValue(),
-                moesifPublisherReq.getPublisherTypes());
+                moesifPublisherReq.getEventPublisherEnablement());
         return Response.ok().entity(updated).build();
     }
 

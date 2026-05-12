@@ -51,8 +51,8 @@ public class MoesifPublisherManagementService {
     public MoesifPublisher addMoesifPublisher(MoesifPublisherReq moesifPublisherReq) {
 
         try {
-            MoesifPublisherDTO result = moesifConfigurationManagementService
-                    .addMoesifPublisher(moesifPublisherReq.getApiKeyValue(), moesifPublisherReq.getPublisherTypes());
+            MoesifPublisherDTO result = moesifConfigurationManagementService.addMoesifPublisher(
+                    moesifPublisherReq.getApiKeyValue(), moesifPublisherReq.getEventPublisherEnablement());
             return buildResponse(result);
         } catch (MoesifConfigurationManagementException e) {
             throw handleException(e);
@@ -69,12 +69,12 @@ public class MoesifPublisherManagementService {
         }
     }
 
-    public MoesifPublisher updateMoesifPublisher(String apiKeyValue, Map<String, Boolean> publisherTypes) {
+    public MoesifPublisher updateMoesifPublisher(String apiKeyValue, Map<String, Boolean> eventPublisherEnablement) {
 
         try {
             MoesifPublisherDTO result = moesifConfigurationManagementService
                     .updateMoesifPublisher(apiKeyValue,
-                            publisherTypes != null ? publisherTypes : Collections.emptyMap());
+                            eventPublisherEnablement != null ? eventPublisherEnablement : Collections.emptyMap());
             return buildResponse(result);
         } catch (MoesifConfigurationManagementException e) {
             throw handleException(e);
@@ -95,7 +95,7 @@ public class MoesifPublisherManagementService {
         MoesifPublisher publisher = new MoesifPublisher();
         publisher.setName(dto.getName());
         if (dto.getPublisherTypes() != null) {
-            publisher.setPublisherTypes(dto.getPublisherTypes());
+            publisher.setEventPublisherEnablement(dto.getPublisherTypes());
         }
         return publisher;
     }

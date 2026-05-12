@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.validation.constraints.*;
 
@@ -35,7 +36,8 @@ import javax.xml.bind.annotation.*;
 public class MoesifPublisherReq  {
   
     private String apiKeyValue;
-    private Map<String, Boolean> publisherTypes = new HashMap<>();
+    private Map<String, Boolean> eventPublisherEnablement = null;
+
 
     /**
     * Moesif collector API key value.
@@ -46,7 +48,7 @@ public class MoesifPublisherReq  {
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "Moesif collector API key value.")
+    @ApiModelProperty(example = "mzf_live_1234567890abcdef", required = true, value = "Moesif collector API key value.")
     @JsonProperty("apiKeyValue")
     @Valid
     @NotNull(message = "Property apiKeyValue cannot be null.")
@@ -59,23 +61,34 @@ public class MoesifPublisherReq  {
     }
 
     /**
-    * Map of publisher type key to enabled flag. Keys absent default to false.
+    * Map of event publisher key to enabled flag (e.g. {\&quot;moesif-authentication-publisher\&quot;: true, \&quot;moesif-registration-publisher\&quot;: false, \&quot;flow\&quot;: true, \&quot;moesif-oauth2-token-publisher\&quot;: true}). Keys absent from the map default to false (replace-all semantics). Known keys: \&quot;moesif-authentication-publisher\&quot;, \&quot;moesif-registration-publisher\&quot;, \&quot;moesif-flow-publisher\&quot;, \&quot;moesif-oauth2-token-publisher\&quot;. 
     **/
-    public MoesifPublisherReq publisherTypes(Map<String, Boolean> publisherTypes) {
+    public MoesifPublisherReq eventPublisherEnablement(Map<String, Boolean> eventPublisherEnablement) {
 
-        this.publisherTypes = publisherTypes;
+        this.eventPublisherEnablement = eventPublisherEnablement;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "{\"authentication\":true,\"registration\":false,\"flow\":true,\"oauthToken\":true}", value = "Map of event publisher key to enabled flag (e.g. {\"moesif-authentication-publisher\": true, \"moesif-registration-publisher\": false, \"flow\": true, \"moesif-oauth2-token-publisher\": true}). Keys absent from the map default to false (replace-all semantics). Known keys: \"moesif-authentication-publisher\", \"moesif-registration-publisher\", \"moesif-flow-publisher\", \"moesif-oauth2-token-publisher\". ")
+    @JsonProperty("eventPublisherEnablement")
+    @Valid
+    public Map<String, Boolean> getEventPublisherEnablement() {
+        return eventPublisherEnablement;
+    }
+    public void setEventPublisherEnablement(Map<String, Boolean> eventPublisherEnablement) {
+        this.eventPublisherEnablement = eventPublisherEnablement;
+    }
+
+
+    public MoesifPublisherReq putEventPublisherEnablementItem(String key, Boolean eventPublisherEnablementItem) {
+        if (this.eventPublisherEnablement == null) {
+            this.eventPublisherEnablement = new HashMap<>();
+        }
+        this.eventPublisherEnablement.put(key, eventPublisherEnablementItem);
         return this;
     }
 
-    @ApiModelProperty(value = "Map of publisher type key to enabled flag. Keys absent default to false.")
-    @JsonProperty("publisherTypes")
-    @Valid
-    public Map<String, Boolean> getPublisherTypes() {
-        return publisherTypes;
-    }
-    public void setPublisherTypes(Map<String, Boolean> publisherTypes) {
-        this.publisherTypes = publisherTypes;
-    }
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -88,12 +101,12 @@ public class MoesifPublisherReq  {
         }
         MoesifPublisherReq moesifPublisherReq = (MoesifPublisherReq) o;
         return Objects.equals(this.apiKeyValue, moesifPublisherReq.apiKeyValue) &&
-                Objects.equals(this.publisherTypes, moesifPublisherReq.publisherTypes);
+            Objects.equals(this.eventPublisherEnablement, moesifPublisherReq.eventPublisherEnablement);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(apiKeyValue, publisherTypes);
+        return Objects.hash(apiKeyValue, eventPublisherEnablement);
     }
 
     @Override
@@ -102,8 +115,8 @@ public class MoesifPublisherReq  {
         StringBuilder sb = new StringBuilder();
         sb.append("class MoesifPublisherReq {\n");
         
-        sb.append("    apiKeyValue: ").append(toIndentedString("[REDACTED]")).append("\n");
-        sb.append("    publisherTypes: ").append(toIndentedString(publisherTypes)).append("\n");
+        sb.append("    apiKeyValue: ").append(toIndentedString(apiKeyValue)).append("\n");
+        sb.append("    eventPublisherEnablement: ").append(toIndentedString(eventPublisherEnablement)).append("\n");
         sb.append("}");
         return sb.toString();
     }

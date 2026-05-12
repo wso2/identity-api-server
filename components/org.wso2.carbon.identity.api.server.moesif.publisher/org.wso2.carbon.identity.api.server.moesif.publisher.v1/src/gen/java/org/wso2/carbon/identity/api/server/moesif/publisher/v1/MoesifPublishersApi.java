@@ -86,7 +86,7 @@ public class MoesifPublishersApi  {
     
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get a Moesif event publisher by name", notes = "", response = MoesifPublisher.class, tags={ "Moesif Publishers", })
+    @ApiOperation(value = "Get Moesif event publisher", notes = "", response = MoesifPublisher.class, tags={ "Moesif Publishers", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful operation", response = MoesifPublisher.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),

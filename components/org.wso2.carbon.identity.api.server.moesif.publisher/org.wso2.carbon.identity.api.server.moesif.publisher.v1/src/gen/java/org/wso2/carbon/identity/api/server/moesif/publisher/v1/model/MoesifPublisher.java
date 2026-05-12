@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.validation.constraints.*;
 
@@ -35,7 +36,8 @@ import javax.xml.bind.annotation.*;
 public class MoesifPublisher  {
   
     private String name;
-    private Map<String, Boolean> publisherTypes = new HashMap<>();
+    private Map<String, Boolean> eventPublisherEnablement = null;
+
 
     /**
     **/
@@ -45,7 +47,7 @@ public class MoesifPublisher  {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(example = "default", value = "")
     @JsonProperty("name")
     @Valid
     public String getName() {
@@ -56,23 +58,34 @@ public class MoesifPublisher  {
     }
 
     /**
-    * Map of publisher type key to current enabled flag.
+    * Map of event publisher key to current enabled flag.
     **/
-    public MoesifPublisher publisherTypes(Map<String, Boolean> publisherTypes) {
+    public MoesifPublisher eventPublisherEnablement(Map<String, Boolean> eventPublisherEnablement) {
 
-        this.publisherTypes = publisherTypes;
+        this.eventPublisherEnablement = eventPublisherEnablement;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "{\"authentication\":true,\"registration\":false,\"flow\":true,\"oauthToken\":true}", value = "Map of event publisher key to current enabled flag.")
+    @JsonProperty("eventPublisherEnablement")
+    @Valid
+    public Map<String, Boolean> getEventPublisherEnablement() {
+        return eventPublisherEnablement;
+    }
+    public void setEventPublisherEnablement(Map<String, Boolean> eventPublisherEnablement) {
+        this.eventPublisherEnablement = eventPublisherEnablement;
+    }
+
+
+    public MoesifPublisher putEventPublisherEnablementItem(String key, Boolean eventPublisherEnablementItem) {
+        if (this.eventPublisherEnablement == null) {
+            this.eventPublisherEnablement = new HashMap<>();
+        }
+        this.eventPublisherEnablement.put(key, eventPublisherEnablementItem);
         return this;
     }
 
-    @ApiModelProperty(value = "Map of publisher type key to current enabled flag.")
-    @JsonProperty("publisherTypes")
-    @Valid
-    public Map<String, Boolean> getPublisherTypes() {
-        return publisherTypes;
-    }
-    public void setPublisherTypes(Map<String, Boolean> publisherTypes) {
-        this.publisherTypes = publisherTypes;
-    }
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -85,12 +98,12 @@ public class MoesifPublisher  {
         }
         MoesifPublisher moesifPublisher = (MoesifPublisher) o;
         return Objects.equals(this.name, moesifPublisher.name) &&
-                Objects.equals(this.publisherTypes, moesifPublisher.publisherTypes);
+            Objects.equals(this.eventPublisherEnablement, moesifPublisher.eventPublisherEnablement);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, publisherTypes);
+        return Objects.hash(name, eventPublisherEnablement);
     }
 
     @Override
@@ -100,7 +113,7 @@ public class MoesifPublisher  {
         sb.append("class MoesifPublisher {\n");
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
-        sb.append("    publisherTypes: ").append(toIndentedString(publisherTypes)).append("\n");
+        sb.append("    eventPublisherEnablement: ").append(toIndentedString(eventPublisherEnablement)).append("\n");
         sb.append("}");
         return sb.toString();
     }
