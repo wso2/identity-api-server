@@ -110,6 +110,11 @@
                 <version>${commons.beanutils.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.consent.mgt</groupId>
+                <artifactId>org.wso2.carbon.consent.mgt.core</artifactId>
+                <version>${carbon.consent.mgt.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.identity.governance</groupId>
                 <artifactId>org.wso2.carbon.identity.recovery</artifactId>
                 <version>${identity.governance.version}</version>
@@ -1098,6 +1103,7 @@
         <apache.felix.scr.ds.annotations.version>1.2.4</apache.felix.scr.ds.annotations.version>
         <workflow.imple.bps.version>5.5.21</workflow.imple.bps.version>
         <carbon.workflow.engine.version>1.0.18</carbon.workflow.engine.version>
+        <carbon.consent.mgt.version>2.9.1</carbon.consent.mgt.version>
 
         <!--<maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>-->
 
@@ -1132,6 +1138,7 @@
 
     <modules>
         <module>components/org.wso2.carbon.identity.api.server.common</module>
+        <module>components/org.wso2.carbon.identity.api.server.consent.management</module>
         <module>components/org.wso2.carbon.identity.api.server.claim.management</module>
         <module>components/org.wso2.carbon.identity.api.server.identity.governance</module>
         <module>components/org.wso2.carbon.identity.api.server.permission.management</module>
