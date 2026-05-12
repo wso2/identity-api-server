@@ -22,7 +22,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.debug.v1.constants.DebugConstants;
-import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionResponse;
+import org.wso2.carbon.identity.api.server.debug.v1.model.DebugResponse;
+import org.wso2.carbon.identity.api.server.debug.v1.model.DebugResponse.StatusEnum;
 import org.wso2.carbon.identity.api.server.debug.v1.model.DebugResult;
 import org.wso2.carbon.identity.api.server.debug.v1.utils.Utils;
 import org.wso2.carbon.identity.debug.framework.DebugFrameworkConstants;
@@ -38,7 +39,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.ws.rs.core.Response;
@@ -51,6 +51,7 @@ public class DebugService {
     private static final Log LOG = LogFactory.getLog(DebugService.class);
     private static final Map<String, List<String>> REQUIRED_PROPERTIES_BY_RESOURCE_TYPE =
             createRequiredPropertiesByResourceType();
+    private static final DebugStatusBuilder STATUS_BUILDER = new DebugStatusBuilder(LOG);
     private final DebugRequestCoordinator coordinator;
 
     public DebugService(DebugRequestCoordinator coordinator) {
@@ -64,17 +65,15 @@ public class DebugService {
      *
      * @param resourceType Path parameter resource type.
      * @param requestBody Debug request payload.
-     * @return DebugConnectionResponse DTO.
+     * @return DebugResponse DTO.
      */
-    public DebugConnectionResponse processStartSession(String resourceType,
-                                                       Map<String, String> requestBody) {
+    public DebugResponse processStartSession(
+            String resourceType, Map<String, String> requestBody) {
 
         try {
-            String normalizedResourceType = normalizeInput(resourceType);
-            Map<String, String> properties = getNormalizedProperties(requestBody);
-            validateRequest(normalizedResourceType, requestBody, properties);
-            Map<String, Object> responseData = handleDebugRequest(normalizedResourceType, properties);
-            return buildDebugConnectionResponse(responseData);
+            validateRequest(resourceType, requestBody);
+            Map<String, Object> responseData = handleDebugRequest(resourceType, requestBody);
+            return buildDebugResponse(responseData);
         } catch (DebugFrameworkException e) {
             throw Utils.handleDebugException(e);
         }
@@ -90,21 +89,20 @@ public class DebugService {
     public DebugResult processGetResult(String debugId) {
 
         try {
-            String normalizedDebugId = normalizeInput(debugId);
-            if (normalizedDebugId == null) {
+            if (StringUtils.isBlank(debugId)) {
                 throw new DebugFrameworkClientException(
                         DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getCode(),
                         DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getMessage(),
                         "Debug ID cannot be null or empty.");
             }
-            Map<String, Object> frameworkResponse = coordinator.getDebugResult(normalizedDebugId);
+            Map<String, Object> frameworkResponse = coordinator.getDebugResult(debugId);
             if (frameworkResponse == null) {
                 throw new DebugFrameworkClientException(
                         DebugFrameworkConstants.ErrorMessages.ERROR_CODE_RESULT_NOT_FOUND.getCode(),
                         DebugFrameworkConstants.ErrorMessages.ERROR_CODE_RESULT_NOT_FOUND.getMessage(),
-                        "Debug result not found for session id: " + normalizedDebugId + ".");
+                        "Debug result not found for session id: " + debugId + ".");
             }
-            return buildDebugResult(frameworkResponse, normalizedDebugId);
+            return buildDebugResult(frameworkResponse, debugId);
         } catch (DebugFrameworkClientException e) {
             if (DebugFrameworkConstants.ErrorMessages.ERROR_CODE_RESULT_NOT_FOUND.getCode()
                     .equals(e.getErrorCode())) {
@@ -124,7 +122,7 @@ public class DebugService {
      * Sends a debug request to the coordinator and returns a safe copy of the response data.
      *
      * @param resourceType Resource type from path parameter.
-     * @param properties Normalized properties map.
+     * @param properties Request properties map.
      * @return Response data map (safe copy, never null).
      * @throws DebugFrameworkClientException if the framework encounters a client error.
      * @throws DebugFrameworkServerException if the framework encounters a server error.
@@ -136,17 +134,12 @@ public class DebugService {
         DebugRequest debugRequest = new DebugRequest();
         debugRequest.setResourceType(resourceType);
 
-        for (Map.Entry<String, String> entry : properties.entrySet()) {
+        Map<String, String> requestProperties = properties != null ? properties : Collections.emptyMap();
+        for (Map.Entry<String, String> entry : requestProperties.entrySet()) {
             debugRequest.addContextProperty(entry.getKey(), entry.getValue());
         }
 
         DebugResponse response = coordinator.handleDebugRequest(debugRequest);
-        if (response == null) {
-            throw new DebugFrameworkServerException(
-                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_SERVER_ERROR.getCode(),
-                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_SERVER_ERROR.getMessage(),
-                    "Debug framework returned an empty response.");
-        }
 
         // Copy framework response into a new map to avoid mutating framework-owned data.
         Map<String, Object> responseData = new HashMap<>();
@@ -154,22 +147,25 @@ public class DebugService {
             responseData.putAll(response.getData());
         }
         responseData.putIfAbsent(DebugConstants.ResponseKeys.STATUS,
-                deriveStatus(response.isSuccess()));
+                STATUS_BUILDER.buildDebugStatus(
+                        responseData.get(DebugConstants.ResponseKeys.STATUS),
+                        response.isSuccess()).name());
 
         return responseData;
     }
 
     /**
-     * Builds a DebugConnectionResponse DTO from the framework response data map.
+     * Builds a DebugResponse DTO from the framework response data map.
      *
      * @param responseData Framework response data.
-     * @return DebugConnectionResponse DTO.
+     * @return DebugResponse DTO.
      * @throws DebugFrameworkServerException if required fields are missing.
      */
-    private DebugConnectionResponse buildDebugConnectionResponse(Map<String, Object> responseData)
+    private DebugResponse buildDebugResponse( Map<String, Object> responseData)
             throws DebugFrameworkServerException {
 
-        DebugConnectionResponse response = new DebugConnectionResponse();
+        DebugResponse response =
+                new DebugResponse();
 
         Object debugId = resolveDebugId(responseData, null);
         if (debugId == null) {
@@ -180,10 +176,11 @@ public class DebugService {
         }
         response.setDebugId(debugId.toString());
 
-        DebugConnectionResponse.StatusEnum status =
-                resolveConnectionStatus(responseData.get(DebugConstants.ResponseKeys.STATUS));
+        StatusEnum status =
+                STATUS_BUILDER.buildDebugStatus(
+                        responseData.get(DebugConstants.ResponseKeys.STATUS), null);
         response.setStatus(status);
-        response.setMessage(resolveConnectionMessage(
+        response.setMessage(resolveDebugMessage(
                 status, responseData.get(DebugConstants.ResponseKeys.MESSAGE)));
 
         Map<String, Object> metadata = new LinkedHashMap<>();
@@ -212,7 +209,7 @@ public class DebugService {
      * @return DebugResult DTO.
      */
     private DebugResult buildDebugResult(Map<String, Object> frameworkResponse,
-                                         String requestedDebugId) {
+            String requestedDebugId) {
 
         DebugResult response = new DebugResult();
 
@@ -221,7 +218,7 @@ public class DebugService {
             response.setDebugId(debugId.toString());
         }
 
-        DebugResult.StatusEnum status = resolveResultStatus(
+        DebugResult.StatusEnum status = STATUS_BUILDER.buildResultStatus(
                 frameworkResponse.get(DebugConstants.ResponseKeys.STATUS),
                 frameworkResponse.get(DebugConstants.ResponseKeys.SUCCESS));
         response.setStatus(status);
@@ -245,63 +242,13 @@ public class DebugService {
     }
 
     /**
-     * Resolves the StatusEnum from the raw status object, defaulting to FAILURE for unknown values.
-     *
-     * @param status Raw status object from framework response.
-     * @return Resolved StatusEnum.
-     */
-    private DebugConnectionResponse.StatusEnum resolveConnectionStatus(Object status) {
-
-        if (status == null) {
-            return DebugConnectionResponse.StatusEnum.SUCCESS;
-        }
-        String statusValue = status.toString().toUpperCase(Locale.ROOT);
-        for (DebugConnectionResponse.StatusEnum candidate : DebugConnectionResponse.StatusEnum.values()) {
-            if (candidate.name().equals(statusValue)) {
-                return candidate;
-            }
-        }
-        LOG.warn("Unrecognized debug connection status from framework: " + status
-                + ". Falling back to FAILURE.");
-        return DebugConnectionResponse.StatusEnum.FAILURE;
-    }
-
-    /**
-     * Resolves the result StatusEnum from both status string and boolean success flag.
-     * FAILURE is the safer default for unrecognized statuses to avoid masking errors.
-     *
-     * @param status Raw status object from framework response.
-     * @param success Raw success flag object from framework response.
-     * @return Resolved StatusEnum.
-     */
-    private DebugResult.StatusEnum resolveResultStatus(Object status, Object success) {
-
-        if (status != null) {
-            String statusValue = status.toString().toUpperCase(Locale.ROOT);
-            for (DebugResult.StatusEnum candidate : DebugResult.StatusEnum.values()) {
-                if (candidate.name().equals(statusValue)) {
-                    return candidate;
-                }
-            }
-            LOG.warn("Unrecognized debug result status from framework: " + status + ". Falling back to FAILURE.");
-        }
-
-        if (success instanceof Boolean) {
-            return (Boolean) success ? DebugResult.StatusEnum.SUCCESS : DebugResult.StatusEnum.FAILURE;
-        }
-
-        return DebugResult.StatusEnum.FAILURE;
-    }
-
-    /**
      * Resolves the response message for a connection response.
      *
      * @param status Resolved status enum.
      * @param frameworkMessage Raw message from framework.
      * @return Message string.
      */
-    private String resolveConnectionMessage(DebugConnectionResponse.StatusEnum status,
-                                            Object frameworkMessage) {
+    private String resolveDebugMessage(StatusEnum status, Object frameworkMessage) {
 
         String normalizedMessage = frameworkMessage != null
                 ? StringUtils.trimToNull(frameworkMessage.toString()) : null;
@@ -311,7 +258,10 @@ public class DebugService {
         switch (status) {
             case FAILURE:
                 return "Debug session execution failed";
-            case SUCCESS:
+            case SUCCESS_COMPLETE:
+                return "Debug session executed successfully";
+            case SUCCESS_INCOMPLETE:
+                return "Debug session started successfully and is awaiting completion";
             default:
                 return "Debug session executed successfully";
         }
@@ -333,25 +283,15 @@ public class DebugService {
         }
         switch (status) {
             case IN_PROGRESS:
+            case SUCCESS_INCOMPLETE:
                 return "Debug session is in progress";
+            case SUCCESS_COMPLETE:
             case SUCCESS:
                 return "Debug session retrieved successfully.";
             case FAILURE:
             default:
                 return "Debug session retrieval failed.";
         }
-    }
-
-    /**
-     * Derives a status string when the framework omits the explicit status field.
-     *
-     * @param success Framework response success flag.
-     * @return SUCCESS or FAILURE string.
-     */
-    private String deriveStatus(boolean success) {
-
-        return success ? DebugConnectionResponse.StatusEnum.SUCCESS.name()
-                : DebugConnectionResponse.StatusEnum.FAILURE.name();
     }
 
     private Object resolveDebugId(Map<String, Object> responseData, String fallbackDebugId) {
@@ -363,33 +303,26 @@ public class DebugService {
         return debugId;
     }
 
+    // Temporary until we support more resource types and validation rules.
     private static Map<String, List<String>> createRequiredPropertiesByResourceType() {
 
         Map<String, List<String>> requiredPropertiesByResourceType = new HashMap<>();
         requiredPropertiesByResourceType.put(DebugConstants.ResourceType.IDP,
-                Arrays.asList(DebugConstants.CONNECTION_ID_KEY));
+                Arrays.asList(DebugConstants.CONNECTION_ID));
         return Collections.unmodifiableMap(requiredPropertiesByResourceType);
     }
 
     /**
      * Validates the debug start session request.
      *
-     * @param resourceType Normalized resource type.
+     * @param resourceType Resource type.
      * @param requestBody Request body.
-     * @param properties Normalized properties map.
      * @throws DebugFrameworkClientException if validation fails.
      */
+    //TODO: fix the validations.
     private void validateRequest(String resourceType,
-                                 Map<String, String> requestBody,
-                                 Map<String, String> properties)
+                                 Map<String, String> requestBody)
             throws DebugFrameworkClientException {
-
-        if (StringUtils.isBlank(resourceType)) {
-            throw new DebugFrameworkClientException(
-                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_MISSING_RESOURCE_TYPE.getCode(),
-                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_MISSING_RESOURCE_TYPE.getMessage(),
-                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_MISSING_RESOURCE_TYPE.getDescription());
-        }
 
         List<String> requiredProperties = REQUIRED_PROPERTIES_BY_RESOURCE_TYPE.get(resourceType);
         if (requiredProperties == null) {
@@ -400,7 +333,7 @@ public class DebugService {
                             + String.join(", ", REQUIRED_PROPERTIES_BY_RESOURCE_TYPE.keySet()) + ".");
         }
 
-        if (requestBody == null && !requiredProperties.isEmpty()) {
+        if (requestBody == null && requiredProperties.isEmpty()) {
             throw new DebugFrameworkClientException(
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getCode(),
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getMessage(),
@@ -408,40 +341,12 @@ public class DebugService {
         }
 
         for (String requiredProperty : requiredProperties) {
-            if (!properties.containsKey(requiredProperty)) {
+            if (requestBody == null || !requestBody.containsKey(requiredProperty)) {
                 throw new DebugFrameworkClientException(
                         DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getCode(),
                         DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getMessage(),
                         "Missing required property: " + requiredProperty + ".");
             }
         }
-    }
-
-    /**
-     * Normalizes and filters properties from the request, removing null/blank keys and values.
-     *
-     * @param requestBody Request body.
-     * @return Normalized properties map, never null.
-     */
-    private Map<String, String> getNormalizedProperties(Map<String, String> requestBody) {
-
-        if (requestBody == null) {
-            return new HashMap<>();
-        }
-
-        Map<String, String> normalized = new HashMap<>();
-        for (Map.Entry<String, String> entry : requestBody.entrySet()) {
-            String key = normalizeInput(entry.getKey());
-            String value = normalizeInput(entry.getValue());
-            if (key != null && value != null) {
-                normalized.put(key, value);
-            }
-        }
-        return normalized;
-    }
-
-    private String normalizeInput(String value) {
-
-        return StringUtils.trimToNull(value);
     }
 }

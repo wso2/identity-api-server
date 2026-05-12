@@ -23,8 +23,8 @@ package org.wso2.carbon.identity.api.server.debug.v1.constants;
  */
 public class DebugConstants {
 
-    public static final String DEBUG_PREFIX = "DBG-";
-    public static final String CONNECTION_ID_KEY = "connectionId";
+    public static final String DEBUG_PREFIX = "DSM-";
+    public static final String CONNECTION_ID = "connectionId";
 
     private DebugConstants() {
         // Prevent instantiation.

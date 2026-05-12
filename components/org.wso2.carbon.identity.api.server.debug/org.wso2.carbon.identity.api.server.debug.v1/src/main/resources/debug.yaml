@@ -68,7 +68,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DebugConnectionResponse"
+                $ref: "#/components/schemas/DebugResponse"
         '400':
           description: "Bad Request"
           content:
@@ -207,9 +207,9 @@ components:
     # ---------------------------------
     # Debug Request/Response Models
     # ---------------------------------
-    DebugConnectionResponse:
+    DebugResponse:
       type: object
-      description: "Debug connection response containing generic debug information and resource-specific metadata."
+      description: "Debug response containing generic debug information and resource-specific metadata."
       properties:
         debugId:
           type: string
@@ -218,7 +218,7 @@ components:
         status:
           type: string
           description: "Status of the debug operation."
-          enum: ["SUCCESS", "FAILURE"]
+          enum: ["SUCCESS", "SUCCESS_INCOMPLETE", "SUCCESS_COMPLETE", "FAILURE"]
           example: "SUCCESS"
         message:
           type: string
@@ -249,7 +249,7 @@ components:
         status:
           type: string
           description: "Status of the debug operation."
-          enum: ["SUCCESS", "IN_PROGRESS", "FAILURE"]
+          enum: ["SUCCESS", "SUCCESS_INCOMPLETE", "SUCCESS_COMPLETE", "IN_PROGRESS", "FAILURE"]
           example: "SUCCESS"
         message:
           type: string

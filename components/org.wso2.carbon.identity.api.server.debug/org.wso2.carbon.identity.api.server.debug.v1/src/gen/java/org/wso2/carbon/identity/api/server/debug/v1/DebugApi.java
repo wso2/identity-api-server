@@ -23,7 +23,7 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 
-import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionResponse;
+import org.wso2.carbon.identity.api.server.debug.v1.model.DebugResponse;
 import org.wso2.carbon.identity.api.server.debug.v1.model.DebugResult;
 import org.wso2.carbon.identity.api.server.debug.v1.model.Error;
 import java.util.Map;
@@ -77,14 +77,14 @@ public class DebugApi  {
     @Path("/{resourceType}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Start Debug Session", notes = "Initiates a debug session for supported resource types with configurable properties.", response = DebugConnectionResponse.class, authorizations = {
+    @ApiOperation(value = "Start Debug Session", notes = "Initiates a debug session for supported resource types with configurable properties.", response = DebugResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             @AuthorizationScope(scope = "internal_debug_mgt_update", description = "Create and manage debug sessions")
         })
     }, tags={ "Debug" })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Debug session executed successfully.", response = DebugConnectionResponse.class),
+        @ApiResponse(code = 200, message = "Debug session executed successfully.", response = DebugResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Error.class),

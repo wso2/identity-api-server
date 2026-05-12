@@ -28,15 +28,15 @@ import java.util.Map;
 import javax.validation.constraints.*;
 
 /**
- * Debug connection response containing generic debug information and resource-specific metadata.
+ * Debug response containing generic debug information and resource-specific metadata.
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "Debug connection response containing generic debug information and resource-specific metadata.")
-public class DebugConnectionResponse  {
+@ApiModel(description = "Debug response containing generic debug information and resource-specific metadata.")
+public class DebugResponse  {
   
     private String debugId;
 
@@ -44,7 +44,7 @@ public class DebugConnectionResponse  {
 @XmlEnum(String.class)
 public enum StatusEnum {
 
-    @XmlEnumValue("SUCCESS") SUCCESS(String.valueOf("SUCCESS")), @XmlEnumValue("FAILURE") FAILURE(String.valueOf("FAILURE"));
+    @XmlEnumValue("SUCCESS") SUCCESS(String.valueOf("SUCCESS")), @XmlEnumValue("SUCCESS_INCOMPLETE") SUCCESS_INCOMPLETE(String.valueOf("SUCCESS_INCOMPLETE")), @XmlEnumValue("SUCCESS_COMPLETE") SUCCESS_COMPLETE(String.valueOf("SUCCESS_COMPLETE")), @XmlEnumValue("FAILURE") FAILURE(String.valueOf("FAILURE"));
 
 
     private String value;
@@ -80,7 +80,7 @@ public enum StatusEnum {
     /**
     * Debug session identifier.
     **/
-    public DebugConnectionResponse debugId(String debugId) {
+    public DebugResponse debugId(String debugId) {
 
         this.debugId = debugId;
         return this;
@@ -99,7 +99,7 @@ public enum StatusEnum {
     /**
     * Status of the debug operation.
     **/
-    public DebugConnectionResponse status(StatusEnum status) {
+    public DebugResponse status(StatusEnum status) {
 
         this.status = status;
         return this;
@@ -118,7 +118,7 @@ public enum StatusEnum {
     /**
     * Generic response message.
     **/
-    public DebugConnectionResponse message(String message) {
+    public DebugResponse message(String message) {
 
         this.message = message;
         return this;
@@ -137,7 +137,7 @@ public enum StatusEnum {
     /**
     * Resource-specific metadata. Includes any framework-returned fields other than top-level debugId, status, message, and success.
     **/
-    public DebugConnectionResponse metadata(Map<String, Object> metadata) {
+    public DebugResponse metadata(Map<String, Object> metadata) {
 
         this.metadata = metadata;
         return this;
@@ -154,7 +154,7 @@ public enum StatusEnum {
     }
 
 
-    public DebugConnectionResponse putMetadataItem(String key, Object metadataItem) {
+    public DebugResponse putMetadataItem(String key, Object metadataItem) {
         if (this.metadata == null) {
             this.metadata = new HashMap<String, Object>();
         }
@@ -173,11 +173,11 @@ public enum StatusEnum {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        DebugConnectionResponse debugConnectionResponse = (DebugConnectionResponse) o;
-        return Objects.equals(this.debugId, debugConnectionResponse.debugId) &&
-            Objects.equals(this.status, debugConnectionResponse.status) &&
-            Objects.equals(this.message, debugConnectionResponse.message) &&
-            Objects.equals(this.metadata, debugConnectionResponse.metadata);
+        DebugResponse debugResponse = (DebugResponse) o;
+        return Objects.equals(this.debugId, debugResponse.debugId) &&
+            Objects.equals(this.status, debugResponse.status) &&
+            Objects.equals(this.message, debugResponse.message) &&
+            Objects.equals(this.metadata, debugResponse.metadata);
     }
 
     @Override
@@ -189,7 +189,7 @@ public enum StatusEnum {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class DebugConnectionResponse {\n");
+        sb.append("class DebugResponse {\n");
         
         sb.append("    debugId: ").append(toIndentedString(debugId)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
