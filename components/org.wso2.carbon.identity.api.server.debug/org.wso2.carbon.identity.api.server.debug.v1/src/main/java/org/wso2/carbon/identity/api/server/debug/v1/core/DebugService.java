@@ -23,7 +23,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.debug.v1.constants.DebugConstants;
 import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionResponse;
-import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionResponseMetadata;
 import org.wso2.carbon.identity.api.server.debug.v1.model.DebugResult;
 import org.wso2.carbon.identity.api.server.debug.v1.utils.Utils;
 import org.wso2.carbon.identity.debug.framework.DebugFrameworkConstants;
@@ -136,7 +135,6 @@ public class DebugService {
 
         DebugRequest debugRequest = new DebugRequest();
         debugRequest.setResourceType(resourceType);
-        debugRequest.setConnectionId(properties.get(DebugConstants.CONNECTION_ID_KEY));
 
         for (Map.Entry<String, String> entry : properties.entrySet()) {
             debugRequest.addContextProperty(entry.getKey(), entry.getValue());
@@ -188,10 +186,18 @@ public class DebugService {
         response.setMessage(resolveConnectionMessage(
                 status, responseData.get(DebugConstants.ResponseKeys.MESSAGE)));
 
-        Object authorizationUrl = responseData.get(DebugConstants.ResponseKeys.AUTHORIZATION_URL);
-        if (authorizationUrl != null) {
-            DebugConnectionResponseMetadata metadata = new DebugConnectionResponseMetadata();
-            metadata.setAuthorizationUrl(authorizationUrl.toString());
+        Map<String, Object> metadata = new LinkedHashMap<>();
+        for (Map.Entry<String, Object> entry : responseData.entrySet()) {
+            String key = entry.getKey();
+            if (!DebugConstants.ResponseKeys.DEBUG_ID.equals(key)
+                    && !DebugConstants.ResponseKeys.STATUS.equals(key)
+                    && !DebugConstants.ResponseKeys.MESSAGE.equals(key)
+                    && !DebugConstants.ResponseKeys.SUCCESS.equals(key)) {
+                metadata.put(key, entry.getValue());
+            }
+        }
+
+        if (!metadata.isEmpty()) {
             response.setMetadata(metadata);
         }
 

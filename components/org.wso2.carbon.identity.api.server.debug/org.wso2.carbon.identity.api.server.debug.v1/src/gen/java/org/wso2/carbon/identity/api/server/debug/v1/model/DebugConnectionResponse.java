@@ -1,17 +1,17 @@
-/**
- * Copyright (c) 2026, WSO2 LLC. (https://www.wso2.com).
+/*
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
+ * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
  */
@@ -22,7 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.wso2.carbon.identity.api.server.debug.v1.model.DebugConnectionResponseMetadata;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.validation.constraints.*;
 
 /**
@@ -72,7 +74,8 @@ public enum StatusEnum {
 
     private StatusEnum status;
     private String message;
-    private DebugConnectionResponseMetadata metadata;
+    private Map<String, Object> metadata = null;
+
 
     /**
     * Debug session identifier.
@@ -132,24 +135,34 @@ public enum StatusEnum {
     }
 
     /**
+    * Resource-specific metadata. Includes any framework-returned fields other than top-level debugId, status, message, and success.
     **/
-    public DebugConnectionResponse metadata(DebugConnectionResponseMetadata metadata) {
+    public DebugConnectionResponse metadata(Map<String, Object> metadata) {
 
         this.metadata = metadata;
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(example = "{\"authorizationUrl\":\"https://api.asgardeo.io/t/linuka/oauth2/authorize?response_type=code&client_id=lfrTEyDGHBEUbeBKoiaosz1y8Aca&redirect_uri=https%3A%2F%2Flocalhost%3A9443%2Fcommonauth\",\"resourceName\":\"google-oidc\"}", value = "Resource-specific metadata. Includes any framework-returned fields other than top-level debugId, status, message, and success.")
     @JsonProperty("metadata")
     @Valid
-    public DebugConnectionResponseMetadata getMetadata() {
+    public Map<String, Object> getMetadata() {
         return metadata;
     }
-    public void setMetadata(DebugConnectionResponseMetadata metadata) {
+    public void setMetadata(Map<String, Object> metadata) {
         this.metadata = metadata;
     }
 
 
+    public DebugConnectionResponse putMetadataItem(String key, Object metadataItem) {
+        if (this.metadata == null) {
+            this.metadata = new HashMap<String, Object>();
+        }
+        this.metadata.put(key, metadataItem);
+        return this;
+    }
+
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -198,3 +211,4 @@ public enum StatusEnum {
         return o.toString().replace("\n", "\n");
     }
 }
+
