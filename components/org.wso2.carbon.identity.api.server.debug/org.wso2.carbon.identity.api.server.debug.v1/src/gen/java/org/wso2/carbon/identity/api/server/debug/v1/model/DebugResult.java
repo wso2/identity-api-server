@@ -44,7 +44,7 @@ public class DebugResult  {
 @XmlEnum(String.class)
 public enum StatusEnum {
 
-    @XmlEnumValue("SUCCESS") SUCCESS(String.valueOf("SUCCESS")), @XmlEnumValue("SUCCESS_INCOMPLETE") SUCCESS_INCOMPLETE(String.valueOf("SUCCESS_INCOMPLETE")), @XmlEnumValue("SUCCESS_COMPLETE") SUCCESS_COMPLETE(String.valueOf("SUCCESS_COMPLETE")), @XmlEnumValue("IN_PROGRESS") IN_PROGRESS(String.valueOf("IN_PROGRESS")), @XmlEnumValue("FAILURE") FAILURE(String.valueOf("FAILURE"));
+    @XmlEnumValue("SUCCESS_INCOMPLETE") SUCCESS_INCOMPLETE(String.valueOf("SUCCESS_INCOMPLETE")), @XmlEnumValue("SUCCESS_COMPLETE") SUCCESS_COMPLETE(String.valueOf("SUCCESS_COMPLETE")), @XmlEnumValue("FAILURE") FAILURE(String.valueOf("FAILURE"));
 
 
     private String value;
@@ -107,7 +107,7 @@ public enum StatusEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "SUCCESS", required = true, value = "Status of the debug operation.")
+    @ApiModelProperty(example = "SUCCESS_INCOMPLETE", required = true, value = "Status of the debug operation.")
     @JsonProperty("status")
     @Valid
     @NotNull(message = "Property status cannot be null.")

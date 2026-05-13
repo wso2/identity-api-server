@@ -46,6 +46,7 @@ import javax.ws.rs.core.Response;
  */
 public class DebugService {
 
+    private static final int MAX_REQUEST_PROPERTY_VALUE_LENGTH = 255;
     private static final Log LOG = LogFactory.getLog(DebugService.class);
     private static final Map<String, List<String>> REQUIRED_PROPERTIES_BY_RESOURCE_TYPE =
             createRequiredPropertiesByResourceType();
@@ -71,7 +72,7 @@ public class DebugService {
         try {
             validateRequest(resourceType, requestBody);
             Map<String, Object> responseData = handleDebugRequest(resourceType, requestBody);
-            return buildDebugResponse(resourceType, responseData);
+            return buildDebugResponse(responseData);
         } catch (DebugFrameworkException e) {
             throw Utils.handleDebugException(e);
         }
@@ -160,11 +161,10 @@ public class DebugService {
      * @return DebugResponse DTO.
      * @throws DebugFrameworkServerException if required fields are missing.
      */
-    private DebugResponse buildDebugResponse(String resourceType, Map<String, Object> responseData)
+    private DebugResponse buildDebugResponse(Map<String, Object> responseData)
             throws DebugFrameworkServerException {
 
-        DebugResponse response =
-                new DebugResponse();
+        DebugResponse response = new DebugResponse();
 
         Object debugId = resolveDebugId(responseData, null);
         if (debugId == null) {
@@ -182,8 +182,8 @@ public class DebugService {
         response.setMessage(resolveDebugMessage(
                 status, responseData.get(DebugConstants.ResponseKeys.MESSAGE)));
 
-        Map<String, Object> metadata = buildStartResponseMetadata(resourceType, responseData);
-
+        // Build metadata: Framework provides only approved metadata fields.
+        Map<String, Object> metadata = buildMetadataFromFrameworkResponse(responseData);
         if (!metadata.isEmpty()) {
             response.setMetadata(metadata);
         }
@@ -215,7 +215,7 @@ public class DebugService {
         response.setMessage(resolveResultMessage(
                 status, frameworkResponse.get(DebugConstants.ResponseKeys.MESSAGE)));
 
-        // Build metadata: preserve framework-specific keys except fields extracted to the top level.
+        // Build metadata: preserve framework-specific keys except fields extracted to the top level
         Map<String, Object> metadata = new LinkedHashMap<>();
         for (Map.Entry<String, Object> entry : frameworkResponse.entrySet()) {
             String key = entry.getKey();
@@ -232,33 +232,24 @@ public class DebugService {
     }
 
     /**
-     * Builds API metadata for the start-session response.
-     * The API layer exposes only contract-approved fields instead of forwarding
-     * all framework data directly.
+     * Builds metadata from framework response.
+     * Extracts all framework-provided metadata except top-level response fields.
+     * The framework is responsible for including only contract-approved metadata.
      *
-     * @param resourceType Resource type of the debug request.
      * @param responseData Framework response data.
-     * @return Curated metadata map for the API response.
+     * @return Metadata map for API response.
      */
-    private Map<String, Object> buildStartResponseMetadata(String resourceType, Map<String, Object> responseData) {
+    private Map<String, Object> buildMetadataFromFrameworkResponse(
+            Map<String, Object> responseData) {
 
         Map<String, Object> metadata = new LinkedHashMap<>();
-        if (DebugConstants.ResourceType.IDP.equals(resourceType)) {
-            Object authorizationUrl = responseData.get(DebugConstants.ResponseKeys.AUTHORIZATION_URL);
-            if (authorizationUrl != null) {
-                metadata.put(DebugConstants.ResponseKeys.AUTHORIZATION_URL, authorizationUrl);
-            }
-            return metadata;
-        }
-
         for (Map.Entry<String, Object> entry : responseData.entrySet()) {
             String key = entry.getKey();
+            // Exclude framework management fields that are exposed at top level
+            // or internal framework fields not intended for API exposure.
             if (!DebugConstants.ResponseKeys.DEBUG_ID.equals(key)
                     && !DebugConstants.ResponseKeys.STATUS.equals(key)
-                    && !DebugConstants.ResponseKeys.MESSAGE.equals(key)
-                    && !DebugConstants.ResponseKeys.SUCCESS.equals(key)
-                    && !"successful".equals(key)
-                    && !"timestamp".equals(key)) {
+                    && !DebugConstants.ResponseKeys.MESSAGE.equals(key)) {
                 metadata.put(key, entry.getValue());
             }
         }
@@ -284,9 +275,9 @@ public class DebugService {
             case FAILURE:
                 return "Debug session execution failed";
             case SUCCESS_COMPLETE:
-                return "Debug session executed successfully";
+                return "Debug session completed successfully";
             case SUCCESS_INCOMPLETE:
-                return "Debug session started successfully and is awaiting completion";
+                return "Debug session started executed and is awaiting completion";
             default:
                 return "Debug session executed successfully";
         }
@@ -307,11 +298,9 @@ public class DebugService {
             return normalizedMessage;
         }
         switch (status) {
-            case IN_PROGRESS:
             case SUCCESS_INCOMPLETE:
                 return "Debug session is in progress";
             case SUCCESS_COMPLETE:
-            case SUCCESS:
                 return "Debug session retrieved successfully.";
             case FAILURE:
             default:
@@ -328,7 +317,7 @@ public class DebugService {
         return debugId;
     }
 
-    // Temporary until we support more resource types and validation rules.
+    // Note: Add new resource types to REQUIRED_PROPERTIES_BY_RESOURCE_TYPE and validate in validateRequest().
     private static Map<String, List<String>> createRequiredPropertiesByResourceType() {
 
         Map<String, List<String>> requiredPropertiesByResourceType = new HashMap<>();
@@ -347,6 +336,13 @@ public class DebugService {
     private void validateRequest(String resourceType,
                                  Map<String, String> requestBody)
             throws DebugFrameworkClientException {
+        
+        if (!REQUIRED_PROPERTIES_BY_RESOURCE_TYPE.containsKey(resourceType)) {
+            throw new DebugFrameworkClientException(
+                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getCode(),
+                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getMessage(),
+                    "Unsupported resource type: " + resourceType + ".");
+        }
 
         List<String> requiredProperties = REQUIRED_PROPERTIES_BY_RESOURCE_TYPE.get(resourceType);
         if (requiredProperties == null || requiredProperties.isEmpty()) {
@@ -361,7 +357,7 @@ public class DebugService {
         }
 
         for (String requiredProperty : requiredProperties) {
-            if (requestBody == null || !requestBody.containsKey(requiredProperty)) {
+            if (!requestBody.containsKey(requiredProperty)) {
                 throw new DebugFrameworkClientException(
                         DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getCode(),
                         DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getMessage(),

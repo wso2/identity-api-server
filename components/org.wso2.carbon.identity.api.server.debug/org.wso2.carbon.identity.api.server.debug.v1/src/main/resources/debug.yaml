@@ -76,7 +76,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
               example:
-                code: "DBG-60101"
+                code: "DSM-60101"
                 message: "Invalid request."
                 description: "Request validation failed."
         '401':
@@ -98,7 +98,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
               example:
-                code: "DBG-65101"
+                code: "DSM-65101"
                 message: "Error processing request."
                 description: "Error occurred while processing the debug request."
 
@@ -134,7 +134,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
               example:
-                code: "DBG-60101"
+                code: "DSM-60101"
                 message: "Invalid request."
                 description: "Request validation failed."
         '401':
@@ -150,7 +150,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
               example:
-                code: "DBG-60102"
+                code: "DSM-60102"
                 message: "Debug result not found."
                 description: "No debug result exists for the provided session id."
         '500':
@@ -160,7 +160,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
               example:
-                code: "DBG-65101"
+                code: "DSM-65101"
                 message: "Error processing request."
                 description: "Error occurred while processing the debug request."
 
@@ -192,9 +192,9 @@ components:
       properties:
         code:
           type: string
-          pattern: "^DBG-[0-9]{5}$"
-          example: "DBG-60101"
-          description: "An error code in DBG-prefixed format."
+          pattern: "^DSM-[0-9]{5}$"
+          example: "DSM-60101"
+          description: "An error code in DSM-prefixed format."
         message:
           type: string
           example: "Invalid request."
@@ -248,8 +248,8 @@ components:
         status:
           type: string
           description: "Status of the debug operation."
-          enum: ["SUCCESS", "SUCCESS_INCOMPLETE", "SUCCESS_COMPLETE", "IN_PROGRESS", "FAILURE"]
-          example: "SUCCESS"
+          enum: ["SUCCESS_INCOMPLETE", "SUCCESS_COMPLETE", "FAILURE"]
+          example: "SUCCESS_INCOMPLETE"
         message:
           type: string
           description: "Generic response message."
