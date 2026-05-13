@@ -238,14 +238,13 @@ public class ConsentManagementService {
             }
             if (!isFirstPage) {
                 String encodedString = Base64.getEncoder().encodeToString(
-                        String.valueOf(receipts.get(0).getConsentTimestamp()).getBytes(StandardCharsets.UTF_8));
+                        receipts.get(0).getCursor().getBytes(StandardCharsets.UTF_8));
                 links.add(buildPaginationLink(url + "&" + FilterConstants.FILTER_ATTR_BEFORE + "=" + encodedString,
                         ConsentManagementConstants.LINK_REL_PREVIOUS));
             }
             if (!isLastPage) {
                 String encodedString = Base64.getEncoder().encodeToString(
-                        String.valueOf(receipts.get(receipts.size() - 1).getConsentTimestamp())
-                                .getBytes(StandardCharsets.UTF_8));
+                        receipts.get(receipts.size() - 1).getCursor().getBytes(StandardCharsets.UTF_8));
                 links.add(buildPaginationLink(url + "&" + FilterConstants.FILTER_ATTR_AFTER + "=" + encodedString,
                         ConsentManagementConstants.LINK_REL_NEXT));
             }
