@@ -147,9 +147,7 @@ public class DebugService {
             responseData.putAll(frameworkResponse.getData());
         }
         responseData.putIfAbsent(DebugConstants.ResponseKeys.STATUS,
-                STATUS_BUILDER.buildDebugStatus(
-                        responseData.get(DebugConstants.ResponseKeys.STATUS),
-                        frameworkResponse.isSuccess()).name());
+                resolveStartSessionStatus(responseData).name());
 
         return responseData;
     }
@@ -191,6 +189,12 @@ public class DebugService {
         return response;
     }
 
+    private DebugResponse.StatusEnum resolveStartSessionStatus(Map<String, Object> responseData) {
+
+        Object status = responseData.get(DebugConstants.ResponseKeys.STATUS);
+        return STATUS_BUILDER.buildDebugStatus(status, null);
+    }
+
     /**
      * Builds a DebugResult DTO from the framework response data map.
      *
@@ -219,10 +223,7 @@ public class DebugService {
         Map<String, Object> metadata = new LinkedHashMap<>();
         for (Map.Entry<String, Object> entry : frameworkResponse.entrySet()) {
             String key = entry.getKey();
-            if (!DebugConstants.ResponseKeys.STATUS.equals(key)
-                    && !DebugConstants.ResponseKeys.SUCCESS.equals(key)
-                    && !DebugConstants.ResponseKeys.DEBUG_ID.equals(key)
-                    && !DebugConstants.ResponseKeys.MESSAGE.equals(key)) {
+            if (!isFrameworkInternalKey(key)) {
                 metadata.put(key, entry.getValue());
             }
         }
@@ -245,15 +246,19 @@ public class DebugService {
         Map<String, Object> metadata = new LinkedHashMap<>();
         for (Map.Entry<String, Object> entry : responseData.entrySet()) {
             String key = entry.getKey();
-            // Exclude framework management fields that are exposed at top level
-            // or internal framework fields not intended for API exposure.
-            if (!DebugConstants.ResponseKeys.DEBUG_ID.equals(key)
-                    && !DebugConstants.ResponseKeys.STATUS.equals(key)
-                    && !DebugConstants.ResponseKeys.MESSAGE.equals(key)) {
+            // Exclude framework management fields that are exposed at top level.
+            if (!isFrameworkInternalKey(key)) {
                 metadata.put(key, entry.getValue());
             }
         }
         return metadata;
+    }
+
+    private boolean isFrameworkInternalKey(String key) {
+
+        return DebugConstants.ResponseKeys.DEBUG_ID.equals(key)
+                || DebugConstants.ResponseKeys.STATUS.equals(key)
+                || DebugConstants.ResponseKeys.MESSAGE.equals(key);
     }
 
     /**
