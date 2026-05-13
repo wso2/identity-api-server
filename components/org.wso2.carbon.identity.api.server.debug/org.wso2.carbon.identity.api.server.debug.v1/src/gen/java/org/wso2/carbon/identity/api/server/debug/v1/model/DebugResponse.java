@@ -28,14 +28,14 @@ import java.util.Map;
 import javax.validation.constraints.*;
 
 /**
- * Debug response containing generic debug information and resource-specific metadata.
+ * Debug response containing generic debug information and API-curated resource-specific metadata.
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "Debug response containing generic debug information and resource-specific metadata.")
+@ApiModel(description = "Debug response containing generic debug information and API-curated resource-specific metadata.")
 public class DebugResponse  {
   
     private String debugId;
@@ -143,7 +143,7 @@ public enum StatusEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "{\"authorizationUrl\":\"https://api.asgardeo.io/t/linuka/oauth2/authorize?response_type=code&client_id=lfrTEyDGHBEUbeBKoiaosz1y8Aca&redirect_uri=https%3A%2F%2Flocalhost%3A9443%2Fcommonauth\",\"resourceName\":\"google-oidc\"}", value = "Resource-specific metadata. Includes any framework-returned fields other than top-level debugId, status, message, and success.")
+    @ApiModelProperty(example = "{\"authorizationUrl\":\"https://api.asgardeo.io/t/linuka/oauth2/authorize?response_type=code&client_id=lfrTEyDGHBEUbeBKoiaosz1y8Aca&redirect_uri=https%3A%2F%2Flocalhost%3A9443%2Fcommonauth\"}", value = "Resource-specific metadata. Includes any framework-returned fields other than top-level debugId, status, message, and success.")
     @JsonProperty("metadata")
     @Valid
     public Map<String, Object> getMetadata() {

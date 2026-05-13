@@ -209,7 +209,7 @@ components:
     # ---------------------------------
     DebugResponse:
       type: object
-      description: "Debug response containing generic debug information and resource-specific metadata."
+      description: "Debug response containing generic debug information and API-curated resource-specific metadata."
       properties:
         debugId:
           type: string
@@ -230,7 +230,6 @@ components:
           additionalProperties: true
           example:
             authorizationUrl: "https://api.asgardeo.io/t/linuka/oauth2/authorize?response_type=code&client_id=lfrTEyDGHBEUbeBKoiaosz1y8Aca&redirect_uri=https%3A%2F%2Flocalhost%3A9443%2Fcommonauth"
-            resourceName: "google-oidc"
 
     # -----------------------------
     # GET /debug/{debugId}/result
