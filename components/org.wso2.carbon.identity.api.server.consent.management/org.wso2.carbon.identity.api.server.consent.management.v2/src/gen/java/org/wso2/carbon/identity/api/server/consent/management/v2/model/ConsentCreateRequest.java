@@ -76,7 +76,7 @@ public enum StateEnum {
 }
 
     private StateEnum state = StateEnum.ACTIVE;
-    private Long validityTime;
+    private Long expiryTime;
     private List<String> authorizations = null;
 
     private Map<String, String> properties = null;
@@ -189,20 +189,20 @@ public enum StateEnum {
     /**
     * Milliseconds since epoch until which the consent is valid. If omitted, the consent does not expire.
     **/
-    public ConsentCreateRequest validityTime(Long validityTime) {
+    public ConsentCreateRequest expiryTime(Long expiryTime) {
 
-        this.validityTime = validityTime;
+        this.expiryTime = expiryTime;
         return this;
     }
     
     @ApiModelProperty(example = "1766383796000", value = "Milliseconds since epoch until which the consent is valid. If omitted, the consent does not expire.")
-    @JsonProperty("validityTime")
+    @JsonProperty("expiryTime")
     @Valid
-    public Long getValidityTime() {
-        return validityTime;
+    public Long getExpiryTime() {
+        return expiryTime;
     }
-    public void setValidityTime(Long validityTime) {
-        this.validityTime = validityTime;
+    public void setExpiryTime(Long expiryTime) {
+        this.expiryTime = expiryTime;
     }
 
     /**
@@ -277,14 +277,14 @@ public enum StateEnum {
             Objects.equals(this.language, consentCreateRequest.language) &&
             Objects.equals(this.purposes, consentCreateRequest.purposes) &&
             Objects.equals(this.state, consentCreateRequest.state) &&
-            Objects.equals(this.validityTime, consentCreateRequest.validityTime) &&
+            Objects.equals(this.expiryTime, consentCreateRequest.expiryTime) &&
             Objects.equals(this.authorizations, consentCreateRequest.authorizations) &&
             Objects.equals(this.properties, consentCreateRequest.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(subjectId, serviceId, language, purposes, state, validityTime, authorizations, properties);
+        return Objects.hash(subjectId, serviceId, language, purposes, state, expiryTime, authorizations, properties);
     }
 
     @Override
@@ -298,7 +298,7 @@ public enum StateEnum {
         sb.append("    language: ").append(toIndentedString(language)).append("\n");
         sb.append("    purposes: ").append(toIndentedString(purposes)).append("\n");
         sb.append("    state: ").append(toIndentedString(state)).append("\n");
-        sb.append("    validityTime: ").append(toIndentedString(validityTime)).append("\n");
+        sb.append("    expiryTime: ").append(toIndentedString(expiryTime)).append("\n");
         sb.append("    authorizations: ").append(toIndentedString(authorizations)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");

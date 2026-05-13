@@ -983,7 +983,7 @@ components:
             version is published. PENDING is set automatically when authorizations are
             provided and cannot be specified here.
           example: "ACTIVE"
-        validityTime:
+        expiryTime:
           type: integer
           format: int64
           nullable: true
@@ -1331,7 +1331,7 @@ components:
         state:
           type: string
           enum: [PENDING, ACTIVE, REJECTED, REVOKED, EXPIRED]
-          description: PENDING if awaiting approvals, ACTIVE if all accepted, REJECTED if any rejected before activation, REVOKED if any user revoked after activation, EXPIRED if validityTime has passed.
+          description: PENDING if awaiting approvals, ACTIVE if all accepted, REJECTED if any rejected before activation, REVOKED if any user revoked after activation, EXPIRED if expiryTime has passed.
           example: "ACTIVE"
 
     ConsentListResponse:
@@ -1355,13 +1355,13 @@ components:
               serviceId: "admin-dashboard"
               state: "ACTIVE"
               timestamp: 1744000000000
-              validityTime: 1766383796000
+              expiryTime: 1766383796000
             - id: "c2d3e4f5-2345-6789-bcde-f01234567891"
               subjectId: "bob@wso2.com"
               serviceId: "mobile-app"
               state: "PENDING"
               timestamp: 1744000100000
-              validityTime: null
+              expiryTime: null
           items:
             $ref: '#/components/schemas/ConsentSummaryDTO'
 
@@ -1389,7 +1389,7 @@ components:
           format: int64
           description: Milliseconds since epoch when the consent was created.
           example: 1744000000000
-        validityTime:
+        expiryTime:
           type: integer
           format: int64
           nullable: true
@@ -1424,9 +1424,9 @@ components:
         state:
           type: string
           enum: [PENDING, ACTIVE, REJECTED, REVOKED, EXPIRED]
-          description: PENDING if awaiting approvals, ACTIVE if all accepted, REJECTED if any rejected before activation, REVOKED if any user revoked after activation, EXPIRED if validityTime has passed.
+          description: PENDING if awaiting approvals, ACTIVE if all accepted, REJECTED if any rejected before activation, REVOKED if any user revoked after activation, EXPIRED if expiryTime has passed.
           example: "ACTIVE"
-        validityTime:
+        expiryTime:
           type: integer
           format: int64
           nullable: true
@@ -1536,7 +1536,7 @@ components:
           enum: [PENDING, ACTIVE, REJECTED, REVOKED, EXPIRED]
           description: Current state of the consent object.
           example: "ACTIVE"
-        validityTime:
+        expiryTime:
           type: integer
           format: int64
           nullable: true

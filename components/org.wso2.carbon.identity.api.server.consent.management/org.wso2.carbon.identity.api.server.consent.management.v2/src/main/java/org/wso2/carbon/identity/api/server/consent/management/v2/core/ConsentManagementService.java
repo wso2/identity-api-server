@@ -55,6 +55,7 @@ import org.wso2.carbon.identity.api.server.consent.management.v2.util.ConsentMgt
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
@@ -308,8 +309,10 @@ public class ConsentManagementService {
 
         boolean rejected = ConsentCreateRequest.StateEnum.REJECTED.equals(request.getState());
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        Long expiryMillis = request.getExpiryTime();
+        Timestamp expiryTime = expiryMillis != null ? new Timestamp(expiryMillis) : null;
         return ConsentReceiptUtils.buildReceiptInput(request.getLanguage(), subjectId, tenantDomain,
-                request.getValidityTime(), rejected, request.getAuthorizations(), request.getProperties(),
+                expiryTime, rejected, request.getAuthorizations(), request.getProperties(),
                 request.getServiceId(), purposeBindings, consentManager);
     }
 
@@ -322,7 +325,7 @@ public class ConsentManagementService {
         dto.setSubjectId(receipt.getPiiPrincipalId());
         String state = StringUtils.isNotBlank(receipt.getState()) ? receipt.getState() : ACTIVE_STATE;
         dto.setState(ConsentDTO.StateEnum.fromValue(state));
-        dto.setValidityTime(receipt.getValidityTime());
+        dto.setExpiryTime(receipt.getExpiryTime() != null ? receipt.getExpiryTime().getTime() : null);
 
         // Extract service name and purposes from the first service entry (V2 is single-service).
         List<ConsentedPurposeDTO> purposeDTOs = new ArrayList<>();
@@ -500,7 +503,8 @@ public class ConsentManagementService {
 
             Receipt receipt = consentManager.getReceiptWithExtendedSchema(consentId);
             if (receipt != null) {
-                validateResponse.setValidityTime(receipt.getValidityTime());
+                validateResponse.setExpiryTime(
+                        receipt.getExpiryTime() != null ? receipt.getExpiryTime().getTime() : null);
             }
             return validateResponse;
         } catch (ConsentManagementException e) {
@@ -516,7 +520,7 @@ public class ConsentManagementService {
         String state = StringUtils.isNotBlank(receipt.getState()) ? receipt.getState() : ACTIVE_STATE;
         dto.setState(ConsentSummaryDTO.StateEnum.fromValue(state));
         dto.setTimestamp(receipt.getConsentTimestamp());
-        dto.setValidityTime(receipt.getValidityTime());
+        dto.setExpiryTime(receipt.getExpiryTime() != null ? receipt.getExpiryTime().getTime() : null);
         if (receipt.getServices() != null && !receipt.getServices().isEmpty()) {
             dto.setServiceId(receipt.getServices().get(0).getService());
         }

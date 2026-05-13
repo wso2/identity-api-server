@@ -73,7 +73,7 @@ public enum StateEnum {
 
     private StateEnum state;
     private Long timestamp;
-    private Long validityTime;
+    private Long expiryTime;
 
     /**
     * Unique identifier for the consent
@@ -171,20 +171,20 @@ public enum StateEnum {
     /**
     * Milliseconds since epoch until which the consent is valid. Null if no expiry.
     **/
-    public ConsentSummaryDTO validityTime(Long validityTime) {
+    public ConsentSummaryDTO expiryTime(Long expiryTime) {
 
-        this.validityTime = validityTime;
+        this.expiryTime = expiryTime;
         return this;
     }
     
     @ApiModelProperty(example = "1766383796000", value = "Milliseconds since epoch until which the consent is valid. Null if no expiry.")
-    @JsonProperty("validityTime")
+    @JsonProperty("expiryTime")
     @Valid
-    public Long getValidityTime() {
-        return validityTime;
+    public Long getExpiryTime() {
+        return expiryTime;
     }
-    public void setValidityTime(Long validityTime) {
-        this.validityTime = validityTime;
+    public void setExpiryTime(Long expiryTime) {
+        this.expiryTime = expiryTime;
     }
 
 
@@ -204,12 +204,12 @@ public enum StateEnum {
             Objects.equals(this.serviceId, consentSummaryDTO.serviceId) &&
             Objects.equals(this.state, consentSummaryDTO.state) &&
             Objects.equals(this.timestamp, consentSummaryDTO.timestamp) &&
-            Objects.equals(this.validityTime, consentSummaryDTO.validityTime);
+            Objects.equals(this.expiryTime, consentSummaryDTO.expiryTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, subjectId, serviceId, state, timestamp, validityTime);
+        return Objects.hash(id, subjectId, serviceId, state, timestamp, expiryTime);
     }
 
     @Override
@@ -223,7 +223,7 @@ public enum StateEnum {
         sb.append("    serviceId: ").append(toIndentedString(serviceId)).append("\n");
         sb.append("    state: ").append(toIndentedString(state)).append("\n");
         sb.append("    timestamp: ").append(toIndentedString(timestamp)).append("\n");
-        sb.append("    validityTime: ").append(toIndentedString(validityTime)).append("\n");
+        sb.append("    expiryTime: ").append(toIndentedString(expiryTime)).append("\n");
         sb.append("}");
         return sb.toString();
     }

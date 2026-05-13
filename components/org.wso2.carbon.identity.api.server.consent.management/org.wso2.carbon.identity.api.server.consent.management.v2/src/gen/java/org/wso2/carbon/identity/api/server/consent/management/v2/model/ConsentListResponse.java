@@ -97,7 +97,7 @@ public class ConsentListResponse  {
         return this;
     }
     
-    @ApiModelProperty(example = "[{\"id\":\"f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2\",\"subjectId\":\"alice@wso2.com\",\"serviceId\":\"admin-dashboard\",\"state\":\"ACTIVE\",\"timestamp\":1744000000000,\"validityTime\":1766383796000},{\"id\":\"c2d3e4f5-2345-6789-bcde-f01234567891\",\"subjectId\":\"bob@wso2.com\",\"serviceId\":\"mobile-app\",\"state\":\"PENDING\",\"timestamp\":1744000100000,\"validityTime\":null}]", value = "List of consent records")
+    @ApiModelProperty(example = "[{\"id\":\"f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2\",\"subjectId\":\"alice@wso2.com\",\"serviceId\":\"admin-dashboard\",\"state\":\"ACTIVE\",\"timestamp\":1744000000000,\"expiryTime\":1766383796000},{\"id\":\"c2d3e4f5-2345-6789-bcde-f01234567891\",\"subjectId\":\"bob@wso2.com\",\"serviceId\":\"mobile-app\",\"state\":\"PENDING\",\"timestamp\":1744000100000,\"expiryTime\":null}]", value = "List of consent records")
     @JsonProperty("Consents")
     @Valid
     public List<ConsentSummaryDTO> getConsents() {

@@ -66,7 +66,7 @@ public enum StateEnum {
 }
 
     private StateEnum state;
-    private Long validityTime;
+    private Long expiryTime;
 
     /**
     * Current state of the consent object.
@@ -90,20 +90,20 @@ public enum StateEnum {
     /**
     * Milliseconds since epoch until which the consent is valid. Null if no expiry.
     **/
-    public ConsentValidateResponse validityTime(Long validityTime) {
+    public ConsentValidateResponse expiryTime(Long expiryTime) {
 
-        this.validityTime = validityTime;
+        this.expiryTime = expiryTime;
         return this;
     }
     
     @ApiModelProperty(example = "1766383796000", value = "Milliseconds since epoch until which the consent is valid. Null if no expiry.")
-    @JsonProperty("validityTime")
+    @JsonProperty("expiryTime")
     @Valid
-    public Long getValidityTime() {
-        return validityTime;
+    public Long getExpiryTime() {
+        return expiryTime;
     }
-    public void setValidityTime(Long validityTime) {
-        this.validityTime = validityTime;
+    public void setExpiryTime(Long expiryTime) {
+        this.expiryTime = expiryTime;
     }
 
 
@@ -119,12 +119,12 @@ public enum StateEnum {
         }
         ConsentValidateResponse consentValidateResponse = (ConsentValidateResponse) o;
         return Objects.equals(this.state, consentValidateResponse.state) &&
-            Objects.equals(this.validityTime, consentValidateResponse.validityTime);
+            Objects.equals(this.expiryTime, consentValidateResponse.expiryTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(state, validityTime);
+        return Objects.hash(state, expiryTime);
     }
 
     @Override
@@ -134,7 +134,7 @@ public enum StateEnum {
         sb.append("class ConsentValidateResponse {\n");
         
         sb.append("    state: ").append(toIndentedString(state)).append("\n");
-        sb.append("    validityTime: ").append(toIndentedString(validityTime)).append("\n");
+        sb.append("    expiryTime: ").append(toIndentedString(expiryTime)).append("\n");
         sb.append("}");
         return sb.toString();
     }

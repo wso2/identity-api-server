@@ -151,7 +151,7 @@ public enum StateEnum {
     }
 
     /**
-    * PENDING if awaiting approvals, ACTIVE if all accepted, REJECTED if any rejected before activation, REVOKED if any user revoked after activation, EXPIRED if validityTime has passed.
+    * PENDING if awaiting approvals, ACTIVE if all accepted, REJECTED if any rejected before activation, REVOKED if any user revoked after activation, EXPIRED if expiryTime has passed.
     **/
     public ConsentResponseDTO state(StateEnum state) {
 
@@ -159,7 +159,7 @@ public enum StateEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "ACTIVE", value = "PENDING if awaiting approvals, ACTIVE if all accepted, REJECTED if any rejected before activation, REVOKED if any user revoked after activation, EXPIRED if validityTime has passed.")
+    @ApiModelProperty(example = "ACTIVE", value = "PENDING if awaiting approvals, ACTIVE if all accepted, REJECTED if any rejected before activation, REVOKED if any user revoked after activation, EXPIRED if expiryTime has passed.")
     @JsonProperty("state")
     @Valid
     public StateEnum getState() {
