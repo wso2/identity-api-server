@@ -233,7 +233,9 @@ public class Constants {
                 "Unable to delete OAuth2 inbound auth configs.",
                 "Server encountered an error while deleting the OAuth2 inbound auth configs."),
 
-        // Issuer usage scope configuration errors.
+        /**
+        * Issuer usage scope configuration errors.
+        */
         ERROR_CODE_ERROR_ISSUER_USAGE_SCOPE_EMPTY("65028",
                 "Unable to retrieve issuer usage scope configuration.",
                 "The issuer usage scope configuration is empty for the tenant domain %s."),
@@ -243,6 +245,9 @@ public class Constants {
         ERROR_CODE_ERROR_ISSUER_USAGE_SCOPE_UPDATE("65030",
                 "Unable to update issuer usage scope configuration.",
                 "Server encountered an error while updating issuer usage scope configuration. %s"),
+        ERROR_CODE_CLIENT_ERROR_ISSUER_USAGE_SCOPE_UPDATE("60008",
+                "Unable to update issuer usage scope configuration.",
+                "Issuer usage scope config update failed. %s"),
         /**
          * Compatibility Settings errors.
          */

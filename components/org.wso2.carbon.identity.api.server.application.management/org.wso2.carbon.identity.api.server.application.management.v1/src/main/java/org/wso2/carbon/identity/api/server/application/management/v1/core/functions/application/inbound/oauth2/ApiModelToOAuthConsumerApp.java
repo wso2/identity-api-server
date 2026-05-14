@@ -336,6 +336,8 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
             } else {
                 consumerAppDTO.setCibaNotificationChannels(StringUtils.EMPTY);
             }
+            consumerAppDTO.setCibaSkipUserValidation(cibaAuthReq.getSkipUserValidation());
+            consumerAppDTO.setCibaAllowFederatedUsers(cibaAuthReq.getAllowFederatedUsers());
         }
     }
 

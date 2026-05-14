@@ -41,6 +41,7 @@ import org.wso2.carbon.identity.notification.sender.tenant.config.exception.Noti
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
@@ -280,6 +281,24 @@ public class NotificationSenderManagementService {
         }
     }
 
+    public Map<String, String> setNotificationSenderConfigurations(String publisherType, Map<String, String> configs) {
+
+        try {
+            return notificationSenderManagementService.setNotificationSenderConfigurations(publisherType, configs);
+        } catch (NotificationSenderManagementException e) {
+            throw handleException(e);
+        }
+    }
+
+    public Map<String, String> getNotificationSenderConfigurations(String publisherType) {
+
+        try {
+            return notificationSenderManagementService.getNotificationSenderConfigurations(publisherType, false);
+        } catch (NotificationSenderManagementException e) {
+            throw handleException(e);
+        }
+    }
+
     private EmailSenderDTO buildEmailSenderDTO(EmailSenderAdd emailSenderAdd) {
 
         EmailSenderDTO dto = new EmailSenderDTO();
@@ -293,7 +312,6 @@ public class NotificationSenderManagementService {
         properties.forEach((prop) -> dto.getProperties().put(prop.getKey(), prop.getValue()));
         return dto;
     }
-
 
     private EmailSenderDTO buildEmailSenderDTO(String senderName, EmailSenderUpdateRequest emailSenderUpdateRequest) {
 

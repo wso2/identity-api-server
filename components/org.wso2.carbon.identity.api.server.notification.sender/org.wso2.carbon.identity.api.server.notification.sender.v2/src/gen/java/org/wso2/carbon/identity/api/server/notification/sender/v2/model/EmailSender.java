@@ -36,6 +36,41 @@ import javax.xml.bind.annotation.*;
 public class EmailSender  {
   
     private String name;
+
+@XmlType(name="ProviderEnum")
+@XmlEnum(String.class)
+public enum ProviderEnum {
+
+    @XmlEnumValue("SMTP") SMTP(String.valueOf("SMTP")), @XmlEnumValue("HTTP") HTTP(String.valueOf("HTTP"));
+
+
+    private String value;
+
+    ProviderEnum(String v) {
+        value = v;
+    }
+
+    public String value() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    public static ProviderEnum fromValue(String value) {
+        for (ProviderEnum b : ProviderEnum.values()) {
+            if (b.value.equals(value)) {
+                return b;
+            }
+        }
+        throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+}
+
+    private ProviderEnum provider = ProviderEnum.SMTP;
+    private String providerURL;
     private String smtpServerHost;
     private Integer smtpPort;
     private String fromAddress;
@@ -61,6 +96,43 @@ public class EmailSender  {
     }
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+    **/
+    public EmailSender provider(ProviderEnum provider) {
+
+        this.provider = provider;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "SMTP", value = "")
+    @JsonProperty("provider")
+    @Valid
+    public ProviderEnum getProvider() {
+        return provider;
+    }
+    public void setProvider(ProviderEnum provider) {
+        this.provider = provider;
+    }
+
+    /**
+    * URL of the email provider endpoint. Required when &#x60;provider&#x60; is &#x60;HTTP&#x60;.
+    **/
+    public EmailSender providerURL(String providerURL) {
+
+        this.providerURL = providerURL;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "URL of the email provider endpoint. Required when `provider` is `HTTP`.")
+    @JsonProperty("providerURL")
+    @Valid
+    public String getProviderURL() {
+        return providerURL;
+    }
+    public void setProviderURL(String providerURL) {
+        this.providerURL = providerURL;
     }
 
     /**
@@ -176,6 +248,8 @@ public class EmailSender  {
         }
         EmailSender emailSender = (EmailSender) o;
         return Objects.equals(this.name, emailSender.name) &&
+            Objects.equals(this.provider, emailSender.provider) &&
+            Objects.equals(this.providerURL, emailSender.providerURL) &&
             Objects.equals(this.smtpServerHost, emailSender.smtpServerHost) &&
             Objects.equals(this.smtpPort, emailSender.smtpPort) &&
             Objects.equals(this.fromAddress, emailSender.fromAddress) &&
@@ -185,7 +259,7 @@ public class EmailSender  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, smtpServerHost, smtpPort, fromAddress, authType, properties);
+        return Objects.hash(name, provider, providerURL, smtpServerHost, smtpPort, fromAddress, authType, properties);
     }
 
     @Override
@@ -195,6 +269,8 @@ public class EmailSender  {
         sb.append("class EmailSender {\n");
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    provider: ").append(toIndentedString(provider)).append("\n");
+        sb.append("    providerURL: ").append(toIndentedString(providerURL)).append("\n");
         sb.append("    smtpServerHost: ").append(toIndentedString(smtpServerHost)).append("\n");
         sb.append("    smtpPort: ").append(toIndentedString(smtpPort)).append("\n");
         sb.append("    fromAddress: ").append(toIndentedString(fromAddress)).append("\n");

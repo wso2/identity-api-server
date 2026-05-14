@@ -109,6 +109,7 @@ import org.wso2.carbon.identity.fraud.detection.core.model.FraudDetectionConfigD
 import org.wso2.carbon.identity.fraud.detection.core.service.FraudDetectionConfigsService;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
 import org.wso2.carbon.identity.oauth.dcr.exception.DCRMException;
+import org.wso2.carbon.identity.oauth2.config.exceptions.OAuth2OIDCConfigOrgUsageScopeMgtClientException;
 import org.wso2.carbon.identity.oauth2.config.exceptions.OAuth2OIDCConfigOrgUsageScopeMgtException;
 import org.wso2.carbon.identity.oauth2.config.models.IssuerUsageScopeConfig;
 import org.wso2.carbon.identity.oauth2.config.models.UsageScope;
@@ -2392,6 +2393,10 @@ public class ServerConfigManagementService {
                     updateIssuerUsageScopeConfig(tenantDomain, issuerUsageScopeConfig);
             return buildIssuerUsageScopeConfig(updateIssuerUsageScopeConfig, tenantDomain);
         } catch (OAuth2OIDCConfigOrgUsageScopeMgtException | OrganizationManagementException e) {
+            if (e instanceof OAuth2OIDCConfigOrgUsageScopeMgtClientException) {
+                throw handleException(Response.Status.BAD_REQUEST,
+                        Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_ISSUER_USAGE_SCOPE_UPDATE, e.getMessage());
+            }
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     Constants.ErrorMessage.ERROR_CODE_ERROR_ISSUER_USAGE_SCOPE_UPDATE, e.getMessage());
         }

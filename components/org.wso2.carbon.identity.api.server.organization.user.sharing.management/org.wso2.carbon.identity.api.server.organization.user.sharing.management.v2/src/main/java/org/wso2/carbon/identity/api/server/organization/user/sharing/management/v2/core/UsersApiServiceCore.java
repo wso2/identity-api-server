@@ -719,6 +719,13 @@ public class UsersApiServiceCore {
 
         org.setOrgId(orgDO.getOrganizationId());
         org.setOrgName(orgDO.getOrganizationName());
+        org.setOrgHandle(orgDO.getOrganizationHandle());
+        org.setOrgStatus(orgDO.getOrganizationStatus());
+        org.setOrgRef(orgDO.getOrganizationReference());
+        org.setHasChildren(orgDO.isHasChildren());
+        org.setDepthFromRoot(orgDO.getDepthFromRoot());
+        org.setParentOrgId(orgDO.getParentOrganizationId());
+        org.setParentUserId(orgDO.getUserId());
         org.setSharedUserId(orgDO.getSharedUserId());
 
         if (orgDO.getSharedType() != null) {

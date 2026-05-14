@@ -57,7 +57,9 @@ import static org.wso2.carbon.identity.notification.sender.tenant.config.Notific
 import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_CONFLICT_PUBLISHER;
 import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_NO_ACTIVE_PUBLISHERS_FOUND;
 import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_PUBLISHER_NOT_EXISTS;
+import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.HTTP;
 import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.PASSWORD;
+import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.SMTP;
 import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.USERNAME;
 
 /**
@@ -296,10 +298,15 @@ public class NotificationSenderManagementService {
 
         EmailSenderDTO dto = new EmailSenderDTO();
         dto.setName(emailSenderAdd.getName());
+        dto.setProvider(emailSenderAdd.getProvider().toString());
+        if (StringUtils.equalsIgnoreCase(HTTP, emailSenderAdd.getProvider().toString())) {
+            dto.setProviderURL(emailSenderAdd.getProviderURL());
+        } else {
+            dto.setSmtpPort(emailSenderAdd.getSmtpPort());
+            dto.setSmtpServerHost(emailSenderAdd.getSmtpServerHost());
+        }
         dto.setFromAddress(emailSenderAdd.getFromAddress());
-        dto.setSmtpPort(emailSenderAdd.getSmtpPort());
         dto.setAuthType(emailSenderAdd.getAuthType());
-        dto.setSmtpServerHost(emailSenderAdd.getSmtpServerHost());
         List<Properties> properties = emailSenderAdd.getProperties();
         if (properties == null) {
             return dto;
@@ -317,9 +324,14 @@ public class NotificationSenderManagementService {
 
         EmailSenderDTO dto = new EmailSenderDTO();
         dto.setName(senderName);
+        dto.setProvider(emailSenderUpdateRequest.getProvider().toString());
+        if (StringUtils.equalsIgnoreCase(HTTP, emailSenderUpdateRequest.getProvider().toString())) {
+            dto.setProviderURL(emailSenderUpdateRequest.getProviderURL());
+        } else {
+            dto.setSmtpPort(emailSenderUpdateRequest.getSmtpPort());
+            dto.setSmtpServerHost(emailSenderUpdateRequest.getSmtpServerHost());
+        }
         dto.setFromAddress(emailSenderUpdateRequest.getFromAddress());
-        dto.setSmtpPort(emailSenderUpdateRequest.getSmtpPort());
-        dto.setSmtpServerHost(emailSenderUpdateRequest.getSmtpServerHost());
         dto.setAuthType(emailSenderUpdateRequest.getAuthType());
         List<Properties> properties = emailSenderUpdateRequest.getProperties();
         if (properties == null) {
@@ -337,9 +349,15 @@ public class NotificationSenderManagementService {
 
         EmailSender emailSender = new EmailSender();
         emailSender.setName(dto.getName());
+        if (StringUtils.isBlank(dto.getProvider()) || StringUtils.equalsIgnoreCase(SMTP, dto.getProvider())) {
+            emailSender.setProvider(EmailSender.ProviderEnum.SMTP);
+            emailSender.setSmtpPort(dto.getSmtpPort());
+            emailSender.setSmtpServerHost(dto.getSmtpServerHost());
+        } else {
+            emailSender.setProvider(EmailSender.ProviderEnum.HTTP);
+            emailSender.setProviderURL(dto.getProviderURL());
+        }
         emailSender.setFromAddress(dto.getFromAddress());
-        emailSender.setSmtpPort(dto.getSmtpPort());
-        emailSender.setSmtpServerHost(dto.getSmtpServerHost());
         emailSender.setAuthType(StringUtils.isBlank(dto.getAuthType()) ? BASIC : dto.getAuthType());
         List<Properties> properties = new ArrayList<>();
 
@@ -444,8 +462,8 @@ public class NotificationSenderManagementService {
 
         if (dto.getAuthentication() != null) {
             Map<String, Object> filteredAuthProp = dto.getAuthentication().getProperties().entrySet().stream()
-                .filter(entry -> !authPropToExclude.contains(Property.valueOfName(entry.getKey())))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                    .filter(entry -> !authPropToExclude.contains(Property.valueOfName(entry.getKey())))
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
             smsSender.setAuthentication(new Authentication()
                     .type(Authentication.TypeEnum.fromValue(dto.getAuthentication().getType().getName()))
                     .properties(filteredAuthProp));

@@ -37,6 +37,8 @@ public class CIBAAuthenticationRequestConfiguration  {
     private Long authReqExpiryTime;
     private List<String> notificationChannels = null;
 
+    private Boolean skipUserValidation = false;
+    private Boolean allowFederatedUsers = false;
 
     /**
     * CIBA authentication request expiry time in seconds.
@@ -84,7 +86,45 @@ public class CIBAAuthenticationRequestConfiguration  {
         return this;
     }
 
+    /**
+    * Skip validation that the authenticated user matches the resolved user from login_hint during token issuance.
+    **/
+    public CIBAAuthenticationRequestConfiguration skipUserValidation(Boolean skipUserValidation) {
+
+        this.skipUserValidation = skipUserValidation;
+        return this;
+    }
     
+    @ApiModelProperty(example = "false", value = "Skip validation that the authenticated user matches the resolved user from login_hint during token issuance.")
+    @JsonProperty("skipUserValidation")
+    @Valid
+    public Boolean getSkipUserValidation() {
+        return skipUserValidation;
+    }
+    public void setSkipUserValidation(Boolean skipUserValidation) {
+        this.skipUserValidation = skipUserValidation;
+    }
+
+    /**
+    * Allow sending CIBA notifications to users not found in the local user store. When enabled, the notification is sent directly to the login_hint value using the notification_channel to determine if it is an email or phone number. Requires skipUserValidation to be enabled.
+    **/
+    public CIBAAuthenticationRequestConfiguration allowFederatedUsers(Boolean allowFederatedUsers) {
+
+        this.allowFederatedUsers = allowFederatedUsers;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "Allow sending CIBA notifications to users not found in the local user store. When enabled, the notification is sent directly to the login_hint value using the notification_channel to determine if it is an email or phone number. Requires skipUserValidation to be enabled.")
+    @JsonProperty("allowFederatedUsers")
+    @Valid
+    public Boolean getAllowFederatedUsers() {
+        return allowFederatedUsers;
+    }
+    public void setAllowFederatedUsers(Boolean allowFederatedUsers) {
+        this.allowFederatedUsers = allowFederatedUsers;
+    }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -97,12 +137,14 @@ public class CIBAAuthenticationRequestConfiguration  {
         }
         CIBAAuthenticationRequestConfiguration ciBAAuthenticationRequestConfiguration = (CIBAAuthenticationRequestConfiguration) o;
         return Objects.equals(this.authReqExpiryTime, ciBAAuthenticationRequestConfiguration.authReqExpiryTime) &&
-            Objects.equals(this.notificationChannels, ciBAAuthenticationRequestConfiguration.notificationChannels);
+            Objects.equals(this.notificationChannels, ciBAAuthenticationRequestConfiguration.notificationChannels) &&
+            Objects.equals(this.skipUserValidation, ciBAAuthenticationRequestConfiguration.skipUserValidation) &&
+            Objects.equals(this.allowFederatedUsers, ciBAAuthenticationRequestConfiguration.allowFederatedUsers);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authReqExpiryTime, notificationChannels);
+        return Objects.hash(authReqExpiryTime, notificationChannels, skipUserValidation, allowFederatedUsers);
     }
 
     @Override
@@ -113,6 +155,8 @@ public class CIBAAuthenticationRequestConfiguration  {
         
         sb.append("    authReqExpiryTime: ").append(toIndentedString(authReqExpiryTime)).append("\n");
         sb.append("    notificationChannels: ").append(toIndentedString(notificationChannels)).append("\n");
+        sb.append("    skipUserValidation: ").append(toIndentedString(skipUserValidation)).append("\n");
+        sb.append("    allowFederatedUsers: ").append(toIndentedString(allowFederatedUsers)).append("\n");
         sb.append("}");
         return sb.toString();
     }

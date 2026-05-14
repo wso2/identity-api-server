@@ -15,6 +15,7 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
@@ -50,8 +51,8 @@ public class ApplicationBasicInfoToApiModel implements Function<ApplicationBasic
                 .name(applicationBasicInfo.getApplicationName())
                 .description(applicationBasicInfo.getDescription())
                 .applicationVersion(applicationBasicInfo.getApplicationVersion())
-                .image(applicationBasicInfo.getImageUrl())
-                .accessUrl(applicationBasicInfo.getAccessUrl())
+                .image(StringUtils.trim(applicationBasicInfo.getImageUrl()))
+                .accessUrl(StringUtils.trim(applicationBasicInfo.getAccessUrl()))
                 .clientId(applicationBasicInfo.getClientId())
                 .issuer(applicationBasicInfo.getIssuer())
                 .access(getAccess(applicationBasicInfo.getApplicationName()))
