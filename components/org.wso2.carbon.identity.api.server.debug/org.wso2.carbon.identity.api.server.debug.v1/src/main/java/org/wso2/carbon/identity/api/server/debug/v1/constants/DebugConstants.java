@@ -86,7 +86,7 @@ public class DebugConstants {
 
         public String getCode() {
 
-            return DEBUG_PREFIX + code;
+            return ERROR_CODE_PREFIX + code;
         }
 
         public String getMessage() {

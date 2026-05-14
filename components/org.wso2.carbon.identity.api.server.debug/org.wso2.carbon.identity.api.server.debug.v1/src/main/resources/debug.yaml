@@ -76,7 +76,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
               example:
-                code: "DSM-60101"
+                code: "DSM-60001"
                 message: "Invalid request."
                 description: "Request validation failed."
         '401':
@@ -98,7 +98,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
               example:
-                code: "DSM-65101"
+                code: "DSM-65001"
                 message: "Error processing request."
                 description: "Error occurred while processing the debug request."
 
@@ -134,7 +134,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
               example:
-                code: "DSM-60101"
+                code: "DSM-60001"
                 message: "Invalid request."
                 description: "Request validation failed."
         '401':
@@ -150,7 +150,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
               example:
-                code: "DSM-60102"
+                code: "DSM-60002"
                 message: "Debug result not found."
                 description: "No debug result exists for the provided session id."
         '500':
@@ -160,7 +160,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
               example:
-                code: "DSM-65101"
+                code: "DSM-65001"
                 message: "Error processing request."
                 description: "Error occurred while processing the debug request."
 
@@ -193,7 +193,7 @@ components:
         code:
           type: string
           pattern: "^DSM-[0-9]{5}$"
-          example: "DSM-60101"
+          example: "DSM-60001"
           description: "An error code in DSM-prefixed format."
         message:
           type: string

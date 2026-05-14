@@ -37,7 +37,7 @@ public class Error  {
     private String description;
 
     /**
-    * An error code in DBG-prefixed format.
+    * An error code in DSM-prefixed format.
     **/
     public Error code(String code) {
 
@@ -45,11 +45,11 @@ public class Error  {
         return this;
     }
     
-    @ApiModelProperty(example = "DBG-60101", required = true, value = "An error code in DBG-prefixed format.")
+    @ApiModelProperty(example = "DSM-60001", required = true, value = "An error code in DSM-prefixed format.")
     @JsonProperty("code")
     @Valid
     @NotNull(message = "Property code cannot be null.")
- @Pattern(regexp="^DBG-[0-9]{5}$")
+ @Pattern(regexp="^DSM-[0-9]{5}$")
     public String getCode() {
         return code;
     }
@@ -144,3 +144,4 @@ public class Error  {
         return o.toString().replace("\n", "\n");
     }
 }
+
