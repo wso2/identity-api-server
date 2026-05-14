@@ -36,7 +36,6 @@ import org.wso2.carbon.consent.mgt.core.model.ReceiptInput;
 import org.wso2.carbon.consent.mgt.core.model.ReceiptService;
 import org.wso2.carbon.consent.mgt.core.util.ConsentReceiptUtils;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.consent.management.common.ConsentManagementConstants;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.AuthorizationCreateRequest;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.AuthorizationDTO;
@@ -56,6 +55,7 @@ import org.wso2.carbon.identity.api.server.consent.management.v2.util.ConsentMgt
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
@@ -65,7 +65,6 @@ import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ACTIVE_
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.DEFAULT_LIMIT;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_CONSENT_INVALID_STATE_FOR_AUTHORIZE;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_CONSENT_REJECTED_WITH_AUTHORIZATIONS;
-import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_CONSENT_SUBJECT_MISMATCH;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_CONSENT_USER_NOT_IN_AUTHORIZATION_LIST;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_ELEMENT_UUID_NOT_FOUND;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_INVALID_QUERY_PARAM;
@@ -114,9 +113,6 @@ public class ConsentManagementService {
         boolean rejected = ConsentCreateRequest.StateEnum.REJECTED.equals(request.getState());
         if (rejected && hasAuthorizations) {
             throw handleClientException(ERROR_CODE_CONSENT_REJECTED_WITH_AUTHORIZATIONS, null);
-        }
-        if (!subjectId.equals(currentUser) && !hasAuthorizations) {
-            throw handleClientException(ERROR_CODE_CONSENT_SUBJECT_MISMATCH, subjectId);
         }
 
         ReceiptInput receiptInput = buildReceiptInput(request, subjectId);
@@ -243,13 +239,13 @@ public class ConsentManagementService {
             }
             if (!isFirstPage) {
                 String encodedString = Base64.getEncoder().encodeToString(
-                        receipts.get(0).getConsentReceiptId().getBytes(StandardCharsets.UTF_8));
+                        receipts.get(0).getCursor().getBytes(StandardCharsets.UTF_8));
                 links.add(buildPaginationLink(url + "&" + FilterConstants.FILTER_ATTR_BEFORE + "=" + encodedString,
                         ConsentManagementConstants.LINK_REL_PREVIOUS));
             }
             if (!isLastPage) {
                 String encodedString = Base64.getEncoder().encodeToString(
-                        receipts.get(receipts.size() - 1).getConsentReceiptId().getBytes(StandardCharsets.UTF_8));
+                        receipts.get(receipts.size() - 1).getCursor().getBytes(StandardCharsets.UTF_8));
                 links.add(buildPaginationLink(url + "&" + FilterConstants.FILTER_ATTR_AFTER + "=" + encodedString,
                         ConsentManagementConstants.LINK_REL_NEXT));
             }
@@ -283,13 +279,6 @@ public class ConsentManagementService {
                 return;
             }
             String callingUser = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername();
-            List<ConsentAuthorization> auths = consentManager.getConsentAuthorizations(receiptId);
-            if (auths != null && !auths.isEmpty()) {
-                boolean callingUserInList = auths.stream().anyMatch(a -> callingUser.equals(a.getUserId()));
-                if (!callingUserInList) {
-                    throw handleClientException(ERROR_CODE_CONSENT_USER_NOT_IN_AUTHORIZATION_LIST, callingUser);
-                }
-            }
             consentManager.authorizeConsent(receiptId, callingUser, REVOKE_STATE);
         } catch (ConsentManagementException e) {
             throw ConsentMgtEndpointUtil.handleConsentManagementException(e);
@@ -320,8 +309,10 @@ public class ConsentManagementService {
 
         boolean rejected = ConsentCreateRequest.StateEnum.REJECTED.equals(request.getState());
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        Long expiryMillis = request.getExpiryTime();
+        Timestamp expiryTime = expiryMillis != null ? new Timestamp(expiryMillis) : null;
         return ConsentReceiptUtils.buildReceiptInput(request.getLanguage(), subjectId, tenantDomain,
-                request.getValidityTime(), rejected, request.getAuthorizations(), request.getProperties(),
+                expiryTime, rejected, request.getAuthorizations(), request.getProperties(),
                 request.getServiceId(), purposeBindings, consentManager);
     }
 
@@ -334,7 +325,7 @@ public class ConsentManagementService {
         dto.setSubjectId(receipt.getPiiPrincipalId());
         String state = StringUtils.isNotBlank(receipt.getState()) ? receipt.getState() : ACTIVE_STATE;
         dto.setState(ConsentDTO.StateEnum.fromValue(state));
-        dto.setValidityTime(receipt.getValidityTime());
+        dto.setExpiryTime(receipt.getExpiryTime() != null ? receipt.getExpiryTime().getTime() : null);
 
         // Extract service name and purposes from the first service entry (V2 is single-service).
         List<ConsentedPurposeDTO> purposeDTOs = new ArrayList<>();
@@ -512,7 +503,8 @@ public class ConsentManagementService {
 
             Receipt receipt = consentManager.getReceiptWithExtendedSchema(consentId);
             if (receipt != null) {
-                validateResponse.setValidityTime(receipt.getValidityTime());
+                validateResponse.setExpiryTime(
+                        receipt.getExpiryTime() != null ? receipt.getExpiryTime().getTime() : null);
             }
             return validateResponse;
         } catch (ConsentManagementException e) {
@@ -528,7 +520,7 @@ public class ConsentManagementService {
         String state = StringUtils.isNotBlank(receipt.getState()) ? receipt.getState() : ACTIVE_STATE;
         dto.setState(ConsentSummaryDTO.StateEnum.fromValue(state));
         dto.setTimestamp(receipt.getConsentTimestamp());
-        dto.setValidityTime(receipt.getValidityTime());
+        dto.setExpiryTime(receipt.getExpiryTime() != null ? receipt.getExpiryTime().getTime() : null);
         if (receipt.getServices() != null && !receipt.getServices().isEmpty()) {
             dto.setServiceId(receipt.getServices().get(0).getService());
         }
@@ -547,7 +539,7 @@ public class ConsentManagementService {
     private PaginationLink buildPaginationLink(String url, String rel) {
 
         return new PaginationLink()
-                .href(ContextLoader.buildURIForHeader(ConsentManagementConstants.V2_API_PATH_COMPONENT +
+                .href(ConsentMgtEndpointUtil.buildURIForHeader(ConsentManagementConstants.V2_API_PATH_COMPONENT +
                         ConsentManagementConstants.CONSENTS_PATH + url).toString())
                 .rel(rel);
     }

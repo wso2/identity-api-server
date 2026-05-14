@@ -24,7 +24,10 @@ import org.wso2.carbon.consent.mgt.core.exception.ConsentManagementClientExcepti
 import org.wso2.carbon.consent.mgt.core.exception.ConsentManagementException;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.core.ServiceURLBuilder;
+import org.wso2.carbon.identity.core.URLBuilderException;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -57,6 +60,7 @@ import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMe
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.STATUS_BAD_REQUEST_MESSAGE_DEFAULT;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.STATUS_INTERNAL_SERVER_ERROR_DESCRIPTION_DEFAULT;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.STATUS_INTERNAL_SERVER_ERROR_MESSAGE_DEFAULT;
+import static org.wso2.carbon.identity.api.server.consent.management.common.ConsentManagementConstants.IDENTITY_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.consent.management.common.ConsentManagementConstants.STATUS_CONFLICT_MESSAGE_DEFAULT;
 import static org.wso2.carbon.identity.api.server.consent.management.common.ConsentManagementConstants.STATUS_FORBIDDEN_MESSAGE_DEFAULT;
 import static org.wso2.carbon.identity.api.server.consent.management.common.ConsentManagementConstants.STATUS_NOT_FOUND_MESSAGE_DEFAULT;
@@ -106,6 +110,21 @@ public class ConsentMgtEndpointUtil {
 
     private ConsentMgtEndpointUtil() {
 
+    }
+
+    public static URI buildURIForHeader(String endpoint) {
+
+        try {
+            String url = ServiceURLBuilder.create().addPath(IDENTITY_API_PATH_COMPONENT + endpoint)
+                    .build().getAbsolutePublicURL();
+            return URI.create(url);
+        } catch (URLBuilderException e) {
+            ErrorResponse errorResponse = new ErrorResponse.Builder()
+                    .withMessage("Error while building response.")
+                    .withDescription("Server encountered an error while building URL for response header.")
+                    .build(LOG, e, e.getMessage());
+            throw new APIError(Response.Status.INTERNAL_SERVER_ERROR, errorResponse);
+        }
     }
 
     public static APIError handleConsentManagementException(ConsentManagementException e) {

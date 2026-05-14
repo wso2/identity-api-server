@@ -26,6 +26,7 @@ public class ConsentManagementConstants {
     }
 
     // API Path Components
+    public static final String IDENTITY_API_PATH_COMPONENT = "/api/identity";
     public static final String V2_API_PATH_COMPONENT = "/consent-mgt/v2.0";
 
     // Resource Paths

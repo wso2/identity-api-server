@@ -80,7 +80,7 @@ public enum StateEnum {
 }
 
     private StateEnum state;
-    private Long validityTime;
+    private Long expiryTime;
     private List<ConsentedPurposeDTO> purposes = null;
 
     private List<AuthorizationDTO> authorizations = null;
@@ -184,7 +184,7 @@ public enum StateEnum {
     }
 
     /**
-    * PENDING if awaiting approvals, ACTIVE if all accepted, REJECTED if any rejected before activation, REVOKED if any user revoked after activation, EXPIRED if validityTime has passed.
+    * PENDING if awaiting approvals, ACTIVE if all accepted, REJECTED if any rejected before activation, REVOKED if any user revoked after activation, EXPIRED if expiryTime has passed.
     **/
     public ConsentDTO state(StateEnum state) {
 
@@ -192,7 +192,7 @@ public enum StateEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "ACTIVE", value = "PENDING if awaiting approvals, ACTIVE if all accepted, REJECTED if any rejected before activation, REVOKED if any user revoked after activation, EXPIRED if validityTime has passed.")
+    @ApiModelProperty(example = "ACTIVE", value = "PENDING if awaiting approvals, ACTIVE if all accepted, REJECTED if any rejected before activation, REVOKED if any user revoked after activation, EXPIRED if expiryTime has passed.")
     @JsonProperty("state")
     @Valid
     public StateEnum getState() {
@@ -205,20 +205,20 @@ public enum StateEnum {
     /**
     * Milliseconds since epoch until which the consent is valid. Null if no expiry.
     **/
-    public ConsentDTO validityTime(Long validityTime) {
+    public ConsentDTO expiryTime(Long expiryTime) {
 
-        this.validityTime = validityTime;
+        this.expiryTime = expiryTime;
         return this;
     }
     
     @ApiModelProperty(example = "1766383796000", value = "Milliseconds since epoch until which the consent is valid. Null if no expiry.")
-    @JsonProperty("validityTime")
+    @JsonProperty("expiryTime")
     @Valid
-    public Long getValidityTime() {
-        return validityTime;
+    public Long getExpiryTime() {
+        return expiryTime;
     }
-    public void setValidityTime(Long validityTime) {
-        this.validityTime = validityTime;
+    public void setExpiryTime(Long expiryTime) {
+        this.expiryTime = expiryTime;
     }
 
     /**
@@ -321,7 +321,7 @@ public enum StateEnum {
             Objects.equals(this.subjectId, consentDTO.subjectId) &&
             Objects.equals(this.serviceId, consentDTO.serviceId) &&
             Objects.equals(this.state, consentDTO.state) &&
-            Objects.equals(this.validityTime, consentDTO.validityTime) &&
+            Objects.equals(this.expiryTime, consentDTO.expiryTime) &&
             Objects.equals(this.purposes, consentDTO.purposes) &&
             Objects.equals(this.authorizations, consentDTO.authorizations) &&
             Objects.equals(this.properties, consentDTO.properties);
@@ -329,7 +329,7 @@ public enum StateEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(timestamp, id, language, subjectId, serviceId, state, validityTime, purposes, authorizations, properties);
+        return Objects.hash(timestamp, id, language, subjectId, serviceId, state, expiryTime, purposes, authorizations, properties);
     }
 
     @Override
@@ -344,7 +344,7 @@ public enum StateEnum {
         sb.append("    subjectId: ").append(toIndentedString(subjectId)).append("\n");
         sb.append("    serviceId: ").append(toIndentedString(serviceId)).append("\n");
         sb.append("    state: ").append(toIndentedString(state)).append("\n");
-        sb.append("    validityTime: ").append(toIndentedString(validityTime)).append("\n");
+        sb.append("    expiryTime: ").append(toIndentedString(expiryTime)).append("\n");
         sb.append("    purposes: ").append(toIndentedString(purposes)).append("\n");
         sb.append("    authorizations: ").append(toIndentedString(authorizations)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
