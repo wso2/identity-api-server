@@ -30,7 +30,8 @@ import org.wso2.carbon.identity.debug.framework.core.DebugRequestCoordinator;
 import org.wso2.carbon.identity.debug.framework.exception.DebugFrameworkClientException;
 import org.wso2.carbon.identity.debug.framework.exception.DebugFrameworkException;
 import org.wso2.carbon.identity.debug.framework.exception.DebugFrameworkServerException;
-import org.wso2.carbon.identity.debug.framework.model.DebugRequest;
+import org.wso2.carbon.identity.debug.framework.model.DebugFrameworkRequest;
+import org.wso2.carbon.identity.debug.framework.model.DebugFrameworkResponse;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -46,13 +47,17 @@ import javax.ws.rs.core.Response;
  */
 public class DebugService {
 
-    private static final int MAX_REQUEST_PROPERTY_VALUE_LENGTH = 255;
     private static final Log LOG = LogFactory.getLog(DebugService.class);
     private static final Map<String, List<String>> REQUIRED_PROPERTIES_BY_RESOURCE_TYPE =
             createRequiredPropertiesByResourceType();
     private static final DebugStatusBuilder STATUS_BUILDER = new DebugStatusBuilder(LOG);
     private final DebugRequestCoordinator coordinator;
 
+    /**
+     * Constructs a new {@link DebugService} with the specified coordinator.
+     *
+     * @param coordinator The {@link DebugRequestCoordinator} used to manage debug requests.
+     */
     public DebugService(DebugRequestCoordinator coordinator) {
 
         this.coordinator = coordinator;
@@ -66,8 +71,7 @@ public class DebugService {
      * @param requestBody Debug request payload.
      * @return DebugResponse DTO.
      */
-    public DebugResponse processStartSession(
-            String resourceType, Map<String, String> requestBody) {
+    public DebugResponse processStartSession(String resourceType, Map<String, String> requestBody) {
 
         try {
             validateRequest(resourceType, requestBody);
@@ -122,7 +126,7 @@ public class DebugService {
      *
      * @param resourceType Resource type from path parameter.
      * @param properties Request properties map.
-     * @return Response data map (safe copy, never null).
+     * @return Response data map.
      * @throws DebugFrameworkClientException if the framework encounters a client error.
      * @throws DebugFrameworkServerException if the framework encounters a server error.
      */
@@ -130,7 +134,7 @@ public class DebugService {
                                                     Map<String, String> properties)
             throws DebugFrameworkClientException, DebugFrameworkServerException {
 
-        DebugRequest debugRequest = new DebugRequest();
+        DebugFrameworkRequest debugRequest = new DebugFrameworkRequest();
         debugRequest.setResourceType(resourceType);
 
         Map<String, String> requestProperties = properties != null ? properties : Collections.emptyMap();
@@ -138,14 +142,12 @@ public class DebugService {
             debugRequest.addContextProperty(entry.getKey(), entry.getValue());
         }
 
-        org.wso2.carbon.identity.debug.framework.model.DebugResponse frameworkResponse =
+        DebugFrameworkResponse frameworkResponse =
                 coordinator.handleDebugRequest(debugRequest);
 
         // Copy framework response into a new map to avoid mutating framework-owned data.
-        Map<String, Object> responseData = new HashMap<>();
-        if (frameworkResponse.getData() != null) {
-            responseData.putAll(frameworkResponse.getData());
-        }
+        Map<String, Object> responseData = frameworkResponse.getData() != null
+                ? new HashMap<>(frameworkResponse.getData()) : new HashMap<>();
         responseData.putIfAbsent(DebugConstants.ResponseKeys.STATUS,
                 resolveStartSessionStatus(responseData).name());
 
@@ -164,6 +166,8 @@ public class DebugService {
 
         DebugResponse response = new DebugResponse();
 
+        // Resolve debugId from the framework response.
+        // A null debugId here is considered a server-side error as it's a mandatory part of the session lifecycle.
         Object debugId = resolveDebugId(responseData, null);
         if (debugId == null) {
             throw new DebugFrameworkServerException(
@@ -173,6 +177,7 @@ public class DebugService {
         }
         response.setDebugId(debugId.toString());
 
+        // Map internal framework status and messages to the public API DTO.
         DebugResponse.StatusEnum status =
                 STATUS_BUILDER.buildDebugStatus(
                         responseData.get(DebugConstants.ResponseKeys.STATUS), null);
@@ -201,17 +206,24 @@ public class DebugService {
      * @param frameworkResponse Framework response data.
      * @param requestedDebugId  The originally requested debug ID (used as fallback).
      * @return DebugResult DTO.
+     * @throws DebugFrameworkServerException if debug ID cannot be resolved.
      */
     private DebugResult buildDebugResult(Map<String, Object> frameworkResponse,
-            String requestedDebugId) {
+            String requestedDebugId) throws DebugFrameworkServerException {
 
         DebugResult response = new DebugResult();
 
+        // Resolve debugId from the framework response or use the requested fallback.
         Object debugId = resolveDebugId(frameworkResponse, requestedDebugId);
-        if (debugId != null) {
-            response.setDebugId(debugId.toString());
+        if (debugId == null) {
+            throw new DebugFrameworkServerException(
+                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_SERVER_ERROR.getCode(),
+                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_SERVER_ERROR.getMessage(),
+                    "Debug framework response does not contain debugId and no fallback available");
         }
+        response.setDebugId(debugId.toString());
 
+        // Map internal framework status and messages to the public API DTO.
         DebugResult.StatusEnum status = STATUS_BUILDER.buildResultStatus(
                 frameworkResponse.get(DebugConstants.ResponseKeys.STATUS),
                 frameworkResponse.get(DebugConstants.ResponseKeys.SUCCESS));
@@ -219,15 +231,11 @@ public class DebugService {
         response.setMessage(resolveResultMessage(
                 status, frameworkResponse.get(DebugConstants.ResponseKeys.MESSAGE)));
 
-        // Build metadata: preserve framework-specific keys except fields extracted to the top level
-        Map<String, Object> metadata = new LinkedHashMap<>();
-        for (Map.Entry<String, Object> entry : frameworkResponse.entrySet()) {
-            String key = entry.getKey();
-            if (!isFrameworkInternalKey(key)) {
-                metadata.put(key, entry.getValue());
-            }
+        // Build metadata: preserve framework-specific keys except fields extracted to the top level.
+        Map<String, Object> metadata = buildMetadataFromFrameworkResponse(frameworkResponse);
+        if (!metadata.isEmpty()) {
+            response.setMetadata(metadata);
         }
-        response.setMetadata(metadata);
 
         return response;
     }
@@ -278,13 +286,13 @@ public class DebugService {
         }
         switch (status) {
             case FAILURE:
-                return "Debug session execution failed";
+                return "Failed to execute the debug session.";
             case SUCCESS_COMPLETE:
-                return "Debug session completed successfully";
+                return "The debug session has completed successfully.";
             case SUCCESS_INCOMPLETE:
-                return "Debug session started executed and is awaiting completion";
+                return "The debug session has partially completed.";
             default:
-                return "Debug session executed successfully";
+                return "Debug session executed successfully.";
         }
     }
 
@@ -304,12 +312,12 @@ public class DebugService {
         }
         switch (status) {
             case SUCCESS_INCOMPLETE:
-                return "Debug session is in progress";
+                return "The debug session is still in progress.";
             case SUCCESS_COMPLETE:
-                return "Debug session retrieved successfully.";
+                return "Debug session results have been retrieved successfully.";
             case FAILURE:
             default:
-                return "Debug session retrieval failed.";
+                return "Failed to retrieve debug results.";
         }
     }
 
@@ -322,7 +330,8 @@ public class DebugService {
         return debugId;
     }
 
-    // Note: Add new resource types to REQUIRED_PROPERTIES_BY_RESOURCE_TYPE and validate in validateRequest().
+    // Note: Add new resource types to REQUIRED_PROPERTIES_BY_RESOURCE_TYPE
+    // hence a validation is applied for each requests based on the resource type.
     private static Map<String, List<String>> createRequiredPropertiesByResourceType() {
 
         Map<String, List<String>> requiredPropertiesByResourceType = new HashMap<>();

@@ -2,8 +2,7 @@ openapi: 3.0.0
 info:
   description: >
     This document specifies a **Debug RESTful API** for **WSO2 Identity Server**.
-    This API supports debugging of various authentication flows and resource configurations.
-    The APIs provide the capability to start and retrieve debug sessions for different resource types.
+    This API provides the capability to start and retrieve debug sessions for supported resource types.
     OAuth2 scopes: `internal_debug_mgt_view` (read) and `internal_debug_mgt_update` (write).
 
   version: "1.0"
@@ -105,7 +104,7 @@ paths:
   /debug/{debugId}/result:
     get:
       summary: "Get Debug Result"
-      description: "Retrieves the debug results for a specific debug ID."
+      description: "Retrieves the debug results for a specific debug ID. This endpoint is primarily required for multi-step debug flows, such as Identity Provider (IDP) debugging, which involve intermediate steps. For most other resources, the initial request completes the flow and this endpoint may not be needed."
       operationId: "getDebugResult"
       tags:
         - "Debug"
