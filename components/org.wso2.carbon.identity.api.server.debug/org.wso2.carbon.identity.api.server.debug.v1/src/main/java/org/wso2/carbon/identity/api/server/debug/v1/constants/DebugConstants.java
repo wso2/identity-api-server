@@ -42,21 +42,6 @@ public class DebugConstants {
         }
     }
 
-    /**
-     * Keys expected in responses emitted by the debug framework.
-     */
-    public static final class ResponseKeys {
-
-        public static final String DEBUG_ID = "debugId";
-        public static final String SUCCESS = "success";
-        public static final String STATUS = "status";
-        public static final String MESSAGE = "message";
-        public static final String AUTHORIZATION_URL = "authorizationUrl";
-
-        private ResponseKeys() {
-            // Prevent instantiation.
-        }
-    }
 
     /**
      * Error constants for debug flow.
