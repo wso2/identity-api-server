@@ -70,6 +70,3 @@ public enum FapiProfile {
         return fromValue(fapiProfileEnum.value());
     }
 }
-
-
-

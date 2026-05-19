@@ -296,9 +296,10 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
         try {
             return FapiProfile.fromValue(fapiProfileValue);
         } catch (IllegalArgumentException e) {
-            log.warn("Unrecognised fapiProfile value stored for application '"
-                    + oauthAppDTO.getApplicationName() + "': " + fapiProfileValue
-                    + ". Omitting from response.");
+            if (log.isDebugEnabled()) {
+                log.debug(String.format("Unrecognised fapiProfile value stored for application '%s': %s",
+                        oauthAppDTO.getApplicationName(), fapiProfileValue), e);
+            }
             return null;
         }
     }

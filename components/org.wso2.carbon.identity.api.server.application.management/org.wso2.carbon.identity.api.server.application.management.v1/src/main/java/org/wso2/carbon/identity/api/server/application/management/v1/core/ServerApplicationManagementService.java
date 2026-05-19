@@ -66,7 +66,6 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Role;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.ScriptUpdateModel;
-import org.wso2.carbon.identity.api.server.application.management.v1.FapiProfile;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApiModelToServiceProvider;
@@ -844,6 +843,11 @@ public class ServerApplicationManagementService {
                 Boolean.TRUE.equals(applicationModel.getEnhancedOrgAuthenticationEnabled())) {
             throw buildBadRequestError(UNSUPPORTED_ENHANCED_ORGANIZATION_AUTHENTICATION_ENABLED_CONFIGURATION.getCode(),
                     UNSUPPORTED_ENHANCED_ORGANIZATION_AUTHENTICATION_ENABLED_CONFIGURATION.getDescription());
+        }
+
+        if (applicationModel.getEnhancedOrgAuthenticationEnabled() == null
+                && isEnhancedOrganizationAuthenticationFeatureEnabled()) {
+            applicationModel.setEnhancedOrgAuthenticationEnabled(isEnhancedOrgAuthEnabledByDefaultForNewApps());
         }
 
         // Block application creation with name Console or MyAccount.
