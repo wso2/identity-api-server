@@ -390,6 +390,9 @@ public class ConsentManagementService {
                 if (StringUtils.isNotBlank(purpose.getUuid())) {
                     dto.setId(purpose.getUuid());
                 }
+                if (StringUtils.isNotBlank(purpose.getGroupType())) {
+                    dto.setType(purpose.getGroupType());
+                }
                 if (StringUtils.isNotBlank(versionUuid)) {
                     dto.setVersionId(versionUuid);
                     PurposeVersion latestVersion = purpose.getLatestVersion();

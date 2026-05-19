@@ -42,6 +42,7 @@ public class ConsentedPurposeDTO  {
   
     private String name;
     private String id;
+    private String type;
     private String versionId;
     private String version;
     private List<ConsentedElementDTO> elements = null;
@@ -81,7 +82,29 @@ public class ConsentedPurposeDTO  {
         return id;
     }
     public void setId(String id) {
+
         this.id = id;
+    }
+
+    /**
+    * Purpose type classification
+    **/
+    public ConsentedPurposeDTO type(String type) {
+
+        this.type = type;
+        return this;
+    }
+
+    @ApiModelProperty(example = "Policy", value = "Purpose type classification")
+    @JsonProperty("type")
+    @Valid
+    public String getType() {
+
+        return type;
+    }
+    public void setType(String type) {
+
+        this.type = type;
     }
 
     /**
@@ -193,6 +216,7 @@ public class ConsentedPurposeDTO  {
         ConsentedPurposeDTO consentedPurposeDTO = (ConsentedPurposeDTO) o;
         return Objects.equals(this.name, consentedPurposeDTO.name) &&
             Objects.equals(this.id, consentedPurposeDTO.id) &&
+            Objects.equals(this.type, consentedPurposeDTO.type) &&
             Objects.equals(this.versionId, consentedPurposeDTO.versionId) &&
             Objects.equals(this.version, consentedPurposeDTO.version) &&
             Objects.equals(this.elements, consentedPurposeDTO.elements) &&
@@ -201,7 +225,7 @@ public class ConsentedPurposeDTO  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, id, versionId, version, elements, properties);
+        return Objects.hash(name, id, type, versionId, version, elements, properties);
     }
 
     @Override
@@ -212,6 +236,7 @@ public class ConsentedPurposeDTO  {
 
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
+        sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    versionId: ").append(toIndentedString(versionId)).append("\n");
         sb.append("    version: ").append(toIndentedString(version)).append("\n");
         sb.append("    elements: ").append(toIndentedString(elements)).append("\n");
