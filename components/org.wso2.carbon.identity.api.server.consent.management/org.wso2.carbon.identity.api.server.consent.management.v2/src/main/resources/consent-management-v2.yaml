@@ -1475,6 +1475,11 @@ components:
           description: Consented elements for this purpose
           items:
             $ref: '#/components/schemas/ConsentedElementDTO'
+        properties:
+          type: object
+          description: Key-value properties from the consented purpose version
+          additionalProperties:
+            type: string
 
     ConsentedElementDTO:
       type: object

@@ -395,10 +395,12 @@ public class ConsentManagementService {
                     PurposeVersion latestVersion = purpose.getLatestVersion();
                     if (latestVersion != null && versionUuid.equals(latestVersion.getUuid())) {
                         dto.setVersion(latestVersion.getVersion());
+                        dto.setProperties(latestVersion.getProperties());
                     } else if (dto.getId() != null) {
                         PurposeVersion pv = consentManager.getPurposeVersion(dto.getId(), versionUuid);
                         if (pv != null) {
                             dto.setVersion(pv.getVersion());
+                            dto.setProperties(pv.getProperties());
                         }
                     }
                 }
