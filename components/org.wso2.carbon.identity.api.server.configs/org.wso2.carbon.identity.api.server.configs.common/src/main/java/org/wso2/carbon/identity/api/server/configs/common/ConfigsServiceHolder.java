@@ -27,6 +27,7 @@ import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.fraud.detection.core.service.FraudDetectionConfigsService;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
 import org.wso2.carbon.identity.oauth2.config.services.OAuth2OIDCConfigOrgUsageScopeMgtService;
+import org.wso2.carbon.identity.oauth2.fapi.services.FapiConfigMgtService;
 import org.wso2.carbon.identity.oauth2.impersonation.services.ImpersonationConfigMgtService;
 import org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.core.JWTClientAuthenticatorMgtService;
 import org.wso2.carbon.idp.mgt.IdentityProviderManager;
@@ -116,6 +117,13 @@ public class ConfigsServiceHolder {
         static final CompatibilitySettingsService SERVICE =
                 (CompatibilitySettingsService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                         .getOSGiService(CompatibilitySettingsService.class, null);
+    }
+
+    private static class FapiConfigMgtServiceHolder {
+
+        static final FapiConfigMgtService SERVICE =
+                (FapiConfigMgtService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(FapiConfigMgtService.class, null);
     }
 
     /**
@@ -236,5 +244,15 @@ public class ConfigsServiceHolder {
     public static CompatibilitySettingsService getIdentityCompatibilitySettingsService() {
 
         return IdentityCompatibilitySettingsServiceHolder.SERVICE;
+    }
+
+    /**
+     * Get FapiConfigMgtService osgi service.
+     *
+     * @return FapiConfigMgtService
+     */
+    public static FapiConfigMgtService getFapiConfigMgtService() {
+
+        return FapiConfigMgtServiceHolder.SERVICE;
     }
 }

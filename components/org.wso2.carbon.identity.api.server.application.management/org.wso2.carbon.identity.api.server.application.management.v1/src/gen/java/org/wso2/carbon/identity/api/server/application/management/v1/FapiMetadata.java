@@ -64,7 +64,7 @@ public class FapiMetadata  {
         this.allowedSignatureAlgorithms = allowedSignatureAlgorithms;
         return this;
     }
-
+    
     @ApiModelProperty(value = "")
     @JsonProperty("allowedSignatureAlgorithms")
     @Valid
@@ -82,7 +82,7 @@ public class FapiMetadata  {
         this.allowedEncryptionAlgorithms = allowedEncryptionAlgorithms;
         return this;
     }
-
+    
     @ApiModelProperty(value = "")
     @JsonProperty("allowedEncryptionAlgorithms")
     @Valid
@@ -100,7 +100,7 @@ public class FapiMetadata  {
         this.tokenEndpointAuthMethod = tokenEndpointAuthMethod;
         return this;
     }
-
+    
     @ApiModelProperty(value = "")
     @JsonProperty("tokenEndpointAuthMethod")
     @Valid

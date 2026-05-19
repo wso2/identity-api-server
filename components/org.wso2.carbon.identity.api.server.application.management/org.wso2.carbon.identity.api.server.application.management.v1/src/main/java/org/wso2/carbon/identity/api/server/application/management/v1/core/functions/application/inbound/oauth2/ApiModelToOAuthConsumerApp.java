@@ -173,7 +173,7 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
     }
 
     private void updateAllowedOrigins(OAuthConsumerAppDTO consumerAppDTO, List<String> allowedOrigins) {
-
+        
         // Setting the allowed origins since now the cors origin services will be called and handle by the Oauth2
         // Inbound config handler
         consumerAppDTO.setAllowedOrigins(allowedOrigins);

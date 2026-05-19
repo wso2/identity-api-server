@@ -192,8 +192,7 @@ public class ServerConfigManagementService {
                                          FraudDetectionConfigsService fraudDetectionConfigsService,
                                          OAuth2OIDCConfigOrgUsageScopeMgtService
                                                  oauth2OIDCConfigOrgUsageScopeMgtService,
-                                         CompatibilitySettingsService identityCompatibilitySettingsService,
-                                         FapiConfigMgtService fapiConfigMgtService) {
+                                         CompatibilitySettingsService identityCompatibilitySettingsService) {
 
         this.applicationManagementService = applicationManagementService;
         this.idpManager = idpManager;

@@ -72,6 +72,7 @@ public class Constants {
     public static final String DCR_CONFIG_SSA_JWKS = "/ssaJwks";
     public static final String DCR_CONFIG_AUTHENTICATION_REQUIRED = "/authenticationRequired";
     public static final String DCR_CONFIG_MANDATE_SSA = "/mandateSSA";
+    public static final String DCR_CONFIG_FAPI_PROFILE = "/fapiProfile";
 
     /**
      * SAML2 metadata endpoint uri path.
@@ -259,7 +260,18 @@ public class Constants {
                 "Server encountered an error while updating the Compatibility Settings."),
         ERROR_CODE_SETTING_GROUP_NOT_FOUND("60007",
                 "Setting group not found.",
-                "Unable to find compatibility settings for the setting group %s.");
+                "Unable to find compatibility settings for the setting group %s."),
+
+        /**
+         * FAPI Configuration errors.
+         */
+        ERROR_CODE_FAPI_CONFIG_RETRIEVE("65033",
+                "Unable to retrieve FAPI configuration.",
+                "Server encountered an error while retrieving the FAPI configuration."),
+
+        ERROR_CODE_FAPI_CONFIG_UPDATE("65034",
+                "Unable to update FAPI configuration.",
+                "Server encountered an error while updating the FAPI configuration.");
 
         private final String code;
         private final String message;
