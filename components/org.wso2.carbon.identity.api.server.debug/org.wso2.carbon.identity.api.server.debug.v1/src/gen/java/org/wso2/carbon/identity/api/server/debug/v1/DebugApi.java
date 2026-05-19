@@ -54,7 +54,7 @@ public class DebugApi  {
     @Path("/{debugId}/result")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get Debug Result", notes = "Retrieves the debug results for a specific debug ID.", response = DebugResult.class, authorizations = {
+    @ApiOperation(value = "Get Debug Result", notes = "Retrieves the debug results for a specific debug ID. This endpoint is primarily required for multi-step debug flows, such as Identity Provider (IDP) debugging, which involve intermediate steps. For most other resources, the initial request completes the flow and this endpoint may not be needed.   <b>Scope (Permission) required:</b> ``internal_debug_mgt_view``", response = DebugResult.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             @AuthorizationScope(scope = "internal_debug_mgt_view", description = "View debug sessions and results")
@@ -77,7 +77,7 @@ public class DebugApi  {
     @Path("/{resourceType}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Start Debug Session", notes = "Initiates a debug session for supported resource types with configurable properties.", response = DebugResponse.class, authorizations = {
+    @ApiOperation(value = "Start Debug Session", notes = "Initiates a debug session for supported resource types with configurable properties.   <b>Scope (Permission) required:</b> ``internal_debug_mgt_update``  ", response = DebugResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             @AuthorizationScope(scope = "internal_debug_mgt_update", description = "Create and manage debug sessions")

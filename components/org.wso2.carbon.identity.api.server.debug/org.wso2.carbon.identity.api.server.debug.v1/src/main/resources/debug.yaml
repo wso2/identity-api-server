@@ -1,12 +1,12 @@
 openapi: 3.0.0
 info:
-  description: >
-    This document specifies a **Debug RESTful API** for **WSO2 Identity Server**.
-    This API provides the capability to start and retrieve debug sessions for supported resource types.
-    OAuth2 scopes: `internal_debug_mgt_view` (read) and `internal_debug_mgt_update` (write).
-
   version: "1.0"
   title: WSO2 Identity Server - Debug API
+  description: >
+    The Debug REST API provides a centralized interface to initiate and retrieve
+    debug sessions within the WSO2 Identity Server. This API enables developers
+    and administrators to troubleshoot supported resource types efficiently through
+    controlled debug workflows.
   contact:
     name: WSO2
     url: 'https://wso2.com/identity-platform/'
@@ -30,7 +30,8 @@ paths:
   /debug/{resourceType}:
     post:
       summary: "Start Debug Session"
-      description: "Initiates a debug session for supported resource types with configurable properties."
+      description: "Initiates a debug session for supported resource types with configurable properties.\n\n
+        <b>Scope (Permission) required:</b> ``internal_debug_mgt_update``\n\n"
       operationId: "startDebugSession"
       tags:
         - "Debug"
@@ -104,7 +105,8 @@ paths:
   /debug/{debugId}/result:
     get:
       summary: "Get Debug Result"
-      description: "Retrieves the debug results for a specific debug ID. This endpoint is primarily required for multi-step debug flows, such as Identity Provider (IDP) debugging, which involve intermediate steps. For most other resources, the initial request completes the flow and this endpoint may not be needed."
+      description: "Retrieves the debug results for a specific debug ID. This endpoint is primarily required for multi-step debug flows, such as Identity Provider (IDP) debugging, which involve intermediate steps. For most other resources, the initial request completes the flow and this endpoint may not be needed.\n\n
+        <b>Scope (Permission) required:</b> ``internal_debug_mgt_view``"
       operationId: "getDebugResult"
       tags:
         - "Debug"

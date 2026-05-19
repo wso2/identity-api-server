@@ -86,34 +86,22 @@ public class DebugService {
      */
     public DebugResult processGetResult(String debugId) {
 
+        DebugFrameworkResponse frameworkResponse;
         try {
-            if (StringUtils.isBlank(debugId)) {
-                throw new DebugFrameworkClientException(
-                        DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getCode(),
-                        DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getMessage(),
-                        "Debug ID cannot be null or empty.");
-            }
-            DebugFrameworkResponse frameworkResponse = coordinator.getDebugResult(debugId);
-            if (frameworkResponse == null) {
-                throw new DebugFrameworkClientException(
-                        DebugFrameworkConstants.ErrorMessages.ERROR_CODE_RESULT_NOT_FOUND.getCode(),
-                        DebugFrameworkConstants.ErrorMessages.ERROR_CODE_RESULT_NOT_FOUND.getMessage(),
-                        String.format("Debug result not found for session id: %s.", debugId));
-            }
-            return buildDebugResult(frameworkResponse, debugId);
-        } catch (DebugFrameworkClientException e) {
-            if (DebugFrameworkConstants.ErrorMessages.ERROR_CODE_RESULT_NOT_FOUND.getCode()
-                    .equals(e.getErrorCode())) {
-                throw Utils.handleException(
-                        Response.Status.NOT_FOUND,
-                        DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND.getCode(),
-                        DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND.getMessage(),
-                        DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND.getDescription());
-            }
-            throw Utils.handleDebugException(e);
+            validateDebugId(debugId);
+            frameworkResponse = coordinator.getDebugResult(debugId);
         } catch (DebugFrameworkException e) {
             throw Utils.handleDebugException(e);
         }
+
+        if (frameworkResponse == null) {
+            throw Utils.handleException(
+                    Response.Status.NOT_FOUND,
+                    DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND.getCode(),
+                    DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND.getMessage(),
+                    DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND.getDescription());
+        }
+        return buildDebugResult(frameworkResponse, debugId);
     }
 
     /**
@@ -146,16 +134,14 @@ public class DebugService {
      *
      * @param frameworkResponse Framework response.
      * @return DebugResponse DTO.
-     * @throws DebugFrameworkServerException if debugId is missing from the framework response.
      */
-    private DebugResponse buildDebugResponse(DebugFrameworkResponse frameworkResponse)
-            throws DebugFrameworkServerException {
+    private DebugResponse buildDebugResponse(DebugFrameworkResponse frameworkResponse) {
 
         if (frameworkResponse.getDebugId() == null) {
-            throw new DebugFrameworkServerException(
+            throw Utils.handleDebugException(new DebugFrameworkServerException(
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_SERVER_ERROR.getCode(),
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_SERVER_ERROR.getMessage(),
-                    "Debug framework response does not contain debugId.");
+                    "Debug framework response does not contain debugId."));
         }
 
         DebugResponse response = new DebugResponse();
@@ -181,18 +167,16 @@ public class DebugService {
      * @param frameworkResponse Framework response.
      * @param requestedDebugId  The originally requested debug ID (used as fallback if absent from response).
      * @return DebugResult DTO.
-     * @throws DebugFrameworkServerException if debug ID cannot be resolved.
      */
-    private DebugResult buildDebugResult(DebugFrameworkResponse frameworkResponse, String requestedDebugId)
-            throws DebugFrameworkServerException {
+    private DebugResult buildDebugResult(DebugFrameworkResponse frameworkResponse, String requestedDebugId) {
 
         String debugId = frameworkResponse.getDebugId() != null
                 ? frameworkResponse.getDebugId() : requestedDebugId;
         if (debugId == null) {
-            throw new DebugFrameworkServerException(
+            throw Utils.handleDebugException(new DebugFrameworkServerException(
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_SERVER_ERROR.getCode(),
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_SERVER_ERROR.getMessage(),
-                    "Debug framework response does not contain debugId and no fallback available.");
+                    "Debug framework response does not contain debugId and no fallback available."));
         }
 
         DebugResult response = new DebugResult();
@@ -267,6 +251,22 @@ public class DebugService {
         requiredPropertiesByResourceType.put(DebugConstants.ResourceType.IDP,
                 Arrays.asList(DebugConstants.CONNECTION_ID));
         return Collections.unmodifiableMap(requiredPropertiesByResourceType);
+    }
+
+    /**
+     * Validates that the given debug ID is non-blank.
+     *
+     * @param debugId Debug session ID to validate.
+     * @throws DebugFrameworkClientException if the debug ID is blank.
+     */
+    private void validateDebugId(String debugId) throws DebugFrameworkClientException {
+
+        if (StringUtils.isBlank(debugId)) {
+            throw new DebugFrameworkClientException(
+                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getCode(),
+                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST.getMessage(),
+                    "Debug ID cannot be null or empty.");
+        }
     }
 
     /**

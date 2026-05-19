@@ -91,6 +91,8 @@ public class Utils {
         String errorCode = e.getErrorCode();
         if (errorCode == null) {
             errorCode = DebugConstants.ErrorMessage.ERROR_CODE_ERROR_PROCESSING_REQUEST.getCode();
+        } else if (!errorCode.startsWith(DebugConstants.ERROR_CODE_PREFIX)) {
+            errorCode = DebugConstants.ERROR_CODE_PREFIX + errorCode;
         }
 
         return handleException(status, errorCode, e.getMessage(), e.getDescription());
