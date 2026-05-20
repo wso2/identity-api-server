@@ -1,0 +1,171 @@
+openapi: 3.0.0
+info:
+  description: >
+    This is the RESTful API for managing Moesif event publisher configurations in WSO2 Identity Server.
+  version: "v1"
+  title: WSO2 Identity Server - Moesif Publisher Management API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+
+paths:
+  /moesif-publishers:
+    post:
+      tags:
+        - Moesif Publishers
+      summary: Create a Moesif event publisher
+      operationId: createMoesifPublisher
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MoesifPublisherReq'
+        required: true
+      responses:
+        '201':
+          description: Successfully created
+          headers:
+            Location:
+              description: Location of the newly created resource.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MoesifPublisher'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    get:
+      tags:
+        - Moesif Publishers
+      summary: Get Moesif event publisher
+      operationId: getMoesifPublisher
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MoesifPublisher'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags:
+        - Moesif Publishers
+      summary: Update the Moesif event publisher configuration
+      operationId: updateMoesifPublisher
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MoesifPublisherReq'
+        required: true
+      responses:
+        '200':
+          description: Successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MoesifPublisher'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    delete:
+      tags:
+        - Moesif Publishers
+      summary: Delete a Moesif event publisher
+      operationId: deleteMoesifPublisher
+      responses:
+        '204':
+          description: Successfully deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  schemas:
+    MoesifPublisherReq:
+      type: object
+      required:
+        - apiKeyValue
+      properties:
+        apiKeyValue:
+          type: string
+          description: Moesif collector API key value.
+          example: mzf_live_1234567890abcdef
+        eventPublisherEnablement:
+          type: object
+          additionalProperties:
+            type: boolean
+          description: >
+            Map of event publisher key to enabled flag
+            (e.g. {"moesif-authentication-publisher": true, "moesif-registration-publisher": false, "flow": true, "moesif-oauth2-token-publisher": true}).
+            Keys absent from the map default to false (replace-all semantics).
+            Known keys: "moesif-authentication-publisher", "moesif-registration-publisher", "moesif-flow-publisher", "moesif-oauth2-token-publisher".
+          example:
+            moesif-authentication-publisher: true
+            moesif-registration-publisher: false
+            moesif-flow-publisher: true
+            moesif-oauth2-token-publisher: true
+    MoesifPublisher:
+      type: object
+      properties:
+        name:
+          type: string
+          example: default
+        eventPublisherEnablement:
+          type: object
+          additionalProperties:
+            type: boolean
+          description: Map of event publisher key to current enabled flag.
+          example:
+            authentication: true
+            registration: false
+            flow: true
+            oauthToken: true
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        description:
+          type: string
+
+  responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    ServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
