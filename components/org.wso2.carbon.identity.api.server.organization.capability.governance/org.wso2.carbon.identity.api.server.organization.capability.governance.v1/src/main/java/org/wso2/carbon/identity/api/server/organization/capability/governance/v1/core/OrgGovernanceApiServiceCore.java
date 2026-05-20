@@ -30,6 +30,7 @@ import org.wso2.carbon.identity.organization.management.capability.governance.Go
 import org.wso2.carbon.identity.organization.management.capability.governance.exception.GovernancePolicyMgtClientException;
 import org.wso2.carbon.identity.organization.management.capability.governance.exception.GovernancePolicyMgtException;
 import org.wso2.carbon.identity.organization.management.capability.governance.model.GovernancePolicyEvaluationResult;
+import org.wso2.carbon.identity.organization.management.service.exception.OrganizationManagementClientException;
 import org.wso2.carbon.identity.organization.management.service.exception.OrganizationManagementException;
 
 import java.util.UUID;
@@ -49,9 +50,17 @@ public class OrgGovernanceApiServiceCore {
         String orgId;
         try {
             orgId = GovernancePolicyServiceHolder.getOrganizationManager().resolveOrganizationId(tenantDomain);
-        } catch (OrganizationManagementException e) {
+        } catch (OrganizationManagementClientException e) {
             LOG.debug("Failed to resolve organization ID for tenant: " + tenantDomain, e);
             return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(buildErrorResponse(
+                            ErrorMessage.ERROR_RESOLVING_ORGANIZATION_ID.getCode(),
+                            ErrorMessage.ERROR_RESOLVING_ORGANIZATION_ID.getMessage(),
+                            ErrorMessage.ERROR_RESOLVING_ORGANIZATION_ID.getDescription()))
+                    .build();
+        } catch (OrganizationManagementException e) {
+            LOG.error("Error resolving organization ID for tenant: " + tenantDomain, e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(buildErrorResponse(
                             ErrorMessage.ERROR_RESOLVING_ORGANIZATION_ID.getCode(),
                             ErrorMessage.ERROR_RESOLVING_ORGANIZATION_ID.getMessage(),
