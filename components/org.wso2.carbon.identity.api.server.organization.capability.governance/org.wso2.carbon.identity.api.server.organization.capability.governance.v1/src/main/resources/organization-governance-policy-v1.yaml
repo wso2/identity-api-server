@@ -1,0 +1,156 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: "Organization Capability Governance API (v1)"
+  description: |-
+    REST API for evaluating organization capability governance policies in **WSO2 Identity Server**.
+
+    The calling organization is resolved from the auth token. It is never passed in the request body.
+
+    This API is served under `/t/{root-tenant-domain}/o/api/server/v1/org-governance/evaluate`.
+  contact:
+    name: WSO2
+    url: 'http://wso2.com/products/identity-server/'
+    email: iam-dev@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+
+servers:
+  - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
+    variables:
+      tenant-domain:
+        default: "carbon.super"
+      server-url:
+        default: "localhost:9443"
+
+security:
+  - OAuth2: []
+  - BasicAuth: []
+
+paths:
+
+  /org-governance/evaluate:
+    post:
+      tags:
+        - Governance Policy Evaluation
+      summary: Evaluate whether the calling org has a given capability
+      description: |-
+        Evaluates governance policies to determine whether the organization resolved from
+        the auth token is permitted to use the specified capability.
+
+        The hierarchy is walked from the calling org up to the root.
+
+        **Scope required:** `internal_org_governance_evaluate`
+      operationId: evaluateGovernancePolicy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GovernancePolicyEvaluateRequest'
+            example:
+              resourceType: "application"
+              capability: "adaptive-auth"
+      responses:
+        "200":
+          description: Evaluation completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GovernancePolicyEvaluateResponse'
+              example:
+                resourceType: "application"
+                capability: "adaptive-auth"
+                allowed: true
+        "400":
+          description: Missing required fields (`resourceType` or `capability`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: "OCGM-60001"
+                message: "Invalid request."
+                description: "Required field 'capability' is missing."
+                traceId: "e0fbcfeb-3617-43c4-8dd0-7b7d38e13047"
+        "401":
+          description: Missing or invalid authentication token.
+        "500":
+          description: Internal evaluation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: "OCGM-65001"
+                message: "Error evaluating governance policy."
+                description: "An unexpected error occurred while traversing the organization hierarchy."
+                traceId: "e0fbcfeb-3617-43c4-8dd0-7b7d38e13047"
+
+components:
+
+  schemas:
+
+    GovernancePolicyEvaluateRequest:
+      type: object
+      required:
+        - resourceType
+        - capability
+      properties:
+        resourceType:
+          type: string
+          description: The resource type context for evaluation.
+          example: "application"
+        capability:
+          type: string
+          description: The capability to evaluate.
+          example: "adaptive-auth"
+
+    GovernancePolicyEvaluateResponse:
+      type: object
+      required:
+        - resourceType
+        - capability
+        - allowed
+      properties:
+        resourceType:
+          type: string
+          example: "application"
+        capability:
+          type: string
+          example: "adaptive-auth"
+        allowed:
+          type: boolean
+          description: Whether the capability is permitted for the calling organization.
+          example: true
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          example: "OCGM-60001"
+        message:
+          type: string
+          example: "Short error message."
+        description:
+          type: string
+          example: "Detailed description with context."
+        traceId:
+          type: string
+          example: "e0fbcfeb-3617-43c4-8dd0-7b7d38e13047"
+
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://localhost:9443/oauth2/authorize'
+          tokenUrl: 'https://localhost:9443/oauth2/token'
