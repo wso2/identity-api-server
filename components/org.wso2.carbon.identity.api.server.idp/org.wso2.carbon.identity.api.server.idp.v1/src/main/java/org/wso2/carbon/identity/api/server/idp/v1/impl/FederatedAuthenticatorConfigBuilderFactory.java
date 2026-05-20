@@ -462,7 +462,7 @@ public class FederatedAuthenticatorConfigBuilderFactory {
             AuthenticationType authenticationType = new AuthenticationType();
             authenticationType.setType(AuthenticationType.TypeEnum.fromValue(endpointConfig.getEndpointConfig()
                     .getAuthentication().getType().toString()));
-            authenticationType.setProperties(null);
+            authenticationType.setProperties(endpointConfig.getResolvedEndpointAuthenticationProperties());
 
             Endpoint endpoint = new Endpoint();
             endpoint.setUri(endpointConfig.getEndpointConfig().getUri());

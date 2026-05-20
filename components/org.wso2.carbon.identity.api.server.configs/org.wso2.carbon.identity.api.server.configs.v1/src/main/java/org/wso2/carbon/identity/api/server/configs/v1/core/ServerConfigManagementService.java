@@ -976,15 +976,12 @@ public class ServerConfigManagementService {
     private void resolveEndpointConfigurationForAuthenticatorFromConfig(
             Authenticator authenticator, UserDefinedLocalAuthenticatorConfig config) {
 
-        /* Only the endpoint URI of the endpoint configurations of the user-defined authenticator is set to the
-        authenticator. The authentication properties in the config are aliases for secrets and must not be included
-         in the response body.*/
         UserDefinedAuthenticatorEndpointConfig endpointConfig = config.getEndpointConfig();
 
         AuthenticationType authenticationType = new AuthenticationType();
         authenticationType.setType(AuthenticationType.TypeEnum.fromValue(
                 endpointConfig.getAuthenticatorEndpointAuthenticationType()));
-        authenticationType.setProperties(null);
+        authenticationType.setProperties(endpointConfig.getResolvedEndpointAuthenticationProperties());
 
         Endpoint endpoint = new Endpoint();
         endpoint.setUri(endpointConfig.getAuthenticatorEndpointUri());
