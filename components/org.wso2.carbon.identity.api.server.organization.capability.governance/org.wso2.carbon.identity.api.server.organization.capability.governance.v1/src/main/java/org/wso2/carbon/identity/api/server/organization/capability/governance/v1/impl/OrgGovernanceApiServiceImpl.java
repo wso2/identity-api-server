@@ -25,6 +25,11 @@ import org.wso2.carbon.identity.api.server.organization.capability.governance.v1
 
 import javax.ws.rs.core.Response;
 
+/**
+ * Implementation of the OrgGovernanceApiService interface which is responsible for handling the API requests
+ * related to organization governance policies. This class delegates the actual processing of the requests to
+ * the OrgGovernanceApiServiceCore class.
+ */
 public class OrgGovernanceApiServiceImpl implements OrgGovernanceApiService {
 
     private final OrgGovernanceApiServiceCore core;
