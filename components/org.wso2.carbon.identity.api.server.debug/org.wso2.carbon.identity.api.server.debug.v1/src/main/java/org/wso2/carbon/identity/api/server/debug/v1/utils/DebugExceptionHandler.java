@@ -31,27 +31,24 @@ import javax.ws.rs.core.Response;
 /**
  * Utility class for debug API.
  */
-public class Utils {
+public class DebugExceptionHandler {
 
-    private static final Log LOG = LogFactory.getLog(Utils.class);
+    private static final Log LOG = LogFactory.getLog(DebugExceptionHandler.class);
 
-    private Utils() {
+    private DebugExceptionHandler() {
 
     }
 
     /**
-     * Builds an APIError for an explicit HTTP status.
+     * Builds an APIError from a typed ErrorMessage enum and HTTP status.
      *
      * @param status HTTP status.
-     * @param errorCode Error code.
-     * @param message Error message.
-     * @param description Error description.
+     * @param error  Typed error message enum.
      * @return APIError.
      */
-    public static APIError handleException(Response.Status status, String errorCode,
-            String message, String description) {
+    public static APIError handleException(Response.Status status, DebugConstants.ErrorMessage error) {
 
-        return new APIError(status, getError(errorCode, message, description));
+        return new APIError(status, getError(error.getCode(), error.getMessage(), error.getDescription()));
     }
 
     /**
@@ -96,6 +93,12 @@ public class Utils {
         }
 
         return handleException(status, errorCode, e.getMessage(), e.getDescription());
+    }
+
+    private static APIError handleException(Response.Status status, String errorCode,
+            String message, String description) {
+
+        return new APIError(status, getError(errorCode, message, description));
     }
 
 }

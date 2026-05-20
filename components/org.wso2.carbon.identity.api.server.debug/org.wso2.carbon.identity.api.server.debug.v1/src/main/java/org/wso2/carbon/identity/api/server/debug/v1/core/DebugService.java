@@ -22,7 +22,8 @@ import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.debug.v1.constants.DebugConstants;
 import org.wso2.carbon.identity.api.server.debug.v1.model.DebugResponse;
 import org.wso2.carbon.identity.api.server.debug.v1.model.DebugResult;
-import org.wso2.carbon.identity.api.server.debug.v1.utils.Utils;
+import org.wso2.carbon.identity.api.server.debug.v1.model.FrameworkResponseDTO;
+import org.wso2.carbon.identity.api.server.debug.v1.utils.DebugExceptionHandler;
 import org.wso2.carbon.identity.debug.framework.DebugFrameworkConstants;
 import org.wso2.carbon.identity.debug.framework.core.DebugRequestCoordinator;
 import org.wso2.carbon.identity.debug.framework.exception.DebugFrameworkClientException;
@@ -70,10 +71,10 @@ public class DebugService {
 
         try {
             validateRequest(resourceType, requestBody);
-            DebugFrameworkResponse frameworkResponse = sendDebugRequest(resourceType, requestBody);
+            DebugFrameworkResponse frameworkResponse = startDebugSession(resourceType, requestBody);
             return buildDebugResponse(frameworkResponse);
         } catch (DebugFrameworkException e) {
-            throw Utils.handleDebugException(e);
+            throw DebugExceptionHandler.handleDebugException(e);
         }
     }
 
@@ -86,22 +87,13 @@ public class DebugService {
      */
     public DebugResult processGetResult(String debugId) {
 
-        DebugFrameworkResponse frameworkResponse;
         try {
             validateDebugId(debugId);
-            frameworkResponse = coordinator.getDebugResult(debugId);
+            DebugFrameworkResponse frameworkResponse = coordinator.getDebugResult(debugId);
+            return buildDebugResult(frameworkResponse, debugId);
         } catch (DebugFrameworkException e) {
-            throw Utils.handleDebugException(e);
+            throw DebugExceptionHandler.handleDebugException(e);
         }
-
-        if (frameworkResponse == null) {
-            throw Utils.handleException(
-                    Response.Status.NOT_FOUND,
-                    DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND.getCode(),
-                    DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND.getMessage(),
-                    DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND.getDescription());
-        }
-        return buildDebugResult(frameworkResponse, debugId);
     }
 
     /**
@@ -113,18 +105,19 @@ public class DebugService {
      * @throws DebugFrameworkClientException if the framework encounters a client error.
      * @throws DebugFrameworkServerException if the framework encounters a server error.
      */
-    private DebugFrameworkResponse sendDebugRequest(String resourceType, Map<String, String> properties)
+    private DebugFrameworkResponse startDebugSession(String resourceType, Map<String, String> properties)
             throws DebugFrameworkClientException, DebugFrameworkServerException {
+
+        return coordinator.handleDebugRequest(buildDebugRequest(resourceType, properties));
+    }
+
+    private DebugFrameworkRequest buildDebugRequest(String resourceType, Map<String, String> properties) {
 
         DebugFrameworkRequest debugRequest = new DebugFrameworkRequest();
         debugRequest.setResourceType(resourceType);
-
-        Map<String, String> requestProperties = properties != null ? properties : Collections.emptyMap();
-        for (Map.Entry<String, String> entry : requestProperties.entrySet()) {
-            debugRequest.addContextProperty(entry.getKey(), entry.getValue());
-        }
-
-        return coordinator.handleDebugRequest(debugRequest);
+        (properties != null ? properties : Collections.<String, String>emptyMap())
+                .forEach(debugRequest::addContextProperty);
+        return debugRequest;
     }
 
     /**
@@ -138,24 +131,23 @@ public class DebugService {
     private DebugResponse buildDebugResponse(DebugFrameworkResponse frameworkResponse) {
 
         if (frameworkResponse.getDebugId() == null) {
-            throw Utils.handleDebugException(new DebugFrameworkServerException(
+            throw DebugExceptionHandler.handleDebugException(new DebugFrameworkServerException(
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_SERVER_ERROR.getCode(),
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_SERVER_ERROR.getMessage(),
                     "Debug framework response does not contain debugId."));
         }
 
+        FrameworkResponseDTO data = extractResponseData(frameworkResponse, null);
         DebugResponse response = new DebugResponse();
-        response.setDebugId(frameworkResponse.getDebugId());
+        response.setDebugId(data.getDebugId());
 
-        DebugResponse.StatusEnum status = DebugStatusBuilder.resolveDebugStatus(frameworkResponse.getStatus());
+        DebugResponse.StatusEnum status = DebugStatusBuilder.resolveDebugStatus(data.getRawStatus());
         response.setStatus(status);
-        response.setMessage(resolveDebugMessage(status, frameworkResponse.getMessage()));
+        response.setMessage(resolveDebugMessage(status, data.getRawMessage()));
 
-        Map<String, Object> metadata = frameworkResponse.getData();
-        if (metadata != null && !metadata.isEmpty()) {
-            response.setMetadata(metadata);
+        if (data.getMetadata() != null) {
+            response.setMetadata(data.getMetadata());
         }
-
         return response;
     }
 
@@ -170,28 +162,43 @@ public class DebugService {
      */
     private DebugResult buildDebugResult(DebugFrameworkResponse frameworkResponse, String requestedDebugId) {
 
-        String debugId = frameworkResponse.getDebugId() != null
-                ? frameworkResponse.getDebugId() : requestedDebugId;
-        if (debugId == null) {
-            throw Utils.handleDebugException(new DebugFrameworkServerException(
-                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_SERVER_ERROR.getCode(),
-                    DebugFrameworkConstants.ErrorMessages.ERROR_CODE_SERVER_ERROR.getMessage(),
-                    "Debug framework response does not contain debugId and no fallback available."));
+        FrameworkResponseDTO data = extractResponseData(frameworkResponse, requestedDebugId);
+        if (data.getDebugId() == null) {
+            throw DebugExceptionHandler.handleException(
+                    Response.Status.NOT_FOUND,
+                    DebugConstants.ErrorMessage.ERROR_CODE_RESULT_NOT_FOUND);
         }
 
         DebugResult response = new DebugResult();
-        response.setDebugId(debugId);
+        response.setDebugId(data.getDebugId());
 
-        DebugResult.StatusEnum status = DebugStatusBuilder.resolveResultStatus(frameworkResponse.getStatus());
+        DebugResult.StatusEnum status = DebugStatusBuilder.resolveResultStatus(data.getRawStatus());
         response.setStatus(status);
-        response.setMessage(resolveResultMessage(status, frameworkResponse.getMessage()));
+        response.setMessage(resolveResultMessage(status, data.getRawMessage()));
 
-        Map<String, Object> metadata = frameworkResponse.getData();
-        if (metadata != null && !metadata.isEmpty()) {
-            response.setMetadata(metadata);
+        if (data.getMetadata() != null) {
+            response.setMetadata(data.getMetadata());
         }
-
         return response;
+    }
+
+    /**
+     * Extracts common fields from a framework response into a FrameworkResponseDTO,
+     * using fallbackDebugId when the response does not carry its own debugId.
+     *
+     * @param frameworkResponse Framework response.
+     * @param fallbackDebugId   Fallback debug ID (may be null).
+     * @return FrameworkResponseDTO holding the extracted fields.
+     */
+    private FrameworkResponseDTO extractResponseData(DebugFrameworkResponse frameworkResponse,
+            String fallbackDebugId) {
+
+        String debugId = frameworkResponse.getDebugId() != null
+                ? frameworkResponse.getDebugId() : fallbackDebugId;
+        Map<String, Object> data = frameworkResponse.getData();
+        Map<String, Object> metadata = (data != null && !data.isEmpty()) ? data : null;
+        return new FrameworkResponseDTO(debugId, frameworkResponse.getStatus(),
+                frameworkResponse.getMessage(), metadata);
     }
 
     /**
