@@ -23,23 +23,37 @@ import javax.ws.rs.core.Response;
 
 public interface FlowApiService {
 
-    public Response deleteFlow(String flowType);
+      public Response checkInFlowExtensionName(InFlowExtensionNameCheckRequest inFlowExtensionNameCheckRequest);
 
-    public Response generateFlow(FlowGenerateRequest flowGenerateRequest);
+      public Response createInFlowExtension(InFlowExtensionModel inFlowExtensionModel);
 
-    public Response getFlow(String flowType);
+      public Response deleteFlow(String flowType);
 
-    public Response getFlowConfigForFlow(String flowType);
+      public Response deleteInFlowExtension(String extensionId);
 
-    public Response getFlowConfigs();
+      public Response generateFlow(FlowGenerateRequest flowGenerateRequest);
 
-    public Response getFlowGenerationResult(String operationId);
+      public Response getFlow(String flowType);
 
-    public Response getFlowGenerationStatus(String operationId);
+      public Response getFlowConfigForFlow(String flowType);
 
-    public Response getFlowMeta(String flowType);
+      public Response getFlowConfigs();
 
-    public Response updateFlow(FlowRequest flowRequest);
+      public Response getFlowGenerationResult(String operationId);
 
-    public Response updateFlowConfig(FlowConfigPatchModel flowConfigPatchModel);
+      public Response getFlowGenerationStatus(String operationId);
+
+      public Response getFlowMeta(String flowType);
+
+      public Response getInFlowExtensionById(String extensionId);
+
+      public Response getInFlowExtensionContextTree(String flowType);
+
+      public Response getInFlowExtensions();
+
+      public Response updateFlow(FlowRequest flowRequest);
+
+      public Response updateFlowConfig(FlowConfigPatchModel flowConfigPatchModel);
+
+      public Response updateInFlowExtension(String extensionId, InFlowExtensionUpdateModel inFlowExtensionUpdateModel);
 }

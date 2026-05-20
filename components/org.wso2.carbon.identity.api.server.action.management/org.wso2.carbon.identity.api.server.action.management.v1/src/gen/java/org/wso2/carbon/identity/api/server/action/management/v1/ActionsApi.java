@@ -24,16 +24,22 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionBasicResponse;
+import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
+import org.wso2.carbon.identity.api.server.action.management.v1.ActionNameCheckRequest;
+import org.wso2.carbon.identity.api.server.action.management.v1.ActionNameCheckResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionTypesResponseItem;
+import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.Error;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionsApiService;
+import org.wso2.carbon.identity.api.server.action.management.v1.factories.ActionsApiServiceFactory;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
-import org.wso2.carbon.identity.api.server.action.management.v1.factories.ActionsApiServiceFactory;
+
+import javax.validation.constraints.*;
 
 @Path("/actions")
 @Api(description = "The actions API")
@@ -67,9 +73,33 @@ public class ActionsApi  {
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response activateAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration, preIssueIdToken") @PathParam("actionType") String actionType, @ApiParam(value = "Unique identifier of the action.",required=true) @PathParam("actionId") String actionId) {
+    public Response activateAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration, preIssueIdToken, inFlowExtension") @PathParam("actionType") String actionType, @ApiParam(value = "Unique identifier of the action.",required=true) @PathParam("actionId") String actionId) {
 
         return delegate.activateAction(actionType,  actionId );
+    }
+
+    @Valid
+    @POST
+    @Path("/{actionType}/check-name")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Check Action Name Availability", notes = "This API checks whether the given action name is available for the specified action type.    <b>Scope (Permission) required:</b> ``internal_action_mgt_view``  ", response = ActionNameCheckResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Actions", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = ActionNameCheckResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class),
+        @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
+    })
+    public Response checkActionName(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration, preIssueIdToken, inFlowExtension") @PathParam("actionType") String actionType, @ApiParam(value = "This represents the action name to check." ,required=true) @Valid ActionNameCheckRequest actionNameCheckRequest) {
+
+        return delegate.checkActionName(actionType,  actionNameCheckRequest );
     }
 
     @Valid
@@ -91,7 +121,7 @@ public class ActionsApi  {
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response createAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration, preIssueIdToken") @PathParam("actionType") String actionType, @ApiParam(value = "This represents the information of the action to be created." ,required=true) @Valid String body) {
+    public Response createAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration, preIssueIdToken, inFlowExtension") @PathParam("actionType") String actionType, @ApiParam(value = "This represents the information of the action to be created." ,required=true) @Valid String body) {
 
         return delegate.createAction(actionType,  body );
     }
@@ -116,7 +146,7 @@ public class ActionsApi  {
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response deactivateAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration, preIssueIdToken") @PathParam("actionType") String actionType, @ApiParam(value = "Unique identifier of the action.",required=true) @PathParam("actionId") String actionId) {
+    public Response deactivateAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration, preIssueIdToken, inFlowExtension") @PathParam("actionType") String actionType, @ApiParam(value = "Unique identifier of the action.",required=true) @PathParam("actionId") String actionId) {
 
         return delegate.deactivateAction(actionType,  actionId );
     }
@@ -140,7 +170,7 @@ public class ActionsApi  {
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response deleteAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration, preIssueIdToken") @PathParam("actionType") String actionType, @ApiParam(value = "Unique identifier of the action.",required=true) @PathParam("actionId") String actionId) {
+    public Response deleteAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration, preIssueIdToken, inFlowExtension") @PathParam("actionType") String actionType, @ApiParam(value = "Unique identifier of the action.",required=true) @PathParam("actionId") String actionId) {
 
         return delegate.deleteAction(actionType,  actionId );
     }
@@ -165,7 +195,7 @@ public class ActionsApi  {
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response getActionByActionId(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration, preIssueIdToken") @PathParam("actionType") String actionType, @ApiParam(value = "Unique identifier of the action.",required=true) @PathParam("actionId") String actionId) {
+    public Response getActionByActionId(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration, preIssueIdToken, inFlowExtension") @PathParam("actionType") String actionType, @ApiParam(value = "Unique identifier of the action.",required=true) @PathParam("actionId") String actionId) {
 
         return delegate.getActionByActionId(actionType,  actionId );
     }
@@ -212,7 +242,7 @@ public class ActionsApi  {
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response getActionsByActionType(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration, preIssueIdToken") @PathParam("actionType") String actionType) {
+    public Response getActionsByActionType(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration, preIssueIdToken, inFlowExtension") @PathParam("actionType") String actionType) {
 
         return delegate.getActionsByActionType(actionType );
     }
@@ -237,7 +267,7 @@ public class ActionsApi  {
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response updateAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration, preIssueIdToken") @PathParam("actionType") String actionType, @ApiParam(value = "Unique identifier of the action.",required=true) @PathParam("actionId") String actionId, @ApiParam(value = "This represents the action to be updated." ,required=true) @Valid String body) {
+    public Response updateAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration, preIssueIdToken, inFlowExtension") @PathParam("actionType") String actionType, @ApiParam(value = "Unique identifier of the action.",required=true) @PathParam("actionId") String actionId, @ApiParam(value = "This represents the action to be updated." ,required=true) @Valid String body) {
 
         return delegate.updateAction(actionType,  actionId,  body );
     }
