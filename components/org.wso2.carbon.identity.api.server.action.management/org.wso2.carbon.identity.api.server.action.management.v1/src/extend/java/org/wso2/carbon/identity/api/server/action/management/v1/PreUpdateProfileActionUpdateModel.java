@@ -31,8 +31,6 @@ import javax.validation.Valid;
  **/
 public class PreUpdateProfileActionUpdateModel extends ActionUpdateModel {
 
-    private List<String> attributes;
-
     public PreUpdateProfileActionUpdateModel() {
         // Default constructor required for Jackson
     }
@@ -43,25 +41,7 @@ public class PreUpdateProfileActionUpdateModel extends ActionUpdateModel {
         setDescription(actionUpdateModel.getDescription());
         setEndpoint(actionUpdateModel.getEndpoint());
         setRule(actionUpdateModel.getRule());
-    }
-
-    public PreUpdateProfileActionUpdateModel attributes(List<String> attributes) {
-
-        this.attributes = attributes;
-        return this;
-    }
-
-    @ApiModelProperty()
-    @JsonProperty("attributes")
-    @Valid
-    public List<String> getAttributes() {
-
-        return attributes;
-    }
-
-    public void setAttributes(List<String> attributes) {
-
-        this.attributes = attributes;
+        setAttributes(actionUpdateModel.getAttributes());
     }
 
     @Override
@@ -77,13 +57,13 @@ public class PreUpdateProfileActionUpdateModel extends ActionUpdateModel {
         return Objects.equals(this.getName(), actionUpdateModel.getName()) &&
                 Objects.equals(this.getDescription(), actionUpdateModel.getDescription()) &&
                 Objects.equals(this.getEndpoint(), actionUpdateModel.getEndpoint()) &&
-                Objects.equals(this.attributes, actionUpdateModel.attributes) &&
+                Objects.equals(this.getAttributes(), actionUpdateModel.getAttributes()) &&
                 Objects.equals(this.getRule(), actionUpdateModel.getRule());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), getDescription(), getEndpoint(), attributes, getRule());
+        return Objects.hash(getName(), getDescription(), getEndpoint(), getAttributes(), getRule());
     }
 
     @Override
@@ -94,7 +74,7 @@ public class PreUpdateProfileActionUpdateModel extends ActionUpdateModel {
         sb.append("    name: ").append(toIndentedString(getName())).append("\n");
         sb.append("    description: ").append(toIndentedString(getDescription())).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(getEndpoint())).append("\n");
-        sb.append("    attributes: ").append(toIndentedString(attributes)).append("\n");
+        sb.append("    attributes: ").append(toIndentedString(getAttributes())).append("\n");
         sb.append("    rule: ").append(toIndentedString(getRule())).append("\n");
         sb.append("}");
         return sb.toString();
