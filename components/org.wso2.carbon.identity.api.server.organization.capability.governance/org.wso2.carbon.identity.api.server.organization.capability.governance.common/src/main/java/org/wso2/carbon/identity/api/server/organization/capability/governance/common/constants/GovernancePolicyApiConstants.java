@@ -34,12 +34,15 @@ public class GovernancePolicyApiConstants {
         ERROR_MISSING_ORGANIZATION_CONTEXT("60001",
                 "Unable to resolve organization context.",
                 "The organization could not be resolved from the current request context."),
-        ERROR_RESOLVING_ORGANIZATION_ID("60002",
-                "Unable to resolve organization.",
-                "The organization could not be resolved for the tenant domain."),
+        ORGANIZATION_NOT_FOUND("60002",
+                "Organization not found.",
+                "No organization could be found for the given tenant domain."),
 
         // Server errors.
-        ERROR_EVALUATING_GOVERNANCE_POLICY("65001",
+        ERROR_RESOLVING_ORGANIZATION_ID("65001",
+                "Error resolving organization.",
+                "An unexpected error occurred while resolving the organization for the tenant domain."),
+        ERROR_EVALUATING_GOVERNANCE_POLICY("65002",
                 "Error evaluating governance policy.",
                 "An unexpected error occurred while evaluating the governance policy for the organization.");
 

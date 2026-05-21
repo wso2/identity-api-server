@@ -54,9 +54,9 @@ public class OrgGovernanceApiServiceCore {
             LOG.debug("Failed to resolve organization ID for tenant: " + tenantDomain, e);
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(buildErrorResponse(
-                            ErrorMessage.ERROR_RESOLVING_ORGANIZATION_ID.getCode(),
-                            ErrorMessage.ERROR_RESOLVING_ORGANIZATION_ID.getMessage(),
-                            ErrorMessage.ERROR_RESOLVING_ORGANIZATION_ID.getDescription()))
+                            ErrorMessage.ORGANIZATION_NOT_FOUND.getCode(),
+                            ErrorMessage.ORGANIZATION_NOT_FOUND.getMessage(),
+                            ErrorMessage.ORGANIZATION_NOT_FOUND.getDescription()))
                     .build();
         } catch (OrganizationManagementException e) {
             LOG.error("Error resolving organization ID for tenant: " + tenantDomain, e);

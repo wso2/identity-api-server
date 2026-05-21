@@ -83,7 +83,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                code: "OCGM-65001"
+                code: "OCGM-65002"
                 message: "Error evaluating governance policy."
                 description: "An unexpected error occurred while traversing the organization hierarchy."
                 traceId: "e0fbcfeb-3617-43c4-8dd0-7b7d38e13047"
