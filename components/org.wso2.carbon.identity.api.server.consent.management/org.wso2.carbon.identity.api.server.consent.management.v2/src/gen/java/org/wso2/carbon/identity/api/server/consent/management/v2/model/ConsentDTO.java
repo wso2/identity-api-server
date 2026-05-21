@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.AuthorizationDTO;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentedPurposeDTO;
+
 import javax.validation.constraints.*;
 
 /**
@@ -81,7 +82,7 @@ public enum StateEnum {
 
     private StateEnum state;
     private Long expiryTime;
-    private List<ConsentedPurposeDTO> purposes = null;
+    private ConsentedPurposeDTO purpose;
 
     private List<AuthorizationDTO> authorizations = null;
 
@@ -222,30 +223,22 @@ public enum StateEnum {
     }
 
     /**
-    * Purposes and elements in this consent
+    * Purpose and elements in this consent
     **/
-    public ConsentDTO purposes(List<ConsentedPurposeDTO> purposes) {
+    public ConsentDTO purpose(ConsentedPurposeDTO purpose) {
 
-        this.purposes = purposes;
+        this.purpose = purpose;
         return this;
     }
-    
-    @ApiModelProperty(value = "Purposes and elements in this consent")
-    @JsonProperty("purposes")
+
+    @ApiModelProperty(value = "Purpose and elements in this consent")
+    @JsonProperty("purpose")
     @Valid
-    public List<ConsentedPurposeDTO> getPurposes() {
-        return purposes;
+    public ConsentedPurposeDTO getPurpose() {
+        return purpose;
     }
-    public void setPurposes(List<ConsentedPurposeDTO> purposes) {
-        this.purposes = purposes;
-    }
-
-    public ConsentDTO addPurposesItem(ConsentedPurposeDTO purposesItem) {
-        if (this.purposes == null) {
-            this.purposes = new ArrayList<>();
-        }
-        this.purposes.add(purposesItem);
-        return this;
+    public void setPurpose(ConsentedPurposeDTO purpose) {
+        this.purpose = purpose;
     }
 
         /**
@@ -322,14 +315,14 @@ public enum StateEnum {
             Objects.equals(this.serviceId, consentDTO.serviceId) &&
             Objects.equals(this.state, consentDTO.state) &&
             Objects.equals(this.expiryTime, consentDTO.expiryTime) &&
-            Objects.equals(this.purposes, consentDTO.purposes) &&
+            Objects.equals(this.purpose, consentDTO.purpose) &&
             Objects.equals(this.authorizations, consentDTO.authorizations) &&
             Objects.equals(this.properties, consentDTO.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(timestamp, id, language, subjectId, serviceId, state, expiryTime, purposes, authorizations, properties);
+        return Objects.hash(timestamp, id, language, subjectId, serviceId, state, expiryTime, purpose, authorizations, properties);
     }
 
     @Override
@@ -345,7 +338,7 @@ public enum StateEnum {
         sb.append("    serviceId: ").append(toIndentedString(serviceId)).append("\n");
         sb.append("    state: ").append(toIndentedString(state)).append("\n");
         sb.append("    expiryTime: ").append(toIndentedString(expiryTime)).append("\n");
-        sb.append("    purposes: ").append(toIndentedString(purposes)).append("\n");
+        sb.append("    purpose: ").append(toIndentedString(purpose)).append("\n");
         sb.append("    authorizations: ").append(toIndentedString(authorizations)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");

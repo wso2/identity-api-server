@@ -942,7 +942,7 @@ components:
       type: object
       required:
         - serviceId
-        - purposes
+        - purpose
       properties:
         subjectId:
           type: string
@@ -964,12 +964,9 @@ components:
           maxLength: 20
           description: Language code for the consent
           example: "en"
-        purposes:
-          type: array
-          minItems: 1
-          description: List of purposes and associated elements
-          items:
-            $ref: '#/components/schemas/ConsentPurposeBinding'
+        purpose:
+          description: Purpose and associated elements for this consent
+          $ref: '#/components/schemas/ConsentPurposeBinding'
         state:
           type: string
           enum:
@@ -1432,11 +1429,9 @@ components:
           nullable: true
           description: Milliseconds since epoch until which the consent is valid. Null if no expiry.
           example: 1766383796000
-        purposes:
-          type: array
-          description: Purposes and elements in this consent
-          items:
-            $ref: '#/components/schemas/ConsentedPurposeDTO'
+        purpose:
+          description: Purpose and elements in this consent
+          $ref: '#/components/schemas/ConsentedPurposeDTO'
         authorizations:
           type: array
           description: Authorization records associated with this consent

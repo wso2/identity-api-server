@@ -288,23 +288,22 @@ public class ConsentManagementService {
     private ReceiptInput buildReceiptInput(ConsentCreateRequest request, String subjectId)
             throws ConsentManagementException {
 
-        List<PurposePIICategoryBinding> purposeBindings = new ArrayList<>();
-        if (request.getPurposes() != null) {
-            for (ConsentPurposeBinding purposeBinding : request.getPurposes()) {
-                List<PIICategory> piiCategories = new ArrayList<>();
-                if (purposeBinding.getElements() != null) {
-                    for (ElementTerminationInfo elementInfo : purposeBinding.getElements()) {
-                        String elementId = elementInfo.getId().toString();
-                        PIICategory piiCategory = consentManager.getPIICategoryByUuid(elementId);
-                        if (piiCategory == null) {
-                            throw handleClientException(ERROR_CODE_ELEMENT_UUID_NOT_FOUND, elementId);
-                        }
-                        piiCategories.add(piiCategory);
+        PurposePIICategoryBinding purposeBinding = null;
+        if (request.getPurpose() != null) {
+            ConsentPurposeBinding consentPurposeBinding = request.getPurpose();
+            List<PIICategory> piiCategories = new ArrayList<>();
+            if (consentPurposeBinding.getElements() != null) {
+                for (ElementTerminationInfo elementInfo : consentPurposeBinding.getElements()) {
+                    String elementId = elementInfo.getId().toString();
+                    PIICategory piiCategory = consentManager.getPIICategoryByUuid(elementId);
+                    if (piiCategory == null) {
+                        throw handleClientException(ERROR_CODE_ELEMENT_UUID_NOT_FOUND, elementId);
                     }
+                    piiCategories.add(piiCategory);
                 }
-                purposeBindings.add(new PurposePIICategoryBinding(
-                        purposeBinding.getId().toString(), piiCategories));
             }
+            purposeBinding = new PurposePIICategoryBinding(
+                    consentPurposeBinding.getId().toString(), piiCategories);
         }
 
         boolean rejected = ConsentCreateRequest.StateEnum.REJECTED.equals(request.getState());
@@ -313,7 +312,7 @@ public class ConsentManagementService {
         Timestamp expiryTime = expiryMillis != null ? new Timestamp(expiryMillis) : null;
         return ConsentReceiptUtils.buildReceiptInput(request.getLanguage(), subjectId, tenantDomain,
                 expiryTime, rejected, request.getAuthorizations(), request.getProperties(),
-                request.getServiceId(), purposeBindings, consentManager);
+                request.getServiceId(), purposeBinding, consentManager);
     }
 
     private ConsentDTO toConsentDTO(Receipt receipt) throws ConsentManagementException {
@@ -327,20 +326,16 @@ public class ConsentManagementService {
         dto.setState(ConsentDTO.StateEnum.fromValue(state));
         dto.setExpiryTime(receipt.getExpiryTime() != null ? receipt.getExpiryTime().getTime() : null);
 
-        // Extract service name and purposes from the first service entry (V2 is single-service).
-        List<ConsentedPurposeDTO> purposeDTOs = new ArrayList<>();
+        // Extract service name and purpose from the first service entry (V2 is single-service, single-purpose).
         List<ReceiptService> services = receipt.getServices();
         if (services != null && !services.isEmpty()) {
             ReceiptService receiptService = services.get(0);
             dto.setServiceId(receiptService.getService());
 
-            if (receiptService.getPurposes() != null) {
-                for (ConsentPurpose consentPurpose : receiptService.getPurposes()) {
-                    purposeDTOs.add(toConsentedPurposeDTO(consentPurpose));
-                }
+            if (receiptService.getPurposes() != null && !receiptService.getPurposes().isEmpty()) {
+                dto.setPurpose(toConsentedPurposeDTO(receiptService.getPurposes().get(0)));
             }
         }
-        dto.setPurposes(purposeDTOs);
 
         dto.setProperties(receipt.getProperties());
 

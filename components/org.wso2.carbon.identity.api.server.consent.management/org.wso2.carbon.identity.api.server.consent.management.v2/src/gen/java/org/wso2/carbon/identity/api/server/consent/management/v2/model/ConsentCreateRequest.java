@@ -30,6 +30,8 @@ import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentPu
 import javax.validation.constraints.*;
 
 
+
+
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
@@ -40,7 +42,7 @@ public class ConsentCreateRequest  {
     private String subjectId;
     private String serviceId;
     private String language;
-    private List<ConsentPurposeBinding> purposes = new ArrayList<>();
+    private ConsentPurposeBinding purpose;
 
 
 @XmlType(name="StateEnum")
@@ -142,29 +144,23 @@ public enum StateEnum {
     }
 
     /**
-    * List of purposes and associated elements
+    * Purpose and associated elements for this consent
     **/
-    public ConsentCreateRequest purposes(List<ConsentPurposeBinding> purposes) {
+    public ConsentCreateRequest purpose(ConsentPurposeBinding purpose) {
 
-        this.purposes = purposes;
+        this.purpose = purpose;
         return this;
     }
-    
-    @ApiModelProperty(required = true, value = "List of purposes and associated elements")
-    @JsonProperty("purposes")
+
+    @ApiModelProperty(required = true, value = "Purpose and associated elements for this consent")
+    @JsonProperty("purpose")
     @Valid
-    @NotNull(message = "Property purposes cannot be null.")
- @Size(min=1)
-    public List<ConsentPurposeBinding> getPurposes() {
-        return purposes;
+    @NotNull(message = "Property purpose cannot be null.")
+    public ConsentPurposeBinding getPurpose() {
+        return purpose;
     }
-    public void setPurposes(List<ConsentPurposeBinding> purposes) {
-        this.purposes = purposes;
-    }
-
-    public ConsentCreateRequest addPurposesItem(ConsentPurposeBinding purposesItem) {
-        this.purposes.add(purposesItem);
-        return this;
+    public void setPurpose(ConsentPurposeBinding purpose) {
+        this.purpose = purpose;
     }
 
         /**
@@ -275,7 +271,7 @@ public enum StateEnum {
         return Objects.equals(this.subjectId, consentCreateRequest.subjectId) &&
             Objects.equals(this.serviceId, consentCreateRequest.serviceId) &&
             Objects.equals(this.language, consentCreateRequest.language) &&
-            Objects.equals(this.purposes, consentCreateRequest.purposes) &&
+            Objects.equals(this.purpose, consentCreateRequest.purpose) &&
             Objects.equals(this.state, consentCreateRequest.state) &&
             Objects.equals(this.expiryTime, consentCreateRequest.expiryTime) &&
             Objects.equals(this.authorizations, consentCreateRequest.authorizations) &&
@@ -284,7 +280,7 @@ public enum StateEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(subjectId, serviceId, language, purposes, state, expiryTime, authorizations, properties);
+        return Objects.hash(subjectId, serviceId, language, purpose, state, expiryTime, authorizations, properties);
     }
 
     @Override
@@ -296,7 +292,7 @@ public enum StateEnum {
         sb.append("    subjectId: ").append(toIndentedString(subjectId)).append("\n");
         sb.append("    serviceId: ").append(toIndentedString(serviceId)).append("\n");
         sb.append("    language: ").append(toIndentedString(language)).append("\n");
-        sb.append("    purposes: ").append(toIndentedString(purposes)).append("\n");
+        sb.append("    purpose: ").append(toIndentedString(purpose)).append("\n");
         sb.append("    state: ").append(toIndentedString(state)).append("\n");
         sb.append("    expiryTime: ").append(toIndentedString(expiryTime)).append("\n");
         sb.append("    authorizations: ").append(toIndentedString(authorizations)).append("\n");
