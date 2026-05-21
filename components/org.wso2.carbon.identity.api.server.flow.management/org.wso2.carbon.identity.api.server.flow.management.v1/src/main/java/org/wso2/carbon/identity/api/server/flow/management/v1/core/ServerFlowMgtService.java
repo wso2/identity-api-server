@@ -42,8 +42,8 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.InFlowExtensionContextTreeMapper;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.InFlowExtensionMapper;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
-import org.wso2.carbon.identity.flow.inflow.extensions.metadata.InFlowExtensionContextTreeMetadata;
-import org.wso2.carbon.identity.flow.inflow.extensions.metadata.InFlowExtensionContextTreeService;
+import org.wso2.carbon.identity.flow.extensions.metadata.InFlowExtensionContextTreeMetadata;
+import org.wso2.carbon.identity.flow.extensions.metadata.InFlowExtensionContextTreeService;
 import org.wso2.carbon.identity.flow.mgt.Constants;
 import org.wso2.carbon.identity.flow.mgt.FlowMgtService;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtFrameworkException;
@@ -372,8 +372,11 @@ public class ServerFlowMgtService {
             // Pass excludeId as-is; null or empty means creation scenario (no exclusion).
             String excludeId = (request.getExcludeId() != null && !request.getExcludeId().isEmpty())
                     ? request.getExcludeId() : null;
-            boolean available = actionManagementService.isActionNameAvailable(
-                    IN_FLOW_EXTENSION_ACTION_TYPE, request.getName(), excludeId, tenantDomain);
+            List<Action> existing = actionManagementService.getActionsByActionType(
+                    IN_FLOW_EXTENSION_ACTION_TYPE, tenantDomain);
+            boolean available = existing.stream()
+                    .filter(a -> excludeId == null || !excludeId.equals(a.getId()))
+                    .noneMatch(a -> request.getName().equals(a.getName()));
             return new InFlowExtensionNameCheckResponse().available(available);
         } catch (ActionMgtException e) {
             throw Utils.handleActionMgtException(e);

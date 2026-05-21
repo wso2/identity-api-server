@@ -111,6 +111,12 @@
             <groupId>org.wso2.carbon.identity.server.api</groupId>
             <artifactId>org.wso2.carbon.identity.api.server.action.management.common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <artifactId>org.wso2.carbon.identity.flow.extensions</artifactId>
+            <version>${carbon.identity.framework.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>

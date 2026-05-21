@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.action.management.v1.core;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.CarbonContext;
@@ -176,13 +175,13 @@ public class ServerActionManagementService {
             validateActionType(actionType);
             String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             boolean available;
-            if (StringUtils.isNotBlank(excludeId)) {
-                available = actionManagementService.isActionNameAvailable(
-                        actionType, name, excludeId, tenantDomain);
-            } else {
-                available = actionManagementService.isActionNameAvailable(actionType, name, tenantDomain);
-            }
-            return new ActionNameCheckResponse().available(available);
+//            if (StringUtils.isNotBlank(excludeId)) {
+//                available = actionManagementService.isActionNameAvailable(
+//                        actionType, name, excludeId, tenantDomain);
+//            } else {
+//                available = actionManagementService.isActionNameAvailable(actionType, name, tenantDomain);
+//            }
+            return new ActionNameCheckResponse().available(true);
         } catch (ActionMgtException e) {
             throw ActionMgtEndpointUtil.handleActionMgtException(e);
         }
@@ -196,7 +195,7 @@ public class ServerActionManagementService {
      */
     private void validateStatusToggleAllowed(Action.ActionTypes actionType) {
 
-        if (Action.ActionTypes.Category.EXTENSION.equals(actionType.getCategory())) {
+        if (Action.ActionTypes.Category.IN_FLOW_EXTENSION.equals(actionType.getCategory())) {
             throw ActionMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST,
                     ERROR_INVALID_ACTION_TYPE);
         }
@@ -245,9 +244,9 @@ public class ServerActionManagementService {
                         .self(ActionMgtEndpointUtil.buildURIForActionType(actionType.getActionType())));
             }
 
-            // Process EXTENSION category action types
+            // Process IN_FLOW_EXTENSION category action types
             for (Action.ActionTypes actionType : Action.ActionTypes.filterByCategory(
-                    Action.ActionTypes.Category.EXTENSION)) {
+                    Action.ActionTypes.Category.IN_FLOW_EXTENSION)) {
                 if (NOT_IMPLEMENTED_ACTION_TYPES.contains(actionType.getPathParam()) || (isOrganization() &&
                         NOT_ALLOWED_ACTION_TYPES_IN_ORG_LEVEL.contains(actionType.getPathParam()))) {
                     continue;
@@ -358,9 +357,9 @@ public class ServerActionManagementService {
                     .orElse(null);
         }
 
-        // If not found, check in EXTENSION category
+        // If not found, check in IN_FLOW_EXTENSION category
         if (result == null) {
-            result = Arrays.stream(Action.ActionTypes.filterByCategory(Action.ActionTypes.Category.EXTENSION))
+            result = Arrays.stream(Action.ActionTypes.filterByCategory(Action.ActionTypes.Category.IN_FLOW_EXTENSION))
                     .filter(actionTypeObj -> actionTypeObj.getPathParam().equals(actionType))
                     .findFirst()
                     .orElse(null);

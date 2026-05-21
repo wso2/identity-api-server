@@ -34,7 +34,7 @@ import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
 import org.wso2.carbon.identity.claim.metadata.mgt.model.LocalClaim;
-import org.wso2.carbon.identity.flow.inflow.extensions.model.InFlowExtensionAction;
+import org.wso2.carbon.identity.flow.extensions.model.InFlowExtensionAction;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
 import org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
@@ -54,7 +54,6 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_GET_IDENTITY_PROVIDERS;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.APPLE_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.EMAIL_OTP_EXECUTOR;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.EXTENSION_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.FACEBOOK_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.GITHUB_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.GOOGLE_EXECUTOR;
@@ -358,41 +357,4 @@ public abstract class AbstractMetaResponseHandler {
         return meta;
     }
 
-    /**
-     * Retrieve active in-flow extension actions and map them to connection info DTOs.
-     *
-     * @return List of InFlowExtensionConnectionInfo for active in-flow extension actions.
-     */
-    private List<InFlowExtensionConnectionInfo> getInflowExtensionConnections() {
-
-        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-
-        try {
-            List<Action> actions = FlowMgtServiceHolder.getActionManagementService()
-                    .getActionsByActionType(
-                            Action.ActionTypes.IN_FLOW_EXTENSION.getPathParam(), tenantDomain);
-
-            if (actions == null || actions.isEmpty()) {
-                return Collections.emptyList();
-            }
-
-            List<InFlowExtensionConnectionInfo> connections = new ArrayList<>();
-            for (Action action : actions) {
-                if (action.getStatus() != Action.Status.ACTIVE) {
-                    continue;
-                }
-                InFlowExtensionConnectionInfo info = new InFlowExtensionConnectionInfo();
-                if (action instanceof InFlowExtensionAction) {
-                    info.setActionId(action.getId());
-                    info.setName(action.getName());
-                    info.setIconUrl(((InFlowExtensionAction) action).getIconUrl());
-                }
-                connections.add(info);
-            }
-            return connections;
-        } catch (ActionMgtException e) {
-            log.warn("Error retrieving in-flow extension actions for metadata.", e);
-            return Collections.emptyList();
-        }
-    }
 }

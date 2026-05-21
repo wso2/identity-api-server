@@ -35,7 +35,7 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionMod
 import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionUpdateModel;
 import org.wso2.carbon.identity.certificate.management.model.Certificate;
-import org.wso2.carbon.identity.flow.inflow.extensions.model.InFlowExtensionAction;
+import org.wso2.carbon.identity.flow.extensions.model.InFlowExtensionAction;
 
 import java.util.List;
 import java.util.Map;
@@ -74,9 +74,9 @@ public final class InFlowExtensionMapper {
 
         EndpointConfig endpointConfig = toEndpointConfig(model.getEndpoint());
 
-        org.wso2.carbon.identity.flow.inflow.extensions.model.AccessConfig accessConfig =
+        org.wso2.carbon.identity.flow.extensions.model.AccessConfig accessConfig =
                 toEngineAccessConfig(model.getAccessConfig());
-        org.wso2.carbon.identity.flow.inflow.extensions.model.Encryption encryption =
+        org.wso2.carbon.identity.flow.extensions.model.Encryption encryption =
                 toEngineEncryption(model.getEncryption());
 
         Action baseAction = new Action.ActionRequestBuilder()
@@ -121,9 +121,9 @@ public final class InFlowExtensionMapper {
                 .endpoint(endpointConfig)
                 .build();
 
-        org.wso2.carbon.identity.flow.inflow.extensions.model.AccessConfig accessConfig =
+        org.wso2.carbon.identity.flow.extensions.model.AccessConfig accessConfig =
                 toEngineAccessConfig(model.getAccessConfig());
-        org.wso2.carbon.identity.flow.inflow.extensions.model.Encryption encryption =
+        org.wso2.carbon.identity.flow.extensions.model.Encryption encryption =
                 toEngineEncryption(model.getEncryption());
 
         return new InFlowExtensionAction.RequestBuilder(baseAction)
@@ -327,35 +327,35 @@ public final class InFlowExtensionMapper {
     // Private helpers — AccessConfig
     // -------------------------------------------------------------------------
 
-    private static org.wso2.carbon.identity.flow.inflow.extensions.model.AccessConfig
+    private static org.wso2.carbon.identity.flow.extensions.model.AccessConfig
     toEngineAccessConfig(AccessConfig model) {
 
         if (model == null) {
             return null;
         }
-        List<org.wso2.carbon.identity.flow.inflow.extensions.model.ContextPath> expose =
+        List<org.wso2.carbon.identity.flow.extensions.model.ContextPath> expose =
                 toEngineContextPaths(model.getExpose());
-        List<org.wso2.carbon.identity.flow.inflow.extensions.model.ContextPath> modify =
+        List<org.wso2.carbon.identity.flow.extensions.model.ContextPath> modify =
                 toEngineContextPaths(model.getModify());
 
-        return new org.wso2.carbon.identity.flow.inflow.extensions.model
+        return new org.wso2.carbon.identity.flow.extensions.model
                 .AccessConfig(expose, modify);
     }
 
-    private static List<org.wso2.carbon.identity.flow.inflow.extensions.model.ContextPath>
+    private static List<org.wso2.carbon.identity.flow.extensions.model.ContextPath>
     toEngineContextPaths(List<ContextPath> apiPaths) {
 
         if (apiPaths == null) {
             return null;
         }
         return apiPaths.stream()
-                .map(cp -> new org.wso2.carbon.identity.flow.inflow.extensions.model
+                .map(cp -> new org.wso2.carbon.identity.flow.extensions.model
                         .ContextPath(cp.getPath(), Boolean.TRUE.equals(cp.getEncrypted())))
                 .collect(Collectors.toList());
     }
 
     private static AccessConfig toApiAccessConfig(
-            org.wso2.carbon.identity.flow.inflow.extensions.model.AccessConfig engineConfig) {
+            org.wso2.carbon.identity.flow.extensions.model.AccessConfig engineConfig) {
 
         if (engineConfig == null) {
             return null;
@@ -378,7 +378,7 @@ public final class InFlowExtensionMapper {
     // Private helpers — Encryption
     // -------------------------------------------------------------------------
 
-    private static org.wso2.carbon.identity.flow.inflow.extensions.model.Encryption
+    private static org.wso2.carbon.identity.flow.extensions.model.Encryption
     toEngineEncryption(Encryption model) {
 
         if (model == null) {
@@ -388,18 +388,18 @@ public final class InFlowExtensionMapper {
             // Blank/null certificate in the update request signals explicit removal.
             // Return Encryption with null certificate so buildActionDTO stores "" (String),
             // which handleCertificateUpdate recognises as isExplicitRemoval.
-            return new org.wso2.carbon.identity.flow.inflow.extensions.model.Encryption(null);
+            return new org.wso2.carbon.identity.flow.extensions.model.Encryption(null);
         }
         // Pass the raw PEM string to the framework; the DTOModelResolver (InFlowExtensionActionDTOModelResolver)
         // takes care of persisting it via CertificateManagementService and replacing with a UUID.
         Certificate cert = new Certificate.Builder()
                 .certificateContent(model.getCertificate())
                 .build();
-        return new org.wso2.carbon.identity.flow.inflow.extensions.model.Encryption(cert);
+        return new org.wso2.carbon.identity.flow.extensions.model.Encryption(cert);
     }
 
     private static Encryption toApiEncryption(
-            org.wso2.carbon.identity.flow.inflow.extensions.model.Encryption engineEncryption) {
+            org.wso2.carbon.identity.flow.extensions.model.Encryption engineEncryption) {
 
         // The certificate is resolved back to a Certificate object by the DTOModelResolver on GET.
         // We intentionally do not echo the certificate content back in the response.

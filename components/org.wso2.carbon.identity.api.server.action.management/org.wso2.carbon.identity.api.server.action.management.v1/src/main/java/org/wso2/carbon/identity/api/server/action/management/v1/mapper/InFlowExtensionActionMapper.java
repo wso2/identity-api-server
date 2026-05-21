@@ -32,10 +32,10 @@ import org.wso2.carbon.identity.api.server.action.management.v1.InFlowExtensionA
 import org.wso2.carbon.identity.api.server.action.management.v1.InFlowExtensionBasicResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.util.ActionMapperUtil;
 import org.wso2.carbon.identity.certificate.management.model.Certificate;
-import org.wso2.carbon.identity.flow.execution.engine.inflow.extension.model.AccessConfig;
-import org.wso2.carbon.identity.flow.execution.engine.inflow.extension.model.ContextPath;
-import org.wso2.carbon.identity.flow.execution.engine.inflow.extension.model.Encryption;
-import org.wso2.carbon.identity.flow.execution.engine.inflow.extension.model.InFlowExtensionAction;
+import org.wso2.carbon.identity.flow.extensions.model.AccessConfig;
+import org.wso2.carbon.identity.flow.extensions.model.ContextPath;
+import org.wso2.carbon.identity.flow.extensions.model.Encryption;
+import org.wso2.carbon.identity.flow.extensions.model.InFlowExtensionAction;
 
 import java.util.ArrayList;
 import java.util.HashMap;

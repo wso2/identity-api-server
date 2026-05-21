@@ -207,30 +207,6 @@ public class FlowMetaResponse  {
         return this;
     }
 
-    public FlowMetaResponse inflowExtensionConnections(List<InFlowExtensionConnectionInfo> inflowExtensionConnections) {
-
-        this.inflowExtensionConnections = inflowExtensionConnections;
-        return this;
-    }
-
-    @ApiModelProperty(value = "")
-    @JsonProperty("inflowExtensionConnections")
-    @Valid
-    public List<InFlowExtensionConnectionInfo> getInflowExtensionConnections() {
-        return inflowExtensionConnections;
-    }
-    public void setInflowExtensionConnections(List<InFlowExtensionConnectionInfo> inflowExtensionConnections) {
-        this.inflowExtensionConnections = inflowExtensionConnections;
-    }
-
-    public FlowMetaResponse addInflowExtensionConnectionsItem(InFlowExtensionConnectionInfo item) {
-        if (this.inflowExtensionConnections == null) {
-            this.inflowExtensionConnections = new ArrayList<InFlowExtensionConnectionInfo>();
-        }
-        this.inflowExtensionConnections.add(item);
-        return this;
-    }
-
         /**
     **/
     public FlowMetaResponse inflowExtensionConnections(List<InFlowExtensionConnectionInfo> inflowExtensionConnections) {

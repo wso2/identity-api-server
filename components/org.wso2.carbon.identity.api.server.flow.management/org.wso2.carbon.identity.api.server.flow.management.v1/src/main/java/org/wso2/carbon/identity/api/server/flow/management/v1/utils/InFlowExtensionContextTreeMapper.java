@@ -20,7 +20,7 @@ package org.wso2.carbon.identity.api.server.flow.management.v1.utils;
 
 import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionContextTreeNode;
 import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionContextTreeResponse;
-import org.wso2.carbon.identity.flow.inflow.extensions.metadata.InFlowExtensionContextTreeMetadata;
+import org.wso2.carbon.identity.flow.extensions.metadata.InFlowExtensionContextTreeMetadata;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,7 +48,7 @@ public final class InFlowExtensionContextTreeMapper {
     }
 
     private static List<InFlowExtensionContextTreeNode> toApiNodes(
-            List<org.wso2.carbon.identity.flow.inflow.extensions.metadata
+            List<org.wso2.carbon.identity.flow.extensions.metadata
                     .InFlowExtensionContextTreeNode> nodes) {
 
         if (nodes == null) {
@@ -60,7 +60,7 @@ public final class InFlowExtensionContextTreeMapper {
     }
 
     private static InFlowExtensionContextTreeNode toApiNode(
-            org.wso2.carbon.identity.flow.inflow.extensions.metadata
+            org.wso2.carbon.identity.flow.extensions.metadata
                     .InFlowExtensionContextTreeNode node) {
 
         InFlowExtensionContextTreeNode out = new InFlowExtensionContextTreeNode()
