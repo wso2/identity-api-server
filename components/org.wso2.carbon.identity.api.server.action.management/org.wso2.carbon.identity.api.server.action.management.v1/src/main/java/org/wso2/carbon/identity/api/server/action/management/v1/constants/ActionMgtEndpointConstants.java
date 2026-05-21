@@ -68,7 +68,7 @@ public class ActionMgtEndpointConstants {
         ERROR_WHILE_INITIALIZING_RULE_BUILDER("650017",
                 "Unable to perform the operation.",
                 "Error while retrieving rule metadata for rule validations."),
-        ERROR_NOT_IMPLEMENTED_ATTRIBUTES("650018",
+        ERROR_NOT_IMPLEMENTED_ATTRIBUTES("65018",
                 "Unable to perform the operation.",
                 "Attributes are not currently supported for the action type: %s.");
 
