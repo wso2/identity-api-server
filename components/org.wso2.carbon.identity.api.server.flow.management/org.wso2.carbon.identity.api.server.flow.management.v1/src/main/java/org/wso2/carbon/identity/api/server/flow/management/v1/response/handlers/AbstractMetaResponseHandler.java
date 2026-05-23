@@ -238,7 +238,7 @@ public abstract class AbstractMetaResponseHandler {
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         try {
             List<Action> actions = FlowMgtServiceHolder.getActionManagementService()
-                    .getActionsByActionType(Action.ActionTypes.IN_FLOW_EXTENSION.getPathParam(), tenantDomain);
+                    .getActionsByActionType(Action.ActionTypes.FLOW_EXTENSIONS.getPathParam(), tenantDomain);
             if (actions == null) {
                 return Collections.emptyList();
             }

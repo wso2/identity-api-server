@@ -50,7 +50,7 @@ public class InFlowExtensionActionMapper implements ActionMapper {
     @Override
     public Action.ActionTypes getSupportedActionType() {
 
-        return Action.ActionTypes.IN_FLOW_EXTENSION;
+        return Action.ActionTypes.FLOW_EXTENSIONS;
     }
 
     @Override

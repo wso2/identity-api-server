@@ -64,7 +64,7 @@ public class ActionDeserializer {
                     // Validate the object
                     validateActionModel(actionModel, ActionModel.class);
                     break;
-                case IN_FLOW_EXTENSION:
+                case FLOW_EXTENSIONS:
                     InFlowExtensionActionModel inFlowExtensionActionModel = objectMapper.readValue(jsonBody,
                             InFlowExtensionActionModel.class);
                     // Validate the object
@@ -114,7 +114,7 @@ public class ActionDeserializer {
                     // Validate the object
                     validateActionModel(actionUpdateModel, ActionUpdateModel.class);
                     break;
-                case IN_FLOW_EXTENSION:
+                case FLOW_EXTENSIONS:
                     InFlowExtensionActionUpdateModel inFlowExtensionActionUpdateModel =
                             objectMapper.readValue(jsonBody, InFlowExtensionActionUpdateModel.class);
                     // Validate the object

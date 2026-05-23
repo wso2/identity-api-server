@@ -67,7 +67,7 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils
 public class ServerFlowMgtService {
 
     private static final String IN_FLOW_EXTENSION_ACTION_TYPE =
-            Action.ActionTypes.IN_FLOW_EXTENSION.getPathParam();
+            Action.ActionTypes.FLOW_EXTENSIONS.getPathParam();
 
     private final FlowMgtService flowMgtService;
     private final ActionManagementService actionManagementService;

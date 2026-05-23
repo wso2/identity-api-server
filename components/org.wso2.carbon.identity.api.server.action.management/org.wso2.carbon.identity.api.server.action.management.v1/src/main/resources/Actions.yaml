@@ -56,7 +56,7 @@ paths:
                   description: This action invokes before issuing an ID token.
                   count: 1
                   self: "/api/server/v1/actions/preIssueIdToken"
-                - type: IN_FLOW_EXTENSION
+                - type: FLOW_EXTENSIONS
                   displayName: In-Flow Extension
                   description: This action invokes during flow execution.
                   count: 1
@@ -687,7 +687,7 @@ paths:
                   summary: Sample response for in-flow extension action
                   value:
                     - id: 24f64d17-9824-4e28-8413-de45728d8e84
-                      type: IN_FLOW_EXTENSION
+                      type: FLOW_EXTENSIONS
                       name: Risk Assessment Extension
                       description: This action invokes during flow execution to assess risk.
                       status: ACTIVE
@@ -960,7 +960,7 @@ paths:
                   summary: Sample response for in-flow extension action
                   value:
                     id: 24f64d17-9824-4e28-8413-de45728d8e84
-                    type: IN_FLOW_EXTENSION
+                    type: FLOW_EXTENSIONS
                     name: Risk Assessment Extension
                     description: This action invokes during flow execution to assess risk.
                     status: ACTIVE
@@ -1794,7 +1794,7 @@ components:
         - PRE_UPDATE_PROFILE
         - PRE_REGISTRATION
         - PRE_ISSUE_ID_TOKEN
-        - IN_FLOW_EXTENSION
+        - FLOW_EXTENSIONS
     ActionModel:
       type: object
       required:
