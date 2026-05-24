@@ -19,7 +19,11 @@
 package org.wso2.carbon.identity.api.server.action.management.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.wso2.carbon.identity.api.server.action.management.v1.EndpointUpdateModel;
+import org.wso2.carbon.identity.api.server.action.management.v1.ORRule;
 import javax.validation.constraints.*;
 
 
