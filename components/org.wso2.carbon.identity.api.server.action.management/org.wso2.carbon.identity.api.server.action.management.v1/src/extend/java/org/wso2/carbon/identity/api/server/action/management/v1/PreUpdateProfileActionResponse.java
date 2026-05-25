@@ -18,13 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.action.management.v1;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
-
 import java.util.List;
 import java.util.Objects;
-
-import javax.validation.Valid;
 
 /**
  * Pre Update Profile Action Response.
@@ -44,26 +39,8 @@ public class PreUpdateProfileActionResponse extends ActionResponse {
         setCreatedAt(actionResponse.getCreatedAt());
         setUpdatedAt(actionResponse.getUpdatedAt());
         setEndpoint(actionResponse.getEndpoint());
+        setAttributes(actionResponse.getAttributes());
         setRule(actionResponse.getRule());
-    }
-
-    public PreUpdateProfileActionResponse attributes(List<String> attributes) {
-
-        this.attributes = attributes;
-        return this;
-    }
-
-    @ApiModelProperty()
-    @JsonProperty("attributes")
-    @Valid
-    public List<String> getAttributes() {
-
-        return attributes;
-    }
-
-    public void setAttributes(List<String> attributes) {
-
-        this.attributes = attributes;
     }
 
     @Override

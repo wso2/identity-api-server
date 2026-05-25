@@ -45,6 +45,7 @@ public class PreUpdatePasswordActionResponse extends ActionResponse {
         setCreatedAt(actionResponse.getCreatedAt());
         setUpdatedAt(actionResponse.getUpdatedAt());
         setEndpoint(actionResponse.getEndpoint());
+        setAttributes(actionResponse.getAttributes());
         setRule(actionResponse.getRule());
     }
 
@@ -71,19 +72,6 @@ public class PreUpdatePasswordActionResponse extends ActionResponse {
 
         this.attributes = attributes;
         return this;
-    }
-
-    @ApiModelProperty()
-    @JsonProperty("attributes")
-    @Valid
-    public List<String> getAttributes() {
-
-        return attributes;
-    }
-
-    public void setAttributes(List<String> attributes) {
-
-        this.attributes = attributes;
     }
 
     @Override
