@@ -42,15 +42,12 @@ public class DebugConstants {
         }
     }
 
-
     /**
      * Error constants for debug flow.
      */
     public enum ErrorMessage {
 
         // Client error codes.
-        ERROR_CODE_ERROR_VALIDATING_REQUEST("60001", "Invalid request.",
-                "Debug request validation failed."),
         ERROR_CODE_RESULT_NOT_FOUND("60002", "Debug result not found.",
                 "No debug result exists for the provided debug id."),
 

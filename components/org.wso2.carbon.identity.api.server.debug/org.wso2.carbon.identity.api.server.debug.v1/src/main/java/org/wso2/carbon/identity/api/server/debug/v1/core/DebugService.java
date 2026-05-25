@@ -32,9 +32,7 @@ import org.wso2.carbon.identity.debug.framework.exception.DebugFrameworkServerEx
 import org.wso2.carbon.identity.debug.framework.model.DebugFrameworkRequest;
 import org.wso2.carbon.identity.debug.framework.model.DebugFrameworkResponse;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,8 +43,9 @@ import javax.ws.rs.core.Response;
  */
 public class DebugService {
 
-    private static final Map<String, List<String>> REQUIRED_PROPERTIES_BY_RESOURCE_TYPE =
-            createRequiredPropertiesByResourceType();
+    // Note: Add new resource types here so that validation is applied for each request based on the resource type.
+    private static final Map<String, List<String>> REQUIRED_PROPERTIES_BY_RESOURCE_TYPE = Map.of(
+            DebugConstants.ResourceType.IDP, List.of(DebugConstants.CONNECTION_ID));
     private final DebugRequestCoordinator coordinator;
 
     /**
@@ -124,17 +123,15 @@ public class DebugService {
      * Builds a DebugResponse DTO from the typed framework response.
      * The framework is responsible for providing a structured response with
      * debugId, status and message as top-level fields, and metadata in getData().
-     *
-     * @param frameworkResponse Framework response.
-     * @return DebugResponse DTO.
      */
-    private DebugResponse buildDebugResponse(DebugFrameworkResponse frameworkResponse) {
+    private DebugResponse buildDebugResponse(DebugFrameworkResponse frameworkResponse)
+            throws DebugFrameworkServerException {
 
         if (frameworkResponse.getDebugId() == null) {
-            throw DebugExceptionHandler.handleDebugException(new DebugFrameworkServerException(
+            throw new DebugFrameworkServerException(
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_SERVER_ERROR.getCode(),
                     DebugFrameworkConstants.ErrorMessages.ERROR_CODE_SERVER_ERROR.getMessage(),
-                    "Debug framework response does not contain debugId."));
+                    "Debug framework response does not contain debugId.");
         }
 
         FrameworkResponseDTO data = extractResponseData(frameworkResponse, null);
@@ -250,16 +247,6 @@ public class DebugService {
         }
     }
 
-    // Note: Add new resource types to REQUIRED_PROPERTIES_BY_RESOURCE_TYPE
-    // so that a validation is applied for each request based on the resource type.
-    private static Map<String, List<String>> createRequiredPropertiesByResourceType() {
-
-        Map<String, List<String>> requiredPropertiesByResourceType = new HashMap<>();
-        requiredPropertiesByResourceType.put(DebugConstants.ResourceType.IDP,
-                Arrays.asList(DebugConstants.CONNECTION_ID));
-        return Collections.unmodifiableMap(requiredPropertiesByResourceType);
-    }
-
     /**
      * Validates that the given debug ID is non-blank.
      *
@@ -294,7 +281,7 @@ public class DebugService {
         }
 
         List<String> requiredProperties = REQUIRED_PROPERTIES_BY_RESOURCE_TYPE.get(resourceType);
-        if (requiredProperties == null || requiredProperties.isEmpty()) {
+        if (requiredProperties.isEmpty()) {
             return;
         }
 
