@@ -59,9 +59,7 @@ public class PreUpdateProfileActionMapper implements ActionMapper {
         validateAllowedHeadersAndParameters(actionModel.getEndpoint().getAllowedHeaders(),
                 actionModel.getEndpoint().getAllowedParameters());
         Action basicAction = ActionMapperUtil.buildActionRequest(getSupportedActionType(), actionModel);
-        return new PreUpdateProfileAction.RequestBuilder(basicAction)
-                .attributes(((PreUpdateProfileActionModel) actionModel).getAttributes())
-                .build();
+        return new PreUpdateProfileAction.RequestBuilder(basicAction).build();
     }
 
     @Override
@@ -78,9 +76,7 @@ public class PreUpdateProfileActionMapper implements ActionMapper {
         }
         Action basicUpdatingAction = ActionMapperUtil.buildUpdatingActionRequest(getSupportedActionType(),
                 actionUpdateModel);
-        return new PreUpdateProfileAction.RequestBuilder(basicUpdatingAction)
-                .attributes(((PreUpdateProfileActionUpdateModel) actionUpdateModel).getAttributes())
-                .build();
+        return new PreUpdateProfileAction.RequestBuilder(basicUpdatingAction).build();
     }
 
     @Override
@@ -92,8 +88,7 @@ public class PreUpdateProfileActionMapper implements ActionMapper {
         }
 
         ActionResponse actionResponse = ActionMapperUtil.buildActionResponse(action);
-        return new PreUpdateProfileActionResponse(actionResponse)
-                .attributes(((PreUpdateProfileAction) action).getAttributes());
+        return new PreUpdateProfileActionResponse(actionResponse);
     }
 
     private void validateAllowedHeadersAndParameters(List<String> allowedHeaders, List<String> allowedParams) {
