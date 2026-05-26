@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_EMPTY_ENDPOINT_AUTH_PROPERTIES;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_ENDPOINT_AUTH_PROPERTIES;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_REQUEST_BODY;
 
 /**
  * Mapper utility for translating between the flow-management API models and the
@@ -57,10 +58,6 @@ public final class FlowExtensionMapper {
 
     }
 
-    // -------------------------------------------------------------------------
-    // API model → Domain model (create)
-    // -------------------------------------------------------------------------
-
     /**
      * Convert a create-request {@link FlowExtensionModel} to an {@link FlowExtensionAction}
      * ready to be passed to {@code ActionManagementService#addAction}.
@@ -72,6 +69,12 @@ public final class FlowExtensionMapper {
     public static Action toFlowExtensionAction(FlowExtensionModel model)
             throws ActionMgtClientException {
 
+        if (model == null) {
+            throw new ActionMgtClientException(
+                    ERROR_CODE_INVALID_REQUEST_BODY.getMessage(),
+                    ERROR_CODE_INVALID_REQUEST_BODY.getDescription(),
+                    ERROR_CODE_INVALID_REQUEST_BODY.getCode());
+        }
         EndpointConfig endpointConfig = toEndpointConfig(model.getEndpoint());
 
         org.wso2.carbon.identity.flow.extension.model.AccessConfig accessConfig =
@@ -91,10 +94,6 @@ public final class FlowExtensionMapper {
                 .build();
     }
 
-    // -------------------------------------------------------------------------
-    // API model → Domain model (update / PATCH)
-    // -------------------------------------------------------------------------
-
     /**
      * Convert an update-request {@link FlowExtensionUpdateModel} to an
      * {@link FlowExtensionAction} ready to be passed to
@@ -108,6 +107,12 @@ public final class FlowExtensionMapper {
     public static Action toFlowExtensionAction(FlowExtensionUpdateModel model)
             throws ActionMgtClientException {
 
+        if (model == null) {
+            throw new ActionMgtClientException(
+                    ERROR_CODE_INVALID_REQUEST_BODY.getMessage(),
+                    ERROR_CODE_INVALID_REQUEST_BODY.getDescription(),
+                    ERROR_CODE_INVALID_REQUEST_BODY.getCode());
+        }
         EndpointConfig endpointConfig = null;
         if (model.getEndpoint() != null) {
             endpointConfig = toEndpointConfigFromUpdate(model.getEndpoint());
@@ -130,10 +135,6 @@ public final class FlowExtensionMapper {
                 .iconUrl(model.getIconUrl())
                 .build();
     }
-
-    // -------------------------------------------------------------------------
-    // Domain model → API response (full)
-    // -------------------------------------------------------------------------
 
     /**
      * Convert an {@link Action} (expected to be an {@link FlowExtensionAction}) to a full
@@ -169,10 +170,6 @@ public final class FlowExtensionMapper {
         return response;
     }
 
-    // -------------------------------------------------------------------------
-    // Domain model → API response (list item)
-    // -------------------------------------------------------------------------
-
     /**
      * Convert an {@link Action} to a lightweight {@link FlowExtensionBasicResponse} for list
      * responses.
@@ -197,10 +194,6 @@ public final class FlowExtensionMapper {
         }
         return response;
     }
-
-    // -------------------------------------------------------------------------
-    // Private helpers — Endpoint
-    // -------------------------------------------------------------------------
 
     private static EndpointConfig toEndpointConfig(Endpoint endpoint)
             throws ActionMgtClientException {
@@ -246,10 +239,6 @@ public final class FlowExtensionMapper {
                                 endpointConfig.getAuthentication().getType().toString())))
                 .allowedHeaders(endpointConfig.getAllowedHeaders());
     }
-
-    // -------------------------------------------------------------------------
-    // Private helpers — Authentication
-    // -------------------------------------------------------------------------
 
     private static Authentication buildAuthentication(Authentication.Type authType,
                                                       Map<String, Object> props)
@@ -321,10 +310,6 @@ public final class FlowExtensionMapper {
         return (val instanceof String) ? (String) val : null;
     }
 
-    // -------------------------------------------------------------------------
-    // Private helpers — AccessConfig
-    // -------------------------------------------------------------------------
-
     private static org.wso2.carbon.identity.flow.extension.model.AccessConfig
     toEngineAccessConfig(AccessConfig model) {
 
@@ -372,23 +357,14 @@ public final class FlowExtensionMapper {
         return model;
     }
 
-    // -------------------------------------------------------------------------
-    // Private helpers — Certificate
-    // -------------------------------------------------------------------------
-
     private static Certificate toCertificate(Encryption model) {
 
         if (model == null) {
             return null;
         }
         if (StringUtils.isBlank(model.getCertificate())) {
-            // Blank/null certificate in the update request signals explicit removal.
-            // Return a Certificate with null content so buildActionDTO stores "" (String),
-            // which handleCertificateUpdate recognises as isExplicitRemoval.
             return new Certificate.Builder().certificateContent(null).build();
         }
-        // Pass the raw PEM string to the framework; the DTOModelResolver (FlowExtensionActionDTOModelResolver)
-        // takes care of persisting it via CertificateManagementService and replacing with a UUID.
         return new Certificate.Builder()
                 .certificateContent(model.getCertificate())
                 .build();
@@ -396,12 +372,9 @@ public final class FlowExtensionMapper {
 
     private static Encryption toApiEncryption(Certificate certificate) {
 
-        // The certificate is resolved back to a Certificate object by the DTOModelResolver on GET.
-        // We intentionally do not echo the certificate content back in the response.
         if (certificate == null) {
             return null;
         }
-        // Return an Encryption object without the certificate content (treat as opaque).
         return new Encryption();
     }
 }

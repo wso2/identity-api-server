@@ -30,8 +30,6 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfigPatchMod
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionBasicResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionContextTreeResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionModel;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionNameCheckRequest;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionNameCheckResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionUpdateModel;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateRequest;
@@ -45,8 +43,6 @@ import javax.ws.rs.core.Response;
 
 
 public interface FlowApiService {
-
-      public Response checkFlowExtensionName(FlowExtensionNameCheckRequest flowExtensionNameCheckRequest);
 
       public Response createFlowExtension(FlowExtensionModel flowExtensionModel);
 

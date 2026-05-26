@@ -40,6 +40,8 @@ public class FlowEndpointConstants {
     public static final String IDP_TEMPLATE_ID = "templateId";
     public static final String MICROSOFT_IDP_TEMPLATE_ID = "microsoft-idp";
 
+    public static final String FLOW_EXTENSION_PATH_COMPONENT = "/flow/flow-extension/";
+
     /**
      * Error messages related to flow management.
      */
@@ -101,17 +103,16 @@ public class FlowEndpointConstants {
                 "Flow Extension not found.",
                 "No Flow Extension was found with the provided ID."),
 
-        ERROR_CODE_INFLOW_EXTENSION_NAME_CONFLICT("10021",
-                "Flow Extension name already in use.",
-                "An Flow Extension with the name '%s' already exists."),
-
         ERROR_CODE_INVALID_ENDPOINT_AUTH_PROPERTIES("10022",
                 "Invalid endpoint authentication properties.",
                 "Required authentication properties are missing or empty for the given authentication type."),
 
         ERROR_CODE_EMPTY_ENDPOINT_AUTH_PROPERTIES("10023",
                 "Empty endpoint authentication properties.",
-                "Endpoint authentication properties cannot be empty.");
+                "Endpoint authentication properties cannot be empty."),
+        ERROR_CODE_INVALID_REQUEST_BODY("10024",
+                "Invalid request body.",
+                "Request body cannot be null.");
 
         private final String code;
         private final String message;

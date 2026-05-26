@@ -24,8 +24,6 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfig;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfigPatchModel;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionBasicResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionModel;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionNameCheckRequest;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionNameCheckResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionUpdateModel;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateRequest;
@@ -45,6 +43,7 @@ import java.util.List;
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FLOW_EXTENSION_PATH_COMPONENT;
 
 /**
  * Implementation of the Flow API.
@@ -63,20 +62,14 @@ public class FlowApiServiceImpl implements FlowApiService {
             throw new RuntimeException("Error occurred while initiating flow management service.", e);
         }
     }
-    @Override
-    public Response checkFlowExtensionName(FlowExtensionNameCheckRequest flowExtensionNameCheckRequest) {
 
-        FlowExtensionNameCheckResponse result =
-                flowMgtService.checkFlowExtensionName(flowExtensionNameCheckRequest);
-        return Response.ok().entity(result).build();
-    }
 
     @Override
     public Response createFlowExtension(FlowExtensionModel flowExtensionModel) {
 
         FlowExtensionResponse created = flowMgtService.createFlowExtension(flowExtensionModel);
         URI location = ContextLoader.buildURIForHeader(
-                V1_API_PATH_COMPONENT + "/flow/flow-extension/" + created.getId());
+                V1_API_PATH_COMPONENT + FLOW_EXTENSION_PATH_COMPONENT + created.getId());
         return Response.created(location).entity(created).build();
     }
 

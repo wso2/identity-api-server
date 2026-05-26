@@ -18,37 +18,27 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1;
 
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import java.io.InputStream;
-import java.util.List;
-
-import org.wso2.carbon.identity.api.server.flow.management.v1.Error;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfig;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfigPatchModel;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionBasicResponse;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionContextTreeResponse;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionModel;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionNameCheckRequest;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionNameCheckResponse;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionResponse;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionUpdateModel;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateRequest;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateResponse;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateResult;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateStatus;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRequest;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowResponse;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowApiService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.wso2.carbon.identity.api.server.flow.management.v1.factories.FlowApiServiceFactory;
 
 import javax.validation.Valid;
-import javax.ws.rs.*;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.PATCH;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-import io.swagger.annotations.*;
-
-import javax.validation.constraints.*;
 
 @Path("/flow")
 @Api(description = "The flow API")
@@ -64,33 +54,10 @@ public class FlowApi  {
 
     @Valid
     @POST
-    @Path("/flow-extension/check-name")
-    @Consumes({ "application/json" })
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Check Extension Name Availability", notes = "Checks whether the given flow extension name is available.  <b>Scope (Permission) required:</b> ``internal_flow_mgt_view``  ", response = FlowExtensionNameCheckResponse.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Flow Composer - Extensions", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Name availability check result", response = FlowExtensionNameCheckResponse.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Void.class)
-    })
-    public Response checkFlowExtensionName(@ApiParam(value = "" ,required=true) @Valid FlowExtensionNameCheckRequest flowExtensionNameCheckRequest) {
-
-        return delegate.checkFlowExtensionName(flowExtensionNameCheckRequest );
-    }
-
-    @Valid
-    @POST
     @Path("/flow-extension")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Create Flow Extension", notes = "Creates an flow extension and returns the details along with the unique ID.  <b>Scope (Permission) required:</b> ``internal_flow_mgt_update``  ", response = FlowExtensionResponse.class, authorizations = {
+    @ApiOperation(value = "Create Flow Extension", notes = "Creates an flow extension and returns the details along with the unique ID.  <b>Scope (Permission) required:</b> ``internal_flow_extension_create``  ", response = FlowExtensionResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -136,7 +103,7 @@ public class FlowApi  {
     @Path("/flow-extension/{extensionId}")
     
     
-    @ApiOperation(value = "Delete Flow Extension", notes = "Deletes an flow extension by its ID.  <b>Scope (Permission) required:</b> ``internal_flow_mgt_update``  ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete Flow Extension", notes = "Deletes an flow extension by its ID.  <b>Scope (Permission) required:</b> ``internal_flow_extension_delete``  ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -247,7 +214,7 @@ public class FlowApi  {
     @Path("/flow-extension/{extensionId}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve Flow Extension by ID", notes = "Retrieves the flow extension by its ID.  <b>Scope (Permission) required:</b> ``internal_flow_mgt_view``  ", response = FlowExtensionResponse.class, authorizations = {
+    @ApiOperation(value = "Retrieve Flow Extension by ID", notes = "Retrieves the flow extension by its ID.  <b>Scope (Permission) required:</b> ``internal_flow_extension_view``  ", response = FlowExtensionResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -292,7 +259,7 @@ public class FlowApi  {
     @Path("/flow-extension")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "List Flow Extensions", notes = "Returns a list of all configured flow extensions.  <b>Scope (Permission) required:</b> ``internal_flow_mgt_view``  ", response = FlowExtensionBasicResponse.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "List Flow Extensions", notes = "Returns a list of all configured flow extensions.  <b>Scope (Permission) required:</b> ``internal_flow_extension_view``  ", response = FlowExtensionBasicResponse.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -432,7 +399,7 @@ public class FlowApi  {
     @Path("/flow-extension/{extensionId}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update Flow Extension", notes = "Updates an existing flow extension.  <b>Scope (Permission) required:</b> ``internal_flow_mgt_update``  ", response = FlowExtensionResponse.class, authorizations = {
+    @ApiOperation(value = "Update Flow Extension", notes = "Updates an existing flow extension.  <b>Scope (Permission) required:</b> ``internal_flow_extension_update``  ", response = FlowExtensionResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             

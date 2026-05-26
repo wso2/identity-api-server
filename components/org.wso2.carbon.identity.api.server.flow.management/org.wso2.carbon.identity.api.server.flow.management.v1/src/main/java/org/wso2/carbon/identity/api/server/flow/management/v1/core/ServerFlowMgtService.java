@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.core;
 
+import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.action.management.api.exception.ActionMgtException;
 import org.wso2.carbon.identity.action.management.api.model.Action;
@@ -27,8 +28,6 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfigPatchMod
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionBasicResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionContextTreeResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionModel;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionNameCheckRequest;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionNameCheckResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionUpdateModel;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
@@ -71,6 +70,11 @@ public class ServerFlowMgtService {
 
     private final FlowMgtService flowMgtService;
     private final ActionManagementService actionManagementService;
+
+    public ServerFlowMgtService(FlowMgtService flowMgtService) {
+
+        this(flowMgtService, null);
+    }
 
     public ServerFlowMgtService(FlowMgtService flowMgtService,
                                 ActionManagementService actionManagementService) {
@@ -127,7 +131,7 @@ public class ServerFlowMgtService {
      */
     public FlowExtensionContextTreeResponse getFlowExtensionContextTree(String flowType) {
 
-        String resolvedFlowType = (flowType != null && !flowType.trim().isEmpty()) ? flowType : null;
+        String resolvedFlowType = StringUtils.isNotBlank(flowType) ? flowType : null;
         if (resolvedFlowType != null) {
             // Reuse the same flow-type validation used by the other endpoints.
             Utils.validateFlowType(resolvedFlowType);
@@ -272,10 +276,10 @@ public class ServerFlowMgtService {
     public FlowExtensionResponse createFlowExtension(FlowExtensionModel model) {
 
         try {
-            Action domainAction = FlowExtensionMapper.toFlowExtensionAction(model);
+            Action flowExtensionAction = FlowExtensionMapper.toFlowExtensionAction(model);
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             Action created = actionManagementService.addAction(
-                    FLOW_EXTENSION_ACTION_TYPE, domainAction, tenantDomain);
+                    FLOW_EXTENSION_ACTION_TYPE, flowExtensionAction, tenantDomain);
             return FlowExtensionMapper.toFlowExtensionResponse(created);
         } catch (ActionMgtException e) {
             throw Utils.handleActionMgtException(e);
@@ -330,10 +334,10 @@ public class ServerFlowMgtService {
                                                          FlowExtensionUpdateModel model) {
 
         try {
-            Action domainAction = FlowExtensionMapper.toFlowExtensionAction(model);
+            Action flowExtensionAction = FlowExtensionMapper.toFlowExtensionAction(model);
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             Action updated = actionManagementService.updateAction(
-                    FLOW_EXTENSION_ACTION_TYPE, extensionId, domainAction, tenantDomain);
+                    FLOW_EXTENSION_ACTION_TYPE, extensionId, flowExtensionAction, tenantDomain);
             return FlowExtensionMapper.toFlowExtensionResponse(updated);
         } catch (ActionMgtException e) {
             throw Utils.handleActionMgtException(e);
@@ -351,35 +355,6 @@ public class ServerFlowMgtService {
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             actionManagementService.deleteAction(
                     FLOW_EXTENSION_ACTION_TYPE, extensionId, tenantDomain);
-        } catch (ActionMgtException e) {
-            throw Utils.handleActionMgtException(e);
-        }
-    }
-
-    /**
-     * Check whether the given Flow extension name is available (unique) for the current tenant.
-     * When {@code request.getExcludeId()} is non-null the check excludes that action ID (update
-     * scenario).
-     *
-     * @param request the name-check request model.
-     * @return a response model with {@code available = true/false}.
-     */
-    public FlowExtensionNameCheckResponse checkFlowExtensionName(
-            FlowExtensionNameCheckRequest request) {
-
-        try {
-            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-            // Null/empty excludeId means creation scenario (no exclusion).
-            String excludeId = (request.getExcludeId() != null && !request.getExcludeId().isEmpty())
-                    ? request.getExcludeId() : null;
-            String requestedName = request.getName();
-            List<Action> existing = actionManagementService.getActionsByActionType(
-                    FLOW_EXTENSION_ACTION_TYPE, tenantDomain);
-            boolean available = existing.stream().noneMatch(action ->
-                    action.getName() != null
-                            && action.getName().equalsIgnoreCase(requestedName)
-                            && (excludeId == null || !excludeId.equals(action.getId())));
-            return new FlowExtensionNameCheckResponse().available(available);
         } catch (ActionMgtException e) {
             throw Utils.handleActionMgtException(e);
         }
