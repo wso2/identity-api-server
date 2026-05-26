@@ -72,6 +72,7 @@ public class ServerActionManagementService {
     static {
         NOT_IMPLEMENTED_ACTION_TYPES.add(Action.ActionTypes.PRE_REGISTRATION.getPathParam());
         NOT_IMPLEMENTED_ACTION_TYPES.add(Action.ActionTypes.AUTHENTICATION.getPathParam());
+        NOT_IMPLEMENTED_ACTION_TYPES.add(Action.ActionTypes.FLOW_EXTENSION.getPathParam());
 
         NOT_ALLOWED_ACTION_TYPES_IN_ORG_LEVEL.add(Action.ActionTypes.PRE_ISSUE_ACCESS_TOKEN.getPathParam());
         NOT_ALLOWED_ACTION_TYPES_IN_ORG_LEVEL.add(Action.ActionTypes.PRE_ISSUE_ID_TOKEN.getPathParam());
