@@ -45,7 +45,7 @@ public class FlowMetaResponse  {
 
     private List<ExecutorConnections> executorConnections = null;
 
-    private List<InFlowExtensionConnectionInfo> inflowExtensionConnections = null;
+    private List<FlowExtensionConnectionInfo> inflowExtensionConnections = null;
 
     private Boolean workflowEnabled;
 
@@ -207,7 +207,7 @@ public class FlowMetaResponse  {
         return this;
     }
 
-    public FlowMetaResponse inflowExtensionConnections(List<InFlowExtensionConnectionInfo> inflowExtensionConnections) {
+    public FlowMetaResponse inflowExtensionConnections(List<FlowExtensionConnectionInfo> inflowExtensionConnections) {
 
         this.inflowExtensionConnections = inflowExtensionConnections;
         return this;
@@ -216,16 +216,16 @@ public class FlowMetaResponse  {
     @ApiModelProperty(value = "")
     @JsonProperty("inflowExtensionConnections")
     @Valid
-    public List<InFlowExtensionConnectionInfo> getInflowExtensionConnections() {
+    public List<FlowExtensionConnectionInfo> getInflowExtensionConnections() {
         return inflowExtensionConnections;
     }
-    public void setInflowExtensionConnections(List<InFlowExtensionConnectionInfo> inflowExtensionConnections) {
+    public void setInflowExtensionConnections(List<FlowExtensionConnectionInfo> inflowExtensionConnections) {
         this.inflowExtensionConnections = inflowExtensionConnections;
     }
 
-    public FlowMetaResponse addInflowExtensionConnectionsItem(InFlowExtensionConnectionInfo item) {
+    public FlowMetaResponse addInflowExtensionConnectionsItem(FlowExtensionConnectionInfo item) {
         if (this.inflowExtensionConnections == null) {
-            this.inflowExtensionConnections = new ArrayList<InFlowExtensionConnectionInfo>();
+            this.inflowExtensionConnections = new ArrayList<FlowExtensionConnectionInfo>();
         }
         this.inflowExtensionConnections.add(item);
         return this;

@@ -26,10 +26,10 @@ import java.util.Objects;
 import javax.validation.Valid;
 
 /**
- * Represents a single active in-flow extension connection available for use in flow builders.
+ * Represents a single active flow extension connection available for use in flow builders.
  */
 @ApiModel(description = "In-flow extension connection info for flow metadata")
-public class InFlowExtensionConnectionInfo {
+public class FlowExtensionConnectionInfo {
 
     private String actionId;
     private String name;
@@ -37,7 +37,7 @@ public class InFlowExtensionConnectionInfo {
 
     /**
      **/
-    public InFlowExtensionConnectionInfo actionId(String actionId) {
+    public FlowExtensionConnectionInfo actionId(String actionId) {
 
         this.actionId = actionId;
         return this;
@@ -58,7 +58,7 @@ public class InFlowExtensionConnectionInfo {
 
     /**
      **/
-    public InFlowExtensionConnectionInfo name(String name) {
+    public FlowExtensionConnectionInfo name(String name) {
 
         this.name = name;
         return this;
@@ -79,7 +79,7 @@ public class InFlowExtensionConnectionInfo {
 
     /**
      **/
-    public InFlowExtensionConnectionInfo iconUrl(String iconUrl) {
+    public FlowExtensionConnectionInfo iconUrl(String iconUrl) {
 
         this.iconUrl = iconUrl;
         return this;
@@ -107,7 +107,7 @@ public class InFlowExtensionConnectionInfo {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        InFlowExtensionConnectionInfo that = (InFlowExtensionConnectionInfo) o;
+        FlowExtensionConnectionInfo that = (FlowExtensionConnectionInfo) o;
         return Objects.equals(this.actionId, that.actionId) &&
                 Objects.equals(this.name, that.name) &&
                 Objects.equals(this.iconUrl, that.iconUrl);
@@ -123,7 +123,7 @@ public class InFlowExtensionConnectionInfo {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class InFlowExtensionConnectionInfo {\n");
+        sb.append("class FlowExtensionConnectionInfo {\n");
         sb.append("    actionId: ").append(toIndentedString(actionId)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    iconUrl: ").append(toIndentedString(iconUrl)).append("\n");

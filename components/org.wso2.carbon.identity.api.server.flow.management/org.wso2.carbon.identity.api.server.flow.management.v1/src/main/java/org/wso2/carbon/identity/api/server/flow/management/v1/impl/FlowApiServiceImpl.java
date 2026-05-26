@@ -22,6 +22,12 @@ import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowApiService;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfig;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfigPatchModel;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionBasicResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionModel;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionNameCheckRequest;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionNameCheckResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionUpdateModel;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateRequest;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateResult;
@@ -29,12 +35,6 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateStatus
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRequest;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowResponse;
-import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionBasicResponse;
-import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionModel;
-import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionNameCheckRequest;
-import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionNameCheckResponse;
-import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionResponse;
-import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionUpdateModel;
 import org.wso2.carbon.identity.api.server.flow.management.v1.core.FlowAIServiceCore;
 import org.wso2.carbon.identity.api.server.flow.management.v1.core.ServerFlowMgtService;
 import org.wso2.carbon.identity.api.server.flow.management.v1.factories.FlowAIServiceFactory;
@@ -64,19 +64,19 @@ public class FlowApiServiceImpl implements FlowApiService {
         }
     }
     @Override
-    public Response checkInFlowExtensionName(InFlowExtensionNameCheckRequest inFlowExtensionNameCheckRequest) {
+    public Response checkFlowExtensionName(FlowExtensionNameCheckRequest flowExtensionNameCheckRequest) {
 
-        InFlowExtensionNameCheckResponse result =
-                flowMgtService.checkInFlowExtensionName(inFlowExtensionNameCheckRequest);
+        FlowExtensionNameCheckResponse result =
+                flowMgtService.checkFlowExtensionName(flowExtensionNameCheckRequest);
         return Response.ok().entity(result).build();
     }
 
     @Override
-    public Response createInFlowExtension(InFlowExtensionModel inFlowExtensionModel) {
+    public Response createFlowExtension(FlowExtensionModel flowExtensionModel) {
 
-        InFlowExtensionResponse created = flowMgtService.createInFlowExtension(inFlowExtensionModel);
+        FlowExtensionResponse created = flowMgtService.createFlowExtension(flowExtensionModel);
         URI location = ContextLoader.buildURIForHeader(
-                V1_API_PATH_COMPONENT + "/flow/in-flow-extensions/" + created.getId());
+                V1_API_PATH_COMPONENT + "/flow/flow-extensions/" + created.getId());
         return Response.created(location).entity(created).build();
     }
 
@@ -88,9 +88,9 @@ public class FlowApiServiceImpl implements FlowApiService {
     }
 
     @Override
-    public Response deleteInFlowExtension(String extensionId) {
+    public Response deleteFlowExtension(String extensionId) {
 
-        flowMgtService.deleteInFlowExtension(extensionId);
+        flowMgtService.deleteFlowExtension(extensionId);
         return Response.noContent().build();
     }
 
@@ -144,23 +144,23 @@ public class FlowApiServiceImpl implements FlowApiService {
     }
 
     @Override
-    public Response getInFlowExtensionById(String extensionId) {
+    public Response getFlowExtensionById(String extensionId) {
 
-        InFlowExtensionResponse extension = flowMgtService.getInFlowExtensionById(extensionId);
+        FlowExtensionResponse extension = flowMgtService.getFlowExtensionById(extensionId);
         return Response.ok().entity(extension).build();
     }
 
     @Override
-    public Response getInFlowExtensionContextTree(String flowType) {
+    public Response getFlowExtensionContextTree(String flowType) {
 
         return Response.ok().entity(
-                flowMgtService.getInFlowExtensionContextTree(flowType)).build();
+                flowMgtService.getFlowExtensionContextTree(flowType)).build();
     }
 
     @Override
-    public Response getInFlowExtensions() {
+    public Response getFlowExtensions() {
 
-        List<InFlowExtensionBasicResponse> extensions = flowMgtService.getInFlowExtensions();
+        List<FlowExtensionBasicResponse> extensions = flowMgtService.getFlowExtensions();
         return Response.ok().entity(extensions).build();
     }
 
@@ -179,11 +179,11 @@ public class FlowApiServiceImpl implements FlowApiService {
     }
 
     @Override
-    public Response updateInFlowExtension(String extensionId,
-                                          InFlowExtensionUpdateModel inFlowExtensionUpdateModel) {
+    public Response updateFlowExtension(String extensionId,
+                                          FlowExtensionUpdateModel flowExtensionUpdateModel) {
 
-        InFlowExtensionResponse updated =
-                flowMgtService.updateInFlowExtension(extensionId, inFlowExtensionUpdateModel);
+        FlowExtensionResponse updated =
+                flowMgtService.updateFlowExtension(extensionId, flowExtensionUpdateModel);
         return Response.ok().entity(updated).build();
     }
 }

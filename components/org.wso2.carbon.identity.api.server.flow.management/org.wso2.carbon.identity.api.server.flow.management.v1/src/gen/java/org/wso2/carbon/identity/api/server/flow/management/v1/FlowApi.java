@@ -57,48 +57,48 @@ public class FlowApi  {
 
     @Valid
     @POST
-    @Path("/in-flow-extensions/check-name")
+    @Path("/flow-extensions/check-name")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Check Extension Name Availability", notes = "Checks whether the given in-flow extension name is available.  <b>Scope (Permission) required:</b> ``internal_flow_mgt_view``  ", response = InFlowExtensionNameCheckResponse.class, authorizations = {
+    @ApiOperation(value = "Check Extension Name Availability", notes = "Checks whether the given flow extension name is available.  <b>Scope (Permission) required:</b> ``internal_flow_mgt_view``  ", response = FlowExtensionNameCheckResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Flow Composer - Extensions", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Name availability check result", response = InFlowExtensionNameCheckResponse.class),
+        @ApiResponse(code = 200, message = "Name availability check result", response = FlowExtensionNameCheckResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 500, message = "Server Error", response = Void.class)
     })
-    public Response checkInFlowExtensionName(@ApiParam(value = "" ,required=true) @Valid InFlowExtensionNameCheckRequest inFlowExtensionNameCheckRequest) {
+    public Response checkFlowExtensionName(@ApiParam(value = "" ,required=true) @Valid FlowExtensionNameCheckRequest flowExtensionNameCheckRequest) {
 
-        return delegate.checkInFlowExtensionName(inFlowExtensionNameCheckRequest );
+        return delegate.checkFlowExtensionName(flowExtensionNameCheckRequest );
     }
 
     @Valid
     @POST
-    @Path("/in-flow-extensions")
+    @Path("/flow-extensions")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Create In-Flow Extension", notes = "Creates an in-flow extension and returns the details along with the unique ID.  <b>Scope (Permission) required:</b> ``internal_flow_mgt_update``  ", response = InFlowExtensionResponse.class, authorizations = {
+    @ApiOperation(value = "Create Flow Extension", notes = "Creates an flow extension and returns the details along with the unique ID.  <b>Scope (Permission) required:</b> ``internal_flow_mgt_update``  ", response = FlowExtensionResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Flow Composer - Extensions", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 201, message = "In-Flow Extension Created", response = InFlowExtensionResponse.class),
+        @ApiResponse(code = 201, message = "Flow Extension Created", response = FlowExtensionResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response createInFlowExtension(@ApiParam(value = "" ,required=true) @Valid InFlowExtensionModel inFlowExtensionModel) {
+    public Response createFlowExtension(@ApiParam(value = "" ,required=true) @Valid FlowExtensionModel flowExtensionModel) {
 
-        return delegate.createInFlowExtension(inFlowExtensionModel );
+        return delegate.createFlowExtension(flowExtensionModel );
     }
 
     @Valid
@@ -126,10 +126,10 @@ public class FlowApi  {
 
     @Valid
     @DELETE
-    @Path("/in-flow-extensions/{extensionId}")
+    @Path("/flow-extensions/{extensionId}")
     
     
-    @ApiOperation(value = "Delete In-Flow Extension", notes = "Deletes an in-flow extension by its ID.  <b>Scope (Permission) required:</b> ``internal_flow_mgt_update``  ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete Flow Extension", notes = "Deletes an flow extension by its ID.  <b>Scope (Permission) required:</b> ``internal_flow_mgt_update``  ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -142,9 +142,9 @@ public class FlowApi  {
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 500, message = "Server Error", response = Void.class)
     })
-    public Response deleteInFlowExtension(@ApiParam(value = "Unique identifier of the extension.",required=true) @PathParam("extensionId") String extensionId) {
+    public Response deleteFlowExtension(@ApiParam(value = "Unique identifier of the extension.",required=true) @PathParam("extensionId") String extensionId) {
 
-        return delegate.deleteInFlowExtension(extensionId );
+        return delegate.deleteFlowExtension(extensionId );
     }
 
     @Valid
@@ -306,69 +306,69 @@ public class FlowApi  {
 
     @Valid
     @GET
-    @Path("/in-flow-extensions/{extensionId}")
+    @Path("/flow-extensions/{extensionId}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve In-Flow Extension by ID", notes = "Retrieves the in-flow extension by its ID.  <b>Scope (Permission) required:</b> ``internal_flow_mgt_view``  ", response = InFlowExtensionResponse.class, authorizations = {
+    @ApiOperation(value = "Retrieve Flow Extension by ID", notes = "Retrieves the flow extension by its ID.  <b>Scope (Permission) required:</b> ``internal_flow_mgt_view``  ", response = FlowExtensionResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Flow Composer - Extensions", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = InFlowExtensionResponse.class),
+        @ApiResponse(code = 200, message = "OK", response = FlowExtensionResponse.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Void.class),
         @ApiResponse(code = 500, message = "Server Error", response = Void.class)
     })
-    public Response getInFlowExtensionById(@ApiParam(value = "Unique identifier of the extension.",required=true) @PathParam("extensionId") String extensionId) {
+    public Response getFlowExtensionById(@ApiParam(value = "Unique identifier of the extension.",required=true) @PathParam("extensionId") String extensionId) {
 
-        return delegate.getInFlowExtensionById(extensionId );
+        return delegate.getFlowExtensionById(extensionId );
     }
 
     @Valid
     @GET
-    @Path("/in-flow-extension/context-tree")
+    @Path("/flow-extension/context-tree")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve the controlled In-Flow Extension context tree", notes = "Returns the canonical context tree filtered by the deployment.toml whitelist ([identity.in_flow_extension.context.{flow_type}]) for the given flow type. When `flowType` is omitted the default tree is returned. Used by the Console UI to render the In-Flow Extension access-config editor without offering paths the deployment has switched off, and to drive per-flow-type policy flags such as `redirectionEnabled` and `allowReadOnlyClaimsModification`. ", response = InFlowExtensionContextTreeResponse.class, authorizations = {
+    @ApiOperation(value = "Retrieve the controlled Flow Extension context tree", notes = "Returns the canonical context tree filtered by the deployment.toml whitelist ([identity.flow_extension.context.{flow_type}]) for the given flow type. When `flowType` is omitted the default tree is returned. Used by the Console UI to render the Flow Extension access-config editor without offering paths the deployment has switched off, and to drive per-flow-type policy flags such as `redirectionEnabled` and `allowReadOnlyClaimsModification`. ", response = FlowExtensionContextTreeResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Flow Composer", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successfully retrieved the context tree", response = InFlowExtensionContextTreeResponse.class),
+        @ApiResponse(code = 200, message = "Successfully retrieved the context tree", response = FlowExtensionContextTreeResponse.class),
         @ApiResponse(code = 400, message = "Invalid flow type specified", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Error.class)
     })
-    public Response getInFlowExtensionContextTree(    @Valid@ApiParam(value = "Optional flow type. When omitted, the default tree is returned.", allowableValues="REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION, ASK_PASSWORD")  @QueryParam("flowType") String flowType) {
+    public Response getFlowExtensionContextTree(    @Valid@ApiParam(value = "Optional flow type. When omitted, the default tree is returned.", allowableValues="REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION, ASK_PASSWORD")  @QueryParam("flowType") String flowType) {
 
-        return delegate.getInFlowExtensionContextTree(flowType );
+        return delegate.getFlowExtensionContextTree(flowType );
     }
 
     @Valid
     @GET
-    @Path("/in-flow-extensions")
+    @Path("/flow-extensions")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "List In-Flow Extensions", notes = "Returns a list of all configured in-flow extensions.  <b>Scope (Permission) required:</b> ``internal_flow_mgt_view``  ", response = InFlowExtensionBasicResponse.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "List Flow Extensions", notes = "Returns a list of all configured flow extensions.  <b>Scope (Permission) required:</b> ``internal_flow_mgt_view``  ", response = FlowExtensionBasicResponse.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Flow Composer - Extensions", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = InFlowExtensionBasicResponse.class, responseContainer = "List"),
+        @ApiResponse(code = 200, message = "OK", response = FlowExtensionBasicResponse.class, responseContainer = "List"),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getInFlowExtensions() {
+    public Response getFlowExtensions() {
 
-        return delegate.getInFlowExtensions();
+        return delegate.getFlowExtensions();
     }
 
     @Valid
@@ -422,26 +422,26 @@ public class FlowApi  {
 
     @Valid
     @PATCH
-    @Path("/in-flow-extensions/{extensionId}")
+    @Path("/flow-extensions/{extensionId}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update In-Flow Extension", notes = "Updates an existing in-flow extension.  <b>Scope (Permission) required:</b> ``internal_flow_mgt_update``  ", response = InFlowExtensionResponse.class, authorizations = {
+    @ApiOperation(value = "Update Flow Extension", notes = "Updates an existing flow extension.  <b>Scope (Permission) required:</b> ``internal_flow_mgt_update``  ", response = FlowExtensionResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Flow Composer - Extensions" })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Extension Updated", response = InFlowExtensionResponse.class),
+        @ApiResponse(code = 200, message = "Extension Updated", response = FlowExtensionResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Void.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Void.class),
         @ApiResponse(code = 500, message = "Server Error", response = Void.class)
     })
-    public Response updateInFlowExtension(@ApiParam(value = "Unique identifier of the extension.",required=true) @PathParam("extensionId") String extensionId, @ApiParam(value = "" ,required=true) @Valid InFlowExtensionUpdateModel inFlowExtensionUpdateModel) {
+    public Response updateFlowExtension(@ApiParam(value = "Unique identifier of the extension.",required=true) @PathParam("extensionId") String extensionId, @ApiParam(value = "" ,required=true) @Valid FlowExtensionUpdateModel flowExtensionUpdateModel) {
 
-        return delegate.updateInFlowExtension(extensionId,  inFlowExtensionUpdateModel );
+        return delegate.updateFlowExtension(extensionId,  flowExtensionUpdateModel );
     }
 
 }

@@ -30,14 +30,14 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class InFlowExtensionNameCheckRequest  {
+public class FlowExtensionNameCheckRequest  {
   
     private String name;
     private String excludeId;
 
     /**
     **/
-    public InFlowExtensionNameCheckRequest name(String name) {
+    public FlowExtensionNameCheckRequest name(String name) {
 
         this.name = name;
         return this;
@@ -57,7 +57,7 @@ public class InFlowExtensionNameCheckRequest  {
 
     /**
     **/
-    public InFlowExtensionNameCheckRequest excludeId(String excludeId) {
+    public FlowExtensionNameCheckRequest excludeId(String excludeId) {
 
         this.excludeId = excludeId;
         return this;
@@ -84,9 +84,9 @@ public class InFlowExtensionNameCheckRequest  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        InFlowExtensionNameCheckRequest inFlowExtensionNameCheckRequest = (InFlowExtensionNameCheckRequest) o;
-        return Objects.equals(this.name, inFlowExtensionNameCheckRequest.name) &&
-            Objects.equals(this.excludeId, inFlowExtensionNameCheckRequest.excludeId);
+        FlowExtensionNameCheckRequest flowExtensionNameCheckRequest = (FlowExtensionNameCheckRequest) o;
+        return Objects.equals(this.name, flowExtensionNameCheckRequest.name) &&
+            Objects.equals(this.excludeId, flowExtensionNameCheckRequest.excludeId);
     }
 
     @Override
@@ -98,7 +98,7 @@ public class InFlowExtensionNameCheckRequest  {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class InFlowExtensionNameCheckRequest {\n");
+        sb.append("class FlowExtensionNameCheckRequest {\n");
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    excludeId: ").append(toIndentedString(excludeId)).append("\n");

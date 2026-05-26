@@ -18,14 +18,13 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.wso2.carbon.identity.api.server.flow.management.v1.AccessConfig;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Encryption;
-import org.wso2.carbon.identity.api.server.flow.management.v1.EndpointUpdateModel;
+import org.wso2.carbon.identity.api.server.flow.management.v1.Endpoint;
 import javax.validation.constraints.*;
 
 
@@ -34,28 +33,29 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class InFlowExtensionUpdateModel  {
+public class FlowExtensionModel  {
   
     private String name;
     private String description;
     private String iconUrl;
-    private String version;
-    private EndpointUpdateModel endpoint;
+    private Endpoint endpoint;
     private AccessConfig accessConfig;
     private Encryption encryption;
 
     /**
+    * Name of the extension.
     **/
-    public InFlowExtensionUpdateModel name(String name) {
+    public FlowExtensionModel name(String name) {
 
         this.name = name;
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(example = "Risk Assessment Extension", required = true, value = "Name of the extension.")
     @JsonProperty("name")
     @Valid
+    @NotNull(message = "Property name cannot be null.")
+
     public String getName() {
         return name;
     }
@@ -64,14 +64,15 @@ public class InFlowExtensionUpdateModel  {
     }
 
     /**
+    * Description of the extension.
     **/
-    public InFlowExtensionUpdateModel description(String description) {
+    public FlowExtensionModel description(String description) {
 
         this.description = description;
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(example = "This action invokes during flow execution to assess risk.", value = "Description of the extension.")
     @JsonProperty("description")
     @Valid
     public String getDescription() {
@@ -83,13 +84,13 @@ public class InFlowExtensionUpdateModel  {
 
     /**
     **/
-    public InFlowExtensionUpdateModel iconUrl(String iconUrl) {
+    public FlowExtensionModel iconUrl(String iconUrl) {
 
         this.iconUrl = iconUrl;
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "URL for the extension's icon.")
     @JsonProperty("iconUrl")
     @Valid
     public String getIconUrl() {
@@ -101,43 +102,27 @@ public class InFlowExtensionUpdateModel  {
 
     /**
     **/
-    public InFlowExtensionUpdateModel version(String version) {
-
-        this.version = version;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "")
-    @JsonProperty("version")
-    @Valid
-    public String getVersion() {
-        return version;
-    }
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    /**
-    **/
-    public InFlowExtensionUpdateModel endpoint(EndpointUpdateModel endpoint) {
+    public FlowExtensionModel endpoint(Endpoint endpoint) {
 
         this.endpoint = endpoint;
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(required = true, value = "")
     @JsonProperty("endpoint")
     @Valid
-    public EndpointUpdateModel getEndpoint() {
+    @NotNull(message = "Property endpoint cannot be null.")
+
+    public Endpoint getEndpoint() {
         return endpoint;
     }
-    public void setEndpoint(EndpointUpdateModel endpoint) {
+    public void setEndpoint(Endpoint endpoint) {
         this.endpoint = endpoint;
     }
 
     /**
     **/
-    public InFlowExtensionUpdateModel accessConfig(AccessConfig accessConfig) {
+    public FlowExtensionModel accessConfig(AccessConfig accessConfig) {
 
         this.accessConfig = accessConfig;
         return this;
@@ -155,7 +140,7 @@ public class InFlowExtensionUpdateModel  {
 
     /**
     **/
-    public InFlowExtensionUpdateModel encryption(Encryption encryption) {
+    public FlowExtensionModel encryption(Encryption encryption) {
 
         this.encryption = encryption;
         return this;
@@ -182,31 +167,29 @@ public class InFlowExtensionUpdateModel  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        InFlowExtensionUpdateModel inFlowExtensionUpdateModel = (InFlowExtensionUpdateModel) o;
-        return Objects.equals(this.name, inFlowExtensionUpdateModel.name) &&
-            Objects.equals(this.description, inFlowExtensionUpdateModel.description) &&
-            Objects.equals(this.iconUrl, inFlowExtensionUpdateModel.iconUrl) &&
-            Objects.equals(this.version, inFlowExtensionUpdateModel.version) &&
-            Objects.equals(this.endpoint, inFlowExtensionUpdateModel.endpoint) &&
-            Objects.equals(this.accessConfig, inFlowExtensionUpdateModel.accessConfig) &&
-            Objects.equals(this.encryption, inFlowExtensionUpdateModel.encryption);
+        FlowExtensionModel flowExtensionModel = (FlowExtensionModel) o;
+        return Objects.equals(this.name, flowExtensionModel.name) &&
+            Objects.equals(this.description, flowExtensionModel.description) &&
+            Objects.equals(this.iconUrl, flowExtensionModel.iconUrl) &&
+            Objects.equals(this.endpoint, flowExtensionModel.endpoint) &&
+            Objects.equals(this.accessConfig, flowExtensionModel.accessConfig) &&
+            Objects.equals(this.encryption, flowExtensionModel.encryption);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, iconUrl, version, endpoint, accessConfig, encryption);
+        return Objects.hash(name, description, iconUrl, endpoint, accessConfig, encryption);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class InFlowExtensionUpdateModel {\n");
+        sb.append("class FlowExtensionModel {\n");
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    iconUrl: ").append(toIndentedString(iconUrl)).append("\n");
-        sb.append("    version: ").append(toIndentedString(version)).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
         sb.append("    accessConfig: ").append(toIndentedString(accessConfig)).append("\n");
         sb.append("    encryption: ").append(toIndentedString(encryption)).append("\n");

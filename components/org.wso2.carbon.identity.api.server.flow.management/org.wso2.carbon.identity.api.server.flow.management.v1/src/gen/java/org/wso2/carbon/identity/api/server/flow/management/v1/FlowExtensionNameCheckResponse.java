@@ -30,13 +30,13 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class InFlowExtensionNameCheckResponse  {
+public class FlowExtensionNameCheckResponse  {
   
     private Boolean available;
 
     /**
     **/
-    public InFlowExtensionNameCheckResponse available(Boolean available) {
+    public FlowExtensionNameCheckResponse available(Boolean available) {
 
         this.available = available;
         return this;
@@ -63,8 +63,8 @@ public class InFlowExtensionNameCheckResponse  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        InFlowExtensionNameCheckResponse inFlowExtensionNameCheckResponse = (InFlowExtensionNameCheckResponse) o;
-        return Objects.equals(this.available, inFlowExtensionNameCheckResponse.available);
+        FlowExtensionNameCheckResponse flowExtensionNameCheckResponse = (FlowExtensionNameCheckResponse) o;
+        return Objects.equals(this.available, flowExtensionNameCheckResponse.available);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class InFlowExtensionNameCheckResponse  {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class InFlowExtensionNameCheckResponse {\n");
+        sb.append("class FlowExtensionNameCheckResponse {\n");
         
         sb.append("    available: ").append(toIndentedString(available)).append("\n");
         sb.append("}");

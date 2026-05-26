@@ -30,12 +30,12 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.Encryption;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Endpoint;
 import org.wso2.carbon.identity.api.server.flow.management.v1.EndpointResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.EndpointUpdateModel;
-import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionBasicResponse;
-import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionModel;
-import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionResponse;
-import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionUpdateModel;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionBasicResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionModel;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionUpdateModel;
 import org.wso2.carbon.identity.certificate.management.model.Certificate;
-import org.wso2.carbon.identity.flow.inflow.extensions.model.InFlowExtensionAction;
+import org.wso2.carbon.identity.flow.extension.model.FlowExtensionAction;
 
 import java.util.List;
 import java.util.Map;
@@ -46,14 +46,14 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.F
 
 /**
  * Mapper utility for translating between the flow-management API models and the
- * {@link InFlowExtensionAction} domain model.
+ * {@link FlowExtensionAction} domain model.
  * <p>
  * All methods are static; this class has no OSGi dependency.
  * </p>
  */
-public final class InFlowExtensionMapper {
+public final class FlowExtensionMapper {
 
-    private InFlowExtensionMapper() {
+    private FlowExtensionMapper() {
 
     }
 
@@ -62,22 +62,21 @@ public final class InFlowExtensionMapper {
     // -------------------------------------------------------------------------
 
     /**
-     * Convert a create-request {@link InFlowExtensionModel} to an {@link InFlowExtensionAction}
+     * Convert a create-request {@link FlowExtensionModel} to an {@link FlowExtensionAction}
      * ready to be passed to {@code ActionManagementService#addAction}.
      *
      * @param model the API create model.
      * @return domain action for persistence.
      * @throws ActionMgtClientException if endpoint authentication properties are invalid.
      */
-    public static Action toInFlowExtensionAction(InFlowExtensionModel model)
+    public static Action toFlowExtensionAction(FlowExtensionModel model)
             throws ActionMgtClientException {
 
         EndpointConfig endpointConfig = toEndpointConfig(model.getEndpoint());
 
-        org.wso2.carbon.identity.flow.inflow.extensions.model.AccessConfig accessConfig =
+        org.wso2.carbon.identity.flow.extension.model.AccessConfig accessConfig =
                 toEngineAccessConfig(model.getAccessConfig());
-        org.wso2.carbon.identity.flow.inflow.extensions.model.Encryption encryption =
-                toEngineEncryption(model.getEncryption());
+        Certificate certificate = toCertificate(model.getEncryption());
 
         Action baseAction = new Action.ActionRequestBuilder()
                 .name(model.getName())
@@ -85,9 +84,9 @@ public final class InFlowExtensionMapper {
                 .endpoint(endpointConfig)
                 .build();
 
-        return new InFlowExtensionAction.RequestBuilder(baseAction)
+        return new FlowExtensionAction.RequestBuilder(baseAction)
                 .accessConfig(accessConfig)
-                .encryption(encryption)
+                .certificate(certificate)
                 .iconUrl(model.getIconUrl())
                 .build();
     }
@@ -97,8 +96,8 @@ public final class InFlowExtensionMapper {
     // -------------------------------------------------------------------------
 
     /**
-     * Convert an update-request {@link InFlowExtensionUpdateModel} to an
-     * {@link InFlowExtensionAction} ready to be passed to
+     * Convert an update-request {@link FlowExtensionUpdateModel} to an
+     * {@link FlowExtensionAction} ready to be passed to
      * {@code ActionManagementService#updateAction}.
      * Only non-null fields are set; null fields are ignored (PATCH semantics).
      *
@@ -106,7 +105,7 @@ public final class InFlowExtensionMapper {
      * @return domain action carrying only the fields that should be updated.
      * @throws ActionMgtClientException if endpoint authentication properties are invalid.
      */
-    public static Action toInFlowExtensionAction(InFlowExtensionUpdateModel model)
+    public static Action toFlowExtensionAction(FlowExtensionUpdateModel model)
             throws ActionMgtClientException {
 
         EndpointConfig endpointConfig = null;
@@ -121,14 +120,13 @@ public final class InFlowExtensionMapper {
                 .endpoint(endpointConfig)
                 .build();
 
-        org.wso2.carbon.identity.flow.inflow.extensions.model.AccessConfig accessConfig =
+        org.wso2.carbon.identity.flow.extension.model.AccessConfig accessConfig =
                 toEngineAccessConfig(model.getAccessConfig());
-        org.wso2.carbon.identity.flow.inflow.extensions.model.Encryption encryption =
-                toEngineEncryption(model.getEncryption());
+        Certificate certificate = toCertificate(model.getEncryption());
 
-        return new InFlowExtensionAction.RequestBuilder(baseAction)
+        return new FlowExtensionAction.RequestBuilder(baseAction)
                 .accessConfig(accessConfig)
-                .encryption(encryption)
+                .certificate(certificate)
                 .iconUrl(model.getIconUrl())
                 .build();
     }
@@ -138,22 +136,22 @@ public final class InFlowExtensionMapper {
     // -------------------------------------------------------------------------
 
     /**
-     * Convert an {@link Action} (expected to be an {@link InFlowExtensionAction}) to a full
-     * {@link InFlowExtensionResponse}.
+     * Convert an {@link Action} (expected to be an {@link FlowExtensionAction}) to a full
+     * {@link FlowExtensionResponse}.
      *
      * @param action the domain action returned by the service layer.
      * @return API response model.
      */
-    public static InFlowExtensionResponse toInFlowExtensionResponse(Action action) {
+    public static FlowExtensionResponse toFlowExtensionResponse(Action action) {
 
-        InFlowExtensionAction ext = (action instanceof InFlowExtensionAction)
-                ? (InFlowExtensionAction) action : null;
+        FlowExtensionAction ext = (action instanceof FlowExtensionAction)
+                ? (FlowExtensionAction) action : null;
 
-        InFlowExtensionResponse response = new InFlowExtensionResponse()
+        FlowExtensionResponse response = new FlowExtensionResponse()
                 .id(action.getId())
                 .name(action.getName())
                 .description(action.getDescription())
-                .status(InFlowExtensionResponse.StatusEnum.valueOf(action.getStatus().name()))
+                .status(FlowExtensionResponse.StatusEnum.valueOf(action.getStatus().name()))
                 .version(action.getActionVersion())
                 .createdAt(action.getCreatedAt() != null
                         ? action.getCreatedAt().toInstant().toString() : null)
@@ -163,8 +161,8 @@ public final class InFlowExtensionMapper {
 
         if (ext != null) {
             response.accessConfig(toApiAccessConfig(ext.getAccessConfig()));
-            if (ext.getEncryption() != null) {
-                response.encryption(toApiEncryption(ext.getEncryption()));
+            if (ext.getCertificate() != null) {
+                response.encryption(toApiEncryption(ext.getCertificate()));
             }
             response.iconUrl(ext.getIconUrl());
         }
@@ -176,26 +174,26 @@ public final class InFlowExtensionMapper {
     // -------------------------------------------------------------------------
 
     /**
-     * Convert an {@link Action} to a lightweight {@link InFlowExtensionBasicResponse} for list
+     * Convert an {@link Action} to a lightweight {@link FlowExtensionBasicResponse} for list
      * responses.
      *
      * @param action the domain action.
      * @return API list-item model.
      */
-    public static InFlowExtensionBasicResponse toInFlowExtensionBasicResponse(Action action) {
+    public static FlowExtensionBasicResponse toFlowExtensionBasicResponse(Action action) {
 
-        InFlowExtensionBasicResponse response = new InFlowExtensionBasicResponse()
+        FlowExtensionBasicResponse response = new FlowExtensionBasicResponse()
                 .id(action.getId())
                 .name(action.getName())
                 .description(action.getDescription())
-                .status(InFlowExtensionBasicResponse.StatusEnum.valueOf(action.getStatus().name()))
+                .status(FlowExtensionBasicResponse.StatusEnum.valueOf(action.getStatus().name()))
                 .version(action.getActionVersion())
                 .createdAt(action.getCreatedAt() != null
                         ? action.getCreatedAt().toInstant().toString() : null)
                 .updatedAt(action.getUpdatedAt() != null
                         ? action.getUpdatedAt().toInstant().toString() : null);
-        if (action instanceof InFlowExtensionAction) {
-            response.iconUrl(((InFlowExtensionAction) action).getIconUrl());
+        if (action instanceof FlowExtensionAction) {
+            response.iconUrl(((FlowExtensionAction) action).getIconUrl());
         }
         return response;
     }
@@ -327,35 +325,35 @@ public final class InFlowExtensionMapper {
     // Private helpers — AccessConfig
     // -------------------------------------------------------------------------
 
-    private static org.wso2.carbon.identity.flow.inflow.extensions.model.AccessConfig
+    private static org.wso2.carbon.identity.flow.extension.model.AccessConfig
     toEngineAccessConfig(AccessConfig model) {
 
         if (model == null) {
             return null;
         }
-        List<org.wso2.carbon.identity.flow.inflow.extensions.model.ContextPath> expose =
+        List<org.wso2.carbon.identity.flow.extension.model.ContextPath> expose =
                 toEngineContextPaths(model.getExpose());
-        List<org.wso2.carbon.identity.flow.inflow.extensions.model.ContextPath> modify =
+        List<org.wso2.carbon.identity.flow.extension.model.ContextPath> modify =
                 toEngineContextPaths(model.getModify());
 
-        return new org.wso2.carbon.identity.flow.inflow.extensions.model
+        return new org.wso2.carbon.identity.flow.extension.model
                 .AccessConfig(expose, modify);
     }
 
-    private static List<org.wso2.carbon.identity.flow.inflow.extensions.model.ContextPath>
+    private static List<org.wso2.carbon.identity.flow.extension.model.ContextPath>
     toEngineContextPaths(List<ContextPath> apiPaths) {
 
         if (apiPaths == null) {
             return null;
         }
         return apiPaths.stream()
-                .map(cp -> new org.wso2.carbon.identity.flow.inflow.extensions.model
+                .map(cp -> new org.wso2.carbon.identity.flow.extension.model
                         .ContextPath(cp.getPath(), Boolean.TRUE.equals(cp.getEncrypted())))
                 .collect(Collectors.toList());
     }
 
     private static AccessConfig toApiAccessConfig(
-            org.wso2.carbon.identity.flow.inflow.extensions.model.AccessConfig engineConfig) {
+            org.wso2.carbon.identity.flow.extension.model.AccessConfig engineConfig) {
 
         if (engineConfig == null) {
             return null;
@@ -375,35 +373,32 @@ public final class InFlowExtensionMapper {
     }
 
     // -------------------------------------------------------------------------
-    // Private helpers — Encryption
+    // Private helpers — Certificate
     // -------------------------------------------------------------------------
 
-    private static org.wso2.carbon.identity.flow.inflow.extensions.model.Encryption
-    toEngineEncryption(Encryption model) {
+    private static Certificate toCertificate(Encryption model) {
 
         if (model == null) {
             return null;
         }
         if (StringUtils.isBlank(model.getCertificate())) {
             // Blank/null certificate in the update request signals explicit removal.
-            // Return Encryption with null certificate so buildActionDTO stores "" (String),
+            // Return a Certificate with null content so buildActionDTO stores "" (String),
             // which handleCertificateUpdate recognises as isExplicitRemoval.
-            return new org.wso2.carbon.identity.flow.inflow.extensions.model.Encryption(null);
+            return new Certificate.Builder().certificateContent(null).build();
         }
-        // Pass the raw PEM string to the framework; the DTOModelResolver (InFlowExtensionActionDTOModelResolver)
+        // Pass the raw PEM string to the framework; the DTOModelResolver (FlowExtensionActionDTOModelResolver)
         // takes care of persisting it via CertificateManagementService and replacing with a UUID.
-        Certificate cert = new Certificate.Builder()
+        return new Certificate.Builder()
                 .certificateContent(model.getCertificate())
                 .build();
-        return new org.wso2.carbon.identity.flow.inflow.extensions.model.Encryption(cert);
     }
 
-    private static Encryption toApiEncryption(
-            org.wso2.carbon.identity.flow.inflow.extensions.model.Encryption engineEncryption) {
+    private static Encryption toApiEncryption(Certificate certificate) {
 
         // The certificate is resolved back to a Certificate object by the DTOModelResolver on GET.
         // We intentionally do not echo the certificate content back in the response.
-        if (engineEncryption == null || engineEncryption.getCertificate() == null) {
+        if (certificate == null) {
             return null;
         }
         // Return an Encryption object without the certificate content (treat as opaque).

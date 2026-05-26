@@ -23,13 +23,13 @@ import javax.ws.rs.core.Response;
 
 public interface FlowApiService {
 
-      public Response checkInFlowExtensionName(InFlowExtensionNameCheckRequest inFlowExtensionNameCheckRequest);
+      public Response checkFlowExtensionName(FlowExtensionNameCheckRequest flowExtensionNameCheckRequest);
 
-      public Response createInFlowExtension(InFlowExtensionModel inFlowExtensionModel);
+      public Response createFlowExtension(FlowExtensionModel flowExtensionModel);
 
       public Response deleteFlow(String flowType);
 
-      public Response deleteInFlowExtension(String extensionId);
+      public Response deleteFlowExtension(String extensionId);
 
       public Response generateFlow(FlowGenerateRequest flowGenerateRequest);
 
@@ -45,15 +45,15 @@ public interface FlowApiService {
 
       public Response getFlowMeta(String flowType);
 
-      public Response getInFlowExtensionById(String extensionId);
+      public Response getFlowExtensionById(String extensionId);
 
-      public Response getInFlowExtensionContextTree(String flowType);
+      public Response getFlowExtensionContextTree(String flowType);
 
-      public Response getInFlowExtensions();
+      public Response getFlowExtensions();
 
       public Response updateFlow(FlowRequest flowRequest);
 
       public Response updateFlowConfig(FlowConfigPatchModel flowConfigPatchModel);
 
-      public Response updateInFlowExtension(String extensionId, InFlowExtensionUpdateModel inFlowExtensionUpdateModel);
+      public Response updateFlowExtension(String extensionId, FlowExtensionUpdateModel flowExtensionUpdateModel);
 }

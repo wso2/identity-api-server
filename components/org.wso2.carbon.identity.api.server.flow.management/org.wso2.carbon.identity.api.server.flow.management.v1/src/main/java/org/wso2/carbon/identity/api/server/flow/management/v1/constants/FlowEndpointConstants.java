@@ -98,12 +98,12 @@ public class FlowEndpointConstants {
                 "The flow must contain the required executors."),
 
         ERROR_CODE_INFLOW_EXTENSION_NOT_FOUND("10020",
-                "In-Flow Extension not found.",
-                "No In-Flow Extension was found with the provided ID."),
+                "Flow Extension not found.",
+                "No Flow Extension was found with the provided ID."),
 
         ERROR_CODE_INFLOW_EXTENSION_NAME_CONFLICT("10021",
-                "In-Flow Extension name already in use.",
-                "An In-Flow Extension with the name '%s' already exists."),
+                "Flow Extension name already in use.",
+                "An Flow Extension with the name '%s' already exists."),
 
         ERROR_CODE_INVALID_ENDPOINT_AUTH_PROPERTIES("10022",
                 "Invalid endpoint authentication properties.",
@@ -169,7 +169,7 @@ public class FlowEndpointConstants {
         public static final String MAGIC_LINK_EXECUTOR = "MagicLinkExecutor";
         public static final String CONFIRMATION_CODE_VALIDATION_EXECUTOR = "ConfirmationCodeValidationExecutor";
         public static final String USER_PROVISIONING_EXECUTOR = "UserProvisioningExecutor";
-        public static final String IN_FLOW_EXTENSION_EXECUTOR = "InFlowExtensionExecutor";
+        public static final String FLOW_EXTENSION_EXECUTOR = "FlowExtensionExecutor";
     }
 
     /**

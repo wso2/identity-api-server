@@ -206,26 +206,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /flow/in-flow-extensions:
+  /flow/flow-extensions:
     post:
       tags:
         - Flow Composer - Extensions
-      summary: Create In-Flow Extension
-      description: "Creates an in-flow extension and returns the details along with the unique ID.\n\n<b>Scope (Permission) required:</b> ``internal_flow_mgt_update``\n\n"
-      operationId: createInFlowExtension
+      summary: Create Flow Extension
+      description: "Creates an flow extension and returns the details along with the unique ID.\n\n<b>Scope (Permission) required:</b> ``internal_flow_mgt_update``\n\n"
+      operationId: createFlowExtension
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InFlowExtensionModel'
+              $ref: '#/components/schemas/FlowExtensionModel'
         required: true
       responses:
         '201':
-          description: In-Flow Extension Created
+          description: Flow Extension Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InFlowExtensionResponse'
+                $ref: '#/components/schemas/FlowExtensionResponse'
         '400':
           description: Bad Request
           content:
@@ -245,16 +245,16 @@ paths:
     get:
       tags:
         - Flow Composer - Extensions
-      summary: List In-Flow Extensions
-      description: "Returns a list of all configured in-flow extensions.\n\n<b>Scope (Permission) required:</b> ``internal_flow_mgt_view``\n\n"
-      operationId: getInFlowExtensions
+      summary: List Flow Extensions
+      description: "Returns a list of all configured flow extensions.\n\n<b>Scope (Permission) required:</b> ``internal_flow_mgt_view``\n\n"
+      operationId: getFlowExtensions
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InFlowExtensionResponseList'
+                $ref: '#/components/schemas/FlowExtensionResponseList'
         '401':
           description: Unauthorized
         '403':
@@ -266,18 +266,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /flow/in-flow-extensions/check-name:
+  /flow/flow-extensions/check-name:
     post:
       tags:
         - Flow Composer - Extensions
       summary: Check Extension Name Availability
-      description: "Checks whether the given in-flow extension name is available.\n\n<b>Scope (Permission) required:</b> ``internal_flow_mgt_view``\n\n"
-      operationId: checkInFlowExtensionName
+      description: "Checks whether the given flow extension name is available.\n\n<b>Scope (Permission) required:</b> ``internal_flow_mgt_view``\n\n"
+      operationId: checkFlowExtensionName
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InFlowExtensionNameCheckRequest'
+              $ref: '#/components/schemas/FlowExtensionNameCheckRequest'
         required: true
       responses:
         '200':
@@ -285,7 +285,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InFlowExtensionNameCheckResponse'
+                $ref: '#/components/schemas/FlowExtensionNameCheckResponse'
         '400':
           description: Bad Request
           content:
@@ -299,13 +299,13 @@ paths:
         '500':
           description: Server Error
 
-  /flow/in-flow-extensions/{extensionId}:
+  /flow/flow-extensions/{extensionId}:
     get:
       tags:
         - Flow Composer - Extensions
-      summary: Retrieve In-Flow Extension by ID
-      description: "Retrieves the in-flow extension by its ID.\n\n<b>Scope (Permission) required:</b> ``internal_flow_mgt_view``\n\n"
-      operationId: getInFlowExtensionById
+      summary: Retrieve Flow Extension by ID
+      description: "Retrieves the flow extension by its ID.\n\n<b>Scope (Permission) required:</b> ``internal_flow_mgt_view``\n\n"
+      operationId: getFlowExtensionById
       parameters:
         - name: extensionId
           in: path
@@ -319,7 +319,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InFlowExtensionResponse'
+                $ref: '#/components/schemas/FlowExtensionResponse'
         '401':
           description: Unauthorized
         '403':
@@ -331,9 +331,9 @@ paths:
     patch:
       tags:
         - Flow Composer - Extensions
-      summary: Update In-Flow Extension
-      description: "Updates an existing in-flow extension.\n\n<b>Scope (Permission) required:</b> ``internal_flow_mgt_update``\n\n"
-      operationId: updateInFlowExtension
+      summary: Update Flow Extension
+      description: "Updates an existing flow extension.\n\n<b>Scope (Permission) required:</b> ``internal_flow_mgt_update``\n\n"
+      operationId: updateFlowExtension
       parameters:
         - name: extensionId
           in: path
@@ -345,7 +345,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InFlowExtensionUpdateModel'
+              $ref: '#/components/schemas/FlowExtensionUpdateModel'
         required: true
       responses:
         '200':
@@ -353,7 +353,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InFlowExtensionResponse'
+                $ref: '#/components/schemas/FlowExtensionResponse'
         '400':
           description: Bad Request
         '401':
@@ -367,9 +367,9 @@ paths:
     delete:
       tags:
         - Flow Composer - Extensions
-      summary: Delete In-Flow Extension
-      description: "Deletes an in-flow extension by its ID.\n\n<b>Scope (Permission) required:</b> ``internal_flow_mgt_update``\n\n"
-      operationId: deleteInFlowExtension
+      summary: Delete Flow Extension
+      description: "Deletes an flow extension by its ID.\n\n<b>Scope (Permission) required:</b> ``internal_flow_mgt_update``\n\n"
+      operationId: deleteFlowExtension
       parameters:
         - name: extensionId
           in: path
@@ -389,17 +389,17 @@ paths:
         '500':
           description: Server Error
 
-  /flow/in-flow-extension/context-tree:
+  /flow/flow-extension/context-tree:
     get:
-      summary: Retrieve the controlled In-Flow Extension context tree
+      summary: Retrieve the controlled Flow Extension context tree
       description: >
         Returns the canonical context tree filtered by the deployment.toml whitelist
-        ([identity.in_flow_extension.context.{flow_type}]) for the given flow type.
+        ([identity.flow_extension.context.{flow_type}]) for the given flow type.
         When `flowType` is omitted the default tree is returned. Used by the Console UI
-        to render the In-Flow Extension access-config editor without offering paths
+        to render the Flow Extension access-config editor without offering paths
         the deployment has switched off, and to drive per-flow-type policy flags such
         as `redirectionEnabled` and `allowReadOnlyClaimsModification`.
-      operationId: getInFlowExtensionContextTree
+      operationId: getFlowExtensionContextTree
       tags:
         - Flow Composer
       parameters:
@@ -416,7 +416,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InFlowExtensionContextTreeResponse'
+                $ref: '#/components/schemas/FlowExtensionContextTreeResponse'
         '400':
           description: Invalid flow type specified
           content:
@@ -800,7 +800,7 @@ components:
         inflowExtensionConnections:
             type: array
             items:
-              $ref: '#/components/schemas/InFlowExtensionConnectionInfo'
+              $ref: '#/components/schemas/FlowExtensionConnectionInfo'
         workflowEnabled:
           type: boolean
           example: false
@@ -819,19 +819,19 @@ components:
             type: string
             example: IdpName
 
-    InFlowExtensionConnectionInfo:
+    FlowExtensionConnectionInfo:
       type: object
       description: In-flow extension connection info for flow metadata
       properties:
         actionId:
           type: string
-          description: The unique identifier of the in-flow extension action.
+          description: The unique identifier of the flow extension action.
         name:
           type: string
-          description: The name of the in-flow extension.
+          description: The name of the flow extension.
         iconUrl:
           type: string
-          description: The URL of the icon associated with the in-flow extension.
+          description: The URL of the icon associated with the flow extension.
 
     AttributeMetadata:
       type: object
@@ -1033,7 +1033,7 @@ components:
           type: number
           example: 200.22
 
-    InFlowExtensionModel:
+    FlowExtensionModel:
       type: object
       required:
         - name
@@ -1054,7 +1054,7 @@ components:
         encryption:
           $ref: '#/components/schemas/Encryption'
 
-    InFlowExtensionUpdateModel:
+    FlowExtensionUpdateModel:
       type: object
       properties:
         name:
@@ -1070,7 +1070,7 @@ components:
         encryption:
           $ref: '#/components/schemas/Encryption'
 
-    InFlowExtensionResponse:
+    FlowExtensionResponse:
       type: object
       properties:
         id:
@@ -1095,7 +1095,7 @@ components:
         encryption:
           $ref: '#/components/schemas/Encryption'
 
-    InFlowExtensionBasicResponse:
+    FlowExtensionBasicResponse:
       type: object
       properties:
         id:
@@ -1118,12 +1118,12 @@ components:
           items:
             $ref: '#/components/schemas/Link'
 
-    InFlowExtensionResponseList:
+    FlowExtensionResponseList:
       type: array
       items:
-        $ref: '#/components/schemas/InFlowExtensionBasicResponse'
+        $ref: '#/components/schemas/FlowExtensionBasicResponse'
 
-    InFlowExtensionNameCheckRequest:
+    FlowExtensionNameCheckRequest:
       type: object
       required:
         - name
@@ -1133,7 +1133,7 @@ components:
         excludeId:
           type: string
 
-    InFlowExtensionNameCheckResponse:
+    FlowExtensionNameCheckResponse:
       type: object
       properties:
         available:
@@ -1239,10 +1239,10 @@ components:
         certificate:
           type: string
 
-    InFlowExtensionContextTreeResponse:
+    FlowExtensionContextTreeResponse:
       type: object
       description: >
-        Controlled In-Flow Extension context tree for a given flow type, plus per-flow-type
+        Controlled Flow Extension context tree for a given flow type, plus per-flow-type
         policy flags consumed by the Console UI.
       properties:
         flowType:
@@ -1255,7 +1255,7 @@ components:
             Tree of context fields available for the active flow type. Fields disabled at
             the deployment.toml whitelist level are omitted entirely.
           items:
-            $ref: '#/components/schemas/InFlowExtensionContextTreeNode'
+            $ref: '#/components/schemas/FlowExtensionContextTreeNode'
         redirectionEnabled:
           type: boolean
           description: Whether REDIRECT is advertised in `allowedOperations` for this flow type.
@@ -1267,9 +1267,9 @@ components:
             Hardcoded enumerative mapping in the engine.
           example: true
 
-    InFlowExtensionContextTreeNode:
+    FlowExtensionContextTreeNode:
       type: object
-      description: One node in the controlled In-Flow Extension context tree.
+      description: One node in the controlled Flow Extension context tree.
       properties:
         key:
           type: string
@@ -1309,7 +1309,7 @@ components:
         children:
           type: array
           items:
-            $ref: '#/components/schemas/InFlowExtensionContextTreeNode'
+            $ref: '#/components/schemas/FlowExtensionContextTreeNode'
 
     Error:
       type: object

@@ -18,27 +18,27 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.utils;
 
-import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionContextTreeNode;
-import org.wso2.carbon.identity.api.server.flow.management.v1.InFlowExtensionContextTreeResponse;
-import org.wso2.carbon.identity.flow.inflow.extensions.metadata.InFlowExtensionContextTreeMetadata;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionContextTreeNode;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionContextTreeResponse;
+import org.wso2.carbon.identity.flow.extension.metadata.FlowExtensionContextTreeMetadata;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Maps the engine-side {@link InFlowExtensionContextTreeMetadata} DTO to the API-side
- * {@link InFlowExtensionContextTreeResponse} model. A boundary-crossing copy keeps the
+ * Maps the engine-side {@link FlowExtensionContextTreeMetadata} DTO to the API-side
+ * {@link FlowExtensionContextTreeResponse} model. A boundary-crossing copy keeps the
  * engine module independent of the API server's swagger-generated models.
  */
-public final class InFlowExtensionContextTreeMapper {
+public final class FlowExtensionContextTreeMapper {
 
-    private InFlowExtensionContextTreeMapper() {
+    private FlowExtensionContextTreeMapper() {
 
     }
 
-    public static InFlowExtensionContextTreeResponse toResponse(InFlowExtensionContextTreeMetadata metadata) {
+    public static FlowExtensionContextTreeResponse toResponse(FlowExtensionContextTreeMetadata metadata) {
 
-        InFlowExtensionContextTreeResponse response = new InFlowExtensionContextTreeResponse()
+        FlowExtensionContextTreeResponse response = new FlowExtensionContextTreeResponse()
                 .flowType(metadata.getFlowType())
                 .redirectionEnabled(metadata.isRedirectionEnabled())
                 .allowReadOnlyClaimsModification(metadata.isAllowReadOnlyClaimsModification());
@@ -47,29 +47,29 @@ public final class InFlowExtensionContextTreeMapper {
         return response;
     }
 
-    private static List<InFlowExtensionContextTreeNode> toApiNodes(
-            List<org.wso2.carbon.identity.flow.inflow.extensions.metadata
-                    .InFlowExtensionContextTreeNode> nodes) {
+    private static List<FlowExtensionContextTreeNode> toApiNodes(
+            List<org.wso2.carbon.identity.flow.extension.metadata
+                    .FlowExtensionContextTreeNode> nodes) {
 
         if (nodes == null) {
             return null;
         }
         return nodes.stream()
-                .map(InFlowExtensionContextTreeMapper::toApiNode)
+                .map(FlowExtensionContextTreeMapper::toApiNode)
                 .collect(Collectors.toList());
     }
 
-    private static InFlowExtensionContextTreeNode toApiNode(
-            org.wso2.carbon.identity.flow.inflow.extensions.metadata
-                    .InFlowExtensionContextTreeNode node) {
+    private static FlowExtensionContextTreeNode toApiNode(
+            org.wso2.carbon.identity.flow.extension.metadata
+                    .FlowExtensionContextTreeNode node) {
 
-        InFlowExtensionContextTreeNode out = new InFlowExtensionContextTreeNode()
+        FlowExtensionContextTreeNode out = new FlowExtensionContextTreeNode()
                 .key(node.getKey())
                 .title(node.getTitle())
                 .path(node.getPath())
                 .dataType(node.getDataType())
                 .nodeType(node.getNodeType() != null
-                        ? InFlowExtensionContextTreeNode.NodeTypeEnum.fromValue(node.getNodeType()) : null)
+                        ? FlowExtensionContextTreeNode.NodeTypeEnum.fromValue(node.getNodeType()) : null)
                 .readOnly(node.isReadOnly())
                 .replaceable(node.isReplaceable())
                 .dynamicEntryAllowed(node.isDynamicEntryAllowed())
@@ -77,7 +77,7 @@ public final class InFlowExtensionContextTreeMapper {
 
         if (node.getAllowedOperations() != null) {
             out.setAllowedOperations(node.getAllowedOperations().stream()
-                    .map(InFlowExtensionContextTreeNode.AllowedOperationsEnum::fromValue)
+                    .map(FlowExtensionContextTreeNode.AllowedOperationsEnum::fromValue)
                     .collect(java.util.stream.Collectors.toList()));
         }
         if (node.getChildren() != null) {

@@ -33,7 +33,7 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class InFlowExtensionResponse  {
+public class FlowExtensionResponse  {
   
     private String id;
     private String name;
@@ -82,7 +82,7 @@ public enum StatusEnum {
 
     /**
     **/
-    public InFlowExtensionResponse id(String id) {
+    public FlowExtensionResponse id(String id) {
 
         this.id = id;
         return this;
@@ -100,7 +100,7 @@ public enum StatusEnum {
 
     /**
     **/
-    public InFlowExtensionResponse name(String name) {
+    public FlowExtensionResponse name(String name) {
 
         this.name = name;
         return this;
@@ -118,7 +118,7 @@ public enum StatusEnum {
 
     /**
     **/
-    public InFlowExtensionResponse description(String description) {
+    public FlowExtensionResponse description(String description) {
 
         this.description = description;
         return this;
@@ -136,7 +136,7 @@ public enum StatusEnum {
 
     /**
     **/
-    public InFlowExtensionResponse status(StatusEnum status) {
+    public FlowExtensionResponse status(StatusEnum status) {
 
         this.status = status;
         return this;
@@ -154,7 +154,7 @@ public enum StatusEnum {
 
     /**
     **/
-    public InFlowExtensionResponse version(String version) {
+    public FlowExtensionResponse version(String version) {
 
         this.version = version;
         return this;
@@ -172,7 +172,7 @@ public enum StatusEnum {
 
     /**
     **/
-    public InFlowExtensionResponse createdAt(String createdAt) {
+    public FlowExtensionResponse createdAt(String createdAt) {
 
         this.createdAt = createdAt;
         return this;
@@ -190,7 +190,7 @@ public enum StatusEnum {
 
     /**
     **/
-    public InFlowExtensionResponse updatedAt(String updatedAt) {
+    public FlowExtensionResponse updatedAt(String updatedAt) {
 
         this.updatedAt = updatedAt;
         return this;
@@ -208,7 +208,7 @@ public enum StatusEnum {
 
     /**
     **/
-    public InFlowExtensionResponse iconUrl(String iconUrl) {
+    public FlowExtensionResponse iconUrl(String iconUrl) {
 
         this.iconUrl = iconUrl;
         return this;
@@ -226,7 +226,7 @@ public enum StatusEnum {
 
     /**
     **/
-    public InFlowExtensionResponse endpoint(EndpointResponse endpoint) {
+    public FlowExtensionResponse endpoint(EndpointResponse endpoint) {
 
         this.endpoint = endpoint;
         return this;
@@ -244,7 +244,7 @@ public enum StatusEnum {
 
     /**
     **/
-    public InFlowExtensionResponse accessConfig(AccessConfig accessConfig) {
+    public FlowExtensionResponse accessConfig(AccessConfig accessConfig) {
 
         this.accessConfig = accessConfig;
         return this;
@@ -262,7 +262,7 @@ public enum StatusEnum {
 
     /**
     **/
-    public InFlowExtensionResponse encryption(Encryption encryption) {
+    public FlowExtensionResponse encryption(Encryption encryption) {
 
         this.encryption = encryption;
         return this;
@@ -289,18 +289,18 @@ public enum StatusEnum {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        InFlowExtensionResponse inFlowExtensionResponse = (InFlowExtensionResponse) o;
-        return Objects.equals(this.id, inFlowExtensionResponse.id) &&
-            Objects.equals(this.name, inFlowExtensionResponse.name) &&
-            Objects.equals(this.description, inFlowExtensionResponse.description) &&
-            Objects.equals(this.status, inFlowExtensionResponse.status) &&
-            Objects.equals(this.version, inFlowExtensionResponse.version) &&
-            Objects.equals(this.createdAt, inFlowExtensionResponse.createdAt) &&
-            Objects.equals(this.updatedAt, inFlowExtensionResponse.updatedAt) &&
-            Objects.equals(this.iconUrl, inFlowExtensionResponse.iconUrl) &&
-            Objects.equals(this.endpoint, inFlowExtensionResponse.endpoint) &&
-            Objects.equals(this.accessConfig, inFlowExtensionResponse.accessConfig) &&
-            Objects.equals(this.encryption, inFlowExtensionResponse.encryption);
+        FlowExtensionResponse flowExtensionResponse = (FlowExtensionResponse) o;
+        return Objects.equals(this.id, flowExtensionResponse.id) &&
+            Objects.equals(this.name, flowExtensionResponse.name) &&
+            Objects.equals(this.description, flowExtensionResponse.description) &&
+            Objects.equals(this.status, flowExtensionResponse.status) &&
+            Objects.equals(this.version, flowExtensionResponse.version) &&
+            Objects.equals(this.createdAt, flowExtensionResponse.createdAt) &&
+            Objects.equals(this.updatedAt, flowExtensionResponse.updatedAt) &&
+            Objects.equals(this.iconUrl, flowExtensionResponse.iconUrl) &&
+            Objects.equals(this.endpoint, flowExtensionResponse.endpoint) &&
+            Objects.equals(this.accessConfig, flowExtensionResponse.accessConfig) &&
+            Objects.equals(this.encryption, flowExtensionResponse.encryption);
     }
 
     @Override
@@ -312,7 +312,7 @@ public enum StatusEnum {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class InFlowExtensionResponse {\n");
+        sb.append("class FlowExtensionResponse {\n");
         
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
