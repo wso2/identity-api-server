@@ -76,7 +76,7 @@ public class FlowApiServiceImpl implements FlowApiService {
 
         FlowExtensionResponse created = flowMgtService.createFlowExtension(flowExtensionModel);
         URI location = ContextLoader.buildURIForHeader(
-                V1_API_PATH_COMPONENT + "/flow/flow-extensions/" + created.getId());
+                V1_API_PATH_COMPONENT + "/flow/flow-extension/" + created.getId());
         return Response.created(location).entity(created).build();
     }
 

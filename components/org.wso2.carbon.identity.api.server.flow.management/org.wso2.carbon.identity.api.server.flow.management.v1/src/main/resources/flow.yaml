@@ -206,7 +206,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /flow/flow-extensions:
+  /flow/flow-extension:
     post:
       tags:
         - Flow Composer - Extensions
@@ -266,7 +266,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /flow/flow-extensions/check-name:
+  /flow/flow-extension/check-name:
     post:
       tags:
         - Flow Composer - Extensions
@@ -299,7 +299,7 @@ paths:
         '500':
           description: Server Error
 
-  /flow/flow-extensions/{extensionId}:
+  /flow/flow-extension/{extensionId}:
     get:
       tags:
         - Flow Composer - Extensions

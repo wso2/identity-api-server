@@ -64,7 +64,7 @@ public class FlowApi  {
 
     @Valid
     @POST
-    @Path("/flow-extensions/check-name")
+    @Path("/flow-extension/check-name")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @ApiOperation(value = "Check Extension Name Availability", notes = "Checks whether the given flow extension name is available.  <b>Scope (Permission) required:</b> ``internal_flow_mgt_view``  ", response = FlowExtensionNameCheckResponse.class, authorizations = {
@@ -87,7 +87,7 @@ public class FlowApi  {
 
     @Valid
     @POST
-    @Path("/flow-extensions")
+    @Path("/flow-extension")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @ApiOperation(value = "Create Flow Extension", notes = "Creates an flow extension and returns the details along with the unique ID.  <b>Scope (Permission) required:</b> ``internal_flow_mgt_update``  ", response = FlowExtensionResponse.class, authorizations = {
@@ -133,7 +133,7 @@ public class FlowApi  {
 
     @Valid
     @DELETE
-    @Path("/flow-extensions/{extensionId}")
+    @Path("/flow-extension/{extensionId}")
     
     
     @ApiOperation(value = "Delete Flow Extension", notes = "Deletes an flow extension by its ID.  <b>Scope (Permission) required:</b> ``internal_flow_mgt_update``  ", response = Void.class, authorizations = {
@@ -244,7 +244,7 @@ public class FlowApi  {
 
     @Valid
     @GET
-    @Path("/flow-extensions/{extensionId}")
+    @Path("/flow-extension/{extensionId}")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Retrieve Flow Extension by ID", notes = "Retrieves the flow extension by its ID.  <b>Scope (Permission) required:</b> ``internal_flow_mgt_view``  ", response = FlowExtensionResponse.class, authorizations = {
@@ -289,7 +289,7 @@ public class FlowApi  {
 
     @Valid
     @GET
-    @Path("/flow-extensions")
+    @Path("/flow-extension")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "List Flow Extensions", notes = "Returns a list of all configured flow extensions.  <b>Scope (Permission) required:</b> ``internal_flow_mgt_view``  ", response = FlowExtensionBasicResponse.class, responseContainer = "List", authorizations = {
@@ -429,7 +429,7 @@ public class FlowApi  {
 
     @Valid
     @PATCH
-    @Path("/flow-extensions/{extensionId}")
+    @Path("/flow-extension/{extensionId}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @ApiOperation(value = "Update Flow Extension", notes = "Updates an existing flow extension.  <b>Scope (Permission) required:</b> ``internal_flow_mgt_update``  ", response = FlowExtensionResponse.class, authorizations = {
