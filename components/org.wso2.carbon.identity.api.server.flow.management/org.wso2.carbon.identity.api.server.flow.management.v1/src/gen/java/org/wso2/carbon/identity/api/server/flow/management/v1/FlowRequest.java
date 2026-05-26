@@ -19,32 +19,39 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.flow.management.v1.Step;
+import javax.validation.constraints.*;
+
+/**
+ * Request payload for creating or updating a flow
+ **/
+
+import io.swagger.annotations.*;
 import java.util.Objects;
-
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
+import javax.xml.bind.annotation.*;
 @ApiModel(description = "Request payload for creating or updating a flow")
-public class FlowRequest {
-
+public class FlowRequest  {
+  
     private String flowType;
     private List<Step> steps = new ArrayList<Step>();
 
 
     /**
-     * Type of the flow being updated
-     **/
+    * Type of the flow being updated
+    **/
     public FlowRequest flowType(String flowType) {
 
         this.flowType = flowType;
         return this;
     }
-
-    @ApiModelProperty(example = "SELF_REGISTRATION", required = true, value = "Type of the flow being updated")
+    
+    @ApiModelProperty(example = "REGISTRATION", required = true, value = "Type of the flow being updated")
     @JsonProperty("flowType")
     @Valid
     @NotNull(message = "Property flowType cannot be null.")
@@ -52,20 +59,18 @@ public class FlowRequest {
     public String getFlowType() {
         return flowType;
     }
-
     public void setFlowType(String flowType) {
         this.flowType = flowType;
     }
 
     /**
-     *
-     **/
+    **/
     public FlowRequest steps(List<Step> steps) {
 
         this.steps = steps;
         return this;
     }
-
+    
     @ApiModelProperty(required = true, value = "")
     @JsonProperty("steps")
     @Valid
@@ -74,7 +79,6 @@ public class FlowRequest {
     public List<Step> getSteps() {
         return steps;
     }
-
     public void setSteps(List<Step> steps) {
         this.steps = steps;
     }
@@ -84,6 +88,7 @@ public class FlowRequest {
         return this;
     }
 
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -96,7 +101,7 @@ public class FlowRequest {
         }
         FlowRequest flowRequest = (FlowRequest) o;
         return Objects.equals(this.flowType, flowRequest.flowType) &&
-                Objects.equals(this.steps, flowRequest.steps);
+            Objects.equals(this.steps, flowRequest.steps);
     }
 
     @Override
@@ -109,7 +114,7 @@ public class FlowRequest {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class FlowRequest {\n");
-
+        
         sb.append("    flowType: ").append(toIndentedString(flowType)).append("\n");
         sb.append("    steps: ").append(toIndentedString(steps)).append("\n");
         sb.append("}");
@@ -117,9 +122,9 @@ public class FlowRequest {
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
-     */
+    * Convert the given object to string with each line indented by 4 spaces
+    * (except the first line).
+    */
     private String toIndentedString(java.lang.Object o) {
 
         if (o == null) {

@@ -19,108 +19,99 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 
+/**
+ * Status response for generating a flow
+ **/
+
+import io.swagger.annotations.*;
 import java.util.Objects;
-
 import javax.validation.Valid;
-
+import javax.xml.bind.annotation.*;
 @ApiModel(description = "Status response for generating a flow")
-public class FlowGenerateStatus {
-
+public class FlowGenerateStatus  {
+  
     private Boolean optimizingQuery;
     private Boolean fetchingSamples;
     private Boolean generatingFlow;
     private Boolean completed;
 
     /**
-     *
-     **/
+    **/
     public FlowGenerateStatus optimizingQuery(Boolean optimizingQuery) {
 
         this.optimizingQuery = optimizingQuery;
         return this;
     }
-
+    
     @ApiModelProperty(example = "true", value = "")
     @JsonProperty("optimizingQuery")
     @Valid
     public Boolean getOptimizingQuery() {
-
         return optimizingQuery;
     }
-
     public void setOptimizingQuery(Boolean optimizingQuery) {
-
         this.optimizingQuery = optimizingQuery;
     }
 
     /**
-     *
-     **/
+    **/
     public FlowGenerateStatus fetchingSamples(Boolean fetchingSamples) {
 
         this.fetchingSamples = fetchingSamples;
         return this;
     }
-
+    
     @ApiModelProperty(example = "true", value = "")
     @JsonProperty("fetchingSamples")
     @Valid
     public Boolean getFetchingSamples() {
-
         return fetchingSamples;
     }
-
     public void setFetchingSamples(Boolean fetchingSamples) {
-
         this.fetchingSamples = fetchingSamples;
     }
 
     /**
-     *
-     **/
+    **/
     public FlowGenerateStatus generatingFlow(Boolean generatingFlow) {
 
         this.generatingFlow = generatingFlow;
         return this;
     }
-
+    
     @ApiModelProperty(example = "true", value = "")
     @JsonProperty("generatingFlow")
     @Valid
     public Boolean getGeneratingFlow() {
-
         return generatingFlow;
     }
-
     public void setGeneratingFlow(Boolean generatingFlow) {
-
         this.generatingFlow = generatingFlow;
     }
 
     /**
-     *
-     **/
+    **/
     public FlowGenerateStatus completed(Boolean completed) {
 
         this.completed = completed;
         return this;
     }
-
+    
     @ApiModelProperty(example = "true", value = "")
     @JsonProperty("completed")
     @Valid
     public Boolean getCompleted() {
-
         return completed;
     }
-
     public void setCompleted(Boolean completed) {
-
         this.completed = completed;
     }
+
 
 
     @Override
@@ -134,14 +125,13 @@ public class FlowGenerateStatus {
         }
         FlowGenerateStatus flowGenerateStatus = (FlowGenerateStatus) o;
         return Objects.equals(this.optimizingQuery, flowGenerateStatus.optimizingQuery) &&
-                Objects.equals(this.fetchingSamples, flowGenerateStatus.fetchingSamples) &&
-                Objects.equals(this.generatingFlow, flowGenerateStatus.generatingFlow) &&
-                Objects.equals(this.completed, flowGenerateStatus.completed);
+            Objects.equals(this.fetchingSamples, flowGenerateStatus.fetchingSamples) &&
+            Objects.equals(this.generatingFlow, flowGenerateStatus.generatingFlow) &&
+            Objects.equals(this.completed, flowGenerateStatus.completed);
     }
 
     @Override
     public int hashCode() {
-
         return Objects.hash(optimizingQuery, fetchingSamples, generatingFlow, completed);
     }
 
@@ -150,7 +140,7 @@ public class FlowGenerateStatus {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class FlowGenerateStatus {\n");
-
+        
         sb.append("    optimizingQuery: ").append(toIndentedString(optimizingQuery)).append("\n");
         sb.append("    fetchingSamples: ").append(toIndentedString(fetchingSamples)).append("\n");
         sb.append("    generatingFlow: ").append(toIndentedString(generatingFlow)).append("\n");
@@ -160,9 +150,9 @@ public class FlowGenerateStatus {
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
-     */
+    * Convert the given object to string with each line indented by 4 spaces
+    * (except the first line).
+    */
     private String toIndentedString(java.lang.Object o) {
 
         if (o == null) {
