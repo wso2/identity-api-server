@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
@@ -34,13 +33,12 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class FlowExtensionUpdateModel  {
   
     private String name;
     private String description;
-    private String iconUrl;
     private String version;
+    private String iconUrl;
     private EndpointUpdateModel endpoint;
     private AccessConfig accessConfig;
     private Encryption encryption;
@@ -83,24 +81,6 @@ public class FlowExtensionUpdateModel  {
 
     /**
     **/
-    public FlowExtensionUpdateModel iconUrl(String iconUrl) {
-
-        this.iconUrl = iconUrl;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "")
-    @JsonProperty("iconUrl")
-    @Valid
-    public String getIconUrl() {
-        return iconUrl;
-    }
-    public void setIconUrl(String iconUrl) {
-        this.iconUrl = iconUrl;
-    }
-
-    /**
-    **/
     public FlowExtensionUpdateModel version(String version) {
 
         this.version = version;
@@ -115,6 +95,25 @@ public class FlowExtensionUpdateModel  {
     }
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    /**
+    * The URL of the icon associated with the flow extension.
+    **/
+    public FlowExtensionUpdateModel iconUrl(String iconUrl) {
+
+        this.iconUrl = iconUrl;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "The URL of the icon associated with the flow extension.")
+    @JsonProperty("iconUrl")
+    @Valid
+    public String getIconUrl() {
+        return iconUrl;
+    }
+    public void setIconUrl(String iconUrl) {
+        this.iconUrl = iconUrl;
     }
 
     /**
@@ -185,8 +184,8 @@ public class FlowExtensionUpdateModel  {
         FlowExtensionUpdateModel flowExtensionUpdateModel = (FlowExtensionUpdateModel) o;
         return Objects.equals(this.name, flowExtensionUpdateModel.name) &&
             Objects.equals(this.description, flowExtensionUpdateModel.description) &&
-            Objects.equals(this.iconUrl, flowExtensionUpdateModel.iconUrl) &&
             Objects.equals(this.version, flowExtensionUpdateModel.version) &&
+            Objects.equals(this.iconUrl, flowExtensionUpdateModel.iconUrl) &&
             Objects.equals(this.endpoint, flowExtensionUpdateModel.endpoint) &&
             Objects.equals(this.accessConfig, flowExtensionUpdateModel.accessConfig) &&
             Objects.equals(this.encryption, flowExtensionUpdateModel.encryption);
@@ -194,7 +193,7 @@ public class FlowExtensionUpdateModel  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, iconUrl, version, endpoint, accessConfig, encryption);
+        return Objects.hash(name, description, version, iconUrl, endpoint, accessConfig, encryption);
     }
 
     @Override
@@ -205,8 +204,8 @@ public class FlowExtensionUpdateModel  {
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
-        sb.append("    iconUrl: ").append(toIndentedString(iconUrl)).append("\n");
         sb.append("    version: ").append(toIndentedString(version)).append("\n");
+        sb.append("    iconUrl: ").append(toIndentedString(iconUrl)).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
         sb.append("    accessConfig: ").append(toIndentedString(accessConfig)).append("\n");
         sb.append("    encryption: ").append(toIndentedString(encryption)).append("\n");

@@ -102,7 +102,7 @@ public class EndpointResponse  {
         return this;
     }
 
-
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -129,7 +129,7 @@ public class EndpointResponse  {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class EndpointResponse {\n");
-
+        
         sb.append("    uri: ").append(toIndentedString(uri)).append("\n");
         sb.append("    authentication: ").append(toIndentedString(authentication)).append("\n");
         sb.append("    allowedHeaders: ").append(toIndentedString(allowedHeaders)).append("\n");

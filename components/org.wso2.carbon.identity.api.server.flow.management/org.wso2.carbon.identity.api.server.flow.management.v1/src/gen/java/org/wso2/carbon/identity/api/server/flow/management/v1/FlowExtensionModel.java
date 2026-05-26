@@ -83,6 +83,7 @@ public class FlowExtensionModel  {
     }
 
     /**
+    * The URL of the icon associated with the flow extension.
     **/
     public FlowExtensionModel iconUrl(String iconUrl) {
 
@@ -90,7 +91,7 @@ public class FlowExtensionModel  {
         return this;
     }
     
-    @ApiModelProperty(value = "URL for the extension's icon.")
+    @ApiModelProperty(value = "The URL of the icon associated with the flow extension.")
     @JsonProperty("iconUrl")
     @Valid
     public String getIconUrl() {

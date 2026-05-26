@@ -38,9 +38,8 @@ public class FlowExtensionBasicResponse  {
     private String id;
     private String name;
     private String description;
-    private String iconUrl;
 
-@jakarta.xml.bind.annotation.XmlType(name="StatusEnum")
+@XmlType(name="StatusEnum")
 @XmlEnum(String.class)
 public enum StatusEnum {
 
@@ -76,6 +75,7 @@ public enum StatusEnum {
     private String version;
     private String createdAt;
     private String updatedAt;
+    private String iconUrl;
     private List<Link> links = null;
 
 
@@ -131,24 +131,6 @@ public enum StatusEnum {
     }
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    /**
-    **/
-    public FlowExtensionBasicResponse iconUrl(String iconUrl) {
-
-        this.iconUrl = iconUrl;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "")
-    @JsonProperty("iconUrl")
-    @Valid
-    public String getIconUrl() {
-        return iconUrl;
-    }
-    public void setIconUrl(String iconUrl) {
-        this.iconUrl = iconUrl;
     }
 
     /**
@@ -224,6 +206,25 @@ public enum StatusEnum {
     }
 
     /**
+    * The URL of the icon associated with the flow extension.
+    **/
+    public FlowExtensionBasicResponse iconUrl(String iconUrl) {
+
+        this.iconUrl = iconUrl;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "The URL of the icon associated with the flow extension.")
+    @JsonProperty("iconUrl")
+    @Valid
+    public String getIconUrl() {
+        return iconUrl;
+    }
+    public void setIconUrl(String iconUrl) {
+        this.iconUrl = iconUrl;
+    }
+
+    /**
     **/
     public FlowExtensionBasicResponse links(List<Link> links) {
 
@@ -264,17 +265,17 @@ public enum StatusEnum {
         return Objects.equals(this.id, flowExtensionBasicResponse.id) &&
             Objects.equals(this.name, flowExtensionBasicResponse.name) &&
             Objects.equals(this.description, flowExtensionBasicResponse.description) &&
-            Objects.equals(this.iconUrl, flowExtensionBasicResponse.iconUrl) &&
             Objects.equals(this.status, flowExtensionBasicResponse.status) &&
             Objects.equals(this.version, flowExtensionBasicResponse.version) &&
             Objects.equals(this.createdAt, flowExtensionBasicResponse.createdAt) &&
             Objects.equals(this.updatedAt, flowExtensionBasicResponse.updatedAt) &&
+            Objects.equals(this.iconUrl, flowExtensionBasicResponse.iconUrl) &&
             Objects.equals(this.links, flowExtensionBasicResponse.links);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, iconUrl, status, version, createdAt, updatedAt, links);
+        return Objects.hash(id, name, description, status, version, createdAt, updatedAt, iconUrl, links);
     }
 
     @Override
@@ -286,11 +287,11 @@ public enum StatusEnum {
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
-        sb.append("    iconUrl: ").append(toIndentedString(iconUrl)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("    version: ").append(toIndentedString(version)).append("\n");
         sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
         sb.append("    updatedAt: ").append(toIndentedString(updatedAt)).append("\n");
+        sb.append("    iconUrl: ").append(toIndentedString(iconUrl)).append("\n");
         sb.append("    links: ").append(toIndentedString(links)).append("\n");
         sb.append("}");
         return sb.toString();

@@ -19,15 +19,18 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import javax.validation.constraints.*;
 
 /**
  * One node in the controlled Flow Extension context tree.
  **/
 
+import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
@@ -341,18 +344,18 @@ public enum AllowedOperationsEnum {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        FlowExtensionContextTreeNode FlowExtensionContextTreeNode = (FlowExtensionContextTreeNode) o;
-        return Objects.equals(this.key, FlowExtensionContextTreeNode.key) &&
-            Objects.equals(this.title, FlowExtensionContextTreeNode.title) &&
-            Objects.equals(this.path, FlowExtensionContextTreeNode.path) &&
-            Objects.equals(this.dataType, FlowExtensionContextTreeNode.dataType) &&
-            Objects.equals(this.nodeType, FlowExtensionContextTreeNode.nodeType) &&
-            Objects.equals(this.allowedOperations, FlowExtensionContextTreeNode.allowedOperations) &&
-            Objects.equals(this.readOnly, FlowExtensionContextTreeNode.readOnly) &&
-            Objects.equals(this.replaceable, FlowExtensionContextTreeNode.replaceable) &&
-            Objects.equals(this.dynamicEntryAllowed, FlowExtensionContextTreeNode.dynamicEntryAllowed) &&
-            Objects.equals(this.dynamicEntryType, FlowExtensionContextTreeNode.dynamicEntryType) &&
-            Objects.equals(this.children, FlowExtensionContextTreeNode.children);
+        FlowExtensionContextTreeNode flowExtensionContextTreeNode = (FlowExtensionContextTreeNode) o;
+        return Objects.equals(this.key, flowExtensionContextTreeNode.key) &&
+            Objects.equals(this.title, flowExtensionContextTreeNode.title) &&
+            Objects.equals(this.path, flowExtensionContextTreeNode.path) &&
+            Objects.equals(this.dataType, flowExtensionContextTreeNode.dataType) &&
+            Objects.equals(this.nodeType, flowExtensionContextTreeNode.nodeType) &&
+            Objects.equals(this.allowedOperations, flowExtensionContextTreeNode.allowedOperations) &&
+            Objects.equals(this.readOnly, flowExtensionContextTreeNode.readOnly) &&
+            Objects.equals(this.replaceable, flowExtensionContextTreeNode.replaceable) &&
+            Objects.equals(this.dynamicEntryAllowed, flowExtensionContextTreeNode.dynamicEntryAllowed) &&
+            Objects.equals(this.dynamicEntryType, flowExtensionContextTreeNode.dynamicEntryType) &&
+            Objects.equals(this.children, flowExtensionContextTreeNode.children);
     }
 
     @Override

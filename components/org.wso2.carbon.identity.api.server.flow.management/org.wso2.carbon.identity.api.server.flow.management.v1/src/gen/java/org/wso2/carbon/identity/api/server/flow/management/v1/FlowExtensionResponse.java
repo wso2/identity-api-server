@@ -207,6 +207,7 @@ public enum StatusEnum {
     }
 
     /**
+    * The URL of the icon associated with the flow extension.
     **/
     public FlowExtensionResponse iconUrl(String iconUrl) {
 
@@ -214,7 +215,7 @@ public enum StatusEnum {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "The URL of the icon associated with the flow extension.")
     @JsonProperty("iconUrl")
     @Valid
     public String getIconUrl() {

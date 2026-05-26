@@ -1047,6 +1047,9 @@ components:
           type: string
           description: Description of the extension.
           example: This action invokes during flow execution to assess risk.
+        iconUrl:
+          type: string
+          description: The URL of the icon associated with the flow extension.
         endpoint:
           $ref: '#/components/schemas/Endpoint'
         accessConfig:
@@ -1063,6 +1066,9 @@ components:
           type: string
         version:
           type: string
+        iconUrl:
+          type: string
+          description: The URL of the icon associated with the flow extension.
         endpoint:
           $ref: '#/components/schemas/EndpointUpdateModel'
         accessConfig:
@@ -1088,6 +1094,9 @@ components:
           type: string
         updatedAt:
           type: string
+        iconUrl:
+          type: string
+          description: The URL of the icon associated with the flow extension.
         endpoint:
           $ref: '#/components/schemas/EndpointResponse'
         accessConfig:
@@ -1113,6 +1122,9 @@ components:
           type: string
         updatedAt:
           type: string
+        iconUrl:
+          type: string
+          description: The URL of the icon associated with the flow extension.
         links:
           type: array
           items:
