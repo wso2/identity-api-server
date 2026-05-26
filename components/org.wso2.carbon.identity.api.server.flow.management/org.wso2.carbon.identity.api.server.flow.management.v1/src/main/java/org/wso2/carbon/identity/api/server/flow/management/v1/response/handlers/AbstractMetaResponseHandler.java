@@ -158,7 +158,7 @@ public abstract class AbstractMetaResponseHandler {
         response.setSupportedExecutors(getSupportedExecutors());
         response.setConnectorConfigs(getConnectorConfigs());
         response.setExecutorConnections(getExecutorConnections());
-        response.setInflowExtensionConnections(getInflowExtensionConnections());
+        response.setFlowExtensionConnections(getFlowExtensionConnections());
         response.setSupportedFlowCompletionConfigs(getSupportedFlowCompletionConfigs());
         return response;
     }
@@ -233,7 +233,7 @@ public abstract class AbstractMetaResponseHandler {
      *
      * @return list of Flow extension connections, or empty list if none.
      */
-    protected List<FlowExtensionConnectionInfo> getInflowExtensionConnections() {
+    protected List<FlowExtensionConnectionInfo> getFlowExtensionConnections() {
 
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         try {
