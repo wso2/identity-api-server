@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -104,7 +104,7 @@ public enum TypeEnum {
         this.properties = properties;
         return this;
     }
-    
+
     @ApiModelProperty(value = "Authentication properties(without secrets) specific to the selected type.")
     @JsonProperty("properties")
     @Valid
@@ -124,7 +124,7 @@ public enum TypeEnum {
         return this;
     }
 
-    
+
 
     @Override
     public boolean equals(java.lang.Object o) {

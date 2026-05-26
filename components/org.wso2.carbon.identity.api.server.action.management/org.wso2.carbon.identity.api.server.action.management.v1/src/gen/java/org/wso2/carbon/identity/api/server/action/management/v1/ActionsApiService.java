@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -37,7 +37,7 @@ public interface ActionsApiService {
 
       public Response activateAction(String actionType, String actionId);
 
-      public Response createAction(String actionType, ActionModel body);
+      public Response createAction(String actionType, String body);
 
       public Response deactivateAction(String actionType, String actionId);
 
@@ -49,5 +49,5 @@ public interface ActionsApiService {
 
       public Response getActionsByActionType(String actionType);
 
-      public Response updateAction(String actionType, String actionId, ActionUpdateModel body);
+      public Response updateAction(String actionType, String actionId, String body);
 }

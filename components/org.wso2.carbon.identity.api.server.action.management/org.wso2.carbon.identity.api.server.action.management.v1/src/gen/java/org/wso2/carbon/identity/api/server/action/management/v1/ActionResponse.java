@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -22,8 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionType;
 import org.wso2.carbon.identity.api.server.action.management.v1.EndpointResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ORRuleResponse;
@@ -31,6 +29,7 @@ import javax.validation.constraints.*;
 
 
 import io.swagger.annotations.*;
+import java.util.List;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
@@ -80,8 +79,7 @@ public enum StatusEnum {
     private String updatedAt;
     private EndpointResponse endpoint;
     private ORRuleResponse rule;
-    private List<String> attributes = null;
-
+    private List<String> attributes;
 
     /**
     * Unique identifier of the action.
@@ -271,15 +269,15 @@ public enum StatusEnum {
     }
 
     /**
-    * Attributes required for the action.
-    **/
+     * Attributes required for the action.
+     **/
     public ActionResponse attributes(List<String> attributes) {
 
         this.attributes = attributes;
         return this;
     }
-    
-    @ApiModelProperty(example = "[\"http://wso2.org/claims/givenname\",\"http://wso2.org/claims/dob\"]", value = "Attributes required for the action.")
+
+    @ApiModelProperty(value = "Attributes required for the action.")
     @JsonProperty("attributes")
     @Valid
     public List<String> getAttributes() {
@@ -288,16 +286,6 @@ public enum StatusEnum {
     public void setAttributes(List<String> attributes) {
         this.attributes = attributes;
     }
-
-    public ActionResponse addAttributesItem(String attributesItem) {
-        if (this.attributes == null) {
-            this.attributes = new ArrayList<String>();
-        }
-        this.attributes.add(attributesItem);
-        return this;
-    }
-
-    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -310,21 +298,21 @@ public enum StatusEnum {
         }
         ActionResponse actionResponse = (ActionResponse) o;
         return Objects.equals(this.id, actionResponse.id) &&
-            Objects.equals(this.type, actionResponse.type) &&
-            Objects.equals(this.name, actionResponse.name) &&
-            Objects.equals(this.description, actionResponse.description) &&
-            Objects.equals(this.status, actionResponse.status) &&
-            Objects.equals(this.version, actionResponse.version) &&
-            Objects.equals(this.createdAt, actionResponse.createdAt) &&
-            Objects.equals(this.updatedAt, actionResponse.updatedAt) &&
-            Objects.equals(this.endpoint, actionResponse.endpoint) &&
-            Objects.equals(this.rule, actionResponse.rule) &&
-            Objects.equals(this.attributes, actionResponse.attributes);
+                Objects.equals(this.type, actionResponse.type) &&
+                Objects.equals(this.name, actionResponse.name) &&
+                Objects.equals(this.description, actionResponse.description) &&
+                Objects.equals(this.status, actionResponse.status) &&
+                Objects.equals(this.version, actionResponse.version) &&
+                Objects.equals(this.createdAt, actionResponse.createdAt) &&
+                Objects.equals(this.updatedAt, actionResponse.updatedAt) &&
+                Objects.equals(this.endpoint, actionResponse.endpoint) &&
+                Objects.equals(this.attributes, actionResponse.attributes) &&
+                Objects.equals(this.rule, actionResponse.rule);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, type, name, description, status, version, createdAt, updatedAt, endpoint, rule, attributes);
+        return Objects.hash(id, type, name, description, status, version, createdAt, updatedAt, endpoint, attributes, rule);
     }
 
     @Override
@@ -342,8 +330,8 @@ public enum StatusEnum {
         sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
         sb.append("    updatedAt: ").append(toIndentedString(updatedAt)).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
-        sb.append("    rule: ").append(toIndentedString(rule)).append("\n");
         sb.append("    attributes: ").append(toIndentedString(attributes)).append("\n");
+        sb.append("    rule: ").append(toIndentedString(rule)).append("\n");
         sb.append("}");
         return sb.toString();
     }

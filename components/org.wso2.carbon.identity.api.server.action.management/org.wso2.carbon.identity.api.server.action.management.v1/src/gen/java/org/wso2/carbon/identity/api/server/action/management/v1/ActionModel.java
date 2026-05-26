@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -22,14 +22,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
 import org.wso2.carbon.identity.api.server.action.management.v1.Endpoint;
 import org.wso2.carbon.identity.api.server.action.management.v1.ORRule;
 import javax.validation.constraints.*;
 
 
 import io.swagger.annotations.*;
+import java.util.List;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
@@ -40,8 +39,7 @@ public class ActionModel  {
     private String description;
     private Endpoint endpoint;
     private ORRule rule;
-    private List<String> attributes = null;
-
+    private List<String> attributes;
 
     /**
     * Name of the action.
@@ -56,7 +54,7 @@ public class ActionModel  {
     @JsonProperty("name")
     @Valid
     @NotNull(message = "Property name cannot be null.")
- @Size(min=1,max=255)
+    @Size(min=1,max=255)
     public String getName() {
         return name;
     }
@@ -122,33 +120,24 @@ public class ActionModel  {
     }
 
     /**
-    * Attributes required for the action.
-    **/
+     * Attributes required for the action.
+     */
     public ActionModel attributes(List<String> attributes) {
 
         this.attributes = attributes;
         return this;
     }
-    
-    @ApiModelProperty(example = "[\"http://wso2.org/claims/givenname\",\"http://wso2.org/claims/dob\"]", value = "Attributes required for the action.")
+
+    @ApiModelProperty(value = "Attributes required for the action.")
     @JsonProperty("attributes")
     @Valid
     public List<String> getAttributes() {
         return attributes;
     }
+
     public void setAttributes(List<String> attributes) {
         this.attributes = attributes;
     }
-
-    public ActionModel addAttributesItem(String attributesItem) {
-        if (this.attributes == null) {
-            this.attributes = new ArrayList<String>();
-        }
-        this.attributes.add(attributesItem);
-        return this;
-    }
-
-    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -161,15 +150,15 @@ public class ActionModel  {
         }
         ActionModel actionModel = (ActionModel) o;
         return Objects.equals(this.name, actionModel.name) &&
-            Objects.equals(this.description, actionModel.description) &&
-            Objects.equals(this.endpoint, actionModel.endpoint) &&
-            Objects.equals(this.rule, actionModel.rule) &&
-            Objects.equals(this.attributes, actionModel.attributes);
+                Objects.equals(this.description, actionModel.description) &&
+                Objects.equals(this.endpoint, actionModel.endpoint) &&
+                Objects.equals(this.attributes, actionModel.attributes) &&
+                Objects.equals(this.rule, actionModel.rule);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, endpoint, rule, attributes);
+        return Objects.hash(name, description, endpoint, rule);
     }
 
     @Override
@@ -181,8 +170,8 @@ public class ActionModel  {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
-        sb.append("    rule: ").append(toIndentedString(rule)).append("\n");
         sb.append("    attributes: ").append(toIndentedString(attributes)).append("\n");
+        sb.append("    rule: ").append(toIndentedString(rule)).append("\n");
         sb.append("}");
         return sb.toString();
     }

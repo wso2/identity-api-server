@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -22,8 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
 import org.wso2.carbon.identity.api.server.action.management.v1.EndpointUpdateModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ORRule;
 import javax.validation.constraints.*;
@@ -41,8 +39,7 @@ public class ActionUpdateModel  {
     private String version;
     private EndpointUpdateModel endpoint;
     private ORRule rule;
-    private List<String> attributes = null;
-
+    private java.util.List<String> attributes;
 
     /**
     * Updating name of the action.
@@ -138,33 +135,23 @@ public class ActionUpdateModel  {
     }
 
     /**
-    * Attributes required for the action.
-    **/
-    public ActionUpdateModel attributes(List<String> attributes) {
-
+     * Attributes required for the action.
+     **/
+    public ActionUpdateModel attributes(java.util.List<String> attributes) {
         this.attributes = attributes;
         return this;
     }
-    
-    @ApiModelProperty(example = "[\"http://wso2.org/claims/givenname\",\"http://wso2.org/claims/dob\"]", value = "Attributes required for the action.")
+
+    @ApiModelProperty(value = "Attributes required for the action.")
     @JsonProperty("attributes")
     @Valid
-    public List<String> getAttributes() {
+    public java.util.List<String> getAttributes() {
         return attributes;
     }
-    public void setAttributes(List<String> attributes) {
+
+    public void setAttributes(java.util.List<String> attributes) {
         this.attributes = attributes;
     }
-
-    public ActionUpdateModel addAttributesItem(String attributesItem) {
-        if (this.attributes == null) {
-            this.attributes = new ArrayList<String>();
-        }
-        this.attributes.add(attributesItem);
-        return this;
-    }
-
-    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -177,16 +164,16 @@ public class ActionUpdateModel  {
         }
         ActionUpdateModel actionUpdateModel = (ActionUpdateModel) o;
         return Objects.equals(this.name, actionUpdateModel.name) &&
-            Objects.equals(this.description, actionUpdateModel.description) &&
-            Objects.equals(this.version, actionUpdateModel.version) &&
-            Objects.equals(this.endpoint, actionUpdateModel.endpoint) &&
-            Objects.equals(this.rule, actionUpdateModel.rule) &&
-            Objects.equals(this.attributes, actionUpdateModel.attributes);
+                Objects.equals(this.description, actionUpdateModel.description) &&
+                Objects.equals(this.version, actionUpdateModel.version) &&
+                Objects.equals(this.endpoint, actionUpdateModel.endpoint) &&
+                Objects.equals(this.attributes, actionUpdateModel.attributes) &&
+                Objects.equals(this.rule, actionUpdateModel.rule);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, version, endpoint, rule, attributes);
+        return Objects.hash(name, description, version, endpoint, attributes, rule);
     }
 
     @Override
@@ -199,8 +186,8 @@ public class ActionUpdateModel  {
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    version: ").append(toIndentedString(version)).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
-        sb.append("    rule: ").append(toIndentedString(rule)).append("\n");
         sb.append("    attributes: ").append(toIndentedString(attributes)).append("\n");
+        sb.append("    rule: ").append(toIndentedString(rule)).append("\n");
         sb.append("}");
         return sb.toString();
     }
