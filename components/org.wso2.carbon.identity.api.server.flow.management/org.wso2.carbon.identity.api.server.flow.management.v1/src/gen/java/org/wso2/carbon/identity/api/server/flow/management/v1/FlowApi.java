@@ -100,7 +100,7 @@ public class FlowApi  {
 
     @Valid
     @DELETE
-    @Path("/flow-extension/{extensionId}")
+    @Path("/extension/{extensionId}")
     
     
     @ApiOperation(value = "Delete Flow Extension", notes = "Deletes an flow extension by its ID.  <b>Scope (Permission) required:</b> ``internal_flow_extension_delete``  ", response = Void.class, authorizations = {
@@ -211,7 +211,7 @@ public class FlowApi  {
 
     @Valid
     @GET
-    @Path("/flow-extension/{extensionId}")
+    @Path("/extension/{extensionId}")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Retrieve Flow Extension by ID", notes = "Retrieves the flow extension by its ID.  <b>Scope (Permission) required:</b> ``internal_flow_extension_view``  ", response = FlowExtensionResponse.class, authorizations = {
@@ -396,7 +396,7 @@ public class FlowApi  {
 
     @Valid
     @PATCH
-    @Path("/flow-extension/{extensionId}")
+    @Path("/extension/{extensionId}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @ApiOperation(value = "Update Flow Extension", notes = "Updates an existing flow extension.  <b>Scope (Permission) required:</b> ``internal_flow_extension_update``  ", response = FlowExtensionResponse.class, authorizations = {

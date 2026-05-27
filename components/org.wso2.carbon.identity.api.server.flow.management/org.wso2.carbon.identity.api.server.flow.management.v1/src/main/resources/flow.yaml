@@ -266,7 +266,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /flow/flow-extension/{extensionId}:
+  /flow/extension/{extensionId}:
     get:
       tags:
         - Flow Composer - Extensions
