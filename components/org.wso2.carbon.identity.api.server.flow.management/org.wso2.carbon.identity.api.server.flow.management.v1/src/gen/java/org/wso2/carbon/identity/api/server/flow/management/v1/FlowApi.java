@@ -18,30 +18,27 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1;
 
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import java.io.InputStream;
-import java.util.List;
-
-import org.wso2.carbon.identity.api.server.flow.management.v1.Error;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfig;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfigPatchModel;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateRequest;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateResponse;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateResult;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateStatus;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRequest;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowResponse;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowApiService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.wso2.carbon.identity.api.server.flow.management.v1.factories.FlowApiServiceFactory;
 
 import javax.validation.Valid;
-import javax.ws.rs.*;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.PATCH;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-import io.swagger.annotations.*;
-
-import javax.validation.constraints.*;
 
 @Path("/flow")
 @Api(description = "The flow API")
@@ -53,6 +50,29 @@ public class FlowApi  {
     public FlowApi() {
 
         this.delegate = FlowApiServiceFactory.getFlowApi();
+    }
+
+    @Valid
+    @POST
+    @Path("/extension")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Create Flow Extension", notes = "Creates an flow extension and returns the details along with the unique ID.  <b>Scope (Permission) required:</b> ``internal_flow_extension_create``  ", response = FlowExtensionResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Flow Composer - Extensions", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 201, message = "Flow Extension Created", response = FlowExtensionResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response createFlowExtension(@ApiParam(value = "" ,required=true) @Valid FlowExtensionModel flowExtensionModel) {
+
+        return delegate.createFlowExtension(flowExtensionModel );
     }
 
     @Valid
@@ -76,6 +96,29 @@ public class FlowApi  {
     public Response deleteFlow(    @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Type of the flow to delete",required=true, allowableValues="REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD")  @QueryParam("flowType") String flowType) {
 
         return delegate.deleteFlow(flowType );
+    }
+
+    @Valid
+    @DELETE
+    @Path("/extension/{extensionId}")
+    
+    
+    @ApiOperation(value = "Delete Flow Extension", notes = "Deletes an flow extension by its ID.  <b>Scope (Permission) required:</b> ``internal_flow_extension_delete``  ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Flow Composer - Extensions", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "Extension Deleted", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Void.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Void.class)
+    })
+    public Response deleteFlowExtension(@ApiParam(value = "Unique identifier of the extension.",required=true) @PathParam("extensionId") String extensionId) {
+
+        return delegate.deleteFlowExtension(extensionId );
     }
 
     @Valid
@@ -164,6 +207,73 @@ public class FlowApi  {
     public Response getFlowConfigs() {
 
         return delegate.getFlowConfigs();
+    }
+
+    @Valid
+    @GET
+    @Path("/extension/{extensionId}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve Flow Extension by ID", notes = "Retrieves the flow extension by its ID.  <b>Scope (Permission) required:</b> ``internal_flow_extension_view``  ", response = FlowExtensionResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Flow Composer - Extensions", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = FlowExtensionResponse.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Void.class)
+    })
+    public Response getFlowExtensionById(@ApiParam(value = "Unique identifier of the extension.",required=true) @PathParam("extensionId") String extensionId) {
+
+        return delegate.getFlowExtensionById(extensionId );
+    }
+
+    @Valid
+    @GET
+    @Path("/extension/meta")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve the Flow Extension context tree", notes = "Returns the flow extension context tree for the given flow type. When `flowType` is omitted the default tree is returned.  <b>Scope (Permission) required:</b> ``internal_flow_extension_view``  ", response = FlowExtensionContextResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Flow Composer - Extensions", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successfully retrieved the context tree", response = FlowExtensionContextResponse.class),
+        @ApiResponse(code = 400, message = "Invalid flow type specified", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class)
+    })
+    public Response getFlowExtensionContext(    @Valid@ApiParam(value = "Optional flow type. When omitted, the default tree is returned.", allowableValues="REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION, ASK_PASSWORD")  @QueryParam("flowType") String flowType) {
+
+        return delegate.getFlowExtensionContext(flowType );
+    }
+
+    @Valid
+    @GET
+    @Path("/extension")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "List Flow Extensions", notes = "Returns a list of all configured flow extensions.  <b>Scope (Permission) required:</b> ``internal_flow_extension_view``  ", response = FlowExtensionBasicResponse.class, responseContainer = "List", authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Flow Composer - Extensions", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = FlowExtensionBasicResponse.class, responseContainer = "List"),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getFlowExtensions() {
+
+        return delegate.getFlowExtensions();
     }
 
     @Valid
@@ -270,7 +380,7 @@ public class FlowApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Flow Configuration" })
+    }, tags={ "Flow Configuration", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Flow successfully updated", response = FlowConfig.class),
         @ApiResponse(code = 400, message = "Invalid request body or unsupported flow type", response = Error.class),
@@ -282,6 +392,30 @@ public class FlowApi  {
     public Response updateFlowConfig(@ApiParam(value = "" ,required=true) @Valid FlowConfigPatchModel flowConfigPatchModel) {
 
         return delegate.updateFlowConfig(flowConfigPatchModel );
+    }
+
+    @Valid
+    @PATCH
+    @Path("/extension/{extensionId}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update Flow Extension", notes = "Updates an existing flow extension.  <b>Scope (Permission) required:</b> ``internal_flow_extension_update``  ", response = FlowExtensionResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Flow Composer - Extensions" })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Extension Updated", response = FlowExtensionResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Void.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Void.class)
+    })
+    public Response updateFlowExtension(@ApiParam(value = "Unique identifier of the extension.",required=true) @PathParam("extensionId") String extensionId, @ApiParam(value = "" ,required=true) @Valid FlowExtensionUpdateModel flowExtensionUpdateModel) {
+
+        return delegate.updateFlowExtension(extensionId,  flowExtensionUpdateModel );
     }
 
 }

@@ -18,10 +18,15 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.action.management.api.exception.ActionMgtException;
+import org.wso2.carbon.identity.action.management.api.model.Action;
 import org.wso2.carbon.identity.api.server.flow.management.common.FlowMgtServiceHolder;
 import org.wso2.carbon.identity.api.server.flow.management.v1.AttributeMetadata;
 import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorConnections;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionConnectionInfo;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
@@ -29,6 +34,7 @@ import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
 import org.wso2.carbon.identity.claim.metadata.mgt.model.LocalClaim;
+import org.wso2.carbon.identity.flow.extension.model.FlowExtensionAction;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
 import org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
@@ -49,6 +55,7 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.F
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.APPLE_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.EMAIL_OTP_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.FACEBOOK_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.FLOW_EXTENSION_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.GITHUB_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.GOOGLE_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.MAGIC_LINK_EXECUTOR;
@@ -71,6 +78,7 @@ import static org.wso2.carbon.identity.application.authentication.framework.util
  */
 public abstract class AbstractMetaResponseHandler {
 
+    private static final Log log = LogFactory.getLog(AbstractMetaResponseHandler.class);
     private static final String MULTI_ATTRIBUTE_LOGIN_ENABLED = "multiAttributeLoginEnabled";
 
     /**
@@ -110,6 +118,7 @@ public abstract class AbstractMetaResponseHandler {
         supportedExecutors.add(SMS_OTP_EXECUTOR);
         supportedExecutors.add(MAGIC_LINK_EXECUTOR);
         supportedExecutors.add(USER_PROVISIONING_EXECUTOR);
+        supportedExecutors.add(FLOW_EXTENSION_EXECUTOR);
         return supportedExecutors;
     }
 
@@ -149,6 +158,7 @@ public abstract class AbstractMetaResponseHandler {
         response.setSupportedExecutors(getSupportedExecutors());
         response.setConnectorConfigs(getConnectorConfigs());
         response.setExecutorConnections(getExecutorConnections());
+        response.setFlowExtensionConnections(getFlowExtensionConnections());
         response.setSupportedFlowCompletionConfigs(getSupportedFlowCompletionConfigs());
         return response;
     }
@@ -215,6 +225,41 @@ public abstract class AbstractMetaResponseHandler {
             fields.add(FlowEndpointConstants.USERNAME_IDENTIFIER);
         }
         return fields;
+    }
+
+    /**
+     * Returns the list of Flow extension connection info for this flow.
+     * Fetches all ACTIVE Flow Extension actions from ActionManagementService.
+     *
+     * @return list of Flow extension connections, or empty list if none.
+     */
+    protected List<FlowExtensionConnectionInfo> getFlowExtensionConnections() {
+
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        try {
+            List<Action> actions = FlowMgtServiceHolder.getActionManagementService()
+                    .getActionsByActionType(Action.ActionTypes.FLOW_EXTENSION.getPathParam(), tenantDomain);
+            if (actions == null) {
+                return Collections.emptyList();
+            }
+            List<FlowExtensionConnectionInfo> connections = new ArrayList<>();
+            for (Action action : actions) {
+                if (!Action.Status.ACTIVE.equals(action.getStatus())) {
+                    continue;
+                }
+                FlowExtensionConnectionInfo info = new FlowExtensionConnectionInfo()
+                        .actionId(action.getId())
+                        .name(action.getName());
+                if (action instanceof FlowExtensionAction) {
+                    info.iconUrl(((FlowExtensionAction) action).getIconUrl());
+                }
+                connections.add(info);
+            }
+            return connections;
+        } catch (ActionMgtException e) {
+            log.warn("Failed to fetch Flow Extension connections for flow meta.", e);
+            return Collections.emptyList();
+        }
     }
 
     protected List<ExecutorConnections> getExecutorConnections() {

@@ -27,6 +27,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.action.management.api.constant.ErrorMessage;
+import org.wso2.carbon.identity.action.management.api.exception.ActionMgtClientException;
+import org.wso2.carbon.identity.action.management.api.exception.ActionMgtException;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
 import org.wso2.carbon.identity.api.server.flow.management.common.FlowMgtServiceHolder;
@@ -155,6 +158,36 @@ public class Utils {
         }
         e.setDescription(description);
         return handleFlowMgtException(e);
+    }
+
+    /**
+     * Handles {@link ActionMgtException} thrown when calling {@link
+     * org.wso2.carbon.identity.action.management.api.service.ActionManagementService} from the
+     * flow management layer and converts it into an {@link APIError}.
+     *
+     * @param e ActionMgtException object.
+     * @return APIError object.
+     */
+    public static APIError handleActionMgtException(ActionMgtException e) {
+
+        Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+        if (e instanceof ActionMgtClientException) {
+            LOG.debug(e.getMessage(), e);
+            String rawCode = e.getErrorCode();
+            if (ErrorMessage.ERROR_NO_ACTION_CONFIGURED_ON_GIVEN_ACTION_TYPE_AND_ID.getCode().equals(rawCode)) {
+                status = Response.Status.NOT_FOUND;
+            } else if (ErrorMessage.ERROR_ACTION_NAME_ALREADY_EXISTS.getCode().equals(rawCode)) {
+                status = Response.Status.CONFLICT;
+            } else {
+                status = Response.Status.BAD_REQUEST;
+            }
+        } else {
+            LOG.error(e.getMessage(), e);
+        }
+        String errorCode = e.getErrorCode();
+        errorCode = (errorCode != null && errorCode.contains(ERROR_CODE_DELIMITER))
+                ? errorCode : FlowEndpointConstants.FLOW_PREFIX + errorCode;
+        return handleException(status, errorCode, e.getMessage(), e.getDescription());
     }
 
     /**

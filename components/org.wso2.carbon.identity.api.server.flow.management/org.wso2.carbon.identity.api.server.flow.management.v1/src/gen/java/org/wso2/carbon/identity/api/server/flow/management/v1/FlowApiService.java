@@ -27,6 +27,11 @@ import java.util.List;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Error;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfig;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfigPatchModel;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionBasicResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionContextResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionModel;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionUpdateModel;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateRequest;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateResult;
@@ -39,7 +44,11 @@ import javax.ws.rs.core.Response;
 
 public interface FlowApiService {
 
+      public Response createFlowExtension(FlowExtensionModel flowExtensionModel);
+
       public Response deleteFlow(String flowType);
+
+      public Response deleteFlowExtension(String extensionId);
 
       public Response generateFlow(FlowGenerateRequest flowGenerateRequest);
 
@@ -48,6 +57,12 @@ public interface FlowApiService {
       public Response getFlowConfigForFlow(String flowType);
 
       public Response getFlowConfigs();
+
+      public Response getFlowExtensionById(String extensionId);
+
+      public Response getFlowExtensionContext(String flowType);
+
+      public Response getFlowExtensions();
 
       public Response getFlowGenerationResult(String operationId);
 
@@ -58,4 +73,6 @@ public interface FlowApiService {
       public Response updateFlow(FlowRequest flowRequest);
 
       public Response updateFlowConfig(FlowConfigPatchModel flowConfigPatchModel);
+
+      public Response updateFlowExtension(String extensionId, FlowExtensionUpdateModel flowExtensionUpdateModel);
 }
