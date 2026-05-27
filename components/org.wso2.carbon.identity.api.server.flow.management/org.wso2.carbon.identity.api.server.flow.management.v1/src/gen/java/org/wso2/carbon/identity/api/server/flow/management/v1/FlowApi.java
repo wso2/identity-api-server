@@ -54,7 +54,7 @@ public class FlowApi  {
 
     @Valid
     @POST
-    @Path("/flow-extension")
+    @Path("/extension")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @ApiOperation(value = "Create Flow Extension", notes = "Creates an flow extension and returns the details along with the unique ID.  <b>Scope (Permission) required:</b> ``internal_flow_extension_create``  ", response = FlowExtensionResponse.class, authorizations = {
@@ -234,15 +234,15 @@ public class FlowApi  {
 
     @Valid
     @GET
-    @Path("/flow-extension/context-tree")
+    @Path("/extension/meta")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve the controlled Flow Extension context tree", notes = "Returns the canonical context tree filtered by the deployment.toml whitelist ([identity.flow_extension.context.{flow_type}]) for the given flow type. When `flowType` is omitted the default tree is returned. Used by the Console UI to render the Flow Extension access-config editor without offering paths the deployment has switched off, and to drive per-flow-type policy flags such as `redirectionEnabled` and `allowReadOnlyClaimsModification`. ", response = FlowExtensionContextTreeResponse.class, authorizations = {
+    @ApiOperation(value = "Retrieve the Flow Extension context tree", notes = "Returns the flow extension context tree for the given flow type. When `flowType` is omitted the default tree is returned.  <b>Scope (Permission) required:</b> ``internal_flow_extension_view``  ", response = FlowExtensionContextTreeResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Flow Composer", })
+    }, tags={ "Flow Composer - Extensions", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successfully retrieved the context tree", response = FlowExtensionContextTreeResponse.class),
         @ApiResponse(code = 400, message = "Invalid flow type specified", response = Error.class),
@@ -256,7 +256,7 @@ public class FlowApi  {
 
     @Valid
     @GET
-    @Path("/flow-extension")
+    @Path("/extension")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "List Flow Extensions", notes = "Returns a list of all configured flow extensions.  <b>Scope (Permission) required:</b> ``internal_flow_extension_view``  ", response = FlowExtensionBasicResponse.class, responseContainer = "List", authorizations = {

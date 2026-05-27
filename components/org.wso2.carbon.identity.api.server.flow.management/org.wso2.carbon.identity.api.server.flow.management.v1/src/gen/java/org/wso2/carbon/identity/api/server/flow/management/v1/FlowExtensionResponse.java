@@ -38,40 +38,6 @@ public class FlowExtensionResponse  {
     private String id;
     private String name;
     private String description;
-
-@XmlType(name="StatusEnum")
-@XmlEnum(String.class)
-public enum StatusEnum {
-
-    @XmlEnumValue("ACTIVE") ACTIVE(String.valueOf("ACTIVE")), @XmlEnumValue("INACTIVE") INACTIVE(String.valueOf("INACTIVE"));
-
-
-    private String value;
-
-    StatusEnum(String v) {
-        value = v;
-    }
-
-    public String value() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return String.valueOf(value);
-    }
-
-    public static StatusEnum fromValue(String value) {
-        for (StatusEnum b : StatusEnum.values()) {
-            if (b.value.equals(value)) {
-                return b;
-            }
-        }
-        throw new IllegalArgumentException("Unexpected value '" + value + "'");
-    }
-}
-
-    private StatusEnum status;
     private String version;
     private String createdAt;
     private String updatedAt;
@@ -132,24 +98,6 @@ public enum StatusEnum {
     }
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    /**
-    **/
-    public FlowExtensionResponse status(StatusEnum status) {
-
-        this.status = status;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "")
-    @JsonProperty("status")
-    @Valid
-    public StatusEnum getStatus() {
-        return status;
-    }
-    public void setStatus(StatusEnum status) {
-        this.status = status;
     }
 
     /**
@@ -294,7 +242,6 @@ public enum StatusEnum {
         return Objects.equals(this.id, flowExtensionResponse.id) &&
             Objects.equals(this.name, flowExtensionResponse.name) &&
             Objects.equals(this.description, flowExtensionResponse.description) &&
-            Objects.equals(this.status, flowExtensionResponse.status) &&
             Objects.equals(this.version, flowExtensionResponse.version) &&
             Objects.equals(this.createdAt, flowExtensionResponse.createdAt) &&
             Objects.equals(this.updatedAt, flowExtensionResponse.updatedAt) &&
@@ -306,7 +253,7 @@ public enum StatusEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, status, version, createdAt, updatedAt, iconUrl, endpoint, accessConfig, encryption);
+        return Objects.hash(id, name, description, version, createdAt, updatedAt, iconUrl, endpoint, accessConfig, encryption);
     }
 
     @Override
@@ -318,7 +265,6 @@ public enum StatusEnum {
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
-        sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("    version: ").append(toIndentedString(version)).append("\n");
         sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
         sb.append("    updatedAt: ").append(toIndentedString(updatedAt)).append("\n");

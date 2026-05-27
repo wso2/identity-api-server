@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -19,7 +19,6 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1.utils;
 
 import org.apache.commons.lang.StringUtils;
-import org.wso2.carbon.identity.action.management.api.exception.ActionMgtClientException;
 import org.wso2.carbon.identity.action.management.api.model.Action;
 import org.wso2.carbon.identity.action.management.api.model.Authentication;
 import org.wso2.carbon.identity.action.management.api.model.EndpointConfig;
@@ -36,6 +35,7 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionRespo
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionUpdateModel;
 import org.wso2.carbon.identity.certificate.management.model.Certificate;
 import org.wso2.carbon.identity.flow.extension.model.FlowExtensionAction;
+import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
 
 import java.util.List;
 import java.util.Map;
@@ -64,16 +64,16 @@ public final class FlowExtensionMapper {
      *
      * @param model the API create model.
      * @return domain action for persistence.
-     * @throws ActionMgtClientException if endpoint authentication properties are invalid.
+     * @throws FlowMgtClientException if endpoint authentication properties are invalid.
      */
     public static Action toFlowExtensionAction(FlowExtensionModel model)
-            throws ActionMgtClientException {
+            throws FlowMgtClientException {
 
         if (model == null) {
-            throw new ActionMgtClientException(
+            throw new FlowMgtClientException(
+                    ERROR_CODE_INVALID_REQUEST_BODY.getCode(),
                     ERROR_CODE_INVALID_REQUEST_BODY.getMessage(),
-                    ERROR_CODE_INVALID_REQUEST_BODY.getDescription(),
-                    ERROR_CODE_INVALID_REQUEST_BODY.getCode());
+                    ERROR_CODE_INVALID_REQUEST_BODY.getDescription());
         }
         EndpointConfig endpointConfig = toEndpointConfig(model.getEndpoint());
 
@@ -102,16 +102,16 @@ public final class FlowExtensionMapper {
      *
      * @param model the API update model.
      * @return domain action carrying only the fields that should be updated.
-     * @throws ActionMgtClientException if endpoint authentication properties are invalid.
+     * @throws FlowMgtClientException if endpoint authentication properties are invalid.
      */
     public static Action toFlowExtensionAction(FlowExtensionUpdateModel model)
-            throws ActionMgtClientException {
+            throws FlowMgtClientException {
 
         if (model == null) {
-            throw new ActionMgtClientException(
+            throw new FlowMgtClientException(
+                    ERROR_CODE_INVALID_REQUEST_BODY.getCode(),
                     ERROR_CODE_INVALID_REQUEST_BODY.getMessage(),
-                    ERROR_CODE_INVALID_REQUEST_BODY.getDescription(),
-                    ERROR_CODE_INVALID_REQUEST_BODY.getCode());
+                    ERROR_CODE_INVALID_REQUEST_BODY.getDescription());
         }
         EndpointConfig endpointConfig = null;
         if (model.getEndpoint() != null) {
@@ -152,7 +152,6 @@ public final class FlowExtensionMapper {
                 .id(action.getId())
                 .name(action.getName())
                 .description(action.getDescription())
-                .status(FlowExtensionResponse.StatusEnum.valueOf(action.getStatus().name()))
                 .version(action.getActionVersion())
                 .createdAt(action.getCreatedAt() != null
                         ? action.getCreatedAt().toInstant().toString() : null)
@@ -183,7 +182,6 @@ public final class FlowExtensionMapper {
                 .id(action.getId())
                 .name(action.getName())
                 .description(action.getDescription())
-                .status(FlowExtensionBasicResponse.StatusEnum.valueOf(action.getStatus().name()))
                 .version(action.getActionVersion())
                 .createdAt(action.getCreatedAt() != null
                         ? action.getCreatedAt().toInstant().toString() : null)
@@ -196,7 +194,7 @@ public final class FlowExtensionMapper {
     }
 
     private static EndpointConfig toEndpointConfig(Endpoint endpoint)
-            throws ActionMgtClientException {
+            throws FlowMgtClientException {
 
         Authentication authentication = buildAuthentication(
                 Authentication.Type.valueOfName(endpoint.getAuthentication().getType().toString()),
@@ -210,7 +208,7 @@ public final class FlowExtensionMapper {
     }
 
     private static EndpointConfig toEndpointConfigFromUpdate(EndpointUpdateModel endpoint)
-            throws ActionMgtClientException {
+            throws FlowMgtClientException {
 
         Authentication authentication = null;
         if (endpoint.getAuthentication() != null) {
@@ -242,7 +240,7 @@ public final class FlowExtensionMapper {
 
     private static Authentication buildAuthentication(Authentication.Type authType,
                                                       Map<String, Object> props)
-            throws ActionMgtClientException {
+            throws FlowMgtClientException {
 
         switch (authType) {
             case BASIC:
@@ -272,31 +270,47 @@ public final class FlowExtensionMapper {
                         Authentication.Property.SCOPES.getName());
                 return new Authentication.ClientCredentialAuthBuilder(
                         clientId, clientSecret, tokenEndpoint, scopes).build();
+            case PASSWORD_CREDENTIAL:
+                String pwdGrantClientId = getRequiredStringProp(props,
+                        Authentication.Property.CLIENT_ID.getName());
+                String pwdGrantClientSecret = getRequiredStringProp(props,
+                        Authentication.Property.CLIENT_SECRET.getName());
+                String pwdGrantTokenEndpoint = getRequiredStringProp(props,
+                        Authentication.Property.TOKEN_ENDPOINT.getName());
+                String pwdGrantUsername = getRequiredStringProp(props,
+                        Authentication.Property.USERNAME.getName());
+                String pwdGrantPassword = getRequiredStringProp(props,
+                        Authentication.Property.PASSWORD.getName());
+                String pwdGrantScopes = getOptionalStringProp(props,
+                        Authentication.Property.SCOPES.getName());
+                return new Authentication.PasswordCredentialAuthBuilder(
+                        pwdGrantClientId, pwdGrantClientSecret, pwdGrantTokenEndpoint,
+                        pwdGrantScopes, pwdGrantUsername, pwdGrantPassword).build();
             case NONE:
                 return new Authentication.NoneAuthBuilder().build();
             default:
-                throw new ActionMgtClientException(
+                throw new FlowMgtClientException(
+                        ERROR_CODE_INVALID_ENDPOINT_AUTH_PROPERTIES.getCode(),
                         ERROR_CODE_INVALID_ENDPOINT_AUTH_PROPERTIES.getMessage(),
-                        ERROR_CODE_INVALID_ENDPOINT_AUTH_PROPERTIES.getDescription(),
-                        ERROR_CODE_INVALID_ENDPOINT_AUTH_PROPERTIES.getCode());
+                        ERROR_CODE_INVALID_ENDPOINT_AUTH_PROPERTIES.getDescription());
         }
     }
 
     private static String getRequiredStringProp(Map<String, Object> props, String key)
-            throws ActionMgtClientException {
+            throws FlowMgtClientException {
 
         if (props == null || !props.containsKey(key)) {
-            throw new ActionMgtClientException(
+            throw new FlowMgtClientException(
+                    ERROR_CODE_INVALID_ENDPOINT_AUTH_PROPERTIES.getCode(),
                     ERROR_CODE_INVALID_ENDPOINT_AUTH_PROPERTIES.getMessage(),
-                    ERROR_CODE_INVALID_ENDPOINT_AUTH_PROPERTIES.getDescription(),
-                    ERROR_CODE_INVALID_ENDPOINT_AUTH_PROPERTIES.getCode());
+                    ERROR_CODE_INVALID_ENDPOINT_AUTH_PROPERTIES.getDescription());
         }
         String val = (String) props.get(key);
         if (StringUtils.isEmpty(val)) {
-            throw new ActionMgtClientException(
+            throw new FlowMgtClientException(
+                    ERROR_CODE_EMPTY_ENDPOINT_AUTH_PROPERTIES.getCode(),
                     ERROR_CODE_EMPTY_ENDPOINT_AUTH_PROPERTIES.getMessage(),
-                    ERROR_CODE_EMPTY_ENDPOINT_AUTH_PROPERTIES.getDescription(),
-                    ERROR_CODE_EMPTY_ENDPOINT_AUTH_PROPERTIES.getCode());
+                    ERROR_CODE_EMPTY_ENDPOINT_AUTH_PROPERTIES.getDescription());
         }
         return val;
     }

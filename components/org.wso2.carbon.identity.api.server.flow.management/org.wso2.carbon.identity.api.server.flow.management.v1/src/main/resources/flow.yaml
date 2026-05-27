@@ -206,7 +206,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /flow/flow-extension:
+  /flow/extension:
     post:
       tags:
         - Flow Composer - Extensions
@@ -356,19 +356,13 @@ paths:
         '500':
           description: Server Error
 
-  /flow/flow-extension/context-tree:
+  /flow/extension/meta:
     get:
-      summary: Retrieve the controlled Flow Extension context tree
-      description: >
-        Returns the canonical context tree filtered by the deployment.toml whitelist
-        ([identity.flow_extension.context.{flow_type}]) for the given flow type.
-        When `flowType` is omitted the default tree is returned. Used by the Console UI
-        to render the Flow Extension access-config editor without offering paths
-        the deployment has switched off, and to drive per-flow-type policy flags such
-        as `redirectionEnabled` and `allowReadOnlyClaimsModification`.
-      operationId: getFlowExtensionContextTree
       tags:
-        - Flow Composer
+        - Flow Composer - Extensions
+      summary: Retrieve the Flow Extension context tree
+      description: "Returns the flow extension context tree for the given flow type. When `flowType` is omitted the default tree is returned.\n\n<b>Scope (Permission) required:</b> ``internal_flow_extension_view``\n\n"
+      operationId: getFlowExtensionContextTree
       parameters:
         - in: query
           name: flowType
@@ -1052,9 +1046,6 @@ components:
           type: string
         description:
           type: string
-        status:
-          type: string
-          enum: [ ACTIVE, INACTIVE ]
         version:
           type: string
         createdAt:
@@ -1080,9 +1071,6 @@ components:
           type: string
         description:
           type: string
-        status:
-          type: string
-          enum: [ ACTIVE, INACTIVE ]
         version:
           type: string
         createdAt:
@@ -1150,7 +1138,7 @@ components:
       properties:
         type:
           type: string
-          enum: [ NONE, BEARER, API_KEY, BASIC, CLIENT_CREDENTIAL ]
+          enum: [ NONE, BEARER, API_KEY, BASIC, CLIENT_CREDENTIAL, PASSWORD_CREDENTIAL ]
         properties:
           type: object
           additionalProperties: true
@@ -1160,7 +1148,7 @@ components:
       properties:
         type:
           type: string
-          enum: [ NONE, BEARER, API_KEY, BASIC, CLIENT_CREDENTIAL ]
+          enum: [ NONE, BEARER, API_KEY, BASIC, CLIENT_CREDENTIAL, PASSWORD_CREDENTIAL ]
 
     Link:
       type: object

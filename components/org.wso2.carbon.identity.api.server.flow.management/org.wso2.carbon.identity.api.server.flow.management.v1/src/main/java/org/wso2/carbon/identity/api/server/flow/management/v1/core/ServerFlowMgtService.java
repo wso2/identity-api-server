@@ -283,6 +283,8 @@ public class ServerFlowMgtService {
             return FlowExtensionMapper.toFlowExtensionResponse(created);
         } catch (ActionMgtException e) {
             throw Utils.handleActionMgtException(e);
+        } catch (FlowMgtFrameworkException e) {
+            throw Utils.handleFlowMgtException(e);
         }
     }
 
@@ -341,6 +343,8 @@ public class ServerFlowMgtService {
             return FlowExtensionMapper.toFlowExtensionResponse(updated);
         } catch (ActionMgtException e) {
             throw Utils.handleActionMgtException(e);
+        } catch (FlowMgtFrameworkException e) {
+            throw Utils.handleFlowMgtException(e);
         }
     }
 
