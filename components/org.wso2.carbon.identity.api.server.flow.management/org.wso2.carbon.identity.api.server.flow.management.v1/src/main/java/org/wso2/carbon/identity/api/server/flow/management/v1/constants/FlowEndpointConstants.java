@@ -40,7 +40,7 @@ public class FlowEndpointConstants {
     public static final String IDP_TEMPLATE_ID = "templateId";
     public static final String MICROSOFT_IDP_TEMPLATE_ID = "microsoft-idp";
 
-    public static final String FLOW_EXTENSION_PATH_COMPONENT = "/flow/flow-extension/";
+    public static final String FLOW_EXTENSION_PATH_COMPONENT = "/flow/extension/";
 
     /**
      * Error messages related to flow management.
