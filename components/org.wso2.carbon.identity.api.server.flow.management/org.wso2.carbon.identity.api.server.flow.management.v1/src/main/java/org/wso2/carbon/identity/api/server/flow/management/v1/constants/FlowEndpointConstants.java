@@ -110,6 +110,7 @@ public class FlowEndpointConstants {
         ERROR_CODE_EMPTY_ENDPOINT_AUTH_PROPERTIES("10023",
                 "Empty endpoint authentication properties.",
                 "Endpoint authentication properties cannot be empty."),
+
         ERROR_CODE_INVALID_REQUEST_BODY("10024",
                 "Invalid request body.",
                 "Request body cannot be null.");
