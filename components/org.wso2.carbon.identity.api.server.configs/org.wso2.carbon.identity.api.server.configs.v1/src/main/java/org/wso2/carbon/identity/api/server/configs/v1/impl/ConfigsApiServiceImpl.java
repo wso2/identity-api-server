@@ -23,6 +23,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.core.ServerConfigManagemen
 import org.wso2.carbon.identity.api.server.configs.v1.factories.ServerConfigManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettings;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ConfigPreferenceSearchAttribute;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.FraudDetectionConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
@@ -31,6 +32,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveST
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.PushDeviceMgtConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfigListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ScimConfig;
@@ -352,6 +354,27 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
 
         configManagementService.deleteOAuth2InboundAuthConfig();
         return Response.noContent().build();
+    }
+
+    @Override
+    public Response getPushDeviceMgtConfigs() {
+
+        // do some magic!
+        return Response.ok().entity("magic!").build();
+    }
+
+    @Override
+    public Response updatePushDeviceMgtConfigs(PushDeviceMgtConfig pushDeviceMgtConfig) {
+
+        // do some magic!
+        return Response.ok().entity("magic!").build();
+    }
+
+    @Override
+    public Response getConfigPreferences(List<ConfigPreferenceSearchAttribute> configPreferenceSearchAttribute) {
+
+        // do some magic!
+        return Response.ok().entity("magic!").build();
     }
 
     private RemoteLoggingConfigListItem createRemoteLoggingConfigListItem(

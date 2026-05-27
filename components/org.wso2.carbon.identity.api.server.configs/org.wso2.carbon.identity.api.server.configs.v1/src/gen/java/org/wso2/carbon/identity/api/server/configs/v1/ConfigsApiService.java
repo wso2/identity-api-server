@@ -117,4 +117,10 @@ public interface ConfigsApiService {
       public Response patchCompatibilitySettings(CompatibilitySettings compatibilitySettings);
 
       public Response getCompatibilitySettingsByGroup(String settingGroup);
+
+      public Response getConfigPreferences(List<ConfigPreferenceSearchAttribute> configPreferenceSearchAttribute);
+
+      public Response getPushDeviceMgtConfigs();
+
+      public Response updatePushDeviceMgtConfigs(PushDeviceMgtConfig pushDeviceMgtConfig);
 }

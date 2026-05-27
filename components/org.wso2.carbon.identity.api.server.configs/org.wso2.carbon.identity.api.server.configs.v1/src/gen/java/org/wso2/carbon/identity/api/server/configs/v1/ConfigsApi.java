@@ -30,6 +30,8 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettings;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettingsGroup;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ConfigPreferenceResp;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ConfigPreferenceSearchAttribute;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Error;
@@ -43,6 +45,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTValidatorConfig;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.PushDeviceMgtConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfigListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Schema;
@@ -879,6 +882,78 @@ public class ConfigsApi  {
     public Response updatePassiveSTSInboundAuthConfig(@ApiParam(value = "" ) @Valid InboundAuthPassiveSTSConfig inboundAuthPassiveSTSConfig) {
 
         return delegate.updatePassiveSTSInboundAuthConfig(inboundAuthPassiveSTSConfig );
+    }
+
+    @Valid
+    @POST
+    @Path("/preferences")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve config store preferences of a tenant.", notes = "Retrieve config store resource attributes for the given resource types, names and there properties.   <table>     <tr>       <td><b>Resource Type</b></td>       <td><b>Resource Name</b></td>       <td><b>Properties</b></td>     </tr>     <tr>       <td rowspan=\"9\">push-auth-settings</td>       <td>device-management</td>       <td>         <ul>           <li>enableMultipleDeviceEnrollment</li>           <li>maximumDeviceLimit</li>         </ul>       </td>     </tr>    </table>  <b>Scope (Permission) required:</b> `internal_login` ", response = ConfigPreferenceResp.class, responseContainer = "List", authorizations = {
+            @Authorization(value = "BasicAuth"),
+            @Authorization(value = "OAuth2", scopes = {
+
+            })
+    }, tags={ "Preferences", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Configuration preferences", response = ConfigPreferenceResp.class, responseContainer = "List"),
+            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+            @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getConfigPreferences(@ApiParam(value = "This represents the resource type, resource name and the attributes which preferences need to be returned." ,required=true) @Valid List<ConfigPreferenceSearchAttribute> configPreferenceSearchAttribute) {
+
+        return delegate.getConfigPreferences(configPreferenceSearchAttribute );
+    }
+
+    @Valid
+    @GET
+    @Path("/push-device-mgt")
+
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve push device management related configurations of a tenant.", notes = "Retrieve push device management related configurations of a tenant.  <b>Scope (Permission) required:</b> `internal_login` ", response = PushDeviceMgtConfig.class, authorizations = {
+            @Authorization(value = "BasicAuth"),
+            @Authorization(value = "OAuth2", scopes = {
+
+            })
+    }, tags={ "Push Device Management", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully retrieved.", response = PushDeviceMgtConfig.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+            @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getPushDeviceMgtConfigs() {
+
+        return delegate.getPushDeviceMgtConfigs();
+    }
+
+    @Valid
+    @PUT
+    @Path("/push-device-mgt")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update push device management related configurations of a tenant.", notes = "Update push device management related configurations of a tenant.", response = PushDeviceMgtConfig.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Push Device Management", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successfully updated.", response = PushDeviceMgtConfig.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response updatePushDeviceMgtConfigs(@ApiParam(value = "" ,required=true) @Valid PushDeviceMgtConfig pushDeviceMgtConfig) {
+
+        return delegate.updatePushDeviceMgtConfigs(pushDeviceMgtConfig );
     }
 
     @Valid
