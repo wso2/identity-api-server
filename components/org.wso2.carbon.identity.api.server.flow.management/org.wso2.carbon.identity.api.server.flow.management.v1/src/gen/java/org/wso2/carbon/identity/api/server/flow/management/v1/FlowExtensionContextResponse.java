@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionContextTreeNode;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionContextNode;
 import javax.validation.constraints.*;
 
 /**
@@ -36,10 +36,10 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 @ApiModel(description = "Controlled Flow Extension context tree for a given flow type, plus per-flow-type policy flags consumed by the Console UI. ")
-public class FlowExtensionContextTreeResponse  {
+public class FlowExtensionContextResponse  {
   
     private String flowType;
-    private List<FlowExtensionContextTreeNode> contextTree = null;
+    private List<FlowExtensionContextNode> context = null;
 
     private Boolean redirectionEnabled;
     private Boolean allowReadOnlyClaimsModification;
@@ -47,7 +47,7 @@ public class FlowExtensionContextTreeResponse  {
     /**
     * Echoed flow type. &#x60;null&#x60; when no flowType was supplied (default tree).
     **/
-    public FlowExtensionContextTreeResponse flowType(String flowType) {
+    public FlowExtensionContextResponse flowType(String flowType) {
 
         this.flowType = flowType;
         return this;
@@ -66,34 +66,34 @@ public class FlowExtensionContextTreeResponse  {
     /**
     * Tree of context fields available for the active flow type. Fields disabled at the deployment.toml whitelist level are omitted entirely. 
     **/
-    public FlowExtensionContextTreeResponse contextTree(List<FlowExtensionContextTreeNode> contextTree) {
+    public FlowExtensionContextResponse context(List<FlowExtensionContextNode> context) {
 
-        this.contextTree = contextTree;
+        this.context = context;
         return this;
     }
     
     @ApiModelProperty(value = "Tree of context fields available for the active flow type. Fields disabled at the deployment.toml whitelist level are omitted entirely. ")
-    @JsonProperty("contextTree")
+    @JsonProperty("context")
     @Valid
-    public List<FlowExtensionContextTreeNode> getContextTree() {
-        return contextTree;
+    public List<FlowExtensionContextNode> getContext() {
+        return context;
     }
-    public void setContextTree(List<FlowExtensionContextTreeNode> contextTree) {
-        this.contextTree = contextTree;
+    public void setContext(List<FlowExtensionContextNode> context) {
+        this.context = context;
     }
 
-    public FlowExtensionContextTreeResponse addContextTreeItem(FlowExtensionContextTreeNode contextTreeItem) {
-        if (this.contextTree == null) {
-            this.contextTree = new ArrayList<FlowExtensionContextTreeNode>();
+    public FlowExtensionContextResponse addContextItem(FlowExtensionContextNode contextItem) {
+        if (this.context == null) {
+            this.context = new ArrayList<FlowExtensionContextNode>();
         }
-        this.contextTree.add(contextTreeItem);
+        this.context.add(contextItem);
         return this;
     }
 
         /**
     * Whether REDIRECT is advertised in &#x60;allowedOperations&#x60; for this flow type.
     **/
-    public FlowExtensionContextTreeResponse redirectionEnabled(Boolean redirectionEnabled) {
+    public FlowExtensionContextResponse redirectionEnabled(Boolean redirectionEnabled) {
 
         this.redirectionEnabled = redirectionEnabled;
         return this;
@@ -112,7 +112,7 @@ public class FlowExtensionContextTreeResponse  {
     /**
     * Whether the Console UI may permit MODIFY on read-only claims for this flow type. Hardcoded enumerative mapping in the engine. 
     **/
-    public FlowExtensionContextTreeResponse allowReadOnlyClaimsModification(Boolean allowReadOnlyClaimsModification) {
+    public FlowExtensionContextResponse allowReadOnlyClaimsModification(Boolean allowReadOnlyClaimsModification) {
 
         this.allowReadOnlyClaimsModification = allowReadOnlyClaimsModification;
         return this;
@@ -139,26 +139,26 @@ public class FlowExtensionContextTreeResponse  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        FlowExtensionContextTreeResponse flowExtensionContextTreeResponse = (FlowExtensionContextTreeResponse) o;
-        return Objects.equals(this.flowType, flowExtensionContextTreeResponse.flowType) &&
-            Objects.equals(this.contextTree, flowExtensionContextTreeResponse.contextTree) &&
-            Objects.equals(this.redirectionEnabled, flowExtensionContextTreeResponse.redirectionEnabled) &&
-            Objects.equals(this.allowReadOnlyClaimsModification, flowExtensionContextTreeResponse.allowReadOnlyClaimsModification);
+        FlowExtensionContextResponse flowExtensionContextResponse = (FlowExtensionContextResponse) o;
+        return Objects.equals(this.flowType, flowExtensionContextResponse.flowType) &&
+            Objects.equals(this.context, flowExtensionContextResponse.context) &&
+            Objects.equals(this.redirectionEnabled, flowExtensionContextResponse.redirectionEnabled) &&
+            Objects.equals(this.allowReadOnlyClaimsModification, flowExtensionContextResponse.allowReadOnlyClaimsModification);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(flowType, contextTree, redirectionEnabled, allowReadOnlyClaimsModification);
+        return Objects.hash(flowType, context, redirectionEnabled, allowReadOnlyClaimsModification);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class FlowExtensionContextTreeResponse {\n");
+        sb.append("class FlowExtensionContextResponse {\n");
         
         sb.append("    flowType: ").append(toIndentedString(flowType)).append("\n");
-        sb.append("    contextTree: ").append(toIndentedString(contextTree)).append("\n");
+        sb.append("    context: ").append(toIndentedString(context)).append("\n");
         sb.append("    redirectionEnabled: ").append(toIndentedString(redirectionEnabled)).append("\n");
         sb.append("    allowReadOnlyClaimsModification: ").append(toIndentedString(allowReadOnlyClaimsModification)).append("\n");
         sb.append("}");

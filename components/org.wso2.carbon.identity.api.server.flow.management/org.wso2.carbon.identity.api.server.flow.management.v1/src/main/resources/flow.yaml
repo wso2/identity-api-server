@@ -362,7 +362,7 @@ paths:
         - Flow Composer - Extensions
       summary: Retrieve the Flow Extension context tree
       description: "Returns the flow extension context tree for the given flow type. When `flowType` is omitted the default tree is returned.\n\n<b>Scope (Permission) required:</b> ``internal_flow_extension_view``\n\n"
-      operationId: getFlowExtensionContextTree
+      operationId: getFlowExtensionContext
       parameters:
         - in: query
           name: flowType
@@ -377,7 +377,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FlowExtensionContextTreeResponse'
+                $ref: '#/components/schemas/FlowExtensionContextResponse'
         '400':
           description: Invalid flow type specified
           content:
@@ -1190,7 +1190,7 @@ components:
         certificate:
           type: string
 
-    FlowExtensionContextTreeResponse:
+    FlowExtensionContextResponse:
       type: object
       description: >
         Controlled Flow Extension context tree for a given flow type, plus per-flow-type
@@ -1200,13 +1200,13 @@ components:
           type: string
           description: Echoed flow type. `null` when no flowType was supplied (default tree).
           example: PASSWORD_RECOVERY
-        contextTree:
+        context:
           type: array
           description: >
             Tree of context fields available for the active flow type. Fields disabled at
             the deployment.toml whitelist level are omitted entirely.
           items:
-            $ref: '#/components/schemas/FlowExtensionContextTreeNode'
+            $ref: '#/components/schemas/FlowExtensionContextNode'
         redirectionEnabled:
           type: boolean
           description: Whether REDIRECT is advertised in `allowedOperations` for this flow type.
@@ -1218,7 +1218,7 @@ components:
             Hardcoded enumerative mapping in the engine.
           example: true
 
-    FlowExtensionContextTreeNode:
+    FlowExtensionContextNode:
       type: object
       description: One node in the controlled Flow Extension context tree.
       properties:
@@ -1260,7 +1260,7 @@ components:
         children:
           type: array
           items:
-            $ref: '#/components/schemas/FlowExtensionContextTreeNode'
+            $ref: '#/components/schemas/FlowExtensionContextNode'
 
     Error:
       type: object

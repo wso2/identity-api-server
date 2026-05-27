@@ -35,7 +35,7 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 @ApiModel(description = "One node in the controlled Flow Extension context tree.")
-public class FlowExtensionContextTreeNode  {
+public class FlowExtensionContextNode  {
   
     private String key;
     private String title;
@@ -114,12 +114,12 @@ public enum AllowedOperationsEnum {
     private Boolean replaceable;
     private Boolean dynamicEntryAllowed;
     private String dynamicEntryType;
-    private List<FlowExtensionContextTreeNode> children = null;
+    private List<FlowExtensionContextNode> children = null;
 
 
     /**
     **/
-    public FlowExtensionContextTreeNode key(String key) {
+    public FlowExtensionContextNode key(String key) {
 
         this.key = key;
         return this;
@@ -137,7 +137,7 @@ public enum AllowedOperationsEnum {
 
     /**
     **/
-    public FlowExtensionContextTreeNode title(String title) {
+    public FlowExtensionContextNode title(String title) {
 
         this.title = title;
         return this;
@@ -155,7 +155,7 @@ public enum AllowedOperationsEnum {
 
     /**
     **/
-    public FlowExtensionContextTreeNode path(String path) {
+    public FlowExtensionContextNode path(String path) {
 
         this.path = path;
         return this;
@@ -173,7 +173,7 @@ public enum AllowedOperationsEnum {
 
     /**
     **/
-    public FlowExtensionContextTreeNode dataType(String dataType) {
+    public FlowExtensionContextNode dataType(String dataType) {
 
         this.dataType = dataType;
         return this;
@@ -192,7 +192,7 @@ public enum AllowedOperationsEnum {
     /**
     * Tree node type.
     **/
-    public FlowExtensionContextTreeNode nodeType(NodeTypeEnum nodeType) {
+    public FlowExtensionContextNode nodeType(NodeTypeEnum nodeType) {
 
         this.nodeType = nodeType;
         return this;
@@ -211,7 +211,7 @@ public enum AllowedOperationsEnum {
     /**
     * Operations the admin may configure on this node.
     **/
-    public FlowExtensionContextTreeNode allowedOperations(List<AllowedOperationsEnum> allowedOperations) {
+    public FlowExtensionContextNode allowedOperations(List<AllowedOperationsEnum> allowedOperations) {
 
         this.allowedOperations = allowedOperations;
         return this;
@@ -227,7 +227,7 @@ public enum AllowedOperationsEnum {
         this.allowedOperations = allowedOperations;
     }
 
-    public FlowExtensionContextTreeNode addAllowedOperationsItem(AllowedOperationsEnum allowedOperationsItem) {
+    public FlowExtensionContextNode addAllowedOperationsItem(AllowedOperationsEnum allowedOperationsItem) {
         if (this.allowedOperations == null) {
             this.allowedOperations = new ArrayList<AllowedOperationsEnum>();
         }
@@ -237,7 +237,7 @@ public enum AllowedOperationsEnum {
 
         /**
     **/
-    public FlowExtensionContextTreeNode readOnly(Boolean readOnly) {
+    public FlowExtensionContextNode readOnly(Boolean readOnly) {
 
         this.readOnly = readOnly;
         return this;
@@ -255,7 +255,7 @@ public enum AllowedOperationsEnum {
 
     /**
     **/
-    public FlowExtensionContextTreeNode replaceable(Boolean replaceable) {
+    public FlowExtensionContextNode replaceable(Boolean replaceable) {
 
         this.replaceable = replaceable;
         return this;
@@ -273,7 +273,7 @@ public enum AllowedOperationsEnum {
 
     /**
     **/
-    public FlowExtensionContextTreeNode dynamicEntryAllowed(Boolean dynamicEntryAllowed) {
+    public FlowExtensionContextNode dynamicEntryAllowed(Boolean dynamicEntryAllowed) {
 
         this.dynamicEntryAllowed = dynamicEntryAllowed;
         return this;
@@ -291,7 +291,7 @@ public enum AllowedOperationsEnum {
 
     /**
     **/
-    public FlowExtensionContextTreeNode dynamicEntryType(String dynamicEntryType) {
+    public FlowExtensionContextNode dynamicEntryType(String dynamicEntryType) {
 
         this.dynamicEntryType = dynamicEntryType;
         return this;
@@ -309,7 +309,7 @@ public enum AllowedOperationsEnum {
 
     /**
     **/
-    public FlowExtensionContextTreeNode children(List<FlowExtensionContextTreeNode> children) {
+    public FlowExtensionContextNode children(List<FlowExtensionContextNode> children) {
 
         this.children = children;
         return this;
@@ -318,16 +318,16 @@ public enum AllowedOperationsEnum {
     @ApiModelProperty(value = "")
     @JsonProperty("children")
     @Valid
-    public List<FlowExtensionContextTreeNode> getChildren() {
+    public List<FlowExtensionContextNode> getChildren() {
         return children;
     }
-    public void setChildren(List<FlowExtensionContextTreeNode> children) {
+    public void setChildren(List<FlowExtensionContextNode> children) {
         this.children = children;
     }
 
-    public FlowExtensionContextTreeNode addChildrenItem(FlowExtensionContextTreeNode childrenItem) {
+    public FlowExtensionContextNode addChildrenItem(FlowExtensionContextNode childrenItem) {
         if (this.children == null) {
-            this.children = new ArrayList<FlowExtensionContextTreeNode>();
+            this.children = new ArrayList<FlowExtensionContextNode>();
         }
         this.children.add(childrenItem);
         return this;
@@ -344,18 +344,18 @@ public enum AllowedOperationsEnum {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        FlowExtensionContextTreeNode flowExtensionContextTreeNode = (FlowExtensionContextTreeNode) o;
-        return Objects.equals(this.key, flowExtensionContextTreeNode.key) &&
-            Objects.equals(this.title, flowExtensionContextTreeNode.title) &&
-            Objects.equals(this.path, flowExtensionContextTreeNode.path) &&
-            Objects.equals(this.dataType, flowExtensionContextTreeNode.dataType) &&
-            Objects.equals(this.nodeType, flowExtensionContextTreeNode.nodeType) &&
-            Objects.equals(this.allowedOperations, flowExtensionContextTreeNode.allowedOperations) &&
-            Objects.equals(this.readOnly, flowExtensionContextTreeNode.readOnly) &&
-            Objects.equals(this.replaceable, flowExtensionContextTreeNode.replaceable) &&
-            Objects.equals(this.dynamicEntryAllowed, flowExtensionContextTreeNode.dynamicEntryAllowed) &&
-            Objects.equals(this.dynamicEntryType, flowExtensionContextTreeNode.dynamicEntryType) &&
-            Objects.equals(this.children, flowExtensionContextTreeNode.children);
+        FlowExtensionContextNode flowExtensionContextNode = (FlowExtensionContextNode) o;
+        return Objects.equals(this.key, flowExtensionContextNode.key) &&
+            Objects.equals(this.title, flowExtensionContextNode.title) &&
+            Objects.equals(this.path, flowExtensionContextNode.path) &&
+            Objects.equals(this.dataType, flowExtensionContextNode.dataType) &&
+            Objects.equals(this.nodeType, flowExtensionContextNode.nodeType) &&
+            Objects.equals(this.allowedOperations, flowExtensionContextNode.allowedOperations) &&
+            Objects.equals(this.readOnly, flowExtensionContextNode.readOnly) &&
+            Objects.equals(this.replaceable, flowExtensionContextNode.replaceable) &&
+            Objects.equals(this.dynamicEntryAllowed, flowExtensionContextNode.dynamicEntryAllowed) &&
+            Objects.equals(this.dynamicEntryType, flowExtensionContextNode.dynamicEntryType) &&
+            Objects.equals(this.children, flowExtensionContextNode.children);
     }
 
     @Override
@@ -367,7 +367,7 @@ public enum AllowedOperationsEnum {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class FlowExtensionContextTreeNode {\n");
+        sb.append("class FlowExtensionContextNode {\n");
         
         sb.append("    key: ").append(toIndentedString(key)).append("\n");
         sb.append("    title: ").append(toIndentedString(title)).append("\n");

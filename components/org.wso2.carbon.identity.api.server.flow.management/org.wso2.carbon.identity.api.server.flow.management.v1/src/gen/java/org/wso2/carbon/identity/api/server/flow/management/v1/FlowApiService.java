@@ -28,7 +28,7 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.Error;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfig;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfigPatchModel;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionBasicResponse;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionContextTreeResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionContextResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionModel;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionUpdateModel;
@@ -60,7 +60,7 @@ public interface FlowApiService {
 
       public Response getFlowExtensionById(String extensionId);
 
-      public Response getFlowExtensionContextTree(String flowType);
+      public Response getFlowExtensionContext(String flowType);
 
       public Response getFlowExtensions();
 

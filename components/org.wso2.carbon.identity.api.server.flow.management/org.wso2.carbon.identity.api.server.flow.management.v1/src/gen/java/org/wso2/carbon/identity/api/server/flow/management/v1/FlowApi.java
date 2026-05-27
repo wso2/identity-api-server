@@ -237,21 +237,21 @@ public class FlowApi  {
     @Path("/extension/meta")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve the Flow Extension context tree", notes = "Returns the flow extension context tree for the given flow type. When `flowType` is omitted the default tree is returned.  <b>Scope (Permission) required:</b> ``internal_flow_extension_view``  ", response = FlowExtensionContextTreeResponse.class, authorizations = {
+    @ApiOperation(value = "Retrieve the Flow Extension context tree", notes = "Returns the flow extension context tree for the given flow type. When `flowType` is omitted the default tree is returned.  <b>Scope (Permission) required:</b> ``internal_flow_extension_view``  ", response = FlowExtensionContextResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Flow Composer - Extensions", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successfully retrieved the context tree", response = FlowExtensionContextTreeResponse.class),
+        @ApiResponse(code = 200, message = "Successfully retrieved the context tree", response = FlowExtensionContextResponse.class),
         @ApiResponse(code = 400, message = "Invalid flow type specified", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Error.class)
     })
-    public Response getFlowExtensionContextTree(    @Valid@ApiParam(value = "Optional flow type. When omitted, the default tree is returned.", allowableValues="REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION, ASK_PASSWORD")  @QueryParam("flowType") String flowType) {
+    public Response getFlowExtensionContext(    @Valid@ApiParam(value = "Optional flow type. When omitted, the default tree is returned.", allowableValues="REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION, ASK_PASSWORD")  @QueryParam("flowType") String flowType) {
 
-        return delegate.getFlowExtensionContextTree(flowType );
+        return delegate.getFlowExtensionContext(flowType );
     }
 
     @Valid
