@@ -18,8 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.utils;
 
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionContextTreeNode;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionContextTreeResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionContextNode;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionContextResponse;
 import org.wso2.carbon.identity.flow.extension.metadata.FlowExtensionContextTreeMetadata;
 
 import java.util.List;
@@ -27,27 +27,27 @@ import java.util.stream.Collectors;
 
 /**
  * Maps the engine-side {@link FlowExtensionContextTreeMetadata} DTO to the API-side
- * {@link FlowExtensionContextTreeResponse} model. A boundary-crossing copy keeps the
+ * {@link FlowExtensionContextResponse} model. A boundary-crossing copy keeps the
  * engine module independent of the API server's swagger-generated models.
  */
-public final class FlowExtensionContextTreeMapper {
+public final class FlowExtensionContextMapper {
 
-    private FlowExtensionContextTreeMapper() {
+    private FlowExtensionContextMapper() {
 
     }
 
-    public static FlowExtensionContextTreeResponse toResponse(FlowExtensionContextTreeMetadata metadata) {
+    public static FlowExtensionContextResponse toResponse(FlowExtensionContextTreeMetadata metadata) {
 
-        FlowExtensionContextTreeResponse response = new FlowExtensionContextTreeResponse()
+        FlowExtensionContextResponse response = new FlowExtensionContextResponse()
                 .flowType(metadata.getFlowType())
                 .redirectionEnabled(metadata.isRedirectionEnabled())
                 .allowReadOnlyClaimsModification(metadata.isAllowReadOnlyClaimsModification());
 
-        response.setContextTree(toApiNodes(metadata.getContextTree()));
+        response.setContext(toApiNodes(metadata.getContextTree()));
         return response;
     }
 
-    private static List<FlowExtensionContextTreeNode> toApiNodes(
+    private static List<FlowExtensionContextNode> toApiNodes(
             List<org.wso2.carbon.identity.flow.extension.metadata
                     .FlowExtensionContextTreeNode> nodes) {
 
@@ -55,21 +55,21 @@ public final class FlowExtensionContextTreeMapper {
             return null;
         }
         return nodes.stream()
-                .map(FlowExtensionContextTreeMapper::toApiNode)
+                .map(FlowExtensionContextMapper::toApiNode)
                 .collect(Collectors.toList());
     }
 
-    private static FlowExtensionContextTreeNode toApiNode(
+    private static FlowExtensionContextNode toApiNode(
             org.wso2.carbon.identity.flow.extension.metadata
                     .FlowExtensionContextTreeNode node) {
 
-        FlowExtensionContextTreeNode out = new FlowExtensionContextTreeNode()
+        FlowExtensionContextNode out = new FlowExtensionContextNode()
                 .key(node.getKey())
                 .title(node.getTitle())
                 .path(node.getPath())
                 .dataType(node.getDataType())
                 .nodeType(node.getNodeType() != null
-                        ? FlowExtensionContextTreeNode.NodeTypeEnum.fromValue(node.getNodeType()) : null)
+                        ? FlowExtensionContextNode.NodeTypeEnum.fromValue(node.getNodeType()) : null)
                 .readOnly(node.isReadOnly())
                 .replaceable(node.isReplaceable())
                 .dynamicEntryAllowed(node.isDynamicEntryAllowed())
@@ -77,7 +77,7 @@ public final class FlowExtensionContextTreeMapper {
 
         if (node.getAllowedOperations() != null) {
             out.setAllowedOperations(node.getAllowedOperations().stream()
-                    .map(FlowExtensionContextTreeNode.AllowedOperationsEnum::fromValue)
+                    .map(FlowExtensionContextNode.AllowedOperationsEnum::fromValue)
                     .collect(java.util.stream.Collectors.toList()));
         }
         if (node.getChildren() != null) {

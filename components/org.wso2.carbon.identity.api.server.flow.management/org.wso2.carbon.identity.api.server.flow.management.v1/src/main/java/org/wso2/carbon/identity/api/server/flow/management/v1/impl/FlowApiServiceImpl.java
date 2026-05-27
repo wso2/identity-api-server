@@ -144,7 +144,7 @@ public class FlowApiServiceImpl implements FlowApiService {
     }
 
     @Override
-    public Response getFlowExtensionContextTree(String flowType) {
+    public Response getFlowExtensionContext(String flowType) {
 
         return Response.ok().entity(
                 flowMgtService.getFlowExtensionContextTree(flowType)).build();

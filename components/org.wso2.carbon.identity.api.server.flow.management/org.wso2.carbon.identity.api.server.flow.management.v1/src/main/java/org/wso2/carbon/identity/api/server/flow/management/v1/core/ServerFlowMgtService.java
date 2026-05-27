@@ -26,7 +26,7 @@ import org.wso2.carbon.identity.action.management.api.service.ActionManagementSe
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfig;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfigPatchModel;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionBasicResponse;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionContextTreeResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionContextResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionModel;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionUpdateModel;
@@ -38,7 +38,7 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.AskPasswordFlowMetaHandler;
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.PasswordRecoveryFlowMetaHandler;
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.RegistrationFlowMetaHandler;
-import org.wso2.carbon.identity.api.server.flow.management.v1.utils.FlowExtensionContextTreeMapper;
+import org.wso2.carbon.identity.api.server.flow.management.v1.utils.FlowExtensionContextMapper;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.FlowExtensionMapper;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
 import org.wso2.carbon.identity.flow.extension.metadata.FlowExtensionContextTreeMetadata;
@@ -129,7 +129,7 @@ public class ServerFlowMgtService {
      * @param flowType optional flow type (null → default tree).
      * @return the tree response.
      */
-    public FlowExtensionContextTreeResponse getFlowExtensionContextTree(String flowType) {
+    public FlowExtensionContextResponse getFlowExtensionContextTree(String flowType) {
 
         String resolvedFlowType = StringUtils.isNotBlank(flowType) ? flowType : null;
         if (resolvedFlowType != null) {
@@ -141,7 +141,7 @@ public class ServerFlowMgtService {
         // visible to other OSGi bundles at runtime.
         FlowExtensionContextTreeMetadata metadata =
                 FlowExtensionContextTreeService.getInstance().buildContextTree(resolvedFlowType);
-        return FlowExtensionContextTreeMapper.toResponse(metadata);
+        return FlowExtensionContextMapper.toResponse(metadata);
     }
 
     /**
