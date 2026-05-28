@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025, WSO2 LLC. (http://www.wso2.com).
+     * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -35,6 +35,9 @@ public class RefreshTokenConfiguration  {
     private Long expiryInSeconds;
     private Boolean extendRenewedRefreshTokenExpiryTime;
     private Boolean renewRefreshToken;
+    private Boolean gracefulRefreshTokenRotationEnabled;
+    private Integer gracefulRefreshTokenRotationValidityPeriod;
+    private Integer gracefulRefreshTokenReuseLimit;
 
     /**
     **/
@@ -92,6 +95,63 @@ public class RefreshTokenConfiguration  {
         this.renewRefreshToken = renewRefreshToken;
     }
 
+    /**
+    * If enabled, the previous refresh token remains usable for a grace period after rotation instead of being revoked immediately.
+    **/
+    public RefreshTokenConfiguration gracefulRefreshTokenRotationEnabled(Boolean gracefulRefreshTokenRotationEnabled) {
+
+        this.gracefulRefreshTokenRotationEnabled = gracefulRefreshTokenRotationEnabled;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "If enabled, the previous refresh token remains usable for a grace period after rotation instead of being revoked immediately.")
+    @JsonProperty("gracefulRefreshTokenRotationEnabled")
+    @Valid
+    public Boolean getGracefulRefreshTokenRotationEnabled() {
+        return gracefulRefreshTokenRotationEnabled;
+    }
+    public void setGracefulRefreshTokenRotationEnabled(Boolean gracefulRefreshTokenRotationEnabled) {
+        this.gracefulRefreshTokenRotationEnabled = gracefulRefreshTokenRotationEnabled;
+    }
+
+    /**
+    * Grace window (in seconds) during which the previous refresh token remains usable after rotation. Only meaningful when gracefulRefreshTokenRotationEnabled is true.
+    **/
+    public RefreshTokenConfiguration gracefulRefreshTokenRotationValidityPeriod(Integer gracefulRefreshTokenRotationValidityPeriod) {
+
+        this.gracefulRefreshTokenRotationValidityPeriod = gracefulRefreshTokenRotationValidityPeriod;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "60", value = "Grace window (in seconds) during which the previous refresh token remains usable after rotation. Only meaningful when gracefulRefreshTokenRotationEnabled is true.")
+    @JsonProperty("gracefulRefreshTokenRotationValidityPeriod")
+    @Valid
+    public Integer getGracefulRefreshTokenRotationValidityPeriod() {
+        return gracefulRefreshTokenRotationValidityPeriod;
+    }
+    public void setGracefulRefreshTokenRotationValidityPeriod(Integer gracefulRefreshTokenRotationValidityPeriod) {
+        this.gracefulRefreshTokenRotationValidityPeriod = gracefulRefreshTokenRotationValidityPeriod;
+    }
+
+    /**
+    * Maximum number of times the previous refresh token may be reused during the grace window. Only meaningful when gracefulRefreshTokenRotationEnabled is true.
+    **/
+    public RefreshTokenConfiguration gracefulRefreshTokenReuseLimit(Integer gracefulRefreshTokenReuseLimit) {
+
+        this.gracefulRefreshTokenReuseLimit = gracefulRefreshTokenReuseLimit;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "1", value = "Maximum number of times the previous refresh token may be reused during the grace window. Only meaningful when gracefulRefreshTokenRotationEnabled is true.")
+    @JsonProperty("gracefulRefreshTokenReuseLimit")
+    @Valid
+    public Integer getGracefulRefreshTokenReuseLimit() {
+        return gracefulRefreshTokenReuseLimit;
+    }
+    public void setGracefulRefreshTokenReuseLimit(Integer gracefulRefreshTokenReuseLimit) {
+        this.gracefulRefreshTokenReuseLimit = gracefulRefreshTokenReuseLimit;
+    }
+
 
 
     @Override
@@ -106,12 +166,15 @@ public class RefreshTokenConfiguration  {
         RefreshTokenConfiguration refreshTokenConfiguration = (RefreshTokenConfiguration) o;
         return Objects.equals(this.expiryInSeconds, refreshTokenConfiguration.expiryInSeconds) &&
             Objects.equals(this.extendRenewedRefreshTokenExpiryTime, refreshTokenConfiguration.extendRenewedRefreshTokenExpiryTime) &&
-            Objects.equals(this.renewRefreshToken, refreshTokenConfiguration.renewRefreshToken);
+            Objects.equals(this.renewRefreshToken, refreshTokenConfiguration.renewRefreshToken) &&
+            Objects.equals(this.gracefulRefreshTokenRotationEnabled, refreshTokenConfiguration.gracefulRefreshTokenRotationEnabled) &&
+            Objects.equals(this.gracefulRefreshTokenRotationValidityPeriod, refreshTokenConfiguration.gracefulRefreshTokenRotationValidityPeriod) &&
+            Objects.equals(this.gracefulRefreshTokenReuseLimit, refreshTokenConfiguration.gracefulRefreshTokenReuseLimit);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(expiryInSeconds, extendRenewedRefreshTokenExpiryTime, renewRefreshToken);
+        return Objects.hash(expiryInSeconds, extendRenewedRefreshTokenExpiryTime, renewRefreshToken, gracefulRefreshTokenRotationEnabled, gracefulRefreshTokenRotationValidityPeriod, gracefulRefreshTokenReuseLimit);
     }
 
     @Override
@@ -123,6 +186,9 @@ public class RefreshTokenConfiguration  {
         sb.append("    expiryInSeconds: ").append(toIndentedString(expiryInSeconds)).append("\n");
         sb.append("    extendRenewedRefreshTokenExpiryTime: ").append(toIndentedString(extendRenewedRefreshTokenExpiryTime)).append("\n");
         sb.append("    renewRefreshToken: ").append(toIndentedString(renewRefreshToken)).append("\n");
+        sb.append("    gracefulRefreshTokenRotationEnabled: ").append(toIndentedString(gracefulRefreshTokenRotationEnabled)).append("\n");
+        sb.append("    gracefulRefreshTokenRotationValidityPeriod: ").append(toIndentedString(gracefulRefreshTokenRotationValidityPeriod)).append("\n");
+        sb.append("    gracefulRefreshTokenReuseLimit: ").append(toIndentedString(gracefulRefreshTokenReuseLimit)).append("\n");
         sb.append("}");
         return sb.toString();
     }
