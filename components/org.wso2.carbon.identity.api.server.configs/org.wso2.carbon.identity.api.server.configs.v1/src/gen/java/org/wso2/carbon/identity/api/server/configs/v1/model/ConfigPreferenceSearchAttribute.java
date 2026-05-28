@@ -52,7 +52,7 @@ public class ConfigPreferenceSearchAttribute  {
     }
     
     @ApiModelProperty(example = "PUSH_AUTH", required = true, value = "The resource type in the config store.")
-    @JsonProperty("resource-type")
+    @JsonProperty("resourceType")
     @Valid
     @NotNull(message = "Property resourceType cannot be null.")
 
@@ -73,7 +73,7 @@ public class ConfigPreferenceSearchAttribute  {
     }
     
     @ApiModelProperty(example = "push-device-mgt", required = true, value = "The resource name in the config store.")
-    @JsonProperty("resource-name")
+    @JsonProperty("resourceName")
     @Valid
     @NotNull(message = "Property resourceName cannot be null.")
 

@@ -53,7 +53,7 @@ public class ConfigPreferenceResp  {
     }
     
     @ApiModelProperty(example = "PUSH_AUTH", value = "The resource type in the config store.")
-    @JsonProperty("resource-type")
+    @JsonProperty("resourceType")
     @Valid
     public String getResourceType() {
         return resourceType;
@@ -72,7 +72,7 @@ public class ConfigPreferenceResp  {
     }
     
     @ApiModelProperty(example = "push-device-mgt", value = "The resource name in the config store.")
-    @JsonProperty("resource-name")
+    @JsonProperty("resourceName")
     @Valid
     public String getResourceName() {
         return resourceName;

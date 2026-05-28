@@ -1556,8 +1556,8 @@ paths:
             schema:
               type: array
               example:
-                - resource-type: PUSH_AUTH
-                  resource-name: push-device-mgt
+                - resourceType: PUSH_AUTH
+                  resourceName: push-device-mgt
                   properties:
                     - enableMultipleDeviceEnrollment
                     - maximumDeviceLimit
@@ -1573,8 +1573,8 @@ paths:
               schema:
                 type: array
                 example:
-                  - resource-type: PUSH_AUTH
-                    resource-name: push-device-mgt
+                  - resourceType: PUSH_AUTH
+                    resourceName: push-device-mgt
                     properties:
                       - name: enableMultipleDeviceEnrollment
                         value: 'true'
@@ -2398,14 +2398,14 @@ components:
       type: object
       description: Config store resource details to retrieve preferences for.
       required:
-        - resource-type
-        - resource-name
+        - resourceType
+        - resourceName
       properties:
-        resource-type:
+        resourceType:
           type: string
           description: The resource type in the config store.
           example: PUSH_AUTH
-        resource-name:
+        resourceName:
           type: string
           description: The resource name in the config store.
           example: push-device-mgt
@@ -2433,11 +2433,11 @@ components:
       type: object
       description: Config store resource attribute values.
       properties:
-        resource-type:
+        resourceType:
           type: string
           description: The resource type in the config store.
           example: PUSH_AUTH
-        resource-name:
+        resourceName:
           type: string
           description: The resource name in the config store.
           example: push-device-mgt

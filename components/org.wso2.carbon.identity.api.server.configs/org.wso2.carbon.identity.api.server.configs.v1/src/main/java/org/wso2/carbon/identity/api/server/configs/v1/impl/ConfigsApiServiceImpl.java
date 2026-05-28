@@ -359,22 +359,20 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     @Override
     public Response getPushDeviceMgtConfigs() {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        return Response.ok().entity(configManagementService.getPushDeviceMgtConfigs()).build();
     }
 
     @Override
     public Response updatePushDeviceMgtConfigs(PushDeviceMgtConfig pushDeviceMgtConfig) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        return Response.ok().entity(configManagementService.updatePushDeviceMgtConfigs(pushDeviceMgtConfig)).build();
     }
 
     @Override
     public Response getConfigPreferences(List<ConfigPreferenceSearchAttribute> configPreferenceSearchAttribute) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        return Response.ok().entity(configManagementService.getConfigPreferences(configPreferenceSearchAttribute))
+                .build();
     }
 
     private RemoteLoggingConfigListItem createRemoteLoggingConfigListItem(

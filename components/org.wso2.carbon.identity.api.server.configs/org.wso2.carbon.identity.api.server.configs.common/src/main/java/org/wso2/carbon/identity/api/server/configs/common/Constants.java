@@ -16,6 +16,18 @@
 
 package org.wso2.carbon.identity.api.server.configs.common;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import static org.wso2.carbon.identity.notification.push.device.handler.constant.PushDeviceHandlerConstants.ATTR_ENABLE_DEVICE_MANAGEMENT;
+import static org.wso2.carbon.identity.notification.push.device.handler.constant.PushDeviceHandlerConstants.ATTR_MAX_DEVICE_LIMIT;
+import static org.wso2.carbon.identity.notification.push.device.handler.constant.PushDeviceHandlerConstants.RESOURCE_NAME;
+import static org.wso2.carbon.identity.notification.push.device.handler.constant.PushDeviceHandlerConstants.RESOURCE_TYPE;
+
 /**
  * Server configuration Management constant class.
  */
@@ -26,6 +38,26 @@ public class Constants {
     }
 
     public static final String CONFIG_ERROR_PREFIX = "CNF-";
+
+    /**
+     * Allowlist for the POST /configs/preferences endpoint.
+     * Structure: Map<resourceType, Map<resourceName, Set<allowedAttributeNames>>>
+     * An empty Set for allowedAttributeNames means all attributes of that resource are permitted.
+     * Add entries here to expose additional config store resources via this endpoint.
+     */
+    public static final Map<String, Map<String, Set<String>>> ALLOWED_CONFIG_PREFERENCES;
+    static {
+        Map<String, Map<String, Set<String>>> allowed = new HashMap<>();
+
+        // Push authentication device management configuration.
+        Map<String, Set<String>> pushAuthResources = new HashMap<>();
+        pushAuthResources.put(RESOURCE_NAME,
+                new HashSet<>(Arrays.asList(ATTR_ENABLE_DEVICE_MANAGEMENT, ATTR_MAX_DEVICE_LIMIT)));
+        allowed.put(RESOURCE_TYPE, Collections.unmodifiableMap(pushAuthResources));
+
+        ALLOWED_CONFIG_PREFERENCES = Collections.unmodifiableMap(allowed);
+    }
+
     public static final String CONFIGS_AUTHENTICATOR_PATH_COMPONENT = "/configs/authenticators";
     public static final String CONFIGS_SCHEMAS_PATH_COMPONENT = "/configs/schemas";
     public static final String PATH_SEPERATOR = "/";
@@ -259,7 +291,32 @@ public class Constants {
                 "Server encountered an error while updating the Compatibility Settings."),
         ERROR_CODE_SETTING_GROUP_NOT_FOUND("60007",
                 "Setting group not found.",
-                "Unable to find compatibility settings for the setting group %s.");
+        "Unable to find compatibility settings for the setting group %s."),
+        ERROR_CODE_CONFIG_PREFERENCES_RETRIEVE("65034",
+                "Unable to retrieve config store preferences.",
+                "Server encountered an error while retrieving config store preferences for resource type: %s."),
+        ERROR_CODE_CONFIG_PREFERENCES_RESOURCE_NOT_FOUND("60009",
+                "Config store resource not found.",
+                "No config store resource found for resource type: %s and resource name: %s."),
+        ERROR_CODE_CONFIG_PREFERENCES_ATTRIBUTE_NOT_FOUND("60010",
+                "Config store attribute not found.",
+                "Attribute '%s' not found for resource type: %s and resource name: %s."),
+        ERROR_CODE_CONFIG_PREFERENCES_RESOURCE_TYPE_NOT_ALLOWED("60011",
+                "Resource type not allowed.",
+                "Resource type '%s' is not permitted via the config preferences endpoint."),
+        ERROR_CODE_CONFIG_PREFERENCES_RESOURCE_NAME_NOT_ALLOWED("60012",
+                "Resource name not allowed.",
+                "Resource name '%s' is not permitted for resource type '%s' via the config preferences endpoint."),
+        ERROR_CODE_CONFIG_PREFERENCES_ATTRIBUTE_NOT_ALLOWED("60013",
+                "Attribute not allowed.",
+                "Attribute '%s' is not permitted for resource type '%s' and resource name '%s'."),
+
+        ERROR_CODE_PUSH_DEVICE_MGT_CONFIG_RETRIEVE("65033",
+                "Unable to retrieve Push Device Management configuration.",
+                "Server encountered an error while retrieving the Push Device Management configuration."),
+        ERROR_CODE_CLIENT_ERROR_PUSH_DEVICE_MGT_CONFIG_UPDATE("60008",
+                "Unable to update Push Device Management configuration.",
+                "Push Device Management config update failed.");
 
         private final String code;
         private final String message;
