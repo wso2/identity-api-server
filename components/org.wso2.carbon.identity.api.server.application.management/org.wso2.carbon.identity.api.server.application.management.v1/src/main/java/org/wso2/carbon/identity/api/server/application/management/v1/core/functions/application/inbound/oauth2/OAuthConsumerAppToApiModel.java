@@ -129,7 +129,11 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
         return new RefreshTokenConfiguration()
                 .expiryInSeconds(oAuthConsumerAppDTO.getRefreshTokenExpiryTime())
                 .renewRefreshToken(Boolean.parseBoolean(oAuthConsumerAppDTO.getRenewRefreshTokenEnabled()))
-                .extendRenewedRefreshTokenExpiryTime(oAuthConsumerAppDTO.getExtendRenewedRefreshTokenExpiryTime());
+                .extendRenewedRefreshTokenExpiryTime(oAuthConsumerAppDTO.getExtendRenewedRefreshTokenExpiryTime())
+                .gracefulRefreshTokenRotationEnabled(oAuthConsumerAppDTO.isGracefulRefreshTokenRotationEnabled())
+                .gracefulRefreshTokenRotationValidityPeriod(
+                        oAuthConsumerAppDTO.getGracefulRefreshTokenRotationValidityPeriod())
+                .gracefulRefreshTokenReuseLimit(oAuthConsumerAppDTO.getGracefulRefreshTokenReuseLimit());
     }
 
     private IdTokenConfiguration buildIdTokenConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {

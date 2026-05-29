@@ -4053,6 +4053,23 @@ components:
           description: Decides whether the refresh token needs to be renewed during refresh grant flow.
           type: boolean
           example: true
+        gracefulRefreshTokenRotationEnabled:
+          description: "If enabled, the previous refresh token remains usable for a grace period after rotation
+            instead of being revoked immediately."
+          type: boolean
+          example: false
+        gracefulRefreshTokenRotationValidityPeriod:
+          description: "Grace window (in seconds) during which the previous refresh token remains usable after rotation.
+            Only meaningful when gracefulRefreshTokenRotationEnabled is true."
+          type: integer
+          format: int32
+          example: 60
+        gracefulRefreshTokenReuseLimit:
+          description: "Maximum number of times the previous refresh token may be reused during the grace window.
+            Only meaningful when gracefulRefreshTokenRotationEnabled is true."
+          type: integer
+          format: int32
+          example: 1
     SubjectTokenConfiguration:
       type: object
       properties:
