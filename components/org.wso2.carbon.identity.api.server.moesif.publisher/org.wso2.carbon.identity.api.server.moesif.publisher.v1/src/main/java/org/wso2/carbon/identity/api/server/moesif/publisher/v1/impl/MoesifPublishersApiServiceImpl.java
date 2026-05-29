@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -22,6 +22,7 @@ import org.wso2.carbon.identity.api.server.moesif.publisher.v1.MoesifPublishersA
 import org.wso2.carbon.identity.api.server.moesif.publisher.v1.core.MoesifPublisherManagementService;
 import org.wso2.carbon.identity.api.server.moesif.publisher.v1.factories.MoesifPublisherManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.MoesifPublisher;
+import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.MoesifPublisherPatchReq;
 import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.MoesifPublisherReq;
 
 import java.net.URI;
@@ -68,11 +69,11 @@ public class MoesifPublishersApiServiceImpl implements MoesifPublishersApiServic
     }
 
     @Override
-    public Response updateMoesifPublisher(MoesifPublisherReq moesifPublisherReq) {
+    public Response patchMoesifPublisher(MoesifPublisherPatchReq moesifPublisherPatchReq) {
 
         MoesifPublisher updated = moesifPublisherManagementService.updateMoesifPublisher(
-                moesifPublisherReq.getApiKeyValue(),
-                moesifPublisherReq.getEventPublisherEnablement());
+                moesifPublisherPatchReq.getApiKeyValue(),
+                moesifPublisherPatchReq.getEventPublisherEnablement());
         return Response.ok().entity(updated).build();
     }
 

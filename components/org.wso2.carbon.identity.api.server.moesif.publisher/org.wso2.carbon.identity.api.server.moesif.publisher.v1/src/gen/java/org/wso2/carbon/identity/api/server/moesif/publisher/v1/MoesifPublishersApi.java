@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.Error;
 import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.MoesifPublisher;
+import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.MoesifPublisherPatchReq;
 import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.MoesifPublisherReq;
 import org.wso2.carbon.identity.api.server.moesif.publisher.v1.MoesifPublishersApiService;
 import org.wso2.carbon.identity.api.server.moesif.publisher.v1.factories.MoesifPublishersApiServiceFactory;
@@ -98,20 +99,20 @@ public class MoesifPublishersApi  {
     }
 
     @Valid
-    @PUT
-    
+    @PATCH
+
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update the Moesif event publisher configuration", notes = "", response = MoesifPublisher.class, tags={ "Moesif Publishers" })
-    @ApiResponses(value = { 
+    @ApiOperation(value = "Partially update the Moesif event publisher configuration", notes = "", response = MoesifPublisher.class, tags={ "Moesif Publishers" })
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successfully updated", response = MoesifPublisher.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response updateMoesifPublisher(@ApiParam(value = "" ,required=true) @Valid MoesifPublisherReq moesifPublisherReq) {
+    public Response patchMoesifPublisher(@ApiParam(value = "" ,required=true) @Valid MoesifPublisherPatchReq moesifPublisherPatchReq) {
 
-        return delegate.updateMoesifPublisher(moesifPublisherReq );
+        return delegate.patchMoesifPublisher(moesifPublisherPatchReq );
     }
 
 }
