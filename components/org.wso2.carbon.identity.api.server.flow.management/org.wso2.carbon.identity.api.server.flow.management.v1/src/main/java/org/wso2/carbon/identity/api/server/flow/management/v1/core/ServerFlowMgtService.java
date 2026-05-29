@@ -18,9 +18,18 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.core;
 
+import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.action.management.api.exception.ActionMgtException;
+import org.wso2.carbon.identity.action.management.api.model.Action;
+import org.wso2.carbon.identity.action.management.api.service.ActionManagementService;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfig;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfigPatchModel;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionBasicResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionContextResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionModel;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionUpdateModel;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRequest;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowResponse;
@@ -29,7 +38,11 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.AskPasswordFlowMetaHandler;
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.PasswordRecoveryFlowMetaHandler;
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.RegistrationFlowMetaHandler;
+import org.wso2.carbon.identity.api.server.flow.management.v1.utils.FlowExtensionContextMapper;
+import org.wso2.carbon.identity.api.server.flow.management.v1.utils.FlowExtensionMapper;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
+import org.wso2.carbon.identity.flow.extension.metadata.FlowExtensionContextTreeMetadata;
+import org.wso2.carbon.identity.flow.extension.metadata.FlowExtensionContextTreeService;
 import org.wso2.carbon.identity.flow.mgt.Constants;
 import org.wso2.carbon.identity.flow.mgt.FlowMgtService;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtFrameworkException;
@@ -52,11 +65,22 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils
  */
 public class ServerFlowMgtService {
 
+    private static final String FLOW_EXTENSION_ACTION_TYPE =
+            Action.ActionTypes.FLOW_EXTENSION.getPathParam();
+
     private final FlowMgtService flowMgtService;
+    private final ActionManagementService actionManagementService;
 
     public ServerFlowMgtService(FlowMgtService flowMgtService) {
 
+        this(flowMgtService, null);
+    }
+
+    public ServerFlowMgtService(FlowMgtService flowMgtService,
+                                ActionManagementService actionManagementService) {
+
         this.flowMgtService = flowMgtService;
+        this.actionManagementService = actionManagementService;
     }
 
     /**
@@ -94,6 +118,30 @@ public class ServerFlowMgtService {
         Utils.validateFlowType(flowType);
         AbstractMetaResponseHandler metaResponseHandler = resolveHandler(flowType);
         return metaResponseHandler.createResponse();
+    }
+
+    /**
+     * Retrieve the controlled Flow Extension context tree for the given flow type. When
+     * {@code flowType} is null/blank, the default tree is returned. The tree is filtered
+     * server-side per the {@code [identity.flow_extension.context.*]} whitelist in
+     * {@code deployment.toml} so the Console UI only offers paths the deployment allows.
+     *
+     * @param flowType optional flow type (null → default tree).
+     * @return the tree response.
+     */
+    public FlowExtensionContextResponse getFlowExtensionContextTree(String flowType) {
+
+        String resolvedFlowType = StringUtils.isNotBlank(flowType) ? flowType : null;
+        if (resolvedFlowType != null) {
+            // Reuse the same flow-type validation used by the other endpoints.
+            Utils.validateFlowType(resolvedFlowType);
+        }
+        // Goes through the engine's PUBLIC metadata service rather than reaching into the
+        // engine's internal DataHolder — the latter lives in a Private-Package and isn't
+        // visible to other OSGi bundles at runtime.
+        FlowExtensionContextTreeMetadata metadata =
+                FlowExtensionContextTreeService.getInstance().buildContextTree(resolvedFlowType);
+        return FlowExtensionContextMapper.toResponse(metadata);
     }
 
     /**
@@ -216,6 +264,103 @@ public class ServerFlowMgtService {
             return Utils.convertToFlowConfig(updatedFlowConfig);
         } catch (FlowMgtFrameworkException e) {
             throw Utils.handleFlowMgtException(e);
+        }
+    }
+
+    /**
+     * Create a new Flow extension action.
+     *
+     * @param model the create request model.
+     * @return the full response of the created extension.
+     */
+    public FlowExtensionResponse createFlowExtension(FlowExtensionModel model) {
+
+        try {
+            Action flowExtensionAction = FlowExtensionMapper.toFlowExtensionAction(model);
+            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            Action created = actionManagementService.addAction(
+                    FLOW_EXTENSION_ACTION_TYPE, flowExtensionAction, tenantDomain);
+            return FlowExtensionMapper.toFlowExtensionResponse(created);
+        } catch (ActionMgtException e) {
+            throw Utils.handleActionMgtException(e);
+        } catch (FlowMgtFrameworkException e) {
+            throw Utils.handleFlowMgtException(e);
+        }
+    }
+
+    /**
+     * List all Flow extension actions for the current tenant.
+     *
+     * @return list of basic response items.
+     */
+    public List<FlowExtensionBasicResponse> getFlowExtensions() {
+
+        try {
+            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            List<Action> actions = actionManagementService.getActionsByActionType(
+                    FLOW_EXTENSION_ACTION_TYPE, tenantDomain);
+            return actions.stream()
+                    .map(FlowExtensionMapper::toFlowExtensionBasicResponse)
+                    .collect(Collectors.toList());
+        } catch (ActionMgtException e) {
+            throw Utils.handleActionMgtException(e);
+        }
+    }
+
+    /**
+     * Get a single Flow extension by its ID.
+     *
+     * @param extensionId the action ID.
+     * @return the full response model.
+     */
+    public FlowExtensionResponse getFlowExtensionById(String extensionId) {
+
+        try {
+            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            Action action = actionManagementService.getActionByActionId(
+                    FLOW_EXTENSION_ACTION_TYPE, extensionId, tenantDomain);
+            return FlowExtensionMapper.toFlowExtensionResponse(action);
+        } catch (ActionMgtException e) {
+            throw Utils.handleActionMgtException(e);
+        }
+    }
+
+    /**
+     * Update (PATCH) an Flow extension.
+     *
+     * @param extensionId the action ID to update.
+     * @param model       the update request model.
+     * @return the full updated response model.
+     */
+    public FlowExtensionResponse updateFlowExtension(String extensionId,
+                                                         FlowExtensionUpdateModel model) {
+
+        try {
+            Action flowExtensionAction = FlowExtensionMapper.toFlowExtensionAction(model);
+            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            Action updated = actionManagementService.updateAction(
+                    FLOW_EXTENSION_ACTION_TYPE, extensionId, flowExtensionAction, tenantDomain);
+            return FlowExtensionMapper.toFlowExtensionResponse(updated);
+        } catch (ActionMgtException e) {
+            throw Utils.handleActionMgtException(e);
+        } catch (FlowMgtFrameworkException e) {
+            throw Utils.handleFlowMgtException(e);
+        }
+    }
+
+    /**
+     * Delete an Flow extension by its ID.
+     *
+     * @param extensionId the action ID to delete.
+     */
+    public void deleteFlowExtension(String extensionId) {
+
+        try {
+            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            actionManagementService.deleteAction(
+                    FLOW_EXTENSION_ACTION_TYPE, extensionId, tenantDomain);
+        } catch (ActionMgtException e) {
+            throw Utils.handleActionMgtException(e);
         }
     }
 

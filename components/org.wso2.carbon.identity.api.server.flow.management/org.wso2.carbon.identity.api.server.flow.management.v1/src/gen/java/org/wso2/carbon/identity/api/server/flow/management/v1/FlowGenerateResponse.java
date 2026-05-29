@@ -19,39 +19,43 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 
+/**
+ * Response for generating a flow
+ **/
+
+import io.swagger.annotations.*;
 import java.util.Objects;
-
 import javax.validation.Valid;
-
+import javax.xml.bind.annotation.*;
 @ApiModel(description = "Response for generating a flow")
-public class FlowGenerateResponse {
-
+public class FlowGenerateResponse  {
+  
     private String operationId;
 
     /**
-     * Id for the submitted generation operation
-     **/
+    * Id for the submitted generation operation
+    **/
     public FlowGenerateResponse operationId(String operationId) {
 
         this.operationId = operationId;
         return this;
     }
-
+    
     @ApiModelProperty(example = "2dc32cd4-3cde-4a77-bf95-af55a6738b92", value = "Id for the submitted generation operation")
     @JsonProperty("operation_id")
     @Valid
     public String getOperationId() {
-
         return operationId;
     }
-
     public void setOperationId(String operationId) {
-
         this.operationId = operationId;
     }
+
 
 
     @Override
@@ -69,7 +73,6 @@ public class FlowGenerateResponse {
 
     @Override
     public int hashCode() {
-
         return Objects.hash(operationId);
     }
 
@@ -78,16 +81,16 @@ public class FlowGenerateResponse {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class FlowGenerateResponse {\n");
-
+        
         sb.append("    operationId: ").append(toIndentedString(operationId)).append("\n");
         sb.append("}");
         return sb.toString();
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
-     */
+    * Convert the given object to string with each line indented by 4 spaces
+    * (except the first line).
+    */
     private String toIndentedString(java.lang.Object o) {
 
         if (o == null) {

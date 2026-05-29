@@ -43,7 +43,7 @@ import javax.ws.rs.core.Response;
 @Path("/flow")
 @Api(description = "The flow API")
 
-public class FlowApi {
+public class FlowApi  {
 
     private final FlowApiService delegate;
 
@@ -53,111 +53,156 @@ public class FlowApi {
     }
 
     @Valid
-    @DELETE
-
-
-    @Produces({"application/json"})
-    @ApiOperation(value = "Delete the flow", notes = "", response = Void.class, authorizations = {
-            @Authorization(value = "BasicAuth"),
-            @Authorization(value = "OAuth2", scopes = {
-
-            })
-    }, tags = {"Flow Composer",})
-    @ApiResponses(value = {
-            @ApiResponse(code = 204, message = "Flow successfully deleted", response = Void.class),
-            @ApiResponse(code = 400, message = "Invalid request body or unsupported flow type", response = Error.class),
-            @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-            @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-            @ApiResponse(code = 500, message = "Encountered a server error", response = Error.class)
+    @POST
+    @Path("/extension")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Create Flow Extension", notes = "Creates an flow extension and returns the details along with the unique ID.  <b>Scope (Permission) required:</b> ``internal_flow_extension_create``  ", response = FlowExtensionResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Flow Composer - Extensions", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 201, message = "Flow Extension Created", response = FlowExtensionResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response deleteFlow(@Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Type of the " +
-            "flow to delete", required = true, allowableValues = "REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD") @QueryParam("flowType") String flowType) {
+    public Response createFlowExtension(@ApiParam(value = "" ,required=true) @Valid FlowExtensionModel flowExtensionModel) {
 
-        return delegate.deleteFlow(flowType);
+        return delegate.createFlowExtension(flowExtensionModel );
+    }
+
+    @Valid
+    @DELETE
+    
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Delete the flow", notes = "", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Flow Composer", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "Flow successfully deleted", response = Void.class),
+        @ApiResponse(code = 400, message = "Invalid request body or unsupported flow type", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 500, message = "Encountered a server error", response = Error.class)
+    })
+    public Response deleteFlow(    @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Type of the flow to delete",required=true, allowableValues="REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD")  @QueryParam("flowType") String flowType) {
+
+        return delegate.deleteFlow(flowType );
+    }
+
+    @Valid
+    @DELETE
+    @Path("/extension/{extensionId}")
+    
+    
+    @ApiOperation(value = "Delete Flow Extension", notes = "Deletes an flow extension by its ID.  <b>Scope (Permission) required:</b> ``internal_flow_extension_delete``  ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Flow Composer - Extensions", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "Extension Deleted", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Void.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Void.class)
+    })
+    public Response deleteFlowExtension(@ApiParam(value = "Unique identifier of the extension.",required=true) @PathParam("extensionId") String extensionId) {
+
+        return delegate.deleteFlowExtension(extensionId );
     }
 
     @Valid
     @POST
     @Path("/generate")
-    @Consumes({"application/json"})
-    @Produces({"application/json"})
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
     @ApiOperation(value = "Generate a flow", notes = "", response = FlowGenerateResponse.class, authorizations = {
-            @Authorization(value = "BasicAuth"),
-            @Authorization(value = "OAuth2", scopes = {
-
-            })
-    }, tags = {"Generate Flow",})
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Flow generation request successfully submitted", response = FlowGenerateResponse.class),
-            @ApiResponse(code = 400, message = "Invalid flow type specified", response = Error.class),
-            @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-            @ApiResponse(code = 403, message = "Forbidden", response = Error.class)
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Generate Flow", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Flow generation request successfully submitted", response = FlowGenerateResponse.class),
+        @ApiResponse(code = 400, message = "Invalid flow type specified", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class)
     })
-    public Response generateFlow(@ApiParam(value = "", required = true) @Valid FlowGenerateRequest flowGenerateRequest) {
+    public Response generateFlow(@ApiParam(value = "" ,required=true) @Valid FlowGenerateRequest flowGenerateRequest) {
 
-        return delegate.generateFlow(flowGenerateRequest);
+        return delegate.generateFlow(flowGenerateRequest );
     }
 
     @Valid
     @GET
-
-
-    @Produces({"application/json"})
+    
+    
+    @Produces({ "application/json" })
     @ApiOperation(value = "Retrieve the complete flow", notes = "", response = FlowResponse.class, authorizations = {
-            @Authorization(value = "BasicAuth"),
-            @Authorization(value = "OAuth2", scopes = {
-
-            })
-    }, tags = {"Flow Composer",})
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully retrieved the flow", response = FlowResponse.class),
-            @ApiResponse(code = 400, message = "Invalid flow type specified", response = Error.class),
-            @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-            @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-            @ApiResponse(code = 404, message = "Flow of specified type not found", response = Error.class)
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Flow Composer", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successfully retrieved the flow", response = FlowResponse.class),
+        @ApiResponse(code = 400, message = "Invalid flow type specified", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 404, message = "Flow of specified type not found", response = Error.class)
     })
-    public Response getFlow(@Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Type of the flow to retrieve", required = true, allowableValues = "SELF_REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD") @QueryParam("flowType") String flowType) {
+    public Response getFlow(    @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Type of the flow to retrieve",required=true, allowableValues="REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD")  @QueryParam("flowType") String flowType) {
 
-        return delegate.getFlow(flowType);
+        return delegate.getFlow(flowType );
     }
 
     @Valid
     @GET
     @Path("/config")
-
-    @Produces({"application/json"})
+    
+    @Produces({ "application/json" })
     @ApiOperation(value = "Retrieve metadata related to a flow type", notes = "", response = FlowConfig.class, authorizations = {
-            @Authorization(value = "BasicAuth"),
-            @Authorization(value = "OAuth2", scopes = {
-
-            })
-    }, tags = {"Flow Configuration",})
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully retrieved flow configurations", response = FlowConfig.class),
-            @ApiResponse(code = 400, message = "Invalid flow type specified", response = Error.class),
-            @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-            @ApiResponse(code = 403, message = "Forbidden", response = Error.class)
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Flow Configuration", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successfully retrieved flow configurations", response = FlowConfig.class),
+        @ApiResponse(code = 400, message = "Invalid flow type specified", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class)
     })
-    public Response getFlowConfigForFlow(@Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Type of the flow to get configurations for", required = true, allowableValues = "SELF_REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD") @QueryParam("flowType") String flowType) {
+    public Response getFlowConfigForFlow(    @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Type of the flow to get configurations for",required=true, allowableValues="REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD")  @QueryParam("flowType") String flowType) {
 
-        return delegate.getFlowConfigForFlow(flowType);
+        return delegate.getFlowConfigForFlow(flowType );
     }
 
     @Valid
     @GET
     @Path("/configs")
-
-    @Produces({"application/json"})
+    
+    @Produces({ "application/json" })
     @ApiOperation(value = "Retrieve flow management configuration", notes = "", response = FlowConfig.class, responseContainer = "List", authorizations = {
-            @Authorization(value = "BasicAuth"),
-            @Authorization(value = "OAuth2", scopes = {
-
-            })
-    }, tags = {"Flow Configuration",})
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully retrieved flow configurations", response = FlowConfig.class, responseContainer = "List"),
-            @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-            @ApiResponse(code = 403, message = "Forbidden", response = Error.class)
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Flow Configuration", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successfully retrieved flow configurations", response = FlowConfig.class, responseContainer = "List"),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class)
     })
     public Response getFlowConfigs() {
 
@@ -166,122 +211,211 @@ public class FlowApi {
 
     @Valid
     @GET
-    @Path("/result/{operationId}")
-
-    @Produces({"application/json"})
-    @ApiOperation(value = "Retrieve flow generation result", notes = "", response = FlowGenerateResult.class, authorizations = {
-            @Authorization(value = "BasicAuth"),
-            @Authorization(value = "OAuth2", scopes = {
-
-            })
-    }, tags = {"Generate Flow",})
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully retrieved the generation result", response = FlowGenerateResult.class),
-            @ApiResponse(code = 400, message = "Invalid operation specified", response = Error.class),
-            @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-            @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-            @ApiResponse(code = 500, message = "Encountered a server error", response = Error.class)
+    @Path("/extension/{extensionId}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve Flow Extension by ID", notes = "Retrieves the flow extension by its ID.  <b>Scope (Permission) required:</b> ``internal_flow_extension_view``  ", response = FlowExtensionResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Flow Composer - Extensions", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = FlowExtensionResponse.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Void.class)
     })
-    public Response getFlowGenerationResult(@ApiParam(value = "Operation id to get the generation result", required =
-            true) @PathParam("operationId") String operationId) {
+    public Response getFlowExtensionById(@ApiParam(value = "Unique identifier of the extension.",required=true) @PathParam("extensionId") String extensionId) {
 
-        return delegate.getFlowGenerationResult(operationId);
+        return delegate.getFlowExtensionById(extensionId );
+    }
+
+    @Valid
+    @GET
+    @Path("/extension/meta")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve the Flow Extension context tree", notes = "Returns the flow extension context tree for the given flow type. When `flowType` is omitted the default tree is returned.  <b>Scope (Permission) required:</b> ``internal_flow_extension_view``  ", response = FlowExtensionContextResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Flow Composer - Extensions", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successfully retrieved the context tree", response = FlowExtensionContextResponse.class),
+        @ApiResponse(code = 400, message = "Invalid flow type specified", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class)
+    })
+    public Response getFlowExtensionContext(    @Valid@ApiParam(value = "Optional flow type. When omitted, the default tree is returned.", allowableValues="REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION, ASK_PASSWORD")  @QueryParam("flowType") String flowType) {
+
+        return delegate.getFlowExtensionContext(flowType );
+    }
+
+    @Valid
+    @GET
+    @Path("/extension")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "List Flow Extensions", notes = "Returns a list of all configured flow extensions.  <b>Scope (Permission) required:</b> ``internal_flow_extension_view``  ", response = FlowExtensionBasicResponse.class, responseContainer = "List", authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Flow Composer - Extensions", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = FlowExtensionBasicResponse.class, responseContainer = "List"),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getFlowExtensions() {
+
+        return delegate.getFlowExtensions();
+    }
+
+    @Valid
+    @GET
+    @Path("/result/{operationId}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve flow generation result", notes = "", response = FlowGenerateResult.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Generate Flow", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successfully retrieved the generation result", response = FlowGenerateResult.class),
+        @ApiResponse(code = 400, message = "Invalid operation specified", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 500, message = "Encountered a server error", response = Error.class)
+    })
+    public Response getFlowGenerationResult(@ApiParam(value = "Operation id to get the generation result",required=true) @PathParam("operationId") String operationId) {
+
+        return delegate.getFlowGenerationResult(operationId );
     }
 
     @Valid
     @GET
     @Path("/status/{operationId}")
-
-    @Produces({"application/json"})
+    
+    @Produces({ "application/json" })
     @ApiOperation(value = "Retrieve flow generation status", notes = "", response = FlowGenerateStatus.class, authorizations = {
-            @Authorization(value = "BasicAuth"),
-            @Authorization(value = "OAuth2", scopes = {
-
-            })
-    }, tags = {"Generate Flow",})
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully retrieved the generation status.", response = FlowGenerateStatus.class),
-            @ApiResponse(code = 400, message = "Invalid operation specified", response = Error.class),
-            @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-            @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-            @ApiResponse(code = 500, message = "Encountered a server error", response = Error.class)
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Generate Flow", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successfully retrieved the generation status.", response = FlowGenerateStatus.class),
+        @ApiResponse(code = 400, message = "Invalid operation specified", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 500, message = "Encountered a server error", response = Error.class)
     })
-    public Response getFlowGenerationStatus(@ApiParam(value = "Operation id to get the generation status", required =
-            true) @PathParam("operationId") String operationId) {
+    public Response getFlowGenerationStatus(@ApiParam(value = "Operation id to get the generation status",required=true) @PathParam("operationId") String operationId) {
 
-        return delegate.getFlowGenerationStatus(operationId);
+        return delegate.getFlowGenerationStatus(operationId );
     }
 
     @Valid
     @GET
     @Path("/meta")
-
-    @Produces({"application/json"})
+    
+    @Produces({ "application/json" })
     @ApiOperation(value = "Retrieve metadata related to a flow type", notes = "", response = FlowMetaResponse.class, authorizations = {
-            @Authorization(value = "BasicAuth"),
-            @Authorization(value = "OAuth2", scopes = {
-
-            })
-    }, tags = {"Flow Composer",})
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully retrieved flow metadata", response = FlowMetaResponse.class),
-            @ApiResponse(code = 400, message = "Invalid flow type specified", response = Error.class),
-            @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-            @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-            @ApiResponse(code = 404, message = "Metadata for specified flow type not found", response = Error.class)
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Flow Composer", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successfully retrieved flow metadata", response = FlowMetaResponse.class),
+        @ApiResponse(code = 400, message = "Invalid flow type specified", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 404, message = "Metadata for specified flow type not found", response = Error.class)
     })
-    public Response getFlowMeta(@Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Type of the flow to get metadata for", required = true, allowableValues = "SELF_REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD") @QueryParam("flowType") String flowType) {
+    public Response getFlowMeta(    @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Type of the flow to get metadata for",required=true, allowableValues="REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD")  @QueryParam("flowType") String flowType) {
 
-        return delegate.getFlowMeta(flowType);
+        return delegate.getFlowMeta(flowType );
     }
 
     @Valid
     @PUT
-
-    @Consumes({"application/json"})
-    @Produces({"application/json"})
+    
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
     @ApiOperation(value = "Create or update the complete flow", notes = "", response = Void.class, authorizations = {
-            @Authorization(value = "BasicAuth"),
-            @Authorization(value = "OAuth2", scopes = {
-
-            })
-    }, tags = {"Flow Composer",})
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Flow successfully updated", response = Void.class),
-            @ApiResponse(code = 201, message = "Flow successfully created", response = Void.class),
-            @ApiResponse(code = 400, message = "Invalid request body or unsupported flow type", response = Error.class),
-            @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-            @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-            @ApiResponse(code = 404, message = "Flow type not found", response = Error.class),
-            @ApiResponse(code = 500, message = "Encountered a server error", response = Error.class)
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Flow Composer", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Flow successfully updated", response = Void.class),
+        @ApiResponse(code = 201, message = "Flow successfully created", response = Void.class),
+        @ApiResponse(code = 400, message = "Invalid request body or unsupported flow type", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 404, message = "Flow type not found", response = Error.class),
+        @ApiResponse(code = 500, message = "Encountered a server error", response = Error.class)
     })
-    public Response updateFlow(@ApiParam(value = "", required = true) @Valid FlowRequest flowRequest) {
+    public Response updateFlow(@ApiParam(value = "" ,required=true) @Valid FlowRequest flowRequest) {
 
-        return delegate.updateFlow(flowRequest);
+        return delegate.updateFlow(flowRequest );
     }
 
     @Valid
     @PATCH
     @Path("/config")
-    @Consumes({"application/json"})
-    @Produces({"application/json"})
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
     @ApiOperation(value = "Update the flow configuration", notes = "", response = FlowConfig.class, authorizations = {
-            @Authorization(value = "BasicAuth"),
-            @Authorization(value = "OAuth2", scopes = {
-
-            })
-    }, tags = {"Flow Configuration"})
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Flow successfully updated", response = FlowConfig.class),
-            @ApiResponse(code = 400, message = "Invalid request body or unsupported flow type", response = Error.class),
-            @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-            @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-            @ApiResponse(code = 404, message = "Flow type not found", response = Error.class),
-            @ApiResponse(code = 500, message = "Encountered a server error", response = Error.class)
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Flow Configuration", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Flow successfully updated", response = FlowConfig.class),
+        @ApiResponse(code = 400, message = "Invalid request body or unsupported flow type", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 404, message = "Flow type not found", response = Error.class),
+        @ApiResponse(code = 500, message = "Encountered a server error", response = Error.class)
     })
-    public Response updateFlowConfig(@ApiParam(value = "", required = true) @Valid FlowConfigPatchModel flowConfigPatchModel) {
+    public Response updateFlowConfig(@ApiParam(value = "" ,required=true) @Valid FlowConfigPatchModel flowConfigPatchModel) {
 
-        return delegate.updateFlowConfig(flowConfigPatchModel);
+        return delegate.updateFlowConfig(flowConfigPatchModel );
+    }
+
+    @Valid
+    @PATCH
+    @Path("/extension/{extensionId}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update Flow Extension", notes = "Updates an existing flow extension.  <b>Scope (Permission) required:</b> ``internal_flow_extension_update``  ", response = FlowExtensionResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Flow Composer - Extensions" })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Extension Updated", response = FlowExtensionResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Void.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Void.class)
+    })
+    public Response updateFlowExtension(@ApiParam(value = "Unique identifier of the extension.",required=true) @PathParam("extensionId") String extensionId, @ApiParam(value = "" ,required=true) @Valid FlowExtensionUpdateModel flowExtensionUpdateModel) {
+
+        return delegate.updateFlowExtension(extensionId,  flowExtensionUpdateModel );
     }
 
 }

@@ -1460,6 +1460,10 @@ components:
           type: string
 
           example: "f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2"
+        type:
+          type: string
+          description: Purpose type classification
+          example: "Policy"
         versionId:
           type: string
 
@@ -1475,6 +1479,12 @@ components:
           description: Consented elements for this purpose
           items:
             $ref: '#/components/schemas/ConsentedElementDTO'
+        properties:
+          type: object
+          nullable: true
+          description: Key-value properties from the consented purpose version
+          additionalProperties:
+            type: string
 
     ConsentedElementDTO:
       type: object

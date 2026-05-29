@@ -19,6 +19,7 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1.factories;
 
 
+import org.wso2.carbon.identity.action.management.api.service.ActionManagementService;
 import org.wso2.carbon.identity.api.server.flow.management.common.FlowMgtServiceHolder;
 import org.wso2.carbon.identity.api.server.flow.management.v1.core.ServerFlowMgtService;
 import org.wso2.carbon.identity.flow.mgt.FlowMgtService;
@@ -38,7 +39,14 @@ public class ServerFlowMgtServiceFactory {
             throw new IllegalStateException("FlowMgtService is not available from OSGi context.");
         }
 
-        SERVICE = new ServerFlowMgtService(flowMgtService);
+        ActionManagementService actionManagementService = FlowMgtServiceHolder
+                .getActionManagementService();
+
+        if (actionManagementService == null) {
+            throw new IllegalStateException("ActionManagementService is not available from OSGi context.");
+        }
+
+        SERVICE = new ServerFlowMgtService(flowMgtService, actionManagementService);
     }
 
     /**
