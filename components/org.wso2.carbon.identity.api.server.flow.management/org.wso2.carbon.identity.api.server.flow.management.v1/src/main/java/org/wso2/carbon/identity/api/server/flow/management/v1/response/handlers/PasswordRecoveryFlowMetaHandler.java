@@ -19,8 +19,10 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.api.server.flow.management.v1.AttributeMetadata;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
 import org.wso2.carbon.identity.flow.mgt.Constants;
+import org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +30,8 @@ import java.util.Map;
 
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.END_USER_ATTRIBUTE_PROFILE;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.USER_RESOLVE_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USER_IDENTIFIER;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USER_IDENTIFIER_NAME;
 
 /**
  * Handler for managing the password recovery flow meta information.
@@ -81,5 +85,28 @@ public class PasswordRecoveryFlowMetaHandler extends AbstractMetaResponseHandler
         List<String> supportedExecutors = new ArrayList<>(super.getSupportedExecutors());
         supportedExecutors.add(USER_RESOLVE_EXECUTOR);
         return supportedExecutors;
+    }
+
+    @Override
+    protected List<AttributeMetadata> getSupportedClaims() {
+
+        List<AttributeMetadata> supportedClaims = new ArrayList<>(super.getSupportedClaims());
+        // Add user identifier claim if multi-attribute login is enabled.
+        if (Utils.getGovernanceConfig(
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(),
+                MultiAttributeLoginConstants.MULTI_ATTRIBUTE_LOGIN_PROPERTY)) {
+            supportedClaims.add(createUserIdentifierMeta());
+        }
+        return supportedClaims;
+    }
+
+    private AttributeMetadata createUserIdentifierMeta() {
+
+        AttributeMetadata meta = new AttributeMetadata();
+        meta.setName(USER_IDENTIFIER_NAME);
+        meta.setClaimURI(USER_IDENTIFIER);
+        meta.setRequired(true);
+        meta.setReadOnly(true);
+        return meta;
     }
 }
