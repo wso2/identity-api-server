@@ -37,6 +37,7 @@ import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.core.model.ExpressionNode;
 import org.wso2.carbon.identity.core.model.FilterTreeBuilder;
 import org.wso2.carbon.identity.core.model.Node;
+import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -231,6 +232,7 @@ public class ElementManagementService {
         dto.setName(cat.getName());
         dto.setDisplayName(cat.getDisplayName());
         dto.setDescription(cat.getDescription());
+        dto.setTenantDomain(IdentityTenantUtil.getTenantDomain(cat.getTenantId()));
         return dto;
     }
 

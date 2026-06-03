@@ -1084,6 +1084,11 @@ components:
           example:
             policy_url: "https://example.com/privacy-policy"
             retentionPeriod: "365"
+        tenantDomain:
+          type: string
+          nullable: true
+          description: Tenant domain that owns this purpose
+          example: "wso2.com"
 
     PurposeListResponse:
       type: object
@@ -1105,6 +1110,7 @@ components:
               name: "Privacy Policy"
               description: "Collection of user data for privacy policy compliance and consent management"
               type: "Policy"
+              tenantDomain: "wso2.com"
               latestVersion:
                 id: "a1b2c3d4-1234-5678-abcd-ef1234567890"
                 version: "v1.0"
@@ -1112,6 +1118,7 @@ components:
               name: "DEFAULT"
               description: "For core functionalities of the product"
               type: "SP"
+              tenantDomain: "subsidiaryA.com"
               latestVersion:
                 id: "b2c3d4e5-2345-6789-bcde-f01234567892"
                 version: "v1.0"
@@ -1144,13 +1151,18 @@ components:
           properties:
             id:
               type: string
-    
+
               description: ID of the latest version
               example: "a1b2c3d4-1234-5678-abcd-ef1234567890"
             version:
               type: string
               description: Version label
               example: "v1"
+        tenantDomain:
+          type: string
+          nullable: true
+          description: Tenant domain that owns this purpose
+          example: "wso2.com"
 
     PurposeElementDTO:
       type: object
@@ -1280,6 +1292,11 @@ components:
           nullable: true
           description: Detailed description
           example: "User email address used for account notifications and communications"
+        tenantDomain:
+          type: string
+          nullable: true
+          description: Tenant domain that owns this element
+          example: "wso2.com"
 
     ElementListResponse:
       type: object
@@ -1301,10 +1318,12 @@ components:
               name: "email_address"
               displayName: "Email Address"
               description: "User email address used for account notifications and communications"
+              tenantDomain: "wso2.com"
             - id: "c2d3e4f5-2345-6789-bcde-f01234567891"
               name: "phone_number"
               displayName: "Phone Number"
               description: "User phone number used for SMS notifications and two-factor authentication"
+              tenantDomain: "subsidiaryA.com"
           items:
             $ref: '#/components/schemas/ElementDTO'
 

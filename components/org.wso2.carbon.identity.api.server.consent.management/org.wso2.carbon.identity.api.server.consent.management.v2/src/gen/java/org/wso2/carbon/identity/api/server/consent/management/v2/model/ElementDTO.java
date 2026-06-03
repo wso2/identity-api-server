@@ -36,6 +36,7 @@ public class ElementDTO  {
     private String name;
     private String displayName;
     private String description;
+    private String tenantDomain;
 
     /**
     * ID of the element
@@ -113,6 +114,25 @@ public class ElementDTO  {
         this.description = description;
     }
 
+    /**
+    * Tenant domain that owns this element
+    **/
+    public ElementDTO tenantDomain(String tenantDomain) {
+
+        this.tenantDomain = tenantDomain;
+        return this;
+    }
+
+    @ApiModelProperty(example = "wso2.com", value = "Tenant domain that owns this element")
+    @JsonProperty("tenantDomain")
+    @Valid
+    public String getTenantDomain() {
+        return tenantDomain;
+    }
+    public void setTenantDomain(String tenantDomain) {
+        this.tenantDomain = tenantDomain;
+    }
+
 
 
     @Override
@@ -128,12 +148,13 @@ public class ElementDTO  {
         return Objects.equals(this.id, elementDTO.id) &&
             Objects.equals(this.name, elementDTO.name) &&
             Objects.equals(this.displayName, elementDTO.displayName) &&
-            Objects.equals(this.description, elementDTO.description);
+            Objects.equals(this.description, elementDTO.description) &&
+            Objects.equals(this.tenantDomain, elementDTO.tenantDomain);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, displayName, description);
+        return Objects.hash(id, name, displayName, description, tenantDomain);
     }
 
     @Override
@@ -146,6 +167,7 @@ public class ElementDTO  {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
+        sb.append("    tenantDomain: ").append(toIndentedString(tenantDomain)).append("\n");
         sb.append("}");
         return sb.toString();
     }
