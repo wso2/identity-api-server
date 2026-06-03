@@ -2516,8 +2516,8 @@ public class ServerConfigManagementService {
             CompatibilitySetting setting = compatibilitySettingsService.getCompatibilitySettings(tenantDomain);
             return CompatibilitySettingUtil.toCompatibilitySettings(setting);
         } catch (CompatibilitySettingException e) {
-            throw handleCompatibilitySettingsError(e, Constants.ErrorMessage.ERROR_CODE_COMPATIBILITY_SETTINGS_RETRIEVE,
-                    null);
+            throw CompatibilitySettingUtil.handleCompatibilitySettingsException(e,
+                    Constants.ErrorMessage.ERROR_CODE_COMPATIBILITY_SETTINGS_RETRIEVE, null);
         }
     }
 
@@ -2536,8 +2536,8 @@ public class ServerConfigManagementService {
                     compatibilitySettingsService.updateCompatibilitySettings(tenantDomain, setting);
             return CompatibilitySettingUtil.toCompatibilitySettings(updatedSetting);
         } catch (CompatibilitySettingException e) {
-            throw handleCompatibilitySettingsError(e, Constants.ErrorMessage.ERROR_CODE_COMPATIBILITY_SETTINGS_UPDATE,
-                    null);
+            throw CompatibilitySettingUtil.handleCompatibilitySettingsException(e,
+                    Constants.ErrorMessage.ERROR_CODE_COMPATIBILITY_SETTINGS_UPDATE, null);
         }
     }
 
@@ -2550,11 +2550,10 @@ public class ServerConfigManagementService {
     public CompatibilitySettingsGroup getCompatibilitySettingsByGroup(String settingGroup) {
 
         if (!CompatibilitySettingUtil.isValidSettingGroupName(settingGroup)) {
-            throw handleCompatibilitySettingsError(
-                    new IllegalArgumentException("Invalid setting group name: " + settingGroup),
+            throw CompatibilitySettingUtil.handleCompatibilitySettingsException(
+                    Response.Status.BAD_REQUEST,
                     Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT,
-                    settingGroup
-            );
+                    settingGroup);
         }
 
         try {
@@ -2563,30 +2562,16 @@ public class ServerConfigManagementService {
                     compatibilitySettingsService.getCompatibilitySettingsByGroup(tenantDomain, settingGroup);
 
             if (!CompatibilitySettingUtil.hasSettingGroup(setting, settingGroup)) {
-                throw handleCompatibilitySettingsError(
-                        new IllegalArgumentException("Setting group not found: " + settingGroup),
+                throw CompatibilitySettingUtil.handleCompatibilitySettingsException(
+                        Response.Status.NOT_FOUND,
                         Constants.ErrorMessage.ERROR_CODE_SETTING_GROUP_NOT_FOUND,
-                        settingGroup
-                );
+                        settingGroup);
             }
 
             return CompatibilitySettingUtil.toCompatibilitySettingsGroup(setting, settingGroup);
         } catch (CompatibilitySettingException e) {
-            throw handleCompatibilitySettingsError(e, Constants.ErrorMessage.ERROR_CODE_COMPATIBILITY_SETTINGS_RETRIEVE,
-                    settingGroup);
+            throw CompatibilitySettingUtil.handleCompatibilitySettingsException(e,
+                    Constants.ErrorMessage.ERROR_CODE_COMPATIBILITY_SETTINGS_RETRIEVE, settingGroup);
         }
-    }
-
-    /**
-     * Handle compatibility settings errors.
-     *
-     * @param e         Exception.
-     * @param errorEnum Error enum.
-     * @param data      Additional data.
-     * @return APIError.
-     */
-    private APIError handleCompatibilitySettingsError(Exception e, Constants.ErrorMessage errorEnum, String data) {
-
-        return CompatibilitySettingUtil.handleCompatibilitySettingsException(e, errorEnum, data);
     }
 }
