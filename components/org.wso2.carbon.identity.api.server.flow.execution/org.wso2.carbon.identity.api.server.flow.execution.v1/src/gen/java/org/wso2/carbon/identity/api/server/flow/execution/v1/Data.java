@@ -37,7 +37,7 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 public class Data  {
-
+ 
     private List<Component> components = null;
 
     private String redirectURL;
@@ -57,7 +57,7 @@ public class Data  {
         this.components = components;
         return this;
     }
-
+    
     @ApiModelProperty(value = "")
     @JsonProperty("components")
     @Valid
@@ -83,7 +83,7 @@ public class Data  {
         this.redirectURL = redirectURL;
         return this;
     }
-
+    
     @ApiModelProperty(value = "")
     @JsonProperty("redirectURL")
     @Valid
@@ -101,7 +101,7 @@ public class Data  {
         this.requiredParams = requiredParams;
         return this;
     }
-
+    
     @ApiModelProperty(value = "")
     @JsonProperty("requiredParams")
     @Valid
@@ -128,7 +128,7 @@ public class Data  {
         this.webAuthnData = webAuthnData;
         return this;
     }
-
+    
     @ApiModelProperty(value = "Data related to WebAuthn operations")
     @JsonProperty("webAuthnData")
     @Valid
@@ -155,7 +155,7 @@ public class Data  {
         this.additionalData = additionalData;
         return this;
     }
-
+    
     @ApiModelProperty(value = "")
     @JsonProperty("additionalData")
     @Valid
@@ -231,7 +231,7 @@ public class Data  {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class Data {\n");
-
+        
         sb.append("    components: ").append(toIndentedString(components)).append("\n");
         sb.append("    redirectURL: ").append(toIndentedString(redirectURL)).append("\n");
         sb.append("    requiredParams: ").append(toIndentedString(requiredParams)).append("\n");
