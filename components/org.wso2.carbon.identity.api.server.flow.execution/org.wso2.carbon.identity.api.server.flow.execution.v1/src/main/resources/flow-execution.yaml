@@ -131,6 +131,25 @@ components:
         additionalData:
           type: object
           additionalProperties: true
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/Message"
+
+    Message:
+      type: object
+      description: Represents a message surfaced during flow execution
+      properties:
+        type:
+          type: string
+          enum: [ERROR, INFO, WARNING]
+          example: ERROR
+        message:
+          type: string
+          example: User does not exist
+        i18nKey:
+          type: string
+          example: error.invalid.identifier
 
     Component:
       type: object

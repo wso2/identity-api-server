@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.Component;
+import org.wso2.carbon.identity.api.server.flow.execution.v1.Message;
 import javax.validation.constraints.*;
 
 
@@ -36,7 +37,7 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 public class Data  {
-  
+
     private List<Component> components = null;
 
     private String redirectURL;
@@ -46,6 +47,8 @@ public class Data  {
 
     private Map<String, Object> additionalData = null;
 
+    private List<Message> messages = null;
+
 
     /**
     **/
@@ -54,7 +57,7 @@ public class Data  {
         this.components = components;
         return this;
     }
-    
+
     @ApiModelProperty(value = "")
     @JsonProperty("components")
     @Valid
@@ -80,7 +83,7 @@ public class Data  {
         this.redirectURL = redirectURL;
         return this;
     }
-    
+
     @ApiModelProperty(value = "")
     @JsonProperty("redirectURL")
     @Valid
@@ -98,7 +101,7 @@ public class Data  {
         this.requiredParams = requiredParams;
         return this;
     }
-    
+
     @ApiModelProperty(value = "")
     @JsonProperty("requiredParams")
     @Valid
@@ -125,7 +128,7 @@ public class Data  {
         this.webAuthnData = webAuthnData;
         return this;
     }
-    
+
     @ApiModelProperty(value = "Data related to WebAuthn operations")
     @JsonProperty("webAuthnData")
     @Valid
@@ -152,7 +155,7 @@ public class Data  {
         this.additionalData = additionalData;
         return this;
     }
-    
+
     @ApiModelProperty(value = "")
     @JsonProperty("additionalData")
     @Valid
@@ -172,7 +175,33 @@ public class Data  {
         return this;
     }
 
-    
+        /**
+    **/
+    public Data messages(List<Message> messages) {
+
+        this.messages = messages;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("messages")
+    @Valid
+    public List<Message> getMessages() {
+        return messages;
+    }
+    public void setMessages(List<Message> messages) {
+        this.messages = messages;
+    }
+
+    public Data addMessagesItem(Message messagesItem) {
+        if (this.messages == null) {
+            this.messages = new ArrayList<Message>();
+        }
+        this.messages.add(messagesItem);
+        return this;
+    }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -188,12 +217,13 @@ public class Data  {
             Objects.equals(this.redirectURL, data.redirectURL) &&
             Objects.equals(this.requiredParams, data.requiredParams) &&
             Objects.equals(this.webAuthnData, data.webAuthnData) &&
-            Objects.equals(this.additionalData, data.additionalData);
+            Objects.equals(this.additionalData, data.additionalData) &&
+            Objects.equals(this.messages, data.messages);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(components, redirectURL, requiredParams, webAuthnData, additionalData);
+        return Objects.hash(components, redirectURL, requiredParams, webAuthnData, additionalData, messages);
     }
 
     @Override
@@ -201,12 +231,13 @@ public class Data  {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class Data {\n");
-        
+
         sb.append("    components: ").append(toIndentedString(components)).append("\n");
         sb.append("    redirectURL: ").append(toIndentedString(redirectURL)).append("\n");
         sb.append("    requiredParams: ").append(toIndentedString(requiredParams)).append("\n");
         sb.append("    webAuthnData: ").append(toIndentedString(webAuthnData)).append("\n");
         sb.append("    additionalData: ").append(toIndentedString(additionalData)).append("\n");
+        sb.append("    messages: ").append(toIndentedString(messages)).append("\n");
         sb.append("}");
         return sb.toString();
     }
