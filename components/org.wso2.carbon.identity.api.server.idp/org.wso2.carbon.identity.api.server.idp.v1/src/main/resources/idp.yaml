@@ -1813,6 +1813,231 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  '/identity-providers/{identity-provider-id}/share':
+    get:
+      tags:
+        - Identity Provider Sharing
+      summary: |
+        List of organizations that the identity provider is shared with.
+      description: >
+        This API returns the list of organizations that the identity provider is shared with. <br>
+        <b>Scope required:</b> `internal_idp_shared_access_view`
+      operationId: getIdentityProviderSharedOrganizations
+      parameters:
+        - name: identity-provider-id
+          in: path
+          description: ID of the identity provider which is shared with organizations.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/beforeQueryParam'
+        - $ref: '#/components/parameters/afterQueryParam'
+        - $ref: '#/components/parameters/sharedOrganizationsFilterQueryParam'
+        - $ref: '#/components/parameters/sharedOrganizationsLimitQueryParam'
+        - $ref: '#/components/parameters/recursiveQueryParam'
+        - $ref: '#/components/parameters/idpShareExcludedAttributesQueryParam'
+        - $ref: '#/components/parameters/idpShareAttributesQueryParam'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SharedOrganizationsResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /identity-providers/share:
+    post:
+      tags: [ Identity Provider Sharing ]
+      summary: Share a single identity provider with specific organizations
+      description: >
+        This API provides the capability to share an identity provider with specific organizations. <br>
+        <b>Scope required:</b> `internal_idp_share`
+      operationId: shareIdentityProviderWithSelected
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentityProviderShareSelectedRequestBody'
+      responses:
+        '202':
+          description: Sharing process triggered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessSuccessResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /identity-providers/share-with-all:
+    post:
+      tags: [ Identity Provider Sharing ]
+      summary: Share a single identity provider with all organizations
+      description: >
+        This API provides the capability to share an identity provider with all organizations. <br>
+        <b>Scope required:</b> `internal_idp_share`
+      operationId: shareIdentityProviderWithAll
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentityProviderShareAllRequestBody'
+      responses:
+        '202':
+          description: Sharing process triggered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessSuccessResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /identity-providers/unshare:
+    post:
+      tags: [ Identity Provider Sharing ]
+      summary: Unshare an identity provider from specific organizations
+      description: >
+        This API provides the capability to unshare an identity provider from specific organizations. <br>
+        <b>Scope required:</b> `internal_idp_unshare`
+      operationId: unshareIdentityProviderFromSelected
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentityProviderUnshareSelectedRequestBody'
+      responses:
+        '202':
+          description: Unsharing process triggered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessSuccessResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /identity-providers/unshare-with-all:
+    post:
+      tags: [ Identity Provider Sharing ]
+      summary: Unshare an identity provider from all organizations
+      description: >
+        This API provides the capability to unshare an identity provider from all organizations. <br>
+        <b>Scope required:</b> `internal_idp_unshare`
+      operationId: unshareIdentityProviderFromAll
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentityProviderUnshareAllRequestBody'
+      responses:
+        '202':
+          description: Unsharing process triggered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessSuccessResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /identity-providers/templates:
     get:
       tags:
@@ -2467,6 +2692,70 @@ components:
       description: >-
         Attribute by which the retrieved records should be sorted. Currently sorting through _<b>domainName<b>_ only
         supported.
+      schema:
+        type: string
+    beforeQueryParam:
+      name: before
+      in: query
+      required: false
+      description: |
+        Base64 encoded cursor value for backward pagination.
+      schema:
+        type: string
+      example: Ng==
+    afterQueryParam:
+      name: after
+      in: query
+      required: false
+      description: |
+        Base64 encoded cursor value for forward pagination.
+      schema:
+        type: string
+      example: Ng==
+    sharedOrganizationsFilterQueryParam:
+      name: filter
+      in: query
+      required: false
+      description: |
+        Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations.
+      schema:
+        type: string
+      example: id+eq+088fb49c-46fa-48c1-a0a8-5538ee4b7ec5
+    sharedOrganizationsLimitQueryParam:
+      name: limit
+      in: query
+      required: false
+      description: |
+        Maximum number of records to return.
+      schema:
+        type: integer
+      example: 10
+    recursiveQueryParam:
+      in: query
+      name: recursive
+      required: false
+      description: |
+        Determines whether a recursive search should happen.
+        If set to true, will include shared organizations in all levels of the hierarchy; If set to false, includes only shared organizations in the next level of the hierarchy.
+      schema:
+        type: boolean
+    idpShareExcludedAttributesQueryParam:
+      in: query
+      name: excludedAttributes
+      description: |
+        excludedAttribute parameter.
+      required: false
+      schema:
+        type: string
+    idpShareAttributesQueryParam:
+      in: query
+      name: attributes
+      required: false
+      description: |
+        Specifies the required parameters in the response.
+        Only 'sharingMode' attribute is currently supported.
+
+        /identity-providers/{identity-provider-id}/share?attributes=sharingMode
       schema:
         type: string
   securitySchemes:
@@ -3277,9 +3566,9 @@ components:
           default: false
           example: true
         skipJITForLookupFailure:
-            type: boolean
-            default: false
-            example: true
+          type: boolean
+          default: false
+          example: true
         accountLookupAttributeMappings:
           type: array
           items:
@@ -3524,3 +3813,138 @@ components:
           type: string
           format: binary
           description: file to upload
+    SharedOrganizationsResponse:
+      type: object
+      properties:
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+          example:
+            [
+              {
+                "href": "/api/server/v1/identity-providers/67f5a202-48c4-4313-9327-016da5f08f17/share?limit=10&recursive=false&next=MTA=",
+                "rel": "next",
+              },
+              {
+                "href": "/api/server/v1/identity-providers/67f5a202-48c4-4313-9327-016da5f08f17/share?limit=10&recursive=false&before=MTA=",
+                "rel": "previous",
+              }
+            ]
+        sharingMode:
+          $ref: '#/components/schemas/SharingMode'
+        organizations:
+          type: array
+          items:
+            $ref: '#/components/schemas/BasicOrganizationResponse'
+    SharingMode:
+      type: object
+      properties:
+        policy:
+          type: string
+          enum: [ "SELECTED_ORG_ONLY", "SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN" ]
+          description: Sharing scope for this organization.
+    BasicOrganizationResponse:
+      type: object
+      required:
+        - id
+        - name
+        - orgHandle
+        - parentId
+        - status
+        - ref
+        - hasChildren
+        - depthFromRoot
+      properties:
+        id:
+          type: string
+          example: 'b4526d91-a8bf-43d2-8b14-c548cf73065b'
+        name:
+          type: string
+          example: 'ABC Builders'
+        orgHandle:
+          type: string
+          example: 'abcbuilders'
+        parentId:
+          type: string
+          example: '08f8c1d2-4b3e-4c5a-9f6b-7d8e9f0a1b2c'
+          description: |
+            The parent organization ID.
+        status:
+          type: string
+          enum: [ ACTIVE, DISABLED ]
+          example: ACTIVE
+        ref:
+          type: string
+          example: '/t/wso2.com/api/server/v1/organizations/b4526d91-a8bf-43d2-8b14-c548cf73065b'
+        hasChildren:
+          type: boolean
+          example: true
+        depthFromRoot:
+          type: integer
+          example: 1
+        sharingMode:
+          $ref: '#/components/schemas/SharingMode'
+    IdentityProviderShareSelectedRequestBody:
+      type: object
+      required: [ identityProviderId, organizations ]
+      properties:
+        identityProviderId:
+          type: string
+          example: 'c75e27f9-98c7-4518-a968-c6cd59f0ac6b'
+        organizations:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrgShareConfig'
+    OrgShareConfig:
+      type: object
+      required: [ orgId, policy ]
+      properties:
+        orgId:
+          type: string
+          example: '682edf68-4835-4bb8-961f-0a16bc6cc866'
+        policy:
+          type: string
+          enum: [ "SELECTED_ORG_ONLY", "SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN" ]
+          description: Sharing scope for this organization.
+    IdentityProviderShareAllRequestBody:
+      type: object
+      required: [ identityProviderId, policy ]
+      properties:
+        identityProviderId:
+          type: string
+          example: 'c75e27f9-98c7-4518-a968-c6cd59f0ac6b'
+        policy:
+          type: string
+          enum: [ "SELECTED_ORG_ONLY", "SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN" ]
+          description: Sharing scope for this organization.
+    IdentityProviderUnshareSelectedRequestBody:
+      type: object
+      required: [ identityProviderId, orgIds ]
+      properties:
+        identityProviderId:
+          type: string
+          example: 'c75e27f9-98c7-4518-a968-c6cd59f0ac6b'
+        orgIds:
+          type: array
+          items:
+            type: string
+          example:
+            - 682edf68-4835-4bb8-961f-0a16bc6cc866
+            - ghfbctgf-4318-46d4-8ee1-7t3s38e23098
+    IdentityProviderUnshareAllRequestBody:
+      type: object
+      required: [ identityProviderId ]
+      properties:
+        identityProviderId:
+          type: string
+          example: 'c75e27f9-98c7-4518-a968-c6cd59f0ac6b'
+    ProcessSuccessResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "Processing"
+        details:
+          type: string
+          example: "Identity provider sharing process triggered successfully."

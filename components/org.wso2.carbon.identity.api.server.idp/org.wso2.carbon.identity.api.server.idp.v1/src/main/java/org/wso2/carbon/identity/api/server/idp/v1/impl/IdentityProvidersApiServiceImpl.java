@@ -33,7 +33,11 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorRe
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdPGroup;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPOSTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderResponse;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderShareAllRequestBody;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderShareSelectedRequestBody;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderTemplate;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderUnshareAllRequestBody;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderUnshareSelectedRequestBody;
 import org.wso2.carbon.identity.api.server.idp.v1.model.JustInTimeProvisioning;
 import org.wso2.carbon.identity.api.server.idp.v1.model.OutboundConnectorPUTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.OutboundProvisioningRequest;
@@ -186,6 +190,13 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
     }
 
     @Override
+    public Response getIdentityProviderSharedOrganizations(String identityProviderId, String before, String after,
+                                                           String filter, Integer limit, Boolean recursive,
+                                                           String excludedAttributes, String attributes) {
+        return null;
+    }
+
+    @Override
     public Response getJITConfig(String identityProviderId) {
 
         return Response.ok().entity(idpManagementService.getJITConfig(identityProviderId)).build();
@@ -255,6 +266,26 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
     public Response patchIDP(String identityProviderId, List<Patch> patchRequest) {
 
         return Response.ok().entity(idpManagementService.patchIDP(identityProviderId, patchRequest)).build();
+    }
+
+    @Override
+    public Response shareIdentityProviderWithAll(IdentityProviderShareAllRequestBody requestBody) {
+        return null;
+    }
+
+    @Override
+    public Response shareIdentityProviderWithSelected(IdentityProviderShareSelectedRequestBody requestBody) {
+        return null;
+    }
+
+    @Override
+    public Response unshareIdentityProviderFromAll(IdentityProviderUnshareAllRequestBody requestBody) {
+        return null;
+    }
+
+    @Override
+    public Response unshareIdentityProviderFromSelected(IdentityProviderUnshareSelectedRequestBody requestBody) {
+        return null;
     }
 
     @Override
