@@ -41,6 +41,7 @@ import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtFrameworkException;
 import org.wso2.carbon.identity.flow.mgt.model.ComponentDTO;
 import org.wso2.carbon.identity.flow.mgt.model.DataDTO;
 import org.wso2.carbon.identity.flow.mgt.model.FlowConfigDTO;
+import org.wso2.carbon.identity.flow.mgt.model.MessageDTO;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -241,15 +242,15 @@ public class Utils {
         }
     }
 
-    private static Message convertToMessage(org.wso2.carbon.identity.flow.mgt.model.Message message) {
+    private static Message convertToMessage(MessageDTO messageDTO) {
 
-        if (message == null) {
+        if (messageDTO == null) {
             return null;
         }
         return new Message()
-                .type(message.getType() != null ? Message.TypeEnum.valueOf(message.getType().name()) : null)
-                .message(message.getMessage())
-                .i18nKey(message.getI18nKey());
+                .type(messageDTO.getType() != null ? Message.TypeEnum.valueOf(messageDTO.getType().name()) : null)
+                .message(messageDTO.getMessage())
+                .i18nKey(messageDTO.getI18nKey());
     }
 
     private static Component convertToComponent(ComponentDTO componentDTO) {
