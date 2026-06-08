@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -37,7 +37,7 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 public class Data  {
- 
+  
     private List<Component> components = null;
 
     private String redirectURL;
@@ -182,7 +182,7 @@ public class Data  {
         this.messages = messages;
         return this;
     }
-
+    
     @ApiModelProperty(value = "")
     @JsonProperty("messages")
     @Valid
@@ -201,7 +201,7 @@ public class Data  {
         return this;
     }
 
-
+    
 
     @Override
     public boolean equals(java.lang.Object o) {

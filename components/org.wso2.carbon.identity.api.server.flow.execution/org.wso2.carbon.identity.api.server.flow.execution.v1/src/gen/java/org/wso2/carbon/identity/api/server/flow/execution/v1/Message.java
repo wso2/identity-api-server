@@ -34,14 +34,13 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 @ApiModel(description = "Represents a message surfaced during flow execution")
 public class Message  {
-
+  
 
 @XmlType(name="TypeEnum")
 @XmlEnum(String.class)
 public enum TypeEnum {
 
-    @XmlEnumValue("ERROR") ERROR(String.valueOf("ERROR")), @XmlEnumValue("INFO") INFO(String.valueOf("INFO")),
-    @XmlEnumValue("WARNING") WARNING(String.valueOf("WARNING"));
+    @XmlEnumValue("ERROR") ERROR(String.valueOf("ERROR")), @XmlEnumValue("INFO") INFO(String.valueOf("INFO")), @XmlEnumValue("WARNING") WARNING(String.valueOf("WARNING"));
 
 
     private String value;
@@ -80,7 +79,7 @@ public enum TypeEnum {
         this.type = type;
         return this;
     }
-
+    
     @ApiModelProperty(example = "ERROR", value = "")
     @JsonProperty("type")
     @Valid
@@ -98,7 +97,7 @@ public enum TypeEnum {
         this.message = message;
         return this;
     }
-
+    
     @ApiModelProperty(example = "User does not exist", value = "")
     @JsonProperty("message")
     @Valid
@@ -116,7 +115,7 @@ public enum TypeEnum {
         this.i18nKey = i18nKey;
         return this;
     }
-
+    
     @ApiModelProperty(example = "error.invalid.identifier", value = "")
     @JsonProperty("i18nKey")
     @Valid
@@ -154,7 +153,7 @@ public enum TypeEnum {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class Message {\n");
-
+        
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    message: ").append(toIndentedString(message)).append("\n");
         sb.append("    i18nKey: ").append(toIndentedString(i18nKey)).append("\n");
