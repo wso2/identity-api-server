@@ -18,9 +18,14 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.impl;
 
+import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowApiService;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfig;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfigPatchModel;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionBasicResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionModel;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionUpdateModel;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateRequest;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateResult;
@@ -32,10 +37,13 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.core.FlowAIService
 import org.wso2.carbon.identity.api.server.flow.management.v1.core.ServerFlowMgtService;
 import org.wso2.carbon.identity.api.server.flow.management.v1.factories.FlowAIServiceFactory;
 import org.wso2.carbon.identity.api.server.flow.management.v1.factories.ServerFlowMgtServiceFactory;
-
+import java.net.URI;
 import java.util.List;
 
 import javax.ws.rs.core.Response;
+
+import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.FLOW_EXTENSION_PATH_COMPONENT;
 
 /**
  * Implementation of the Flow API.
@@ -55,10 +63,27 @@ public class FlowApiServiceImpl implements FlowApiService {
         }
     }
 
+
+    @Override
+    public Response createFlowExtension(FlowExtensionModel flowExtensionModel) {
+
+        FlowExtensionResponse created = flowMgtService.createFlowExtension(flowExtensionModel);
+        URI location = ContextLoader.buildURIForHeader(
+                V1_API_PATH_COMPONENT + FLOW_EXTENSION_PATH_COMPONENT + created.getId());
+        return Response.created(location).entity(created).build();
+    }
+
     @Override
     public Response deleteFlow(String flowType) {
 
         flowMgtService.deleteFlow(flowType);
+        return Response.noContent().build();
+    }
+
+    @Override
+    public Response deleteFlowExtension(String extensionId) {
+
+        flowMgtService.deleteFlowExtension(extensionId);
         return Response.noContent().build();
     }
 
@@ -112,6 +137,27 @@ public class FlowApiServiceImpl implements FlowApiService {
     }
 
     @Override
+    public Response getFlowExtensionById(String extensionId) {
+
+        FlowExtensionResponse extension = flowMgtService.getFlowExtensionById(extensionId);
+        return Response.ok().entity(extension).build();
+    }
+
+    @Override
+    public Response getFlowExtensionContext(String flowType) {
+
+        return Response.ok().entity(
+                flowMgtService.getFlowExtensionContextTree(flowType)).build();
+    }
+
+    @Override
+    public Response getFlowExtensions() {
+
+        List<FlowExtensionBasicResponse> extensions = flowMgtService.getFlowExtensions();
+        return Response.ok().entity(extensions).build();
+    }
+
+    @Override
     public Response updateFlow(FlowRequest flowRequest) {
 
         flowMgtService.updateFlow(flowRequest);
@@ -123,5 +169,14 @@ public class FlowApiServiceImpl implements FlowApiService {
 
         FlowConfig flowConfig = flowMgtService.updateFlowConfig(flowConfigPatchModel);
         return Response.ok().entity(flowConfig).build();
+    }
+
+    @Override
+    public Response updateFlowExtension(String extensionId,
+                                          FlowExtensionUpdateModel flowExtensionUpdateModel) {
+
+        FlowExtensionResponse updated =
+                flowMgtService.updateFlowExtension(extensionId, flowExtensionUpdateModel);
+        return Response.ok().entity(updated).build();
     }
 }

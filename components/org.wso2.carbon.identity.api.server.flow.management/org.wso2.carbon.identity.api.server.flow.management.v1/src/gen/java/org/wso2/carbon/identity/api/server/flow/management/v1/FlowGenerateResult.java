@@ -19,62 +19,62 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateResultData;
+import javax.validation.constraints.*;
 
+/**
+ * Result response for generating a flow
+ **/
+
+import io.swagger.annotations.*;
 import java.util.Objects;
-
 import javax.validation.Valid;
-
+import javax.xml.bind.annotation.*;
 @ApiModel(description = "Result response for generating a flow")
-public class FlowGenerateResult {
-
+public class FlowGenerateResult  {
+  
     private String status;
     private FlowGenerateResultData data;
 
     /**
-     *
-     **/
+    **/
     public FlowGenerateResult status(String status) {
 
         this.status = status;
         return this;
     }
-
+    
     @ApiModelProperty(example = "SUCCESS", value = "")
     @JsonProperty("status")
     @Valid
     public String getStatus() {
-
         return status;
     }
-
     public void setStatus(String status) {
-
         this.status = status;
     }
 
     /**
-     *
-     **/
+    **/
     public FlowGenerateResult data(FlowGenerateResultData data) {
 
         this.data = data;
         return this;
     }
-
+    
     @ApiModelProperty(value = "")
     @JsonProperty("data")
     @Valid
     public FlowGenerateResultData getData() {
-
         return data;
     }
-
     public void setData(FlowGenerateResultData data) {
-
         this.data = data;
     }
+
 
 
     @Override
@@ -88,12 +88,11 @@ public class FlowGenerateResult {
         }
         FlowGenerateResult flowGenerateResult = (FlowGenerateResult) o;
         return Objects.equals(this.status, flowGenerateResult.status) &&
-                Objects.equals(this.data, flowGenerateResult.data);
+            Objects.equals(this.data, flowGenerateResult.data);
     }
 
     @Override
     public int hashCode() {
-
         return Objects.hash(status, data);
     }
 
@@ -102,7 +101,7 @@ public class FlowGenerateResult {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class FlowGenerateResult {\n");
-
+        
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("    data: ").append(toIndentedString(data)).append("\n");
         sb.append("}");
@@ -110,9 +109,9 @@ public class FlowGenerateResult {
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
-     */
+    * Convert the given object to string with each line indented by 4 spaces
+    * (except the first line).
+    */
     private String toIndentedString(java.lang.Object o) {
 
         if (o == null) {

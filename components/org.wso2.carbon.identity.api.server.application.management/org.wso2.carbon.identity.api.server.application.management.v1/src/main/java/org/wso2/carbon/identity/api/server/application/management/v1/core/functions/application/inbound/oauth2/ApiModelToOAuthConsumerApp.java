@@ -152,6 +152,17 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
                     refreshToken.getExtendRenewedRefreshTokenExpiryTime() : OAuthServerConfiguration.getInstance()
                     .isExtendRenewedTokenExpiryTimeEnabled();
             consumerAppDTO.setExtendRenewedRefreshTokenExpiryTime(extendRefreshTokenExpiryTime);
+            if (refreshToken.getGracefulRefreshTokenRotationEnabled() != null) {
+                consumerAppDTO.setGracefulRefreshTokenRotationEnabled(
+                        refreshToken.getGracefulRefreshTokenRotationEnabled());
+            }
+            if (refreshToken.getGracefulRefreshTokenRotationValidityPeriod() != null) {
+                consumerAppDTO.setGracefulRefreshTokenRotationValidityPeriod(
+                        refreshToken.getGracefulRefreshTokenRotationValidityPeriod());
+            }
+            if (refreshToken.getGracefulRefreshTokenReuseLimit() != null) {
+                consumerAppDTO.setGracefulRefreshTokenReuseLimit(refreshToken.getGracefulRefreshTokenReuseLimit());
+            }
         }
     }
 

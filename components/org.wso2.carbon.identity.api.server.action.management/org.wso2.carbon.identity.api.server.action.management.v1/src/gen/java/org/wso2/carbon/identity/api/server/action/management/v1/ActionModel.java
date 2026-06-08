@@ -28,6 +28,7 @@ import javax.validation.constraints.*;
 
 
 import io.swagger.annotations.*;
+import java.util.List;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
@@ -38,6 +39,7 @@ public class ActionModel  {
     private String description;
     private Endpoint endpoint;
     private ORRule rule;
+    private List<String> attributes;
 
     /**
     * Name of the action.
@@ -117,7 +119,25 @@ public class ActionModel  {
         this.rule = rule;
     }
 
+    /**
+     * Attributes required for the action.
+     */
+    public ActionModel attributes(List<String> attributes) {
 
+        this.attributes = attributes;
+        return this;
+    }
+
+    @ApiModelProperty(value = "Attributes required for the action.")
+    @JsonProperty("attributes")
+    @Valid
+    public List<String> getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(List<String> attributes) {
+        this.attributes = attributes;
+    }
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -130,9 +150,10 @@ public class ActionModel  {
         }
         ActionModel actionModel = (ActionModel) o;
         return Objects.equals(this.name, actionModel.name) &&
-            Objects.equals(this.description, actionModel.description) &&
-            Objects.equals(this.endpoint, actionModel.endpoint) &&
-            Objects.equals(this.rule, actionModel.rule);
+                Objects.equals(this.description, actionModel.description) &&
+                Objects.equals(this.endpoint, actionModel.endpoint) &&
+                Objects.equals(this.attributes, actionModel.attributes) &&
+                Objects.equals(this.rule, actionModel.rule);
     }
 
     @Override
@@ -149,6 +170,7 @@ public class ActionModel  {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
+        sb.append("    attributes: ").append(toIndentedString(attributes)).append("\n");
         sb.append("    rule: ").append(toIndentedString(rule)).append("\n");
         sb.append("}");
         return sb.toString();

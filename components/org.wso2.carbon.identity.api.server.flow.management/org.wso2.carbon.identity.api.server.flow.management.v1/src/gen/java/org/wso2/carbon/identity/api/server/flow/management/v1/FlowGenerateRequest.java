@@ -19,67 +19,67 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 
+/**
+ * Request payload for generating a flow
+ **/
+
+import io.swagger.annotations.*;
 import java.util.Objects;
-
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
+import javax.xml.bind.annotation.*;
 @ApiModel(description = "Request payload for generating a flow")
-public class FlowGenerateRequest {
-
+public class FlowGenerateRequest  {
+  
     private String flowType;
     private String userQuery;
 
     /**
-     * Type of the flow being updated
-     **/
+    * Type of the flow being updated
+    **/
     public FlowGenerateRequest flowType(String flowType) {
 
         this.flowType = flowType;
         return this;
     }
-
+    
     @ApiModelProperty(example = "REGISTRATION", required = true, value = "Type of the flow being updated")
     @JsonProperty("flow_type")
     @Valid
     @NotNull(message = "Property flowType cannot be null.")
 
     public String getFlowType() {
-
         return flowType;
     }
-
     public void setFlowType(String flowType) {
-
         this.flowType = flowType;
     }
 
     /**
-     * User query to generate the flow
-     **/
+    * User query to generate the flow
+    **/
     public FlowGenerateRequest userQuery(String userQuery) {
 
         this.userQuery = userQuery;
         return this;
     }
-
-    @ApiModelProperty(example = "Generate a registration flow with basic details and passkey", required = true,
-            value = "User query to generate the flow")
+    
+    @ApiModelProperty(example = "Generate a registration flow with basic details and passkey", required = true, value = "User query to generate the flow")
     @JsonProperty("user_query")
     @Valid
     @NotNull(message = "Property userQuery cannot be null.")
-    public String getUserQuery() {
 
+    public String getUserQuery() {
         return userQuery;
     }
-
     public void setUserQuery(String userQuery) {
-
         this.userQuery = userQuery;
     }
+
 
 
     @Override
@@ -93,12 +93,11 @@ public class FlowGenerateRequest {
         }
         FlowGenerateRequest flowGenerateRequest = (FlowGenerateRequest) o;
         return Objects.equals(this.flowType, flowGenerateRequest.flowType) &&
-                Objects.equals(this.userQuery, flowGenerateRequest.userQuery);
+            Objects.equals(this.userQuery, flowGenerateRequest.userQuery);
     }
 
     @Override
     public int hashCode() {
-
         return Objects.hash(flowType, userQuery);
     }
 
@@ -107,7 +106,7 @@ public class FlowGenerateRequest {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class FlowGenerateRequest {\n");
-
+        
         sb.append("    flowType: ").append(toIndentedString(flowType)).append("\n");
         sb.append("    userQuery: ").append(toIndentedString(userQuery)).append("\n");
         sb.append("}");
@@ -115,9 +114,9 @@ public class FlowGenerateRequest {
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
-     */
+    * Convert the given object to string with each line indented by 4 spaces
+    * (except the first line).
+    */
     private String toIndentedString(java.lang.Object o) {
 
         if (o == null) {

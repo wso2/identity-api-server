@@ -21,9 +21,7 @@ package org.wso2.carbon.identity.api.server.action.management.v1;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.util.List;
 import java.util.Objects;
-
 import javax.validation.Valid;
 
 /**
@@ -32,7 +30,6 @@ import javax.validation.Valid;
 public class PreUpdatePasswordActionUpdateModel extends ActionUpdateModel {
 
     private PasswordSharingUpdateModel passwordSharing;
-    private List<String> attributes;
 
     public PreUpdatePasswordActionUpdateModel() {
         // Default constructor required for Jackson
@@ -44,6 +41,7 @@ public class PreUpdatePasswordActionUpdateModel extends ActionUpdateModel {
         setDescription(actionUpdateModel.getDescription());
         setEndpoint(actionUpdateModel.getEndpoint());
         setRule(actionUpdateModel.getRule());
+        setAttributes(actionUpdateModel.getAttributes());
     }
 
     public PreUpdatePasswordActionUpdateModel passwordSharing(PasswordSharingUpdateModel passwordSharing) {
@@ -65,25 +63,6 @@ public class PreUpdatePasswordActionUpdateModel extends ActionUpdateModel {
         this.passwordSharing = passwordSharing;
     }
 
-    public PreUpdatePasswordActionUpdateModel attributes(List<String> attributes) {
-
-        this.attributes = attributes;
-        return this;
-    }
-
-    @ApiModelProperty()
-    @JsonProperty("attributes")
-    @Valid
-    public List<String> getAttributes() {
-
-        return attributes;
-    }
-
-    public void setAttributes(List<String> attributes) {
-
-        this.attributes = attributes;
-    }
-
     @Override
     public boolean equals(java.lang.Object o) {
 
@@ -98,13 +77,13 @@ public class PreUpdatePasswordActionUpdateModel extends ActionUpdateModel {
                 Objects.equals(this.getDescription(), actionUpdateModel.getDescription()) &&
                 Objects.equals(this.getEndpoint(), actionUpdateModel.getEndpoint()) &&
                 Objects.equals(this.passwordSharing, actionUpdateModel.passwordSharing) &&
-                Objects.equals(this.attributes, actionUpdateModel.attributes) &&
+                Objects.equals(this.getAttributes(), actionUpdateModel.getAttributes()) &&
                 Objects.equals(this.getRule(), actionUpdateModel.getRule());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), getDescription(), getEndpoint(), passwordSharing, attributes, getRule());
+        return Objects.hash(getName(), getDescription(), getEndpoint(), passwordSharing, getAttributes(), getRule());
     }
 
     @Override
@@ -116,7 +95,7 @@ public class PreUpdatePasswordActionUpdateModel extends ActionUpdateModel {
         sb.append("    description: ").append(toIndentedString(getDescription())).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(getEndpoint())).append("\n");
         sb.append("    passwordSharing: ").append(toIndentedString(passwordSharing)).append("\n");
-        sb.append("    attributes: ").append(toIndentedString(attributes)).append("\n");
+        sb.append("    attributes: ").append(toIndentedString(getAttributes())).append("\n");
         sb.append("    rule: ").append(toIndentedString(getRule())).append("\n");
         sb.append("}");
         return sb.toString();

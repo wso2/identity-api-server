@@ -41,6 +41,7 @@ public class PurposeSummaryDTO  {
     private String description;
     private String type;
     private PurposeDTOLatestVersion latestVersion;
+    private String tenantDomain;
 
     /**
     **/
@@ -132,6 +133,25 @@ public class PurposeSummaryDTO  {
         this.latestVersion = latestVersion;
     }
 
+    /**
+    * Tenant domain that owns this purpose
+    **/
+    public PurposeSummaryDTO tenantDomain(String tenantDomain) {
+
+        this.tenantDomain = tenantDomain;
+        return this;
+    }
+
+    @ApiModelProperty(example = "wso2.com", value = "Tenant domain that owns this purpose")
+    @JsonProperty("tenantDomain")
+    @Valid
+    public String getTenantDomain() {
+        return tenantDomain;
+    }
+    public void setTenantDomain(String tenantDomain) {
+        this.tenantDomain = tenantDomain;
+    }
+
 
 
     @Override
@@ -148,12 +168,13 @@ public class PurposeSummaryDTO  {
             Objects.equals(this.name, purposeSummaryDTO.name) &&
             Objects.equals(this.description, purposeSummaryDTO.description) &&
             Objects.equals(this.type, purposeSummaryDTO.type) &&
-            Objects.equals(this.latestVersion, purposeSummaryDTO.latestVersion);
+            Objects.equals(this.latestVersion, purposeSummaryDTO.latestVersion) &&
+            Objects.equals(this.tenantDomain, purposeSummaryDTO.tenantDomain);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, type, latestVersion);
+        return Objects.hash(id, name, description, type, latestVersion, tenantDomain);
     }
 
     @Override
@@ -167,6 +188,7 @@ public class PurposeSummaryDTO  {
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    latestVersion: ").append(toIndentedString(latestVersion)).append("\n");
+        sb.append("    tenantDomain: ").append(toIndentedString(tenantDomain)).append("\n");
         sb.append("}");
         return sb.toString();
     }

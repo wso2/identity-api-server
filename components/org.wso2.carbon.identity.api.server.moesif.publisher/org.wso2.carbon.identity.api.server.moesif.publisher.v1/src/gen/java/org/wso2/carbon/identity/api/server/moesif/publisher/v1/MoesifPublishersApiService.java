@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.Error;
 import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.MoesifPublisher;
+import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.MoesifPublisherPatchReq;
 import org.wso2.carbon.identity.api.server.moesif.publisher.v1.model.MoesifPublisherReq;
 import javax.ws.rs.core.Response;
 
@@ -38,5 +39,5 @@ public interface MoesifPublishersApiService {
 
       public Response getMoesifPublisher();
 
-      public Response updateMoesifPublisher(MoesifPublisherReq moesifPublisherReq);
+      public Response patchMoesifPublisher(MoesifPublisherPatchReq moesifPublisherPatchReq);
 }

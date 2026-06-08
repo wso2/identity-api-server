@@ -44,8 +44,8 @@ public class PurposeDTO  {
     private String type;
     private PurposeDTOLatestVersion latestVersion;
     private List<PurposeElementDTO> elements = null;
-
     private Map<String, String> properties = null;
+    private String tenantDomain;
 
 
     /**
@@ -197,7 +197,26 @@ public class PurposeDTO  {
         return this;
     }
 
-    
+    /**
+    * Tenant domain that owns this purpose
+    **/
+    public PurposeDTO tenantDomain(String tenantDomain) {
+
+        this.tenantDomain = tenantDomain;
+        return this;
+    }
+
+    @ApiModelProperty(example = "wso2.com", value = "Tenant domain that owns this purpose")
+    @JsonProperty("tenantDomain")
+    @Valid
+    public String getTenantDomain() {
+        return tenantDomain;
+    }
+    public void setTenantDomain(String tenantDomain) {
+        this.tenantDomain = tenantDomain;
+    }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -215,12 +234,13 @@ public class PurposeDTO  {
             Objects.equals(this.type, purposeDTO.type) &&
             Objects.equals(this.latestVersion, purposeDTO.latestVersion) &&
             Objects.equals(this.elements, purposeDTO.elements) &&
-            Objects.equals(this.properties, purposeDTO.properties);
+            Objects.equals(this.properties, purposeDTO.properties) &&
+            Objects.equals(this.tenantDomain, purposeDTO.tenantDomain);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, type, latestVersion, elements, properties);
+        return Objects.hash(id, name, description, type, latestVersion, elements, properties, tenantDomain);
     }
 
     @Override
@@ -236,6 +256,7 @@ public class PurposeDTO  {
         sb.append("    latestVersion: ").append(toIndentedString(latestVersion)).append("\n");
         sb.append("    elements: ").append(toIndentedString(elements)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
+        sb.append("    tenantDomain: ").append(toIndentedString(tenantDomain)).append("\n");
         sb.append("}");
         return sb.toString();
     }

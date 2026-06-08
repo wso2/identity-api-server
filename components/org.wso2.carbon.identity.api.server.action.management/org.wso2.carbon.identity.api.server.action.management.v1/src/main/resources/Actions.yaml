@@ -1539,6 +1539,12 @@ components:
           $ref: '#/components/schemas/Endpoint'
         rule:
           $ref: '#/components/schemas/ORRule'
+        attributes:
+          type: array
+          description: Attributes required for the action.
+          items:
+            type: string
+          example: ["http://wso2.org/claims/givenname", "http://wso2.org/claims/dob"]
 
     Endpoint:
       type: object
@@ -1637,6 +1643,12 @@ components:
           $ref: '#/components/schemas/EndpointResponse'
         rule:
           $ref: '#/components/schemas/ORRuleResponse'
+        attributes:
+          type: array
+          description: Attributes required for the action.
+          items:
+            type: string
+          example: ["http://wso2.org/claims/givenname", "http://wso2.org/claims/dob"]
 
     ActionBasicResponse:
       type: object
@@ -1861,6 +1873,12 @@ components:
           $ref: '#/components/schemas/EndpointUpdateModel'
         rule:
           $ref: '#/components/schemas/ORRule'
+        attributes:
+          type: array
+          description: Attributes required for the action.
+          items:
+            type: string
+          example: ["http://wso2.org/claims/givenname", "http://wso2.org/claims/dob"]
 
     EndpointUpdateModel:
       type: object

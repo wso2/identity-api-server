@@ -55,16 +55,16 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-    put:
+    patch:
       tags:
         - Moesif Publishers
-      summary: Update the Moesif event publisher configuration
-      operationId: updateMoesifPublisher
+      summary: Partially update the Moesif event publisher configuration
+      operationId: patchMoesifPublisher
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MoesifPublisherReq'
+              $ref: '#/components/schemas/MoesifPublisherPatchReq'
         required: true
       responses:
         '200':
@@ -112,6 +112,31 @@ components:
             (e.g. {"moesif-authentication-publisher": true, "moesif-registration-publisher": false, "flow": true, "moesif-oauth2-token-publisher": true}).
             Keys absent from the map default to false (replace-all semantics).
             Known keys: "moesif-authentication-publisher", "moesif-registration-publisher", "moesif-flow-publisher", "moesif-oauth2-token-publisher".
+          example:
+            moesif-authentication-publisher: true
+            moesif-registration-publisher: false
+            moesif-flow-publisher: true
+            moesif-oauth2-token-publisher: true
+    MoesifPublisherPatchReq:
+      type: object
+      required:
+        - eventPublisherEnablement
+      properties:
+        apiKeyValue:
+          type: string
+          nullable: true
+          description: >
+            Moesif collector API key value. If omitted or null, the existing API key is retained.
+          example: mzf_live_1234567890abcdef
+        eventPublisherEnablement:
+          type: object
+          additionalProperties:
+            type: boolean
+          description: >
+            Map of event publisher key to enabled flag. Keys absent from the map default to false
+            (replace-all semantics).
+            Known keys: "moesif-authentication-publisher", "moesif-registration-publisher",
+            "moesif-flow-publisher", "moesif-oauth2-token-publisher".
           example:
             moesif-authentication-publisher: true
             moesif-registration-publisher: false

@@ -18,10 +18,15 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.action.management.api.exception.ActionMgtException;
+import org.wso2.carbon.identity.action.management.api.model.Action;
 import org.wso2.carbon.identity.api.server.flow.management.common.FlowMgtServiceHolder;
 import org.wso2.carbon.identity.api.server.flow.management.v1.AttributeMetadata;
 import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorConnections;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionConnectionInfo;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
@@ -29,18 +34,23 @@ import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
 import org.wso2.carbon.identity.claim.metadata.mgt.model.LocalClaim;
+import org.wso2.carbon.identity.core.util.IdentityUtil;
+import org.wso2.carbon.identity.flow.extension.model.FlowExtensionAction;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
 import org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdpManager;
 import org.wso2.carbon.idp.mgt.model.IdpSearchResult;
+import org.wso2.carbon.user.core.UserCoreConstants;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DISPLAY_NAME;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_READ_ONLY;
@@ -49,6 +59,7 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.F
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.APPLE_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.EMAIL_OTP_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.FACEBOOK_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.FLOW_EXTENSION_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.GITHUB_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.GOOGLE_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.MAGIC_LINK_EXECUTOR;
@@ -59,8 +70,6 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.F
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.USER_PROVISIONING_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.IDP_TEMPLATE_ID;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.MICROSOFT_IDP_TEMPLATE_ID;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USER_IDENTIFIER;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.USER_IDENTIFIER_NAME;
 import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.GROUPS_CLAIM;
 import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.ROLES_CLAIM;
 
@@ -71,6 +80,8 @@ import static org.wso2.carbon.identity.application.authentication.framework.util
  */
 public abstract class AbstractMetaResponseHandler {
 
+    private static final Log log = LogFactory.getLog(AbstractMetaResponseHandler.class);
+    private static final String HIDDEN_CLAIMS_IDENTITY_CONFIG = "HiddenClaims.HiddenClaim";
     private static final String MULTI_ATTRIBUTE_LOGIN_ENABLED = "multiAttributeLoginEnabled";
 
     /**
@@ -110,6 +121,7 @@ public abstract class AbstractMetaResponseHandler {
         supportedExecutors.add(SMS_OTP_EXECUTOR);
         supportedExecutors.add(MAGIC_LINK_EXECUTOR);
         supportedExecutors.add(USER_PROVISIONING_EXECUTOR);
+        supportedExecutors.add(FLOW_EXTENSION_EXECUTOR);
         return supportedExecutors;
     }
 
@@ -145,10 +157,11 @@ public abstract class AbstractMetaResponseHandler {
         response.setFlowType(getFlowType());
         response.setAttributeProfile(getAttributeProfile());
         response.setWorkflowEnabled(getWorkflowEnabled());
-        response.setAttributeMetadata(getSupportedClaims(getAttributeProfile()));
+        response.setAttributeMetadata(getSupportedClaims());
         response.setSupportedExecutors(getSupportedExecutors());
         response.setConnectorConfigs(getConnectorConfigs());
         response.setExecutorConnections(getExecutorConnections());
+        response.setFlowExtensionConnections(getFlowExtensionConnections());
         response.setSupportedFlowCompletionConfigs(getSupportedFlowCompletionConfigs());
         return response;
     }
@@ -158,15 +171,15 @@ public abstract class AbstractMetaResponseHandler {
         return Utils.getSupportedFlowCompletionConfig(getFlowType());
     }
 
-    private List<AttributeMetadata> getSupportedClaims(String attributeProfile) {
+    protected List<AttributeMetadata> getSupportedClaims() {
 
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         List<AttributeMetadata> claimProperties = new ArrayList<>();
         try {
             ClaimMetadataManagementService claimService = (ClaimMetadataManagementService) PrivilegedCarbonContext
                     .getThreadLocalCarbonContext().getOSGiService(ClaimMetadataManagementService.class, null);
-            List<LocalClaim> attributeList =
-                    claimService.getSupportedLocalClaimsForProfile(tenantDomain, attributeProfile);
+            List<LocalClaim> attributeList = claimService.getLocalClaims(tenantDomain);
+            attributeList = filterClaims(attributeList);
 
             for (LocalClaim claim : attributeList) {
                 Map<String, String> claimProps = claim.getClaimProperties();
@@ -186,12 +199,9 @@ public abstract class AbstractMetaResponseHandler {
                 }
             }
 
-            // Add user identifier claim if multi-attribute login is enabled.
-            if (Utils.getGovernanceConfig(
-                    PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(),
-                    MultiAttributeLoginConstants.MULTI_ATTRIBUTE_LOGIN_PROPERTY)) {
-                claimProperties.add(createUserIdentifierMeta());
-            }
+            // Sort claims alphabetically by display name.
+            claimProperties.sort(Comparator.comparing(AttributeMetadata::getName,
+                    Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)));
         } catch (ClaimMetadataException e) {
             throw Utils.handleFlowMgtException(new FlowMgtClientException(
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_GET_SUPPORTED_CLAIMS.getCode(),
@@ -199,6 +209,21 @@ public abstract class AbstractMetaResponseHandler {
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_GET_SUPPORTED_CLAIMS.getDescription(), e));
         }
         return claimProperties;
+    }
+
+    /**
+     * Filter out identity claims and hidden claims from the list of local claims.
+     * @param claims List of local claims to filter.
+     * @return Filtered list of local claims.
+     */
+    private static List<LocalClaim> filterClaims(List<LocalClaim> claims) {
+
+        List<String> hiddenClaims = IdentityUtil.getPropertyAsList(HIDDEN_CLAIMS_IDENTITY_CONFIG);
+        return claims.stream()
+                .filter(claim ->
+                        !claim.getClaimURI().startsWith(UserCoreConstants.ClaimTypeURIs.IDENTITY_CLAIM_URI))
+                .filter(claim -> !hiddenClaims.contains(claim.getClaimURI()))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -215,6 +240,41 @@ public abstract class AbstractMetaResponseHandler {
             fields.add(FlowEndpointConstants.USERNAME_IDENTIFIER);
         }
         return fields;
+    }
+
+    /**
+     * Returns the list of Flow extension connection info for this flow.
+     * Fetches all ACTIVE Flow Extension actions from ActionManagementService.
+     *
+     * @return list of Flow extension connections, or empty list if none.
+     */
+    protected List<FlowExtensionConnectionInfo> getFlowExtensionConnections() {
+
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        try {
+            List<Action> actions = FlowMgtServiceHolder.getActionManagementService()
+                    .getActionsByActionType(Action.ActionTypes.FLOW_EXTENSION.getPathParam(), tenantDomain);
+            if (actions == null) {
+                return Collections.emptyList();
+            }
+            List<FlowExtensionConnectionInfo> connections = new ArrayList<>();
+            for (Action action : actions) {
+                if (!Action.Status.ACTIVE.equals(action.getStatus())) {
+                    continue;
+                }
+                FlowExtensionConnectionInfo info = new FlowExtensionConnectionInfo()
+                        .actionId(action.getId())
+                        .name(action.getName());
+                if (action instanceof FlowExtensionAction) {
+                    info.iconUrl(((FlowExtensionAction) action).getIconUrl());
+                }
+                connections.add(info);
+            }
+            return connections;
+        } catch (ActionMgtException e) {
+            log.warn("Failed to fetch Flow Extension connections for flow meta.", e);
+            return Collections.emptyList();
+        }
     }
 
     protected List<ExecutorConnections> getExecutorConnections() {
@@ -300,15 +360,5 @@ public abstract class AbstractMetaResponseHandler {
             offset += pageSize;
         } while (offset < totalCount);
         return identityProviders;
-    }
-
-    private AttributeMetadata createUserIdentifierMeta() {
-
-        AttributeMetadata meta = new AttributeMetadata();
-        meta.setName(USER_IDENTIFIER_NAME);
-        meta.claimURI(USER_IDENTIFIER);
-        meta.setRequired(true);
-        meta.setReadOnly(true);
-        return meta;
     }
 }
