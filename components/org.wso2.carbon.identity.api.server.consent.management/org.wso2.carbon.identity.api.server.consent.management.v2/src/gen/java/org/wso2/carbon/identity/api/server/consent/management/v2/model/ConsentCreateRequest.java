@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.wso2.carbon.identity.api.server.consent.management.v2.model.AuthorizationEntry;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentPurposeBinding;
 import javax.validation.constraints.*;
 
@@ -77,7 +78,7 @@ public enum StateEnum {
 
     private StateEnum state = StateEnum.ACTIVE;
     private Long expiryTime;
-    private List<String> authorizations = null;
+    private List<AuthorizationEntry> authorizations = null;
 
     private Map<String, String> properties = null;
 
@@ -206,25 +207,25 @@ public enum StateEnum {
     }
 
     /**
-    * Optional list of user IDs who are expected to authorize this consent. Each user will use the /authorize endpoint to give their actual consent.
+    * Optional list of users who are expected to authorize this consent. Each user will use the /authorize endpoint to give their actual consent.
     **/
-    public ConsentCreateRequest authorizations(List<String> authorizations) {
+    public ConsentCreateRequest authorizations(List<AuthorizationEntry> authorizations) {
 
         this.authorizations = authorizations;
         return this;
     }
     
-    @ApiModelProperty(example = "[\"a1b2c3d4-1234-5678-abcd-ef1234567890\",\"b2c3d4e5-2345-6789-bcde-f01234567891\"]", value = "Optional list of user IDs who are expected to authorize this consent. Each user will use the /authorize endpoint to give their actual consent.")
+    @ApiModelProperty(example = "[{\"id\":\"alice@wso2.com\"},{\"id\":\"bob@wso2.com\"}]", value = "Optional list of users who are expected to authorize this consent. Each user will use the /authorize endpoint to give their actual consent.")
     @JsonProperty("authorizations")
     @Valid
-    public List<String> getAuthorizations() {
+    public List<AuthorizationEntry> getAuthorizations() {
         return authorizations;
     }
-    public void setAuthorizations(List<String> authorizations) {
+    public void setAuthorizations(List<AuthorizationEntry> authorizations) {
         this.authorizations = authorizations;
     }
 
-    public ConsentCreateRequest addAuthorizationsItem(String authorizationsItem) {
+    public ConsentCreateRequest addAuthorizationsItem(AuthorizationEntry authorizationsItem) {
         if (this.authorizations == null) {
             this.authorizations = new ArrayList<>();
         }

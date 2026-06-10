@@ -169,6 +169,8 @@ public enum StateEnum {
         this.state = state;
     }
 
+
+
     @Override
     public boolean equals(java.lang.Object o) {
 

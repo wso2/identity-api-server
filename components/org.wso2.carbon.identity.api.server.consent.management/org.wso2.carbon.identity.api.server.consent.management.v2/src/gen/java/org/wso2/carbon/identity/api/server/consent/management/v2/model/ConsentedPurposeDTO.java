@@ -46,6 +46,7 @@ public class ConsentedPurposeDTO  {
     private String versionId;
     private String version;
     private List<ConsentedElementDTO> elements = null;
+
     private Map<String, String> properties = null;
 
 
@@ -82,7 +83,6 @@ public class ConsentedPurposeDTO  {
         return id;
     }
     public void setId(String id) {
-
         this.id = id;
     }
 
@@ -94,16 +94,14 @@ public class ConsentedPurposeDTO  {
         this.type = type;
         return this;
     }
-
+    
     @ApiModelProperty(example = "Policy", value = "Purpose type classification")
     @JsonProperty("type")
     @Valid
     public String getType() {
-
         return type;
     }
     public void setType(String type) {
-
         this.type = type;
     }
 
@@ -172,7 +170,7 @@ public class ConsentedPurposeDTO  {
         return this;
     }
 
-    /**
+        /**
     * Key-value properties from the consented purpose version
     **/
     public ConsentedPurposeDTO properties(Map<String, String> properties) {
@@ -180,21 +178,19 @@ public class ConsentedPurposeDTO  {
         this.properties = properties;
         return this;
     }
-
+    
     @ApiModelProperty(value = "Key-value properties from the consented purpose version")
     @JsonProperty("properties")
     @Valid
     public Map<String, String> getProperties() {
-
         return properties;
     }
     public void setProperties(Map<String, String> properties) {
-
         this.properties = properties;
     }
 
-    public ConsentedPurposeDTO putPropertiesItem(String key, String propertiesItem) {
 
+    public ConsentedPurposeDTO putPropertiesItem(String key, String propertiesItem) {
         if (this.properties == null) {
             this.properties = new HashMap<>();
         }
@@ -202,7 +198,7 @@ public class ConsentedPurposeDTO  {
         return this;
     }
 
-
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -233,7 +229,7 @@ public class ConsentedPurposeDTO  {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class ConsentedPurposeDTO {\n");
-
+        
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
