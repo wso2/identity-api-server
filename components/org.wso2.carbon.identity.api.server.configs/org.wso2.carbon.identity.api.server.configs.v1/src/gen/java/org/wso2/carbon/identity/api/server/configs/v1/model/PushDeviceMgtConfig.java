@@ -34,7 +34,9 @@ import javax.xml.bind.annotation.*;
 public class PushDeviceMgtConfig  {
   
     private Boolean enableMultipleDeviceEnrollment;
-    private BigDecimal maximumDeviceLimit;
+    private Integer maximumDeviceLimit;
+    private Boolean enableDeviceRegistrationEmailNotification;
+    private Boolean enableDeviceRegistrationPushNotification;
 
     /**
     * Whether to enable push device management related features.
@@ -58,7 +60,7 @@ public class PushDeviceMgtConfig  {
     /**
     * Maximum number of devices a user can enroll. This property becomes only applicable if the enableMultipleDeviceEnrollment config is set to true.
     **/
-    public PushDeviceMgtConfig maximumDeviceLimit(BigDecimal maximumDeviceLimit) {
+    public PushDeviceMgtConfig maximumDeviceLimit(Integer maximumDeviceLimit) {
 
         this.maximumDeviceLimit = maximumDeviceLimit;
         return this;
@@ -67,11 +69,49 @@ public class PushDeviceMgtConfig  {
     @ApiModelProperty(example = "5", value = "Maximum number of devices a user can enroll. This property becomes only applicable if the enableMultipleDeviceEnrollment config is set to true.")
     @JsonProperty("maximumDeviceLimit")
     @Valid
-    public BigDecimal getMaximumDeviceLimit() {
+    public Integer getMaximumDeviceLimit() {
         return maximumDeviceLimit;
     }
-    public void setMaximumDeviceLimit(BigDecimal maximumDeviceLimit) {
+    public void setMaximumDeviceLimit(Integer maximumDeviceLimit) {
         this.maximumDeviceLimit = maximumDeviceLimit;
+    }
+
+    /**
+    * Whether to send an email notification to the user when a new device is registered.
+    **/
+    public PushDeviceMgtConfig enableDeviceRegistrationEmailNotification(Boolean enableDeviceRegistrationEmailNotification) {
+
+        this.enableDeviceRegistrationEmailNotification = enableDeviceRegistrationEmailNotification;
+        return this;
+    }
+
+    @ApiModelProperty(example = "true", value = "Whether to send an email notification to the user when a new device is registered.")
+    @JsonProperty("enableDeviceRegistrationEmailNotification")
+    @Valid
+    public Boolean getEnableDeviceRegistrationEmailNotification() {
+        return enableDeviceRegistrationEmailNotification;
+    }
+    public void setEnableDeviceRegistrationEmailNotification(Boolean enableDeviceRegistrationEmailNotification) {
+        this.enableDeviceRegistrationEmailNotification = enableDeviceRegistrationEmailNotification;
+    }
+
+    /**
+    * Whether to send a push notification to the user&#39;s existing devices when a new device is registered.
+    **/
+    public PushDeviceMgtConfig enableDeviceRegistrationPushNotification(Boolean enableDeviceRegistrationPushNotification) {
+
+        this.enableDeviceRegistrationPushNotification = enableDeviceRegistrationPushNotification;
+        return this;
+    }
+
+    @ApiModelProperty(example = "true", value = "Whether to send a push notification to the user's existing devices when a new device is registered.")
+    @JsonProperty("enableDeviceRegistrationPushNotification")
+    @Valid
+    public Boolean getEnableDeviceRegistrationPushNotification() {
+        return enableDeviceRegistrationPushNotification;
+    }
+    public void setEnableDeviceRegistrationPushNotification(Boolean enableDeviceRegistrationPushNotification) {
+        this.enableDeviceRegistrationPushNotification = enableDeviceRegistrationPushNotification;
     }
 
 
@@ -87,12 +127,14 @@ public class PushDeviceMgtConfig  {
         }
         PushDeviceMgtConfig pushDeviceMgtConfig = (PushDeviceMgtConfig) o;
         return Objects.equals(this.enableMultipleDeviceEnrollment, pushDeviceMgtConfig.enableMultipleDeviceEnrollment) &&
-            Objects.equals(this.maximumDeviceLimit, pushDeviceMgtConfig.maximumDeviceLimit);
+            Objects.equals(this.maximumDeviceLimit, pushDeviceMgtConfig.maximumDeviceLimit) &&
+            Objects.equals(this.enableDeviceRegistrationEmailNotification, pushDeviceMgtConfig.enableDeviceRegistrationEmailNotification) &&
+            Objects.equals(this.enableDeviceRegistrationPushNotification, pushDeviceMgtConfig.enableDeviceRegistrationPushNotification);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(enableMultipleDeviceEnrollment, maximumDeviceLimit);
+        return Objects.hash(enableMultipleDeviceEnrollment, maximumDeviceLimit, enableDeviceRegistrationEmailNotification, enableDeviceRegistrationPushNotification);
     }
 
     @Override
@@ -103,6 +145,8 @@ public class PushDeviceMgtConfig  {
         
         sb.append("    enableMultipleDeviceEnrollment: ").append(toIndentedString(enableMultipleDeviceEnrollment)).append("\n");
         sb.append("    maximumDeviceLimit: ").append(toIndentedString(maximumDeviceLimit)).append("\n");
+        sb.append("    enableDeviceRegistrationEmailNotification: ").append(toIndentedString(enableDeviceRegistrationEmailNotification)).append("\n");
+        sb.append("    enableDeviceRegistrationPushNotification: ").append(toIndentedString(enableDeviceRegistrationPushNotification)).append("\n");
         sb.append("}");
         return sb.toString();
     }

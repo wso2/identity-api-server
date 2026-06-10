@@ -2457,3 +2457,11 @@ components:
           type: number
           description: "Maximum number of devices a user can enroll. This property becomes only applicable if the enableMultipleDeviceEnrollment config is set to true."
           example: 5
+        enableDeviceRegistrationEmailNotification:
+          type: boolean
+          description: "Whether to send an email notification to the user when a new device is registered."
+          example: true
+        enableDeviceRegistrationPushNotification:
+          type: boolean
+          description: "Whether to send a push notification to the user's existing devices when a new device is registered."
+          example: true

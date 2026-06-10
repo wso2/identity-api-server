@@ -48,6 +48,9 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettings;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettingsGroup;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ConfigAttribute;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ConfigPreferenceResp;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ConfigPreferenceSearchAttribute;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Endpoint;
@@ -64,6 +67,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTValidatorConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ProvisioningConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.PushDeviceMgtConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RealmConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfigListItem;
@@ -94,6 +98,10 @@ import org.wso2.carbon.identity.base.AuthenticatorPropertyConstants;
 import org.wso2.carbon.identity.compatibility.settings.core.exception.CompatibilitySettingException;
 import org.wso2.carbon.identity.compatibility.settings.core.model.CompatibilitySetting;
 import org.wso2.carbon.identity.compatibility.settings.core.service.CompatibilitySettingsService;
+import org.wso2.carbon.identity.configuration.mgt.core.ConfigurationManager;
+import org.wso2.carbon.identity.configuration.mgt.core.exception.ConfigurationManagementException;
+import org.wso2.carbon.identity.configuration.mgt.core.model.Attribute;
+import org.wso2.carbon.identity.configuration.mgt.core.model.Resource;
 import org.wso2.carbon.identity.core.ServiceURLBuilder;
 import org.wso2.carbon.identity.core.URLBuilderException;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
@@ -107,6 +115,10 @@ import org.wso2.carbon.identity.fraud.detection.core.exception.IdentityFraudDete
 import org.wso2.carbon.identity.fraud.detection.core.model.EventConfigDTO;
 import org.wso2.carbon.identity.fraud.detection.core.model.FraudDetectionConfigDTO;
 import org.wso2.carbon.identity.fraud.detection.core.service.FraudDetectionConfigsService;
+import org.wso2.carbon.identity.notification.push.device.handler.DeviceHandlerService;
+import org.wso2.carbon.identity.notification.push.device.handler.exception.PushDeviceHandlerClientException;
+import org.wso2.carbon.identity.notification.push.device.handler.exception.PushDeviceHandlerException;
+import org.wso2.carbon.identity.notification.push.device.handler.model.PushDeviceMgtConfigData;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
 import org.wso2.carbon.identity.oauth.dcr.exception.DCRMException;
 import org.wso2.carbon.identity.oauth2.config.exceptions.OAuth2OIDCConfigOrgUsageScopeMgtClientException;
@@ -144,6 +156,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -173,6 +186,7 @@ public class ServerConfigManagementService {
     private final DCRConfigurationMgtService dcrConfigurationMgtService;
     private final OAuth2OIDCConfigOrgUsageScopeMgtService oauth2OIDCConfigOrgUsageScopeMgtService;
     private final CompatibilitySettingsService compatibilitySettingsService;
+    private final DeviceHandlerService deviceHandlerService;
 
     private static final Log log = LogFactory.getLog(ServerConfigManagementService.class);
 
@@ -186,7 +200,8 @@ public class ServerConfigManagementService {
                                          FraudDetectionConfigsService fraudDetectionConfigsService,
                                          OAuth2OIDCConfigOrgUsageScopeMgtService
                                                  oauth2OIDCConfigOrgUsageScopeMgtService,
-                                         CompatibilitySettingsService identityCompatibilitySettingsService) {
+                                         CompatibilitySettingsService identityCompatibilitySettingsService,
+                                         DeviceHandlerService deviceHandlerService) {
 
         this.applicationManagementService = applicationManagementService;
         this.idpManager = idpManager;
@@ -198,6 +213,7 @@ public class ServerConfigManagementService {
         this.fraudDetectionConfigsService = fraudDetectionConfigsService;
         this.oauth2OIDCConfigOrgUsageScopeMgtService = oauth2OIDCConfigOrgUsageScopeMgtService;
         this.compatibilitySettingsService = identityCompatibilitySettingsService;
+        this.deviceHandlerService = deviceHandlerService;
     }
 
     /**
@@ -2577,6 +2593,173 @@ public class ServerConfigManagementService {
         }
     }
 
+    public List<ConfigPreferenceResp> getConfigPreferences(
+            List<ConfigPreferenceSearchAttribute> searchAttributes) {
+
+        ConfigurationManager configurationManager = ConfigsServiceHolder.getConfigurationManager();
+        List<ConfigPreferenceResp> responseList = new ArrayList<>();
+
+        for (ConfigPreferenceSearchAttribute searchAttr : searchAttributes) {
+            String resourceType = searchAttr.getResourceType();
+            String resourceName = searchAttr.getResourceName();
+            List<String> requestedProperties = searchAttr.getProperties();
+
+            if (log.isDebugEnabled()) {
+                log.debug("Processing config preference request for resource type: " + resourceType
+                        + ", resource name: " + resourceName + ", requested properties: " + requestedProperties);
+            }
+
+            // Validate resource type against the allowlist.
+            Map<String, Set<String>> allowedResources =
+                    Constants.ALLOWED_CONFIG_PREFERENCES.get(resourceType);
+            if (allowedResources == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Resource type '" + resourceType + "' is not in the config preferences allowlist.");
+                }
+                throw handleException(Response.Status.BAD_REQUEST,
+                        Constants.ErrorMessage.ERROR_CODE_CONFIG_PREFERENCES_RESOURCE_TYPE_NOT_ALLOWED,
+                        resourceType);
+            }
+
+            // Validate resource name against the allowlist.
+            Set<String> allowedAttributes = allowedResources.get(resourceName);
+            if (allowedAttributes == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Resource name '" + resourceName + "' is not in the config preferences allowlist"
+                            + " for resource type: " + resourceType);
+                }
+                throw handleException(Response.Status.BAD_REQUEST,
+                        Constants.ErrorMessage.ERROR_CODE_CONFIG_PREFERENCES_RESOURCE_NAME_NOT_ALLOWED,
+                        resourceName + ", " + resourceType);
+            }
+
+            // Validate requested attribute names against the allowlist (skip if allowedAttributes is empty,
+            // which means all attributes of that resource are permitted).
+            if (!allowedAttributes.isEmpty() && requestedProperties != null) {
+                for (String requestedProperty : requestedProperties) {
+                    if (!allowedAttributes.contains(requestedProperty)) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Attribute '" + requestedProperty + "' is not in the config preferences"
+                                    + " allowlist for resource type: " + resourceType
+                                    + ", resource name: " + resourceName);
+                        }
+                        throw handleException(Response.Status.BAD_REQUEST,
+                                Constants.ErrorMessage.ERROR_CODE_CONFIG_PREFERENCES_ATTRIBUTE_NOT_ALLOWED,
+                                requestedProperty + ", " + resourceType + ", " + resourceName);
+                    }
+                }
+            }
+
+            Resource resource;
+            try {
+                if (log.isDebugEnabled()) {
+                    log.debug("Fetching config store resource for type: " + resourceType
+                            + ", name: " + resourceName);
+                }
+                resource = configurationManager.getResource(resourceType, resourceName);
+            } catch (ConfigurationManagementException e) {
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                        Constants.ErrorMessage.ERROR_CODE_CONFIG_PREFERENCES_RETRIEVE, resourceType);
+            }
+
+            if (resource == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("No config store resource found for type: " + resourceType
+                            + ", name: " + resourceName);
+                }
+                throw handleException(Response.Status.NOT_FOUND,
+                        Constants.ErrorMessage.ERROR_CODE_CONFIG_PREFERENCES_RESOURCE_NOT_FOUND,
+                        resourceType + ", " + resourceName);
+            }
+
+            List<Attribute> allAttributes = resource.getAttributes();
+            List<ConfigAttribute> configAttributes = new ArrayList<>();
+
+            if (requestedProperties == null || requestedProperties.isEmpty()) {
+                // Return only allowlisted attributes (or all if the allowed set is empty).
+                if (allAttributes != null) {
+                    for (Attribute attr : allAttributes) {
+                        if (allowedAttributes.isEmpty() || allowedAttributes.contains(attr.getKey())) {
+                            configAttributes.add(new ConfigAttribute().name(attr.getKey()).value(attr.getValue()));
+                        }
+                    }
+                }
+            } else {
+                Map<String, String> attrMap = new HashMap<>();
+                if (allAttributes != null) {
+                    for (Attribute attr : allAttributes) {
+                        attrMap.put(attr.getKey(), attr.getValue());
+                    }
+                }
+                for (String requestedProperty : requestedProperties) {
+                    if (!attrMap.containsKey(requestedProperty)) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Attribute '" + requestedProperty + "' not found in config store resource"
+                                    + " for type: " + resourceType + ", name: " + resourceName);
+                        }
+                        throw handleException(Response.Status.BAD_REQUEST,
+                                Constants.ErrorMessage.ERROR_CODE_CONFIG_PREFERENCES_ATTRIBUTE_NOT_FOUND,
+                                requestedProperty + ", " + resourceType + ", " + resourceName);
+                    }
+                    configAttributes.add(new ConfigAttribute().name(requestedProperty)
+                            .value(attrMap.get(requestedProperty)));
+                }
+            }
+
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully retrieved " + configAttributes.size() + " attribute(s) for resource type: "
+                        + resourceType + ", resource name: " + resourceName);
+            }
+
+            ConfigPreferenceResp resp = new ConfigPreferenceResp()
+                    .resourceType(resourceType)
+                    .resourceName(resourceName)
+                    .properties(configAttributes);
+            responseList.add(resp);
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Config preferences retrieval completed. Returning " + responseList.size() + " result(s).");
+        }
+        return responseList;
+    }
+
+    public PushDeviceMgtConfig getPushDeviceMgtConfigs() {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            PushDeviceMgtConfigData handlerConfig = deviceHandlerService.getDeviceManagementConfig(tenantDomain);
+            return buildPushDeviceMgtConfig(handlerConfig);
+        } catch (PushDeviceHandlerException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_PUSH_DEVICE_MGT_CONFIG_RETRIEVE, null);
+        }
+    }
+
+    public PushDeviceMgtConfig updatePushDeviceMgtConfigs(PushDeviceMgtConfig pushDeviceMgtConfig) {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            PushDeviceMgtConfigData configData = new PushDeviceMgtConfigData();
+            configData.setEnableMultipleDeviceEnrollment(pushDeviceMgtConfig.getEnableMultipleDeviceEnrollment());
+            configData.setMaximumDeviceLimit(pushDeviceMgtConfig.getMaximumDeviceLimit());
+            configData.setEnableDeviceRegistrationEmailNotification(
+                    pushDeviceMgtConfig.getEnableDeviceRegistrationEmailNotification());
+            configData.setEnableDeviceRegistrationPushNotification(
+                    pushDeviceMgtConfig.getEnableDeviceRegistrationPushNotification());
+            PushDeviceMgtConfigData handlerConfig =
+                    deviceHandlerService.updatePushDeviceMgtConfigs(configData, tenantDomain);
+            return buildPushDeviceMgtConfig(handlerConfig);
+        } catch (PushDeviceHandlerException e) {
+            if (e instanceof PushDeviceHandlerClientException) {
+                throw handleException(Response.Status.BAD_REQUEST,
+                        Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_PUSH_DEVICE_MGT_CONFIG_UPDATE, e.getMessage());
+            }
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_PUSH_DEVICE_MGT_CONFIG_RETRIEVE, null);
+        }
+    }
+
     /**
      * Handle compatibility settings errors.
      *
@@ -2588,5 +2771,17 @@ public class ServerConfigManagementService {
     private APIError handleCompatibilitySettingsError(Exception e, Constants.ErrorMessage errorEnum, String data) {
 
         return CompatibilitySettingUtil.handleCompatibilitySettingsException(e, errorEnum, data);
+    }
+
+    private PushDeviceMgtConfig buildPushDeviceMgtConfig(PushDeviceMgtConfigData handlerConfig) {
+
+        PushDeviceMgtConfig config = new PushDeviceMgtConfig();
+        config.setEnableMultipleDeviceEnrollment(handlerConfig.getEnableMultipleDeviceEnrollment());
+        config.setMaximumDeviceLimit(handlerConfig.getMaximumDeviceLimit());
+        config.setEnableDeviceRegistrationEmailNotification(
+                handlerConfig.getEnableDeviceRegistrationEmailNotification());
+        config.setEnableDeviceRegistrationPushNotification(
+                handlerConfig.getEnableDeviceRegistrationPushNotification());
+        return config;
     }
 }
