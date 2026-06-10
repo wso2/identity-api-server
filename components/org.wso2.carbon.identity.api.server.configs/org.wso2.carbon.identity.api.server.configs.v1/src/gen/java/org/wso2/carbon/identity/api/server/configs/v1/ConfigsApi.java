@@ -1051,11 +1051,11 @@ public class ConfigsApi  {
     }
 
     @Valid
-    @PATCH
+    @PUT
     @Path("/fapi")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Patch the tenant FAPI configuration.", notes = "Patch the tenant Financial-grade API (FAPI) configuration. <b>Scope (Permission) required:</b> <br>   * internal_config_update ", response = FapiConfig.class, authorizations = {
+    @ApiOperation(value = "Update the tenant FAPI configuration.", notes = "Update the tenant Financial-grade API (FAPI) configuration. <b>Scope (Permission) required:</b> <br>   * internal_config_update ", response = FapiConfig.class, authorizations = {
             @Authorization(value = "BasicAuth"),
             @Authorization(value = "OAuth2", scopes = {
 
@@ -1069,8 +1069,8 @@ public class ConfigsApi  {
             @ApiResponse(code = 404, message = "Not Found", response = Error.class),
             @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response patchFAPIConfiguration(@ApiParam(value = "" ,required=true) @Valid FapiConfig fapiConfig) {
+    public Response updateFAPIConfiguration(@ApiParam(value = "" ,required=true) @Valid FapiConfig fapiConfig) {
 
-        return delegate.patchFAPIConfiguration(fapiConfig );
+        return delegate.updateFAPIConfiguration(fapiConfig );
     }
 }

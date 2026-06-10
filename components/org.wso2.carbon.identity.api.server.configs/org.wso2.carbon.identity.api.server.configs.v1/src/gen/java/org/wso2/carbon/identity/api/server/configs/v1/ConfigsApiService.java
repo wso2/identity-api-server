@@ -93,7 +93,7 @@ public interface ConfigsApiService {
 
       public Response patchDCRConfiguration(List<DCRPatch> patch);
 
-      public Response patchFAPIConfiguration(FapiConfig fapiConfig);
+      public Response updateFAPIConfiguration(FapiConfig fapiConfig);
 
       public Response restoreServerRemoteLoggingConfiguration(String logType);
 

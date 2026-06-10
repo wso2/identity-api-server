@@ -535,9 +535,7 @@ public class ServerConfigManagementService {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
-            org.wso2.carbon.identity.oauth2.fapi.models.FapiConfig fapiConfig =
-                    fapiConfigMgtService.getFapiConfig(tenantDomain);
-            return FAPIConnectorUtil.toApiModel(fapiConfig);
+            return FAPIConnectorUtil.toApiModel(fapiConfigMgtService.getFapiConfig(tenantDomain));
         } catch (FapiConfigMgtClientException e) {
             log.error(Constants.ErrorMessage.ERROR_CODE_FAPI_CONFIG_RETRIEVE.message(), e);
             throw new APIError(Response.Status.BAD_REQUEST, this.getFapiConfigErrorResponse(e,
@@ -560,7 +558,7 @@ public class ServerConfigManagementService {
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
             fapiConfigMgtService.setFapiConfig(FAPIConnectorUtil.toOAuthModel(fapiConfig), tenantDomain);
-            return fapiConfig;
+            return FAPIConnectorUtil.toApiModel(fapiConfigMgtService.getFapiConfig(tenantDomain));
         } catch (FapiConfigMgtClientException e) {
             log.error(Constants.ErrorMessage.ERROR_CODE_FAPI_CONFIG_UPDATE.message(), e);
             throw new APIError(Response.Status.BAD_REQUEST, this.getFapiConfigErrorResponse(e,

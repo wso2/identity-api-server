@@ -1408,7 +1408,9 @@ paths:
         - FAPI Configurations
       summary: Retrieve the tenant FAPI configuration.
       operationId: getFAPIConfiguration
-      description: Retrieve the tenant Financial-grade API (FAPI) configuration.
+      description: |
+        Retrieve the tenant Financial-grade API (FAPI) configuration.
+        <b>Scope (Permission) required:</b> `internal_config_view`
       responses:
         '200':
           description: Successful Response
@@ -1438,13 +1440,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    patch:
+    put:
       tags:
         - FAPI Configurations
-      summary: Patch the tenant FAPI configuration.
-      operationId: patchFAPIConfiguration
+      summary: Update the tenant FAPI configuration.
+      operationId: updateFAPIConfiguration
       description: |
-        Patch the tenant Financial-grade API (FAPI) configuration.
+        Update the tenant Financial-grade API (FAPI) configuration.
         <b>Scope (Permission) required:</b> <br>
           * internal_config_update
       requestBody:
@@ -1970,7 +1972,6 @@ components:
             If enableFapiEnforcement is true and this property is omitted, `FAPI1_ADVANCED` will be applied by default.
           allOf:
             - $ref: '#/components/schemas/FapiProfile'
-          default: FAPI1_ADVANCED
           example: FAPI1_ADVANCED
         mandateSSA:
           type: boolean

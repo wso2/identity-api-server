@@ -169,7 +169,7 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     }
 
     @Override
-    public Response patchFAPIConfiguration(final FapiConfig fapiConfig) {
+    public Response updateFAPIConfiguration(final FapiConfig fapiConfig) {
 
         return Response.ok().entity(configManagementService.updateFAPIConfiguration(fapiConfig)).build();
     }

@@ -2239,14 +2239,21 @@ public class ServerApplicationManagementService {
      */
     private void validateFapiProfile(OpenIDConnectConfiguration oidcConfig) {
 
-        // Validate — only needed when a profile is present.
-        if (oidcConfig.getFapiProfile() == null) {
+        // Only validate when the application is marked as FAPI and a specific profile is provided.
+        // If isFAPIApplication is false the profile field is ignored in storage, so validation would
+        // produce a misleading error for a field that has no effect.
+        if (!Boolean.TRUE.equals(oidcConfig.getIsFAPIApplication()) || oidcConfig.getFapiProfile() == null) {
             return;
         }
 
+        /*
+         * FapiConfigMgtService is treated as optional here. Profile validation is an enhancement —
+         * silently skipping it avoids blocking all OIDC application updates in deployments where
+         * the FAPI bundle is not present. The configs API module (/configs/fapi) hard-requires
+         * the service at startup and fails fast if it is absent.
+         */
         FapiConfigMgtService fapiConfigMgtService = ApplicationManagementServiceHolder.getFapiConfigMgtService();
         if (fapiConfigMgtService == null) {
-            // FapiConfigMgtService is optional. Skip validation rather than blocking all OIDC updates.
             log.debug("FapiConfigMgtService is unavailable. Skipping fapiProfile validation.");
             return;
         }

@@ -3983,7 +3983,6 @@ components:
             If isFAPIApplication is true and this property is omitted, `FAPI1_ADVANCED` will be applied by default.
           allOf:
             - $ref: '#/components/schemas/FapiProfile'
-          default: FAPI1_ADVANCED
           example: FAPI1_ADVANCED
         cibaAuthenticationRequest:
           $ref: '#/components/schemas/CIBAAuthenticationRequestConfiguration'
@@ -4317,7 +4316,9 @@ components:
       type: object
       properties:
         allowedFapiProfiles:
-          $ref: '#/components/schemas/MetadataProperty'
+          description: The FAPI security profiles supported by the tenant for this application.
+          allOf:
+            - $ref: '#/components/schemas/MetadataProperty'
         allowedSignatureAlgorithms:
           $ref: '#/components/schemas/MetadataProperty'
         allowedEncryptionAlgorithms:
