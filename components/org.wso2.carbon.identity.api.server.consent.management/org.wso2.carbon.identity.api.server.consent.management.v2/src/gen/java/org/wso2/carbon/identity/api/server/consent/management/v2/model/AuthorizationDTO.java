@@ -70,7 +70,7 @@ public enum StateEnum {
     private Long updatedTime;
 
     /**
-    * ID of the user who performed this authorization
+    * Username of the user who performed this authorization
     **/
     public AuthorizationDTO userId(String userId) {
 
@@ -78,7 +78,7 @@ public enum StateEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "a1b2c3d4-1234-5678-abcd-ef1234567890", value = "ID of the user who performed this authorization")
+    @ApiModelProperty(example = "alice@wso2.com", value = "Username of the user who performed this authorization")
     @JsonProperty("userId")
     @Valid
     public String getUserId() {

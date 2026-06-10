@@ -97,7 +97,7 @@ public class PurposeListResponse  {
         return this;
     }
     
-    @ApiModelProperty(example = "[{\"id\":\"f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2\",\"name\":\"Privacy Policy\",\"description\":\"Collection of user data for privacy policy compliance and consent management\",\"type\":\"Policy\",\"latestVersion\":{\"id\":\"a1b2c3d4-1234-5678-abcd-ef1234567890\",\"version\":\"v1.0\"}},{\"id\":\"c2d3e4f5-2345-6789-bcde-f01234567891\",\"name\":\"DEFAULT\",\"description\":\"For core functionalities of the product\",\"type\":\"SP\",\"latestVersion\":{\"id\":\"b2c3d4e5-2345-6789-bcde-f01234567892\",\"version\":\"v1.0\"}}]", value = "List of purposes")
+    @ApiModelProperty(example = "[{\"id\":\"f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2\",\"name\":\"Privacy Policy\",\"description\":\"Collection of user data for privacy policy compliance and consent management\",\"type\":\"Policy\",\"tenantDomain\":\"wso2.com\",\"latestVersion\":{\"id\":\"a1b2c3d4-1234-5678-abcd-ef1234567890\",\"version\":\"v1.0\"}},{\"id\":\"c2d3e4f5-2345-6789-bcde-f01234567891\",\"name\":\"DEFAULT\",\"description\":\"For core functionalities of the product\",\"type\":\"SP\",\"tenantDomain\":\"subsidiaryA.com\",\"latestVersion\":{\"id\":\"b2c3d4e5-2345-6789-bcde-f01234567892\",\"version\":\"v1.0\"}}]", value = "List of purposes")
     @JsonProperty("Purposes")
     @Valid
     public List<PurposeSummaryDTO> getPurposes() {
