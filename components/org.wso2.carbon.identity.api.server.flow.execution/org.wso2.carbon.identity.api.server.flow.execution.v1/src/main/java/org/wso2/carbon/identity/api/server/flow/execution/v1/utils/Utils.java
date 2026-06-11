@@ -29,6 +29,7 @@ import org.wso2.carbon.identity.api.server.flow.execution.common.FlowExecutionSe
 import org.wso2.carbon.identity.api.server.flow.execution.v1.Component;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.Data;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.FlowExecutionRequest;
+import org.wso2.carbon.identity.api.server.flow.execution.v1.Message;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.constants.FlowExecutionEndpointConstants;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.model.FlowExecutionErrorDTO;
 import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
@@ -40,6 +41,7 @@ import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtFrameworkException;
 import org.wso2.carbon.identity.flow.mgt.model.ComponentDTO;
 import org.wso2.carbon.identity.flow.mgt.model.DataDTO;
 import org.wso2.carbon.identity.flow.mgt.model.FlowConfigDTO;
+import org.wso2.carbon.identity.flow.mgt.model.MessageDTO;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -165,6 +167,12 @@ public class Utils {
             dataDTO.getRequiredParams().forEach(data::addRequiredParamsItem);
         }
 
+        if (dataDTO.getMessages() != null) {
+            data.messages(dataDTO.getMessages().stream()
+                    .map(Utils::convertToMessage)
+                    .collect(Collectors.toList()));
+        }
+
         switch (type) {
             case Constants.StepTypes.VIEW:
                 if (dataDTO.getComponents() != null && !dataDTO.getComponents().isEmpty()) {
@@ -232,6 +240,17 @@ public class Utils {
                     ERROR_CODE_GET_FLOW_CONFIG.getMessage(),
                     ERROR_CODE_GET_FLOW_CONFIG.getDescription(), e));
         }
+    }
+
+    private static Message convertToMessage(MessageDTO messageDTO) {
+
+        if (messageDTO == null) {
+            return null;
+        }
+        return new Message()
+                .type(messageDTO.getType() != null ? Message.TypeEnum.valueOf(messageDTO.getType().name()) : null)
+                .message(messageDTO.getMessage())
+                .i18nKey(messageDTO.getI18nKey());
     }
 
     private static Component convertToComponent(ComponentDTO componentDTO) {

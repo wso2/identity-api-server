@@ -97,7 +97,7 @@ public class ElementListResponse  {
         return this;
     }
     
-    @ApiModelProperty(example = "[{\"id\":\"f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2\",\"name\":\"email_address\",\"displayName\":\"Email Address\",\"description\":\"User email address used for account notifications and communications\"},{\"id\":\"c2d3e4f5-2345-6789-bcde-f01234567891\",\"name\":\"phone_number\",\"displayName\":\"Phone Number\",\"description\":\"User phone number used for SMS notifications and two-factor authentication\"}]", value = "List of consent elements")
+    @ApiModelProperty(example = "[{\"id\":\"f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2\",\"name\":\"email_address\",\"displayName\":\"Email Address\",\"description\":\"User email address used for account notifications and communications\",\"tenantDomain\":\"wso2.com\"},{\"id\":\"c2d3e4f5-2345-6789-bcde-f01234567891\",\"name\":\"phone_number\",\"displayName\":\"Phone Number\",\"description\":\"User phone number used for SMS notifications and two-factor authentication\",\"tenantDomain\":\"subsidiaryA.com\"}]", value = "List of consent elements")
     @JsonProperty("Elements")
     @Valid
     public List<ElementDTO> getElements() {

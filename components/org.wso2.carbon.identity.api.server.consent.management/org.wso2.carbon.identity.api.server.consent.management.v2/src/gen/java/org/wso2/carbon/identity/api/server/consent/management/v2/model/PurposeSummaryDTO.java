@@ -141,7 +141,7 @@ public class PurposeSummaryDTO  {
         this.tenantDomain = tenantDomain;
         return this;
     }
-
+    
     @ApiModelProperty(example = "wso2.com", value = "Tenant domain that owns this purpose")
     @JsonProperty("tenantDomain")
     @Valid

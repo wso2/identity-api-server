@@ -122,7 +122,7 @@ public class ElementDTO  {
         this.tenantDomain = tenantDomain;
         return this;
     }
-
+    
     @ApiModelProperty(example = "wso2.com", value = "Tenant domain that owns this element")
     @JsonProperty("tenantDomain")
     @Valid

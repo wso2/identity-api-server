@@ -991,10 +991,12 @@ components:
           example: 1766383796000
         authorizations:
           type: array
-          description: Optional list of user IDs who are expected to authorize this consent. Each user will use the /authorize endpoint to give their actual consent.
+          description: Optional list of users who are expected to authorize this consent. Each user will use the /authorize endpoint to give their actual consent.
           items:
-            type: string
-          example: ["a1b2c3d4-1234-5678-abcd-ef1234567890", "b2c3d4e5-2345-6789-bcde-f01234567891"]
+            $ref: '#/components/schemas/AuthorizationEntry'
+          example:
+            - id: "alice@wso2.com"
+            - id: "bob@wso2.com"
         properties:
           type: object
           description: Optional properties as key-value pairs
@@ -1534,14 +1536,24 @@ components:
           description: Authorization state.
           example: "APPROVED"
 
+    AuthorizationEntry:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          description: Username of the user expected to authorize this consent
+          example: "alice@wso2.com"
+
     AuthorizationDTO:
       type: object
       properties:
         userId:
           type: string
           nullable: true
-          description: ID of the user who performed this authorization
-          example: "a1b2c3d4-1234-5678-abcd-ef1234567890"
+          description: Username of the user who performed this authorization
+          example: "alice@wso2.com"
         state:
           type: string
           enum: [APPROVED, REJECTED, REVOKED, EXPIRED]

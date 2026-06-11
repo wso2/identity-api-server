@@ -44,9 +44,10 @@ public class PurposeDTO  {
     private String type;
     private PurposeDTOLatestVersion latestVersion;
     private List<PurposeElementDTO> elements = null;
-    private Map<String, String> properties = null;
-    private String tenantDomain;
 
+    private Map<String, String> properties = null;
+
+    private String tenantDomain;
 
     /**
     * ID of the purpose
@@ -197,7 +198,7 @@ public class PurposeDTO  {
         return this;
     }
 
-    /**
+        /**
     * Tenant domain that owns this purpose
     **/
     public PurposeDTO tenantDomain(String tenantDomain) {
@@ -205,7 +206,7 @@ public class PurposeDTO  {
         this.tenantDomain = tenantDomain;
         return this;
     }
-
+    
     @ApiModelProperty(example = "wso2.com", value = "Tenant domain that owns this purpose")
     @JsonProperty("tenantDomain")
     @Valid

@@ -39,6 +39,7 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.consent.management.common.ConsentManagementConstants;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.AuthorizationCreateRequest;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.AuthorizationDTO;
+import org.wso2.carbon.identity.api.server.consent.management.v2.model.AuthorizationEntry;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentCreateRequest;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentDTO;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentListResponse;
@@ -311,8 +312,15 @@ public class ConsentManagementService {
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         Long expiryMillis = request.getExpiryTime();
         Timestamp expiryTime = expiryMillis != null ? new Timestamp(expiryMillis) : null;
+        List<String> authorizationUserIds = null;
+        if (request.getAuthorizations() != null) {
+            authorizationUserIds = new ArrayList<>();
+            for (AuthorizationEntry entry : request.getAuthorizations()) {
+                authorizationUserIds.add(entry.getId());
+            }
+        }
         return ConsentReceiptUtils.buildReceiptInput(request.getLanguage(), subjectId, tenantDomain,
-                expiryTime, rejected, request.getAuthorizations(), request.getProperties(),
+                expiryTime, rejected, authorizationUserIds, request.getProperties(),
                 request.getServiceId(), purposeBindings, consentManager);
     }
 
