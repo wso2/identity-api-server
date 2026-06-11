@@ -200,6 +200,24 @@ public class CompatibilitySettingUtil {
     }
 
     /**
+     * Build an APIError for compatibility settings flows where the HTTP status is known up-front
+     * (e.g., NOT_FOUND for a missing setting group or BAD_REQUEST for invalid input) and there is no
+     * underlying exception to extract details from.
+     *
+     * @param status    HTTP response status.
+     * @param errorEnum Error Message enum.
+     * @param data      Extra data.
+     * @return APIError.
+     */
+    public static APIError handleCompatibilitySettingsException(Response.Status status,
+                                                                Constants.ErrorMessage errorEnum,
+                                                                String data) {
+
+        ErrorResponse errorResponse = getErrorBuilder(errorEnum, data).build(LOG, errorEnum.description());
+        return new APIError(status, errorResponse);
+    }
+
+    /**
      * Return error builder with given error message enum and data.
      *
      * @param errorEnum Error Message enum.
@@ -223,12 +241,6 @@ public class CompatibilitySettingUtil {
      */
     private static String includeData(Constants.ErrorMessage error, String data) {
 
-        String message;
-        if (StringUtils.isNotBlank(data)) {
-            message = String.format(error.description(), data);
-        } else {
-            message = error.description();
-        }
-        return message;
+        return StringUtils.isNotBlank(data) ? String.format(error.description(), data) : error.description();
     }
 }
