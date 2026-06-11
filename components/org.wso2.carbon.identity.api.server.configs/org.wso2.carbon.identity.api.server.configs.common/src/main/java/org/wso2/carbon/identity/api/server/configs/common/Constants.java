@@ -265,19 +265,19 @@ public class Constants {
                 "No consent purpose found with ID: %s."),
         ERROR_CODE_CONSENT_APPLICATION_ALREADY_MAPPED("60010",
                 "Application already mapped.",
-                "Application %s is already mapped to consent purpose %s."),
+                "Application %s is already mapped to a consent purpose."),
         ERROR_CODE_CONSENT_APPLICATION_MAPPING_NOT_FOUND("60011",
                 "Application mapping not found.",
-                "Application %s is not mapped to consent purpose %s."),
+                "Application %s is not mapped to the specified consent purpose."),
         ERROR_CODE_CONSENT_MAPPING_RETRIEVE("65033",
                 "Unable to retrieve consent application mappings.",
                 "Server encountered an error while retrieving application mappings for consent purpose: %s."),
         ERROR_CODE_CONSENT_MAPPING_ADD("65034",
                 "Unable to add consent application mapping.",
-                "Server encountered an error while mapping application %s to consent purpose %s."),
+                "Server encountered an error while mapping application %s."),
         ERROR_CODE_CONSENT_MAPPING_DELETE("65035",
                 "Unable to delete consent application mapping.",
-                "Server encountered an error while removing application %s from consent purpose %s.");
+                "Server encountered an error while removing application %s.");
 
         private final String code;
         private final String message;

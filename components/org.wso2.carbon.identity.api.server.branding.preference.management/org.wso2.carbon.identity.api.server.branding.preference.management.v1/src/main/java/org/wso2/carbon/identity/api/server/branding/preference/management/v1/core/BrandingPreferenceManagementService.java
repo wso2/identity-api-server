@@ -497,10 +497,17 @@ public class BrandingPreferenceManagementService {
         BrandingPreference existingPreference = brandingPreferenceManager.getBrandingPreference(type, name, locale);
 
         ObjectMapper mapper = new ObjectMapper();
-        com.fasterxml.jackson.databind.node.ObjectNode existingNode =
+        com.fasterxml.jackson.databind.JsonNode existingJsonNode =
                 mapper.valueToTree(existingPreference.getPreference());
         com.fasterxml.jackson.databind.JsonNode incomingNode =
                 mapper.valueToTree(brandingPreferenceModel.getPreference());
+
+        com.fasterxml.jackson.databind.node.ObjectNode existingNode;
+        if (existingJsonNode == null || !existingJsonNode.isObject()) {
+            existingNode = mapper.createObjectNode();
+        } else {
+            existingNode = (com.fasterxml.jackson.databind.node.ObjectNode) existingJsonNode;
+        }
 
         if (incomingNode.has(ATTR_URLS)) {
             existingNode.set(ATTR_URLS, incomingNode.get(ATTR_URLS));
