@@ -40,6 +40,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.function.CORSConfiguration
 import org.wso2.carbon.identity.api.server.configs.v1.function.CompatibilitySettingUtil;
 import org.wso2.carbon.identity.api.server.configs.v1.function.DCRConnectorUtil;
 import org.wso2.carbon.identity.api.server.configs.v1.function.JWTConnectorUtil;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ApplicationObject;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticationType;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
@@ -94,6 +95,7 @@ import org.wso2.carbon.identity.base.AuthenticatorPropertyConstants;
 import org.wso2.carbon.identity.compatibility.settings.core.exception.CompatibilitySettingException;
 import org.wso2.carbon.identity.compatibility.settings.core.model.CompatibilitySetting;
 import org.wso2.carbon.identity.compatibility.settings.core.service.CompatibilitySettingsService;
+import org.wso2.carbon.identity.consent.application.mgt.exception.ConsentAppMappingException;
 import org.wso2.carbon.identity.core.ServiceURLBuilder;
 import org.wso2.carbon.identity.core.URLBuilderException;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
@@ -2588,5 +2590,67 @@ public class ServerConfigManagementService {
     private APIError handleCompatibilitySettingsError(Exception e, Constants.ErrorMessage errorEnum, String data) {
 
         return CompatibilitySettingUtil.handleCompatibilitySettingsException(e, errorEnum, data);
+    }
+
+    /**
+     * Get the list of applications mapped to a consent purpose.
+     *
+     * @param purposeId UUID of the consent purpose.
+     * @return List of ApplicationObject.
+     */
+    public List<ApplicationObject> getApplicationsForPurpose(String purposeId) {
+
+        try {
+            return ConfigsServiceHolder.getConsentAppMappingService()
+                    .getApplicationsForPurpose(purposeId)
+                    .stream()
+                    .map(id -> new ApplicationObject().id(id))
+                    .collect(Collectors.toList());
+        } catch (ConsentAppMappingException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_CONSENT_MAPPING_RETRIEVE, purposeId);
+        }
+    }
+
+    /**
+     * Map an application to a consent purpose.
+     *
+     * @param purposeId     UUID of the consent purpose.
+     * @param applicationId Resource ID of the application.
+     */
+    public void addApplicationToPurpose(String purposeId, String applicationId) {
+
+        try {
+            ConfigsServiceHolder.getConsentAppMappingService()
+                    .addApplicationToPurpose(purposeId, applicationId);
+        } catch (ConsentAppMappingException e) {
+            if (e.getErrorCode() != null && e.getErrorCode().contains("CPM-60001")) {
+                throw handleException(Response.Status.CONFLICT,
+                        Constants.ErrorMessage.ERROR_CODE_CONSENT_APPLICATION_ALREADY_MAPPED, applicationId);
+            }
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_CONSENT_MAPPING_ADD, applicationId);
+        }
+    }
+
+    /**
+     * Remove an application from a consent purpose mapping.
+     *
+     * @param purposeId     UUID of the consent purpose.
+     * @param applicationId Resource ID of the application.
+     */
+    public void removeApplicationFromPurpose(String purposeId, String applicationId) {
+
+        try {
+            ConfigsServiceHolder.getConsentAppMappingService()
+                    .removeApplicationFromPurpose(purposeId, applicationId);
+        } catch (ConsentAppMappingException e) {
+            if (e.getErrorCode() != null && e.getErrorCode().contains("CPM-60002")) {
+                throw handleException(Response.Status.NOT_FOUND,
+                        Constants.ErrorMessage.ERROR_CODE_CONSENT_APPLICATION_MAPPING_NOT_FOUND, applicationId);
+            }
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_CONSENT_MAPPING_DELETE, applicationId);
+        }
     }
 }

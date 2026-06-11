@@ -23,6 +23,7 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
 import org.wso2.carbon.identity.compatibility.settings.core.service.CompatibilitySettingsService;
+import org.wso2.carbon.identity.consent.application.mgt.services.ConsentAppMappingService;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.fraud.detection.core.service.FraudDetectionConfigsService;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
@@ -116,6 +117,13 @@ public class ConfigsServiceHolder {
         static final CompatibilitySettingsService SERVICE =
                 (CompatibilitySettingsService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                         .getOSGiService(CompatibilitySettingsService.class, null);
+    }
+
+    private static class ConsentAppMappingServiceHolder {
+
+        static final ConsentAppMappingService SERVICE =
+                (ConsentAppMappingService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(ConsentAppMappingService.class, null);
     }
 
     /**
@@ -236,5 +244,15 @@ public class ConfigsServiceHolder {
     public static CompatibilitySettingsService getIdentityCompatibilitySettingsService() {
 
         return IdentityCompatibilitySettingsServiceHolder.SERVICE;
+    }
+
+    /**
+     * Get ConsentAppMappingService osgi service.
+     *
+     * @return ConsentAppMappingService
+     */
+    public static ConsentAppMappingService getConsentAppMappingService() {
+
+        return ConsentAppMappingServiceHolder.SERVICE;
     }
 }
