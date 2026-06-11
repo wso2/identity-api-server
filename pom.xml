@@ -1139,7 +1139,7 @@
 
         <tenant.resource.manager.version>1.5.55</tenant.resource.manager.version>
         <identity.verification.version>1.0.15</identity.verification.version>
-        <identity.notification.push.version>1.2.2-SNAPSHOT</identity.notification.push.version>
+        <identity.notification.push.version>1.2.1</identity.notification.push.version>
         <identity.local.auth.fido.version>6.0.3</identity.local.auth.fido.version>
 
         <!-- Organization management core Version -->
