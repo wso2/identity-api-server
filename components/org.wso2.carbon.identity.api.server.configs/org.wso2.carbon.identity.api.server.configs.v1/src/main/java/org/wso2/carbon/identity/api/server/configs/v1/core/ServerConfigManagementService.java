@@ -96,6 +96,7 @@ import org.wso2.carbon.identity.base.AuthenticatorPropertyConstants;
 import org.wso2.carbon.identity.compatibility.settings.core.exception.CompatibilitySettingException;
 import org.wso2.carbon.identity.compatibility.settings.core.model.CompatibilitySetting;
 import org.wso2.carbon.identity.compatibility.settings.core.service.CompatibilitySettingsService;
+import org.wso2.carbon.identity.configuration.mgt.core.constant.ConfigurationConstants;
 import org.wso2.carbon.identity.core.ServiceURLBuilder;
 import org.wso2.carbon.identity.core.URLBuilderException;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
@@ -2607,6 +2608,11 @@ public class ServerConfigManagementService {
                     .map(id -> new ApplicationObject().id(id))
                     .collect(Collectors.toList());
         } catch (ConsentAppMappingException e) {
+            if (ConfigurationConstants.ErrorMessages.ERROR_CODE_RESOURCE_DOES_NOT_EXISTS.getCode()
+                    .equals(e.getErrorCode())) {
+                throw handleException(Response.Status.NOT_FOUND,
+                        Constants.ErrorMessage.ERROR_CODE_CONSENT_PURPOSE_NOT_FOUND, purposeId);
+            }
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     Constants.ErrorMessage.ERROR_CODE_CONSENT_MAPPING_RETRIEVE, purposeId);
         }
@@ -2624,7 +2630,8 @@ public class ServerConfigManagementService {
             ConfigsServiceHolder.getConsentAppMappingService()
                     .addApplicationToPurpose(purposeId, applicationId);
         } catch (ConsentAppMappingException e) {
-            if (e.getErrorCode() != null && e.getErrorCode().contains("CPM-60001")) {
+            if (ConfigurationConstants.ErrorMessages.ERROR_CODE_ATTRIBUTE_ALREADY_EXISTS.getCode()
+                    .equals(e.getErrorCode())) {
                 throw handleException(Response.Status.CONFLICT,
                         Constants.ErrorMessage.ERROR_CODE_CONSENT_APPLICATION_ALREADY_MAPPED, applicationId);
             }
@@ -2645,7 +2652,8 @@ public class ServerConfigManagementService {
             ConfigsServiceHolder.getConsentAppMappingService()
                     .removeApplicationFromPurpose(purposeId, applicationId);
         } catch (ConsentAppMappingException e) {
-            if (e.getErrorCode() != null && e.getErrorCode().contains("CPM-60002")) {
+            if (ConfigurationConstants.ErrorMessages.ERROR_CODE_ATTRIBUTE_DOES_NOT_EXISTS.getCode()
+                    .equals(e.getErrorCode())) {
                 throw handleException(Response.Status.NOT_FOUND,
                         Constants.ErrorMessage.ERROR_CODE_CONSENT_APPLICATION_MAPPING_NOT_FOUND, applicationId);
             }
