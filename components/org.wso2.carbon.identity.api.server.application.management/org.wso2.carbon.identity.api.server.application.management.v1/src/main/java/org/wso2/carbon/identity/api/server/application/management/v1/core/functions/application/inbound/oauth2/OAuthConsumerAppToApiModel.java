@@ -18,10 +18,13 @@
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.v1.AccessTokenConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.AllowedIssuer;
 import org.wso2.carbon.identity.api.server.application.management.v1.CIBAAuthenticationRequestConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthenticationConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.FapiProfile;
 import org.wso2.carbon.identity.api.server.application.management.v1.HybridFlowConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.IdTokenConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.IdTokenEncryptionConfiguration;
@@ -48,6 +51,8 @@ import java.util.function.Function;
  */
 public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO, OpenIDConnectConfiguration> {
 
+    private static final Log LOG = LogFactory.getLog(OAuthConsumerAppToApiModel.class);
+
     @Override
     public OpenIDConnectConfiguration apply(OAuthConsumerAppDTO oauthAppDTO) {
 
@@ -72,6 +77,7 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
                 .pushAuthorizationRequest(buildPARAuthenticationConfiguration(oauthAppDTO))
                 .subject(buildSubjectConfiguration(oauthAppDTO))
                 .isFAPIApplication(oauthAppDTO.isFapiConformanceEnabled())
+                .fapiProfile(buildFapiProfileConfiguration(oauthAppDTO))
                 .subjectToken(buildSubjectTokenConfiguration(oauthAppDTO))
                 .cibaAuthenticationRequest(buildCIBAAuthenticationRequestConfiguration(oauthAppDTO))
                 .issuer(buildIssuerOrganizationConfiguration(oauthAppDTO));
@@ -271,5 +277,29 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
             return allowedIssuer;
         }
         return null;
+    }
+
+    /**
+     * Converts the stored FAPI profile string from the DTO into the API model enum.
+     * Returns null if no profile is stored, which will omit the field from the response.
+     *
+     * @param oauthAppDTO the DTO containing the stored FAPI profile string.
+     * @return the {@link FapiProfile} enum constant, or null if not set.
+     */
+    private FapiProfile buildFapiProfileConfiguration(OAuthConsumerAppDTO oauthAppDTO) {
+
+        String fapiProfileValue = oauthAppDTO.getFapiProfile();
+        if (StringUtils.isBlank(fapiProfileValue)) {
+            return null;
+        }
+        try {
+            return FapiProfile.fromValue(fapiProfileValue);
+        } catch (IllegalArgumentException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(String.format("Unrecognised fapiProfile value stored for application '%s': %s",
+                        oauthAppDTO.getApplicationName(), fapiProfileValue), e);
+            }
+            return null;
+        }
     }
 }

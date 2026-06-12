@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -25,11 +25,13 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.configs.common.Constants;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.FapiProfile;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
 import org.wso2.carbon.identity.oauth.dcr.exception.DCRMClientException;
 import org.wso2.carbon.identity.oauth.dcr.exception.DCRMException;
 import org.wso2.carbon.identity.oauth.dcr.exception.DCRMServerException;
 import org.wso2.carbon.identity.oauth.dcr.model.DCRConfiguration;
+import org.wso2.carbon.identity.oauth2.fapi.models.FapiProfileEnum;
 
 import javax.ws.rs.core.Response;
 
@@ -72,6 +74,7 @@ public class DCRConnectorUtil {
         dcrConfig.setEnableFapiEnforcement(dcrConfiguration.getEnableFapiEnforcement());
         dcrConfig.setSsaJwks(dcrConfiguration.getSsaJwks());
         dcrConfig.setMandateSSA(dcrConfiguration.getMandateSSA());
+        dcrConfig.setFapiProfile(FapiProfile.fromValue(dcrConfiguration.getFapiProfile()));
 
         return dcrConfig;
     }
@@ -166,6 +169,8 @@ public class DCRConnectorUtil {
         dcrConfiguration.setSsaJwks(dcrConfig.getSsaJwks());
         dcrConfiguration.setAuthenticationRequired(dcrConfig.getAuthenticationRequired());
         dcrConfiguration.setMandateSSA(dcrConfig.getMandateSSA());
+        dcrConfiguration.setFapiProfile(dcrConfig.getFapiProfile() == null ?
+                null : FapiProfileEnum.fromValue(dcrConfig.getFapiProfile().value()));
         return dcrConfiguration;
     }
 }
