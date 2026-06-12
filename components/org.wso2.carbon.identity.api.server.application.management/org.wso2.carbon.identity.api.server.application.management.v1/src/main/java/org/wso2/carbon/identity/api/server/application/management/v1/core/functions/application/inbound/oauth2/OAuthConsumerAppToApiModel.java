@@ -51,7 +51,7 @@ import java.util.function.Function;
  */
 public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO, OpenIDConnectConfiguration> {
 
-    private static final Log log = LogFactory.getLog(OAuthConsumerAppToApiModel.class);
+    private static final Log LOG = LogFactory.getLog(OAuthConsumerAppToApiModel.class);
 
     @Override
     public OpenIDConnectConfiguration apply(OAuthConsumerAppDTO oauthAppDTO) {
@@ -282,7 +282,6 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
     /**
      * Converts the stored FAPI profile string from the DTO into the API model enum.
      * Returns null if no profile is stored, which will omit the field from the response.
-     * Logs a warning if an unrecognised value is found (data integrity issue, not an API error).
      *
      * @param oauthAppDTO the DTO containing the stored FAPI profile string.
      * @return the {@link FapiProfile} enum constant, or null if not set.
@@ -290,14 +289,14 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
     private FapiProfile buildFapiProfileConfiguration(OAuthConsumerAppDTO oauthAppDTO) {
 
         String fapiProfileValue = oauthAppDTO.getFapiProfile();
-        if (fapiProfileValue == null) {
+        if (StringUtils.isBlank(fapiProfileValue)) {
             return null;
         }
         try {
             return FapiProfile.fromValue(fapiProfileValue);
         } catch (IllegalArgumentException e) {
-            if (log.isDebugEnabled()) {
-                log.debug(String.format("Unrecognised fapiProfile value stored for application '%s': %s",
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(String.format("Unrecognised fapiProfile value stored for application '%s': %s",
                         oauthAppDTO.getApplicationName(), fapiProfileValue), e);
             }
             return null;

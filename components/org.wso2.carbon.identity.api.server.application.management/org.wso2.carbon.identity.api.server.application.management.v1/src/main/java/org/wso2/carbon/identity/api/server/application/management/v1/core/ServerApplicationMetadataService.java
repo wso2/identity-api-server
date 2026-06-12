@@ -104,12 +104,9 @@ public class ServerApplicationMetadataService {
                                             OAuthAdminServiceImpl oAuthAdminService,
                                             STSAdminServiceInterface sTSAdminServiceInterface) {
 
-        this.applicationManagementService = applicationManagementService;
-        this.samlSSOConfigService = samlSSOConfigService;
-        this.oAuthAdminService = oAuthAdminService;
-        this.sTSAdminServiceInterface = sTSAdminServiceInterface;
-        this.cibaAuthService = ApplicationManagementServiceHolder.getCibaAuthService();
-        this.fapiConfigMgtService = ApplicationManagementServiceHolder.getFapiConfigMgtService();
+        this(applicationManagementService, samlSSOConfigService, oAuthAdminService, sTSAdminServiceInterface,
+                ApplicationManagementServiceHolder.getCibaAuthService(),
+                ApplicationManagementServiceHolder.getFapiConfigMgtService());
     }
 
     @Deprecated
@@ -119,12 +116,8 @@ public class ServerApplicationMetadataService {
                                             STSAdminServiceInterface sTSAdminServiceInterface,
                                             CibaAuthServiceImpl cibaAuthService) {
 
-        this.applicationManagementService = applicationManagementService;
-        this.samlSSOConfigService = samlSSOConfigService;
-        this.oAuthAdminService = oAuthAdminService;
-        this.sTSAdminServiceInterface = sTSAdminServiceInterface;
-        this.cibaAuthService = cibaAuthService;
-        this.fapiConfigMgtService = ApplicationManagementServiceHolder.getFapiConfigMgtService();
+        this(applicationManagementService, samlSSOConfigService, oAuthAdminService, sTSAdminServiceInterface,
+                cibaAuthService, ApplicationManagementServiceHolder.getFapiConfigMgtService());
     }
 
     public ServerApplicationMetadataService(ApplicationManagementService applicationManagementService,
@@ -563,9 +556,7 @@ public class ServerApplicationMetadataService {
     private List<String> getAllowedFapiProfiles() {
 
         if (fapiConfigMgtService == null) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("FapiConfigMgtService is not available. Returning empty FAPI profiles list.");
-            }
+            LOG.debug("FapiConfigMgtService is not available. Returning empty FAPI profiles list.");
             return Collections.emptyList();
         }
         String tenantDomain = ContextLoader.getTenantDomainFromContext();

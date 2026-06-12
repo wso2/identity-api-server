@@ -2242,7 +2242,8 @@ public class ServerApplicationManagementService {
         // Only validate when the application is marked as FAPI and a specific profile is provided.
         // If isFAPIApplication is false the profile field is ignored in storage, so validation would
         // produce a misleading error for a field that has no effect.
-        if (!Boolean.TRUE.equals(oidcConfig.getIsFAPIApplication()) || oidcConfig.getFapiProfile() == null) {
+        if (oidcConfig == null || !Boolean.TRUE.equals(oidcConfig.getIsFAPIApplication())
+                || oidcConfig.getFapiProfile() == null) {
             return;
         }
 

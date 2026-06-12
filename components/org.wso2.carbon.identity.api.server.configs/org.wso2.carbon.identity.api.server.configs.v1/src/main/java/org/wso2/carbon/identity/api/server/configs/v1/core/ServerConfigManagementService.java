@@ -537,11 +537,9 @@ public class ServerConfigManagementService {
         try {
             return FAPIConnectorUtil.toApiModel(fapiConfigMgtService.getFapiConfig(tenantDomain));
         } catch (FapiConfigMgtClientException e) {
-            log.error(Constants.ErrorMessage.ERROR_CODE_FAPI_CONFIG_RETRIEVE.message(), e);
             throw new APIError(Response.Status.BAD_REQUEST, this.getFapiConfigErrorResponse(e,
                     Constants.ErrorMessage.ERROR_CODE_FAPI_CONFIG_RETRIEVE, tenantDomain));
         } catch (FapiConfigMgtException e) {
-            log.error(Constants.ErrorMessage.ERROR_CODE_FAPI_CONFIG_RETRIEVE.message(), e);
             throw new APIError(Response.Status.INTERNAL_SERVER_ERROR, this.getFapiConfigErrorResponse(e,
                     Constants.ErrorMessage.ERROR_CODE_FAPI_CONFIG_RETRIEVE, tenantDomain));
         }
@@ -555,16 +553,18 @@ public class ServerConfigManagementService {
      */
     public FapiConfig updateFAPIConfiguration(FapiConfig fapiConfig) {
 
-        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (fapiConfig == null) {
+            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT,
+                    "FAPI configuration is required in the request body.");
+        }
+        final String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
             fapiConfigMgtService.setFapiConfig(FAPIConnectorUtil.toOAuthModel(fapiConfig), tenantDomain);
             return FAPIConnectorUtil.toApiModel(fapiConfigMgtService.getFapiConfig(tenantDomain));
         } catch (FapiConfigMgtClientException e) {
-            log.error(Constants.ErrorMessage.ERROR_CODE_FAPI_CONFIG_UPDATE.message(), e);
             throw new APIError(Response.Status.BAD_REQUEST, this.getFapiConfigErrorResponse(e,
                     Constants.ErrorMessage.ERROR_CODE_FAPI_CONFIG_UPDATE, tenantDomain));
         } catch (FapiConfigMgtException e) {
-            log.error(Constants.ErrorMessage.ERROR_CODE_FAPI_CONFIG_UPDATE.message(), e);
             throw new APIError(Response.Status.INTERNAL_SERVER_ERROR, this.getFapiConfigErrorResponse(e,
                     Constants.ErrorMessage.ERROR_CODE_FAPI_CONFIG_UPDATE, tenantDomain));
         }
