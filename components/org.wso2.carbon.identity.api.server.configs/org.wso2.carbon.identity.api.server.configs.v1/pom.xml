@@ -166,6 +166,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <artifactId>org.wso2.carbon.identity.application.authentication.framework</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.wso2.carbon.extension.identity.oauth.addons</groupId>
             <artifactId>org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt</artifactId>
             <scope>provided</scope>

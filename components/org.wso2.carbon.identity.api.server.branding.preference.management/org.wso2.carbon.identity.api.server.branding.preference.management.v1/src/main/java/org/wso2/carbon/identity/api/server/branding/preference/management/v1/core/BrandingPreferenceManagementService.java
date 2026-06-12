@@ -23,6 +23,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.OperationScopeValidationContext;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.core.utils.BrandingPreferenceUtils;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingPreferenceModel;
@@ -32,6 +34,8 @@ import org.wso2.carbon.identity.api.server.branding.preference.management.v1.mod
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.ResolvedCustomTextModal;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.authorization.common.AuthorizationUtil;
+import org.wso2.carbon.identity.authorization.common.exception.ForbiddenException;
 import org.wso2.carbon.identity.branding.preference.management.core.BrandingPreferenceManager;
 import org.wso2.carbon.identity.branding.preference.management.core.exception.BrandingPreferenceMgtClientException;
 import org.wso2.carbon.identity.branding.preference.management.core.exception.BrandingPreferenceMgtException;
@@ -72,6 +76,9 @@ import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenant
  * Invoke internal OSGi service to perform branding preference management operations.
  */
 public class BrandingPreferenceManagementService {
+
+    private static final String UPDATE_POLICY_URL_OPERATION = "updatePolicyUrl";
+    private static final String ATTR_URLS = "urls";
 
     private final BrandingPreferenceManager brandingPreferenceManager;
     private static final Log log = LogFactory.getLog(BrandingPreferenceManagementService.class);
@@ -252,6 +259,17 @@ public class BrandingPreferenceManagementService {
      */
     public BrandingPreferenceModel updateBrandingPreference(BrandingPreferenceModel brandingPreferenceModel) {
 
+        try {
+            AuthorizationUtil.validateOperationScopes(UPDATE_POLICY_URL_OPERATION);
+        } catch (ForbiddenException e) {
+            throw handleExceptionWithMessage(Response.Status.FORBIDDEN,
+                    ERROR_CODE_NOT_ALLOWED_BRANDING_PREFERENCE_CONFIGURATIONS, e.getMessage());
+        }
+
+        OperationScopeValidationContext operationScopeCtx =
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().getOperationScopeValidationContext();
+        boolean restrictToUrls = operationScopeCtx != null && operationScopeCtx.isValidationRequired();
+
         String tenantDomain = getTenantDomainFromContext();
 
         String preferencesJSON = generatePreferencesJSONFromRequest(brandingPreferenceModel.getPreference());
@@ -261,6 +279,9 @@ public class BrandingPreferenceManagementService {
 
         BrandingPreference responseDTO;
         try {
+            if (restrictToUrls) {
+                mergeUrlsIntoExistingPreference(brandingPreferenceModel, tenantDomain);
+            }
             BrandingPreference requestDTO = buildRequestDTOFromBrandingRequest(brandingPreferenceModel);
             responseDTO = brandingPreferenceManager.replaceBrandingPreference(requestDTO);
         } catch (BrandingPreferenceMgtException e) {
@@ -462,6 +483,36 @@ public class BrandingPreferenceManagementService {
                     tenantDomain);
         }
         return buildCustomTextResponseFromResponseDTO(responseDTO);
+    }
+
+    private void mergeUrlsIntoExistingPreference(BrandingPreferenceModel brandingPreferenceModel,
+                                                  String tenantDomain)
+            throws BrandingPreferenceMgtException {
+
+        String type = brandingPreferenceModel.getType().toString();
+        String name = ORGANIZATION_TYPE.equals(type) ? tenantDomain : brandingPreferenceModel.getName();
+        String locale = StringUtils.isBlank(brandingPreferenceModel.getLocale()) ? DEFAULT_LOCALE
+                : brandingPreferenceModel.getLocale();
+
+        BrandingPreference existingPreference = brandingPreferenceManager.getBrandingPreference(type, name, locale);
+
+        ObjectMapper mapper = new ObjectMapper();
+        com.fasterxml.jackson.databind.JsonNode existingJsonNode =
+                mapper.valueToTree(existingPreference.getPreference());
+        com.fasterxml.jackson.databind.JsonNode incomingNode =
+                mapper.valueToTree(brandingPreferenceModel.getPreference());
+
+        com.fasterxml.jackson.databind.node.ObjectNode existingNode;
+        if (existingJsonNode == null || !existingJsonNode.isObject()) {
+            existingNode = mapper.createObjectNode();
+        } else {
+            existingNode = (com.fasterxml.jackson.databind.node.ObjectNode) existingJsonNode;
+        }
+
+        if (incomingNode.has(ATTR_URLS)) {
+            existingNode.set(ATTR_URLS, incomingNode.get(ATTR_URLS));
+        }
+        brandingPreferenceModel.setPreference(mapper.convertValue(existingNode, Object.class));
     }
 
     /**
