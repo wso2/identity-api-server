@@ -159,6 +159,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <artifactId>org.wso2.carbon.identity.authorization.common</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.wso2.carbon.identity.server.api</groupId>
             <artifactId>org.wso2.carbon.identity.api.server.consent.management.common</artifactId>
             <version>${project.version}</version>

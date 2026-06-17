@@ -34,26 +34,32 @@ import org.wso2.carbon.consent.mgt.core.model.PurposeVersion;
 import org.wso2.carbon.consent.mgt.core.model.Receipt;
 import org.wso2.carbon.consent.mgt.core.model.ReceiptInput;
 import org.wso2.carbon.consent.mgt.core.model.ReceiptService;
+import org.wso2.carbon.consent.mgt.core.model.ReceiptUpdateInput;
 import org.wso2.carbon.consent.mgt.core.util.ConsentReceiptUtils;
+import org.wso2.carbon.consent.mgt.core.util.FilterQueriesUtil;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.consent.management.common.ConsentManagementConstants;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.AuthorizationCreateRequest;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.AuthorizationDTO;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.AuthorizationEntry;
+import org.wso2.carbon.identity.api.server.consent.management.v2.model.AuthorizationUpdateEntry;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentCreateRequest;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentDTO;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentListResponse;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentPurposeBinding;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentResponseDTO;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentSummaryDTO;
+import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentUpdateRequest;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentValidateResponse;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentedElementDTO;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentedPurposeDTO;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ElementTerminationInfo;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.PaginationLink;
 import org.wso2.carbon.identity.api.server.consent.management.v2.util.ConsentMgtEndpointUtil;
+import org.wso2.carbon.identity.authorization.common.AuthorizationUtil;
+import org.wso2.carbon.identity.authorization.common.exception.ForbiddenException;
+import org.wso2.carbon.identity.core.model.ExpressionNode;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
@@ -61,18 +67,20 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
-
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ACTIVE_STATE;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.DEFAULT_LIMIT;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_CONSENT_INVALID_STATE_FOR_AUTHORIZE;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_CONSENT_REJECTED_WITH_AUTHORIZATIONS;
-import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_CONSENT_USER_NOT_IN_AUTHORIZATION_LIST;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_ELEMENT_UUID_NOT_FOUND;
+import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_INVALID_FILTER_EXPRESSION;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_INVALID_QUERY_PARAM;
+import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_USER_NOT_AUTHORIZED;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.FilterConstants;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.PENDING_STATE;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.REVOKE_STATE;
 import static org.wso2.carbon.consent.mgt.core.util.ConsentUtils.handleClientException;
+import static org.wso2.carbon.identity.api.server.consent.management.common.ConsentManagementConstants.CONSENT_ADMIN_CREATE_OPERATION;
+import static org.wso2.carbon.identity.api.server.consent.management.common.ConsentManagementConstants.CONSENT_ADMIN_LIST_OPERATION;
 
 /**
  * Service class for consent (receipt) operations in the V2 Consent Management API.
@@ -109,7 +117,16 @@ public class ConsentManagementService {
 
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         String currentUser = carbonContext.getUsername();
-        String subjectId = StringUtils.isNotBlank(request.getSubjectId()) ? request.getSubjectId() : currentUser;
+        String subjectId;
+        try {
+            AuthorizationUtil.validateOperationScopes(CONSENT_ADMIN_CREATE_OPERATION);
+            subjectId = StringUtils.isNotBlank(request.getSubjectId()) ? request.getSubjectId() : currentUser;
+        } catch (ForbiddenException e) {
+            subjectId = currentUser;
+            if (request.getAuthorizations() != null && !request.getAuthorizations().isEmpty()) {
+                throw handleClientException(ERROR_CODE_USER_NOT_AUTHORIZED, currentUser);
+            }
+        }
         boolean hasAuthorizations = request.getAuthorizations() != null && !request.getAuthorizations().isEmpty();
         boolean rejected = ConsentCreateRequest.StateEnum.REJECTED.equals(request.getState());
         if (rejected && hasAuthorizations) {
@@ -146,11 +163,16 @@ public class ConsentManagementService {
 
         try {
             Receipt receipt = consentManager.getReceiptWithExtendedSchema(receiptId);
-            // Lazy expiry on GET — validate status and re-fetch if state changed
-            String latestState = consentManager.validateConsentStatus(receiptId);
-            if (!latestState.equals(receipt.getState())) {
-                receipt = consentManager.getReceiptWithExtendedSchema(receiptId);
+            // Need operation scopes to list consents of other users.
+            try {
+                AuthorizationUtil.validateOperationScopes(CONSENT_ADMIN_LIST_OPERATION);
+            } catch (ForbiddenException e) {
+                String currentUser = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername();
+                if (!currentUser.equalsIgnoreCase(receipt.getPiiPrincipalId())) {
+                    throw handleClientException(ERROR_CODE_USER_NOT_AUTHORIZED, currentUser);
+                }
             }
+            // The effective state (including expiry) is already resolved by getReceiptWithExtendedSchema.
             return toConsentDTO(receipt);
         } catch (ConsentManagementException e) {
             throw ConsentMgtEndpointUtil.handleConsentManagementException(e);
@@ -169,37 +191,56 @@ public class ConsentManagementService {
      * @param after            Cursor for pagination (results after this cursor).
      * @param before           Cursor for pagination (results before this cursor).
      * @return Response with list of ConsentSummaryDTOs.
-     * @throws ConsentManagementException if listing fails.
      */
     public ConsentListResponse listConsents(String subjectId, String serviceId, String state, String purposeId,
-                                            String purposeVersionId, Integer limit, String after, String before) {
+                                            String purposeVersionId, String filter, Integer limit,
+                                            String after, String before) {
 
         try {
-            return listConsentsInternal(subjectId, serviceId, state, purposeId, purposeVersionId, limit, after, before);
+            return listConsentsInternal(subjectId, serviceId, state, purposeId, purposeVersionId, filter, limit,
+                    after, before);
         } catch (ConsentManagementException e) {
             throw ConsentMgtEndpointUtil.handleConsentManagementException(e);
         }
     }
 
     private ConsentListResponse listConsentsInternal(String subjectId, String serviceId, String state,
-                                                     String purposeId, String purposeVersionId, Integer limit,
-                                                     String after, String before)
+                                                     String purposeId, String purposeVersionId, String filter,
+                                                     Integer limit, String after, String before)
             throws ConsentManagementException {
 
         limit = validatedLimit(limit);
+
+        // Need operation scopes to list consents of other users.
+        try {
+            AuthorizationUtil.validateOperationScopes(CONSENT_ADMIN_LIST_OPERATION);
+        } catch (ForbiddenException e) {
+            subjectId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername();
+        }
 
         if (StringUtils.isNotBlank(before) && StringUtils.isNotBlank(after)) {
             throw handleClientException(ERROR_CODE_INVALID_QUERY_PARAM,
                     "Both 'before' and 'after' parameters are provided.");
         }
 
+        List<ExpressionNode> expressionNodes = FilterQueriesUtil.getExpressionNodes(filter, after, before);
+        for (ExpressionNode node : expressionNodes) {
+            String attr = node.getAttributeValue();
+            if (FilterConstants.FILTER_ATTR_AFTER.equals(attr) || FilterConstants.FILTER_ATTR_BEFORE.equals(attr)) {
+                continue;
+            }
+            if (attr == null || !attr.startsWith("properties.")) {
+                throw handleClientException(ERROR_CODE_INVALID_FILTER_EXPRESSION,
+                        "Only 'properties.<key>' attributes are supported in consent filter. Got: " + attr);
+            }
+            if (!"eq".equalsIgnoreCase(node.getOperation())) {
+                throw handleClientException(ERROR_CODE_INVALID_FILTER_EXPRESSION,
+                        "Only 'eq' operation is supported for consent property filter.");
+            }
+        }
+
         List<Receipt> receipts = consentManager.listReceipts(
-                subjectId,
-                serviceId,
-                state,
-                purposeId != null ? purposeId.toString() : null,
-                purposeVersionId != null ? purposeVersionId.toString() : null,
-                after, before, limit + 1);
+                subjectId, serviceId, state, purposeId, purposeVersionId, expressionNodes, limit + 1);
 
         ConsentListResponse result = new ConsentListResponse();
         List<PaginationLink> links = new ArrayList<>();
@@ -212,24 +253,23 @@ public class ConsentManagementService {
             boolean isLastPage = !hasMoreItems && (StringUtils.isNotBlank(after) || StringUtils.isBlank(before));
 
             String url = "?limit=" + limit;
-            try {
-                if (StringUtils.isNotBlank(subjectId)) {
-                    url += "&subjectId=" + URLEncoder.encode(subjectId, StandardCharsets.UTF_8.name());
-                }
-                if (StringUtils.isNotBlank(serviceId)) {
-                    url += "&serviceId=" + URLEncoder.encode(serviceId, StandardCharsets.UTF_8.name());
-                }
-                if (StringUtils.isNotBlank(state)) {
-                    url += "&state=" + URLEncoder.encode(state, StandardCharsets.UTF_8.name());
-                }
-            } catch (UnsupportedEncodingException e) {
-                LOG.debug("Server encountered an error while building pagination URL for the response.", e);
+            if (StringUtils.isNotBlank(subjectId)) {
+                url += "&subjectId=" + URLEncoder.encode(subjectId, StandardCharsets.UTF_8);
+            }
+            if (StringUtils.isNotBlank(serviceId)) {
+                url += "&serviceId=" + URLEncoder.encode(serviceId, StandardCharsets.UTF_8);
+            }
+            if (StringUtils.isNotBlank(state)) {
+                url += "&state=" + URLEncoder.encode(state, StandardCharsets.UTF_8);
             }
             if (purposeId != null) {
                 url += "&purposeId=" + purposeId;
             }
             if (purposeVersionId != null) {
                 url += "&purposeVersionId=" + purposeVersionId;
+            }
+            if (StringUtils.isNotBlank(filter)) {
+                url += "&filter=" + URLEncoder.encode(filter, StandardCharsets.UTF_8);
             }
 
             if (hasMoreItems) {
@@ -274,16 +314,68 @@ public class ConsentManagementService {
     public void revokeConsent(String receiptId) {
 
         try {
+            String callingUser = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername();
             Receipt receipt = consentManager.getReceiptWithExtendedSchema(receiptId);
             String currentState = StringUtils.isNotBlank(receipt.getState()) ? receipt.getState() : ACTIVE_STATE;
             if (REVOKE_STATE.equals(currentState)) {
                 return;
             }
-            String callingUser = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername();
+            validateConsentAccess(receiptId, callingUser, receipt);
             consentManager.authorizeConsent(receiptId, callingUser, REVOKE_STATE);
         } catch (ConsentManagementException e) {
             throw ConsentMgtEndpointUtil.handleConsentManagementException(e);
         }
+    }
+
+    /**
+     * Admin update of an existing consent's expiryTime, properties, and/or authorizations.
+     *
+     * @param consentId Consent receipt ID.
+     * @param request   Update request (all fields optional).
+     * @return Updated ConsentDTO.
+     */
+    public ConsentDTO updateConsent(String consentId, ConsentUpdateRequest request) {
+
+        try {
+            return updateConsentInternal(consentId, request);
+        } catch (ConsentManagementException e) {
+            throw ConsentMgtEndpointUtil.handleConsentManagementException(e);
+        }
+    }
+
+    private ConsentDTO updateConsentInternal(String consentId, ConsentUpdateRequest request)
+            throws ConsentManagementException {
+
+        ReceiptUpdateInput updateInput = new ReceiptUpdateInput();
+        updateInput.setConsentReceiptId(consentId);
+
+        if (request.getExpiryTime() != null) {
+            if (request.getExpiryTime() < 0) {
+                // A negative expiryTime is the sentinel for removing the expiry entirely.
+                updateInput.setClearExpiry(true);
+            } else {
+                updateInput.setExpiryTime(new Timestamp(request.getExpiryTime()));
+            }
+        }
+
+        updateInput.setProperties(request.getProperties());
+
+        if (request.getAuthorizations() != null) {
+            List<ConsentAuthorization> authorizations = new ArrayList<>();
+            for (AuthorizationUpdateEntry entry : request.getAuthorizations()) {
+                ConsentAuthorization auth = new ConsentAuthorization();
+                auth.setUserId(entry.getUserId());
+                auth.setType(entry.getType());
+                if (entry.getState() != null) {
+                    auth.setStatus(ConsentAuthorization.AuthorizationStatus.valueOf(entry.getState().toString()));
+                }
+                authorizations.add(auth);
+            }
+            updateInput.setAuthorizations(authorizations);
+        }
+
+        consentManager.updateConsent(updateInput);
+        return toConsentDTO(consentManager.getReceiptWithExtendedSchema(consentId));
     }
 
     private ReceiptInput buildReceiptInput(ConsentCreateRequest request, String subjectId)
@@ -312,15 +404,18 @@ public class ConsentManagementService {
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         Long expiryMillis = request.getExpiryTime();
         Timestamp expiryTime = expiryMillis != null ? new Timestamp(expiryMillis) : null;
-        List<String> authorizationUserIds = null;
+        List<ConsentAuthorization> authorizations = null;
         if (request.getAuthorizations() != null) {
-            authorizationUserIds = new ArrayList<>();
+            authorizations = new ArrayList<>();
             for (AuthorizationEntry entry : request.getAuthorizations()) {
-                authorizationUserIds.add(entry.getId());
+                ConsentAuthorization auth = new ConsentAuthorization();
+                auth.setUserId(entry.getUserId());
+                auth.setType(entry.getType());
+                authorizations.add(auth);
             }
         }
-        return ConsentReceiptUtils.buildReceiptInput(request.getLanguage(), subjectId, tenantDomain,
-                expiryTime, rejected, authorizationUserIds, request.getProperties(),
+        return ConsentReceiptUtils.buildReceiptInput(request.getLanguage(), subjectId,
+                tenantDomain, expiryTime, rejected, authorizations, request.getProperties(),
                 request.getServiceId(), purposeBindings, consentManager);
     }
 
@@ -469,21 +564,15 @@ public class ConsentManagementService {
                 throw handleClientException(ERROR_CODE_CONSENT_INVALID_STATE_FOR_AUTHORIZE, consentId);
             }
 
-            PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-            String callingUser = carbonContext.getUsername();
+            String callingUser = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername();
             String authStatus = request.getState() != null ? request.getState().toString() : "APPROVED";
 
-            List<ConsentAuthorization> existing = consentManager.getConsentAuthorizations(consentId);
-            boolean callingUserInList = existing.stream().anyMatch(a -> callingUser.equals(a.getUserId()));
-            if (!callingUserInList) {
-                throw handleClientException(ERROR_CODE_CONSENT_USER_NOT_IN_AUTHORIZATION_LIST, callingUser);
-            }
-
+            validateConsentAccess(consentId, callingUser, receipt);
             consentManager.authorizeConsent(consentId, callingUser, authStatus);
 
             List<ConsentAuthorization> all = consentManager.getConsentAuthorizations(consentId);
             ConsentAuthorization updated = all.stream()
-                    .filter(a -> callingUser.equals(a.getUserId()))
+                    .filter(a -> callingUser.equalsIgnoreCase(a.getUserId()))
                     .findFirst()
                     .orElse(null);
 
@@ -509,19 +598,34 @@ public class ConsentManagementService {
     public ConsentValidateResponse validateConsent(String consentId) {
 
         try {
+            String callingUser = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername();
+            Receipt receipt = consentManager.getReceiptWithExtendedSchema(consentId);
+            validateConsentAccess(consentId, callingUser, receipt);
             String status = consentManager.validateConsentStatus(consentId);
 
             ConsentValidateResponse validateResponse = new ConsentValidateResponse();
             validateResponse.setState(ConsentValidateResponse.StateEnum.fromValue(status));
-
-            Receipt receipt = consentManager.getReceiptWithExtendedSchema(consentId);
-            if (receipt != null) {
-                validateResponse.setExpiryTime(
-                        receipt.getExpiryTime() != null ? receipt.getExpiryTime().getTime() : null);
-            }
+            validateResponse.setExpiryTime(
+                    receipt.getExpiryTime() != null ? receipt.getExpiryTime().getTime() : null);
             return validateResponse;
         } catch (ConsentManagementException e) {
             throw ConsentMgtEndpointUtil.handleConsentManagementException(e);
+        }
+    }
+
+    private void validateConsentAccess(String consentId, String callingUser, Receipt receipt)
+            throws ConsentManagementException {
+
+        List<ConsentAuthorization> authorizations = consentManager.getConsentAuthorizations(consentId);
+        if (authorizations == null || authorizations.isEmpty()) {
+            if (receipt == null || !callingUser.equalsIgnoreCase(receipt.getPiiPrincipalId())) {
+                throw handleClientException(ERROR_CODE_USER_NOT_AUTHORIZED, callingUser);
+            }
+        } else {
+            boolean inList = authorizations.stream().anyMatch(a -> callingUser.equalsIgnoreCase(a.getUserId()));
+            if (!inList) {
+                throw handleClientException(ERROR_CODE_USER_NOT_AUTHORIZED, callingUser);
+            }
         }
     }
 
@@ -556,4 +660,5 @@ public class ConsentManagementService {
                         ConsentManagementConstants.CONSENTS_PATH + url).toString())
                 .rel(rel);
     }
+
 }

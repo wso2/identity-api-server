@@ -84,6 +84,9 @@ public class ElementManagementService {
                     : request.getName();
             PIICategory piiCategory = new PIICategory(request.getName(), request.getDescription(), false, displayName);
             piiCategory.setTenantId(ConsentUtils.getTenantIdFromCarbonContext());
+            if (request.getProperties() != null) {
+                piiCategory.setProperties(request.getProperties());
+            }
             PIICategory created = consentManager.addPIICategoryWithUuid(piiCategory);
             return toElementDTO(created);
         } catch (ConsentManagementException e) {
@@ -231,6 +234,7 @@ public class ElementManagementService {
         dto.setName(cat.getName());
         dto.setDisplayName(cat.getDisplayName());
         dto.setDescription(cat.getDescription());
+        dto.setProperties(cat.getProperties());
         dto.setTenantDomain(cat.getTenantDomain());
         return dto;
     }

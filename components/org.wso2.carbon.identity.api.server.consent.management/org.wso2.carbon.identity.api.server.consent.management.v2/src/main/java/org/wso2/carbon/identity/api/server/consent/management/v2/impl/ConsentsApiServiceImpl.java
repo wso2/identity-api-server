@@ -25,6 +25,7 @@ import org.wso2.carbon.identity.api.server.consent.management.v2.factories.Conse
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.AuthorizationCreateRequest;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentCreateRequest;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentResponseDTO;
+import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentUpdateRequest;
 
 import java.net.URI;
 
@@ -70,11 +71,11 @@ public class ConsentsApiServiceImpl implements ConsentsApiService {
 
     @Override
     public Response consentsList(String subjectId, String serviceId, String state, String purposeId,
-                                     String purposeVersionId, Integer limit, String after, String before) {
+                                 String purposeVersionId, String filter, Integer limit, String after, String before) {
 
         return Response.ok().entity(
-                consentService.listConsents(subjectId, serviceId, state, purposeId, purposeVersionId, limit, after,
-                        before)).build();
+                consentService.listConsents(subjectId, serviceId, state, purposeId, purposeVersionId, filter, limit,
+                        after, before)).build();
     }
 
     @Override
@@ -82,6 +83,12 @@ public class ConsentsApiServiceImpl implements ConsentsApiService {
 
         consentService.revokeConsent(consentId);
         return Response.noContent().build();
+    }
+
+    @Override
+    public Response consentsUpdate(String consentId, ConsentUpdateRequest consentUpdateRequest) {
+
+        return Response.ok().entity(consentService.updateConsent(consentId, consentUpdateRequest)).build();
     }
 
     @Override

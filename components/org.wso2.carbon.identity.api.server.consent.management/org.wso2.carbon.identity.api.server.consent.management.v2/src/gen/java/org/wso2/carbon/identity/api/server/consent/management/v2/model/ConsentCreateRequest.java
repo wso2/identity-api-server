@@ -215,7 +215,7 @@ public enum StateEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "[{\"id\":\"alice@wso2.com\"},{\"id\":\"bob@wso2.com\"}]", value = "Optional list of users who are expected to authorize this consent. Each user will use the /authorize endpoint to give their actual consent.")
+    @ApiModelProperty(example = "[{\"userId\":\"alice@wso2.com\",\"type\":\"USER\"},{\"userId\":\"bob@wso2.com\",\"type\":\"USER\"}]", value = "Optional list of users who are expected to authorize this consent. Each user will use the /authorize endpoint to give their actual consent.")
     @JsonProperty("authorizations")
     @Valid
     public List<AuthorizationEntry> getAuthorizations() {

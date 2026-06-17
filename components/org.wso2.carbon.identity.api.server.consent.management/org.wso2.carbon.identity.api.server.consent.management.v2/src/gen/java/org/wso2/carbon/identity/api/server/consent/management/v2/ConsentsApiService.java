@@ -30,6 +30,7 @@ import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentCr
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentDTO;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentListResponse;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentResponseDTO;
+import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentUpdateRequest;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentValidateResponse;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ErrorDTO;
 import javax.ws.rs.core.Response;
@@ -43,9 +44,11 @@ public interface ConsentsApiService {
 
       public Response consentsGet(String consentId);
 
-      public Response consentsList(String subjectId, String serviceId, String state, String purposeId, String purposeVersionId, Integer limit, String after, String before);
+      public Response consentsList(String subjectId, String serviceId, String state, String purposeId, String purposeVersionId, String filter, Integer limit, String after, String before);
 
       public Response consentsRevoke(String consentId);
+
+      public Response consentsUpdate(String consentId, ConsentUpdateRequest consentUpdateRequest);
 
       public Response consentsValidate(String consentId);
 }

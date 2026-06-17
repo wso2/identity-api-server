@@ -25,6 +25,7 @@ import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentCr
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentDTO;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentListResponse;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentResponseDTO;
+import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentUpdateRequest;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentValidateResponse;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ErrorDTO;
 
@@ -52,7 +53,7 @@ public class ConsentsApi  {
     @Path("/{consentId}/authorize")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Authorize a consent", notes = "Authorizes a PENDING consent. The authenticated user must be in the consent's authorization list. When all required users have approved, the consent transitions to ACTIVE state. If any user rejects, the consent transitions to REJECTED state. Returns 403 if the calling user is not in the authorization list. ", response = AuthorizationDTO.class, authorizations = {
+    @ApiOperation(value = "Authorize a consent", notes = "Authorizes a PENDING consent. The authenticated user must be in the consent's authorization list, returns 403 otherwise. When all required users have approved, the consent transitions to ACTIVE state. If any user rejects, the consent transitions to REJECTED state. ", response = AuthorizationDTO.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -77,7 +78,7 @@ public class ConsentsApi  {
     
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Create a consent record", notes = "Record user consent for specified purposes and elements. ", response = ConsentResponseDTO.class, authorizations = {
+    @ApiOperation(value = "Create a consent record", notes = "Record consent for specified purposes and elements.  Without a scope, the authenticated user creates and gives consent simultaneously. The consent is immediately recorded as `ACTIVE`. The `subjectId` field is ignored — the calling user is always the consent subject. Providing `authorizations` returns 400.  <b>Scope(Permission) required:</b> `internal_consent_mgt_consent_create` — Creates a consent record on behalf of a subject user without giving consent. The consent is created in `PENDING` state and requires the subject user to authorize via `POST /consents/{consentId}/authorize`. The `subjectId` field is required. The `authorizations` field may be provided to pre-declare which users must authorize the pending consent. ", response = ConsentResponseDTO.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -101,7 +102,7 @@ public class ConsentsApi  {
     @Path("/{consentId}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get a consent record", notes = "Retrieve a specific consent record by consent ID. ", response = ConsentDTO.class, authorizations = {
+    @ApiOperation(value = "Get a consent record", notes = "Retrieve a specific consent record by consent ID.  Without a scope, only the consent subject may retrieve the record. Returns 403 if the authenticated user is not the consent subject.  <b>Scope(Permission) required:</b> `internal_consent_mgt_consent_view` — Any consent record can be retrieved regardless of who the subject is. ", response = ConsentDTO.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -111,6 +112,7 @@ public class ConsentsApi  {
         @ApiResponse(code = 200, message = "Consent record details", response = ConsentDTO.class),
         @ApiResponse(code = 400, message = "Bad Request", response = ErrorDTO.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = ErrorDTO.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = ErrorDTO.class),
         @ApiResponse(code = 404, message = "Not Found", response = ErrorDTO.class),
         @ApiResponse(code = 500, message = "Server Error", response = ErrorDTO.class)
     })
@@ -124,7 +126,7 @@ public class ConsentsApi  {
     
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "List consent records", notes = "Retrieve consent records with optional filtering. ", response = ConsentListResponse.class, authorizations = {
+    @ApiOperation(value = "List consent records", notes = "Retrieve consent records with optional filtering.  Without a scope, returns only the authenticated user's own consents. The `subjectId` query parameter is ignored.  <b>Scope(Permission) required:</b> `internal_consent_mgt_consent_view` — Returns consents for any user. The `subjectId` parameter is applied as a filter. ", response = ConsentListResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -136,9 +138,9 @@ public class ConsentsApi  {
         @ApiResponse(code = 401, message = "Unauthorized", response = ErrorDTO.class),
         @ApiResponse(code = 500, message = "Server Error", response = ErrorDTO.class)
     })
-    public Response consentsList(    @Valid @Size(max=255)@ApiParam(value = "Filter by subject username.")  @QueryParam("subjectId") String subjectId,     @Valid @Size(max=255)@ApiParam(value = "Filter by service ID.")  @QueryParam("serviceId") String serviceId,     @Valid@ApiParam(value = "Filter consents by state.", allowableValues="PENDING, ACTIVE, REJECTED, REVOKED, EXPIRED")  @QueryParam("state") String state,     @Valid@ApiParam(value = "Filter consents by purpose ID.")  @QueryParam("purposeId") String purposeId,     @Valid@ApiParam(value = "Filter consents by specific purpose version ID.")  @QueryParam("purposeVersionId") String purposeVersionId,     @Valid @Min(1)@ApiParam(value = "Maximum number of records to return.", defaultValue="10") @DefaultValue("10")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Cursor for forward pagination. Pass the base64-encoded UUID of the last item received from the previous page to retrieve the next page of results. ")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Cursor for backward pagination. Pass the base64-encoded UUID of the first item received from the current page to retrieve the previous page of results. ")  @QueryParam("before") String before) {
+    public Response consentsList(    @Valid @Size(max=255)@ApiParam(value = "Filter by subject username.")  @QueryParam("subjectId") String subjectId,     @Valid @Size(max=255)@ApiParam(value = "Filter by service ID.")  @QueryParam("serviceId") String serviceId,     @Valid@ApiParam(value = "Filter consents by state.", allowableValues="PENDING, ACTIVE, REJECTED, REVOKED, EXPIRED")  @QueryParam("state") String state,     @Valid@ApiParam(value = "Filter consents by purpose ID.")  @QueryParam("purposeId") String purposeId,     @Valid@ApiParam(value = "Filter consents by specific purpose version ID.")  @QueryParam("purposeVersionId") String purposeVersionId,     @Valid@ApiParam(value = "Filter consents by custom properties using dot notation `properties.<key>`. Supports 'sw' (starts with), 'co' (contains), 'ew' (ends with), and 'eq' (equals) operations. Combine multiple conditions with 'and', 'or' logical operators. Examples: - filter=properties.dataCategory eq personal - filter=properties.region eq EU - filter=properties.region eq EU and properties.dataCategory eq personal ")  @QueryParam("filter") String filter,     @Valid @Min(1)@ApiParam(value = "Maximum number of records to return.", defaultValue="10") @DefaultValue("10")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Cursor for forward pagination. Pass the base64-encoded UUID of the last item received from the previous page to retrieve the next page of results. ")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Cursor for backward pagination. Pass the base64-encoded UUID of the first item received from the current page to retrieve the previous page of results. ")  @QueryParam("before") String before) {
 
-        return delegate.consentsList(subjectId,  serviceId,  state,  purposeId,  purposeVersionId,  limit,  after,  before );
+        return delegate.consentsList(subjectId,  serviceId,  state,  purposeId,  purposeVersionId,  filter,  limit,  after,  before );
     }
 
     @Valid
@@ -146,7 +148,7 @@ public class ConsentsApi  {
     @Path("/{consentId}/revoke")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Revoke a consent", notes = "Revokes the consent. Idempotent — if the consent is already revoked, returns 204 with no error. For consents with an authorization list, only users in that list may revoke (returns 403 otherwise). ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Revoke a consent", notes = "Revokes the consent. The authenticated user must be the consent subject, returns 403 otherwise. Idempotent — if the consent is already revoked, returns 204 with no error. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -166,11 +168,35 @@ public class ConsentsApi  {
     }
 
     @Valid
+    @PATCH
+    @Path("/{consentId}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update a consent record", notes = "Update an existing consent record's expiry time, properties, and authorizations. All fields in the request body are optional; omit a field to leave that aspect of the consent unchanged. `expiryTime` sets or clears the expiry, `properties` replaces the full property map, and `authorizations` upserts the listed users — adding them as authorizers if absent or overriding their state if present.  <b>Scope(Permission) required:</b> `internal_consent_mgt_consent_update` — Updates any consent record regardless of who the subject is. ", response = ConsentDTO.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Consents", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Consent updated successfully", response = ConsentDTO.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = ErrorDTO.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = ErrorDTO.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = ErrorDTO.class),
+        @ApiResponse(code = 404, message = "Not Found", response = ErrorDTO.class),
+        @ApiResponse(code = 500, message = "Server Error", response = ErrorDTO.class)
+    })
+    public Response consentsUpdate( @Size(min=1,max=255)@ApiParam(value = "ID of the consent.",required=true) @PathParam("consentId") String consentId, @ApiParam(value = "" ,required=true) @Valid ConsentUpdateRequest consentUpdateRequest) {
+
+        return delegate.consentsUpdate(consentId,  consentUpdateRequest );
+    }
+
+    @Valid
     @GET
     @Path("/{consentId}/validate")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get the current state of a consent object", notes = "", response = ConsentValidateResponse.class, authorizations = {
+    @ApiOperation(value = "Get the current state of a consent object", notes = "Returns the current state of a consent record, performing a lazy expiry check. The authenticated user must be the consent subject, returns 403 otherwise. ", response = ConsentValidateResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -180,6 +206,7 @@ public class ConsentsApi  {
         @ApiResponse(code = 200, message = "Validation result", response = ConsentValidateResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = ErrorDTO.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = ErrorDTO.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = ErrorDTO.class),
         @ApiResponse(code = 404, message = "Not Found", response = ErrorDTO.class),
         @ApiResponse(code = 500, message = "Server Error", response = ErrorDTO.class)
     })
