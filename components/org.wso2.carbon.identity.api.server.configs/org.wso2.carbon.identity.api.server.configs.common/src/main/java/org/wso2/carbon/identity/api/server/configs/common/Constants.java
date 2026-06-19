@@ -261,15 +261,28 @@ public class Constants {
         ERROR_CODE_SETTING_GROUP_NOT_FOUND("60007",
                 "Setting group not found.",
                 "Unable to find compatibility settings for the setting group %s."),
-
-        /**
-         * FAPI Configuration errors.
-         */
-        ERROR_CODE_FAPI_CONFIG_RETRIEVE("65033",
+        ERROR_CODE_CONSENT_PURPOSE_NOT_FOUND("60009",
+                "Consent purpose not found.",
+                "No consent purpose found with ID: %s."),
+        ERROR_CODE_CONSENT_APPLICATION_ALREADY_MAPPED("60010",
+                "Application already mapped.",
+                "Application %s is already mapped to a consent purpose."),
+        ERROR_CODE_CONSENT_APPLICATION_MAPPING_NOT_FOUND("60011",
+                "Application mapping not found.",
+                "Application %s is not mapped to the specified consent purpose."),
+        ERROR_CODE_CONSENT_MAPPING_RETRIEVE("65033",
+                "Unable to retrieve consent application mappings.",
+                "Server encountered an error while retrieving application mappings for consent purpose: %s."),
+        ERROR_CODE_CONSENT_MAPPING_ADD("65034",
+                "Unable to add consent application mapping.",
+                "Server encountered an error while mapping application %s."),
+        ERROR_CODE_CONSENT_MAPPING_DELETE("65035",
+                "Unable to delete consent application mapping.",
+                "Server encountered an error while removing application %s."),
+        ERROR_CODE_FAPI_CONFIG_RETRIEVE("65036",
                 "Unable to retrieve FAPI configuration.",
                 "Server encountered an error while retrieving the FAPI configuration."),
-
-        ERROR_CODE_FAPI_CONFIG_UPDATE("65034",
+        ERROR_CODE_FAPI_CONFIG_UPDATE("65037",
                 "Unable to update FAPI configuration.",
                 "Server encountered an error while updating the FAPI configuration.");
 

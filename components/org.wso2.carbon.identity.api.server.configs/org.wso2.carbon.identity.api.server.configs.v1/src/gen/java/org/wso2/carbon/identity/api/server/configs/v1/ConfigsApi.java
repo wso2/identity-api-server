@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.wso2.carbon.identity.api.server.configs.v1.factories.ConfigsApiServiceFactory;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ApplicationObject;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
@@ -137,6 +138,55 @@ public class ConfigsApi  {
     public Response deleteSAMLInboundAuthConfig() {
 
         return delegate.deleteSAMLInboundAuthConfig();
+    }
+
+    @Valid
+    @GET
+    @Path("/consent/purposes/{purpose-id}/applications")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve applications mapped to a consent purpose.", notes = "Retrieves the list of applications associated with the given consent purpose. ", response = ApplicationObject.class, responseContainer = "List", authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Purpose Application Mappings", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = ApplicationObject.class, responseContainer = "List"),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found - the consent purpose does not exist.", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getApplicationsForPurpose(@ApiParam(value = "UUID of the consent purpose.",required=true) @PathParam("purpose-id") String purposeId) {
+
+        return delegate.getApplicationsForPurpose(purposeId );
+    }
+
+    @Valid
+    @POST
+    @Path("/consent/purposes/{purpose-id}/applications")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Map an application to a consent purpose.", notes = "Associates an application with the given consent purpose so that consent is enforced during login. ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+
+        })
+    }, tags={ "Purpose Application Mappings", })
+    @ApiResponses(value = {
+        @ApiResponse(code = 201, message = "Mapping created.", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found - the consent purpose does not exist.", response = Error.class),
+        @ApiResponse(code = 409, message = "Conflict - application already mapped.", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response addApplicationToPurpose(@ApiParam(value = "UUID of the consent purpose.",required=true) @PathParam("purpose-id") String purposeId, @ApiParam(value = "" ,required=true) @Valid ApplicationObject applicationObject) {
+
+        return delegate.addApplicationToPurpose(purposeId, applicationObject );
     }
 
     @Valid
@@ -666,6 +716,29 @@ public class ConfigsApi  {
     public Response patchPrivatKeyJWTValidationConfiguration(@ApiParam(value = "" ,required=true) @Valid List<JWTKeyValidatorPatch> jwTKeyValidatorPatch) {
 
         return delegate.patchPrivatKeyJWTValidationConfiguration(jwTKeyValidatorPatch );
+    }
+
+    @Valid
+    @DELETE
+    @Path("/consent/purposes/{purpose-id}/applications/{application-id}")
+
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Remove an application from a consent purpose mapping.", notes = "Removes the association between the given application and consent purpose. ", response = Void.class, authorizations = {
+            @Authorization(value = "BasicAuth"),
+            @Authorization(value = "OAuth2", scopes = {
+
+            })
+    }, tags={ "Purpose Application Mappings", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Mapping deleted.", response = Void.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+            @ApiResponse(code = 404, message = "Not Found - the consent purpose or the application mapping does not exist.", response = Error.class),
+            @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response removeApplicationFromPurpose(@ApiParam(value = "UUID of the consent purpose.",required=true) @PathParam("purpose-id") String purposeId, @ApiParam(value = "Resource ID of the application.",required=true) @PathParam("application-id") String applicationId) {
+
+        return delegate.removeApplicationFromPurpose(purposeId,  applicationId );
     }
 
     @Valid

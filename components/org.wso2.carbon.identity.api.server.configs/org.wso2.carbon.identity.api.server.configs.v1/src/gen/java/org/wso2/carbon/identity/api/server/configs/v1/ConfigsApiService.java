@@ -39,11 +39,15 @@ import javax.ws.rs.core.Response;
 
 public interface ConfigsApiService {
 
+      public Response addApplicationToPurpose(String purposeId, ApplicationObject applicationObject);
+
       public Response deleteOAuth2InboundAuthConfig();
 
       public Response deletePassiveSTSInboundAuthConfig();
 
       public Response deleteSAMLInboundAuthConfig();
+
+      public Response getApplicationsForPurpose(String purposeId);
 
       public Response getAuthenticator(String authenticatorId);
 
@@ -98,6 +102,8 @@ public interface ConfigsApiService {
       public Response restoreServerRemoteLoggingConfiguration(String logType);
 
       public Response restoreServerRemoteLoggingConfigurations();
+
+      public Response removeApplicationFromPurpose(String purposeId, String applicationId);
 
       public Response deleteImpersonationConfiguration();
 
