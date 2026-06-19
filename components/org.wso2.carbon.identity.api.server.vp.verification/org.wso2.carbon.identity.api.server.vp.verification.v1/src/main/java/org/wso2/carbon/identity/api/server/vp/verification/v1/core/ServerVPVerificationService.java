@@ -76,9 +76,7 @@ public class ServerVPVerificationService {
 
         try {
             StandaloneVerificationInitiation initiation =
-                    service.initiate(request.getPresentationDefinitionId(), tenantDomain,
-                            request.getClientIdScheme(), request.getResponseMode(),
-                            request.getRegistrationCert());
+                    service.initiate(request.getPresentationDefinitionId(), tenantDomain);
 
             VerificationInitiateResponse resp = new VerificationInitiateResponse();
             resp.setTxnId(initiation.getTxnId());

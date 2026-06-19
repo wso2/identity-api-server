@@ -259,7 +259,20 @@ public class Constants {
                 "Server encountered an error while updating the Compatibility Settings."),
         ERROR_CODE_SETTING_GROUP_NOT_FOUND("60007",
                 "Setting group not found.",
-                "Unable to find compatibility settings for the setting group %s.");
+                "Unable to find compatibility settings for the setting group %s."),
+
+        /**
+         * OpenID4VP configuration errors.
+         */
+        ERROR_CODE_OID4VP_NOT_ENABLED("65033",
+                "OpenID4VP feature is not enabled.",
+                "The OpenID4VP feature is not enabled in this deployment."),
+        ERROR_CODE_OID4VP_CONFIG_RETRIEVE("65034",
+                "Unable to retrieve OpenID4VP configuration.",
+                "Server encountered an error while retrieving the OpenID4VP configuration."),
+        ERROR_CODE_OID4VP_CONFIG_UPDATE("65035",
+                "Unable to update OpenID4VP configuration.",
+                "Server encountered an error while updating the OpenID4VP configuration.");
 
         private final String code;
         private final String message;

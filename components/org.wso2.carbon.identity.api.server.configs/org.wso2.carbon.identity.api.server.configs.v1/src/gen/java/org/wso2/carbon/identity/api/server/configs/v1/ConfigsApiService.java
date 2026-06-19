@@ -25,6 +25,7 @@ import java.util.List;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettings;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.OpenID4VPConfiguration;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthOAuth2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
@@ -56,6 +57,10 @@ public interface ConfigsApiService {
       public Response getHomeRealmIdentifiers();
 
       public Response getImpersonationConfiguration();
+
+      public Response getOpenID4VPConfiguration();
+
+      public Response updateOpenID4VPConfiguration(OpenID4VPConfiguration openID4VPConfiguration);
 
       public Response getInboundScimConfigs();
 

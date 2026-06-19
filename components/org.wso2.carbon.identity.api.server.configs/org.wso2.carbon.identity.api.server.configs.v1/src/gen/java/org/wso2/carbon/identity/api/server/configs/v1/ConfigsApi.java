@@ -36,6 +36,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.Error;
 import org.wso2.carbon.identity.api.server.configs.v1.model.FraudDetectionConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationConfiguration;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.OpenID4VPConfiguration;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthOAuth2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
@@ -280,6 +281,55 @@ public class ConfigsApi  {
     public Response getImpersonationConfiguration() {
 
         return delegate.getImpersonationConfiguration();
+    }
+
+    @Valid
+    @GET
+    @Path("/openid4vp")
+
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve the tenant OpenID4VP configuration.",
+            notes = "Retrieve the tenant OpenID4VP configuration.",
+            response = OpenID4VPConfiguration.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {})
+    }, tags={ "OpenID4VP Configurations", })
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Successful Response", response = OpenID4VPConfiguration.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getOpenID4VPConfiguration() {
+
+        return delegate.getOpenID4VPConfiguration();
+    }
+
+    @Valid
+    @PUT
+    @Path("/openid4vp")
+
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update the tenant OpenID4VP configuration.",
+            notes = "Update the tenant OpenID4VP configuration.",
+            response = OpenID4VPConfiguration.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {})
+    }, tags={ "OpenID4VP Configurations", })
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Successful Response", response = OpenID4VPConfiguration.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response updateOpenID4VPConfiguration(
+            @ApiParam(value = "", required = true) @Valid OpenID4VPConfiguration openID4VPConfiguration) {
+
+        return delegate.updateOpenID4VPConfiguration(openID4VPConfiguration);
     }
 
     @Valid

@@ -56,6 +56,10 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.EventProperty;
 import org.wso2.carbon.identity.api.server.configs.v1.model.FraudDetectionConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationConfiguration;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.OpenID4VPConfiguration;
+import org.wso2.carbon.identity.openid4vc.presentation.common.config.OpenID4VPConfigMgtException;
+import org.wso2.carbon.identity.openid4vc.presentation.common.config.OpenID4VPConfigService;
+import org.wso2.carbon.identity.openid4vc.presentation.common.config.OpenID4VPTenantConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthOAuth2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
@@ -514,6 +518,58 @@ public class ServerConfigManagementService {
         } catch (ImpersonationConfigMgtException e) {
             throw handleImpersonationConfigException(e, Constants.ErrorMessage.ERROR_CODE_IMP_CONFIG_DELETE,
                     tenantDomain);
+        }
+    }
+
+    /**
+     * Retrieves the OpenID4VP configuration for the current tenant domain.
+     *
+     * @return OpenID4VPConfiguration the current OID4VP configuration.
+     */
+    public OpenID4VPConfiguration getOpenID4VPConfiguration() {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        OpenID4VPConfigService configService = ConfigsServiceHolder.getOpenID4VPConfigService();
+        if (configService == null) {
+            throw handleException(Response.Status.NOT_IMPLEMENTED,
+                    Constants.ErrorMessage.ERROR_CODE_OID4VP_NOT_ENABLED, null);
+        }
+        try {
+            OpenID4VPTenantConfig cfg = configService.getConfig(tenantDomain);
+            return new OpenID4VPConfiguration()
+                    .clientIdScheme(cfg.getClientIdScheme())
+                    .responseMode(cfg.getResponseMode())
+                    .registrationCertificate(cfg.getRegistrationCertificate());
+        } catch (OpenID4VPConfigMgtException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_OID4VP_CONFIG_RETRIEVE, null);
+        }
+    }
+
+    /**
+     * Updates the OpenID4VP configuration for the current tenant domain.
+     *
+     * @param config the new OID4VP configuration.
+     * @return the updated OpenID4VPConfiguration.
+     */
+    public OpenID4VPConfiguration updateOpenID4VPConfiguration(OpenID4VPConfiguration config) {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        OpenID4VPConfigService configService = ConfigsServiceHolder.getOpenID4VPConfigService();
+        if (configService == null) {
+            throw handleException(Response.Status.NOT_IMPLEMENTED,
+                    Constants.ErrorMessage.ERROR_CODE_OID4VP_NOT_ENABLED, null);
+        }
+        try {
+            OpenID4VPTenantConfig tenantConfig = new OpenID4VPTenantConfig();
+            tenantConfig.setClientIdScheme(config.getClientIdScheme());
+            tenantConfig.setResponseMode(config.getResponseMode());
+            tenantConfig.setRegistrationCertificate(config.getRegistrationCertificate());
+            configService.setConfig(tenantConfig, tenantDomain);
+            return config;
+        } catch (OpenID4VPConfigMgtException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_OID4VP_CONFIG_UPDATE, null);
         }
     }
 

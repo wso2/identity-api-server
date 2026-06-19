@@ -29,6 +29,7 @@ import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
 import org.wso2.carbon.identity.oauth2.config.services.OAuth2OIDCConfigOrgUsageScopeMgtService;
 import org.wso2.carbon.identity.oauth2.impersonation.services.ImpersonationConfigMgtService;
 import org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.core.JWTClientAuthenticatorMgtService;
+import org.wso2.carbon.identity.openid4vc.presentation.common.config.OpenID4VPConfigService;
 import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 import org.wso2.carbon.idp.mgt.IdpManager;
 import org.wso2.carbon.logging.service.RemoteLoggingConfigService;
@@ -236,5 +237,17 @@ public class ConfigsServiceHolder {
     public static CompatibilitySettingsService getIdentityCompatibilitySettingsService() {
 
         return IdentityCompatibilitySettingsServiceHolder.SERVICE;
+    }
+
+    /**
+     * Get OpenID4VPConfigService osgi service.
+     * Returns null if the OID4VP feature is not enabled/deployed.
+     *
+     * @return OpenID4VPConfigService
+     */
+    public static OpenID4VPConfigService getOpenID4VPConfigService() {
+
+        return (OpenID4VPConfigService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(OpenID4VPConfigService.class, null);
     }
 }

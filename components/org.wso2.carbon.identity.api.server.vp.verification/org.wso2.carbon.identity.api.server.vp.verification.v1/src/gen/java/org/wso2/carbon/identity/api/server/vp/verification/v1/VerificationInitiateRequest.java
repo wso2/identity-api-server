@@ -29,9 +29,6 @@ import io.swagger.annotations.ApiModelProperty;
 public class VerificationInitiateRequest {
 
     private String presentationDefinitionId;
-    private String clientIdScheme;
-    private String responseMode;
-    private String registrationCert;
 
     @ApiModelProperty(required = true,
             value = "ID of the presentation definition the verifier wants the wallet to satisfy.")
@@ -42,37 +39,5 @@ public class VerificationInitiateRequest {
 
     public void setPresentationDefinitionId(String presentationDefinitionId) {
         this.presentationDefinitionId = presentationDefinitionId;
-    }
-
-    @ApiModelProperty(value = "Client ID scheme: redirect_uri, x509_san_dns, or x509_hash. "
-            + "Defaults to x509_san_dns.")
-    @JsonProperty("clientIdScheme")
-    public String getClientIdScheme() {
-        return clientIdScheme;
-    }
-
-    public void setClientIdScheme(String clientIdScheme) {
-        this.clientIdScheme = clientIdScheme;
-    }
-
-    @ApiModelProperty(value = "Response mode: direct_post or direct_post.jwt. Defaults to direct_post.")
-    @JsonProperty("responseMode")
-    public String getResponseMode() {
-        return responseMode;
-    }
-
-    public void setResponseMode(String responseMode) {
-        this.responseMode = responseMode;
-    }
-
-    @ApiModelProperty(value = "PEM-encoded X.509 certificate to include in the x5c header of the request JWT. "
-            + "Required for x509_san_dns and x509_hash schemes.")
-    @JsonProperty("registrationCert")
-    public String getRegistrationCert() {
-        return registrationCert;
-    }
-
-    public void setRegistrationCert(String registrationCert) {
-        this.registrationCert = registrationCert;
     }
 }

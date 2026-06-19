@@ -199,6 +199,11 @@
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.openid4vc</groupId>
+            <artifactId>org.wso2.carbon.identity.openid4vc.presentation.common</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
 </project>
