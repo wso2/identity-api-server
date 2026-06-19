@@ -56,6 +56,7 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_READ_ONLY;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_REQUIRED;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_GET_IDENTITY_PROVIDERS;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Authenticators.OPENID4VP_AUTHENTICATOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.APPLE_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.EMAIL_OTP_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.FACEBOOK_EXECUTOR;
@@ -65,6 +66,7 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.F
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.MAGIC_LINK_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.OFFICE365_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.OPENID_CONNECT_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.OPENID4VP_REGISTRATION_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.PASSWORD_PROVISIONING_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.SMS_OTP_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.USER_PROVISIONING_EXECUTOR;
@@ -337,6 +339,7 @@ public abstract class AbstractMetaResponseHandler {
         connectionExecutorMap.put(FlowEndpointConstants.Authenticators.APPLE_AUTHENTICATOR, APPLE_EXECUTOR);
         connectionExecutorMap.put(FlowEndpointConstants.Authenticators.OPENID_CONNECT_AUTHENTICATOR,
                 OPENID_CONNECT_EXECUTOR);
+        connectionExecutorMap.put(OPENID4VP_AUTHENTICATOR, OPENID4VP_REGISTRATION_EXECUTOR);
         return connectionExecutorMap;
     }
 
