@@ -27,10 +27,12 @@ import org.wso2.carbon.identity.api.server.vp.template.management.v1.Presentatio
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionListItem;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionResponse;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionUpdateModel;
+import org.wso2.carbon.identity.api.server.vp.template.management.v1.ClaimConstraintModel;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.RequestedCredentialModel;
 import org.wso2.carbon.identity.openid4vc.presentation.common.exception.VPException;
 import org.wso2.carbon.identity.openid4vc.presentation.management.exception.PresentationDefinitionNotFoundException;
 import org.wso2.carbon.identity.openid4vc.presentation.management.model.PresentationDefinition;
+import org.wso2.carbon.identity.openid4vc.presentation.management.model.PresentationDefinition.ClaimConstraint;
 import org.wso2.carbon.identity.openid4vc.presentation.management.model.PresentationDefinition.RequestedCredential;
 import org.wso2.carbon.identity.openid4vc.presentation.management.service.PresentationDefinitionService;
 
@@ -207,7 +209,7 @@ public class ServerVPDefinitionManagementService {
             cred.setType(apiModel.getType());
             cred.setPurpose(apiModel.getPurpose());
             cred.setIssuer(apiModel.getIssuer());
-            cred.setClaims(apiModel.getClaims());
+            cred.setClaims(toClaimConstraints(apiModel.getClaims()));
             cred.setEnforceTrustedIssuers(Boolean.TRUE.equals(apiModel.getEnforceTrustedIssuers()));
             cred.setTrustedIssuers(apiModel.getTrustedIssuers());
             result.add(cred);
@@ -230,10 +232,42 @@ public class ServerVPDefinitionManagementService {
             model.setType(cred.getType());
             model.setPurpose(cred.getPurpose());
             model.setIssuer(cred.getIssuer());
-            model.setClaims(cred.getClaims());
+            model.setClaims(toClaimConstraintModels(cred.getClaims()));
             model.setEnforceTrustedIssuers(cred.isEnforceTrustedIssuers());
             model.setTrustedIssuers(cred.getTrustedIssuers());
             result.add(model);
+        }
+        return result;
+    }
+
+    private List<ClaimConstraint> toClaimConstraints(List<ClaimConstraintModel> apiModels) {
+
+        if (apiModels == null) {
+            return null;
+        }
+        List<ClaimConstraint> result = new ArrayList<>();
+        for (ClaimConstraintModel cm : apiModels) {
+            ClaimConstraint cc = new ClaimConstraint();
+            cc.setName(cm.getName());
+            cc.setMandatory(Boolean.TRUE.equals(cm.getMandatory() == null ? Boolean.TRUE : cm.getMandatory()));
+            cc.setAllowedValues(cm.getAllowedValues());
+            result.add(cc);
+        }
+        return result;
+    }
+
+    private List<ClaimConstraintModel> toClaimConstraintModels(List<ClaimConstraint> domainConstraints) {
+
+        if (domainConstraints == null) {
+            return null;
+        }
+        List<ClaimConstraintModel> result = new ArrayList<>();
+        for (ClaimConstraint cc : domainConstraints) {
+            ClaimConstraintModel cm = new ClaimConstraintModel();
+            cm.setName(cc.getName());
+            cm.setMandatory(cc.isMandatory());
+            cm.setAllowedValues(cc.getAllowedValues());
+            result.add(cm);
         }
         return result;
     }

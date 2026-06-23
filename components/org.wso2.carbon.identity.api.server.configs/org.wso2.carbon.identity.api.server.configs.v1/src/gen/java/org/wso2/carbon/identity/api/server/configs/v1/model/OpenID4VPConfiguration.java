@@ -34,6 +34,7 @@ public class OpenID4VPConfiguration {
     private String clientId;
     private String responseMode;
     private String registrationCertificate;
+    private Boolean rejectVcWithoutStatusClaim;
 
     public OpenID4VPConfiguration clientIdScheme(String clientIdScheme) {
 
@@ -105,6 +106,23 @@ public class OpenID4VPConfiguration {
 
     public void setRegistrationCertificate(String registrationCertificate) {
         this.registrationCertificate = registrationCertificate;
+    }
+
+    public OpenID4VPConfiguration rejectVcWithoutStatusClaim(Boolean rejectVcWithoutStatusClaim) {
+
+        this.rejectVcWithoutStatusClaim = rejectVcWithoutStatusClaim;
+        return this;
+    }
+
+    @ApiModelProperty(value = "When true, VCs that do not carry a status claim are rejected during verification.")
+    @JsonProperty("rejectVcWithoutStatusClaim")
+    @Valid
+    public Boolean getRejectVcWithoutStatusClaim() {
+        return rejectVcWithoutStatusClaim;
+    }
+
+    public void setRejectVcWithoutStatusClaim(Boolean rejectVcWithoutStatusClaim) {
+        this.rejectVcWithoutStatusClaim = rejectVcWithoutStatusClaim;
     }
 
     @Override

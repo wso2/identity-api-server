@@ -17,7 +17,7 @@ public class RequestedCredentialModel {
     private String type;
     private String purpose;
     private String issuer;
-    private List<String> claims;
+    private List<ClaimConstraintModel> claims;
     private Boolean enforceTrustedIssuers;
     private List<String> trustedIssuers;
 
@@ -51,13 +51,13 @@ public class RequestedCredentialModel {
         this.issuer = issuer;
     }
 
-    @ApiModelProperty(value = "List of claims requested from this credential.")
+    @ApiModelProperty(value = "List of claim constraints for this credential.")
     @JsonProperty("claims")
-    public List<String> getClaims() {
+    public List<ClaimConstraintModel> getClaims() {
         return claims;
     }
 
-    public void setClaims(List<String> claims) {
+    public void setClaims(List<ClaimConstraintModel> claims) {
         this.claims = claims;
     }
 
