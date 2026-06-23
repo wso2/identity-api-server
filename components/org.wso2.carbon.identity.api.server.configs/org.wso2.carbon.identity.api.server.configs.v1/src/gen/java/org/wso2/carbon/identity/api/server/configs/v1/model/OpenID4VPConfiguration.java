@@ -31,6 +31,7 @@ import javax.validation.Valid;
 public class OpenID4VPConfiguration {
 
     private String clientIdScheme;
+    private String clientId;
     private String responseMode;
     private String registrationCertificate;
 
@@ -50,6 +51,25 @@ public class OpenID4VPConfiguration {
 
     public void setClientIdScheme(String clientIdScheme) {
         this.clientIdScheme = clientIdScheme;
+    }
+
+    public OpenID4VPConfiguration clientId(String clientId) {
+
+        this.clientId = clientId;
+        return this;
+    }
+
+    @ApiModelProperty(example = "x509_san_dns:myserver.example.com",
+            value = "Optional override for the client_id sent in VP requests. "
+                    + "Leave blank to auto-derive from the client ID scheme.")
+    @JsonProperty("clientId")
+    @Valid
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
     }
 
     public OpenID4VPConfiguration responseMode(String responseMode) {
@@ -98,13 +118,14 @@ public class OpenID4VPConfiguration {
         }
         OpenID4VPConfiguration that = (OpenID4VPConfiguration) o;
         return Objects.equals(this.clientIdScheme, that.clientIdScheme)
+                && Objects.equals(this.clientId, that.clientId)
                 && Objects.equals(this.responseMode, that.responseMode)
                 && Objects.equals(this.registrationCertificate, that.registrationCertificate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(clientIdScheme, responseMode, registrationCertificate);
+        return Objects.hash(clientIdScheme, clientId, responseMode, registrationCertificate);
     }
 
     @Override
@@ -113,6 +134,7 @@ public class OpenID4VPConfiguration {
         StringBuilder sb = new StringBuilder();
         sb.append("class OpenID4VPConfiguration {\n");
         sb.append("    clientIdScheme: ").append(clientIdScheme).append("\n");
+        sb.append("    clientId: ").append(clientId).append("\n");
         sb.append("    responseMode: ").append(responseMode).append("\n");
         sb.append("    registrationCertificate: ").append("[REDACTED]").append("\n");
         sb.append("}");
