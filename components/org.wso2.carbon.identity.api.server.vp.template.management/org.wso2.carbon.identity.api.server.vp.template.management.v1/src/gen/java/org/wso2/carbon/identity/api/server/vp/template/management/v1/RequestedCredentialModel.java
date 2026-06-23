@@ -18,6 +18,8 @@ public class RequestedCredentialModel {
     private String purpose;
     private String issuer;
     private List<String> claims;
+    private Boolean enforceTrustedIssuers;
+    private List<String> trustedIssuers;
 
     @ApiModelProperty(required = true, value = "Type of the requested credential.")
     @JsonProperty("type")
@@ -57,5 +59,25 @@ public class RequestedCredentialModel {
 
     public void setClaims(List<String> claims) {
         this.claims = claims;
+    }
+
+    @ApiModelProperty(value = "Whether to enforce trusted issuer validation for this credential.")
+    @JsonProperty("enforceTrustedIssuers")
+    public Boolean getEnforceTrustedIssuers() {
+        return enforceTrustedIssuers;
+    }
+
+    public void setEnforceTrustedIssuers(Boolean enforceTrustedIssuers) {
+        this.enforceTrustedIssuers = enforceTrustedIssuers;
+    }
+
+    @ApiModelProperty(value = "List of trusted issuer URIs/DIDs for this credential.")
+    @JsonProperty("trustedIssuers")
+    public List<String> getTrustedIssuers() {
+        return trustedIssuers;
+    }
+
+    public void setTrustedIssuers(List<String> trustedIssuers) {
+        this.trustedIssuers = trustedIssuers;
     }
 }

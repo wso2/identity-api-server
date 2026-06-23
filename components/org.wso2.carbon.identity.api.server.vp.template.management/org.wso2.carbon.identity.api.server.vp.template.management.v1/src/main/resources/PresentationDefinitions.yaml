@@ -254,13 +254,23 @@ components:
           example: "Please share your employee badge to prove employment."
         issuer:
           type: string
-          description: The trusted issuer for this credential.
+          description: The trusted issuer for this credential (legacy single-issuer field).
         claims:
           type: array
           description: List of claims requested from this credential.
           items:
             type: string
             example: "email"
+        enforceTrustedIssuers:
+          type: boolean
+          description: When true, the credential's issuer is validated against the trustedIssuers list.
+          example: true
+        trustedIssuers:
+          type: array
+          description: List of trusted issuer URIs or DIDs. Enforced only when enforceTrustedIssuers is true.
+          items:
+            type: string
+            example: "https://issuer.example.com"
 
     PresentationDefinitionCreationModel:
       type: object

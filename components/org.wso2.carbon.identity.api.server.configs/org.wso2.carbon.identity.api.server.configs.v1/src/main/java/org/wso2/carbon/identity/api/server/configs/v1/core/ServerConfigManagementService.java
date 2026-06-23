@@ -60,6 +60,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.OpenID4VPConfigurati
 import org.wso2.carbon.identity.openid4vc.presentation.common.config.OpenID4VPConfigMgtException;
 import org.wso2.carbon.identity.openid4vc.presentation.common.config.OpenID4VPConfigService;
 import org.wso2.carbon.identity.openid4vc.presentation.common.config.OpenID4VPTenantConfig;
+import org.wso2.carbon.identity.openid4vc.presentation.common.constant.OpenID4VPConstants;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthOAuth2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
@@ -537,8 +538,11 @@ public class ServerConfigManagementService {
         try {
             OpenID4VPTenantConfig cfg = configService.getConfig(tenantDomain);
             return new OpenID4VPConfiguration()
-                    .clientIdScheme(cfg.getClientIdScheme())
-                    .responseMode(cfg.getResponseMode())
+                    .clientIdScheme(StringUtils.defaultIfBlank(
+                            cfg.getClientIdScheme(), OpenID4VPConstants.Defaults.CLIENT_ID_SCHEME))
+                    .clientId(cfg.getClientId())
+                    .responseMode(StringUtils.defaultIfBlank(
+                            cfg.getResponseMode(), OpenID4VPConstants.Defaults.RESPONSE_MODE))
                     .registrationCertificate(cfg.getRegistrationCertificate());
         } catch (OpenID4VPConfigMgtException e) {
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
@@ -563,6 +567,7 @@ public class ServerConfigManagementService {
         try {
             OpenID4VPTenantConfig tenantConfig = new OpenID4VPTenantConfig();
             tenantConfig.setClientIdScheme(config.getClientIdScheme());
+            tenantConfig.setClientId(config.getClientId());
             tenantConfig.setResponseMode(config.getResponseMode());
             tenantConfig.setRegistrationCertificate(config.getRegistrationCertificate());
             configService.setConfig(tenantConfig, tenantDomain);

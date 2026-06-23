@@ -208,6 +208,8 @@ public class ServerVPDefinitionManagementService {
             cred.setPurpose(apiModel.getPurpose());
             cred.setIssuer(apiModel.getIssuer());
             cred.setClaims(apiModel.getClaims());
+            cred.setEnforceTrustedIssuers(Boolean.TRUE.equals(apiModel.getEnforceTrustedIssuers()));
+            cred.setTrustedIssuers(apiModel.getTrustedIssuers());
             result.add(cred);
         }
         return result;
@@ -229,6 +231,8 @@ public class ServerVPDefinitionManagementService {
             model.setPurpose(cred.getPurpose());
             model.setIssuer(cred.getIssuer());
             model.setClaims(cred.getClaims());
+            model.setEnforceTrustedIssuers(cred.isEnforceTrustedIssuers());
+            model.setTrustedIssuers(cred.getTrustedIssuers());
             result.add(model);
         }
         return result;
