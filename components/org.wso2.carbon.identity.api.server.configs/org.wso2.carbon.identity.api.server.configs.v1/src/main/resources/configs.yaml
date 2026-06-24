@@ -578,6 +578,101 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /configs/agent:
+    get:
+      tags:
+        - Agent Configurations
+      summary: Retrieve the tenant agent configuration.
+      operationId: getAgentConfiguration
+      description: Retrieve the tenant agent configuration.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentConfiguration'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - Agent Configurations
+      summary: Patch the tenant agent configuration.
+      operationId: patchAgentConfiguration
+      description: Patch the tenant agent configuration.  A JSONPatch as defined by RFC 6902.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentConfigPatchRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - Agent Configurations
+      summary: Revert the tenant agent configuration.
+      operationId: deleteAgentConfiguration
+      description: |
+        Revert the tenant agent configuration.
+        <b>Scope (Permission) required:</b> <br>
+          * internal_config_update
+      responses:
+        '204':
+          description: Successful deletion
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /configs/home-realm-identifiers:
     get:
       tags:
@@ -2182,6 +2277,40 @@ components:
           type: boolean
           description: The value to be used within the operations.
           example: false
+    AgentConfiguration:
+      type: object
+      properties:
+        agentsExternallyManaged:
+          type: boolean
+          description: If true, the tenant's agents are managed in an external system and the requested_actor is not validated against the local agent store in authorization.
+          example: false
+    AgentConfigPatchRequest:
+      type: array
+      items:
+        $ref: '#/components/schemas/AgentConfigPatch'
+    AgentConfigPatch:
+      type: object
+      required:
+        - operation
+        - path
+        - value
+      properties:
+        operation:
+          type: string
+          description: The operation to be performed.
+          enum:
+            - ADD
+            - REMOVE
+            - REPLACE
+          example: REPLACE
+        path:
+          type: string
+          description: A JSON-Pointer
+          example: '/agentsExternallyManaged'
+        value:
+          type: boolean
+          description: The value to be used within the operations.
+          example: true
     HomeRealmIdentifiers:
       type: array
       description: The list of home realm identifiers.

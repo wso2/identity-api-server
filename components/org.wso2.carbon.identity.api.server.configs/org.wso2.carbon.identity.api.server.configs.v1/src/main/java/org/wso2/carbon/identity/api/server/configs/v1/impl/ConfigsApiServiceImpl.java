@@ -22,6 +22,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.ConfigsApiService;
 import org.wso2.carbon.identity.api.server.configs.v1.core.ServerConfigManagementService;
 import org.wso2.carbon.identity.api.server.configs.v1.factories.ServerConfigManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ApplicationObject;
+import org.wso2.carbon.identity.api.server.configs.v1.model.AgentConfigPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettings;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
@@ -177,13 +178,6 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     }
 
     @Override
-    public Response removeApplicationFromPurpose(String purposeId, String applicationId) {
-
-        configManagementService.removeApplicationFromPurpose(purposeId, applicationId);
-        return Response.noContent().build();
-    }
-
-    @Override
     public Response getSchemas() {
 
         return Response.ok().entity(configManagementService.getSchemas()).build();
@@ -326,12 +320,6 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
         return Response.noContent().build();
     }
 
-    @Override
-    public Response getApplicationsForPurpose(String purposeId) {
-
-        return Response.ok().entity(configManagementService.getApplicationsForPurpose(purposeId)).build();
-    }
-
     /**
      * Gets the OAuth2 inbound authentication configuration of an organization.
      *
@@ -354,13 +342,6 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
 
         configManagementService.updateOAuth2InboundAuthConfig(inboundAuthOAuth2Config);
         return Response.ok().build();
-    }
-
-    @Override
-    public Response addApplicationToPurpose(String purposeId, ApplicationObject applicationObject) {
-
-        configManagementService.addApplicationToPurpose(purposeId, applicationObject.getId());
-        return Response.status(Response.Status.CREATED).build();
     }
 
     /**

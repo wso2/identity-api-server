@@ -54,6 +54,8 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Endpoint;
 import org.wso2.carbon.identity.api.server.configs.v1.model.EventConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.EventProperty;
+import org.wso2.carbon.identity.api.server.configs.v1.model.AgentConfigPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.AgentConfiguration;
 import org.wso2.carbon.identity.api.server.configs.v1.model.FraudDetectionConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationConfiguration;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
@@ -117,6 +119,11 @@ import org.wso2.carbon.identity.oauth2.config.exceptions.OAuth2OIDCConfigOrgUsag
 import org.wso2.carbon.identity.oauth2.config.models.IssuerUsageScopeConfig;
 import org.wso2.carbon.identity.oauth2.config.models.UsageScope;
 import org.wso2.carbon.identity.oauth2.config.services.OAuth2OIDCConfigOrgUsageScopeMgtService;
+import org.wso2.carbon.identity.oauth2.agent.exceptions.AgentConfigMgtClientException;
+import org.wso2.carbon.identity.oauth2.agent.exceptions.AgentConfigMgtException;
+import org.wso2.carbon.identity.oauth2.agent.exceptions.AgentConfigMgtServerException;
+import org.wso2.carbon.identity.oauth2.agent.models.AgentConfig;
+import org.wso2.carbon.identity.oauth2.agent.services.AgentConfigMgtService;
 import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationConfigMgtClientException;
 import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationConfigMgtException;
 import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationConfigMgtServerException;
@@ -172,6 +179,7 @@ public class ServerConfigManagementService {
     private final CORSManagementService corsManagementService;
     private final RemoteLoggingConfigService remoteLoggingConfigService;
     private final ImpersonationConfigMgtService impersonationConfigMgtService;
+    private final AgentConfigMgtService agentConfigMgtService;
     private final JWTClientAuthenticatorMgtService jwtClientAuthenticatorMgtService;
     private final DCRConfigurationMgtService dcrConfigurationMgtService;
     private final OAuth2OIDCConfigOrgUsageScopeMgtService oauth2OIDCConfigOrgUsageScopeMgtService;
@@ -184,6 +192,7 @@ public class ServerConfigManagementService {
                                          CORSManagementService corsManagementService,
                                          RemoteLoggingConfigService remoteLoggingConfigService,
                                          ImpersonationConfigMgtService impersonationConfigMgtService,
+                                         AgentConfigMgtService agentConfigMgtService,
                                          DCRConfigurationMgtService dcrConfigurationMgtService,
                                          JWTClientAuthenticatorMgtService jwtClientAuthenticatorMgtService,
                                          FraudDetectionConfigsService fraudDetectionConfigsService,
@@ -196,6 +205,7 @@ public class ServerConfigManagementService {
         this.corsManagementService = corsManagementService;
         this.remoteLoggingConfigService = remoteLoggingConfigService;
         this.impersonationConfigMgtService = impersonationConfigMgtService;
+        this.agentConfigMgtService = agentConfigMgtService;
         this.dcrConfigurationMgtService = dcrConfigurationMgtService;
         this.jwtClientAuthenticatorMgtService = jwtClientAuthenticatorMgtService;
         this.fraudDetectionConfigsService = fraudDetectionConfigsService;
@@ -517,6 +527,86 @@ public class ServerConfigManagementService {
         } catch (ImpersonationConfigMgtException e) {
             throw handleImpersonationConfigException(e, Constants.ErrorMessage.ERROR_CODE_IMP_CONFIG_DELETE,
                     tenantDomain);
+        }
+    }
+
+    /**
+     * Retrieves the agent configuration for the current tenant domain.
+     *
+     * @return AgentConfiguration The current agent configuration.
+     * @throws AgentConfigMgtException If there is an error retrieving the agent configuration.
+     */
+    public AgentConfiguration getAgentConfiguration() {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        AgentConfiguration agentConfiguration = new AgentConfiguration();
+        try {
+            AgentConfig agentConfig = agentConfigMgtService.getAgentConfig(tenantDomain);
+            return agentConfiguration.agentsExternallyManaged(agentConfig.isAgentsExternallyManaged());
+        } catch (AgentConfigMgtException e) {
+            throw handleAgentConfigException(e, Constants.ErrorMessage.ERROR_CODE_AGENT_CONFIG_RETRIEVE, null);
+        }
+    }
+
+    /**
+     * Applies patch operations to the agent configuration for the current tenant domain.
+     *
+     * @param agentConfigPatchList List of patch operations to apply.
+     * @throws AgentConfigMgtException If there is an error updating the agent configuration.
+     */
+    public void patchAgentConfiguration(List<AgentConfigPatch> agentConfigPatchList) {
+
+        if (CollectionUtils.isEmpty(agentConfigPatchList)) {
+            return;
+        }
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        AgentConfig agentConfig;
+        try {
+            agentConfig = agentConfigMgtService.getAgentConfig(tenantDomain);
+        } catch (AgentConfigMgtException e) {
+            throw handleAgentConfigException(e, Constants.ErrorMessage.ERROR_CODE_AGENT_CONFIG_RETRIEVE, null);
+        }
+
+        try {
+            for (AgentConfigPatch agentConfigPatch : agentConfigPatchList) {
+                String path = agentConfigPatch.getPath();
+                AgentConfigPatch.OperationEnum operation = agentConfigPatch.getOperation();
+                boolean value = agentConfigPatch.getValue();
+
+                // Support only 'REPLACE' and 'ADD' patch operations on the externally-managed flag.
+                if (operation == AgentConfigPatch.OperationEnum.REPLACE
+                        || operation == AgentConfigPatch.OperationEnum.ADD) {
+                    if (path.matches(Constants.AGENT_CONFIG_AGENTS_EXTERNALLY_MANAGED)) {
+                        agentConfig.setAgentsExternallyManaged(value);
+                    } else {
+                        throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                                .ERROR_CODE_INVALID_INPUT, "Unsupported patch operation");
+                    }
+                } else {
+                    throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                            .ERROR_CODE_INVALID_INPUT, "Unsupported patch operation");
+                }
+            }
+
+            agentConfigMgtService.setAgentConfig(agentConfig, tenantDomain);
+        } catch (AgentConfigMgtException e) {
+            throw handleAgentConfigException(e, Constants.ErrorMessage.ERROR_CODE_AGENT_CONFIG_UPDATE, null);
+        }
+    }
+
+    /**
+     * Deletes the agent configuration for the current tenant domain.
+     *
+     * @throws AgentConfigMgtException If there is an error deleting the agent configuration.
+     */
+    public void deleteAgentConfiguration() {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            agentConfigMgtService.deleteAgentConfig(tenantDomain);
+        } catch (AgentConfigMgtException e) {
+            throw handleAgentConfigException(e, Constants.ErrorMessage.ERROR_CODE_AGENT_CONFIG_DELETE, tenantDomain);
         }
     }
 
@@ -1456,6 +1546,43 @@ public class ServerConfigManagementService {
         }
         return new APIError(status, errorResponse);
     }
+
+    private APIError handleAgentConfigException(AgentConfigMgtException e,
+                                                Constants.ErrorMessage errorEnum, String data) {
+
+        ErrorResponse errorResponse;
+
+        Response.Status status;
+
+        if (e instanceof AgentConfigMgtClientException) {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e.getMessage());
+            if (e.getErrorCode() != null) {
+                String errorCode = e.getErrorCode();
+                errorCode =
+                        errorCode.contains(org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER) ?
+                                errorCode : Constants.CONFIG_ERROR_PREFIX + errorCode;
+                errorResponse.setCode(errorCode);
+            }
+            errorResponse.setDescription(e.getMessage());
+            status = Response.Status.BAD_REQUEST;
+        } else if (e instanceof AgentConfigMgtServerException) {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.description());
+            if (e.getErrorCode() != null) {
+                String errorCode = e.getErrorCode();
+                errorCode =
+                        errorCode.contains(org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER) ?
+                                errorCode : Constants.CONFIG_ERROR_PREFIX + errorCode;
+                errorResponse.setCode(errorCode);
+            }
+            errorResponse.setDescription(e.getMessage());
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+        } else {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.description());
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+        }
+        return new APIError(status, errorResponse);
+    }
+
 
     /**
      * Handle exceptions generated in API.

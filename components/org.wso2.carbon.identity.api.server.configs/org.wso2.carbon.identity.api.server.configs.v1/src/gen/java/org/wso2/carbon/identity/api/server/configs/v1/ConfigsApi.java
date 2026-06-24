@@ -34,6 +34,8 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySetting
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Error;
+import org.wso2.carbon.identity.api.server.configs.v1.model.AgentConfiguration;
+import org.wso2.carbon.identity.api.server.configs.v1.model.AgentConfigPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.FraudDetectionConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationConfiguration;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
@@ -330,6 +332,30 @@ public class ConfigsApi  {
     public Response getImpersonationConfiguration() {
 
         return delegate.getImpersonationConfiguration();
+    }
+
+    @Valid
+    @GET
+    @Path("/agent")
+
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve the tenant agent configuration.", notes = "Retrieve the tenant agent configuration.", response = AgentConfiguration.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+
+        })
+    }, tags={ "Agent Configurations", })
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Successful Response", response = AgentConfiguration.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getAgentConfiguration() {
+
+        return delegate.getAgentConfiguration();
     }
 
     @Valid
@@ -695,6 +721,30 @@ public class ConfigsApi  {
 
     @Valid
     @PATCH
+    @Path("/agent")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Patch the tenant agent configuration.", notes = "Patch the tenant agent configuration.  A JSONPatch as defined by RFC 6902.", response = Void.class, authorizations = {
+            @Authorization(value = "BasicAuth"),
+            @Authorization(value = "OAuth2", scopes = {
+
+            })
+    }, tags={ "Agent Configurations", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful Response", response = Void.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+            @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response patchAgentConfiguration(@ApiParam(value = "" ,required=true) @Valid List<AgentConfigPatch> agentConfigPatch) {
+
+        return delegate.patchAgentConfiguration(agentConfigPatch );
+    }
+
+    @Valid
+    @PATCH
     @Path("/jwt-key-validator")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
@@ -832,6 +882,28 @@ public class ConfigsApi  {
     public Response deleteImpersonationConfiguration() {
 
         return delegate.deleteImpersonationConfiguration();
+    }
+
+    @Valid
+    @DELETE
+    @Path("/agent")
+
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Revert the tenant agent configuration.", notes = "Revert the tenant agent configuration.  <b>Scope (Permission) required:</b> <br>   * internal_config_update ", response = Void.class, authorizations = {
+            @Authorization(value = "BasicAuth"),
+            @Authorization(value = "OAuth2", scopes = {
+
+            })
+    }, tags={ "Agent Configurations", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Successful deletion", response = Void.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+            @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response deleteAgentConfiguration() {
+
+        return delegate.deleteAgentConfiguration();
     }
 
     @Valid
