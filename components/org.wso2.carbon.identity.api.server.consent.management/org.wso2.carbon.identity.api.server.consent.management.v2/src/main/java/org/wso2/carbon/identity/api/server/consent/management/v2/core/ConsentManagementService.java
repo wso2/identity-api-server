@@ -229,7 +229,7 @@ public class ConsentManagementService {
             if (FilterConstants.FILTER_ATTR_AFTER.equals(attr) || FilterConstants.FILTER_ATTR_BEFORE.equals(attr)) {
                 continue;
             }
-            if (attr == null || !attr.startsWith("properties.")) {
+            if (attr == null || !attr.startsWith("properties.") || attr.length() <= "properties.".length()) {
                 throw handleClientException(ERROR_CODE_INVALID_FILTER_EXPRESSION,
                         "Only 'properties.<key>' attributes are supported in consent filter. Got: " + attr);
             }
