@@ -64,7 +64,6 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
-import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ACTIVE_STATE;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.DEFAULT_LIMIT;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_CONSENT_REJECTED_WITH_AUTHORIZATIONS;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_ELEMENT_UUID_NOT_FOUND;
@@ -123,14 +122,6 @@ public class ConsentManagementService {
         responseDTO.setLanguage(addReceiptResponse.getLanguage());
         responseDTO.setSubjectId(addReceiptResponse.getPiiPrincipalId());
         responseDTO.setTenantDomain(addReceiptResponse.getTenantDomain());
-        boolean hasPendingAuth = request.getAuthorizations() != null && !request.getAuthorizations().isEmpty();
-        if (hasPendingAuth) {
-            responseDTO.setState(ConsentResponseDTO.StateEnum.PENDING);
-        } else if (ConsentCreateRequest.StateEnum.REJECTED.equals(request.getState())) {
-            responseDTO.setState(ConsentResponseDTO.StateEnum.REJECTED);
-        } else {
-            responseDTO.setState(ConsentResponseDTO.StateEnum.ACTIVE);
-        }
         return responseDTO;
     }
 
@@ -280,10 +271,6 @@ public class ConsentManagementService {
 
         try {
             Receipt receipt = consentManager.getReceiptWithExtendedSchema(receiptId);
-            String currentState = StringUtils.isNotBlank(receipt.getState()) ? receipt.getState() : ACTIVE_STATE;
-            if (REVOKE_STATE.equals(currentState)) {
-                return;
-            }
             consentManager.authorizeConsent(receiptId, receipt.getPiiPrincipalId(), REVOKE_STATE);
         } catch (ConsentManagementException e) {
             throw ConsentMgtEndpointUtil.handleConsentManagementException(e);
@@ -389,8 +376,7 @@ public class ConsentManagementService {
         dto.setTimestamp(receipt.getConsentTimestamp());
         dto.setLanguage(receipt.getLanguage());
         dto.setSubjectId(receipt.getPiiPrincipalId());
-        String state = StringUtils.isNotBlank(receipt.getState()) ? receipt.getState() : ACTIVE_STATE;
-        dto.setState(ConsentDTO.StateEnum.fromValue(state));
+        dto.setState(ConsentDTO.StateEnum.fromValue(receipt.getState()));
         dto.setExpiryTime(receipt.getExpiryTime() != null ? receipt.getExpiryTime().getTime() : null);
 
         // Extract service name and purposes from the first service entry (V2 is single-service).
@@ -444,7 +430,6 @@ public class ConsentManagementService {
         ConsentedPurposeDTO dto = new ConsentedPurposeDTO();
         dto.setName(consentPurpose.getPurpose());
 
-        // Resolve purpose int ID to UUID, and populate version label using the fetched purpose.
         String versionUuid = consentPurpose.getPurposeVersionId();
         try {
             Purpose purpose = consentManager.getPurposeByUuid(consentPurpose.getUuid());
@@ -476,7 +461,7 @@ public class ConsentManagementService {
             }
         } catch (ConsentManagementException e) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Could not resolve purpose UUID for purposeId: " + consentPurpose.getPurposeId(), e);
+                LOG.debug("Could not resolve purpose UUID: " + consentPurpose.getUuid(), e);
             }
         }
 
@@ -486,21 +471,20 @@ public class ConsentManagementService {
                 ConsentedElementDTO elementDTO = new ConsentedElementDTO();
                 elementDTO.setName(piiCategoryValidity.getName());
                 elementDTO.setDisplayName(piiCategoryValidity.getDisplayName());
-                // Resolve element int ID to UUID.
                 try {
-                    PIICategory element = consentManager.getPIICategoryByUuid(piiCategoryValidity.getUuid());
-                    if (element == null) {
+                    PIICategory piiCategory = consentManager.getPIICategoryByUuid(piiCategoryValidity.getUuid());
+                    if (piiCategory == null) {
                         if (LOG.isDebugEnabled()) {
                             LOG.debug("Could not resolve element UUID for elementId: " + piiCategoryValidity.getUuid());
                         }
                     } else {
-                        if (StringUtils.isNotBlank(element.getUuid())) {
-                            elementDTO.setId(element.getUuid());
+                        if (StringUtils.isNotBlank(piiCategory.getUuid())) {
+                            elementDTO.setId(piiCategory.getUuid());
                         }
                     }
                 } catch (ConsentManagementException e) {
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("Could not resolve element UUID for elementId: " + piiCategoryValidity.getId(), e);
+                        LOG.debug("Could not resolve element UUID: " + piiCategoryValidity.getUuid(), e);
                     }
                 }
                 elementDTOs.add(elementDTO);
@@ -538,8 +522,7 @@ public class ConsentManagementService {
         ConsentSummaryDTO dto = new ConsentSummaryDTO();
         dto.setId(receipt.getConsentReceiptId());
         dto.setSubjectId(receipt.getPiiPrincipalId());
-        String state = StringUtils.isNotBlank(receipt.getState()) ? receipt.getState() : ACTIVE_STATE;
-        dto.setState(ConsentSummaryDTO.StateEnum.fromValue(state));
+        dto.setState(ConsentSummaryDTO.StateEnum.fromValue(receipt.getState()));
         dto.setTimestamp(receipt.getConsentTimestamp());
         dto.setExpiryTime(receipt.getExpiryTime() != null ? receipt.getExpiryTime().getTime() : null);
         if (receipt.getServices() != null && !receipt.getServices().isEmpty()) {

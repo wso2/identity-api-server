@@ -1473,11 +1473,6 @@ components:
           type: string
           description: Tenant domain
           example: "carbon.super"
-        state:
-          type: string
-          enum: [PENDING, ACTIVE, REJECTED, REVOKED, EXPIRED]
-          description: PENDING if awaiting approvals, ACTIVE if all accepted, REJECTED if any rejected before activation, REVOKED if any user revoked after activation, EXPIRED if expiryTime has passed.
-          example: "ACTIVE"
 
     ConsentListResponse:
       type: object
