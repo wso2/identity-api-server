@@ -431,17 +431,8 @@ paths:
         - Consents
       summary: Create a consent record
       description: |
-        Record consent for specified purposes and elements.
-
-        Without a scope, the authenticated user creates and gives consent simultaneously. The consent is
-        immediately recorded as `ACTIVE`. The `subjectId` field is ignored — the calling user is always
-        the consent subject. Providing `authorizations` returns 400.
-
-        <b>Scope(Permission) required:</b> `internal_consent_mgt_consent_create` — Creates a consent
-        record on behalf of a subject user without giving consent. The consent is created in `PENDING`
-        state and requires the subject user to authorize via `POST /consents/{consentId}/authorize`.
-        The `subjectId` field is required. The `authorizations` field may be provided to pre-declare
-        which users must authorize the pending consent.
+        Record a consent on behalf of a subject user.<br>
+        <b>Scope(Permission) required:</b> `internal_consent_mgt_consent_create`
       operationId: consentsCreate
       requestBody:
         required: true
@@ -477,13 +468,8 @@ paths:
         - Consents
       summary: List consent records
       description: |
-        Retrieve consent records with optional filtering.
-
-        Without a scope, returns only the authenticated user's own consents. The `subjectId` query
-        parameter is ignored.
-
-        <b>Scope(Permission) required:</b> `internal_consent_mgt_consent_view` — Returns consents for
-        any user. The `subjectId` parameter is applied as a filter.
+        Retrieve consent records with optional filtering.<br>
+        <b>Scope(Permission) required:</b> `internal_consent_mgt_consent_view`
       operationId: consentsList
       parameters:
         - $ref: '#/components/parameters/subjectId'
@@ -515,13 +501,8 @@ paths:
         - Consents
       summary: Get a consent record
       description: |
-        Retrieve a specific consent record by consent ID.
-
-        Without a scope, only the consent subject may retrieve the record. Returns 403 if the
-        authenticated user is not the consent subject.
-
-        <b>Scope(Permission) required:</b> `internal_consent_mgt_consent_view` — Any consent record
-        can be retrieved regardless of who the subject is.
+        Retrieve a specific consent record by consent ID.<br>
+        <b>Scope(Permission) required:</b> `internal_consent_mgt_consent_view`
       operationId: consentsGet
       parameters:
         - $ref: '#/components/parameters/consentId'
@@ -552,10 +533,8 @@ paths:
         All fields in the request body are optional; omit a field to leave that aspect of
         the consent unchanged. `expiryTime` sets or clears the expiry, `properties`
         replaces the full property map, and `authorizations` upserts the listed users —
-        adding them as authorizers if absent or overriding their state if present.
-
-        <b>Scope(Permission) required:</b> `internal_consent_mgt_consent_update` — Updates
-        any consent record regardless of who the subject is.
+        adding them as authorizers if absent or overriding their state if present.<br>
+        <b>Scope(Permission) required:</b> `internal_consent_mgt_consent_update`
       operationId: consentsUpdate
       parameters:
         - $ref: '#/components/parameters/consentId'
@@ -589,8 +568,8 @@ paths:
         - Consents
       summary: Revoke a consent
       description: |
-        Revokes the consent. The authenticated user must be the consent subject, returns 403 otherwise.
-        Idempotent — if the consent is already revoked, returns 204 with no error.
+        Revokes the consent. Idempotent — if the consent is already revoked, returns 204 with no error.<br>
+        <b>Scope(Permission) required:</b> `internal_consent_mgt_consent_update`
       operationId: consentsRevoke
       parameters:
         - $ref: '#/components/parameters/consentId'
@@ -608,53 +587,14 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
-  /consents/{consentId}/authorize:
-    post:
-      tags:
-        - Consents
-      summary: Authorize a consent
-      description: |
-        Authorizes a PENDING consent. The authenticated user must be in the consent's authorization
-        list, returns 403 otherwise.
-        When all required users have approved, the consent transitions to ACTIVE state.
-        If any user rejects, the consent transitions to REJECTED state.
-      operationId: consentsAuthorize
-      parameters:
-        - $ref: '#/components/parameters/consentId'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AuthorizationCreateRequest'
-      responses:
-        '200':
-          description: Consent authorized successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthorizationDTO'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/ServerError'
-
   /consents/{consentId}/validate:
     get:
       tags:
         - Consents
       summary: Get the current state of a consent object
       description: |
-        Returns the current state of a consent record, performing a lazy expiry check.
-        The authenticated user must be the consent subject, returns 403 otherwise.
+        Returns the current state of a consent record, performing a lazy expiry check.<br>
+        <b>Scope(Permission) required:</b> `internal_consent_mgt_consent_view`
       operationId: consentsValidate
       parameters:
         - $ref: '#/components/parameters/consentId'
@@ -1047,6 +987,7 @@ components:
     ConsentCreateRequest:
       type: object
       required:
+        - subjectId
         - serviceId
         - purposes
       properties:
@@ -1054,9 +995,7 @@ components:
           type: string
           minLength: 1
           maxLength: 255
-          description: >
-            Username of the user giving consent. If omitted, defaults to the authenticated
-            caller. Required when the subject differs from the caller (delegated consent).
+          description: Username of the user giving consent.
           example: "alice@wso2.com"
         serviceId:
           type: string
@@ -1097,7 +1036,7 @@ components:
           example: 1766383796000
         authorizations:
           type: array
-          description: Optional list of users who are expected to authorize this consent. Each user will use the /authorize endpoint to give their actual consent.
+          description: Optional list of users who are expected to authorize this consent.
           items:
             $ref: '#/components/schemas/AuthorizationEntry'
           example:

@@ -22,7 +22,6 @@ import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.consent.management.v2.ConsentsApiService;
 import org.wso2.carbon.identity.api.server.consent.management.v2.core.ConsentManagementService;
 import org.wso2.carbon.identity.api.server.consent.management.v2.factories.ConsentManagementServiceFactory;
-import org.wso2.carbon.identity.api.server.consent.management.v2.model.AuthorizationCreateRequest;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentCreateRequest;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentResponseDTO;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentUpdateRequest;
@@ -47,12 +46,6 @@ public class ConsentsApiServiceImpl implements ConsentsApiService {
         } catch (IllegalStateException e) {
             throw new RuntimeException("Error occurred while initiating consent management service.", e);
         }
-    }
-
-    @Override
-    public Response consentsAuthorize(String consentId, AuthorizationCreateRequest authorizationCreateRequest) {
-
-        return Response.ok().entity(consentService.authorizeConsent(consentId, authorizationCreateRequest)).build();
     }
 
     @Override

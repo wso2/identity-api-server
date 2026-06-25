@@ -47,14 +47,14 @@ public class ConsentUpdateRequest  {
 
 
     /**
-    * When present, sets or extends the consent&#39;s expiry time to the given milliseconds-since-epoch timestamp. Omit to leave the existing expiry unchanged. Pass any negative value (e.g. &#x60;-1&#x60;) to remove the expiry entirely (the consent no longer expires).
+    * When present, sets or extends the consent&#39;s expiry time to the given milliseconds-since-epoch timestamp. Omit to leave the existing expiry unchanged. Pass any negative value (e.g. &#x60;-1&#x60;) to remove the expiry entirely (the consent no longer expires). 
     **/
     public ConsentUpdateRequest expiryTime(Long expiryTime) {
 
         this.expiryTime = expiryTime;
         return this;
     }
-
+    
     @ApiModelProperty(example = "1766383796000", value = "When present, sets or extends the consent's expiry time to the given milliseconds-since-epoch timestamp. Omit to leave the existing expiry unchanged. Pass any negative value (e.g. `-1`) to remove the expiry entirely (the consent no longer expires). ")
     @JsonProperty("expiryTime")
     @Valid

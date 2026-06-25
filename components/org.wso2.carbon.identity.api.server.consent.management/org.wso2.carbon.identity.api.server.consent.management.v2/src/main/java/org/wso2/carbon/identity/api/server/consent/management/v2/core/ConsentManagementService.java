@@ -39,7 +39,6 @@ import org.wso2.carbon.consent.mgt.core.util.ConsentReceiptUtils;
 import org.wso2.carbon.consent.mgt.core.util.FilterQueriesUtil;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.consent.management.common.ConsentManagementConstants;
-import org.wso2.carbon.identity.api.server.consent.management.v2.model.AuthorizationCreateRequest;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.AuthorizationDTO;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.AuthorizationEntry;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.AuthorizationUpdateEntry;
@@ -56,8 +55,6 @@ import org.wso2.carbon.identity.api.server.consent.management.v2.model.Consented
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ElementTerminationInfo;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.PaginationLink;
 import org.wso2.carbon.identity.api.server.consent.management.v2.util.ConsentMgtEndpointUtil;
-import org.wso2.carbon.identity.authorization.common.AuthorizationUtil;
-import org.wso2.carbon.identity.authorization.common.exception.ForbiddenException;
 import org.wso2.carbon.identity.core.model.ExpressionNode;
 
 import java.net.URLEncoder;
@@ -69,18 +66,14 @@ import java.util.Collections;
 import java.util.List;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ACTIVE_STATE;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.DEFAULT_LIMIT;
-import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_CONSENT_INVALID_STATE_FOR_AUTHORIZE;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_CONSENT_REJECTED_WITH_AUTHORIZATIONS;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_ELEMENT_UUID_NOT_FOUND;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_INVALID_FILTER_EXPRESSION;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_INVALID_QUERY_PARAM;
-import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_USER_NOT_AUTHORIZED;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.FilterConstants;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.PENDING_STATE;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.REVOKE_STATE;
 import static org.wso2.carbon.consent.mgt.core.util.ConsentUtils.handleClientException;
-import static org.wso2.carbon.identity.api.server.consent.management.common.ConsentManagementConstants.CONSENT_ADMIN_CREATE_OPERATION;
-import static org.wso2.carbon.identity.api.server.consent.management.common.ConsentManagementConstants.CONSENT_ADMIN_LIST_OPERATION;
 
 /**
  * Service class for consent (receipt) operations in the V2 Consent Management API.
@@ -115,18 +108,7 @@ public class ConsentManagementService {
 
     private ConsentResponseDTO createConsentInternal(ConsentCreateRequest request) throws ConsentManagementException {
 
-        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-        String currentUser = carbonContext.getUsername();
-        String subjectId;
-        try {
-            AuthorizationUtil.validateOperationScopes(CONSENT_ADMIN_CREATE_OPERATION);
-            subjectId = StringUtils.isNotBlank(request.getSubjectId()) ? request.getSubjectId() : currentUser;
-        } catch (ForbiddenException e) {
-            subjectId = currentUser;
-            if (request.getAuthorizations() != null && !request.getAuthorizations().isEmpty()) {
-                throw handleClientException(ERROR_CODE_USER_NOT_AUTHORIZED, currentUser);
-            }
-        }
+        String subjectId = request.getSubjectId();
         boolean hasAuthorizations = request.getAuthorizations() != null && !request.getAuthorizations().isEmpty();
         boolean rejected = ConsentCreateRequest.StateEnum.REJECTED.equals(request.getState());
         if (rejected && hasAuthorizations) {
@@ -163,16 +145,6 @@ public class ConsentManagementService {
 
         try {
             Receipt receipt = consentManager.getReceiptWithExtendedSchema(receiptId);
-            // Need operation scopes to list consents of other users.
-            try {
-                AuthorizationUtil.validateOperationScopes(CONSENT_ADMIN_LIST_OPERATION);
-            } catch (ForbiddenException e) {
-                String currentUser = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername();
-                if (!currentUser.equalsIgnoreCase(receipt.getPiiPrincipalId())) {
-                    throw handleClientException(ERROR_CODE_USER_NOT_AUTHORIZED, currentUser);
-                }
-            }
-            // The effective state (including expiry) is already resolved by getReceiptWithExtendedSchema.
             return toConsentDTO(receipt);
         } catch (ConsentManagementException e) {
             throw ConsentMgtEndpointUtil.handleConsentManagementException(e);
@@ -210,13 +182,6 @@ public class ConsentManagementService {
             throws ConsentManagementException {
 
         limit = validatedLimit(limit);
-
-        // Need operation scopes to list consents of other users.
-        try {
-            AuthorizationUtil.validateOperationScopes(CONSENT_ADMIN_LIST_OPERATION);
-        } catch (ForbiddenException e) {
-            subjectId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername();
-        }
 
         if (StringUtils.isNotBlank(before) && StringUtils.isNotBlank(after)) {
             throw handleClientException(ERROR_CODE_INVALID_QUERY_PARAM,
@@ -314,14 +279,12 @@ public class ConsentManagementService {
     public void revokeConsent(String receiptId) {
 
         try {
-            String callingUser = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername();
             Receipt receipt = consentManager.getReceiptWithExtendedSchema(receiptId);
             String currentState = StringUtils.isNotBlank(receipt.getState()) ? receipt.getState() : ACTIVE_STATE;
             if (REVOKE_STATE.equals(currentState)) {
                 return;
             }
-            validateConsentAccess(receiptId, callingUser, receipt);
-            consentManager.authorizeConsent(receiptId, callingUser, REVOKE_STATE);
+            consentManager.authorizeConsent(receiptId, receipt.getPiiPrincipalId(), REVOKE_STATE);
         } catch (ConsentManagementException e) {
             throw ConsentMgtEndpointUtil.handleConsentManagementException(e);
         }
@@ -548,47 +511,6 @@ public class ConsentManagementService {
     }
 
     /**
-     * Authorizes (approves/rejects) a consent receipt.
-     *
-     * @param consentId Consent receipt ID.
-     * @param request   Authorization create request.
-     * @return Response with AuthorizationDTO.
-     * @throws ConsentManagementException if authorization fails.
-     */
-    public AuthorizationDTO authorizeConsent(String consentId, AuthorizationCreateRequest request) {
-
-        try {
-            Receipt receipt = consentManager.getReceiptWithExtendedSchema(consentId);
-            String currentState = StringUtils.isNotBlank(receipt.getState()) ? receipt.getState() : ACTIVE_STATE;
-            if (!PENDING_STATE.equals(currentState)) {
-                throw handleClientException(ERROR_CODE_CONSENT_INVALID_STATE_FOR_AUTHORIZE, consentId);
-            }
-
-            String callingUser = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername();
-            String authStatus = request.getState() != null ? request.getState().toString() : "APPROVED";
-
-            validateConsentAccess(consentId, callingUser, receipt);
-            consentManager.authorizeConsent(consentId, callingUser, authStatus);
-
-            List<ConsentAuthorization> all = consentManager.getConsentAuthorizations(consentId);
-            ConsentAuthorization updated = all.stream()
-                    .filter(a -> callingUser.equalsIgnoreCase(a.getUserId()))
-                    .findFirst()
-                    .orElse(null);
-
-            AuthorizationDTO dto = new AuthorizationDTO();
-            dto.setUserId(callingUser);
-            if (updated != null) {
-                dto.setState(AuthorizationDTO.StateEnum.fromValue(updated.getStatus().name()));
-                dto.setUpdatedTime(updated.getUpdatedTime());
-            }
-            return dto;
-        } catch (ConsentManagementException e) {
-            throw ConsentMgtEndpointUtil.handleConsentManagementException(e);
-        }
-    }
-
-    /**
      * Validates the current status of a consent receipt.
      *
      * @param consentId Consent receipt ID.
@@ -598,9 +520,7 @@ public class ConsentManagementService {
     public ConsentValidateResponse validateConsent(String consentId) {
 
         try {
-            String callingUser = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername();
             Receipt receipt = consentManager.getReceiptWithExtendedSchema(consentId);
-            validateConsentAccess(consentId, callingUser, receipt);
             String status = consentManager.validateConsentStatus(consentId);
 
             ConsentValidateResponse validateResponse = new ConsentValidateResponse();
@@ -610,22 +530,6 @@ public class ConsentManagementService {
             return validateResponse;
         } catch (ConsentManagementException e) {
             throw ConsentMgtEndpointUtil.handleConsentManagementException(e);
-        }
-    }
-
-    private void validateConsentAccess(String consentId, String callingUser, Receipt receipt)
-            throws ConsentManagementException {
-
-        List<ConsentAuthorization> authorizations = consentManager.getConsentAuthorizations(consentId);
-        if (authorizations == null || authorizations.isEmpty()) {
-            if (receipt == null || !callingUser.equalsIgnoreCase(receipt.getPiiPrincipalId())) {
-                throw handleClientException(ERROR_CODE_USER_NOT_AUTHORIZED, callingUser);
-            }
-        } else {
-            boolean inList = authorizations.stream().anyMatch(a -> callingUser.equalsIgnoreCase(a.getUserId()));
-            if (!inList) {
-                throw handleClientException(ERROR_CODE_USER_NOT_AUTHORIZED, callingUser);
-            }
         }
     }
 

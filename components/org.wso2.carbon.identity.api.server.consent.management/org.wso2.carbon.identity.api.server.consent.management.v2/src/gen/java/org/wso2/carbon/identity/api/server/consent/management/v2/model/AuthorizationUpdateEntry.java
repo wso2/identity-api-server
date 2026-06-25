@@ -33,7 +33,7 @@ import javax.xml.bind.annotation.*;
 public class AuthorizationUpdateEntry  {
   
     private String userId;
-    private String type = "USER";
+    private String type;
 
 @XmlType(name="StateEnum")
 @XmlEnum(String.class)

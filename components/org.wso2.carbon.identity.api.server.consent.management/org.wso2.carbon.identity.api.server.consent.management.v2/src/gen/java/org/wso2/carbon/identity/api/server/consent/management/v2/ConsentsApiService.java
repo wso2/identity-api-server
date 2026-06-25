@@ -24,8 +24,6 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.consent.management.v2.model.AuthorizationCreateRequest;
-import org.wso2.carbon.identity.api.server.consent.management.v2.model.AuthorizationDTO;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentCreateRequest;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentDTO;
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentListResponse;
@@ -37,8 +35,6 @@ import javax.ws.rs.core.Response;
 
 
 public interface ConsentsApiService {
-
-      public Response consentsAuthorize(String consentId, AuthorizationCreateRequest authorizationCreateRequest);
 
       public Response consentsCreate(ConsentCreateRequest consentCreateRequest);
 
