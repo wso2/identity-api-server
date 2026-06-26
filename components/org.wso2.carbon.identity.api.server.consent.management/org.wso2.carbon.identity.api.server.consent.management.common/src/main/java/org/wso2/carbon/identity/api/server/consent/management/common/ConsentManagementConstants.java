@@ -43,8 +43,4 @@ public class ConsentManagementConstants {
     // Pagination Link Relations
     public static final String LINK_REL_PREVIOUS = "previous";
     public static final String LINK_REL_NEXT = "next";
-
-    // Operation scope names for admin-level consent operations
-    public static final String CONSENT_ADMIN_CREATE_OPERATION = "createConsent";
-    public static final String CONSENT_ADMIN_LIST_OPERATION = "viewConsent";
 }
