@@ -189,9 +189,10 @@ public class ConsentManagementService {
                 throw handleClientException(ERROR_CODE_INVALID_FILTER_EXPRESSION,
                         "Only 'properties.<key>' attributes are supported in consent filter. Got: " + attr);
             }
-            if (!"eq".equalsIgnoreCase(node.getOperation())) {
+            String op = node.getOperation() != null ? node.getOperation().toLowerCase() : "";
+            if (!("eq".equals(op) || "sw".equals(op) || "co".equals(op) || "ew".equals(op))) {
                 throw handleClientException(ERROR_CODE_INVALID_FILTER_EXPRESSION,
-                        "Only 'eq' operation is supported for consent property filter.");
+                        "Only 'eq', 'sw', 'co', and 'ew' operations are supported for consent property filter.");
             }
         }
 
