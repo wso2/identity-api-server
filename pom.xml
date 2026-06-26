@@ -1148,7 +1148,7 @@
         <org.wso2.carbon.identity.organization.management.core.version.range>[1.0.0, 2.0.0)
         </org.wso2.carbon.identity.organization.management.core.version.range>
 
-        <org.wso2.carbon.identity.moesif.version>1.0.0</org.wso2.carbon.identity.moesif.version>
+        <org.wso2.carbon.identity.moesif.version>1.0.7</org.wso2.carbon.identity.moesif.version>
 
         <!-- Organization management service Version -->
         <org.wso2.carbon.identity.organization.management.version>2.5.10

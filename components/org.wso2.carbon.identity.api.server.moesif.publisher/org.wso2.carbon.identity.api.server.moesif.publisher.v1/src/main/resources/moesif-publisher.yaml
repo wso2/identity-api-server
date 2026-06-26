@@ -117,6 +117,12 @@ components:
             moesif-registration-publisher: false
             moesif-flow-publisher: true
             moesif-oauth2-token-publisher: true
+        enableAllPublishers:
+          type: boolean
+          description: >
+            When true, all supported publishers are enabled for the organization regardless of
+            eventPublisherEnablement, and the individual governance toggles are not consulted.
+          example: false
     MoesifPublisherPatchReq:
       type: object
       required:
@@ -142,6 +148,13 @@ components:
             moesif-registration-publisher: false
             moesif-flow-publisher: true
             moesif-oauth2-token-publisher: true
+        enableAllPublishers:
+          type: boolean
+          nullable: true
+          description: >
+            When true, all supported publishers are enabled regardless of eventPublisherEnablement.
+            If omitted/null, the existing setting is retained.
+          example: false
     MoesifPublisher:
       type: object
       properties:
@@ -158,6 +171,10 @@ components:
             registration: false
             flow: true
             oauthToken: true
+        enableAllPublishers:
+          type: boolean
+          description: Whether all supported publishers are currently enabled for the organization.
+          example: false
 
     Error:
       type: object

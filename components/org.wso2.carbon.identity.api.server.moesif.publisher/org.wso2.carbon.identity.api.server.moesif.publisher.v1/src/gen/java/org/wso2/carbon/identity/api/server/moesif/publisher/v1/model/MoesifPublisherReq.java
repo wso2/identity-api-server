@@ -37,6 +37,7 @@ public class MoesifPublisherReq  {
   
     private String apiKeyValue;
     private Map<String, Boolean> eventPublisherEnablement = null;
+    private Boolean enableAllPublishers;
 
 
     /**
@@ -89,6 +90,26 @@ public class MoesifPublisherReq  {
     }
 
     
+
+    /**
+    * When true, all supported publishers are enabled regardless of eventPublisherEnablement.
+    **/
+    public MoesifPublisherReq enableAllPublishers(Boolean enableAllPublishers) {
+
+        this.enableAllPublishers = enableAllPublishers;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "When true, all supported publishers are enabled regardless of eventPublisherEnablement.")
+    @JsonProperty("enableAllPublishers")
+    @Valid
+    public Boolean getEnableAllPublishers() {
+        return enableAllPublishers;
+    }
+    public void setEnableAllPublishers(Boolean enableAllPublishers) {
+        this.enableAllPublishers = enableAllPublishers;
+    }
+
 
     @Override
     public boolean equals(java.lang.Object o) {
