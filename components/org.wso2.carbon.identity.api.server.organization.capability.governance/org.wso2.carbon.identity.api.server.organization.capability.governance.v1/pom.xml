@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.organization.capability.governance</artifactId>
-        <version>1.6.31-SNAPSHOT</version>
+        <version>1.6.31</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
