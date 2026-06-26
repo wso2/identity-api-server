@@ -56,6 +56,7 @@ import org.wso2.carbon.identity.api.server.consent.management.v2.model.ElementTe
 import org.wso2.carbon.identity.api.server.consent.management.v2.model.PaginationLink;
 import org.wso2.carbon.identity.api.server.consent.management.v2.util.ConsentMgtEndpointUtil;
 import org.wso2.carbon.identity.core.model.ExpressionNode;
+import org.wso2.carbon.identity.core.util.IdentityUtil;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -537,6 +538,14 @@ public class ConsentManagementService {
         limit = limit == null ? DEFAULT_LIMIT : limit;
         if (limit <= 0) {
             throw handleClientException(ERROR_CODE_INVALID_QUERY_PARAM, limit.toString());
+        }
+        int maximumItemPerPage = IdentityUtil.getMaximumItemPerPage();
+        if (limit > maximumItemPerPage) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Given limit exceeds the maximum limit. Therefore the configured maximum limit: "
+                        + maximumItemPerPage + " is set as the limit.");
+            }
+            return maximumItemPerPage;
         }
         return limit;
     }
