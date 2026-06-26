@@ -1133,7 +1133,7 @@
         <apache.felix.scr.ds.annotations.version>1.2.4</apache.felix.scr.ds.annotations.version>
         <workflow.imple.bps.version>5.5.21</workflow.imple.bps.version>
         <carbon.workflow.engine.version>1.0.18</carbon.workflow.engine.version>
-        <carbon.consent.mgt.version>2.9.9</carbon.consent.mgt.version>
+        <carbon.consent.mgt.version>2.9.10</carbon.consent.mgt.version>
 
         <!--<maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>-->
 
