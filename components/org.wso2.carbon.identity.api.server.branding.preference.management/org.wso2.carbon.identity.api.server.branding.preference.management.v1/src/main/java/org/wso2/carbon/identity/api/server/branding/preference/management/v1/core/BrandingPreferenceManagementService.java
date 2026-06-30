@@ -34,15 +34,14 @@ import org.wso2.carbon.identity.api.server.branding.preference.management.v1.mod
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.ResolvedCustomTextModal;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.authorization.common.AuthorizationUtil;
+import org.wso2.carbon.identity.authorization.common.exception.ForbiddenException;
 import org.wso2.carbon.identity.branding.preference.management.core.BrandingPreferenceManager;
 import org.wso2.carbon.identity.branding.preference.management.core.exception.BrandingPreferenceMgtClientException;
 import org.wso2.carbon.identity.branding.preference.management.core.exception.BrandingPreferenceMgtException;
 import org.wso2.carbon.identity.branding.preference.management.core.exception.BrandingPreferenceMgtServerException;
 import org.wso2.carbon.identity.branding.preference.management.core.model.BrandingPreference;
 import org.wso2.carbon.identity.branding.preference.management.core.model.CustomText;
-
-import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
@@ -260,7 +259,16 @@ public class BrandingPreferenceManagementService {
      */
     public BrandingPreferenceModel updateBrandingPreference(BrandingPreferenceModel brandingPreferenceModel) {
 
-        boolean restrictToUrls = isRestrictedToUrlUpdate();
+        try {
+            AuthorizationUtil.validateOperationScopes(UPDATE_POLICY_URL_OPERATION);
+        } catch (ForbiddenException e) {
+            throw handleExceptionWithMessage(Response.Status.FORBIDDEN,
+                    ERROR_CODE_NOT_ALLOWED_BRANDING_PREFERENCE_CONFIGURATIONS, e.getMessage());
+        }
+
+        OperationScopeValidationContext operationScopeCtx =
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().getOperationScopeValidationContext();
+        boolean restrictToUrls = operationScopeCtx != null && operationScopeCtx.isValidationRequired();
 
         String tenantDomain = getTenantDomainFromContext();
 
@@ -475,24 +483,6 @@ public class BrandingPreferenceManagementService {
                     tenantDomain);
         }
         return buildCustomTextResponseFromResponseDTO(responseDTO);
-    }
-
-    private boolean isRestrictedToUrlUpdate() {
-
-        OperationScopeValidationContext operationScopeValidationContext =
-                PrivilegedCarbonContext.getThreadLocalCarbonContext().getOperationScopeValidationContext();
-        if (operationScopeValidationContext != null) {
-            List<String> allowedScopes = operationScopeValidationContext.getValidatedScopes();
-            Map<String, String> operationScopeMap = operationScopeValidationContext.getOperationScopeSet().
-                    getOperationScopeMap();
-            String operationScope = operationScopeMap.get(UPDATE_POLICY_URL_OPERATION);
-            if (!allowedScopes.contains(operationScope)) {
-                log.debug("Operation is not permitted. You do not have permissions to make this request.");
-                return false;
-            }
-            return true;
-        }
-        return false;
     }
 
     private void mergeUrlsIntoExistingPreference(BrandingPreferenceModel brandingPreferenceModel,
