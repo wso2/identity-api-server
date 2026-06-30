@@ -1031,6 +1031,7 @@ components:
         expiryTime:
           type: integer
           format: int64
+          minimum: 0
           nullable: true
           description: Milliseconds since epoch until which the consent is valid. If omitted, the consent does not expire.
           example: 1766383796000
@@ -1088,11 +1089,10 @@ components:
         expiryTime:
           type: integer
           format: int64
+          minimum: 0
           description: >
             When present, sets or extends the consent's expiry time to the given
             milliseconds-since-epoch timestamp. Omit to leave the existing expiry unchanged.
-            Pass any negative value (e.g. `-1`) to remove the expiry entirely (the consent
-            no longer expires).
           example: 1766383796000
         properties:
           type: object

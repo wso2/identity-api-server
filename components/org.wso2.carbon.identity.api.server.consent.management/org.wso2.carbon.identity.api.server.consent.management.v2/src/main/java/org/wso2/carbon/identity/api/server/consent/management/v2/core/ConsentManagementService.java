@@ -302,12 +302,7 @@ public class ConsentManagementService {
         updateInput.setConsentReceiptId(consentId);
 
         if (request.getExpiryTime() != null) {
-            if (request.getExpiryTime() < 0) {
-                // A negative expiryTime is the sentinel for removing the expiry entirely.
-                updateInput.setClearExpiry(true);
-            } else {
-                updateInput.setExpiryTime(new Timestamp(request.getExpiryTime()));
-            }
+            updateInput.setExpiryTime(new Timestamp(request.getExpiryTime()));
         }
 
         updateInput.setProperties(request.getProperties());
