@@ -66,6 +66,11 @@ public class Constants {
     public static final String IMPERSONATION_CONFIG_ENABLE_EMAIL_NOTIFICATION = "/enableEmailNotification";
 
     /**
+     * PATCH operation path for Agent configuration.
+     */
+    public static final String AGENT_CONFIG_AGENTS_EXTERNALLY_MANAGED = "/agentsExternallyManaged";
+
+    /**
      * PATCH operation paths for DCR configuration.
      */
     public static final String DCR_CONFIG_ENABLE_FAPI_ENFORCEMENT = "/enableFapiEnforcement";
@@ -216,6 +221,15 @@ public class Constants {
         ERROR_CODE_IMP_CONFIG_DELETE("65022",
                 "Unable to delete Impersonation configuration.",
                 "Server encountered an error while deleting the Impersonation configuration of %s."),
+        ERROR_CODE_AGENT_CONFIG_RETRIEVE("65036",
+                "Unable to retrieve Agent configuration.",
+                "Server encountered an error while retrieving the Agent configuration of %s."),
+        ERROR_CODE_AGENT_CONFIG_UPDATE("65037",
+                "Unable to update Agent configuration.",
+                "Server encountered an error while updating the Agent configuration of %s."),
+        ERROR_CODE_AGENT_CONFIG_DELETE("65038",
+                "Unable to delete Agent configuration.",
+                "Server encountered an error while deleting the Agent configuration of %s."),
 
         ERROR_CODE_FRAUD_DETECTION_CONFIG_RETRIEVE("65023",
                 "Unable to retrieve Fraud Detection configuration.",

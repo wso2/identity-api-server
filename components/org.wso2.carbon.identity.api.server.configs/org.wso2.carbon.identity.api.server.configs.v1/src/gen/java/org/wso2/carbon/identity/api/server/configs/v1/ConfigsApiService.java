@@ -22,6 +22,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.*;
 
 import java.util.List;
 
+import org.wso2.carbon.identity.api.server.configs.v1.model.AgentConfigPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettings;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
@@ -61,6 +62,8 @@ public interface ConfigsApiService {
 
       public Response getImpersonationConfiguration();
 
+      public Response getAgentConfiguration();
+
       public Response getInboundScimConfigs();
 
       public Response getIssuerUsageScopeConfig();
@@ -90,6 +93,8 @@ public interface ConfigsApiService {
 
       public Response patchImpersonationConfiguration(List<ImpersonationPatch> impersonationPatch);
 
+      public Response patchAgentConfiguration(List<AgentConfigPatch> agentConfigPatch);
+
       public Response patchPrivatKeyJWTValidationConfiguration(List<JWTKeyValidatorPatch> jwTKeyValidatorPatch);
 
       public Response patchDCRConfiguration(List<DCRPatch> patch);
@@ -101,6 +106,8 @@ public interface ConfigsApiService {
       public Response removeApplicationFromPurpose(String purposeId, String applicationId);
 
       public Response deleteImpersonationConfiguration();
+
+      public Response deleteAgentConfiguration();
 
       public Response updateFraudDetectionConfigs(FraudDetectionConfig fraudDetectionConfig);
 

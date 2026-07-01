@@ -21,6 +21,7 @@ package org.wso2.carbon.identity.api.server.configs.v1.impl;
 import org.wso2.carbon.identity.api.server.configs.v1.ConfigsApiService;
 import org.wso2.carbon.identity.api.server.configs.v1.core.ServerConfigManagementService;
 import org.wso2.carbon.identity.api.server.configs.v1.factories.ServerConfigManagementServiceFactory;
+import org.wso2.carbon.identity.api.server.configs.v1.model.AgentConfigPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ApplicationObject;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettings;
@@ -86,6 +87,12 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     public Response getImpersonationConfiguration() {
 
         return Response.ok().entity(configManagementService.getImpersonationConfiguration()).build();
+    }
+
+    @Override
+    public Response getAgentConfiguration() {
+
+        return Response.ok().entity(configManagementService.getAgentConfiguration()).build();
     }
 
     @Override
@@ -220,6 +227,20 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     public Response deleteImpersonationConfiguration() {
 
         configManagementService.deleteImpersonationConfiguration();
+        return Response.noContent().build();
+    }
+
+    @Override
+    public Response patchAgentConfiguration(List<AgentConfigPatch> agentConfigPatch) {
+
+        configManagementService.patchAgentConfiguration(agentConfigPatch);
+        return Response.ok().build();
+    }
+
+    @Override
+    public Response deleteAgentConfiguration() {
+
+        configManagementService.deleteAgentConfiguration();
         return Response.noContent().build();
     }
 
