@@ -22,6 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.validation.constraints.*;
 
 
@@ -36,6 +39,8 @@ public class ElementDTO  {
     private String name;
     private String displayName;
     private String description;
+    private Map<String, String> properties = null;
+
     private String tenantDomain;
 
     /**
@@ -66,9 +71,11 @@ public class ElementDTO  {
         return this;
     }
     
-    @ApiModelProperty(example = "email_address", value = "Name/identifier of the element")
+    @ApiModelProperty(example = "email_address", required = true, value = "Name/identifier of the element")
     @JsonProperty("name")
     @Valid
+    @NotNull(message = "Property name cannot be null.")
+
     public String getName() {
         return name;
     }
@@ -115,6 +122,34 @@ public class ElementDTO  {
     }
 
     /**
+    * Free-form key-value properties for this element.
+    **/
+    public ElementDTO properties(Map<String, String> properties) {
+
+        this.properties = properties;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "{\"dataCategory\":\"personal\",\"retentionPeriod\":\"365\"}", value = "Free-form key-value properties for this element.")
+    @JsonProperty("properties")
+    @Valid
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+    public void setProperties(Map<String, String> properties) {
+        this.properties = properties;
+    }
+
+
+    public ElementDTO putPropertiesItem(String key, String propertiesItem) {
+        if (this.properties == null) {
+            this.properties = new HashMap<>();
+        }
+        this.properties.put(key, propertiesItem);
+        return this;
+    }
+
+        /**
     * Tenant domain that owns this element
     **/
     public ElementDTO tenantDomain(String tenantDomain) {
@@ -149,12 +184,13 @@ public class ElementDTO  {
             Objects.equals(this.name, elementDTO.name) &&
             Objects.equals(this.displayName, elementDTO.displayName) &&
             Objects.equals(this.description, elementDTO.description) &&
+            Objects.equals(this.properties, elementDTO.properties) &&
             Objects.equals(this.tenantDomain, elementDTO.tenantDomain);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, displayName, description, tenantDomain);
+        return Objects.hash(id, name, displayName, description, properties, tenantDomain);
     }
 
     @Override
@@ -167,6 +203,7 @@ public class ElementDTO  {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
+        sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("    tenantDomain: ").append(toIndentedString(tenantDomain)).append("\n");
         sb.append("}");
         return sb.toString();

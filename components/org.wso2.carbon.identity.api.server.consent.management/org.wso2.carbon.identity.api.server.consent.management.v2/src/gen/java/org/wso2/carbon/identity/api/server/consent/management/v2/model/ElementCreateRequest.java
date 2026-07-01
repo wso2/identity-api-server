@@ -22,6 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.validation.constraints.*;
 
 
@@ -35,6 +38,8 @@ public class ElementCreateRequest  {
     private String name;
     private String displayName;
     private String description;
+    private Map<String, String> properties = null;
+
 
     /**
     * Identifier/name of the consent element
@@ -95,7 +100,35 @@ public class ElementCreateRequest  {
         this.description = description;
     }
 
+    /**
+    * Free-form key-value properties for this element.
+    **/
+    public ElementCreateRequest properties(Map<String, String> properties) {
 
+        this.properties = properties;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "{\"dataCategory\":\"personal\",\"retentionPeriod\":\"365\"}", value = "Free-form key-value properties for this element.")
+    @JsonProperty("properties")
+    @Valid
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+    public void setProperties(Map<String, String> properties) {
+        this.properties = properties;
+    }
+
+
+    public ElementCreateRequest putPropertiesItem(String key, String propertiesItem) {
+        if (this.properties == null) {
+            this.properties = new HashMap<>();
+        }
+        this.properties.put(key, propertiesItem);
+        return this;
+    }
+
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -109,12 +142,13 @@ public class ElementCreateRequest  {
         ElementCreateRequest elementCreateRequest = (ElementCreateRequest) o;
         return Objects.equals(this.name, elementCreateRequest.name) &&
             Objects.equals(this.displayName, elementCreateRequest.displayName) &&
-            Objects.equals(this.description, elementCreateRequest.description);
+            Objects.equals(this.description, elementCreateRequest.description) &&
+            Objects.equals(this.properties, elementCreateRequest.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, displayName, description);
+        return Objects.hash(name, displayName, description, properties);
     }
 
     @Override
@@ -126,6 +160,7 @@ public class ElementCreateRequest  {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
+        sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");
         return sb.toString();
     }

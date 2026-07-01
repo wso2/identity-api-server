@@ -47,9 +47,11 @@ public class ConsentedElementDTO  {
         return this;
     }
     
-    @ApiModelProperty(example = "f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2", value = "")
+    @ApiModelProperty(example = "f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2", required = true, value = "")
     @JsonProperty("id")
     @Valid
+    @NotNull(message = "Property id cannot be null.")
+
     public String getId() {
         return id;
     }
@@ -65,9 +67,11 @@ public class ConsentedElementDTO  {
         return this;
     }
     
-    @ApiModelProperty(example = "email_address", value = "")
+    @ApiModelProperty(example = "email_address", required = true, value = "")
     @JsonProperty("name")
     @Valid
+    @NotNull(message = "Property name cannot be null.")
+
     public String getName() {
         return name;
     }

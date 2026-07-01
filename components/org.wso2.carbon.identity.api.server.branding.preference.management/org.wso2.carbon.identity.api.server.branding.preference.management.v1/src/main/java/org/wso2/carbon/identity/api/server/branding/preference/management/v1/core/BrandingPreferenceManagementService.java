@@ -70,6 +70,7 @@ import static org.wso2.carbon.identity.api.server.branding.preference.management
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_INVALID_CUSTOM_TEXT_PREFERENCE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_NOT_ALLOWED_BRANDING_PREFERENCE_CONFIGURATIONS;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ORGANIZATION_TYPE;
+import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.UPDATE_POLICY_URL_OPERATION;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenantDomainFromContext;
 
 /**
@@ -77,7 +78,6 @@ import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenant
  */
 public class BrandingPreferenceManagementService {
 
-    private static final String UPDATE_POLICY_URL_OPERATION = "updatePolicyUrl";
     private static final String ATTR_URLS = "urls";
 
     private final BrandingPreferenceManager brandingPreferenceManager;

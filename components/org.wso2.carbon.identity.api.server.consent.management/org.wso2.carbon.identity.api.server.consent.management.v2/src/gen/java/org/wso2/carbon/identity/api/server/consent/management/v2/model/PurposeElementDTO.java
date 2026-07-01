@@ -66,9 +66,11 @@ public class PurposeElementDTO  {
         return this;
     }
     
-    @ApiModelProperty(example = "email_address", value = "Name/identifier of the element")
+    @ApiModelProperty(example = "email_address", required = true, value = "Name/identifier of the element")
     @JsonProperty("name")
     @Valid
+    @NotNull(message = "Property name cannot be null.")
+
     public String getName() {
         return name;
     }
@@ -123,9 +125,11 @@ public class PurposeElementDTO  {
         return this;
     }
     
-    @ApiModelProperty(example = "true", value = "Whether this element is mandatory")
+    @ApiModelProperty(example = "true", required = true, value = "Whether this element is mandatory")
     @JsonProperty("mandatory")
     @Valid
+    @NotNull(message = "Property mandatory cannot be null.")
+
     public Boolean getMandatory() {
         return mandatory;
     }
