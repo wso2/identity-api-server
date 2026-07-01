@@ -72,6 +72,7 @@ public class Constants {
     public static final String DCR_CONFIG_SSA_JWKS = "/ssaJwks";
     public static final String DCR_CONFIG_AUTHENTICATION_REQUIRED = "/authenticationRequired";
     public static final String DCR_CONFIG_MANDATE_SSA = "/mandateSSA";
+    public static final String DCR_CONFIG_FAPI_PROFILE = "/fapiProfile";
 
     /**
      * SAML2 metadata endpoint uri path.
@@ -277,7 +278,13 @@ public class Constants {
                 "Server encountered an error while mapping application %s."),
         ERROR_CODE_CONSENT_MAPPING_DELETE("65035",
                 "Unable to delete consent application mapping.",
-                "Server encountered an error while removing application %s.");
+                "Server encountered an error while removing application %s."),
+        ERROR_CODE_FAPI_CONFIG_RETRIEVE("65036",
+                "Unable to retrieve FAPI configuration.",
+                "Server encountered an error while retrieving the FAPI configuration."),
+        ERROR_CODE_FAPI_CONFIG_UPDATE("65037",
+                "Unable to update FAPI configuration.",
+                "Server encountered an error while updating the FAPI configuration.");
 
         private final String code;
         private final String message;
