@@ -7,6 +7,7 @@ import org.wso2.carbon.identity.compatibility.settings.core.service.Compatibilit
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.fraud.detection.core.service.FraudDetectionConfigsService;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
+import org.wso2.carbon.identity.oauth2.agent.services.AgentConfigMgtService;
 import org.wso2.carbon.identity.oauth2.config.services.OAuth2OIDCConfigOrgUsageScopeMgtService;
 import org.wso2.carbon.identity.oauth2.fapi.services.FapiConfigMgtService;
 import org.wso2.carbon.identity.oauth2.impersonation.services.ImpersonationConfigMgtService;
@@ -31,6 +32,7 @@ public class ServerConfigManagementServiceFactory {
         RemoteLoggingConfigService remoteLoggingConfigService = ConfigsServiceHolder.getRemoteLoggingConfigService();
         ImpersonationConfigMgtService impersonationConfigMgtService = ConfigsServiceHolder
                 .getImpersonationConfigMgtService();
+        AgentConfigMgtService agentConfigMgtService = ConfigsServiceHolder.getAgentConfigMgtService();
         JWTClientAuthenticatorMgtService jwtClientAuthenticatorMgtService = ConfigsServiceHolder
                 .getJWTClientAuthenticatorMgtService();
         DCRConfigurationMgtService dcrConfigurationMgtService = ConfigsServiceHolder.getDcrConfigurationMgtService();
@@ -62,6 +64,10 @@ public class ServerConfigManagementServiceFactory {
             throw new IllegalStateException("ImpersonationConfigMgtService is not available from OSGi context.");
         }
 
+        if (agentConfigMgtService == null) {
+            throw new IllegalStateException("AgentConfigMgtService is not available from OSGi context.");
+        }
+
         if (jwtClientAuthenticatorMgtService == null) {
             throw new IllegalStateException("JWTClientAuthenticatorMgtService is not available from OSGi context.");
         }
@@ -91,6 +97,7 @@ public class ServerConfigManagementServiceFactory {
                 corsManagementService,
                 remoteLoggingConfigService,
                 impersonationConfigMgtService,
+                agentConfigMgtService,
                 dcrConfigurationMgtService,
                 jwtClientAuthenticatorMgtService,
                 fraudDetectionConfigsService,
