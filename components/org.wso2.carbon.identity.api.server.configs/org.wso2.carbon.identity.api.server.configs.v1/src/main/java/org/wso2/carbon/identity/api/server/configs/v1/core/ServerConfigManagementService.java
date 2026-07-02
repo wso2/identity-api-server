@@ -544,7 +544,7 @@ public class ServerConfigManagementService {
             AgentConfig agentConfig = agentConfigMgtService.getAgentConfig(tenantDomain);
             return agentConfiguration.agentsExternallyManaged(agentConfig.isAgentsExternallyManaged());
         } catch (AgentConfigMgtException e) {
-            throw handleAgentConfigException(e, Constants.ErrorMessage.ERROR_CODE_AGENT_CONFIG_RETRIEVE, null);
+            throw handleAgentConfigException(e, Constants.ErrorMessage.ERROR_CODE_AGENT_CONFIG_RETRIEVE, tenantDomain);
         }
     }
 
@@ -565,7 +565,7 @@ public class ServerConfigManagementService {
         try {
             agentConfig = agentConfigMgtService.getAgentConfig(tenantDomain);
         } catch (AgentConfigMgtException e) {
-            throw handleAgentConfigException(e, Constants.ErrorMessage.ERROR_CODE_AGENT_CONFIG_RETRIEVE, null);
+            throw handleAgentConfigException(e, Constants.ErrorMessage.ERROR_CODE_AGENT_CONFIG_RETRIEVE, tenantDomain);
         }
 
         try {
@@ -591,7 +591,7 @@ public class ServerConfigManagementService {
 
             agentConfigMgtService.setAgentConfig(agentConfig, tenantDomain);
         } catch (AgentConfigMgtException e) {
-            throw handleAgentConfigException(e, Constants.ErrorMessage.ERROR_CODE_AGENT_CONFIG_UPDATE, null);
+            throw handleAgentConfigException(e, Constants.ErrorMessage.ERROR_CODE_AGENT_CONFIG_UPDATE, tenantDomain);
         }
     }
 
