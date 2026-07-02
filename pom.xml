@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.6.31-SNAPSHOT</version>
+    <version>1.6.34-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -1133,7 +1133,7 @@
         <apache.felix.scr.ds.annotations.version>1.2.4</apache.felix.scr.ds.annotations.version>
         <workflow.imple.bps.version>5.5.21</workflow.imple.bps.version>
         <carbon.workflow.engine.version>1.0.18</carbon.workflow.engine.version>
-        <carbon.consent.mgt.version>2.9.4</carbon.consent.mgt.version>
+        <carbon.consent.mgt.version>2.9.10</carbon.consent.mgt.version>
 
         <!--<maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>-->
 
@@ -1148,7 +1148,7 @@
         <org.wso2.carbon.identity.organization.management.core.version.range>[1.0.0, 2.0.0)
         </org.wso2.carbon.identity.organization.management.core.version.range>
 
-        <org.wso2.carbon.identity.moesif.version>1.0.0</org.wso2.carbon.identity.moesif.version>
+        <org.wso2.carbon.identity.moesif.version>1.0.7</org.wso2.carbon.identity.moesif.version>
 
         <!-- Organization management service Version -->
         <org.wso2.carbon.identity.organization.management.version>2.5.10

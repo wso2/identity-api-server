@@ -84,7 +84,7 @@ public enum StateEnum {
 
 
     /**
-    * Username of the user giving consent. If omitted, defaults to the authenticated caller. Required when the subject differs from the caller (delegated consent). 
+    * Username of the user giving consent.
     **/
     public ConsentCreateRequest subjectId(String subjectId) {
 
@@ -92,9 +92,11 @@ public enum StateEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "alice@wso2.com", value = "Username of the user giving consent. If omitted, defaults to the authenticated caller. Required when the subject differs from the caller (delegated consent). ")
+    @ApiModelProperty(example = "alice@wso2.com", required = true, value = "Username of the user giving consent.")
     @JsonProperty("subjectId")
-    @Valid @Size(min=1,max=255)
+    @Valid
+    @NotNull(message = "Property subjectId cannot be null.")
+ @Size(min=1,max=255)
     public String getSubjectId() {
         return subjectId;
     }
@@ -207,7 +209,7 @@ public enum StateEnum {
     }
 
     /**
-    * Optional list of users who are expected to authorize this consent. Each user will use the /authorize endpoint to give their actual consent.
+    * Optional list of users who are expected to authorize this consent.
     **/
     public ConsentCreateRequest authorizations(List<AuthorizationEntry> authorizations) {
 
@@ -215,7 +217,7 @@ public enum StateEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "[{\"id\":\"alice@wso2.com\"},{\"id\":\"bob@wso2.com\"}]", value = "Optional list of users who are expected to authorize this consent. Each user will use the /authorize endpoint to give their actual consent.")
+    @ApiModelProperty(example = "[{\"userId\":\"alice@wso2.com\",\"type\":\"USER\"},{\"userId\":\"bob@wso2.com\",\"type\":\"USER\"}]", value = "Optional list of users who are expected to authorize this consent.")
     @JsonProperty("authorizations")
     @Valid
     public List<AuthorizationEntry> getAuthorizations() {

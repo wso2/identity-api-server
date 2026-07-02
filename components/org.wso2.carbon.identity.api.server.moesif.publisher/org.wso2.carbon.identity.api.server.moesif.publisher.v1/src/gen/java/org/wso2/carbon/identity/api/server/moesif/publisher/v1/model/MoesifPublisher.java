@@ -37,6 +37,7 @@ public class MoesifPublisher  {
   
     private String name;
     private Map<String, Boolean> eventPublisherEnablement = null;
+    private Boolean enableAllPublishers;
 
 
     /**
@@ -86,6 +87,26 @@ public class MoesifPublisher  {
     }
 
     
+
+    /**
+    * When true, all supported publishers are enabled regardless of eventPublisherEnablement.
+    **/
+    public MoesifPublisher enableAllPublishers(Boolean enableAllPublishers) {
+
+        this.enableAllPublishers = enableAllPublishers;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "When true, all supported publishers are enabled regardless of eventPublisherEnablement.")
+    @JsonProperty("enableAllPublishers")
+    @Valid
+    public Boolean getEnableAllPublishers() {
+        return enableAllPublishers;
+    }
+    public void setEnableAllPublishers(Boolean enableAllPublishers) {
+        this.enableAllPublishers = enableAllPublishers;
+    }
+
 
     @Override
     public boolean equals(java.lang.Object o) {

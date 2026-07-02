@@ -41,6 +41,9 @@ public class BrandingPreferenceManagementConstants {
     public static final String CUSTOM_TEXT_PREFERENCE_NOT_EXISTS_ERROR_CODE = "BRANDINGM_00023";
     public static final String CUSTOM_TEXT_PREFERENCE_ALREADY_EXISTS_ERROR_CODE = "BRANDINGM_00024";
 
+    // Operation scope constants.
+    public static final String UPDATE_POLICY_URL_OPERATION = "updatePolicyUrl";
+
     // AI Constants.
     public static final String AI_RESPONSE_DATA_KEY = "data";
     public static final String AI_RESPONSE_STATUS_KEY = "status";

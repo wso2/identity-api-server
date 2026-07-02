@@ -37,6 +37,7 @@ import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.core.model.ExpressionNode;
 import org.wso2.carbon.identity.core.model.FilterTreeBuilder;
 import org.wso2.carbon.identity.core.model.Node;
+import org.wso2.carbon.identity.core.util.IdentityUtil;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -84,6 +85,9 @@ public class ElementManagementService {
                     : request.getName();
             PIICategory piiCategory = new PIICategory(request.getName(), request.getDescription(), false, displayName);
             piiCategory.setTenantId(ConsentUtils.getTenantIdFromCarbonContext());
+            if (request.getProperties() != null) {
+                piiCategory.setProperties(request.getProperties());
+            }
             PIICategory created = consentManager.addPIICategoryWithUuid(piiCategory);
             return toElementDTO(created);
         } catch (ConsentManagementException e) {
@@ -231,6 +235,7 @@ public class ElementManagementService {
         dto.setName(cat.getName());
         dto.setDisplayName(cat.getDisplayName());
         dto.setDescription(cat.getDescription());
+        dto.setProperties(cat.getProperties());
         dto.setTenantDomain(cat.getTenantDomain());
         return dto;
     }
@@ -240,6 +245,14 @@ public class ElementManagementService {
         limit = limit == null ? DEFAULT_LIMIT : limit;
         if (limit <= 0) {
             throw handleClientException(ERROR_CODE_INVALID_QUERY_PARAM, limit.toString());
+        }
+        int maximumItemPerPage = IdentityUtil.getMaximumItemPerPage();
+        if (limit > maximumItemPerPage) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Given limit exceeds the maximum limit. Therefore the configured maximum limit: "
+                        + maximumItemPerPage + " is set as the limit.");
+            }
+            return maximumItemPerPage;
         }
         return limit;
     }

@@ -40,40 +40,6 @@ public class ConsentResponseDTO  {
     private String subjectId;
     private String tenantDomain;
 
-@XmlType(name="StateEnum")
-@XmlEnum(String.class)
-public enum StateEnum {
-
-    @XmlEnumValue("PENDING") PENDING(String.valueOf("PENDING")), @XmlEnumValue("ACTIVE") ACTIVE(String.valueOf("ACTIVE")), @XmlEnumValue("REJECTED") REJECTED(String.valueOf("REJECTED")), @XmlEnumValue("REVOKED") REVOKED(String.valueOf("REVOKED")), @XmlEnumValue("EXPIRED") EXPIRED(String.valueOf("EXPIRED"));
-
-
-    private String value;
-
-    StateEnum(String v) {
-        value = v;
-    }
-
-    public String value() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return String.valueOf(value);
-    }
-
-    public static StateEnum fromValue(String value) {
-        for (StateEnum b : StateEnum.values()) {
-            if (b.value.equals(value)) {
-                return b;
-            }
-        }
-        throw new IllegalArgumentException("Unexpected value '" + value + "'");
-    }
-}
-
-    private StateEnum state;
-
     /**
     * Unique identifier for this consent
     **/
@@ -150,25 +116,6 @@ public enum StateEnum {
         this.tenantDomain = tenantDomain;
     }
 
-    /**
-    * PENDING if awaiting approvals, ACTIVE if all accepted, REJECTED if any rejected before activation, REVOKED if any user revoked after activation, EXPIRED if expiryTime has passed.
-    **/
-    public ConsentResponseDTO state(StateEnum state) {
-
-        this.state = state;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "ACTIVE", value = "PENDING if awaiting approvals, ACTIVE if all accepted, REJECTED if any rejected before activation, REVOKED if any user revoked after activation, EXPIRED if expiryTime has passed.")
-    @JsonProperty("state")
-    @Valid
-    public StateEnum getState() {
-        return state;
-    }
-    public void setState(StateEnum state) {
-        this.state = state;
-    }
-
 
 
     @Override
@@ -184,13 +131,12 @@ public enum StateEnum {
         return Objects.equals(this.id, consentResponseDTO.id) &&
             Objects.equals(this.language, consentResponseDTO.language) &&
             Objects.equals(this.subjectId, consentResponseDTO.subjectId) &&
-            Objects.equals(this.tenantDomain, consentResponseDTO.tenantDomain) &&
-            Objects.equals(this.state, consentResponseDTO.state);
+            Objects.equals(this.tenantDomain, consentResponseDTO.tenantDomain);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, language, subjectId, tenantDomain, state);
+        return Objects.hash(id, language, subjectId, tenantDomain);
     }
 
     @Override
@@ -203,7 +149,6 @@ public enum StateEnum {
         sb.append("    language: ").append(toIndentedString(language)).append("\n");
         sb.append("    subjectId: ").append(toIndentedString(subjectId)).append("\n");
         sb.append("    tenantDomain: ").append(toIndentedString(tenantDomain)).append("\n");
-        sb.append("    state: ").append(toIndentedString(state)).append("\n");
         sb.append("}");
         return sb.toString();
     }
