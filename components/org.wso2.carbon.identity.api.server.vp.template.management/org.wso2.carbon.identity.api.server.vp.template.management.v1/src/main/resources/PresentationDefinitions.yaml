@@ -261,6 +261,19 @@ components:
           items:
             type: string
             example: "email"
+        issuerCertPem:
+          type: string
+          description: >
+            PEM-encoded X.509 certificate of the credential issuer. When provided, the issuer's
+            signature is verified directly against this certificate without any network discovery.
+          example: "-----BEGIN CERTIFICATE-----\nMIIB....\n-----END CERTIFICATE-----"
+        jwksUri:
+          type: string
+          description: >
+            JWKS endpoint URL of the credential issuer. When provided and no issuerCertPem is set,
+            the verifier fetches the issuer's public keys from this URI instead of performing
+            automatic well-known discovery.
+          example: "https://issuer.example.com/jwks"
         enforceTrustedIssuers:
           type: boolean
           description: When true, the credential's issuer is validated against the trustedIssuers list.

@@ -17,6 +17,8 @@ public class RequestedCredentialModel {
     private String type;
     private String purpose;
     private String issuer;
+    private String issuerCertPem;
+    private String jwksUri;
     private List<ClaimConstraintModel> claims;
     private Boolean enforceTrustedIssuers;
     private List<String> trustedIssuers;
@@ -49,6 +51,26 @@ public class RequestedCredentialModel {
 
     public void setIssuer(String issuer) {
         this.issuer = issuer;
+    }
+
+    @ApiModelProperty(value = "PEM-encoded X.509 certificate of the credential issuer.")
+    @JsonProperty("issuerCertPem")
+    public String getIssuerCertPem() {
+        return issuerCertPem;
+    }
+
+    public void setIssuerCertPem(String issuerCertPem) {
+        this.issuerCertPem = issuerCertPem;
+    }
+
+    @ApiModelProperty(value = "JWKS endpoint URL of the credential issuer.")
+    @JsonProperty("jwksUri")
+    public String getJwksUri() {
+        return jwksUri;
+    }
+
+    public void setJwksUri(String jwksUri) {
+        this.jwksUri = jwksUri;
     }
 
     @ApiModelProperty(value = "List of claim constraints for this credential.")

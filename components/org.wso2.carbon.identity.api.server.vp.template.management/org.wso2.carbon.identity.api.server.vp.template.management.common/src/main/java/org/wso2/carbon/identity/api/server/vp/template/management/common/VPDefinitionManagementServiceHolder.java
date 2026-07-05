@@ -37,8 +37,12 @@ public class VPDefinitionManagementServiceHolder {
      */
     public static PresentationDefinitionService getPresentationDefinitionService() {
 
-        return (PresentationDefinitionService) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext()
-                .getOSGiService(PresentationDefinitionService.class, null);
+        try {
+            return (PresentationDefinitionService) PrivilegedCarbonContext
+                    .getThreadLocalCarbonContext()
+                    .getOSGiService(PresentationDefinitionService.class, null);
+        } catch (NullPointerException e) {
+            return null;
+        }
     }
 }

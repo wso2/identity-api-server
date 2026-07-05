@@ -19,6 +19,7 @@
 package org.wso2.carbon.identity.api.server.vp.template.management.v1.core;
 
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
+import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.api.server.vp.template.management.common.VPDefinitionManagementConstants.ErrorMessage;
 import org.wso2.carbon.identity.api.server.vp.template.management.common.VPDefinitionManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.Error;
@@ -29,8 +30,9 @@ import org.wso2.carbon.identity.api.server.vp.template.management.v1.Presentatio
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionUpdateModel;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.ClaimConstraintModel;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.RequestedCredentialModel;
-import org.wso2.carbon.identity.openid4vc.presentation.common.exception.VPException;
-import org.wso2.carbon.identity.openid4vc.presentation.management.exception.PresentationDefinitionNotFoundException;
+import org.wso2.carbon.identity.openid4vc.presentation.management.exception.PresentationManagementClientException;
+import org.wso2.carbon.identity.openid4vc.presentation.management.exception.PresentationManagementErrorCode;
+import org.wso2.carbon.identity.openid4vc.presentation.management.exception.PresentationManagementException;
 import org.wso2.carbon.identity.openid4vc.presentation.management.model.PresentationDefinition;
 import org.wso2.carbon.identity.openid4vc.presentation.management.model.PresentationDefinition.ClaimConstraint;
 import org.wso2.carbon.identity.openid4vc.presentation.management.model.PresentationDefinition.RequestedCredential;
@@ -68,7 +70,7 @@ public class ServerVPDefinitionManagementService {
                             .map(this::toListItem)
                             .collect(Collectors.toList()));
             return listResponse;
-        } catch (VPException e) {
+        } catch (PresentationManagementException e) {
             throw handleServerError(ErrorMessage.ERROR_CODE_ERROR_LISTING_DEFINITIONS, e);
         }
     }
@@ -98,16 +100,17 @@ public class ServerVPDefinitionManagementService {
 
             PresentationDefinition created = service.createPresentationDefinition(definition, tenantId);
             return toResponse(created);
-        } catch (VPException e) {
-            if (e.getMessage() != null && e.getMessage().contains("already exists")) {
+        } catch (PresentationManagementClientException e) {
+            if (PresentationManagementErrorCode.DEFINITION_ALREADY_EXISTS == e.getErrorCode()) {
                 throw handleClientError(ErrorMessage.ERROR_CODE_DEFINITION_ALREADY_EXISTS, e,
                         Response.Status.CONFLICT);
             }
-            if (e.getMessage() != null && (e.getMessage().contains("Invalid") ||
-                    e.getMessage().contains("required"))) {
+            if (PresentationManagementErrorCode.VALIDATION_ERROR == e.getErrorCode()) {
                 throw handleClientError(ErrorMessage.ERROR_CODE_INVALID_INPUT, e,
                         Response.Status.BAD_REQUEST, e.getMessage());
             }
+            throw handleServerError(ErrorMessage.ERROR_CODE_ERROR_CREATING_DEFINITION, e);
+        } catch (PresentationManagementException e) {
             throw handleServerError(ErrorMessage.ERROR_CODE_ERROR_CREATING_DEFINITION, e);
         }
     }
@@ -127,9 +130,12 @@ public class ServerVPDefinitionManagementService {
             PresentationDefinition definition = service.getPresentationDefinitionById(
                     definitionId, tenantId);
             return toResponse(definition);
-        } catch (PresentationDefinitionNotFoundException e) {
-            throw handleNotFound(definitionId);
-        } catch (VPException e) {
+        } catch (PresentationManagementClientException e) {
+            if (PresentationManagementErrorCode.DEFINITION_NOT_FOUND == e.getErrorCode()) {
+                throw handleNotFound(definitionId);
+            }
+            throw handleServerError(ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_DEFINITION, e, definitionId);
+        } catch (PresentationManagementException e) {
             throw handleServerError(ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_DEFINITION, e,
                     definitionId);
         }
@@ -164,9 +170,12 @@ public class ServerVPDefinitionManagementService {
             PresentationDefinition updated = service.updatePresentationDefinition(
                     definition, tenantId);
             return toResponse(updated);
-        } catch (PresentationDefinitionNotFoundException e) {
-            throw handleNotFound(definitionId);
-        } catch (VPException e) {
+        } catch (PresentationManagementClientException e) {
+            if (PresentationManagementErrorCode.DEFINITION_NOT_FOUND == e.getErrorCode()) {
+                throw handleNotFound(definitionId);
+            }
+            throw handleServerError(ErrorMessage.ERROR_CODE_ERROR_UPDATING_DEFINITION, e, definitionId);
+        } catch (PresentationManagementException e) {
             throw handleServerError(ErrorMessage.ERROR_CODE_ERROR_UPDATING_DEFINITION, e,
                     definitionId);
         }
@@ -184,9 +193,12 @@ public class ServerVPDefinitionManagementService {
             PresentationDefinitionService service = getService();
 
             service.deletePresentationDefinition(definitionId, tenantId);
-        } catch (PresentationDefinitionNotFoundException e) {
-            throw handleNotFound(definitionId);
-        } catch (VPException e) {
+        } catch (PresentationManagementClientException e) {
+            if (PresentationManagementErrorCode.DEFINITION_NOT_FOUND == e.getErrorCode()) {
+                throw handleNotFound(definitionId);
+            }
+            throw handleServerError(ErrorMessage.ERROR_CODE_ERROR_DELETING_DEFINITION, e, definitionId);
+        } catch (PresentationManagementException e) {
             throw handleServerError(ErrorMessage.ERROR_CODE_ERROR_DELETING_DEFINITION, e,
                     definitionId);
         }
@@ -209,6 +221,8 @@ public class ServerVPDefinitionManagementService {
             cred.setType(apiModel.getType());
             cred.setPurpose(apiModel.getPurpose());
             cred.setIssuer(apiModel.getIssuer());
+            cred.setIssuerCertPem(apiModel.getIssuerCertPem());
+            cred.setJwksUri(apiModel.getJwksUri());
             cred.setClaims(toClaimConstraints(apiModel.getClaims()));
             cred.setEnforceTrustedIssuers(Boolean.TRUE.equals(apiModel.getEnforceTrustedIssuers()));
             cred.setTrustedIssuers(apiModel.getTrustedIssuers());
@@ -232,6 +246,8 @@ public class ServerVPDefinitionManagementService {
             model.setType(cred.getType());
             model.setPurpose(cred.getPurpose());
             model.setIssuer(cred.getIssuer());
+            model.setIssuerCertPem(cred.getIssuerCertPem());
+            model.setJwksUri(cred.getJwksUri());
             model.setClaims(toClaimConstraintModels(cred.getClaims()));
             model.setEnforceTrustedIssuers(cred.isEnforceTrustedIssuers());
             model.setTrustedIssuers(cred.getTrustedIssuers());
@@ -343,13 +359,25 @@ public class ServerVPDefinitionManagementService {
 
     private PresentationDefinitionService getService() {
 
+        if (!Boolean.parseBoolean(IdentityUtil.getProperty("OpenID4VP.Enabled"))) {
+            throw buildFeatureDisabledError();
+        }
         PresentationDefinitionService service =
                 VPDefinitionManagementServiceHolder.getPresentationDefinitionService();
         if (service == null) {
-            throw new javax.ws.rs.WebApplicationException(
-                    Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                            .entity("PresentationDefinitionService is not available").build());
+            throw buildFeatureDisabledError();
         }
         return service;
+    }
+
+    private javax.ws.rs.WebApplicationException buildFeatureDisabledError() {
+
+        Error error = new Error();
+        error.setCode("VPD-60004");
+        error.setMessage("OpenID4VP feature is not enabled.");
+        error.setDescription(
+                "The OpenID4VP feature is disabled. Enable it via [openid4vp] enabled=true in deployment.toml.");
+        return new javax.ws.rs.WebApplicationException(
+                Response.status(Response.Status.NOT_IMPLEMENTED).entity(error).build());
     }
 }
