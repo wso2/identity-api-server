@@ -68,8 +68,7 @@ public class ServerVPVerificationService {
 
         StandaloneVerificationService service = getService();
         if (service == null) {
-            return buildInternalErrorResponse(ErrorMessage.ERROR_CODE_SERVICE_UNAVAILABLE,
-                    ErrorMessage.ERROR_CODE_SERVICE_UNAVAILABLE.getMessage());
+            return buildNotImplementedResponse();
         }
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
@@ -109,8 +108,7 @@ public class ServerVPVerificationService {
 
         StandaloneVerificationService service = getService();
         if (service == null) {
-            return buildInternalErrorResponse(ErrorMessage.ERROR_CODE_SERVICE_UNAVAILABLE,
-                    ErrorMessage.ERROR_CODE_SERVICE_UNAVAILABLE.getMessage());
+            return buildNotImplementedResponse();
         }
 
         StandaloneVerificationSession session = service.getSession(txnId);
@@ -210,5 +208,14 @@ public class ServerVPVerificationService {
         error.setMessage(errorMsg.getMessage());
         error.setDescription(description);
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build();
+    }
+
+    private Response buildNotImplementedResponse() {
+        Error error = new Error();
+        error.setCode("OID4VP-60001");
+        error.setMessage("OpenID4VP feature is not enabled.");
+        error.setDescription(
+                "The OpenID4VP feature is disabled. Enable it via [openid4vp] enabled=true in deployment.toml.");
+        return Response.status(Response.Status.NOT_IMPLEMENTED).entity(error).build();
     }
 }
