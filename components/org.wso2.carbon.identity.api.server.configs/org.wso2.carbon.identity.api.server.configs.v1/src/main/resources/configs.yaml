@@ -2843,7 +2843,7 @@ components:
         clientIdScheme:
           type: string
           description: >
-            The client_id_scheme used when building the VP request JWT.
+            The client_id_scheme used when building the Verifiable Presentation request JWT.
             Determines how the verifier identifies itself to the wallet.
           enum:
             - redirect_uri
@@ -2853,13 +2853,13 @@ components:
         clientId:
           type: string
           description: >
-            Optional override for the client_id sent in VP requests.
+            Optional override for the client_id sent in Verifiable Presentation requests.
             Leave blank to auto-derive from the selected client ID scheme.
           example: x509_san_dns:myserver.example.com
         responseMode:
           type: string
           description: >
-            The response_mode used in the VP request.
+            The response_mode used in the Verifiable Presentation request.
             Use direct_post.jwt for encrypted responses or direct_post for plain JSON.
           enum:
             - direct_post
