@@ -68,9 +68,8 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.FraudDetectionConfig
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationConfiguration;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.OpenID4VPConfiguration;
-import org.wso2.carbon.identity.openid4vc.presentation.common.config.OpenID4VPConfigMgtException;
-import org.wso2.carbon.identity.openid4vc.presentation.common.config.OpenID4VPConfigService;
-import org.wso2.carbon.identity.openid4vc.presentation.common.config.OpenID4VPTenantConfig;
+import org.wso2.carbon.identity.openid4vc.presentation.authenticator.exception.OpenID4VPConfigMgtException;
+import org.wso2.carbon.identity.openid4vc.presentation.authenticator.service.OpenID4VPConfigService;
 import org.wso2.carbon.identity.openid4vc.presentation.common.constant.OpenID4VPConstants;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthOAuth2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
@@ -704,7 +703,7 @@ public class ServerConfigManagementService {
                     Constants.ErrorMessage.ERROR_CODE_OID4VP_NOT_ENABLED, null);
         }
         try {
-            OpenID4VPTenantConfig cfg = configService.getConfig(tenantDomain);
+            OpenID4VPConfigService.TenantConfig cfg = configService.getConfig(tenantDomain);
             return new OpenID4VPConfiguration()
                     .clientIdScheme(StringUtils.defaultIfBlank(
                             cfg.getClientIdScheme(), OpenID4VPConstants.Defaults.CLIENT_ID_SCHEME))
@@ -736,7 +735,7 @@ public class ServerConfigManagementService {
                     Constants.ErrorMessage.ERROR_CODE_OID4VP_NOT_ENABLED, null);
         }
         try {
-            OpenID4VPTenantConfig tenantConfig = new OpenID4VPTenantConfig();
+            OpenID4VPConfigService.TenantConfig tenantConfig = new OpenID4VPConfigService.TenantConfig();
             tenantConfig.setClientIdScheme(config.getClientIdScheme());
             tenantConfig.setClientId(config.getClientId());
             tenantConfig.setResponseMode(config.getResponseMode());

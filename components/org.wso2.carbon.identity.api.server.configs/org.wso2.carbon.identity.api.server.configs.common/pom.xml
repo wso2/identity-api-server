@@ -109,7 +109,7 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.identity.openid4vc</groupId>
-            <artifactId>org.wso2.carbon.identity.openid4vc.presentation.common</artifactId>
+            <artifactId>org.wso2.carbon.identity.openid4vc.presentation.authenticator</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>
