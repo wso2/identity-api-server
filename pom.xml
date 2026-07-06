@@ -248,6 +248,12 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.identity.policy.management</artifactId>
+                <version>${carbon.identity.framework.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
                 <artifactId>org.wso2.carbon.identity.webhook.management</artifactId>
                 <version>${carbon.identity.framework.version}</version>
                 <scope>provided</scope>
@@ -474,6 +480,12 @@
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
                 <artifactId>org.wso2.carbon.identity.api.server.cors.common</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.policy.common</artifactId>
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>
@@ -1216,6 +1228,7 @@
         <module>components/org.wso2.carbon.identity.api.server.vc.template.management</module>
         <module>components/org.wso2.carbon.identity.api.server.credential.management</module>
         <module>components/org.wso2.carbon.identity.api.server.moesif.publisher</module>
+        <module>components/org.wso2.carbon.identity.api.server.policy</module>
     </modules>
 
 </project>
