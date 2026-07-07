@@ -44,6 +44,7 @@ import org.wso2.carbon.identity.openid4vc.presentation.verification.dto.Verifica
 
 import java.net.URI;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.Response;
 
@@ -146,7 +147,7 @@ public class ServerVPVerificationService {
                 ? Instant.ofEpochMilli(firstMeta.getPresentationTime()).toString() : null);
 
         // ── Credentials — one entry per verified credential ───────────────────
-        List<Credential> credentials = new java.util.ArrayList<>();
+        List<Credential> credentials = new ArrayList<>();
         if (metadataList != null) {
             for (PresentationMetadata meta : metadataList) {
                 Credential cred = new Credential();
