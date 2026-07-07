@@ -45,6 +45,10 @@ public class Constants {
                 "Invalid pagination parameters.",
                 "The 'limit' must be greater than or equal to 1 and 'offset' must be greater than or equal to 0."),
 
+        ERROR_CODE_UNSUPPORTED_RESOURCE_TYPE("60003",
+                "Unsupported policy resource type.",
+                "Resource type '%s' is not supported for policy resources. Only RULE is currently supported."),
+
         ERROR_CODE_ERROR_ADDING_POLICY("65001",
                 "Unable to add policy.",
                 "Server encountered an error while adding the policy."),

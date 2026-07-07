@@ -67,7 +67,7 @@ public enum ResourceTypeEnum {
     }
 }
 
-    private ResourceTypeEnum resourceType;
+    private ResourceTypeEnum resourceType = ResourceTypeEnum.RULE;
     private RuleRequest rule;
 
     /**

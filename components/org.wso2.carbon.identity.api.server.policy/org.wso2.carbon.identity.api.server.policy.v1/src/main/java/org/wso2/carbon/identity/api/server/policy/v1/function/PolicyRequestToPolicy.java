@@ -18,13 +18,15 @@
 
 package org.wso2.carbon.identity.api.server.policy.v1.function;
 
+import org.wso2.carbon.identity.api.server.policy.common.Constants;
 import org.wso2.carbon.identity.api.server.policy.v1.model.ExpressionRequest;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyRequest;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyResourceRequest;
 import org.wso2.carbon.identity.api.server.policy.v1.model.RuleRequest;
+import org.wso2.carbon.identity.api.server.policy.v1.util.PolicyManagementAPIErrorBuilder;
 import org.wso2.carbon.identity.policy.management.api.model.Policy;
 import org.wso2.carbon.identity.policy.management.api.model.PolicyResource;
-import org.wso2.carbon.identity.policy.management.api.model.ResourceType;
+import org.wso2.carbon.identity.policy.management.api.model.RulePolicyResource;
 import org.wso2.carbon.identity.rule.management.api.model.ANDCombinedRule;
 import org.wso2.carbon.identity.rule.management.api.model.Expression;
 import org.wso2.carbon.identity.rule.management.api.model.ORCombinedRule;
@@ -35,6 +37,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import javax.ws.rs.core.Response;
 
 /**
  * Mapper: PolicyRequest (API model) → Policy (domain model).
@@ -72,15 +75,23 @@ public class PolicyRequestToPolicy implements Function<PolicyRequest, Policy> {
             return Collections.emptyList();
         }
         return resourceRequests.stream()
-                .map(pr -> new PolicyResource(null, pr.getTarget(), resolveResourceType(pr.getResourceType()),
-                        null, buildRule(pr.getRule())))
+                .map(this::toRulePolicyResource)
                 .collect(Collectors.toList());
     }
 
-    private ResourceType resolveResourceType(PolicyResourceRequest.ResourceTypeEnum resourceType) {
+    private PolicyResource toRulePolicyResource(PolicyResourceRequest resourceRequest) {
 
-        // resourceType is optional in the API; rule attachments are the default.
-        return resourceType == null ? ResourceType.RULE : ResourceType.valueOf(resourceType.name());
+        validateResourceType(resourceRequest.getResourceType());
+        return new RulePolicyResource(null, resourceRequest.getTarget(), null, buildRule(resourceRequest.getRule()));
+    }
+
+    private void validateResourceType(PolicyResourceRequest.ResourceTypeEnum resourceType) {
+
+        // resourceType is optional in the API and defaults to RULE; RULE is the only supported type.
+        if (resourceType != null && resourceType != PolicyResourceRequest.ResourceTypeEnum.RULE) {
+            throw PolicyManagementAPIErrorBuilder.handleException(Response.Status.BAD_REQUEST,
+                    Constants.ErrorMessage.ERROR_CODE_UNSUPPORTED_RESOURCE_TYPE, resourceType.toString());
+        }
     }
 
     private Rule buildRule(RuleRequest ruleRequest) {

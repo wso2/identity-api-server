@@ -18,12 +18,9 @@
 
 package org.wso2.carbon.identity.api.server.policy.v1.core;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.Util;
 import org.wso2.carbon.identity.api.server.policy.common.Constants;
-import org.wso2.carbon.identity.api.server.policy.common.PolicyServiceHolder;
 import org.wso2.carbon.identity.api.server.policy.v1.function.PolicyRequestToPolicy;
 import org.wso2.carbon.identity.api.server.policy.v1.function.PolicyToPolicyResponse;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyListItem;
@@ -36,14 +33,8 @@ import org.wso2.carbon.identity.policy.management.api.exception.PolicyManagement
 import org.wso2.carbon.identity.policy.management.api.model.Policy;
 import org.wso2.carbon.identity.policy.management.api.model.PolicyBasicInfo;
 import org.wso2.carbon.identity.policy.management.api.service.PolicyManagementService;
-import org.wso2.carbon.identity.rule.metadata.api.exception.RuleMetadataException;
-import org.wso2.carbon.identity.rule.metadata.api.model.FieldDefinition;
-import org.wso2.carbon.identity.rule.metadata.api.model.FlowType;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
@@ -52,7 +43,6 @@ import javax.ws.rs.core.Response;
  */
 public class PolicyService {
 
-    private static final Log LOG = LogFactory.getLog(PolicyService.class);
     private static final int DEFAULT_LIMIT = 30;
     private static final int DEFAULT_OFFSET = 0;
 
@@ -91,7 +81,7 @@ public class PolicyService {
                 throw PolicyManagementAPIErrorBuilder.handleException(Response.Status.NOT_FOUND,
                         Constants.ErrorMessage.ERROR_CODE_POLICY_NOT_FOUND, policyId);
             }
-            return new PolicyToPolicyResponse(loadFieldDisplayNamesMap()).apply(policy);
+            return new PolicyToPolicyResponse().apply(policy);
         } catch (PolicyManagementException e) {
             throw PolicyManagementAPIErrorBuilder.handleException(e,
                     Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_POLICY);
@@ -187,23 +177,6 @@ public class PolicyService {
         if (limit < 1 || offset < 0) {
             throw PolicyManagementAPIErrorBuilder.handleException(Response.Status.BAD_REQUEST,
                     Constants.ErrorMessage.ERROR_CODE_INVALID_PAGINATION);
-        }
-    }
-
-    private Map<String, String> loadFieldDisplayNamesMap() {
-
-        try {
-            String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            List<FieldDefinition> fields = PolicyServiceHolder.getRuleMetadataService()
-                    .getExpressionMeta(FlowType.DEVICE_POLICY, tenantDomain);
-            Map<String, String> result = new HashMap<>();
-            for (FieldDefinition fd : fields) {
-                result.put(fd.getField().getName(), fd.getField().getDisplayName());
-            }
-            return result;
-        } catch (RuleMetadataException e) {
-            LOG.error("Failed to retrieve field display names from rule metadata.", e);
-            return Collections.emptyMap();
         }
     }
 }

@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.policy.v1.function;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.policy.v1.model.ANDRuleResponse;
 import org.wso2.carbon.identity.api.server.policy.v1.model.ExpressionResponse;
 import org.wso2.carbon.identity.api.server.policy.v1.model.ExpressionValue;
@@ -26,14 +28,13 @@ import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyResponse;
 import org.wso2.carbon.identity.api.server.policy.v1.model.RuleResponse;
 import org.wso2.carbon.identity.policy.management.api.model.Policy;
 import org.wso2.carbon.identity.policy.management.api.model.PolicyResource;
+import org.wso2.carbon.identity.policy.management.api.model.RulePolicyResource;
 import org.wso2.carbon.identity.rule.management.api.model.ANDCombinedRule;
 import org.wso2.carbon.identity.rule.management.api.model.Expression;
 import org.wso2.carbon.identity.rule.management.api.model.ORCombinedRule;
 import org.wso2.carbon.identity.rule.management.api.model.Rule;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -45,17 +46,7 @@ import java.util.stream.Collectors;
  */
 public class PolicyToPolicyResponse implements Function<Policy, PolicyResponse> {
 
-    private final Map<String, String> fieldDisplayNames;
-
-    public PolicyToPolicyResponse() {
-
-        this.fieldDisplayNames = Collections.emptyMap();
-    }
-
-    public PolicyToPolicyResponse(Map<String, String> fieldDisplayNames) {
-
-        this.fieldDisplayNames = fieldDisplayNames != null ? fieldDisplayNames : Collections.emptyMap();
-    }
+    private static final Log LOG = LogFactory.getLog(PolicyToPolicyResponse.class);
 
     @Override
     public PolicyResponse apply(Policy policy) {
@@ -84,14 +75,24 @@ public class PolicyToPolicyResponse implements Function<Policy, PolicyResponse> 
             resourceResponse.setResourceType(
                     PolicyResourceResponse.ResourceTypeEnum.fromValue(policyResource.getResourceType().name()));
         }
-        if (policyResource.getRule() != null) {
-            resourceResponse.setRule(toRuleResponse(policyResource.getRule()));
+        if (policyResource instanceof RulePolicyResource) {
+            Rule rule = ((RulePolicyResource) policyResource).getRule();
+            if (rule != null) {
+                resourceResponse.setRule(toRuleResponse(rule));
+            }
         }
         return resourceResponse;
     }
 
     private RuleResponse toRuleResponse(Rule rule) {
 
+        if (!(rule instanceof ORCombinedRule)) {
+            LOG.error("Unexpected top-level rule type: "
+                    + (rule != null ? rule.getClass().getName() : "null")
+                    + ". Expected an ORCombinedRule while building the policy response.");
+            throw new IllegalStateException(
+                    "Unsupported rule structure encountered while building the policy response.");
+        }
         ORCombinedRule orRule = (ORCombinedRule) rule;
         List<ANDRuleResponse> andGroups = orRule.getRules().stream()
                 .map(this::toANDRuleResponse)
@@ -121,8 +122,6 @@ public class PolicyToPolicyResponse implements Function<Policy, PolicyResponse> 
         }
         ExpressionResponse expressionResponse = new ExpressionResponse();
         expressionResponse.setField(expression.getField());
-        expressionResponse.setDisplayName(
-                fieldDisplayNames.getOrDefault(expression.getField(), expression.getField()));
         expressionResponse.setOperator(expression.getOperator());
         expressionResponse.setValue(expressionValue);
         return expressionResponse;

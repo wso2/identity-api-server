@@ -78,7 +78,7 @@ public class PoliciesApi  {
     @Path("/{policy-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete a  policy.", notes = "This API provides the capability to delete a  policy by ID.", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete a policy.", notes = "This API provides the capability to delete a policy by ID.", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -91,7 +91,7 @@ public class PoliciesApi  {
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response deletePolicy(@ApiParam(value = "ID of the  policy",required=true) @PathParam("policy-id") String policyId) {
+    public Response deletePolicy(@ApiParam(value = "ID of the policy",required=true) @PathParam("policy-id") String policyId) {
 
         return delegate.deletePolicy(policyId );
     }
@@ -101,7 +101,7 @@ public class PoliciesApi  {
     
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "List policies.", notes = "This API provides the capability to retrieve a paginated list of  policies for the tenant, optionally filtered by name.", response = PolicyListResponse.class, authorizations = {
+    @ApiOperation(value = "List policies.", notes = "This API provides the capability to retrieve a paginated list of policies for the tenant, optionally filtered by name.", response = PolicyListResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -124,7 +124,7 @@ public class PoliciesApi  {
     @Path("/{policy-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get a  policy by ID.", notes = "This API provides the capability to retrieve a policy by ID.", response = PolicyResponse.class, authorizations = {
+    @ApiOperation(value = "Get a policy by ID.", notes = "This API provides the capability to retrieve a policy by ID.", response = PolicyResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -138,7 +138,7 @@ public class PoliciesApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getPolicyById(@ApiParam(value = "ID of the  policy",required=true) @PathParam("policy-id") String policyId) {
+    public Response getPolicyById(@ApiParam(value = "ID of the policy",required=true) @PathParam("policy-id") String policyId) {
 
         return delegate.getPolicyById(policyId );
     }

@@ -20,7 +20,7 @@ paths:
         - Policy Management
       summary: List policies.
       operationId: getPolicies
-      description: This API provides the capability to retrieve a paginated list of  policies for the tenant, optionally filtered by name.
+      description: This API provides the capability to retrieve a paginated list of policies for the tenant, optionally filtered by name.
       parameters:
         - name: limit
           in: query
@@ -112,13 +112,13 @@ paths:
     get:
       tags:
         - Policy Management
-      summary: Get a  policy by ID.
+      summary: Get a policy by ID.
       operationId: getPolicyById
       description: This API provides the capability to retrieve a policy by ID.
       parameters:
         - name: policy-id
           in: path
-          description: ID of the  policy
+          description: ID of the policy
           required: true
           schema:
             type: string
@@ -202,13 +202,13 @@ paths:
     delete:
       tags:
         - Policy Management
-      summary: Delete a  policy.
+      summary: Delete a policy.
       operationId: deletePolicy
-      description: This API provides the capability to delete a  policy by ID.
+      description: This API provides the capability to delete a policy by ID.
       parameters:
         - name: policy-id
           in: path
-          description: ID of the  policy
+          description: ID of the policy
           required: true
           schema:
             type: string
@@ -261,7 +261,7 @@ components:
         - name
         - resources
       example:
-        name: "Corporate  Policy"
+        name: "Corporate Policy"
         resources:
           - target: "ios"
             resourceType: "RULE"
@@ -299,6 +299,7 @@ components:
         resourceType:
           type: string
           enum: [RULE, ACTION]
+          default: RULE
           description: The type of resource. Defaults to RULE. Only RULE is currently supported.
           example: "RULE"
         rule:
@@ -474,10 +475,6 @@ components:
           type: string
           description: The field to evaluate.
           example: "platform"
-        displayName:
-          type: string
-          description: The human-readable display name of the field.
-          example: "Platform"
         operator:
           type: string
           description: The operator to apply.

@@ -34,7 +34,6 @@ import javax.xml.bind.annotation.*;
 public class ExpressionResponse  {
   
     private String field;
-    private String displayName;
     private String operator;
     private ExpressionValue value;
 
@@ -55,25 +54,6 @@ public class ExpressionResponse  {
     }
     public void setField(String field) {
         this.field = field;
-    }
-
-    /**
-    * The human-readable display name of the field.
-    **/
-    public ExpressionResponse displayName(String displayName) {
-
-        this.displayName = displayName;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "Platform", value = "The human-readable display name of the field.")
-    @JsonProperty("displayName")
-    @Valid
-    public String getDisplayName() {
-        return displayName;
-    }
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
     }
 
     /**
@@ -126,14 +106,13 @@ public class ExpressionResponse  {
         }
         ExpressionResponse expressionResponse = (ExpressionResponse) o;
         return Objects.equals(this.field, expressionResponse.field) &&
-            Objects.equals(this.displayName, expressionResponse.displayName) &&
             Objects.equals(this.operator, expressionResponse.operator) &&
             Objects.equals(this.value, expressionResponse.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(field, displayName, operator, value);
+        return Objects.hash(field, operator, value);
     }
 
     @Override
@@ -143,7 +122,6 @@ public class ExpressionResponse  {
         sb.append("class ExpressionResponse {\n");
         
         sb.append("    field: ").append(toIndentedString(field)).append("\n");
-        sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    operator: ").append(toIndentedString(operator)).append("\n");
         sb.append("    value: ").append(toIndentedString(value)).append("\n");
         sb.append("}");

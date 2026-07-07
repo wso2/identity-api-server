@@ -100,8 +100,8 @@ public class PolicyManagementAPIErrorBuilder {
     }
 
     /**
-     * Build an APIError for an API-layer error that wraps a non-policy backend cause
-     * (e.g. a failure while retrieving rule metadata). The cause is logged.
+     * Build an APIError for an API-layer error that wraps a non-policy backend cause.
+     * The cause is logged.
      *
      * @param status    HTTP status to return.
      * @param errorEnum API-layer error message.

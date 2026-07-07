@@ -34,11 +34,6 @@
             <artifactId>org.wso2.carbon.identity.policy.management</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.identity.framework</groupId>
-            <artifactId>org.wso2.carbon.identity.rule.metadata</artifactId>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 
     <build>
