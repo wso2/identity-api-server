@@ -55,6 +55,7 @@ public class VerificationStatusResponse {
 
     @ApiModelProperty(value = "Error descriptions when status=FAILED.")
     @JsonProperty("errors")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public List<String> getErrors() { return errors; }
     public void setErrors(List<String> errors) { this.errors = errors; }
 
@@ -67,7 +68,7 @@ public class VerificationStatusResponse {
 
         private String format;
         private String submittedAt;
-        private Credential credential;
+        private List<Credential> credentials;
         private Holder holder;
         private KeyBinding keyBinding;
 
@@ -80,11 +81,13 @@ public class VerificationStatusResponse {
         public String getSubmittedAt() { return submittedAt; }
         public void setSubmittedAt(String submittedAt) { this.submittedAt = submittedAt; }
 
-        @JsonProperty("credential")
-        public Credential getCredential() { return credential; }
-        public void setCredential(Credential credential) { this.credential = credential; }
+        @JsonProperty("credentials")
+        @JsonInclude(JsonInclude.Include.NON_EMPTY)
+        public List<Credential> getCredentials() { return credentials; }
+        public void setCredentials(List<Credential> credentials) { this.credentials = credentials; }
 
         @JsonProperty("holder")
+        @JsonInclude(JsonInclude.Include.NON_NULL)
         public Holder getHolder() { return holder; }
         public void setHolder(Holder holder) { this.holder = holder; }
 
@@ -106,6 +109,7 @@ public class VerificationStatusResponse {
         private String expiresAt;
         private String signingAlgorithm;
         private HolderBinding holderBinding;
+        private Map<String, Object> claims;
 
         @ApiModelProperty(value = "Credential type (vct claim).")
         @JsonProperty("type")
@@ -142,6 +146,12 @@ public class VerificationStatusResponse {
         @JsonInclude(JsonInclude.Include.NON_NULL)
         public HolderBinding getHolderBinding() { return holderBinding; }
         public void setHolderBinding(HolderBinding holderBinding) { this.holderBinding = holderBinding; }
+
+        @ApiModelProperty(value = "Disclosed attribute claims from this credential (technical JWT fields excluded).")
+        @JsonProperty("claims")
+        @JsonInclude(JsonInclude.Include.NON_EMPTY)
+        public Map<String, Object> getClaims() { return claims; }
+        public void setClaims(Map<String, Object> claims) { this.claims = claims; }
     }
 
     /**
@@ -171,23 +181,17 @@ public class VerificationStatusResponse {
     }
 
     /**
-     * Credential holder — subject identifier and disclosed attribute claims.
+     * Credential holder — subject identifier from the sub claim.
      */
     public static class Holder {
 
         private String id;
-        private Map<String, Object> claims;
 
         @ApiModelProperty(value = "Subject identifier (sub claim).")
         @JsonProperty("id")
         @JsonInclude(JsonInclude.Include.NON_NULL)
         public String getId() { return id; }
         public void setId(String id) { this.id = id; }
-
-        @ApiModelProperty(value = "Disclosed attribute claims (everything except JWT/SD-JWT technical fields).")
-        @JsonProperty("claims")
-        public Map<String, Object> getClaims() { return claims; }
-        public void setClaims(Map<String, Object> claims) { this.claims = claims; }
     }
 
     /**

@@ -35,14 +35,16 @@ import org.wso2.carbon.identity.api.server.vp.verification.v1.VerificationStatus
 import org.wso2.carbon.identity.api.server.vp.verification.v1.VerificationStatusResponse.KeyBinding;
 import org.wso2.carbon.identity.api.server.vp.verification.v1.VerificationStatusResponse.Presentation;
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.exception.VPAuthenticatorException;
-import org.wso2.carbon.identity.openid4vc.presentation.authenticator.model.StandaloneVerificationSession;
+import org.wso2.carbon.identity.openid4vc.presentation.authenticator.model.VPSession;
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.model.VPRequestStatus;
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.service.StandaloneVerificationService;
-import org.wso2.carbon.identity.openid4vc.presentation.authenticator.model.StandaloneVerificationInitiation;
+import org.wso2.carbon.identity.openid4vc.presentation.authenticator.model.VPSessionInitiation;
 import org.wso2.carbon.identity.openid4vc.presentation.verification.dto.PresentationMetadata;
+import org.wso2.carbon.identity.openid4vc.presentation.verification.dto.VerificationResult;
 
 import java.net.URI;
 import java.time.Instant;
+import java.util.List;
 import javax.ws.rs.core.Response;
 
 /**
@@ -74,7 +76,7 @@ public class ServerVPVerificationService {
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
 
         try {
-            StandaloneVerificationInitiation initiation =
+            VPSessionInitiation initiation =
                     service.initiate(request.getPresentationDefinitionId(), tenantDomain);
 
             VerificationInitiateResponse resp = new VerificationInitiateResponse();
@@ -111,7 +113,7 @@ public class ServerVPVerificationService {
             return buildNotImplementedResponse();
         }
 
-        StandaloneVerificationSession session = service.getSession(txnId);
+        VPSession session = service.getSession(txnId);
         if (session == null) {
             return buildNotFoundResponse(txnId);
         }
@@ -121,10 +123,7 @@ public class ServerVPVerificationService {
         resp.setStatus(session.getStatus() != null ? session.getStatus().name() : VPRequestStatus.FAILED.name());
 
         if (session.getVerificationResult() != null && session.getStatus() == VPRequestStatus.VERIFIED) {
-            PresentationMetadata meta = session.getVerificationResult().getMetadata();
-            if (meta != null) {
-                resp.setPresentation(buildPresentation(meta));
-            }
+            resp.setPresentation(buildPresentation(session.getVerificationResult()));
             resp.setErrors(session.getVerificationResult().getErrors());
         } else if (session.getStatus() == VPRequestStatus.FAILED) {
             if (session.getVerificationResult() != null) {
@@ -135,48 +134,67 @@ public class ServerVPVerificationService {
         return Response.ok(resp).build();
     }
 
-    private Presentation buildPresentation(PresentationMetadata meta) {
+    private Presentation buildPresentation(VerificationResult result) {
+
+        List<PresentationMetadata> metadataList = result.getCredentialMetadataList();
+        PresentationMetadata firstMeta = (metadataList != null && !metadataList.isEmpty())
+                ? metadataList.get(0) : null;
 
         Presentation p = new Presentation();
-        p.setFormat(meta.getVpFormat());
-        p.setSubmittedAt(Instant.ofEpochMilli(meta.getPresentationTime()).toString());
+        p.setFormat(firstMeta != null ? firstMeta.getVpFormat() : null);
+        p.setSubmittedAt(firstMeta != null
+                ? Instant.ofEpochMilli(firstMeta.getPresentationTime()).toString() : null);
 
-        // ── Credential ────────────────────────────────────────────────────────
-        Credential cred = new Credential();
-        cred.setType(meta.getCredentialType());
-        cred.setIssuer(meta.getIssuerDid());
-        cred.setSigningAlgorithm(meta.getAlgorithm());
-        if (meta.getIssuedAt() != null) {
-            cred.setIssuedAt(Instant.ofEpochMilli(meta.getIssuedAt()).toString());
-        }
-        if (meta.getExpiresAt() != null) {
-            cred.setExpiresAt(Instant.ofEpochMilli(meta.getExpiresAt()).toString());
-        }
-        if (StringUtils.isNotBlank(meta.getHolderBindingMethod())) {
-            HolderBinding hb = new HolderBinding();
-            hb.setMethod(meta.getHolderBindingMethod());
-            hb.setKeyType(meta.getHolderKeyType());
-            hb.setCurve(meta.getHolderKeyCurve());
-            cred.setHolderBinding(hb);
-        }
-        p.setCredential(cred);
-
-        // ── Holder ────────────────────────────────────────────────────────────
-        Holder holder = new Holder();
-        holder.setId(meta.getHolderDid());
-        holder.setClaims(meta.getCredentialClaims());
-        p.setHolder(holder);
-
-        // ── Key Binding ───────────────────────────────────────────────────────
-        if (meta.isKbJwtVerified()) {
-            KeyBinding kb = new KeyBinding();
-            kb.setVerified(true);
-            if (meta.getKbJwtPresentedAt() != null) {
-                kb.setPresentedAt(Instant.ofEpochMilli(meta.getKbJwtPresentedAt()).toString());
+        // ── Credentials — one entry per verified credential ───────────────────
+        List<Credential> credentials = new java.util.ArrayList<>();
+        if (metadataList != null) {
+            for (PresentationMetadata meta : metadataList) {
+                Credential cred = new Credential();
+                cred.setType(meta.getCredentialType());
+                cred.setIssuer(meta.getIssuerDid());
+                cred.setSigningAlgorithm(meta.getAlgorithm());
+                if (meta.getIssuedAt() != null) {
+                    cred.setIssuedAt(Instant.ofEpochMilli(meta.getIssuedAt()).toString());
+                }
+                if (meta.getExpiresAt() != null) {
+                    cred.setExpiresAt(Instant.ofEpochMilli(meta.getExpiresAt()).toString());
+                }
+                if (StringUtils.isNotBlank(meta.getHolderBindingMethod())) {
+                    HolderBinding hb = new HolderBinding();
+                    hb.setMethod(meta.getHolderBindingMethod());
+                    hb.setKeyType(meta.getHolderKeyType());
+                    hb.setCurve(meta.getHolderKeyCurve());
+                    cred.setHolderBinding(hb);
+                }
+                cred.setClaims(meta.getCredentialClaims());
+                credentials.add(cred);
             }
-            kb.setAudience(meta.getKbJwtAudience());
-            kb.setNonce(meta.getNonce());
-            p.setKeyBinding(kb);
+        }
+        p.setCredentials(credentials);
+
+        // ── Holder — only emitted when a sub claim was present in the credential ─
+        if (firstMeta != null && StringUtils.isNotBlank(firstMeta.getHolderDid())) {
+            Holder holder = new Holder();
+            holder.setId(firstMeta.getHolderDid());
+            p.setHolder(holder);
+        }
+
+        // ── Key Binding — use first credential that carried a verified KB-JWT ─
+        // All KB-JWTs in a VP share the same nonce and audience, so any one is representative.
+        if (metadataList != null) {
+            for (PresentationMetadata meta : metadataList) {
+                if (meta.isKbJwtVerified()) {
+                    KeyBinding kb = new KeyBinding();
+                    kb.setVerified(true);
+                    if (meta.getKbJwtPresentedAt() != null) {
+                        kb.setPresentedAt(Instant.ofEpochMilli(meta.getKbJwtPresentedAt()).toString());
+                    }
+                    kb.setAudience(meta.getKbJwtAudience());
+                    kb.setNonce(meta.getNonce());
+                    p.setKeyBinding(kb);
+                    break;
+                }
+            }
         }
 
         return p;
