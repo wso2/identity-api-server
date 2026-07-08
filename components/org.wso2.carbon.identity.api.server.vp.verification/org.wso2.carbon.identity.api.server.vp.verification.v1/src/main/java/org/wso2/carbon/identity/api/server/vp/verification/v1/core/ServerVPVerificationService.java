@@ -38,7 +38,7 @@ import org.wso2.carbon.identity.openid4vc.presentation.authenticator.exception.V
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.model.VPSession;
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.model.VPRequestStatus;
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.service.StandaloneVerificationService;
-import org.wso2.carbon.identity.openid4vc.presentation.authenticator.model.VPSessionInitiation;
+import org.wso2.carbon.identity.openid4vc.presentation.authenticator.model.VPRequestHandle;
 import org.wso2.carbon.identity.openid4vc.presentation.verification.dto.PresentationMetadata;
 import org.wso2.carbon.identity.openid4vc.presentation.verification.dto.VerificationResult;
 
@@ -77,7 +77,7 @@ public class ServerVPVerificationService {
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
 
         try {
-            VPSessionInitiation initiation =
+            VPRequestHandle initiation =
                     service.initiate(request.getPresentationDefinitionId(), tenantDomain);
 
             VerificationInitiateResponse resp = new VerificationInitiateResponse();
