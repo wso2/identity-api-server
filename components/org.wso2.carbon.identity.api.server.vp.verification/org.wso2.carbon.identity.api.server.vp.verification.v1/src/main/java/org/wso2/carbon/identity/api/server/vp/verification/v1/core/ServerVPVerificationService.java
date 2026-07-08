@@ -35,7 +35,7 @@ import org.wso2.carbon.identity.api.server.vp.verification.v1.VerificationStatus
 import org.wso2.carbon.identity.api.server.vp.verification.v1.VerificationStatusResponse.KeyBinding;
 import org.wso2.carbon.identity.api.server.vp.verification.v1.VerificationStatusResponse.Presentation;
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.exception.VPAuthenticatorException;
-import org.wso2.carbon.identity.openid4vc.presentation.authenticator.model.VPSession;
+import org.wso2.carbon.identity.openid4vc.presentation.authenticator.model.VPFlowSession;
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.model.VPFlowStatus;
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.service.StandaloneVerificationService;
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.model.VPFlowInitiationResult;
@@ -114,7 +114,7 @@ public class ServerVPVerificationService {
             return buildNotImplementedResponse();
         }
 
-        VPSession session = service.getSession(txnId);
+        VPFlowSession session = service.getSession(txnId);
         if (session == null) {
             return buildNotFoundResponse(txnId);
         }
