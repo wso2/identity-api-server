@@ -36,7 +36,7 @@ import org.wso2.carbon.identity.api.server.vp.verification.v1.VerificationStatus
 import org.wso2.carbon.identity.api.server.vp.verification.v1.VerificationStatusResponse.Presentation;
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.exception.VPAuthenticatorException;
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.model.VPSession;
-import org.wso2.carbon.identity.openid4vc.presentation.authenticator.model.VPRequestStatus;
+import org.wso2.carbon.identity.openid4vc.presentation.authenticator.model.VPFlowStatus;
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.service.StandaloneVerificationService;
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.model.VPFlowInitiationResult;
 import org.wso2.carbon.identity.openid4vc.presentation.verification.dto.PresentationMetadata;
@@ -121,12 +121,12 @@ public class ServerVPVerificationService {
 
         VerificationStatusResponse resp = new VerificationStatusResponse();
         resp.setTxnId(txnId);
-        resp.setStatus(session.getStatus() != null ? session.getStatus().name() : VPRequestStatus.FAILED.name());
+        resp.setStatus(session.getStatus() != null ? session.getStatus().name() : VPFlowStatus.FAILED.name());
 
-        if (session.getVerificationResult() != null && session.getStatus() == VPRequestStatus.VERIFIED) {
+        if (session.getVerificationResult() != null && session.getStatus() == VPFlowStatus.VERIFIED) {
             resp.setPresentation(buildPresentation(session.getVerificationResult()));
             resp.setErrors(session.getVerificationResult().getErrors());
-        } else if (session.getStatus() == VPRequestStatus.FAILED) {
+        } else if (session.getStatus() == VPFlowStatus.FAILED) {
             if (session.getVerificationResult() != null) {
                 resp.setErrors(session.getVerificationResult().getErrors());
             }
