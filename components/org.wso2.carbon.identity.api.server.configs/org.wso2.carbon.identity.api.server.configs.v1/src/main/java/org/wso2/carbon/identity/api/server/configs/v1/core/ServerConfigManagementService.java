@@ -68,7 +68,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.FraudDetectionConfig
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationConfiguration;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.OpenID4VPConfiguration;
-import org.wso2.carbon.identity.openid4vc.presentation.authenticator.exception.OpenID4VPConfigMgtException;
+import org.wso2.carbon.identity.openid4vc.presentation.authenticator.exception.VPAuthenticatorException;
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.service.OpenID4VPConfigService;
 import org.wso2.carbon.identity.openid4vc.presentation.common.constant.OpenID4VPConstants;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthOAuth2Config;
@@ -714,7 +714,7 @@ public class ServerConfigManagementService {
                     .rejectVcWithoutStatusClaim(
                             cfg.getRejectVcWithoutStatusClaim() != null
                                     ? cfg.getRejectVcWithoutStatusClaim() : Boolean.FALSE);
-        } catch (OpenID4VPConfigMgtException e) {
+        } catch (VPAuthenticatorException e) {
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     Constants.ErrorMessage.ERROR_CODE_OID4VP_CONFIG_RETRIEVE, null);
         }
@@ -743,7 +743,7 @@ public class ServerConfigManagementService {
             tenantConfig.setRejectVcWithoutStatusClaim(config.getRejectVcWithoutStatusClaim());
             configService.setConfig(tenantConfig, tenantDomain);
             return config;
-        } catch (OpenID4VPConfigMgtException e) {
+        } catch (VPAuthenticatorException e) {
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     Constants.ErrorMessage.ERROR_CODE_OID4VP_CONFIG_UPDATE, null);
         }
