@@ -19,11 +19,11 @@
 package org.wso2.carbon.identity.api.server.vp.verification.common;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.openid4vc.presentation.authenticator.service.StandaloneVerificationService;
+import org.wso2.carbon.identity.openid4vc.presentation.authenticator.service.VPFlowService;
 
 /**
  * Service holder for VP Verification API.
- * Obtains the StandaloneVerificationService OSGi service via PrivilegedCarbonContext.
+ * Obtains the VPFlowService OSGi service via PrivilegedCarbonContext.
  */
 public class VPVerificationServiceHolder {
 
@@ -31,14 +31,14 @@ public class VPVerificationServiceHolder {
     }
 
     /**
-     * Get StandaloneVerificationService OSGi service.
+     * Get VPFlowService OSGi service.
      *
-     * @return StandaloneVerificationService instance.
+     * @return VPFlowService instance.
      */
-    public static StandaloneVerificationService getStandaloneVerificationService() {
+    public static VPFlowService getVPFlowService() {
 
-        return (StandaloneVerificationService) PrivilegedCarbonContext
+        return (VPFlowService) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext()
-                .getOSGiService(StandaloneVerificationService.class, null);
+                .getOSGiService(VPFlowService.class, null);
     }
 }

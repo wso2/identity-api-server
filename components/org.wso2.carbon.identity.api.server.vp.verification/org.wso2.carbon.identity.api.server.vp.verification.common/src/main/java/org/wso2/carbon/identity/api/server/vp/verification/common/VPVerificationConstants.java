@@ -38,7 +38,7 @@ public class VPVerificationConstants {
         ERROR_CODE_SESSION_NOT_FOUND("VPV-60401", "Verification session not found."),
         ERROR_CODE_INTERNAL_ERROR("VPV-65001", "Internal server error."),
         ERROR_CODE_SERVICE_UNAVAILABLE("VPV-65002",
-                "StandaloneVerificationService is not available.");
+                "VPVerificationService is not available.");
 
         private final String code;
         private final String message;

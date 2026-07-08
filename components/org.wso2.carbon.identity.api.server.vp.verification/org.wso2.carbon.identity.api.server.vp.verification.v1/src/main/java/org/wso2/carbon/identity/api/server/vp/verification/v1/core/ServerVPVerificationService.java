@@ -37,7 +37,7 @@ import org.wso2.carbon.identity.api.server.vp.verification.v1.VerificationStatus
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.exception.VPAuthenticatorException;
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.model.VPFlowSession;
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.model.VPFlowStatus;
-import org.wso2.carbon.identity.openid4vc.presentation.authenticator.service.StandaloneVerificationService;
+import org.wso2.carbon.identity.openid4vc.presentation.authenticator.service.VPFlowService;
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.model.VPFlowInitiationResult;
 import org.wso2.carbon.identity.openid4vc.presentation.verification.dto.PresentationMetadata;
 import org.wso2.carbon.identity.openid4vc.presentation.verification.dto.VerificationResult;
@@ -50,7 +50,7 @@ import javax.ws.rs.core.Response;
 
 /**
  * Core business logic for the VP Verification REST API.
- * Delegates to StandaloneVerificationService (obtained via OSGi) and maps to REST response models.
+ * Delegates to VPFlowService (obtained via OSGi) and maps to REST response models.
  */
 public class ServerVPVerificationService {
 
@@ -69,7 +69,7 @@ public class ServerVPVerificationService {
                     "presentationDefinitionId is required.");
         }
 
-        StandaloneVerificationService service = getService();
+        VPFlowService service = getService();
         if (service == null) {
             return buildNotImplementedResponse();
         }
@@ -109,7 +109,7 @@ public class ServerVPVerificationService {
                     "txnId is required.");
         }
 
-        StandaloneVerificationService service = getService();
+        VPFlowService service = getService();
         if (service == null) {
             return buildNotImplementedResponse();
         }
@@ -201,8 +201,8 @@ public class ServerVPVerificationService {
         return p;
     }
 
-    private StandaloneVerificationService getService() {
-        return VPVerificationServiceHolder.getStandaloneVerificationService();
+    private VPFlowService getService() {
+        return VPVerificationServiceHolder.getVPFlowService();
     }
 
     private Response buildBadRequestResponse(ErrorMessage errorMsg, String description) {
