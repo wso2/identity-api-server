@@ -81,13 +81,13 @@ public class ServerVPVerificationService {
                     service.initiate(request.getPresentationDefinitionId(), tenantDomain);
 
             VerificationInitiateResponse resp = new VerificationInitiateResponse();
-            resp.setTxnId(initiation.getTxnId());
+            resp.setRequestId(initiation.getRequestId());
             resp.setWalletUrl(initiation.getWalletUrl());
             resp.setRequestUri(initiation.getRequestUri());
             resp.setExpiresAt(initiation.getExpiresAt());
 
             URI location = URI.create(
-                    VPVerificationConstants.VP_VERIFICATION_STATUS_PATH + "/" + initiation.getTxnId());
+                    VPVerificationConstants.VP_VERIFICATION_STATUS_PATH + "/" + initiation.getRequestId());
             return Response.created(location).entity(resp).build();
 
         } catch (VPAuthenticatorException e) {
@@ -99,14 +99,14 @@ public class ServerVPVerificationService {
     /**
      * Poll the status of a verification session.
      *
-     * @param txnId Transaction ID from initiation.
+     * @param requestId Request ID from initiation.
      * @return JAX-RS Response with VerificationStatusResponse (200) or Error.
      */
-    public Response getVerificationStatus(String txnId) {
+    public Response getVerificationStatus(String requestId) {
 
-        if (StringUtils.isBlank(txnId)) {
+        if (StringUtils.isBlank(requestId)) {
             return buildBadRequestResponse(ErrorMessage.ERROR_CODE_INVALID_REQUEST,
-                    "txnId is required.");
+                    "requestId is required.");
         }
 
         VPFlowService service = getService();
@@ -114,13 +114,13 @@ public class ServerVPVerificationService {
             return buildNotImplementedResponse();
         }
 
-        VPFlowSession session = service.getSession(txnId);
+        VPFlowSession session = service.getSession(requestId);
         if (session == null) {
-            return buildNotFoundResponse(txnId);
+            return buildNotFoundResponse(requestId);
         }
 
         VerificationStatusResponse resp = new VerificationStatusResponse();
-        resp.setTxnId(txnId);
+        resp.setRequestId(requestId);
         resp.setStatus(session.getStatus() != null ? session.getStatus().name() : VPFlowStatus.FAILED.name());
 
         if (session.getVerificationResult() != null && session.getStatus() == VPFlowStatus.VERIFIED) {
@@ -213,11 +213,11 @@ public class ServerVPVerificationService {
         return Response.status(Response.Status.BAD_REQUEST).entity(error).build();
     }
 
-    private Response buildNotFoundResponse(String txnId) {
+    private Response buildNotFoundResponse(String requestId) {
         Error error = new Error();
         error.setCode(ErrorMessage.ERROR_CODE_SESSION_NOT_FOUND.getCode());
         error.setMessage(ErrorMessage.ERROR_CODE_SESSION_NOT_FOUND.getMessage());
-        error.setDescription("No verification session found for txnId: " + txnId);
+        error.setDescription("No verification session found for requestId: " + requestId);
         return Response.status(Response.Status.NOT_FOUND).entity(error).build();
     }
 

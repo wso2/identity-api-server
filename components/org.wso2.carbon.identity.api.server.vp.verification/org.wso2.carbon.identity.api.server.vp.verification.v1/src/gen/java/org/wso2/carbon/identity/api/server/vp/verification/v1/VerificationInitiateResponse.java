@@ -28,15 +28,15 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(description = "Response returned when a verification session is created.")
 public class VerificationInitiateResponse {
 
-    private String txnId;
+    private String requestId;
     private String walletUrl;
     private String requestUri;
     private Long expiresAt;
 
-    @ApiModelProperty(value = "Transaction ID used to poll for the verification status.")
-    @JsonProperty("txnId")
-    public String getTxnId() { return txnId; }
-    public void setTxnId(String txnId) { this.txnId = txnId; }
+    @ApiModelProperty(value = "Request ID used to poll for the verification status.")
+    @JsonProperty("requestId")
+    public String getRequestId() { return requestId; }
+    public void setRequestId(String requestId) { this.requestId = requestId; }
 
     @ApiModelProperty(value = "Deep-link URL to launch the wallet (show as QR code).")
     @JsonProperty("walletUrl")

@@ -32,15 +32,15 @@ import java.util.Map;
 @ApiModel(description = "Response for a VP verification session status poll.")
 public class VerificationStatusResponse {
 
-    private String txnId;
+    private String requestId;
     private String status;
     private Presentation presentation;
     private List<String> errors;
 
-    @ApiModelProperty(value = "Transaction ID of the verification session.")
-    @JsonProperty("txnId")
-    public String getTxnId() { return txnId; }
-    public void setTxnId(String txnId) { this.txnId = txnId; }
+    @ApiModelProperty(value = "Request ID of the verification session.")
+    @JsonProperty("requestId")
+    public String getRequestId() { return requestId; }
+    public void setRequestId(String requestId) { this.requestId = requestId; }
 
     @ApiModelProperty(value = "Current status: ACTIVE, VERIFIED, FAILED.")
     @JsonProperty("status")

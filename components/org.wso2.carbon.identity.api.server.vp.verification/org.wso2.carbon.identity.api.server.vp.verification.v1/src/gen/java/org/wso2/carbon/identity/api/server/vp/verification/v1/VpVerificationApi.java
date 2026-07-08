@@ -40,7 +40,7 @@ import javax.ws.rs.core.Response;
  * <p>Endpoints (public — no authentication required):
  * <ul>
  *   <li>POST /vp/verification/initiate — start a new verification transaction</li>
- *   <li>GET  /vp/verification/status/{txn_id} — poll for transaction result</li>
+ *   <li>GET  /vp/verification/status/{request_id} — poll for verification result</li>
  * </ul>
  */
 @Path("/vp/verification")
@@ -71,13 +71,13 @@ public class VpVerificationApi {
     }
 
     @GET
-    @Path("/status/{txn_id}")
+    @Path("/status/{request_id}")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Get VP verification status",
-            notes = "Poll for the result of a verification transaction. "
-                    + "Returns PENDING while waiting, COMPLETED with result_token on success, "
-                    + "FAILED with error, or EXPIRED.",
+            notes = "Poll for the result of a verification session. "
+                    + "Returns ACTIVE while waiting, VERIFIED with presentation on success, "
+                    + "or FAILED with errors.",
             response = VerificationStatusResponse.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = VerificationStatusResponse.class),
@@ -85,9 +85,9 @@ public class VpVerificationApi {
             @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
     public Response getVerificationStatus(
-            @ApiParam(value = "Transaction ID returned from initiation.", required = true)
-            @PathParam("txn_id") String txnId) {
+            @ApiParam(value = "Request ID returned from initiation.", required = true)
+            @PathParam("request_id") String requestId) {
 
-        return delegate.getVerificationStatus(txnId);
+        return delegate.getVerificationStatus(requestId);
     }
 }

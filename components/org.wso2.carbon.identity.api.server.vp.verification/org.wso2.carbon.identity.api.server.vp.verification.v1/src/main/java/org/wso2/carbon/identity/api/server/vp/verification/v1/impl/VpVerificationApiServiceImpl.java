@@ -39,8 +39,8 @@ public class VpVerificationApiServiceImpl extends VpVerificationApiService {
     }
 
     @Override
-    public Response getVerificationStatus(String txnId) {
+    public Response getVerificationStatus(String requestId) {
 
-        return CORE_SERVICE.getVerificationStatus(txnId);
+        return CORE_SERVICE.getVerificationStatus(requestId);
     }
 }

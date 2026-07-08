@@ -27,5 +27,5 @@ public abstract class VpVerificationApiService {
 
     public abstract Response initiateVerification(VerificationInitiateRequest body);
 
-    public abstract Response getVerificationStatus(String txnId);
+    public abstract Response getVerificationStatus(String requestId);
 }
