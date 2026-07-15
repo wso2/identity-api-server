@@ -35,8 +35,8 @@ import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreResponse;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList; 
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
@@ -101,7 +101,7 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
         return Response.ok().entity(serverUserStoreService.getPrimaryUserStore()).build();
     }
 
-    @Override
+   @Override
     public Response getSecondaryUserStores(Integer limit, Integer offset, String filter, String sort,
                                            String requiredAttributes, Boolean excludeAgentUserstore) {
 
@@ -109,18 +109,14 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
                 limit, offset, filter, sort, requiredAttributes);
 
         if (Boolean.TRUE.equals(excludeAgentUserstore) && userStoreList != null) {
-            List<UserStoreListResponse> filteredUserStores = new ArrayList<>();
-            for (UserStoreListResponse userStore : userStoreList) {
-                if (!"AGENT".equalsIgnoreCase(userStore.getName())) {
-                    filteredUserStores.add(userStore);
-                }
-            }
+            List<UserStoreListResponse> filteredUserStores = userStoreList.stream()
+                    .filter(userStore -> !"AGENT".equalsIgnoreCase(userStore.getName()))
+                    .collect(Collectors.toList());
             return Response.ok().entity(filteredUserStores).build();
         }
 
         return Response.ok().entity(userStoreList).build();
     }
-
     @Override
     public Response getUserStoreAttributeMappings(String typeId, Boolean includeIdentityClaimMappings) {
 
