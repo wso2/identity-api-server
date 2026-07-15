@@ -49,6 +49,10 @@ public class Constants {
                 "Unsupported policy resource type.",
                 "Resource type '%s' is not supported for policy resources. Only RULE is currently supported."),
 
+        ERROR_CODE_INVALID_RULE("60004",
+                "Invalid policy rule.",
+                "The provided policy rule is invalid: %s"),
+
         ERROR_CODE_ERROR_ADDING_POLICY("65001",
                 "Unable to add policy.",
                 "Server encountered an error while adding the policy."),
@@ -71,7 +75,11 @@ public class Constants {
 
         ERROR_CODE_ERROR_RETRIEVING_METADATA("65006",
                 "Unable to retrieve policy metadata.",
-                "Server encountered an error while retrieving device policy field metadata.");
+                "Server encountered an error while retrieving device policy field metadata."),
+
+        ERROR_CODE_ERROR_INITIALIZING_RULE_BUILDER("65007",
+                "Unable to build policy rule.",
+                "Server encountered an error while initializing the rule builder for the device policy flow.");
 
         private final String code;
         private final String message;

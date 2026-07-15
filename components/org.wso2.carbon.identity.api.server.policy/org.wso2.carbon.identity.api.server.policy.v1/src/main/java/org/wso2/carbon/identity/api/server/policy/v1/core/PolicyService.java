@@ -60,7 +60,7 @@ public class PolicyService {
 
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            Policy policy = new PolicyRequestToPolicy().apply(policyRequest);
+            Policy policy = new PolicyRequestToPolicy(tenantDomain).apply(policyRequest);
             Policy createdPolicy = policyManagementService.addPolicy(policy, tenantDomain);
             return new PolicyToPolicyResponse().apply(createdPolicy);
         } catch (PolicyManagementException e) {
@@ -95,7 +95,7 @@ public class PolicyService {
 
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            Policy policy = new PolicyRequestToPolicy(policyId).apply(policyRequest);
+            Policy policy = new PolicyRequestToPolicy(policyId, tenantDomain).apply(policyRequest);
             Policy updatedPolicy = policyManagementService.updatePolicy(policy, tenantDomain);
             return new PolicyToPolicyResponse().apply(updatedPolicy);
         } catch (PolicyManagementException e) {
@@ -111,8 +111,6 @@ public class PolicyService {
 
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            // The backend delete is idempotent: it silently no-ops when the policy does not exist,
-            // so no explicit not-found handling is needed here.
             policyManagementService.deletePolicy(policyId, tenantDomain);
         } catch (PolicyManagementException e) {
             throw PolicyManagementAPIErrorBuilder.handleException(e,
