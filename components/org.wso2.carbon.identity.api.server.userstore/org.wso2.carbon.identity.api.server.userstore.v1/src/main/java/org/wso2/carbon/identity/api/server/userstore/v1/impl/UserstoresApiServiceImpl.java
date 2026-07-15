@@ -28,12 +28,14 @@ import org.wso2.carbon.identity.api.server.userstore.v1.factories.ServerUserStor
 import org.wso2.carbon.identity.api.server.userstore.v1.model.ClaimAttributeMapping;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.PatchDocument;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.RDBMSConnectionReq;
+import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreListResponse;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreReq;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreResponse;
 
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList; 
 import java.util.List;
 import javax.ws.rs.core.Response;
 
@@ -42,7 +44,7 @@ import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIF
 import static org.wso2.carbon.identity.api.server.userstore.common.UserStoreConstants.USER_STORE_PATH_COMPONENT;
 
 /**
- * User Store API Service Implementation
+ * User Store API Service Implementation.
  */
 public class UserstoresApiServiceImpl implements UserstoresApiService {
 
@@ -101,11 +103,22 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
 
     @Override
     public Response getSecondaryUserStores(Integer limit, Integer offset, String filter, String sort,
-                                           String requiredAttributes) {
+                                           String requiredAttributes, Boolean excludeAgentUserstore) {
 
-        return Response.ok()
-                .entity(serverUserStoreService.getUserStoreList(limit, offset, filter, sort, requiredAttributes))
-                .build();
+        List<UserStoreListResponse> userStoreList = serverUserStoreService.getUserStoreList(
+                limit, offset, filter, sort, requiredAttributes);
+
+        if (Boolean.TRUE.equals(excludeAgentUserstore) && userStoreList != null) {
+            List<UserStoreListResponse> filteredUserStores = new ArrayList<>();
+            for (UserStoreListResponse userStore : userStoreList) {
+                if (!"AGENT".equalsIgnoreCase(userStore.getName())) {
+                    filteredUserStores.add(userStore);
+                }
+            }
+            return Response.ok().entity(filteredUserStores).build();
+        }
+
+        return Response.ok().entity(userStoreList).build();
     }
 
     @Override
