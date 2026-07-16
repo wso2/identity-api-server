@@ -14,6 +14,8 @@ import java.util.List;
 public class RequestedCredentialModel {
 
     @NotNull
+    private String credentialQueryId;
+    @NotNull
     private String type;
     private String purpose;
     private String issuer;
@@ -22,6 +24,16 @@ public class RequestedCredentialModel {
     private List<ClaimConstraintModel> claims;
     private Boolean enforceTrustedIssuers;
     private List<String> trustedIssuers;
+
+    @ApiModelProperty(value = "Credential query ID used as the DCQL credential query identifier.")
+    @JsonProperty("credentialQueryId")
+    public String getCredentialQueryId() {
+        return credentialQueryId;
+    }
+
+    public void setCredentialQueryId(String credentialQueryId) {
+        this.credentialQueryId = credentialQueryId;
+    }
 
     @ApiModelProperty(required = true, value = "Type of the requested credential.")
     @JsonProperty("type")

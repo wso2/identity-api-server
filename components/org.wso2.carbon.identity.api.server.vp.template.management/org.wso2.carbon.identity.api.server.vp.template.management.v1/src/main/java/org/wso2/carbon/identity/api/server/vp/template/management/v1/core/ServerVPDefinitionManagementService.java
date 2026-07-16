@@ -218,6 +218,7 @@ public class ServerVPDefinitionManagementService {
         List<RequestedCredential> result = new ArrayList<>();
         for (RequestedCredentialModel apiModel : apiModels) {
             RequestedCredential cred = new RequestedCredential();
+            cred.setCredentialQueryId(apiModel.getCredentialQueryId());
             cred.setType(apiModel.getType());
             cred.setPurpose(apiModel.getPurpose());
             cred.setIssuer(apiModel.getIssuer());
@@ -243,6 +244,7 @@ public class ServerVPDefinitionManagementService {
         List<RequestedCredentialModel> result = new ArrayList<>();
         for (RequestedCredential cred : domainCredentials) {
             RequestedCredentialModel model = new RequestedCredentialModel();
+            model.setCredentialQueryId(cred.getCredentialQueryId());
             model.setType(cred.getType());
             model.setPurpose(cred.getPurpose());
             model.setIssuer(cred.getIssuer());
