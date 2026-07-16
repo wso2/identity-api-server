@@ -25,7 +25,9 @@ import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.file.FileContent;
 import org.wso2.carbon.identity.api.server.idp.v1.IdentityProvidersApiService;
 import org.wso2.carbon.identity.api.server.idp.v1.core.ServerIdpManagementService;
+import org.wso2.carbon.identity.api.server.idp.v1.core.ServerIdpSharingService;
 import org.wso2.carbon.identity.api.server.idp.v1.factories.ServerIdpManagementServiceFactory;
+import org.wso2.carbon.identity.api.server.idp.v1.factories.ServerIdpSharingServiceFactory;
 import org.wso2.carbon.identity.api.server.idp.v1.model.AssociationRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorPUTRequest;
@@ -60,6 +62,7 @@ import static org.wso2.carbon.identity.api.server.idp.common.Constants.IDP_TEMPL
 public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiService {
 
     private final ServerIdpManagementService idpManagementService;
+    private final ServerIdpSharingService idpSharingService;
 
     public IdentityProvidersApiServiceImpl() {
 
@@ -67,6 +70,11 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
             this.idpManagementService = ServerIdpManagementServiceFactory.getServerIdpManagementService();
         } catch (IllegalStateException e) {
             throw new RuntimeException("Error occurred while initiating ServerIdpManagementService.", e);
+        }
+        try {
+            this.idpSharingService = ServerIdpSharingServiceFactory.getServerIdpSharingService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating ServerIdpSharingService.", e);
         }
     }
 
@@ -193,7 +201,9 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
     public Response getIdentityProviderSharedOrganizations(String identityProviderId, String before, String after,
                                                            String filter, Integer limit, Boolean recursive,
                                                            String excludedAttributes, String attributes) {
-        return null;
+
+        return idpSharingService.getSharedOrganizations(identityProviderId, before, after, filter, limit, recursive,
+                excludedAttributes, attributes);
     }
 
     @Override
@@ -270,22 +280,26 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
 
     @Override
     public Response shareIdentityProviderWithAll(IdentityProviderShareAllRequestBody requestBody) {
-        return null;
+
+        return idpSharingService.shareIdentityProviderWithAll(requestBody);
     }
 
     @Override
     public Response shareIdentityProviderWithSelected(IdentityProviderShareSelectedRequestBody requestBody) {
-        return null;
+
+        return idpSharingService.shareIdentityProviderWithSelected(requestBody);
     }
 
     @Override
     public Response unshareIdentityProviderFromAll(IdentityProviderUnshareAllRequestBody requestBody) {
-        return null;
+
+        return idpSharingService.unshareIdentityProviderFromAll(requestBody);
     }
 
     @Override
     public Response unshareIdentityProviderFromSelected(IdentityProviderUnshareSelectedRequestBody requestBody) {
-        return null;
+
+        return idpSharingService.unshareIdentityProviderFromSelected(requestBody);
     }
 
     @Override

@@ -3842,8 +3842,13 @@ components:
       properties:
         policy:
           type: string
-          enum: [ "SELECTED_ORG_ONLY", "SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN" ]
-          description: Sharing scope for this organization.
+          description: |-
+            Sharing scope for this organization.
+
+            Possible values:
+            - `SELECTED_ORG_ONLY`
+            - `SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN`
+            - `ALL_EXISTING_AND_FUTURE_ORGS`
     BasicOrganizationResponse:
       type: object
       required:
@@ -3905,8 +3910,13 @@ components:
           example: '682edf68-4835-4bb8-961f-0a16bc6cc866'
         policy:
           type: string
-          enum: [ "SELECTED_ORG_ONLY", "SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN" ]
-          description: Sharing scope for this organization.
+          description: |-
+            Sharing scope for this organization.
+
+            Possible values:
+            - `SELECTED_ORG_ONLY`
+            - `SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN`
+            - `ALL_EXISTING_AND_FUTURE_ORGS`
     IdentityProviderShareAllRequestBody:
       type: object
       required: [ identityProviderId, policy ]
@@ -3916,8 +3926,13 @@ components:
           example: 'c75e27f9-98c7-4518-a968-c6cd59f0ac6b'
         policy:
           type: string
-          enum: [ "SELECTED_ORG_ONLY", "SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN" ]
-          description: Sharing scope for this organization.
+          description: |-
+            Sharing scope for this organization.
+
+            Possible values:
+            - `SELECTED_ORG_ONLY`
+            - `SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN`
+            - `ALL_EXISTING_AND_FUTURE_ORGS`
     IdentityProviderUnshareSelectedRequestBody:
       type: object
       required: [ identityProviderId, orgIds ]

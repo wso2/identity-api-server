@@ -32,57 +32,24 @@ import javax.xml.bind.annotation.*;
 
 public class SharingMode  {
   
-
-@XmlType(name="PolicyEnum")
-@XmlEnum(String.class)
-public enum PolicyEnum {
-
-    @XmlEnumValue("SELECTED_ORG_ONLY") ONLY(String.valueOf("SELECTED_ORG_ONLY")), @XmlEnumValue("SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN") WITH_ALL_EXISTING_AND_FUTURE_CHILDREN(String.valueOf("SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN"));
-
-
-    private String value;
-
-    PolicyEnum(String v) {
-        value = v;
-    }
-
-    public String value() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return String.valueOf(value);
-    }
-
-    public static PolicyEnum fromValue(String value) {
-        for (PolicyEnum b : PolicyEnum.values()) {
-            if (b.value.equals(value)) {
-                return b;
-            }
-        }
-        throw new IllegalArgumentException("Unexpected value '" + value + "'");
-    }
-}
-
-    private PolicyEnum policy;
+    private String policy;
 
     /**
-    * Sharing scope for this organization.
+    * Sharing scope for this organization.  Possible values: - &#x60;SELECTED_ORG_ONLY&#x60; - &#x60;SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN&#x60; - &#x60;ALL_EXISTING_AND_FUTURE_ORGS&#x60;
     **/
-    public SharingMode policy(PolicyEnum policy) {
+    public SharingMode policy(String policy) {
 
         this.policy = policy;
         return this;
     }
     
-    @ApiModelProperty(value = "Sharing scope for this organization.")
+    @ApiModelProperty(value = "Sharing scope for this organization.  Possible values: - `SELECTED_ORG_ONLY` - `SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN` - `ALL_EXISTING_AND_FUTURE_ORGS`")
     @JsonProperty("policy")
     @Valid
-    public PolicyEnum getPolicy() {
+    public String getPolicy() {
         return policy;
     }
-    public void setPolicy(PolicyEnum policy) {
+    public void setPolicy(String policy) {
         this.policy = policy;
     }
 

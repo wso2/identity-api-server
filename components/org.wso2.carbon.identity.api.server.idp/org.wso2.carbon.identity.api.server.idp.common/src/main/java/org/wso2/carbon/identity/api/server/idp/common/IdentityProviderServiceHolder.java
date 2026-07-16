@@ -20,6 +20,7 @@ package org.wso2.carbon.identity.api.server.idp.common;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
+import org.wso2.carbon.identity.organization.management.organization.connection.sharing.ConnectionSharingPolicyHandlerService;
 import org.wso2.carbon.identity.template.mgt.TemplateManager;
 import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 
@@ -47,6 +48,13 @@ public class IdentityProviderServiceHolder {
 
         static final TemplateManager SERVICE = (TemplateManager) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(TemplateManager.class, null);
+    }
+
+    private static class ConnectionSharingPolicyHandlerServiceHolder {
+
+        static final ConnectionSharingPolicyHandlerService SERVICE =
+                (ConnectionSharingPolicyHandlerService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(ConnectionSharingPolicyHandlerService.class, null);
     }
 
     /**
@@ -77,5 +85,15 @@ public class IdentityProviderServiceHolder {
     public static TemplateManager getTemplateManager() {
 
         return TemplateManagerHolder.SERVICE;
+    }
+
+    /**
+     * Get ConnectionSharingPolicyHandlerService osgi service.
+     *
+     * @return ConnectionSharingPolicyHandlerService.
+     */
+    public static ConnectionSharingPolicyHandlerService getConnectionSharingPolicyHandlerService() {
+
+        return ConnectionSharingPolicyHandlerServiceHolder.SERVICE;
     }
 }

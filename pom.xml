@@ -789,6 +789,12 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.identity.organization.management</groupId>
+                <artifactId>org.wso2.carbon.identity.organization.management.organization.connection.sharing</artifactId>
+                <version>${org.wso2.carbon.identity.organization.management.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
                 <artifactId>org.wso2.carbon.identity.api.server.organization.agent.sharing.management.common</artifactId>
                 <version>${project.version}</version>
@@ -1151,7 +1157,7 @@
         <org.wso2.carbon.identity.moesif.version>1.0.0</org.wso2.carbon.identity.moesif.version>
 
         <!-- Organization management service Version -->
-        <org.wso2.carbon.identity.organization.management.version>2.5.10
+        <org.wso2.carbon.identity.organization.management.version>2.5.14-SNAPSHOT
         </org.wso2.carbon.identity.organization.management.version>
 
         <org.wso2.carbon.identity.inbound.provisioning.scim2.version>3.4.146
