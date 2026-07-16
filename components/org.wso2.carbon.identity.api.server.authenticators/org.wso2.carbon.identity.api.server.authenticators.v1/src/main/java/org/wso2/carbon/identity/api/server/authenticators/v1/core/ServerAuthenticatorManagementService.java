@@ -45,6 +45,7 @@ import org.wso2.carbon.identity.application.common.exception.AuthenticatorMgtExc
 import org.wso2.carbon.identity.application.common.exception.AuthenticatorMgtServerException;
 import org.wso2.carbon.identity.application.common.model.FederatedAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
+import org.wso2.carbon.identity.application.common.model.IdentityProviderProperty;
 import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.UserDefinedLocalAuthenticatorConfig;
@@ -63,6 +64,7 @@ import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
 import org.wso2.carbon.idp.mgt.IdpManager;
 import org.wso2.carbon.idp.mgt.model.ConnectedAppsResult;
 import org.wso2.carbon.idp.mgt.model.IdpSearchResult;
+import org.wso2.carbon.idp.mgt.model.SharedIdPResolveType;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -155,7 +157,8 @@ public class ServerAuthenticatorManagementService {
             at the maximum items per page count. */
             if (idPCountToBeRetrieved > 0 && StringUtils.isBlank(filter)) {
                 IdpSearchResult idpSearchResult = idpManager.getIdPs(idPCountToBeRetrieved, null, null,
-                        null, null, ContextLoader.getTenantDomainFromContext(), requestedAttributeList);
+                        null, null, ContextLoader.getTenantDomainFromContext(), requestedAttributeList,
+                        SharedIdPResolveType.BASE_PARENT);
                 identityProviders = idpSearchResult.getIdPs();
             }
 
@@ -401,7 +404,7 @@ public class ServerAuthenticatorManagementService {
             try {
                 idpSearchResult = idpManager.getIdPs(idPCountToBeRetrieved, null, null, null,
                                 ContextLoader.getTenantDomainFromContext(), requestedAttributeList,
-                                expressionNodesForIdp);
+                                expressionNodesForIdp, SharedIdPResolveType.BASE_PARENT);
                 identityProviders = idpSearchResult.getIdPs();
                 if (identityProviders != null) {
                     addIdPsToAuthenticatorList(maximumItemsPerPage, identityProviders, authenticators,
@@ -504,6 +507,7 @@ public class ServerAuthenticatorManagementService {
             authenticator.setDisplayName(identityProvider.getIdentityProviderName());
         }
         authenticator.setIsEnabled(identityProvider.isEnable());
+        authenticator.setIsShared(resolveIsSharedConnection(identityProvider));
         authenticator.setType(Authenticator.TypeEnum.FEDERATED);
         authenticator.setImage(identityProvider.getImageUrl());
         authenticator.setDescription(identityProvider.getIdentityProviderDescription());
@@ -529,6 +533,28 @@ public class ServerAuthenticatorManagementService {
         authenticators.add(authenticator);
         authenticator.setSelf(ContextLoader.buildURIForBody(
                 String.format("/v1/identity-providers/%s", identityProvider.getResourceId())).toString());
+    }
+
+    /**
+     * Resolves the value of the {@code isShared} IdP property when it is present on the identity provider (i.e. it
+     * belongs to a shared/shadow connection resolved from a parent organization), or {@code null} when the property
+     * is absent — so the {@code isShared} attribute is emitted only for shared connections and omitted otherwise.
+     *
+     * @param identityProvider The identity provider.
+     * @return The {@code isShared} property value if present; {@code null} otherwise.
+     */
+    private Boolean resolveIsSharedConnection(IdentityProvider identityProvider) {
+
+        IdentityProviderProperty[] idpProperties = identityProvider.getIdpProperties();
+        if (idpProperties == null) {
+            return null;
+        }
+        for (IdentityProviderProperty property : idpProperties) {
+            if (Constants.IS_SHARED_PROPERTY.equals(property.getName())) {
+                return Boolean.parseBoolean(property.getValue());
+            }
+        }
+        return null;
     }
 
     private FederatedAuthenticatorConfig resolveFederatedAuthenticatorConfig(IdentityProvider identityProvider) {
@@ -892,7 +918,8 @@ public class ServerAuthenticatorManagementService {
 
         try {
             IdpSearchResult idpSearchResult = idpManager.getIdPs(limit, (offSet + limit), null, null,
-                            ContextLoader.getTenantDomainFromContext(), requestedAttributeList, expressionNodes);
+                    ContextLoader.getTenantDomainFromContext(), requestedAttributeList, expressionNodes,
+                    SharedIdPResolveType.BASE_PARENT);
             identityProviders.addAll(idpSearchResult.getIdPs());
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_IDPS, null);
