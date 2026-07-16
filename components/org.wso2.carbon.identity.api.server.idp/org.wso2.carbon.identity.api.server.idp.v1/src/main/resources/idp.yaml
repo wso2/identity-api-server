@@ -2962,6 +2962,12 @@ components:
         isPrimary:
           type: boolean
           default: false
+        isShared:
+          type: boolean
+          example: true
+          description: Whether this connection is a shared connection resolved from a parent organization.
+            Present (and true) only for shared connections; omitted otherwise.
+          readOnly: true
         image:
           type: string
           example: "google-logo-url"
