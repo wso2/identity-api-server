@@ -974,7 +974,7 @@
             <dependency>
                 <groupId>org.wso2.carbon.identity.framework</groupId>
                 <artifactId>org.wso2.carbon.identity.device.mgt</artifactId>
-                <version>7.11.110-SNAPSHOT</version>
+                <version>${carbon.identity.framework.version}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
