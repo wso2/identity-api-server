@@ -36,8 +36,6 @@ import org.wso2.carbon.identity.device.mgt.api.exception.DeviceMgtException;
 import org.wso2.carbon.identity.device.mgt.api.model.Device;
 import org.wso2.carbon.identity.device.mgt.api.service.DeviceManagementService;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
@@ -197,8 +195,7 @@ public class DeviceManagementApiService {
             response.setStatus(device.getStatus().name());
         }
         if (device.getRegisteredAt() != null) {
-            response.setRegisteredAt(
-                    OffsetDateTime.ofInstant(device.getRegisteredAt().toInstant(), ZoneOffset.UTC));
+            response.setRegisteredAt(device.getRegisteredAt().toInstant().toString());
         }
         response.setMetadata(device.getMetadata());
         return response;

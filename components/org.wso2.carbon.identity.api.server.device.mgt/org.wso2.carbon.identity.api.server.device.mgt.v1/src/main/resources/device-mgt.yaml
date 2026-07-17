@@ -264,8 +264,7 @@ components:
           example: "ACTIVE"
         registeredAt:
           type: string
-          format: date-time
-          description: The timestamp when the device was registered.
+          description: The timestamp when the device was registered, in ISO-8601 format.
           example: "2026-04-27T10:00:00.000Z"
         metadata:
           type: string

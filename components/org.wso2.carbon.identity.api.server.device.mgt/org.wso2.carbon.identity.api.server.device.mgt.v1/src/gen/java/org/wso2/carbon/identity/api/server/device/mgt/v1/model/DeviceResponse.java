@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.time.OffsetDateTime;
 import javax.validation.constraints.*;
 
 
@@ -38,7 +37,7 @@ public class DeviceResponse  {
     private String deviceName;
     private String deviceModel;
     private String status;
-    private OffsetDateTime registeredAt;
+    private String registeredAt;
     private String metadata;
 
     /**
@@ -137,21 +136,21 @@ public class DeviceResponse  {
     }
 
     /**
-    * The timestamp when the device was registered.
+    * The timestamp when the device was registered, in ISO-8601 format.
     **/
-    public DeviceResponse registeredAt(OffsetDateTime registeredAt) {
+    public DeviceResponse registeredAt(String registeredAt) {
 
         this.registeredAt = registeredAt;
         return this;
     }
     
-    @ApiModelProperty(example = "2026-04-27T10:00Z", value = "The timestamp when the device was registered.")
+    @ApiModelProperty(example = "2026-04-27T10:00:00.000Z", value = "The timestamp when the device was registered, in ISO-8601 format.")
     @JsonProperty("registeredAt")
     @Valid
-    public OffsetDateTime getRegisteredAt() {
+    public String getRegisteredAt() {
         return registeredAt;
     }
-    public void setRegisteredAt(OffsetDateTime registeredAt) {
+    public void setRegisteredAt(String registeredAt) {
         this.registeredAt = registeredAt;
     }
 
