@@ -44,6 +44,7 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.Size;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Step;
 import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.AbstractMetaResponseHandler;
+import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.DeviceRegistrationFlowMetaHandler;
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.PasswordRecoveryFlowMetaHandler;
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.core.util.LambdaExceptionUtils;
@@ -540,6 +541,16 @@ public class Utils {
             if (!executors.contains(FlowEndpointConstants.Executors.EMAIL_OTP_EXECUTOR) &&
                     !executors.contains(FlowEndpointConstants.Executors.SMS_OTP_EXECUTOR) &&
                     !executors.contains(FlowEndpointConstants.Executors.MAGIC_LINK_EXECUTOR)) {
+                throw handleFlowMgtException(new FlowMgtClientException(
+                        FlowEndpointConstants.ErrorMessages.ERROR_CODE_REQUIRED_EXECUTOR_MISSING.getCode(),
+                        FlowEndpointConstants.ErrorMessages.ERROR_CODE_REQUIRED_EXECUTOR_MISSING.getMessage(),
+                        FlowEndpointConstants.ErrorMessages.ERROR_CODE_REQUIRED_EXECUTOR_MISSING.getDescription()));
+            }
+        }
+
+        // For device registration flow, ensure DeviceRegistrationExecutor is present.
+        if (metaResponseHandler instanceof DeviceRegistrationFlowMetaHandler) {
+            if (!executors.contains(FlowEndpointConstants.Executors.DEVICE_REGISTRATION_EXECUTOR)) {
                 throw handleFlowMgtException(new FlowMgtClientException(
                         FlowEndpointConstants.ErrorMessages.ERROR_CODE_REQUIRED_EXECUTOR_MISSING.getCode(),
                         FlowEndpointConstants.ErrorMessages.ERROR_CODE_REQUIRED_EXECUTOR_MISSING.getMessage(),

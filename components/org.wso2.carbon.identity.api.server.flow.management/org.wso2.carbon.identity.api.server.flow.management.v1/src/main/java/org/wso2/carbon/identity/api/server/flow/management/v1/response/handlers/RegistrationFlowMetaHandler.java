@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.APPLE_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.DEVICE_REGISTRATION_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.FACEBOOK_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.FIDO2_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.GITHUB_EXECUTOR;
@@ -86,6 +87,7 @@ public class RegistrationFlowMetaHandler extends AbstractMetaResponseHandler {
         supportedExecutors.add(APPLE_EXECUTOR);
         supportedExecutors.add(GITHUB_EXECUTOR);
         supportedExecutors.add(FIDO2_EXECUTOR);
+        supportedExecutors.add(DEVICE_REGISTRATION_EXECUTOR);
         return supportedExecutors;
     }
 }
