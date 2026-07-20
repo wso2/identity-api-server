@@ -44,7 +44,6 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.Size;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Step;
 import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.AbstractMetaResponseHandler;
-import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.PasswordRecoveryFlowMetaHandler;
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.core.util.LambdaExceptionUtils;
 import org.wso2.carbon.identity.flow.mgt.Constants;
@@ -535,11 +534,13 @@ public class Utils {
                     ERROR_CODE_UNSUPPORTED_EXECUTOR.getDescription()));
         }
 
-        // For password recovery flow, ensure at least one of the following executors is present.
-        if (metaResponseHandler instanceof PasswordRecoveryFlowMetaHandler) {
-            if (!executors.contains(FlowEndpointConstants.Executors.EMAIL_OTP_EXECUTOR) &&
-                    !executors.contains(FlowEndpointConstants.Executors.SMS_OTP_EXECUTOR) &&
-                    !executors.contains(FlowEndpointConstants.Executors.MAGIC_LINK_EXECUTOR)) {
+        /*
+         * Some flows require at least one executor out of a group, e.g. a recovery factor for password
+         * recovery. The handler decides the groups, so a dynamically registered executor that declares
+         * itself as such a factor can satisfy the requirement without a change here.
+         */
+        for (Set<String> requiredGroup : metaResponseHandler.getRequiredExecutorGroups()) {
+            if (Collections.disjoint(requiredGroup, executors)) {
                 throw handleFlowMgtException(new FlowMgtClientException(
                         FlowEndpointConstants.ErrorMessages.ERROR_CODE_REQUIRED_EXECUTOR_MISSING.getCode(),
                         FlowEndpointConstants.ErrorMessages.ERROR_CODE_REQUIRED_EXECUTOR_MISSING.getMessage(),

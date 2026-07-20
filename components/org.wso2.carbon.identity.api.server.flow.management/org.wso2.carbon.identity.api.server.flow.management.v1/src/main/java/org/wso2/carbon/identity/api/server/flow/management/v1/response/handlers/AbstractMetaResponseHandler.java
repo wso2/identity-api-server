@@ -26,9 +26,11 @@ import org.wso2.carbon.identity.action.management.api.model.Action;
 import org.wso2.carbon.identity.api.server.flow.management.common.FlowMgtServiceHolder;
 import org.wso2.carbon.identity.api.server.flow.management.v1.AttributeMetadata;
 import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorConnections;
+import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorMetadata;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionConnectionInfo;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
+import org.wso2.carbon.identity.api.server.flow.management.v1.utils.ExecutorMetadataResolver;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
@@ -50,24 +52,14 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DISPLAY_NAME;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_READ_ONLY;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_REQUIRED;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_GET_IDENTITY_PROVIDERS;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.APPLE_EXECUTOR;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.EMAIL_OTP_EXECUTOR;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.FACEBOOK_EXECUTOR;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.FLOW_EXTENSION_EXECUTOR;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.GITHUB_EXECUTOR;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.GOOGLE_EXECUTOR;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.MAGIC_LINK_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.OFFICE365_EXECUTOR;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.OPENID_CONNECT_EXECUTOR;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.PASSWORD_PROVISIONING_EXECUTOR;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.SMS_OTP_EXECUTOR;
-import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.USER_PROVISIONING_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.IDP_TEMPLATE_ID;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.MICROSOFT_IDP_TEMPLATE_ID;
 import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.GROUPS_CLAIM;
@@ -83,6 +75,8 @@ public abstract class AbstractMetaResponseHandler {
     private static final Log log = LogFactory.getLog(AbstractMetaResponseHandler.class);
     private static final String HIDDEN_CLAIMS_IDENTITY_CONFIG = "HiddenClaims.HiddenClaim";
     private static final String MULTI_ATTRIBUTE_LOGIN_ENABLED = "multiAttributeLoginEnabled";
+
+    private ExecutorMetadataResolver resolver;
 
     /**
      * Get the flow type.
@@ -109,20 +103,72 @@ public abstract class AbstractMetaResponseHandler {
     }
 
     /**
-     * Get the supported executors for the flow.
+     * Get the executors this server advertises for the flow regardless of what is registered with the
+     * flow execution engine.
+     * <p>
+     * These predate executors being able to declare themselves and are kept so that executors shipping
+     * from other repositories, which do not declare their supported flow types, keep working exactly as
+     * before. Subclasses append the ones specific to their flow. Remove an entry once the owning
+     * connector declares its own metadata.
+     *
+     * @return Mutable list of executor names, in the order they should be presented.
+     */
+    protected List<String> getLegacyExecutorBaseline() {
+
+        return new ArrayList<>(FlowEndpointConstants.LegacyExecutors.COMMON);
+    }
+
+    /**
+     * Get the supported executors for the flow: the backward compatibility baseline unioned with every
+     * executor that has declared support for this flow type, including those contributed by connectors
+     * deployed into repository/components/dropins.
+     * <p>
+     * This is also what {@link Utils#validateExecutors} checks a flow against on save, so the set the
+     * composer is offered and the set a flow may use cannot drift apart. Do not cache the result
+     * statically: executors can be bound long after this web application started.
      *
      * @return List of supported executors.
      */
     public List<String> getSupportedExecutors() {
 
-        ArrayList<String> supportedExecutors = new ArrayList<>();
-        supportedExecutors.add(PASSWORD_PROVISIONING_EXECUTOR);
-        supportedExecutors.add(EMAIL_OTP_EXECUTOR);
-        supportedExecutors.add(SMS_OTP_EXECUTOR);
-        supportedExecutors.add(MAGIC_LINK_EXECUTOR);
-        supportedExecutors.add(USER_PROVISIONING_EXECUTOR);
-        supportedExecutors.add(FLOW_EXTENSION_EXECUTOR);
-        return supportedExecutors;
+        return getResolver().getSupportedExecutorNames();
+    }
+
+    /**
+     * Get the metadata for the executors contributed by a deployed extension. Built in executors are
+     * fully identified by their name in {@link #getSupportedExecutors()} and are not described again
+     * here. Connections are not repeated either; they are carried by
+     * {@link #getExecutorConnections()}, keyed by the same executor name.
+     *
+     * @return List of extension executor metadata.
+     */
+    public List<ExecutorMetadata> getExtensionExecutors() {
+
+        return getResolver().getExtensionExecutorMetadata();
+    }
+
+    /**
+     * Groups of executors of which at least one must be present in a valid flow. Empty by default.
+     *
+     * @return List of "at least one of" executor groups.
+     */
+    public List<Set<String>> getRequiredExecutorGroups() {
+
+        return Collections.emptyList();
+    }
+
+    /**
+     * The resolver is held per handler instance, and handlers are created per request, so the executor
+     * list is resolved at most once per request and never cached beyond it.
+     *
+     * @return Executor metadata resolver for this flow type.
+     */
+    protected ExecutorMetadataResolver getResolver() {
+
+        if (resolver == null) {
+            resolver = new ExecutorMetadataResolver(getFlowType(), getLegacyExecutorBaseline());
+        }
+        return resolver;
     }
 
     /**
@@ -161,6 +207,7 @@ public abstract class AbstractMetaResponseHandler {
         response.setSupportedExecutors(getSupportedExecutors());
         response.setConnectorConfigs(getConnectorConfigs());
         response.setExecutorConnections(getExecutorConnections());
+        response.setExtensionExecutors(getExtensionExecutors());
         response.setFlowExtensionConnections(getFlowExtensionConnections());
         response.setSupportedFlowCompletionConfigs(getSupportedFlowCompletionConfigs());
         return response;
@@ -281,7 +328,7 @@ public abstract class AbstractMetaResponseHandler {
 
         try {
 
-            Map<String, String> connectionExecutorMap = getConnectionExecutorMap();
+            Map<String, String> connectionExecutorMap = getResolver().getConnectionExecutorMap();
             Map<String, ExecutorConnections> executorConnections = new HashMap<>();
             getSupportedExecutors().forEach(executorName -> {
                 if (connectionExecutorMap.containsValue(executorName)) {
@@ -325,19 +372,6 @@ public abstract class AbstractMetaResponseHandler {
                     ERROR_CODE_GET_IDENTITY_PROVIDERS.getMessage(),
                     ERROR_CODE_GET_IDENTITY_PROVIDERS.getDescription(), e));
         }
-    }
-
-    private static Map<String, String> getConnectionExecutorMap() {
-
-        Map<String, String> connectionExecutorMap = new HashMap<>();
-        connectionExecutorMap.put(FlowEndpointConstants.Authenticators.GOOGLE_AUTHENTICATOR, GOOGLE_EXECUTOR);
-        connectionExecutorMap.put(FlowEndpointConstants.Authenticators.FACEBOOK_AUTHENTICATOR, FACEBOOK_EXECUTOR);
-        connectionExecutorMap.put(FlowEndpointConstants.Authenticators.GITHUB_AUTHENTICATOR, GITHUB_EXECUTOR);
-        connectionExecutorMap.put(FlowEndpointConstants.Authenticators.OFFICE365_AUTHENTICATOR, OFFICE365_EXECUTOR);
-        connectionExecutorMap.put(FlowEndpointConstants.Authenticators.APPLE_AUTHENTICATOR, APPLE_EXECUTOR);
-        connectionExecutorMap.put(FlowEndpointConstants.Authenticators.OPENID_CONNECT_AUTHENTICATOR,
-                OPENID_CONNECT_EXECUTOR);
-        return connectionExecutorMap;
     }
 
     private static List<IdentityProvider> getAllIdPs() throws IdentityProviderManagementException {

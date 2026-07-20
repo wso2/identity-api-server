@@ -20,13 +20,17 @@ package org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.flow.management.v1.AttributeMetadata;
+import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
 import org.wso2.carbon.identity.flow.mgt.Constants;
 import org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.END_USER_ATTRIBUTE_PROFILE;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.USER_RESOLVE_EXECUTOR;
@@ -80,11 +84,26 @@ public class PasswordRecoveryFlowMetaHandler extends AbstractMetaResponseHandler
     }
 
     @Override
-    public List<String> getSupportedExecutors() {
+    protected List<String> getLegacyExecutorBaseline() {
 
-        List<String> supportedExecutors = new ArrayList<>(super.getSupportedExecutors());
+        List<String> supportedExecutors = new ArrayList<>(super.getLegacyExecutorBaseline());
         supportedExecutors.add(USER_RESOLVE_EXECUTOR);
         return supportedExecutors;
+    }
+
+    /**
+     * A password recovery flow is only meaningful if it verifies the user somehow, so at least one
+     * recovery factor must be present. The built in factors are always accepted; a connector opts in by
+     * tagging its executor with
+     * {@link org.wso2.carbon.identity.flow.execution.engine.Constants.ExecutorTags#RECOVERY_FACTOR}.
+     */
+    @Override
+    public List<Set<String>> getRequiredExecutorGroups() {
+
+        Set<String> recoveryFactors = new HashSet<>(FlowEndpointConstants.LegacyExecutors.RECOVERY_FACTORS);
+        recoveryFactors.addAll(getResolver().getExecutorsWithTag(
+                org.wso2.carbon.identity.flow.execution.engine.Constants.ExecutorTags.RECOVERY_FACTOR));
+        return Collections.singletonList(recoveryFactors);
     }
 
     @Override

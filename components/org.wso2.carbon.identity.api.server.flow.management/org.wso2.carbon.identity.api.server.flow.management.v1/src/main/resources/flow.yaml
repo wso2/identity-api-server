@@ -740,6 +740,15 @@ components:
           items:
             type: string
             example: SMSOTPExecutor
+        extensionExecutors:
+          type: array
+          description: >-
+            Metadata for the executors contributed by a deployed extension, such as a connector placed
+            in repository/components/dropins. Built in executors are listed by name in
+            supportedExecutors only and are not described here. Connections are not repeated here
+            either; they are carried by executorConnections, keyed by the same executor name.
+          items:
+            $ref: '#/components/schemas/ExecutorMetadata'
         connectorConfigs:
           type: object
         attributeProfile:
@@ -779,6 +788,48 @@ components:
           items:
             type: string
             example: IdpName
+
+    ExecutorMetadata:
+      type: object
+      description: Metadata describing an executor contributed by a deployed extension
+      properties:
+        name:
+          type: string
+          description: >-
+            Unique name of the executor, as registered with the flow execution engine. Matches the
+            entry in supportedExecutors and the executorName in executorConnections.
+          example: CustomVerificationExecutor
+        displayName:
+          type: string
+          description: Human readable name for the executor
+          example: Custom Identity Verification
+        description:
+          type: string
+          description: Short explanation of what this step does
+          example: Verifies the user's identity with an external verification provider before the flow continues.
+        tags:
+          type: array
+          description: >-
+            Reserved tags that change how a consumer treats this executor. RECOVERY_FACTOR declares
+            that this executor satisfies the password recovery flow requirement of having at least one
+            recovery factor. Tags outside the reserved set are passed through but have no effect.
+          items:
+            type: string
+          example: [ "RECOVERY_FACTOR" ]
+        icon:
+          type: string
+          description: Icon path or URL for the executor
+          example: assets/images/logos/custom-verification.svg
+        requiresConnection:
+          type: boolean
+          description: >-
+            Whether a connection must be selected for a step using this executor. The applicable
+            connections are listed against this executor name in executorConnections.
+          example: true
+        associatedAuthenticator:
+          type: string
+          description: Name of the authenticator backing this executor
+          example: CustomVerificationAuthenticator
 
     FlowExtensionConnectionInfo:
       type: object
