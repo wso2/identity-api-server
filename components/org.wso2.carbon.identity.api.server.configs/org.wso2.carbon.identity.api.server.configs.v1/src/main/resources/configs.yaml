@@ -2850,12 +2850,6 @@ components:
             - x509_san_dns
             - x509_hash
           example: x509_san_dns
-        clientId:
-          type: string
-          description: >
-            Optional override for the client_id sent in Verifiable Presentation requests.
-            Leave blank to auto-derive from the selected client ID scheme.
-          example: x509_san_dns:myserver.example.com
         responseMode:
           type: string
           description: >

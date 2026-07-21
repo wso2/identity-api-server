@@ -707,7 +707,6 @@ public class ServerConfigManagementService {
             return new OpenID4VPConfiguration()
                     .clientIdScheme(StringUtils.defaultIfBlank(
                             cfg.getClientIdScheme(), OpenID4VPConstants.Defaults.CLIENT_ID_SCHEME))
-                    .clientId(cfg.getClientId())
                     .responseMode(StringUtils.defaultIfBlank(
                             cfg.getResponseMode(), OpenID4VPConstants.Defaults.RESPONSE_MODE))
                     .registrationCertificate(cfg.getRegistrationCertificate())
@@ -737,7 +736,6 @@ public class ServerConfigManagementService {
         try {
             OpenID4VPConfigService.TenantConfig tenantConfig = new OpenID4VPConfigService.TenantConfig();
             tenantConfig.setClientIdScheme(config.getClientIdScheme());
-            tenantConfig.setClientId(config.getClientId());
             tenantConfig.setResponseMode(config.getResponseMode());
             tenantConfig.setRegistrationCertificate(config.getRegistrationCertificate());
             tenantConfig.setRejectVcWithoutStatusClaim(config.getRejectVcWithoutStatusClaim());
