@@ -29,6 +29,7 @@ import org.wso2.carbon.identity.api.server.vp.template.management.v1.Presentatio
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionResponse;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionUpdateModel;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.ClaimConstraintModel;
+import org.wso2.carbon.identity.api.server.vp.template.management.v1.CredentialSetModel;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.RequestedCredentialModel;
 import org.wso2.carbon.identity.openid4vc.presentation.management.exception.PresentationManagementClientException;
 import org.wso2.carbon.identity.openid4vc.presentation.management.exception.PresentationManagementErrorCode;
@@ -37,7 +38,6 @@ import org.wso2.carbon.identity.openid4vc.presentation.management.model.Presenta
 import org.wso2.carbon.identity.openid4vc.presentation.management.model.PresentationDefinition.ClaimConstraint;
 import org.wso2.carbon.identity.openid4vc.presentation.management.model.PresentationDefinition.RequestedCredential;
 import org.wso2.carbon.identity.openid4vc.presentation.management.service.PresentationDefinitionService;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -95,6 +95,7 @@ public class ServerVPDefinitionManagementService {
                     .name(creationModel.getName())
                     .description(creationModel.getDescription())
                     .requestedCredentials(toRequestedCredentials(creationModel.getCredentials()))
+                    .credentialSets(toCredentialSets(creationModel.getCredentialSets()))
                     .tenantId(tenantId)
                     .build();
 
@@ -164,6 +165,7 @@ public class ServerVPDefinitionManagementService {
                     .name(updateModel.getName())
                     .description(updateModel.getDescription())
                     .requestedCredentials(credentials)
+                    .credentialSets(toCredentialSets(updateModel.getCredentialSets()))
                     .tenantId(tenantId)
                     .build();
 
@@ -225,6 +227,7 @@ public class ServerVPDefinitionManagementService {
             cred.setIssuerCertPem(apiModel.getIssuerCertPem());
             cred.setJwksUri(apiModel.getJwksUri());
             cred.setClaims(toClaimConstraints(apiModel.getClaims()));
+            cred.setClaimSets(apiModel.getClaimSets());
             cred.setEnforceTrustedIssuers(Boolean.TRUE.equals(apiModel.getEnforceTrustedIssuers()));
             cred.setTrustedIssuers(apiModel.getTrustedIssuers());
             result.add(cred);
@@ -251,6 +254,7 @@ public class ServerVPDefinitionManagementService {
             model.setIssuerCertPem(cred.getIssuerCertPem());
             model.setJwksUri(cred.getJwksUri());
             model.setClaims(toClaimConstraintModels(cred.getClaims()));
+            model.setClaimSets(cred.getClaimSets());
             model.setEnforceTrustedIssuers(cred.isEnforceTrustedIssuers());
             model.setTrustedIssuers(cred.getTrustedIssuers());
             result.add(model);
@@ -266,7 +270,8 @@ public class ServerVPDefinitionManagementService {
         List<ClaimConstraint> result = new ArrayList<>();
         for (ClaimConstraintModel cm : apiModels) {
             ClaimConstraint cc = new ClaimConstraint();
-            cc.setName(cm.getName());
+            cc.setId(cm.getId());
+            cc.setPath(cm.getPath());
             cc.setMandatory(Boolean.TRUE.equals(cm.getMandatory() == null ? Boolean.TRUE : cm.getMandatory()));
             cc.setAllowedValues(cm.getAllowedValues());
             result.add(cc);
@@ -282,10 +287,43 @@ public class ServerVPDefinitionManagementService {
         List<ClaimConstraintModel> result = new ArrayList<>();
         for (ClaimConstraint cc : domainConstraints) {
             ClaimConstraintModel cm = new ClaimConstraintModel();
-            cm.setName(cc.getName());
+            cm.setId(cc.getId());
+            cm.setPath(cc.getPath());
             cm.setMandatory(cc.isMandatory());
             cm.setAllowedValues(cc.getAllowedValues());
             result.add(cm);
+        }
+        return result;
+    }
+
+    private List<PresentationDefinition.CredentialSet> toCredentialSets(
+            List<CredentialSetModel> apiModels) {
+
+        if (apiModels == null) {
+            return null;
+        }
+        List<PresentationDefinition.CredentialSet> result = new ArrayList<>();
+        for (CredentialSetModel csm : apiModels) {
+            PresentationDefinition.CredentialSet cs = new PresentationDefinition.CredentialSet();
+            cs.setRequired(Boolean.TRUE.equals(csm.getRequired() == null ? Boolean.TRUE : csm.getRequired()));
+            cs.setOptions(csm.getOptions());
+            result.add(cs);
+        }
+        return result;
+    }
+
+    private List<CredentialSetModel> toCredentialSetModels(
+            List<PresentationDefinition.CredentialSet> domainSets) {
+
+        if (domainSets == null) {
+            return null;
+        }
+        List<CredentialSetModel> result = new ArrayList<>();
+        for (PresentationDefinition.CredentialSet cs : domainSets) {
+            CredentialSetModel csm = new CredentialSetModel();
+            csm.setRequired(cs.isRequired());
+            csm.setOptions(cs.getOptions());
+            result.add(csm);
         }
         return result;
     }
@@ -297,6 +335,7 @@ public class ServerVPDefinitionManagementService {
         response.setName(definition.getName());
         response.setDescription(definition.getDescription());
         response.setCredentials(toCredentialModels(definition.getRequestedCredentials()));
+        response.setCredentialSets(toCredentialSetModels(definition.getCredentialSets()));
         return response;
     }
 

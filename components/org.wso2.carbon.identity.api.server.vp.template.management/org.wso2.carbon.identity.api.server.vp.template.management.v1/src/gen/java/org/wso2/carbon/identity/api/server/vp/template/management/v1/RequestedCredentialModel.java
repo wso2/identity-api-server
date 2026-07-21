@@ -22,6 +22,7 @@ public class RequestedCredentialModel {
     private String issuerCertPem;
     private String jwksUri;
     private List<ClaimConstraintModel> claims;
+    private List<List<String>> claimSets;
     private Boolean enforceTrustedIssuers;
     private List<String> trustedIssuers;
 
@@ -93,6 +94,16 @@ public class RequestedCredentialModel {
 
     public void setClaims(List<ClaimConstraintModel> claims) {
         this.claims = claims;
+    }
+
+    @ApiModelProperty(value = "DCQL claim_sets — list of claim ID groups; at least one complete group must be satisfied.")
+    @JsonProperty("claimSets")
+    public List<List<String>> getClaimSets() {
+        return claimSets;
+    }
+
+    public void setClaimSets(List<List<String>> claimSets) {
+        this.claimSets = claimSets;
     }
 
     @ApiModelProperty(value = "Whether to enforce trusted issuer validation for this credential.")

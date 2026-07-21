@@ -33,6 +33,7 @@ public class PresentationDefinitionResponse {
     private String name;
     private String description;
     private java.util.List<RequestedCredentialModel> credentials;
+    private java.util.List<CredentialSetModel> credentialSets;
 
     @ApiModelProperty(value = "Unique identifier of the presentation definition.")
     @JsonProperty("id")
@@ -72,5 +73,15 @@ public class PresentationDefinitionResponse {
 
     public void setCredentials(java.util.List<RequestedCredentialModel> credentials) {
         this.credentials = credentials;
+    }
+
+    @ApiModelProperty(value = "DCQL credential_sets: acceptable combinations of credential query IDs.")
+    @JsonProperty("credentialSets")
+    public java.util.List<CredentialSetModel> getCredentialSets() {
+        return credentialSets;
+    }
+
+    public void setCredentialSets(java.util.List<CredentialSetModel> credentialSets) {
+        this.credentialSets = credentialSets;
     }
 }

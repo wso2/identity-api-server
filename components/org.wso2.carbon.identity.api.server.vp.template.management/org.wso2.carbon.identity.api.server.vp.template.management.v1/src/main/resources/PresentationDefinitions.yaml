@@ -244,6 +244,12 @@ components:
       required:
         - type
       properties:
+        credentialId:
+          type: string
+          description: >
+            Credential identifier used as the DCQL credential query identifier.
+            Maps to the CREDENTIAL_ID column in the presentation definition store.
+          example: "employee-badge"
         type:
           type: string
           description: Type of the requested credential.

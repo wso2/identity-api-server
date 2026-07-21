@@ -38,6 +38,7 @@ public class PresentationDefinitionCreationModel {
     private String description;
     @NotNull
     private List<RequestedCredentialModel> credentials;
+    private List<CredentialSetModel> credentialSets;
 
     @ApiModelProperty(required = true, value = "Name of the presentation definition.")
     @JsonProperty("name")
@@ -67,5 +68,15 @@ public class PresentationDefinitionCreationModel {
 
     public void setCredentials(List<RequestedCredentialModel> credentials) {
         this.credentials = credentials;
+    }
+
+    @ApiModelProperty(value = "DCQL credential_sets: acceptable combinations of credential query IDs.")
+    @JsonProperty("credentialSets")
+    public List<CredentialSetModel> getCredentialSets() {
+        return credentialSets;
+    }
+
+    public void setCredentialSets(List<CredentialSetModel> credentialSets) {
+        this.credentialSets = credentialSets;
     }
 }

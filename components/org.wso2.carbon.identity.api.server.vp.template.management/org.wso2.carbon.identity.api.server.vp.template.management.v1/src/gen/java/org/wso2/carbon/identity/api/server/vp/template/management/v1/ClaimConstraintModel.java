@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -31,12 +30,33 @@ import java.util.List;
 @ApiModel(description = "Claim Constraint Model")
 public class ClaimConstraintModel {
 
-    @NotNull
+    private String id;
+    private List<String> path;
     private String name;
     private Boolean mandatory = Boolean.TRUE;
     private List<String> allowedValues;
 
-    @ApiModelProperty(required = true, value = "The claim name (e.g. given_name).")
+    @ApiModelProperty(value = "DCQL claim id — used to reference this claim in claim_sets.")
+    @JsonProperty("id")
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    @ApiModelProperty(value = "DCQL path array, e.g. [\"address\", \"street_address\"].")
+    @JsonProperty("path")
+    public List<String> getPath() {
+        return path;
+    }
+
+    public void setPath(List<String> path) {
+        this.path = path;
+    }
+
+    @ApiModelProperty(value = "The claim name (e.g. given_name). Used when path is absent.")
     @JsonProperty("name")
     public String getName() {
         return name;
