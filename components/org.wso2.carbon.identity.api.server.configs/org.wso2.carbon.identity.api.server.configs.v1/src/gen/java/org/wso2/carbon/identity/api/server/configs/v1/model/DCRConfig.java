@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.wso2.carbon.identity.api.server.configs.v1.model.FapiProfile;
 import javax.validation.constraints.*;
 
 
@@ -35,6 +36,7 @@ public class DCRConfig  {
     private Boolean authenticationRequired;
     private String ssaJwks;
     private Boolean enableFapiEnforcement;
+    private FapiProfile fapiProfile = null;
     private Boolean mandateSSA;
 
     /**
@@ -95,6 +97,25 @@ public class DCRConfig  {
     }
 
     /**
+    * The FAPI security profile to enforce for applications created via DCR. Applicable only when enableFapiEnforcement is true. If enableFapiEnforcement is true and this property is omitted, &#x60;FAPI1_ADVANCED&#x60; will be applied by default. 
+    **/
+    public DCRConfig fapiProfile(FapiProfile fapiProfile) {
+
+        this.fapiProfile = fapiProfile;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "FAPI1_ADVANCED", value = "The FAPI security profile to enforce for applications created via DCR. Applicable only when enableFapiEnforcement is true. If enableFapiEnforcement is true and this property is omitted, `FAPI1_ADVANCED` will be applied by default. ")
+    @JsonProperty("fapiProfile")
+    @Valid
+    public FapiProfile getFapiProfile() {
+        return fapiProfile;
+    }
+    public void setFapiProfile(FapiProfile fapiProfile) {
+        this.fapiProfile = fapiProfile;
+    }
+
+    /**
     * If true, the software_statement parameter is mandatory for the DCR create request.
     **/
     public DCRConfig mandateSSA(Boolean mandateSSA) {
@@ -128,12 +149,13 @@ public class DCRConfig  {
         return Objects.equals(this.authenticationRequired, dcRConfig.authenticationRequired) &&
             Objects.equals(this.ssaJwks, dcRConfig.ssaJwks) &&
             Objects.equals(this.enableFapiEnforcement, dcRConfig.enableFapiEnforcement) &&
+            Objects.equals(this.fapiProfile, dcRConfig.fapiProfile) &&
             Objects.equals(this.mandateSSA, dcRConfig.mandateSSA);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authenticationRequired, ssaJwks, enableFapiEnforcement, mandateSSA);
+        return Objects.hash(authenticationRequired, ssaJwks, enableFapiEnforcement, fapiProfile, mandateSSA);
     }
 
     @Override
@@ -145,6 +167,7 @@ public class DCRConfig  {
         sb.append("    authenticationRequired: ").append(toIndentedString(authenticationRequired)).append("\n");
         sb.append("    ssaJwks: ").append(toIndentedString(ssaJwks)).append("\n");
         sb.append("    enableFapiEnforcement: ").append(toIndentedString(enableFapiEnforcement)).append("\n");
+        sb.append("    fapiProfile: ").append(toIndentedString(fapiProfile)).append("\n");
         sb.append("    mandateSSA: ").append(toIndentedString(mandateSSA)).append("\n");
         sb.append("}");
         return sb.toString();

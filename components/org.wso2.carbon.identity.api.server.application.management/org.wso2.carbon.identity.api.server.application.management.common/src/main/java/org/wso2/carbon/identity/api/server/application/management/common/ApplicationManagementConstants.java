@@ -250,7 +250,17 @@ public class ApplicationManagementConstants {
         // Organization application based issuer configuration related error messages.
         ERROR_RETRIEVING_ALLOWED_ISSUERS("65603",
                 "Error occurred while retrieving allowed issuers for the tenant.",
-                "Unexpected error occurred while retrieving allowed issuers for the tenant.");
+                "Unexpected error occurred while retrieving allowed issuers for the tenant."),
+
+        // FAPI metadata related error messages.
+        ERROR_RETRIEVING_FAPI_METADATA("65604",
+                "Error occurred while retrieving FAPI metadata.",
+                "Unexpected error occurred while retrieving FAPI metadata for tenant: %s."),
+
+        // FAPI profile validation related error messages.
+        UNSUPPORTED_FAPI_PROFILE("65605",
+                "Unsupported FAPI profile.",
+                "The provided FAPI profile '%s' is not supported by the organization. Supported profiles: %s.");
 
         private final String code;
         private final String message;

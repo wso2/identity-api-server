@@ -1193,6 +1193,18 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/APIResourceCollectionItem'
+        create:
+          type: array
+          items:
+            $ref: '#/components/schemas/APIResourceCollectionItem'
+        update:
+          type: array
+          items:
+            $ref: '#/components/schemas/APIResourceCollectionItem'
+        delete:
+          type: array
+          items:
+            $ref: '#/components/schemas/APIResourceCollectionItem'
 
     APIResourceCollectionListItem:
       type: object

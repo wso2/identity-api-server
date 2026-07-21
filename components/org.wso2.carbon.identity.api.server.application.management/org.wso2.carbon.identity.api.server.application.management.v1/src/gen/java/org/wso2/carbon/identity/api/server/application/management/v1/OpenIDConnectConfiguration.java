@@ -104,6 +104,7 @@ public enum StateEnum {
     private SubjectConfiguration subject;
     private Boolean isFAPIApplication = false;
     private FapiMetadata fapiMetadata;
+    private FapiProfile fapiProfile = null;
     private CIBAAuthenticationRequestConfiguration cibaAuthenticationRequest;
     private AllowedIssuer issuer;
 
@@ -539,6 +540,25 @@ public enum StateEnum {
     }
 
     /**
+     * The FAPI security profile applied to the application. Applicable only when isFAPIApplication is true. If isFAPIApplication is true and this property is omitted, &#x60;FAPI1_ADVANCED&#x60; will be applied by default.
+     **/
+    public OpenIDConnectConfiguration fapiProfile(FapiProfile fapiProfile) {
+
+        this.fapiProfile = fapiProfile;
+        return this;
+    }
+
+    @ApiModelProperty(example = "FAPI1_ADVANCED", value = "The FAPI security profile applied to the application. Applicable only when isFAPIApplication is true. If isFAPIApplication is true and this property is omitted, `FAPI1_ADVANCED` will be applied by default. ")
+    @JsonProperty("fapiProfile")
+    @Valid
+    public FapiProfile getFapiProfile() {
+        return fapiProfile;
+    }
+    public void setFapiProfile(FapiProfile fapiProfile) {
+        this.fapiProfile = fapiProfile;
+    }
+
+    /**
     **/
     public OpenIDConnectConfiguration cibaAuthenticationRequest(CIBAAuthenticationRequestConfiguration cibaAuthenticationRequest) {
 
@@ -608,6 +628,7 @@ public enum StateEnum {
             Objects.equals(this.subject, openIDConnectConfiguration.subject) &&
             Objects.equals(this.isFAPIApplication, openIDConnectConfiguration.isFAPIApplication) &&
             Objects.equals(this.fapiMetadata, openIDConnectConfiguration.fapiMetadata) &&
+            Objects.equals(this.fapiProfile, openIDConnectConfiguration.fapiProfile) &&
             Objects.equals(this.cibaAuthenticationRequest, openIDConnectConfiguration.cibaAuthenticationRequest) &&
             Objects.equals(this.issuer, openIDConnectConfiguration.issuer);
     }
@@ -646,6 +667,7 @@ public enum StateEnum {
         sb.append("    subject: ").append(toIndentedString(subject)).append("\n");
         sb.append("    isFAPIApplication: ").append(toIndentedString(isFAPIApplication)).append("\n");
         sb.append("    fapiMetadata: ").append(toIndentedString(fapiMetadata)).append("\n");
+        sb.append("    fapiProfile: ").append(toIndentedString(fapiProfile)).append("\n");
         sb.append("    cibaAuthenticationRequest: ").append(toIndentedString(cibaAuthenticationRequest)).append("\n");
         sb.append("    issuer: ").append(toIndentedString(issuer)).append("\n");
         sb.append("}");

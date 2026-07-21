@@ -23,15 +23,12 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.wso2.carbon.base.CarbonBaseConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.api.resource.mgt.APIResourceManager;
 import org.wso2.carbon.identity.api.server.organization.selfservice.common.SelfServiceMgtServiceHolder;
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.model.PropertyPatchReq;
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.model.PropertyReq;
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.model.PropertyRes;
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.util.SelfServiceMgtConstants;
 import org.wso2.carbon.identity.application.common.model.Property;
-import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
-import org.wso2.carbon.identity.application.mgt.AuthorizedAPIManagementService;
 import org.wso2.carbon.identity.governance.IdentityGovernanceException;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
 import org.wso2.carbon.identity.governance.bean.ConnectorConfig;
@@ -68,16 +65,13 @@ public class SelfServiceMgtServiceTest {
     public void setUp() {
 
         identityGovernanceService = mock(IdentityGovernanceService.class);
-        ApplicationManagementService applicationManagementService = mock(ApplicationManagementService.class);
-        APIResourceManager apiResourceManager = mock(APIResourceManager.class);
-        AuthorizedAPIManagementService authorizedAPIManagementService = mock(AuthorizedAPIManagementService.class);
 
         // Create SelfServiceMgtService with mock dependencies.
         selfServiceMgtService = new SelfServiceMgtService(
                 identityGovernanceService,
-                applicationManagementService,
-                apiResourceManager,
-                authorizedAPIManagementService
+                null,
+                null,
+                null
         );
 
         mockCarbonContext();
@@ -131,7 +125,7 @@ public class SelfServiceMgtServiceTest {
     @Test
     public void testUpdateOrganizationGovernanceConfigs() throws IdentityGovernanceException {
 
-        PropertyPatchReq mockGovernanceConnector = mock(PropertyPatchReq.class);
+        PropertyPatchReq mockGovernanceConnector = new PropertyPatchReq();
         List<PropertyReq> propertyReqs = new ArrayList<>();
 
         // Update onboardAdminToSubOrg as false.
@@ -144,7 +138,7 @@ public class SelfServiceMgtServiceTest {
         property1.setValue(property1.getValue());
 
         propertyReqs.add(property1);
-        when(mockGovernanceConnector.getProperties()).thenReturn(propertyReqs);
+        mockGovernanceConnector.setProperties(propertyReqs);
 
         Map<String, String> configurationDetails = new HashMap<>();
         configurationDetails.put(property1.getName(), property1.getValue());

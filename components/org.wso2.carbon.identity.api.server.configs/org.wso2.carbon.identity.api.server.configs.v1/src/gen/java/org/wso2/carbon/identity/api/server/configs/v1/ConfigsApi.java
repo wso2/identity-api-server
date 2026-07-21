@@ -24,15 +24,21 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.wso2.carbon.identity.api.server.configs.v1.factories.ConfigsApiServiceFactory;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ApplicationObject;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettings;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettingsGroup;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ConfigPreferenceResponseDTO;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ConfigPreferenceRequestDTO;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Error;
+import org.wso2.carbon.identity.api.server.configs.v1.model.AgentConfiguration;
+import org.wso2.carbon.identity.api.server.configs.v1.model.AgentConfigPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.FapiConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.FraudDetectionConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationConfiguration;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
@@ -43,6 +49,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTValidatorConfig;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.PushDeviceMgtConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfigListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Schema;
@@ -136,6 +143,55 @@ public class ConfigsApi  {
     public Response deleteSAMLInboundAuthConfig() {
 
         return delegate.deleteSAMLInboundAuthConfig();
+    }
+
+    @Valid
+    @GET
+    @Path("/consent/purposes/{purpose-id}/applications")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve applications mapped to a consent purpose.", notes = "Retrieves the list of applications associated with the given consent purpose. ", response = ApplicationObject.class, responseContainer = "List", authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Purpose Application Mappings", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = ApplicationObject.class, responseContainer = "List"),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found - the consent purpose does not exist.", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getApplicationsForPurpose(@ApiParam(value = "UUID of the consent purpose.",required=true) @PathParam("purpose-id") String purposeId) {
+
+        return delegate.getApplicationsForPurpose(purposeId );
+    }
+
+    @Valid
+    @POST
+    @Path("/consent/purposes/{purpose-id}/applications")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Map an application to a consent purpose.", notes = "Associates an application with the given consent purpose so that consent is enforced during login. ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+
+        })
+    }, tags={ "Purpose Application Mappings", })
+    @ApiResponses(value = {
+        @ApiResponse(code = 201, message = "Mapping created.", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found - the consent purpose does not exist.", response = Error.class),
+        @ApiResponse(code = 409, message = "Conflict - application already mapped.", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response addApplicationToPurpose(@ApiParam(value = "UUID of the consent purpose.",required=true) @PathParam("purpose-id") String purposeId, @ApiParam(value = "" ,required=true) @Valid ApplicationObject applicationObject) {
+
+        return delegate.addApplicationToPurpose(purposeId, applicationObject );
     }
 
     @Valid
@@ -280,6 +336,30 @@ public class ConfigsApi  {
     public Response getImpersonationConfiguration() {
 
         return delegate.getImpersonationConfiguration();
+    }
+
+    @Valid
+    @GET
+    @Path("/agent")
+
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve the tenant agent configuration.", notes = "Retrieve the tenant agent configuration.", response = AgentConfiguration.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+
+        })
+    }, tags={ "Agent Configurations", })
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Successful Response", response = AgentConfiguration.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getAgentConfiguration() {
+
+        return delegate.getAgentConfiguration();
     }
 
     @Valid
@@ -645,6 +725,30 @@ public class ConfigsApi  {
 
     @Valid
     @PATCH
+    @Path("/agent")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Patch the tenant agent configuration.", notes = "Patch the tenant agent configuration.  A JSONPatch as defined by RFC 6902.", response = Void.class, authorizations = {
+            @Authorization(value = "BasicAuth"),
+            @Authorization(value = "OAuth2", scopes = {
+
+            })
+    }, tags={ "Agent Configurations", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful Response", response = Void.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+            @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response patchAgentConfiguration(@ApiParam(value = "" ,required=true) @Valid List<AgentConfigPatch> agentConfigPatch) {
+
+        return delegate.patchAgentConfiguration(agentConfigPatch );
+    }
+
+    @Valid
+    @PATCH
     @Path("/jwt-key-validator")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
@@ -665,6 +769,29 @@ public class ConfigsApi  {
     public Response patchPrivatKeyJWTValidationConfiguration(@ApiParam(value = "" ,required=true) @Valid List<JWTKeyValidatorPatch> jwTKeyValidatorPatch) {
 
         return delegate.patchPrivatKeyJWTValidationConfiguration(jwTKeyValidatorPatch );
+    }
+
+    @Valid
+    @DELETE
+    @Path("/consent/purposes/{purpose-id}/applications/{application-id}")
+
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Remove an application from a consent purpose mapping.", notes = "Removes the association between the given application and consent purpose. ", response = Void.class, authorizations = {
+            @Authorization(value = "BasicAuth"),
+            @Authorization(value = "OAuth2", scopes = {
+
+            })
+    }, tags={ "Purpose Application Mappings", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Mapping deleted.", response = Void.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+            @ApiResponse(code = 404, message = "Not Found - the consent purpose or the application mapping does not exist.", response = Error.class),
+            @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response removeApplicationFromPurpose(@ApiParam(value = "UUID of the consent purpose.",required=true) @PathParam("purpose-id") String purposeId, @ApiParam(value = "Resource ID of the application.",required=true) @PathParam("application-id") String applicationId) {
+
+        return delegate.removeApplicationFromPurpose(purposeId,  applicationId );
     }
 
     @Valid
@@ -759,6 +886,28 @@ public class ConfigsApi  {
     public Response deleteImpersonationConfiguration() {
 
         return delegate.deleteImpersonationConfiguration();
+    }
+
+    @Valid
+    @DELETE
+    @Path("/agent")
+
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Revert the tenant agent configuration.", notes = "Revert the tenant agent configuration.  <b>Scope (Permission) required:</b> <br>   * internal_config_update ", response = Void.class, authorizations = {
+            @Authorization(value = "BasicAuth"),
+            @Authorization(value = "OAuth2", scopes = {
+
+            })
+    }, tags={ "Agent Configurations", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Successful deletion", response = Void.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+            @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response deleteAgentConfiguration() {
+
+        return delegate.deleteAgentConfiguration();
     }
 
     @Valid
@@ -879,6 +1028,78 @@ public class ConfigsApi  {
     public Response updatePassiveSTSInboundAuthConfig(@ApiParam(value = "" ) @Valid InboundAuthPassiveSTSConfig inboundAuthPassiveSTSConfig) {
 
         return delegate.updatePassiveSTSInboundAuthConfig(inboundAuthPassiveSTSConfig );
+    }
+
+    @Valid
+    @POST
+    @Path("/preferences")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve config store preferences of a tenant.", notes = "Returns config store resource attributes for the specified resource types and names. Use this endpoint to expose allowed resources to users — only a permitted subset of resources given below is currently supported.   <table>     <tr>       <td><b>Resource Type</b></td>       <td><b>Resource Name</b></td>       <td><b>Properties</b></td>     </tr>     <tr>       <td rowspan=\"9\">DEVICE_MANAGEMENT</td>       <td>PUSH_DEVICE_MANAGEMENT</td>       <td>         <ul>           <li>enableMultipleDeviceEnrollment</li>           <li>maximumDeviceLimit</li>         </ul>       </td>     </tr>    </table>  <b>Scope (Permission) required:</b> `internal_login` ", response = ConfigPreferenceResponseDTO.class, responseContainer = "List", authorizations = {
+            @Authorization(value = "BasicAuth"),
+            @Authorization(value = "OAuth2", scopes = {
+
+            })
+    }, tags={ "Preferences", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Configuration preferences", response = ConfigPreferenceResponseDTO.class, responseContainer = "List"),
+            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+            @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getConfigPreferences(@ApiParam(value = "This represents the resource type, resource name and the attributes which preferences need to be returned." ,required=true) @Valid List<ConfigPreferenceRequestDTO> configPreferenceRequestDTO) {
+
+        return delegate.getConfigPreferences(configPreferenceRequestDTO );
+    }
+
+    @Valid
+    @GET
+    @Path("/push-device-mgt")
+
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve push device management related configurations of a tenant.", notes = "Retrieve push device management related configurations of a tenant.<br> <b>Scope (Permission) required:</b> `internal_config_view` ", response = PushDeviceMgtConfig.class, authorizations = {
+            @Authorization(value = "BasicAuth"),
+            @Authorization(value = "OAuth2", scopes = {
+
+            })
+    }, tags={ "Push Device Management", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully retrieved.", response = PushDeviceMgtConfig.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+            @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getPushDeviceMgtConfigs() {
+
+        return delegate.getPushDeviceMgtConfigs();
+    }
+
+    @Valid
+    @PUT
+    @Path("/push-device-mgt")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update push device management related configurations of a tenant.", notes = "Update push device management related configurations of a tenant.<br> <b>Scope (Permission) required:</b> `internal_config_update`", response = PushDeviceMgtConfig.class, authorizations = {
+            @Authorization(value = "BasicAuth"),
+            @Authorization(value = "OAuth2", scopes = {
+
+            })
+    }, tags={ "Push Device Management", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully updated.", response = PushDeviceMgtConfig.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+            @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response updatePushDeviceMgtConfigs(@ApiParam(value = "" ,required=true) @Valid PushDeviceMgtConfig pushDeviceMgtConfig) {
+
+        return delegate.updatePushDeviceMgtConfigs(pushDeviceMgtConfig );
     }
 
     @Valid
@@ -1023,5 +1244,53 @@ public class ConfigsApi  {
     public Response getCompatibilitySettingsByGroup(@ApiParam(value = "Setting group name (e.g., scim2, oauth)",required=true) @PathParam("setting-group") String settingGroup) {
 
         return delegate.getCompatibilitySettingsByGroup(settingGroup);
+    }
+
+    @Valid
+    @GET
+    @Path("/fapi")
+
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve the tenant FAPI configuration.", notes = "Retrieve the tenant Financial-grade API (FAPI) configuration.", response = FapiConfig.class, authorizations = {
+            @Authorization(value = "BasicAuth"),
+            @Authorization(value = "OAuth2", scopes = {
+
+            })
+    }, tags={ "FAPI Configurations", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful Response", response = FapiConfig.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+            @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getFAPIConfiguration() {
+
+        return delegate.getFAPIConfiguration();
+    }
+
+    @Valid
+    @PUT
+    @Path("/fapi")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update the tenant FAPI configuration.", notes = "Update the tenant Financial-grade API (FAPI) configuration. <b>Scope (Permission) required:</b> <br>   * internal_config_update ", response = FapiConfig.class, authorizations = {
+            @Authorization(value = "BasicAuth"),
+            @Authorization(value = "OAuth2", scopes = {
+
+            })
+    }, tags={ "FAPI Configurations", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful Response", response = FapiConfig.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+            @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response updateFAPIConfiguration(@ApiParam(value = "" ,required=true) @Valid FapiConfig fapiConfig) {
+
+        return delegate.updateFAPIConfiguration(fapiConfig );
     }
 }

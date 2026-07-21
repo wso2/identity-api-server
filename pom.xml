@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.6.30-SNAPSHOT</version>
+    <version>1.6.38-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -1115,7 +1115,7 @@
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
         <identity.governance.version>1.11.103</identity.governance.version>
-        <carbon.identity.framework.version>7.11.112</carbon.identity.framework.version>
+        <carbon.identity.framework.version>7.11.160</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
         <spotbugs.maven.plugin.version>4.9.8.2</spotbugs.maven.plugin.version>
         <spotbugs.annotations.version>4.9.8</spotbugs.annotations.version>
@@ -1124,7 +1124,7 @@
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
         <identity.event.handler.version>1.12.4</identity.event.handler.version>
         <identity.data.publisher.authentication.version>5.10.1</identity.data.publisher.authentication.version>
-        <identity.inbound.oauth2.version>7.5.46</identity.inbound.oauth2.version>
+        <identity.inbound.oauth2.version>7.5.59</identity.inbound.oauth2.version>
         <identity.inbound.saml2.version>5.11.51</identity.inbound.saml2.version>
         <identity.x509Certificate.validation.version>1.1.19</identity.x509Certificate.validation.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
@@ -1139,13 +1139,13 @@
         <apache.felix.scr.ds.annotations.version>1.2.4</apache.felix.scr.ds.annotations.version>
         <workflow.imple.bps.version>5.5.21</workflow.imple.bps.version>
         <carbon.workflow.engine.version>1.0.18</carbon.workflow.engine.version>
-        <carbon.consent.mgt.version>2.9.4</carbon.consent.mgt.version>
+        <carbon.consent.mgt.version>2.9.10</carbon.consent.mgt.version>
 
         <!--<maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>-->
 
         <tenant.resource.manager.version>1.5.55</tenant.resource.manager.version>
         <identity.verification.version>1.0.15</identity.verification.version>
-        <identity.notification.push.version>1.1.2</identity.notification.push.version>
+        <identity.notification.push.version>1.2.2</identity.notification.push.version>
         <identity.local.auth.fido.version>6.0.3</identity.local.auth.fido.version>
 
         <!-- Organization management core Version -->
@@ -1154,7 +1154,7 @@
         <org.wso2.carbon.identity.organization.management.core.version.range>[1.0.0, 2.0.0)
         </org.wso2.carbon.identity.organization.management.core.version.range>
 
-        <org.wso2.carbon.identity.moesif.version>1.0.0</org.wso2.carbon.identity.moesif.version>
+        <org.wso2.carbon.identity.moesif.version>1.0.7</org.wso2.carbon.identity.moesif.version>
 
         <!-- Organization management service Version -->
         <org.wso2.carbon.identity.organization.management.version>2.5.14-SNAPSHOT

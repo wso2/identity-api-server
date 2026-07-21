@@ -32,27 +32,47 @@ import javax.xml.bind.annotation.*;
 
 public class AuthorizationEntry  {
   
-    private String id;
+    private String userId;
+    private String type;
 
     /**
     * Username of the user expected to authorize this consent
     **/
-    public AuthorizationEntry id(String id) {
+    public AuthorizationEntry userId(String userId) {
 
-        this.id = id;
+        this.userId = userId;
         return this;
     }
     
     @ApiModelProperty(example = "alice@wso2.com", required = true, value = "Username of the user expected to authorize this consent")
-    @JsonProperty("id")
+    @JsonProperty("userId")
     @Valid
-    @NotNull(message = "Property id cannot be null.")
+    @NotNull(message = "Property userId cannot be null.")
 
-    public String getId() {
-        return id;
+    public String getUserId() {
+        return userId;
     }
-    public void setId(String id) {
-        this.id = id;
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    /**
+    * Type of the authorization principal
+    **/
+    public AuthorizationEntry type(String type) {
+
+        this.type = type;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "USER", value = "Type of the authorization principal")
+    @JsonProperty("type")
+    @Valid
+    public String getType() {
+        return type;
+    }
+    public void setType(String type) {
+        this.type = type;
     }
 
 
@@ -67,12 +87,13 @@ public class AuthorizationEntry  {
             return false;
         }
         AuthorizationEntry authorizationEntry = (AuthorizationEntry) o;
-        return Objects.equals(this.id, authorizationEntry.id);
+        return Objects.equals(this.userId, authorizationEntry.userId) &&
+            Objects.equals(this.type, authorizationEntry.type);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(userId, type);
     }
 
     @Override
@@ -81,7 +102,8 @@ public class AuthorizationEntry  {
         StringBuilder sb = new StringBuilder();
         sb.append("class AuthorizationEntry {\n");
         
-        sb.append("    id: ").append(toIndentedString(id)).append("\n");
+        sb.append("    userId: ").append(toIndentedString(userId)).append("\n");
+        sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("}");
         return sb.toString();
     }

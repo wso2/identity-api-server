@@ -66,12 +66,18 @@ public class Constants {
     public static final String IMPERSONATION_CONFIG_ENABLE_EMAIL_NOTIFICATION = "/enableEmailNotification";
 
     /**
+     * PATCH operation path for Agent configuration.
+     */
+    public static final String AGENT_CONFIG_AGENTS_EXTERNALLY_MANAGED = "/agentsExternallyManaged";
+
+    /**
      * PATCH operation paths for DCR configuration.
      */
     public static final String DCR_CONFIG_ENABLE_FAPI_ENFORCEMENT = "/enableFapiEnforcement";
     public static final String DCR_CONFIG_SSA_JWKS = "/ssaJwks";
     public static final String DCR_CONFIG_AUTHENTICATION_REQUIRED = "/authenticationRequired";
     public static final String DCR_CONFIG_MANDATE_SSA = "/mandateSSA";
+    public static final String DCR_CONFIG_FAPI_PROFILE = "/fapiProfile";
 
     /**
      * SAML2 metadata endpoint uri path.
@@ -216,6 +222,15 @@ public class Constants {
         ERROR_CODE_IMP_CONFIG_DELETE("65022",
                 "Unable to delete Impersonation configuration.",
                 "Server encountered an error while deleting the Impersonation configuration of %s."),
+        ERROR_CODE_AGENT_CONFIG_RETRIEVE("65036",
+                "Unable to retrieve Agent configuration.",
+                "Server encountered an error while retrieving the Agent configuration of %s."),
+        ERROR_CODE_AGENT_CONFIG_UPDATE("65037",
+                "Unable to update Agent configuration.",
+                "Server encountered an error while updating the Agent configuration of %s."),
+        ERROR_CODE_AGENT_CONFIG_DELETE("65038",
+                "Unable to delete Agent configuration.",
+                "Server encountered an error while deleting the Agent configuration of %s."),
 
         ERROR_CODE_FRAUD_DETECTION_CONFIG_RETRIEVE("65023",
                 "Unable to retrieve Fraud Detection configuration.",
@@ -259,7 +274,71 @@ public class Constants {
                 "Server encountered an error while updating the Compatibility Settings."),
         ERROR_CODE_SETTING_GROUP_NOT_FOUND("60007",
                 "Setting group not found.",
-                "Unable to find compatibility settings for the setting group %s.");
+                "Unable to find compatibility settings for the setting group %s."),
+        /**
+         * Config preferences errors.
+         */
+        // Server errors.
+        ERROR_CODE_CONFIG_NOT_FOUND("65040",
+                "Unable to retrieve config.",
+                "Server encountered an error while retrieving config for resource type: %s."),
+        // Client errors.
+        ERROR_CODE_CONFIG_RESOURCE_NOT_FOUND("60016",
+                "Config store resource not found.",
+                "No config store resource found for resource type: %s and resource name: %s."),
+        ERROR_CODE_CONFIG_ATTRIBUTE_NOT_FOUND("60017",
+                "Config store attribute not found.",
+                "Attribute '%s' not found for resource type: %s and resource name: %s."),
+        ERROR_CODE_CONFIG_RESOURCE_TYPE_NOT_ALLOWED("60018",
+                "Resource type not allowed.",
+                "Resource type '%s' is not permitted via the config preferences endpoint."),
+        ERROR_CODE_CONFIG_RESOURCE_NAME_NOT_ALLOWED("60012",
+                "Resource name not allowed.",
+                "Resource name '%s' is not permitted for resource type '%s' via the config preferences endpoint."),
+        ERROR_CODE_CONFIG_ATTRIBUTE_NOT_ALLOWED("60013",
+                "Attribute not allowed.",
+                "Attribute '%s' is not permitted for resource type '%s' and resource name '%s'."),
+        ERROR_CODE_CONFIG_INVALID_REQUEST("60014",
+                "Invalid config request.",
+                "Resource type and resource name are required for each config search attribute in"
+                        + " the request payload."),
+
+        /**
+         * Push device management errors.
+         */
+        // Server errors.
+        ERROR_CODE_PUSH_DEVICE_MGT_CONFIG_RETRIEVE("65041",
+                "Unable to retrieve Push Device Management configuration.",
+                "Server encountered an error while retrieving the Push Device Management configuration."),
+        // Client errors.
+        ERROR_CODE_CLIENT_ERROR_PUSH_DEVICE_MGT_CONFIG_UPDATE("60015",
+                "Unable to update Push Device Management configuration.",
+                "Push Device Management config update failed."),
+
+        ERROR_CODE_CONSENT_PURPOSE_NOT_FOUND("60009",
+                "Consent purpose not found.",
+                "No consent purpose found with ID: %s."),
+        ERROR_CODE_CONSENT_APPLICATION_ALREADY_MAPPED("60010",
+                "Application already mapped.",
+                "Application %s is already mapped to a consent purpose."),
+        ERROR_CODE_CONSENT_APPLICATION_MAPPING_NOT_FOUND("60011",
+                "Application mapping not found.",
+                "Application %s is not mapped to the specified consent purpose."),
+        ERROR_CODE_CONSENT_MAPPING_RETRIEVE("65033",
+                "Unable to retrieve consent application mappings.",
+                "Server encountered an error while retrieving application mappings for consent purpose: %s."),
+        ERROR_CODE_CONSENT_MAPPING_ADD("65034",
+                "Unable to add consent application mapping.",
+                "Server encountered an error while mapping application %s."),
+        ERROR_CODE_CONSENT_MAPPING_DELETE("65035",
+                "Unable to delete consent application mapping.",
+                "Server encountered an error while removing application %s."),
+        ERROR_CODE_FAPI_CONFIG_RETRIEVE("65036",
+                "Unable to retrieve FAPI configuration.",
+                "Server encountered an error while retrieving the FAPI configuration."),
+        ERROR_CODE_FAPI_CONFIG_UPDATE("65039",
+                "Unable to update FAPI configuration.",
+                "Server encountered an error while updating the FAPI configuration.");
 
         private final String code;
         private final String message;

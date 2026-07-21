@@ -22,6 +22,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.*;
 
 import java.util.List;
 
+import org.wso2.carbon.identity.api.server.configs.v1.model.AgentConfigPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettings;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
@@ -39,11 +40,15 @@ import javax.ws.rs.core.Response;
 
 public interface ConfigsApiService {
 
+      public Response addApplicationToPurpose(String purposeId, ApplicationObject applicationObject);
+
       public Response deleteOAuth2InboundAuthConfig();
 
       public Response deletePassiveSTSInboundAuthConfig();
 
       public Response deleteSAMLInboundAuthConfig();
+
+      public Response getApplicationsForPurpose(String purposeId);
 
       public Response getAuthenticator(String authenticatorId);
 
@@ -57,6 +62,8 @@ public interface ConfigsApiService {
 
       public Response getImpersonationConfiguration();
 
+      public Response getAgentConfiguration();
+
       public Response getInboundScimConfigs();
 
       public Response getIssuerUsageScopeConfig();
@@ -66,7 +73,10 @@ public interface ConfigsApiService {
       public Response getPassiveSTSInboundAuthConfig();
 
       public Response getPrivatKeyJWTValidationConfiguration();
+
       public Response getDCRConfiguration();
+
+      public Response getFAPIConfiguration();
 
       public Response getRemoteLoggingConfig(String logType);
 
@@ -86,15 +96,23 @@ public interface ConfigsApiService {
 
       public Response patchImpersonationConfiguration(List<ImpersonationPatch> impersonationPatch);
 
+      public Response patchAgentConfiguration(List<AgentConfigPatch> agentConfigPatch);
+
       public Response patchPrivatKeyJWTValidationConfiguration(List<JWTKeyValidatorPatch> jwTKeyValidatorPatch);
 
       public Response patchDCRConfiguration(List<DCRPatch> patch);
+
+      public Response updateFAPIConfiguration(FapiConfig fapiConfig);
 
       public Response restoreServerRemoteLoggingConfiguration(String logType);
 
       public Response restoreServerRemoteLoggingConfigurations();
 
+      public Response removeApplicationFromPurpose(String purposeId, String applicationId);
+
       public Response deleteImpersonationConfiguration();
+
+      public Response deleteAgentConfiguration();
 
       public Response updateFraudDetectionConfigs(FraudDetectionConfig fraudDetectionConfig);
 
@@ -117,4 +135,10 @@ public interface ConfigsApiService {
       public Response patchCompatibilitySettings(CompatibilitySettings compatibilitySettings);
 
       public Response getCompatibilitySettingsByGroup(String settingGroup);
+
+      public Response getConfigPreferences(List<ConfigPreferenceRequestDTO> configPreferenceRequestDTO);
+
+      public Response getPushDeviceMgtConfigs();
+
+      public Response updatePushDeviceMgtConfigs(PushDeviceMgtConfig pushDeviceMgtConfig);
 }

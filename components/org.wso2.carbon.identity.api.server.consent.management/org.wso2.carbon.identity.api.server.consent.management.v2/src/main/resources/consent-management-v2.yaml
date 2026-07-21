@@ -42,7 +42,8 @@ paths:
         - Purposes
       summary: Create a new purpose
       description: |
-        Create a new consent purpose (e.g., "Privacy Policy", "Marketing").
+        Create a new consent purpose (e.g., "Privacy Policy", "Marketing").<br>
+        <b>Scope(Permission) required:</b> `internal_consent_mgt_purpose_create`
       operationId: purposesCreate
       requestBody:
         required: true
@@ -78,7 +79,8 @@ paths:
         - Purposes
       summary: List all purposes
       description: |
-        Retrieve all purposes with optional filtering.
+        Retrieve all purposes with optional filtering.<br>
+        <b>Scope(Permission) required:</b> `internal_consent_mgt_purpose_view`
       operationId: purposesList
       parameters:
         - $ref: '#/components/parameters/filterPurposes'
@@ -105,7 +107,8 @@ paths:
         - Purposes
       summary: Get a purpose
       description: |
-        Retrieve a specific purpose by ID.
+        Retrieve a specific purpose by ID.<br>
+        <b>Scope(Permission) required:</b> `internal_consent_mgt_purpose_view`
       operationId: purposesGet
       parameters:
         - $ref: '#/components/parameters/purposeId'
@@ -130,7 +133,8 @@ paths:
         - Purposes
       summary: Delete a purpose
       description: |
-        Delete a purpose by ID.
+        Delete a purpose by ID.<br>
+        <b>Scope(Permission) required:</b> `internal_consent_mgt_purpose_delete`
       operationId: purposesDelete
       parameters:
         - $ref: '#/components/parameters/purposeId'
@@ -156,7 +160,8 @@ paths:
         - Purposes
       summary: List purpose versions
       description: |
-        Retrieve all versions of a specific purpose with pagination support.
+        Retrieve all versions of a specific purpose with pagination support.<br>
+        <b>Scope(Permission) required:</b> `internal_consent_mgt_purpose_view`
       operationId: purposesVersionsList
       parameters:
         - $ref: '#/components/parameters/purposeId'
@@ -184,7 +189,8 @@ paths:
         - Purposes
       summary: Create a new purpose version
       description: |
-        Add a new version to an existing purpose.
+        Add a new version to an existing purpose.<br>
+        <b>Scope(Permission) required:</b> `internal_consent_mgt_purpose_update`
       operationId: purposesVersionsCreate
       parameters:
         - $ref: '#/components/parameters/purposeId'
@@ -221,7 +227,8 @@ paths:
       summary: Set the latest version of a purpose
       description: |
         Designate a specific version as the "latest" version of a purpose. The latest version
-        is returned in GET /purposes/{purposeId} and used when creating new consents.
+        is returned in GET /purposes/{purposeId} and used when creating new consents.<br>
+        <b>Scope(Permission) required:</b> `internal_consent_mgt_purpose_update`
       operationId: purposesSetLatestVersion
       parameters:
         - $ref: '#/components/parameters/purposeId'
@@ -251,7 +258,8 @@ paths:
         - Purposes
       summary: Get a purpose version
       description: |
-        Retrieve a specific version of a purpose.
+        Retrieve a specific version of a purpose.<br>
+        <b>Scope(Permission) required:</b> `internal_consent_mgt_purpose_view`
       operationId: purposesVersionsGet
       parameters:
         - $ref: '#/components/parameters/purposeId'
@@ -277,7 +285,8 @@ paths:
         - Purposes
       summary: Delete a purpose version
       description: |
-        Delete a specific version of a purpose.
+        Delete a specific version of a purpose.<br>
+        <b>Scope(Permission) required:</b> `internal_consent_mgt_purpose_delete`
       operationId: purposesVersionsDelete
       parameters:
         - $ref: '#/components/parameters/purposeId'
@@ -304,7 +313,8 @@ paths:
         - Elements
       summary: Create a consent element
       description: |
-        Create a new consent element (e.g., "email_address", "phone_number").
+        Create a new consent element (e.g., "email_address", "phone_number").<br>
+        <b>Scope(Permission) required:</b> `internal_consent_mgt_element_create`
       operationId: elementsCreate
       requestBody:
         required: true
@@ -340,7 +350,8 @@ paths:
         - Elements
       summary: List consent elements
       description: |
-        Retrieve all consent elements with optional filtering.
+        Retrieve all consent elements with optional filtering.<br>
+        <b>Scope(Permission) required:</b> `internal_consent_mgt_element_view`
       operationId: elementsList
       parameters:
         - $ref: '#/components/parameters/filterElements'
@@ -367,7 +378,8 @@ paths:
         - Elements
       summary: Get a consent element
       description: |
-        Retrieve a specific consent element by ID.
+        Retrieve a specific consent element by ID.<br>
+        <b>Scope(Permission) required:</b> `internal_consent_mgt_element_view`
       operationId: elementsGet
       parameters:
         - $ref: '#/components/parameters/elementId'
@@ -392,7 +404,8 @@ paths:
         - Elements
       summary: Delete a consent element
       description: |
-        Delete a consent element by ID.
+        Delete a consent element by ID.<br>
+        <b>Scope(Permission) required:</b> `internal_consent_mgt_element_delete`
       operationId: elementsDelete
       parameters:
         - $ref: '#/components/parameters/elementId'
@@ -418,7 +431,8 @@ paths:
         - Consents
       summary: Create a consent record
       description: |
-        Record user consent for specified purposes and elements.
+        Record a consent on behalf of a subject user.<br>
+        <b>Scope(Permission) required:</b> `internal_consent_mgt_consent_create`
       operationId: consentsCreate
       requestBody:
         required: true
@@ -454,7 +468,8 @@ paths:
         - Consents
       summary: List consent records
       description: |
-        Retrieve consent records with optional filtering.
+        Retrieve consent records with optional filtering.<br>
+        <b>Scope(Permission) required:</b> `internal_consent_mgt_consent_view`
       operationId: consentsList
       parameters:
         - $ref: '#/components/parameters/subjectId'
@@ -462,6 +477,7 @@ paths:
         - $ref: '#/components/parameters/consentState'
         - $ref: '#/components/parameters/purposeIdQuery'
         - $ref: '#/components/parameters/purposeVersionIdQuery'
+        - $ref: '#/components/parameters/filterConsents'
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/after'
         - $ref: '#/components/parameters/before'
@@ -485,7 +501,8 @@ paths:
         - Consents
       summary: Get a consent record
       description: |
-        Retrieve a specific consent record by consent ID.
+        Retrieve a specific consent record by consent ID.<br>
+        <b>Scope(Permission) required:</b> `internal_consent_mgt_consent_view`
       operationId: consentsGet
       parameters:
         - $ref: '#/components/parameters/consentId'
@@ -500,6 +517,46 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    patch:
+      tags:
+        - Consents
+      summary: Update a consent record
+      description: |
+        Update an existing consent record's expiry time, properties, and authorizations.
+        All fields in the request body are optional; omit a field to leave that aspect of
+        the consent unchanged. `expiryTime` sets or clears the expiry, `properties`
+        replaces the full property map, and `authorizations` upserts the listed users —
+        adding them as authorizers if absent or overriding their state if present.<br>
+        <b>Scope(Permission) required:</b> `internal_consent_mgt_consent_update`
+      operationId: consentsUpdate
+      parameters:
+        - $ref: '#/components/parameters/consentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentUpdateRequest'
+      responses:
+        '200':
+          description: Consent updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -511,8 +568,8 @@ paths:
         - Consents
       summary: Revoke a consent
       description: |
-        Revokes the consent. Idempotent — if the consent is already revoked, returns 204 with no error.
-        For consents with an authorization list, only users in that list may revoke (returns 403 otherwise).
+        Revokes the consent. Idempotent — if the consent is already revoked, returns 204 with no error.<br>
+        <b>Scope(Permission) required:</b> `internal_consent_mgt_consent_update`
       operationId: consentsRevoke
       parameters:
         - $ref: '#/components/parameters/consentId'
@@ -530,50 +587,14 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
-  /consents/{consentId}/authorize:
-    post:
-      tags:
-        - Consents
-      summary: Authorize a consent
-      description: |
-        Authorizes a PENDING consent. The authenticated user must be in the consent's authorization list.
-        When all required users have approved, the consent transitions to ACTIVE state.
-        If any user rejects, the consent transitions to REJECTED state.
-        Returns 403 if the calling user is not in the authorization list.
-      operationId: consentsAuthorize
-      parameters:
-        - $ref: '#/components/parameters/consentId'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AuthorizationCreateRequest'
-      responses:
-        '200':
-          description: Consent authorized successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthorizationDTO'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/ServerError'
-
   /consents/{consentId}/validate:
     get:
       tags:
         - Consents
       summary: Get the current state of a consent object
+      description: |
+        Returns the current state of a consent record, performing a lazy expiry check.<br>
+        <b>Scope(Permission) required:</b> `internal_consent_mgt_consent_view`
       operationId: consentsValidate
       parameters:
         - $ref: '#/components/parameters/consentId'
@@ -588,6 +609,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -802,6 +825,21 @@ components:
         maxLength: 255
       description: Filter purposes by name (partial match, case-insensitive).
 
+    filterConsents:
+      in: query
+      name: filter
+      required: false
+      description: |
+        Filter consents by custom properties using dot notation `properties.<key>`.
+        Supports 'sw' (starts with), 'co' (contains), 'ew' (ends with), and 'eq' (equals) operations.
+        Combine multiple conditions with 'and', 'or' logical operators.
+        Examples:
+        - filter=properties.dataCategory eq personal
+        - filter=properties.region eq EU
+        - filter=properties.region eq EU and properties.dataCategory eq personal
+      schema:
+        type: string
+
   schemas:
     # ============================================================================
     # REQUEST SCHEMAS
@@ -937,10 +975,19 @@ components:
           maxLength: 1024
           description: Detailed description of the element
           example: "User email address used for account notifications and communications"
+        properties:
+          type: object
+          description: Free-form key-value properties for this element.
+          additionalProperties:
+            type: string
+          example:
+            dataCategory: "personal"
+            retentionPeriod: "365"
 
     ConsentCreateRequest:
       type: object
       required:
+        - subjectId
         - serviceId
         - purposes
       properties:
@@ -948,9 +995,7 @@ components:
           type: string
           minLength: 1
           maxLength: 255
-          description: >
-            Username of the user giving consent. If omitted, defaults to the authenticated
-            caller. Required when the subject differs from the caller (delegated consent).
+          description: Username of the user giving consent.
           example: "alice@wso2.com"
         serviceId:
           type: string
@@ -986,17 +1031,20 @@ components:
         expiryTime:
           type: integer
           format: int64
+          minimum: 0
           nullable: true
           description: Milliseconds since epoch until which the consent is valid. If omitted, the consent does not expire.
           example: 1766383796000
         authorizations:
           type: array
-          description: Optional list of users who are expected to authorize this consent. Each user will use the /authorize endpoint to give their actual consent.
+          description: Optional list of users who are expected to authorize this consent.
           items:
             $ref: '#/components/schemas/AuthorizationEntry'
           example:
-            - id: "alice@wso2.com"
-            - id: "bob@wso2.com"
+            - userId: "alice@wso2.com"
+              type: "USER"
+            - userId: "bob@wso2.com"
+              type: "USER"
         properties:
           type: object
           description: Optional properties as key-value pairs
@@ -1031,6 +1079,68 @@ components:
 
           description: ID of the consent element
           example: "f83aa1a3-5d4d-4c0e-84db-c3a4f1e6c8b2"
+
+    ConsentUpdateRequest:
+      type: object
+      description: >
+        Admin update of an existing consent. All fields are optional; omit a field to
+        leave that aspect of the consent unchanged.
+      properties:
+        expiryTime:
+          type: integer
+          format: int64
+          minimum: 0
+          description: >
+            When present, sets or extends the consent's expiry time to the given
+            milliseconds-since-epoch timestamp. Omit to leave the existing expiry unchanged.
+          example: 1766383796000
+        properties:
+          type: object
+          nullable: true
+          description: >
+            When present, replaces the consent's full property map. Omit to leave existing
+            properties unchanged.
+          additionalProperties:
+            type: string
+          example:
+            dataCategory: "personal"
+            region: "EU"
+        authorizations:
+          type: array
+          nullable: true
+          description: >
+            When present, upserts each listed user's authorization — adds the user as an
+            authorizer if absent, or overrides the existing authorization state if present.
+            Users not listed are left untouched.
+          items:
+            $ref: '#/components/schemas/AuthorizationUpdateEntry'
+          example:
+            - userId: "alice@wso2.com"
+              state: "REVOKED"
+            - userId: "carol@wso2.com"
+              type: "USER"
+              state: "APPROVED"
+
+    AuthorizationUpdateEntry:
+      type: object
+      required:
+        - userId
+      properties:
+        userId:
+          type: string
+          description: Username of the authorizer to add or update
+          example: "alice@wso2.com"
+        type:
+          type: string
+          description: Type of the authorization principal. Used when adding a new authorizer.
+          example: "USER"
+        state:
+          type: string
+          enum: [APPROVED, REJECTED, REVOKED]
+          description: >
+            Authorization state to set. Required when overriding an existing authorizer;
+            for a newly added authorizer, omit to leave it pending.
+          example: "REVOKED"
 
     # ============================================================================
     # RESPONSE SCHEMAS
@@ -1168,6 +1278,9 @@ components:
 
     PurposeElementDTO:
       type: object
+      required:
+        - name
+        - mandatory
       properties:
         id:
           type: string
@@ -1273,6 +1386,8 @@ components:
 
     ElementDTO:
       type: object
+      required:
+        - name
       properties:
         id:
           type: string
@@ -1294,6 +1409,15 @@ components:
           nullable: true
           description: Detailed description
           example: "User email address used for account notifications and communications"
+        properties:
+          type: object
+          nullable: true
+          description: Free-form key-value properties for this element.
+          additionalProperties:
+            type: string
+          example:
+            dataCategory: "personal"
+            retentionPeriod: "365"
         tenantDomain:
           type: string
           nullable: true
@@ -1349,11 +1473,6 @@ components:
           type: string
           description: Tenant domain
           example: "carbon.super"
-        state:
-          type: string
-          enum: [PENDING, ACTIVE, REJECTED, REVOKED, EXPIRED]
-          description: PENDING if awaiting approvals, ACTIVE if all accepted, REJECTED if any rejected before activation, REVOKED if any user revoked after activation, EXPIRED if expiryTime has passed.
-          example: "ACTIVE"
 
     ConsentListResponse:
       type: object
@@ -1510,6 +1629,9 @@ components:
     ConsentedElementDTO:
       type: object
       description: Element information within a consented purpose
+      required:
+        - id
+        - name
       properties:
         id:
           type: string
@@ -1539,12 +1661,16 @@ components:
     AuthorizationEntry:
       type: object
       required:
-        - id
+        - userId
       properties:
-        id:
+        userId:
           type: string
           description: Username of the user expected to authorize this consent
           example: "alice@wso2.com"
+        type:
+          type: string
+          description: Type of the authorization principal
+          example: "USER"
 
     AuthorizationDTO:
       type: object

@@ -21,9 +21,13 @@ package org.wso2.carbon.identity.api.server.configs.v1.impl;
 import org.wso2.carbon.identity.api.server.configs.v1.ConfigsApiService;
 import org.wso2.carbon.identity.api.server.configs.v1.core.ServerConfigManagementService;
 import org.wso2.carbon.identity.api.server.configs.v1.factories.ServerConfigManagementServiceFactory;
+import org.wso2.carbon.identity.api.server.configs.v1.model.AgentConfigPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ApplicationObject;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettings;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ConfigPreferenceRequestDTO;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.FapiConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.FraudDetectionConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthOAuth2Config;
@@ -31,6 +35,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveST
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.PushDeviceMgtConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfigListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ScimConfig;
@@ -88,6 +93,12 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     }
 
     @Override
+    public Response getAgentConfiguration() {
+
+        return Response.ok().entity(configManagementService.getAgentConfiguration()).build();
+    }
+
+    @Override
     public Response getInboundScimConfigs() {
 
         return Response.ok().entity(configManagementService.getInboundScimConfig()).build();
@@ -117,6 +128,12 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
 
         return Response.ok().entity(configManagementService.getDCRConfiguration()).build();
 
+    }
+
+    @Override
+    public Response getFAPIConfiguration() {
+
+        return Response.ok().entity(configManagementService.getFAPIConfiguration()).build();
     }
 
     @Override
@@ -162,6 +179,12 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     }
 
     @Override
+    public Response updateFAPIConfiguration(final FapiConfig fapiConfig) {
+
+        return Response.ok().entity(configManagementService.updateFAPIConfiguration(fapiConfig)).build();
+    }
+
+    @Override
     public Response restoreServerRemoteLoggingConfiguration(String logType) {
 
         configManagementService.resetRemoteServerConfig(logType);
@@ -172,6 +195,13 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     public Response restoreServerRemoteLoggingConfigurations() {
 
         configManagementService.resetRemoteServerConfig();
+        return Response.noContent().build();
+    }
+
+    @Override
+    public Response removeApplicationFromPurpose(String purposeId, String applicationId) {
+
+        configManagementService.removeApplicationFromPurpose(purposeId, applicationId);
         return Response.noContent().build();
     }
 
@@ -212,6 +242,20 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     public Response deleteImpersonationConfiguration() {
 
         configManagementService.deleteImpersonationConfiguration();
+        return Response.noContent().build();
+    }
+
+    @Override
+    public Response patchAgentConfiguration(List<AgentConfigPatch> agentConfigPatch) {
+
+        configManagementService.patchAgentConfiguration(agentConfigPatch);
+        return Response.ok().build();
+    }
+
+    @Override
+    public Response deleteAgentConfiguration() {
+
+        configManagementService.deleteAgentConfiguration();
         return Response.noContent().build();
     }
 
@@ -318,6 +362,12 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
         return Response.noContent().build();
     }
 
+    @Override
+    public Response getApplicationsForPurpose(String purposeId) {
+
+        return Response.ok().entity(configManagementService.getApplicationsForPurpose(purposeId)).build();
+    }
+
     /**
      * Gets the OAuth2 inbound authentication configuration of an organization.
      *
@@ -342,6 +392,13 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
         return Response.ok().build();
     }
 
+    @Override
+    public Response addApplicationToPurpose(String purposeId, ApplicationObject applicationObject) {
+
+        configManagementService.addApplicationToPurpose(purposeId, applicationObject.getId());
+        return Response.status(Response.Status.CREATED).build();
+    }
+
     /**
      * Deletes the OAuth2 inbound authentication configuration of an organization.
      *
@@ -352,6 +409,24 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
 
         configManagementService.deleteOAuth2InboundAuthConfig();
         return Response.noContent().build();
+    }
+
+    @Override
+    public Response getPushDeviceMgtConfigs() {
+
+        return Response.ok().entity(configManagementService.getPushDeviceMgtConfigs()).build();
+    }
+
+    @Override
+    public Response updatePushDeviceMgtConfigs(PushDeviceMgtConfig pushDeviceMgtConfig) {
+
+        return Response.ok().entity(configManagementService.updatePushDeviceMgtConfigs(pushDeviceMgtConfig)).build();
+    }
+
+    @Override
+    public Response getConfigPreferences(List<ConfigPreferenceRequestDTO> configPreferenceRequestDTO) {
+
+        return Response.ok().entity(configManagementService.getConfigPreferences(configPreferenceRequestDTO)).build();
     }
 
     private RemoteLoggingConfigListItem createRemoteLoggingConfigListItem(
