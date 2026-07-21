@@ -21,13 +21,8 @@ package org.wso2.carbon.identity.api.server.policy.v1.function;
 import org.wso2.carbon.identity.api.server.policy.common.Constants;
 import org.wso2.carbon.identity.api.server.policy.v1.model.ANDRuleRequest;
 import org.wso2.carbon.identity.api.server.policy.v1.model.ExpressionRequest;
-import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyRequest;
-import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyResourceRequest;
 import org.wso2.carbon.identity.api.server.policy.v1.model.RuleRequest;
 import org.wso2.carbon.identity.api.server.policy.v1.util.PolicyManagementAPIErrorBuilder;
-import org.wso2.carbon.identity.policy.management.api.model.Policy;
-import org.wso2.carbon.identity.policy.management.api.model.PolicyResource;
-import org.wso2.carbon.identity.policy.management.api.model.RulePolicyResource;
 import org.wso2.carbon.identity.rule.management.api.exception.RuleManagementClientException;
 import org.wso2.carbon.identity.rule.management.api.exception.RuleManagementException;
 import org.wso2.carbon.identity.rule.management.api.model.Expression;
@@ -36,75 +31,26 @@ import org.wso2.carbon.identity.rule.management.api.model.Rule;
 import org.wso2.carbon.identity.rule.management.api.model.Value;
 import org.wso2.carbon.identity.rule.management.api.util.RuleBuilder;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
 /**
- * Mapper: PolicyRequest (API model) → Policy (domain model).
- *
- * Used in:
- *   addPolicy    → no ID yet, pass null
- *   updatePolicy → ID comes from the URL path param
+ * Builds a Rule (domain model) from a RuleRequest (API model).
  *
  * Rules are built through {@link RuleBuilder} so that each expression value is validated and
  * resolved against the device-policy field metadata. This is what assigns the correct value type
  * (e.g. SYMBOLIC for OS version fields such as LATEST_ANDROID); hand-constructing the Value here
  * would persist symbolic tokens as plain LIST/RAW values and fail at rule evaluation time.
  */
-public class PolicyRequestToPolicy implements Function<PolicyRequest, Policy> {
+public class PolicyRuleBuilder {
 
     private static final String OPERATOR_IN = "in";
 
-    private final String policyId;
-    private final String tenantDomain;
+    private PolicyRuleBuilder() {
 
-    public PolicyRequestToPolicy(String tenantDomain) {
-
-        this(null, tenantDomain);
     }
 
-    public PolicyRequestToPolicy(String policyId, String tenantDomain) {
-
-        this.policyId = policyId;
-        this.tenantDomain = tenantDomain;
-    }
-
-    @Override
-    public Policy apply(PolicyRequest policyRequest) {
-
-        List<PolicyResource> resources = buildPolicyResources(policyRequest.getResources());
-        return new Policy(policyId, policyRequest.getName(), null, resources);
-    }
-
-    private List<PolicyResource> buildPolicyResources(List<PolicyResourceRequest> resourceRequests) {
-
-        if (resourceRequests == null || resourceRequests.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return resourceRequests.stream()
-                .map(this::toRulePolicyResource)
-                .collect(Collectors.toList());
-    }
-
-    private PolicyResource toRulePolicyResource(PolicyResourceRequest resourceRequest) {
-
-        validateResourceType(resourceRequest.getResourceType());
-        return new RulePolicyResource(null, resourceRequest.getTarget(), null, buildRule(resourceRequest.getRule()));
-    }
-
-    private void validateResourceType(PolicyResourceRequest.ResourceTypeEnum resourceType) {
-
-        // resourceType is optional in the API and defaults to RULE; RULE is the only supported type.
-        if (resourceType != null && resourceType != PolicyResourceRequest.ResourceTypeEnum.RULE) {
-            throw PolicyManagementAPIErrorBuilder.handleException(Response.Status.BAD_REQUEST,
-                    Constants.ErrorMessage.ERROR_CODE_UNSUPPORTED_RESOURCE_TYPE, resourceType.toString());
-        }
-    }
-
-    private Rule buildRule(RuleRequest ruleRequest) {
+    public static Rule buildRule(RuleRequest ruleRequest, String tenantDomain) {
 
         RuleBuilder ruleBuilder;
         try {

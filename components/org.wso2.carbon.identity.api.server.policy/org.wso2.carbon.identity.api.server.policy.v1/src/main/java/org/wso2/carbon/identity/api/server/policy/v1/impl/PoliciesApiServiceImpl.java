@@ -22,7 +22,6 @@ import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.policy.common.Constants;
 import org.wso2.carbon.identity.api.server.policy.v1.PoliciesApiService;
 import org.wso2.carbon.identity.api.server.policy.v1.core.PolicyService;
-import org.wso2.carbon.identity.api.server.policy.v1.factories.PolicyServiceFactory;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyRequest;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyResponse;
 
@@ -39,7 +38,7 @@ public class PoliciesApiServiceImpl implements PoliciesApiService {
     public PoliciesApiServiceImpl() {
 
         try {
-            this.policyService = PolicyServiceFactory.getPolicyService();
+            this.policyService = PolicyService.getPolicyService();
         } catch (IllegalStateException e) {
             throw new RuntimeException("Error occurred while initiating PolicyService.", e);
         }

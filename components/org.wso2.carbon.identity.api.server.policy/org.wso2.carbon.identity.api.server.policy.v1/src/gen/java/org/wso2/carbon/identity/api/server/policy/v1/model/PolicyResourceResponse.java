@@ -33,7 +33,6 @@ import javax.xml.bind.annotation.*;
 
 public class PolicyResourceResponse  {
   
-    private String id;
     private String target;
 
 @XmlType(name="ResourceTypeEnum")
@@ -69,27 +68,7 @@ public enum ResourceTypeEnum {
 }
 
     private ResourceTypeEnum resourceType;
-    private String resourceId;
     private RuleResponse rule;
-
-    /**
-    * The policy-resource association ID.
-    **/
-    public PolicyResourceResponse id(String id) {
-
-        this.id = id;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "pr-456", value = "The policy-resource association ID.")
-    @JsonProperty("id")
-    @Valid
-    public String getId() {
-        return id;
-    }
-    public void setId(String id) {
-        this.id = id;
-    }
 
     /**
     * The selector value this resource applies to (e.g. device platform).
@@ -130,25 +109,6 @@ public enum ResourceTypeEnum {
     }
 
     /**
-    * The ID of the attached resource (rule ID or action ID).
-    **/
-    public PolicyResourceResponse resourceId(String resourceId) {
-
-        this.resourceId = resourceId;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "rule-123", value = "The ID of the attached resource (rule ID or action ID).")
-    @JsonProperty("resourceId")
-    @Valid
-    public String getResourceId() {
-        return resourceId;
-    }
-    public void setResourceId(String resourceId) {
-        this.resourceId = resourceId;
-    }
-
-    /**
     **/
     public PolicyResourceResponse rule(RuleResponse rule) {
 
@@ -178,16 +138,14 @@ public enum ResourceTypeEnum {
             return false;
         }
         PolicyResourceResponse policyResourceResponse = (PolicyResourceResponse) o;
-        return Objects.equals(this.id, policyResourceResponse.id) &&
-            Objects.equals(this.target, policyResourceResponse.target) &&
+        return Objects.equals(this.target, policyResourceResponse.target) &&
             Objects.equals(this.resourceType, policyResourceResponse.resourceType) &&
-            Objects.equals(this.resourceId, policyResourceResponse.resourceId) &&
             Objects.equals(this.rule, policyResourceResponse.rule);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, target, resourceType, resourceId, rule);
+        return Objects.hash(target, resourceType, rule);
     }
 
     @Override
@@ -196,10 +154,8 @@ public enum ResourceTypeEnum {
         StringBuilder sb = new StringBuilder();
         sb.append("class PolicyResourceResponse {\n");
         
-        sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    target: ").append(toIndentedString(target)).append("\n");
         sb.append("    resourceType: ").append(toIndentedString(resourceType)).append("\n");
-        sb.append("    resourceId: ").append(toIndentedString(resourceId)).append("\n");
         sb.append("    rule: ").append(toIndentedString(rule)).append("\n");
         sb.append("}");
         return sb.toString();

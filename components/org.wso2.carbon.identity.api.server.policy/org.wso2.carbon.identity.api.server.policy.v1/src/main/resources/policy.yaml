@@ -433,10 +433,6 @@ components:
     PolicyResourceResponse:
       type: object
       properties:
-        id:
-          type: string
-          description: The policy-resource association ID.
-          example: "pr-456"
         target:
           type: string
           description: The selector value this resource applies to (e.g. device platform).
@@ -446,10 +442,6 @@ components:
           enum: [RULE, ACTION]
           description: The type of resource.
           example: "RULE"
-        resourceId:
-          type: string
-          description: The ID of the attached resource (rule ID or action ID).
-          example: "rule-123"
         rule:
           $ref: '#/components/schemas/RuleResponse'
     RuleResponse:

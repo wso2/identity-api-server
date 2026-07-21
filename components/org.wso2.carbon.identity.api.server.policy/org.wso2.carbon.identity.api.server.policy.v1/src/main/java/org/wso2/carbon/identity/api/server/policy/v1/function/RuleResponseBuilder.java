@@ -23,68 +23,27 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.policy.v1.model.ANDRuleResponse;
 import org.wso2.carbon.identity.api.server.policy.v1.model.ExpressionResponse;
 import org.wso2.carbon.identity.api.server.policy.v1.model.ExpressionValue;
-import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyResourceResponse;
-import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyResponse;
 import org.wso2.carbon.identity.api.server.policy.v1.model.RuleResponse;
-import org.wso2.carbon.identity.policy.management.api.model.Policy;
-import org.wso2.carbon.identity.policy.management.api.model.PolicyResource;
-import org.wso2.carbon.identity.policy.management.api.model.RulePolicyResource;
 import org.wso2.carbon.identity.rule.management.api.model.ANDCombinedRule;
 import org.wso2.carbon.identity.rule.management.api.model.Expression;
 import org.wso2.carbon.identity.rule.management.api.model.ORCombinedRule;
 import org.wso2.carbon.identity.rule.management.api.model.Rule;
 
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Mapper: Policy (domain model) → PolicyResponse (API model).
- *
- * Used after every successful operation to build the JSON response
- * that gets sent back to the client.
+ * Builds a RuleResponse (API model) from a Rule (domain model).
  */
-public class PolicyToPolicyResponse implements Function<Policy, PolicyResponse> {
+public class RuleResponseBuilder {
 
-    private static final Log LOG = LogFactory.getLog(PolicyToPolicyResponse.class);
+    private static final Log LOG = LogFactory.getLog(RuleResponseBuilder.class);
 
-    @Override
-    public PolicyResponse apply(Policy policy) {
+    private RuleResponseBuilder() {
 
-        PolicyResponse response = new PolicyResponse();
-        response.setId(policy.getId());
-        response.setName(policy.getName());
-
-        if (policy.getResources() != null && !policy.getResources().isEmpty()) {
-            List<PolicyResourceResponse> resourceResponses = policy.getResources().stream()
-                    .map(this::toPolicyResourceResponse)
-                    .collect(Collectors.toList());
-            response.setResources(resourceResponses);
-        }
-
-        return response;
     }
 
-    private PolicyResourceResponse toPolicyResourceResponse(PolicyResource policyResource) {
-
-        PolicyResourceResponse resourceResponse = new PolicyResourceResponse();
-        resourceResponse.setId(policyResource.getId());
-        resourceResponse.setResourceId(policyResource.getResourceId());
-        resourceResponse.setTarget(policyResource.getTarget());
-        if (policyResource.getResourceType() != null) {
-            resourceResponse.setResourceType(
-                    PolicyResourceResponse.ResourceTypeEnum.fromValue(policyResource.getResourceType().name()));
-        }
-        if (policyResource instanceof RulePolicyResource) {
-            Rule rule = ((RulePolicyResource) policyResource).getRule();
-            if (rule != null) {
-                resourceResponse.setRule(toRuleResponse(rule));
-            }
-        }
-        return resourceResponse;
-    }
-
-    private RuleResponse toRuleResponse(Rule rule) {
+    public static RuleResponse buildRuleResponse(Rule rule) {
 
         if (!(rule instanceof ORCombinedRule)) {
             LOG.error("Unexpected top-level rule type: "
@@ -95,24 +54,24 @@ public class PolicyToPolicyResponse implements Function<Policy, PolicyResponse> 
         }
         ORCombinedRule orRule = (ORCombinedRule) rule;
         List<ANDRuleResponse> andGroups = orRule.getRules().stream()
-                .map(this::toANDRuleResponse)
+                .map(RuleResponseBuilder::toANDRuleResponse)
                 .collect(Collectors.toList());
         RuleResponse ruleResponse = new RuleResponse();
         ruleResponse.setRules(andGroups);
         return ruleResponse;
     }
 
-    private ANDRuleResponse toANDRuleResponse(ANDCombinedRule andRule) {
+    private static ANDRuleResponse toANDRuleResponse(ANDCombinedRule andRule) {
 
         List<ExpressionResponse> expressions = andRule.getExpressions().stream()
-                .map(this::toExpressionResponse)
+                .map(RuleResponseBuilder::toExpressionResponse)
                 .collect(Collectors.toList());
         ANDRuleResponse andRuleResponse = new ANDRuleResponse();
         andRuleResponse.setExpressions(expressions);
         return andRuleResponse;
     }
 
-    private ExpressionResponse toExpressionResponse(Expression expression) {
+    private static ExpressionResponse toExpressionResponse(Expression expression) {
 
         ExpressionValue expressionValue = new ExpressionValue();
         if (expression.getValue() != null) {

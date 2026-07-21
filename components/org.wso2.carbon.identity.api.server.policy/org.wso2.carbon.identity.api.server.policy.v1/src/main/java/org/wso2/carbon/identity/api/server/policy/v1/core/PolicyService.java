@@ -21,8 +21,9 @@ package org.wso2.carbon.identity.api.server.policy.v1.core;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.Util;
 import org.wso2.carbon.identity.api.server.policy.common.Constants;
-import org.wso2.carbon.identity.api.server.policy.v1.function.PolicyRequestToPolicy;
-import org.wso2.carbon.identity.api.server.policy.v1.function.PolicyToPolicyResponse;
+import org.wso2.carbon.identity.api.server.policy.common.PolicyServiceHolder;
+import org.wso2.carbon.identity.api.server.policy.v1.function.PolicyBuilder;
+import org.wso2.carbon.identity.api.server.policy.v1.function.PolicyResponseBuilder;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyListItem;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyListLink;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyListResponse;
@@ -46,6 +47,24 @@ public class PolicyService {
     private static final int DEFAULT_LIMIT = 30;
     private static final int DEFAULT_OFFSET = 0;
 
+    private static final PolicyService SERVICE;
+
+    static {
+        PolicyManagementService policyManagementService =
+                PolicyServiceHolder.getPolicyManagementService();
+
+        if (policyManagementService == null) {
+            throw new IllegalStateException("PolicyManagementService is not available from OSGi context.");
+        }
+
+        SERVICE = new PolicyService(policyManagementService);
+    }
+
+    public static PolicyService getPolicyService() {
+
+        return SERVICE;
+    }
+
     private final PolicyManagementService policyManagementService;
 
     public PolicyService(PolicyManagementService policyManagementService) {
@@ -54,15 +73,18 @@ public class PolicyService {
     }
 
     /**
-     * Create a new device policy.
+     * Create a new policy.
+     *
+     * @param policyRequest Policy creation request.
+     * @return Created policy response.
      */
     public PolicyResponse addPolicy(PolicyRequest policyRequest) {
 
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            Policy policy = new PolicyRequestToPolicy(tenantDomain).apply(policyRequest);
+            Policy policy = PolicyBuilder.buildPolicy(policyRequest, null, tenantDomain);
             Policy createdPolicy = policyManagementService.addPolicy(policy, tenantDomain);
-            return new PolicyToPolicyResponse().apply(createdPolicy);
+            return PolicyResponseBuilder.buildPolicyResponse(createdPolicy);
         } catch (PolicyManagementException e) {
             throw PolicyManagementAPIErrorBuilder.handleException(e,
                     Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_POLICY);
@@ -70,7 +92,10 @@ public class PolicyService {
     }
 
     /**
-     * Get a device policy by its ID.
+     * Get a policy by its ID.
+     *
+     * @param policyId ID of the policy to retrieve.
+     * @return Policy response.
      */
     public PolicyResponse getPolicyById(String policyId) {
 
@@ -81,7 +106,7 @@ public class PolicyService {
                 throw PolicyManagementAPIErrorBuilder.handleException(Response.Status.NOT_FOUND,
                         Constants.ErrorMessage.ERROR_CODE_POLICY_NOT_FOUND, policyId);
             }
-            return new PolicyToPolicyResponse().apply(policy);
+            return PolicyResponseBuilder.buildPolicyResponse(policy);
         } catch (PolicyManagementException e) {
             throw PolicyManagementAPIErrorBuilder.handleException(e,
                     Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_POLICY);
@@ -89,15 +114,19 @@ public class PolicyService {
     }
 
     /**
-     * Update an existing device policy.
+     * Update an existing policy.
+     *
+     * @param policyId      ID of the policy to update.
+     * @param policyRequest Policy update request.
+     * @return Updated policy response.
      */
     public PolicyResponse updatePolicy(String policyId, PolicyRequest policyRequest) {
 
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            Policy policy = new PolicyRequestToPolicy(policyId, tenantDomain).apply(policyRequest);
+            Policy policy = PolicyBuilder.buildPolicy(policyRequest, policyId, tenantDomain);
             Policy updatedPolicy = policyManagementService.updatePolicy(policy, tenantDomain);
-            return new PolicyToPolicyResponse().apply(updatedPolicy);
+            return PolicyResponseBuilder.buildPolicyResponse(updatedPolicy);
         } catch (PolicyManagementException e) {
             throw PolicyManagementAPIErrorBuilder.handleException(e,
                     Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_POLICY);
@@ -105,7 +134,9 @@ public class PolicyService {
     }
 
     /**
-     * Delete a device policy by its ID.
+     * Delete a policy by its ID.
+     *
+     * @param policyId ID of the policy to delete.
      */
     public void deletePolicy(String policyId) {
 
@@ -119,7 +150,7 @@ public class PolicyService {
     }
 
     /**
-     * Get a paginated list of device policy summaries for the current tenant, optionally filtered by name.
+     * Get a paginated list of policy summaries for the current tenant, optionally filtered by name.
      *
      * @param limit  Maximum number of records to return (defaults to 30 when null).
      * @param offset Number of records to skip (defaults to 0 when null).
