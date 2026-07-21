@@ -21,6 +21,7 @@ package org.wso2.carbon.identity.api.server.policy.v1.function;
 import org.wso2.carbon.identity.api.server.policy.common.Constants;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyRequest;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyResourceRequest;
+import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyUpdateRequest;
 import org.wso2.carbon.identity.api.server.policy.v1.util.PolicyManagementAPIErrorBuilder;
 import org.wso2.carbon.identity.policy.management.api.model.Policy;
 import org.wso2.carbon.identity.policy.management.api.model.PolicyResource;
@@ -48,6 +49,14 @@ public class PolicyBuilder {
 
         List<PolicyResource> resources = buildPolicyResources(policyRequest.getResources(), tenantDomain);
         return new Policy(policyId, policyRequest.getName(), null, resources);
+    }
+
+    public static Policy buildUpdatingPolicy(PolicyUpdateRequest policyUpdateRequest, String policyId,
+                                              String tenantDomain) {
+
+        List<PolicyResource> resources = buildPolicyResources(policyUpdateRequest.getResources(), tenantDomain);
+        // Policy name is immutable; the backend retains the stored name.
+        return new Policy(policyId, null, null, resources);
     }
 
     private static List<PolicyResource> buildPolicyResources(List<PolicyResourceRequest> resourceRequests,

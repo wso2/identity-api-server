@@ -29,6 +29,7 @@ import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyListLink;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyListResponse;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyRequest;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyResponse;
+import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyUpdateRequest;
 import org.wso2.carbon.identity.api.server.policy.v1.util.PolicyManagementAPIErrorBuilder;
 import org.wso2.carbon.identity.policy.management.api.exception.PolicyManagementException;
 import org.wso2.carbon.identity.policy.management.api.model.Policy;
@@ -116,15 +117,15 @@ public class PolicyService {
     /**
      * Update an existing policy.
      *
-     * @param policyId      ID of the policy to update.
-     * @param policyRequest Policy update request.
+     * @param policyId            ID of the policy to update.
+     * @param policyUpdateRequest Policy update request.
      * @return Updated policy response.
      */
-    public PolicyResponse updatePolicy(String policyId, PolicyRequest policyRequest) {
+    public PolicyResponse updatePolicy(String policyId, PolicyUpdateRequest policyUpdateRequest) {
 
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            Policy policy = PolicyBuilder.buildPolicy(policyRequest, policyId, tenantDomain);
+            Policy policy = PolicyBuilder.buildUpdatingPolicy(policyUpdateRequest, policyId, tenantDomain);
             Policy updatedPolicy = policyManagementService.updatePolicy(policy, tenantDomain);
             return PolicyResponseBuilder.buildPolicyResponse(updatedPolicy);
         } catch (PolicyManagementException e) {

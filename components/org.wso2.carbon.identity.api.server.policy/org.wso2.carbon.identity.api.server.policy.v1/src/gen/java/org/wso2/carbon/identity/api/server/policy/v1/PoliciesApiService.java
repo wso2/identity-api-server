@@ -28,6 +28,7 @@ import org.wso2.carbon.identity.api.server.policy.v1.model.Error;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyListResponse;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyRequest;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyResponse;
+import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyUpdateRequest;
 import javax.ws.rs.core.Response;
 
 
@@ -41,5 +42,5 @@ public interface PoliciesApiService {
 
       public Response getPolicyById(String policyId);
 
-      public Response updatePolicy(String policyId, PolicyRequest policyRequest);
+      public Response updatePolicy(String policyId, PolicyUpdateRequest policyUpdateRequest);
 }

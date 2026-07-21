@@ -27,6 +27,7 @@ import org.wso2.carbon.identity.api.server.policy.v1.model.Error;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyListResponse;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyRequest;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyResponse;
+import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyUpdateRequest;
 import org.wso2.carbon.identity.api.server.policy.v1.PoliciesApiService;
 import org.wso2.carbon.identity.api.server.policy.v1.factories.PoliciesApiServiceFactory;
 
@@ -162,9 +163,9 @@ public class PoliciesApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response updatePolicy(@ApiParam(value = "ID of the policy",required=true) @PathParam("policy-id") String policyId, @ApiParam(value = "" ,required=true) @Valid PolicyRequest policyRequest) {
+    public Response updatePolicy(@ApiParam(value = "ID of the policy",required=true) @PathParam("policy-id") String policyId, @ApiParam(value = "" ,required=true) @Valid PolicyUpdateRequest policyUpdateRequest) {
 
-        return delegate.updatePolicy(policyId,  policyRequest );
+        return delegate.updatePolicy(policyId,  policyUpdateRequest );
     }
 
 }

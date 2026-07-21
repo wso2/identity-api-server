@@ -169,7 +169,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PolicyRequest'
+              $ref: '#/components/schemas/PolicyUpdateRequest'
       responses:
         '200':
           description: Successful Response
@@ -281,6 +281,16 @@ components:
           type: string
           description: The name of the policy.
           example: "Corporate Policy"
+        resources:
+          type: array
+          description: Resources attached to the policy. Each target may have at most one resource of each type.
+          items:
+            $ref: '#/components/schemas/PolicyResourceRequest'
+    PolicyUpdateRequest:
+      type: object
+      required:
+        - resources
+      properties:
         resources:
           type: array
           description: Resources attached to the policy. Each target may have at most one resource of each type.
