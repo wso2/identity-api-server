@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2019-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -2451,7 +2451,7 @@ public class ServerIdpManagementService {
             return null;
         }
         for (IdentityProviderProperty property : idpProperties) {
-            if (Constants.IS_SHARED_PROPERTY.equals(property.getName())) {
+            if (IdentityProvider.IS_SHARED_IDP_PROPERTY.equals(property.getName())) {
                 return Boolean.parseBoolean(property.getValue());
             }
         }

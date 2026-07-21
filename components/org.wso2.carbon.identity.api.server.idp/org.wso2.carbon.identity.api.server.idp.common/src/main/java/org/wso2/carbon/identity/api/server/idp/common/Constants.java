@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019-2026, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +34,6 @@ public class Constants {
     public static final String JWKS_URI = "jwksUri";
     public static final String SAML_METADATA_URI = "samlMetadataUri";
     public static final String IDP_ISSUER_NAME = "idpIssuerName";
-    // IdP property marking a shadow (shared) connection resolved from a parent organization.
-    public static final String IS_SHARED_PROPERTY = "isShared";
     public static final String TEMPLATE_ID = "templateId";
     public static final String META_DATA_SAML = "meta_data_saml";
     public static final String SELECT_MODE = "SelectMode";

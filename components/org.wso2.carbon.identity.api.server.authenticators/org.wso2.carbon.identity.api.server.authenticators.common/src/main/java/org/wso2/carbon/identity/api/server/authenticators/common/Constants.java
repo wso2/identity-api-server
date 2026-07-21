@@ -27,8 +27,6 @@ public class Constants {
 
     public static final String AUTHENTICATOR_ERROR_PREFIX = "AUT-";
     public static final String FEDERATED_AUTHENTICATORS = "federatedAuthenticators";
-    // IdP property marking a shadow (shared) connection resolved from a parent organization.
-    public static final String IS_SHARED_PROPERTY = "isShared";
     public static final String AUTHENTICATOR_PATH_COMPONENT = "/authenticators";
     public static final String CONFIGS_AUTHENTICATOR_PATH_COMPONENT = "/configs/authenticators/%s";
     public static final String PATH_SEPERATOR = "/";
