@@ -48,7 +48,11 @@ public class PolicyBuilder {
     public static Policy buildPolicy(PolicyRequest policyRequest, String policyId, String tenantDomain) {
 
         List<PolicyResource> resources = buildPolicyResources(policyRequest.getResources(), tenantDomain);
-        return new Policy(policyId, policyRequest.getName(), null, resources);
+        return new Policy.Builder()
+                .id(policyId)
+                .name(policyRequest.getName())
+                .resources(resources)
+                .build();
     }
 
     public static Policy buildUpdatingPolicy(PolicyUpdateRequest policyUpdateRequest, String policyId,
@@ -56,7 +60,10 @@ public class PolicyBuilder {
 
         List<PolicyResource> resources = buildPolicyResources(policyUpdateRequest.getResources(), tenantDomain);
         // Policy name is immutable; the backend retains the stored name.
-        return new Policy(policyId, null, null, resources);
+        return new Policy.Builder()
+                .id(policyId)
+                .resources(resources)
+                .build();
     }
 
     private static List<PolicyResource> buildPolicyResources(List<PolicyResourceRequest> resourceRequests,
@@ -73,8 +80,10 @@ public class PolicyBuilder {
     private static PolicyResource toRulePolicyResource(PolicyResourceRequest resourceRequest, String tenantDomain) {
 
         validateResourceType(resourceRequest.getResourceType());
-        return new RulePolicyResource(null, resourceRequest.getTarget(), null,
-                PolicyRuleBuilder.buildRule(resourceRequest.getRule(), tenantDomain));
+        return new RulePolicyResource.Builder()
+                .target(resourceRequest.getTarget())
+                .rule(PolicyRuleBuilder.buildRule(resourceRequest.getRule(), tenantDomain))
+                .build();
     }
 
     private static void validateResourceType(PolicyResourceRequest.ResourceTypeEnum resourceType) {
