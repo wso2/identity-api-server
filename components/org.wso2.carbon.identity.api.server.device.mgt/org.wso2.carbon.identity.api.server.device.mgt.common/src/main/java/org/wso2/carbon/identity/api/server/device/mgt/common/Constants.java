@@ -32,6 +32,12 @@ public class Constants {
 
     public static final String DEVICE_PATH_COMPONENT = "/devices";
 
+    // Device list pagination link constants.
+    public static final String PAGINATION_LINK_FORMAT = "?offset=%d&limit=%d";
+    public static final String PAGINATION_WITH_USER_ID_LINK_FORMAT = "?offset=%d&limit=%d&userId=%s";
+    public static final String PAGE_LINK_REL_NEXT = "next";
+    public static final String PAGE_LINK_REL_PREVIOUS = "previous";
+
     /**
      * Error messages for the device management API.
      */
@@ -43,7 +49,8 @@ public class Constants {
 
         ERROR_CODE_INVALID_PAGINATION("60101",
                 "Invalid pagination parameters.",
-                "The 'limit' must be greater than or equal to 1 and 'offset' must be greater than or equal to 0."),
+                "The 'limit' must be between 1 and 100 (inclusive), and 'offset' must be greater than or "
+                        + "equal to 0."),
 
         ERROR_CODE_INVALID_DEVICE_NAME("60102",
                 "Invalid device name.",
