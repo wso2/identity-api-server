@@ -2927,7 +2927,7 @@ public class ServerConfigManagementService {
             log.debug("Fetching config store resource for type: " + resourceType + ", name: " + resourceName);
         }
         try {
-            return configurationManager.getResource(resourceType, resourceName);
+            return configurationManager.getResource(resourceType, resourceName, true);
         } catch (ConfigurationManagementException e) {
             // A genuine retrieval failure must not be masked by serving default configs.
             if (!isResourceNotExistsError(e)) {
