@@ -55,7 +55,7 @@ public class PoliciesApi  {
     
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Create a policy.", notes = "This API provides the capability to create a new policy.", response = PolicyResponse.class, authorizations = {
+    @ApiOperation(value = "Create a policy.", notes = "This API provides the capability to create a new policy.  <b>Scope (Permission) required:</b> `internal_policy_mgt_create` ", response = PolicyResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -79,7 +79,7 @@ public class PoliciesApi  {
     @Path("/{policy-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete a policy.", notes = "This API provides the capability to delete a policy by ID.", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete a policy.", notes = "This API provides the capability to delete a policy by ID.  <b>Scope (Permission) required:</b> `internal_policy_mgt_delete` ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -102,7 +102,7 @@ public class PoliciesApi  {
     
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "List policies.", notes = "This API provides the capability to retrieve a paginated list of policies for the tenant, optionally filtered by name.", response = PolicyListResponse.class, authorizations = {
+    @ApiOperation(value = "List policies.", notes = "This API provides the capability to retrieve a paginated list of policies for the tenant, optionally filtered by name.  <b>Scope (Permission) required:</b> `internal_policy_mgt_view` ", response = PolicyListResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -125,7 +125,7 @@ public class PoliciesApi  {
     @Path("/{policy-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get a policy by ID.", notes = "This API provides the capability to retrieve a policy by ID.", response = PolicyResponse.class, authorizations = {
+    @ApiOperation(value = "Get a policy by ID.", notes = "This API provides the capability to retrieve a policy by ID.  <b>Scope (Permission) required:</b> `internal_policy_mgt_view` ", response = PolicyResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -149,7 +149,7 @@ public class PoliciesApi  {
     @Path("/{policy-id}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update a policy.", notes = "This API provides the capability to update an existing policy.", response = PolicyResponse.class, authorizations = {
+    @ApiOperation(value = "Update a policy.", notes = "This API provides the capability to update an existing policy.  <b>Scope (Permission) required:</b> `internal_policy_mgt_update` ", response = PolicyResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             

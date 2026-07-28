@@ -10,6 +10,13 @@ info:
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+servers:
+  - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
+    variables:
+      server-url:
+        default: "localhost:9443"
+      tenant-domain:
+        default: carbon.super
 security:
   - OAuth2: []
   - BasicAuth: []
@@ -20,7 +27,10 @@ paths:
         - Policy Management
       summary: List policies.
       operationId: getPolicies
-      description: This API provides the capability to retrieve a paginated list of policies for the tenant, optionally filtered by name.
+      description: |
+        This API provides the capability to retrieve a paginated list of policies for the tenant, optionally filtered by name.
+
+        <b>Scope (Permission) required:</b> `internal_policy_mgt_view`
       parameters:
         - name: limit
           in: query
@@ -72,7 +82,10 @@ paths:
         - Policy Management
       summary: Create a policy.
       operationId: addPolicy
-      description: This API provides the capability to create a new policy.
+      description: |
+        This API provides the capability to create a new policy.
+
+        <b>Scope (Permission) required:</b> `internal_policy_mgt_create`
       requestBody:
         required: true
         content:
@@ -114,7 +127,10 @@ paths:
         - Policy Management
       summary: Get a policy by ID.
       operationId: getPolicyById
-      description: This API provides the capability to retrieve a policy by ID.
+      description: |
+        This API provides the capability to retrieve a policy by ID.
+
+        <b>Scope (Permission) required:</b> `internal_policy_mgt_view`
       parameters:
         - name: policy-id
           in: path
@@ -156,7 +172,10 @@ paths:
         - Policy Management
       summary: Update a policy.
       operationId: updatePolicy
-      description: This API provides the capability to update an existing policy.
+      description: |
+        This API provides the capability to update an existing policy.
+
+        <b>Scope (Permission) required:</b> `internal_policy_mgt_update`
       parameters:
         - name: policy-id
           in: path
@@ -204,7 +223,10 @@ paths:
         - Policy Management
       summary: Delete a policy.
       operationId: deletePolicy
-      description: This API provides the capability to delete a policy by ID.
+      description: |
+        This API provides the capability to delete a policy by ID.
+
+        <b>Scope (Permission) required:</b> `internal_policy_mgt_delete`
       parameters:
         - name: policy-id
           in: path
@@ -231,13 +253,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-servers:
-  - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
-    variables:
-      server-url:
-        default: "localhost:9443"
-      tenant-domain:
-        default: carbon.super
 components:
   securitySchemes:
     BasicAuth:
@@ -300,6 +315,7 @@ components:
       type: object
       required:
         - target
+        - resourceType
         - rule
       properties:
         target:
@@ -309,8 +325,7 @@ components:
         resourceType:
           type: string
           enum: [RULE, ACTION]
-          default: RULE
-          description: The type of resource. Defaults to RULE. Only RULE is currently supported.
+          description: The type of resource. Only RULE is currently supported.
           example: "RULE"
         rule:
           $ref: '#/components/schemas/RuleRequest'

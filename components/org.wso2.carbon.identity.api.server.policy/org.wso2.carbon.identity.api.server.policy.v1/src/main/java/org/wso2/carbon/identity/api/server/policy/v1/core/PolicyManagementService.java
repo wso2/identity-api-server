@@ -42,14 +42,14 @@ import javax.ws.rs.core.Response;
 /**
  * Core service for the Policy API — handles policy CRUD operations.
  */
-public class PolicyService {
+public class PolicyManagementService {
 
     private static final int DEFAULT_LIMIT = 30;
     private static final int DEFAULT_OFFSET = 0;
 
     private final PolicyManagementService policyManagementService;
 
-    public PolicyService(PolicyManagementService policyManagementService) {
+    public PolicyManagementService(PolicyManagementService policyManagementService) {
 
         this.policyManagementService = policyManagementService;
     }

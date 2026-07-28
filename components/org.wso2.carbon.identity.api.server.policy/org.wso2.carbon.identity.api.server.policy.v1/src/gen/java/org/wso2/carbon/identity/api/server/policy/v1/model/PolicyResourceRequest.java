@@ -67,7 +67,7 @@ public enum ResourceTypeEnum {
     }
 }
 
-    private ResourceTypeEnum resourceType = ResourceTypeEnum.RULE;
+    private ResourceTypeEnum resourceType;
     private RuleRequest rule;
 
     /**
@@ -92,7 +92,7 @@ public enum ResourceTypeEnum {
     }
 
     /**
-    * The type of resource. Defaults to RULE. Only RULE is currently supported.
+    * The type of resource. Only RULE is currently supported.
     **/
     public PolicyResourceRequest resourceType(ResourceTypeEnum resourceType) {
 
@@ -100,9 +100,11 @@ public enum ResourceTypeEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "RULE", value = "The type of resource. Defaults to RULE. Only RULE is currently supported.")
+    @ApiModelProperty(example = "RULE", required = true, value = "The type of resource. Only RULE is currently supported.")
     @JsonProperty("resourceType")
     @Valid
+    @NotNull(message = "Property resourceType cannot be null.")
+
     public ResourceTypeEnum getResourceType() {
         return resourceType;
     }

@@ -19,7 +19,7 @@
 package org.wso2.carbon.identity.api.server.policy.v1.factories;
 
 import org.wso2.carbon.identity.api.server.policy.common.PolicyServiceHolder;
-import org.wso2.carbon.identity.api.server.policy.v1.core.PolicyService;
+import org.wso2.carbon.identity.api.server.policy.v1.core.PolicyManagementService;
 import org.wso2.carbon.identity.policy.management.api.service.PolicyManagementService;
 
 /**
@@ -27,7 +27,7 @@ import org.wso2.carbon.identity.policy.management.api.service.PolicyManagementSe
  */
 public class PolicyServiceFactory {
 
-    private static final PolicyService SERVICE;
+    private static final PolicyManagementService SERVICE;
 
     static {
         PolicyManagementService policyManagementService =
@@ -37,7 +37,7 @@ public class PolicyServiceFactory {
             throw new IllegalStateException("PolicyManagementService is not available from OSGi context.");
         }
 
-        SERVICE = new PolicyService(policyManagementService);
+        SERVICE = new PolicyManagementService(policyManagementService);
     }
 
     /**
@@ -45,7 +45,7 @@ public class PolicyServiceFactory {
      *
      * @return PolicyService.
      */
-    public static PolicyService getPolicyService() {
+    public static PolicyManagementService getPolicyService() {
 
         return SERVICE;
     }

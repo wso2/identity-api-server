@@ -21,7 +21,7 @@ package org.wso2.carbon.identity.api.server.policy.v1.impl;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.policy.common.Constants;
 import org.wso2.carbon.identity.api.server.policy.v1.PoliciesApiService;
-import org.wso2.carbon.identity.api.server.policy.v1.core.PolicyService;
+import org.wso2.carbon.identity.api.server.policy.v1.core.PolicyManagementService;
 import org.wso2.carbon.identity.api.server.policy.v1.factories.PolicyServiceFactory;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyRequest;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyResponse;
@@ -35,7 +35,7 @@ import javax.ws.rs.core.Response;
  */
 public class PoliciesApiServiceImpl implements PoliciesApiService {
 
-    private final PolicyService policyService;
+    private final PolicyManagementService policyService;
 
     public PoliciesApiServiceImpl() {
 
@@ -58,7 +58,7 @@ public class PoliciesApiServiceImpl implements PoliciesApiService {
     @Override
     public Response getPolicies(Integer limit, Integer offset, String filter) {
 
-        return Response.ok().entity(policyService.getPolicies(limit, offset, filter)).build();
+        return Response.ok().entity(policyService.getPoliciesBasicInfo(limit, offset, filter)).build();
     }
 
     @Override
