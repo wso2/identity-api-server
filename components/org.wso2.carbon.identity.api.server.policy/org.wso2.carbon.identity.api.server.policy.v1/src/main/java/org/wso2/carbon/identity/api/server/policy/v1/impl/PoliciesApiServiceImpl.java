@@ -42,7 +42,7 @@ public class PoliciesApiServiceImpl implements PoliciesApiService {
         try {
             this.policyService = PolicyServiceFactory.getPolicyService();
         } catch (IllegalStateException e) {
-            throw new RuntimeException("Error occurred while initiating PolicyService.", e);
+            throw new RuntimeException("Error occurred while initiating PolicyManagementService.", e);
         }
     }
 

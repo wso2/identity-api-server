@@ -21,13 +21,14 @@ package org.wso2.carbon.identity.api.server.policy.v1.function;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyRequest;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyResourceRequest;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyUpdateRequest;
+import org.wso2.carbon.identity.policy.management.api.exception.PolicyManagementClientException;
 import org.wso2.carbon.identity.policy.management.api.model.Policy;
 import org.wso2.carbon.identity.policy.management.api.model.PolicyResource;
 import org.wso2.carbon.identity.policy.management.api.model.RulePolicyResource;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Builds a Policy (domain model) from a PolicyRequest (API model).
@@ -42,7 +43,8 @@ public class PolicyBuilder {
 
     }
 
-    public static Policy buildPolicy(PolicyRequest policyRequest, String tenantDomain) {
+    public static Policy buildPolicy(PolicyRequest policyRequest, String tenantDomain)
+            throws PolicyManagementClientException {
 
         List<PolicyResource> resources = buildPolicyResources(policyRequest.getResources(), tenantDomain);
         return new Policy.Builder()
@@ -52,7 +54,7 @@ public class PolicyBuilder {
     }
 
     public static Policy buildUpdatingPolicy(PolicyUpdateRequest policyUpdateRequest, String policyId,
-                                              String tenantDomain) {
+                                              String tenantDomain) throws PolicyManagementClientException {
 
         List<PolicyResource> resources = buildPolicyResources(policyUpdateRequest.getResources(), tenantDomain);
         // Policy name is immutable; the backend retains the stored name.
@@ -63,17 +65,21 @@ public class PolicyBuilder {
     }
 
     private static List<PolicyResource> buildPolicyResources(List<PolicyResourceRequest> resourceRequests,
-                                                               String tenantDomain) {
+                                                               String tenantDomain)
+            throws PolicyManagementClientException {
 
         if (resourceRequests == null || resourceRequests.isEmpty()) {
             return Collections.emptyList();
         }
-        return resourceRequests.stream()
-                .map(resourceRequest -> toRulePolicyResource(resourceRequest, tenantDomain))
-                .collect(Collectors.toList());
+        List<PolicyResource> resources = new ArrayList<>();
+        for (PolicyResourceRequest resourceRequest : resourceRequests) {
+            resources.add(toRulePolicyResource(resourceRequest, tenantDomain));
+        }
+        return resources;
     }
 
-    private static PolicyResource toRulePolicyResource(PolicyResourceRequest resourceRequest, String tenantDomain) {
+    private static PolicyResource toRulePolicyResource(PolicyResourceRequest resourceRequest, String tenantDomain)
+            throws PolicyManagementClientException {
 
         return new RulePolicyResource.Builder()
                 .target(resourceRequest.getTarget())

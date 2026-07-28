@@ -20,7 +20,6 @@ package org.wso2.carbon.identity.api.server.policy.v1.factories;
 
 import org.wso2.carbon.identity.api.server.policy.common.PolicyServiceHolder;
 import org.wso2.carbon.identity.api.server.policy.v1.core.PolicyManagementService;
-import org.wso2.carbon.identity.policy.management.api.service.PolicyManagementService;
 
 /**
  * Factory class for Policy Service.
@@ -30,7 +29,7 @@ public class PolicyServiceFactory {
     private static final PolicyManagementService SERVICE;
 
     static {
-        PolicyManagementService policyManagementService =
+        org.wso2.carbon.identity.policy.management.api.service.PolicyManagementService policyManagementService =
                 PolicyServiceHolder.getPolicyManagementService();
 
         if (policyManagementService == null) {

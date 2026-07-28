@@ -33,7 +33,6 @@ import org.wso2.carbon.identity.api.server.policy.v1.util.PolicyManagementAPIErr
 import org.wso2.carbon.identity.policy.management.api.exception.PolicyManagementException;
 import org.wso2.carbon.identity.policy.management.api.model.Policy;
 import org.wso2.carbon.identity.policy.management.api.model.PolicyBasicInfo;
-import org.wso2.carbon.identity.policy.management.api.service.PolicyManagementService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,9 +46,11 @@ public class PolicyManagementService {
     private static final int DEFAULT_LIMIT = 30;
     private static final int DEFAULT_OFFSET = 0;
 
-    private final PolicyManagementService policyManagementService;
+    private final org.wso2.carbon.identity.policy.management.api.service.PolicyManagementService
+            policyManagementService;
 
-    public PolicyManagementService(PolicyManagementService policyManagementService) {
+    public PolicyManagementService(
+            org.wso2.carbon.identity.policy.management.api.service.PolicyManagementService policyManagementService) {
 
         this.policyManagementService = policyManagementService;
     }
@@ -64,7 +65,7 @@ public class PolicyManagementService {
 
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            Policy policy = PolicyBuilder.buildPolicy(policyRequest, null, tenantDomain);
+            Policy policy = PolicyBuilder.buildPolicy(policyRequest, tenantDomain);
             Policy createdPolicy = policyManagementService.addPolicy(policy, tenantDomain);
             return PolicyResponseBuilder.buildPolicyResponse(createdPolicy);
         } catch (PolicyManagementException e) {
