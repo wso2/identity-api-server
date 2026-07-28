@@ -52,6 +52,9 @@ import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedA
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAuthorizationDetailsTypes;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedScope;
+import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretCreationRequest;
+import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretList;
+import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticator;
 import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticatorsModal;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
@@ -1875,6 +1878,35 @@ public class ServerApplicationManagementService {
         InboundAuthenticationRequestConfig oauthInbound = getInboundAuthRequestConfig(applicationId, OAUTH2);
         String clientId = oauthInbound.getInboundAuthKey();
         return OAuthInboundFunctions.regenerateClientSecret(clientId);
+    }
+
+    public ClientSecretResponse createOAuthClientSecret(String applicationId,
+                                                          ClientSecretCreationRequest request) {
+
+        InboundAuthenticationRequestConfig oauthInbound = getInboundAuthRequestConfig(applicationId, OAUTH2);
+        String clientId = oauthInbound.getInboundAuthKey();
+        return OAuthInboundFunctions.createClientSecret(clientId, request);
+    }
+
+    public ClientSecretList getOAuthClientSecrets(String applicationId) {
+
+        InboundAuthenticationRequestConfig oauthInbound = getInboundAuthRequestConfig(applicationId, OAUTH2);
+        String clientId = oauthInbound.getInboundAuthKey();
+        return OAuthInboundFunctions.getClientSecrets(clientId);
+    }
+
+    public ClientSecretResponse getOAuthClientSecret(String applicationId, String secretId) {
+
+        InboundAuthenticationRequestConfig oauthInbound = getInboundAuthRequestConfig(applicationId, OAUTH2);
+        String clientId = oauthInbound.getInboundAuthKey();
+        return OAuthInboundFunctions.getClientSecret(clientId, secretId);
+    }
+
+    public void deleteOAuthClientSecret(String applicationId, String secretId) {
+
+        InboundAuthenticationRequestConfig oauthInbound = getInboundAuthRequestConfig(applicationId, OAUTH2);
+        String clientId = oauthInbound.getInboundAuthKey();
+        OAuthInboundFunctions.deleteClientSecret(clientId, secretId);
     }
 
     public void revokeOAuthClient(String applicationId) {

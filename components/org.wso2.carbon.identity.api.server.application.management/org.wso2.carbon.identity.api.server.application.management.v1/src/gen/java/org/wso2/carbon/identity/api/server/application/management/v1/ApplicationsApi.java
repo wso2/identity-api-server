@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -42,6 +42,9 @@ import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtoco
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPICreationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretCreationRequest;
+import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretList;
+import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticatorsModal;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
@@ -189,6 +192,31 @@ public class ApplicationsApi  {
     }
 
     @Valid
+    @POST
+    @Path("/{applicationId}/inbound-protocols/oidc/secrets")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Create a new OAuth2/OIDC client secret.", notes = "This API creates a new client secret for the application. Existing secrets, access tokens, refresh tokens, and authorization codes remain valid.  <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_create` ", response = ClientSecretResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Inbound Protocols - OAuth / OIDC", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 201, message = "Client secret created.", response = ClientSecretResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 409, message = "Conflict — client secret limit reached for the application.", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response createOAuthClientSecret(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "" ) @Valid ClientSecretCreationRequest clientSecretCreationRequest) {
+
+        return delegate.createOAuthClientSecret(applicationId,  clientSecretCreationRequest );
+    }
+
+    @Valid
     @DELETE
     @Path("/{applicationId}")
     
@@ -328,6 +356,31 @@ public class ApplicationsApi  {
     public Response deleteInboundSAMLConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.deleteInboundSAMLConfiguration(applicationId );
+    }
+
+    @Valid
+    @DELETE
+    @Path("/{applicationId}/inbound-protocols/oidc/secrets/{secretId}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Delete a specific OAuth2/OIDC client secret.", notes = "This API deletes the client secret identified by `secretId`. The application's most recently added active secret cannot be deleted — at least one active secret must remain per application.  <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_create` ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Inbound Protocols - OAuth / OIDC", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "Client secret deleted.", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 409, message = "Conflict — cannot delete the last active client secret.", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response deleteOAuthClientSecret(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "ID of the client secret to delete.",required=true) @PathParam("secretId") String secretId) {
+
+        return delegate.deleteOAuthClientSecret(applicationId,  secretId );
     }
 
     @Valid
@@ -521,7 +574,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response getAllApplications(    @Valid @Min(1)@ApiParam(value = "Maximum number of records to return. ", defaultValue="30") @DefaultValue("30")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Number of records to skip for pagination. ", defaultValue="0") @DefaultValue("0")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew', and 'eq' operations with 'and', 'or' logical operators. Note that 'and' and 'or' operators in filters follow the general precedence of logical operators. For example, A and B or C and D = (A and B) or (C and D)). Currently supports only filtering based on the 'name', the 'clientId', and the 'issuer' attributes.  /applications?filter=name+eq+user_portal <br> /applications?filter=name+co+prod+or+clientId+co+123 ")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Define the order in which the retrieved records should be sorted. _This parameter is not supported yet._ ", allowableValues="ASC, DESC")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _This parameter is not supported yet._ ")  @QueryParam("sortBy") String sortBy,     @Valid@ApiParam(value = "Specifies the required parameters in the response. Only 'advancedConfigurations', 'templateId', 'templateVersion', 'clientId', 'issuer',  and 'associatedRoles.allowedAudience' attributes are currently supported.  /applications?attributes=advancedConfigurations,templateId,templateVersion,clientId,issuer, associatedRoles.allowedAudience ")  @QueryParam("attributes") String attributes,     @Valid@ApiParam(value = "Specifies whether to include or exclude system portals in the response.  Default will be treated as false if parameter is not preset in the request.  /applications?excludeSystemPortals=true ")  @QueryParam("excludeSystemPortals") Boolean excludeSystemPortals) {
+    public Response getAllApplications(    @Valid @Min(1)@ApiParam(value = "Maximum number of records to return. ", defaultValue="30") @DefaultValue("30")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Number of records to skip for pagination. ", defaultValue="0") @DefaultValue("0")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew', and 'eq' operations with 'and', 'or' logical operators. Note that 'and' and 'or' operators in filters follow the general precedence of logical operators. For example, A and B or C and D = (A and B) or (C and D)). Currently supports only filtering based on the 'name', the 'clientId', and the 'issuer' attributes.  /applications?filter=name+eq+user_portal <br> /applications?filter=name+co+prod+or+clientId+co+123 ")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Define the order in which the retrieved records should be sorted. _This parameter is not supported yet._ ", allowableValues="ASC, DESC")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _This parameter is not supported yet._ ")  @QueryParam("sortBy") String sortBy,     @Valid@ApiParam(value = "Specifies the required parameters in the response. Only 'advancedConfigurations', 'templateId', 'templateVersion', 'clientId', 'issuer', and 'associatedRoles.allowedAudience' attributes are currently supported.  /applications?attributes=advancedConfigurations,templateId,templateVersion,clientId,issuer, associatedRoles.allowedAudience ")  @QueryParam("attributes") String attributes,     @Valid@ApiParam(value = "Specifies whether to include or exclude system portals in the response.  Default will be treated as false if parameter is not preset in the request.  /applications?excludeSystemPortals=true ")  @QueryParam("excludeSystemPortals") Boolean excludeSystemPortals) {
 
         return delegate.getAllApplications(limit,  offset,  filter,  sortOrder,  sortBy,  attributes,  excludeSystemPortals );
     }
@@ -835,6 +888,54 @@ public class ApplicationsApi  {
 
     @Valid
     @GET
+    @Path("/{applicationId}/inbound-protocols/oidc/secrets/{secretId}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Get a specific client secret's metadata.", notes = "This API returns the metadata of the client secret identified by `secretId`.  <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_view` ", response = ClientSecretResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Inbound Protocols - OAuth / OIDC", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = ClientSecretResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getOAuthClientSecret(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "ID of the client secret.",required=true) @PathParam("secretId") String secretId) {
+
+        return delegate.getOAuthClientSecret(applicationId,  secretId );
+    }
+
+    @Valid
+    @GET
+    @Path("/{applicationId}/inbound-protocols/oidc/secrets")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "List client secrets of the application.", notes = "This API returns metadata of all client secrets attached to the application.  <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_view` ", response = ClientSecretList.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Inbound Protocols - OAuth / OIDC", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = ClientSecretList.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getOAuthClientSecrets(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
+
+        return delegate.getOAuthClientSecrets(applicationId );
+    }
+
+    @Valid
+    @GET
     @Path("/meta/inbound-protocols/oidc")
     
     @Produces({ "application/json" })
@@ -1093,9 +1194,8 @@ public class ApplicationsApi  {
     @Valid
     @POST
     @Path("/{applicationId}/inbound-protocols/oidc/regenerate-secret")
-    
     @Produces({ "application/json" })
-    @ApiOperation(value = "Regenerate the OAuth2/OIDC client secret. ", notes = "This API regenerates the OAuth2/OIDC client secret. <br>   <b>Scope(Permission) required:</b> `internal_application_mgt_create` ", response = OpenIDConnectConfiguration.class, authorizations = {
+    @ApiOperation(value = "Regenerate the OAuth2/OIDC client secret. ", notes = "This API regenerates a new client secret. Existing secrets, access tokens, refresh tokens, and authorization codes are revoked.  <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_create` ", response = OpenIDConnectConfiguration.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -1109,7 +1209,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response regenerateOAuthClientSecret(@ApiParam(value = "ID of the application",required=true) @PathParam("applicationId") String applicationId) {
+    public Response regenerateOAuthClientSecret(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.regenerateOAuthClientSecret(applicationId );
     }
@@ -1119,7 +1219,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/oidc/revoke")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Revoke the OAuth2/OIDC client of application. ", notes = "This API revokes the OAuth2/OIDC client secret. To re-activate the client, the client secret needs to be regenerated. <br>   <b>Scope(Permission) required:</b> `internal_application_mgt_create` ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Revoke the OAuth2/OIDC client of application. ", notes = "This API revokes the OAuth2/OIDC client of application and all the client secrets. To re-activate the client, a client secret needs to be regenerated. <br>   <b>Scope(Permission) required:</b> `internal_application_mgt_create` ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             

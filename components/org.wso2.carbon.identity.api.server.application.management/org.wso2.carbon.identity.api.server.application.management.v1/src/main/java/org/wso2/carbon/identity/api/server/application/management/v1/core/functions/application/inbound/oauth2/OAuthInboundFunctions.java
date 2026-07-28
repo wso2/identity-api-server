@@ -21,6 +21,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
+import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretCreationRequest;
+import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretList;
+import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
@@ -36,9 +39,12 @@ import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceClientException;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceException;
 import org.wso2.carbon.identity.cors.mgt.core.model.CORSOrigin;
+import org.wso2.carbon.identity.oauth.Error;
 import org.wso2.carbon.identity.oauth.IdentityOAuthAdminException;
 import org.wso2.carbon.identity.oauth.IdentityOAuthClientException;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
+import org.wso2.carbon.identity.oauth.dto.OAuthClientSecretRequestDTO;
+import org.wso2.carbon.identity.oauth.dto.OAuthClientSecretResponseDTO;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 
 import java.util.List;
@@ -48,6 +54,9 @@ import java.util.stream.Collectors;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.VIEW_APPLICATION_CLIENT_SECRET_OPERATION;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildClientError;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildConflictError;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotFoundError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildServerError;
 import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.OAUTH2;
 
@@ -159,6 +168,26 @@ public class OAuthInboundFunctions {
     }
 
     /**
+     * Build an APIError for a failed client secret operation, propagating the backend error code and mapping it
+     * to the appropriate HTTP status.
+     */
+    private static APIError handleClientSecretException(Exception e, String contextMessage) {
+
+        if (e instanceof IdentityOAuthClientException) {
+            String errorCode = ((IdentityOAuthClientException) e).getErrorCode();
+            if (Error.INVALID_SECRET_ID.getErrorCode().equals(errorCode)) {
+                return buildNotFoundError(errorCode, contextMessage, e.getMessage());
+            }
+            if (Error.CLIENT_SECRET_LIMIT_REACHED.getErrorCode().equals(errorCode)
+                    || Error.INVALID_DELETE.getErrorCode().equals(errorCode)) {
+                return buildConflictError(errorCode, contextMessage, e.getMessage());
+            }
+            return buildClientError(errorCode, contextMessage, e.getMessage());
+        }
+        return buildServerError(contextMessage, e);
+    }
+
+    /**
      * @deprecated This method will be removed in the upcoming major release.
      * Because, service provider name should be passed to create oauth app name.
      * Use {@link #createOAuthInbound(String, OpenIDConnectConfiguration)} instead.
@@ -210,8 +239,6 @@ public class OAuthInboundFunctions {
 
             OpenIDConnectConfiguration openIDConnectConfiguration = new OAuthConsumerAppToApiModel().apply(oauthApp);
 
-            removeClientSecretIfUnauthorized(openIDConnectConfiguration);
-
             // Set CORS origins as allowed domains.
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             String applicationResourceId = ApplicationManagementServiceHolder.getApplicationManagementService()
@@ -221,6 +248,9 @@ public class OAuthInboundFunctions {
             openIDConnectConfiguration.setAllowedOrigins(corsOriginList.stream().map(CORSOrigin::getOrigin)
                     .collect(Collectors.toList()));
 
+            // Strip the secret-related properties for a caller without the dedicated view scope.
+            removeClientSecretPropertiesIfUnauthorized(openIDConnectConfiguration);
+
             return openIDConnectConfiguration;
 
         } catch (IdentityOAuthAdminException | IdentityApplicationManagementException
@@ -229,7 +259,8 @@ public class OAuthInboundFunctions {
         }
     }
 
-    private static void removeClientSecretIfUnauthorized(OpenIDConnectConfiguration openIDConnectConfiguration) {
+    private static void removeClientSecretPropertiesIfUnauthorized(
+            OpenIDConnectConfiguration openIDConnectConfiguration) {
 
         if (Boolean.parseBoolean(IdentityUtil.getProperty(
                 ApplicationManagementConstants.SKIP_ENFORCE_CLIENT_SECRET_UPDATE_PERMISSION))) {
@@ -239,8 +270,11 @@ public class OAuthInboundFunctions {
         try {
             AuthorizationUtil.validateOperationScopes(VIEW_APPLICATION_CLIENT_SECRET_OPERATION);
         } catch (ForbiddenException e) {
-            // Removing the client secret if operation scope is not present.
+            /* Remove the client secret and its related properties when the operation scope is not present, so the
+               response carries no client secret information for callers without the dedicated view scope. */
             openIDConnectConfiguration.setClientSecret(null);
+            openIDConnectConfiguration.setClientSecretExpiresAt(null);
+            openIDConnectConfiguration.setMultipleClientSecretsConfigured(null);
         }
     }
 
@@ -262,8 +296,70 @@ public class OAuthInboundFunctions {
                     .getOAuthAdminService().updateAndRetrieveOauthSecretKey(clientId);
             return new OAuthConsumerAppToApiModel().apply(oAuthConsumerAppDTO);
         } catch (IdentityOAuthAdminException e) {
-            throw buildServerError("Error while regenerating client secret of oauth application.", e);
+            throw handleException(e);
         }
+    }
+
+    public static ClientSecretResponse createClientSecret(String clientId,
+                                                            ClientSecretCreationRequest request) {
+
+        OAuthClientSecretRequestDTO secretRequest = new OAuthClientSecretRequestDTO();
+        if (request != null) {
+            secretRequest.setExpiryTime(request.getExpiresAt());
+        }
+        try {
+            OAuthClientSecretResponseDTO created = ApplicationManagementServiceHolder.getOAuthAdminService()
+                    .createOAuthClientSecret(clientId, secretRequest);
+            return toClientSecretResponse(created);
+        } catch (IdentityOAuthAdminException e) {
+            throw handleClientSecretException(e, "Error while creating the client secret.");
+        }
+    }
+
+    public static ClientSecretList getClientSecrets(String clientId) {
+
+        try {
+            List<OAuthClientSecretResponseDTO> secrets =
+                    ApplicationManagementServiceHolder.getOAuthAdminService().getOAuthClientSecrets(clientId);
+            ClientSecretList list = new ClientSecretList();
+            list.setCount(secrets.size());
+            list.setList(secrets.stream().map(OAuthInboundFunctions::toClientSecretResponse)
+                    .collect(Collectors.toList()));
+            return list;
+        } catch (IdentityOAuthAdminException e) {
+            throw handleClientSecretException(e, "Error while listing the client secrets.");
+        }
+    }
+
+    public static ClientSecretResponse getClientSecret(String clientId, String secretId) {
+
+        try {
+            OAuthClientSecretResponseDTO secret = ApplicationManagementServiceHolder.getOAuthAdminService()
+                    .getOAuthClientSecret(clientId, secretId);
+            return toClientSecretResponse(secret);
+        } catch (IdentityOAuthAdminException e) {
+            throw handleClientSecretException(e, "Error while retrieving the client secret.");
+        }
+    }
+
+    public static void deleteClientSecret(String clientId, String secretId) {
+
+        try {
+            ApplicationManagementServiceHolder.getOAuthAdminService().removeOAuthClientSecret(clientId, secretId);
+        } catch (IdentityOAuthAdminException e) {
+            throw handleClientSecretException(e, "Error while deleting the client secret.");
+        }
+    }
+
+    private static ClientSecretResponse toClientSecretResponse(OAuthClientSecretResponseDTO dto) {
+
+        ClientSecretResponse response = new ClientSecretResponse();
+        response.setSecretId(dto.getSecretId());
+        response.setSecretValue(dto.getSecretValue());
+        response.setExpiresAt(dto.getExpiryTime());
+        response.setStatus(ClientSecretResponse.StatusEnum.valueOf(dto.getStatus().name()));
+        response.setLatest(dto.isLatest());
+        return response;
     }
 
     public static void revokeOAuthClient(String clientId) {

@@ -20,6 +20,7 @@ package org.wso2.carbon.identity.api.server.application.management.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
@@ -48,6 +49,8 @@ public class OpenIDConnectConfiguration  {
   
     private String clientId;
     private String clientSecret;
+    private Long clientSecretExpiresAt;
+    private Boolean multipleClientSecretsConfigured;
 
 @XmlType(name="StateEnum")
 @XmlEnum(String.class)
@@ -142,6 +145,44 @@ public enum StateEnum {
     }
     public void setClientSecret(String clientSecret) {
         this.clientSecret = clientSecret;
+    }
+
+    /**
+    * Expiry time of the client secret as Unix epoch seconds; 0 if it never expires. On creation, sets the initial secret&#39;s expiry. Present in responses and effective in requests only when multiple client secrets are enabled.
+    **/
+    public OpenIDConnectConfiguration clientSecretExpiresAt(Long clientSecretExpiresAt) {
+
+        this.clientSecretExpiresAt = clientSecretExpiresAt;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "1761568483", value = "Expiry time of the client secret as Unix epoch seconds; 0 if it never expires. On creation, sets the initial secret's expiry. Present in responses and effective in requests only when multiple client secrets are enabled.")
+    @JsonProperty("clientSecretExpiresAt")
+    @Valid
+    public Long getClientSecretExpiresAt() {
+        return clientSecretExpiresAt;
+    }
+    public void setClientSecretExpiresAt(Long clientSecretExpiresAt) {
+        this.clientSecretExpiresAt = clientSecretExpiresAt;
+    }
+
+    /**
+    * Whether the application has more than one client secret configured. When true, the full set can be retrieved via the client secrets sub-resource. Present only when multiple client secrets are enabled.
+    **/
+    public OpenIDConnectConfiguration multipleClientSecretsConfigured(Boolean multipleClientSecretsConfigured) {
+
+        this.multipleClientSecretsConfigured = multipleClientSecretsConfigured;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "true", value = "Whether the application has more than one client secret configured. When true, the full set can be retrieved via the client secrets sub-resource. Present only when multiple client secrets are enabled.")
+    @JsonProperty("multipleClientSecretsConfigured")
+    @Valid
+    public Boolean getMultipleClientSecretsConfigured() {
+        return multipleClientSecretsConfigured;
+    }
+    public void setMultipleClientSecretsConfigured(Boolean multipleClientSecretsConfigured) {
+        this.multipleClientSecretsConfigured = multipleClientSecretsConfigured;
     }
 
     /**
@@ -608,6 +649,8 @@ public enum StateEnum {
         OpenIDConnectConfiguration openIDConnectConfiguration = (OpenIDConnectConfiguration) o;
         return Objects.equals(this.clientId, openIDConnectConfiguration.clientId) &&
             Objects.equals(this.clientSecret, openIDConnectConfiguration.clientSecret) &&
+            Objects.equals(this.clientSecretExpiresAt, openIDConnectConfiguration.clientSecretExpiresAt) &&
+            Objects.equals(this.multipleClientSecretsConfigured, openIDConnectConfiguration.multipleClientSecretsConfigured) &&
             Objects.equals(this.state, openIDConnectConfiguration.state) &&
             Objects.equals(this.grantTypes, openIDConnectConfiguration.grantTypes) &&
             Objects.equals(this.callbackURLs, openIDConnectConfiguration.callbackURLs) &&
@@ -636,7 +679,7 @@ public enum StateEnum {
     @Override
     public int hashCode() {
 
-        return Objects.hash(clientId, clientSecret, state, grantTypes, callbackURLs, allowedOrigins, publicClient, pkce, accessToken, hybridFlow, refreshToken, subjectToken, idToken, logout, validateRequestObjectSignature, scopeValidators, clientAuthentication, requestObject, pushAuthorizationRequest, subject, isFAPIApplication, fapiMetadata, cibaAuthenticationRequest, issuer);
+        return Objects.hash(clientId, clientSecret, clientSecretExpiresAt, multipleClientSecretsConfigured, state, grantTypes, callbackURLs, allowedOrigins, publicClient, pkce, accessToken, hybridFlow, refreshToken, subjectToken, idToken, logout, validateRequestObjectSignature, scopeValidators, clientAuthentication, requestObject, pushAuthorizationRequest, subject, isFAPIApplication, fapiMetadata, cibaAuthenticationRequest, issuer);
     }
 
     @Override
@@ -647,6 +690,8 @@ public enum StateEnum {
         
         sb.append("    clientId: ").append(toIndentedString(clientId)).append("\n");
         sb.append("    clientSecret: ").append(toIndentedString(clientSecret)).append("\n");
+        sb.append("    clientSecretExpiresAt: ").append(toIndentedString(clientSecretExpiresAt)).append("\n");
+        sb.append("    multipleClientSecretsConfigured: ").append(toIndentedString(multipleClientSecretsConfigured)).append("\n");
         sb.append("    state: ").append(toIndentedString(state)).append("\n");
         sb.append("    grantTypes: ").append(toIndentedString(grantTypes)).append("\n");
         sb.append("    callbackURLs: ").append(toIndentedString(callbackURLs)).append("\n");

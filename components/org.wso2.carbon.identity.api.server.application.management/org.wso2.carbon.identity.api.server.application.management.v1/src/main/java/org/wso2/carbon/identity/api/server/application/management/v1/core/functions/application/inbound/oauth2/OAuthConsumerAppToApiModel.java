@@ -59,6 +59,8 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
         return new OpenIDConnectConfiguration()
                 .clientId(oauthAppDTO.getOauthConsumerKey())
                 .clientSecret(oauthAppDTO.getOauthConsumerSecret())
+                .clientSecretExpiresAt(oauthAppDTO.getOauthConsumerSecretExpiryTime())
+                .multipleClientSecretsConfigured(oauthAppDTO.getMultipleConsumerSecretsConfigured())
                 .state(OpenIDConnectConfiguration.StateEnum.valueOf(oauthAppDTO.getState()))
                 .grantTypes(buildGrantTypeList(oauthAppDTO))
                 .publicClient(oauthAppDTO.isBypassClientCredentials())
