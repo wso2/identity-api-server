@@ -139,7 +139,7 @@ public class PolicyManagementService {
      * @param filter Name substring filter; null or blank returns all policies.
      * @return Paginated policy list response.
      */
-    public PolicyListResponse getPolicies(Integer limit, Integer offset, String filter) {
+    public PolicyListResponse getPoliciesBasicInfo(Integer limit, Integer offset, String filter) {
 
         int resolvedLimit = limit != null ? limit : DEFAULT_LIMIT;
         int resolvedOffset = offset != null ? offset : DEFAULT_OFFSET;
