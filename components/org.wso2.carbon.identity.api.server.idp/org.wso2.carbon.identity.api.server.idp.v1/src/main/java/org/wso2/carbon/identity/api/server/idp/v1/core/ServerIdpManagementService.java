@@ -215,7 +215,7 @@ public class ServerIdpManagementService {
             }
             return createIDPListResponse(identityProviderManager.getIdPs(limit, offset, filter, sortOrder, sortBy,
                             ContextLoader.getTenantDomainFromContext(), requestedAttributeList,
-                            SharedIdPResolveType.BASE_PARENT),
+                            SharedIdPResolveType.BASE_RESOLVED),
                     requestedAttributeList);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_IDPS, null);
@@ -279,7 +279,7 @@ public class ServerIdpManagementService {
 
         try {
             IdentityProvider identityProvider = identityProviderManager.getIdPByResourceId(idpId,
-                            ContextLoader.getTenantDomainFromContext(), true, SharedIdPResolveType.BASE_PARENT);
+                            ContextLoader.getTenantDomainFromContext(), true, SharedIdPResolveType.BASE_RESOLVED);
             if (identityProvider == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
@@ -722,7 +722,7 @@ public class ServerIdpManagementService {
 
         try {
             IdentityProvider idP = identityProviderManager.getIdPByResourceId(idpId, ContextLoader
-                    .getTenantDomainFromContext(), true, SharedIdPResolveType.BASE_PARENT);
+                    .getTenantDomainFromContext(), true, SharedIdPResolveType.BASE_RESOLVED);
 
             if (idP == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
@@ -755,7 +755,7 @@ public class ServerIdpManagementService {
 
         try {
             IdentityProvider idp = identityProviderManager.getIdPByResourceId(idpId, ContextLoader
-                    .getTenantDomainFromContext(), true, SharedIdPResolveType.BASE_PARENT);
+                    .getTenantDomainFromContext(), true, SharedIdPResolveType.BASE_RESOLVED);
             if (idp == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
@@ -875,7 +875,7 @@ public class ServerIdpManagementService {
 
         try {
             IdentityProvider idp = identityProviderManager.getIdPByResourceId(idpId, ContextLoader
-                    .getTenantDomainFromContext(), true, SharedIdPResolveType.BASE_PARENT);
+                    .getTenantDomainFromContext(), true, SharedIdPResolveType.BASE_RESOLVED);
             if (idp == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
@@ -915,7 +915,7 @@ public class ServerIdpManagementService {
 
         try {
             IdentityProvider idp = identityProviderManager.getIdPByResourceId(idpId, ContextLoader
-                    .getTenantDomainFromContext(), true, SharedIdPResolveType.BASE_PARENT);
+                    .getTenantDomainFromContext(), true, SharedIdPResolveType.BASE_RESOLVED);
             if (idp == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
@@ -1037,7 +1037,7 @@ public class ServerIdpManagementService {
 
         try {
             IdentityProvider identityProvider = identityProviderManager.getIdPByResourceId(idpId, ContextLoader
-                    .getTenantDomainFromContext(), true, SharedIdPResolveType.BASE_PARENT);
+                    .getTenantDomainFromContext(), true, SharedIdPResolveType.BASE_RESOLVED);
             if (identityProvider == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
@@ -1085,7 +1085,7 @@ public class ServerIdpManagementService {
 
         try {
             IdentityProvider identityProvider = identityProviderManager.getIdPByResourceId(idpId, ContextLoader
-                    .getTenantDomainFromContext(), true, SharedIdPResolveType.BASE_PARENT);
+                    .getTenantDomainFromContext(), true, SharedIdPResolveType.BASE_RESOLVED);
             if (identityProvider == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
@@ -1132,7 +1132,7 @@ public class ServerIdpManagementService {
 
         try {
             IdentityProvider identityProvider = identityProviderManager.getIdPByResourceId(idpId,
-                    ContextLoader.getTenantDomainFromContext(), true, SharedIdPResolveType.BASE_PARENT);
+                    ContextLoader.getTenantDomainFromContext(), true, SharedIdPResolveType.BASE_RESOLVED);
             if (identityProvider == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
@@ -1180,7 +1180,7 @@ public class ServerIdpManagementService {
 
         try {
             IdentityProvider identityProvider = identityProviderManager.getIdPByResourceId(idpId, ContextLoader
-                    .getTenantDomainFromContext(), true, SharedIdPResolveType.BASE_PARENT);
+                    .getTenantDomainFromContext(), true, SharedIdPResolveType.BASE_RESOLVED);
             if (identityProvider == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
@@ -1195,7 +1195,7 @@ public class ServerIdpManagementService {
 
         try {
             IdentityProvider identityProvider = identityProviderManager.getIdPByResourceId(idpId, ContextLoader
-                    .getTenantDomainFromContext(), true, SharedIdPResolveType.BASE_PARENT);
+                    .getTenantDomainFromContext(), true, SharedIdPResolveType.BASE_RESOLVED);
             if (identityProvider == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
@@ -1239,7 +1239,7 @@ public class ServerIdpManagementService {
 
         try {
             IdentityProvider identityProvider = identityProviderManager.getIdPByResourceId(idpId, ContextLoader
-                            .getTenantDomainFromContext(), true, SharedIdPResolveType.BASE_PARENT);
+                            .getTenantDomainFromContext(), true, SharedIdPResolveType.BASE_RESOLVED);
             if (identityProvider == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
@@ -2451,7 +2451,7 @@ public class ServerIdpManagementService {
             return null;
         }
         for (IdentityProviderProperty property : idpProperties) {
-            if (IdentityProvider.IS_SHARED_IDP_PROPERTY.equals(property.getName())) {
+            if (IdPManagementConstants.IS_SHARED_IDP_PROPERTY.equals(property.getName())) {
                 return Boolean.parseBoolean(property.getValue());
             }
         }

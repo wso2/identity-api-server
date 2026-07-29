@@ -65,6 +65,7 @@ import org.wso2.carbon.idp.mgt.IdpManager;
 import org.wso2.carbon.idp.mgt.model.ConnectedAppsResult;
 import org.wso2.carbon.idp.mgt.model.IdpSearchResult;
 import org.wso2.carbon.idp.mgt.model.SharedIdPResolveType;
+import org.wso2.carbon.idp.mgt.util.IdPManagementConstants;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -158,7 +159,7 @@ public class ServerAuthenticatorManagementService {
             if (idPCountToBeRetrieved > 0 && StringUtils.isBlank(filter)) {
                 IdpSearchResult idpSearchResult = idpManager.getIdPs(idPCountToBeRetrieved, null, null,
                         null, null, ContextLoader.getTenantDomainFromContext(), requestedAttributeList,
-                        SharedIdPResolveType.BASE_PARENT);
+                        SharedIdPResolveType.BASE_RESOLVED);
                 identityProviders = idpSearchResult.getIdPs();
             }
 
@@ -404,7 +405,7 @@ public class ServerAuthenticatorManagementService {
             try {
                 idpSearchResult = idpManager.getIdPs(idPCountToBeRetrieved, null, null, null,
                                 ContextLoader.getTenantDomainFromContext(), requestedAttributeList,
-                                expressionNodesForIdp, SharedIdPResolveType.BASE_PARENT);
+                                expressionNodesForIdp, SharedIdPResolveType.BASE_RESOLVED);
                 identityProviders = idpSearchResult.getIdPs();
                 if (identityProviders != null) {
                     addIdPsToAuthenticatorList(maximumItemsPerPage, identityProviders, authenticators,
@@ -550,7 +551,7 @@ public class ServerAuthenticatorManagementService {
             return null;
         }
         for (IdentityProviderProperty property : idpProperties) {
-            if (IdentityProvider.IS_SHARED_IDP_PROPERTY.equals(property.getName())) {
+            if (IdPManagementConstants.IS_SHARED_IDP_PROPERTY.equals(property.getName())) {
                 return Boolean.parseBoolean(property.getValue());
             }
         }
@@ -919,7 +920,7 @@ public class ServerAuthenticatorManagementService {
         try {
             IdpSearchResult idpSearchResult = idpManager.getIdPs(limit, (offSet + limit), null, null,
                     ContextLoader.getTenantDomainFromContext(), requestedAttributeList, expressionNodes,
-                    SharedIdPResolveType.BASE_PARENT);
+                    SharedIdPResolveType.BASE_RESOLVED);
             identityProviders.addAll(idpSearchResult.getIdPs());
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_IDPS, null);
