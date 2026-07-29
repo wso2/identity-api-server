@@ -33,12 +33,10 @@ import javax.xml.bind.annotation.*;
 public class DeviceResponse  {
   
     private String id;
-    private String userId;
     private String deviceName;
     private String deviceModel;
     private String status;
     private String registeredAt;
-    private String metadata;
 
     /**
     * The device UUID.
@@ -57,25 +55,6 @@ public class DeviceResponse  {
     }
     public void setId(String id) {
         this.id = id;
-    }
-
-    /**
-    * The user identifier who owns the device.
-    **/
-    public DeviceResponse userId(String userId) {
-
-        this.userId = userId;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "kaviska", value = "The user identifier who owns the device.")
-    @JsonProperty("userId")
-    @Valid
-    public String getUserId() {
-        return userId;
-    }
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 
     /**
@@ -154,25 +133,6 @@ public class DeviceResponse  {
         this.registeredAt = registeredAt;
     }
 
-    /**
-    * Additional non-sensitive metadata associated with the device.
-    **/
-    public DeviceResponse metadata(String metadata) {
-
-        this.metadata = metadata;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "{\"osVersion\":\"17.0\",\"deviceType\":\"mobile\",\"manufacturer\":\"Apple\"}", value = "Additional non-sensitive metadata associated with the device.")
-    @JsonProperty("metadata")
-    @Valid
-    public String getMetadata() {
-        return metadata;
-    }
-    public void setMetadata(String metadata) {
-        this.metadata = metadata;
-    }
-
 
 
     @Override
@@ -186,17 +146,15 @@ public class DeviceResponse  {
         }
         DeviceResponse deviceResponse = (DeviceResponse) o;
         return Objects.equals(this.id, deviceResponse.id) &&
-            Objects.equals(this.userId, deviceResponse.userId) &&
             Objects.equals(this.deviceName, deviceResponse.deviceName) &&
             Objects.equals(this.deviceModel, deviceResponse.deviceModel) &&
             Objects.equals(this.status, deviceResponse.status) &&
-            Objects.equals(this.registeredAt, deviceResponse.registeredAt) &&
-            Objects.equals(this.metadata, deviceResponse.metadata);
+            Objects.equals(this.registeredAt, deviceResponse.registeredAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userId, deviceName, deviceModel, status, registeredAt, metadata);
+        return Objects.hash(id, deviceName, deviceModel, status, registeredAt);
     }
 
     @Override
@@ -206,12 +164,10 @@ public class DeviceResponse  {
         sb.append("class DeviceResponse {\n");
         
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
-        sb.append("    userId: ").append(toIndentedString(userId)).append("\n");
         sb.append("    deviceName: ").append(toIndentedString(deviceName)).append("\n");
         sb.append("    deviceModel: ").append(toIndentedString(deviceModel)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("    registeredAt: ").append(toIndentedString(registeredAt)).append("\n");
-        sb.append("    metadata: ").append(toIndentedString(metadata)).append("\n");
         sb.append("}");
         return sb.toString();
     }

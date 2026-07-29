@@ -263,10 +263,6 @@ components:
           type: string
           description: The device UUID.
           example: "74070bae-df8c-42bf-8754-5173c237c936"
-        userId:
-          type: string
-          description: The user identifier who owns the device.
-          example: "kaviska"
         deviceName:
           type: string
           description: The display name of the device.
@@ -283,10 +279,6 @@ components:
           type: string
           description: The timestamp when the device was registered, in ISO-8601 format.
           example: "2026-04-27T10:00:00.000Z"
-        metadata:
-          type: string
-          description: Additional non-sensitive metadata associated with the device.
-          example: "{\"osVersion\":\"17.0\",\"deviceType\":\"mobile\",\"manufacturer\":\"Apple\"}"
     DevicePatchRequest:
       type: object
       required:

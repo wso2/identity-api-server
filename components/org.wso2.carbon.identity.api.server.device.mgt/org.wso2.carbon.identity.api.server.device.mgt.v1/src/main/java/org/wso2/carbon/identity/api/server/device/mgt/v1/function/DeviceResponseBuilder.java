@@ -37,7 +37,6 @@ public class DeviceResponseBuilder {
 
         DeviceResponse response = new DeviceResponse();
         response.setId(device.getId());
-        response.setUserId(device.getUserId());
         response.setDeviceName(device.getDeviceName());
         response.setDeviceModel(device.getDeviceModel());
         if (device.getStatus() != null) {
@@ -46,7 +45,6 @@ public class DeviceResponseBuilder {
         if (device.getRegisteredAt() != null) {
             response.setRegisteredAt(device.getRegisteredAt().toInstant().toString());
         }
-        response.setMetadata(device.getMetadata());
         return response;
     }
 }
