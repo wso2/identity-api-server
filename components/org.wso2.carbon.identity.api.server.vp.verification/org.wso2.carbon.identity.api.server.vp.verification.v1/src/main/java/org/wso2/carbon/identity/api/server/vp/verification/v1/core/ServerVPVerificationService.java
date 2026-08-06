@@ -152,7 +152,7 @@ public class ServerVPVerificationService {
             for (PresentationMetadata meta : metadataList) {
                 Credential cred = new Credential();
                 cred.setType(meta.getCredentialType());
-                cred.setIssuer(meta.getIssuerDid());
+                cred.setIssuer(meta.getIssuer());
                 cred.setSigningAlgorithm(meta.getAlgorithm());
                 if (meta.getIssuedAt() != null) {
                     cred.setIssuedAt(Instant.ofEpochMilli(meta.getIssuedAt()).toString());
@@ -172,13 +172,6 @@ public class ServerVPVerificationService {
             }
         }
         p.setCredentials(credentials);
-
-        // ── Holder — only emitted when a sub claim was present in the credential ─
-        if (firstMeta != null && StringUtils.isNotBlank(firstMeta.getHolderDid())) {
-            Holder holder = new Holder();
-            holder.setId(firstMeta.getHolderDid());
-            p.setHolder(holder);
-        }
 
         // ── Key Binding — use first credential that carried a verified KB-JWT ─
         // All KB-JWTs in a VP share the same nonce and audience, so any one is representative.
