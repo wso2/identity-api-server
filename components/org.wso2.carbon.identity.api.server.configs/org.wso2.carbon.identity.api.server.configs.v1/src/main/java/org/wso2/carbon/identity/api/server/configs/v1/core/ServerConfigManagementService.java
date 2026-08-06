@@ -69,7 +69,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationConfigu
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.OpenID4VPConfiguration;
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.exception.VPAuthenticatorException;
-import org.wso2.carbon.identity.openid4vc.presentation.authenticator.service.OpenID4VPConfigService;
+import org.wso2.carbon.identity.openid4vc.presentation.authenticator.service.VPConfigService;
 import org.wso2.carbon.identity.openid4vc.presentation.common.constant.OpenID4VPConstants;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthOAuth2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
@@ -697,22 +697,18 @@ public class ServerConfigManagementService {
     public OpenID4VPConfiguration getOpenID4VPConfiguration() {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
-        OpenID4VPConfigService configService = ConfigsServiceHolder.getOpenID4VPConfigService();
+        VPConfigService configService = ConfigsServiceHolder.getOpenID4VPConfigService();
         if (configService == null) {
             throw handleException(Response.Status.NOT_IMPLEMENTED,
                     Constants.ErrorMessage.ERROR_CODE_OID4VP_NOT_ENABLED, null);
         }
         try {
-            OpenID4VPConfigService.TenantConfig cfg = configService.getConfig(tenantDomain);
+            VPConfigService.TenantConfig cfg = configService.getConfig(tenantDomain);
             return new OpenID4VPConfiguration()
                     .clientIdScheme(StringUtils.defaultIfBlank(
                             cfg.getClientIdScheme(), OpenID4VPConstants.Defaults.CLIENT_ID_SCHEME))
                     .responseMode(StringUtils.defaultIfBlank(
-                            cfg.getResponseMode(), OpenID4VPConstants.Defaults.RESPONSE_MODE))
-                    .registrationCertificate(cfg.getRegistrationCertificate())
-                    .rejectVcWithoutStatusClaim(
-                            cfg.getRejectVcWithoutStatusClaim() != null
-                                    ? cfg.getRejectVcWithoutStatusClaim() : Boolean.FALSE);
+                            cfg.getResponseMode(), OpenID4VPConstants.Defaults.RESPONSE_MODE));
         } catch (VPAuthenticatorException e) {
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     Constants.ErrorMessage.ERROR_CODE_OID4VP_CONFIG_RETRIEVE, null);
@@ -728,17 +724,15 @@ public class ServerConfigManagementService {
     public OpenID4VPConfiguration updateOpenID4VPConfiguration(OpenID4VPConfiguration config) {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
-        OpenID4VPConfigService configService = ConfigsServiceHolder.getOpenID4VPConfigService();
+        VPConfigService configService = ConfigsServiceHolder.getOpenID4VPConfigService();
         if (configService == null) {
             throw handleException(Response.Status.NOT_IMPLEMENTED,
                     Constants.ErrorMessage.ERROR_CODE_OID4VP_NOT_ENABLED, null);
         }
         try {
-            OpenID4VPConfigService.TenantConfig tenantConfig = new OpenID4VPConfigService.TenantConfig();
+            VPConfigService.TenantConfig tenantConfig = new VPConfigService.TenantConfig();
             tenantConfig.setClientIdScheme(config.getClientIdScheme());
             tenantConfig.setResponseMode(config.getResponseMode());
-            tenantConfig.setRegistrationCertificate(config.getRegistrationCertificate());
-            tenantConfig.setRejectVcWithoutStatusClaim(config.getRejectVcWithoutStatusClaim());
             configService.setConfig(tenantConfig, tenantDomain);
             return config;
         } catch (VPAuthenticatorException e) {

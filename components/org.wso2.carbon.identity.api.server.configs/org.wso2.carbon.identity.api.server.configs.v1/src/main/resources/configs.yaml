@@ -2846,7 +2846,6 @@ components:
             The client_id_scheme used when building the Verifiable Presentation request JWT.
             Determines how the verifier identifies itself to the wallet.
           enum:
-            - redirect_uri
             - x509_san_dns
             - x509_hash
           example: x509_san_dns
@@ -2859,18 +2858,7 @@ components:
             - direct_post
             - direct_post.jwt
           example: direct_post
-        registrationCertificate:
-          type: string
-          description: >
-            Optional verifier attestation JWT (rc-wrp+jwt) issued by a trust anchor.
-            Used for wallet registration. Leave blank if not applicable.
-          example: eyJ0eXAiOiJyYy13cnArand0IiwieDVjIjpbIi4uLiJdfQ.eyJzdWIiOiJleGFtcGxlIn0.signature
-        rejectVcWithoutStatusClaim:
-          type: boolean
-          description: >
-            When true, credentials that do not include a status claim are rejected
-            during verification. Disable to allow credentials without revocation support.
-          example: false
+
     CompatibilitySettingsGroup:
       type: object
       description: Compatibility settings for a specific group.

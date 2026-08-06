@@ -32,8 +32,6 @@ public class OpenID4VPConfiguration {
 
     private String clientIdScheme;
     private String responseMode;
-    private String registrationCertificate;
-    private Boolean rejectVcWithoutStatusClaim;
 
     public OpenID4VPConfiguration clientIdScheme(String clientIdScheme) {
 
@@ -71,40 +69,6 @@ public class OpenID4VPConfiguration {
         this.responseMode = responseMode;
     }
 
-    public OpenID4VPConfiguration registrationCertificate(String registrationCertificate) {
-
-        this.registrationCertificate = registrationCertificate;
-        return this;
-    }
-
-    @ApiModelProperty(value = "Optional verifier_attestation JWT for wallet registration.")
-    @JsonProperty("registrationCertificate")
-    @Valid
-    public String getRegistrationCertificate() {
-        return registrationCertificate;
-    }
-
-    public void setRegistrationCertificate(String registrationCertificate) {
-        this.registrationCertificate = registrationCertificate;
-    }
-
-    public OpenID4VPConfiguration rejectVcWithoutStatusClaim(Boolean rejectVcWithoutStatusClaim) {
-
-        this.rejectVcWithoutStatusClaim = rejectVcWithoutStatusClaim;
-        return this;
-    }
-
-    @ApiModelProperty(value = "When true, VCs that do not carry a status claim are rejected during verification.")
-    @JsonProperty("rejectVcWithoutStatusClaim")
-    @Valid
-    public Boolean getRejectVcWithoutStatusClaim() {
-        return rejectVcWithoutStatusClaim;
-    }
-
-    public void setRejectVcWithoutStatusClaim(Boolean rejectVcWithoutStatusClaim) {
-        this.rejectVcWithoutStatusClaim = rejectVcWithoutStatusClaim;
-    }
-
     @Override
     public boolean equals(java.lang.Object o) {
 
@@ -116,13 +80,12 @@ public class OpenID4VPConfiguration {
         }
         OpenID4VPConfiguration that = (OpenID4VPConfiguration) o;
         return Objects.equals(this.clientIdScheme, that.clientIdScheme)
-                && Objects.equals(this.responseMode, that.responseMode)
-                && Objects.equals(this.registrationCertificate, that.registrationCertificate);
+                && Objects.equals(this.responseMode, that.responseMode);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(clientIdScheme, responseMode, registrationCertificate);
+        return Objects.hash(clientIdScheme, responseMode);
     }
 
     @Override
@@ -132,7 +95,6 @@ public class OpenID4VPConfiguration {
         sb.append("class OpenID4VPConfiguration {\n");
         sb.append("    clientIdScheme: ").append(clientIdScheme).append("\n");
         sb.append("    responseMode: ").append(responseMode).append("\n");
-        sb.append("    registrationCertificate: ").append("[REDACTED]").append("\n");
         sb.append("}");
         return sb.toString();
     }
