@@ -29,12 +29,14 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
+import javax.ws.rs.PATCH;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 /**
  * JAX-RS resource for Presentation Definition management.
@@ -51,13 +53,22 @@ public class PresentationDefinitionsApi {
     @ApiOperation(value = "List Presentation Definitions", response = PresentationDefinitionList.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = PresentationDefinitionList.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
             @ApiResponse(code = 401, message = "Unauthorized"),
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response listPresentationDefinitions() {
+    public Response listPresentationDefinitions(
+            @ApiParam(value = "Base64 encoded cursor value for backward pagination.")
+            @QueryParam("before") String before,
+            @ApiParam(value = "Base64 encoded cursor value for forward pagination.")
+            @QueryParam("after") String after,
+            @ApiParam(value = "Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations.")
+            @QueryParam("filter") String filter,
+            @ApiParam(value = "Maximum number of records to return.")
+            @QueryParam("limit") Integer limit) {
 
-        return delegate.listPresentationDefinitions();
+        return delegate.listPresentationDefinitions(before, after, filter, limit);
     }
 
     @POST
@@ -99,7 +110,7 @@ public class PresentationDefinitionsApi {
         return delegate.getPresentationDefinition(definitionId);
     }
 
-    @PUT
+    @PATCH
     @Path("/{definition-id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -137,5 +148,49 @@ public class PresentationDefinitionsApi {
             @PathParam("definition-id") String definitionId) {
 
         return delegate.deletePresentationDefinition(definitionId);
+    }
+
+    @GET
+    @Path("/{definition-id}/connected-connections")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Get connections using a Presentation Definition",
+            response = ConnectedConnectionsResponse.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = ConnectedConnectionsResponse.class),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
+    })
+    public Response getConnectedConnections(
+            @ApiParam(value = "Unique identifier of the presentation definition.", required = true)
+            @PathParam("definition-id") String definitionId) {
+
+        return delegate.getConnectedConnections(definitionId);
+    }
+
+    @PATCH
+    @Path("/{definition-id}/trusted-cas")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Update Trusted CAs for a Credential",
+            response = PresentationDefinitionResponse.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = PresentationDefinitionResponse.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
+    })
+    public Response patchTrustedCas(
+            @ApiParam(value = "Unique identifier of the presentation definition.", required = true)
+            @PathParam("definition-id") String definitionId,
+            @ApiParam(value = "The credential query ID to target.", required = true)
+            @QueryParam("credential-id") String credentialId,
+            @ApiParam(value = "Patch operations to apply to trusted CAs.", required = true)
+                    List<CertificatePatch> patchRequest) {
+
+        return delegate.patchTrustedCas(definitionId, credentialId, patchRequest);
     }
 }

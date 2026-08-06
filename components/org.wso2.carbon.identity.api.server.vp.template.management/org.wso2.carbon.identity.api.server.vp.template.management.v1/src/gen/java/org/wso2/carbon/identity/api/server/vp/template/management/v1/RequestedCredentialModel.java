@@ -14,26 +14,25 @@ import java.util.List;
 public class RequestedCredentialModel {
 
     @NotNull
-    private String credentialQueryId;
+    private String id;
     @NotNull
     private String type;
-    private String purpose;
-    private String issuer;
-    private String issuerCertPem;
+    private String format = "dc+sd-jwt";
+    private Boolean enforceTrustedIssuer = Boolean.FALSE;
+    private List<String> trustedCaPems;
+    private String keyResolutionMethod = "x5c";
     private String jwksUri;
+    private String issuerPem;
     private List<ClaimConstraintModel> claims;
-    private List<List<String>> claimSets;
-    private Boolean enforceTrustedIssuers;
-    private List<String> trustedIssuers;
 
-    @ApiModelProperty(value = "Credential query ID used as the DCQL credential query identifier.")
-    @JsonProperty("credentialQueryId")
-    public String getCredentialQueryId() {
-        return credentialQueryId;
+    @ApiModelProperty(required = true, value = "User-defined identifier for this credential (alphanumeric, underscores, hyphens).")
+    @JsonProperty("id")
+    public String getId() {
+        return id;
     }
 
-    public void setCredentialQueryId(String credentialQueryId) {
-        this.credentialQueryId = credentialQueryId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     @ApiModelProperty(required = true, value = "Type of the requested credential.")
@@ -46,37 +45,47 @@ public class RequestedCredentialModel {
         this.type = type;
     }
 
-    @ApiModelProperty(value = "Purpose of requesting the credential.")
-    @JsonProperty("purpose")
-    public String getPurpose() {
-        return purpose;
+    @ApiModelProperty(value = "Credential format as defined by OID4VP §6.1. One of: dc+sd-jwt, mso_mdoc, jwt_vc_json. Defaults to dc+sd-jwt.")
+    @JsonProperty("format")
+    public String getFormat() {
+        return format;
     }
 
-    public void setPurpose(String purpose) {
-        this.purpose = purpose;
+    public void setFormat(String format) {
+        this.format = format;
     }
 
-    @ApiModelProperty(value = "The trusted issuer for this credential.")
-    @JsonProperty("issuer")
-    public String getIssuer() {
-        return issuer;
+    @ApiModelProperty(value = "When true, validates the x5c chain against one of the configured trustedCaPems root CAs. When false (default), signature is verified without CA chain validation.")
+    @JsonProperty("enforceTrustedIssuer")
+    public Boolean getEnforceTrustedIssuer() {
+        return enforceTrustedIssuer;
     }
 
-    public void setIssuer(String issuer) {
-        this.issuer = issuer;
+    public void setEnforceTrustedIssuer(Boolean enforceTrustedIssuer) {
+        this.enforceTrustedIssuer = enforceTrustedIssuer;
     }
 
-    @ApiModelProperty(value = "PEM-encoded X.509 certificate of the credential issuer.")
-    @JsonProperty("issuerCertPem")
-    public String getIssuerCertPem() {
-        return issuerCertPem;
+    @ApiModelProperty(value = "Base64-encoded PEM root CA certificates trusted for x5c chain validation.")
+    @JsonProperty("trustedCaPems")
+    public List<String> getTrustedCaPems() {
+        return trustedCaPems;
     }
 
-    public void setIssuerCertPem(String issuerCertPem) {
-        this.issuerCertPem = issuerCertPem;
+    public void setTrustedCaPems(List<String> trustedCaPems) {
+        this.trustedCaPems = trustedCaPems;
     }
 
-    @ApiModelProperty(value = "JWKS endpoint URL of the credential issuer.")
+    @ApiModelProperty(value = "Key resolution method for verifying the issuer's signature. One of: x5c, jwks_uri, pem, metadata_discovery. Defaults to x5c.")
+    @JsonProperty("keyResolutionMethod")
+    public String getKeyResolutionMethod() {
+        return keyResolutionMethod;
+    }
+
+    public void setKeyResolutionMethod(String keyResolutionMethod) {
+        this.keyResolutionMethod = keyResolutionMethod;
+    }
+
+    @ApiModelProperty(value = "JWKS endpoint URL for fetching the issuer's public key (used when keyResolutionMethod is 'jwks_uri').")
     @JsonProperty("jwksUri")
     public String getJwksUri() {
         return jwksUri;
@@ -84,6 +93,16 @@ public class RequestedCredentialModel {
 
     public void setJwksUri(String jwksUri) {
         this.jwksUri = jwksUri;
+    }
+
+    @ApiModelProperty(value = "PEM-encoded issuer certificate for public key extraction (used when keyResolutionMethod is 'pem').")
+    @JsonProperty("issuerPem")
+    public String getIssuerPem() {
+        return issuerPem;
+    }
+
+    public void setIssuerPem(String issuerPem) {
+        this.issuerPem = issuerPem;
     }
 
     @ApiModelProperty(value = "List of claim constraints for this credential.")
@@ -96,33 +115,4 @@ public class RequestedCredentialModel {
         this.claims = claims;
     }
 
-    @ApiModelProperty(value = "DCQL claim_sets — list of claim ID groups; at least one complete group must be satisfied.")
-    @JsonProperty("claimSets")
-    public List<List<String>> getClaimSets() {
-        return claimSets;
-    }
-
-    public void setClaimSets(List<List<String>> claimSets) {
-        this.claimSets = claimSets;
-    }
-
-    @ApiModelProperty(value = "Whether to enforce trusted issuer validation for this credential.")
-    @JsonProperty("enforceTrustedIssuers")
-    public Boolean getEnforceTrustedIssuers() {
-        return enforceTrustedIssuers;
-    }
-
-    public void setEnforceTrustedIssuers(Boolean enforceTrustedIssuers) {
-        this.enforceTrustedIssuers = enforceTrustedIssuers;
-    }
-
-    @ApiModelProperty(value = "List of trusted issuer URIs/DIDs for this credential.")
-    @JsonProperty("trustedIssuers")
-    public List<String> getTrustedIssuers() {
-        return trustedIssuers;
-    }
-
-    public void setTrustedIssuers(List<String> trustedIssuers) {
-        this.trustedIssuers = trustedIssuers;
-    }
 }

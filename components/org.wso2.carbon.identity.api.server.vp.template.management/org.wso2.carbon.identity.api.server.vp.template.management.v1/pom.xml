@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.vp.template.management</artifactId>
-        <version>1.6.36-SNAPSHOT</version>
+        <version>1.6.38-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 

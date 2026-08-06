@@ -27,6 +27,10 @@ public class VPDefinitionManagementConstants {
     }
 
     public static final String VP_DEFINITION_MANAGEMENT_PATH_COMPONENT = "/presentation-definitions";
+    public static final String PATH_SEPARATOR = "/";
+    public static final Integer DEFAULT_LIMIT = 10;
+    public static final String ASC_SORT_ORDER = "ASC";
+    public static final String DESC_SORT_ORDER = "DESC";
 
     /**
      * Enum for error messages.
@@ -40,8 +44,13 @@ public class VPDefinitionManagementConstants {
                 "Provided input is invalid. %s"),
         ERROR_CODE_DEFINITION_ALREADY_EXISTS("VPD-60003", "Presentation definition already exists.",
                 "A presentation definition with the given identifier already exists."),
+        ERROR_CODE_DEFINITION_IN_USE("VPD-60004", "Presentation definition is in use.",
+                "The presentation definition '%s' is referenced by one or more connections and cannot be deleted."),
 
         // Server errors (65xxx).
+        ERROR_CODE_ERROR_RETRIEVING_CONNECTED_CONNECTIONS("VPD-65006",
+                "Error retrieving connected connections.",
+                "A system error occurred while retrieving connections for presentation definition with id: %s"),
         ERROR_CODE_ERROR_LISTING_DEFINITIONS("VPD-65001", "Error listing presentation definitions.",
                 "A system error occurred while listing presentation definitions."),
         ERROR_CODE_ERROR_CREATING_DEFINITION("VPD-65002", "Error creating presentation definition.",

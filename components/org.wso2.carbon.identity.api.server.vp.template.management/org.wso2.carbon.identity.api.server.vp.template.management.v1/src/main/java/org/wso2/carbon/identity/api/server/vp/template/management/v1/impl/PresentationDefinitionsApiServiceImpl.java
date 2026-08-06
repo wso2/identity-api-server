@@ -19,6 +19,7 @@
 package org.wso2.carbon.identity.api.server.vp.template.management.v1.impl;
 
 import org.wso2.carbon.identity.api.server.vp.template.management.common.VPDefinitionManagementConstants;
+import org.wso2.carbon.identity.api.server.vp.template.management.v1.CertificatePatch;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionCreationModel;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionResponse;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionUpdateModel;
@@ -26,6 +27,7 @@ import org.wso2.carbon.identity.api.server.vp.template.management.v1.Presentatio
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.core.ServerVPDefinitionManagementService;
 
 import java.net.URI;
+import java.util.List;
 import javax.ws.rs.core.Response;
 
 /**
@@ -38,9 +40,9 @@ public class PresentationDefinitionsApiServiceImpl extends PresentationDefinitio
             new ServerVPDefinitionManagementService();
 
     @Override
-    public Response listPresentationDefinitions() {
+    public Response listPresentationDefinitions(String before, String after, String filter, Integer limit) {
 
-        return Response.ok().entity(CORE_SERVICE.listPresentationDefinitions()).build();
+        return Response.ok().entity(CORE_SERVICE.listPresentationDefinitions(before, after, filter, limit)).build();
     }
 
     @Override
@@ -75,5 +77,19 @@ public class PresentationDefinitionsApiServiceImpl extends PresentationDefinitio
 
         CORE_SERVICE.deletePresentationDefinition(definitionId);
         return Response.noContent().build();
+    }
+
+    @Override
+    public Response patchTrustedCas(String definitionId, String credentialId,
+            List<CertificatePatch> patchRequest) {
+
+        return Response.ok().entity(
+                CORE_SERVICE.patchTrustedCas(definitionId, credentialId, patchRequest)).build();
+    }
+
+    @Override
+    public Response getConnectedConnections(String definitionId) {
+
+        return Response.ok().entity(CORE_SERVICE.getConnectedConnections(definitionId)).build();
     }
 }

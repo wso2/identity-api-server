@@ -19,23 +19,28 @@
 package org.wso2.carbon.identity.api.server.vp.template.management.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.util.List;
-
 /**
- * Update model for presentation definition.
+ * Represents a single connection (IDP) that references a presentation definition.
  */
-@ApiModel(description = "Update model for presentation definition")
-public class PresentationDefinitionUpdateModel {
+public class ConnectedConnectionItem {
 
+    private String connectionId;
     private String name;
-    private String description;
-    private List<RequestedCredentialModel> credentials;
+    private String self;
 
-    @ApiModelProperty(value = "Name of the presentation definition.")
+    @ApiModelProperty(value = "UUID of the connection (identity provider).")
+    @JsonProperty("connectionId")
+    public String getConnectionId() {
+        return connectionId;
+    }
+
+    public void setConnectionId(String connectionId) {
+        this.connectionId = connectionId;
+    }
+
+    @ApiModelProperty(value = "Display name of the connection.")
     @JsonProperty("name")
     public String getName() {
         return name;
@@ -45,24 +50,13 @@ public class PresentationDefinitionUpdateModel {
         this.name = name;
     }
 
-    @ApiModelProperty(value = "Description of the presentation definition.")
-    @JsonProperty("description")
-    public String getDescription() {
-        return description;
+    @ApiModelProperty(value = "URI of the connection resource.")
+    @JsonProperty("self")
+    public String getSelf() {
+        return self;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setSelf(String self) {
+        this.self = self;
     }
-
-    @ApiModelProperty(value = "The requested credentials to construct the definition.")
-    @JsonProperty("credentials")
-    public List<RequestedCredentialModel> getCredentials() {
-        return credentials;
-    }
-
-    public void setCredentials(List<RequestedCredentialModel> credentials) {
-        this.credentials = credentials;
-    }
-
 }

@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.vp.template.management.v1;
 
+import java.util.List;
 import javax.ws.rs.core.Response;
 
 /**
@@ -25,7 +26,7 @@ import javax.ws.rs.core.Response;
  */
 public abstract class PresentationDefinitionsApiService {
 
-    public abstract Response listPresentationDefinitions();
+    public abstract Response listPresentationDefinitions(String before, String after, String filter, Integer limit);
 
     public abstract Response createPresentationDefinition(
             PresentationDefinitionCreationModel presentationDefinitionCreationModel);
@@ -36,4 +37,9 @@ public abstract class PresentationDefinitionsApiService {
             PresentationDefinitionUpdateModel presentationDefinitionUpdateModel);
 
     public abstract Response deletePresentationDefinition(String definitionId);
+
+    public abstract Response patchTrustedCas(String definitionId, String credentialId,
+            List<CertificatePatch> patchRequest);
+
+    public abstract Response getConnectedConnections(String definitionId);
 }

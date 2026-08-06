@@ -130,12 +130,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    put:
+    patch:
       tags:
         - Presentation Definitions
       summary: Update a Presentation Definition
       description: |
-        Updates an existing presentation definition.
+        Partially updates an existing presentation definition.
       operationId: updatePresentationDefinition
       parameters:
         - $ref: '#/components/parameters/definitionIdPathParam'
@@ -203,6 +203,62 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /vp/template/{definition-id}/trusted-cas:
+    patch:
+      tags:
+        - Presentation Definitions
+      summary: Update Trusted CAs for a Credential
+      description: |
+        Add, remove, or replace a trusted CA certificate for a specific requested
+        credential in a presentation definition. Each operation targets a single
+        certificate by index.
+      operationId: patchTrustedCas
+      parameters:
+        - $ref: '#/components/parameters/definitionIdPathParam'
+        - name: credential-id
+          in: query
+          description: The credential query ID to target.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/CertificatePatch'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresentationDefinitionResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 components:
   parameters:
     definitionIdPathParam:
@@ -236,60 +292,85 @@ components:
         credentials:
           type: array
           description: The list of requested credentials in this presentation definition.
+          maxItems: 1
           items:
             $ref: '#/components/schemas/RequestedCredentialModel'
 
     RequestedCredentialModel:
       type: object
       required:
+        - id
         - type
       properties:
-        credentialId:
+        id:
           type: string
           description: >
-            Credential identifier used as the DCQL credential query identifier.
-            Maps to the CREDENTIAL_ID column in the presentation definition store.
-          example: "employee-badge"
+            User-defined identifier for this credential entry. Must contain only alphanumeric
+            characters, underscores, or hyphens (e.g. "employee_badge"). Used as the DCQL
+            credential query id and as the primary key in storage.
+          example: "employee_badge"
         type:
           type: string
           description: Type of the requested credential.
           example: "EmployeeBadge"
-        purpose:
+        format:
           type: string
-          description: Purpose of requesting the credential.
-          example: "Please share your employee badge to prove employment."
-        issuer:
-          type: string
-          description: The trusted issuer for this credential (legacy single-issuer field).
+          default: dc+sd-jwt
+          enum: [dc+sd-jwt, mso_mdoc, jwt_vc_json]
+          description: >
+            Credential format as defined by OID4VP §6.1. Specifies which credential format
+            this query targets. Defaults to dc+sd-jwt (SD-JWT VC).
+          example: "dc+sd-jwt"
         claims:
           type: array
           description: List of claims requested from this credential.
           items:
             type: string
             example: "email"
-        issuerCertPem:
-          type: string
-          description: >
-            PEM-encoded X.509 certificate of the credential issuer. When provided, the issuer's
-            signature is verified directly against this certificate without any network discovery.
-          example: "-----BEGIN CERTIFICATE-----\nMIIB....\n-----END CERTIFICATE-----"
-        jwksUri:
-          type: string
-          description: >
-            JWKS endpoint URL of the credential issuer. When provided and no issuerCertPem is set,
-            the verifier fetches the issuer's public keys from this URI instead of performing
-            automatic well-known discovery.
-          example: "https://issuer.example.com/jwks"
-        enforceTrustedIssuers:
+        enforceTrustedIssuer:
           type: boolean
-          description: When true, the credential's issuer is validated against the trustedIssuers list.
-          example: true
-        trustedIssuers:
+          default: false
+          description: >
+            When true, the credential's x5c chain is validated up to one of the configured
+            trustedCaPems root CAs (PKIX chain validation). When false (default), the
+            signature is verified without requiring a chain back to a specific CA.
+        trustedCaPems:
           type: array
-          description: List of trusted issuer URIs or DIDs. Enforced only when enforceTrustedIssuers is true.
+          description: >
+            Base64-encoded PEM X.509 root CA certificates trusted for x5c chain validation.
+            At least one CA must validate the chain when enforceTrustedIssuer is true.
+            CA certs must NOT appear in the x5c chain itself (HAIP §6.1.1).
           items:
             type: string
-            example: "https://issuer.example.com"
+            example: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0t..."
+        keyResolutionMethod:
+          type: string
+          default: x5c
+          enum: [x5c, jwks_uri, pem, metadata_discovery]
+          description: >
+            Key resolution method for verifying the issuer's credential signature.
+            Defaults to x5c (extracts public key from the x5c JOSE header).
+        jwksUri:
+          type: string
+          maxLength: 2048
+          description: >
+            JWKS endpoint URL for fetching the issuer's public key.
+            Required when keyResolutionMethod is 'jwks_uri'.
+          example: "https://issuer.example.com/.well-known/jwks.json"
+        issuerPem:
+          type: string
+          description: >
+            PEM-encoded issuer X.509 certificate. The public key is extracted from this
+            certificate for signature verification. Required when keyResolutionMethod is 'pem'.
+          example: "-----BEGIN CERTIFICATE-----\n..."
+        metadataEndpoint:
+          type: string
+          maxLength: 2048
+          description: >
+            OpenID Connect metadata endpoint (e.g. /.well-known/openid-configuration)
+            used to discover the issuer's jwks_uri. Required when keyResolutionMethod
+            is 'metadata_discovery'.
+          example: "https://issuer.example.com/.well-known/openid-configuration"
 
     PresentationDefinitionCreationModel:
       type: object
@@ -308,6 +389,7 @@ components:
         credentials:
           type: array
           description: The requested credentials to construct the definition.
+          maxItems: 1
           items:
             $ref: '#/components/schemas/RequestedCredentialModel'
 
@@ -324,6 +406,7 @@ components:
         credentials:
           type: array
           description: The requested credentials to construct the definition.
+          maxItems: 1
           items:
             $ref: '#/components/schemas/RequestedCredentialModel'
 
@@ -353,6 +436,22 @@ components:
         description:
           type: string
           description: Description of the presentation definition.
+
+    CertificatePatch:
+      type: object
+      required:
+        - operation
+      properties:
+        operation:
+          type: string
+          enum: [ADD, REMOVE, REPLACE]
+          description: The patch operation to perform.
+        certificateIndex:
+          type: integer
+          description: Zero-based index of the certificate to remove or replace.
+        certificate:
+          type: string
+          description: Base64-encoded PEM certificate (required for ADD and REPLACE).
 
     Error:
       type: object

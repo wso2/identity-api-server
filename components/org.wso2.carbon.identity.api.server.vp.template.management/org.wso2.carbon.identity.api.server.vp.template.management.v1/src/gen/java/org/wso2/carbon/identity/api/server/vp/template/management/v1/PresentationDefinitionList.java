@@ -33,6 +33,7 @@ import java.util.List;
 public class PresentationDefinitionList {
 
     private Integer totalResults;
+    private List<PaginationLink> links = null;
     private List<PresentationDefinitionListItem> presentationDefinitions = new ArrayList<>();
 
     @ApiModelProperty(value = "Total number of presentation definitions.")
@@ -43,6 +44,24 @@ public class PresentationDefinitionList {
 
     public void setTotalResults(Integer totalResults) {
         this.totalResults = totalResults;
+    }
+
+    @ApiModelProperty(value = "Pagination links.")
+    @JsonProperty("links")
+    public List<PaginationLink> getLinks() {
+        return links;
+    }
+
+    public void setLinks(List<PaginationLink> links) {
+        this.links = links;
+    }
+
+    public PresentationDefinitionList addLinksItem(PaginationLink linksItem) {
+        if (this.links == null) {
+            this.links = new ArrayList<>();
+        }
+        this.links.add(linksItem);
+        return this;
     }
 
     @ApiModelProperty(value = "List of presentation definitions.")
