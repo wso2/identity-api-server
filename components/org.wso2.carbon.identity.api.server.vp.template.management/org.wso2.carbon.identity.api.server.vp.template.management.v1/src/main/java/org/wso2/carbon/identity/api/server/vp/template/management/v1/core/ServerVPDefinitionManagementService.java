@@ -367,9 +367,9 @@ public class ServerVPDefinitionManagementService {
             }
 
             RequestedCredential target = null;
-            for (RequestedCredential c : credentials) {
-                if (credentialId.equals(c.getCredentialId())) {
-                    target = c;
+            for (RequestedCredential credential : credentials) {
+                if (credentialId.equals(credential.getCredentialId())) {
+                    target = credential;
                     break;
                 }
             }
@@ -377,29 +377,29 @@ public class ServerVPDefinitionManagementService {
                 throw handleNotFound(credentialId);
             }
 
-            List<String> certs = new ArrayList<>(target.getTrustedCas());
+            List<String> updatedTrustedCas = new ArrayList<>(target.getTrustedCas());
             for (CertificatePatch patch : patchRequest) {
                 switch (patch.getOperation()) {
                     case ADD:
                         String rawPemToAdd = new String(
                                 Base64.getDecoder().decode(patch.getCertificate()),
                                 StandardCharsets.UTF_8);
-                        certs.add(rawPemToAdd);
+                        updatedTrustedCas.add(rawPemToAdd);
                         break;
                     case REMOVE:
                         int removeIdx = patch.getCertificateIndex();
-                        if (removeIdx < 0 || removeIdx >= certs.size()) {
+                        if (removeIdx < 0 || removeIdx >= updatedTrustedCas.size()) {
                             throw new javax.ws.rs.WebApplicationException(
                                     Response.status(Response.Status.BAD_REQUEST)
                                             .entity(buildError("VPD-60005",
                                                     "Invalid certificate index: " + removeIdx))
                                             .build());
                         }
-                        certs.remove(removeIdx);
+                        updatedTrustedCas.remove(removeIdx);
                         break;
                     case REPLACE:
                         int replaceIdx = patch.getCertificateIndex();
-                        if (replaceIdx < 0 || replaceIdx >= certs.size()) {
+                        if (replaceIdx < 0 || replaceIdx >= updatedTrustedCas.size()) {
                             throw new javax.ws.rs.WebApplicationException(
                                     Response.status(Response.Status.BAD_REQUEST)
                                             .entity(buildError("VPD-60005",
@@ -409,13 +409,13 @@ public class ServerVPDefinitionManagementService {
                         String rawPemToReplace = new String(
                                 Base64.getDecoder().decode(patch.getCertificate()),
                                 StandardCharsets.UTF_8);
-                        certs.set(replaceIdx, rawPemToReplace);
+                        updatedTrustedCas.set(replaceIdx, rawPemToReplace);
                         break;
                     default:
                         break;
                 }
             }
-            target.setTrustedCas(certs);
+            target.setTrustedCas(updatedTrustedCas);
 
             PresentationDefinition updated = service.updatePresentationDefinition(definition, tenantId);
             return toResponse(updated);
@@ -444,17 +444,17 @@ public class ServerVPDefinitionManagementService {
         }
         List<RequestedCredential> result = new ArrayList<>();
         for (RequestedCredentialModel apiModel : apiModels) {
-            RequestedCredential cred = new RequestedCredential();
-            cred.setCredentialId(apiModel.getId());
-            cred.setType(apiModel.getType());
-            cred.setFormat(apiModel.getFormat() != null ? apiModel.getFormat() : "dc+sd-jwt");
-            cred.setEnforceTrustedIssuer(Boolean.TRUE.equals(apiModel.getEnforceTrustedIssuer()));
-            cred.setTrustedCas(decodeBase64PemList(apiModel.getTrustedCaPems()));
-            cred.setKeyResolutionMethod(apiModel.getKeyResolutionMethod() != null ? apiModel.getKeyResolutionMethod() : "x5c");
-            cred.setJwksUri(apiModel.getJwksUri());
-            cred.setIssuerPem(apiModel.getIssuerPem());
-            cred.setClaims(toClaimConstraints(apiModel.getClaims()));
-            result.add(cred);
+            RequestedCredential requestedCredential = new RequestedCredential();
+            requestedCredential.setCredentialId(apiModel.getId());
+            requestedCredential.setType(apiModel.getType());
+            requestedCredential.setFormat(apiModel.getFormat() != null ? apiModel.getFormat() : "dc+sd-jwt");
+            requestedCredential.setEnforceTrustedIssuer(Boolean.TRUE.equals(apiModel.getEnforceTrustedIssuer()));
+            requestedCredential.setTrustedCas(decodeBase64PemList(apiModel.getTrustedCaPems()));
+            requestedCredential.setKeyResolutionMethod(apiModel.getKeyResolutionMethod() != null ? apiModel.getKeyResolutionMethod() : "x5c");
+            requestedCredential.setJwksUri(apiModel.getJwksUri());
+            requestedCredential.setIssuerPem(apiModel.getIssuerPem());
+            requestedCredential.setClaims(toClaimConstraints(apiModel.getClaims()));
+            result.add(requestedCredential);
         }
         return result;
     }
@@ -469,17 +469,17 @@ public class ServerVPDefinitionManagementService {
             return null;
         }
         List<RequestedCredentialModel> result = new ArrayList<>();
-        for (RequestedCredential cred : domainCredentials) {
+        for (RequestedCredential requestedCredential : domainCredentials) {
             RequestedCredentialModel model = new RequestedCredentialModel();
-            model.setId(cred.getCredentialId());
-            model.setType(cred.getType());
-            model.setFormat(cred.getFormat());
-            model.setEnforceTrustedIssuer(cred.isEnforceTrustedIssuer());
-            model.setTrustedCaPems(encodeBase64PemList(cred.getTrustedCas()));
-            model.setKeyResolutionMethod(cred.getKeyResolutionMethod());
-            model.setJwksUri(cred.getJwksUri());
-            model.setIssuerPem(cred.getIssuerPem());
-            model.setClaims(toClaimConstraintModels(cred.getClaims()));
+            model.setId(requestedCredential.getCredentialId());
+            model.setType(requestedCredential.getType());
+            model.setFormat(requestedCredential.getFormat());
+            model.setEnforceTrustedIssuer(requestedCredential.isEnforceTrustedIssuer());
+            model.setTrustedCaPems(encodeBase64PemList(requestedCredential.getTrustedCas()));
+            model.setKeyResolutionMethod(requestedCredential.getKeyResolutionMethod());
+            model.setJwksUri(requestedCredential.getJwksUri());
+            model.setIssuerPem(requestedCredential.getIssuerPem());
+            model.setClaims(toClaimConstraintModels(requestedCredential.getClaims()));
             result.add(model);
         }
         return result;
@@ -491,13 +491,14 @@ public class ServerVPDefinitionManagementService {
             return null;
         }
         List<ClaimConstraint> result = new ArrayList<>();
-        for (ClaimConstraintModel cm : apiModels) {
-            ClaimConstraint cc = new ClaimConstraint();
-            cc.setId(cm.getId());
-            cc.setPath(cm.getPath());
-            cc.setMandatory(Boolean.TRUE.equals(cm.getMandatory() == null ? Boolean.TRUE : cm.getMandatory()));
-            cc.setAllowedValues(cm.getAllowedValues());
-            result.add(cc);
+        for (ClaimConstraintModel claimConstraintModel : apiModels) {
+            ClaimConstraint claimConstraint = new ClaimConstraint();
+            claimConstraint.setId(claimConstraintModel.getId());
+            claimConstraint.setPath(claimConstraintModel.getPath());
+            claimConstraint.setMandatory(Boolean.TRUE.equals(
+                    claimConstraintModel.getMandatory() == null ? Boolean.TRUE : claimConstraintModel.getMandatory()));
+            claimConstraint.setAllowedValues(claimConstraintModel.getAllowedValues());
+            result.add(claimConstraint);
         }
         return result;
     }
@@ -508,9 +509,9 @@ public class ServerVPDefinitionManagementService {
             return null;
         }
         List<String> rawPems = new ArrayList<>();
-        for (String b64 : base64Pems) {
-            if (StringUtils.isNotBlank(b64)) {
-                rawPems.add(new String(Base64.getDecoder().decode(b64), StandardCharsets.UTF_8));
+        for (String encodedPem : base64Pems) {
+            if (StringUtils.isNotBlank(encodedPem)) {
+                rawPems.add(new String(Base64.getDecoder().decode(encodedPem), StandardCharsets.UTF_8));
             }
         }
         return rawPems;
@@ -536,13 +537,13 @@ public class ServerVPDefinitionManagementService {
             return null;
         }
         List<ClaimConstraintModel> result = new ArrayList<>();
-        for (ClaimConstraint cc : domainConstraints) {
-            ClaimConstraintModel cm = new ClaimConstraintModel();
-            cm.setId(cc.getId());
-            cm.setPath(cc.getPath());
-            cm.setMandatory(cc.isMandatory());
-            cm.setAllowedValues(cc.getAllowedValues());
-            result.add(cm);
+        for (ClaimConstraint claimConstraint : domainConstraints) {
+            ClaimConstraintModel claimConstraintModel = new ClaimConstraintModel();
+            claimConstraintModel.setId(claimConstraint.getId());
+            claimConstraintModel.setPath(claimConstraint.getPath());
+            claimConstraintModel.setMandatory(claimConstraint.isMandatory());
+            claimConstraintModel.setAllowedValues(claimConstraint.getAllowedValues());
+            result.add(claimConstraintModel);
         }
         return result;
     }
