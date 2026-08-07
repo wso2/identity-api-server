@@ -33,6 +33,7 @@ import org.wso2.carbon.identity.api.server.vp.verification.v1.VerificationStatus
 import org.wso2.carbon.identity.api.server.vp.verification.v1.VerificationStatusResponse.HolderBinding;
 import org.wso2.carbon.identity.api.server.vp.verification.v1.VerificationStatusResponse.KeyBinding;
 import org.wso2.carbon.identity.api.server.vp.verification.v1.VerificationStatusResponse.Presentation;
+import org.wso2.carbon.identity.openid4vc.presentation.authenticator.exception.VPAuthenticatorErrorCode;
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.exception.VPAuthenticatorException;
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.model.VPFlowSession;
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.model.VPFlowStatus;
@@ -91,7 +92,16 @@ public class ServerVPVerificationService {
 
         } catch (VPAuthenticatorException e) {
             LOG.error("Failed to initiate VP verification session.", e);
-            return buildInternalErrorResponse(ErrorMessage.ERROR_CODE_INTERNAL_ERROR, e.getMessage());
+            VPAuthenticatorErrorCode errorCode = e.getErrorCode();
+            if (errorCode == VPAuthenticatorErrorCode.FEATURE_DISABLED) {
+                return buildNotImplementedResponse();
+            }
+            if (errorCode != null && errorCode.getCode().startsWith("VPA-4")) {
+                return buildBadRequestResponse(ErrorMessage.ERROR_CODE_INVALID_REQUEST,
+                        errorCode.getDescription());
+            }
+            return buildInternalErrorResponse(ErrorMessage.ERROR_CODE_INTERNAL_ERROR,
+                    "An error occurred while initiating the verification session.");
         }
     }
 
@@ -124,7 +134,6 @@ public class ServerVPVerificationService {
 
         if (session.getVerificationResult() != null && session.getStatus() == VPFlowStatus.VERIFIED) {
             statusResponse.setPresentation(buildPresentation(session.getVerificationResult()));
-            statusResponse.setErrors(session.getVerificationResult().getErrors());
         } else if (session.getStatus() == VPFlowStatus.FAILED) {
             if (session.getVerificationResult() != null) {
                 statusResponse.setErrors(session.getVerificationResult().getErrors());

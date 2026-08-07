@@ -1,50 +1,42 @@
-openapi: 3.0.3
-
+openapi: 3.0.0
 info:
-  title: VP Verification API
-  description: |
-    Standalone Verifiable Presentation (VP) verification API for WSO2 Identity Server.
+  version: "v1"
+  title: WSO2 Identity Server - VP Verification API
+  description: >-
+    This is the RESTful API for standalone Verifiable Presentation (VP) verification
+    in WSO2 Identity Server. Enables external applications to initiate OpenID4VP-based
+    credential verification flows independently of the authentication pipeline.
 
-    Enables external applications to initiate OpenID4VP-based credential verification
-    flows independently of the authentication pipeline. A typical integration:
+    A typical integration:
 
-    1. Call **POST /initiate** with a presentation definition ID.
+    1. Call **POST /vp/verification/initiate** with a presentation definition ID.
     2. Display the returned `walletUrl` as a QR code (or deeplink on mobile).
     3. The user scans the QR code — their wallet fetches the signed request, selects
        credentials, and submits the VP response directly to IS.
-    4. Poll **GET /status/{requestId}** until `status` is `VERIFIED` or `FAILED`.
-
-    **Authentication**: These endpoints are public — no Bearer token required.
-    The tenant is resolved from the request URL context.
-  version: "1.0.0"
+    4. Poll **GET /vp/verification/status/{requestId}** until `status` is `VERIFIED`
+       or `FAILED`.
   contact:
-    name: WSO2
-    url: https://wso2.com
-
-servers:
-  - url: https://{host}/t/{tenant-domain}/api/server/v1
-    variables:
-      host:
-        default: localhost:9443
-      tenant-domain:
-        default: carbon.super
-
-tags:
-  - name: VP Verification
-    description: Standalone Verifiable Presentation verification operations
-
+    name: WSO2 Identity Server
+    url: 'https://wso2.com/identity-and-access-management/'
+    email: architecture@wso2.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 paths:
-
   /vp/verification/initiate:
     post:
       tags:
         - VP Verification
+      summary: Initiate a VP verification transaction.
       operationId: initiateVerification
-      summary: Initiate a VP verification transaction
       description: |
         Creates a new verification session for the specified presentation definition.
         Returns a wallet deeplink URL (display as a QR code) and a `requestId` for
         polling the result.
+
+        These endpoints are public — no Bearer token is required. The tenant is
+        resolved from the request URL context.
+      security: []
       requestBody:
         required: true
         content:
@@ -54,16 +46,15 @@ paths:
             example:
               presentationDefinitionId: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
       responses:
-        "201":
+        '201':
           description: Verification session created successfully.
           headers:
             Location:
               description: URL to poll for the verification status.
               schema:
                 type: string
-                format: uri
           content:
-            application/json:
+            'application/json':
               schema:
                 $ref: '#/components/schemas/VerificationInitiateResponse'
               example:
@@ -71,49 +62,40 @@ paths:
                 walletUrl: "openid4vp://authorize?client_id=x509_hash%3AAb...&request_uri=https%3A%2F%2Fis.example.com%2Foid4vp%2Fv1%2Frequest%2Fabc123"
                 requestUri: "https://is.example.com/oid4vp/v1/request/abc123"
                 expiresAt: 1706265900000
-        "400":
-          description: Bad request — missing or invalid `presentationDefinitionId`.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              example:
-                code: "VPV-60001"
-                message: "Invalid request."
-                description: "presentationDefinitionId is required."
-        "501":
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '501':
           description: OpenID4VP feature is not enabled on this IS instance.
           content:
-            application/json:
+            'application/json':
               schema:
                 $ref: '#/components/schemas/Error'
               example:
                 code: "OID4VP-60001"
                 message: "OpenID4VP feature is not enabled."
                 description: "Enable it via [openid4vp] enabled=true in deployment.toml."
-        "500":
-          description: Internal server error.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
 
-  /vp/verification/status/{requestId}:
+  '/vp/verification/status/{requestId}':
     get:
       tags:
         - VP Verification
+      summary: Poll for VP verification result.
       operationId: getVerificationStatus
-      summary: Poll for VP verification result
       description: |
         Returns the current state of a verification session.
 
         - `ACTIVE` — the wallet has not yet submitted a presentation; keep polling.
-        - `VERIFIED` — the wallet submitted a valid VP; the `presentation` field contains
-          full credential details and disclosed claims.
+        - `VERIFIED` — the wallet submitted a valid VP; the `presentation` field
+          contains full credential details and disclosed claims.
         - `FAILED` — verification failed; the `errors` field contains descriptions.
 
         Sessions expire after the `expiresAt` time returned from initiation.
-        Polling an expired session returns `404`.
+        Polling an expired session returns 404.
+
+        These endpoints are public — no Bearer token is required.
+      security: []
       parameters:
         - name: requestId
           in: path
@@ -123,20 +105,20 @@ paths:
             type: string
           example: "abc123-def456-ghi789"
       responses:
-        "200":
+        '200':
           description: Status retrieved successfully.
           content:
-            application/json:
+            'application/json':
               schema:
                 $ref: '#/components/schemas/VerificationStatusResponse'
               examples:
                 active:
-                  summary: Wallet has not yet responded
+                  summary: Wallet has not yet responded.
                   value:
                     requestId: "abc123-def456-ghi789"
                     status: "ACTIVE"
                 verified:
-                  summary: Wallet submitted a valid VP
+                  summary: Wallet submitted a valid VP.
                   value:
                     requestId: "abc123-def456-ghi789"
                     status: "VERIFIED"
@@ -157,41 +139,56 @@ paths:
                             given_name: "Alice"
                             family_name: "Smith"
                             email: "alice@example.com"
-                      holder:
-                        id: "https://issuer.example.com/oid4vci#alice@example.com"
                       keyBinding:
                         verified: true
                         presentedAt: "2024-01-26T10:30:00Z"
                         audience: "x509_hash:AbCdEf1234"
                         nonce: "n-0S6_WzA2Mj"
                 failed:
-                  summary: Verification failed
+                  summary: Verification failed.
                   value:
                     requestId: "abc123-def456-ghi789"
                     status: "FAILED"
                     errors:
                       - "KB-JWT nonce mismatch."
                       - "Credential signature verification failed."
-        "404":
-          description: No session found for the given `requestId` (expired or invalid).
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              example:
-                code: "VPV-60401"
-                message: "Session not found."
-                description: "No verification session found for requestId: abc123-def456-ghi789"
-        "500":
-          description: Internal server error.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
 
 components:
+  responses:
+    NotFound:
+      description: The specified resource is not found.
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
+    ServerError:
+      description: Internal server error.
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
+    InvalidInput:
+      description: Invalid input request.
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://localhost:9443/oauth2/authorize'
+          tokenUrl: 'https://localhost:9443/oauth2/token'
+          scopes: {}
   schemas:
-
     VerificationInitiateRequest:
       type: object
       required:
@@ -274,8 +271,6 @@ components:
           description: One entry per verified credential in the presentation.
           items:
             $ref: '#/components/schemas/Credential'
-        holder:
-          $ref: '#/components/schemas/Holder'
         keyBinding:
           $ref: '#/components/schemas/KeyBinding'
 
@@ -339,16 +334,6 @@ components:
           description: Elliptic curve name (e.g. `P-256`, `Ed25519`); null for RSA.
           example: "P-256"
 
-    Holder:
-      type: object
-      description: Credential subject identifier from the `sub` claim.
-      properties:
-        id:
-          type: string
-          nullable: true
-          description: Subject identifier (namespaced as `<issuer>#<subjectValue>`).
-          example: "https://issuer.example.com/oid4vci#alice@example.com"
-
     KeyBinding:
       type: object
       description: >
@@ -381,6 +366,9 @@ components:
 
     Error:
       type: object
+      required:
+        - code
+        - message
       properties:
         code:
           type: string
@@ -394,3 +382,7 @@ components:
           type: string
           description: Detailed error description.
           example: "presentationDefinitionId is required."
+        traceId:
+          type: string
+          description: Correlation ID for tracing the request across logs.
+          example: "e0fbcfeb-3617-43c4-8dd0-7b7d38e13047"

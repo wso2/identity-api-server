@@ -62,14 +62,13 @@ public class VerificationStatusResponse {
     // ── Nested model classes ──────────────────────────────────────────────────
 
     /**
-     * Top-level presentation envelope — format, timing, credential details, holder, and key binding.
+     * Top-level presentation envelope — format, timing, credential details, and key binding.
      */
     public static class Presentation {
 
         private String format;
         private String submittedAt;
         private List<Credential> credentials;
-        private Holder holder;
         private KeyBinding keyBinding;
 
         @JsonProperty("format")
@@ -85,11 +84,6 @@ public class VerificationStatusResponse {
         @JsonInclude(JsonInclude.Include.NON_EMPTY)
         public List<Credential> getCredentials() { return credentials; }
         public void setCredentials(List<Credential> credentials) { this.credentials = credentials; }
-
-        @JsonProperty("holder")
-        @JsonInclude(JsonInclude.Include.NON_NULL)
-        public Holder getHolder() { return holder; }
-        public void setHolder(Holder holder) { this.holder = holder; }
 
         @ApiModelProperty(value = "KB-JWT details — present only when the wallet included a Key Binding JWT.")
         @JsonProperty("keyBinding")
@@ -178,20 +172,6 @@ public class VerificationStatusResponse {
         @JsonInclude(JsonInclude.Include.NON_NULL)
         public String getCurve() { return curve; }
         public void setCurve(String curve) { this.curve = curve; }
-    }
-
-    /**
-     * Credential holder — subject identifier from the sub claim.
-     */
-    public static class Holder {
-
-        private String id;
-
-        @ApiModelProperty(value = "Subject identifier (sub claim).")
-        @JsonProperty("id")
-        @JsonInclude(JsonInclude.Include.NON_NULL)
-        public String getId() { return id; }
-        public void setId(String id) { this.id = id; }
     }
 
     /**

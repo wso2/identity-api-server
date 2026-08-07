@@ -26,9 +26,10 @@ public class VPDefinitionManagementConstants {
     private VPDefinitionManagementConstants() {
     }
 
-    public static final String VP_DEFINITION_MANAGEMENT_PATH_COMPONENT = "/presentation-definitions";
+    public static final String VP_DEFINITION_MANAGEMENT_PATH_COMPONENT = "/vp/template";
     public static final String PATH_SEPARATOR = "/";
     public static final Integer DEFAULT_LIMIT = 10;
+    public static final Integer MAX_LIMIT = 100;
     public static final String ASC_SORT_ORDER = "ASC";
     public static final String DESC_SORT_ORDER = "DESC";
 

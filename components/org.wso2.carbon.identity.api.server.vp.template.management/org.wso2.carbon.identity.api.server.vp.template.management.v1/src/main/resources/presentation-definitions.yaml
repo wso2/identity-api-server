@@ -1,142 +1,130 @@
 openapi: 3.0.0
 info:
-  title: "WSO2 IS Presentation Definition Management API"
   version: "v1"
-  description: "Admin API for managing presentation definitions in WSO2 Identity Server."
+  title: WSO2 Identity Server - VP Presentation Definition Management API
+  description: >-
+    This is the RESTful API for managing VP Presentation Definitions in the
+    WSO2 Identity Server.
   contact:
-    name: WSO2
-    url: 'http://wso2.com/products/identity-server/'
-    email: architecture@wso2.org
+    name: WSO2 Identity Server
+    url: 'https://wso2.com/identity-and-access-management/'
+    email: architecture@wso2.com
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
-
-servers:
-  - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
-    variables:
-      server-url:
-        default: localhost:9443
-      tenant-domain:
-        default: carbon.super
-
 security:
   - OAuth2: []
   - BasicAuth: []
-
 paths:
   /vp/template:
     get:
       tags:
         - Presentation Definitions
-      summary: List Presentation Definitions
-      description: |
-        Returns a list of all presentation definitions for the tenant.
+      summary: List presentation definitions.
       operationId: listPresentationDefinitions
+      description: |
+        Returns a paginated list of presentation definitions for the tenant.
+
+        <b>scope required:</b>
+        * internal_list_vp_templates
+      parameters:
+        - $ref: '#/components/parameters/limitQueryParam'
+        - $ref: '#/components/parameters/beforeQueryParam'
+        - $ref: '#/components/parameters/afterQueryParam'
+        - $ref: '#/components/parameters/filterQueryParam'
       responses:
         '200':
           description: OK
           content:
-            application/json:
+            'application/json':
               schema:
                 $ref: '#/components/schemas/PresentationDefinitionList'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
     post:
       tags:
         - Presentation Definitions
-      summary: Create a Presentation Definition
+      summary: Create a presentation definition.
+      operationId: createPresentationDefinition
       description: |
         Creates a new presentation definition.
-      operationId: createPresentationDefinition
+
+        <b>scope required:</b>
+        * internal_create_vp_template
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/PresentationDefinitionCreationModel'
+        description: Presentation definition to be created.
         required: true
       responses:
         '201':
-          description: Created
+          description: Item Created
           headers:
             Location:
               description: URI of the created resource.
               schema:
                 type: string
           content:
-            application/json:
+            'application/json':
               schema:
                 $ref: '#/components/schemas/PresentationDefinitionResponse'
         '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/InvalidInput'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
         '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Conflict'
         '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
 
-  /vp/template/{definition-id}:
+  '/vp/template/{definition-id}':
     get:
       tags:
         - Presentation Definitions
-      summary: Get a Presentation Definition
+      summary: Get a presentation definition.
+      operationId: getPresentationDefinition
       description: |
         Retrieves a presentation definition by its ID.
-      operationId: getPresentationDefinition
+
+        <b>scope required:</b>
+        * internal_view_vp_template
       parameters:
         - $ref: '#/components/parameters/definitionIdPathParam'
       responses:
         '200':
           description: OK
           content:
-            application/json:
+            'application/json':
               schema:
                 $ref: '#/components/schemas/PresentationDefinitionResponse'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
     patch:
       tags:
         - Presentation Definitions
-      summary: Update a Presentation Definition
+      summary: Update a presentation definition.
+      operationId: updatePresentationDefinition
       description: |
         Partially updates an existing presentation definition.
-      operationId: updatePresentationDefinition
+
+        <b>scope required:</b>
+        * internal_update_vp_template
       parameters:
         - $ref: '#/components/parameters/definitionIdPathParam'
       requestBody:
@@ -149,70 +137,57 @@ paths:
         '200':
           description: OK
           content:
-            application/json:
+            'application/json':
               schema:
                 $ref: '#/components/schemas/PresentationDefinitionResponse'
         '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/InvalidInput'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
     delete:
       tags:
         - Presentation Definitions
-      summary: Delete a Presentation Definition
+      summary: Delete a presentation definition.
+      operationId: deletePresentationDefinition
       description: |
         Deletes a presentation definition by its ID.
-      operationId: deletePresentationDefinition
+
+        <b>scope required:</b>
+        * internal_delete_vp_template
       parameters:
         - $ref: '#/components/parameters/definitionIdPathParam'
       responses:
         '204':
-          description: No Content
+          $ref: '#/components/responses/Deleted'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
         '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
 
-  /vp/template/{definition-id}/trusted-cas:
+  '/vp/template/{definition-id}/trusted-cas':
     patch:
       tags:
         - Presentation Definitions
-      summary: Update Trusted CAs for a Credential
+      summary: Update trusted CAs for a credential.
+      operationId: patchTrustedCas
       description: |
         Add, remove, or replace a trusted CA certificate for a specific requested
-        credential in a presentation definition. Each operation targets a single
-        certificate by index.
-      operationId: patchTrustedCas
+        credential within a presentation definition.
+
+        <b>scope required:</b>
+        * internal_update_vp_template
       parameters:
         - $ref: '#/components/parameters/definitionIdPathParam'
         - name: credential-id
@@ -233,31 +208,49 @@ paths:
         '200':
           description: OK
           content:
-            application/json:
+            'application/json':
               schema:
                 $ref: '#/components/schemas/PresentationDefinitionResponse'
         '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/InvalidInput'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          description: Internal Server Error
+          $ref: '#/components/responses/ServerError'
+
+  '/vp/template/{definition-id}/connected-connections':
+    get:
+      tags:
+        - Presentation Definitions
+      summary: List connections using this definition.
+      operationId: getConnectedConnections
+      description: |
+        Returns all federated connections (identity providers) that reference
+        the specified presentation definition.
+
+        <b>scope required:</b>
+        * internal_view_vp_template
+      parameters:
+        - $ref: '#/components/parameters/definitionIdPathParam'
+      responses:
+        '200':
+          description: OK
           content:
-            application/json:
+            'application/json':
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ConnectedConnectionsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
 
 components:
   parameters:
@@ -268,7 +261,82 @@ components:
       required: true
       schema:
         type: string
-
+    limitQueryParam:
+      in: query
+      name: limit
+      required: false
+      description: Maximum number of records to return.
+      schema:
+        type: integer
+        default: 10
+    beforeQueryParam:
+      in: query
+      name: before
+      required: false
+      description: >-
+        Cursor for backward pagination — returns records before this opaque
+        cursor value (Base64-encoded).
+      schema:
+        type: string
+    afterQueryParam:
+      in: query
+      name: after
+      required: false
+      description: >-
+        Cursor for forward pagination — returns records after this opaque
+        cursor value (Base64-encoded).
+      schema:
+        type: string
+    filterQueryParam:
+      in: query
+      name: filter
+      required: false
+      description: >-
+        Filter expression in SCIM-style format (e.g. name eq "Employee Verification").
+      schema:
+        type: string
+  responses:
+    NotFound:
+      description: The specified resource is not found.
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized.
+    Forbidden:
+      description: Resource forbidden.
+    ServerError:
+      description: Internal server error.
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
+    InvalidInput:
+      description: Invalid input request.
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: Element already exists.
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
+    Deleted:
+      description: No content.
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://localhost:9443/oauth2/authorize'
+          tokenUrl: 'https://localhost:9443/oauth2/token'
+          scopes: {}
   schemas:
     PresentationDefinitionResponse:
       type: object
@@ -331,15 +399,14 @@ components:
           type: boolean
           default: false
           description: >
-            When true, the credential's x5c chain is validated up to one of the configured
-            trustedCaPems root CAs (PKIX chain validation). When false (default), the
-            signature is verified without requiring a chain back to a specific CA.
+            When true, the credential's x5c chain is validated against the configured
+            trustedCaPems root CAs. When false (default), the signature is verified
+            without requiring a chain back to a specific CA.
         trustedCaPems:
           type: array
           description: >
             Base64-encoded PEM X.509 root CA certificates trusted for x5c chain validation.
-            At least one CA must validate the chain when enforceTrustedIssuer is true.
-            CA certs must NOT appear in the x5c chain itself (HAIP §6.1.1).
+            Required when enforceTrustedIssuer is true.
           items:
             type: string
             example: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0t..."
@@ -349,7 +416,7 @@ components:
           enum: [x5c, jwks_uri, pem, metadata_discovery]
           description: >
             Key resolution method for verifying the issuer's credential signature.
-            Defaults to x5c (extracts public key from the x5c JOSE header).
+            Defaults to x5c (extracts the public key from the x5c JOSE header).
         jwksUri:
           type: string
           maxLength: 2048
@@ -360,16 +427,15 @@ components:
         issuerPem:
           type: string
           description: >
-            PEM-encoded issuer X.509 certificate. The public key is extracted from this
-            certificate for signature verification. Required when keyResolutionMethod is 'pem'.
+            PEM-encoded issuer X.509 certificate. The public key is extracted for
+            signature verification. Required when keyResolutionMethod is 'pem'.
           example: "-----BEGIN CERTIFICATE-----\n..."
         metadataEndpoint:
           type: string
           maxLength: 2048
           description: >
-            OpenID Connect metadata endpoint (e.g. /.well-known/openid-configuration)
-            used to discover the issuer's jwks_uri. Required when keyResolutionMethod
-            is 'metadata_discovery'.
+            OpenID Connect metadata endpoint used to discover the issuer's jwks_uri.
+            Required when keyResolutionMethod is 'metadata_discovery'.
           example: "https://issuer.example.com/.well-known/openid-configuration"
 
     PresentationDefinitionCreationModel:
@@ -415,12 +481,20 @@ components:
       properties:
         totalResults:
           type: integer
-          description: Total number of presentation definitions.
+          description: Total number of presentation definitions matching the request.
           example: 2
         presentationDefinitions:
           type: array
           items:
             $ref: '#/components/schemas/PresentationDefinitionListItem'
+        links:
+          type: array
+          description: Pagination links (prev/next).
+          items:
+            $ref: '#/components/schemas/PaginationLink'
+          example:
+            - href: "/api/server/v1/vp/template?after=eyJuYW1lIjoiQSJ9&limit=10"
+              rel: "next"
 
     PresentationDefinitionListItem:
       type: object
@@ -436,6 +510,39 @@ components:
         description:
           type: string
           description: Description of the presentation definition.
+
+    ConnectedConnectionsResponse:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Number of connections returned.
+          example: 2
+        totalResults:
+          type: integer
+          description: Total number of connections referencing this definition.
+          example: 2
+        connectedConnections:
+          type: array
+          description: List of connections referencing the presentation definition.
+          items:
+            $ref: '#/components/schemas/ConnectedConnectionItem'
+
+    ConnectedConnectionItem:
+      type: object
+      properties:
+        connectionId:
+          type: string
+          description: Unique identifier of the federated connection.
+          example: "63f0b5e7-6e10-4de7-8e5c-1d0f9283f44b"
+        name:
+          type: string
+          description: Display name of the connection.
+          example: "University Wallet IDP"
+        self:
+          type: string
+          description: Self-link URL to the connection resource.
+          example: "https://localhost:9443/api/server/v1/identity-providers/63f0b5e7-6e10-4de7-8e5c-1d0f9283f44b"
 
     CertificatePatch:
       type: object
@@ -453,6 +560,18 @@ components:
           type: string
           description: Base64-encoded PEM certificate (required for ADD and REPLACE).
 
+    PaginationLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: URL of the linked page.
+          example: "/api/server/v1/vp/template?after=eyJuYW1lIjoiQSJ9&limit=10"
+        rel:
+          type: string
+          description: Link relation — 'next' or 'prev'.
+          example: "next"
+
     Error:
       type: object
       required:
@@ -464,22 +583,10 @@ components:
           example: "VPD-60001"
         message:
           type: string
-          example: "Some error message"
+          example: "Some error message."
         description:
           type: string
-          example: "Some error description"
+          example: "Some error description."
         traceId:
           type: string
           example: "e0fbcfeb-3617-43c4-8dd0-7b7d38e13047"
-
-  securitySchemes:
-    BasicAuth:
-      type: http
-      scheme: basic
-    OAuth2:
-      type: oauth2
-      flows:
-        authorizationCode:
-          authorizationUrl: 'https://localhost:9443/oauth2/authorize'
-          tokenUrl: 'https://localhost:9443/oauth2/token'
-          scopes: {}

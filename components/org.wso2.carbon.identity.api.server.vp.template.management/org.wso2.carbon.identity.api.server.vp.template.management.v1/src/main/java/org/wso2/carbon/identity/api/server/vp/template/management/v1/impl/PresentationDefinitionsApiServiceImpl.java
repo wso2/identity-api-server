@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.vp.template.management.v1.impl;
 
+import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.vp.template.management.common.VPDefinitionManagementConstants;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.CertificatePatch;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionCreationModel;
@@ -29,6 +30,8 @@ import org.wso2.carbon.identity.api.server.vp.template.management.v1.core.Server
 import java.net.URI;
 import java.util.List;
 import javax.ws.rs.core.Response;
+
+import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 
 /**
  * Implementation of PresentationDefinitionsApiService.
@@ -51,9 +54,9 @@ public class PresentationDefinitionsApiServiceImpl extends PresentationDefinitio
 
         PresentationDefinitionResponse created =
                 CORE_SERVICE.createPresentationDefinition(presentationDefinitionCreationModel);
-        URI location = URI.create(
-                VPDefinitionManagementConstants.VP_DEFINITION_MANAGEMENT_PATH_COMPONENT
-                        + "/" + created.getId());
+        URI location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT
+                + VPDefinitionManagementConstants.VP_DEFINITION_MANAGEMENT_PATH_COMPONENT
+                + "/" + created.getId());
         return Response.created(location).entity(created).build();
     }
 

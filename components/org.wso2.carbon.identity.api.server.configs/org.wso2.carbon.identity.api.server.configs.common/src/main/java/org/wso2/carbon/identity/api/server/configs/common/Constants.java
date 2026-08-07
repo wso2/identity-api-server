@@ -343,13 +343,13 @@ public class Constants {
         /**
          * OpenID4VP configuration errors.
          */
-        ERROR_CODE_OID4VP_NOT_ENABLED("65038",
+        ERROR_CODE_OID4VP_NOT_ENABLED("65042",
                 "OpenID4VP feature is not enabled.",
                 "The OpenID4VP feature is not enabled in this deployment."),
-        ERROR_CODE_OID4VP_CONFIG_RETRIEVE("65039",
+        ERROR_CODE_OID4VP_CONFIG_RETRIEVE("65043",
                 "Unable to retrieve OpenID4VP configuration.",
                 "Server encountered an error while retrieving the OpenID4VP configuration."),
-        ERROR_CODE_OID4VP_CONFIG_UPDATE("65040",
+        ERROR_CODE_OID4VP_CONFIG_UPDATE("65044",
                 "Unable to update OpenID4VP configuration.",
                 "Server encountered an error while updating the OpenID4VP configuration.");
 
