@@ -1332,6 +1332,18 @@ components:
               "value": "123ert45"
             }
           }``
+        - PASSWORD_CREDENTIAL: OAuth 2.0 resource owner password credentials authentication.<br>
+          ``{
+            "type": "PASSWORD_CREDENTIAL",
+            "properties": {
+              "clientId": "3e172dd2-901b-43a9-a26a-728466795f01",
+              "clientSecret": "83cdc120-ccf6-4163-a4a8-c1ba3e872daa",
+              "username": "admin",
+              "password": "admin123",
+              "tokenEndpoint": "https://custom.idp.com/todos",
+              "scopes": "send_scope"
+            }
+          }``
       required:
         - type
       properties:
@@ -1342,6 +1354,7 @@ components:
             - BASIC
             - API_KEY
             - BEARER
+            - PASSWORD_CREDENTIAL
             - NONE
           example: CLIENT_CREDENTIAL
         properties:
