@@ -316,8 +316,10 @@ public class ServerVPDefinitionManagementService {
             String serverUrl = IdentityUtil.getServerURL(
                     "/api/server/v1/identity-providers/", true, true);
 
+            List<ConnectedConnectionInfo> effectiveConnections =
+                    connections != null ? connections : Collections.<ConnectedConnectionInfo>emptyList();
             List<ConnectedConnectionItem> items = new ArrayList<>();
-            for (ConnectedConnectionInfo info : (connections != null ? connections : Collections.emptyList())) {
+            for (ConnectedConnectionInfo info : effectiveConnections) {
                 ConnectedConnectionItem item = new ConnectedConnectionItem();
                 item.setConnectionId(info.getConnectionId());
                 item.setName(info.getConnectionName());
