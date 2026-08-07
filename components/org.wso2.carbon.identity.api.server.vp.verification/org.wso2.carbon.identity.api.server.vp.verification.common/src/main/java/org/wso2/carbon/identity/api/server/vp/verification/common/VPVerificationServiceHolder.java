@@ -33,7 +33,7 @@ public class VPVerificationServiceHolder {
     /**
      * Get VPFlowService OSGi service.
      *
-     * @return VPFlowService instance.
+     * @return the {@link VPFlowService} registered in the OSGi context, or {@code null} if not available.
      */
     public static VPFlowService getVPFlowService() {
 

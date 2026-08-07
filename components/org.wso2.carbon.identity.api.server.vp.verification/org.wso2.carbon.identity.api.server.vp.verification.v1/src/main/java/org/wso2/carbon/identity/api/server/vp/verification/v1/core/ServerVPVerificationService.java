@@ -59,8 +59,8 @@ public class ServerVPVerificationService {
     /**
      * Initiate a new standalone VP verification session.
      *
-     * @param request Initiation request containing presentationDefinitionId.
-     * @return JAX-RS Response with VerificationInitiateResponse (201) or Error.
+     * @param request the initiation request containing the presentation definition ID for this verification session.
+     * @return a response with the wallet deeplink URL and session identifier on success, or an error response.
      */
     public Response initiateVerification(VerificationInitiateRequest request) {
 
@@ -108,8 +108,8 @@ public class ServerVPVerificationService {
     /**
      * Poll the status of a verification session.
      *
-     * @param requestId Request ID from initiation.
-     * @return JAX-RS Response with VerificationStatusResponse (200) or Error.
+     * @param requestId the session identifier returned by the initiation call.
+     * @return a response with the current session status and, when verified, the full presentation details.
      */
     public Response getVerificationStatus(String requestId) {
 

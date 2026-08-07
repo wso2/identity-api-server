@@ -33,7 +33,7 @@ public class VPDefinitionManagementServiceHolder {
     /**
      * Get PresentationDefinitionService OSGi service.
      *
-     * @return PresentationDefinitionService instance
+     * @return the {@link PresentationDefinitionService} registered in the OSGi context, or {@code null} if not available.
      */
     public static PresentationDefinitionService getPresentationDefinitionService() {
 

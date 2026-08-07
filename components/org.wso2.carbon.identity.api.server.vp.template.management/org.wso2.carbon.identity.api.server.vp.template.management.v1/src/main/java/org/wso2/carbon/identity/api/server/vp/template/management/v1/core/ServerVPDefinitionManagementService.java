@@ -68,11 +68,11 @@ public class ServerVPDefinitionManagementService {
     /**
      * List presentation definitions with cursor-based pagination and optional filtering.
      *
-     * @param before Base64-encoded backward cursor, or null.
-     * @param after  Base64-encoded forward cursor, or null.
-     * @param filter SCIM-style filter expression, or null.
-     * @param limit  Maximum number of records to return.
-     * @return PresentationDefinitionList with pagination links.
+     * @param before base64-encoded backward cursor for reverse pagination; {@code null} for the default forward direction.
+     * @param after  base64-encoded forward cursor from the previous page's "next" link; {@code null} to start from the beginning.
+     * @param filter a SCIM-style filter expression to narrow results; {@code null} to return all definitions.
+     * @param limit  maximum number of records per page; capped at {@code MAX_LIMIT}.
+     * @return the paginated list of presentation definitions with cursor-based navigation links.
      */
     public PresentationDefinitionList listPresentationDefinitions(String before, String after,
             String filter, Integer limit) {
@@ -164,8 +164,8 @@ public class ServerVPDefinitionManagementService {
     /**
      * Create a new presentation definition.
      *
-     * @param creationModel The creation model
-     * @return Created PresentationDefinitionResponse
+     * @param creationModel the request model containing the name, description, and credential constraints.
+     * @return the newly created presentation definition with its server-assigned ID.
      */
     public PresentationDefinitionResponse createPresentationDefinition(
             PresentationDefinitionCreationModel creationModel) {
@@ -204,8 +204,8 @@ public class ServerVPDefinitionManagementService {
     /**
      * Get a presentation definition by ID.
      *
-     * @param definitionId The definition ID
-     * @return PresentationDefinitionResponse
+     * @param definitionId the server-assigned ID of the definition to retrieve.
+     * @return the matching presentation definition.
      */
     public PresentationDefinitionResponse getPresentationDefinition(String definitionId) {
 
@@ -230,9 +230,9 @@ public class ServerVPDefinitionManagementService {
     /**
      * Update a presentation definition.
      *
-     * @param definitionId The definition ID
-     * @param updateModel  The update model
-     * @return Updated PresentationDefinitionResponse
+     * @param definitionId the server-assigned ID of the definition to update.
+     * @param updateModel  the model containing the fields to replace.
+     * @return the updated presentation definition.
      */
     public PresentationDefinitionResponse updatePresentationDefinition(
             String definitionId, PresentationDefinitionUpdateModel updateModel) {
@@ -274,7 +274,7 @@ public class ServerVPDefinitionManagementService {
     /**
      * Delete a presentation definition.
      *
-     * @param definitionId The definition ID
+     * @param definitionId the server-assigned ID of the definition to delete.
      */
     public void deletePresentationDefinition(String definitionId) {
 
@@ -301,8 +301,8 @@ public class ServerVPDefinitionManagementService {
     /**
      * Get all connections that reference this presentation definition.
      *
-     * @param definitionId The definition ID
-     * @return ConnectedConnectionsResponse with list of connections
+     * @param definitionId the server-assigned ID of the definition to query.
+     * @return the list of identity provider connections configured to use this definition.
      */
     public ConnectedConnectionsResponse getConnectedConnections(String definitionId) {
 
@@ -348,10 +348,10 @@ public class ServerVPDefinitionManagementService {
     /**
      * Patch trusted CA certificates for a specific credential within a presentation definition.
      *
-     * @param definitionId The definition ID
-     * @param credentialId The credential query ID
-     * @param patchRequest List of patch operations
-     * @return Updated PresentationDefinitionResponse
+     * @param definitionId the server-assigned ID of the definition containing the credential.
+     * @param credentialId the ID of the specific credential query within the definition.
+     * @param patchRequest the list of ADD, REMOVE, or REPLACE operations to apply to the CA certificate list.
+     * @return the updated presentation definition reflecting the CA certificate changes.
      */
     public PresentationDefinitionResponse patchTrustedCas(String definitionId, String credentialId,
             List<CertificatePatch> patchRequest) {
