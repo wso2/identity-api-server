@@ -300,7 +300,7 @@ public class OAuthInboundFunctions {
         }
     }
 
-    public static ClientSecretResponse createClientSecret(String clientId,
+    public static ClientSecretResponse createClientSecret(String clientId, String tenantDomain,
                                                             ClientSecretCreationRequest request) {
 
         OAuthClientSecretRequestDTO secretRequest = new OAuthClientSecretRequestDTO();
@@ -309,18 +309,18 @@ public class OAuthInboundFunctions {
         }
         try {
             OAuthClientSecretResponseDTO created = ApplicationManagementServiceHolder.getOAuthAdminService()
-                    .createOAuthClientSecret(clientId, secretRequest);
+                    .createOAuthClientSecret(clientId, tenantDomain, secretRequest);
             return toClientSecretResponse(created);
         } catch (IdentityOAuthAdminException e) {
             throw handleClientSecretException(e, "Error while creating the client secret.");
         }
     }
 
-    public static ClientSecretList getClientSecrets(String clientId) {
+    public static ClientSecretList getClientSecrets(String clientId, String tenantDomain) {
 
         try {
-            List<OAuthClientSecretResponseDTO> secrets =
-                    ApplicationManagementServiceHolder.getOAuthAdminService().getOAuthClientSecrets(clientId);
+            List<OAuthClientSecretResponseDTO> secrets = ApplicationManagementServiceHolder.getOAuthAdminService()
+                    .getOAuthClientSecrets(clientId, tenantDomain);
             ClientSecretList list = new ClientSecretList();
             list.setCount(secrets.size());
             list.setList(secrets.stream().map(OAuthInboundFunctions::toClientSecretResponse)
@@ -331,21 +331,22 @@ public class OAuthInboundFunctions {
         }
     }
 
-    public static ClientSecretResponse getClientSecret(String clientId, String secretId) {
+    public static ClientSecretResponse getClientSecret(String clientId, String tenantDomain, String secretId) {
 
         try {
             OAuthClientSecretResponseDTO secret = ApplicationManagementServiceHolder.getOAuthAdminService()
-                    .getOAuthClientSecret(clientId, secretId);
+                    .getOAuthClientSecret(clientId, tenantDomain, secretId);
             return toClientSecretResponse(secret);
         } catch (IdentityOAuthAdminException e) {
             throw handleClientSecretException(e, "Error while retrieving the client secret.");
         }
     }
 
-    public static void deleteClientSecret(String clientId, String secretId) {
+    public static void deleteClientSecret(String clientId, String tenantDomain, String secretId) {
 
         try {
-            ApplicationManagementServiceHolder.getOAuthAdminService().removeOAuthClientSecret(clientId, secretId);
+            ApplicationManagementServiceHolder.getOAuthAdminService()
+                    .removeOAuthClientSecret(clientId, tenantDomain, secretId);
         } catch (IdentityOAuthAdminException e) {
             throw handleClientSecretException(e, "Error while deleting the client secret.");
         }

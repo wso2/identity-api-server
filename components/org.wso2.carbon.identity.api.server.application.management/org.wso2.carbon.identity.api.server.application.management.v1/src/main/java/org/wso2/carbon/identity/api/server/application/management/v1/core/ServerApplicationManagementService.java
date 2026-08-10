@@ -1885,28 +1885,32 @@ public class ServerApplicationManagementService {
 
         InboundAuthenticationRequestConfig oauthInbound = getInboundAuthRequestConfig(applicationId, OAUTH2);
         String clientId = oauthInbound.getInboundAuthKey();
-        return OAuthInboundFunctions.createClientSecret(clientId, request);
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        return OAuthInboundFunctions.createClientSecret(clientId, tenantDomain, request);
     }
 
     public ClientSecretList getOAuthClientSecrets(String applicationId) {
 
         InboundAuthenticationRequestConfig oauthInbound = getInboundAuthRequestConfig(applicationId, OAUTH2);
         String clientId = oauthInbound.getInboundAuthKey();
-        return OAuthInboundFunctions.getClientSecrets(clientId);
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        return OAuthInboundFunctions.getClientSecrets(clientId, tenantDomain);
     }
 
     public ClientSecretResponse getOAuthClientSecret(String applicationId, String secretId) {
 
         InboundAuthenticationRequestConfig oauthInbound = getInboundAuthRequestConfig(applicationId, OAUTH2);
         String clientId = oauthInbound.getInboundAuthKey();
-        return OAuthInboundFunctions.getClientSecret(clientId, secretId);
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        return OAuthInboundFunctions.getClientSecret(clientId, tenantDomain, secretId);
     }
 
     public void deleteOAuthClientSecret(String applicationId, String secretId) {
 
         InboundAuthenticationRequestConfig oauthInbound = getInboundAuthRequestConfig(applicationId, OAUTH2);
         String clientId = oauthInbound.getInboundAuthKey();
-        OAuthInboundFunctions.deleteClientSecret(clientId, secretId);
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        OAuthInboundFunctions.deleteClientSecret(clientId, tenantDomain, secretId);
     }
 
     public void revokeOAuthClient(String applicationId) {
