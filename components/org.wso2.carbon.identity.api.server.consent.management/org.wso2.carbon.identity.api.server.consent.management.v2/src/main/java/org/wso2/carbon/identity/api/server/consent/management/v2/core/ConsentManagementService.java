@@ -71,7 +71,6 @@ import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMe
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_INVALID_FILTER_EXPRESSION;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_INVALID_QUERY_PARAM;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.FilterConstants;
-import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.PENDING_STATE;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.REVOKE_STATE;
 import static org.wso2.carbon.consent.mgt.core.util.ConsentUtils.handleClientException;
 
@@ -398,10 +397,6 @@ public class ConsentManagementService {
         List<AuthorizationDTO> authDTOs = new ArrayList<>();
         if (auths != null) {
             for (ConsentAuthorization auth : auths) {
-                // Skip PENDING authorizations — they are not exposed in the API response DTO
-                if (PENDING_STATE.equals(auth.getStatus().name())) {
-                    continue;
-                }
                 try {
                     AuthorizationDTO.StateEnum stateEnum =
                             AuthorizationDTO.StateEnum.fromValue(auth.getStatus().name());
