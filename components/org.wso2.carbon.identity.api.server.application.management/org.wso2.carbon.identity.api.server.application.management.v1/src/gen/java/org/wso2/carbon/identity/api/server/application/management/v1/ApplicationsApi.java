@@ -363,7 +363,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/oidc/secrets/{secretId}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete a specific OAuth2/OIDC client secret.", notes = "This API deletes the client secret identified by `secretId`. The application's most recently added active secret cannot be deleted — at least one active secret must remain per application.  <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_create` ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete a specific OAuth2/OIDC client secret.", notes = "This API deletes the client secret identified by `secretId`. The application's most recently added active secret cannot be deleted — at least one active secret must remain per application.  <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_delete` ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -1195,7 +1195,7 @@ public class ApplicationsApi  {
     @POST
     @Path("/{applicationId}/inbound-protocols/oidc/regenerate-secret")
     @Produces({ "application/json" })
-    @ApiOperation(value = "Regenerate the OAuth2/OIDC client secret. ", notes = "This API regenerates a new client secret. Existing secrets, access tokens, refresh tokens, and authorization codes are revoked.  <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_create` ", response = OpenIDConnectConfiguration.class, authorizations = {
+    @ApiOperation(value = "Regenerate the OAuth2/OIDC client secret. ", notes = "This API regenerates a new client secret. Existing secrets, access tokens, refresh tokens, and authorization codes are revoked.  <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_regenerate`  When the multiple client secrets feature is disabled, this endpoint falls back to the `internal_application_mgt_client_secret_create` scope. ", response = OpenIDConnectConfiguration.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             

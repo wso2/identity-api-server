@@ -1237,7 +1237,10 @@ paths:
         This API regenerates a new client secret. Existing secrets, access tokens, refresh
         tokens, and authorization codes are revoked.
 
-        <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_create`
+        <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_regenerate`
+
+        When the multiple client secrets feature is disabled, this endpoint falls back to the
+        `internal_application_mgt_client_secret_create` scope.
       operationId: regenerateOAuthClientSecret
       parameters:
         - name: applicationId
@@ -1440,7 +1443,7 @@ paths:
         added active secret cannot be deleted — at least one active secret must remain per
         application.
 
-        <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_create`
+        <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_delete`
       operationId: deleteOAuthClientSecret
       parameters:
         - name: applicationId
