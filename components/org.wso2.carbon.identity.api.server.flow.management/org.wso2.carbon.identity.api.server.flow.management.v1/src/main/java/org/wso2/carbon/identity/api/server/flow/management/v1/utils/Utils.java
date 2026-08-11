@@ -37,6 +37,7 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.Action;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Component;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Data;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Executor;
+import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorMetadata;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfig;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfigPatchModel;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Position;
@@ -46,6 +47,8 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndp
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.AbstractMetaResponseHandler;
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.core.util.LambdaExceptionUtils;
+import org.wso2.carbon.identity.flow.execution.engine.metadata.FlowExecutorInfo;
+import org.wso2.carbon.identity.flow.execution.engine.metadata.FlowExecutorMetadataService;
 import org.wso2.carbon.identity.flow.mgt.Constants;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtFrameworkException;
@@ -66,9 +69,11 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -94,6 +99,13 @@ public class Utils {
 
     private static final Log LOG = LogFactory.getLog(Utils.class);
     private static final String EXECUTOR = "EXECUTOR";
+
+    /*
+     * Display strings originate in a third party jar and are rendered in an administrative UI, so they
+     * are length capped before being handed on.
+     */
+    private static final int MAX_EXECUTOR_DISPLAY_NAME_LENGTH = 100;
+    private static final int MAX_EXECUTOR_DESCRIPTION_LENGTH = 1024;
 
     private static final Map<Constants.FlowTypes, String> WORKFLOW_FILTERS = new HashMap<>();
 
@@ -534,11 +546,6 @@ public class Utils {
                     ERROR_CODE_UNSUPPORTED_EXECUTOR.getDescription()));
         }
 
-        /*
-         * Some flows require at least one executor out of a group, e.g. a recovery factor for password
-         * recovery. The handler decides the groups, so a dynamically registered executor that declares
-         * itself as such a factor can satisfy the requirement without a change here.
-         */
         for (Set<String> requiredGroup : metaResponseHandler.getRequiredExecutorGroups()) {
             if (Collections.disjoint(requiredGroup, executors)) {
                 throw handleFlowMgtException(new FlowMgtClientException(
@@ -723,5 +730,142 @@ public class Utils {
             return false;
         }
         return false;
+    }
+
+    /**
+     * Dynamically registered executors that supports this flow type.
+     */
+    public static List<FlowExecutorInfo> getSupportedExtensionExecutors(String flowType) {
+
+        try {
+            return FlowExecutorMetadataService.getInstance().getSupportedExtensionExecutors(flowType);
+        } catch (Throwable e) {
+            // Executors are dynamically registered from /dropins, so a faulty one must not fail the endpoint.
+            LOG.warn("Failed to resolve dynamically registered executors for flow type: " + flowType
+                    + ". Falling back to the built in executor list.", e);
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Effective executor names for this flow type.
+     *
+     * @return De-duplicated list of executor names.
+     */
+    public static List<String> resolveSupportedExecutorNames(List<FlowExecutorInfo> registeredExecutors,
+                                                             List<String> legacyBaseline) {
+
+        List<String> names = new ArrayList<>();
+        for (String name : legacyBaseline) {
+            if (!names.contains(name)) {
+                names.add(name);
+            }
+        }
+        for (FlowExecutorInfo extension : filterExtensionExecutors(registeredExecutors, legacyBaseline)) {
+            names.add(extension.getName());
+        }
+        return names;
+    }
+
+    /**
+     * Metadata for the executors contributed by a deployed extension.
+     *
+     * @return List of extension executor metadata.
+     */
+    public static List<ExecutorMetadata> resolveExtensionExecutorMetadata(List<FlowExecutorInfo> registeredExecutors,
+                                                                          List<String> legacyBaseline) {
+
+        List<ExecutorMetadata> metadata = new ArrayList<>();
+        for (FlowExecutorInfo extension : filterExtensionExecutors(registeredExecutors, legacyBaseline)) {
+            metadata.add(buildExecutorMetadata(extension));
+        }
+        return metadata;
+    }
+
+    /**
+     * Authenticator name to executor name mapping.
+     *
+     * @return Map of authenticator name to executor name.
+     */
+    public static Map<String, String> resolveConnectionExecutorMap(List<FlowExecutorInfo> registeredExecutors) {
+
+        Map<String, String> map = new HashMap<>(FlowEndpointConstants.LegacyExecutors.CONNECTION_EXECUTOR_MAP);
+        for (FlowExecutorInfo info : registeredExecutors) {
+            if (StringUtils.isNotBlank(info.getAssociatedAuthenticator())) {
+                map.put(info.getAssociatedAuthenticator(), info.getName());
+            }
+        }
+        return Collections.unmodifiableMap(map);
+    }
+
+    /**
+     * Executors for this flow type that declared the given behavior flag.
+     *
+     * @param behaviorFlag Behavior flag to match.
+     * @return Names of the matching executors.
+     */
+    public static Set<String> filterExecutorsByBehaviorFlag(List<FlowExecutorInfo> registeredExecutors,
+                                                            String behaviorFlag) {
+
+        Set<String> matching = new HashSet<>();
+        if (StringUtils.isBlank(behaviorFlag)) {
+            return matching;
+        }
+        for (FlowExecutorInfo info : registeredExecutors) {
+            if (info.getBehaviorFlags().contains(behaviorFlag)) {
+                matching.add(info.getName());
+            }
+        }
+        return matching;
+    }
+
+    private static List<FlowExecutorInfo> filterExtensionExecutors(List<FlowExecutorInfo> registeredExecutors,
+                                                                   List<String> legacyBaseline) {
+
+        List<FlowExecutorInfo> extensions = new ArrayList<>();
+        for (FlowExecutorInfo info : registeredExecutors) {
+            if (!legacyBaseline.contains(info.getName())) {
+                extensions.add(info);
+            }
+        }
+        extensions.sort(Comparator.comparing(info -> info.getDisplayName() == null
+                ? info.getName().toLowerCase(Locale.ENGLISH) : info.getDisplayName().toLowerCase(Locale.ENGLISH)));
+        return extensions;
+    }
+
+    private static ExecutorMetadata buildExecutorMetadata(FlowExecutorInfo declared) {
+
+        String authenticator = StringUtils.isNotBlank(declared.getAssociatedAuthenticator())
+                ? declared.getAssociatedAuthenticator() : findAuthenticatorForExecutor(declared.getName());
+
+        return new ExecutorMetadata()
+                .name(declared.getName())
+                .displayName(truncate(declared.getDisplayName(), MAX_EXECUTOR_DISPLAY_NAME_LENGTH))
+                .description(truncate(declared.getDescription(), MAX_EXECUTOR_DESCRIPTION_LENGTH))
+                .behaviorFlags(declared.getBehaviorFlags().isEmpty()
+                        ? null : new ArrayList<>(declared.getBehaviorFlags()))
+                .icon(declared.getIcon())
+                .associatedAuthenticator(authenticator)
+                .requiresConnection(declared.isConnectionRequired() || declared.isIdpRequired()
+                        || authenticator != null);
+    }
+
+    private static String findAuthenticatorForExecutor(String executorName) {
+
+        for (Map.Entry<String, String> entry
+                : FlowEndpointConstants.LegacyExecutors.CONNECTION_EXECUTOR_MAP.entrySet()) {
+            if (entry.getValue().equals(executorName)) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
+    private static String truncate(String value, int maxLength) {
+
+        if (value == null || value.length() <= maxLength) {
+            return value;
+        }
+        return value.substring(0, maxLength);
     }
 }

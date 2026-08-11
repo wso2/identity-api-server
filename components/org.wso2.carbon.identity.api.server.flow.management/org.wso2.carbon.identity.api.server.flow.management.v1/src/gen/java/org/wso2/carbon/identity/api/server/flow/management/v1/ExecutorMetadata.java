@@ -40,7 +40,7 @@ public class ExecutorMetadata  {
     private String name;
     private String displayName;
     private String description;
-    private List<String> tags = null;
+    private List<String> behaviorFlags = null;
 
     private String icon;
     private Boolean requiresConnection;
@@ -104,29 +104,29 @@ public class ExecutorMetadata  {
     }
 
     /**
-    * Reserved tags that change how a consumer treats this executor. RECOVERY_FACTOR declares that this executor satisfies the password recovery flow requirement of having at least one recovery factor. Tags outside the reserved set are passed through but have no effect.
+    * Flags that change how a consumer treats this executor. RECOVERY_FACTOR declares that this executor satisfies the password recovery flow requirement of having at least one recovery factor. Values outside the recognised set are passed through but have no effect.
     **/
-    public ExecutorMetadata tags(List<String> tags) {
+    public ExecutorMetadata behaviorFlags(List<String> behaviorFlags) {
 
-        this.tags = tags;
+        this.behaviorFlags = behaviorFlags;
         return this;
     }
     
-    @ApiModelProperty(example = "[\"RECOVERY_FACTOR\"]", value = "Reserved tags that change how a consumer treats this executor. RECOVERY_FACTOR declares that this executor satisfies the password recovery flow requirement of having at least one recovery factor. Tags outside the reserved set are passed through but have no effect.")
-    @JsonProperty("tags")
+    @ApiModelProperty(example = "[\"RECOVERY_FACTOR\"]", value = "Flags that change how a consumer treats this executor. RECOVERY_FACTOR declares that this executor satisfies the password recovery flow requirement of having at least one recovery factor. Values outside the recognised set are passed through but have no effect.")
+    @JsonProperty("behaviorFlags")
     @Valid
-    public List<String> getTags() {
-        return tags;
+    public List<String> getBehaviorFlags() {
+        return behaviorFlags;
     }
-    public void setTags(List<String> tags) {
-        this.tags = tags;
+    public void setBehaviorFlags(List<String> behaviorFlags) {
+        this.behaviorFlags = behaviorFlags;
     }
 
-    public ExecutorMetadata addTagsItem(String tagsItem) {
-        if (this.tags == null) {
-            this.tags = new ArrayList<String>();
+    public ExecutorMetadata addBehaviorFlagsItem(String behaviorFlagsItem) {
+        if (this.behaviorFlags == null) {
+            this.behaviorFlags = new ArrayList<String>();
         }
-        this.tags.add(tagsItem);
+        this.behaviorFlags.add(behaviorFlagsItem);
         return this;
     }
 
@@ -202,7 +202,7 @@ public class ExecutorMetadata  {
         return Objects.equals(this.name, executorMetadata.name) &&
             Objects.equals(this.displayName, executorMetadata.displayName) &&
             Objects.equals(this.description, executorMetadata.description) &&
-            Objects.equals(this.tags, executorMetadata.tags) &&
+            Objects.equals(this.behaviorFlags, executorMetadata.behaviorFlags) &&
             Objects.equals(this.icon, executorMetadata.icon) &&
             Objects.equals(this.requiresConnection, executorMetadata.requiresConnection) &&
             Objects.equals(this.associatedAuthenticator, executorMetadata.associatedAuthenticator);
@@ -210,7 +210,7 @@ public class ExecutorMetadata  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, displayName, description, tags, icon, requiresConnection, associatedAuthenticator);
+        return Objects.hash(name, displayName, description, behaviorFlags, icon, requiresConnection, associatedAuthenticator);
     }
 
     @Override
@@ -222,7 +222,7 @@ public class ExecutorMetadata  {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
-        sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
+        sb.append("    behaviorFlags: ").append(toIndentedString(behaviorFlags)).append("\n");
         sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
         sb.append("    requiresConnection: ").append(toIndentedString(requiresConnection)).append("\n");
         sb.append("    associatedAuthenticator: ").append(toIndentedString(associatedAuthenticator)).append("\n");

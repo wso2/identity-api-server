@@ -196,13 +196,7 @@ public class FlowEndpointConstants {
     }
 
     /**
-     * Executor names and mappings that were hardcoded here before executors could declare themselves
-     * to the flow execution engine.
-     * <p>
-     * These are kept as a backward compatibility baseline: they are always advertised for their flow
-     * type, so executors that ship from other repositories and have not adopted the metadata SPI keep
-     * working exactly as before. Dynamically declared executors are unioned on top. Remove an entry
-     * once the owning connector declares its own supported flow types and metadata.
+     * Executor names and mappings added by default and not dynamically registered.
      */
     public static class LegacyExecutors {
 

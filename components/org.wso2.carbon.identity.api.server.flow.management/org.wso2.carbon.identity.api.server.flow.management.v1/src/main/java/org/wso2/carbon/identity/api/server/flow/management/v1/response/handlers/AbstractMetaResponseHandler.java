@@ -30,13 +30,13 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorMetadata;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionConnectionInfo;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
-import org.wso2.carbon.identity.api.server.flow.management.v1.utils.ExecutorMetadataResolver;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
 import org.wso2.carbon.identity.claim.metadata.mgt.model.LocalClaim;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
+import org.wso2.carbon.identity.flow.execution.engine.metadata.FlowExecutorInfo;
 import org.wso2.carbon.identity.flow.extension.model.FlowExtensionAction;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
 import org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants;
@@ -76,7 +76,7 @@ public abstract class AbstractMetaResponseHandler {
     private static final String HIDDEN_CLAIMS_IDENTITY_CONFIG = "HiddenClaims.HiddenClaim";
     private static final String MULTI_ATTRIBUTE_LOGIN_ENABLED = "multiAttributeLoginEnabled";
 
-    private ExecutorMetadataResolver resolver;
+    private List<FlowExecutorInfo> registeredExecutors;
 
     /**
      * Get the flow type.
@@ -103,15 +103,9 @@ public abstract class AbstractMetaResponseHandler {
     }
 
     /**
-     * Get the executors this server advertises for the flow regardless of what is registered with the
-     * flow execution engine.
-     * <p>
-     * These predate executors being able to declare themselves and are kept so that executors shipping
-     * from other repositories, which do not declare their supported flow types, keep working exactly as
-     * before. Subclasses append the ones specific to their flow. Remove an entry once the owning
-     * connector declares its own metadata.
+     * Get the executors advertised by the server.
      *
-     * @return Mutable list of executor names, in the order they should be presented.
+     * @return Mutable list of executor names.
      */
     protected List<String> getLegacyExecutorBaseline() {
 
@@ -119,36 +113,27 @@ public abstract class AbstractMetaResponseHandler {
     }
 
     /**
-     * Get the supported executors for the flow: the backward compatibility baseline unioned with every
-     * executor that has declared support for this flow type, including those contributed by connectors
-     * deployed into repository/components/dropins.
-     * <p>
-     * This is also what {@link Utils#validateExecutors} checks a flow against on save, so the set the
-     * composer is offered and the set a flow may use cannot drift apart. Do not cache the result
-     * statically: executors can be bound long after this web application started.
+     * Get the supported executors for the flow, including those contributed by connectors in /dropins.
      *
      * @return List of supported executors.
      */
     public List<String> getSupportedExecutors() {
 
-        return getResolver().getSupportedExecutorNames();
+        return Utils.resolveSupportedExecutorNames(getSupportedExtensionExecutors(), getLegacyExecutorBaseline());
     }
 
     /**
-     * Get the metadata for the executors contributed by a deployed extension. Built in executors are
-     * fully identified by their name in {@link #getSupportedExecutors()} and are not described again
-     * here. Connections are not repeated either; they are carried by
-     * {@link #getExecutorConnections()}, keyed by the same executor name.
+     * Get metadata for executors contributed by a deployed extension.
      *
      * @return List of extension executor metadata.
      */
     public List<ExecutorMetadata> getExtensionExecutors() {
 
-        return getResolver().getExtensionExecutorMetadata();
+        return Utils.resolveExtensionExecutorMetadata(getSupportedExtensionExecutors(), getLegacyExecutorBaseline());
     }
 
     /**
-     * Groups of executors of which at least one must be present in a valid flow. Empty by default.
+     * Groups of executors of which at least one must be present in a valid flow.
      *
      * @return List of "at least one of" executor groups.
      */
@@ -158,17 +143,16 @@ public abstract class AbstractMetaResponseHandler {
     }
 
     /**
-     * The resolver is held per handler instance, and handlers are created per request, so the executor
-     * list is resolved at most once per request and never cached beyond it.
+     * The executors registered with the engine for this flow type, resolved once per request.
      *
-     * @return Executor metadata resolver for this flow type.
+     * @return List of registered executor info.
      */
-    protected ExecutorMetadataResolver getResolver() {
+    protected List<FlowExecutorInfo> getSupportedExtensionExecutors() {
 
-        if (resolver == null) {
-            resolver = new ExecutorMetadataResolver(getFlowType(), getLegacyExecutorBaseline());
+        if (registeredExecutors == null) {
+            registeredExecutors = Utils.getSupportedExtensionExecutors(getFlowType());
         }
-        return resolver;
+        return registeredExecutors;
     }
 
     /**
@@ -328,7 +312,8 @@ public abstract class AbstractMetaResponseHandler {
 
         try {
 
-            Map<String, String> connectionExecutorMap = getResolver().getConnectionExecutorMap();
+            Map<String, String> connectionExecutorMap =
+                    Utils.resolveConnectionExecutorMap(getSupportedExtensionExecutors());
             Map<String, ExecutorConnections> executorConnections = new HashMap<>();
             getSupportedExecutors().forEach(executorName -> {
                 if (connectionExecutorMap.containsValue(executorName)) {
