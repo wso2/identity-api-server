@@ -92,17 +92,14 @@ public class PasswordRecoveryFlowMetaHandler extends AbstractMetaResponseHandler
     }
 
     /**
-     * A password recovery flow is only meaningful if it verifies the user somehow, so at least one
-     * recovery factor must be present. The built in factors are always accepted; a connector opts in by
-     * tagging its executor with
-     * {@link org.wso2.carbon.identity.flow.execution.engine.Constants.ExecutorTags#RECOVERY_FACTOR}.
+     * At least one recovery factor must be present in a valid password recovery flow.
      */
     @Override
     public List<Set<String>> getRequiredExecutorGroups() {
 
         Set<String> recoveryFactors = new HashSet<>(FlowEndpointConstants.LegacyExecutors.RECOVERY_FACTORS);
-        recoveryFactors.addAll(getResolver().getExecutorsWithTag(
-                org.wso2.carbon.identity.flow.execution.engine.Constants.ExecutorTags.RECOVERY_FACTOR));
+        recoveryFactors.addAll(Utils.filterExecutorsByBehaviorFlag(getRegisteredExecutors(),
+                Constants.ExecutorBehaviorFlags.RECOVERY_FACTOR));
         return Collections.singletonList(recoveryFactors);
     }
 
