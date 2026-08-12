@@ -2295,6 +2295,7 @@ public class ServerIdpManagementService {
         identityProviderListItem.setName(idp.getIdentityProviderName());
         identityProviderListItem.setDescription(idp.getIdentityProviderDescription());
         identityProviderListItem.setIsEnabled(idp.isEnable());
+        identityProviderListItem.setIsShared(resolveIsSharedConnection(idp));
         identityProviderListItem.setImage(idp.getImageUrl());
         identityProviderListItem.setSelf(
                 ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT + IDP_PATH_COMPONENT + "/%s",

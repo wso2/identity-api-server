@@ -20,7 +20,7 @@ package org.wso2.carbon.identity.api.server.idp.common;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
-import org.wso2.carbon.identity.organization.management.organization.connection.sharing.ConnectionSharingPolicyHandlerService;
+import org.wso2.carbon.identity.organization.management.organization.connection.sharing.api.service.ConnectionSharingPolicyHandlerService;
 import org.wso2.carbon.identity.template.mgt.TemplateManager;
 import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 

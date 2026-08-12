@@ -20,7 +20,7 @@ package org.wso2.carbon.identity.api.server.idp.v1.factories;
 
 import org.wso2.carbon.identity.api.server.idp.common.IdentityProviderServiceHolder;
 import org.wso2.carbon.identity.api.server.idp.v1.core.ServerIdpSharingService;
-import org.wso2.carbon.identity.organization.management.organization.connection.sharing.ConnectionSharingPolicyHandlerService;
+import org.wso2.carbon.identity.organization.management.organization.connection.sharing.api.service.ConnectionSharingPolicyHandlerService;
 
 /**
  * Factory class for Server Idp Sharing Service.

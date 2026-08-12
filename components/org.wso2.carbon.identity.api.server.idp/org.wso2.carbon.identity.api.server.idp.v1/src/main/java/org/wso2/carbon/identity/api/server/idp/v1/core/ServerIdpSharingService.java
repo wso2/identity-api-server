@@ -35,21 +35,21 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.OrgShareConfig;
 import org.wso2.carbon.identity.api.server.idp.v1.model.ProcessSuccessResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.SharedOrganizationsResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.SharingMode;
-import org.wso2.carbon.identity.organization.management.organization.connection.sharing.ConnectionSharingPolicyHandlerService;
-import org.wso2.carbon.identity.organization.management.organization.connection.sharing.constant.ConnectionType;
-import org.wso2.carbon.identity.organization.management.organization.connection.sharing.dto.ConnectionSharingModeDTO;
-import org.wso2.carbon.identity.organization.management.organization.connection.sharing.dto.GeneralConnectionShareDTO;
-import org.wso2.carbon.identity.organization.management.organization.connection.sharing.dto.GeneralConnectionUnshareDTO;
-import org.wso2.carbon.identity.organization.management.organization.connection.sharing.dto.GetConnectionSharedOrgsDTO;
-import org.wso2.carbon.identity.organization.management.organization.connection.sharing.dto.ResponseConnectionOrgDetailsDTO;
-import org.wso2.carbon.identity.organization.management.organization.connection.sharing.dto.ResponseSharedConnectionOrgsDTO;
-import org.wso2.carbon.identity.organization.management.organization.connection.sharing.dto.SelectiveConnectionShareDTO;
-import org.wso2.carbon.identity.organization.management.organization.connection.sharing.dto.SelectiveConnectionShareOrgConfigDTO;
-import org.wso2.carbon.identity.organization.management.organization.connection.sharing.dto.SelectiveConnectionUnshareDTO;
-import org.wso2.carbon.identity.organization.management.organization.connection.sharing.exception.ConnectionSharingMgtClientException;
-import org.wso2.carbon.identity.organization.management.organization.connection.sharing.exception.ConnectionSharingMgtException;
+import org.wso2.carbon.identity.organization.management.organization.connection.sharing.api.dto.ConnectionSharingModeDTO;
+import org.wso2.carbon.identity.organization.management.organization.connection.sharing.api.dto.GeneralConnectionShareDTO;
+import org.wso2.carbon.identity.organization.management.organization.connection.sharing.api.dto.GeneralConnectionUnshareDTO;
+import org.wso2.carbon.identity.organization.management.organization.connection.sharing.api.dto.GetConnectionSharedOrgsDTO;
+import org.wso2.carbon.identity.organization.management.organization.connection.sharing.api.dto.ResponseConnectionOrgDetailsDTO;
+import org.wso2.carbon.identity.organization.management.organization.connection.sharing.api.dto.ResponseSharedConnectionOrgsDTO;
+import org.wso2.carbon.identity.organization.management.organization.connection.sharing.api.dto.SelectiveConnectionShareDTO;
+import org.wso2.carbon.identity.organization.management.organization.connection.sharing.api.dto.SelectiveConnectionShareOrgConfigDTO;
+import org.wso2.carbon.identity.organization.management.organization.connection.sharing.api.dto.SelectiveConnectionUnshareDTO;
+import org.wso2.carbon.identity.organization.management.organization.connection.sharing.api.exception.ConnectionSharingMgtClientException;
+import org.wso2.carbon.identity.organization.management.organization.connection.sharing.api.exception.ConnectionSharingMgtException;
+import org.wso2.carbon.identity.organization.management.organization.connection.sharing.api.service.ConnectionSharingPolicyHandlerService;
 import org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants;
 import org.wso2.carbon.identity.organization.resource.sharing.policy.management.constant.PolicyEnum;
+import org.wso2.carbon.identity.organization.resource.sharing.policy.management.constant.ResourceType;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -125,7 +125,7 @@ public class ServerIdpSharingService {
         }
         SelectiveConnectionShareDTO selectiveConnectionShareDTO = new SelectiveConnectionShareDTO();
         selectiveConnectionShareDTO.setConnectionId(requestBody.getIdentityProviderId());
-        selectiveConnectionShareDTO.setConnectionType(ConnectionType.IDP);
+        selectiveConnectionShareDTO.setResourceType(ResourceType.CONNECTION_IDENTITY_PROVIDER);
         selectiveConnectionShareDTO.setOrganizations(organizations);
         try {
             connectionSharingPolicyHandlerService.populateSelectiveConnectionShare(selectiveConnectionShareDTO);
@@ -156,7 +156,7 @@ public class ServerIdpSharingService {
         }
         GeneralConnectionShareDTO generalConnectionShareDTO = new GeneralConnectionShareDTO();
         generalConnectionShareDTO.setConnectionId(requestBody.getIdentityProviderId());
-        generalConnectionShareDTO.setConnectionType(ConnectionType.IDP);
+        generalConnectionShareDTO.setResourceType(ResourceType.CONNECTION_IDENTITY_PROVIDER);
         generalConnectionShareDTO.setPolicy(policy);
         try {
             connectionSharingPolicyHandlerService.populateGeneralConnectionShare(generalConnectionShareDTO);
@@ -185,7 +185,7 @@ public class ServerIdpSharingService {
         }
         SelectiveConnectionUnshareDTO selectiveConnectionUnshareDTO = new SelectiveConnectionUnshareDTO();
         selectiveConnectionUnshareDTO.setConnectionId(requestBody.getIdentityProviderId());
-        selectiveConnectionUnshareDTO.setConnectionType(ConnectionType.IDP);
+        selectiveConnectionUnshareDTO.setResourceType(ResourceType.CONNECTION_IDENTITY_PROVIDER);
         selectiveConnectionUnshareDTO.setOrgIds(requestBody.getOrgIds());
         try {
             connectionSharingPolicyHandlerService.populateSelectiveConnectionUnshare(selectiveConnectionUnshareDTO);
@@ -210,7 +210,7 @@ public class ServerIdpSharingService {
         }
         GeneralConnectionUnshareDTO generalConnectionUnshareDTO = new GeneralConnectionUnshareDTO();
         generalConnectionUnshareDTO.setConnectionId(requestBody.getIdentityProviderId());
-        generalConnectionUnshareDTO.setConnectionType(ConnectionType.IDP);
+        generalConnectionUnshareDTO.setResourceType(ResourceType.CONNECTION_IDENTITY_PROVIDER);
         try {
             connectionSharingPolicyHandlerService.populateGeneralConnectionUnshare(generalConnectionUnshareDTO);
             return Response.accepted()
@@ -242,7 +242,7 @@ public class ServerIdpSharingService {
         boolean recursiveFlag = (recursive == null) || recursive;
         GetConnectionSharedOrgsDTO getConnectionSharedOrgsDTO = new GetConnectionSharedOrgsDTO();
         getConnectionSharedOrgsDTO.setConnectionId(identityProviderId);
-        getConnectionSharedOrgsDTO.setConnectionType(ConnectionType.IDP);
+        getConnectionSharedOrgsDTO.setResourceType(ResourceType.CONNECTION_IDENTITY_PROVIDER);
         getConnectionSharedOrgsDTO.setInitiatingOrgId(getOrganizationId());
         getConnectionSharedOrgsDTO.setBefore(decodeCursor(before));
         getConnectionSharedOrgsDTO.setAfter(decodeCursor(after));
