@@ -86,7 +86,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
+            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD, DEVICE_REGISTRATION]
           description: Type of the flow to retrieve
       responses:
         '200':
@@ -131,7 +131,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
+            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD, DEVICE_REGISTRATION]
           description: Type of the flow to delete
       responses:
         '204':
@@ -173,7 +173,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
+            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD, DEVICE_REGISTRATION]
           description: Type of the flow to get metadata for
       responses:
         '200':
@@ -369,7 +369,7 @@ paths:
           required: false
           schema:
             type: string
-            enum: [REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION, ASK_PASSWORD]
+            enum: [REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION, ASK_PASSWORD, DEVICE_REGISTRATION]
           description: Optional flow type. When omitted, the default tree is returned.
       responses:
         '200':
@@ -437,7 +437,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
+            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD, DEVICE_REGISTRATION]
           description: Type of the flow to get configurations for
       responses:
         '200':
