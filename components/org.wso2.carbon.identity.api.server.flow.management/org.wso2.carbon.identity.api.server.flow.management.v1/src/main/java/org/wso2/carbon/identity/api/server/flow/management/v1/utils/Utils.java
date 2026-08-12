@@ -735,10 +735,10 @@ public class Utils {
     /**
      * Dynamically registered executors that supports this flow type.
      */
-    public static List<FlowExecutorInfo> getRegisteredExecutors(String flowType) {
+    public static List<FlowExecutorInfo> getSupportedExtensionExecutors(String flowType) {
 
         try {
-            return FlowExecutorMetadataService.getInstance().getComposerExecutors(flowType);
+            return FlowExecutorMetadataService.getInstance().getSupportedExtensionExecutors(flowType);
         } catch (Throwable e) {
             // Executors are dynamically registered from /dropins, so a faulty one must not fail the endpoint.
             LOG.warn("Failed to resolve dynamically registered executors for flow type: " + flowType

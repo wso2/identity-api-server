@@ -119,7 +119,7 @@ public abstract class AbstractMetaResponseHandler {
      */
     public List<String> getSupportedExecutors() {
 
-        return Utils.resolveSupportedExecutorNames(getRegisteredExecutors(), getLegacyExecutorBaseline());
+        return Utils.resolveSupportedExecutorNames(getSupportedExtensionExecutors(), getLegacyExecutorBaseline());
     }
 
     /**
@@ -129,7 +129,7 @@ public abstract class AbstractMetaResponseHandler {
      */
     public List<ExecutorMetadata> getExtensionExecutors() {
 
-        return Utils.resolveExtensionExecutorMetadata(getRegisteredExecutors(), getLegacyExecutorBaseline());
+        return Utils.resolveExtensionExecutorMetadata(getSupportedExtensionExecutors(), getLegacyExecutorBaseline());
     }
 
     /**
@@ -147,10 +147,10 @@ public abstract class AbstractMetaResponseHandler {
      *
      * @return List of registered executor info.
      */
-    protected List<FlowExecutorInfo> getRegisteredExecutors() {
+    protected List<FlowExecutorInfo> getSupportedExtensionExecutors() {
 
         if (registeredExecutors == null) {
-            registeredExecutors = Utils.getRegisteredExecutors(getFlowType());
+            registeredExecutors = Utils.getSupportedExtensionExecutors(getFlowType());
         }
         return registeredExecutors;
     }
@@ -312,7 +312,8 @@ public abstract class AbstractMetaResponseHandler {
 
         try {
 
-            Map<String, String> connectionExecutorMap = Utils.resolveConnectionExecutorMap(getRegisteredExecutors());
+            Map<String, String> connectionExecutorMap =
+                    Utils.resolveConnectionExecutorMap(getSupportedExtensionExecutors());
             Map<String, ExecutorConnections> executorConnections = new HashMap<>();
             getSupportedExecutors().forEach(executorName -> {
                 if (connectionExecutorMap.containsValue(executorName)) {

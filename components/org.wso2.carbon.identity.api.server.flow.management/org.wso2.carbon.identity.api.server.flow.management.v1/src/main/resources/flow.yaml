@@ -803,13 +803,12 @@ components:
         description:
           type: string
           description: Short explanation of what this step does
-          example: Verifies the user's identity with an external verification provider before the flow continues.
+          example: Verifies the user's identity with an external verification provider.
         behaviorFlags:
           type: array
           description: >-
-            Flags that change how a consumer treats this executor. RECOVERY_FACTOR declares
-            that this executor satisfies the password recovery flow requirement of having at least one
-            recovery factor. Values outside the recognised set are passed through but have no effect.
+            Flags that change how a consumer treats this executor. Values outside the recognised set are passed 
+            through but have no effect.
           items:
             type: string
           example: [ "RECOVERY_FACTOR" ]
