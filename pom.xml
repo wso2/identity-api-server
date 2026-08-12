@@ -478,6 +478,12 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.device.policy.common</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-rs-extension-search</artifactId>
                 <version>${cxf.extensions.search.version}</version>
@@ -1216,6 +1222,7 @@
         <module>components/org.wso2.carbon.identity.api.server.vc.template.management</module>
         <module>components/org.wso2.carbon.identity.api.server.credential.management</module>
         <module>components/org.wso2.carbon.identity.api.server.moesif.publisher</module>
+        <module>components/org.wso2.carbon.identity.api.server.device.policy</module>
     </modules>
 
 </project>
