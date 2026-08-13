@@ -67,16 +67,13 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.FapiProfile;
 import org.wso2.carbon.identity.api.server.configs.v1.model.FraudDetectionConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationConfiguration;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
-import org.wso2.carbon.identity.api.server.configs.v1.model.OpenID4VPConfiguration;
-import org.wso2.carbon.identity.openid4vc.presentation.authenticator.exception.VPAuthenticatorException;
-import org.wso2.carbon.identity.openid4vc.presentation.authenticator.service.VPConfigService;
-import org.wso2.carbon.identity.openid4vc.presentation.common.constant.OpenID4VPConstants;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthOAuth2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTValidatorConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.OpenID4VPConfiguration;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ProvisioningConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.PushDeviceMgtConfig;
@@ -156,6 +153,9 @@ import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationCon
 import org.wso2.carbon.identity.oauth2.impersonation.models.ImpersonationConfig;
 import org.wso2.carbon.identity.oauth2.impersonation.services.ImpersonationConfigMgtService;
 import org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.core.JWTClientAuthenticatorMgtService;
+import org.wso2.carbon.identity.openid4vc.presentation.authenticator.exception.VPAuthenticatorException;
+import org.wso2.carbon.identity.openid4vc.presentation.authenticator.service.VPConfigService;
+import org.wso2.carbon.identity.openid4vc.presentation.common.constant.VPConstants;
 import org.wso2.carbon.identity.organization.management.service.exception.OrganizationManagementException;
 import org.wso2.carbon.identity.organization.management.service.util.OrganizationManagementUtil;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
@@ -706,9 +706,9 @@ public class ServerConfigManagementService {
             VPConfigService.TenantConfig cfg = configService.getConfig(tenantDomain);
             return new OpenID4VPConfiguration()
                     .clientIdScheme(StringUtils.defaultIfBlank(
-                            cfg.getClientIdScheme(), OpenID4VPConstants.Defaults.CLIENT_ID_SCHEME))
+                            cfg.getClientIdScheme(), VPConstants.DEFAULT_CLIENT_ID_SCHEME))
                     .responseMode(StringUtils.defaultIfBlank(
-                            cfg.getResponseMode(), OpenID4VPConstants.Defaults.RESPONSE_MODE));
+                            cfg.getResponseMode(), VPConstants.DEFAULT_RESPONSE_MODE));
         } catch (VPAuthenticatorException e) {
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     Constants.ErrorMessage.ERROR_CODE_OID4VP_CONFIG_RETRIEVE, null);

@@ -23,7 +23,7 @@ import javax.ws.rs.core.Response;
 /**
  * Abstract service for VP Verification API.
  */
-public abstract class VpVerificationApiService {
+public abstract class VCVerificationsApiService {
 
     public abstract Response initiateVerification(VerificationInitiateRequest body);
 

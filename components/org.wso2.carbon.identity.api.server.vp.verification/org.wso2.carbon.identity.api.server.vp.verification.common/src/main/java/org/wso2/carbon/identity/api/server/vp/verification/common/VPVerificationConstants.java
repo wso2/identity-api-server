@@ -23,8 +23,7 @@ package org.wso2.carbon.identity.api.server.vp.verification.common;
  */
 public class VPVerificationConstants {
 
-    public static final String VP_VERIFICATION_INITIATE_PATH = "/api/server/v1/vp/verification/initiate";
-    public static final String VP_VERIFICATION_STATUS_PATH = "/api/server/v1/vp/verification/status";
+    public static final String CREDENTIAL_VERIFICATIONS_PATH = "/api/server/v1/openid4vp/vc-verifications";
 
     private VPVerificationConstants() {
     }

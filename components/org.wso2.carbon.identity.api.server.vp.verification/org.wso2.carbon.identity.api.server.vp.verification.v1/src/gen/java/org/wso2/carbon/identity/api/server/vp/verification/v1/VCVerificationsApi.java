@@ -23,7 +23,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.wso2.carbon.identity.api.server.vp.verification.v1.factories.VpVerificationApiServiceFactory;
+import org.wso2.carbon.identity.api.server.vp.verification.v1.factories.VCVerificationsApiServiceFactory;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -35,28 +35,27 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
- * JAX-RS resource for standalone VP (Verifiable Presentation) verification.
+ * JAX-RS resource for standalone credential verification via OpenID for Verifiable Presentations.
  *
  * <p>Endpoints (public — no authentication required):
  * <ul>
- *   <li>POST /vp/verification/initiate — start a new verification transaction</li>
- *   <li>GET  /vp/verification/status/{request_id} — poll for verification result</li>
+ *   <li>POST /openid4vp/vc-verifications         — create a new verification request</li>
+ *   <li>GET  /openid4vp/vc-verifications/{id}    — retrieve the request state</li>
  * </ul>
  */
-@Path("/vp/verification")
-@Api(value = "/vp/verification", description = "Standalone VP Verification API")
-public class VpVerificationApi {
+@Path("/openid4vp/vc-verifications")
+@Api(value = "/openid4vp/vc-verifications")
+public class VCVerificationsApi {
 
-    private final VpVerificationApiService delegate =
-            VpVerificationApiServiceFactory.getVpVerificationApi();
+    private final VCVerificationsApiService delegate =
+            VCVerificationsApiServiceFactory.getVCVerificationsApi();
 
     @POST
-    @Path("/initiate")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
-            value = "Initiate a VP verification transaction",
-            notes = "Creates a new verification transaction and returns a wallet URL for QR code display.",
+            value = "Create a credential verification request",
+            notes = "Creates a new verification request and returns a wallet URL for QR code display.",
             response = VerificationInitiateResponse.class)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Created", response = VerificationInitiateResponse.class),
@@ -64,20 +63,20 @@ public class VpVerificationApi {
             @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
     public Response initiateVerification(
-            @ApiParam(value = "Verification initiation request", required = true)
+            @ApiParam(value = "Verification request body", required = true)
                     VerificationInitiateRequest body) {
 
         return delegate.initiateVerification(body);
     }
 
     @GET
-    @Path("/status/{request_id}")
+    @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
-            value = "Get VP verification status",
-            notes = "Poll for the result of a verification session. "
-                    + "Returns ACTIVE while waiting, VERIFIED with presentation on success, "
-                    + "or FAILED with errors.",
+            value = "Get credential verification state",
+            notes = "Returns the current state of a verification request. "
+                    + "Returns ACTIVE while waiting, VERIFIED with the full presentation on success, "
+                    + "or FAILED with errors. The resource is removed after a terminal state is returned.",
             response = VerificationStatusResponse.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = VerificationStatusResponse.class),
@@ -85,8 +84,8 @@ public class VpVerificationApi {
             @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
     public Response getVerificationStatus(
-            @ApiParam(value = "Request ID returned from initiation.", required = true)
-            @PathParam("request_id") String requestId) {
+            @ApiParam(value = "Verification request ID returned from creation.", required = true)
+            @PathParam("id") String requestId) {
 
         return delegate.getVerificationStatus(requestId);
     }

@@ -18,17 +18,17 @@
 
 package org.wso2.carbon.identity.api.server.vp.verification.v1.impl;
 
+import org.wso2.carbon.identity.api.server.vp.verification.v1.VCVerificationsApiService;
 import org.wso2.carbon.identity.api.server.vp.verification.v1.VerificationInitiateRequest;
-import org.wso2.carbon.identity.api.server.vp.verification.v1.VpVerificationApiService;
 import org.wso2.carbon.identity.api.server.vp.verification.v1.core.ServerVPVerificationService;
 
 import javax.ws.rs.core.Response;
 
 /**
- * Thin wrapper implementation of VpVerificationApiService.
+ * Thin wrapper implementation of VCVerificationsApiService.
  * Delegates all logic to ServerVPVerificationService.
  */
-public class VpVerificationApiServiceImpl extends VpVerificationApiService {
+public class VCVerificationsApiServiceImpl extends VCVerificationsApiService {
 
     private static final ServerVPVerificationService CORE_SERVICE = new ServerVPVerificationService();
 

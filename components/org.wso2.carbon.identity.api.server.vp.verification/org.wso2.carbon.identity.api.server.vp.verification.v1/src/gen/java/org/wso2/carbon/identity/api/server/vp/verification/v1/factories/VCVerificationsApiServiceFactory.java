@@ -18,17 +18,17 @@
 
 package org.wso2.carbon.identity.api.server.vp.verification.v1.factories;
 
-import org.wso2.carbon.identity.api.server.vp.verification.v1.VpVerificationApiService;
-import org.wso2.carbon.identity.api.server.vp.verification.v1.impl.VpVerificationApiServiceImpl;
+import org.wso2.carbon.identity.api.server.vp.verification.v1.VCVerificationsApiService;
+import org.wso2.carbon.identity.api.server.vp.verification.v1.impl.VCVerificationsApiServiceImpl;
 
 /**
- * Factory class for VpVerificationApiService.
+ * Factory class for VCVerificationsApiService.
  */
-public class VpVerificationApiServiceFactory {
+public class VCVerificationsApiServiceFactory {
 
-    private static final VpVerificationApiService SERVICE = new VpVerificationApiServiceImpl();
+    private static final VCVerificationsApiService SERVICE = new VCVerificationsApiServiceImpl();
 
-    public static VpVerificationApiService getVpVerificationApi() {
+    public static VCVerificationsApiService getVCVerificationsApi() {
         return SERVICE;
     }
 }

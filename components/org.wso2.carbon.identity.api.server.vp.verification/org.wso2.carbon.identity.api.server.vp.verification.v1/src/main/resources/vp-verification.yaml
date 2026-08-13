@@ -1,20 +1,20 @@
 openapi: 3.0.0
 info:
   version: "v1"
-  title: WSO2 Identity Server - VP Verification API
+  title: WSO2 Identity Server - OpenID4VP Credential Verification API
   description: >-
-    This is the RESTful API for standalone Verifiable Presentation (VP) verification
-    in WSO2 Identity Server. Enables external applications to initiate OpenID4VP-based
-    credential verification flows independently of the authentication pipeline.
+    RESTful API for standalone credential verification via OpenID for Verifiable
+    Presentations (OpenID4VP) in WSO2 Identity Server. Enables external applications
+    to verify user credentials independently of the IS authentication pipeline.
 
     A typical integration:
 
-    1. Call **POST /vp/verification/initiate** with a presentation definition ID.
+    1. Call **POST /openid4vp/vc-verifications** with a presentation definition ID.
     2. Display the returned `walletUrl` as a QR code (or deeplink on mobile).
     3. The user scans the QR code — their wallet fetches the signed request, selects
        credentials, and submits the VP response directly to IS.
-    4. Poll **GET /vp/verification/status/{requestId}** until `status` is `VERIFIED`
-       or `FAILED`.
+    4. Poll **GET /openid4vp/vc-verifications/{id}** until `status` is `VERIFIED`
+       or `FAILED`. The resource is removed after the terminal state is returned.
   contact:
     name: WSO2 Identity Server
     url: 'https://wso2.com/identity-and-access-management/'
@@ -23,18 +23,17 @@ info:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 paths:
-  /vp/verification/initiate:
+  /openid4vp/vc-verifications:
     post:
       tags:
-        - VP Verification
-      summary: Initiate a VP verification transaction.
+        - Credential Verifications
+      summary: Create a credential verification request.
       operationId: initiateVerification
       description: |
-        Creates a new verification session for the specified presentation definition.
-        Returns a wallet deeplink URL (display as a QR code) and a `requestId` for
-        polling the result.
+        Creates a new credential verification request for the specified presentation definition.
+        Returns a wallet deeplink URL (display as a QR code) and an `id` for polling the result.
 
-        These endpoints are public — no Bearer token is required. The tenant is
+        This endpoint is public — no Bearer token is required. The tenant is
         resolved from the request URL context.
       security: []
       requestBody:
@@ -50,7 +49,7 @@ paths:
           description: Verification session created successfully.
           headers:
             Location:
-              description: URL to poll for the verification status.
+              description: URL to retrieve the verification request state.
               schema:
                 type: string
           content:
@@ -59,8 +58,8 @@ paths:
                 $ref: '#/components/schemas/VerificationInitiateResponse'
               example:
                 requestId: "abc123-def456-ghi789"
-                walletUrl: "openid4vp://authorize?client_id=x509_hash%3AAb...&request_uri=https%3A%2F%2Fis.example.com%2Foid4vp%2Fv1%2Frequest%2Fabc123"
-                requestUri: "https://is.example.com/oid4vp/v1/request/abc123"
+                walletUrl: "openid4vp://authorize?client_id=x509_hash%3AAb...&request_uri=https%3A%2F%2Fis.example.com%2Fopenid4vp%2Fv1%2Frequest%2Fabc123"
+                requestUri: "https://is.example.com/openid4vp/v1/request/abc123"
                 expiresAt: 1706265900000
         '400':
           $ref: '#/components/responses/InvalidInput'
@@ -77,30 +76,30 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
-  '/vp/verification/status/{requestId}':
+  '/openid4vp/vc-verifications/{id}':
     get:
       tags:
-        - VP Verification
-      summary: Poll for VP verification result.
+        - Credential Verifications
+      summary: Get credential verification state.
       operationId: getVerificationStatus
       description: |
-        Returns the current state of a verification session.
+        Returns the current state of a credential verification request.
 
         - `ACTIVE` — the wallet has not yet submitted a presentation; keep polling.
         - `VERIFIED` — the wallet submitted a valid VP; the `presentation` field
           contains full credential details and disclosed claims.
         - `FAILED` — verification failed; the `errors` field contains descriptions.
 
-        Sessions expire after the `expiresAt` time returned from initiation.
-        Polling an expired session returns 404.
+        The resource is removed after `VERIFIED` or `FAILED` is returned — the caller
+        must persist the result. Requesting a removed or expired resource returns 404.
 
-        These endpoints are public — no Bearer token is required.
+        This endpoint is public — no Bearer token is required.
       security: []
       parameters:
-        - name: requestId
+        - name: id
           in: path
           required: true
-          description: The `requestId` returned from the initiation call.
+          description: The verification request ID returned from the creation call.
           schema:
             type: string
           example: "abc123-def456-ghi789"
@@ -213,13 +212,13 @@ components:
           description: >
             OpenID4VP deeplink URL. Display as a QR code on desktop or open
             directly on mobile to launch the user's wallet.
-          example: "openid4vp://authorize?client_id=x509_hash%3AAb...&request_uri=https%3A%2F%2Fis.example.com%2Foid4vp%2Fv1%2Frequest%2Fabc123"
+          example: "openid4vp://authorize?client_id=x509_hash%3AAb...&request_uri=https%3A%2F%2Fis.example.com%2Fopenid4vp%2Fv1%2Frequest%2Fabc123"
         requestUri:
           type: string
           description: >
             URI from which the wallet fetches the signed Authorization Request JWT.
             Embedded inside `walletUrl`; exposed separately for logging/debugging.
-          example: "https://is.example.com/oid4vp/v1/request/abc123"
+          example: "https://is.example.com/openid4vp/v1/request/abc123"
         expiresAt:
           type: integer
           format: int64

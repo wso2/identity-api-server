@@ -35,10 +35,10 @@ import org.wso2.carbon.identity.api.server.vp.verification.v1.VerificationStatus
 import org.wso2.carbon.identity.api.server.vp.verification.v1.VerificationStatusResponse.Presentation;
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.exception.VPAuthenticatorErrorCode;
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.exception.VPAuthenticatorException;
+import org.wso2.carbon.identity.openid4vc.presentation.authenticator.model.VPFlowInitiationResult;
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.model.VPFlowSession;
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.model.VPFlowStatus;
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.service.VPFlowService;
-import org.wso2.carbon.identity.openid4vc.presentation.authenticator.model.VPFlowInitiationResult;
 import org.wso2.carbon.identity.openid4vc.presentation.verification.dto.PresentationMetadata;
 import org.wso2.carbon.identity.openid4vc.presentation.verification.dto.VerificationResult;
 
@@ -87,7 +87,7 @@ public class ServerVPVerificationService {
             initiationResponse.setExpiresAt(initiation.getExpiresAt());
 
             URI location = URI.create(
-                    VPVerificationConstants.VP_VERIFICATION_STATUS_PATH + "/" + initiation.getRequestId());
+                    VPVerificationConstants.CREDENTIAL_VERIFICATIONS_PATH + "/" + initiation.getRequestId());
             return Response.created(location).entity(initiationResponse).build();
 
         } catch (VPAuthenticatorException e) {
@@ -128,16 +128,29 @@ public class ServerVPVerificationService {
             return buildNotFoundResponse(requestId);
         }
 
+        VPFlowStatus status = session.getStatus() != null ? session.getStatus() : VPFlowStatus.FAILED;
+
         VerificationStatusResponse statusResponse = new VerificationStatusResponse();
         statusResponse.setRequestId(requestId);
-        statusResponse.setStatus(session.getStatus() != null ? session.getStatus().name() : VPFlowStatus.FAILED.name());
+        statusResponse.setStatus(status.name());
 
-        if (session.getVerificationResult() != null && session.getStatus() == VPFlowStatus.VERIFIED) {
-            statusResponse.setPresentation(buildPresentation(session.getVerificationResult()));
-        } else if (session.getStatus() == VPFlowStatus.FAILED) {
+        if (status == VPFlowStatus.VERIFIED) {
             if (session.getVerificationResult() != null) {
-                statusResponse.setErrors(session.getVerificationResult().getErrors());
+                statusResponse.setPresentation(buildPresentation(session.getVerificationResult()));
             }
+            // Remove session immediately after returning the verified presentation — the caller
+            // is expected to persist the claims themselves. Keeps PII off the cache.
+            service.removeSession(requestId);
+        } else if (status == VPFlowStatus.FAILED) {
+            // WalletSubmissionServlet sets failureReason on the session, not verificationResult,
+            // for all failure paths (wallet error response and verification failure alike).
+            String reason = session.getFailureReason();
+            if (StringUtils.isNotBlank(reason)) {
+                List<String> errors = new ArrayList<>();
+                errors.add(reason);
+                statusResponse.setErrors(errors);
+            }
+            service.removeSession(requestId);
         }
 
         return Response.ok(statusResponse).build();
