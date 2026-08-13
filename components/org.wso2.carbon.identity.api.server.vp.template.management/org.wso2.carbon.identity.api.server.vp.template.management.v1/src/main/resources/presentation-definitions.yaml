@@ -16,7 +16,7 @@ security:
   - OAuth2: []
   - BasicAuth: []
 paths:
-  /vp/template:
+  /openid4vp/presentation-definitions:
     get:
       tags:
         - Presentation Definitions
@@ -87,7 +87,7 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
-  '/vp/template/{definition-id}':
+  '/openid4vp/presentation-definitions/{definition-id}':
     get:
       tags:
         - Presentation Definitions
@@ -176,7 +176,7 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
-  '/vp/template/{definition-id}/trusted-cas':
+  '/openid4vp/presentation-definitions/{definition-id}/trusted-cas':
     patch:
       tags:
         - Presentation Definitions
@@ -222,7 +222,7 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
-  '/vp/template/{definition-id}/connected-connections':
+  '/openid4vp/presentation-definitions/{definition-id}/connected-connections':
     get:
       tags:
         - Presentation Definitions
@@ -493,7 +493,7 @@ components:
           items:
             $ref: '#/components/schemas/PaginationLink'
           example:
-            - href: "/api/server/v1/vp/template?after=eyJuYW1lIjoiQSJ9&limit=10"
+            - href: "/api/server/v1/openid4vp/presentation-definitions?after=eyJuYW1lIjoiQSJ9&limit=10"
               rel: "next"
 
     PresentationDefinitionListItem:
@@ -566,7 +566,7 @@ components:
         href:
           type: string
           description: URL of the linked page.
-          example: "/api/server/v1/vp/template?after=eyJuYW1lIjoiQSJ9&limit=10"
+          example: "/api/server/v1/openid4vp/presentation-definitions?after=eyJuYW1lIjoiQSJ9&limit=10"
         rel:
           type: string
           description: Link relation — 'next' or 'prev'.

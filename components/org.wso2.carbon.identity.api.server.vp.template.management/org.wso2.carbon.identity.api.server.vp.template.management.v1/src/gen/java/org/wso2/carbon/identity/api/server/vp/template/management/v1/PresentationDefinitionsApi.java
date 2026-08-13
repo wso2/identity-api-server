@@ -41,8 +41,8 @@ import java.util.List;
 /**
  * JAX-RS resource for Presentation Definition management.
  */
-@Path("/vp/template")
-@Api(value = "/vp/template", description = "Presentation Definition Management API")
+@Path("/openid4vp/presentation-definitions")
+@Api(value = "/openid4vp/presentation-definitions", description = "Presentation Definition Management API")
 public class PresentationDefinitionsApi {
 
     private final PresentationDefinitionsApiService delegate =

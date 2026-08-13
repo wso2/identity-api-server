@@ -20,12 +20,13 @@ package org.wso2.carbon.identity.api.server.vp.template.management.v1.core;
 
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
-import org.wso2.carbon.identity.core.util.IdentityUtil;
-import org.wso2.carbon.identity.openid4vc.presentation.common.constant.OpenID4VPConstants;
 import org.wso2.carbon.identity.api.server.vp.template.management.common.VPDefinitionManagementConstants;
 import org.wso2.carbon.identity.api.server.vp.template.management.common.VPDefinitionManagementConstants.ErrorMessage;
 import org.wso2.carbon.identity.api.server.vp.template.management.common.VPDefinitionManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.CertificatePatch;
+import org.wso2.carbon.identity.api.server.vp.template.management.v1.ClaimConstraintModel;
+import org.wso2.carbon.identity.api.server.vp.template.management.v1.ConnectedConnectionItem;
+import org.wso2.carbon.identity.api.server.vp.template.management.v1.ConnectedConnectionsResponse;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.Error;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PaginationLink;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionCreationModel;
@@ -33,10 +34,9 @@ import org.wso2.carbon.identity.api.server.vp.template.management.v1.Presentatio
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionListItem;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionResponse;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionUpdateModel;
-import org.wso2.carbon.identity.api.server.vp.template.management.v1.ClaimConstraintModel;
-import org.wso2.carbon.identity.api.server.vp.template.management.v1.ConnectedConnectionItem;
-import org.wso2.carbon.identity.api.server.vp.template.management.v1.ConnectedConnectionsResponse;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.RequestedCredentialModel;
+import org.wso2.carbon.identity.core.util.IdentityUtil;
+import org.wso2.carbon.identity.openid4vc.presentation.common.constant.VPConstants;
 import org.wso2.carbon.identity.openid4vc.presentation.management.exception.PresentationManagementClientException;
 import org.wso2.carbon.identity.openid4vc.presentation.management.exception.PresentationManagementErrorCode;
 import org.wso2.carbon.identity.openid4vc.presentation.management.exception.PresentationManagementException;
@@ -68,8 +68,9 @@ public class ServerVPDefinitionManagementService {
     /**
      * List presentation definitions with cursor-based pagination and optional filtering.
      *
-     * @param before base64-encoded backward cursor for reverse pagination; {@code null} for the default forward direction.
-     * @param after  base64-encoded forward cursor from the previous page's "next" link; {@code null} to start from the beginning.
+     * @param before base64-encoded backward cursor for reverse pagination; {@code null} for forward direction.
+     * @param after  base64-encoded forward cursor from the previous page's "next" link; {@code null} to start from
+     *               the beginning.
      * @param filter a SCIM-style filter expression to narrow results; {@code null} to return all definitions.
      * @param limit  maximum number of records per page; capped at {@code MAX_LIMIT}.
      * @return the paginated list of presentation definitions with cursor-based navigation links.
@@ -389,7 +390,8 @@ public class ServerVPDefinitionManagementService {
             }
 
             List<String> existingCas = target.getTrustedCas();
-            List<String> updatedTrustedCas = new ArrayList<>(existingCas != null ? existingCas : Collections.emptyList());
+            List<String> updatedTrustedCas = new ArrayList<>(
+                    existingCas != null ? existingCas : Collections.emptyList());
             for (CertificatePatch patch : patchRequest) {
                 switch (patch.getOperation()) {
                     case ADD:
@@ -506,7 +508,8 @@ public class ServerVPDefinitionManagementService {
             requestedCredential.setFormat(apiModel.getFormat() != null ? apiModel.getFormat() : "dc+sd-jwt");
             requestedCredential.setEnforceTrustedIssuer(Boolean.TRUE.equals(apiModel.getEnforceTrustedIssuer()));
             requestedCredential.setTrustedCas(decodeBase64PemList(apiModel.getTrustedCaPems()));
-            requestedCredential.setKeyResolutionMethod(apiModel.getKeyResolutionMethod() != null ? apiModel.getKeyResolutionMethod() : "x5c");
+            requestedCredential.setKeyResolutionMethod(
+                    apiModel.getKeyResolutionMethod() != null ? apiModel.getKeyResolutionMethod() : "x5c");
             requestedCredential.setJwksUri(apiModel.getJwksUri());
             requestedCredential.setIssuerPem(apiModel.getIssuerPem());
             requestedCredential.setClaims(toClaimConstraints(apiModel.getClaims()));
@@ -675,7 +678,7 @@ public class ServerVPDefinitionManagementService {
 
     private PresentationDefinitionService getService() {
 
-        if (!Boolean.parseBoolean(IdentityUtil.getProperty(OpenID4VPConstants.ConfigKeys.FEATURE_ENABLED))) {
+        if (!Boolean.parseBoolean(IdentityUtil.getProperty(VPConstants.ConfigKeys.FEATURE_ENABLED))) {
             throw buildFeatureDisabledError();
         }
         PresentationDefinitionService service =

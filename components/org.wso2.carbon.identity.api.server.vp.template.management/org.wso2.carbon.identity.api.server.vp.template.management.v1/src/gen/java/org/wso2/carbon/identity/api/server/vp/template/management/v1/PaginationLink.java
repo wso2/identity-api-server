@@ -46,7 +46,7 @@ public class PaginationLink {
         return this;
     }
 
-    @ApiModelProperty(example = "/api/server/v1/vp/template?after=NDoy")
+    @ApiModelProperty(example = "/api/server/v1/openid4vp/presentation-definitions?after=NDoy")
     @JsonProperty("href")
     public String getHref() {
         return href;
