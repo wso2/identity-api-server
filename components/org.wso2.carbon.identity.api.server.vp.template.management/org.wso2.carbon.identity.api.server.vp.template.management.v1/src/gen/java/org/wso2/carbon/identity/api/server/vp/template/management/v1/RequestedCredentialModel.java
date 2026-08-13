@@ -75,7 +75,7 @@ public class RequestedCredentialModel {
         this.trustedCaPems = trustedCaPems;
     }
 
-    @ApiModelProperty(value = "Key resolution method for verifying the issuer's signature. One of: x5c, jwks_uri, pem, metadata_discovery. Defaults to x5c.")
+    @ApiModelProperty(value = "Key resolution method for verifying the issuer's signature. One of: x5c, jwks_uri, pem. Defaults to x5c.")
     @JsonProperty("keyResolutionMethod")
     public String getKeyResolutionMethod() {
         return keyResolutionMethod;
