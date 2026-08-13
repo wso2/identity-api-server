@@ -158,6 +158,13 @@ public class ConfigsServiceHolder {
                         .getOSGiService(FapiConfigMgtService.class, null);
     }
 
+    private static class VPConfigServiceHolder {
+
+        static final VPConfigService SERVICE =
+                (VPConfigService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(VPConfigService.class, null);
+    }
+
     /**
      * Get ApplicationManagementService osgi service.
      *
@@ -329,14 +336,12 @@ public class ConfigsServiceHolder {
     }
 
     /**
-     * Get OpenID4VPConfigService osgi service.
-     * Returns null if the OID4VP feature is not enabled/deployed.
+     * Get VPConfigService osgi service.
      *
-     * @return OpenID4VPConfigService
+     * @return VPConfigService
      */
     public static VPConfigService getOpenID4VPConfigService() {
 
-        return (VPConfigService) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext().getOSGiService(VPConfigService.class, null);
+        return VPConfigServiceHolder.SERVICE;
     }
 }

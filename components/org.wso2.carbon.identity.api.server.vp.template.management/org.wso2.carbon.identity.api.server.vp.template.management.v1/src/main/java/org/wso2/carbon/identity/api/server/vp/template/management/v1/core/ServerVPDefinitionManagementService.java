@@ -113,10 +113,11 @@ public class ServerVPDefinitionManagementService {
             boolean isLastPage = !hasMoreItems
                     && (StringUtils.isNotBlank(after) || StringUtils.isBlank(before));
 
-            String urlBase = "?limit=" + resolvedLimit;
+            String urlBase = VPDefinitionManagementConstants.PARAM_LIMIT + resolvedLimit;
             if (StringUtils.isNotBlank(filter)) {
                 try {
-                    urlBase += "&filter=" + URLEncoder.encode(filter, StandardCharsets.UTF_8.name());
+                    urlBase += VPDefinitionManagementConstants.PARAM_FILTER
+                            + URLEncoder.encode(filter, StandardCharsets.UTF_8.name());
                 } catch (UnsupportedEncodingException e) {
                     // UTF-8 is always supported; ignore.
                 }
@@ -132,13 +133,17 @@ public class ServerVPDefinitionManagementService {
             if (!isFirstPage && pageItems.get(0).getCursorKey() != null) {
                 String encoded = Base64.getEncoder().encodeToString(
                         pageItems.get(0).getCursorKey().toString().getBytes(StandardCharsets.UTF_8));
-                result.addLinksItem(buildPaginationLink(urlBase + "&before=" + encoded, "previous"));
+                result.addLinksItem(buildPaginationLink(
+                        urlBase + VPDefinitionManagementConstants.PARAM_BEFORE + encoded,
+                        VPDefinitionManagementConstants.LINK_REL_PREVIOUS));
             }
             if (!isLastPage && pageItems.get(pageItems.size() - 1).getCursorKey() != null) {
                 String encoded = Base64.getEncoder().encodeToString(
                         pageItems.get(pageItems.size() - 1).getCursorKey()
                                 .toString().getBytes(StandardCharsets.UTF_8));
-                result.addLinksItem(buildPaginationLink(urlBase + "&after=" + encoded, "next"));
+                result.addLinksItem(buildPaginationLink(
+                        urlBase + VPDefinitionManagementConstants.PARAM_AFTER + encoded,
+                        VPDefinitionManagementConstants.LINK_REL_NEXT));
             }
 
             result.setTotalResults(searchResult.getTotalCount());
@@ -315,7 +320,7 @@ public class ServerVPDefinitionManagementService {
                     service.getConnectedConnections(definitionId, tenantId);
 
             String serverUrl = IdentityUtil.getServerURL(
-                    "/api/server/v1/identity-providers/", true, true);
+                    VPDefinitionManagementConstants.IDENTITY_PROVIDER_PATH_COMPONENT, true, true);
 
             List<ConnectedConnectionInfo> effectiveConnections =
                     connections != null ? connections : Collections.<ConnectedConnectionInfo>emptyList();
@@ -385,7 +390,7 @@ public class ServerVPDefinitionManagementService {
             if (patchRequest == null || patchRequest.isEmpty()) {
                 throw new javax.ws.rs.WebApplicationException(
                         Response.status(Response.Status.BAD_REQUEST)
-                                .entity(buildError("VPD-60005", "Patch request must not be empty."))
+                                .entity(buildError(ErrorMessage.ERROR_CODE_INVALID_PATCH_REQUEST.getCode(), "Patch request must not be empty."))
                                 .build());
             }
 
@@ -395,79 +400,13 @@ public class ServerVPDefinitionManagementService {
             for (CertificatePatch patch : patchRequest) {
                 switch (patch.getOperation()) {
                     case ADD:
-                        if (StringUtils.isBlank(patch.getCertificate())) {
-                            throw new javax.ws.rs.WebApplicationException(
-                                    Response.status(Response.Status.BAD_REQUEST)
-                                            .entity(buildError("VPD-60005",
-                                                    "Certificate is required for ADD operation."))
-                                            .build());
-                        }
-                        try {
-                            String rawPemToAdd = new String(
-                                    Base64.getDecoder().decode(patch.getCertificate()),
-                                    StandardCharsets.UTF_8);
-                            updatedTrustedCas.add(rawPemToAdd);
-                        } catch (IllegalArgumentException e) {
-                            throw new javax.ws.rs.WebApplicationException(
-                                    Response.status(Response.Status.BAD_REQUEST)
-                                            .entity(buildError("VPD-60005",
-                                                    "Certificate is not valid Base64."))
-                                            .build());
-                        }
+                        applyAddCertificatePatch(patch, updatedTrustedCas);
                         break;
                     case REMOVE:
-                        if (patch.getCertificateIndex() == null) {
-                            throw new javax.ws.rs.WebApplicationException(
-                                    Response.status(Response.Status.BAD_REQUEST)
-                                            .entity(buildError("VPD-60005",
-                                                    "certificateIndex is required for REMOVE operation."))
-                                            .build());
-                        }
-                        int removeIdx = patch.getCertificateIndex();
-                        if (removeIdx < 0 || removeIdx >= updatedTrustedCas.size()) {
-                            throw new javax.ws.rs.WebApplicationException(
-                                    Response.status(Response.Status.BAD_REQUEST)
-                                            .entity(buildError("VPD-60005",
-                                                    "Invalid certificate index: " + removeIdx))
-                                            .build());
-                        }
-                        updatedTrustedCas.remove(removeIdx);
+                        applyRemoveCertificatePatch(patch, updatedTrustedCas);
                         break;
                     case REPLACE:
-                        if (patch.getCertificateIndex() == null) {
-                            throw new javax.ws.rs.WebApplicationException(
-                                    Response.status(Response.Status.BAD_REQUEST)
-                                            .entity(buildError("VPD-60005",
-                                                    "certificateIndex is required for REPLACE operation."))
-                                            .build());
-                        }
-                        if (StringUtils.isBlank(patch.getCertificate())) {
-                            throw new javax.ws.rs.WebApplicationException(
-                                    Response.status(Response.Status.BAD_REQUEST)
-                                            .entity(buildError("VPD-60005",
-                                                    "Certificate is required for REPLACE operation."))
-                                            .build());
-                        }
-                        int replaceIdx = patch.getCertificateIndex();
-                        if (replaceIdx < 0 || replaceIdx >= updatedTrustedCas.size()) {
-                            throw new javax.ws.rs.WebApplicationException(
-                                    Response.status(Response.Status.BAD_REQUEST)
-                                            .entity(buildError("VPD-60005",
-                                                    "Invalid certificate index: " + replaceIdx))
-                                            .build());
-                        }
-                        try {
-                            String rawPemToReplace = new String(
-                                    Base64.getDecoder().decode(patch.getCertificate()),
-                                    StandardCharsets.UTF_8);
-                            updatedTrustedCas.set(replaceIdx, rawPemToReplace);
-                        } catch (IllegalArgumentException e) {
-                            throw new javax.ws.rs.WebApplicationException(
-                                    Response.status(Response.Status.BAD_REQUEST)
-                                            .entity(buildError("VPD-60005",
-                                                    "Certificate is not valid Base64."))
-                                            .build());
-                        }
+                        applyReplaceCertificatePatch(patch, updatedTrustedCas);
                         break;
                     default:
                         break;
@@ -505,11 +444,14 @@ public class ServerVPDefinitionManagementService {
             RequestedCredential requestedCredential = new RequestedCredential();
             requestedCredential.setCredentialId(apiModel.getId());
             requestedCredential.setType(apiModel.getType());
-            requestedCredential.setFormat(apiModel.getFormat() != null ? apiModel.getFormat() : "dc+sd-jwt");
+            requestedCredential.setFormat(apiModel.getFormat() != null
+                    ? apiModel.getFormat() : VPDefinitionManagementConstants.DEFAULT_CREDENTIAL_FORMAT);
             requestedCredential.setEnforceTrustedIssuer(Boolean.TRUE.equals(apiModel.getEnforceTrustedIssuer()));
             requestedCredential.setTrustedCas(decodeBase64PemList(apiModel.getTrustedCaPems()));
             requestedCredential.setKeyResolutionMethod(
-                    apiModel.getKeyResolutionMethod() != null ? apiModel.getKeyResolutionMethod() : "x5c");
+                    apiModel.getKeyResolutionMethod() != null
+                            ? apiModel.getKeyResolutionMethod()
+                            : VPDefinitionManagementConstants.DEFAULT_KEY_RESOLUTION_METHOD);
             requestedCredential.setJwksUri(apiModel.getJwksUri());
             requestedCredential.setIssuerPem(apiModel.getIssuerPem());
             requestedCredential.setClaims(toClaimConstraints(apiModel.getClaims()));
@@ -689,6 +631,58 @@ public class ServerVPDefinitionManagementService {
         return service;
     }
 
+    private void applyAddCertificatePatch(CertificatePatch patch, List<String> trustedCas) {
+
+        if (StringUtils.isBlank(patch.getCertificate())) {
+            throw buildInvalidPatchRequestException("Certificate is required for ADD operation.");
+        }
+        try {
+            trustedCas.add(new String(Base64.getDecoder().decode(patch.getCertificate()), StandardCharsets.UTF_8));
+        } catch (IllegalArgumentException e) {
+            throw buildInvalidPatchRequestException("Certificate is not valid Base64.");
+        }
+    }
+
+    private void applyRemoveCertificatePatch(CertificatePatch patch, List<String> trustedCas) {
+
+        if (patch.getCertificateIndex() == null) {
+            throw buildInvalidPatchRequestException("certificateIndex is required for REMOVE operation.");
+        }
+        int index = patch.getCertificateIndex();
+        if (index < 0 || index >= trustedCas.size()) {
+            throw buildInvalidPatchRequestException("Invalid certificate index: " + index);
+        }
+        trustedCas.remove(index);
+    }
+
+    private void applyReplaceCertificatePatch(CertificatePatch patch, List<String> trustedCas) {
+
+        if (patch.getCertificateIndex() == null) {
+            throw buildInvalidPatchRequestException("certificateIndex is required for REPLACE operation.");
+        }
+        if (StringUtils.isBlank(patch.getCertificate())) {
+            throw buildInvalidPatchRequestException("Certificate is required for REPLACE operation.");
+        }
+        int index = patch.getCertificateIndex();
+        if (index < 0 || index >= trustedCas.size()) {
+            throw buildInvalidPatchRequestException("Invalid certificate index: " + index);
+        }
+        try {
+            trustedCas.set(index,
+                    new String(Base64.getDecoder().decode(patch.getCertificate()), StandardCharsets.UTF_8));
+        } catch (IllegalArgumentException e) {
+            throw buildInvalidPatchRequestException("Certificate is not valid Base64.");
+        }
+    }
+
+    private javax.ws.rs.WebApplicationException buildInvalidPatchRequestException(String description) {
+
+        return new javax.ws.rs.WebApplicationException(
+                Response.status(Response.Status.BAD_REQUEST)
+                        .entity(buildError(ErrorMessage.ERROR_CODE_INVALID_PATCH_REQUEST.getCode(), description))
+                        .build());
+    }
+
     private Error buildError(String code, String message) {
 
         Error error = new Error();
@@ -700,10 +694,9 @@ public class ServerVPDefinitionManagementService {
     private javax.ws.rs.WebApplicationException buildFeatureDisabledError() {
 
         Error error = new Error();
-        error.setCode("VPD-60004");
-        error.setMessage("OpenID4VP feature is not enabled.");
-        error.setDescription(
-                "The OpenID4VP feature is disabled. Enable it via [openid4vp] enabled=true in deployment.toml.");
+        error.setCode(ErrorMessage.ERROR_CODE_FEATURE_DISABLED.getCode());
+        error.setMessage(ErrorMessage.ERROR_CODE_FEATURE_DISABLED.getMessage());
+        error.setDescription(ErrorMessage.ERROR_CODE_FEATURE_DISABLED.getDescription());
         return new javax.ws.rs.WebApplicationException(
                 Response.status(Response.Status.NOT_IMPLEMENTED).entity(error).build());
     }

@@ -79,7 +79,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                code: "OID4VP-60001"
+                code: "VPV-60501"
                 message: "OpenID4VP feature is not enabled."
                 description: "Enable it via [openid4vp] enabled=true in deployment.toml."
         '500':
@@ -113,6 +113,7 @@ paths:
           required: true
           schema:
             type: string
+            minLength: 1
           example: "vp-req-abc123"
       responses:
         '200':
@@ -161,6 +162,16 @@ paths:
                     status: "FAILED"
                     errors:
                       - "KB-JWT aud does not match the expected verifier client_id."
+        '400':
+          description: Bad Request — missing or blank requestId.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: "VPV-60001"
+                message: "Invalid request."
+                description: "requestId must not be blank."
         '404':
           description: Not Found — the session does not exist or has already been consumed.
           content:
@@ -194,6 +205,7 @@ components:
       properties:
         presentationDefinitionId:
           type: string
+          minLength: 1
           description: >
             ID of the presentation definition the verifier wants the wallet to satisfy.
             Must exist in the tenant's presentation definition registry.
@@ -254,7 +266,10 @@ components:
           $ref: '#/components/schemas/Presentation'
         errors:
           type: array
-          description: Human-readable error descriptions when `status` is `FAILED`. Empty otherwise.
+          description: >
+            Human-readable error descriptions. Present only when `status` is `FAILED` and a failure
+            reason is available. Omitted for `ACTIVE` and `VERIFIED` states, and for failed sessions
+            where no specific reason was recorded.
           items:
             type: string
           example:

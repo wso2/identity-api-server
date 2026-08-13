@@ -24,14 +24,24 @@ package org.wso2.carbon.identity.api.server.vp.template.management.common;
 public class VPDefinitionManagementConstants {
 
     private VPDefinitionManagementConstants() {
+
     }
 
     public static final String VP_DEFINITION_MANAGEMENT_PATH_COMPONENT = "/openid4vp/presentation-definitions";
+    public static final String IDENTITY_PROVIDER_PATH_COMPONENT = "/api/server/v1/identity-providers/";
     public static final String PATH_SEPARATOR = "/";
     public static final Integer DEFAULT_LIMIT = 10;
     public static final Integer MAX_LIMIT = 100;
     public static final String ASC_SORT_ORDER = "ASC";
     public static final String DESC_SORT_ORDER = "DESC";
+    public static final String DEFAULT_CREDENTIAL_FORMAT = "dc+sd-jwt";
+    public static final String DEFAULT_KEY_RESOLUTION_METHOD = "x5c";
+    public static final String PARAM_LIMIT = "?limit=";
+    public static final String PARAM_FILTER = "&filter=";
+    public static final String PARAM_BEFORE = "&before=";
+    public static final String PARAM_AFTER = "&after=";
+    public static final String LINK_REL_PREVIOUS = "previous";
+    public static final String LINK_REL_NEXT = "next";
 
     /**
      * Enum for error messages.
@@ -47,6 +57,9 @@ public class VPDefinitionManagementConstants {
                 "A presentation definition with the given identifier already exists."),
         ERROR_CODE_DEFINITION_IN_USE("VPD-60004", "Presentation definition is in use.",
                 "The presentation definition '%s' is referenced by one or more connections and cannot be deleted."),
+        ERROR_CODE_INVALID_PATCH_REQUEST("VPD-60005", "Invalid certificate patch request.", "%s"),
+        ERROR_CODE_FEATURE_DISABLED("VPD-60006", "OpenID4VP feature is not enabled.",
+                "The OpenID4VP feature is disabled. Enable it via [openid4vp] enabled=true in deployment.toml."),
 
         // Server errors (65xxx).
         ERROR_CODE_ERROR_RETRIEVING_CONNECTED_CONNECTIONS("VPD-65006",
@@ -68,25 +81,30 @@ public class VPDefinitionManagementConstants {
         private final String description;
 
         ErrorMessage(String code, String message, String description) {
+
             this.code = code;
             this.message = message;
             this.description = description;
         }
 
         public String getCode() {
+
             return code;
         }
 
         public String getMessage() {
+
             return message;
         }
 
         public String getDescription() {
+
             return description;
         }
 
         @Override
         public String toString() {
+
             return code + " | " + message;
         }
     }

@@ -34,14 +34,17 @@ public class PaginationLink {
     @ApiModelProperty(example = "next")
     @JsonProperty("rel")
     public String getRel() {
+
         return rel;
     }
 
     public void setRel(String rel) {
+
         this.rel = rel;
     }
 
     public PaginationLink rel(String rel) {
+
         this.rel = rel;
         return this;
     }
@@ -49,20 +52,24 @@ public class PaginationLink {
     @ApiModelProperty(example = "/api/server/v1/openid4vp/presentation-definitions?after=NDoy")
     @JsonProperty("href")
     public String getHref() {
+
         return href;
     }
 
     public void setHref(String href) {
+
         this.href = href;
     }
 
     public PaginationLink href(String href) {
+
         this.href = href;
         return this;
     }
 
     @Override
     public boolean equals(Object o) {
+
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PaginationLink that = (PaginationLink) o;
@@ -71,11 +78,13 @@ public class PaginationLink {
 
     @Override
     public int hashCode() {
+
         return Objects.hash(rel, href);
     }
 
     @Override
     public String toString() {
+
         return "PaginationLink{rel='" + rel + "', href='" + href + "'}";
     }
 }

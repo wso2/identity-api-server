@@ -23,9 +23,11 @@ package org.wso2.carbon.identity.api.server.vp.verification.common;
  */
 public class VPVerificationConstants {
 
-    public static final String CREDENTIAL_VERIFICATIONS_PATH = "/api/server/v1/openid4vp/vc-verifications";
+    public static final String CREDENTIAL_VERIFICATIONS_PATH = "/v1/openid4vp/vc-verifications";
+    public static final String CLIENT_ERROR_CODE_PREFIX = "VPA-4";
 
     private VPVerificationConstants() {
+
     }
 
     /**
@@ -35,6 +37,7 @@ public class VPVerificationConstants {
 
         ERROR_CODE_INVALID_REQUEST("VPV-60001", "Invalid request."),
         ERROR_CODE_SESSION_NOT_FOUND("VPV-60401", "Verification session not found."),
+        ERROR_CODE_FEATURE_DISABLED("VPV-60501", "OpenID4VP feature is not enabled."),
         ERROR_CODE_INTERNAL_ERROR("VPV-65001", "Internal server error."),
         ERROR_CODE_SERVICE_UNAVAILABLE("VPV-65002",
                 "VPVerificationService is not available.");
@@ -43,15 +46,18 @@ public class VPVerificationConstants {
         private final String message;
 
         ErrorMessage(String code, String message) {
+
             this.code = code;
             this.message = message;
         }
 
         public String getCode() {
+
             return code;
         }
 
         public String getMessage() {
+
             return message;
         }
     }

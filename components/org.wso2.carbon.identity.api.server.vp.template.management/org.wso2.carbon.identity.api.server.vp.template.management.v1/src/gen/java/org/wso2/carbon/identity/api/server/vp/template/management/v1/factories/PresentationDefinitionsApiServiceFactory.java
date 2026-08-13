@@ -30,6 +30,7 @@ public class PresentationDefinitionsApiServiceFactory {
             new PresentationDefinitionsApiServiceImpl();
 
     public static PresentationDefinitionsApiService getPresentationDefinitionsApi() {
+
         return SERVICE;
     }
 }

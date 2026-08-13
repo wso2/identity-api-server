@@ -28,6 +28,7 @@ import org.wso2.carbon.identity.openid4vc.presentation.authenticator.service.VPF
 public class VPVerificationServiceHolder {
 
     private VPVerificationServiceHolder() {
+
     }
 
     /**

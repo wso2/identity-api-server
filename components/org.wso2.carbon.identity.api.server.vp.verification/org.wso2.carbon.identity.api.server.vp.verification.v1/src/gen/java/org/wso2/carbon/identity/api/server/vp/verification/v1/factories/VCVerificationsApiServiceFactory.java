@@ -29,6 +29,7 @@ public class VCVerificationsApiServiceFactory {
     private static final VCVerificationsApiService SERVICE = new VCVerificationsApiServiceImpl();
 
     public static VCVerificationsApiService getVCVerificationsApi() {
+
         return SERVICE;
     }
 }

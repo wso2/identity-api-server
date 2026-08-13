@@ -39,30 +39,36 @@ public class CertificatePatch {
     @ApiModelProperty(required = true, value = "The patch operation to perform.")
     @JsonProperty("operation")
     public OperationEnum getOperation() {
+
         return operation;
     }
 
     public void setOperation(OperationEnum operation) {
+
         this.operation = operation;
     }
 
     @ApiModelProperty(value = "Zero-based index of the certificate to remove or replace.")
     @JsonProperty("certificateIndex")
     public Integer getCertificateIndex() {
+
         return certificateIndex;
     }
 
     public void setCertificateIndex(Integer certificateIndex) {
+
         this.certificateIndex = certificateIndex;
     }
 
     @ApiModelProperty(value = "Base64-encoded PEM certificate (required for ADD and REPLACE).")
     @JsonProperty("certificate")
     public String getCertificate() {
+
         return certificate;
     }
 
     public void setCertificate(String certificate) {
+
         this.certificate = certificate;
     }
 }

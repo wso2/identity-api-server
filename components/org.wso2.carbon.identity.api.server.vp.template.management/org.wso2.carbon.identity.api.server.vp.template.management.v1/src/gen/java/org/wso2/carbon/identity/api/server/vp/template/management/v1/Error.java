@@ -37,40 +37,48 @@ public class Error {
     @ApiModelProperty(required = true, value = "Error code.")
     @JsonProperty("code")
     public String getCode() {
+
         return code;
     }
 
     public void setCode(String code) {
+
         this.code = code;
     }
 
     @ApiModelProperty(required = true, value = "Error message.")
     @JsonProperty("message")
     public String getMessage() {
+
         return message;
     }
 
     public void setMessage(String message) {
+
         this.message = message;
     }
 
     @ApiModelProperty(value = "Error description.")
     @JsonProperty("description")
     public String getDescription() {
+
         return description;
     }
 
     public void setDescription(String description) {
+
         this.description = description;
     }
 
     @ApiModelProperty(value = "Trace ID for debugging.")
     @JsonProperty("traceId")
     public String getTraceId() {
+
         return traceId;
     }
 
     public void setTraceId(String traceId) {
+
         this.traceId = traceId;
     }
 }

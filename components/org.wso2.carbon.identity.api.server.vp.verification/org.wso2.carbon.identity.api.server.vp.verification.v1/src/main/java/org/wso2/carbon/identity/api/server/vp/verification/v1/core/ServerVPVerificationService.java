@@ -86,7 +86,7 @@ public class ServerVPVerificationService {
             initiationResponse.setRequestUri(initiation.getRequestUri());
             initiationResponse.setExpiresAt(initiation.getExpiresAt());
 
-            URI location = URI.create(
+            URI location = ContextLoader.buildURIForHeader(
                     VPVerificationConstants.CREDENTIAL_VERIFICATIONS_PATH + "/" + initiation.getRequestId());
             return Response.created(location).entity(initiationResponse).build();
 
@@ -96,7 +96,7 @@ public class ServerVPVerificationService {
             if (errorCode == VPAuthenticatorErrorCode.FEATURE_DISABLED) {
                 return buildNotImplementedResponse();
             }
-            if (errorCode != null && errorCode.getCode().startsWith("VPA-4")) {
+            if (errorCode != null && errorCode.getCode().startsWith(VPVerificationConstants.CLIENT_ERROR_CODE_PREFIX)) {
                 return buildBadRequestResponse(ErrorMessage.ERROR_CODE_INVALID_REQUEST,
                         errorCode.getDescription());
             }
@@ -216,10 +216,12 @@ public class ServerVPVerificationService {
     }
 
     private VPFlowService getService() {
+
         return VPVerificationServiceHolder.getVPFlowService();
     }
 
     private Response buildBadRequestResponse(ErrorMessage errorMsg, String description) {
+
         Error error = new Error();
         error.setCode(errorMsg.getCode());
         error.setMessage(errorMsg.getMessage());
@@ -228,6 +230,7 @@ public class ServerVPVerificationService {
     }
 
     private Response buildNotFoundResponse(String requestId) {
+
         Error error = new Error();
         error.setCode(ErrorMessage.ERROR_CODE_SESSION_NOT_FOUND.getCode());
         error.setMessage(ErrorMessage.ERROR_CODE_SESSION_NOT_FOUND.getMessage());
@@ -236,6 +239,7 @@ public class ServerVPVerificationService {
     }
 
     private Response buildInternalErrorResponse(ErrorMessage errorMsg, String description) {
+
         Error error = new Error();
         error.setCode(errorMsg.getCode());
         error.setMessage(errorMsg.getMessage());
@@ -244,9 +248,10 @@ public class ServerVPVerificationService {
     }
 
     private Response buildNotImplementedResponse() {
+
         Error error = new Error();
-        error.setCode("OID4VP-60001");
-        error.setMessage("OpenID4VP feature is not enabled.");
+        error.setCode(ErrorMessage.ERROR_CODE_FEATURE_DISABLED.getCode());
+        error.setMessage(ErrorMessage.ERROR_CODE_FEATURE_DISABLED.getMessage());
         error.setDescription(
                 "The OpenID4VP feature is disabled. Enable it via [openid4vp] enabled=true in deployment.toml.");
         return Response.status(Response.Status.NOT_IMPLEMENTED).entity(error).build();

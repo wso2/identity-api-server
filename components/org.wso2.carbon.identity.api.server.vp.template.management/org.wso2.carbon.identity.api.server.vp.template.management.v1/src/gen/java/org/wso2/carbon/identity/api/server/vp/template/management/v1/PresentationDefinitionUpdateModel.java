@@ -38,30 +38,36 @@ public class PresentationDefinitionUpdateModel {
     @ApiModelProperty(value = "Name of the presentation definition.")
     @JsonProperty("name")
     public String getName() {
+
         return name;
     }
 
     public void setName(String name) {
+
         this.name = name;
     }
 
     @ApiModelProperty(value = "Description of the presentation definition.")
     @JsonProperty("description")
     public String getDescription() {
+
         return description;
     }
 
     public void setDescription(String description) {
+
         this.description = description;
     }
 
     @ApiModelProperty(value = "The requested credentials to construct the definition.")
     @JsonProperty("credentials")
     public List<RequestedCredentialModel> getCredentials() {
+
         return credentials;
     }
 
     public void setCredentials(List<RequestedCredentialModel> credentials) {
+
         this.credentials = credentials;
     }
 

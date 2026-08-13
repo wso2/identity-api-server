@@ -33,30 +33,36 @@ public class ConnectedConnectionItem {
     @ApiModelProperty(value = "UUID of the connection (identity provider).")
     @JsonProperty("connectionId")
     public String getConnectionId() {
+
         return connectionId;
     }
 
     public void setConnectionId(String connectionId) {
+
         this.connectionId = connectionId;
     }
 
     @ApiModelProperty(value = "Display name of the connection.")
     @JsonProperty("name")
     public String getName() {
+
         return name;
     }
 
     public void setName(String name) {
+
         this.name = name;
     }
 
     @ApiModelProperty(value = "URI of the connection resource.")
     @JsonProperty("self")
     public String getSelf() {
+
         return self;
     }
 
     public void setSelf(String self) {
+
         this.self = self;
     }
 }

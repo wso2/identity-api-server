@@ -34,10 +34,12 @@ public class VerificationInitiateRequest {
             value = "ID of the presentation definition the verifier wants the wallet to satisfy.")
     @JsonProperty("presentationDefinitionId")
     public String getPresentationDefinitionId() {
+
         return presentationDefinitionId;
     }
 
     public void setPresentationDefinitionId(String presentationDefinitionId) {
+
         this.presentationDefinitionId = presentationDefinitionId;
     }
 }

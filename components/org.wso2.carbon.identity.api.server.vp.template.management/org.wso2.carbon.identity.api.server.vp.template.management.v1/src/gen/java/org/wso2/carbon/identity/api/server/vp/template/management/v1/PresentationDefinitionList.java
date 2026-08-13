@@ -39,24 +39,29 @@ public class PresentationDefinitionList {
     @ApiModelProperty(value = "Total number of presentation definitions.")
     @JsonProperty("totalResults")
     public Integer getTotalResults() {
+
         return totalResults;
     }
 
     public void setTotalResults(Integer totalResults) {
+
         this.totalResults = totalResults;
     }
 
     @ApiModelProperty(value = "Pagination links.")
     @JsonProperty("links")
     public List<PaginationLink> getLinks() {
+
         return links;
     }
 
     public void setLinks(List<PaginationLink> links) {
+
         this.links = links;
     }
 
     public PresentationDefinitionList addLinksItem(PaginationLink linksItem) {
+
         if (this.links == null) {
             this.links = new ArrayList<>();
         }
@@ -67,10 +72,12 @@ public class PresentationDefinitionList {
     @ApiModelProperty(value = "List of presentation definitions.")
     @JsonProperty("presentationDefinitions")
     public List<PresentationDefinitionListItem> getPresentationDefinitions() {
+
         return presentationDefinitions;
     }
 
     public void setPresentationDefinitions(List<PresentationDefinitionListItem> presentationDefinitions) {
+
         this.presentationDefinitions = presentationDefinitions;
     }
 }

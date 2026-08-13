@@ -37,40 +37,48 @@ public class ConnectedConnectionsResponse {
     @ApiModelProperty(value = "Total number of connections referencing this presentation definition.")
     @JsonProperty("totalResults")
     public Integer getTotalResults() {
+
         return totalResults;
     }
 
     public void setTotalResults(Integer totalResults) {
+
         this.totalResults = totalResults;
     }
 
     @ApiModelProperty(value = "Index of the first result (1-based).")
     @JsonProperty("startIndex")
     public Integer getStartIndex() {
+
         return startIndex;
     }
 
     public void setStartIndex(Integer startIndex) {
+
         this.startIndex = startIndex;
     }
 
     @ApiModelProperty(value = "Number of connections returned in this response.")
     @JsonProperty("count")
     public Integer getCount() {
+
         return count;
     }
 
     public void setCount(Integer count) {
+
         this.count = count;
     }
 
     @ApiModelProperty(value = "List of connections referencing this presentation definition.")
     @JsonProperty("connectedConnections")
     public List<ConnectedConnectionItem> getConnectedConnections() {
+
         return connectedConnections;
     }
 
     public void setConnectedConnections(List<ConnectedConnectionItem> connectedConnections) {
+
         this.connectedConnections = connectedConnections;
     }
 }

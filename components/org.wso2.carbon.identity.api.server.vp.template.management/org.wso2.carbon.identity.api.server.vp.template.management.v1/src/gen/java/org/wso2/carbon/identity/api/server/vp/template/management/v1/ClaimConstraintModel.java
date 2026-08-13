@@ -39,50 +39,60 @@ public class ClaimConstraintModel {
     @ApiModelProperty(value = "DCQL claim id — used to reference this claim in claim_sets.")
     @JsonProperty("id")
     public String getId() {
+
         return id;
     }
 
     public void setId(String id) {
+
         this.id = id;
     }
 
     @ApiModelProperty(value = "DCQL path array, e.g. [\"address\", \"street_address\"].")
     @JsonProperty("path")
     public List<String> getPath() {
+
         return path;
     }
 
     public void setPath(List<String> path) {
+
         this.path = path;
     }
 
     @ApiModelProperty(value = "The claim name (e.g. given_name). Used when path is absent.")
     @JsonProperty("name")
     public String getName() {
+
         return name;
     }
 
     public void setName(String name) {
+
         this.name = name;
     }
 
     @ApiModelProperty(value = "Whether this claim is mandatory. Defaults to true.")
     @JsonProperty("mandatory")
     public Boolean getMandatory() {
+
         return mandatory;
     }
 
     public void setMandatory(Boolean mandatory) {
+
         this.mandatory = mandatory;
     }
 
     @ApiModelProperty(value = "Allowed values for this claim. When set, the credential value must be one of these.")
     @JsonProperty("allowedValues")
     public List<String> getAllowedValues() {
+
         return allowedValues;
     }
 
     public void setAllowedValues(List<String> allowedValues) {
+
         this.allowedValues = allowedValues;
     }
 }

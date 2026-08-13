@@ -28,6 +28,7 @@ import org.wso2.carbon.identity.openid4vc.presentation.management.service.Presen
 public class VPDefinitionManagementServiceHolder {
 
     private VPDefinitionManagementServiceHolder() {
+
     }
 
     /**
