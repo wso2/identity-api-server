@@ -1682,7 +1682,7 @@ components:
           example: "alice@wso2.com"
         state:
           type: string
-          enum: [APPROVED, REJECTED, REVOKED, EXPIRED]
+          enum: [PENDING, APPROVED, REJECTED, REVOKED, EXPIRED]
           description: Current state of this authorization
           example: "APPROVED"
         updatedTime:
