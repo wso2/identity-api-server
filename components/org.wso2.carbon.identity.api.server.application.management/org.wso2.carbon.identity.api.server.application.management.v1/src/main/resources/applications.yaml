@@ -1237,10 +1237,7 @@ paths:
         This API regenerates a new client secret. Existing secrets, access tokens, refresh
         tokens, and authorization codes are revoked.
 
-        <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_regenerate`
-
-        When the multiple client secrets feature is disabled, this endpoint falls back to the
-        `internal_application_mgt_client_secret_create` scope.
+        <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_create`
       operationId: regenerateOAuthClientSecret
       parameters:
         - name: applicationId
@@ -1288,6 +1285,8 @@ paths:
         refresh tokens, and authorization codes remain valid.
 
         <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_create`
+
+        Responds with 404 when the multiple client secrets feature is disabled on the server.
       operationId: createOAuthClientSecret
       parameters:
         - name: applicationId
@@ -1345,6 +1344,8 @@ paths:
         This API returns metadata of all client secrets attached to the application.
 
         <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_view`
+
+        Responds with 404 when the multiple client secrets feature is disabled on the server.
       operationId: getOAuthClientSecrets
       parameters:
         - name: applicationId
@@ -1391,6 +1392,8 @@ paths:
         This API returns the metadata of the client secret identified by `secretId`.
 
         <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_view`
+
+        Responds with 404 when the multiple client secrets feature is disabled on the server.
       operationId: getOAuthClientSecret
       parameters:
         - name: applicationId
@@ -1444,6 +1447,8 @@ paths:
         application.
 
         <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_delete`
+
+        Responds with 404 when the multiple client secrets feature is disabled on the server.
       operationId: deleteOAuthClientSecret
       parameters:
         - name: applicationId

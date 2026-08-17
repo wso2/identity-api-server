@@ -175,7 +175,9 @@ public class OAuthInboundFunctions {
 
         if (e instanceof IdentityOAuthClientException) {
             String errorCode = ((IdentityOAuthClientException) e).getErrorCode();
-            if (Error.INVALID_SECRET_ID.getErrorCode().equals(errorCode)) {
+            if (Error.INVALID_SECRET_ID.getErrorCode().equals(errorCode)
+                    || Error.INVALID_OAUTH_CLIENT.getErrorCode().equals(errorCode)
+                    || Error.FEATURE_NOT_ENABLED.getErrorCode().equals(errorCode)) {
                 return buildNotFoundError(errorCode, contextMessage, e.getMessage());
             }
             if (Error.CLIENT_SECRET_LIMIT_REACHED.getErrorCode().equals(errorCode)
@@ -312,7 +314,7 @@ public class OAuthInboundFunctions {
                     .createOAuthClientSecret(clientId, tenantDomain, secretRequest);
             return toClientSecretResponse(created);
         } catch (IdentityOAuthAdminException e) {
-            throw handleClientSecretException(e, "Error while creating the client secret.");
+            throw handleClientSecretException(e, "Unable to create the client secret.");
         }
     }
 
@@ -327,7 +329,7 @@ public class OAuthInboundFunctions {
                     .collect(Collectors.toList()));
             return list;
         } catch (IdentityOAuthAdminException e) {
-            throw handleClientSecretException(e, "Error while listing the client secrets.");
+            throw handleClientSecretException(e, "Unable to list the client secrets.");
         }
     }
 
@@ -338,7 +340,7 @@ public class OAuthInboundFunctions {
                     .getOAuthClientSecret(clientId, tenantDomain, secretId);
             return toClientSecretResponse(secret);
         } catch (IdentityOAuthAdminException e) {
-            throw handleClientSecretException(e, "Error while retrieving the client secret.");
+            throw handleClientSecretException(e, "Unable to retrieve the client secret.");
         }
     }
 
@@ -348,7 +350,7 @@ public class OAuthInboundFunctions {
             ApplicationManagementServiceHolder.getOAuthAdminService()
                     .removeOAuthClientSecret(clientId, tenantDomain, secretId);
         } catch (IdentityOAuthAdminException e) {
-            throw handleClientSecretException(e, "Error while deleting the client secret.");
+            throw handleClientSecretException(e, "Unable to delete the client secret.");
         }
     }
 
