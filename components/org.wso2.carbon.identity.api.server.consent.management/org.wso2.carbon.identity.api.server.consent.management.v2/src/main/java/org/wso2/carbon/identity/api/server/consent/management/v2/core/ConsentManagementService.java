@@ -26,6 +26,7 @@ import org.wso2.carbon.consent.mgt.core.exception.ConsentManagementException;
 import org.wso2.carbon.consent.mgt.core.model.AddReceiptResponse;
 import org.wso2.carbon.consent.mgt.core.model.ConsentAuthorization;
 import org.wso2.carbon.consent.mgt.core.model.ConsentPurpose;
+import org.wso2.carbon.consent.mgt.core.model.ConsentRelation;
 import org.wso2.carbon.consent.mgt.core.model.PIICategory;
 import org.wso2.carbon.consent.mgt.core.model.PIICategoryValidity;
 import org.wso2.carbon.consent.mgt.core.model.Purpose;
@@ -65,6 +66,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.DEFAULT_LIMIT;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_CONSENT_REJECTED_WITH_AUTHORIZATIONS;
 import static org.wso2.carbon.consent.mgt.core.constant.ConsentConstants.ErrorMessages.ERROR_CODE_ELEMENT_UUID_NOT_FOUND;
@@ -154,20 +156,47 @@ public class ConsentManagementService {
      * @param after            Cursor for pagination (results after this cursor).
      * @param before           Cursor for pagination (results before this cursor).
      * @return Response with list of ConsentSummaryDTOs.
+     * @deprecated Use
+     * {@link #listConsents(String, String, String, String, String, String, String, Integer, String, String)}
+     * instead.
      */
+    @Deprecated
     public ConsentListResponse listConsents(String subjectId, String serviceId, String state, String purposeId,
                                             String purposeVersionId, String filter, Integer limit,
                                             String after, String before) {
 
+        String relation = StringUtils.isNotBlank(subjectId) ? ConsentRelation.SUBJECT.name() : null;
+        return listConsents(subjectId, relation, serviceId, state, purposeId, purposeVersionId, filter, limit,
+                after, before);
+    }
+
+    /**
+     * Lists consent receipts with explicit filter params and pagination.
+     *
+     * @param userId           Filter by user ID, matched according to {@code relation}.
+     * @param relation         Relation of {@code userId} to the retrieved consents.
+     * @param serviceId        Filter by service ID.
+     * @param state            Filter by consent state.
+     * @param purposeId        Filter by purpose ID.
+     * @param purposeVersionId Filter by specific purpose version ID.
+     * @param limit            Maximum results.
+     * @param after            Cursor for pagination (results after this cursor).
+     * @param before           Cursor for pagination (results before this cursor).
+     * @return Response with list of ConsentSummaryDTOs.
+     */
+    public ConsentListResponse listConsents(String userId, String relation, String serviceId, String state,
+                                            String purposeId, String purposeVersionId, String filter, Integer limit,
+                                            String after, String before) {
+
         try {
-            return listConsentsInternal(subjectId, serviceId, state, purposeId, purposeVersionId, filter, limit,
+            return listConsentsInternal(userId, relation, serviceId, state, purposeId, purposeVersionId, filter, limit,
                     after, before);
         } catch (ConsentManagementException e) {
             throw ConsentMgtEndpointUtil.handleConsentManagementException(e);
         }
     }
 
-    private ConsentListResponse listConsentsInternal(String subjectId, String serviceId, String state,
+    private ConsentListResponse listConsentsInternal(String userId, String relation, String serviceId, String state,
                                                      String purposeId, String purposeVersionId, String filter,
                                                      Integer limit, String after, String before)
             throws ConsentManagementException {
@@ -178,6 +207,12 @@ public class ConsentManagementService {
             throw handleClientException(ERROR_CODE_INVALID_QUERY_PARAM,
                     "Both 'before' and 'after' parameters are provided.");
         }
+
+        if (StringUtils.isNotBlank(userId) != StringUtils.isNotBlank(relation)) {
+            throw handleClientException(ERROR_CODE_INVALID_QUERY_PARAM,
+                    "'userId' and 'relation' must be provided together.");
+        }
+        ConsentRelation consentRelation = StringUtils.isNotBlank(relation) ? resolveRelation(relation) : null;
 
         List<ExpressionNode> expressionNodes = FilterQueriesUtil.getExpressionNodes(filter, after, before);
         for (ExpressionNode node : expressionNodes) {
@@ -197,7 +232,7 @@ public class ConsentManagementService {
         }
 
         List<Receipt> receipts = consentManager.listReceipts(
-                subjectId, serviceId, state, purposeId, purposeVersionId, expressionNodes, limit + 1);
+                userId, consentRelation, serviceId, state, purposeId, purposeVersionId, expressionNodes, limit + 1);
 
         ConsentListResponse result = new ConsentListResponse();
         List<PaginationLink> links = new ArrayList<>();
@@ -210,8 +245,9 @@ public class ConsentManagementService {
             boolean isLastPage = !hasMoreItems && (StringUtils.isNotBlank(after) || StringUtils.isBlank(before));
 
             String url = "?limit=" + limit;
-            if (StringUtils.isNotBlank(subjectId)) {
-                url += "&subjectId=" + URLEncoder.encode(subjectId, StandardCharsets.UTF_8);
+            if (StringUtils.isNotBlank(userId)) {
+                url += "&userId=" + URLEncoder.encode(userId, StandardCharsets.UTF_8);
+                url += "&relation=" + consentRelation.name();
             }
             if (StringUtils.isNotBlank(serviceId)) {
                 url += "&serviceId=" + URLEncoder.encode(serviceId, StandardCharsets.UTF_8);
@@ -521,6 +557,15 @@ public class ConsentManagementService {
             dto.setServiceId(receipt.getServices().get(0).getService());
         }
         return dto;
+    }
+
+    private ConsentRelation resolveRelation(String relation) throws ConsentManagementException {
+
+        try {
+            return ConsentRelation.valueOf(relation.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            throw handleClientException(ERROR_CODE_INVALID_QUERY_PARAM, "relation: " + relation);
+        }
     }
 
     private Integer validatedLimit(Integer limit) throws ConsentManagementException {
