@@ -46,7 +46,9 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import javax.ws.rs.core.Response;
+import org.slf4j.MDC;
 
 /**
  * Core business logic for the VP Verification REST API.
@@ -55,6 +57,7 @@ import javax.ws.rs.core.Response;
 public class ServerVPVerificationService {
 
     private static final Log LOG = LogFactory.getLog(ServerVPVerificationService.class);
+    private static final Log AUDIT_LOG = LogFactory.getLog("AUDIT_LOG");
 
     /**
      * Initiate a new standalone VP verification session.
@@ -85,6 +88,16 @@ public class ServerVPVerificationService {
             initiationResponse.setWalletUrl(initiation.getWalletUrl());
             initiationResponse.setRequestUri(initiation.getRequestUri());
             initiationResponse.setExpiresAt(initiation.getExpiresAt());
+            initiationResponse.setRespondedAt(Instant.now().toString());
+            initiationResponse.setCorrelationId(resolveCorrelationId());
+
+            AUDIT_LOG.info("Initiator : " + tenantDomain
+                    + " | Action : VP-Verification-Initiated"
+                    + " | Target : " + initiation.getRequestId()
+                    + " | Data : { \"presentationDefinitionId\": \"" + request.getPresentationDefinitionId()
+                    + "\", \"tenantDomain\": \"" + tenantDomain
+                    + "\", \"correlationId\": \"" + initiationResponse.getCorrelationId() + "\" }"
+                    + " | Result : Success");
 
             URI location = ContextLoader.buildURIForHeader(
                     VPVerificationConstants.CREDENTIAL_VERIFICATIONS_PATH + "/" + initiation.getRequestId());
@@ -133,6 +146,8 @@ public class ServerVPVerificationService {
         VerificationStatusResponse statusResponse = new VerificationStatusResponse();
         statusResponse.setRequestId(requestId);
         statusResponse.setStatus(status.name());
+        statusResponse.setRespondedAt(Instant.now().toString());
+        statusResponse.setCorrelationId(resolveCorrelationId());
 
         if (status == VPFlowStatus.VERIFIED) {
             if (session.getVerificationResult() != null) {
@@ -141,6 +156,21 @@ public class ServerVPVerificationService {
             // Remove session immediately after returning the verified presentation — the caller
             // is expected to persist the claims themselves. Keeps PII off the cache.
             service.removeSession(requestId);
+            Presentation p = statusResponse.getPresentation();
+            String submittedAt = (p != null) ? p.getSubmittedAt() : null;
+            String credentialType = (p != null && p.getCredentials() != null && !p.getCredentials().isEmpty())
+                    ? p.getCredentials().get(0).getType() : null;
+            String issuer = (p != null && p.getCredentials() != null && !p.getCredentials().isEmpty())
+                    ? p.getCredentials().get(0).getIssuer() : null;
+            AUDIT_LOG.info("Initiator : " + ContextLoader.getTenantDomainFromContext()
+                    + " | Action : VP-Verified"
+                    + " | Target : " + requestId
+                    + " | Data : { \"requestId\": \"" + requestId
+                    + "\", \"credentialType\": \"" + credentialType
+                    + "\", \"issuer\": \"" + issuer
+                    + "\", \"submittedAt\": \"" + submittedAt
+                    + "\", \"correlationId\": \"" + statusResponse.getCorrelationId() + "\" }"
+                    + " | Result : Success");
         } else if (status == VPFlowStatus.FAILED) {
             // WalletSubmissionServlet sets failureReason on the session, not verificationResult,
             // for all failure paths (wallet error response and verification failure alike).
@@ -151,6 +181,13 @@ public class ServerVPVerificationService {
                 statusResponse.setErrors(errors);
             }
             service.removeSession(requestId);
+            // reason is wallet-controlled and may contain user identifiers — kept out of the audit log.
+            AUDIT_LOG.info("Initiator : " + ContextLoader.getTenantDomainFromContext()
+                    + " | Action : VP-Verification-Failed"
+                    + " | Target : " + requestId
+                    + " | Data : { \"requestId\": \"" + requestId
+                    + "\", \"correlationId\": \"" + statusResponse.getCorrelationId() + "\" }"
+                    + " | Result : Failure");
         }
 
         return Response.ok(statusResponse).build();
@@ -213,6 +250,16 @@ public class ServerVPVerificationService {
         }
 
         return presentation;
+    }
+
+    /**
+     * Returns the correlation ID set by WSO2 IS's CorrelationLogInterceptor in MDC,
+     * or generates a fresh UUID when the header was absent from the request.
+     */
+    private String resolveCorrelationId() {
+
+        String correlationId = MDC.get("Correlation-ID");
+        return StringUtils.isNotBlank(correlationId) ? correlationId : UUID.randomUUID().toString();
     }
 
     private VPFlowService getService() {

@@ -32,6 +32,8 @@ public class VerificationInitiateResponse {
     private String walletUrl;
     private String requestUri;
     private Long expiresAt;
+    private String respondedAt;
+    private String correlationId;
 
     @ApiModelProperty(value = "Request ID used to poll for the verification status.")
     @JsonProperty("requestId")
@@ -52,4 +54,14 @@ public class VerificationInitiateResponse {
     @JsonProperty("expiresAt")
     public Long getExpiresAt() { return expiresAt; }
     public void setExpiresAt(Long expiresAt) { this.expiresAt = expiresAt; }
+
+    @ApiModelProperty(value = "ISO-8601 timestamp when this response was generated.")
+    @JsonProperty("respondedAt")
+    public String getRespondedAt() { return respondedAt; }
+    public void setRespondedAt(String respondedAt) { this.respondedAt = respondedAt; }
+
+    @ApiModelProperty(value = "Correlation ID for tracing this request across logs.")
+    @JsonProperty("correlationId")
+    public String getCorrelationId() { return correlationId; }
+    public void setCorrelationId(String correlationId) { this.correlationId = correlationId; }
 }

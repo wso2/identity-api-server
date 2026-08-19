@@ -36,6 +36,8 @@ public class VerificationStatusResponse {
     private String status;
     private Presentation presentation;
     private List<String> errors;
+    private String respondedAt;
+    private String correlationId;
 
     @ApiModelProperty(value = "Request ID of the verification session.")
     @JsonProperty("requestId")
@@ -58,6 +60,16 @@ public class VerificationStatusResponse {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public List<String> getErrors() { return errors; }
     public void setErrors(List<String> errors) { this.errors = errors; }
+
+    @ApiModelProperty(value = "ISO-8601 timestamp when this response was generated.")
+    @JsonProperty("respondedAt")
+    public String getRespondedAt() { return respondedAt; }
+    public void setRespondedAt(String respondedAt) { this.respondedAt = respondedAt; }
+
+    @ApiModelProperty(value = "Correlation ID for tracing this request across logs.")
+    @JsonProperty("correlationId")
+    public String getCorrelationId() { return correlationId; }
+    public void setCorrelationId(String correlationId) { this.correlationId = correlationId; }
 
     // ── Nested model classes ──────────────────────────────────────────────────
 
