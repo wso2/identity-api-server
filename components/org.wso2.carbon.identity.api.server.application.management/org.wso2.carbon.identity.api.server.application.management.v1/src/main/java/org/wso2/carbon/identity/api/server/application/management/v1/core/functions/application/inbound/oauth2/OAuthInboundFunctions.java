@@ -43,7 +43,6 @@ import org.wso2.carbon.identity.oauth.Error;
 import org.wso2.carbon.identity.oauth.IdentityOAuthAdminException;
 import org.wso2.carbon.identity.oauth.IdentityOAuthClientException;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
-import org.wso2.carbon.identity.oauth.dto.OAuthClientSecretRequestDTO;
 import org.wso2.carbon.identity.oauth.dto.OAuthClientSecretResponseDTO;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 
@@ -176,8 +175,7 @@ public class OAuthInboundFunctions {
         if (e instanceof IdentityOAuthClientException) {
             String errorCode = ((IdentityOAuthClientException) e).getErrorCode();
             if (Error.INVALID_SECRET_ID.getErrorCode().equals(errorCode)
-                    || Error.INVALID_OAUTH_CLIENT.getErrorCode().equals(errorCode)
-                    || Error.FEATURE_NOT_ENABLED.getErrorCode().equals(errorCode)) {
+                    || Error.INVALID_OAUTH_CLIENT.getErrorCode().equals(errorCode)) {
                 return buildNotFoundError(errorCode, contextMessage, e.getMessage());
             }
             if (Error.CLIENT_SECRET_LIMIT_REACHED.getErrorCode().equals(errorCode)
@@ -305,13 +303,10 @@ public class OAuthInboundFunctions {
     public static ClientSecretResponse createClientSecret(String clientId, String tenantDomain,
                                                             ClientSecretCreationRequest request) {
 
-        OAuthClientSecretRequestDTO secretRequest = new OAuthClientSecretRequestDTO();
-        if (request != null) {
-            secretRequest.setExpiryTime(request.getExpiresAt());
-        }
         try {
             OAuthClientSecretResponseDTO created = ApplicationManagementServiceHolder.getOAuthAdminService()
-                    .createOAuthClientSecret(clientId, tenantDomain, secretRequest);
+                    .createOAuthClientSecret(clientId, tenantDomain,
+                            request == null ? null : request.getExpiresAt());
             return toClientSecretResponse(created);
         } catch (IdentityOAuthAdminException e) {
             throw handleClientSecretException(e, "Unable to create the client secret.");
@@ -360,6 +355,7 @@ public class OAuthInboundFunctions {
         response.setSecretId(dto.getSecretId());
         response.setSecretValue(dto.getSecretValue());
         response.setExpiresAt(dto.getExpiryTime());
+        response.setCreatedAt(dto.getCreatedTime());
         response.setStatus(ClientSecretResponse.StatusEnum.valueOf(dto.getStatus().name()));
         response.setLatest(dto.isLatest());
         return response;

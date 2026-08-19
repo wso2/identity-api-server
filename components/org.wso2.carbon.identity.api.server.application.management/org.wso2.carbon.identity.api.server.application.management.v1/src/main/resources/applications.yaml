@@ -1285,8 +1285,6 @@ paths:
         refresh tokens, and authorization codes remain valid.
 
         <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_create`
-
-        Responds with 404 when the multiple client secrets feature is disabled on the server.
       operationId: createOAuthClientSecret
       parameters:
         - name: applicationId
@@ -1344,8 +1342,6 @@ paths:
         This API returns metadata of all client secrets attached to the application.
 
         <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_view`
-
-        Responds with 404 when the multiple client secrets feature is disabled on the server.
       operationId: getOAuthClientSecrets
       parameters:
         - name: applicationId
@@ -1392,8 +1388,6 @@ paths:
         This API returns the metadata of the client secret identified by `secretId`.
 
         <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_view`
-
-        Responds with 404 when the multiple client secrets feature is disabled on the server.
       operationId: getOAuthClientSecret
       parameters:
         - name: applicationId
@@ -1447,8 +1441,6 @@ paths:
         application.
 
         <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_delete`
-
-        Responds with 404 when the multiple client secrets feature is disabled on the server.
       operationId: deleteOAuthClientSecret
       parameters:
         - name: applicationId
@@ -4127,12 +4119,12 @@ components:
         clientSecretExpiresAt:
           type: integer
           format: int64
-          description: Expiry time of the client secret as Unix epoch seconds; 0 if it never expires. On creation, sets the initial secret's expiry. Present in responses and effective in requests only when multiple client secrets are enabled.
+          description: The expiration time of the latest client secret, expressed in Unix epoch seconds. A value of 0 indicates that the secret never expires.
           example: 1761568483
         multipleClientSecretsConfigured:
           type: boolean
           readOnly: true
-          description: Whether the application has more than one client secret configured. When true, the full set can be retrieved via the client secrets sub-resource. Present only when multiple client secrets are enabled.
+          description: Indicates if the application has more than one client secret.
           example: true
         state:
           type: string
@@ -4379,6 +4371,11 @@ components:
           type: integer
           format: int64
           description: Expiry time as Unix epoch seconds; 0 if the secret never expires.
+          example: 1761568483
+        createdAt:
+          type: integer
+          format: int64
+          description: Creation time as Unix epoch seconds.
           example: 1761568483
         status:
           type: string

@@ -148,7 +148,7 @@ public enum StateEnum {
     }
 
     /**
-    * Expiry time of the client secret as Unix epoch seconds; 0 if it never expires. On creation, sets the initial secret&#39;s expiry. Present in responses and effective in requests only when multiple client secrets are enabled.
+    * The expiration time of the latest client secret, expressed in Unix epoch seconds. A value of 0 indicates that the secret never expires.
     **/
     public OpenIDConnectConfiguration clientSecretExpiresAt(Long clientSecretExpiresAt) {
 
@@ -156,7 +156,7 @@ public enum StateEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "1761568483", value = "Expiry time of the client secret as Unix epoch seconds; 0 if it never expires. On creation, sets the initial secret's expiry. Present in responses and effective in requests only when multiple client secrets are enabled.")
+    @ApiModelProperty(example = "1761568483", value = "The expiration time of the latest client secret, expressed in Unix epoch seconds. A value of 0 indicates that the secret never expires.")
     @JsonProperty("clientSecretExpiresAt")
     @Valid
     public Long getClientSecretExpiresAt() {
@@ -167,7 +167,7 @@ public enum StateEnum {
     }
 
     /**
-    * Whether the application has more than one client secret configured. When true, the full set can be retrieved via the client secrets sub-resource. Present only when multiple client secrets are enabled.
+    * Indicates if the application has more than one client secret.
     **/
     public OpenIDConnectConfiguration multipleClientSecretsConfigured(Boolean multipleClientSecretsConfigured) {
 
@@ -175,7 +175,7 @@ public enum StateEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "true", value = "Whether the application has more than one client secret configured. When true, the full set can be retrieved via the client secrets sub-resource. Present only when multiple client secrets are enabled.")
+    @ApiModelProperty(example = "true", value = "Indicates if the application has more than one client secret.")
     @JsonProperty("multipleClientSecretsConfigured")
     @Valid
     public Boolean getMultipleClientSecretsConfigured() {

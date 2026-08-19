@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -38,6 +38,7 @@ public class ClientSecretResponse  {
     private String secretId;
     private String secretValue;
     private Long expiresAt;
+    private Long createdAt;
 
 @XmlType(name="StatusEnum")
 @XmlEnum(String.class)
@@ -136,6 +137,25 @@ public enum StatusEnum {
     }
 
     /**
+    * Creation time as Unix epoch seconds.
+    **/
+    public ClientSecretResponse createdAt(Long createdAt) {
+
+        this.createdAt = createdAt;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "1761568483", value = "Creation time as Unix epoch seconds.")
+    @JsonProperty("createdAt")
+    @Valid
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(Long createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    /**
     * Status of the secret.
     **/
     public ClientSecretResponse status(StatusEnum status) {
@@ -192,13 +212,14 @@ public enum StatusEnum {
         return Objects.equals(this.secretId, clientSecretResponse.secretId) &&
             Objects.equals(this.secretValue, clientSecretResponse.secretValue) &&
             Objects.equals(this.expiresAt, clientSecretResponse.expiresAt) &&
+            Objects.equals(this.createdAt, clientSecretResponse.createdAt) &&
             Objects.equals(this.status, clientSecretResponse.status) &&
             Objects.equals(this.latest, clientSecretResponse.latest);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(secretId, secretValue, expiresAt, status, latest);
+        return Objects.hash(secretId, secretValue, expiresAt, createdAt, status, latest);
     }
 
     @Override
@@ -210,6 +231,7 @@ public enum StatusEnum {
         sb.append("    secretId: ").append(toIndentedString(secretId)).append("\n");
         sb.append("    secretValue: ").append(toIndentedString(secretValue)).append("\n");
         sb.append("    expiresAt: ").append(toIndentedString(expiresAt)).append("\n");
+        sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("    latest: ").append(toIndentedString(latest)).append("\n");
         sb.append("}");

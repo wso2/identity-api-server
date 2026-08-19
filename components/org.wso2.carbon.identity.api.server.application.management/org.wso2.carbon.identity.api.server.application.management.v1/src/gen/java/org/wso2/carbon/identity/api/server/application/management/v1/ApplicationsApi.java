@@ -196,7 +196,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/oidc/secrets")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Create a new OAuth2/OIDC client secret.", notes = "This API creates a new client secret for the application. Existing secrets, access tokens, refresh tokens, and authorization codes remain valid.  <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_create`  Responds with 404 when the multiple client secrets feature is disabled on the server.", response = ClientSecretResponse.class, authorizations = {
+    @ApiOperation(value = "Create a new OAuth2/OIDC client secret.", notes = "This API creates a new client secret for the application. Existing secrets, access tokens, refresh tokens, and authorization codes remain valid.  <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_create` ", response = ClientSecretResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -363,7 +363,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/oidc/secrets/{secretId}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete a specific OAuth2/OIDC client secret.", notes = "This API deletes the client secret identified by `secretId`. The application's most recently added active secret cannot be deleted — at least one active secret must remain per application.  <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_delete`  Responds with 404 when the multiple client secrets feature is disabled on the server.", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete a specific OAuth2/OIDC client secret.", notes = "This API deletes the client secret identified by `secretId`. The application's most recently added active secret cannot be deleted — at least one active secret must remain per application.  <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_delete` ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -891,7 +891,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/oidc/secrets/{secretId}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get a specific client secret's metadata.", notes = "This API returns the metadata of the client secret identified by `secretId`.  <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_view`  Responds with 404 when the multiple client secrets feature is disabled on the server.", response = ClientSecretResponse.class, authorizations = {
+    @ApiOperation(value = "Get a specific client secret's metadata.", notes = "This API returns the metadata of the client secret identified by `secretId`.  <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_view` ", response = ClientSecretResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -915,7 +915,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/oidc/secrets")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "List client secrets of the application.", notes = "This API returns metadata of all client secrets attached to the application.  <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_view`  Responds with 404 when the multiple client secrets feature is disabled on the server.", response = ClientSecretList.class, authorizations = {
+    @ApiOperation(value = "List client secrets of the application.", notes = "This API returns metadata of all client secrets attached to the application.  <b>Scope(Permission) required:</b> `internal_application_mgt_client_secret_view` ", response = ClientSecretList.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
