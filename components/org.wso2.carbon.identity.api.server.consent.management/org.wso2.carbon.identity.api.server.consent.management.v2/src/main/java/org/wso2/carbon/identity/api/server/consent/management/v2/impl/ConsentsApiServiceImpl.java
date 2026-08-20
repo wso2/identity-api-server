@@ -69,7 +69,7 @@ public class ConsentsApiServiceImpl implements ConsentsApiService {
 
         return Response.ok().entity(
                 consentService.listConsents(userId, relation, serviceId, state, purposeId, purposeVersionId, filter,
-                        limit, after, before)).build();
+                        attributes, limit, after, before)).build();
     }
 
     @Override
