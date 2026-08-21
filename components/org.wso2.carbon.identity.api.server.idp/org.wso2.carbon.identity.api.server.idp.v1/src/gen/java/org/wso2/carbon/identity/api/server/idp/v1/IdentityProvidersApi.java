@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -38,8 +38,12 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.IdPGroup;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPOSTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderResponse;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderShareAllRequestBody;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderShareSelectedRequestBody;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderTemplate;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderTemplateListResponse;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderUnshareAllRequestBody;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderUnshareSelectedRequestBody;
 import org.wso2.carbon.identity.api.server.idp.v1.model.JustInTimeProvisioning;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.idp.v1.model.MetaFederatedAuthenticator;
@@ -51,8 +55,10 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.OutboundConnectorListRes
 import org.wso2.carbon.identity.api.server.idp.v1.model.OutboundConnectorPUTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.OutboundProvisioningRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Patch;
+import org.wso2.carbon.identity.api.server.idp.v1.model.ProcessSuccessResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.ProvisioningResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Roles;
+import org.wso2.carbon.identity.api.server.idp.v1.model.SharedOrganizationsResponse;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -439,6 +445,30 @@ public class IdentityProvidersApi  {
 
     @Valid
     @GET
+    @Path("/{identity-provider-id}/share")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "List of organizations that the identity provider is shared with. ", notes = "This API returns the list of organizations that the identity provider is shared with. <br> <b>Scope required:</b> `internal_idp_shared_access_view` ", response = SharedOrganizationsResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Identity Provider Sharing", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = SharedOrganizationsResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getIdentityProviderSharedOrganizations(@ApiParam(value = "ID of the identity provider which is shared with organizations.",required=true) @PathParam("identity-provider-id") String identityProviderId,     @Valid@ApiParam(value = "Base64 encoded cursor value for backward pagination. ")  @QueryParam("before") String before,     @Valid@ApiParam(value = "Base64 encoded cursor value for forward pagination. ")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations. ")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Maximum number of records to return. ")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Determines whether a recursive search should happen. If set to true, will include shared organizations in all levels of the hierarchy; If set to false, includes only shared organizations in the next level of the hierarchy. ")  @QueryParam("recursive") Boolean recursive,     @Valid@ApiParam(value = "excludedAttribute parameter. ")  @QueryParam("excludedAttributes") String excludedAttributes,     @Valid@ApiParam(value = "Specifies the required parameters in the response. Only 'sharingMode' attribute is currently supported.  /identity-providers/{identity-provider-id}/share?attributes=sharingMode ")  @QueryParam("attributes") String attributes) {
+
+        return delegate.getIdentityProviderSharedOrganizations(identityProviderId,  before,  after,  filter,  limit,  recursive,  excludedAttributes,  attributes );
+    }
+
+    @Valid
+    @GET
     @Path("/{identity-provider-id}/provisioning/jit")
     
     @Produces({ "application/json" })
@@ -699,6 +729,102 @@ public class IdentityProvidersApi  {
     public Response patchIDP(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "" ,required=true) @Valid List<Patch> patch) {
 
         return delegate.patchIDP(identityProviderId,  patch );
+    }
+
+    @Valid
+    @POST
+    @Path("/share-with-all")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Share a single identity provider with all organizations", notes = "This API provides the capability to share an identity provider with all organizations. <br> <b>Scope required:</b> `internal_idp_share` ", response = ProcessSuccessResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Identity Provider Sharing", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 202, message = "Sharing process triggered successfully", response = ProcessSuccessResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response shareIdentityProviderWithAll(@ApiParam(value = "" ,required=true) @Valid IdentityProviderShareAllRequestBody identityProviderShareAllRequestBody) {
+
+        return delegate.shareIdentityProviderWithAll(identityProviderShareAllRequestBody );
+    }
+
+    @Valid
+    @POST
+    @Path("/share")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Share a single identity provider with specific organizations", notes = "This API provides the capability to share an identity provider with specific organizations. <br> <b>Scope required:</b> `internal_idp_share` ", response = ProcessSuccessResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Identity Provider Sharing", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 202, message = "Sharing process triggered successfully", response = ProcessSuccessResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response shareIdentityProviderWithSelected(@ApiParam(value = "" ,required=true) @Valid IdentityProviderShareSelectedRequestBody identityProviderShareSelectedRequestBody) {
+
+        return delegate.shareIdentityProviderWithSelected(identityProviderShareSelectedRequestBody );
+    }
+
+    @Valid
+    @POST
+    @Path("/unshare-with-all")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Unshare an identity provider from all organizations", notes = "This API provides the capability to unshare an identity provider from all organizations. <br> <b>Scope required:</b> `internal_idp_unshare` ", response = ProcessSuccessResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Identity Provider Sharing", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 202, message = "Unsharing process triggered successfully", response = ProcessSuccessResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response unshareIdentityProviderFromAll(@ApiParam(value = "" ,required=true) @Valid IdentityProviderUnshareAllRequestBody identityProviderUnshareAllRequestBody) {
+
+        return delegate.unshareIdentityProviderFromAll(identityProviderUnshareAllRequestBody );
+    }
+
+    @Valid
+    @POST
+    @Path("/unshare")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Unshare an identity provider from specific organizations", notes = "This API provides the capability to unshare an identity provider from specific organizations. <br> <b>Scope required:</b> `internal_idp_unshare` ", response = ProcessSuccessResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Identity Provider Sharing", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 202, message = "Unsharing process triggered successfully", response = ProcessSuccessResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response unshareIdentityProviderFromSelected(@ApiParam(value = "" ,required=true) @Valid IdentityProviderUnshareSelectedRequestBody identityProviderUnshareSelectedRequestBody) {
+
+        return delegate.unshareIdentityProviderFromSelected(identityProviderUnshareSelectedRequestBody );
     }
 
     @Valid
