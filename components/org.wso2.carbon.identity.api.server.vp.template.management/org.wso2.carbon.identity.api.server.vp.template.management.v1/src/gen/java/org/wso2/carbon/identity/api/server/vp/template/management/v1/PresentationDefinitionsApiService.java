@@ -41,5 +41,5 @@ public abstract class PresentationDefinitionsApiService {
     public abstract Response patchTrustedCas(String definitionId, String credentialId,
             List<CertificatePatch> patchRequest);
 
-    public abstract Response getConnectedConnections(String definitionId);
+    public abstract Response getConnectedIdps(String definitionId);
 }

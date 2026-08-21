@@ -24,17 +24,16 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.List;
 
 /**
- * Response model for listing connections that reference a presentation definition.
- * Mirrors the ConnectedApps pattern from the IDP API.
+ * Response model for listing IDPs that reference a presentation definition.
  */
-public class ConnectedConnectionsResponse {
+public class ConnectedIdpsResponse {
 
     private Integer totalResults;
     private Integer startIndex;
     private Integer count;
-    private List<ConnectedConnectionItem> connectedConnections;
+    private List<ConnectedIdpItem> connectedIdps;
 
-    @ApiModelProperty(value = "Total number of connections referencing this presentation definition.")
+    @ApiModelProperty(value = "Total number of IDPs referencing this presentation definition.")
     @JsonProperty("totalResults")
     public Integer getTotalResults() {
 
@@ -58,7 +57,7 @@ public class ConnectedConnectionsResponse {
         this.startIndex = startIndex;
     }
 
-    @ApiModelProperty(value = "Number of connections returned in this response.")
+    @ApiModelProperty(value = "Number of IDPs returned in this response.")
     @JsonProperty("count")
     public Integer getCount() {
 
@@ -70,15 +69,15 @@ public class ConnectedConnectionsResponse {
         this.count = count;
     }
 
-    @ApiModelProperty(value = "List of connections referencing this presentation definition.")
-    @JsonProperty("connectedConnections")
-    public List<ConnectedConnectionItem> getConnectedConnections() {
+    @ApiModelProperty(value = "List of IDPs referencing this presentation definition.")
+    @JsonProperty("connectedIdps")
+    public List<ConnectedIdpItem> getConnectedIdps() {
 
-        return connectedConnections;
+        return connectedIdps;
     }
 
-    public void setConnectedConnections(List<ConnectedConnectionItem> connectedConnections) {
+    public void setConnectedIdps(List<ConnectedIdpItem> connectedIdps) {
 
-        this.connectedConnections = connectedConnections;
+        this.connectedIdps = connectedIdps;
     }
 }

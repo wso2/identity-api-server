@@ -22,27 +22,27 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * Represents a single connection (IDP) that references a presentation definition.
+ * Represents a single IDP that references a presentation definition.
  */
-public class ConnectedConnectionItem {
+public class ConnectedIdpItem {
 
-    private String connectionId;
+    private String idpId;
     private String name;
     private String self;
 
-    @ApiModelProperty(value = "UUID of the connection (identity provider).")
-    @JsonProperty("connectionId")
-    public String getConnectionId() {
+    @ApiModelProperty(value = "UUID of the identity provider.")
+    @JsonProperty("idpId")
+    public String getIdpId() {
 
-        return connectionId;
+        return idpId;
     }
 
-    public void setConnectionId(String connectionId) {
+    public void setIdpId(String idpId) {
 
-        this.connectionId = connectionId;
+        this.idpId = idpId;
     }
 
-    @ApiModelProperty(value = "Display name of the connection.")
+    @ApiModelProperty(value = "Display name of the IDP.")
     @JsonProperty("name")
     public String getName() {
 
@@ -54,7 +54,7 @@ public class ConnectedConnectionItem {
         this.name = name;
     }
 
-    @ApiModelProperty(value = "URI of the connection resource.")
+    @ApiModelProperty(value = "URI of the IDP resource.")
     @JsonProperty("self")
     public String getSelf() {
 

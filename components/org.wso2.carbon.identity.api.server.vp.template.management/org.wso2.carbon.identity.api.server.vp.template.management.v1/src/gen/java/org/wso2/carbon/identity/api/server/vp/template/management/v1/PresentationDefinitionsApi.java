@@ -151,22 +151,22 @@ public class PresentationDefinitionsApi {
     }
 
     @GET
-    @Path("/{definition-id}/connected-connections")
+    @Path("/{definition-id}/connected-idps")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Get connections using a Presentation Definition",
-            response = ConnectedConnectionsResponse.class)
+            response = ConnectedIdpsResponse.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = ConnectedConnectionsResponse.class),
+            @ApiResponse(code = 200, message = "OK", response = ConnectedIdpsResponse.class),
             @ApiResponse(code = 401, message = "Unauthorized"),
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not Found", response = Error.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response getConnectedConnections(
+    public Response getConnectedIdps(
             @ApiParam(value = "Unique identifier of the presentation definition.", required = true)
             @PathParam("definition-id") String definitionId) {
 
-        return delegate.getConnectedConnections(definitionId);
+        return delegate.getConnectedIdps(definitionId);
     }
 
     @PATCH

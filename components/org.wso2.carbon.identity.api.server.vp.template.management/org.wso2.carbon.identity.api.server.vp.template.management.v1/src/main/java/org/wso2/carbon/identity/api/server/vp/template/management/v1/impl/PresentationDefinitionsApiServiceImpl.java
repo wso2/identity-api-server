@@ -91,8 +91,8 @@ public class PresentationDefinitionsApiServiceImpl extends PresentationDefinitio
     }
 
     @Override
-    public Response getConnectedConnections(String definitionId) {
+    public Response getConnectedIdps(String definitionId) {
 
-        return Response.ok().entity(CORE_SERVICE.getConnectedConnections(definitionId)).build();
+        return Response.ok().entity(CORE_SERVICE.getConnectedIdps(definitionId)).build();
     }
 }

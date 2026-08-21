@@ -27,8 +27,8 @@ import org.wso2.carbon.identity.api.server.vp.template.management.common.VPDefin
 import org.wso2.carbon.identity.api.server.vp.template.management.common.VPDefinitionManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.CertificatePatch;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.ClaimConstraintModel;
-import org.wso2.carbon.identity.api.server.vp.template.management.v1.ConnectedConnectionItem;
-import org.wso2.carbon.identity.api.server.vp.template.management.v1.ConnectedConnectionsResponse;
+import org.wso2.carbon.identity.api.server.vp.template.management.v1.ConnectedIdpItem;
+import org.wso2.carbon.identity.api.server.vp.template.management.v1.ConnectedIdpsResponse;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.Error;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PaginationLink;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionCreationModel;
@@ -42,7 +42,7 @@ import org.wso2.carbon.identity.openid4vc.presentation.common.constant.VPConstan
 import org.wso2.carbon.identity.openid4vc.template.management.exception.PresentationManagementClientException;
 import org.wso2.carbon.identity.openid4vc.template.management.exception.PresentationManagementErrorCode;
 import org.wso2.carbon.identity.openid4vc.template.management.exception.PresentationManagementException;
-import org.wso2.carbon.identity.openid4vc.template.management.model.ConnectedConnectionInfo;
+import org.wso2.carbon.identity.openid4vc.template.management.model.ConnectedIdpInfo;
 import org.wso2.carbon.identity.openid4vc.template.management.model.PresentationDefinition;
 import org.wso2.carbon.identity.openid4vc.template.management.model.PresentationDefinition.ClaimConstraint;
 import org.wso2.carbon.identity.openid4vc.template.management.model.PresentationDefinition.RequestedCredential;
@@ -335,7 +335,7 @@ public class ServerVPDefinitionManagementService {
      * @param definitionId the server-generated UUID of the definition to query.
      * @return the list of identity provider connections configured to use this definition.
      */
-    public ConnectedConnectionsResponse getConnectedConnections(String definitionId) {
+    public ConnectedIdpsResponse getConnectedIdps(String definitionId) {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Retrieving connected connections for presentation definition: " + definitionId);
@@ -344,28 +344,28 @@ public class ServerVPDefinitionManagementService {
             int tenantId = getTenantId();
             PresentationDefinitionService service = getService();
 
-            List<ConnectedConnectionInfo> connections =
-                    service.getConnectedConnections(definitionId, tenantId);
+            List<ConnectedIdpInfo> idps =
+                    service.getConnectedIdps(definitionId, tenantId);
 
             String serverUrl = IdentityUtil.getServerURL(
                     VPDefinitionManagementConstants.IDENTITY_PROVIDER_PATH_COMPONENT, true, true);
 
-            List<ConnectedConnectionInfo> effectiveConnections =
-                    connections != null ? connections : Collections.<ConnectedConnectionInfo>emptyList();
-            List<ConnectedConnectionItem> items = new ArrayList<>();
-            for (ConnectedConnectionInfo info : effectiveConnections) {
-                ConnectedConnectionItem item = new ConnectedConnectionItem();
-                item.setConnectionId(info.getConnectionId());
-                item.setName(info.getConnectionName());
-                item.setSelf(serverUrl + info.getConnectionId());
+            List<ConnectedIdpInfo> effectiveIdps =
+                    idps != null ? idps : Collections.<ConnectedIdpInfo>emptyList();
+            List<ConnectedIdpItem> items = new ArrayList<>();
+            for (ConnectedIdpInfo info : effectiveIdps) {
+                ConnectedIdpItem item = new ConnectedIdpItem();
+                item.setIdpId(info.getIdpId());
+                item.setName(info.getIdpName());
+                item.setSelf(serverUrl + info.getIdpId());
                 items.add(item);
             }
 
-            ConnectedConnectionsResponse response = new ConnectedConnectionsResponse();
+            ConnectedIdpsResponse response = new ConnectedIdpsResponse();
             response.setCount(items.size());
             response.setTotalResults(items.size());
             response.setStartIndex(1);
-            response.setConnectedConnections(items);
+            response.setConnectedIdps(items);
             return response;
         } catch (javax.ws.rs.WebApplicationException e) {
             throw e;
