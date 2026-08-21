@@ -22,8 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
 import javax.validation.constraints.*;
 
 /**
@@ -40,8 +38,7 @@ public class ExecutorMetadata  {
     private String name;
     private String displayName;
     private String description;
-    private List<String> behaviorFlags = null;
-
+    private Boolean isAuthenticationExecutor;
     private String icon;
     private Boolean requiresConnection;
     private String associatedAuthenticator;
@@ -104,33 +101,25 @@ public class ExecutorMetadata  {
     }
 
     /**
-    * Flags that change how a consumer treats this executor. RECOVERY_FACTOR declares that this executor satisfies the password recovery flow requirement of having at least one recovery factor. Values outside the recognised set are passed through but have no effect.
+    * Whether this executor authenticates the user. Such an executor satisfies a flow requirement for an authentication factor, for example the password recovery flow requirement of having at least one recovery factor.
     **/
-    public ExecutorMetadata behaviorFlags(List<String> behaviorFlags) {
+    public ExecutorMetadata isAuthenticationExecutor(Boolean isAuthenticationExecutor) {
 
-        this.behaviorFlags = behaviorFlags;
+        this.isAuthenticationExecutor = isAuthenticationExecutor;
         return this;
     }
     
-    @ApiModelProperty(example = "[\"RECOVERY_FACTOR\"]", value = "Flags that change how a consumer treats this executor. RECOVERY_FACTOR declares that this executor satisfies the password recovery flow requirement of having at least one recovery factor. Values outside the recognised set are passed through but have no effect.")
-    @JsonProperty("behaviorFlags")
+    @ApiModelProperty(example = "true", value = "Whether this executor authenticates the user. Such an executor satisfies a flow requirement for an authentication factor, for example the password recovery flow requirement of having at least one recovery factor.")
+    @JsonProperty("isAuthenticationExecutor")
     @Valid
-    public List<String> getBehaviorFlags() {
-        return behaviorFlags;
+    public Boolean getIsAuthenticationExecutor() {
+        return isAuthenticationExecutor;
     }
-    public void setBehaviorFlags(List<String> behaviorFlags) {
-        this.behaviorFlags = behaviorFlags;
-    }
-
-    public ExecutorMetadata addBehaviorFlagsItem(String behaviorFlagsItem) {
-        if (this.behaviorFlags == null) {
-            this.behaviorFlags = new ArrayList<String>();
-        }
-        this.behaviorFlags.add(behaviorFlagsItem);
-        return this;
+    public void setIsAuthenticationExecutor(Boolean isAuthenticationExecutor) {
+        this.isAuthenticationExecutor = isAuthenticationExecutor;
     }
 
-        /**
+    /**
     * Icon path or URL for the executor
     **/
     public ExecutorMetadata icon(String icon) {
@@ -202,7 +191,7 @@ public class ExecutorMetadata  {
         return Objects.equals(this.name, executorMetadata.name) &&
             Objects.equals(this.displayName, executorMetadata.displayName) &&
             Objects.equals(this.description, executorMetadata.description) &&
-            Objects.equals(this.behaviorFlags, executorMetadata.behaviorFlags) &&
+            Objects.equals(this.isAuthenticationExecutor, executorMetadata.isAuthenticationExecutor) &&
             Objects.equals(this.icon, executorMetadata.icon) &&
             Objects.equals(this.requiresConnection, executorMetadata.requiresConnection) &&
             Objects.equals(this.associatedAuthenticator, executorMetadata.associatedAuthenticator);
@@ -210,7 +199,7 @@ public class ExecutorMetadata  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, displayName, description, behaviorFlags, icon, requiresConnection, associatedAuthenticator);
+        return Objects.hash(name, displayName, description, isAuthenticationExecutor, icon, requiresConnection, associatedAuthenticator);
     }
 
     @Override
@@ -222,7 +211,7 @@ public class ExecutorMetadata  {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
-        sb.append("    behaviorFlags: ").append(toIndentedString(behaviorFlags)).append("\n");
+        sb.append("    isAuthenticationExecutor: ").append(toIndentedString(isAuthenticationExecutor)).append("\n");
         sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
         sb.append("    requiresConnection: ").append(toIndentedString(requiresConnection)).append("\n");
         sb.append("    associatedAuthenticator: ").append(toIndentedString(associatedAuthenticator)).append("\n");
