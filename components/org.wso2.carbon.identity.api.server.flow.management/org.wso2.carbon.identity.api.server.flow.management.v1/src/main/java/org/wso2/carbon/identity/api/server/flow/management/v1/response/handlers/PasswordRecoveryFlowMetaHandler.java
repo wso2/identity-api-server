@@ -98,8 +98,7 @@ public class PasswordRecoveryFlowMetaHandler extends AbstractMetaResponseHandler
     public List<Set<String>> getRequiredExecutorGroups() {
 
         Set<String> recoveryFactors = new HashSet<>(FlowEndpointConstants.LegacyExecutors.RECOVERY_FACTORS);
-        recoveryFactors.addAll(Utils.filterExecutorsByBehaviorFlag(getSupportedExtensionExecutors(),
-                Constants.ExecutorBehaviorFlags.RECOVERY_FACTOR));
+        recoveryFactors.addAll(Utils.filterAuthenticationExecutors(getSupportedExtensionExecutors()));
         return Collections.singletonList(recoveryFactors);
     }
 

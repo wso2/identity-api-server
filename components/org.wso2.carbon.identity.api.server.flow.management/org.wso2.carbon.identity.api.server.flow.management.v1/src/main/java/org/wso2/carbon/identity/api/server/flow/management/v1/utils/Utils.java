@@ -799,20 +799,17 @@ public class Utils {
     }
 
     /**
-     * Executors for this flow type that declared the given behavior flag.
+     * Executors that authenticate the user, and so satisfy a flow requirement for an authentication
+     * factor.
      *
-     * @param behaviorFlag Behavior flag to match.
+     * @param registeredExecutors Executors to filter.
      * @return Names of the matching executors.
      */
-    public static Set<String> filterExecutorsByBehaviorFlag(List<FlowExecutorInfo> registeredExecutors,
-                                                            String behaviorFlag) {
+    public static Set<String> filterAuthenticationExecutors(List<FlowExecutorInfo> registeredExecutors) {
 
         Set<String> matching = new HashSet<>();
-        if (StringUtils.isBlank(behaviorFlag)) {
-            return matching;
-        }
         for (FlowExecutorInfo info : registeredExecutors) {
-            if (info.getBehaviorFlags().contains(behaviorFlag)) {
+            if (info.isAuthenticationExecutor()) {
                 matching.add(info.getName());
             }
         }
@@ -842,11 +839,10 @@ public class Utils {
                 .name(declared.getName())
                 .displayName(truncate(declared.getDisplayName(), MAX_EXECUTOR_DISPLAY_NAME_LENGTH))
                 .description(truncate(declared.getDescription(), MAX_EXECUTOR_DESCRIPTION_LENGTH))
-                .behaviorFlags(declared.getBehaviorFlags().isEmpty()
-                        ? null : new ArrayList<>(declared.getBehaviorFlags()))
+                .isAuthenticationExecutor(declared.isAuthenticationExecutor())
                 .icon(declared.getIcon())
                 .associatedAuthenticator(authenticator)
-                .requiresConnection(declared.isConnectionRequired() || declared.isIdpRequired()
+                .requiresConnection(declared.isConnectionRequired() || declared.isAuthenticationExecutor()
                         || authenticator != null);
     }
 
