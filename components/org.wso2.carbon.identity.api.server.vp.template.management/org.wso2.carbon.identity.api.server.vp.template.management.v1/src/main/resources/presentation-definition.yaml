@@ -1,0 +1,735 @@
+openapi: 3.0.0
+info:
+  title: 'WSO2 Identity Server - Presentation Definition Management API'
+  description: 'RESTful API for managing OpenID4VP Presentation Definitions in WSO2 Identity Server.'
+  contact:
+    name: WSO2
+    url: 'http://wso2.com/products/identity-server/'
+    email: architecture@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  version: v1
+
+servers:
+  - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
+    variables:
+      server-url:
+        default: "localhost:9443"
+      tenant-domain:
+        default: "carbon.super"
+
+security:
+  - OAuth2: []
+  - BasicAuth: []
+
+paths:
+  /openid4vp/presentation-definitions:
+    get:
+      tags:
+        - Presentation Definitions
+      summary: List presentation definitions.
+      operationId: listPresentationDefinitions
+      description: |
+        Returns a cursor-paginated list of presentation definitions for the tenant.
+        Supports SCIM-style filtering via the `filter` parameter.
+        Only one of `before` or `after` may be provided at a time.
+      parameters:
+        - name: before
+          in: query
+          description: Base64-encoded cursor value for backward pagination.
+          required: false
+          schema:
+            type: string
+        - name: after
+          in: query
+          description: Base64-encoded cursor value for forward pagination.
+          required: false
+          schema:
+            type: string
+        - name: filter
+          in: query
+          description: >
+            SCIM-style filter expression. Supports 'sw', 'co', 'ew', and 'eq' operations.
+            Example: name sw "my-def"
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Maximum number of records to return per page. Defaults to 10, capped at 100.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresentationDefinitionList'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '501':
+          description: Not Implemented — OpenID4VP feature is not enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - Presentation Definitions
+      summary: Create a presentation definition.
+      operationId: createPresentationDefinition
+      description: Creates a new presentation definition for the tenant.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PresentationDefinitionCreationModel'
+      responses:
+        '201':
+          description: Created
+          headers:
+            Location:
+              description: URI of the newly created presentation definition.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresentationDefinitionResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '409':
+          description: Conflict — a presentation definition with the given name already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '501':
+          description: Not Implemented — OpenID4VP feature is not enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /openid4vp/presentation-definitions/{identifier}:
+    get:
+      tags:
+        - Presentation Definitions
+      summary: Get a presentation definition.
+      operationId: getPresentationDefinition
+      description: Returns a presentation definition by its unique identifier.
+      parameters:
+        - $ref: '#/components/parameters/definitionId'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresentationDefinitionResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '501':
+          description: Not Implemented — OpenID4VP feature is not enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - Presentation Definitions
+      summary: Update a presentation definition.
+      operationId: updatePresentationDefinition
+      description: >
+        Replaces the fields of an existing presentation definition.
+        Only fields included in the request body are updated.
+      parameters:
+        - $ref: '#/components/parameters/definitionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PresentationDefinitionUpdateModel'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresentationDefinitionResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '501':
+          description: Not Implemented — OpenID4VP feature is not enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - Presentation Definitions
+      summary: Delete a presentation definition.
+      operationId: deletePresentationDefinition
+      description: >
+        Deletes a presentation definition. Fails with 409 Conflict if the definition is
+        referenced by one or more connections.
+      parameters:
+        - $ref: '#/components/parameters/definitionId'
+      responses:
+        '204':
+          description: No Content — definition successfully deleted.
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict — the definition is in use by one or more connections.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '501':
+          description: Not Implemented — OpenID4VP feature is not enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /openid4vp/presentation-definitions/{identifier}/connected-idps:
+    get:
+      tags:
+        - Presentation Definitions
+      summary: Get IDPs using a presentation definition.
+      operationId: getConnectedIdps
+      description: >
+        Returns the list of identity provider connections that are configured to use
+        this presentation definition.
+      parameters:
+        - $ref: '#/components/parameters/definitionId'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectedIdpsResponse''
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '501':
+          description: Not Implemented — OpenID4VP feature is not enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /openid4vp/presentation-definitions/{identifier}/trusted-cas:
+    patch:
+      tags:
+        - Presentation Definitions
+      summary: Update trusted CA certificates for a credential.
+      operationId: patchTrustedCas
+      description: >
+        Applies ADD, REMOVE, or REPLACE patch operations to the trusted CA certificate
+        list of a specific credential within a presentation definition.
+        Certificates are supplied as Base64-encoded PEM strings.
+      parameters:
+        - $ref: '#/components/parameters/definitionId'
+        - name: credential-id
+          in: query
+          description: The credential query ID within the presentation definition to target.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/CertificatePatch'
+              minItems: 1
+      responses:
+        '200':
+          description: Successful Response — the updated presentation definition.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresentationDefinitionResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '501':
+          description: Not Implemented — OpenID4VP feature is not enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://localhost:9443/oauth2/authorize'
+          tokenUrl: 'https://localhost:9443/oauth2/token'
+          scopes:
+            internal_vp_definition_view: View presentation definitions
+            internal_vp_definition_update: Create, update, and delete presentation definitions
+
+  parameters:
+    definitionId:
+      name: identifier
+      in: path
+      description: Unique user-facing identifier of the presentation definition.
+      required: true
+      schema:
+        type: string
+        example: "employee-id-verification"
+
+  schemas:
+    PresentationDefinitionCreationModel:
+      type: object
+      description: Request body for creating a new presentation definition.
+      required:
+        - identifier
+        - displayName
+        - credentials
+      properties:
+        identifier:
+          type: string
+          description: >
+            Unique user-facing identifier for this definition within the tenant.
+            Used in API paths. Only alphanumeric characters, underscores, and hyphens are allowed.
+          pattern: '^[A-Za-z0-9_-]+$'
+          example: "employee-id-verification"
+        displayName:
+          type: string
+          description: Human-readable display label for the presentation definition.
+          example: "Employee ID Verification"
+        description:
+          type: string
+          description: Human-readable description of the presentation definition.
+          example: "Requests an employee ID credential from the wallet."
+        credentials:
+          type: array
+          description: The requested credentials that constitute this presentation definition.
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/RequestedCredentialModel'
+
+    PresentationDefinitionUpdateModel:
+      type: object
+      description: Request body for updating an existing presentation definition. All fields are optional.
+      properties:
+        displayName:
+          type: string
+          description: New display label for the presentation definition.
+          example: "Updated Employee ID Verification"
+        description:
+          type: string
+          description: New description for the presentation definition.
+          example: "Updated employee ID credential request."
+        credentials:
+          type: array
+          description: Replacement set of requested credentials. When provided, replaces the entire list.
+          items:
+            $ref: '#/components/schemas/RequestedCredentialModel'
+
+    PresentationDefinitionResponse:
+      type: object
+      description: Full representation of a presentation definition as returned by the server.
+      properties:
+        identifier:
+          type: string
+          description: User-facing identifier of the presentation definition.
+          example: "employee-id-verification"
+        displayName:
+          type: string
+          description: Display label of the presentation definition.
+          example: "Employee ID Verification"
+        description:
+          type: string
+          description: Description of the presentation definition.
+          example: "Requests an employee ID credential from the wallet."
+        credentials:
+          type: array
+          description: The requested credentials defined in this presentation definition.
+          items:
+            $ref: '#/components/schemas/RequestedCredentialModel'
+
+    PresentationDefinitionList:
+      type: object
+      description: Paginated list of presentation definitions.
+      properties:
+        totalResults:
+          type: integer
+          description: Total number of presentation definitions matching the query.
+          example: 42
+        links:
+          type: array
+          description: Cursor-based pagination links (next/previous).
+          items:
+            $ref: '#/components/schemas/PaginationLink'
+        presentationDefinitions:
+          type: array
+          description: List of presentation definition summaries for the current page.
+          items:
+            $ref: '#/components/schemas/PresentationDefinitionListItem'
+
+    PresentationDefinitionListItem:
+      type: object
+      description: Summary representation of a presentation definition returned in list responses.
+      properties:
+        identifier:
+          type: string
+          description: User-facing identifier of the presentation definition.
+          example: "employee-id-verification"
+        displayName:
+          type: string
+          description: Display label of the presentation definition.
+          example: "Employee ID Verification"
+        description:
+          type: string
+          description: Description of the presentation definition.
+          example: "Requests an employee ID credential from the wallet."
+
+    RequestedCredentialModel:
+      type: object
+      description: Specifies a single credential query within a presentation definition.
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          description: >
+            User-defined identifier for this credential query within the definition.
+            Used to correlate the wallet's response to this specific request.
+          example: "employee_id"
+        type:
+          type: string
+          description: The credential type (vct) to request from the wallet.
+          example: "EmployeeIDCredential"
+        format:
+          type: string
+          description: >
+            Credential format as defined by OID4VP §6.1.
+            Defaults to dc+sd-jwt when not specified.
+          enum:
+            - dc+sd-jwt
+            - mso_mdoc
+            - jwt_vc_json
+          default: dc+sd-jwt
+          example: "dc+sd-jwt"
+        enforceTrustedIssuer:
+          type: boolean
+          description: >
+            When true, validates the credential's x5c certificate chain against one of the
+            configured trustedCaPems root CAs. When false (default), the signature is verified
+            without CA chain validation.
+          default: false
+          example: false
+        trustedCaPems:
+          type: array
+          description: >
+            Base64-encoded PEM root CA certificates trusted for x5c chain validation.
+            Only relevant when enforceTrustedIssuer is true.
+          items:
+            type: string
+            description: Base64-encoded PEM certificate.
+        keyResolutionMethod:
+          type: string
+          description: >
+            Method used to resolve the issuer's public key for signature verification.
+            Defaults to x5c.
+          enum:
+            - x5c
+            - jwks_uri
+            - pem
+          default: x5c
+          example: "x5c"
+        jwksUri:
+          type: string
+          description: >
+            JWKS endpoint URL for fetching the issuer's public key.
+            Required when keyResolutionMethod is jwks_uri.
+          example: "https://issuer.example.com/.well-known/jwks.json"
+        issuerPem:
+          type: string
+          description: >
+            PEM-encoded issuer certificate for public key extraction.
+            Required when keyResolutionMethod is pem.
+        claims:
+          type: array
+          description: Claim constraints that must be satisfied by the presented credential.
+          items:
+            $ref: '#/components/schemas/ClaimConstraintModel'
+
+    ClaimConstraintModel:
+      type: object
+      description: Constraint applied to a single claim within a requested credential.
+      properties:
+        id:
+          type: string
+          description: DCQL claim identifier — used to reference this claim in claim_sets.
+          example: "given_name_claim"
+        path:
+          type: array
+          description: >
+            DCQL path array identifying the claim within the credential.
+            Example: ["address", "street_address"] traverses a nested object.
+          items:
+            type: string
+          example:
+            - "address"
+            - "street_address"
+        name:
+          type: string
+          description: The claim name (e.g. given_name). Used when path is absent.
+          example: "given_name"
+        mandatory:
+          type: boolean
+          description: Whether this claim must be present in the credential. Defaults to true.
+          default: true
+          example: true
+        allowedValues:
+          type: array
+          description: >
+            Allowed values for this claim. When set, the credential value must match one of
+            these entries. Only applicable to scalar (non-collection) claims.
+          items:
+            type: string
+          example:
+            - "Engineering"
+            - "Product"
+
+    CertificatePatch:
+      type: object
+      description: A single patch operation to apply to a credential's trusted CA certificate list.
+      required:
+        - operation
+      properties:
+        operation:
+          type: string
+          description: >
+            The patch operation to perform.
+            ADD appends a certificate; REMOVE removes by index; REPLACE replaces by index.
+          enum:
+            - ADD
+            - REMOVE
+            - REPLACE
+          example: "ADD"
+        certificateIndex:
+          type: integer
+          description: >
+            Zero-based index of the certificate to remove or replace.
+            Required for REMOVE and REPLACE operations.
+          minimum: 0
+          example: 0
+        certificate:
+          type: string
+          description: >
+            Base64-encoded PEM certificate to add or use as the replacement.
+            Required for ADD and REPLACE operations.
+          example: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0t..."
+
+    ConnectedIdpsResponse:
+      type: object
+      description: >
+        List of identity provider connections that reference a given presentation definition.
+        Mirrors the ConnectedApps pattern from the IDP API.
+      properties:
+        totalResults:
+          type: integer
+          description: Total number of connections referencing this presentation definition.
+          example: 3
+        startIndex:
+          type: integer
+          description: Index of the first result (1-based).
+          example: 1
+        count:
+          type: integer
+          description: Number of connections returned in this response.
+          example: 3
+        connectedIdps:
+          type: array
+          description: The connections that reference this presentation definition.
+          items:
+            $ref: '#/components/schemas/ConnectedIdpItem''
+
+    ConnectedIdpItem:
+      type: object
+      description: A single identity provider connection that references a presentation definition.
+      properties:
+        idpId:
+          type: string
+          description: UUID of the identity provider.
+          example: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+        name:
+          type: string
+          description: Display name of the connection.
+          example: "Corporate IDP"
+        self:
+          type: string
+          description: URI of the connection resource in the Identity Provider API.
+          example: "https://localhost:9443/api/server/v1/identity-providers/f47ac10b-58cc-4372-a567-0e02b2c3d479"
+
+    PaginationLink:
+      type: object
+      description: Cursor-based pagination link.
+      properties:
+        rel:
+          type: string
+          description: Link relation — either "next" (forward) or "previous" (backward).
+          enum:
+            - next
+            - previous
+          example: "next"
+        href:
+          type: string
+          description: Relative URL for fetching the linked page.
+          example: "/openid4vp/presentation-definitions?limit=10&after=NDoy"
+
+    Error:
+      type: object
+      description: Error response body.
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: Error code identifying the type of error.
+          example: "VPD-60001"
+        message:
+          type: string
+          description: Short human-readable error message.
+          example: "Presentation definition not found."
+        description:
+          type: string
+          description: Detailed error description.
+          example: "Unable to find a presentation definition with the id: a9b3c21d-84f0-4e1b-b9e7-123456789abc"
+        traceId:
+          type: string
+          description: Trace identifier for debugging and support.
+          example: "e08d7c03-1234-4f5a-9bc3-abcdef012345"
