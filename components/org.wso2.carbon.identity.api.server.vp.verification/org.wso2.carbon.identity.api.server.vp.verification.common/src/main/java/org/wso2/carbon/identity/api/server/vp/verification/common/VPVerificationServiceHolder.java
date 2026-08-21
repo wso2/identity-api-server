@@ -20,6 +20,7 @@ package org.wso2.carbon.identity.api.server.vp.verification.common;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.service.VPFlowService;
+import org.wso2.carbon.identity.openid4vc.template.management.service.PresentationDefinitionService;
 
 /**
  * Service holder for VP Verification API.
@@ -41,5 +42,22 @@ public class VPVerificationServiceHolder {
         return (VPFlowService) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext()
                 .getOSGiService(VPFlowService.class, null);
+    }
+
+    /**
+     * Get PresentationDefinitionService OSGi service.
+     *
+     * @return the {@link PresentationDefinitionService} registered in the OSGi context, or {@code null} if not
+     * available.
+     */
+    public static PresentationDefinitionService getPresentationDefinitionService() {
+
+        try {
+            return (PresentationDefinitionService) PrivilegedCarbonContext
+                    .getThreadLocalCarbonContext()
+                    .getOSGiService(PresentationDefinitionService.class, null);
+        } catch (NullPointerException e) {
+            return null;
+        }
     }
 }

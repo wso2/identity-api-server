@@ -28,18 +28,18 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(description = "Request body for initiating a VP verification session.")
 public class VerificationInitiateRequest {
 
-    private String presentationDefinitionId;
+    private String presentationDefinitionIdentifier;
 
     @ApiModelProperty(required = true,
-            value = "ID of the presentation definition the verifier wants the wallet to satisfy.")
-    @JsonProperty("presentationDefinitionId")
-    public String getPresentationDefinitionId() {
+            value = "Human-readable identifier of the presentation definition the verifier wants the wallet to satisfy.")
+    @JsonProperty("presentationDefinitionIdentifier")
+    public String getPresentationDefinitionIdentifier() {
 
-        return presentationDefinitionId;
+        return presentationDefinitionIdentifier;
     }
 
-    public void setPresentationDefinitionId(String presentationDefinitionId) {
+    public void setPresentationDefinitionIdentifier(String presentationDefinitionIdentifier) {
 
-        this.presentationDefinitionId = presentationDefinitionId;
+        this.presentationDefinitionIdentifier = presentationDefinitionIdentifier;
     }
 }

@@ -21,6 +21,8 @@ package org.wso2.carbon.identity.api.server.vp.verification.v1.core;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.slf4j.MDC;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.vp.verification.common.VPVerificationConstants;
 import org.wso2.carbon.identity.api.server.vp.verification.common.VPVerificationConstants.ErrorMessage;
@@ -41,6 +43,9 @@ import org.wso2.carbon.identity.openid4vc.presentation.authenticator.model.VPFlo
 import org.wso2.carbon.identity.openid4vc.presentation.authenticator.service.VPFlowService;
 import org.wso2.carbon.identity.openid4vc.presentation.verification.dto.PresentationMetadata;
 import org.wso2.carbon.identity.openid4vc.presentation.verification.dto.VerificationResult;
+import org.wso2.carbon.identity.openid4vc.template.management.exception.PresentationManagementException;
+import org.wso2.carbon.identity.openid4vc.template.management.model.PresentationDefinition;
+import org.wso2.carbon.identity.openid4vc.template.management.service.PresentationDefinitionService;
 
 import java.net.URI;
 import java.time.Instant;
@@ -48,7 +53,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.ws.rs.core.Response;
-import org.slf4j.MDC;
 
 /**
  * Core business logic for the VP Verification REST API.
@@ -62,14 +66,14 @@ public class ServerVPVerificationService {
     /**
      * Initiate a new standalone VP verification session.
      *
-     * @param request the initiation request containing the presentation definition ID for this verification session.
+     * @param request the initiation request containing the human-readable identifier of the presentation definition.
      * @return a response with the wallet deeplink URL and session identifier on success, or an error response.
      */
     public Response initiateVerification(VerificationInitiateRequest request) {
 
-        if (request == null || StringUtils.isBlank(request.getPresentationDefinitionId())) {
+        if (request == null || StringUtils.isBlank(request.getPresentationDefinitionIdentifier())) {
             return buildBadRequestResponse(ErrorMessage.ERROR_CODE_INVALID_REQUEST,
-                    "presentationDefinitionId is required.");
+                    "presentationDefinitionIdentifier is required.");
         }
 
         VPFlowService service = getService();
@@ -78,10 +82,32 @@ public class ServerVPVerificationService {
         }
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        String identifier = request.getPresentationDefinitionIdentifier();
+
+        // Resolve the human-readable identifier to the internal UUID required by VPFlowService.
+        String definitionId;
+        try {
+            PresentationDefinitionService definitionService = getPresentationDefinitionService();
+            if (definitionService == null) {
+                return buildInternalErrorResponse(ErrorMessage.ERROR_CODE_INTERNAL_ERROR,
+                        "PresentationDefinitionService is not available.");
+            }
+            PresentationDefinition definition =
+                    definitionService.getPresentationDefinitionByIdentifier(identifier, tenantId);
+            if (definition == null) {
+                return buildNotFoundResponse(ErrorMessage.ERROR_CODE_DEFINITION_NOT_FOUND,
+                        "No presentation definition found for identifier: " + identifier);
+            }
+            definitionId = definition.getDefinitionId();
+        } catch (PresentationManagementException e) {
+            LOG.error("Failed to resolve presentation definition identifier: " + identifier, e);
+            return buildInternalErrorResponse(ErrorMessage.ERROR_CODE_INTERNAL_ERROR,
+                    "An error occurred while resolving the presentation definition.");
+        }
 
         try {
-            VPFlowInitiationResult initiation =
-                    service.initiate(request.getPresentationDefinitionId(), tenantDomain);
+            VPFlowInitiationResult initiation = service.initiate(definitionId, tenantDomain);
 
             VerificationInitiateResponse initiationResponse = new VerificationInitiateResponse();
             initiationResponse.setRequestId(initiation.getRequestId());
@@ -94,7 +120,8 @@ public class ServerVPVerificationService {
             AUDIT_LOG.info("Initiator : " + tenantDomain
                     + " | Action : VP-Verification-Initiated"
                     + " | Target : " + initiation.getRequestId()
-                    + " | Data : { \"presentationDefinitionId\": \"" + request.getPresentationDefinitionId()
+                    + " | Data : { \"presentationDefinitionIdentifier\": \"" + identifier
+                    + "\", \"presentationDefinitionId\": \"" + definitionId
                     + "\", \"tenantDomain\": \"" + tenantDomain
                     + "\", \"correlationId\": \"" + initiationResponse.getCorrelationId() + "\" }"
                     + " | Result : Success");
@@ -267,6 +294,11 @@ public class ServerVPVerificationService {
         return VPVerificationServiceHolder.getVPFlowService();
     }
 
+    private PresentationDefinitionService getPresentationDefinitionService() {
+
+        return VPVerificationServiceHolder.getPresentationDefinitionService();
+    }
+
     private Response buildBadRequestResponse(ErrorMessage errorMsg, String description) {
 
         Error error = new Error();
@@ -282,6 +314,15 @@ public class ServerVPVerificationService {
         error.setCode(ErrorMessage.ERROR_CODE_SESSION_NOT_FOUND.getCode());
         error.setMessage(ErrorMessage.ERROR_CODE_SESSION_NOT_FOUND.getMessage());
         error.setDescription("No verification session found for requestId: " + requestId);
+        return Response.status(Response.Status.NOT_FOUND).entity(error).build();
+    }
+
+    private Response buildNotFoundResponse(ErrorMessage errorMsg, String description) {
+
+        Error error = new Error();
+        error.setCode(errorMsg.getCode());
+        error.setMessage(errorMsg.getMessage());
+        error.setDescription(description);
         return Response.status(Response.Status.NOT_FOUND).entity(error).build();
     }
 

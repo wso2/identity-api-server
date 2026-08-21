@@ -42,6 +42,12 @@
             <version>${carbon.identity.openid4vc.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.openid4vc</groupId>
+            <artifactId>org.wso2.carbon.identity.openid4vc.template.management</artifactId>
+            <version>${carbon.identity.openid4vc.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>

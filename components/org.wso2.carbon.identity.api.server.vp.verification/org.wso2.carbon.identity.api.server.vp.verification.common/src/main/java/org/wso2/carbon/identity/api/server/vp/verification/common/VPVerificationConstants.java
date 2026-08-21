@@ -37,6 +37,7 @@ public class VPVerificationConstants {
 
         ERROR_CODE_INVALID_REQUEST("VPV-60001", "Invalid request."),
         ERROR_CODE_SESSION_NOT_FOUND("VPV-60401", "Verification session not found."),
+        ERROR_CODE_DEFINITION_NOT_FOUND("VPV-60404", "Presentation definition not found."),
         ERROR_CODE_FEATURE_DISABLED("VPV-60501", "OpenID4VP feature is not enabled."),
         ERROR_CODE_INTERNAL_ERROR("VPV-65001", "Internal server error."),
         ERROR_CODE_SERVICE_UNAVAILABLE("VPV-65002",
