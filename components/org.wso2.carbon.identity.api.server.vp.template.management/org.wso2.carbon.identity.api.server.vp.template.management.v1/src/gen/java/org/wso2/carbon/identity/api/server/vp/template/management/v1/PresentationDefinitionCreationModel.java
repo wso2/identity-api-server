@@ -34,21 +34,35 @@ import javax.validation.constraints.NotNull;
 public class PresentationDefinitionCreationModel {
 
     @NotNull
-    private String name;
+    private String identifier;
+    @NotNull
+    private String displayName;
     private String description;
     @NotNull
     private List<RequestedCredentialModel> credentials;
 
-    @ApiModelProperty(required = true, value = "Name of the presentation definition.")
-    @JsonProperty("name")
-    public String getName() {
+    @ApiModelProperty(required = true, value = "Unique user-facing identifier of the presentation definition.")
+    @JsonProperty("identifier")
+    public String getIdentifier() {
 
-        return name;
+        return identifier;
     }
 
-    public void setName(String name) {
+    public void setIdentifier(String identifier) {
 
-        this.name = name;
+        this.identifier = identifier;
+    }
+
+    @ApiModelProperty(required = true, value = "Display label of the presentation definition.")
+    @JsonProperty("displayName")
+    public String getDisplayName() {
+
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+
+        this.displayName = displayName;
     }
 
     @ApiModelProperty(value = "Description of the presentation definition.")

@@ -146,7 +146,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /openid4vp/presentation-definitions/{definition-id}:
+  /openid4vp/presentation-definitions/{identifier}:
     get:
       tags:
         - Presentation Definitions
@@ -277,7 +277,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /openid4vp/presentation-definitions/{definition-id}/connected-connections:
+  /openid4vp/presentation-definitions/{identifier}/connected-connections:
     get:
       tags:
         - Presentation Definitions
@@ -318,7 +318,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /openid4vp/presentation-definitions/{definition-id}/trusted-cas:
+  /openid4vp/presentation-definitions/{identifier}/trusted-cas:
     patch:
       tags:
         - Presentation Definitions
@@ -398,25 +398,33 @@ components:
 
   parameters:
     definitionId:
-      name: definition-id
+      name: identifier
       in: path
-      description: Unique identifier of the presentation definition.
+      description: Unique user-facing identifier of the presentation definition.
       required: true
       schema:
         type: string
-        example: "a9b3c21d-84f0-4e1b-b9e7-123456789abc"
+        example: "employee-id-verification"
 
   schemas:
     PresentationDefinitionCreationModel:
       type: object
       description: Request body for creating a new presentation definition.
       required:
-        - name
+        - identifier
+        - displayName
         - credentials
       properties:
-        name:
+        identifier:
           type: string
-          description: Name of the presentation definition. Must be unique within the tenant.
+          description: >
+            Unique user-facing identifier for this definition within the tenant.
+            Used in API paths. Only alphanumeric characters, underscores, and hyphens are allowed.
+          pattern: '^[A-Za-z0-9_-]+$'
+          example: "employee-id-verification"
+        displayName:
+          type: string
+          description: Human-readable display label for the presentation definition.
           example: "Employee ID Verification"
         description:
           type: string
@@ -433,9 +441,9 @@ components:
       type: object
       description: Request body for updating an existing presentation definition. All fields are optional.
       properties:
-        name:
+        displayName:
           type: string
-          description: New name for the presentation definition.
+          description: New display label for the presentation definition.
           example: "Updated Employee ID Verification"
         description:
           type: string
@@ -451,13 +459,13 @@ components:
       type: object
       description: Full representation of a presentation definition as returned by the server.
       properties:
-        id:
+        identifier:
           type: string
-          description: Server-assigned unique identifier of the presentation definition.
-          example: "a9b3c21d-84f0-4e1b-b9e7-123456789abc"
-        name:
+          description: User-facing identifier of the presentation definition.
+          example: "employee-id-verification"
+        displayName:
           type: string
-          description: Name of the presentation definition.
+          description: Display label of the presentation definition.
           example: "Employee ID Verification"
         description:
           type: string
@@ -492,13 +500,13 @@ components:
       type: object
       description: Summary representation of a presentation definition returned in list responses.
       properties:
-        id:
+        identifier:
           type: string
-          description: Unique identifier of the presentation definition.
-          example: "a9b3c21d-84f0-4e1b-b9e7-123456789abc"
-        name:
+          description: User-facing identifier of the presentation definition.
+          example: "employee-id-verification"
+        displayName:
           type: string
-          description: Name of the presentation definition.
+          description: Display label of the presentation definition.
           example: "Employee ID Verification"
         description:
           type: string

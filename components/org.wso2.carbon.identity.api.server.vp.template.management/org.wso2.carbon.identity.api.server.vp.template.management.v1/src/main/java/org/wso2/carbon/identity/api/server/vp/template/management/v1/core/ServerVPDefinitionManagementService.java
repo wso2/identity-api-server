@@ -19,6 +19,8 @@
 package org.wso2.carbon.identity.api.server.vp.template.management.v1.core;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.vp.template.management.common.VPDefinitionManagementConstants;
 import org.wso2.carbon.identity.api.server.vp.template.management.common.VPDefinitionManagementConstants.ErrorMessage;
@@ -37,15 +39,15 @@ import org.wso2.carbon.identity.api.server.vp.template.management.v1.Presentatio
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.RequestedCredentialModel;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.openid4vc.presentation.common.constant.VPConstants;
-import org.wso2.carbon.identity.openid4vc.presentation.management.exception.PresentationManagementClientException;
-import org.wso2.carbon.identity.openid4vc.presentation.management.exception.PresentationManagementErrorCode;
-import org.wso2.carbon.identity.openid4vc.presentation.management.exception.PresentationManagementException;
-import org.wso2.carbon.identity.openid4vc.presentation.management.model.ConnectedConnectionInfo;
-import org.wso2.carbon.identity.openid4vc.presentation.management.model.PresentationDefinition;
-import org.wso2.carbon.identity.openid4vc.presentation.management.model.PresentationDefinition.ClaimConstraint;
-import org.wso2.carbon.identity.openid4vc.presentation.management.model.PresentationDefinition.RequestedCredential;
-import org.wso2.carbon.identity.openid4vc.presentation.management.model.PresentationDefinitionSearchResult;
-import org.wso2.carbon.identity.openid4vc.presentation.management.service.PresentationDefinitionService;
+import org.wso2.carbon.identity.openid4vc.template.management.exception.PresentationManagementClientException;
+import org.wso2.carbon.identity.openid4vc.template.management.exception.PresentationManagementErrorCode;
+import org.wso2.carbon.identity.openid4vc.template.management.exception.PresentationManagementException;
+import org.wso2.carbon.identity.openid4vc.template.management.model.ConnectedConnectionInfo;
+import org.wso2.carbon.identity.openid4vc.template.management.model.PresentationDefinition;
+import org.wso2.carbon.identity.openid4vc.template.management.model.PresentationDefinition.ClaimConstraint;
+import org.wso2.carbon.identity.openid4vc.template.management.model.PresentationDefinition.RequestedCredential;
+import org.wso2.carbon.identity.openid4vc.template.management.model.PresentationDefinitionSearchResult;
+import org.wso2.carbon.identity.openid4vc.template.management.service.PresentationDefinitionService;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -55,7 +57,6 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
@@ -64,6 +65,8 @@ import javax.ws.rs.core.Response;
  * Handles business logic, model conversion, and error mapping.
  */
 public class ServerVPDefinitionManagementService {
+
+    private static final Log LOG = LogFactory.getLog(ServerVPDefinitionManagementService.class);
 
     /**
      * List presentation definitions with cursor-based pagination and optional filtering.
@@ -78,6 +81,9 @@ public class ServerVPDefinitionManagementService {
     public PresentationDefinitionList listPresentationDefinitions(String before, String after,
             String filter, Integer limit) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Listing presentation definitions.");
+        }
         PresentationDefinitionList result = new PresentationDefinitionList();
         try {
             if (StringUtils.isNotBlank(before) && StringUtils.isNotBlank(after)) {
@@ -176,15 +182,16 @@ public class ServerVPDefinitionManagementService {
     public PresentationDefinitionResponse createPresentationDefinition(
             PresentationDefinitionCreationModel creationModel) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Creating presentation definition.");
+        }
         try {
             int tenantId = getTenantId();
             PresentationDefinitionService service = getService();
 
-            String definitionId = UUID.randomUUID().toString();
-
             PresentationDefinition definition = new PresentationDefinition.Builder()
-                    .definitionId(definitionId)
-                    .name(creationModel.getName())
+                    .identifier(creationModel.getIdentifier())
+                    .displayName(creationModel.getDisplayName())
                     .description(creationModel.getDescription())
                     .requestedCredentials(toRequestedCredentials(creationModel.getCredentials()))
                     .tenantId(tenantId)
@@ -208,52 +215,65 @@ public class ServerVPDefinitionManagementService {
     }
 
     /**
-     * Get a presentation definition by ID.
+     * Get a presentation definition by UUID.
      *
-     * @param definitionId the server-assigned ID of the definition to retrieve.
+     * @param definitionId the server-generated UUID of the definition to retrieve.
      * @return the matching presentation definition.
      */
     public PresentationDefinitionResponse getPresentationDefinition(String definitionId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving presentation definition: " + definitionId);
+        }
         try {
             int tenantId = getTenantId();
             PresentationDefinitionService service = getService();
 
-            PresentationDefinition definition = service.getPresentationDefinitionById(
-                    definitionId, tenantId);
-            return toResponse(definition);
-        } catch (PresentationManagementClientException e) {
-            if (PresentationManagementErrorCode.DEFINITION_NOT_FOUND == e.getErrorCode()) {
+            PresentationDefinition definition =
+                    service.getPresentationDefinitionById(definitionId, tenantId);
+            if (definition == null) {
                 throw handleNotFound(definitionId);
             }
+            return toResponse(definition);
+        } catch (javax.ws.rs.WebApplicationException e) {
+            throw e;
+        } catch (PresentationManagementClientException e) {
             throw handleServerError(ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_DEFINITION, e, definitionId);
         } catch (PresentationManagementException e) {
-            throw handleServerError(ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_DEFINITION, e,
-                    definitionId);
+            throw handleServerError(ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_DEFINITION, e, definitionId);
         }
     }
 
     /**
      * Update a presentation definition.
      *
-     * @param definitionId the server-assigned ID of the definition to update.
+     * @param definitionId the server-generated UUID of the definition to update.
      * @param updateModel  the model containing the fields to replace.
      * @return the updated presentation definition.
      */
     public PresentationDefinitionResponse updatePresentationDefinition(
             String definitionId, PresentationDefinitionUpdateModel updateModel) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating presentation definition: " + definitionId);
+        }
         try {
             int tenantId = getTenantId();
             PresentationDefinitionService service = getService();
+
+            PresentationDefinition existing =
+                    service.getPresentationDefinitionById(definitionId, tenantId);
+            if (existing == null) {
+                throw handleNotFound(definitionId);
+            }
 
             List<RequestedCredential> credentials = updateModel.getCredentials() != null
                     ? toRequestedCredentials(updateModel.getCredentials())
                     : null;
 
             PresentationDefinition definition = new PresentationDefinition.Builder()
-                    .definitionId(definitionId)
-                    .name(updateModel.getName())
+                    .definitionId(existing.getDefinitionId())
+                    .displayName(updateModel.getDisplayName())
                     .description(updateModel.getDescription())
                     .requestedCredentials(credentials)
                     .tenantId(tenantId)
@@ -262,6 +282,8 @@ public class ServerVPDefinitionManagementService {
             PresentationDefinition updated = service.updatePresentationDefinition(
                     definition, tenantId);
             return toResponse(updated);
+        } catch (javax.ws.rs.WebApplicationException e) {
+            throw e;
         } catch (PresentationManagementClientException e) {
             if (PresentationManagementErrorCode.DEFINITION_NOT_FOUND == e.getErrorCode()) {
                 throw handleNotFound(definitionId);
@@ -272,23 +294,27 @@ public class ServerVPDefinitionManagementService {
             }
             throw handleServerError(ErrorMessage.ERROR_CODE_ERROR_UPDATING_DEFINITION, e, definitionId);
         } catch (PresentationManagementException e) {
-            throw handleServerError(ErrorMessage.ERROR_CODE_ERROR_UPDATING_DEFINITION, e,
-                    definitionId);
+            throw handleServerError(ErrorMessage.ERROR_CODE_ERROR_UPDATING_DEFINITION, e, definitionId);
         }
     }
 
     /**
      * Delete a presentation definition.
      *
-     * @param definitionId the server-assigned ID of the definition to delete.
+     * @param definitionId the server-generated UUID of the definition to delete.
      */
     public void deletePresentationDefinition(String definitionId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deleting presentation definition: " + definitionId);
+        }
         try {
             int tenantId = getTenantId();
             PresentationDefinitionService service = getService();
 
             service.deletePresentationDefinition(definitionId, tenantId);
+        } catch (javax.ws.rs.WebApplicationException e) {
+            throw e;
         } catch (PresentationManagementClientException e) {
             if (PresentationManagementErrorCode.DEFINITION_NOT_FOUND == e.getErrorCode()) {
                 throw handleNotFound(definitionId);
@@ -299,19 +325,21 @@ public class ServerVPDefinitionManagementService {
             }
             throw handleServerError(ErrorMessage.ERROR_CODE_ERROR_DELETING_DEFINITION, e, definitionId);
         } catch (PresentationManagementException e) {
-            throw handleServerError(ErrorMessage.ERROR_CODE_ERROR_DELETING_DEFINITION, e,
-                    definitionId);
+            throw handleServerError(ErrorMessage.ERROR_CODE_ERROR_DELETING_DEFINITION, e, definitionId);
         }
     }
 
     /**
      * Get all connections that reference this presentation definition.
      *
-     * @param definitionId the server-assigned ID of the definition to query.
+     * @param definitionId the server-generated UUID of the definition to query.
      * @return the list of identity provider connections configured to use this definition.
      */
     public ConnectedConnectionsResponse getConnectedConnections(String definitionId) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving connected connections for presentation definition: " + definitionId);
+        }
         try {
             int tenantId = getTenantId();
             PresentationDefinitionService service = getService();
@@ -339,6 +367,8 @@ public class ServerVPDefinitionManagementService {
             response.setStartIndex(1);
             response.setConnectedConnections(items);
             return response;
+        } catch (javax.ws.rs.WebApplicationException e) {
+            throw e;
         } catch (PresentationManagementClientException e) {
             if (PresentationManagementErrorCode.DEFINITION_NOT_FOUND == e.getErrorCode()) {
                 throw handleNotFound(definitionId);
@@ -354,7 +384,7 @@ public class ServerVPDefinitionManagementService {
     /**
      * Patch trusted CA certificates for a specific credential within a presentation definition.
      *
-     * @param definitionId the server-assigned ID of the definition containing the credential.
+     * @param definitionId the server-generated UUID of the definition containing the credential.
      * @param credentialId the ID of the specific credential query within the definition.
      * @param patchRequest the list of ADD, REMOVE, or REPLACE operations to apply to the CA certificate list.
      * @return the updated presentation definition reflecting the CA certificate changes.
@@ -362,11 +392,16 @@ public class ServerVPDefinitionManagementService {
     public PresentationDefinitionResponse patchTrustedCas(String definitionId, String credentialId,
             List<CertificatePatch> patchRequest) {
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Patching trusted CAs for credential: " + credentialId
+                    + " in presentation definition: " + definitionId);
+        }
         try {
             int tenantId = getTenantId();
             PresentationDefinitionService service = getService();
 
-            PresentationDefinition definition = service.getPresentationDefinitionById(definitionId, tenantId);
+            PresentationDefinition definition =
+                    service.getPresentationDefinitionById(definitionId, tenantId);
             if (definition == null) {
                 throw handleNotFound(definitionId);
             }
@@ -390,7 +425,8 @@ public class ServerVPDefinitionManagementService {
             if (patchRequest == null || patchRequest.isEmpty()) {
                 throw new javax.ws.rs.WebApplicationException(
                         Response.status(Response.Status.BAD_REQUEST)
-                                .entity(buildError(ErrorMessage.ERROR_CODE_INVALID_PATCH_REQUEST.getCode(), "Patch request must not be empty."))
+                                .entity(buildError(ErrorMessage.ERROR_CODE_INVALID_PATCH_REQUEST.getCode(),
+                                        "Patch request must not be empty."))
                                 .build());
             }
 
@@ -553,7 +589,8 @@ public class ServerVPDefinitionManagementService {
 
         PresentationDefinitionResponse response = new PresentationDefinitionResponse();
         response.setId(definition.getDefinitionId());
-        response.setName(definition.getName());
+        response.setIdentifier(definition.getIdentifier());
+        response.setDisplayName(definition.getDisplayName());
         response.setDescription(definition.getDescription());
         response.setCredentials(toCredentialModels(definition.getRequestedCredentials()));
         return response;
@@ -563,7 +600,8 @@ public class ServerVPDefinitionManagementService {
 
         PresentationDefinitionListItem item = new PresentationDefinitionListItem();
         item.setId(definition.getDefinitionId());
-        item.setName(definition.getName());
+        item.setIdentifier(definition.getIdentifier());
+        item.setDisplayName(definition.getDisplayName());
         item.setDescription(definition.getDescription());
         return item;
     }
@@ -585,6 +623,9 @@ public class ServerVPDefinitionManagementService {
     private javax.ws.rs.WebApplicationException handleClientError(
             ErrorMessage errorMessage, Exception e, Response.Status status, String... args) {
 
+        if (e != null && LOG.isDebugEnabled()) {
+            LOG.debug("Client error [" + errorMessage.getCode() + "]: " + errorMessage.getMessage(), e);
+        }
         Error error = new Error();
         error.setCode(errorMessage.getCode());
         error.setMessage(errorMessage.getMessage());
@@ -598,6 +639,7 @@ public class ServerVPDefinitionManagementService {
     private javax.ws.rs.WebApplicationException handleServerError(
             ErrorMessage errorMessage, Exception e, String... args) {
 
+        LOG.error("Server error [" + errorMessage.getCode() + "]: " + errorMessage.getMessage(), e);
         Error error = new Error();
         error.setCode(errorMessage.getCode());
         error.setMessage(errorMessage.getMessage());

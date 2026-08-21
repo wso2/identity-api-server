@@ -30,11 +30,12 @@ import io.swagger.annotations.ApiModelProperty;
 public class PresentationDefinitionResponse {
 
     private String id;
-    private String name;
+    private String identifier;
+    private String displayName;
     private String description;
     private java.util.List<RequestedCredentialModel> credentials;
 
-    @ApiModelProperty(value = "Unique identifier of the presentation definition.")
+    @ApiModelProperty(value = "Server-generated UUID of the presentation definition.")
     @JsonProperty("id")
     public String getId() {
 
@@ -46,16 +47,28 @@ public class PresentationDefinitionResponse {
         this.id = id;
     }
 
-    @ApiModelProperty(value = "Name of the presentation definition.")
-    @JsonProperty("name")
-    public String getName() {
+    @ApiModelProperty(value = "User-facing identifier of the presentation definition.")
+    @JsonProperty("identifier")
+    public String getIdentifier() {
 
-        return name;
+        return identifier;
     }
 
-    public void setName(String name) {
+    public void setIdentifier(String identifier) {
 
-        this.name = name;
+        this.identifier = identifier;
+    }
+
+    @ApiModelProperty(value = "Display label of the presentation definition.")
+    @JsonProperty("displayName")
+    public String getDisplayName() {
+
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+
+        this.displayName = displayName;
     }
 
     @ApiModelProperty(value = "Description of the presentation definition.")

@@ -31,20 +31,20 @@ import java.util.List;
 @ApiModel(description = "Update model for presentation definition")
 public class PresentationDefinitionUpdateModel {
 
-    private String name;
+    private String displayName;
     private String description;
     private List<RequestedCredentialModel> credentials;
 
-    @ApiModelProperty(value = "Name of the presentation definition.")
-    @JsonProperty("name")
-    public String getName() {
+    @ApiModelProperty(value = "Display label of the presentation definition.")
+    @JsonProperty("displayName")
+    public String getDisplayName() {
 
-        return name;
+        return displayName;
     }
 
-    public void setName(String name) {
+    public void setDisplayName(String displayName) {
 
-        this.name = name;
+        this.displayName = displayName;
     }
 
     @ApiModelProperty(value = "Description of the presentation definition.")
