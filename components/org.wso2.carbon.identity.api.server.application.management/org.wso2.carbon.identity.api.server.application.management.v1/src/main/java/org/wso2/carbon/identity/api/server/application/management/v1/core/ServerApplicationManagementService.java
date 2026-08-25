@@ -52,6 +52,9 @@ import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedA
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAuthorizationDetailsTypes;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedScope;
+import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretCreationRequest;
+import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretList;
+import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticator;
 import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticatorsModal;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
@@ -1875,6 +1878,39 @@ public class ServerApplicationManagementService {
         InboundAuthenticationRequestConfig oauthInbound = getInboundAuthRequestConfig(applicationId, OAUTH2);
         String clientId = oauthInbound.getInboundAuthKey();
         return OAuthInboundFunctions.regenerateClientSecret(clientId);
+    }
+
+    public ClientSecretResponse createOAuthClientSecret(String applicationId,
+                                                          ClientSecretCreationRequest request) {
+
+        InboundAuthenticationRequestConfig oauthInbound = getInboundAuthRequestConfig(applicationId, OAUTH2);
+        String clientId = oauthInbound.getInboundAuthKey();
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        return OAuthInboundFunctions.createClientSecret(clientId, tenantDomain, request);
+    }
+
+    public ClientSecretList getOAuthClientSecrets(String applicationId) {
+
+        InboundAuthenticationRequestConfig oauthInbound = getInboundAuthRequestConfig(applicationId, OAUTH2);
+        String clientId = oauthInbound.getInboundAuthKey();
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        return OAuthInboundFunctions.getClientSecrets(clientId, tenantDomain);
+    }
+
+    public ClientSecretResponse getOAuthClientSecret(String applicationId, String secretId) {
+
+        InboundAuthenticationRequestConfig oauthInbound = getInboundAuthRequestConfig(applicationId, OAUTH2);
+        String clientId = oauthInbound.getInboundAuthKey();
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        return OAuthInboundFunctions.getClientSecret(clientId, tenantDomain, secretId);
+    }
+
+    public void deleteOAuthClientSecret(String applicationId, String secretId) {
+
+        InboundAuthenticationRequestConfig oauthInbound = getInboundAuthRequestConfig(applicationId, OAUTH2);
+        String clientId = oauthInbound.getInboundAuthKey();
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        OAuthInboundFunctions.deleteClientSecret(clientId, tenantDomain, secretId);
     }
 
     public void revokeOAuthClient(String applicationId) {

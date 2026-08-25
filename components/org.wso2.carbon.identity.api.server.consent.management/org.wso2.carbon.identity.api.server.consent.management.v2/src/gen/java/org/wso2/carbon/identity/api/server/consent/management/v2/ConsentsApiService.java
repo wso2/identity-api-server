@@ -40,7 +40,7 @@ public interface ConsentsApiService {
 
       public Response consentsGet(String consentId);
 
-      public Response consentsList(String subjectId, String serviceId, String state, String purposeId, String purposeVersionId, String filter, Integer limit, String after, String before);
+      public Response consentsList(String userId, String relation, String serviceId, String state, String purposeId, String purposeVersionId, String filter, String attributes, Integer limit, String after, String before);
 
       public Response consentsRevoke(String consentId);
 
