@@ -118,9 +118,7 @@ public class ServerIdpSharingService {
         for (OrgShareConfig orgShareConfig : requestBody.getOrganizations()) {
             SelectiveConnectionShareOrgConfigDTO orgConfig = new SelectiveConnectionShareOrgConfigDTO();
             orgConfig.setOrgId(orgShareConfig.getOrgId());
-            if (orgShareConfig.getPolicy() != null) {
-                orgConfig.setPolicy(getPolicyEnum(orgShareConfig.getPolicy()));
-            }
+            orgConfig.setPolicy(getPolicyEnum(orgShareConfig.getPolicy()));
             organizations.add(orgConfig);
         }
         SelectiveConnectionShareDTO selectiveConnectionShareDTO = new SelectiveConnectionShareDTO();
@@ -150,7 +148,7 @@ public class ServerIdpSharingService {
                     Constants.ErrorMessage.ERROR_CODE_INVALID_SHARE_REQUEST_BODY, null);
         }
         PolicyEnum policy = getPolicyEnum(requestBody.getPolicy());
-        if (PolicyEnum.ALL_EXISTING_ORGS_ONLY != policy && PolicyEnum.ALL_EXISTING_AND_FUTURE_ORGS != policy) {
+        if (PolicyEnum.ALL_EXISTING_AND_FUTURE_ORGS != policy) {
             throw handleException(Response.Status.BAD_REQUEST,
                     Constants.ErrorMessage.ERROR_CODE_UNSUPPORTED_SHARE_POLICY, String.valueOf(policy));
         }
@@ -249,7 +247,7 @@ public class ServerIdpSharingService {
         getConnectionSharedOrgsDTO.setFilter(filter);
         getConnectionSharedOrgsDTO.setLimit(limitValue);
         getConnectionSharedOrgsDTO.setRecursive(recursiveFlag);
-        getConnectionSharedOrgsDTO.setAttributes(resolveAttributeList(attributes));
+        getConnectionSharedOrgsDTO.setAttributes(resolveEffectiveAttributes(attributes, excludedAttributes));
         try {
             ResponseSharedConnectionOrgsDTO sharedOrgsResponse =
                     connectionSharingPolicyHandlerService.getConnectionSharedOrganizations(
@@ -295,8 +293,8 @@ public class ServerIdpSharingService {
             Link nextLink = new Link();
             String base64EncodedCursor = Base64.getEncoder().encodeToString(
                     String.valueOf(sharedOrgsResponse.getNextPageCursor()).getBytes(StandardCharsets.UTF_8));
-            nextLink.setHref(URI.create(buildURIForPagination(paginationQueryParams, identityProviderId) + "&"
-                    + PAGINATION_AFTER + "=" + base64EncodedCursor).toString());
+            nextLink.setHref(buildPaginatedLinkHref(paginationQueryParams, identityProviderId, PAGINATION_AFTER,
+                    base64EncodedCursor));
             nextLink.setRel(PAGE_LINK_REL_NEXT);
             response.addLinksItem(nextLink);
         }
@@ -304,8 +302,8 @@ public class ServerIdpSharingService {
             Link previousLink = new Link();
             String base64EncodedCursor = Base64.getEncoder().encodeToString(
                     String.valueOf(sharedOrgsResponse.getPreviousPageCursor()).getBytes(StandardCharsets.UTF_8));
-            previousLink.setHref(URI.create(buildURIForPagination(paginationQueryParams, identityProviderId) + "&"
-                    + PAGINATION_BEFORE + "=" + base64EncodedCursor).toString());
+            previousLink.setHref(buildPaginatedLinkHref(paginationQueryParams, identityProviderId, PAGINATION_BEFORE,
+                    base64EncodedCursor));
             previousLink.setRel(PAGE_LINK_REL_PREVIOUS);
             response.addLinksItem(previousLink);
         }
@@ -336,6 +334,21 @@ public class ServerIdpSharingService {
         return attributeList;
     }
 
+    /**
+     * Resolves the effective attribute list to request from the service: the included attributes minus any
+     * explicitly excluded ones (exclusion takes precedence over inclusion).
+     *
+     * @param attributes         Comma-separated attributes to include in the response.
+     * @param excludedAttributes Comma-separated attributes to exclude from the response.
+     * @return The effective attribute list.
+     */
+    private List<String> resolveEffectiveAttributes(String attributes, String excludedAttributes) {
+
+        List<String> effectiveAttributes = new ArrayList<>(resolveAttributeList(attributes));
+        effectiveAttributes.removeAll(resolveAttributeList(excludedAttributes));
+        return effectiveAttributes;
+    }
+
     private int decodeCursor(String encodedCursor) {
 
         if (StringUtils.isBlank(encodedCursor)) {
@@ -353,29 +366,47 @@ public class ServerIdpSharingService {
     private String buildPaginationQueryParams(String filter, int limit, Boolean recursive, String excludedAttributes,
                                               String attributes) {
 
-        StringBuilder urlStringBuilder = new StringBuilder("?");
+        List<String> queryParams = new ArrayList<>();
         if (limit != 0) {
-            urlStringBuilder.append(LIMIT_PARAM).append("=").append(limit);
+            queryParams.add(LIMIT_PARAM + "=" + limit);
         }
         if (recursive != null) {
-            urlStringBuilder.append("&").append(RECURSIVE_PARAM).append("=").append(recursive);
+            queryParams.add(RECURSIVE_PARAM + "=" + recursive);
         }
         if (StringUtils.isNotBlank(filter)) {
             try {
-                urlStringBuilder.append("&").append(FILTER_PARAM).append("=")
-                        .append(URLEncoder.encode(filter, StandardCharsets.UTF_8.name()));
+                queryParams.add(FILTER_PARAM + "=" + URLEncoder.encode(filter, StandardCharsets.UTF_8.name()));
             } catch (UnsupportedEncodingException e) {
                 throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                         Constants.ErrorMessage.ERROR_CODE_BUILDING_LINKS, e.getMessage());
             }
         }
         if (StringUtils.isNotBlank(excludedAttributes)) {
-            urlStringBuilder.append("&").append(EXCLUDED_ATTRIBUTES_PARAM).append("=").append(excludedAttributes);
+            queryParams.add(EXCLUDED_ATTRIBUTES_PARAM + "=" + excludedAttributes);
         }
         if (StringUtils.isNotBlank(attributes)) {
-            urlStringBuilder.append("&").append(INCLUDED_ATTRIBUTES_PARAM).append("=").append(attributes);
+            queryParams.add(INCLUDED_ATTRIBUTES_PARAM + "=" + attributes);
         }
-        return urlStringBuilder.toString();
+        return queryParams.isEmpty() ? StringUtils.EMPTY : "?" + String.join("&", queryParams);
+    }
+
+    /**
+     * Builds the href for a pagination link by appending the cursor to the base query params using the correct
+     * separator ({@code ?} when there are no other query params, {@code &} otherwise), avoiding a malformed
+     * {@code ?&} prefix.
+     *
+     * @param paginationQueryParams Base query params (may be empty, otherwise starts with {@code ?}).
+     * @param identityProviderId    ID of the identity provider.
+     * @param cursorParam           Cursor parameter name ({@code before} / {@code after}).
+     * @param cursor                Base64 encoded cursor value.
+     * @return The fully built pagination link href.
+     */
+    private String buildPaginatedLinkHref(String paginationQueryParams, String identityProviderId, String cursorParam,
+                                          String cursor) {
+
+        String cursorSeparator = StringUtils.isBlank(paginationQueryParams) ? "?" : "&";
+        return URI.create(buildURIForPagination(paginationQueryParams, identityProviderId) + cursorSeparator
+                + cursorParam + "=" + cursor).toString();
     }
 
     private static String buildURIForPagination(String paginationQueryParams, String identityProviderId) {
@@ -402,9 +433,7 @@ public class ServerIdpSharingService {
         if (policy == null) {
             return null;
         }
-        if (PolicyEnum.ALL_EXISTING_ORGS_ONLY.getValue().equals(policy)) {
-            return PolicyEnum.ALL_EXISTING_ORGS_ONLY;
-        } else if (PolicyEnum.ALL_EXISTING_AND_FUTURE_ORGS.getValue().equals(policy)) {
+        if (PolicyEnum.ALL_EXISTING_AND_FUTURE_ORGS.getValue().equals(policy)) {
             return PolicyEnum.ALL_EXISTING_AND_FUTURE_ORGS;
         } else if (PolicyEnum.SELECTED_ORG_ONLY.getValue().equals(policy)) {
             return PolicyEnum.SELECTED_ORG_ONLY;

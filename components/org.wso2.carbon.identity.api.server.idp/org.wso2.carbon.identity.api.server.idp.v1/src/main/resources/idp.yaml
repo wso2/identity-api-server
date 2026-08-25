@@ -3852,10 +3852,9 @@ components:
         policy:
           type: string
           description: |-
-            Sharing scope for this organization.
+            The sharing scope reported for the organization. Only future-applicable policies are reported.
 
             Possible values:
-            - `SELECTED_ORG_ONLY`
             - `SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN`
             - `ALL_EXISTING_AND_FUTURE_ORGS`
     BasicOrganizationResponse:
@@ -3925,7 +3924,6 @@ components:
             Possible values:
             - `SELECTED_ORG_ONLY`
             - `SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN`
-            - `ALL_EXISTING_AND_FUTURE_ORGS`
     IdentityProviderShareAllRequestBody:
       type: object
       required: [ identityProviderId, policy ]
@@ -3936,11 +3934,9 @@ components:
         policy:
           type: string
           description: |-
-            Sharing scope for this organization.
+            Sharing scope for all organizations.
 
             Possible values:
-            - `SELECTED_ORG_ONLY`
-            - `SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN`
             - `ALL_EXISTING_AND_FUTURE_ORGS`
     IdentityProviderUnshareSelectedRequestBody:
       type: object

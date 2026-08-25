@@ -35,7 +35,7 @@ public class SharingMode  {
     private String policy;
 
     /**
-    * Sharing scope for this organization.  Possible values: - &#x60;SELECTED_ORG_ONLY&#x60; - &#x60;SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN&#x60; - &#x60;ALL_EXISTING_AND_FUTURE_ORGS&#x60;
+    * The sharing scope reported for the organization. Only future-applicable policies are reported.  Possible values: - &#x60;SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN&#x60; - &#x60;ALL_EXISTING_AND_FUTURE_ORGS&#x60;
     **/
     public SharingMode policy(String policy) {
 
@@ -43,7 +43,7 @@ public class SharingMode  {
         return this;
     }
     
-    @ApiModelProperty(value = "Sharing scope for this organization.  Possible values: - `SELECTED_ORG_ONLY` - `SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN` - `ALL_EXISTING_AND_FUTURE_ORGS`")
+    @ApiModelProperty(value = "The sharing scope reported for the organization. Only future-applicable policies are reported.  Possible values: - `SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN` - `ALL_EXISTING_AND_FUTURE_ORGS`")
     @JsonProperty("policy")
     @Valid
     public String getPolicy() {

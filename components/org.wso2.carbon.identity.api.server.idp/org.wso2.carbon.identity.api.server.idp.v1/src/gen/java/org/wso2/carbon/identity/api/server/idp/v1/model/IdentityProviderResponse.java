@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -171,15 +171,15 @@ public class IdentityProviderResponse  {
     }
 
     /**
-    * Whether this connection is a shared connection resolved from a parent organization.
+    * Whether this connection is a shared connection resolved from a parent organization. Present (and true) only for shared connections; omitted otherwise.
     **/
     public IdentityProviderResponse isShared(Boolean isShared) {
 
         this.isShared = isShared;
         return this;
     }
-
-    @ApiModelProperty(example = "false", value = "Whether this connection is a shared connection resolved from a parent organization.")
+    
+    @ApiModelProperty(example = "true", value = "Whether this connection is a shared connection resolved from a parent organization. Present (and true) only for shared connections; omitted otherwise.")
     @JsonProperty("isShared")
     @Valid
     public Boolean getIsShared() {
