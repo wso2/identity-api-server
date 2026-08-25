@@ -61,9 +61,9 @@ public class AskPasswordFlowMetaHandler extends AbstractMetaResponseHandler {
     }
 
     @Override
-    protected List<String> getLegacyExecutorBaseline() {
+    public List<String> getSupportedExecutors() {
 
-        List<String> supportedExecutors = new ArrayList<>(super.getLegacyExecutorBaseline());
+        List<String> supportedExecutors = new ArrayList<>(super.getSupportedExecutors());
         supportedExecutors.add(USER_RESOLVE_EXECUTOR);
         supportedExecutors.add(CONFIRMATION_CODE_VALIDATION_EXECUTOR);
         supportedExecutors.add(OPENID_CONNECT_EXECUTOR);

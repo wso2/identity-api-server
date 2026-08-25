@@ -84,9 +84,9 @@ public class PasswordRecoveryFlowMetaHandler extends AbstractMetaResponseHandler
     }
 
     @Override
-    protected List<String> getLegacyExecutorBaseline() {
+    public List<String> getSupportedExecutors() {
 
-        List<String> supportedExecutors = new ArrayList<>(super.getLegacyExecutorBaseline());
+        List<String> supportedExecutors = new ArrayList<>(super.getSupportedExecutors());
         supportedExecutors.add(USER_RESOLVE_EXECUTOR);
         return supportedExecutors;
     }
