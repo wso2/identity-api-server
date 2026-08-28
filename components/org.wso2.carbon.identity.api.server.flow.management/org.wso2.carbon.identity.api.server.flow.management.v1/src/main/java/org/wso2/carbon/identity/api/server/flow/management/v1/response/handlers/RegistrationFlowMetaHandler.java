@@ -78,7 +78,7 @@ public class RegistrationFlowMetaHandler extends AbstractMetaResponseHandler {
     @Override
     public List<String> getSupportedExecutors() {
 
-        List<String> supportedExecutors = super.getSupportedExecutors();
+        List<String> supportedExecutors = new ArrayList<>(super.getSupportedExecutors());
         supportedExecutors.add(OPENID_CONNECT_EXECUTOR);
         supportedExecutors.add(GOOGLE_EXECUTOR);
         supportedExecutors.add(FACEBOOK_EXECUTOR);

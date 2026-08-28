@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.flow.management.v1.AttributeMetadata;
 import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorConnections;
+import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorMetadata;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionConnectionInfo;
 import javax.validation.constraints.*;
 
@@ -42,6 +43,8 @@ public class FlowMetaResponse  {
   
     private String flowType;
     private List<String> supportedExecutors = null;
+
+    private List<ExecutorMetadata> extensionExecutors = null;
 
     private Object connectorConfigs;
     private String attributeProfile;
@@ -96,6 +99,33 @@ public class FlowMetaResponse  {
             this.supportedExecutors = new ArrayList<String>();
         }
         this.supportedExecutors.add(supportedExecutorsItem);
+        return this;
+    }
+
+        /**
+    * Metadata for the executors provided by a deployed extension, such as a connector placed in /dropins.
+    **/
+    public FlowMetaResponse extensionExecutors(List<ExecutorMetadata> extensionExecutors) {
+
+        this.extensionExecutors = extensionExecutors;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "Metadata for the executors provided by a deployed extension, such as a connector placed in /dropins.")
+    @JsonProperty("extensionExecutors")
+    @Valid
+    public List<ExecutorMetadata> getExtensionExecutors() {
+        return extensionExecutors;
+    }
+    public void setExtensionExecutors(List<ExecutorMetadata> extensionExecutors) {
+        this.extensionExecutors = extensionExecutors;
+    }
+
+    public FlowMetaResponse addExtensionExecutorsItem(ExecutorMetadata extensionExecutorsItem) {
+        if (this.extensionExecutors == null) {
+            this.extensionExecutors = new ArrayList<ExecutorMetadata>();
+        }
+        this.extensionExecutors.add(extensionExecutorsItem);
         return this;
     }
 
@@ -271,6 +301,7 @@ public class FlowMetaResponse  {
         FlowMetaResponse flowMetaResponse = (FlowMetaResponse) o;
         return Objects.equals(this.flowType, flowMetaResponse.flowType) &&
             Objects.equals(this.supportedExecutors, flowMetaResponse.supportedExecutors) &&
+            Objects.equals(this.extensionExecutors, flowMetaResponse.extensionExecutors) &&
             Objects.equals(this.connectorConfigs, flowMetaResponse.connectorConfigs) &&
             Objects.equals(this.attributeProfile, flowMetaResponse.attributeProfile) &&
             Objects.equals(this.supportedFlowCompletionConfigs, flowMetaResponse.supportedFlowCompletionConfigs) &&
@@ -282,7 +313,7 @@ public class FlowMetaResponse  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(flowType, supportedExecutors, connectorConfigs, attributeProfile, supportedFlowCompletionConfigs, attributeMetadata, executorConnections, flowExtensionConnections, workflowEnabled);
+        return Objects.hash(flowType, supportedExecutors, extensionExecutors, connectorConfigs, attributeProfile, supportedFlowCompletionConfigs, attributeMetadata, executorConnections, flowExtensionConnections, workflowEnabled);
     }
 
     @Override
@@ -293,6 +324,7 @@ public class FlowMetaResponse  {
         
         sb.append("    flowType: ").append(toIndentedString(flowType)).append("\n");
         sb.append("    supportedExecutors: ").append(toIndentedString(supportedExecutors)).append("\n");
+        sb.append("    extensionExecutors: ").append(toIndentedString(extensionExecutors)).append("\n");
         sb.append("    connectorConfigs: ").append(toIndentedString(connectorConfigs)).append("\n");
         sb.append("    attributeProfile: ").append(toIndentedString(attributeProfile)).append("\n");
         sb.append("    supportedFlowCompletionConfigs: ").append(toIndentedString(supportedFlowCompletionConfigs)).append("\n");
