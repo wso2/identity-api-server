@@ -18,6 +18,14 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.constants;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Constants related to the flow endpoint.
  */
@@ -185,6 +193,43 @@ public class FlowEndpointConstants {
         public static final String FACEBOOK_AUTHENTICATOR = "FacebookAuthenticator";
         public static final String OFFICE365_AUTHENTICATOR = "Office365Authenticator";
         public static final String APPLE_AUTHENTICATOR = "AppleOIDCAuthenticator";
+    }
+
+    /**
+     * Executor names and mappings added by default and not dynamically registered.
+     */
+    public static class LegacyExecutors {
+
+        public static final List<String> COMMON = Collections.unmodifiableList(Arrays.asList(
+                Executors.PASSWORD_PROVISIONING_EXECUTOR,
+                Executors.EMAIL_OTP_EXECUTOR,
+                Executors.SMS_OTP_EXECUTOR,
+                Executors.MAGIC_LINK_EXECUTOR,
+                Executors.USER_PROVISIONING_EXECUTOR,
+                Executors.FLOW_EXTENSION_EXECUTOR));
+
+        public static final Set<String> RECOVERY_FACTORS = Collections.unmodifiableSet(
+                new LinkedHashSet<>(Arrays.asList(
+                        Executors.EMAIL_OTP_EXECUTOR,
+                        Executors.SMS_OTP_EXECUTOR,
+                        Executors.MAGIC_LINK_EXECUTOR)));
+
+        /**
+         * Authenticator name to executor name. Superseded for any executor that declares an associated
+         * authenticator of its own.
+         */
+        public static final Map<String, String> CONNECTION_EXECUTOR_MAP;
+
+        static {
+            Map<String, String> map = new HashMap<>();
+            map.put(Authenticators.GOOGLE_AUTHENTICATOR, Executors.GOOGLE_EXECUTOR);
+            map.put(Authenticators.FACEBOOK_AUTHENTICATOR, Executors.FACEBOOK_EXECUTOR);
+            map.put(Authenticators.GITHUB_AUTHENTICATOR, Executors.GITHUB_EXECUTOR);
+            map.put(Authenticators.OFFICE365_AUTHENTICATOR, Executors.OFFICE365_EXECUTOR);
+            map.put(Authenticators.APPLE_AUTHENTICATOR, Executors.APPLE_EXECUTOR);
+            map.put(Authenticators.OPENID_CONNECT_AUTHENTICATOR, Executors.OPENID_CONNECT_EXECUTOR);
+            CONNECTION_EXECUTOR_MAP = Collections.unmodifiableMap(map);
+        }
     }
 
     /**
