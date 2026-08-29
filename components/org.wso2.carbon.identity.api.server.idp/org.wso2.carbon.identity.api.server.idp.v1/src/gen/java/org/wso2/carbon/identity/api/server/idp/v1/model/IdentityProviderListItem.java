@@ -57,6 +57,7 @@ public class IdentityProviderListItem  {
 
     private FederatedAuthenticatorListResponse federatedAuthenticators;
     private ProvisioningResponse provisioning;
+    private Boolean isShared;
 
     /**
     **/
@@ -355,6 +356,24 @@ public class IdentityProviderListItem  {
         this.provisioning = provisioning;
     }
 
+    /**
+    **/
+    public IdentityProviderListItem isShared(Boolean isShared) {
+
+        this.isShared = isShared;
+        return this;
+    }
+
+    @ApiModelProperty(example = "false", value = "")
+    @JsonProperty("isShared")
+    @Valid
+    public Boolean getIsShared() {
+        return isShared;
+    }
+    public void setIsShared(Boolean isShared) {
+        this.isShared = isShared;
+    }
+
 
 
     @Override
@@ -382,12 +401,13 @@ public class IdentityProviderListItem  {
             Objects.equals(this.roles, identityProviderListItem.roles) &&
             Objects.equals(this.groups, identityProviderListItem.groups) &&
             Objects.equals(this.federatedAuthenticators, identityProviderListItem.federatedAuthenticators) &&
-            Objects.equals(this.provisioning, identityProviderListItem.provisioning);
+            Objects.equals(this.provisioning, identityProviderListItem.provisioning) &&
+            Objects.equals(this.isShared, identityProviderListItem.isShared);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, isEnabled, image, self, isPrimary, isFederationHub, homeRealmIdentifier, certificate, alias, claims, roles, groups, federatedAuthenticators, provisioning);
+        return Objects.hash(id, name, description, isEnabled, image, self, isPrimary, isFederationHub, homeRealmIdentifier, certificate, alias, claims, roles, groups, federatedAuthenticators, provisioning, isShared);
     }
 
     @Override
@@ -412,6 +432,7 @@ public class IdentityProviderListItem  {
         sb.append("    groups: ").append(toIndentedString(groups)).append("\n");
         sb.append("    federatedAuthenticators: ").append(toIndentedString(federatedAuthenticators)).append("\n");
         sb.append("    provisioning: ").append(toIndentedString(provisioning)).append("\n");
+        sb.append("    isShared: ").append(toIndentedString(isShared)).append("\n");
         sb.append("}");
         return sb.toString();
     }

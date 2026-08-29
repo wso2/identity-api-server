@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019-2026, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,6 +62,19 @@ public class Constants {
     public static final String PAGINATION_WITH_FILTER_LINK_FORMAT = "?offset=%d&limit=%d&filter=%s";
     public static final String PAGE_LINK_REL_NEXT = "next";
     public static final String PAGE_LINK_REL_PREVIOUS = "previous";
+
+    // IdP sharing constants.
+    public static final String IDP_SHARE_PATH_COMPONENT = "/share";
+    public static final String LIMIT_PARAM = "limit";
+    public static final String RECURSIVE_PARAM = "recursive";
+    public static final String FILTER_PARAM = "filter";
+    public static final String EXCLUDED_ATTRIBUTES_PARAM = "excludedAttributes";
+    public static final String INCLUDED_ATTRIBUTES_PARAM = "attributes";
+    public static final String ASYNC_OPERATION_RESPONSE_STATUS = "Processing";
+    public static final String IDP_SHARE_TRIGGER_SUCCESS =
+            "Identity provider sharing process triggered successfully.";
+    public static final String IDP_UNSHARE_TRIGGER_SUCCESS =
+            "Identity provider unsharing process triggered successfully.";
 
     // IdP attributes constants.
     public static final String IS_PRIMARY = "isPrimary";
@@ -170,6 +183,18 @@ public class Constants {
                 "Maximum number of authenticator properties exceeded.",
                 "Maximum number of allowed properties for a federated authenticator have been exceeded. " +
                         "Max allowed: %s."),
+        ERROR_CODE_INVALID_SHARE_REQUEST_BODY("60046",
+                "Invalid identity provider share request body.",
+                "The request body of the identity provider sharing request is empty or invalid."),
+        ERROR_CODE_SHARE_REQUEST_NO_ORGANIZATIONS("60047",
+                "No organizations provided.",
+                "At least one organization must be provided for the identity provider sharing/unsharing operation."),
+        ERROR_CODE_UNSUPPORTED_SHARE_POLICY("60048",
+                "Unsupported sharing policy.",
+                "Provided sharing policy %s is not supported for this operation."),
+        ERROR_CODE_INVALID_PAGINATION_CURSOR("60049",
+                "Invalid pagination cursor.",
+                "Provided pagination cursor is invalid."),
 
         // Server Error starting from 650xx.
         ERROR_CODE_ERROR_ADDING_IDP("65002",
@@ -288,7 +313,15 @@ public class Constants {
         ERROR_CODE_ERROR_INVALID_SEARCH_FILTER("65055", "Search request validation failed.",
                 "Invalid search filter."),
         ERROR_CODE_VALIDATING_LOCAL_CLAIM_URIS("65056", "Error while validation local claim URIs",
-                "Error while validating claim URIs against local claims");
+                "Error while validating claim URIs against local claims"),
+        ERROR_CODE_ERROR_SHARING_IDP("65057", "Unable to share the identity provider.",
+                "Server encountered an error while sharing the identity provider."),
+        ERROR_CODE_ERROR_UNSHARING_IDP("65058", "Unable to unshare the identity provider.",
+                "Server encountered an error while unsharing the identity provider."),
+        ERROR_CODE_ERROR_RETRIEVING_SHARED_ORGS("65059",
+                "Unable to retrieve the organizations the identity provider is shared with.",
+                "Server encountered an error while retrieving the organizations the identity provider " +
+                        "is shared with.");
 
         private final String code;
         private final String message;
