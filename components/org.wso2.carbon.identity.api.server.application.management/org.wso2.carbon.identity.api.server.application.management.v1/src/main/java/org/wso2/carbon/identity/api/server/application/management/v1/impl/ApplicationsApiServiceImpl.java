@@ -35,6 +35,9 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Application
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationsApiService;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPICreationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIPatchModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretCreationRequest;
+import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretList;
+import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowGenerateRequest;
@@ -365,6 +368,38 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
         OpenIDConnectConfiguration openIDConnectConfiguration =
                 applicationManagementService.regenerateOAuthApplicationSecret(applicationId);
         return Response.ok(openIDConnectConfiguration).build();
+    }
+
+    @Override
+    public Response createOAuthClientSecret(String applicationId,
+                                              ClientSecretCreationRequest clientSecretCreationRequest) {
+
+        ClientSecretResponse response =
+                applicationManagementService.createOAuthClientSecret(applicationId,
+                        clientSecretCreationRequest);
+        return Response.status(Response.Status.CREATED).entity(response).build();
+    }
+
+    @Override
+    public Response getOAuthClientSecrets(String applicationId) {
+
+        ClientSecretList list = applicationManagementService.getOAuthClientSecrets(applicationId);
+        return Response.ok(list).build();
+    }
+
+    @Override
+    public Response getOAuthClientSecret(String applicationId, String secretId) {
+
+        ClientSecretResponse response =
+                applicationManagementService.getOAuthClientSecret(applicationId, secretId);
+        return Response.ok(response).build();
+    }
+
+    @Override
+    public Response deleteOAuthClientSecret(String applicationId, String secretId) {
+
+        applicationManagementService.deleteOAuthClientSecret(applicationId, secretId);
+        return Response.noContent().build();
     }
 
     @Override

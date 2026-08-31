@@ -36,6 +36,7 @@ public class Authenticator  {
     private String name;
     private String displayName;
     private Boolean isEnabled;
+    private Boolean isShared;
 
 @XmlType(name="DefinedByEnum")
 @XmlEnum(String.class)
@@ -183,6 +184,25 @@ public enum TypeEnum {
     }
 
     /**
+    * Whether this authenticator belongs to a shared connection resolved from a parent organization.
+    **/
+    public Authenticator isShared(Boolean isShared) {
+
+        this.isShared = isShared;
+        return this;
+    }
+
+    @ApiModelProperty(example = "false", value = "Whether this authenticator belongs to a shared connection resolved from a parent organization.")
+    @JsonProperty("isShared")
+    @Valid
+    public Boolean getIsShared() {
+        return isShared;
+    }
+    public void setIsShared(Boolean isShared) {
+        this.isShared = isShared;
+    }
+
+    /**
     **/
     public Authenticator definedBy(DefinedByEnum definedBy) {
 
@@ -314,6 +334,7 @@ public enum TypeEnum {
             Objects.equals(this.name, authenticator.name) &&
             Objects.equals(this.displayName, authenticator.displayName) &&
             Objects.equals(this.isEnabled, authenticator.isEnabled) &&
+            Objects.equals(this.isShared, authenticator.isShared) &&
             Objects.equals(this.definedBy, authenticator.definedBy) &&
             Objects.equals(this.type, authenticator.type) &&
             Objects.equals(this.image, authenticator.image) &&
@@ -324,7 +345,7 @@ public enum TypeEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, displayName, isEnabled, definedBy, type, image, description, tags, self);
+        return Objects.hash(id, name, displayName, isEnabled, isShared, definedBy, type, image, description, tags, self);
     }
 
     @Override
@@ -337,6 +358,7 @@ public enum TypeEnum {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
+        sb.append("    isShared: ").append(toIndentedString(isShared)).append("\n");
         sb.append("    definedBy: ").append(toIndentedString(definedBy)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    image: ").append(toIndentedString(image)).append("\n");

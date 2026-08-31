@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -38,8 +38,12 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.IdPGroup;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPOSTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderResponse;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderShareAllRequestBody;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderShareSelectedRequestBody;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderTemplate;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderTemplateListResponse;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderUnshareAllRequestBody;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderUnshareSelectedRequestBody;
 import org.wso2.carbon.identity.api.server.idp.v1.model.JustInTimeProvisioning;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.idp.v1.model.MetaFederatedAuthenticator;
@@ -53,6 +57,7 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.OutboundProvisioningRequ
 import org.wso2.carbon.identity.api.server.idp.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.idp.v1.model.ProvisioningResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Roles;
+import org.wso2.carbon.identity.api.server.idp.v1.model.SharedOrganizationsResponse;
 import javax.ws.rs.core.Response;
 
 
@@ -88,6 +93,8 @@ public interface IdentityProvidersApiService {
 
       public Response getIDPs(Integer limit, Integer offset, String filter, String sortOrder, String sortBy, String requiredAttributes);
 
+      public Response getIdentityProviderSharedOrganizations(String identityProviderId, String before, String after, String filter, Integer limit, Boolean recursive, String excludedAttributes, String attributes);
+
       public Response getJITConfig(String identityProviderId);
 
       public Response getMetaFederatedAuthenticator(String federatedAuthenticatorId);
@@ -109,6 +116,14 @@ public interface IdentityProvidersApiService {
       public Response importIDPFromFile(InputStream fileInputStream, Attachment fileDetail);
 
       public Response patchIDP(String identityProviderId, List<Patch> patch);
+
+      public Response shareIdentityProviderWithAll(IdentityProviderShareAllRequestBody identityProviderShareAllRequestBody);
+
+      public Response shareIdentityProviderWithSelected(IdentityProviderShareSelectedRequestBody identityProviderShareSelectedRequestBody);
+
+      public Response unshareIdentityProviderFromAll(IdentityProviderUnshareAllRequestBody identityProviderUnshareAllRequestBody);
+
+      public Response unshareIdentityProviderFromSelected(IdentityProviderUnshareSelectedRequestBody identityProviderUnshareSelectedRequestBody);
 
       public Response updateClaimConfig(String identityProviderId, Claims claims);
 

@@ -68,6 +68,7 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         consumerAppDTO.setApplicationName(appName);
         consumerAppDTO.setOauthConsumerKey(oidcModel.getClientId());
         consumerAppDTO.setOauthConsumerSecret(oidcModel.getClientSecret());
+        consumerAppDTO.setOauthConsumerSecretExpiryTime(oidcModel.getClientSecretExpiresAt());
 
         consumerAppDTO.setCallbackUrl(getCallbackUrl(oidcModel.getCallbackURLs()));
 
