@@ -448,7 +448,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
     private String getRoleClaimUriForUnsetRoleClaim() {
 
         String returnLegacyRoleClaim = IdentityUtil.getProperty(RETURN_LEGACY_ROLE_CLAIM_IN_APPLICATION_RESPONSE);
-        if (returnLegacyRoleClaim != null && !Boolean.parseBoolean(returnLegacyRoleClaim)) {
+        if (!Boolean.parseBoolean(returnLegacyRoleClaim)) {
             return IdentityUtil.getLocalGroupsClaimURI();
         }
         return FrameworkConstants.LOCAL_ROLE_CLAIM_URI;
