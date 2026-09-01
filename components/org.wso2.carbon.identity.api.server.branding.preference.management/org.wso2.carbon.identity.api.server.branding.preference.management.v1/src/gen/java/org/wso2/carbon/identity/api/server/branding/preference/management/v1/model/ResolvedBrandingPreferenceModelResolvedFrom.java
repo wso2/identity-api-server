@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -67,6 +67,8 @@ public enum TypeEnum {
 
     private TypeEnum type;
     private String name;
+    private String organization;
+    private String application;
 
     /**
     **/
@@ -89,6 +91,7 @@ public enum TypeEnum {
     }
 
     /**
+    * Deprecated. Use `organization` and `application` instead.
     **/
     public ResolvedBrandingPreferenceModelResolvedFrom name(String name) {
 
@@ -96,7 +99,7 @@ public enum TypeEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "WSO2", required = true, value = "")
+    @ApiModelProperty(example = "WSO2", required = true, value = "Deprecated. Use `organization` and `application` instead.")
     @JsonProperty("name")
     @Valid
     @NotNull(message = "Property name cannot be null.")
@@ -106,6 +109,44 @@ public enum TypeEnum {
     }
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+    * The organization the preference belongs to. This can be an ancestor organization, when the organization inherits its preference.
+    **/
+    public ResolvedBrandingPreferenceModelResolvedFrom organization(String organization) {
+
+        this.organization = organization;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "WSO2", value = "The organization the preference belongs to. This can be an ancestor organization, when the organization inherits its preference.")
+    @JsonProperty("organization")
+    @Valid
+    public String getOrganization() {
+        return organization;
+    }
+    public void setOrganization(String organization) {
+        this.organization = organization;
+    }
+
+    /**
+    * The application the preference belongs to. Returned only when the type is APP.
+    **/
+    public ResolvedBrandingPreferenceModelResolvedFrom application(String application) {
+
+        this.application = application;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "fa9b9ac5-a429-49e2-9c51-4259c7ebe45e", value = "The application the preference belongs to. Returned only when the type is APP.")
+    @JsonProperty("application")
+    @Valid
+    public String getApplication() {
+        return application;
+    }
+    public void setApplication(String application) {
+        this.application = application;
     }
 
 
@@ -121,12 +162,14 @@ public enum TypeEnum {
         }
         ResolvedBrandingPreferenceModelResolvedFrom resolvedBrandingPreferenceModelResolvedFrom = (ResolvedBrandingPreferenceModelResolvedFrom) o;
         return Objects.equals(this.type, resolvedBrandingPreferenceModelResolvedFrom.type) &&
-            Objects.equals(this.name, resolvedBrandingPreferenceModelResolvedFrom.name);
+            Objects.equals(this.name, resolvedBrandingPreferenceModelResolvedFrom.name) &&
+            Objects.equals(this.organization, resolvedBrandingPreferenceModelResolvedFrom.organization) &&
+            Objects.equals(this.application, resolvedBrandingPreferenceModelResolvedFrom.application);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, name);
+        return Objects.hash(type, name, organization, application);
     }
 
     @Override
@@ -137,6 +180,8 @@ public enum TypeEnum {
         
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    organization: ").append(toIndentedString(organization)).append("\n");
+        sb.append("    application: ").append(toIndentedString(application)).append("\n");
         sb.append("}");
         return sb.toString();
     }
