@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2021-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -595,6 +595,8 @@ public class BrandingPreferenceManagementService {
         resolvedFrom.setType(ResolvedBrandingPreferenceModelResolvedFrom.TypeEnum.valueOf(
                 responseDTO.getResolvedFrom().getType()));
         resolvedFrom.setName(responseDTO.getResolvedFrom().getName());
+        resolvedFrom.setOrganization(responseDTO.getResolvedFrom().getOrganization());
+        resolvedFrom.setApplication(responseDTO.getResolvedFrom().getApplication());
         ResolvedBrandingPreferenceModel brandingPreferenceResponse = new ResolvedBrandingPreferenceModel();
         brandingPreferenceResponse.setType(ResolvedBrandingPreferenceModel.TypeEnum.valueOf(responseDTO.getType()));
         brandingPreferenceResponse.setName(responseDTO.getName());
@@ -634,6 +636,8 @@ public class BrandingPreferenceManagementService {
         resolvedFrom.setType(ResolvedBrandingPreferenceModelResolvedFrom.TypeEnum.valueOf(
                 responseDTO.getResolvedFrom().getType()));
         resolvedFrom.setName(responseDTO.getResolvedFrom().getName());
+        resolvedFrom.setOrganization(responseDTO.getResolvedFrom().getOrganization());
+        resolvedFrom.setApplication(responseDTO.getResolvedFrom().getApplication());
         ResolvedCustomTextModal customTextModel = new ResolvedCustomTextModal();
         customTextModel.setType(ResolvedCustomTextModal.TypeEnum.valueOf(responseDTO.getType()));
         customTextModel.setName(responseDTO.getName());

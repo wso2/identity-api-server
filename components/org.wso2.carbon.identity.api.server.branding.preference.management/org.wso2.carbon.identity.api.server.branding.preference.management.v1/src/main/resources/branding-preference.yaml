@@ -625,7 +625,17 @@ components:
               example: "ORG"
             name:
               type: string
+              deprecated: true
+              description: "Deprecated. Use `organization` and `application` instead."
               example: "WSO2"
+            organization:
+              type: string
+              description: "The organization the preference belongs to. This can be an ancestor organization, when the organization inherits its preference."
+              example: "WSO2"
+            application:
+              type: string
+              description: "The application the preference belongs to. Returned only when the type is APP."
+              example: "fa9b9ac5-a429-49e2-9c51-4259c7ebe45e"
         preference:
           type: object
           description: "This is the JSON structured branding preference"
@@ -788,7 +798,17 @@ components:
               example: "ORG"
             name:
               type: string
+              deprecated: true
+              description: "Deprecated. Use `organization` and `application` instead."
               example: "WSO2"
+            organization:
+              type: string
+              description: "The organization the preference belongs to. This can be an ancestor organization, when the organization inherits its preference."
+              example: "WSO2"
+            application:
+              type: string
+              description: "The application the preference belongs to. Returned only when the type is APP."
+              example: "fa9b9ac5-a429-49e2-9c51-4259c7ebe45e"
         preference:
           type: object
           description: "This is the JSON structured branding preference"
