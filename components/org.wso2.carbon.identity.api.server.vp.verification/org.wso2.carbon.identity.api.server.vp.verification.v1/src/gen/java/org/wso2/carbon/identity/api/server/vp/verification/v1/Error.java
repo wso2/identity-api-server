@@ -19,7 +19,7 @@
 package org.wso2.carbon.identity.api.server.vp.verification.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.*;
 
 /**
  * Standard error response model.
@@ -30,12 +30,12 @@ public class Error {
     private String message;
     private String description;
 
-    @NotBlank
+    @NotNull
     @JsonProperty("code")
     public String getCode() { return code; }
     public void setCode(String code) { this.code = code; }
 
-    @NotBlank
+    @NotNull
     @JsonProperty("message")
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }

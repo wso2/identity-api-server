@@ -21,7 +21,7 @@ package org.wso2.carbon.identity.api.server.vp.verification.v1;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.*;
 
 /**
  * Request body for initiating a VP verification session.
@@ -31,7 +31,7 @@ public class VerificationInitiateRequest {
 
     private String presentationDefinitionIdentifier;
 
-    @NotBlank
+    @NotNull
     @ApiModelProperty(required = true,
             value = "Human-readable identifier of the presentation definition the verifier wants the wallet to satisfy.")
     @JsonProperty("presentationDefinitionIdentifier")

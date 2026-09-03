@@ -230,6 +230,7 @@ public class FlowEndpointConstants {
             map.put(Authenticators.OFFICE365_AUTHENTICATOR, Executors.OFFICE365_EXECUTOR);
             map.put(Authenticators.APPLE_AUTHENTICATOR, Executors.APPLE_EXECUTOR);
             map.put(Authenticators.OPENID_CONNECT_AUTHENTICATOR, Executors.OPENID_CONNECT_EXECUTOR);
+            map.put(Authenticators.OPENID4VP_AUTHENTICATOR, Executors.OPENID4VP_REGISTRATION_EXECUTOR);
             CONNECTION_EXECUTOR_MAP = Collections.unmodifiableMap(map);
         }
     }
