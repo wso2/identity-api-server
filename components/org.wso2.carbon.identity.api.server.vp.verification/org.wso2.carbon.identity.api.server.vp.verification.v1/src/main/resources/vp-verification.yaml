@@ -1,0 +1,454 @@
+openapi: 3.0.0
+info:
+  title: 'WSO2 Identity Server - VC Verification API'
+  description: >
+    RESTful API for initiating and polling standalone OpenID4VP credential verification sessions.
+    The caller presents a presentation definition ID; WSO2 IS generates a wallet deep-link, waits
+    for the wallet's VP response, and exposes the verification outcome via a polling endpoint.
+  contact:
+    name: WSO2
+    url: 'http://wso2.com/products/identity-server/'
+    email: architecture@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  version: v1
+
+servers:
+  - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
+    variables:
+      server-url:
+        default: "localhost:9443"
+      tenant-domain:
+        default: "carbon.super"
+
+security:
+  - OAuth2: []
+  - BasicAuth: []
+
+paths:
+  /openid4vp/vc-verifications:
+    post:
+      tags:
+        - VC Verifications
+      summary: Create a credential verification request.
+      operationId: initiateVerification
+      description: >
+        Creates a new VP verification session for the given presentation definition and returns
+        a wallet deep-link URL suitable for display as a QR code. The caller must poll
+        `GET /openid4vp/vc-verifications/{id}` to retrieve the outcome.
+
+        Requires the `internal_vc_verification_create` scope.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerificationInitiateRequest'
+            example:
+              presentationDefinitionIdentifier: "a9b3c21d-84f0-4e1b-b9e7-123456789abc"
+      responses:
+        '201':
+          description: Session created.
+          headers:
+            Location:
+              description: URL for polling the verification status.
+              schema:
+                type: string
+              example: "/api/server/v1/openid4vp/vc-verifications/vp-req-abc123"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationInitiateResponse'
+              example:
+                requestId: "vp-req-abc123"
+                walletUrl: "openid4vp://authorize?client_id=...&request_uri=..."
+                requestUri: "https://localhost:9443/openid4vp/request/vp-req-abc123"
+                expiresAt: 1738000000000
+        '400':
+          description: Bad Request — missing or invalid presentationDefinitionIdentifier.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: "VPV-60001"
+                message: "Invalid request."
+                description: "presentationDefinitionIdentifier is required."
+        '404':
+          description: Not Found — no presentation definition exists for the given identifier.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: "VPV-60404"
+                message: "Presentation definition not found."
+                description: "No presentation definition found for identifier: verify-your-email-address"
+        '501':
+          description: Not Implemented — OpenID4VP feature is not enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: "VPV-60501"
+                message: "OpenID4VP feature is not enabled."
+                description: "Enable it via [openid4vp] enabled=true in deployment.toml."
+        '500':
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /openid4vp/vc-verifications/{id}:
+    get:
+      tags:
+        - VC Verifications
+      summary: Get credential verification state.
+      operationId: getVerificationStatus
+      description: >
+        Returns the current state of a verification session.
+
+        - **ACTIVE** — the wallet has not yet responded; poll again.
+        - **VERIFIED** — the wallet submitted a valid VP; the full presentation is included in the
+          response body. **The session is deleted after this response is returned** — the caller must
+          persist the claims.
+        - **FAILED** — verification failed (wallet error or credential validation failure); the
+          `errors` array contains a human-readable reason. **The session is also deleted.**
+
+        Requires the `internal_vc_verification_view` scope.
+      parameters:
+        - name: id
+          in: path
+          description: Verification request ID returned by the creation endpoint.
+          required: true
+          schema:
+            type: string
+            minLength: 1
+          example: "vp-req-abc123"
+      responses:
+        '200':
+          description: Current session status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationStatusResponse'
+              examples:
+                active:
+                  summary: Session still waiting for wallet
+                  value:
+                    requestId: "vp-req-abc123"
+                    status: "ACTIVE"
+                verified:
+                  summary: Wallet submitted a valid VP
+                  value:
+                    requestId: "vp-req-abc123"
+                    status: "VERIFIED"
+                    presentation:
+                      format: "dc+sd-jwt"
+                      submittedAt: "2026-01-27T10:30:00Z"
+                      credentials:
+                        - type: "EmployeeIDCredential"
+                          issuer: "https://issuer.example.com"
+                          issuedAt: "2025-12-01T00:00:00Z"
+                          expiresAt: "2026-12-01T00:00:00Z"
+                          signingAlgorithm: "ES256"
+                          holderBinding:
+                            method: "cnf.jwk"
+                            keyType: "EC"
+                            curve: "P-256"
+                          claims:
+                            given_name: "Alice"
+                            family_name: "Smith"
+                            employee_id: "EMP-9001"
+                      keyBinding:
+                        verified: true
+                        presentedAt: "2026-01-27T10:30:00Z"
+                        audience: "https://verifier.example.com"
+                        nonce: "n-0S6_WzA2Mj"
+                failed:
+                  summary: Wallet returned an error or credential validation failed
+                  value:
+                    requestId: "vp-req-abc123"
+                    status: "FAILED"
+                    errors:
+                      - "KB-JWT aud does not match the expected verifier client_id."
+        '400':
+          description: Bad Request — missing or blank requestId.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: "VPV-60001"
+                message: "Invalid request."
+                description: "requestId must not be blank."
+        '404':
+          description: Not Found — the session does not exist or has already been consumed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: "VPV-60401"
+                message: "Verification session not found."
+                description: "No verification session found for requestId: vp-req-abc123"
+        '501':
+          description: Not Implemented — OpenID4VP feature is not enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://localhost:9443/oauth2/authorize'
+          tokenUrl: 'https://localhost:9443/oauth2/token'
+          scopes:
+            internal_vc_verification_create: Initiate a new VC Verification session
+            internal_vc_verification_view: Poll the status of a VC Verification session
+
+  schemas:
+    VerificationInitiateRequest:
+      type: object
+      description: Request body for creating a new VP verification session.
+      required:
+        - presentationDefinitionIdentifier
+      properties:
+        presentationDefinitionIdentifier:
+          type: string
+          minLength: 1
+          description: >
+            ID of the presentation definition the verifier wants the wallet to satisfy.
+            Must exist in the tenant's presentation definition registry.
+          example: "a9b3c21d-84f0-4e1b-b9e7-123456789abc"
+
+    VerificationInitiateResponse:
+      type: object
+      description: Response returned when a verification session is created.
+      properties:
+        requestId:
+          type: string
+          description: >
+            Opaque session identifier. Use this value to poll
+            `GET /openid4vp/vc-verifications/{id}` for the outcome.
+          example: "vp-req-abc123"
+        walletUrl:
+          type: string
+          description: >
+            `openid4vp://` deep-link URL intended to be shown as a QR code. Scanning this
+            URL triggers the wallet to fetch the signed request JWT and begin the presentation flow.
+          example: "openid4vp://authorize?client_id=x509_san_dns%3A...&request_uri=https%3A%2F%2F..."
+        requestUri:
+          type: string
+          description: >
+            URI from which the wallet fetches the signed VP Request Object (JAR).
+            Embedded inside `walletUrl`; exposed separately for logging or debugging.
+          example: "https://localhost:9443/openid4vp/request/vp-req-abc123"
+        expiresAt:
+          type: integer
+          format: int64
+          description: Unix epoch milliseconds when the session expires.
+          example: 1738000000000
+        respondedAt:
+          type: string
+          format: date-time
+          description: ISO-8601 timestamp when WSO2 IS responded to this request.
+          example: "2026-01-27T10:00:00Z"
+        correlationId:
+          type: string
+          description: Opaque correlation ID for tracing this request across logs.
+          example: "corr-abc-123"
+
+    VerificationStatusResponse:
+      type: object
+      description: Response for a VP verification session status poll.
+      properties:
+        requestId:
+          type: string
+          description: Request ID of the verification session.
+          example: "vp-req-abc123"
+        status:
+          type: string
+          description: >
+            Current lifecycle state of the session.
+
+            - `ACTIVE` — waiting for the wallet; call again after a short delay.
+            - `VERIFIED` — the wallet submitted a valid VP; `presentation` is populated.
+              Session is consumed after this response.
+            - `FAILED` — verification failed; `errors` contains the reason.
+              Session is consumed after this response.
+          enum:
+            - ACTIVE
+            - VERIFIED
+            - FAILED
+          example: "VERIFIED"
+        presentation:
+          $ref: '#/components/schemas/Presentation'
+        errors:
+          type: array
+          description: >
+            Human-readable error descriptions. Present only when `status` is `FAILED` and a failure
+            reason is available. Omitted for `ACTIVE` and `VERIFIED` states, and for failed sessions
+            where no specific reason was recorded.
+          items:
+            type: string
+          example:
+            - "KB-JWT aud does not match the expected verifier client_id."
+        respondedAt:
+          type: string
+          format: date-time
+          description: ISO-8601 timestamp when WSO2 IS responded to this request.
+          example: "2026-01-27T10:30:00Z"
+        correlationId:
+          type: string
+          description: Opaque correlation ID for tracing this request across logs.
+          example: "corr-def-456"
+
+    Presentation:
+      type: object
+      description: >
+        Full presentation envelope returned when `status` is `VERIFIED`.
+        Contains per-credential metadata, disclosed claims, and key binding details.
+      properties:
+        format:
+          type: string
+          description: Credential format of the VP response (e.g. dc+sd-jwt).
+          example: "dc+sd-jwt"
+        submittedAt:
+          type: string
+          format: date-time
+          description: ISO-8601 timestamp when WSO2 IS received the wallet's VP response.
+          example: "2026-01-27T10:30:00Z"
+        credentials:
+          type: array
+          description: One entry per verified credential in the presentation.
+          items:
+            $ref: '#/components/schemas/Credential'
+        keyBinding:
+          $ref: '#/components/schemas/KeyBinding'
+
+    Credential:
+      type: object
+      description: Issuer-signed credential metadata and disclosed claims.
+      properties:
+        type:
+          type: string
+          description: Credential type from the `vct` claim.
+          example: "EmployeeIDCredential"
+        issuer:
+          type: string
+          description: Credential issuer from the `iss` claim.
+          example: "https://issuer.example.com"
+        issuedAt:
+          type: string
+          format: date-time
+          description: ISO-8601 timestamp when the credential was issued (`iat` claim).
+          example: "2025-12-01T00:00:00Z"
+        expiresAt:
+          type: string
+          format: date-time
+          description: ISO-8601 expiry of the credential (`exp` claim). Absent if no expiry is set.
+          example: "2026-12-01T00:00:00Z"
+        signingAlgorithm:
+          type: string
+          description: JWS algorithm used by the issuer (JWT header `alg`).
+          example: "ES256"
+        holderBinding:
+          $ref: '#/components/schemas/HolderBinding'
+        claims:
+          type: object
+          description: >
+            Disclosed attribute claims from this credential. Technical JWT claims (iss, iat, exp,
+            vct, cnf, sd_alg) are excluded. Values may be strings, numbers, booleans, or objects
+            for nested attributes.
+          additionalProperties: true
+          example:
+            given_name: "Alice"
+            family_name: "Smith"
+            employee_id: "EMP-9001"
+
+    HolderBinding:
+      type: object
+      description: >
+        Holder binding key info extracted from the `cnf.jwk` claim of the credential.
+        Present only when the credential contains a `cnf` claim.
+      properties:
+        method:
+          type: string
+          description: Binding method identifier, e.g. `cnf.jwk`.
+          example: "cnf.jwk"
+        keyType:
+          type: string
+          description: Public key type — EC, RSA, or OKP.
+          example: "EC"
+        curve:
+          type: string
+          description: Elliptic curve name (e.g. P-256, Ed25519). Absent for RSA keys.
+          example: "P-256"
+
+    KeyBinding:
+      type: object
+      description: >
+        Key Binding JWT details proving the wallet held the credential's private key at
+        presentation time. Present only when at least one credential included a verified KB-JWT.
+        All KB-JWTs in a single VP share the same nonce and audience, so this object is
+        representative of the entire presentation.
+      properties:
+        verified:
+          type: boolean
+          description: >
+            `true` when the KB-JWT signature, `iat`, `sd_hash`, and `nonce` all passed verification.
+          example: true
+        presentedAt:
+          type: string
+          format: date-time
+          description: ISO-8601 timestamp from the KB-JWT `iat` — when the wallet created the presentation.
+          example: "2026-01-27T10:30:00Z"
+        audience:
+          type: string
+          description: >
+            `aud` claim from the KB-JWT — the verifier this presentation was intended for.
+            Matches the verifier's `client_id` from the Authorization Request.
+          example: "https://verifier.example.com"
+        nonce:
+          type: string
+          description: >
+            `nonce` claim from the KB-JWT — matches the nonce sent in the original VP request,
+            binding the presentation to a specific challenge.
+          example: "n-0S6_WzA2Mj"
+
+    Error:
+      type: object
+      description: Error response body.
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: Error code identifying the type of error.
+          example: "VPV-60001"
+        message:
+          type: string
+          description: Short human-readable error message.
+          example: "Invalid request."
+        description:
+          type: string
+          description: Detailed error description.
+          example: "presentationDefinitionIdentifier is required."

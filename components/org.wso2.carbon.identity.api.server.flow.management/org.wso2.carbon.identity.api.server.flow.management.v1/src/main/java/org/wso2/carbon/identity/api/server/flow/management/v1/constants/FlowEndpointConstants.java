@@ -180,6 +180,7 @@ public class FlowEndpointConstants {
         public static final String CONFIRMATION_CODE_VALIDATION_EXECUTOR = "ConfirmationCodeValidationExecutor";
         public static final String USER_PROVISIONING_EXECUTOR = "UserProvisioningExecutor";
         public static final String FLOW_EXTENSION_EXECUTOR = "FlowExtensionExecutor";
+        public static final String OPENID4VP_REGISTRATION_EXECUTOR = "VPRegistrationExecutor";
     }
 
     /**
@@ -193,6 +194,7 @@ public class FlowEndpointConstants {
         public static final String FACEBOOK_AUTHENTICATOR = "FacebookAuthenticator";
         public static final String OFFICE365_AUTHENTICATOR = "Office365Authenticator";
         public static final String APPLE_AUTHENTICATOR = "AppleOIDCAuthenticator";
+        public static final String OPENID4VP_AUTHENTICATOR = "VPAuthenticator";
     }
 
     /**
@@ -228,6 +230,7 @@ public class FlowEndpointConstants {
             map.put(Authenticators.OFFICE365_AUTHENTICATOR, Executors.OFFICE365_EXECUTOR);
             map.put(Authenticators.APPLE_AUTHENTICATOR, Executors.APPLE_EXECUTOR);
             map.put(Authenticators.OPENID_CONNECT_AUTHENTICATOR, Executors.OPENID_CONNECT_EXECUTOR);
+            map.put(Authenticators.OPENID4VP_AUTHENTICATOR, Executors.OPENID4VP_REGISTRATION_EXECUTOR);
             CONNECTION_EXECUTOR_MAP = Collections.unmodifiableMap(map);
         }
     }
