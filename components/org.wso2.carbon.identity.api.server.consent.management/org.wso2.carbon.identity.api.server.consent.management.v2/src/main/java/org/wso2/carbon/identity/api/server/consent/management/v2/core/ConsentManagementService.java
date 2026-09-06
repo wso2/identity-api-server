@@ -120,6 +120,19 @@ public class ConsentManagementService {
         }
     }
 
+    /**
+     * Validates that the provided expiry time is in the future.
+     *
+     * @param expiryTime Expiry timestamp in milliseconds.
+     * @throws ConsentManagementException if the expiry time is in the past or equal to the current time.
+     */
+    private void validateExpiryTime(Long expiryTime) throws ConsentManagementException {
+
+        if (expiryTime != null && expiryTime <= System.currentTimeMillis()) {
+            throw handleClientException(ERROR_CODE_INVALID_QUERY_PARAM, "expiryTime cannot be in the past.");
+        }
+    }
+
     private ConsentResponseDTO createConsentInternal(ConsentCreateRequest request) throws ConsentManagementException {
 
         String subjectId = request.getSubjectId();
@@ -128,6 +141,8 @@ public class ConsentManagementService {
         if (rejected && hasAuthorizations) {
             throw handleClientException(ERROR_CODE_CONSENT_REJECTED_WITH_AUTHORIZATIONS, null);
         }
+
+        validateExpiryTime(request.getExpiryTime());
 
         ReceiptInput receiptInput = buildReceiptInput(request, subjectId);
         AddReceiptResponse addReceiptResponse = consentManager.addConsent(receiptInput);
@@ -364,6 +379,7 @@ public class ConsentManagementService {
         updateInput.setConsentReceiptId(consentId);
 
         if (request.getExpiryTime() != null) {
+            validateExpiryTime(request.getExpiryTime());
             updateInput.setExpiryTime(new Timestamp(request.getExpiryTime()));
         }
 
