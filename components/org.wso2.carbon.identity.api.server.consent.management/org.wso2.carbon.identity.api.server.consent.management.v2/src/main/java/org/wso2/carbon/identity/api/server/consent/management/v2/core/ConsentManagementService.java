@@ -133,6 +133,13 @@ public class ConsentManagementService {
         }
     }
 
+    /**
+     * Internal helper to validate and persist a new consent receipt.
+     *
+     * @param request Consent create request.
+     * @return ConsentResponseDTO with receipt details.
+     * @throws ConsentManagementException if validation fails or persistence fails.
+     */
     private ConsentResponseDTO createConsentInternal(ConsentCreateRequest request) throws ConsentManagementException {
 
         String subjectId = request.getSubjectId();
@@ -372,6 +379,14 @@ public class ConsentManagementService {
         }
     }
 
+    /**
+     * Internal helper to validate and update an existing consent receipt.
+     *
+     * @param consentId Consent receipt ID.
+     * @param request   Update request containing fields to modify.
+     * @return Updated ConsentDTO.
+     * @throws ConsentManagementException if validation fails or update fails.
+     */
     private ConsentDTO updateConsentInternal(String consentId, ConsentUpdateRequest request)
             throws ConsentManagementException {
 
