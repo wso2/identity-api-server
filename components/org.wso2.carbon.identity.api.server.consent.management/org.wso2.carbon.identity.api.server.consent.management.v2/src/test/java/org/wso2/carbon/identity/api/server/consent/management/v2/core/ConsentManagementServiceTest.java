@@ -42,6 +42,9 @@ public class ConsentManagementServiceTest {
 
     private ConsentManagementService consentManagementService;
 
+    /**
+     * Sets up mock objects and initializes {@link ConsentManagementService} before each test method.
+     */
     @BeforeMethod
     public void setUp() {
 
@@ -49,6 +52,10 @@ public class ConsentManagementServiceTest {
         consentManagementService = new ConsentManagementService(consentManager);
     }
 
+    /**
+     * Tests that creating a consent with an expiration timestamp in the past throws an {@link APIError}
+     * with an HTTP 400 Bad Request status and ensures the underlying manager is not called.
+     */
     @Test
     public void testCreateConsentWithPastExpiryTime() {
 
@@ -67,6 +74,10 @@ public class ConsentManagementServiceTest {
         }
     }
 
+    /**
+     * Tests that updating a consent with an expiration timestamp in the past throws an {@link APIError}
+     * with an HTTP 400 Bad Request status and ensures the underlying manager is not called.
+     */
     @Test
     public void testUpdateConsentWithPastExpiryTime() {
 

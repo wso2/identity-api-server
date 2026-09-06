@@ -124,12 +124,12 @@ public class ConsentManagementService {
      * Validates that the provided expiry time is in the future.
      *
      * @param expiryTime Expiry timestamp in milliseconds.
-     * @throws ConsentManagementException if the expiry time is in the past or equal to the current time.
+     * @throws ConsentManagementException if the expiry time is not in the future.
      */
     private void validateExpiryTime(Long expiryTime) throws ConsentManagementException {
 
         if (expiryTime != null && expiryTime <= System.currentTimeMillis()) {
-            throw handleClientException(ERROR_CODE_INVALID_QUERY_PARAM, "expiryTime cannot be in the past.");
+            throw handleClientException(ERROR_CODE_INVALID_QUERY_PARAM, "expiryTime must be in the future.");
         }
     }
 
