@@ -37,6 +37,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.RequestObje
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestObjectEncryptionConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectTokenConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.TokenExchangeConfiguration;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 import org.wso2.carbon.identity.oauth2.config.models.IssuerDetails;
 
@@ -82,7 +83,8 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
                 .fapiProfile(buildFapiProfileConfiguration(oauthAppDTO))
                 .subjectToken(buildSubjectTokenConfiguration(oauthAppDTO))
                 .cibaAuthenticationRequest(buildCIBAAuthenticationRequestConfiguration(oauthAppDTO))
-                .issuer(buildIssuerOrganizationConfiguration(oauthAppDTO));
+                .issuer(buildIssuerOrganizationConfiguration(oauthAppDTO))
+                .tokenExchange(buildTokenExchangeConfiguration(oauthAppDTO));
     }
 
     private List<String> getScopeValidators(OAuthConsumerAppDTO oauthAppDTO) {
@@ -247,6 +249,13 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
         return new SubjectTokenConfiguration()
                 .enable(oAuthConsumerAppDTO.isSubjectTokenEnabled())
                 .applicationSubjectTokenExpiryInSeconds(oAuthConsumerAppDTO.getSubjectTokenExpiryTime());
+    }
+
+    private TokenExchangeConfiguration buildTokenExchangeConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
+
+        return new TokenExchangeConfiguration()
+                .restrictScopeIssuanceForFederatedTokens(
+                        oAuthConsumerAppDTO.isRestrictScopeIssuanceForFederatedTokens());
     }
 
     private CIBAAuthenticationRequestConfiguration buildCIBAAuthenticationRequestConfiguration(
