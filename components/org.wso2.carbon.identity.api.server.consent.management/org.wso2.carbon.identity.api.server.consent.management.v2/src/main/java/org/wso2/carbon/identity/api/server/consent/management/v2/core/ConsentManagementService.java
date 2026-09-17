@@ -334,8 +334,7 @@ public class ConsentManagementService {
     public void revokeConsent(String receiptId) {
 
         try {
-            Receipt receipt = consentManager.getReceiptWithExtendedSchema(receiptId);
-            consentManager.authorizeConsent(receiptId, receipt.getPiiPrincipalId(), REVOKE_STATE);
+            consentManager.authorizeConsentForAllAuthorizers(receiptId, REVOKE_STATE);
         } catch (ConsentManagementException e) {
             throw ConsentMgtEndpointUtil.handleConsentManagementException(e);
         }
