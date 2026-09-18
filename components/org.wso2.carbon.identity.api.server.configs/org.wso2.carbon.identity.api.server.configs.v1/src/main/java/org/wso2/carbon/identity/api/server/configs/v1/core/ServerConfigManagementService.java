@@ -73,6 +73,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Conf
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTValidatorConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.OpenID4VPConfiguration;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ProvisioningConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.PushDeviceMgtConfig;
@@ -152,6 +153,9 @@ import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationCon
 import org.wso2.carbon.identity.oauth2.impersonation.models.ImpersonationConfig;
 import org.wso2.carbon.identity.oauth2.impersonation.services.ImpersonationConfigMgtService;
 import org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.core.JWTClientAuthenticatorMgtService;
+import org.wso2.carbon.identity.openid4vc.presentation.authenticator.exception.VPAuthenticatorException;
+import org.wso2.carbon.identity.openid4vc.presentation.authenticator.service.VPConfigService;
+import org.wso2.carbon.identity.openid4vc.presentation.common.constant.VPConstants;
 import org.wso2.carbon.identity.organization.management.service.exception.OrganizationManagementException;
 import org.wso2.carbon.identity.organization.management.service.util.OrganizationManagementUtil;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
@@ -682,6 +686,58 @@ public class ServerConfigManagementService {
         } catch (FapiConfigMgtException e) {
             throw new APIError(Response.Status.INTERNAL_SERVER_ERROR, this.getFapiConfigErrorResponse(e,
                     Constants.ErrorMessage.ERROR_CODE_FAPI_CONFIG_UPDATE, tenantDomain));
+        }
+    }
+
+    /**
+     * Retrieves the OpenID4VP configuration for the current tenant domain.
+     *
+     * @return OpenID4VPConfiguration the current OID4VP configuration.
+     */
+    public OpenID4VPConfiguration getOpenID4VPConfiguration() {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        VPConfigService configService = ConfigsServiceHolder.getOpenID4VPConfigService();
+        if (configService == null) {
+            throw handleException(Response.Status.NOT_IMPLEMENTED,
+                    Constants.ErrorMessage.ERROR_CODE_OID4VP_NOT_ENABLED, null);
+        }
+        try {
+            VPConfigService.TenantConfig cfg = configService.getConfig(tenantDomain);
+            return new OpenID4VPConfiguration()
+                    .clientIdScheme(StringUtils.defaultIfBlank(
+                            cfg.getClientIdScheme(), VPConstants.DEFAULT_CLIENT_ID_SCHEME))
+                    .responseMode(StringUtils.defaultIfBlank(
+                            cfg.getResponseMode(), VPConstants.DEFAULT_RESPONSE_MODE));
+        } catch (VPAuthenticatorException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_OID4VP_CONFIG_RETRIEVE, null);
+        }
+    }
+
+    /**
+     * Updates the OpenID4VP configuration for the current tenant domain.
+     *
+     * @param config the new OID4VP configuration.
+     * @return the updated OpenID4VPConfiguration.
+     */
+    public OpenID4VPConfiguration updateOpenID4VPConfiguration(OpenID4VPConfiguration config) {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        VPConfigService configService = ConfigsServiceHolder.getOpenID4VPConfigService();
+        if (configService == null) {
+            throw handleException(Response.Status.NOT_IMPLEMENTED,
+                    Constants.ErrorMessage.ERROR_CODE_OID4VP_NOT_ENABLED, null);
+        }
+        try {
+            VPConfigService.TenantConfig tenantConfig = new VPConfigService.TenantConfig();
+            tenantConfig.setClientIdScheme(config.getClientIdScheme());
+            tenantConfig.setResponseMode(config.getResponseMode());
+            configService.setConfig(tenantConfig, tenantDomain);
+            return config;
+        } catch (VPAuthenticatorException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_OID4VP_CONFIG_UPDATE, null);
         }
     }
 

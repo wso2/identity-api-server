@@ -34,6 +34,7 @@ import org.wso2.carbon.identity.oauth2.config.services.OAuth2OIDCConfigOrgUsageS
 import org.wso2.carbon.identity.oauth2.fapi.services.FapiConfigMgtService;
 import org.wso2.carbon.identity.oauth2.impersonation.services.ImpersonationConfigMgtService;
 import org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.core.JWTClientAuthenticatorMgtService;
+import org.wso2.carbon.identity.openid4vc.presentation.authenticator.service.VPConfigService;
 import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 import org.wso2.carbon.idp.mgt.IdpManager;
 import org.wso2.carbon.logging.service.RemoteLoggingConfigService;
@@ -155,6 +156,13 @@ public class ConfigsServiceHolder {
         static final FapiConfigMgtService SERVICE =
                 (FapiConfigMgtService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                         .getOSGiService(FapiConfigMgtService.class, null);
+    }
+
+    private static class VPConfigServiceHolder {
+
+        static final VPConfigService SERVICE =
+                (VPConfigService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(VPConfigService.class, null);
     }
 
     /**
@@ -325,5 +333,15 @@ public class ConfigsServiceHolder {
     public static FapiConfigMgtService getFapiConfigMgtService() {
 
         return FapiConfigMgtServiceHolder.SERVICE;
+    }
+
+    /**
+     * Get VPConfigService osgi service.
+     *
+     * @return VPConfigService
+     */
+    public static VPConfigService getOpenID4VPConfigService() {
+
+        return VPConfigServiceHolder.SERVICE;
     }
 }

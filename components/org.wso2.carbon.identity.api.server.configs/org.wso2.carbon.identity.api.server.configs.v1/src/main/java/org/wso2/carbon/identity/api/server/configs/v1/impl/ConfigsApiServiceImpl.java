@@ -34,6 +34,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthOAuth2Con
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.OpenID4VPConfiguration;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.PushDeviceMgtConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfig;
@@ -96,6 +97,19 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     public Response getAgentConfiguration() {
 
         return Response.ok().entity(configManagementService.getAgentConfiguration()).build();
+    }
+
+    @Override
+    public Response getOpenID4VPConfiguration() {
+
+        return Response.ok().entity(configManagementService.getOpenID4VPConfiguration()).build();
+    }
+
+    @Override
+    public Response updateOpenID4VPConfiguration(OpenID4VPConfiguration openID4VPConfiguration) {
+
+        return Response.ok().entity(configManagementService.updateOpenID4VPConfiguration(openID4VPConfiguration))
+                .build();
     }
 
     @Override
