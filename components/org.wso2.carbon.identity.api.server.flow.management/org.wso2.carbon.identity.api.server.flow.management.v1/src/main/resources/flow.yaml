@@ -768,6 +768,15 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/FlowExtensionConnectionInfo'
+        ruleMetaData:
+          type: array
+          description: >
+            The fields a condition in this flow can be written against, with how each one is keyed,
+            the operators it accepts and how its value is entered. Same shape as the response of the
+            rule metadata endpoint, so a builder does not have to call that separately to render a
+            decision step.
+          items:
+            $ref: '#/components/schemas/FieldDefinition'
         workflowEnabled:
           type: boolean
           example: false

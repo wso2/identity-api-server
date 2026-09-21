@@ -31,6 +31,7 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionConne
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
+import org.wso2.carbon.identity.api.server.rule.metadata.v1.factories.ServerRuleMetadataServiceFactory;
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
@@ -194,7 +195,30 @@ public abstract class AbstractMetaResponseHandler {
         response.setExtensionExecutors(getExtensionExecutors());
         response.setFlowExtensionConnections(getFlowExtensionConnections());
         response.setSupportedFlowCompletionConfigs(getSupportedFlowCompletionConfigs());
+        response.setRuleMetaData(getRuleMetaData());
         return response;
+    }
+
+    /**
+     * The fields a condition in this flow can be written against.
+     * <p>
+     * Carried on the flow metadata so a builder can render a decision step from one call rather than
+     * also asking the rule metadata endpoint. A flow type that publishes no condition fields simply
+     * gets an empty list, which is how a builder knows not to offer decisions for it.
+     *
+     * @return The condition fields, never null.
+     */
+    protected List<org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition> getRuleMetaData() {
+
+        try {
+            org.wso2.carbon.identity.rule.metadata.api.model.FlowType flowType =
+                    org.wso2.carbon.identity.rule.metadata.api.model.FlowType.valueOf(getFlowType());
+            return ServerRuleMetadataServiceFactory.getServerRuleMetadataService()
+                    .getExpressionMeta(flowType.getFlowAlias());
+        } catch (IllegalArgumentException e) {
+            // Not every flow type supports conditions; those simply publish no fields.
+            return Collections.emptyList();
+        }
     }
 
     private List<String> getSupportedFlowCompletionConfigs() {

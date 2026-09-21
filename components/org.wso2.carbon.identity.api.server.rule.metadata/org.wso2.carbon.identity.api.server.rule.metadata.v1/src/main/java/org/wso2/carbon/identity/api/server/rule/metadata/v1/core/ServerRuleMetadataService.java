@@ -85,7 +85,11 @@ public class ServerRuleMetadataService {
         fieldDefinitionResponse.setField(field);
 
         setOperators(fieldDefinition, fieldDefinitionResponse);
-        setValue(fieldDefinition, fieldDefinitionResponse);
+        fieldDefinitionResponse.setValue(buildValue(fieldDefinition.getValue()));
+        // Absent on a field that names a single value, which is what marks it as taking no key.
+        if (fieldDefinition.getKey() != null) {
+            fieldDefinitionResponse.setKey(buildValue(fieldDefinition.getKey()));
+        }
 
         return fieldDefinitionResponse;
     }
@@ -103,23 +107,28 @@ public class ServerRuleMetadataService {
         }
     }
 
-    private void setValue(FieldDefinition fieldDefinition,
-                          org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition
-                                  fieldDefinitionResponse) {
+    /**
+     * Convert a value meta to its API form.
+     * <p>
+     * Used for both the value and the key, which are the same shape: a key says how to choose which
+     * value within a field is compared, and is described exactly as a value is.
+     *
+     * @param value Value meta to convert.
+     * @return The API value, or null when there is nothing to convert.
+     */
+    private org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Value buildValue(Value value) {
 
-        Value value = fieldDefinition.getValue();
         if (value instanceof InputValue) {
-            setInputValue((InputValue) value, fieldDefinitionResponse);
+            return buildInputValue((InputValue) value);
         } else if (value instanceof OptionsInputValue) {
-            setOptionsInputValue((OptionsInputValue) value, fieldDefinitionResponse);
+            return buildOptionsInputValue((OptionsInputValue) value);
         } else if (value instanceof OptionsReferenceValue) {
-            setOptionsReferenceValue((OptionsReferenceValue) value, fieldDefinitionResponse);
+            return buildOptionsReferenceValue((OptionsReferenceValue) value);
         }
+        return null;
     }
 
-    private void setInputValue(
-            InputValue value,
-            org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition fieldDefinitionResponse) {
+    private org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Value buildInputValue(InputValue value) {
 
         org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Value valueItem =
                 new org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Value().inputType(
@@ -128,12 +137,11 @@ public class ServerRuleMetadataService {
                         .valueType(
                                 org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Value.ValueTypeEnum.valueOf(
                                         value.getValueType().name()));
-        fieldDefinitionResponse.value(valueItem);
+        return valueItem;
     }
 
-    private void setOptionsInputValue(OptionsInputValue optionsInputValue,
-                                      org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition
-                                              fieldDefinitionResponse) {
+    private org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Value buildOptionsInputValue(
+            OptionsInputValue optionsInputValue) {
 
         org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Value valueItem =
                 new org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Value().inputType(
@@ -148,12 +156,11 @@ public class ServerRuleMetadataService {
                             .displayName(optionsValue.getDisplayName()).name(optionsValue.getName());
             valueItem.addValuesItem(valueObjectItem);
         }
-        fieldDefinitionResponse.value(valueItem);
+        return valueItem;
     }
 
-    private void setOptionsReferenceValue(OptionsReferenceValue optionsReferenceValue,
-                                          org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition
-                                                  fieldDefinitionResponse) {
+    private org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Value buildOptionsReferenceValue(
+            OptionsReferenceValue optionsReferenceValue) {
 
         org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Value valueItem =
                 new org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Value().inputType(
@@ -171,6 +178,6 @@ public class ServerRuleMetadataService {
                             .method(Link.MethodEnum.fromValue(link.getMethod()));
             valueItem.addLinksItem(linkItem);
         }
-        fieldDefinitionResponse.value(valueItem);
+        return valueItem;
     }
 }

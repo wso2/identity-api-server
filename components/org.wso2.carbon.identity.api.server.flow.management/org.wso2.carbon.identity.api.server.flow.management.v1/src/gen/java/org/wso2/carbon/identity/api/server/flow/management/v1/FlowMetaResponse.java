@@ -56,6 +56,8 @@ public class FlowMetaResponse  {
 
     private List<FlowExtensionConnectionInfo> flowExtensionConnections = null;
 
+    private List<org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition> ruleMetaData = null;
+
     private Boolean workflowEnabled;
 
     /**
@@ -280,6 +282,27 @@ public class FlowMetaResponse  {
     @ApiModelProperty(example = "false", value = "")
     @JsonProperty("workflowEnabled")
     @Valid
+    /**
+    * The fields a condition in this flow can be written against
+    **/
+    public FlowMetaResponse ruleMetaData(
+            List<org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition> ruleMetaData) {
+
+        this.ruleMetaData = ruleMetaData;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "The fields a condition in this flow can be written against")
+    @JsonProperty("ruleMetaData")
+    @Valid
+    public List<org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition> getRuleMetaData() {
+        return ruleMetaData;
+    }
+    public void setRuleMetaData(
+            List<org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition> ruleMetaData) {
+        this.ruleMetaData = ruleMetaData;
+    }
+
     public Boolean getWorkflowEnabled() {
         return workflowEnabled;
     }
@@ -308,12 +331,13 @@ public class FlowMetaResponse  {
             Objects.equals(this.attributeMetadata, flowMetaResponse.attributeMetadata) &&
             Objects.equals(this.executorConnections, flowMetaResponse.executorConnections) &&
             Objects.equals(this.flowExtensionConnections, flowMetaResponse.flowExtensionConnections) &&
+            Objects.equals(this.ruleMetaData, flowMetaResponse.ruleMetaData) &&
             Objects.equals(this.workflowEnabled, flowMetaResponse.workflowEnabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(flowType, supportedExecutors, extensionExecutors, connectorConfigs, attributeProfile, supportedFlowCompletionConfigs, attributeMetadata, executorConnections, flowExtensionConnections, workflowEnabled);
+        return Objects.hash(flowType, supportedExecutors, extensionExecutors, connectorConfigs, attributeProfile, supportedFlowCompletionConfigs, attributeMetadata, executorConnections, flowExtensionConnections, ruleMetaData, workflowEnabled);
     }
 
     @Override
@@ -331,6 +355,7 @@ public class FlowMetaResponse  {
         sb.append("    attributeMetadata: ").append(toIndentedString(attributeMetadata)).append("\n");
         sb.append("    executorConnections: ").append(toIndentedString(executorConnections)).append("\n");
         sb.append("    flowExtensionConnections: ").append(toIndentedString(flowExtensionConnections)).append("\n");
+        sb.append("    ruleMetaData: ").append(toIndentedString(ruleMetaData)).append("\n");
         sb.append("    workflowEnabled: ").append(toIndentedString(workflowEnabled)).append("\n");
         sb.append("}");
         return sb.toString();

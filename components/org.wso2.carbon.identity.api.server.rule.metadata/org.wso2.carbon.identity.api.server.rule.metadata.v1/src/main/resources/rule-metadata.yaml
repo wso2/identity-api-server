@@ -266,6 +266,11 @@ components:
       properties:
         field:
           $ref: '#/components/schemas/Field'
+        key:
+          allOf:
+            - $ref: '#/components/schemas/Value'
+          description: |
+            How a key is chosen for this field, for fields that name a family of values rather than a single one -- a claim, for instance, where the key is the claim URI. Absent on fields that name one value, which is what marks them as taking no key.
         operators:
           type: array
           description: |

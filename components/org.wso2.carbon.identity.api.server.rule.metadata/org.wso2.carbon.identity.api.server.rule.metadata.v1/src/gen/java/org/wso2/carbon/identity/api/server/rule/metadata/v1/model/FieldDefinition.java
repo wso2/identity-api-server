@@ -39,9 +39,29 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public class FieldDefinition  {
   
     private Field field;
+    private Value key;
     private List<Operator> operators = null;
 
     private Value value;
+
+    /**
+    * How a key is chosen for this field. Absent on fields that name a single value.
+    **/
+    public FieldDefinition key(Value key) {
+
+        this.key = key;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "How a key is chosen for this field. Absent on fields that name a single value.")
+    @JsonProperty("key")
+    @Valid
+    public Value getKey() {
+        return key;
+    }
+    public void setKey(Value key) {
+        this.key = key;
+    }
 
     /**
     **/
@@ -119,13 +139,14 @@ public class FieldDefinition  {
         }
         FieldDefinition fieldDefinition = (FieldDefinition) o;
         return Objects.equals(this.field, fieldDefinition.field) &&
+            Objects.equals(this.key, fieldDefinition.key) &&
             Objects.equals(this.operators, fieldDefinition.operators) &&
             Objects.equals(this.value, fieldDefinition.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(field, operators, value);
+        return Objects.hash(field, key, operators, value);
     }
 
     @Override
@@ -135,6 +156,7 @@ public class FieldDefinition  {
         sb.append("class FieldDefinition {\n");
         
         sb.append("    field: ").append(toIndentedString(field)).append("\n");
+        sb.append("    key: ").append(toIndentedString(key)).append("\n");
         sb.append("    operators: ").append(toIndentedString(operators)).append("\n");
         sb.append("    value: ").append(toIndentedString(value)).append("\n");
         sb.append("}");
