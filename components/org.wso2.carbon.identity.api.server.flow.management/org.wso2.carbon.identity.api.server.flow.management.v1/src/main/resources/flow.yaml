@@ -994,6 +994,130 @@ components:
           type: string
           description: ID of the next step. For the last step, value will be "COMPLETE"
           example: dnd-step-asd85f64-5717-4562-b3fc-2234f66afa6
+        branches:
+          type: array
+          description: >
+            Outgoing branches of a rule decision, in evaluation order. The first branch whose rule
+            holds selects the next step. The branch carrying no rule is the default, taken when none
+            of the others hold; it is accepted in any position and always returned last.
+            Only a RULE_DECISION action has branches, and such an action has no `next`.
+          items:
+            $ref: '#/components/schemas/Branch'
+
+    Branch:
+      type: object
+      description: One outgoing branch of a rule decision
+      required:
+        - id
+        - name
+        - next
+      properties:
+        id:
+          type: string
+          description: Identifier for this branch, stable across saves
+          example: br_lk
+        name:
+          type: string
+          description: >
+            Label for the branch. Shown on the canvas and cited in validation messages, so that a
+            rejected condition names something an author recognises.
+          example: Sri Lanka
+        next:
+          type: string
+          description: ID of the step taken when this branch is selected
+          example: dnd-step-3fa85f64-5717-4562-b3fc-2c963f66afa6
+        rule:
+          $ref: '#/components/schemas/Rule'
+
+    Rule:
+      type: object
+      description: >
+        A rule in disjunctive normal form. Any one of the AND combined rules holding makes it true.
+        Absent on the default branch, which always holds.
+      required:
+        - condition
+        - rules
+      properties:
+        condition:
+          type: string
+          enum: [OR]
+          example: OR
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/ANDRule'
+
+    ANDRule:
+      type: object
+      description: A set of expressions that must all hold
+      required:
+        - condition
+        - expressions
+      properties:
+        condition:
+          type: string
+          enum: [AND]
+          example: AND
+        expressions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Expression'
+
+    Expression:
+      type: object
+      description: A single comparison against the flow execution context
+      required:
+        - field
+        - operator
+        - value
+      properties:
+        field:
+          type: string
+          description: >
+            One of the field names published in `ruleMetaData`. `user.claims` reads what is stored
+            for the user, `user.collectedClaims` what this run of the flow has gathered.
+          example: user.claims
+        key:
+          type: string
+          description: >
+            Selects a value within the field, for fields that name a family of values rather than
+            one. Required for `user.claims`, `user.collectedClaims` and `flow.properties`; rejected
+            on fields that name a single value.
+          example: http://wso2.org/claims/country
+        operator:
+          type: string
+          enum: [equals, notEquals, contains, notContains, startsWith, endsWith, greaterThan, lessThan, in, notIn]
+          example: equals
+        value:
+          $ref: '#/components/schemas/Value'
+
+    Value:
+      type: object
+      description: >
+        The right hand side of an expression. A type of REFERENCE makes it a field resolved at
+        evaluation time, which allows both sides to be dynamic; a type of LIST carries a set of
+        values and is required by `in` and `notIn`. Any other type is a single literal.
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum: [STRING, NUMBER, BOOLEAN, DATE_TIME, REFERENCE, RAW, LIST]
+          example: STRING
+        value:
+          type: string
+          description: The value, for every type except LIST
+          example: LK
+        values:
+          type: array
+          description: The values, for a type of LIST
+          items:
+            type: string
+          example: [a@example.com, b@example.com]
+        key:
+          type: string
+          description: Key selecting a value within a REFERENCE field, where that field is keyed
+          example: geoCountry
 
     Executor:
       type: object

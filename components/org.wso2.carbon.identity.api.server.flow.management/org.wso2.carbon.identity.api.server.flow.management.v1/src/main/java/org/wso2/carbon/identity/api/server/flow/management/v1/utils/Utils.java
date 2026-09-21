@@ -276,7 +276,8 @@ public class Utils {
         return new Action()
                 .type(actionDTO.getType())
                 .next(actionDTO.getNextId())
-                .executor(convertToExecutor(actionDTO.getExecutor()));
+                .executor(convertToExecutor(actionDTO.getExecutor()))
+                .branches(RuleMapper.toBranches(actionDTO.getBranches()));
     }
 
     private static Executor convertToExecutor(ExecutorDTO executorDTO) {
@@ -352,6 +353,7 @@ public class Utils {
                 .type(action.getType())
                 .nextId(action.getNext())
                 .executor(convertToExecutorDTO(action.getExecutor()))
+                .branches(RuleMapper.toBranchDTOs(action.getBranches()))
                 .build();
     }
 

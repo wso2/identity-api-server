@@ -23,6 +23,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Executor;
+import java.util.ArrayList;
+import java.util.List;
 import javax.validation.constraints.*;
 
 /**
@@ -39,6 +41,7 @@ public class Action  {
     private String type;
     private Executor executor;
     private String next;
+    private List<Branch> branches = null;
 
     /**
     * Type of action
@@ -100,6 +103,35 @@ public class Action  {
 
 
 
+    /**
+    * Outgoing branches of a rule decision, in evaluation order
+    **/
+    public Action branches(List<Branch> branches) {
+
+        this.branches = branches;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "Outgoing branches of a rule decision, in evaluation order")
+    @JsonProperty("branches")
+    @Valid
+    public List<Branch> getBranches() {
+        return branches;
+    }
+    public void setBranches(List<Branch> branches) {
+        this.branches = branches;
+    }
+
+    public Action addBranchesItem(Branch branchesItem) {
+        if (this.branches == null) {
+            this.branches = new ArrayList<>();
+        }
+        this.branches.add(branchesItem);
+        return this;
+    }
+
+
+
     @Override
     public boolean equals(java.lang.Object o) {
 
@@ -112,12 +144,13 @@ public class Action  {
         Action action = (Action) o;
         return Objects.equals(this.type, action.type) &&
             Objects.equals(this.executor, action.executor) &&
-            Objects.equals(this.next, action.next);
+            Objects.equals(this.next, action.next) &&
+            Objects.equals(this.branches, action.branches);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, executor, next);
+        return Objects.hash(type, executor, next, branches);
     }
 
     @Override
@@ -129,6 +162,7 @@ public class Action  {
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    executor: ").append(toIndentedString(executor)).append("\n");
         sb.append("    next: ").append(toIndentedString(next)).append("\n");
+        sb.append("    branches: ").append(toIndentedString(branches)).append("\n");
         sb.append("}");
         return sb.toString();
     }
