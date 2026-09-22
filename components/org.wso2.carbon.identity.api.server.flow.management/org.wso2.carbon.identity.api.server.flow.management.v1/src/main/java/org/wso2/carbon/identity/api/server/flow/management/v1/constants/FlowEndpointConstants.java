@@ -121,7 +121,21 @@ public class FlowEndpointConstants {
 
         ERROR_CODE_INVALID_REQUEST_BODY("10024",
                 "Invalid request body.",
-                "Request body cannot be null.");
+                "Request body cannot be null."),
+        ERROR_CODE_BRANCHES_NOT_ALLOWED("10025",
+                "Branches are not allowed for this step.",
+                "Only a %s step has branches, but the step %s of type %s carries them."),
+        ERROR_CODE_DECISION_WITHOUT_BRANCHES("10026",
+                "Decision step has no branches.",
+                "The decision step %s has no branches, so it cannot decide anything."),
+        ERROR_CODE_DECISION_WITH_NEXT("10027",
+                "Decision step defines a next step.",
+                "The decision step %s defines a next step. Where the flow goes is decided by its " +
+                        "branches, and the branch without a rule is what catches everything else."),
+        ERROR_CODE_DECISION_EXECUTOR_NOT_ALLOWED("10028",
+                "Executor is not accepted for a decision step.",
+                "The decision step %s defines an executor. A decision evaluates its branches and " +
+                        "runs nothing else, so the executor is assigned by the server.");
 
         private final String code;
         private final String message;
@@ -245,5 +259,6 @@ public class FlowEndpointConstants {
         public static final String EMPTY = "empty";
         public static final String NULL = "null";
         public static final String FORM = "FORM";
+        public static final String RULE_DECISION = "RULE_DECISION";
     }
 }

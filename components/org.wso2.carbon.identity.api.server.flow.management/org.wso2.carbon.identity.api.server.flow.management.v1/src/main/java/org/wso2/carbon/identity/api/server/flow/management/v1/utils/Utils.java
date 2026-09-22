@@ -651,11 +651,72 @@ public class Utils {
     }
 
     /**
+     * Check the shape of a decision step.
+     * <p>
+     * Only the shape: that it has branches, that it does not also name a single next step, and that
+     * it does not bring its own executor. Whether a condition means anything -- that the field is
+     * published, that the operator suits the claim -- is decided further in, where the metadata and
+     * the claims are known.
+     *
+     * @param step Decision step to validate.
+     */
+    private static void validateDecisionStep(Step step) {
+
+        Action action = step.getData() == null ? null : step.getData().getAction();
+        if (action == null || CollectionUtils.isEmpty(action.getBranches())) {
+            throw Utils.handleFlowMgtException(new FlowMgtClientException(
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_WITHOUT_BRANCHES.getCode(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_WITHOUT_BRANCHES.getMessage(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_WITHOUT_BRANCHES.getDescription()),
+                    step.getId());
+        }
+        if (StringUtils.isNotBlank(action.getNext())) {
+            throw Utils.handleFlowMgtException(new FlowMgtClientException(
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_WITH_NEXT.getCode(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_WITH_NEXT.getMessage(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_WITH_NEXT.getDescription()),
+                    step.getId());
+        }
+        if (action.getExecutor() != null) {
+            throw Utils.handleFlowMgtException(new FlowMgtClientException(
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_EXECUTOR_NOT_ALLOWED.getCode(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_EXECUTOR_NOT_ALLOWED.getMessage(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_EXECUTOR_NOT_ALLOWED.getDescription()),
+                    step.getId());
+        }
+    }
+
+    /**
+     * Branches belong to a decision and nowhere else. Accepting them on another step type would store
+     * conditions that are never consulted.
+     *
+     * @param step Step to check.
+     */
+    private static void validateNoBranches(Step step) {
+
+        if (step.getData() != null && step.getData().getAction() != null
+                && CollectionUtils.isNotEmpty(step.getData().getAction().getBranches())) {
+            throw Utils.handleFlowMgtException(new FlowMgtClientException(
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_BRANCHES_NOT_ALLOWED.getCode(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_BRANCHES_NOT_ALLOWED.getMessage(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_BRANCHES_NOT_ALLOWED.getDescription()),
+                    FlowEndpointConstants.FlowGeneration.RULE_DECISION, step.getId(), step.getType());
+        }
+    }
+
+    /**
      * Validate the next node reference of a step.
      *
      * @param step Step to validate.
      */
     public static void validateNextNodeReference(Step step) {
+
+        if (FlowEndpointConstants.FlowGeneration.RULE_DECISION.equals(step.getType())) {
+            // A decision has branches instead of a next step, so the rule below does not apply.
+            validateDecisionStep(step);
+            return;
+        }
+        validateNoBranches(step);
 
         //If the step is not END, and contains action, then the next must not be null.
         if (!END.equals(step.getType())) {
