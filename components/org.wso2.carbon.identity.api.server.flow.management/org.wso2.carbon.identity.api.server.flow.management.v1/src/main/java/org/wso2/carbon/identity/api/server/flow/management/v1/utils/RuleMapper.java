@@ -22,7 +22,6 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.ANDRule;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Branch;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Expression;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Rule;
-import org.wso2.carbon.identity.api.server.flow.management.v1.Value;
 import org.wso2.carbon.identity.flow.mgt.model.BranchDTO;
 import org.wso2.carbon.identity.rule.management.api.model.ANDCombinedRule;
 import org.wso2.carbon.identity.rule.management.api.model.ORCombinedRule;
@@ -127,46 +126,53 @@ public class RuleMapper {
     private static org.wso2.carbon.identity.rule.management.api.model.Expression toRuleMgtExpression(
             Expression expression) {
 
-        return new org.wso2.carbon.identity.rule.management.api.model.Expression.Builder()
-                .field(expression.getField())
-                .key(expression.getKey())
-                .operator(expression.getOperator() == null ? null : expression.getOperator().value())
-                .value(toRuleMgtValue(expression.getValue()))
-                .build();
+        org.wso2.carbon.identity.rule.management.api.model.Expression.Builder builder =
+                new org.wso2.carbon.identity.rule.management.api.model.Expression.Builder()
+                        .field(expression.getField())
+                        .key(expression.getKey())
+                        .operator(expression.getOperator() == null ? null : expression.getOperator().value());
+
+        // A set of values has no raw form, so a list names its own type. A scalar is handed over raw,
+        // exactly as the action management API does, leaving the rule builder to resolve its type
+        // from the field definition.
+        if (expression.getValues() != null && !expression.getValues().isEmpty()) {
+            builder.value(org.wso2.carbon.identity.rule.management.api.model.Value.listOf(expression.getValues()));
+        } else {
+            builder.value(expression.getValue());
+        }
+
+        return builder.build();
     }
 
     private static Expression toApiExpression(
             org.wso2.carbon.identity.rule.management.api.model.Expression expression) {
 
-        return new Expression()
+        Expression apiExpression = new Expression()
                 .field(expression.getField())
                 .key(expression.getKey())
-                .operator(Expression.OperatorEnum.fromValue(expression.getOperator()))
-                .value(toApiValue(expression.getValue()));
+                .operator(Expression.OperatorEnum.fromValue(expression.getOperator()));
+        setApiValue(apiExpression, expression.getValue());
+        return apiExpression;
     }
 
-    private static org.wso2.carbon.identity.rule.management.api.model.Value toRuleMgtValue(Value value) {
+    /**
+     * Writes a rule management value back onto an API expression, as a list for a list value and as a
+     * plain string for everything else. The resolved type is not published, since it is derived from
+     * the field definition and a client rebuilding the expression does not supply it.
+     *
+     * @param expression    API expression to write onto.
+     * @param ruleMgtValue  Value from the rule management model.
+     */
+    private static void setApiValue(Expression expression,
+                                    org.wso2.carbon.identity.rule.management.api.model.Value ruleMgtValue) {
 
-        if (value == null || value.getType() == null) {
-            return null;
+        if (ruleMgtValue == null) {
+            return;
         }
-        // A LIST carries its values separately from the single value every other type uses.
-        if (value.getType() == Value.TypeEnum.LIST) {
-            return org.wso2.carbon.identity.rule.management.api.model.Value.listOf(value.getValues());
+        if (ruleMgtValue.getType() == org.wso2.carbon.identity.rule.management.api.model.Value.Type.LIST) {
+            expression.setValues(ruleMgtValue.getFieldValues());
+        } else {
+            expression.setValue(ruleMgtValue.getFieldValue());
         }
-        return new org.wso2.carbon.identity.rule.management.api.model.Value(
-                org.wso2.carbon.identity.rule.management.api.model.Value.Type.valueOf(value.getType().value()),
-                value.getValue());
-    }
-
-    private static Value toApiValue(org.wso2.carbon.identity.rule.management.api.model.Value value) {
-
-        if (value == null || value.getType() == null) {
-            return null;
-        }
-        return new Value()
-                .type(Value.TypeEnum.fromValue(value.getType().name()))
-                .value(value.getFieldValue())
-                .values(value.getFieldValues());
     }
 }

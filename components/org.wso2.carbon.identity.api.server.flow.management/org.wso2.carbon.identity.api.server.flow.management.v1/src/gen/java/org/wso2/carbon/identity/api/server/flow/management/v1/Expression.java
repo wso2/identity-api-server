@@ -72,7 +72,9 @@ public enum OperatorEnum {
 }
 
     private OperatorEnum operator;
-    private Value value;
+    private String value;
+    private List<String> values = null;
+
 
     /**
     * One of the field names published in ruleMetaData
@@ -132,22 +134,48 @@ public enum OperatorEnum {
         this.operator = operator;
     }
 
-    public Expression value(Value value) {
+    public Expression value(String value) {
 
         this.value = value;
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "")
+    @ApiModelProperty(example = "LK", value = "The value the field is compared against. Its type is resolved from the field's own definition in ruleMetaData, as it is for action rules. Omitted for in and notIn, which carry values instead.")
     @JsonProperty("value")
     @Valid
-    @NotNull(message = "Property value cannot be null.")
-
-    public Value getValue() {
+    public String getValue() {
         return value;
     }
-    public void setValue(Value value) {
+    public void setValue(String value) {
         this.value = value;
+    }
+
+    /**
+    * The set of values for in and notIn. Membership is tested against the whole set, so a multi valued field matches when the two sets intersect.
+    **/
+    public Expression values(List<String> values) {
+
+        this.values = values;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "[\"LK\",\"IN\"]", value = "The set of values for in and notIn. Membership is tested against the whole set, so a multi valued field matches when the two sets intersect.")
+    @JsonProperty("values")
+    @Valid
+    public List<String> getValues() {
+        return values;
+    }
+    public void setValues(List<String> values) {
+        this.values = values;
+    }
+
+    public Expression addValuesItem(String valuesItem) {
+
+        if (this.values == null) {
+            this.values = new ArrayList<>();
+        }
+        this.values.add(valuesItem);
+        return this;
     }
 
 
@@ -165,12 +193,13 @@ public enum OperatorEnum {
         return Objects.equals(this.field, expression.field) &&
             Objects.equals(this.key, expression.key) &&
             Objects.equals(this.operator, expression.operator) &&
-            Objects.equals(this.value, expression.value);
+            Objects.equals(this.value, expression.value) &&
+            Objects.equals(this.values, expression.values);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(field, key, operator, value);
+        return Objects.hash(field, key, operator, value, values);
     }
 
     @Override
@@ -183,6 +212,7 @@ public enum OperatorEnum {
         sb.append("    key: ").append(toIndentedString(key)).append("\n");
         sb.append("    operator: ").append(toIndentedString(operator)).append("\n");
         sb.append("    value: ").append(toIndentedString(value)).append("\n");
+        sb.append("    values: ").append(toIndentedString(values)).append("\n");
         sb.append("}");
         return sb.toString();
     }

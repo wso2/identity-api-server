@@ -1074,11 +1074,12 @@ components:
 
     Expression:
       type: object
-      description: A single comparison against the flow execution context
+      description: >
+        A single comparison against the flow execution context. Exactly one of `value` or `values`
+        is given: `values` for the `in` and `notIn` operators, `value` for every other operator.
       required:
         - field
         - operator
-        - value
       properties:
         field:
           type: string
@@ -1098,35 +1099,21 @@ components:
           enum: [equals, notEquals, contains, notContains, startsWith, endsWith, greaterThan, lessThan, in, notIn]
           example: equals
         value:
-          $ref: '#/components/schemas/Value'
-
-    Value:
-      type: object
-      description: >
-        The right hand side of an expression. A type of REFERENCE makes it a field resolved at
-        evaluation time, which allows both sides to be dynamic; a type of LIST carries a set of
-        values and is required by `in` and `notIn`. Any other type is a single literal.
-      required:
-        - type
-      properties:
-        type:
           type: string
-          enum: [STRING, NUMBER, BOOLEAN, DATE_TIME, REFERENCE, RAW, LIST]
-          example: STRING
-        value:
-          type: string
-          description: The value, for every type except LIST
+          description: >
+            The value the field is compared against. Its type is resolved from the field's own
+            definition in `ruleMetaData`, as it is for action rules. Omitted for `in` and `notIn`,
+            which carry `values` instead.
           example: LK
         values:
           type: array
-          description: The values, for a type of LIST
+          description: >
+            The set of values for `in` and `notIn`. Membership is tested against the whole set, so a
+            multi valued field matches when the two sets intersect.
           items:
             type: string
-          example: [a@example.com, b@example.com]
-        key:
-          type: string
-          description: Key selecting a value within a REFERENCE field, where that field is keyed
-          example: geoCountry
+          example: [LK, IN]
+
 
     Executor:
       type: object
