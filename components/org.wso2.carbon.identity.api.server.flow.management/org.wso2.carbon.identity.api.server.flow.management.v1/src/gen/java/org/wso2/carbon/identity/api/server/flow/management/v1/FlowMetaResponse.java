@@ -282,6 +282,13 @@ public class FlowMetaResponse  {
     @ApiModelProperty(example = "false", value = "")
     @JsonProperty("workflowEnabled")
     @Valid
+    public Boolean getWorkflowEnabled() {
+        return workflowEnabled;
+    }
+    public void setWorkflowEnabled(Boolean workflowEnabled) {
+        this.workflowEnabled = workflowEnabled;
+    }
+
     /**
     * The fields a condition in this flow can be written against
     **/
@@ -301,13 +308,6 @@ public class FlowMetaResponse  {
     public void setRuleMetaData(
             List<org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition> ruleMetaData) {
         this.ruleMetaData = ruleMetaData;
-    }
-
-    public Boolean getWorkflowEnabled() {
-        return workflowEnabled;
-    }
-    public void setWorkflowEnabled(Boolean workflowEnabled) {
-        this.workflowEnabled = workflowEnabled;
     }
 
 
