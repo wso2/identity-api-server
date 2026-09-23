@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.constants;
 
+import org.wso2.carbon.identity.flow.mgt.Constants;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,6 +38,11 @@ public class FlowEndpointConstants {
     }
 
     public static final String FLOW_PREFIX = "FM-";
+
+    /**
+     * The only executor a decision step may carry. Taken from the framework so the two cannot drift.
+     */
+    public static final String FLOW_RULE_EXECUTOR = Constants.ExecutorTypes.FLOW_RULE;
 
     public static final String END_USER_ATTRIBUTE_PROFILE = "endUser";
     public static final String SELF_REGISTRATION_ATTRIBUTE_PROFILE = "selfRegistration";
@@ -132,10 +139,11 @@ public class FlowEndpointConstants {
                 "Decision step defines a next step.",
                 "The decision step %s defines a next step. Where the flow goes is decided by its " +
                         "branches, and the branch without a rule is what catches everything else."),
-        ERROR_CODE_DECISION_EXECUTOR_NOT_ALLOWED("10028",
-                "Executor is not accepted for a decision step.",
-                "The decision step %s defines an executor. A decision evaluates its branches and " +
-                        "runs nothing else, so the executor is assigned by the server.");
+        ERROR_CODE_DECISION_INVALID_EXECUTOR("10028",
+                "Invalid executor for a decision step.",
+                "The decision step %s names an executor other than " + FLOW_RULE_EXECUTOR + ". A " +
+                        "decision evaluates its branches and runs nothing else, so it may only " +
+                        "carry that executor, which the server assigns.");
 
         private final String code;
         private final String message;

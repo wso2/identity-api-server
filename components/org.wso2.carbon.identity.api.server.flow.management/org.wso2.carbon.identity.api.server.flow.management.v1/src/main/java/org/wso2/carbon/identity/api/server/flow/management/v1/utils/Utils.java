@@ -677,11 +677,14 @@ public class Utils {
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_WITH_NEXT.getDescription()),
                     step.getId());
         }
-        if (action.getExecutor() != null) {
+        // The server assigns this executor and returns it on the next read, so a decision coming
+        // back unchanged carries it. Accept that, and only reject an executor that is not it.
+        if (action.getExecutor() != null
+                && !FlowEndpointConstants.FLOW_RULE_EXECUTOR.equals(action.getExecutor().getName())) {
             throw Utils.handleFlowMgtException(new FlowMgtClientException(
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_EXECUTOR_NOT_ALLOWED.getCode(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_EXECUTOR_NOT_ALLOWED.getMessage(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_EXECUTOR_NOT_ALLOWED.getDescription()),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_INVALID_EXECUTOR.getCode(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_INVALID_EXECUTOR.getMessage(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_INVALID_EXECUTOR.getDescription()),
                     step.getId());
         }
     }
