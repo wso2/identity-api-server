@@ -39,39 +39,7 @@ public class Expression  {
     private String field;
     private String key;
 
-@XmlType(name="OperatorEnum")
-@XmlEnum(String.class)
-public enum OperatorEnum {
-
-    @XmlEnumValue("equals") EQUALS(String.valueOf("equals")), @XmlEnumValue("notEquals") NOTEQUALS(String.valueOf("notEquals")), @XmlEnumValue("contains") CONTAINS(String.valueOf("contains")), @XmlEnumValue("notContains") NOTCONTAINS(String.valueOf("notContains")), @XmlEnumValue("startsWith") STARTSWITH(String.valueOf("startsWith")), @XmlEnumValue("endsWith") ENDSWITH(String.valueOf("endsWith")), @XmlEnumValue("greaterThan") GREATERTHAN(String.valueOf("greaterThan")), @XmlEnumValue("lessThan") LESSTHAN(String.valueOf("lessThan")), @XmlEnumValue("in") IN(String.valueOf("in")), @XmlEnumValue("notIn") NOTIN(String.valueOf("notIn"));
-
-
-    private String value;
-
-    OperatorEnum(String v) {
-        value = v;
-    }
-
-    public String value() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return String.valueOf(value);
-    }
-
-    public static OperatorEnum fromValue(String value) {
-        for (OperatorEnum b : OperatorEnum.values()) {
-            if (b.value.equals(value)) {
-                return b;
-            }
-        }
-        throw new IllegalArgumentException("Unexpected value '" + value + "'");
-    }
-}
-
-    private OperatorEnum operator;
+    private String operator;
     private String value;
     private List<String> values = null;
 
@@ -116,21 +84,21 @@ public enum OperatorEnum {
         this.key = key;
     }
 
-    public Expression operator(OperatorEnum operator) {
+    public Expression operator(String operator) {
 
         this.operator = operator;
         return this;
     }
     
-    @ApiModelProperty(example = "equals", required = true, value = "")
+    @ApiModelProperty(example = "equals", required = true, value = "How the field and the value are compared. Which operators a field accepts is published per field in ruleMetaData and enforced against it.")
     @JsonProperty("operator")
     @Valid
     @NotNull(message = "Property operator cannot be null.")
 
-    public OperatorEnum getOperator() {
+    public String getOperator() {
         return operator;
     }
-    public void setOperator(OperatorEnum operator) {
+    public void setOperator(String operator) {
         this.operator = operator;
     }
 

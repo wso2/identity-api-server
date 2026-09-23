@@ -1096,7 +1096,10 @@ components:
           example: http://wso2.org/claims/country
         operator:
           type: string
-          enum: [equals, notEquals, contains, notContains, startsWith, endsWith, greaterThan, lessThan, in, notIn]
+          description: >
+            How the field and the value are compared. Which operators a field accepts is published
+            per field in `ruleMetaData` and enforced against it, rather than fixed here: an operator
+            valid for one field is not valid for another.
           example: equals
         value:
           type: string

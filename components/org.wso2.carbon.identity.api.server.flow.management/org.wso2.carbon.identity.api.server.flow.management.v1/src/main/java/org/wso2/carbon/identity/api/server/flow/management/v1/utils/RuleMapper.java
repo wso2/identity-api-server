@@ -130,7 +130,7 @@ public class RuleMapper {
                 new org.wso2.carbon.identity.rule.management.api.model.Expression.Builder()
                         .field(expression.getField())
                         .key(expression.getKey())
-                        .operator(expression.getOperator() == null ? null : expression.getOperator().value());
+                        .operator(expression.getOperator());
 
         // A set of values has no raw form, so a list names its own type. A scalar is handed over raw,
         // exactly as the action management API does, leaving the rule builder to resolve its type
@@ -150,7 +150,7 @@ public class RuleMapper {
         Expression apiExpression = new Expression()
                 .field(expression.getField())
                 .key(expression.getKey())
-                .operator(Expression.OperatorEnum.fromValue(expression.getOperator()));
+                .operator(expression.getOperator());
         setApiValue(apiExpression, expression.getValue());
         return apiExpression;
     }
