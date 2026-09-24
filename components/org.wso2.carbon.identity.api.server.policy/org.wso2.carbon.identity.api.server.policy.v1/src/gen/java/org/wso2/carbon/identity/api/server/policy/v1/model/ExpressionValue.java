@@ -37,7 +37,7 @@ public class ExpressionValue  {
 @XmlEnum(String.class)
 public enum TypeEnum {
 
-    @XmlEnumValue("STRING") STRING(String.valueOf("STRING")), @XmlEnumValue("NUMBER") NUMBER(String.valueOf("NUMBER")), @XmlEnumValue("BOOLEAN") BOOLEAN(String.valueOf("BOOLEAN")), @XmlEnumValue("DATE_TIME") DATE_TIME(String.valueOf("DATE_TIME")), @XmlEnumValue("REFERENCE") REFERENCE(String.valueOf("REFERENCE")), @XmlEnumValue("RAW") RAW(String.valueOf("RAW")), @XmlEnumValue("LIST") LIST(String.valueOf("LIST")), @XmlEnumValue("SYMBOLIC") SYMBOLIC(String.valueOf("SYMBOLIC"));
+    @XmlEnumValue("STRING") STRING(String.valueOf("STRING")), @XmlEnumValue("NUMBER") NUMBER(String.valueOf("NUMBER")), @XmlEnumValue("BOOLEAN") BOOLEAN(String.valueOf("BOOLEAN")), @XmlEnumValue("DATE_TIME") DATE_TIME(String.valueOf("DATE_TIME")), @XmlEnumValue("REFERENCE") REFERENCE(String.valueOf("REFERENCE")), @XmlEnumValue("RAW") RAW(String.valueOf("RAW"));
 
 
     private String value;

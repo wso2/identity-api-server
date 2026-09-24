@@ -28,7 +28,6 @@ import org.wso2.carbon.identity.rule.management.api.exception.RuleManagementExce
 import org.wso2.carbon.identity.rule.management.api.model.Expression;
 import org.wso2.carbon.identity.rule.management.api.model.FlowType;
 import org.wso2.carbon.identity.rule.management.api.model.Rule;
-import org.wso2.carbon.identity.rule.management.api.model.Value;
 import org.wso2.carbon.identity.rule.management.api.util.RuleBuilder;
 
 import java.util.List;
@@ -38,13 +37,10 @@ import javax.ws.rs.core.Response;
  * Builds a Rule (domain model) from a RuleRequest (API model).
  *
  * Rules are built through {@link RuleBuilder} so that each expression value is validated and
- * resolved against the device-policy field metadata. This is what assigns the correct value type
- * (e.g. SYMBOLIC for OS version fields such as LATEST_ANDROID); hand-constructing the Value here
- * would persist symbolic tokens as plain LIST/RAW values and fail at rule evaluation time.
+ * resolved against the field metadata. This is what assigns the correct value type;
+ * hand-constructing the Value here would bypass that validation and fail at rule evaluation time.
  */
 public class PolicyRuleBuilder {
-
-    private static final String OPERATOR_IN = "in";
 
     private PolicyRuleBuilder() {
 
@@ -67,17 +63,12 @@ public class PolicyRuleBuilder {
                 ruleBuilder.addOrCondition();
             }
             for (ExpressionRequest expressionRequest : andRules.get(i).getExpressions()) {
-                Expression.Builder expressionBuilder = new Expression.Builder()
+                Expression expression = new Expression.Builder()
                         .field(expressionRequest.getField())
-                        .operator(expressionRequest.getOperator());
-                // The 'in' operator carries a comma-separated multi-value; type it as LIST so each token is
-                // validated (and resolved) individually. Single-value operators pass the raw value through.
-                if (OPERATOR_IN.equals(expressionRequest.getOperator())) {
-                    expressionBuilder.value(new Value(Value.Type.LIST, expressionRequest.getValue()));
-                } else {
-                    expressionBuilder.value(expressionRequest.getValue());
-                }
-                ruleBuilder.addAndExpression(expressionBuilder.build());
+                        .operator(expressionRequest.getOperator())
+                        .value(expressionRequest.getValue())
+                        .build();
+                ruleBuilder.addAndExpression(expression);
             }
         }
 

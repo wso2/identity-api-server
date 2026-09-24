@@ -503,7 +503,7 @@ components:
       properties:
         type:
           type: string
-          enum: [STRING, NUMBER, BOOLEAN, DATE_TIME, REFERENCE, RAW, LIST, SYMBOLIC]
+          enum: [STRING, NUMBER, BOOLEAN, DATE_TIME, REFERENCE, RAW]
           description: The value type.
           example: "STRING"
         value:
