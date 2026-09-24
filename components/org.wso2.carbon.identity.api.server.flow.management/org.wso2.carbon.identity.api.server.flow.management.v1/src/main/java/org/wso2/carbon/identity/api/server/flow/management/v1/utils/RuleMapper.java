@@ -22,6 +22,8 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.ANDRule;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Branch;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Expression;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Rule;
+import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
+import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
 import org.wso2.carbon.identity.flow.mgt.model.BranchDTO;
 import org.wso2.carbon.identity.rule.management.api.model.ANDCombinedRule;
 import org.wso2.carbon.identity.rule.management.api.model.ORCombinedRule;
@@ -53,7 +55,7 @@ public class RuleMapper {
                     .id(branch.getId())
                     .name(branch.getName())
                     .nextId(branch.getNext())
-                    .rule(toRuleMgtRule(branch.getRule()))
+                    .rule(toRuleMgtRule(branch))
                     .build());
         }
         return branchDTOs;
@@ -86,24 +88,34 @@ public class RuleMapper {
         return guarded;
     }
 
-    private static ORCombinedRule toRuleMgtRule(Rule rule) {
+    private static ORCombinedRule toRuleMgtRule(Branch branch) {
 
+        Rule rule = branch.getRule();
         if (rule == null) {
             return null;
         }
-        ORCombinedRule.Builder orBuilder = new ORCombinedRule.Builder();
-        if (rule.getRules() != null) {
-            for (ANDRule andRule : rule.getRules()) {
-                ANDCombinedRule.Builder andBuilder = new ANDCombinedRule.Builder();
-                if (andRule.getExpressions() != null) {
-                    for (Expression expression : andRule.getExpressions()) {
-                        andBuilder.addExpression(toRuleMgtExpression(expression));
+        try {
+            ORCombinedRule.Builder orBuilder = new ORCombinedRule.Builder();
+            if (rule.getRules() != null) {
+                for (ANDRule andRule : rule.getRules()) {
+                    ANDCombinedRule.Builder andBuilder = new ANDCombinedRule.Builder();
+                    if (andRule.getExpressions() != null) {
+                        for (Expression expression : andRule.getExpressions()) {
+                            andBuilder.addExpression(toRuleMgtExpression(expression));
+                        }
                     }
+                    orBuilder.addRule(andBuilder.build());
                 }
-                orBuilder.addRule(andBuilder.build());
             }
+            return orBuilder.build();
+        } catch (IllegalArgumentException e) {
+            // The rule model refuses to be built from what was sent, which is the caller's mistake.
+            throw Utils.handleFlowMgtException(new FlowMgtClientException(
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNREADABLE_BRANCH_EXPRESSION.getCode(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNREADABLE_BRANCH_EXPRESSION.getMessage(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNREADABLE_BRANCH_EXPRESSION.getDescription()),
+                    branch.getName(), e.getMessage());
         }
-        return orBuilder.build();
     }
 
     private static Rule toApiRule(ORCombinedRule rule) {
@@ -135,7 +147,7 @@ public class RuleMapper {
         // A set of values has no raw form, so a list names its own type. A scalar is handed over raw,
         // exactly as the action management API does, leaving the rule builder to resolve its type
         // from the field definition.
-        if (expression.getValues() != null && !expression.getValues().isEmpty()) {
+        if (expression.getValues() != null) {
             builder.value(org.wso2.carbon.identity.rule.management.api.model.Value.listOf(expression.getValues()));
         } else {
             builder.value(expression.getValue());

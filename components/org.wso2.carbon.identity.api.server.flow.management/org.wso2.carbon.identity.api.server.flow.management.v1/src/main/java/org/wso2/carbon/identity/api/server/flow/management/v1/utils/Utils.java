@@ -33,11 +33,14 @@ import org.wso2.carbon.identity.action.management.api.exception.ActionMgtExcepti
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
 import org.wso2.carbon.identity.api.server.flow.management.common.FlowMgtServiceHolder;
+import org.wso2.carbon.identity.api.server.flow.management.v1.ANDRule;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Action;
+import org.wso2.carbon.identity.api.server.flow.management.v1.Branch;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Component;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Data;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Executor;
 import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorMetadata;
+import org.wso2.carbon.identity.api.server.flow.management.v1.Expression;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfig;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfigPatchModel;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Position;
@@ -687,6 +690,72 @@ public class Utils {
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_INVALID_EXECUTOR.getDescription()),
                     step.getId());
         }
+        for (Branch branch : action.getBranches()) {
+            validateBranchExpressions(step.getId(), branch);
+        }
+    }
+
+    /**
+     * Check that every expression of a branch can be turned into a rule at all.
+     * <p>
+     * Whether the value suits the operator and the field is decided further in. What is caught here
+     * is what the rule model cannot even be built from, which would otherwise surface as a server
+     * error rather than as the author's mistake.
+     *
+     * @param stepId Id of the decision step, for the message.
+     * @param branch Branch to check.
+     */
+    private static void validateBranchExpressions(String stepId, Branch branch) {
+
+        if (branch.getRule() == null || branch.getRule().getRules() == null) {
+            return;
+        }
+        for (ANDRule andRule : branch.getRule().getRules()) {
+            if (andRule == null || andRule.getExpressions() == null) {
+                continue;
+            }
+            for (Expression expression : andRule.getExpressions()) {
+                String problem = findExpressionProblem(expression);
+                if (problem != null) {
+                    throw Utils.handleFlowMgtException(new FlowMgtClientException(
+                            FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_BRANCH_EXPRESSION.getCode(),
+                            FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_BRANCH_EXPRESSION.getMessage(),
+                            FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_BRANCH_EXPRESSION
+                                    .getDescription()),
+                            branch.getName(), stepId, problem);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param expression Expression to check.
+     * @return What is wrong with the expression, phrased to follow "A condition ... ", or null when
+     * nothing is.
+     */
+    private static String findExpressionProblem(Expression expression) {
+
+        if (expression == null) {
+            return "is empty";
+        }
+        if (StringUtils.isBlank(expression.getField())) {
+            return "has no field";
+        }
+        if (StringUtils.isBlank(expression.getOperator())) {
+            return "has no operator";
+        }
+        boolean hasValue = expression.getValue() != null;
+        boolean hasValues = expression.getValues() != null;
+        if (hasValue && hasValues) {
+            return "gives both a value and a list of values";
+        }
+        if (hasValues && expression.getValues().isEmpty()) {
+            return "has an empty list of values";
+        }
+        if (!hasValue && !hasValues) {
+            return "has no value";
+        }
+        return null;
     }
 
     /**

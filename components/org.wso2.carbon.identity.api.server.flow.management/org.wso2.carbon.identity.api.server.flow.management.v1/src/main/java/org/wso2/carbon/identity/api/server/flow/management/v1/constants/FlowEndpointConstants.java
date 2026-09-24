@@ -143,7 +143,13 @@ public class FlowEndpointConstants {
                 "Invalid executor for a decision step.",
                 "The decision step %s names an executor other than " + FLOW_RULE_EXECUTOR + ". A " +
                         "decision evaluates its branches and runs nothing else, so it may only " +
-                        "carry that executor, which the server assigns.");
+                        "carry that executor, which the server assigns."),
+        ERROR_CODE_INVALID_BRANCH_EXPRESSION("10029",
+                "Invalid condition.",
+                "A condition in branch %s of the decision step %s %s."),
+        ERROR_CODE_UNREADABLE_BRANCH_EXPRESSION("10030",
+                "Invalid condition.",
+                "A condition in branch %s cannot be read: %s");
 
         private final String code;
         private final String message;
