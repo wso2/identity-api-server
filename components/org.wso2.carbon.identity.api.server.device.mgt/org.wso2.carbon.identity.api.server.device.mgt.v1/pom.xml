@@ -104,6 +104,11 @@
 
     <build>
         <plugins>
+            <!--This plugin is used to generate the API classes from the OpenAPI definition.-->
+            <!--Uncomment and execute if the API is updated.-->
+            <!--The cxf-wso2-openapi-generator artifact is not published to a public repository,-->
+            <!--so it has to be built and installed locally before enabling this.-->
+            <!--
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
@@ -137,6 +142,7 @@
                     </dependency>
                 </dependencies>
             </plugin>
+            -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
