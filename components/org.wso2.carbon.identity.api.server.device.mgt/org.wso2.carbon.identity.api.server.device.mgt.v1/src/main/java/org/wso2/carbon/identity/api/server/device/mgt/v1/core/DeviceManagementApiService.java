@@ -130,8 +130,8 @@ public class DeviceManagementApiService {
         List<DeviceListLink> links = new ArrayList<>();
         String baseUrl = Constants.V1_API_PATH_COMPONENT + Constants.DEVICE_PATH_COMPONENT;
 
-        // Next link.
-        if ((offset + limit) < totalResults) {
+        // Next link. Widened to long so that a large 'offset' cannot overflow into a false positive.
+        if (((long) offset + limit) < totalResults) {
             links.add(buildPageLink(baseUrl, Constants.PAGE_LINK_REL_NEXT, offset + limit, limit, userId));
         }
 
@@ -166,8 +166,14 @@ public class DeviceManagementApiService {
             return newOffset;
         }
 
-        // If offset is greater than total, go back by the chunks of limit until a proper page is found.
-        return calculateOffsetForPreviousLink(newOffset, limit, total);
+        /*
+        The offset points past the end of the result set, so step back by chunks of 'limit' until a
+        page that overlaps the results is found. The number of chunks is computed directly, since
+        stepping one page at a time is unbounded for a large 'offset'. The result is floored at 0
+        because a negative offset is not a valid page start.
+        */
+        long chunks = ((long) newOffset - total) / limit + 1;
+        return (int) Math.max(newOffset - chunks * limit, 0);
     }
 
     /**

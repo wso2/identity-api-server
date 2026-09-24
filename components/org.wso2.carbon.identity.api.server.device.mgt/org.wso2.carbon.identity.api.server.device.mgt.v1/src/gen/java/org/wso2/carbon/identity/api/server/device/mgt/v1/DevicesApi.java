@@ -108,11 +108,12 @@ public class DevicesApi  {
     }, tags={ "Device Management", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful Response", response = DeviceListResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response listDevices(    @Valid @Min(1)@ApiParam(value = "Maximum number of records to return.", defaultValue="30") @DefaultValue("30")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination.", defaultValue="0") @DefaultValue("0")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Filter devices by the ID of the user who registered them. Returns devices of any status. Pagination applies as usual.")  @QueryParam("userId") String userId) {
+    public Response listDevices(    @Valid @Min(1) @Max(100)@ApiParam(value = "Maximum number of records to return.", defaultValue="30") @DefaultValue("30")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination.", defaultValue="0") @DefaultValue("0")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Filter devices by the ID of the user who registered them. Returns devices of any status. Pagination applies as usual.")  @QueryParam("userId") String userId) {
 
         return delegate.listDevices(limit,  offset,  userId );
     }
