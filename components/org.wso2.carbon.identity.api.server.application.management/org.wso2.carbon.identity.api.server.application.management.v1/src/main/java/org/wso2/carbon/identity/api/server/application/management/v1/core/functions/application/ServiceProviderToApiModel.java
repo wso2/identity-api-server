@@ -65,6 +65,7 @@ import org.wso2.carbon.identity.application.common.model.SpTrustedAppMetadata;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationMgtUtil;
+import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.role.v2.mgt.core.RoleConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
@@ -94,6 +95,7 @@ import static org.wso2.carbon.identity.application.common.util.IdentityApplicati
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.TEMPLATE_ID_SP_PROPERTY_NAME;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.USE_USER_ID_FOR_DEFAULT_SUBJECT;
 import static org.wso2.carbon.identity.application.mgt.dao.impl.ApplicationDAOImpl.USE_DOMAIN_IN_ROLES;
+import static org.wso2.carbon.identity.base.IdentityConstants.RETURN_LEGACY_ROLE_CLAIM_IN_APPLICATION_RESPONSE;
 import static org.wso2.carbon.identity.base.IdentityConstants.SKIP_CONSENT;
 import static org.wso2.carbon.identity.base.IdentityConstants.SKIP_LOGOUT_CONSENT;
 import static org.wso2.carbon.identity.base.IdentityConstants.USE_EXTERNAL_CONSENT_PAGE;
@@ -418,7 +420,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
             if (StringUtils.isBlank(roleClaimId)) {
                 if (application.getClaimConfig().isLocalClaimDialect()) {
-                    roleConfig.claim(buildClaimModel(FrameworkConstants.LOCAL_ROLE_CLAIM_URI));
+                    roleConfig.claim(buildClaimModel(getRoleClaimUriForUnsetRoleClaim()));
                 }
             } else {
                 roleConfig.claim(buildClaimModel(roleClaimId));
@@ -441,6 +443,15 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         }
 
         return roleConfig;
+    }
+
+    private String getRoleClaimUriForUnsetRoleClaim() {
+
+        String returnLegacyRoleClaim = IdentityUtil.getProperty(RETURN_LEGACY_ROLE_CLAIM_IN_APPLICATION_RESPONSE);
+        if (!Boolean.parseBoolean(returnLegacyRoleClaim)) {
+            return IdentityUtil.getLocalGroupsClaimURI();
+        }
+        return FrameworkConstants.LOCAL_ROLE_CLAIM_URI;
     }
 
     private ProvisioningConfiguration buildProvisioningConfiguration(ServiceProvider application) {

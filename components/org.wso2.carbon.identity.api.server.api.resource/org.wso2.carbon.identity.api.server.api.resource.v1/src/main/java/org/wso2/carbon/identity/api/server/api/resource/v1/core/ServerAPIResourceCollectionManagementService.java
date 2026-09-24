@@ -26,6 +26,7 @@ import org.wso2.carbon.identity.api.resource.collection.mgt.constant.APIResource
 import org.wso2.carbon.identity.api.resource.collection.mgt.exception.APIResourceCollectionMgtException;
 import org.wso2.carbon.identity.api.resource.collection.mgt.model.APIResourceCollection;
 import org.wso2.carbon.identity.api.resource.collection.mgt.model.APIResourceCollectionSearchResult;
+import org.wso2.carbon.identity.api.resource.collection.mgt.util.APIResourceCollectionManagementUtil;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCollectionItem;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCollectionListItem;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCollectionListResponse;
@@ -244,6 +245,17 @@ public class ServerAPIResourceCollectionManagementService {
                 new APIResourceMap();
         apiResourceCollectionResponseApiResources.setRead(readAPIResourceCollectionItems);
         apiResourceCollectionResponseApiResources.setWrite(writeAPIResourceCollectionItems);
+        // Expose the granular create/update/delete scopes only when granular console permissions are enabled
+        // (ConsoleSettings.UseGranularConsolePermissions). Defaults to off so existing deployments keep the
+        // legacy view/edit (read/write) behaviour until they explicitly opt in.
+        if (APIResourceCollectionManagementUtil.isGranularConsolePermissionsEnabled()) {
+            apiResourceCollectionResponseApiResources.setCreate(getAPIResourceCollectionItems(
+                    apiResourceCollection, APIResourceCollectionManagementConstants.CREATE));
+            apiResourceCollectionResponseApiResources.setUpdate(getAPIResourceCollectionItems(
+                    apiResourceCollection, APIResourceCollectionManagementConstants.UPDATE));
+            apiResourceCollectionResponseApiResources.setDelete(getAPIResourceCollectionItems(
+                    apiResourceCollection, APIResourceCollectionManagementConstants.DELETE));
+        }
         return apiResourceCollectionResponseApiResources;
     }
 }

@@ -24,8 +24,10 @@ import org.wso2.carbon.identity.application.authentication.framework.services.Co
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
 import org.wso2.carbon.identity.compatibility.settings.core.service.CompatibilitySettingsService;
+import org.wso2.carbon.identity.configuration.mgt.core.ConfigurationManager;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.fraud.detection.core.service.FraudDetectionConfigsService;
+import org.wso2.carbon.identity.notification.push.device.handler.DeviceHandlerService;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
 import org.wso2.carbon.identity.oauth2.agent.services.AgentConfigMgtService;
 import org.wso2.carbon.identity.oauth2.config.services.OAuth2OIDCConfigOrgUsageScopeMgtService;
@@ -125,6 +127,20 @@ public class ConfigsServiceHolder {
         static final CompatibilitySettingsService SERVICE =
                 (CompatibilitySettingsService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                         .getOSGiService(CompatibilitySettingsService.class, null);
+    }
+
+    private static class PushDeviceHandlerServiceHolder {
+
+        static final DeviceHandlerService SERVICE =
+                (DeviceHandlerService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(DeviceHandlerService.class, null);
+    }
+
+    private static class ConfigurationManagerHolder {
+
+        static final ConfigurationManager SERVICE =
+                (ConfigurationManager) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(ConfigurationManager.class, null);
     }
 
     private static class ConsentAppMappingServiceHolder {
@@ -269,6 +285,26 @@ public class ConfigsServiceHolder {
     public static CompatibilitySettingsService getIdentityCompatibilitySettingsService() {
 
         return IdentityCompatibilitySettingsServiceHolder.SERVICE;
+    }
+
+    /**
+     * Get DeviceHandlerService osgi service.
+     *
+     * @return DeviceHandlerService
+     */
+    public static DeviceHandlerService getPushDeviceHandlerService() {
+
+        return PushDeviceHandlerServiceHolder.SERVICE;
+    }
+
+    /**
+     * Get ConfigurationManager osgi service.
+     *
+     * @return ConfigurationManager
+     */
+    public static ConfigurationManager getConfigurationManager() {
+
+        return ConfigurationManagerHolder.SERVICE;
     }
 
     /**

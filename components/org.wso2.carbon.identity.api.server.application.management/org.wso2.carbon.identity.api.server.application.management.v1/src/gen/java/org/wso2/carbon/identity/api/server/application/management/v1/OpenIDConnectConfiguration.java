@@ -20,6 +20,7 @@ package org.wso2.carbon.identity.api.server.application.management.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.RefreshToke
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestObjectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectTokenConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.TokenExchangeConfiguration;
 import javax.validation.constraints.*;
 
 
@@ -48,6 +50,8 @@ public class OpenIDConnectConfiguration  {
   
     private String clientId;
     private String clientSecret;
+    private Long clientSecretExpiresAt;
+    private Boolean multipleClientSecretsConfigured;
 
 @XmlType(name="StateEnum")
 @XmlEnum(String.class)
@@ -107,6 +111,7 @@ public enum StateEnum {
     private FapiProfile fapiProfile = null;
     private CIBAAuthenticationRequestConfiguration cibaAuthenticationRequest;
     private AllowedIssuer issuer;
+    private TokenExchangeConfiguration tokenExchange;
 
     /**
     **/
@@ -142,6 +147,44 @@ public enum StateEnum {
     }
     public void setClientSecret(String clientSecret) {
         this.clientSecret = clientSecret;
+    }
+
+    /**
+    * The expiration time of the latest client secret, expressed in Unix epoch seconds. A value of 0 indicates that the secret never expires.
+    **/
+    public OpenIDConnectConfiguration clientSecretExpiresAt(Long clientSecretExpiresAt) {
+
+        this.clientSecretExpiresAt = clientSecretExpiresAt;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "1761568483", value = "The expiration time of the latest client secret, expressed in Unix epoch seconds. A value of 0 indicates that the secret never expires.")
+    @JsonProperty("clientSecretExpiresAt")
+    @Valid
+    public Long getClientSecretExpiresAt() {
+        return clientSecretExpiresAt;
+    }
+    public void setClientSecretExpiresAt(Long clientSecretExpiresAt) {
+        this.clientSecretExpiresAt = clientSecretExpiresAt;
+    }
+
+    /**
+    * Indicates if the application has more than one client secret.
+    **/
+    public OpenIDConnectConfiguration multipleClientSecretsConfigured(Boolean multipleClientSecretsConfigured) {
+
+        this.multipleClientSecretsConfigured = multipleClientSecretsConfigured;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "true", value = "Indicates if the application has more than one client secret.")
+    @JsonProperty("multipleClientSecretsConfigured")
+    @Valid
+    public Boolean getMultipleClientSecretsConfigured() {
+        return multipleClientSecretsConfigured;
+    }
+    public void setMultipleClientSecretsConfigured(Boolean multipleClientSecretsConfigured) {
+        this.multipleClientSecretsConfigured = multipleClientSecretsConfigured;
     }
 
     /**
@@ -596,6 +639,24 @@ public enum StateEnum {
         this.issuer = issuer;
     }
 
+    /**
+    **/
+    public OpenIDConnectConfiguration tokenExchange(TokenExchangeConfiguration tokenExchange) {
+
+        this.tokenExchange = tokenExchange;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("tokenExchange")
+    @Valid
+    public TokenExchangeConfiguration getTokenExchange() {
+        return tokenExchange;
+    }
+    public void setTokenExchange(TokenExchangeConfiguration tokenExchange) {
+        this.tokenExchange = tokenExchange;
+    }
+
     @Override
     public boolean equals(java.lang.Object o) {
 
@@ -608,6 +669,8 @@ public enum StateEnum {
         OpenIDConnectConfiguration openIDConnectConfiguration = (OpenIDConnectConfiguration) o;
         return Objects.equals(this.clientId, openIDConnectConfiguration.clientId) &&
             Objects.equals(this.clientSecret, openIDConnectConfiguration.clientSecret) &&
+            Objects.equals(this.clientSecretExpiresAt, openIDConnectConfiguration.clientSecretExpiresAt) &&
+            Objects.equals(this.multipleClientSecretsConfigured, openIDConnectConfiguration.multipleClientSecretsConfigured) &&
             Objects.equals(this.state, openIDConnectConfiguration.state) &&
             Objects.equals(this.grantTypes, openIDConnectConfiguration.grantTypes) &&
             Objects.equals(this.callbackURLs, openIDConnectConfiguration.callbackURLs) &&
@@ -630,13 +693,14 @@ public enum StateEnum {
             Objects.equals(this.fapiMetadata, openIDConnectConfiguration.fapiMetadata) &&
             Objects.equals(this.fapiProfile, openIDConnectConfiguration.fapiProfile) &&
             Objects.equals(this.cibaAuthenticationRequest, openIDConnectConfiguration.cibaAuthenticationRequest) &&
-            Objects.equals(this.issuer, openIDConnectConfiguration.issuer);
+            Objects.equals(this.issuer, openIDConnectConfiguration.issuer) &&
+            Objects.equals(this.tokenExchange, openIDConnectConfiguration.tokenExchange);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(clientId, clientSecret, state, grantTypes, callbackURLs, allowedOrigins, publicClient, pkce, accessToken, hybridFlow, refreshToken, subjectToken, idToken, logout, validateRequestObjectSignature, scopeValidators, clientAuthentication, requestObject, pushAuthorizationRequest, subject, isFAPIApplication, fapiMetadata, cibaAuthenticationRequest, issuer);
+        return Objects.hash(clientId, clientSecret, clientSecretExpiresAt, multipleClientSecretsConfigured, state, grantTypes, callbackURLs, allowedOrigins, publicClient, pkce, accessToken, hybridFlow, refreshToken, subjectToken, idToken, logout, validateRequestObjectSignature, scopeValidators, clientAuthentication, requestObject, pushAuthorizationRequest, subject, isFAPIApplication, fapiMetadata, cibaAuthenticationRequest, issuer, tokenExchange);
     }
 
     @Override
@@ -647,6 +711,8 @@ public enum StateEnum {
         
         sb.append("    clientId: ").append(toIndentedString(clientId)).append("\n");
         sb.append("    clientSecret: ").append(toIndentedString(clientSecret)).append("\n");
+        sb.append("    clientSecretExpiresAt: ").append(toIndentedString(clientSecretExpiresAt)).append("\n");
+        sb.append("    multipleClientSecretsConfigured: ").append(toIndentedString(multipleClientSecretsConfigured)).append("\n");
         sb.append("    state: ").append(toIndentedString(state)).append("\n");
         sb.append("    grantTypes: ").append(toIndentedString(grantTypes)).append("\n");
         sb.append("    callbackURLs: ").append(toIndentedString(callbackURLs)).append("\n");
@@ -670,6 +736,7 @@ public enum StateEnum {
         sb.append("    fapiProfile: ").append(toIndentedString(fapiProfile)).append("\n");
         sb.append("    cibaAuthenticationRequest: ").append(toIndentedString(cibaAuthenticationRequest)).append("\n");
         sb.append("    issuer: ").append(toIndentedString(issuer)).append("\n");
+        sb.append("    tokenExchange: ").append(toIndentedString(tokenExchange)).append("\n");
         sb.append("}");
         return sb.toString();
     }

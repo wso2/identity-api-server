@@ -1700,6 +1700,170 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /configs/preferences:
+    post:
+      tags:
+        - Preferences
+      summary: Retrieve config store preferences of a tenant.
+      operationId: getConfigPreferences
+      description: |
+        Returns config store resource attributes for the specified resource types and names. Use this endpoint to expose allowed resources to users — only a permitted subset of resources given below is currently supported.
+          <table>
+            <tr>
+              <td><b>Resource Type</b></td>
+              <td><b>Resource Name</b></td>
+              <td><b>Properties</b></td>
+            </tr>
+            <tr>
+              <td rowspan="9">DEVICE_MANAGEMENT</td>
+              <td>PUSH_DEVICE_MANAGEMENT</td>
+              <td>
+                <ul>
+                  <li>enableMultipleDeviceEnrollment</li>
+                  <li>maximumDeviceLimit</li>
+                </ul>
+              </td>
+            </tr>
+        
+          </table>
+        
+        <b>Scope (Permission) required:</b> `internal_login`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              example:
+                - resourceType: DEVICE_MANAGEMENT
+                  resourceName: PUSH_DEVICE_MANAGEMENT
+                  attributeNames:
+                    - enableMultipleDeviceEnrollment
+                    - maximumDeviceLimit
+              items:
+                $ref: '#/components/schemas/ConfigPreferenceRequestDTO'
+        description: This represents the resource type, resource name and the attributes which preferences need to be returned.
+        required: true
+      responses:
+        '200':
+          description: Configuration preferences
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  - resourceType: DEVICE_MANAGEMENT
+                    resourceName: PUSH_DEVICE_MANAGEMENT
+                    attributeNames:
+                      - name: enableMultipleDeviceEnrollment
+                        value: 'true'
+                      - name: maximumDeviceLimit
+                        value: '5'
+                items:
+                  $ref: '#/components/schemas/ConfigPreferenceResponseDTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /configs/push-device-mgt:
+    get:
+      tags:
+        - Push Device Management
+      summary: Retrieve push device management related configurations of a tenant.
+      operationId: getPushDeviceMgtConfigs
+      description: |
+        Retrieve push device management related configurations of a tenant.<br>
+        <b>Scope (Permission) required:</b> `internal_config_view`
+
+      responses:
+        '200':
+          description: Successfully retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PushDeviceMgtConfig'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - Push Device Management
+      summary: Update push device management related configurations of a tenant.
+      operationId: updatePushDeviceMgtConfigs
+      description:
+        Update push device management related configurations of a tenant.<br>
+        <b>Scope (Permission) required:</b> `internal_config_update`
+      responses:
+        '200':
+          description: Successfully updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PushDeviceMgtConfig'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PushDeviceMgtConfig'
+        required: true
   /configs/consent/purposes/{purpose-id}/applications:
     get:
       tags:
@@ -2589,6 +2753,91 @@ components:
       additionalProperties: true
       example:
         conflictOnClaimUniquenessViolation: true
+    ConfigPreferenceRequestDTO:
+      type: object
+      description: Config store resource details to retrieve preferences for.
+      required:
+        - resourceType
+        - resourceName
+      properties:
+        resourceType:
+          type: string
+          description: The resource type in the config store.
+          example: DEVICE_MANAGEMENT
+        resourceName:
+          type: string
+          description: The resource name in the config store.
+          example: PUSH_DEVICE_MANAGEMENT
+        attributeNames:
+          type: array
+          description: Specific attribute names to retrieve.
+          items:
+            type: string
+          example:
+            - enableMultipleDeviceEnrollment
+            - maximumDeviceLimit
+    ConfigAttribute:
+      type: object
+      description: A config store attribute name-value pair.
+      properties:
+        name:
+          type: string
+          description: Attribute name.
+          example: enableMultipleDeviceEnrollment
+        value:
+          type: string
+          description: Attribute value.
+          example: 'true'
+    ConfigPreferenceResponseDTO:
+      type: object
+      description: Config store resource attribute values.
+      properties:
+        resourceType:
+          type: string
+          description: The resource type in the config store.
+          example: DEVICE_MANAGEMENT
+        resourceName:
+          type: string
+          description: The resource name in the config store.
+          example: PUSH_DEVICE_MANAGEMENT
+        attributeNames:
+          type: array
+          description: Attribute name-value pairs for the resource.
+          items:
+            $ref: '#/components/schemas/ConfigAttribute'
+    PushDeviceMgtConfig:
+      type: object
+      properties:
+        enableMultipleDeviceEnrollment:
+          type: boolean
+          description: "Whether to enable push device management related features."
+          example: true
+        maximumDeviceLimit:
+          type: integer
+          description: "Maximum number of devices a user can enroll. This property becomes only applicable if the enableMultipleDeviceEnrollment config is set to true."
+          example: 5
+        enableDeviceRegistrationNotifications:
+          type: boolean
+          description: "Whether to notify the user when a new device is registered. The channels used to deliver the notification are configured via deviceRegistrationNotificationChannels."
+          example: true
+        deviceRegistrationNotificationChannels:
+          type: array
+          description: "Channels used to deliver the device registration notification. Both channels can be selected to deliver notifications over email and to the user's existing devices simultaneously."
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/DeviceRegistrationNotificationChannel'
+          example:
+            - EMAIL
+            - PUSH_NOTIFICATION
+    DeviceRegistrationNotificationChannel:
+      type: string
+      description: |
+        Channel used to deliver a device registration notification.
+        - `EMAIL`: Deliver the notification over email.
+        - `PUSH_NOTIFICATION`: Deliver the notification to the user's existing devices.
+      enum:
+        - EMAIL
+        - PUSH_NOTIFICATION
     ApplicationObject:
       type: object
       required:

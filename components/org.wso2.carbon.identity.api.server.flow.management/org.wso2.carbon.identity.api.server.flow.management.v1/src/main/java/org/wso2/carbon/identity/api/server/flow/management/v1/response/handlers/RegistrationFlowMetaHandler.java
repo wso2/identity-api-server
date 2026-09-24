@@ -34,6 +34,7 @@ import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.F
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.GOOGLE_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.OFFICE365_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.OPENID_CONNECT_EXECUTOR;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.Executors.PROVISIONING_DISPATCH_EXECUTOR;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.SELF_REGISTRATION_ATTRIBUTE_PROFILE;
 
 /**
@@ -78,7 +79,7 @@ public class RegistrationFlowMetaHandler extends AbstractMetaResponseHandler {
     @Override
     public List<String> getSupportedExecutors() {
 
-        List<String> supportedExecutors = super.getSupportedExecutors();
+        List<String> supportedExecutors = new ArrayList<>(super.getSupportedExecutors());
         supportedExecutors.add(OPENID_CONNECT_EXECUTOR);
         supportedExecutors.add(GOOGLE_EXECUTOR);
         supportedExecutors.add(FACEBOOK_EXECUTOR);
@@ -86,6 +87,7 @@ public class RegistrationFlowMetaHandler extends AbstractMetaResponseHandler {
         supportedExecutors.add(APPLE_EXECUTOR);
         supportedExecutors.add(GITHUB_EXECUTOR);
         supportedExecutors.add(FIDO2_EXECUTOR);
+        supportedExecutors.add(PROVISIONING_DISPATCH_EXECUTOR);
         return supportedExecutors;
     }
 }

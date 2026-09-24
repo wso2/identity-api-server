@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.configs</artifactId>
-        <version>1.6.36-SNAPSHOT</version>
+        <version>1.6.51-SNAPSHOT</version>
     </parent>
 
     <artifactId>org.wso2.carbon.identity.api.server.configs.common</artifactId>
@@ -95,6 +95,16 @@
         <dependency>
             <groupId>org.wso2.carbon.identity.framework</groupId>
             <artifactId>org.wso2.carbon.identity.compatibility.settings.core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.notification.push</groupId>
+            <artifactId>org.wso2.carbon.identity.notification.push.device.handler</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <artifactId>org.wso2.carbon.identity.configuration.mgt.core</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>
