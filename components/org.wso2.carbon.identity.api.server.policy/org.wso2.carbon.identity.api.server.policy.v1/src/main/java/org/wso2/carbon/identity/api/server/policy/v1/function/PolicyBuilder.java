@@ -1,0 +1,89 @@
+/*
+ * Copyright (c) 2026, WSO2 LLC. (http://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+package org.wso2.carbon.identity.api.server.policy.v1.function;
+
+import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyRequest;
+import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyResourceRequest;
+import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyUpdateRequest;
+import org.wso2.carbon.identity.policy.management.api.exception.PolicyManagementClientException;
+import org.wso2.carbon.identity.policy.management.api.model.Policy;
+import org.wso2.carbon.identity.policy.management.api.model.PolicyResource;
+import org.wso2.carbon.identity.policy.management.api.model.RulePolicyResource;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+/**
+ * Builds a Policy (domain model) from a PolicyRequest (API model).
+ *
+ * Used in:
+ *   addPolicy    → no ID yet, pass null
+ *   updatePolicy → ID comes from the URL path param
+ */
+public class PolicyBuilder {
+
+    private PolicyBuilder() {
+
+    }
+
+    public static Policy buildPolicy(PolicyRequest policyRequest, String tenantDomain)
+            throws PolicyManagementClientException {
+
+        List<PolicyResource> resources = buildPolicyResources(policyRequest.getResources(), tenantDomain);
+        return new Policy.Builder()
+                .name(policyRequest.getName())
+                .resources(resources)
+                .build();
+    }
+
+    public static Policy buildUpdatingPolicy(PolicyUpdateRequest policyUpdateRequest, String policyId,
+                                              String tenantDomain) throws PolicyManagementClientException {
+
+        List<PolicyResource> resources = buildPolicyResources(policyUpdateRequest.getResources(), tenantDomain);
+        // Policy name is immutable; the backend retains the stored name.
+        return new Policy.Builder()
+                .id(policyId)
+                .resources(resources)
+                .build();
+    }
+
+    private static List<PolicyResource> buildPolicyResources(List<PolicyResourceRequest> resourceRequests,
+                                                               String tenantDomain)
+            throws PolicyManagementClientException {
+
+        if (resourceRequests == null || resourceRequests.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<PolicyResource> resources = new ArrayList<>();
+        for (PolicyResourceRequest resourceRequest : resourceRequests) {
+            resources.add(toRulePolicyResource(resourceRequest, tenantDomain));
+        }
+        return resources;
+    }
+
+    private static PolicyResource toRulePolicyResource(PolicyResourceRequest resourceRequest, String tenantDomain)
+            throws PolicyManagementClientException {
+
+        return new RulePolicyResource.Builder()
+                .target(resourceRequest.getTarget())
+                .rule(PolicyRuleBuilder.buildRule(resourceRequest.getRule(), tenantDomain))
+                .build();
+    }
+}

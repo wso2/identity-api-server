@@ -248,6 +248,12 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.identity.policy.management</artifactId>
+                <version>${carbon.identity.framework.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
                 <artifactId>org.wso2.carbon.identity.webhook.management</artifactId>
                 <version>${carbon.identity.framework.version}</version>
                 <scope>provided</scope>
@@ -474,6 +480,12 @@
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
                 <artifactId>org.wso2.carbon.identity.api.server.cors.common</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.policy.common</artifactId>
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>
@@ -1115,7 +1127,7 @@
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
         <identity.governance.version>1.11.103</identity.governance.version>
-        <carbon.identity.framework.version>7.11.195</carbon.identity.framework.version>
+        <carbon.identity.framework.version>7.11.209</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
         <spotbugs.maven.plugin.version>4.9.8.2</spotbugs.maven.plugin.version>
         <spotbugs.annotations.version>4.9.8</spotbugs.annotations.version>
@@ -1222,6 +1234,7 @@
         <module>components/org.wso2.carbon.identity.api.server.vc.template.management</module>
         <module>components/org.wso2.carbon.identity.api.server.credential.management</module>
         <module>components/org.wso2.carbon.identity.api.server.moesif.publisher</module>
+        <module>components/org.wso2.carbon.identity.api.server.policy</module>
     </modules>
 
 </project>
