@@ -389,9 +389,14 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
     private boolean isUserIdUsedAsDefaultSubject(ServiceProviderProperty[] spProperties) {
 
+        if (spProperties == null) {
+            return false;
+        }
         for (ServiceProviderProperty spProperty : spProperties) {
             if (useUserIdForDefaultSubject.equals(spProperty.getName())) {
-                return true;
+                // Match the framework's ApplicationConfig, which parses the stored value rather than
+                // treating the presence of the property as true.
+                return Boolean.parseBoolean(spProperty.getValue());
             }
         }
         return false;
@@ -582,7 +587,26 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
             }
             additionalSpProperties.add(spProperties);
         }
+        additionalSpProperties.add(buildDefaultSubjectProperty(serviceProviderProperties));
         return additionalSpProperties;
+    }
+
+    /**
+     * Expose the effective default subject identifier of the application as a read-only property. Applications
+     * created before the user id became the default subject (for example, applications migrated from older
+     * releases) do not carry the useUserIdForDefaultSubject property and fall back to the username at runtime. The
+     * stored property is removed from the additional properties above, so a normalized true/false entry is always
+     * added so that clients can tell which default applies without inspecting the stored value.
+     *
+     * @param spProperties Service provider properties.
+     * @return Additional property holding the effective value of useUserIdForDefaultSubject.
+     */
+    private AdditionalSpProperty buildDefaultSubjectProperty(ServiceProviderProperty[] spProperties) {
+
+        AdditionalSpProperty defaultSubjectProperty = new AdditionalSpProperty();
+        defaultSubjectProperty.setName(USE_USER_ID_FOR_DEFAULT_SUBJECT);
+        defaultSubjectProperty.setValue(String.valueOf(isUserIdUsedAsDefaultSubject(spProperties)));
+        return defaultSubjectProperty;
     }
 
     private ServiceProviderProperty[] removeAndSetSpProperties(ServiceProviderProperty[] propertyList) {
