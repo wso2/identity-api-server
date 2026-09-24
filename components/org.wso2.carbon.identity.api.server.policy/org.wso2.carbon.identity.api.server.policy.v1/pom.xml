@@ -102,7 +102,9 @@
 
     <build>
         <plugins>
-            <plugin>
+            <!--This plugin is used to generate the API classes from the OpenAPI definition.-->
+            <!--Uncomment and execute if the API is updated.-->
+            <!--<plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
                 <version>4.1.2</version>
@@ -134,7 +136,7 @@
                         <version>1.0.0</version>
                     </dependency>
                 </dependencies>
-            </plugin>
+            </plugin>-->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
