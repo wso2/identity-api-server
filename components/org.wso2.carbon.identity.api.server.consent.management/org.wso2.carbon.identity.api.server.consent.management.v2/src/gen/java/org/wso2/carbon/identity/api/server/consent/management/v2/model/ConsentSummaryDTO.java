@@ -22,6 +22,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.wso2.carbon.identity.api.server.consent.management.v2.model.AuthorizationDTO;
+import org.wso2.carbon.identity.api.server.consent.management.v2.model.ConsentedPurposeSummaryDTO;
 import javax.validation.constraints.*;
 
 /**
@@ -74,6 +80,12 @@ public enum StateEnum {
     private StateEnum state;
     private Long timestamp;
     private Long expiryTime;
+    private List<ConsentedPurposeSummaryDTO> purposes = null;
+
+    private List<AuthorizationDTO> authorizations = null;
+
+    private Map<String, String> properties = null;
+
 
     /**
     * Unique identifier for the consent
@@ -187,7 +199,89 @@ public enum StateEnum {
         this.expiryTime = expiryTime;
     }
 
+    /**
+    * Purposes in this consent. Returned only when requested via &#x60;attributes&#x60;.
+    **/
+    public ConsentSummaryDTO purposes(List<ConsentedPurposeSummaryDTO> purposes) {
 
+        this.purposes = purposes;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "Purposes in this consent. Returned only when requested via `attributes`.")
+    @JsonProperty("purposes")
+    @Valid
+    public List<ConsentedPurposeSummaryDTO> getPurposes() {
+        return purposes;
+    }
+    public void setPurposes(List<ConsentedPurposeSummaryDTO> purposes) {
+        this.purposes = purposes;
+    }
+
+    public ConsentSummaryDTO addPurposesItem(ConsentedPurposeSummaryDTO purposesItem) {
+        if (this.purposes == null) {
+            this.purposes = new ArrayList<>();
+        }
+        this.purposes.add(purposesItem);
+        return this;
+    }
+
+        /**
+    * Authorization records associated with this consent. Returned only when requested via &#x60;attributes&#x60;.
+    **/
+    public ConsentSummaryDTO authorizations(List<AuthorizationDTO> authorizations) {
+
+        this.authorizations = authorizations;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "Authorization records associated with this consent. Returned only when requested via `attributes`.")
+    @JsonProperty("authorizations")
+    @Valid
+    public List<AuthorizationDTO> getAuthorizations() {
+        return authorizations;
+    }
+    public void setAuthorizations(List<AuthorizationDTO> authorizations) {
+        this.authorizations = authorizations;
+    }
+
+    public ConsentSummaryDTO addAuthorizationsItem(AuthorizationDTO authorizationsItem) {
+        if (this.authorizations == null) {
+            this.authorizations = new ArrayList<>();
+        }
+        this.authorizations.add(authorizationsItem);
+        return this;
+    }
+
+        /**
+    * Properties associated with this consent. Returned only when requested via &#x60;attributes&#x60;.
+    **/
+    public ConsentSummaryDTO properties(Map<String, String> properties) {
+
+        this.properties = properties;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "Properties associated with this consent. Returned only when requested via `attributes`.")
+    @JsonProperty("properties")
+    @Valid
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+    public void setProperties(Map<String, String> properties) {
+        this.properties = properties;
+    }
+
+
+    public ConsentSummaryDTO putPropertiesItem(String key, String propertiesItem) {
+        if (this.properties == null) {
+            this.properties = new HashMap<>();
+        }
+        this.properties.put(key, propertiesItem);
+        return this;
+    }
+
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -204,12 +298,15 @@ public enum StateEnum {
             Objects.equals(this.serviceId, consentSummaryDTO.serviceId) &&
             Objects.equals(this.state, consentSummaryDTO.state) &&
             Objects.equals(this.timestamp, consentSummaryDTO.timestamp) &&
-            Objects.equals(this.expiryTime, consentSummaryDTO.expiryTime);
+            Objects.equals(this.expiryTime, consentSummaryDTO.expiryTime) &&
+            Objects.equals(this.purposes, consentSummaryDTO.purposes) &&
+            Objects.equals(this.authorizations, consentSummaryDTO.authorizations) &&
+            Objects.equals(this.properties, consentSummaryDTO.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, subjectId, serviceId, state, timestamp, expiryTime);
+        return Objects.hash(id, subjectId, serviceId, state, timestamp, expiryTime, purposes, authorizations, properties);
     }
 
     @Override
@@ -224,6 +321,9 @@ public enum StateEnum {
         sb.append("    state: ").append(toIndentedString(state)).append("\n");
         sb.append("    timestamp: ").append(toIndentedString(timestamp)).append("\n");
         sb.append("    expiryTime: ").append(toIndentedString(expiryTime)).append("\n");
+        sb.append("    purposes: ").append(toIndentedString(purposes)).append("\n");
+        sb.append("    authorizations: ").append(toIndentedString(authorizations)).append("\n");
+        sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");
         return sb.toString();
     }

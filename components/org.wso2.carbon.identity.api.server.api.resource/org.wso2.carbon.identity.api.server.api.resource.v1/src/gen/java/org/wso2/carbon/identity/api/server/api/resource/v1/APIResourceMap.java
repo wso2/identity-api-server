@@ -39,6 +39,12 @@ public class APIResourceMap  {
 
     private List<APIResourceCollectionItem> write = null;
 
+    private List<APIResourceCollectionItem> create = null;
+
+    private List<APIResourceCollectionItem> update = null;
+
+    private List<APIResourceCollectionItem> delete = null;
+
 
     /**
     **/
@@ -92,7 +98,85 @@ public class APIResourceMap  {
         return this;
     }
 
-    
+        /**
+    **/
+    public APIResourceMap create(List<APIResourceCollectionItem> create) {
+
+        this.create = create;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("create")
+    @Valid
+    public List<APIResourceCollectionItem> getCreate() {
+        return create;
+    }
+    public void setCreate(List<APIResourceCollectionItem> create) {
+        this.create = create;
+    }
+
+    public APIResourceMap addCreateItem(APIResourceCollectionItem createItem) {
+        if (this.create == null) {
+            this.create = new ArrayList<APIResourceCollectionItem>();
+        }
+        this.create.add(createItem);
+        return this;
+    }
+
+        /**
+    **/
+    public APIResourceMap update(List<APIResourceCollectionItem> update) {
+
+        this.update = update;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("update")
+    @Valid
+    public List<APIResourceCollectionItem> getUpdate() {
+        return update;
+    }
+    public void setUpdate(List<APIResourceCollectionItem> update) {
+        this.update = update;
+    }
+
+    public APIResourceMap addUpdateItem(APIResourceCollectionItem updateItem) {
+        if (this.update == null) {
+            this.update = new ArrayList<APIResourceCollectionItem>();
+        }
+        this.update.add(updateItem);
+        return this;
+    }
+
+        /**
+    **/
+    public APIResourceMap delete(List<APIResourceCollectionItem> delete) {
+
+        this.delete = delete;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("delete")
+    @Valid
+    public List<APIResourceCollectionItem> getDelete() {
+        return delete;
+    }
+    public void setDelete(List<APIResourceCollectionItem> delete) {
+        this.delete = delete;
+    }
+
+    public APIResourceMap addDeleteItem(APIResourceCollectionItem deleteItem) {
+        if (this.delete == null) {
+            this.delete = new ArrayList<APIResourceCollectionItem>();
+        }
+        this.delete.add(deleteItem);
+        return this;
+    }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -105,12 +189,15 @@ public class APIResourceMap  {
         }
         APIResourceMap apIResourceMap = (APIResourceMap) o;
         return Objects.equals(this.read, apIResourceMap.read) &&
-            Objects.equals(this.write, apIResourceMap.write);
+            Objects.equals(this.write, apIResourceMap.write) &&
+            Objects.equals(this.create, apIResourceMap.create) &&
+            Objects.equals(this.update, apIResourceMap.update) &&
+            Objects.equals(this.delete, apIResourceMap.delete);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(read, write);
+        return Objects.hash(read, write, create, update, delete);
     }
 
     @Override
@@ -121,6 +208,9 @@ public class APIResourceMap  {
         
         sb.append("    read: ").append(toIndentedString(read)).append("\n");
         sb.append("    write: ").append(toIndentedString(write)).append("\n");
+        sb.append("    create: ").append(toIndentedString(create)).append("\n");
+        sb.append("    update: ").append(toIndentedString(update)).append("\n");
+        sb.append("    delete: ").append(toIndentedString(delete)).append("\n");
         sb.append("}");
         return sb.toString();
     }

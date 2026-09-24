@@ -6,6 +6,7 @@ import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.compatibility.settings.core.service.CompatibilitySettingsService;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.fraud.detection.core.service.FraudDetectionConfigsService;
+import org.wso2.carbon.identity.notification.push.device.handler.DeviceHandlerService;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
 import org.wso2.carbon.identity.oauth2.agent.services.AgentConfigMgtService;
 import org.wso2.carbon.identity.oauth2.config.services.OAuth2OIDCConfigOrgUsageScopeMgtService;
@@ -42,6 +43,7 @@ public class ServerConfigManagementServiceFactory {
                 ConfigsServiceHolder.getOAuth2OIDCConfigOrgUsageScopeMgtService();
         CompatibilitySettingsService compatibilitySettingsService = ConfigsServiceHolder
                 .getIdentityCompatibilitySettingsService();
+        DeviceHandlerService pushDeviceHandlerService = ConfigsServiceHolder.getPushDeviceHandlerService();
         FapiConfigMgtService fapiConfigMgtService = ConfigsServiceHolder.getFapiConfigMgtService();
 
         if (applicationManagementService == null) {
@@ -93,6 +95,10 @@ public class ServerConfigManagementServiceFactory {
             throw new IllegalStateException("FapiConfigMgtService is not available from OSGi context.");
         }
 
+        if (pushDeviceHandlerService == null) {
+            throw new IllegalStateException("PushDeviceHandlerService is not available from OSGi context.");
+        }
+
         SERVICE = new ServerConfigManagementService(applicationManagementService, identityProviderManager,
                 corsManagementService,
                 remoteLoggingConfigService,
@@ -103,7 +109,8 @@ public class ServerConfigManagementServiceFactory {
                 fraudDetectionConfigsService,
                 oAuth2OIDCConfigOrgUsageScopeMgtService,
                 compatibilitySettingsService,
-                fapiConfigMgtService
+                fapiConfigMgtService,
+                pushDeviceHandlerService
                 );
     }
 

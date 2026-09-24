@@ -275,6 +275,46 @@ public class Constants {
         ERROR_CODE_SETTING_GROUP_NOT_FOUND("60007",
                 "Setting group not found.",
                 "Unable to find compatibility settings for the setting group %s."),
+        /**
+         * Config preferences errors.
+         */
+        // Server errors.
+        ERROR_CODE_CONFIG_NOT_FOUND("65040",
+                "Unable to retrieve config.",
+                "Server encountered an error while retrieving config for resource type: %s."),
+        // Client errors.
+        ERROR_CODE_CONFIG_RESOURCE_NOT_FOUND("60016",
+                "Config store resource not found.",
+                "No config store resource found for resource type: %s and resource name: %s."),
+        ERROR_CODE_CONFIG_ATTRIBUTE_NOT_FOUND("60017",
+                "Config store attribute not found.",
+                "Attribute '%s' not found for resource type: %s and resource name: %s."),
+        ERROR_CODE_CONFIG_RESOURCE_TYPE_NOT_ALLOWED("60018",
+                "Resource type not allowed.",
+                "Resource type '%s' is not permitted via the config preferences endpoint."),
+        ERROR_CODE_CONFIG_RESOURCE_NAME_NOT_ALLOWED("60012",
+                "Resource name not allowed.",
+                "Resource name '%s' is not permitted for resource type '%s' via the config preferences endpoint."),
+        ERROR_CODE_CONFIG_ATTRIBUTE_NOT_ALLOWED("60013",
+                "Attribute not allowed.",
+                "Attribute '%s' is not permitted for resource type '%s' and resource name '%s'."),
+        ERROR_CODE_CONFIG_INVALID_REQUEST("60014",
+                "Invalid config request.",
+                "Resource type and resource name are required for each config search attribute in"
+                        + " the request payload."),
+
+        /**
+         * Push device management errors.
+         */
+        // Server errors.
+        ERROR_CODE_PUSH_DEVICE_MGT_CONFIG_RETRIEVE("65041",
+                "Unable to retrieve Push Device Management configuration.",
+                "Server encountered an error while retrieving the Push Device Management configuration."),
+        // Client errors.
+        ERROR_CODE_CLIENT_ERROR_PUSH_DEVICE_MGT_CONFIG_UPDATE("60015",
+                "Unable to update Push Device Management configuration.",
+                "Push Device Management config update failed."),
+
         ERROR_CODE_CONSENT_PURPOSE_NOT_FOUND("60009",
                 "Consent purpose not found.",
                 "No consent purpose found with ID: %s."),
@@ -296,7 +336,7 @@ public class Constants {
         ERROR_CODE_FAPI_CONFIG_RETRIEVE("65036",
                 "Unable to retrieve FAPI configuration.",
                 "Server encountered an error while retrieving the FAPI configuration."),
-        ERROR_CODE_FAPI_CONFIG_UPDATE("65037",
+        ERROR_CODE_FAPI_CONFIG_UPDATE("65039",
                 "Unable to update FAPI configuration.",
                 "Server encountered an error while updating the FAPI configuration.");
 

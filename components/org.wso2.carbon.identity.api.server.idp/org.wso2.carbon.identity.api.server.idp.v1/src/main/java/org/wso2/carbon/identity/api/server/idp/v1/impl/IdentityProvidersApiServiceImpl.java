@@ -25,7 +25,9 @@ import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.file.FileContent;
 import org.wso2.carbon.identity.api.server.idp.v1.IdentityProvidersApiService;
 import org.wso2.carbon.identity.api.server.idp.v1.core.ServerIdpManagementService;
+import org.wso2.carbon.identity.api.server.idp.v1.core.ServerIdpSharingService;
 import org.wso2.carbon.identity.api.server.idp.v1.factories.ServerIdpManagementServiceFactory;
+import org.wso2.carbon.identity.api.server.idp.v1.factories.ServerIdpSharingServiceFactory;
 import org.wso2.carbon.identity.api.server.idp.v1.model.AssociationRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorPUTRequest;
@@ -33,7 +35,11 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorRe
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdPGroup;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPOSTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderResponse;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderShareAllRequestBody;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderShareSelectedRequestBody;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderTemplate;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderUnshareAllRequestBody;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderUnshareSelectedRequestBody;
 import org.wso2.carbon.identity.api.server.idp.v1.model.JustInTimeProvisioning;
 import org.wso2.carbon.identity.api.server.idp.v1.model.OutboundConnectorPUTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.OutboundProvisioningRequest;
@@ -56,6 +62,7 @@ import static org.wso2.carbon.identity.api.server.idp.common.Constants.IDP_TEMPL
 public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiService {
 
     private final ServerIdpManagementService idpManagementService;
+    private final ServerIdpSharingService idpSharingService;
 
     public IdentityProvidersApiServiceImpl() {
 
@@ -63,6 +70,11 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
             this.idpManagementService = ServerIdpManagementServiceFactory.getServerIdpManagementService();
         } catch (IllegalStateException e) {
             throw new RuntimeException("Error occurred while initiating ServerIdpManagementService.", e);
+        }
+        try {
+            this.idpSharingService = ServerIdpSharingServiceFactory.getServerIdpSharingService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating ServerIdpSharingService.", e);
         }
     }
 
@@ -186,6 +198,15 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
     }
 
     @Override
+    public Response getIdentityProviderSharedOrganizations(String identityProviderId, String before, String after,
+                                                           String filter, Integer limit, Boolean recursive,
+                                                           String excludedAttributes, String attributes) {
+
+        return idpSharingService.getSharedOrganizations(identityProviderId, before, after, filter, limit, recursive,
+                excludedAttributes, attributes);
+    }
+
+    @Override
     public Response getJITConfig(String identityProviderId) {
 
         return Response.ok().entity(idpManagementService.getJITConfig(identityProviderId)).build();
@@ -255,6 +276,30 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
     public Response patchIDP(String identityProviderId, List<Patch> patchRequest) {
 
         return Response.ok().entity(idpManagementService.patchIDP(identityProviderId, patchRequest)).build();
+    }
+
+    @Override
+    public Response shareIdentityProviderWithAll(IdentityProviderShareAllRequestBody requestBody) {
+
+        return idpSharingService.shareIdentityProviderWithAll(requestBody);
+    }
+
+    @Override
+    public Response shareIdentityProviderWithSelected(IdentityProviderShareSelectedRequestBody requestBody) {
+
+        return idpSharingService.shareIdentityProviderWithSelected(requestBody);
+    }
+
+    @Override
+    public Response unshareIdentityProviderFromAll(IdentityProviderUnshareAllRequestBody requestBody) {
+
+        return idpSharingService.unshareIdentityProviderFromAll(requestBody);
+    }
+
+    @Override
+    public Response unshareIdentityProviderFromSelected(IdentityProviderUnshareSelectedRequestBody requestBody) {
+
+        return idpSharingService.unshareIdentityProviderFromSelected(requestBody);
     }
 
     @Override

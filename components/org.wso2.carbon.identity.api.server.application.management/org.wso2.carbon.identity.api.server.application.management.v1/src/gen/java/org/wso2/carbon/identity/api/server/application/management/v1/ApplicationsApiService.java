@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -44,6 +44,9 @@ import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtoco
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPICreationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretCreationRequest;
+import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretList;
+import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticatorsModal;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
@@ -82,6 +85,8 @@ public interface ApplicationsApiService {
 
       public Response createApplicationTemplate(ApplicationTemplateModel applicationTemplateModel);
 
+      public Response createOAuthClientSecret(String applicationId, ClientSecretCreationRequest clientSecretCreationRequest);
+
       public Response deleteApplication(String applicationId);
 
       public Response deleteApplicationTemplate(String templateId);
@@ -93,6 +98,8 @@ public interface ApplicationsApiService {
       public Response deleteInboundOAuthConfiguration(String applicationId);
 
       public Response deleteInboundSAMLConfiguration(String applicationId);
+
+      public Response deleteOAuthClientSecret(String applicationId, String secretId);
 
       public Response deletePassiveStsConfiguration(String applicationId);
 
@@ -137,6 +144,10 @@ public interface ApplicationsApiService {
       public Response getLoginFlowGenerationResult(String operationId);
 
       public Response getLoginFlowGenerationStatus(String operationId);
+
+      public Response getOAuthClientSecret(String applicationId, String secretId);
+
+      public Response getOAuthClientSecrets(String applicationId);
 
       public Response getOIDCMetadata();
 

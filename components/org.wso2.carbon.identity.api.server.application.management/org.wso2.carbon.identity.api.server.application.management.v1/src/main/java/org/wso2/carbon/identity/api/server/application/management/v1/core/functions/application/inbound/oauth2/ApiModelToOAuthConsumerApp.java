@@ -34,6 +34,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.RefreshToke
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestObjectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectTokenConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.TokenExchangeConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
@@ -68,6 +69,7 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         consumerAppDTO.setApplicationName(appName);
         consumerAppDTO.setOauthConsumerKey(oidcModel.getClientId());
         consumerAppDTO.setOauthConsumerSecret(oidcModel.getClientSecret());
+        consumerAppDTO.setOauthConsumerSecretExpiryTime(oidcModel.getClientSecretExpiresAt());
 
         consumerAppDTO.setCallbackUrl(getCallbackUrl(oidcModel.getCallbackURLs()));
 
@@ -99,6 +101,7 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         updateSubjectTokenConfigurations(consumerAppDTO, oidcModel.getSubjectToken());
         updateCIBAAuthenticationRequestConfigurations(consumerAppDTO, oidcModel.getCibaAuthenticationRequest());
         updateIssuerDetails(consumerAppDTO, oidcModel.getIssuer());
+        updateTokenExchangeConfigurations(consumerAppDTO, oidcModel.getTokenExchange());
         return consumerAppDTO;
     }
 
@@ -338,6 +341,15 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         if (subjectToken != null) {
             consumerAppDTO.setSubjectTokenEnabled(subjectToken.getEnable());
             consumerAppDTO.setSubjectTokenExpiryTime(subjectToken.getApplicationSubjectTokenExpiryInSeconds());
+        }
+    }
+
+    private void updateTokenExchangeConfigurations(OAuthConsumerAppDTO consumerAppDTO,
+                                                  TokenExchangeConfiguration tokenExchange) {
+
+        if (tokenExchange != null) {
+            consumerAppDTO.setRestrictScopeIssuanceForFederatedTokens(
+                    tokenExchange.getRestrictScopeIssuanceForFederatedTokens());
         }
     }
 

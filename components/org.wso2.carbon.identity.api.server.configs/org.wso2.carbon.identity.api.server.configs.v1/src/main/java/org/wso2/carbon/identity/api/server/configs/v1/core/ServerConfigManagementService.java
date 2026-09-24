@@ -32,6 +32,7 @@ import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.api.server.configs.common.AllowedConfigList;
 import org.wso2.carbon.identity.api.server.configs.common.ConfigsServiceHolder;
 import org.wso2.carbon.identity.api.server.configs.common.Constants;
 import org.wso2.carbon.identity.api.server.configs.common.SchemaConfigParser;
@@ -41,6 +42,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.function.CompatibilitySett
 import org.wso2.carbon.identity.api.server.configs.v1.function.DCRConnectorUtil;
 import org.wso2.carbon.identity.api.server.configs.v1.function.FAPIConnectorUtil;
 import org.wso2.carbon.identity.api.server.configs.v1.function.JWTConnectorUtil;
+  import org.wso2.carbon.identity.api.server.configs.v1.function.PushDeviceMgtConnectorUtil;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AgentConfigPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AgentConfiguration;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ApplicationObject;
@@ -52,6 +54,9 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettings;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettingsGroup;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ConfigAttribute;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ConfigPreferenceRequestDTO;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ConfigPreferenceResponseDTO;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Endpoint;
@@ -70,6 +75,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTValidatorConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ProvisioningConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.PushDeviceMgtConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RealmConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfigListItem;
@@ -101,7 +107,12 @@ import org.wso2.carbon.identity.base.AuthenticatorPropertyConstants;
 import org.wso2.carbon.identity.compatibility.settings.core.exception.CompatibilitySettingException;
 import org.wso2.carbon.identity.compatibility.settings.core.model.CompatibilitySetting;
 import org.wso2.carbon.identity.compatibility.settings.core.service.CompatibilitySettingsService;
+import org.wso2.carbon.identity.configuration.mgt.core.ConfigurationManager;
 import org.wso2.carbon.identity.configuration.mgt.core.constant.ConfigurationConstants;
+import org.wso2.carbon.identity.configuration.mgt.core.exception.ConfigurationManagementClientException;
+import org.wso2.carbon.identity.configuration.mgt.core.exception.ConfigurationManagementException;
+import org.wso2.carbon.identity.configuration.mgt.core.model.Attribute;
+import org.wso2.carbon.identity.configuration.mgt.core.model.Resource;
 import org.wso2.carbon.identity.core.ServiceURLBuilder;
 import org.wso2.carbon.identity.core.URLBuilderException;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
@@ -115,6 +126,11 @@ import org.wso2.carbon.identity.fraud.detection.core.exception.IdentityFraudDete
 import org.wso2.carbon.identity.fraud.detection.core.model.EventConfigDTO;
 import org.wso2.carbon.identity.fraud.detection.core.model.FraudDetectionConfigDTO;
 import org.wso2.carbon.identity.fraud.detection.core.service.FraudDetectionConfigsService;
+import org.wso2.carbon.identity.notification.push.device.handler.DeviceHandlerService;
+import org.wso2.carbon.identity.notification.push.device.handler.exception.PushDeviceHandlerClientException;
+import org.wso2.carbon.identity.notification.push.device.handler.exception.PushDeviceHandlerException;
+import org.wso2.carbon.identity.notification.push.device.handler.model.PushDeviceMgtConfigData;
+import org.wso2.carbon.identity.notification.push.device.handler.utils.PushDeviceConfigManager;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
 import org.wso2.carbon.identity.oauth.dcr.exception.DCRMException;
 import org.wso2.carbon.identity.oauth2.agent.exceptions.AgentConfigMgtClientException;
@@ -173,6 +189,9 @@ import static org.wso2.carbon.identity.api.server.configs.common.Constants.CONFI
 import static org.wso2.carbon.identity.api.server.configs.common.Constants.CONFIGS_SCHEMAS_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.configs.common.Constants.ErrorMessage.ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND;
 import static org.wso2.carbon.identity.api.server.configs.common.Constants.PATH_SEPERATOR;
+import static org.wso2.carbon.identity.configuration.mgt.core.constant.ConfigurationConstants.ErrorMessages.ERROR_CODE_DEFAULT_RESOLVER_DOES_NOT_EXISTS;
+import static org.wso2.carbon.identity.configuration.mgt.core.constant.ConfigurationConstants.ErrorMessages.ERROR_CODE_RESOURCE_DOES_NOT_EXISTS;
+import static org.wso2.carbon.identity.configuration.mgt.core.constant.ConfigurationConstants.ErrorMessages.ERROR_CODE_RESOURCE_TYPE_DOES_NOT_EXISTS;
 
 /**
  * Call internal osgi services to perform server configuration management.
@@ -191,6 +210,7 @@ public class ServerConfigManagementService {
     private final OAuth2OIDCConfigOrgUsageScopeMgtService oauth2OIDCConfigOrgUsageScopeMgtService;
     private final CompatibilitySettingsService compatibilitySettingsService;
     private final FapiConfigMgtService fapiConfigMgtService;
+    private final DeviceHandlerService pushDeviceHandlerService;
 
     private static final Log log = LogFactory.getLog(ServerConfigManagementService.class);
 
@@ -206,7 +226,8 @@ public class ServerConfigManagementService {
                                          OAuth2OIDCConfigOrgUsageScopeMgtService
                                                  oauth2OIDCConfigOrgUsageScopeMgtService,
                                          CompatibilitySettingsService identityCompatibilitySettingsService,
-                                         FapiConfigMgtService fapiConfigMgtService) {
+                                         FapiConfigMgtService fapiConfigMgtService,
+                                         DeviceHandlerService pushDeviceHandlerService) {
 
         this.applicationManagementService = applicationManagementService;
         this.idpManager = idpManager;
@@ -220,6 +241,7 @@ public class ServerConfigManagementService {
         this.oauth2OIDCConfigOrgUsageScopeMgtService = oauth2OIDCConfigOrgUsageScopeMgtService;
         this.compatibilitySettingsService = identityCompatibilitySettingsService;
         this.fapiConfigMgtService = fapiConfigMgtService;
+        this.pushDeviceHandlerService = pushDeviceHandlerService;
     }
 
     /**
@@ -1658,7 +1680,7 @@ public class ServerConfigManagementService {
      * @param error  Error Message information.
      * @return APIError.
      */
-    private APIError handleException(Response.Status status, Constants.ErrorMessage error, String data) {
+    private APIError handleException(Response.Status status, Constants.ErrorMessage error, String... data) {
 
         return new APIError(status, getErrorBuilder(error, data).build());
     }
@@ -1669,7 +1691,7 @@ public class ServerConfigManagementService {
      * @param errorMsg Error Message information.
      * @return ErrorResponse.Builder.
      */
-    private ErrorResponse.Builder getErrorBuilder(Constants.ErrorMessage errorMsg, String data) {
+    private ErrorResponse.Builder getErrorBuilder(Constants.ErrorMessage errorMsg, String... data) {
 
         return new ErrorResponse.Builder().withCode(errorMsg.code()).withMessage(errorMsg.message())
                 .withDescription(includeData(errorMsg, data));
@@ -1679,18 +1701,19 @@ public class ServerConfigManagementService {
      * Include context data to error message.
      *
      * @param error Constant.ErrorMessage.
-     * @param data  Context data.
+     * @param data  Context data, one entry per format specifier in the error description.
      * @return Formatted error message.
      */
-    private static String includeData(Constants.ErrorMessage error, String data) {
+    private static String includeData(Constants.ErrorMessage error, String... data) {
 
-        String message;
-        if (StringUtils.isNotBlank(data)) {
-            message = String.format(error.description(), data);
-        } else {
-            message = error.description();
+        if (data == null || data.length == 0) {
+            return error.description();
         }
-        return message;
+        if (data.length == 1) {
+            return StringUtils.isNotBlank(data[0]) ? String.format(error.description(), data[0])
+                    : error.description();
+        }
+        return String.format(error.description(), (Object[]) data);
     }
 
     /**
@@ -2778,6 +2801,222 @@ public class ServerConfigManagementService {
         } catch (CompatibilitySettingException e) {
             throw handleCompatibilitySettingsError(e, Constants.ErrorMessage.ERROR_CODE_COMPATIBILITY_SETTINGS_RETRIEVE,
                     settingGroup);
+        }
+    }
+
+    /**
+     * Get the allowed configurations of a allowed resource
+     *
+     * @param requestedConfigs
+     * @return List<ConfigPreferenceResponseDTO>
+     */
+    public List<ConfigPreferenceResponseDTO> getConfigPreferences(
+            List<ConfigPreferenceRequestDTO> requestedConfigs) {
+
+        if (requestedConfigs == null || requestedConfigs.isEmpty()) {
+            if (log.isDebugEnabled()) {
+                log.debug("Empty config preferences request payload received.");
+            }
+            throw handleException(Response.Status.BAD_REQUEST,
+                    Constants.ErrorMessage.ERROR_CODE_CONFIG_INVALID_REQUEST);
+        }
+
+        ConfigurationManager configurationManager = ConfigsServiceHolder.getConfigurationManager();
+        List<ConfigPreferenceResponseDTO> responseList = new ArrayList<>(requestedConfigs.size());
+        for (ConfigPreferenceRequestDTO searchAttribute : requestedConfigs) {
+            responseList.add(getConfigPreference(configurationManager, searchAttribute));
+        }
+        return responseList;
+    }
+
+    private ConfigPreferenceResponseDTO getConfigPreference(ConfigurationManager configurationManager,
+                                                            ConfigPreferenceRequestDTO requestedConfig) {
+
+        String resourceType = requestedConfig.getResourceType();
+        String resourceName = requestedConfig.getResourceName();
+        List<String> requestedAttributes = requestedConfig.getAttributeNames();
+
+        if (log.isDebugEnabled()) {
+            log.debug("Processing config preference request for resource type: " + resourceType
+                    + ", resource name: " + resourceName + ", requested attributes: " + requestedAttributes);
+        }
+        validateConfigPreferenceRequest(resourceType, resourceName, requestedAttributes);
+
+        Resource resource = resolveConfigResource(configurationManager, resourceType, resourceName);
+
+        return new ConfigPreferenceResponseDTO().resourceType(resourceType).resourceName(resourceName)
+                .attributeNames(extractRequestedAttributes(resource, requestedAttributes, resourceType, resourceName));
+    }
+
+    private void validateConfigPreferenceRequest(String resourceType, String resourceName,
+                                                 List<String> requestedAttributes) {
+
+        if (StringUtils.isBlank(resourceType) || StringUtils.isBlank(resourceName)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Invalid config preference search attribute. Resource type and name are required. "
+                        + "Received resource type: '" + resourceType + "', resource name: '" + resourceName + "'.");
+            }
+            throw handleException(Response.Status.BAD_REQUEST,
+                    Constants.ErrorMessage.ERROR_CODE_CONFIG_INVALID_REQUEST);
+        }
+        if (!AllowedConfigList.isResourceTypeAllowed(resourceType)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Resource type '" + resourceType + "' is not in the config preferences allowlist.");
+            }
+            throw handleException(Response.Status.BAD_REQUEST,
+                    Constants.ErrorMessage.ERROR_CODE_CONFIG_RESOURCE_TYPE_NOT_ALLOWED, resourceType);
+        }
+        if (!AllowedConfigList.isResourceNameAllowed(resourceType, resourceName)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Resource name '" + resourceName + "' is not in the config preferences allowlist"
+                        + " for resource type: " + resourceType);
+            }
+            throw handleException(Response.Status.BAD_REQUEST,
+                    Constants.ErrorMessage.ERROR_CODE_CONFIG_RESOURCE_NAME_NOT_ALLOWED, resourceName, resourceType);
+        }
+        if (requestedAttributes == null) {
+            return;
+        }
+        for (String requestedAttribute : requestedAttributes) {
+            if (!AllowedConfigList.isAttributeAllowed(resourceType, resourceName, requestedAttribute)) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Attribute '" + requestedAttribute + "' is not in the config preferences allowlist"
+                            + " for resource type: " + resourceType + ", resource name: " + resourceName);
+                }
+                throw handleException(Response.Status.BAD_REQUEST,
+                        Constants.ErrorMessage.ERROR_CODE_CONFIG_ATTRIBUTE_NOT_ALLOWED,
+                        requestedAttribute, resourceType, resourceName);
+            }
+        }
+    }
+
+    private List<ConfigAttribute> extractRequestedAttributes(Resource resource, List<String> requestedAttributes,
+                                                             String resourceType, String resourceName) {
+
+        List<ConfigAttribute> configAttributes = new ArrayList<>();
+        if (requestedAttributes == null || requestedAttributes.isEmpty()) {
+            return configAttributes;
+        }
+
+        Map<String, String> attributesByName = new HashMap<>();
+        if (resource.getAttributes() != null) {
+            for (Attribute attribute : resource.getAttributes()) {
+                attributesByName.put(attribute.getKey(), attribute.getValue());
+            }
+        }
+        for (String requestedAttribute : requestedAttributes) {
+            if (!attributesByName.containsKey(requestedAttribute)) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Attribute '" + requestedAttribute + "' not found in config store resource for type: "
+                            + resourceType + ", name: " + resourceName);
+                }
+                throw handleException(Response.Status.BAD_REQUEST,
+                        Constants.ErrorMessage.ERROR_CODE_CONFIG_ATTRIBUTE_NOT_FOUND,
+                        requestedAttribute, resourceType, resourceName);
+            }
+            configAttributes.add(new ConfigAttribute().name(requestedAttribute)
+                    .value(attributesByName.get(requestedAttribute)));
+        }
+        return configAttributes;
+    }
+
+    private Resource resolveConfigResource(ConfigurationManager configurationManager, String resourceType,
+                                           String resourceName) {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Fetching config store resource for type: " + resourceType + ", name: " + resourceName);
+        }
+        try {
+            return configurationManager.getResource(resourceType, resourceName, true);
+        } catch (ConfigurationManagementException e) {
+            // A genuine retrieval failure must not be masked by serving default configs.
+            if (!isResourceNotExistsError(e)) {
+                throw handleConfigMgtException(e, Constants.ErrorMessage.ERROR_CODE_CONFIG_NOT_FOUND, resourceType);
+            }
+        }
+        /* if this point is reached that means Resource is not in the config store
+        fall back to the default configs if a registered resolver owns this resource. */
+        try {
+            return configurationManager.getDefaultResource(resourceType, resourceName);
+        } catch (ConfigurationManagementException e) {
+            // Neither a stored nor a default resource exists; let the caller translate the absence into a 404.
+            if (isDefaultResolverNotExistsError(e)) {
+                if (log.isDebugEnabled()) {
+                    log.debug("No config store resource found for type: " + resourceType + ", name: " + resourceName);
+                }
+                throw handleException(Response.Status.NOT_FOUND,
+                        Constants.ErrorMessage.ERROR_CODE_CONFIG_RESOURCE_NOT_FOUND, resourceType, resourceName);
+            }
+            throw handleConfigMgtException(e, Constants.ErrorMessage.ERROR_CODE_CONFIG_NOT_FOUND, resourceType);
+        }
+    }
+
+    private boolean isResourceNotExistsError(ConfigurationManagementException e) {
+
+        return e instanceof ConfigurationManagementClientException
+                && (ERROR_CODE_RESOURCE_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode())
+                || ERROR_CODE_RESOURCE_TYPE_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode()));
+    }
+
+
+    private boolean isDefaultResolverNotExistsError(ConfigurationManagementException e) {
+
+        return e instanceof ConfigurationManagementClientException
+                && ERROR_CODE_DEFAULT_RESOLVER_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode());
+    }
+
+    private APIError handleConfigMgtException(ConfigurationManagementException e, Constants.ErrorMessage errorEnum,
+                                              String data) {
+
+        ErrorResponse errorResponse;
+        Response.Status status;
+        if (e instanceof ConfigurationManagementClientException) {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e.getMessage());
+            status = Response.Status.BAD_REQUEST;
+        } else {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.description());
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+        }
+        return new APIError(status, errorResponse);
+    }
+
+    /**
+     * Return the Push Device Management Configs.
+     * @return PushDeviceMgtConfig
+     */
+    public PushDeviceMgtConfig getPushDeviceMgtConfigs() {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            PushDeviceMgtConfigData handlerConfig = PushDeviceConfigManager.getPushDeviceConfig(tenantDomain);
+            return PushDeviceMgtConnectorUtil.buildPushDeviceMgtConfig(handlerConfig);
+        } catch (PushDeviceHandlerException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_PUSH_DEVICE_MGT_CONFIG_RETRIEVE, null);
+        }
+    }
+
+    /**
+     * Update the Push Device Management Configs
+     * @param pushDeviceMgtConfig
+     * @return
+     */
+    public PushDeviceMgtConfig updatePushDeviceMgtConfigs(PushDeviceMgtConfig pushDeviceMgtConfig) {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            PushDeviceMgtConfigData configData =
+                    PushDeviceMgtConnectorUtil.buildPushDeviceMgtConfigData(pushDeviceMgtConfig);
+            PushDeviceMgtConfigData handlerConfig = PushDeviceConfigManager.updatePushDeviceConfig(configData,
+                    tenantDomain);
+            return PushDeviceMgtConnectorUtil.buildPushDeviceMgtConfig(handlerConfig);
+        } catch (PushDeviceHandlerException e) {
+            if (e instanceof PushDeviceHandlerClientException) {
+                throw handleException(Response.Status.BAD_REQUEST,
+                        Constants.ErrorMessage.ERROR_CODE_CLIENT_ERROR_PUSH_DEVICE_MGT_CONFIG_UPDATE, e.getMessage());
+            }
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_PUSH_DEVICE_MGT_CONFIG_RETRIEVE, null);
         }
     }
 

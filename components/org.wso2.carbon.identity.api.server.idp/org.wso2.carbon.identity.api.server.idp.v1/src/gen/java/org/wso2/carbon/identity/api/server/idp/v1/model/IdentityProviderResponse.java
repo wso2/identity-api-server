@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -47,6 +47,7 @@ public class IdentityProviderResponse  {
     private String templateId;
     private Boolean isEnabled = true;
     private Boolean isPrimary = false;
+    private Boolean isShared;
     private String image;
     private Boolean isFederationHub;
     private String homeRealmIdentifier;
@@ -167,6 +168,25 @@ public class IdentityProviderResponse  {
     }
     public void setIsPrimary(Boolean isPrimary) {
         this.isPrimary = isPrimary;
+    }
+
+    /**
+    * Whether this connection is a shared connection resolved from a parent organization. Present (and true) only for shared connections; omitted otherwise.
+    **/
+    public IdentityProviderResponse isShared(Boolean isShared) {
+
+        this.isShared = isShared;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "true", value = "Whether this connection is a shared connection resolved from a parent organization. Present (and true) only for shared connections; omitted otherwise.")
+    @JsonProperty("isShared")
+    @Valid
+    public Boolean getIsShared() {
+        return isShared;
+    }
+    public void setIsShared(Boolean isShared) {
+        this.isShared = isShared;
     }
 
     /**
@@ -412,6 +432,7 @@ public class IdentityProviderResponse  {
             Objects.equals(this.templateId, identityProviderResponse.templateId) &&
             Objects.equals(this.isEnabled, identityProviderResponse.isEnabled) &&
             Objects.equals(this.isPrimary, identityProviderResponse.isPrimary) &&
+            Objects.equals(this.isShared, identityProviderResponse.isShared) &&
             Objects.equals(this.image, identityProviderResponse.image) &&
             Objects.equals(this.isFederationHub, identityProviderResponse.isFederationHub) &&
             Objects.equals(this.homeRealmIdentifier, identityProviderResponse.homeRealmIdentifier) &&
@@ -428,7 +449,7 @@ public class IdentityProviderResponse  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, templateId, isEnabled, isPrimary, image, isFederationHub, homeRealmIdentifier, certificate, alias, idpIssuerName, claims, roles, groups, federatedAuthenticators, provisioning, implicitAssociation);
+        return Objects.hash(id, name, description, templateId, isEnabled, isPrimary, isShared, image, isFederationHub, homeRealmIdentifier, certificate, alias, idpIssuerName, claims, roles, groups, federatedAuthenticators, provisioning, implicitAssociation);
     }
 
     @Override
@@ -443,6 +464,7 @@ public class IdentityProviderResponse  {
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
         sb.append("    isPrimary: ").append(toIndentedString(isPrimary)).append("\n");
+        sb.append("    isShared: ").append(toIndentedString(isShared)).append("\n");
         sb.append("    image: ").append(toIndentedString(image)).append("\n");
         sb.append("    isFederationHub: ").append(toIndentedString(isFederationHub)).append("\n");
         sb.append("    homeRealmIdentifier: ").append(toIndentedString(homeRealmIdentifier)).append("\n");

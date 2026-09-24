@@ -25,6 +25,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.AgentConfigPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ApplicationObject;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettings;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ConfigPreferenceRequestDTO;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.FapiConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.FraudDetectionConfig;
@@ -34,6 +35,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveST
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.PushDeviceMgtConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfigListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ScimConfig;
@@ -407,6 +409,24 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
 
         configManagementService.deleteOAuth2InboundAuthConfig();
         return Response.noContent().build();
+    }
+
+    @Override
+    public Response getPushDeviceMgtConfigs() {
+
+        return Response.ok().entity(configManagementService.getPushDeviceMgtConfigs()).build();
+    }
+
+    @Override
+    public Response updatePushDeviceMgtConfigs(PushDeviceMgtConfig pushDeviceMgtConfig) {
+
+        return Response.ok().entity(configManagementService.updatePushDeviceMgtConfigs(pushDeviceMgtConfig)).build();
+    }
+
+    @Override
+    public Response getConfigPreferences(List<ConfigPreferenceRequestDTO> configPreferenceRequestDTO) {
+
+        return Response.ok().entity(configManagementService.getConfigPreferences(configPreferenceRequestDTO)).build();
     }
 
     private RemoteLoggingConfigListItem createRemoteLoggingConfigListItem(
