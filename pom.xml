@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.6.51-SNAPSHOT</version>
+    <version>1.6.52-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -243,6 +243,12 @@
             <dependency>
                 <groupId>org.wso2.carbon.identity.framework</groupId>
                 <artifactId>org.wso2.carbon.identity.rule.metadata</artifactId>
+                <version>${carbon.identity.framework.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.identity.policy.management</artifactId>
                 <version>${carbon.identity.framework.version}</version>
                 <scope>provided</scope>
             </dependency>
@@ -474,6 +480,12 @@
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
                 <artifactId>org.wso2.carbon.identity.api.server.cors.common</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.policy.common</artifactId>
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>
@@ -1234,6 +1246,7 @@
         <module>components/org.wso2.carbon.identity.api.server.vc.template.management</module>
         <module>components/org.wso2.carbon.identity.api.server.credential.management</module>
         <module>components/org.wso2.carbon.identity.api.server.moesif.publisher</module>
+        <module>components/org.wso2.carbon.identity.api.server.policy</module>
         <module>components/org.wso2.carbon.identity.api.server.device.mgt</module>
     </modules>
 
