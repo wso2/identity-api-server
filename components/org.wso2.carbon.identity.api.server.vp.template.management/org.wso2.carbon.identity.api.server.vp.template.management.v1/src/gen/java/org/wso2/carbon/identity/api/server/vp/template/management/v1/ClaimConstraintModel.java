@@ -39,15 +39,15 @@ public class ClaimConstraintModel  {
     private Boolean mandatory = true;
 
     /**
-    * The claim name identifying the claim within the credential. This is a single, literal claim name — it is not split on any character, so claim names that are themselves URIs (e.g. \&quot;http://wso2.org/vc/claim/ibm\&quot;) are supported as-is. 
+    * The claim name identifying the claim within the credential.
     **/
     public ClaimConstraintModel path(String path) {
 
         this.path = path;
         return this;
     }
-    
-    @ApiModelProperty(example = "given_name", value = "The claim name identifying the claim within the credential. This is a single, literal claim name — it is not split on any character, so claim names that are themselves URIs (e.g. \"http://wso2.org/vc/claim/ibm\") are supported as-is. ")
+
+    @ApiModelProperty(example = "given_name", value = "The claim name identifying the claim within the credential.")
     @JsonProperty("path")
     @Valid
     public String getPath() {

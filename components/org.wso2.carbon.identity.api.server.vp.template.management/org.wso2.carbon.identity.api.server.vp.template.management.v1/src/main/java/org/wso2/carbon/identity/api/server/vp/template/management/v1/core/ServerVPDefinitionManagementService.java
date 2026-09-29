@@ -133,7 +133,7 @@ public class ServerVPDefinitionManagementService {
                     urlBase += VPDefinitionManagementConstants.PARAM_FILTER
                             + URLEncoder.encode(filter, StandardCharsets.UTF_8.name());
                 } catch (UnsupportedEncodingException e) {
-                    // UTF-8 is always supported; ignore.
+                    LOG.error("Server encountered an error while building pagination URL for the response.", e);
                 }
             }
 

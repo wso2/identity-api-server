@@ -556,10 +556,7 @@ components:
       properties:
         path:
           type: string
-          description: >
-            The claim name identifying the claim within the credential. This is a single,
-            literal claim name — it is not split on any character, so claim names that are
-            themselves URIs (e.g. "http://wso2.org/vc/claim/ibm") are supported as-is.
+          description: The claim name identifying the claim within the credential.
           example: "given_name"
         mandatory:
           type: boolean
