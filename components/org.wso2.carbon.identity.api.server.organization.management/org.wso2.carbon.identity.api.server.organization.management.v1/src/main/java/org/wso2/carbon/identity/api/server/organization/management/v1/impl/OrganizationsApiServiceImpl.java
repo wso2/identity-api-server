@@ -30,6 +30,9 @@ import org.wso2.carbon.identity.api.server.organization.management.v1.model.Orga
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationPUTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationPatchRequestItem;
 import org.wso2.carbon.identity.api.server.organization.management.v1.service.OrganizationManagementService;
+import org.wso2.carbon.identity.api.server.organization.management.v1.util.OrganizationManagementEndpointUtil;
+import org.wso2.carbon.identity.core.context.IdentityContext;
+import org.wso2.carbon.identity.core.context.model.Flow;
 
 import java.util.List;
 
@@ -61,7 +64,12 @@ public class OrganizationsApiServiceImpl implements OrganizationsApiService {
     @Override
     public Response organizationsOrganizationIdDelete(String organizationId) {
 
-        return organizationManagementService.deleteOrganization(organizationId);
+        try {
+            OrganizationManagementEndpointUtil.enterFlow(Flow.Name.ORGANIZATION_DELETE);
+            return organizationManagementService.deleteOrganization(organizationId);
+        } finally {
+            IdentityContext.getThreadLocalIdentityContext().exitFlow();
+        }
     }
 
     @Override
@@ -88,20 +96,35 @@ public class OrganizationsApiServiceImpl implements OrganizationsApiService {
     public Response organizationsOrganizationIdPatch(String organizationId, List<OrganizationPatchRequestItem>
             organizationPatchRequestItem) {
 
-        return organizationManagementService.patchOrganization(organizationId, organizationPatchRequestItem);
+        try {
+            OrganizationManagementEndpointUtil.enterFlow(Flow.Name.ORGANIZATION_UPDATE);
+            return organizationManagementService.patchOrganization(organizationId, organizationPatchRequestItem);
+        } finally {
+            IdentityContext.getThreadLocalIdentityContext().exitFlow();
+        }
     }
 
     @Override
     public Response organizationsOrganizationIdPut(String organizationId, OrganizationPUTRequest
             organizationPUTRequest) {
 
-        return organizationManagementService.updateOrganization(organizationId, organizationPUTRequest);
+        try {
+            OrganizationManagementEndpointUtil.enterFlow(Flow.Name.ORGANIZATION_UPDATE);
+            return organizationManagementService.updateOrganization(organizationId, organizationPUTRequest);
+        } finally {
+            IdentityContext.getThreadLocalIdentityContext().exitFlow();
+        }
     }
 
     @Override
     public Response patchSelfOrganization(List<OrganizationPatchRequestItem> organizationPatchRequestItem) {
 
-        return organizationManagementService.patchSelfOrganization(organizationPatchRequestItem);
+        try {
+            OrganizationManagementEndpointUtil.enterFlow(Flow.Name.ORGANIZATION_UPDATE);
+            return organizationManagementService.patchSelfOrganization(organizationPatchRequestItem);
+        } finally {
+            IdentityContext.getThreadLocalIdentityContext().exitFlow();
+        }
     }
 
     @Override
@@ -145,7 +168,12 @@ public class OrganizationsApiServiceImpl implements OrganizationsApiService {
     @Override
     public Response organizationPost(OrganizationPOSTRequest organizationPOSTRequest) {
 
-        return organizationManagementService.addOrganization(organizationPOSTRequest);
+        try {
+            OrganizationManagementEndpointUtil.enterFlow(Flow.Name.ORGANIZATION_CREATE);
+            return organizationManagementService.addOrganization(organizationPOSTRequest);
+        } finally {
+            IdentityContext.getThreadLocalIdentityContext().exitFlow();
+        }
     }
 
     @Override

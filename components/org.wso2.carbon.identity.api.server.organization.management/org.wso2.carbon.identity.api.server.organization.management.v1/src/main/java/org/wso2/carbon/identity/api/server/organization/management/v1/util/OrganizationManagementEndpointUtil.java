@@ -22,6 +22,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.organization.management.v1.exceptions.OrganizationManagementEndpointException;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.Error;
+import org.wso2.carbon.identity.core.context.IdentityContext;
+import org.wso2.carbon.identity.core.context.model.Flow;
 import org.wso2.carbon.identity.organization.management.service.exception.OrganizationManagementClientException;
 import org.wso2.carbon.identity.organization.management.service.exception.OrganizationManagementException;
 
@@ -179,4 +181,46 @@ public class OrganizationManagementEndpointUtil {
                 + ORGANIZATION_PATH + paginationURL).toString();
     }
 
+    /**
+     * Enter an organization management flow in the {@link IdentityContext} so that downstream components
+     * (e.g. event handlers/webhooks) can identify the organization operation being performed.
+     * <p>
+     * The flow is not started if the initiating persona cannot be resolved from the actor. Callers must invoke
+     * {@link IdentityContext#exitFlow()} in a finally block.
+     *
+     * @param flowName The name of the organization management flow being started.
+     */
+    public static void enterFlow(Flow.Name flowName) {
+
+        Flow.InitiatingPersona initiatingPersona = getFlowInitiatingPersona();
+        if (initiatingPersona == null) {
+            LOG.debug("Unable to resolve the initiating persona. Hence, not entering the flow: " + flowName);
+            return;
+        }
+        IdentityContext.getThreadLocalIdentityContext().enterFlow(new Flow.Builder()
+                .name(flowName)
+                .initiatingPersona(initiatingPersona)
+                .build());
+    }
+
+    /**
+     * Resolve the initiating persona of the flow from the flow already active in the identity context, falling back
+     * to the actor set in the identity context.
+     *
+     * @return The resolved initiating persona, or null if it cannot be determined.
+     */
+    private static Flow.InitiatingPersona getFlowInitiatingPersona() {
+
+        IdentityContext identityContext = IdentityContext.getThreadLocalIdentityContext();
+        Flow existingFlow = identityContext.getCurrentFlow();
+        if (existingFlow != null) {
+            return existingFlow.getInitiatingPersona();
+        } else if (identityContext.isApplicationActor()) {
+            return Flow.InitiatingPersona.APPLICATION;
+        } else if (identityContext.isUserActor()) {
+            return Flow.InitiatingPersona.ADMIN;
+        }
+        LOG.debug("Actor is not set in the identity context.");
+        return null;
+    }
 }
