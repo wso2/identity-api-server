@@ -22,58 +22,50 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.vp.template.management.v1.IssuerModel;
 import javax.validation.constraints.*;
 
 /**
- * Constraint applied to a single claim within a requested credential.
+ * List of trusted issuer configurations for a credential.
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "Constraint applied to a single claim within a requested credential.")
-public class ClaimConstraintModel  {
-  
-    private String path;
-    private Boolean mandatory = true;
+@ApiModel(description = "List of trusted issuer configurations for a credential.")
+public class IssuerListResponse  {
+
+    private List<IssuerModel> issuerConfigs = null;
+
 
     /**
-    * The claim name identifying the claim within the credential.
+    * The issuer configurations.
     **/
-    public ClaimConstraintModel path(String path) {
+    public IssuerListResponse issuerConfigs(List<IssuerModel> issuerConfigs) {
 
-        this.path = path;
+        this.issuerConfigs = issuerConfigs;
         return this;
     }
 
-    @ApiModelProperty(example = "given_name", value = "The claim name identifying the claim within the credential.")
-    @JsonProperty("path")
+    @ApiModelProperty(value = "The issuer configurations.")
+    @JsonProperty("issuerConfigs")
     @Valid
-    public String getPath() {
-        return path;
+    public List<IssuerModel> getIssuerConfigs() {
+        return issuerConfigs;
     }
-    public void setPath(String path) {
-        this.path = path;
+    public void setIssuerConfigs(List<IssuerModel> issuerConfigs) {
+        this.issuerConfigs = issuerConfigs;
     }
 
-    /**
-    * Whether this claim must be present in the credential. Defaults to true.
-    **/
-    public ClaimConstraintModel mandatory(Boolean mandatory) {
-
-        this.mandatory = mandatory;
+    public IssuerListResponse addIssuerConfigsItem(IssuerModel issuerConfigsItem) {
+        if (this.issuerConfigs == null) {
+            this.issuerConfigs = new ArrayList<>();
+        }
+        this.issuerConfigs.add(issuerConfigsItem);
         return this;
-    }
-    
-    @ApiModelProperty(example = "true", value = "Whether this claim must be present in the credential. Defaults to true.")
-    @JsonProperty("mandatory")
-    @Valid
-    public Boolean getMandatory() {
-        return mandatory;
-    }
-    public void setMandatory(Boolean mandatory) {
-        this.mandatory = mandatory;
     }
 
 
@@ -87,24 +79,22 @@ public class ClaimConstraintModel  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ClaimConstraintModel claimConstraintModel = (ClaimConstraintModel) o;
-        return Objects.equals(this.path, claimConstraintModel.path) &&
-            Objects.equals(this.mandatory, claimConstraintModel.mandatory);
+        IssuerListResponse issuerListResponse = (IssuerListResponse) o;
+        return Objects.equals(this.issuerConfigs, issuerListResponse.issuerConfigs);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(path, mandatory);
+        return Objects.hash(issuerConfigs);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class ClaimConstraintModel {\n");
-        
-        sb.append("    path: ").append(toIndentedString(path)).append("\n");
-        sb.append("    mandatory: ").append(toIndentedString(mandatory)).append("\n");
+        sb.append("class IssuerListResponse {\n");
+
+        sb.append("    issuerConfigs: ").append(toIndentedString(issuerConfigs)).append("\n");
         sb.append("}");
         return sb.toString();
     }

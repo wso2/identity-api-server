@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.vp.template.management.v1.RequestedCredentialModel;
+import org.wso2.carbon.identity.api.server.vp.template.management.v1.CredentialModel;
 import javax.validation.constraints.*;
 
 /**
@@ -41,7 +41,7 @@ public class PresentationDefinitionCreationModel  {
     private String identifier;
     private String displayName;
     private String description;
-    private List<RequestedCredentialModel> credentials = new ArrayList<>();
+    private List<CredentialModel> credentials = new ArrayList<>();
 
 
     /**
@@ -108,7 +108,7 @@ public class PresentationDefinitionCreationModel  {
     /**
     * The requested credentials that constitute this presentation definition.
     **/
-    public PresentationDefinitionCreationModel credentials(List<RequestedCredentialModel> credentials) {
+    public PresentationDefinitionCreationModel credentials(List<CredentialModel> credentials) {
 
         this.credentials = credentials;
         return this;
@@ -119,14 +119,14 @@ public class PresentationDefinitionCreationModel  {
     @Valid
     @NotNull(message = "Property credentials cannot be null.")
  @Size(min=1)
-    public List<RequestedCredentialModel> getCredentials() {
+    public List<CredentialModel> getCredentials() {
         return credentials;
     }
-    public void setCredentials(List<RequestedCredentialModel> credentials) {
+    public void setCredentials(List<CredentialModel> credentials) {
         this.credentials = credentials;
     }
 
-    public PresentationDefinitionCreationModel addCredentialsItem(RequestedCredentialModel credentialsItem) {
+    public PresentationDefinitionCreationModel addCredentialsItem(CredentialModel credentialsItem) {
         this.credentials.add(credentialsItem);
         return this;
     }

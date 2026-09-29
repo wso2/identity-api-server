@@ -26,7 +26,7 @@ import java.io.InputStream;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.ConnectedIdpsResponse;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.Error;
-import org.wso2.carbon.identity.api.server.vp.template.management.v1.IssuerConfigListResponse;
+import org.wso2.carbon.identity.api.server.vp.template.management.v1.IssuerListResponse;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionCreationModel;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionList;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionResponse;
@@ -48,7 +48,7 @@ public interface PresentationDefinitionsApiService {
 
       public Response listPresentationDefinitions(String before, String after, String filter, Integer limit);
 
-      public Response replaceIssuerConfigs(String definitionId, String credentialIdentifier, IssuerConfigListResponse issuerConfigListResponse);
+      public Response replaceIssuerConfigs(String definitionId, String credentialIdentifier, IssuerListResponse issuerListResponse);
 
       public Response updatePresentationDefinition(String definitionId, PresentationDefinitionUpdateModel presentationDefinitionUpdateModel);
 }

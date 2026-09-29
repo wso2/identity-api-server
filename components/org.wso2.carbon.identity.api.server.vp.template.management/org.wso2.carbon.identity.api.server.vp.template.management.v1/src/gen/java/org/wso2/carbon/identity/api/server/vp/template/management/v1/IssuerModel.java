@@ -33,8 +33,8 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 @ApiModel(description = "A single trusted issuer configuration for a credential.")
-public class IssuerConfigModel  {
-  
+public class IssuerModel  {
+
 
 @XmlType(name="KeySourceTypeEnum")
 @XmlEnum(String.class)
@@ -73,14 +73,14 @@ public enum KeySourceTypeEnum {
     private String keySource;
 
     /**
-    * Type of key source used to resolve the issuer&#39;s public key for signature verification. Use x5c for X.509 certificate chain validation, jwks_uri to fetch public keys from a JWKS endpoint, or pem for a directly-supplied issuer certificate. 
+    * Type of key source used to resolve the issuer&#39;s public key for signature verification. Use x5c for X.509 certificate chain validation, jwks_uri to fetch public keys from a JWKS endpoint, or pem for a directly-supplied issuer certificate.
     **/
-    public IssuerConfigModel keySourceType(KeySourceTypeEnum keySourceType) {
+    public IssuerModel keySourceType(KeySourceTypeEnum keySourceType) {
 
         this.keySourceType = keySourceType;
         return this;
     }
-    
+
     @ApiModelProperty(example = "jwks_uri", required = true, value = "Type of key source used to resolve the issuer's public key for signature verification. Use x5c for X.509 certificate chain validation, jwks_uri to fetch public keys from a JWKS endpoint, or pem for a directly-supplied issuer certificate. ")
     @JsonProperty("keySourceType")
     @Valid
@@ -94,14 +94,14 @@ public enum KeySourceTypeEnum {
     }
 
     /**
-    * URL that uniquely identifies the credential issuer (the iss claim value). Required for jwks_uri and pem methods. Not used for x5c. 
+    * URL that uniquely identifies the credential issuer (the iss claim value). Required for jwks_uri and pem methods. Not used for x5c.
     **/
-    public IssuerConfigModel issuerUrl(String issuerUrl) {
+    public IssuerModel issuerUrl(String issuerUrl) {
 
         this.issuerUrl = issuerUrl;
         return this;
     }
-    
+
     @ApiModelProperty(example = "https://issuer.example.com", value = "URL that uniquely identifies the credential issuer (the iss claim value). Required for jwks_uri and pem methods. Not used for x5c. ")
     @JsonProperty("issuerUrl")
     @Valid
@@ -113,14 +113,14 @@ public enum KeySourceTypeEnum {
     }
 
     /**
-    * Key source for signature verification. For jwks_uri: the JWKS endpoint URL. For pem: the Base64-encoded PEM signing certificate of the issuer. For x5c: the Base64-encoded PEM trusted root CA certificate. 
+    * Key source for signature verification. For jwks_uri: the JWKS endpoint URL. For pem: the Base64-encoded PEM signing certificate of the issuer. For x5c: the Base64-encoded PEM trusted root CA certificate.
     **/
-    public IssuerConfigModel keySource(String keySource) {
+    public IssuerModel keySource(String keySource) {
 
         this.keySource = keySource;
         return this;
     }
-    
+
     @ApiModelProperty(example = "https://issuer.example.com/.well-known/jwks.json", value = "Key source for signature verification. For jwks_uri: the JWKS endpoint URL. For pem: the Base64-encoded PEM signing certificate of the issuer. For x5c: the Base64-encoded PEM trusted root CA certificate. ")
     @JsonProperty("keySource")
     @Valid
@@ -142,10 +142,10 @@ public enum KeySourceTypeEnum {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        IssuerConfigModel issuerConfigModel = (IssuerConfigModel) o;
-        return Objects.equals(this.keySourceType, issuerConfigModel.keySourceType) &&
-            Objects.equals(this.issuerUrl, issuerConfigModel.issuerUrl) &&
-            Objects.equals(this.keySource, issuerConfigModel.keySource);
+        IssuerModel issuerModel = (IssuerModel) o;
+        return Objects.equals(this.keySourceType, issuerModel.keySourceType) &&
+            Objects.equals(this.issuerUrl, issuerModel.issuerUrl) &&
+            Objects.equals(this.keySource, issuerModel.keySource);
     }
 
     @Override
@@ -157,8 +157,8 @@ public enum KeySourceTypeEnum {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class IssuerConfigModel {\n");
-        
+        sb.append("class IssuerModel {\n");
+
         sb.append("    keySourceType: ").append(toIndentedString(keySourceType)).append("\n");
         sb.append("    issuerUrl: ").append(toIndentedString(issuerUrl)).append("\n");
         sb.append("    keySource: ").append(toIndentedString(keySource)).append("\n");

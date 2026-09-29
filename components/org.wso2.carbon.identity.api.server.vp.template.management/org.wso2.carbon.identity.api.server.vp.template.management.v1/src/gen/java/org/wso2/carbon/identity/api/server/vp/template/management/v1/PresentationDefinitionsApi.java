@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.ConnectedIdpsResponse;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.Error;
-import org.wso2.carbon.identity.api.server.vp.template.management.v1.IssuerConfigListResponse;
+import org.wso2.carbon.identity.api.server.vp.template.management.v1.IssuerListResponse;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionCreationModel;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionList;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionResponse;
@@ -128,14 +128,14 @@ public class PresentationDefinitionsApi  {
     @Path("/{definition-id}/credentials/{credential-identifier}/issuer-configs")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get issuer configurations for a credential.", notes = "Returns all trusted issuer configurations for a specific credential within a presentation definition.", response = IssuerConfigListResponse.class, authorizations = {
+    @ApiOperation(value = "Get issuer configurations for a credential.", notes = "Returns all trusted issuer configurations for a specific credential within a presentation definition.", response = IssuerListResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Presentation Definitions", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful Response", response = IssuerConfigListResponse.class),
+        @ApiResponse(code = 200, message = "Successful Response", response = IssuerListResponse.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
@@ -197,23 +197,23 @@ public class PresentationDefinitionsApi  {
     @Path("/{definition-id}/credentials/{credential-identifier}/issuer-configs")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Replace issuer configurations for a credential.", notes = "Atomically replaces the entire set of trusted issuer configurations for a specific credential within a presentation definition. At least one configuration must be provided. ", response = IssuerConfigListResponse.class, authorizations = {
+    @ApiOperation(value = "Replace issuer configurations for a credential.", notes = "Atomically replaces the entire set of trusted issuer configurations for a specific credential within a presentation definition. At least one configuration must be provided. ", response = IssuerListResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Presentation Definitions", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful Response — the stored issuer configurations.", response = IssuerConfigListResponse.class),
+        @ApiResponse(code = 200, message = "Successful Response — the stored issuer configurations.", response = IssuerListResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response replaceIssuerConfigs(@ApiParam(value = "UUID of the presentation definition.",required=true) @PathParam("definition-id") String definitionId, @ApiParam(value = "Identifier of the credential query within the presentation definition.",required=true) @PathParam("credential-identifier") String credentialIdentifier, @ApiParam(value = "" ,required=true) @Valid IssuerConfigListResponse issuerConfigListResponse) {
+    public Response replaceIssuerConfigs(@ApiParam(value = "UUID of the presentation definition.",required=true) @PathParam("definition-id") String definitionId, @ApiParam(value = "Identifier of the credential query within the presentation definition.",required=true) @PathParam("credential-identifier") String credentialIdentifier, @ApiParam(value = "" ,required=true) @Valid IssuerListResponse issuerListResponse) {
 
-        return delegate.replaceIssuerConfigs(definitionId,  credentialIdentifier,  issuerConfigListResponse );
+        return delegate.replaceIssuerConfigs(definitionId,  credentialIdentifier,  issuerListResponse );
     }
 
     @Valid

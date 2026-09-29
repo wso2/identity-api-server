@@ -20,7 +20,7 @@ package org.wso2.carbon.identity.api.server.vp.template.management.v1.impl;
 
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.vp.template.management.common.VPDefinitionManagementConstants;
-import org.wso2.carbon.identity.api.server.vp.template.management.v1.IssuerConfigListResponse;
+import org.wso2.carbon.identity.api.server.vp.template.management.v1.IssuerListResponse;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionCreationModel;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionResponse;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionUpdateModel;
@@ -109,10 +109,10 @@ public class PresentationDefinitionsApiServiceImpl implements PresentationDefini
 
     @Override
     public Response replaceIssuerConfigs(String definitionId, String credentialId,
-            IssuerConfigListResponse issuerConfigListResponse) {
+            IssuerListResponse issuerListResponse) {
 
         return Response.ok().entity(
                 serverVPDefinitionManagementService.replaceIssuerConfigs(definitionId, credentialId,
-                        issuerConfigListResponse)).build();
+                        issuerListResponse)).build();
     }
 }

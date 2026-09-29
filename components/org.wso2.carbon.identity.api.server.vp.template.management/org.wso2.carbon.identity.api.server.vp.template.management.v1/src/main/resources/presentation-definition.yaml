@@ -304,7 +304,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IssuerConfigListResponse'
+                $ref: '#/components/schemas/IssuerListResponse'
         '401':
           description: Unauthorized
         '403':
@@ -343,14 +343,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/IssuerConfigListResponse'
+              $ref: '#/components/schemas/IssuerListResponse'
       responses:
         '200':
           description: Successful Response — the stored issuer configurations.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IssuerConfigListResponse'
+                $ref: '#/components/schemas/IssuerListResponse'
         '400':
           description: Bad Request
           content:
@@ -430,7 +430,7 @@ components:
           description: The requested credentials that constitute this presentation definition.
           minItems: 1
           items:
-            $ref: '#/components/schemas/RequestedCredentialModel'
+            $ref: '#/components/schemas/CredentialModel'
 
     PresentationDefinitionUpdateModel:
       type: object
@@ -448,7 +448,7 @@ components:
           type: array
           description: Replacement set of requested credentials. When provided, replaces the entire list.
           items:
-            $ref: '#/components/schemas/RequestedCredentialModel'
+            $ref: '#/components/schemas/CredentialModel'
 
     PresentationDefinitionResponse:
       type: object
@@ -474,7 +474,7 @@ components:
           type: array
           description: The requested credentials defined in this presentation definition.
           items:
-            $ref: '#/components/schemas/RequestedCredentialModel'
+            $ref: '#/components/schemas/CredentialModel'
 
     PresentationDefinitionList:
       type: object
@@ -516,7 +516,7 @@ components:
           description: Description of the presentation definition.
           example: "Requests an employee ID credential from the wallet."
 
-    RequestedCredentialModel:
+    CredentialModel:
       type: object
       description: Specifies a single credential query within a presentation definition.
       required:
@@ -548,9 +548,9 @@ components:
           type: array
           description: Claim constraints that must be satisfied by the presented credential.
           items:
-            $ref: '#/components/schemas/ClaimConstraintModel'
+            $ref: '#/components/schemas/PresentationClaimModel'
 
-    ClaimConstraintModel:
+    PresentationClaimModel:
       type: object
       description: Constraint applied to a single claim within a requested credential.
       properties:
@@ -565,7 +565,7 @@ components:
           example: true
 
 
-    IssuerConfigModel:
+    IssuerModel:
       type: object
       description: A single trusted issuer configuration for a credential.
       required:
@@ -597,7 +597,7 @@ components:
             For x5c: the Base64-encoded PEM trusted root CA certificate.
           example: "https://issuer.example.com/.well-known/jwks.json"
 
-    IssuerConfigListResponse:
+    IssuerListResponse:
       type: object
       description: List of trusted issuer configurations for a credential.
       properties:
@@ -605,7 +605,7 @@ components:
           type: array
           description: The issuer configurations.
           items:
-            $ref: '#/components/schemas/IssuerConfigModel'
+            $ref: '#/components/schemas/IssuerModel'
 
     ConnectedIdpsResponse:
       type: object

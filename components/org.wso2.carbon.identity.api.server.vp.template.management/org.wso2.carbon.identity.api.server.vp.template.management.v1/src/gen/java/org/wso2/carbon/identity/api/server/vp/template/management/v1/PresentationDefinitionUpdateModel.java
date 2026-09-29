@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.vp.template.management.v1.RequestedCredentialModel;
+import org.wso2.carbon.identity.api.server.vp.template.management.v1.CredentialModel;
 import javax.validation.constraints.*;
 
 /**
@@ -40,7 +40,7 @@ public class PresentationDefinitionUpdateModel  {
   
     private String displayName;
     private String description;
-    private List<RequestedCredentialModel> credentials = null;
+    private List<CredentialModel> credentials = null;
 
 
     /**
@@ -84,7 +84,7 @@ public class PresentationDefinitionUpdateModel  {
     /**
     * Replacement set of requested credentials. When provided, replaces the entire list.
     **/
-    public PresentationDefinitionUpdateModel credentials(List<RequestedCredentialModel> credentials) {
+    public PresentationDefinitionUpdateModel credentials(List<CredentialModel> credentials) {
 
         this.credentials = credentials;
         return this;
@@ -93,14 +93,14 @@ public class PresentationDefinitionUpdateModel  {
     @ApiModelProperty(value = "Replacement set of requested credentials. When provided, replaces the entire list.")
     @JsonProperty("credentials")
     @Valid
-    public List<RequestedCredentialModel> getCredentials() {
+    public List<CredentialModel> getCredentials() {
         return credentials;
     }
-    public void setCredentials(List<RequestedCredentialModel> credentials) {
+    public void setCredentials(List<CredentialModel> credentials) {
         this.credentials = credentials;
     }
 
-    public PresentationDefinitionUpdateModel addCredentialsItem(RequestedCredentialModel credentialsItem) {
+    public PresentationDefinitionUpdateModel addCredentialsItem(CredentialModel credentialsItem) {
         if (this.credentials == null) {
             this.credentials = new ArrayList<>();
         }

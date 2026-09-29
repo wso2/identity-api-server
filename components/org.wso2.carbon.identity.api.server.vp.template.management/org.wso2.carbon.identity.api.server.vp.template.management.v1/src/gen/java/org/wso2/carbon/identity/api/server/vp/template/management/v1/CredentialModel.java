@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.vp.template.management.v1.ClaimConstraintModel;
+import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationClaimModel;
 import javax.validation.constraints.*;
 
 /**
@@ -36,8 +36,8 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 @ApiModel(description = "Specifies a single credential query within a presentation definition.")
-public class RequestedCredentialModel  {
-  
+public class CredentialModel  {
+
     private String id;
     private String type;
 
@@ -74,18 +74,18 @@ public enum FormatEnum {
 }
 
     private FormatEnum format = FormatEnum.DC_SD_JWT;
-    private List<ClaimConstraintModel> claims = null;
+    private List<PresentationClaimModel> claims = null;
 
 
     /**
-    * User-defined identifier for this credential query within the definition. Used to correlate the wallet&#39;s response to this specific request. 
+    * User-defined identifier for this credential query within the definition. Used to correlate the wallet&#39;s response to this specific request.
     **/
-    public RequestedCredentialModel id(String id) {
+    public CredentialModel id(String id) {
 
         this.id = id;
         return this;
     }
-    
+
     @ApiModelProperty(example = "employee_id", required = true, value = "User-defined identifier for this credential query within the definition. Used to correlate the wallet's response to this specific request. ")
     @JsonProperty("id")
     @Valid
@@ -101,12 +101,12 @@ public enum FormatEnum {
     /**
     * The credential type (vct) to request from the wallet.
     **/
-    public RequestedCredentialModel type(String type) {
+    public CredentialModel type(String type) {
 
         this.type = type;
         return this;
     }
-    
+
     @ApiModelProperty(example = "EmployeeIDCredential", required = true, value = "The credential type (vct) to request from the wallet.")
     @JsonProperty("type")
     @Valid
@@ -120,14 +120,14 @@ public enum FormatEnum {
     }
 
     /**
-    * Credential format as defined by OID4VP §6.1. Defaults to dc+sd-jwt when not specified. 
+    * Credential format as defined by OID4VP §6.1. Defaults to dc+sd-jwt when not specified.
     **/
-    public RequestedCredentialModel format(FormatEnum format) {
+    public CredentialModel format(FormatEnum format) {
 
         this.format = format;
         return this;
     }
-    
+
     @ApiModelProperty(example = "dc+sd-jwt", value = "Credential format as defined by OID4VP §6.1. Defaults to dc+sd-jwt when not specified. ")
     @JsonProperty("format")
     @Valid
@@ -141,23 +141,23 @@ public enum FormatEnum {
     /**
     * Claim constraints that must be satisfied by the presented credential.
     **/
-    public RequestedCredentialModel claims(List<ClaimConstraintModel> claims) {
+    public CredentialModel claims(List<PresentationClaimModel> claims) {
 
         this.claims = claims;
         return this;
     }
-    
+
     @ApiModelProperty(value = "Claim constraints that must be satisfied by the presented credential.")
     @JsonProperty("claims")
     @Valid
-    public List<ClaimConstraintModel> getClaims() {
+    public List<PresentationClaimModel> getClaims() {
         return claims;
     }
-    public void setClaims(List<ClaimConstraintModel> claims) {
+    public void setClaims(List<PresentationClaimModel> claims) {
         this.claims = claims;
     }
 
-    public RequestedCredentialModel addClaimsItem(ClaimConstraintModel claimsItem) {
+    public CredentialModel addClaimsItem(PresentationClaimModel claimsItem) {
         if (this.claims == null) {
             this.claims = new ArrayList<>();
         }
@@ -165,7 +165,7 @@ public enum FormatEnum {
         return this;
     }
 
-    
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -176,11 +176,11 @@ public enum FormatEnum {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        RequestedCredentialModel requestedCredentialModel = (RequestedCredentialModel) o;
-        return Objects.equals(this.id, requestedCredentialModel.id) &&
-            Objects.equals(this.type, requestedCredentialModel.type) &&
-            Objects.equals(this.format, requestedCredentialModel.format) &&
-            Objects.equals(this.claims, requestedCredentialModel.claims);
+        CredentialModel credentialModel = (CredentialModel) o;
+        return Objects.equals(this.id, credentialModel.id) &&
+            Objects.equals(this.type, credentialModel.type) &&
+            Objects.equals(this.format, credentialModel.format) &&
+            Objects.equals(this.claims, credentialModel.claims);
     }
 
     @Override
@@ -192,8 +192,8 @@ public enum FormatEnum {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class RequestedCredentialModel {\n");
-        
+        sb.append("class CredentialModel {\n");
+
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    format: ").append(toIndentedString(format)).append("\n");

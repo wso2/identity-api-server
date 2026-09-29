@@ -22,53 +22,61 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
-import org.wso2.carbon.identity.api.server.vp.template.management.v1.IssuerConfigModel;
 import javax.validation.constraints.*;
 
 /**
- * List of trusted issuer configurations for a credential.
+ * Constraint applied to a single claim within a requested credential.
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "List of trusted issuer configurations for a credential.")
-public class IssuerConfigListResponse  {
-  
-    private List<IssuerConfigModel> issuerConfigs = null;
+@ApiModel(description = "Constraint applied to a single claim within a requested credential.")
+public class PresentationClaimModel  {
 
+    private String path;
+    private Boolean mandatory = true;
 
     /**
-    * The issuer configurations.
+    * The claim name identifying the claim within the credential.
     **/
-    public IssuerConfigListResponse issuerConfigs(List<IssuerConfigModel> issuerConfigs) {
+    public PresentationClaimModel path(String path) {
 
-        this.issuerConfigs = issuerConfigs;
+        this.path = path;
         return this;
     }
-    
-    @ApiModelProperty(value = "The issuer configurations.")
-    @JsonProperty("issuerConfigs")
+
+    @ApiModelProperty(example = "given_name", value = "The claim name identifying the claim within the credential.")
+    @JsonProperty("path")
     @Valid
-    public List<IssuerConfigModel> getIssuerConfigs() {
-        return issuerConfigs;
+    public String getPath() {
+        return path;
     }
-    public void setIssuerConfigs(List<IssuerConfigModel> issuerConfigs) {
-        this.issuerConfigs = issuerConfigs;
+    public void setPath(String path) {
+        this.path = path;
     }
 
-    public IssuerConfigListResponse addIssuerConfigsItem(IssuerConfigModel issuerConfigsItem) {
-        if (this.issuerConfigs == null) {
-            this.issuerConfigs = new ArrayList<>();
-        }
-        this.issuerConfigs.add(issuerConfigsItem);
+    /**
+    * Whether this claim must be present in the credential. Defaults to true.
+    **/
+    public PresentationClaimModel mandatory(Boolean mandatory) {
+
+        this.mandatory = mandatory;
         return this;
     }
 
-    
+    @ApiModelProperty(example = "true", value = "Whether this claim must be present in the credential. Defaults to true.")
+    @JsonProperty("mandatory")
+    @Valid
+    public Boolean getMandatory() {
+        return mandatory;
+    }
+    public void setMandatory(Boolean mandatory) {
+        this.mandatory = mandatory;
+    }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -79,22 +87,24 @@ public class IssuerConfigListResponse  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        IssuerConfigListResponse issuerConfigListResponse = (IssuerConfigListResponse) o;
-        return Objects.equals(this.issuerConfigs, issuerConfigListResponse.issuerConfigs);
+        PresentationClaimModel presentationClaimModel = (PresentationClaimModel) o;
+        return Objects.equals(this.path, presentationClaimModel.path) &&
+            Objects.equals(this.mandatory, presentationClaimModel.mandatory);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(issuerConfigs);
+        return Objects.hash(path, mandatory);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class IssuerConfigListResponse {\n");
-        
-        sb.append("    issuerConfigs: ").append(toIndentedString(issuerConfigs)).append("\n");
+        sb.append("class PresentationClaimModel {\n");
+
+        sb.append("    path: ").append(toIndentedString(path)).append("\n");
+        sb.append("    mandatory: ").append(toIndentedString(mandatory)).append("\n");
         sb.append("}");
         return sb.toString();
     }

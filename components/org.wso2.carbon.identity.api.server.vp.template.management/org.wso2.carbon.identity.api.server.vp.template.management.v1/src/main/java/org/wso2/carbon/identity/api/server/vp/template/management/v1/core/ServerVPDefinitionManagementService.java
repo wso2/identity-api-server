@@ -26,18 +26,18 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.vp.template.management.common.VPDefinitionManagementConstants;
 import org.wso2.carbon.identity.api.server.vp.template.management.common.VPDefinitionManagementConstants.ErrorMessage;
-import org.wso2.carbon.identity.api.server.vp.template.management.v1.ClaimConstraintModel;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.ConnectedIdpItem;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.ConnectedIdpsResponse;
-import org.wso2.carbon.identity.api.server.vp.template.management.v1.IssuerConfigListResponse;
-import org.wso2.carbon.identity.api.server.vp.template.management.v1.IssuerConfigModel;
+import org.wso2.carbon.identity.api.server.vp.template.management.v1.CredentialModel;
+import org.wso2.carbon.identity.api.server.vp.template.management.v1.IssuerListResponse;
+import org.wso2.carbon.identity.api.server.vp.template.management.v1.IssuerModel;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PaginationLink;
+import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationClaimModel;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionCreationModel;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionList;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionListItem;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionResponse;
 import org.wso2.carbon.identity.api.server.vp.template.management.v1.PresentationDefinitionUpdateModel;
-import org.wso2.carbon.identity.api.server.vp.template.management.v1.RequestedCredentialModel;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.openid4vc.template.management.PresentationDefinitionManager;
 import org.wso2.carbon.identity.openid4vc.template.management.exception.PresentationManagementClientException;
@@ -380,7 +380,7 @@ public class ServerVPDefinitionManagementService {
      * @param credentialId the user-defined identifier of the target credential.
      * @return the issuer configurations stored for that credential.
      */
-    public IssuerConfigListResponse getIssuerConfigs(String definitionId, String credentialId) {
+    public IssuerListResponse getIssuerConfigs(String definitionId, String credentialId) {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Retrieving issuer configs for credential: " + credentialId
@@ -400,7 +400,7 @@ public class ServerVPDefinitionManagementService {
                 throw handleCredentialNotFound(definitionId, credentialId);
             }
 
-            return toIssuerConfigListResponse(target.getIssuers());
+            return toIssuerListResponse(target.getIssuers());
         } catch (PresentationManagementException e) {
             throw handleServerError(ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_DEFINITION, e, definitionId);
         }
@@ -411,11 +411,11 @@ public class ServerVPDefinitionManagementService {
      *
      * @param definitionId             the server-generated UUID of the definition.
      * @param credentialId             the user-defined identifier of the target credential.
-     * @param issuerConfigListResponse the new issuer configs (replaces all existing ones).
+     * @param issuerListResponse the new issuer configs (replaces all existing ones).
      * @return the stored issuer configurations.
      */
-    public IssuerConfigListResponse replaceIssuerConfigs(String definitionId, String credentialId,
-            IssuerConfigListResponse issuerConfigListResponse) {
+    public IssuerListResponse replaceIssuerConfigs(String definitionId, String credentialId,
+            IssuerListResponse issuerListResponse) {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Replacing issuer configs for credential: " + credentialId
@@ -434,11 +434,11 @@ public class ServerVPDefinitionManagementService {
                 throw handleCredentialNotFound(definitionId, credentialId);
             }
 
-            List<IssuerConfigModel> requestModels = issuerConfigListResponse != null
-                    ? issuerConfigListResponse.getIssuerConfigs()
+            List<IssuerModel> requestModels = issuerListResponse != null
+                    ? issuerListResponse.getIssuerConfigs()
                     : null;
 
-            for (IssuerConfigModel model : safeList(requestModels)) {
+            for (IssuerModel model : safeList(requestModels)) {
                 if (model.getKeySourceType() == null) {
                     throw handleClientError(ErrorMessage.ERROR_CODE_INVALID_INPUT, null,
                             Response.Status.BAD_REQUEST,
@@ -449,7 +449,7 @@ public class ServerVPDefinitionManagementService {
             List<Issuer> issuers = toDomainIssuers(requestModels);
             presentationDefinitionManager.replaceIssuerConfigs(definitionId, credentialId, issuers, tenantId);
 
-            return toIssuerConfigListResponse(issuers);
+            return toIssuerListResponse(issuers);
         } catch (PresentationManagementClientException e) {
             if (PresentationManagementErrorCode.DEFINITION_NOT_FOUND.equals(e.getErrorCode())) {
                 throw handleNotFound(definitionId);
@@ -466,14 +466,14 @@ public class ServerVPDefinitionManagementService {
 
     // --- Conversion helpers ---
 
-    private List<Credential> toCredentials(List<RequestedCredentialModel> apiModels)
+    private List<Credential> toCredentials(List<CredentialModel> apiModels)
             throws PresentationManagementClientException {
 
         if (apiModels == null) {
             return null;
         }
         List<Credential> result = new ArrayList<>();
-        for (RequestedCredentialModel apiModel : apiModels) {
+        for (CredentialModel apiModel : apiModels) {
             Credential credential = new Credential();
             credential.setIdentifier(apiModel.getId());
             credential.setType(apiModel.getType());
@@ -485,30 +485,30 @@ public class ServerVPDefinitionManagementService {
         return result;
     }
 
-    private List<RequestedCredentialModel> toCredentialModels(List<Credential> domainCredentials) {
+    private List<CredentialModel> toCredentialModels(List<Credential> domainCredentials) {
 
         if (domainCredentials == null) {
             return null;
         }
-        List<RequestedCredentialModel> result = new ArrayList<>();
+        List<CredentialModel> result = new ArrayList<>();
         for (Credential credential : domainCredentials) {
-            RequestedCredentialModel model = new RequestedCredentialModel();
+            CredentialModel model = new CredentialModel();
             model.setId(credential.getIdentifier());
             model.setType(credential.getType());
-            model.setFormat(RequestedCredentialModel.FormatEnum.fromValue(credential.getFormat()));
-            model.setClaims(toClaimConstraintModels(credential.getClaims()));
+            model.setFormat(CredentialModel.FormatEnum.fromValue(credential.getFormat()));
+            model.setClaims(toPresentationClaimModels(credential.getClaims()));
             result.add(model);
         }
         return result;
     }
 
-    private List<Issuer> toDomainIssuers(List<IssuerConfigModel> apiModels) {
+    private List<Issuer> toDomainIssuers(List<IssuerModel> apiModels) {
 
         if (apiModels == null) {
             return null;
         }
         List<Issuer> result = new ArrayList<>();
-        for (IssuerConfigModel model : apiModels) {
+        for (IssuerModel model : apiModels) {
             Issuer issuer = new Issuer();
             KeyResolutionMethod method = KeyResolutionMethod.valueOf(model.getKeySourceType().name());
             issuer.setKeyResolutionMethod(method);
@@ -523,15 +523,15 @@ public class ServerVPDefinitionManagementService {
         return result;
     }
 
-    private List<IssuerConfigModel> toIssuerConfigModels(List<Issuer> issuers) {
+    private List<IssuerModel> toIssuerModels(List<Issuer> issuers) {
 
         if (issuers == null) {
             return null;
         }
-        List<IssuerConfigModel> result = new ArrayList<>();
+        List<IssuerModel> result = new ArrayList<>();
         for (Issuer issuer : issuers) {
-            IssuerConfigModel model = new IssuerConfigModel();
-            model.setKeySourceType(IssuerConfigModel.KeySourceTypeEnum.valueOf(issuer.getKeyResolutionMethod().name()));
+            IssuerModel model = new IssuerModel();
+            model.setKeySourceType(IssuerModel.KeySourceTypeEnum.valueOf(issuer.getKeyResolutionMethod().name()));
             model.setIssuerUrl(issuer.getIssuerUrl());
             if (KeyResolutionMethod.JWKS_URI == issuer.getKeyResolutionMethod()) {
                 model.setKeySource(issuer.getJwksUri());
@@ -543,10 +543,10 @@ public class ServerVPDefinitionManagementService {
         return result;
     }
 
-    private IssuerConfigListResponse toIssuerConfigListResponse(List<Issuer> issuers) {
+    private IssuerListResponse toIssuerListResponse(List<Issuer> issuers) {
 
-        IssuerConfigListResponse response = new IssuerConfigListResponse();
-        response.setIssuerConfigs(toIssuerConfigModels(issuers));
+        IssuerListResponse response = new IssuerListResponse();
+        response.setIssuerConfigs(toIssuerModels(issuers));
         return response;
     }
 
@@ -566,13 +566,13 @@ public class ServerVPDefinitionManagementService {
         return Base64.getEncoder().encodeToString(rawPem.getBytes(StandardCharsets.UTF_8));
     }
 
-    private List<PresentationClaim> toPresentationClaims(List<ClaimConstraintModel> apiModels) {
+    private List<PresentationClaim> toPresentationClaims(List<PresentationClaimModel> apiModels) {
 
         if (apiModels == null) {
             return null;
         }
         List<PresentationClaim> result = new ArrayList<>();
-        for (ClaimConstraintModel apiModel : apiModels) {
+        for (PresentationClaimModel apiModel : apiModels) {
             PresentationClaim claim = new PresentationClaim();
             claim.setPath(apiModel.getPath());
             claim.setMandatory(Boolean.TRUE.equals(
@@ -582,14 +582,14 @@ public class ServerVPDefinitionManagementService {
         return result;
     }
 
-    private List<ClaimConstraintModel> toClaimConstraintModels(List<PresentationClaim> claims) {
+    private List<PresentationClaimModel> toPresentationClaimModels(List<PresentationClaim> claims) {
 
         if (claims == null) {
             return null;
         }
-        List<ClaimConstraintModel> result = new ArrayList<>();
+        List<PresentationClaimModel> result = new ArrayList<>();
         for (PresentationClaim claim : claims) {
-            ClaimConstraintModel model = new ClaimConstraintModel();
+            PresentationClaimModel model = new PresentationClaimModel();
             model.setPath(claim.getPath());
             model.setMandatory(claim.isMandatory());
             result.add(model);
