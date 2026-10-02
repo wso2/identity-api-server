@@ -181,6 +181,7 @@ public class FlowEndpointConstants {
         public static final String USER_PROVISIONING_EXECUTOR = "UserProvisioningExecutor";
         public static final String FLOW_EXTENSION_EXECUTOR = "FlowExtensionExecutor";
         public static final String PROVISIONING_DISPATCH_EXECUTOR = "ProvisioningDispatchExecutor";
+        public static final String OPENID4VP_REGISTRATION_EXECUTOR = "PresentationExecutor";
     }
 
     /**
@@ -194,6 +195,7 @@ public class FlowEndpointConstants {
         public static final String FACEBOOK_AUTHENTICATOR = "FacebookAuthenticator";
         public static final String OFFICE365_AUTHENTICATOR = "Office365Authenticator";
         public static final String APPLE_AUTHENTICATOR = "AppleOIDCAuthenticator";
+        public static final String OPENID4VP_AUTHENTICATOR = "PresentationAuthenticator";
     }
 
     /**
