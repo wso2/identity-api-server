@@ -63,7 +63,8 @@ import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
 /**
- * Core service for VP Presentation Definition Management API, handling business logic, model conversion, and error mapping.
+ * Core service for VP Presentation Definition Management API, handling business logic, model conversion,
+ * and error mapping.
  */
 public class ServerVPDefinitionManagementService {
 

@@ -34,7 +34,8 @@ import javax.ws.rs.core.Response;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 
 /**
- * Implementation of PresentationDefinitionsApiService, delegating all operations to ServerVPDefinitionManagementService and wrapping results in JAX-RS Response.
+ * Implementation of PresentationDefinitionsApiService, delegating all operations to
+ * ServerVPDefinitionManagementService and wrapping results in JAX-RS Response.
  */
 public class PresentationDefinitionsApiServiceImpl implements PresentationDefinitionsApiService {
 
