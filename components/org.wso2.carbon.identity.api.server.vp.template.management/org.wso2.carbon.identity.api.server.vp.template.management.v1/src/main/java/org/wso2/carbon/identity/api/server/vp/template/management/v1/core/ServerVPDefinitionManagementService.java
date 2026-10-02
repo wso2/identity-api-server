@@ -240,6 +240,13 @@ public class ServerVPDefinitionManagementService {
             }
             return toResponse(definition);
         } catch (PresentationManagementClientException e) {
+            if (PresentationManagementErrorCode.DEFINITION_NOT_FOUND.equals(e.getErrorCode())) {
+                throw handleNotFound(definitionId);
+            }
+            if (PresentationManagementErrorCode.VALIDATION_ERROR.equals(e.getErrorCode())) {
+                throw handleClientError(ErrorMessage.ERROR_CODE_INVALID_INPUT, e,
+                        Response.Status.BAD_REQUEST, e.getMessage());
+            }
             throw handleServerError(ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_DEFINITION, e, definitionId);
         } catch (PresentationManagementException e) {
             throw handleServerError(ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_DEFINITION, e, definitionId);
@@ -552,7 +559,12 @@ public class ServerVPDefinitionManagementService {
         if (StringUtils.isBlank(base64Pem)) {
             return null;
         }
-        return new String(Base64.getDecoder().decode(base64Pem), StandardCharsets.UTF_8);
+        try {
+            return new String(Base64.getDecoder().decode(base64Pem), StandardCharsets.UTF_8);
+        } catch (IllegalArgumentException e) {
+            throw handleClientError(ErrorMessage.ERROR_CODE_INVALID_INPUT, e,
+                    Response.Status.BAD_REQUEST, "keySource must be a valid Base64-encoded PEM value.");
+        }
     }
 
     private String encodeBase64Pem(String rawPem) {

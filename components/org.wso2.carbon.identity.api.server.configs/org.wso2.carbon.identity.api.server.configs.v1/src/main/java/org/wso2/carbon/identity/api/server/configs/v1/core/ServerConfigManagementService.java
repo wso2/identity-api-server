@@ -723,6 +723,10 @@ public class ServerConfigManagementService {
      */
     public OpenID4VPConfiguration updateOpenID4VPConfiguration(OpenID4VPConfiguration config) {
 
+        if (config == null) {
+            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT,
+                    "OpenID4VP configuration is required in the request body.");
+        }
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         PresentationConfigMgtService configService = ConfigsServiceHolder.getPresentationConfigMgtService();
         try {
@@ -732,7 +736,7 @@ public class ServerConfigManagementService {
             tenantConfig.setResponseMode(
                     config.getResponseMode() != null ? config.getResponseMode().value() : null);
             configService.setVPConfig(tenantConfig, tenantDomain);
-            return config;
+            return getOpenID4VPConfiguration();
         } catch (PresentationCoreException e) {
             throw handlePresentationConfigException(e, Constants.ErrorMessage.ERROR_CODE_OID4VP_CONFIG_UPDATE,
                     tenantDomain);
