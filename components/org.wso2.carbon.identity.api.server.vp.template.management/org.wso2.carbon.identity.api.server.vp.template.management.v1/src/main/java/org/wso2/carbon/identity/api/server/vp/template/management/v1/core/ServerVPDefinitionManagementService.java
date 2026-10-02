@@ -63,8 +63,7 @@ import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
 /**
- * Core service for VP Presentation Definition Management API.
- * Handles business logic, model conversion, and error mapping.
+ * Core service for VP Presentation Definition Management API, handling business logic, model conversion, and error mapping.
  */
 public class ServerVPDefinitionManagementService {
 
@@ -79,12 +78,11 @@ public class ServerVPDefinitionManagementService {
     /**
      * List presentation definitions with cursor-based pagination and optional filtering.
      *
-     * @param before base64-encoded backward cursor for reverse pagination; {@code null} for forward direction.
-     * @param after  base64-encoded forward cursor from the previous page's "next" link; {@code null} to start from
-     *               the beginning.
-     * @param filter a SCIM-style filter expression to narrow results; {@code null} to return all definitions.
-     * @param limit  maximum number of records per page; capped at {@code MAX_LIMIT}.
-     * @return the paginated list of presentation definitions with cursor-based navigation links.
+     * @param before backward cursor; {@code null} for forward direction.
+     * @param after  forward cursor; {@code null} to start from the beginning.
+     * @param filter SCIM-style filter expression; {@code null} to return all definitions.
+     * @param limit  maximum records per page, capped at {@code MAX_LIMIT}.
+     * @return the paginated list of presentation definitions.
      */
     public PresentationDefinitionList listPresentationDefinitions(String before, String after,
             String filter, Integer limit) {
@@ -463,8 +461,6 @@ public class ServerVPDefinitionManagementService {
             throw handleServerError(ErrorMessage.ERROR_CODE_ERROR_UPDATING_DEFINITION, e, definitionId);
         }
     }
-
-    // --- Conversion helpers ---
 
     private List<Credential> toCredentials(List<CredentialModel> apiModels)
             throws PresentationManagementClientException {

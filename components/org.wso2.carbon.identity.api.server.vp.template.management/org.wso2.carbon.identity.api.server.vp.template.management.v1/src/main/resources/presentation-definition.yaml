@@ -611,7 +611,6 @@ components:
       type: object
       description: >
         List of identity provider connections that reference a given presentation definition.
-        Mirrors the ConnectedApps pattern from the IDP API.
       properties:
         totalResults:
           type: integer

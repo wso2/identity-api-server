@@ -28,14 +28,14 @@ import org.wso2.carbon.identity.api.server.vp.template.management.v1.ConnectedId
 import javax.validation.constraints.*;
 
 /**
- * List of identity provider connections that reference a given presentation definition. Mirrors the ConnectedApps pattern from the IDP API. 
+ * List of identity provider connections that reference a given presentation definition.
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "List of identity provider connections that reference a given presentation definition. Mirrors the ConnectedApps pattern from the IDP API. ")
+@ApiModel(description = "List of identity provider connections that reference a given presentation definition. ")
 public class ConnectedIdpsResponse  {
   
     private Integer totalResults;
