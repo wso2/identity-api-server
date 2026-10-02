@@ -20,6 +20,7 @@ package org.wso2.carbon.identity.api.server.vp.template.management.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
@@ -54,6 +55,7 @@ public enum FormatEnum {
         value = v;
     }
 
+    @JsonValue
     public String value() {
         return value;
     }
@@ -63,6 +65,7 @@ public enum FormatEnum {
         return String.valueOf(value);
     }
 
+    @JsonCreator
     public static FormatEnum fromValue(String value) {
         for (FormatEnum b : FormatEnum.values()) {
             if (b.value.equals(value)) {

@@ -20,6 +20,7 @@ package org.wso2.carbon.identity.api.server.vp.template.management.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
@@ -49,6 +50,7 @@ public enum RelEnum {
         value = v;
     }
 
+    @JsonValue
     public String value() {
         return value;
     }
@@ -58,6 +60,7 @@ public enum RelEnum {
         return String.valueOf(value);
     }
 
+    @JsonCreator
     public static RelEnum fromValue(String value) {
         for (RelEnum b : RelEnum.values()) {
             if (b.value.equals(value)) {
