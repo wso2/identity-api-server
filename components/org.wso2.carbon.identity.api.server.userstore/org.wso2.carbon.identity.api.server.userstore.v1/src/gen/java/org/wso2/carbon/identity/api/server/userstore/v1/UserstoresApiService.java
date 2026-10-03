@@ -51,8 +51,7 @@ public interface UserstoresApiService {
 
       public Response getPrimaryUserStore();
 
-      public Response getSecondaryUserStores(Integer limit, Integer offset, String filter, String sort, String requiredAttributes);
-
+      public Response getSecondaryUserStores(Integer limit, Integer offset, String filter, String sort, String requiredAttributes, Boolean excludeAgentUserstore);
       public Response getUserStoreAttributeMappings(String typeId, Boolean includeIdentityClaimMappings);
 
       public Response getUserStoreByDomainId(String userstoreDomainId);
