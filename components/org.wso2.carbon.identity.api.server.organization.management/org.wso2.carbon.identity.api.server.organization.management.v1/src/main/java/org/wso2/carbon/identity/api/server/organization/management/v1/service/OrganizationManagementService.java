@@ -273,6 +273,10 @@ public class OrganizationManagementService {
     public Response addOrganization(OrganizationPOSTRequest organizationPOSTRequest) {
 
         try {
+            if (organizationPOSTRequest == null) {
+                throw new OrganizationManagementClientException("Empty request body.", 
+                        "The request body cannot be empty or null.", "ORG-60025");
+            }
             Organization organization = organizationManager.addOrganization(getOrganizationFromPostRequest
                     (organizationPOSTRequest));
             String organizationId = organization.getId();
@@ -415,6 +419,10 @@ public class OrganizationManagementService {
                                                                organizationDiscoveryPostRequest) {
 
         try {
+            if (organizationDiscoveryPostRequest == null) {
+                throw new OrganizationManagementClientException("Empty request body.", 
+                        "The request body cannot be empty or null.", "ORG-60025");
+            }
             List<OrgDiscoveryAttribute> orgDiscoveryAttributeList = organizationDiscoveryManager
                     .addOrganizationDiscoveryAttributes(organizationDiscoveryPostRequest.getOrganizationId(),
                             getOrgDiscoveryAttributesFromPostRequest(organizationDiscoveryPostRequest), true);
@@ -549,6 +557,10 @@ public class OrganizationManagementService {
                                                           organizationDiscoveryCheckPOSTRequest) {
 
         try {
+            if (organizationDiscoveryCheckPOSTRequest == null) {
+                throw new OrganizationManagementClientException("Empty request body.", 
+                        "The request body cannot be empty or null.", "ORG-60025");
+            }
             boolean discoveryAttributeValueAvailable = organizationDiscoveryManager
                     .isDiscoveryAttributeValueAvailable(organizationDiscoveryCheckPOSTRequest.getType(),
                             organizationDiscoveryCheckPOSTRequest.getValue());
