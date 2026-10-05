@@ -30,89 +30,98 @@ import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
+
 /**
- * A rule in disjunctive normal form. Any one of the AND combined rules holding makes it true.
+ * One rule of a rule evaluation step
  **/
-@ApiModel(description = "A rule in disjunctive normal form. Any one of the AND combined rules holding makes it true.")
+@ApiModel(description = "One rule of a rule evaluation step")
 public class Rule  {
   
-@XmlType(name="ConditionEnum")
-@XmlEnum(String.class)
-public enum ConditionEnum {
+    private String id;
+    private String name;
+    private String next;
+    private RuleExpression expression;
 
-    @XmlEnumValue("OR") OR(String.valueOf("OR"));
+    /**
+    * Identifier for this rule, stable across saves
+    **/
+    public Rule id(String id) {
 
-
-    private String value;
-
-    ConditionEnum(String v) {
-        value = v;
-    }
-
-    public String value() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return String.valueOf(value);
-    }
-
-    public static ConditionEnum fromValue(String value) {
-        for (ConditionEnum b : ConditionEnum.values()) {
-            if (b.value.equals(value)) {
-                return b;
-            }
-        }
-        throw new IllegalArgumentException("Unexpected value '" + value + "'");
-    }
-}
-
-    private ConditionEnum condition;
-    private List<ANDRule> rules = new ArrayList<>();
-
-    public Rule condition(ConditionEnum condition) {
-
-        this.condition = condition;
+        this.id = id;
         return this;
     }
     
-    @ApiModelProperty(example = "OR", required = true, value = "")
-    @JsonProperty("condition")
+    @ApiModelProperty(example = "rule_lk", required = true, value = "Identifier for this rule, stable across saves")
+    @JsonProperty("id")
     @Valid
-    @NotNull(message = "Property condition cannot be null.")
+    @NotNull(message = "Property id cannot be null.")
 
-    public ConditionEnum getCondition() {
-        return condition;
+    public String getId() {
+        return id;
     }
-    public void setCondition(ConditionEnum condition) {
-        this.condition = condition;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public Rule rules(List<ANDRule> rules) {
+    /**
+    * Label for the rule, shown on the canvas and cited in validation messages
+    **/
+    public Rule name(String name) {
 
-        this.rules = rules;
+        this.name = name;
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "")
-    @JsonProperty("rules")
+    @ApiModelProperty(example = "Sri Lanka", required = true, value = "Label for the rule, shown on the canvas and cited in validation messages")
+    @JsonProperty("name")
     @Valid
-    @NotNull(message = "Property rules cannot be null.")
+    @NotNull(message = "Property name cannot be null.")
 
-    public List<ANDRule> getRules() {
-        return rules;
+    public String getName() {
+        return name;
     }
-    public void setRules(List<ANDRule> rules) {
-        this.rules = rules;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public Rule addRulesItem(ANDRule rulesItem) {
-        if (this.rules == null) {
-            this.rules = new ArrayList<>();
-        }
-        this.rules.add(rulesItem);
+    /**
+    * ID of the step taken when this rule is selected
+    **/
+    public Rule next(String next) {
+
+        this.next = next;
         return this;
+    }
+    
+    @ApiModelProperty(example = "dnd-step-3fa85f64-5717-4562-b3fc-2c963f66afa6", required = true, value = "ID of the step taken when this rule is selected")
+    @JsonProperty("next")
+    @Valid
+    @NotNull(message = "Property next cannot be null.")
+
+    public String getNext() {
+        return next;
+    }
+    public void setNext(String next) {
+        this.next = next;
+    }
+
+    /**
+    * Expression this rule tests. Absent on the default rule, which always holds.
+    **/
+    public Rule expression(RuleExpression expression) {
+
+        this.expression = expression;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "Expression this rule tests. Absent on the default rule, which always holds.")
+    @JsonProperty("expression")
+    @Valid
+    public RuleExpression getExpression() {
+        return expression;
+    }
+    public void setExpression(RuleExpression expression) {
+        this.expression = expression;
     }
 
 
@@ -127,13 +136,15 @@ public enum ConditionEnum {
             return false;
         }
         Rule rule = (Rule) o;
-        return Objects.equals(this.condition, rule.condition) &&
-            Objects.equals(this.rules, rule.rules);
+        return Objects.equals(this.id, rule.id) &&
+            Objects.equals(this.name, rule.name) &&
+            Objects.equals(this.next, rule.next) &&
+            Objects.equals(this.expression, rule.expression);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(condition, rules);
+        return Objects.hash(id, name, next, expression);
     }
 
     @Override
@@ -142,8 +153,10 @@ public enum ConditionEnum {
         StringBuilder sb = new StringBuilder();
         sb.append("class Rule {\n");
         
-        sb.append("    condition: ").append(toIndentedString(condition)).append("\n");
-        sb.append("    rules: ").append(toIndentedString(rules)).append("\n");
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    next: ").append(toIndentedString(next)).append("\n");
+        sb.append("    expression: ").append(toIndentedString(expression)).append("\n");
         sb.append("}");
         return sb.toString();
     }

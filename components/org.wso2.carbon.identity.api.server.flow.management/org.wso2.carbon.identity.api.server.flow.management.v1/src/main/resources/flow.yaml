@@ -1003,19 +1003,19 @@ components:
           type: string
           description: ID of the next step. For the last step, value will be "COMPLETE"
           example: dnd-step-asd85f64-5717-4562-b3fc-2234f66afa6
-        branches:
+        rules:
           type: array
           description: >
-            Outgoing branches of a rule decision, in evaluation order. The first branch whose rule
-            holds selects the next step. The branch carrying no rule is the default, taken when none
-            of the others hold; it is accepted in any position and always returned last.
-            Only a RULE_EVALUATOR action has branches, and such an action has no `next` and no `executor`.
+            Rules of a rule evaluation step, in evaluation order. The first rule whose expression
+            holds selects the next step. The rule carrying no expression is the default, taken when
+            none of the others hold; it is accepted in any position and always returned last.
+            Only a RULE_EVALUATOR action has rules, and such an action has no `next` and no `executor`.
           items:
-            $ref: '#/components/schemas/Branch'
+            $ref: '#/components/schemas/Rule'
 
-    Branch:
+    Rule:
       type: object
-      description: One outgoing branch of a rule decision
+      description: One rule of a rule evaluation step
       required:
         - id
         - name
@@ -1023,26 +1023,26 @@ components:
       properties:
         id:
           type: string
-          description: Identifier for this branch, stable across saves
-          example: br_lk
+          description: Identifier for this rule, stable across saves
+          example: rule_lk
         name:
           type: string
           description: >
-            Label for the branch. Shown on the canvas and cited in validation messages, so that a
+            Label for the rule. Shown on the canvas and cited in validation messages, so that a
             rejected condition names something an author recognises.
           example: Sri Lanka
         next:
           type: string
-          description: ID of the step taken when this branch is selected
+          description: ID of the step taken when this rule is selected
           example: dnd-step-3fa85f64-5717-4562-b3fc-2c963f66afa6
-        rule:
-          $ref: '#/components/schemas/Rule'
+        expression:
+          $ref: '#/components/schemas/RuleExpression'
 
-    Rule:
+    RuleExpression:
       type: object
       description: >
-        A rule in disjunctive normal form. Any one of the AND combined rules holding makes it true.
-        Absent on the default branch, which always holds.
+        An expression in disjunctive normal form. Any one of the AND combined rules holding makes it
+        true. Absent on the default rule, which always holds.
       required:
         - condition
         - rules

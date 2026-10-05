@@ -19,12 +19,12 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1.utils;
 
 import org.wso2.carbon.identity.api.server.flow.management.v1.ANDRule;
-import org.wso2.carbon.identity.api.server.flow.management.v1.Branch;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Expression;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Rule;
+import org.wso2.carbon.identity.api.server.flow.management.v1.RuleExpression;
 import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
-import org.wso2.carbon.identity.flow.mgt.model.BranchDTO;
+import org.wso2.carbon.identity.flow.mgt.model.RuleDTO;
 import org.wso2.carbon.identity.rule.management.api.model.ANDCombinedRule;
 import org.wso2.carbon.identity.rule.management.api.model.ORCombinedRule;
 
@@ -32,10 +32,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Converts branches and their conditions between the API model and the flow model.
+ * Converts rules and their expressions between the API model and the flow model.
  * <p>
- * The condition itself is rule management's own model on the far side, which is what evaluation
- * takes, so nothing here reshapes a rule -- it only crosses the boundary. A branch with no rule is
+ * The expression itself is rule management's own model on the far side, which is what evaluation
+ * takes, so nothing here reshapes it -- it only crosses the boundary. A rule with no expression is
  * the default and stays that way in both directions.
  */
 public class RuleMapper {
@@ -44,60 +44,60 @@ public class RuleMapper {
 
     }
 
-    public static List<BranchDTO> toBranchDTOs(List<Branch> branches) {
+    public static List<RuleDTO> toRuleDTOs(List<Rule> rules) {
 
-        if (branches == null) {
+        if (rules == null) {
             return null;
         }
-        List<BranchDTO> branchDTOs = new ArrayList<>();
-        for (Branch branch : branches) {
-            branchDTOs.add(new BranchDTO.Builder()
-                    .id(branch.getId())
-                    .name(branch.getName())
-                    .nextId(branch.getNext())
-                    .rule(toRuleMgtRule(branch))
+        List<RuleDTO> ruleDTOs = new ArrayList<>();
+        for (Rule rule : rules) {
+            ruleDTOs.add(new RuleDTO.Builder()
+                    .id(rule.getId())
+                    .name(rule.getName())
+                    .nextId(rule.getNext())
+                    .expression(toORCombinedRule(rule))
                     .build());
         }
-        return branchDTOs;
+        return ruleDTOs;
     }
 
     /**
-     * Branches come back in evaluation order, with the default last however it was submitted, so a
+     * Rules come back in evaluation order, with the default last however it was submitted, so a
      * response reads top to bottom the way it is evaluated.
      */
-    public static List<Branch> toBranches(List<BranchDTO> branchDTOs) {
+    public static List<Rule> toRules(List<RuleDTO> ruleDTOs) {
 
-        if (branchDTOs == null) {
+        if (ruleDTOs == null) {
             return null;
         }
-        List<Branch> guarded = new ArrayList<>();
-        List<Branch> defaults = new ArrayList<>();
-        for (BranchDTO branchDTO : branchDTOs) {
-            Branch branch = new Branch()
-                    .id(branchDTO.getId())
-                    .name(branchDTO.getName())
-                    .next(branchDTO.getNextId())
-                    .rule(toApiRule(branchDTO.getRule()));
-            if (branchDTO.isDefault()) {
-                defaults.add(branch);
+        List<Rule> guarded = new ArrayList<>();
+        List<Rule> defaults = new ArrayList<>();
+        for (RuleDTO ruleDTO : ruleDTOs) {
+            Rule rule = new Rule()
+                    .id(ruleDTO.getId())
+                    .name(ruleDTO.getName())
+                    .next(ruleDTO.getNextId())
+                    .expression(toRuleExpression(ruleDTO.getExpression()));
+            if (ruleDTO.isDefault()) {
+                defaults.add(rule);
             } else {
-                guarded.add(branch);
+                guarded.add(rule);
             }
         }
         guarded.addAll(defaults);
         return guarded;
     }
 
-    private static ORCombinedRule toRuleMgtRule(Branch branch) {
+    private static ORCombinedRule toORCombinedRule(Rule rule) {
 
-        Rule rule = branch.getRule();
-        if (rule == null) {
+        RuleExpression ruleExpression = rule.getExpression();
+        if (ruleExpression == null) {
             return null;
         }
         try {
             ORCombinedRule.Builder orBuilder = new ORCombinedRule.Builder();
-            if (rule.getRules() != null) {
-                for (ANDRule andRule : rule.getRules()) {
+            if (ruleExpression.getRules() != null) {
+                for (ANDRule andRule : ruleExpression.getRules()) {
                     ANDCombinedRule.Builder andBuilder = new ANDCombinedRule.Builder();
                     if (andRule.getExpressions() != null) {
                         for (Expression expression : andRule.getExpressions()) {
@@ -111,28 +111,28 @@ public class RuleMapper {
         } catch (IllegalArgumentException e) {
             // The rule model refuses to be built from what was sent, which is the caller's mistake.
             throw Utils.handleFlowMgtException(new FlowMgtClientException(
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNREADABLE_BRANCH_EXPRESSION.getCode(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNREADABLE_BRANCH_EXPRESSION.getMessage(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNREADABLE_BRANCH_EXPRESSION.getDescription()),
-                    branch.getName(), e.getMessage());
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNREADABLE_RULE_EXPRESSION.getCode(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNREADABLE_RULE_EXPRESSION.getMessage(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNREADABLE_RULE_EXPRESSION.getDescription()),
+                    rule.getName(), e.getMessage());
         }
     }
 
-    private static Rule toApiRule(ORCombinedRule rule) {
+    private static RuleExpression toRuleExpression(ORCombinedRule orCombinedRule) {
 
-        if (rule == null) {
+        if (orCombinedRule == null) {
             return null;
         }
-        Rule apiRule = new Rule().condition(Rule.ConditionEnum.OR);
-        for (ANDCombinedRule andCombinedRule : rule.getRules()) {
+        RuleExpression apiExpression = new RuleExpression().condition(RuleExpression.ConditionEnum.OR);
+        for (ANDCombinedRule andCombinedRule : orCombinedRule.getRules()) {
             ANDRule apiAndRule = new ANDRule().condition(ANDRule.ConditionEnum.AND);
             for (org.wso2.carbon.identity.rule.management.api.model.Expression expression
                     : andCombinedRule.getExpressions()) {
                 apiAndRule.addExpressionsItem(toApiExpression(expression));
             }
-            apiRule.addRulesItem(apiAndRule);
+            apiExpression.addRulesItem(apiAndRule);
         }
-        return apiRule;
+        return apiExpression;
     }
 
     private static org.wso2.carbon.identity.rule.management.api.model.Expression toRuleMgtExpression(
