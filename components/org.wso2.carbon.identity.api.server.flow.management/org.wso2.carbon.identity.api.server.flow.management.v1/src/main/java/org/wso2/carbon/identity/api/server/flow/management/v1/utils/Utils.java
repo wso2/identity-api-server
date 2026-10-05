@@ -680,10 +680,8 @@ public class Utils {
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_WITH_NEXT.getDescription()),
                     step.getId());
         }
-        // The server assigns this executor and returns it on the next read, so a decision coming
-        // back unchanged carries it. Accept that, and only reject an executor that is not it.
-        if (action.getExecutor() != null
-                && !FlowEndpointConstants.FLOW_RULE_EXECUTOR.equals(action.getExecutor().getName())) {
+        // Evaluating the branches is what the step type itself does, so there is no executor to name.
+        if (action.getExecutor() != null) {
             throw Utils.handleFlowMgtException(new FlowMgtClientException(
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_INVALID_EXECUTOR.getCode(),
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_INVALID_EXECUTOR.getMessage(),
@@ -772,7 +770,7 @@ public class Utils {
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_BRANCHES_NOT_ALLOWED.getCode(),
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_BRANCHES_NOT_ALLOWED.getMessage(),
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_BRANCHES_NOT_ALLOWED.getDescription()),
-                    FlowEndpointConstants.FlowGeneration.RULE_DECISION, step.getId(), step.getType());
+                    FlowEndpointConstants.FlowGeneration.RULE_EVALUATION, step.getId(), step.getType());
         }
     }
 
@@ -783,7 +781,7 @@ public class Utils {
      */
     public static void validateNextNodeReference(Step step) {
 
-        if (FlowEndpointConstants.FlowGeneration.RULE_DECISION.equals(step.getType())) {
+        if (FlowEndpointConstants.FlowGeneration.RULE_EVALUATION.equals(step.getType())) {
             // A decision has branches instead of a next step, so the rule below does not apply.
             validateDecisionStep(step);
             return;

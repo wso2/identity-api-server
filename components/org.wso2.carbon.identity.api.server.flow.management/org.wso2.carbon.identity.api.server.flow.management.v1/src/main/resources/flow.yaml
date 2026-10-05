@@ -1009,7 +1009,7 @@ components:
             Outgoing branches of a rule decision, in evaluation order. The first branch whose rule
             holds selects the next step. The branch carrying no rule is the default, taken when none
             of the others hold; it is accepted in any position and always returned last.
-            Only a RULE_DECISION action has branches, and such an action has no `next`.
+            Only a RULE_EVALUATOR action has branches, and such an action has no `next` and no `executor`.
           items:
             $ref: '#/components/schemas/Branch'
 
