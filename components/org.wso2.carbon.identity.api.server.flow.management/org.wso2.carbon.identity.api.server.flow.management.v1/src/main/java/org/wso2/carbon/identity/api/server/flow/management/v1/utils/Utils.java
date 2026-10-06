@@ -35,6 +35,7 @@ import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
 import org.wso2.carbon.identity.api.server.flow.management.common.FlowMgtServiceHolder;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Action;
 import org.wso2.carbon.identity.api.server.flow.management.v1.AtomicCondition;
+import org.wso2.carbon.identity.api.server.flow.management.v1.Branch;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Component;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Condition;
 import org.wso2.carbon.identity.api.server.flow.management.v1.ConditionValue;
@@ -44,7 +45,6 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorMetadata;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfig;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfigPatchModel;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Position;
-import org.wso2.carbon.identity.api.server.flow.management.v1.Rule;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Size;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Step;
 import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
@@ -286,7 +286,7 @@ public class Utils {
                 .type(actionDTO.getType())
                 .next(actionDTO.getNextId())
                 .executor(convertToExecutor(actionDTO.getExecutor()))
-                .rules(RuleMapper.toRules(actionDTO.getRules()));
+                .branches(RuleMapper.toBranches(actionDTO.getBranches()));
     }
 
     private static Executor convertToExecutor(ExecutorDTO executorDTO) {
@@ -362,7 +362,7 @@ public class Utils {
                 .type(action.getType())
                 .nextId(action.getNext())
                 .executor(convertToExecutorDTO(action.getExecutor()))
-                .rules(RuleMapper.toRuleDTOs(action.getRules()))
+                .branches(RuleMapper.toBranchDTOs(action.getBranches()))
                 .build();
     }
 
@@ -662,7 +662,7 @@ public class Utils {
     /**
      * Check the shape of a decision step.
      * <p>
-     * Only the shape: that it has rules, that it does not also name a single next step, and that
+     * Only the shape: that it has branches, that it does not also name a single next step, and that
      * it does not bring its own executor. Whether a condition means anything -- that the field is
      * published, that the operator suits the claim -- is decided further in, where the metadata and
      * the claims are known.
@@ -672,11 +672,11 @@ public class Utils {
     private static void validateDecisionStep(Step step) {
 
         Action action = step.getData() == null ? null : step.getData().getAction();
-        if (action == null || CollectionUtils.isEmpty(action.getRules())) {
+        if (action == null || CollectionUtils.isEmpty(action.getBranches())) {
             throw Utils.handleFlowMgtException(new FlowMgtClientException(
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_WITHOUT_RULES.getCode(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_WITHOUT_RULES.getMessage(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_WITHOUT_RULES.getDescription()),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_WITHOUT_BRANCHES.getCode(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_WITHOUT_BRANCHES.getMessage(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_WITHOUT_BRANCHES.getDescription()),
                     step.getId());
         }
         if (StringUtils.isNotBlank(action.getNext())) {
@@ -686,7 +686,7 @@ public class Utils {
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_WITH_NEXT.getDescription()),
                     step.getId());
         }
-        // Evaluating the rules is what the step type itself does, so there is no executor to name.
+        // Evaluating the branches is what the step type itself does, so there is no executor to name.
         if (action.getExecutor() != null) {
             throw Utils.handleFlowMgtException(new FlowMgtClientException(
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_INVALID_EXECUTOR.getCode(),
@@ -694,39 +694,39 @@ public class Utils {
                     FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_INVALID_EXECUTOR.getDescription()),
                     step.getId());
         }
-        for (Rule rule : action.getRules()) {
-            validateRuleExpression(step.getId(), rule);
+        for (Branch branch : action.getBranches()) {
+            validateBranchRule(step.getId(), branch);
         }
     }
 
     /**
-     * Check that every expression of a rule can be turned into rule management's model at all.
+     * Check that every condition of a branch's rule can be turned into rule management's model at all.
      * <p>
      * Whether the value suits the operator and the field is decided further in. What is caught here
      * is what the rule model cannot even be built from, which would otherwise surface as a server
      * error rather than as the author's mistake.
      *
      * @param stepId Id of the decision step, for the message.
-     * @param rule   Rule to check.
+     * @param branch Branch to check.
      */
-    private static void validateRuleExpression(String stepId, Rule rule) {
+    private static void validateBranchRule(String stepId, Branch branch) {
 
-        if (rule.getExpression() == null || rule.getExpression().getConditions() == null) {
+        if (branch.getRule() == null || branch.getRule().getConditions() == null) {
             return;
         }
-        for (Condition condition : rule.getExpression().getConditions()) {
-            if (condition == null || condition.getAtomicConditions() == null) {
+        for (Condition condition : branch.getRule().getConditions()) {
+            if (condition == null || condition.getConditions() == null) {
                 continue;
             }
-            for (AtomicCondition atomicCondition : condition.getAtomicConditions()) {
+            for (AtomicCondition atomicCondition : condition.getConditions()) {
                 String problem = findConditionProblem(atomicCondition);
                 if (problem != null) {
                     throw Utils.handleFlowMgtException(new FlowMgtClientException(
-                            FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_RULE_EXPRESSION.getCode(),
-                            FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_RULE_EXPRESSION.getMessage(),
-                            FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_RULE_EXPRESSION
+                            FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_BRANCH_RULE.getCode(),
+                            FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_BRANCH_RULE.getMessage(),
+                            FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_BRANCH_RULE
                                     .getDescription()),
-                            rule.getName(), stepId, problem);
+                            branch.getName(), stepId, problem);
                 }
             }
         }
@@ -788,19 +788,19 @@ public class Utils {
     }
 
     /**
-     * Rules belong to a decision and nowhere else. Accepting them on another step type would store
+     * Branches belong to a decision and nowhere else. Accepting them on another step type would store
      * conditions that are never consulted.
      *
      * @param step Step to check.
      */
-    private static void validateNoRules(Step step) {
+    private static void validateNoBranches(Step step) {
 
         if (step.getData() != null && step.getData().getAction() != null
-                && CollectionUtils.isNotEmpty(step.getData().getAction().getRules())) {
+                && CollectionUtils.isNotEmpty(step.getData().getAction().getBranches())) {
             throw Utils.handleFlowMgtException(new FlowMgtClientException(
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_RULES_NOT_ALLOWED.getCode(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_RULES_NOT_ALLOWED.getMessage(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_RULES_NOT_ALLOWED.getDescription()),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_BRANCHES_NOT_ALLOWED.getCode(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_BRANCHES_NOT_ALLOWED.getMessage(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_BRANCHES_NOT_ALLOWED.getDescription()),
                     FlowEndpointConstants.FlowGeneration.RULE_EVALUATION, step.getId(), step.getType());
         }
     }
@@ -813,11 +813,11 @@ public class Utils {
     public static void validateNextNodeReference(Step step) {
 
         if (FlowEndpointConstants.FlowGeneration.RULE_EVALUATION.equals(step.getType())) {
-            // A decision has rules instead of a next step, so the check below does not apply.
+            // A decision has branches instead of a next step, so the check below does not apply.
             validateDecisionStep(step);
             return;
         }
-        validateNoRules(step);
+        validateNoBranches(step);
 
         //If the step is not END, and contains action, then the next must not be null.
         if (!END.equals(step.getType())) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,8 +18,9 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
@@ -32,96 +33,96 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 /**
- * One rule of a rule evaluation step
+ * A rule in disjunctive normal form. It holds when any one of its conditions holds. Absent on the default branch, which always holds.
  **/
-@ApiModel(description = "One rule of a rule evaluation step")
+@ApiModel(description = "A rule in disjunctive normal form. It holds when any one of its conditions holds. Absent on the default branch, which always holds.")
 public class Rule  {
   
-    private String id;
-    private String name;
-    private String next;
-    private RuleExpression expression;
+@XmlType(name="OperatorEnum")
+@XmlEnum(String.class)
+public enum OperatorEnum {
+
+    @XmlEnumValue("OR") OR(String.valueOf("OR"));
+
+
+    private String value;
+
+    OperatorEnum(String v) {
+        value = v;
+    }
+
+    @JsonValue
+    public String value() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static OperatorEnum fromValue(String value) {
+        for (OperatorEnum b : OperatorEnum.values()) {
+            if (b.value.equals(value)) {
+                return b;
+            }
+        }
+        throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+}
+
+    private OperatorEnum operator;
+    private List<Condition> conditions = new ArrayList<>();
 
     /**
-    * Identifier for this rule, stable across saves
+    * How the conditions combine. Always OR.
     **/
-    public Rule id(String id) {
+    public Rule operator(OperatorEnum operator) {
 
-        this.id = id;
+        this.operator = operator;
         return this;
     }
     
-    @ApiModelProperty(example = "rule_lk", required = true, value = "Identifier for this rule, stable across saves")
-    @JsonProperty("id")
+    @ApiModelProperty(example = "OR", required = true, value = "How the conditions combine. Always OR.")
+    @JsonProperty("operator")
     @Valid
-    @NotNull(message = "Property id cannot be null.")
+    @NotNull(message = "Property operator cannot be null.")
 
-    public String getId() {
-        return id;
+    public OperatorEnum getOperator() {
+        return operator;
     }
-    public void setId(String id) {
-        this.id = id;
+    public void setOperator(OperatorEnum operator) {
+        this.operator = operator;
     }
 
     /**
-    * Label for the rule, shown on the canvas and cited in validation messages
+    * Conditions, any one of which makes the expression hold.
     **/
-    public Rule name(String name) {
+    public Rule conditions(List<Condition> conditions) {
 
-        this.name = name;
+        this.conditions = conditions;
         return this;
     }
     
-    @ApiModelProperty(example = "Sri Lanka", required = true, value = "Label for the rule, shown on the canvas and cited in validation messages")
-    @JsonProperty("name")
+    @ApiModelProperty(required = true, value = "Conditions, any one of which makes the expression hold.")
+    @JsonProperty("conditions")
     @Valid
-    @NotNull(message = "Property name cannot be null.")
+    @NotNull(message = "Property conditions cannot be null.")
 
-    public String getName() {
-        return name;
+    public List<Condition> getConditions() {
+        return conditions;
     }
-    public void setName(String name) {
-        this.name = name;
+    public void setConditions(List<Condition> conditions) {
+        this.conditions = conditions;
     }
 
-    /**
-    * ID of the step taken when this rule is selected
-    **/
-    public Rule next(String next) {
-
-        this.next = next;
+    public Rule addConditionsItem(Condition conditionsItem) {
+        if (this.conditions == null) {
+            this.conditions = new ArrayList<>();
+        }
+        this.conditions.add(conditionsItem);
         return this;
-    }
-    
-    @ApiModelProperty(example = "dnd-step-3fa85f64-5717-4562-b3fc-2c963f66afa6", required = true, value = "ID of the step taken when this rule is selected")
-    @JsonProperty("next")
-    @Valid
-    @NotNull(message = "Property next cannot be null.")
-
-    public String getNext() {
-        return next;
-    }
-    public void setNext(String next) {
-        this.next = next;
-    }
-
-    /**
-    * Expression this rule tests. Absent on the default rule, which always holds.
-    **/
-    public Rule expression(RuleExpression expression) {
-
-        this.expression = expression;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "Expression this rule tests. Absent on the default rule, which always holds.")
-    @JsonProperty("expression")
-    @Valid
-    public RuleExpression getExpression() {
-        return expression;
-    }
-    public void setExpression(RuleExpression expression) {
-        this.expression = expression;
     }
 
 
@@ -135,16 +136,14 @@ public class Rule  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Rule rule = (Rule) o;
-        return Objects.equals(this.id, rule.id) &&
-            Objects.equals(this.name, rule.name) &&
-            Objects.equals(this.next, rule.next) &&
-            Objects.equals(this.expression, rule.expression);
+        Rule other = (Rule) o;
+        return Objects.equals(this.operator, other.operator) &&
+            Objects.equals(this.conditions, other.conditions);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, next, expression);
+        return Objects.hash(operator, conditions);
     }
 
     @Override
@@ -153,10 +152,8 @@ public class Rule  {
         StringBuilder sb = new StringBuilder();
         sb.append("class Rule {\n");
         
-        sb.append("    id: ").append(toIndentedString(id)).append("\n");
-        sb.append("    name: ").append(toIndentedString(name)).append("\n");
-        sb.append("    next: ").append(toIndentedString(next)).append("\n");
-        sb.append("    expression: ").append(toIndentedString(expression)).append("\n");
+        sb.append("    operator: ").append(toIndentedString(operator)).append("\n");
+        sb.append("    conditions: ").append(toIndentedString(conditions)).append("\n");
         sb.append("}");
         return sb.toString();
     }

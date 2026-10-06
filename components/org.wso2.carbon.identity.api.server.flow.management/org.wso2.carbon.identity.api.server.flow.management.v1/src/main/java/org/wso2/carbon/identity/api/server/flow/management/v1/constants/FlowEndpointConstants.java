@@ -123,26 +123,26 @@ public class FlowEndpointConstants {
         ERROR_CODE_INVALID_REQUEST_BODY("10024",
                 "Invalid request body.",
                 "Request body cannot be null."),
-        ERROR_CODE_RULES_NOT_ALLOWED("10025",
-                "Rules are not allowed for this step.",
-                "Only a %s step has rules, but the step %s of type %s carries them."),
-        ERROR_CODE_DECISION_WITHOUT_RULES("10026",
-                "Decision step has no rules.",
-                "The decision step %s has no rules, so it cannot decide anything."),
+        ERROR_CODE_BRANCHES_NOT_ALLOWED("10025",
+                "Branches are not allowed for this step.",
+                "Only a %s step has branches, but the step %s of type %s carries them."),
+        ERROR_CODE_DECISION_WITHOUT_BRANCHES("10026",
+                "Decision step has no branches.",
+                "The decision step %s has no branches, so it cannot decide anything."),
         ERROR_CODE_DECISION_WITH_NEXT("10027",
                 "Decision step defines a next step.",
                 "The decision step %s defines a next step. Where the flow goes is decided by its " +
-                        "rules, and the rule without an expression is what catches everything else."),
+                        "branches, and the branch without a rule is what catches everything else."),
         ERROR_CODE_DECISION_INVALID_EXECUTOR("10028",
                 "Executor not allowed on a decision step.",
-                "The decision step %s names an executor. A decision only evaluates its rules, " +
+                "The decision step %s names an executor. A decision only evaluates its branches, " +
                         "so it carries no executor."),
-        ERROR_CODE_INVALID_RULE_EXPRESSION("10029",
+        ERROR_CODE_INVALID_BRANCH_RULE("10029",
                 "Invalid condition.",
-                "A condition in rule %s of the decision step %s %s."),
-        ERROR_CODE_UNREADABLE_RULE_EXPRESSION("10030",
+                "A condition in branch %s of the decision step %s %s."),
+        ERROR_CODE_UNREADABLE_BRANCH_RULE("10030",
                 "Invalid condition.",
-                "A condition in rule %s cannot be read: %s");
+                "A condition in branch %s cannot be read: %s");
 
         private final String code;
         private final String message;

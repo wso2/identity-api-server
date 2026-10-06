@@ -1003,19 +1003,19 @@ components:
           type: string
           description: ID of the next step. For the last step, value will be "COMPLETE"
           example: dnd-step-asd85f64-5717-4562-b3fc-2234f66afa6
-        rules:
+        branches:
           type: array
           description: >
-            Rules of a rule evaluation step, in evaluation order. The first rule whose expression
-            holds selects the next step. The rule carrying no expression is the default, taken when
+            Branches of a rule evaluation step, in evaluation order. The first branch whose rule
+            holds selects the next step. The branch carrying no rule is the default, taken when
             none of the others hold; it is accepted in any position and always returned last.
-            Only a RULE_EVALUATOR action has rules, and such an action has no `next` and no `executor`.
+            Only a RULE_EVALUATOR action has branches, and such an action has no `next` and no `executor`.
           items:
-            $ref: '#/components/schemas/Rule'
+            $ref: '#/components/schemas/Branch'
 
-    Rule:
+    Branch:
       type: object
-      description: One rule of a rule evaluation step
+      description: One branch of a rule evaluation step
       required:
         - id
         - name
@@ -1023,26 +1023,26 @@ components:
       properties:
         id:
           type: string
-          description: Identifier for this rule, stable across saves
+          description: Identifier for this branch, stable across saves
           example: rule_lk
         name:
           type: string
           description: >
-            Label for the rule. Shown on the canvas and cited in validation messages, so that a
+            Label for the branch. Shown on the canvas and cited in validation messages, so that a
             rejected condition names something an author recognises.
           example: Sri Lanka
         next:
           type: string
-          description: ID of the step taken when this rule is selected
+          description: ID of the step taken when this branch is selected
           example: dnd-step-3fa85f64-5717-4562-b3fc-2c963f66afa6
-        expression:
-          $ref: '#/components/schemas/RuleExpression'
+        rule:
+          $ref: '#/components/schemas/Rule'
 
-    RuleExpression:
+    Rule:
       type: object
       description: >
-        An expression in disjunctive normal form: it holds when any one of its conditions holds.
-        Absent on the default rule, which always holds.
+        A rule in disjunctive normal form: it holds when any one of its conditions holds.
+        Absent on the default branch, which always holds.
       required:
         - operator
         - conditions
@@ -1061,13 +1061,13 @@ components:
       description: A group of atomic conditions that must all hold
       required:
         - operator
-        - atomicConditions
+        - conditions
       properties:
         operator:
           type: string
           enum: [AND]
           example: AND
-        atomicConditions:
+        conditions:
           type: array
           items:
             $ref: '#/components/schemas/AtomicCondition'

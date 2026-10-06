@@ -73,7 +73,7 @@ public enum OperatorEnum {
 }
 
     private OperatorEnum operator;
-    private List<AtomicCondition> atomicConditions = new ArrayList<>();
+    private List<AtomicCondition> conditions = new ArrayList<>();
 
     /**
     * How the atomic conditions combine. Always AND.
@@ -99,29 +99,29 @@ public enum OperatorEnum {
     /**
     * Comparisons that must all hold.
     **/
-    public Condition atomicConditions(List<AtomicCondition> atomicConditions) {
+    public Condition conditions(List<AtomicCondition> conditions) {
 
-        this.atomicConditions = atomicConditions;
+        this.conditions = conditions;
         return this;
     }
     
     @ApiModelProperty(required = true, value = "Comparisons that must all hold.")
-    @JsonProperty("atomicConditions")
+    @JsonProperty("conditions")
     @Valid
-    @NotNull(message = "Property atomicConditions cannot be null.")
+    @NotNull(message = "Property conditions cannot be null.")
 
-    public List<AtomicCondition> getAtomicConditions() {
-        return atomicConditions;
+    public List<AtomicCondition> getConditions() {
+        return conditions;
     }
-    public void setAtomicConditions(List<AtomicCondition> atomicConditions) {
-        this.atomicConditions = atomicConditions;
+    public void setConditions(List<AtomicCondition> conditions) {
+        this.conditions = conditions;
     }
 
-    public Condition addAtomicConditionsItem(AtomicCondition atomicConditionsItem) {
-        if (this.atomicConditions == null) {
-            this.atomicConditions = new ArrayList<>();
+    public Condition addConditionsItem(AtomicCondition conditionsItem) {
+        if (this.conditions == null) {
+            this.conditions = new ArrayList<>();
         }
-        this.atomicConditions.add(atomicConditionsItem);
+        this.conditions.add(conditionsItem);
         return this;
     }
 
@@ -138,12 +138,12 @@ public enum OperatorEnum {
         }
         Condition other = (Condition) o;
         return Objects.equals(this.operator, other.operator) &&
-            Objects.equals(this.atomicConditions, other.atomicConditions);
+            Objects.equals(this.conditions, other.conditions);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(operator, atomicConditions);
+        return Objects.hash(operator, conditions);
     }
 
     @Override
@@ -153,7 +153,7 @@ public enum OperatorEnum {
         sb.append("class Condition {\n");
         
         sb.append("    operator: ").append(toIndentedString(operator)).append("\n");
-        sb.append("    atomicConditions: ").append(toIndentedString(atomicConditions)).append("\n");
+        sb.append("    conditions: ").append(toIndentedString(conditions)).append("\n");
         sb.append("}");
         return sb.toString();
     }

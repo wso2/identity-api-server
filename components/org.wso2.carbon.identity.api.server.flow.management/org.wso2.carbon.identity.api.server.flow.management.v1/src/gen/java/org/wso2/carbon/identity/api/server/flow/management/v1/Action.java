@@ -41,7 +41,7 @@ public class Action  {
     private String type;
     private Executor executor;
     private String next;
-    private List<Rule> rules = null;
+    private List<Branch> branches = null;
 
     /**
     * Type of action
@@ -104,29 +104,29 @@ public class Action  {
 
 
     /**
-    * Rules of a rule evaluation step, in evaluation order
+    * Branches of a rule evaluation step, in evaluation order
     **/
-    public Action rules(List<Rule> rules) {
+    public Action branches(List<Branch> branches) {
 
-        this.rules = rules;
+        this.branches = branches;
         return this;
     }
     
-    @ApiModelProperty(value = "Rules of a rule evaluation step, in evaluation order")
-    @JsonProperty("rules")
+    @ApiModelProperty(value = "Branches of a rule evaluation step, in evaluation order")
+    @JsonProperty("branches")
     @Valid
-    public List<Rule> getRules() {
-        return rules;
+    public List<Branch> getBranches() {
+        return branches;
     }
-    public void setRules(List<Rule> rules) {
-        this.rules = rules;
+    public void setBranches(List<Branch> branches) {
+        this.branches = branches;
     }
 
-    public Action addRulesItem(Rule rulesItem) {
-        if (this.rules == null) {
-            this.rules = new ArrayList<>();
+    public Action addBranchesItem(Branch branchesItem) {
+        if (this.branches == null) {
+            this.branches = new ArrayList<>();
         }
-        this.rules.add(rulesItem);
+        this.branches.add(branchesItem);
         return this;
     }
 
@@ -145,12 +145,12 @@ public class Action  {
         return Objects.equals(this.type, action.type) &&
             Objects.equals(this.executor, action.executor) &&
             Objects.equals(this.next, action.next) &&
-            Objects.equals(this.rules, action.rules);
+            Objects.equals(this.branches, action.branches);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, executor, next, rules);
+        return Objects.hash(type, executor, next, branches);
     }
 
     @Override
@@ -162,7 +162,7 @@ public class Action  {
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    executor: ").append(toIndentedString(executor)).append("\n");
         sb.append("    next: ").append(toIndentedString(next)).append("\n");
-        sb.append("    rules: ").append(toIndentedString(rules)).append("\n");
+        sb.append("    branches: ").append(toIndentedString(branches)).append("\n");
         sb.append("}");
         return sb.toString();
     }

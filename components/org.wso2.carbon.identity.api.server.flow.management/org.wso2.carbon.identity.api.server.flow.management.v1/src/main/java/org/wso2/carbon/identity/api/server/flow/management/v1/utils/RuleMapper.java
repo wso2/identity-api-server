@@ -19,14 +19,14 @@
 package org.wso2.carbon.identity.api.server.flow.management.v1.utils;
 
 import org.wso2.carbon.identity.api.server.flow.management.v1.AtomicCondition;
+import org.wso2.carbon.identity.api.server.flow.management.v1.Branch;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Condition;
 import org.wso2.carbon.identity.api.server.flow.management.v1.ConditionValue;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FieldReference;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Rule;
-import org.wso2.carbon.identity.api.server.flow.management.v1.RuleExpression;
 import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
-import org.wso2.carbon.identity.flow.mgt.model.RuleDTO;
+import org.wso2.carbon.identity.flow.mgt.model.BranchDTO;
 import org.wso2.carbon.identity.rule.management.api.model.ANDCombinedRule;
 import org.wso2.carbon.identity.rule.management.api.model.Expression;
 import org.wso2.carbon.identity.rule.management.api.model.ORCombinedRule;
@@ -36,11 +36,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Converts rules and their expressions between the API model and the flow model.
+ * Converts branches and their rules between the API model and the flow model.
  * <p>
- * On the far side an expression is rule management's own model, which is what evaluation takes and what is
- * stored: conditions become AND combined rules, atomic conditions become expressions, a qualifier becomes the
- * expression's key, and a value read from a field becomes a FIELD value. A rule with no expression is the
+ * On the far side a rule is rule management's own model, which is what evaluation takes and what is stored:
+ * the outer conditions become AND combined rules, the inner conditions become expressions, a qualifier becomes
+ * the expression's key, and a value read from a field becomes a FIELD value. A branch with no rule is the
  * default and stays that way in both directions.
  */
 public class RuleMapper {
@@ -49,63 +49,63 @@ public class RuleMapper {
 
     }
 
-    public static List<RuleDTO> toRuleDTOs(List<Rule> rules) {
+    public static List<BranchDTO> toBranchDTOs(List<Branch> branches) {
 
-        if (rules == null) {
+        if (branches == null) {
             return null;
         }
-        List<RuleDTO> ruleDTOs = new ArrayList<>();
-        for (Rule rule : rules) {
-            ruleDTOs.add(new RuleDTO.Builder()
-                    .id(rule.getId())
-                    .name(rule.getName())
-                    .nextId(rule.getNext())
-                    .expression(toORCombinedRule(rule))
+        List<BranchDTO> branchDTOs = new ArrayList<>();
+        for (Branch branch : branches) {
+            branchDTOs.add(new BranchDTO.Builder()
+                    .id(branch.getId())
+                    .name(branch.getName())
+                    .nextId(branch.getNext())
+                    .rule(toORCombinedRule(branch))
                     .build());
         }
-        return ruleDTOs;
+        return branchDTOs;
     }
 
     /**
-     * Rules come back in evaluation order, with the default last however it was submitted, so a
+     * Branches come back in evaluation order, with the default last however it was submitted, so a
      * response reads top to bottom the way it is evaluated.
      */
-    public static List<Rule> toRules(List<RuleDTO> ruleDTOs) {
+    public static List<Branch> toBranches(List<BranchDTO> branchDTOs) {
 
-        if (ruleDTOs == null) {
+        if (branchDTOs == null) {
             return null;
         }
-        List<Rule> guarded = new ArrayList<>();
-        List<Rule> defaults = new ArrayList<>();
-        for (RuleDTO ruleDTO : ruleDTOs) {
-            Rule rule = new Rule()
-                    .id(ruleDTO.getId())
-                    .name(ruleDTO.getName())
-                    .next(ruleDTO.getNextId())
-                    .expression(toRuleExpression(ruleDTO.getExpression()));
-            if (ruleDTO.isDefault()) {
-                defaults.add(rule);
+        List<Branch> guarded = new ArrayList<>();
+        List<Branch> defaults = new ArrayList<>();
+        for (BranchDTO branchDTO : branchDTOs) {
+            Branch branch = new Branch()
+                    .id(branchDTO.getId())
+                    .name(branchDTO.getName())
+                    .next(branchDTO.getNextId())
+                    .rule(toRule(branchDTO.getRule()));
+            if (branchDTO.isDefault()) {
+                defaults.add(branch);
             } else {
-                guarded.add(rule);
+                guarded.add(branch);
             }
         }
         guarded.addAll(defaults);
         return guarded;
     }
 
-    private static ORCombinedRule toORCombinedRule(Rule rule) {
+    private static ORCombinedRule toORCombinedRule(Branch branch) {
 
-        RuleExpression ruleExpression = rule.getExpression();
-        if (ruleExpression == null) {
+        Rule rule = branch.getRule();
+        if (rule == null) {
             return null;
         }
         try {
             ORCombinedRule.Builder orBuilder = new ORCombinedRule.Builder();
-            if (ruleExpression.getConditions() != null) {
-                for (Condition condition : ruleExpression.getConditions()) {
+            if (rule.getConditions() != null) {
+                for (Condition condition : rule.getConditions()) {
                     ANDCombinedRule.Builder andBuilder = new ANDCombinedRule.Builder();
-                    if (condition.getAtomicConditions() != null) {
-                        for (AtomicCondition atomicCondition : condition.getAtomicConditions()) {
+                    if (condition.getConditions() != null) {
+                        for (AtomicCondition atomicCondition : condition.getConditions()) {
                             andBuilder.addExpression(toRuleMgtExpression(atomicCondition));
                         }
                     }
@@ -116,27 +116,27 @@ public class RuleMapper {
         } catch (IllegalArgumentException e) {
             // The rule model refuses to be built from what was sent, which is the caller's mistake.
             throw Utils.handleFlowMgtException(new FlowMgtClientException(
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNREADABLE_RULE_EXPRESSION.getCode(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNREADABLE_RULE_EXPRESSION.getMessage(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNREADABLE_RULE_EXPRESSION.getDescription()),
-                    rule.getName(), e.getMessage());
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNREADABLE_BRANCH_RULE.getCode(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNREADABLE_BRANCH_RULE.getMessage(),
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNREADABLE_BRANCH_RULE.getDescription()),
+                    branch.getName(), e.getMessage());
         }
     }
 
-    private static RuleExpression toRuleExpression(ORCombinedRule orCombinedRule) {
+    private static Rule toRule(ORCombinedRule orCombinedRule) {
 
         if (orCombinedRule == null) {
             return null;
         }
-        RuleExpression apiExpression = new RuleExpression().operator(RuleExpression.OperatorEnum.OR);
+        Rule apiRule = new Rule().operator(Rule.OperatorEnum.OR);
         for (ANDCombinedRule andCombinedRule : orCombinedRule.getRules()) {
             Condition condition = new Condition().operator(Condition.OperatorEnum.AND);
             for (Expression expression : andCombinedRule.getExpressions()) {
-                condition.addAtomicConditionsItem(toAtomicCondition(expression));
+                condition.addConditionsItem(toAtomicCondition(expression));
             }
-            apiExpression.addConditionsItem(condition);
+            apiRule.addConditionsItem(condition);
         }
-        return apiExpression;
+        return apiRule;
     }
 
     /**
