@@ -776,7 +776,7 @@ components:
             rule metadata endpoint, so a builder does not have to call that separately to render a
             decision step.
           items:
-            $ref: '#/components/schemas/FieldDefinition'
+            $ref: '#/components/schemas/RuleFieldDefinition'
         workflowEnabled:
           type: boolean
           example: false
@@ -1041,82 +1041,158 @@ components:
     RuleExpression:
       type: object
       description: >
-        An expression in disjunctive normal form. Any one of the AND combined rules holding makes it
-        true. Absent on the default rule, which always holds.
+        An expression in disjunctive normal form: it holds when any one of its conditions holds.
+        Absent on the default rule, which always holds.
       required:
-        - condition
-        - rules
+        - operator
+        - conditions
       properties:
-        condition:
+        operator:
           type: string
           enum: [OR]
           example: OR
-        rules:
+        conditions:
           type: array
           items:
-            $ref: '#/components/schemas/ANDRule'
+            $ref: '#/components/schemas/Condition'
 
-    ANDRule:
+    Condition:
       type: object
-      description: A set of expressions that must all hold
+      description: A group of atomic conditions that must all hold
       required:
-        - condition
-        - expressions
+        - operator
+        - atomicConditions
       properties:
-        condition:
+        operator:
           type: string
           enum: [AND]
           example: AND
-        expressions:
+        atomicConditions:
           type: array
           items:
-            $ref: '#/components/schemas/Expression'
+            $ref: '#/components/schemas/AtomicCondition'
 
-    Expression:
+    AtomicCondition:
       type: object
-      description: >
-        A single comparison against the flow execution context. Exactly one of `value` or `values`
-        is given: `values` for the `in` and `notIn` operators, `value` for every other operator.
+      description: A single comparison of a field against a value
       required:
         - field
         - operator
+        - value
       properties:
         field:
-          type: string
-          description: >
-            One of the field names published in `ruleMetaData`. `user.claims` reads what is stored
-            for the user, `user.collectedClaims` what this run of the flow has gathered.
-          example: user.claims
-        key:
-          type: string
-          description: >
-            Selects a value within the field, for fields that name a family of values rather than
-            one. Required for `user.claims`, `user.collectedClaims` and `flow.properties`; rejected
-            on fields that name a single value.
-          example: http://wso2.org/claims/country
+          $ref: '#/components/schemas/FieldReference'
         operator:
           type: string
           description: >
             How the field and the value are compared. Which operators a field accepts is published
-            per field in `ruleMetaData` and enforced against it, rather than fixed here: an operator
-            valid for one field is not valid for another.
+            per field in `ruleMetaData` and enforced against it.
           example: equals
         value:
+          $ref: '#/components/schemas/ConditionValue'
+
+    FieldReference:
+      type: object
+      description: >
+        A field, and for a field that names a family of values, the qualifier that picks one.
+      required:
+        - name
+      properties:
+        name:
           type: string
           description: >
-            The value the field is compared against. Its type is resolved from the field's own
-            definition in `ruleMetaData`, as it is for action rules. Omitted for `in` and `notIn`,
-            which carry `values` instead.
-          example: LK
-        values:
-          type: array
+            One of the field names published in `ruleMetaData`. `user.claims` reads what is stored
+            for the user, `user.collectedClaims` what this run of the flow has gathered.
+          example: user.collectedClaims
+        qualifier:
+          type: string
           description: >
-            The set of values for `in` and `notIn`. Membership is tested against the whole set, so a
-            multi valued field matches when the two sets intersect.
-          items:
-            type: string
-          example: [LK, IN]
+            Picks a value within the field. Required for fields that publish a `qualifier` in
+            `ruleMetaData`, rejected on the others.
+          example: http://wso2.org/claims/country
 
+    ConditionValue:
+      type: object
+      description: >
+        What a field is compared against. A `literal` is given in the rule; a `field` is read from
+        another field when the rule is evaluated, and a comparison with a field that has no value
+        does not hold.
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum: [literal, field]
+          example: literal
+        literal:
+          description: >
+            The value given in the rule, when `type` is `literal`. An array of values for the `in`
+            and `notIn` operators, a single value for every other operator. Its type is resolved
+            from the field's definition in `ruleMetaData`.
+          example: Sri Lanka
+        field:
+          $ref: '#/components/schemas/FieldReference'
+
+    RuleFieldDefinition:
+      type: object
+      description: A field a condition in this flow can be written against
+      required:
+        - field
+        - operators
+        - value
+      properties:
+        field:
+          $ref: '#/components/schemas/RuleField'
+        operators:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                example: equals
+              displayName:
+                type: string
+                example: equals
+        value:
+          $ref: '#/components/schemas/RuleValueDefinition'
+
+    RuleField:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: user.collectedClaims
+        displayName:
+          type: string
+          example: Claim collected in this flow
+        qualifier:
+          type: object
+          description: >
+            How a value within the field is picked, in the same shape as a value definition of the
+            rule metadata endpoint. Absent on a field that names a single value.
+
+    RuleValueDefinition:
+      type: object
+      properties:
+        literal:
+          type: object
+          description: >
+            How a literal is entered, in the same shape as a value definition of the rule metadata
+            endpoint.
+        field:
+          type: object
+          description: The fields a value may be read from. Absent when only literals are allowed.
+          required:
+            - names
+          properties:
+            names:
+              type: array
+              items:
+                type: string
+              example: [user.claims, user.collectedClaims, flow.properties]
 
     Executor:
       type: object

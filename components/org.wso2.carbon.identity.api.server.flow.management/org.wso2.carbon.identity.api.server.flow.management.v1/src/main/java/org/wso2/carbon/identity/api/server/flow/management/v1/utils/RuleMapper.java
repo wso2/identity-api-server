@@ -18,15 +18,19 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.utils;
 
-import org.wso2.carbon.identity.api.server.flow.management.v1.ANDRule;
-import org.wso2.carbon.identity.api.server.flow.management.v1.Expression;
+import org.wso2.carbon.identity.api.server.flow.management.v1.AtomicCondition;
+import org.wso2.carbon.identity.api.server.flow.management.v1.Condition;
+import org.wso2.carbon.identity.api.server.flow.management.v1.ConditionValue;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FieldReference;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Rule;
 import org.wso2.carbon.identity.api.server.flow.management.v1.RuleExpression;
 import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
 import org.wso2.carbon.identity.flow.mgt.model.RuleDTO;
 import org.wso2.carbon.identity.rule.management.api.model.ANDCombinedRule;
+import org.wso2.carbon.identity.rule.management.api.model.Expression;
 import org.wso2.carbon.identity.rule.management.api.model.ORCombinedRule;
+import org.wso2.carbon.identity.rule.management.api.model.Value;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,9 +38,10 @@ import java.util.List;
 /**
  * Converts rules and their expressions between the API model and the flow model.
  * <p>
- * The expression itself is rule management's own model on the far side, which is what evaluation
- * takes, so nothing here reshapes it -- it only crosses the boundary. A rule with no expression is
- * the default and stays that way in both directions.
+ * On the far side an expression is rule management's own model, which is what evaluation takes and what is
+ * stored: conditions become AND combined rules, atomic conditions become expressions, a qualifier becomes the
+ * expression's key, and a value read from a field becomes a FIELD value. A rule with no expression is the
+ * default and stays that way in both directions.
  */
 public class RuleMapper {
 
@@ -96,12 +101,12 @@ public class RuleMapper {
         }
         try {
             ORCombinedRule.Builder orBuilder = new ORCombinedRule.Builder();
-            if (ruleExpression.getRules() != null) {
-                for (ANDRule andRule : ruleExpression.getRules()) {
+            if (ruleExpression.getConditions() != null) {
+                for (Condition condition : ruleExpression.getConditions()) {
                     ANDCombinedRule.Builder andBuilder = new ANDCombinedRule.Builder();
-                    if (andRule.getExpressions() != null) {
-                        for (Expression expression : andRule.getExpressions()) {
-                            andBuilder.addExpression(toRuleMgtExpression(expression));
+                    if (condition.getAtomicConditions() != null) {
+                        for (AtomicCondition atomicCondition : condition.getAtomicConditions()) {
+                            andBuilder.addExpression(toRuleMgtExpression(atomicCondition));
                         }
                     }
                     orBuilder.addRule(andBuilder.build());
@@ -123,68 +128,71 @@ public class RuleMapper {
         if (orCombinedRule == null) {
             return null;
         }
-        RuleExpression apiExpression = new RuleExpression().condition(RuleExpression.ConditionEnum.OR);
+        RuleExpression apiExpression = new RuleExpression().operator(RuleExpression.OperatorEnum.OR);
         for (ANDCombinedRule andCombinedRule : orCombinedRule.getRules()) {
-            ANDRule apiAndRule = new ANDRule().condition(ANDRule.ConditionEnum.AND);
-            for (org.wso2.carbon.identity.rule.management.api.model.Expression expression
-                    : andCombinedRule.getExpressions()) {
-                apiAndRule.addExpressionsItem(toApiExpression(expression));
+            Condition condition = new Condition().operator(Condition.OperatorEnum.AND);
+            for (Expression expression : andCombinedRule.getExpressions()) {
+                condition.addAtomicConditionsItem(toAtomicCondition(expression));
             }
-            apiExpression.addRulesItem(apiAndRule);
+            apiExpression.addConditionsItem(condition);
         }
-        return apiExpression;
-    }
-
-    private static org.wso2.carbon.identity.rule.management.api.model.Expression toRuleMgtExpression(
-            Expression expression) {
-
-        org.wso2.carbon.identity.rule.management.api.model.Expression.Builder builder =
-                new org.wso2.carbon.identity.rule.management.api.model.Expression.Builder()
-                        .field(expression.getField())
-                        .key(expression.getKey())
-                        .operator(expression.getOperator());
-
-        // A set of values has no raw form, so a list names its own type. A scalar is handed over raw,
-        // exactly as the action management API does, leaving the rule builder to resolve its type
-        // from the field definition.
-        if (expression.getValues() != null) {
-            builder.value(org.wso2.carbon.identity.rule.management.api.model.Value.listOf(expression.getValues()));
-        } else {
-            builder.value(expression.getValue());
-        }
-
-        return builder.build();
-    }
-
-    private static Expression toApiExpression(
-            org.wso2.carbon.identity.rule.management.api.model.Expression expression) {
-
-        Expression apiExpression = new Expression()
-                .field(expression.getField())
-                .key(expression.getKey())
-                .operator(expression.getOperator());
-        setApiValue(apiExpression, expression.getValue());
         return apiExpression;
     }
 
     /**
-     * Writes a rule management value back onto an API expression, as a list for a list value and as a
-     * plain string for everything else. The resolved type is not published, since it is derived from
-     * the field definition and a client rebuilding the expression does not supply it.
-     *
-     * @param expression    API expression to write onto.
-     * @param ruleMgtValue  Value from the rule management model.
+     * An atomic condition as rule management holds it. The qualifier is the expression's key; a literal is handed
+     * over raw, exactly as the action management API does, leaving its type to the field definition, except a list,
+     * which has no raw form and names its own type.
      */
-    private static void setApiValue(Expression expression,
-                                    org.wso2.carbon.identity.rule.management.api.model.Value ruleMgtValue) {
+    private static Expression toRuleMgtExpression(AtomicCondition atomicCondition) {
 
-        if (ruleMgtValue == null) {
-            return;
-        }
-        if (ruleMgtValue.getType() == org.wso2.carbon.identity.rule.management.api.model.Value.Type.LIST) {
-            expression.setValues(ruleMgtValue.getFieldValues());
+        Expression.Builder builder = new Expression.Builder()
+                .field(atomicCondition.getField() == null ? null : atomicCondition.getField().getName())
+                .key(atomicCondition.getField() == null ? null : atomicCondition.getField().getQualifier())
+                .operator(atomicCondition.getOperator());
+
+        ConditionValue value = atomicCondition.getValue();
+        if (value.getType() == ConditionValue.TypeEnum.FIELD) {
+            builder.value(Value.fieldOf(new org.wso2.carbon.identity.rule.management.api.model.FieldReference(
+                    value.getField().getName(), value.getField().getQualifier())));
+        } else if (value.getLiteral() instanceof List) {
+            List<String> entries = new ArrayList<>();
+            for (Object entry : (List<?>) value.getLiteral()) {
+                entries.add(String.valueOf(entry));
+            }
+            builder.value(Value.listOf(entries));
         } else {
-            expression.setValue(ruleMgtValue.getFieldValue());
+            builder.value(String.valueOf(value.getLiteral()));
         }
+        return builder.build();
+    }
+
+    private static AtomicCondition toAtomicCondition(Expression expression) {
+
+        return new AtomicCondition()
+                .field(new FieldReference().name(expression.getField()).qualifier(expression.getKey()))
+                .operator(expression.getOperator())
+                .value(toConditionValue(expression.getValue()));
+    }
+
+    /**
+     * A rule management value as the API shows it: a field reference for FIELD, an array for LIST, and the single
+     * value as a string for everything else. The resolved type is not published, since it is derived from the field
+     * definition and a client rebuilding the condition does not supply it.
+     */
+    private static ConditionValue toConditionValue(Value value) {
+
+        if (value == null) {
+            return null;
+        }
+        if (value.getType() == Value.Type.FIELD && value.getFieldReference() != null) {
+            return new ConditionValue().type(ConditionValue.TypeEnum.FIELD)
+                    .field(new FieldReference().name(value.getFieldReference().getName())
+                            .qualifier(value.getFieldReference().getKey()));
+        }
+        ConditionValue literal = new ConditionValue().type(ConditionValue.TypeEnum.LITERAL);
+        return value.getType() == Value.Type.LIST
+                ? literal.literal(value.getFieldValues())
+                : literal.literal(value.getFieldValue());
     }
 }

@@ -33,13 +33,14 @@ import org.wso2.carbon.identity.action.management.api.exception.ActionMgtExcepti
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
 import org.wso2.carbon.identity.api.server.flow.management.common.FlowMgtServiceHolder;
-import org.wso2.carbon.identity.api.server.flow.management.v1.ANDRule;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Action;
+import org.wso2.carbon.identity.api.server.flow.management.v1.AtomicCondition;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Component;
+import org.wso2.carbon.identity.api.server.flow.management.v1.Condition;
+import org.wso2.carbon.identity.api.server.flow.management.v1.ConditionValue;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Data;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Executor;
 import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorMetadata;
-import org.wso2.carbon.identity.api.server.flow.management.v1.Expression;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfig;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfigPatchModel;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Position;
@@ -109,6 +110,11 @@ public class Utils {
      */
     private static final int MAX_EXECUTOR_DISPLAY_NAME_LENGTH = 100;
     private static final int MAX_EXECUTOR_DESCRIPTION_LENGTH = 1024;
+    /**
+     * The operators whose literal is a list of values rather than a single value.
+     */
+    private static final Set<String> LIST_OPERATORS =
+            Collections.unmodifiableSet(new HashSet<>(Arrays.asList("in", "notIn")));
 
     private static final Map<Constants.FlowTypes, String> WORKFLOW_FILTERS = new HashMap<>();
 
@@ -705,15 +711,15 @@ public class Utils {
      */
     private static void validateRuleExpression(String stepId, Rule rule) {
 
-        if (rule.getExpression() == null || rule.getExpression().getRules() == null) {
+        if (rule.getExpression() == null || rule.getExpression().getConditions() == null) {
             return;
         }
-        for (ANDRule andRule : rule.getExpression().getRules()) {
-            if (andRule == null || andRule.getExpressions() == null) {
+        for (Condition condition : rule.getExpression().getConditions()) {
+            if (condition == null || condition.getAtomicConditions() == null) {
                 continue;
             }
-            for (Expression expression : andRule.getExpressions()) {
-                String problem = findExpressionProblem(expression);
+            for (AtomicCondition atomicCondition : condition.getAtomicConditions()) {
+                String problem = findConditionProblem(atomicCondition);
                 if (problem != null) {
                     throw Utils.handleFlowMgtException(new FlowMgtClientException(
                             FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_RULE_EXPRESSION.getCode(),
@@ -731,27 +737,52 @@ public class Utils {
      * @return What is wrong with the expression, phrased to follow "A condition ... ", or null when
      * nothing is.
      */
-    private static String findExpressionProblem(Expression expression) {
+    private static String findConditionProblem(AtomicCondition atomicCondition) {
 
-        if (expression == null) {
+        if (atomicCondition == null) {
             return "is empty";
         }
-        if (StringUtils.isBlank(expression.getField())) {
+        if (atomicCondition.getField() == null || StringUtils.isBlank(atomicCondition.getField().getName())) {
             return "has no field";
         }
-        if (StringUtils.isBlank(expression.getOperator())) {
+        if (StringUtils.isBlank(atomicCondition.getOperator())) {
             return "has no operator";
         }
-        boolean hasValue = expression.getValue() != null;
-        boolean hasValues = expression.getValues() != null;
-        if (hasValue && hasValues) {
-            return "gives both a value and a list of values";
-        }
-        if (hasValues && expression.getValues().isEmpty()) {
-            return "has an empty list of values";
-        }
-        if (!hasValue && !hasValues) {
+        ConditionValue value = atomicCondition.getValue();
+        if (value == null || value.getType() == null) {
             return "has no value";
+        }
+        if (value.getType() == ConditionValue.TypeEnum.FIELD) {
+            if (value.getLiteral() != null) {
+                return "gives both a literal and a field";
+            }
+            if (value.getField() == null || StringUtils.isBlank(value.getField().getName())) {
+                return "reads its value from a field but does not name it";
+            }
+            return null;
+        }
+        if (value.getField() != null) {
+            return "gives both a literal and a field";
+        }
+        Object literal = value.getLiteral();
+        if (literal == null) {
+            return "has no value";
+        }
+        boolean membership = LIST_OPERATORS.contains(atomicCondition.getOperator());
+        if (literal instanceof List) {
+            if (!membership) {
+                return "gives a list of values, which only in and notIn take";
+            }
+            if (((List<?>) literal).isEmpty()) {
+                return "has an empty list of values";
+            }
+            return null;
+        }
+        if (literal instanceof Map) {
+            return "gives an object as its literal, which must be a value or a list of values";
+        }
+        if (membership) {
+            return "gives a single value, but in and notIn take a list of values";
         }
         return null;
     }

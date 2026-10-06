@@ -29,6 +29,10 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorConnection
 import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorMetadata;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionConnectionInfo;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.RuleField;
+import org.wso2.carbon.identity.api.server.flow.management.v1.RuleFieldDefinition;
+import org.wso2.carbon.identity.api.server.flow.management.v1.RuleValueDefinition;
+import org.wso2.carbon.identity.api.server.flow.management.v1.RuleValueFieldDefinition;
 import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
 import org.wso2.carbon.identity.api.server.rule.metadata.v1.factories.ServerRuleMetadataServiceFactory;
@@ -41,6 +45,9 @@ import org.wso2.carbon.identity.flow.execution.engine.metadata.FlowExecutorInfo;
 import org.wso2.carbon.identity.flow.extension.model.FlowExtensionAction;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
 import org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants;
+import org.wso2.carbon.identity.rule.metadata.api.exception.RuleMetadataException;
+import org.wso2.carbon.identity.rule.metadata.api.model.FieldDefinition;
+import org.wso2.carbon.identity.rule.metadata.api.service.RuleMetadataService;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdpManager;
 import org.wso2.carbon.idp.mgt.model.IdpSearchResult;
@@ -208,17 +215,60 @@ public abstract class AbstractMetaResponseHandler {
      *
      * @return The condition fields, never null.
      */
-    protected List<org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition> getRuleMetaData() {
+    protected List<RuleFieldDefinition> getRuleMetaData() {
 
+        org.wso2.carbon.identity.rule.metadata.api.model.FlowType flowType;
         try {
-            org.wso2.carbon.identity.rule.metadata.api.model.FlowType flowType =
-                    org.wso2.carbon.identity.rule.metadata.api.model.FlowType.valueOf(getFlowType());
-            return ServerRuleMetadataServiceFactory.getServerRuleMetadataService()
-                    .getExpressionMeta(flowType.getFlowAlias());
+            flowType = org.wso2.carbon.identity.rule.metadata.api.model.FlowType.valueOf(getFlowType());
         } catch (IllegalArgumentException e) {
             // Not every flow type supports conditions; those simply publish no fields.
             return Collections.emptyList();
         }
+        Map<String, List<String>> valueFieldNames = getValueFieldNames(flowType);
+        List<RuleFieldDefinition> ruleFields = new ArrayList<>();
+        for (org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition definition :
+                ServerRuleMetadataServiceFactory.getServerRuleMetadataService()
+                        .getExpressionMeta(flowType.getFlowAlias())) {
+            String name = definition.getField().getName();
+            RuleValueDefinition value = new RuleValueDefinition().literal(definition.getValue());
+            List<String> names = valueFieldNames.get(name);
+            if (names != null && !names.isEmpty()) {
+                value.field(new RuleValueFieldDefinition().names(new ArrayList<>(names)));
+            }
+            ruleFields.add(new RuleFieldDefinition()
+                    .field(new RuleField()
+                            .name(name)
+                            .displayName(definition.getField().getDisplayName())
+                            .qualifier(definition.getKey()))
+                    .operators(definition.getOperators())
+                    .value(value));
+        }
+        return ruleFields;
+    }
+
+    /**
+     * The fields each condition field's value may be read from, by field name. Carried only on the core metadata,
+     * so the rule metadata endpoint that actions use stays exactly as it is.
+     */
+    private Map<String, List<String>> getValueFieldNames(
+            org.wso2.carbon.identity.rule.metadata.api.model.FlowType flowType) {
+
+        Map<String, List<String>> valueFieldNames = new HashMap<>();
+        RuleMetadataService ruleMetadataService = (RuleMetadataService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RuleMetadataService.class, null);
+        if (ruleMetadataService == null) {
+            return valueFieldNames;
+        }
+        try {
+            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            for (FieldDefinition definition : ruleMetadataService.getExpressionMeta(flowType, tenantDomain)) {
+                valueFieldNames.put(definition.getField().getName(), definition.getValueFieldNames());
+            }
+        } catch (RuleMetadataException e) {
+            log.debug("Could not read which fields condition values may be read from. Only literals are offered.",
+                    e);
+        }
+        return valueFieldNames;
     }
 
     private List<String> getSupportedFlowCompletionConfigs() {

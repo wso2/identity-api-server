@@ -56,7 +56,7 @@ public class FlowMetaResponse  {
 
     private List<FlowExtensionConnectionInfo> flowExtensionConnections = null;
 
-    private List<org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition> ruleMetaData = null;
+    private List<RuleFieldDefinition> ruleMetaData = null;
 
     private Boolean workflowEnabled;
 
@@ -293,7 +293,7 @@ public class FlowMetaResponse  {
     * The fields a condition in this flow can be written against
     **/
     public FlowMetaResponse ruleMetaData(
-            List<org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition> ruleMetaData) {
+            List<RuleFieldDefinition> ruleMetaData) {
 
         this.ruleMetaData = ruleMetaData;
         return this;
@@ -302,11 +302,11 @@ public class FlowMetaResponse  {
     @ApiModelProperty(value = "The fields a condition in this flow can be written against")
     @JsonProperty("ruleMetaData")
     @Valid
-    public List<org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition> getRuleMetaData() {
+    public List<RuleFieldDefinition> getRuleMetaData() {
         return ruleMetaData;
     }
     public void setRuleMetaData(
-            List<org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition> ruleMetaData) {
+            List<RuleFieldDefinition> ruleMetaData) {
         this.ruleMetaData = ruleMetaData;
     }
 

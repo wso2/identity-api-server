@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,8 +18,9 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
@@ -30,25 +31,27 @@ import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
+
 /**
- * A rule in disjunctive normal form. Any one of the AND combined rules holding makes it true.
+ * An expression in disjunctive normal form. It holds when any one of its conditions holds. Absent on the default rule, which always holds.
  **/
-@ApiModel(description = "A rule in disjunctive normal form. Any one of the AND combined rules holding makes it true.")
+@ApiModel(description = "An expression in disjunctive normal form. It holds when any one of its conditions holds. Absent on the default rule, which always holds.")
 public class RuleExpression  {
   
-@XmlType(name="ConditionEnum")
+@XmlType(name="OperatorEnum")
 @XmlEnum(String.class)
-public enum ConditionEnum {
+public enum OperatorEnum {
 
     @XmlEnumValue("OR") OR(String.valueOf("OR"));
 
 
     private String value;
 
-    ConditionEnum(String v) {
+    OperatorEnum(String v) {
         value = v;
     }
 
+    @JsonValue
     public String value() {
         return value;
     }
@@ -58,8 +61,9 @@ public enum ConditionEnum {
         return String.valueOf(value);
     }
 
-    public static ConditionEnum fromValue(String value) {
-        for (ConditionEnum b : ConditionEnum.values()) {
+    @JsonCreator
+    public static OperatorEnum fromValue(String value) {
+        for (OperatorEnum b : OperatorEnum.values()) {
             if (b.value.equals(value)) {
                 return b;
             }
@@ -68,50 +72,56 @@ public enum ConditionEnum {
     }
 }
 
-    private ConditionEnum condition;
-    private List<ANDRule> rules = new ArrayList<>();
+    private OperatorEnum operator;
+    private List<Condition> conditions = new ArrayList<>();
 
-    public RuleExpression condition(ConditionEnum condition) {
+    /**
+    * How the conditions combine. Always OR.
+    **/
+    public RuleExpression operator(OperatorEnum operator) {
 
-        this.condition = condition;
+        this.operator = operator;
         return this;
     }
     
-    @ApiModelProperty(example = "OR", required = true, value = "")
-    @JsonProperty("condition")
+    @ApiModelProperty(example = "OR", required = true, value = "How the conditions combine. Always OR.")
+    @JsonProperty("operator")
     @Valid
-    @NotNull(message = "Property condition cannot be null.")
+    @NotNull(message = "Property operator cannot be null.")
 
-    public ConditionEnum getCondition() {
-        return condition;
+    public OperatorEnum getOperator() {
+        return operator;
     }
-    public void setCondition(ConditionEnum condition) {
-        this.condition = condition;
+    public void setOperator(OperatorEnum operator) {
+        this.operator = operator;
     }
 
-    public RuleExpression rules(List<ANDRule> rules) {
+    /**
+    * Conditions, any one of which makes the expression hold.
+    **/
+    public RuleExpression conditions(List<Condition> conditions) {
 
-        this.rules = rules;
+        this.conditions = conditions;
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "")
-    @JsonProperty("rules")
+    @ApiModelProperty(required = true, value = "Conditions, any one of which makes the expression hold.")
+    @JsonProperty("conditions")
     @Valid
-    @NotNull(message = "Property rules cannot be null.")
+    @NotNull(message = "Property conditions cannot be null.")
 
-    public List<ANDRule> getRules() {
-        return rules;
+    public List<Condition> getConditions() {
+        return conditions;
     }
-    public void setRules(List<ANDRule> rules) {
-        this.rules = rules;
+    public void setConditions(List<Condition> conditions) {
+        this.conditions = conditions;
     }
 
-    public RuleExpression addRulesItem(ANDRule rulesItem) {
-        if (this.rules == null) {
-            this.rules = new ArrayList<>();
+    public RuleExpression addConditionsItem(Condition conditionsItem) {
+        if (this.conditions == null) {
+            this.conditions = new ArrayList<>();
         }
-        this.rules.add(rulesItem);
+        this.conditions.add(conditionsItem);
         return this;
     }
 
@@ -126,14 +136,14 @@ public enum ConditionEnum {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        RuleExpression rule = (RuleExpression) o;
-        return Objects.equals(this.condition, rule.condition) &&
-            Objects.equals(this.rules, rule.rules);
+        RuleExpression other = (RuleExpression) o;
+        return Objects.equals(this.operator, other.operator) &&
+            Objects.equals(this.conditions, other.conditions);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(condition, rules);
+        return Objects.hash(operator, conditions);
     }
 
     @Override
@@ -142,8 +152,8 @@ public enum ConditionEnum {
         StringBuilder sb = new StringBuilder();
         sb.append("class RuleExpression {\n");
         
-        sb.append("    condition: ").append(toIndentedString(condition)).append("\n");
-        sb.append("    rules: ").append(toIndentedString(rules)).append("\n");
+        sb.append("    operator: ").append(toIndentedString(operator)).append("\n");
+        sb.append("    conditions: ").append(toIndentedString(conditions)).append("\n");
         sb.append("}");
         return sb.toString();
     }
