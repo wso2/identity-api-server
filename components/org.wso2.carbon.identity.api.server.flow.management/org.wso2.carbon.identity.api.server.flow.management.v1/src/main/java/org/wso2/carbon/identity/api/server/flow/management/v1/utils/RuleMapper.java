@@ -140,27 +140,27 @@ public class RuleMapper {
     }
 
     /**
-     * An atomic condition as rule management holds it. The qualifier is the expression's key; a literal is handed
-     * over raw, exactly as the action management API does, leaving its type to the field definition, except a list,
-     * which has no raw form and names its own type.
+     * An atomic condition as rule management holds it. The qualifier is the expression's field qualifier; a
+     * literal is handed over raw, exactly as the action management API does, leaving its type to the field
+     * definition, except a list, which has no raw form and names its own type.
      */
     private static Expression toRuleMgtExpression(AtomicCondition atomicCondition) {
 
         Expression.Builder builder = new Expression.Builder()
                 .field(atomicCondition.getField() == null ? null : atomicCondition.getField().getName())
-                .key(atomicCondition.getField() == null ? null : atomicCondition.getField().getQualifier())
+                .fieldQualifier(atomicCondition.getField() == null ? null : atomicCondition.getField().getQualifier())
                 .operator(atomicCondition.getOperator());
 
         ConditionValue value = atomicCondition.getValue();
         if (value.getType() == ConditionValue.TypeEnum.FIELD) {
-            builder.value(Value.fieldOf(new org.wso2.carbon.identity.rule.management.api.model.FieldReference(
+            builder.value(new Value(new org.wso2.carbon.identity.rule.management.api.model.FieldReference(
                     value.getField().getName(), value.getField().getQualifier())));
         } else if (value.getLiteral() instanceof List) {
             List<String> entries = new ArrayList<>();
             for (Object entry : (List<?>) value.getLiteral()) {
                 entries.add(String.valueOf(entry));
             }
-            builder.value(Value.listOf(entries));
+            builder.value(new Value(entries));
         } else {
             builder.value(String.valueOf(value.getLiteral()));
         }
@@ -170,7 +170,7 @@ public class RuleMapper {
     private static AtomicCondition toAtomicCondition(Expression expression) {
 
         return new AtomicCondition()
-                .field(new FieldReference().name(expression.getField()).qualifier(expression.getKey()))
+                .field(new FieldReference().name(expression.getField()).qualifier(expression.getFieldQualifier()))
                 .operator(expression.getOperator())
                 .value(toConditionValue(expression.getValue()));
     }
@@ -188,7 +188,7 @@ public class RuleMapper {
         if (value.getType() == Value.Type.FIELD && value.getFieldReference() != null) {
             return new ConditionValue().type(ConditionValue.TypeEnum.FIELD)
                     .field(new FieldReference().name(value.getFieldReference().getName())
-                            .qualifier(value.getFieldReference().getKey()));
+                            .qualifier(value.getFieldReference().getQualifier()));
         }
         ConditionValue literal = new ConditionValue().type(ConditionValue.TypeEnum.LITERAL);
         return value.getType() == Value.Type.LIST

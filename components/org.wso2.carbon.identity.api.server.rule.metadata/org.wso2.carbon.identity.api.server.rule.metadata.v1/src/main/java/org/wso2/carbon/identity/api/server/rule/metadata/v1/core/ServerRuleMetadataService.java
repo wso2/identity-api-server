@@ -80,16 +80,14 @@ public class ServerRuleMetadataService {
         org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition fieldDefinitionResponse =
                 new org.wso2.carbon.identity.api.server.rule.metadata.v1.model.FieldDefinition();
 
+        // The qualifier is absent on a field that names a single value, which is what marks it as taking none.
         Field field = new Field().name(fieldDefinition.getField().getName())
-                .displayName(fieldDefinition.getField().getDisplayName());
+                .displayName(fieldDefinition.getField().getDisplayName())
+                .qualifier(buildValue(fieldDefinition.getField().getQualifier()));
         fieldDefinitionResponse.setField(field);
 
         setOperators(fieldDefinition, fieldDefinitionResponse);
         fieldDefinitionResponse.setValue(buildValue(fieldDefinition.getValue()));
-        // Absent on a field that names a single value, which is what marks it as taking no key.
-        if (fieldDefinition.getKey() != null) {
-            fieldDefinitionResponse.setKey(buildValue(fieldDefinition.getKey()));
-        }
 
         return fieldDefinitionResponse;
     }
@@ -110,8 +108,8 @@ public class ServerRuleMetadataService {
     /**
      * Convert a value meta to its API form.
      * <p>
-     * Used for both the value and the key, which are the same shape: a key says how to choose which
-     * value within a field is compared, and is described exactly as a value is.
+     * Used for both the value and the field's qualifier, which are the same shape: a qualifier says how to
+     * choose which value within a field is compared, and is described exactly as a value is.
      *
      * @param value Value meta to convert.
      * @return The API value, or null when there is nothing to convert.

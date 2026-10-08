@@ -266,11 +266,6 @@ components:
       properties:
         field:
           $ref: '#/components/schemas/Field'
-        key:
-          allOf:
-            - $ref: '#/components/schemas/Value'
-          description: |
-            How a key is chosen for this field, for fields that name a family of values rather than a single one -- a claim, for instance, where the key is the claim URI. Absent on fields that name one value, which is what marks them as taking no key.
         operators:
           type: array
           description: |
@@ -290,6 +285,11 @@ components:
           type: string
           description: Display name of the field. Use as a user friendly label of the field to show in UI.
           example: user.role
+        qualifier:
+          allOf:
+            - $ref: '#/components/schemas/Value'
+          description: |
+            How a qualifier is chosen for this field, for fields that name a family of values rather than a single one, such as a claim, where the qualifier is the claim URI. Absent on fields that name one value.
         dependantFields:
           type: array
           description: Lists the names of fields on which this field depends for its display or selection in the next expression.

@@ -239,7 +239,7 @@ public abstract class AbstractMetaResponseHandler {
                     .field(new RuleField()
                             .name(name)
                             .displayName(definition.getField().getDisplayName())
-                            .qualifier(definition.getKey()))
+                            .qualifier(definition.getField().getQualifier()))
                     .operators(definition.getOperators())
                     .value(value));
         }
@@ -262,7 +262,10 @@ public abstract class AbstractMetaResponseHandler {
         try {
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             for (FieldDefinition definition : ruleMetadataService.getExpressionMeta(flowType, tenantDomain)) {
-                valueFieldNames.put(definition.getField().getName(), definition.getValueFieldNames());
+                if (definition.getValueFieldOptions() != null) {
+                    valueFieldNames.put(definition.getField().getName(),
+                            definition.getValueFieldOptions().getNames());
+                }
             }
         } catch (RuleMetadataException e) {
             log.debug("Could not read which fields condition values may be read from. Only literals are offered.",

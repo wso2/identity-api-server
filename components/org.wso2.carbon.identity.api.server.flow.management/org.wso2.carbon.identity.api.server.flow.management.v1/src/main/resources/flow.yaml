@@ -1192,7 +1192,7 @@ components:
               type: array
               items:
                 type: string
-              example: [user.claims, user.collectedClaims, flow.properties]
+              example: [user.claims, user.collectedClaims]
 
     Executor:
       type: object
