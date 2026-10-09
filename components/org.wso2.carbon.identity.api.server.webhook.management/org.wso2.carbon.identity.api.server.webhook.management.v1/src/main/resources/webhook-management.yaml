@@ -99,11 +99,40 @@ paths:
                 "endpoint": "https://example.com/webhook",
                 "name": "Login Webhook",
                 "secret": "my-secret",
-                "channelsSubscribed": ["https://schemas.identity.wso2.org/events/login", "https://schemas.identity.wso2.org/events/registration"],
                 "eventProfile": {
                   "name": "WSO2",
                   "uri": "https://schemas.identity.wso2.org/events"
                 },
+                "channelsSubscribed": [
+                  "https://schemas.identity.wso2.org/events/login",
+                  "https://schemas.identity.wso2.org/events/registration",
+                  "https://schemas.identity.wso2.org/events/token",
+                  "https://schemas.identity.wso2.org/events/user"
+                ],
+                "organizationSubscription": [
+                  {
+                    "channel": "https://schemas.identity.wso2.org/events/login",
+                    "subscriptionPolicy": "NONE"
+                  },
+                  {
+                    "channel": "https://schemas.identity.wso2.org/events/registration",
+                    "subscriptionPolicy": "ALL_EXISTING_AND_FUTURE_ORGS"
+                  },
+                  {
+                    "channel": "https://schemas.identity.wso2.org/events/token",
+                    "subscriptionPolicy": "SELECTED",
+                    "organizations": [
+                      {
+                        "orgId": "b028ca17-8f89-449c-ae27-fa955e66465d",
+                        "subscriptionPolicy": "SELECTED_ORG_ONLY"
+                      },
+                      {
+                        "orgId": "a17b28ca-9f89-449c-ae27-fa955e66465f",
+                        "subscriptionPolicy": "SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN"
+                      }
+                    ]
+                  }
+                ],
                 "status": "ACTIVE"
               }'
 
@@ -458,7 +487,31 @@ components:
           items:
             type: string
           description: List of channels to subscribe to.
-          example: ["https://schemas.identity.wso2.org/events/login", "https://schemas.identity.wso2.org/events/registration"]
+          example:
+            - "https://schemas.identity.wso2.org/events/login"
+            - "https://schemas.identity.wso2.org/events/registration"
+            - "https://schemas.identity.wso2.org/events/token"
+            - "https://schemas.identity.wso2.org/events/user"
+        organizationSubscription:
+          type: array
+          description: >
+            Per-channel organization subscription configuration. When provided for a channel,
+            it controls which organizations receive events for that channel. Omitting a channel
+            here is equivalent to specifying `subscriptionPolicy: NONE` for that channel.
+          items:
+            $ref: '#/components/schemas/OrganizationChannelSubscription'
+          example:
+            - channel: "https://schemas.identity.wso2.org/events/login"
+              subscriptionPolicy: "NONE"
+            - channel: "https://schemas.identity.wso2.org/events/registration"
+              subscriptionPolicy: "ALL_EXISTING_AND_FUTURE_ORGS"
+            - channel: "https://schemas.identity.wso2.org/events/token"
+              subscriptionPolicy: "SELECTED"
+              organizations:
+                - orgId: "b028ca17-8f89-449c-ae27-fa955e66465d"
+                  subscriptionPolicy: "SELECTED_ORG_ONLY"
+                - orgId: "a17b28ca-9f89-449c-ae27-fa955e66465f"
+                  subscriptionPolicy: "SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN"
         status:
           type: string
           enum:
@@ -466,6 +519,90 @@ components:
             - INACTIVE
           description: Webhook Status.
           example: "ACTIVE"
+
+    OrganizationSubscription:
+      type: object
+      required:
+        - subscriptionPolicy
+      properties:
+        subscriptionPolicy:
+          type: string
+          enum:
+            - NONE
+            - ALL_EXISTING_AND_FUTURE_ORGS
+            - SELECTED
+          description: >
+            Organization-level fanout policy for this channel.
+            `NONE` – no organization-level fanout.
+            `ALL_EXISTING_AND_FUTURE_ORGS` – events fanned out to every organization, including ones created in the future.
+            `SELECTED` – events delivered only to the organizations listed in the `organizations` array.
+          example: SELECTED
+        organizations:
+          type: array
+          description: >
+            Specific organizations receiving events. Present only when `subscriptionPolicy` is `SELECTED`.
+          items:
+            $ref: '#/components/schemas/OrgSubscription'
+          example:
+            - orgId: "b028ca17-8f89-449c-ae27-fa955e66465d"
+              subscriptionPolicy: "SELECTED_ORG_ONLY"
+            - orgId: "a17b28ca-9f89-449c-ae27-fa955e66465f"
+              subscriptionPolicy: "SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN"
+
+    OrgSubscription:
+      type: object
+      required:
+        - orgId
+        - subscriptionPolicy
+      properties:
+        orgId:
+          type: string
+          description: Organization ID.
+          example: b028ca17-8f89-449c-ae27-fa955e66465d
+        subscriptionPolicy:
+          type: string
+          enum:
+            - SELECTED_ORG_ONLY
+            - SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN
+          description: >
+            Subscription scope for this specific organization.
+            `SELECTED_ORG_ONLY` – Subscribing to events originated only from this organization.
+            `SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN` – Subscribing to events originated from this organization and all its children (present and future).
+          example: SELECTED_ORG_ONLY
+
+    OrganizationChannelSubscription:
+      type: object
+      required:
+        - channel
+        - subscriptionPolicy
+      properties:
+        channel:
+          type: string
+          description: Channel URI this organization subscription applies to.
+          example: https://schemas.identity.wso2.org/events/login
+        subscriptionPolicy:
+          type: string
+          enum:
+            - NONE
+            - ALL_EXISTING_AND_FUTURE_ORGS
+            - SELECTED
+          description: >
+            Top-level subscription policy for this channel.
+            `NONE` – No subscription for the child organization events for this channel.
+            `ALL_EXISTING_AND_FUTURE_ORGS` – Subscribing to events in every organization, including ones created in the future.
+            `SELECTED` – Subscribing to events delivered only to the organizations listed in the `organizations` array.
+          example: NONE
+        organizations:
+          type: array
+          description: >
+            Explicit list of organizations to receive events. Required when `subscriptionPolicy` is `SELECTED`; ignored otherwise.
+          items:
+            $ref: '#/components/schemas/OrgSubscription'
+          example:
+            - orgId: "b028ca17-8f89-449c-ae27-fa955e66465d"
+              subscriptionPolicy: "SELECTED_ORG_ONLY"
+            - orgId: "a17b28ca-9f89-449c-ae27-fa955e66465f"
+              subscriptionPolicy: "SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN"
 
     WebhookSubscription:
       type: object
@@ -485,6 +622,8 @@ components:
             - UNSUBSCRIPTION_ERROR
           description: Status of the subscription.
           example: SUBSCRIPTION_PENDING
+        organizationSubscription:
+          $ref: '#/components/schemas/OrganizationSubscription'
 
     WebhookResponse:
       type: object
@@ -528,8 +667,21 @@ components:
           example:
             - channelUri: https://schemas.identity.wso2.org/events/login
               status: SUBSCRIPTION_ACCEPTED
+              organizationSubscription:
+                subscriptionPolicy: "NONE"
             - channelUri: https://schemas.identity.wso2.org/events/registration
-              status: SUBSCRIPTION_ERROR
+              status: SUBSCRIPTION_ACCEPTED
+              organizationSubscription:
+                subscriptionPolicy: "ALL_EXISTING_AND_FUTURE_ORGS"
+            - channelUri: https://schemas.identity.wso2.org/events/token
+              status: SUBSCRIPTION_ACCEPTED
+              organizationSubscription:
+                subscriptionPolicy: "SELECTED"
+                organizations:
+                  - orgId: "b028ca17-8f89-449c-ae27-fa955e66465d"
+                    subscriptionPolicy: "SELECTED_ORG_ONLY"
+                  - orgId: "a17b28ca-9f89-449c-ae27-fa955e66465f"
+                    subscriptionPolicy: "SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN"
         status:
           type: string
           enum:
