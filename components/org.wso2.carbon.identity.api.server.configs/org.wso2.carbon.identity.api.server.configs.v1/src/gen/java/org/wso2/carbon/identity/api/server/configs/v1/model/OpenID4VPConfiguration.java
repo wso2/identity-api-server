@@ -18,7 +18,9 @@
 
 package org.wso2.carbon.identity.api.server.configs.v1.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -43,6 +45,7 @@ public enum ClientIdSchemeEnum {
         value = v;
     }
 
+    @JsonValue
     public String value() {
         return value;
     }
@@ -52,6 +55,7 @@ public enum ClientIdSchemeEnum {
         return String.valueOf(value);
     }
 
+    @JsonCreator
     public static ClientIdSchemeEnum fromValue(String value) {
         for (ClientIdSchemeEnum b : ClientIdSchemeEnum.values()) {
             if (b.value.equals(value)) {
@@ -75,6 +79,7 @@ public enum ResponseModeEnum {
         value = v;
     }
 
+    @JsonValue
     public String value() {
         return value;
     }
@@ -84,6 +89,7 @@ public enum ResponseModeEnum {
         return String.valueOf(value);
     }
 
+    @JsonCreator
     public static ResponseModeEnum fromValue(String value) {
         for (ResponseModeEnum b : ResponseModeEnum.values()) {
             if (b.value.equals(value)) {
