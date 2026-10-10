@@ -306,6 +306,7 @@ public class OAuthInboundFunctions {
         try {
             OAuthClientSecretResponseDTO created = ApplicationManagementServiceHolder.getOAuthAdminService()
                     .createOAuthClientSecret(clientId, tenantDomain,
+                            request == null ? null : request.getSecretValue(),
                             request == null ? null : request.getExpiresAt());
             return toClientSecretResponse(created);
         } catch (IdentityOAuthAdminException e) {
