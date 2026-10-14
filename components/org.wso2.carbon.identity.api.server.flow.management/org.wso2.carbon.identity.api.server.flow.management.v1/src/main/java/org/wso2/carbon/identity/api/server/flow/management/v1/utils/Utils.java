@@ -115,6 +115,11 @@ public class Utils {
      */
     private static final Set<String> LIST_OPERATORS =
             Collections.unmodifiableSet(new HashSet<>(Arrays.asList("in", "notIn")));
+    /**
+     * The operators that check the field alone and take no value.
+     */
+    private static final Set<String> VALUE_LESS_OPERATORS = Collections.unmodifiableSet(new HashSet<>(
+            Arrays.asList("isBlank", "isNotBlank", "isEmpty", "isNotEmpty")));
 
     private static final Map<Constants.FlowTypes, String> WORKFLOW_FILTERS = new HashMap<>();
 
@@ -749,6 +754,9 @@ public class Utils {
             return "has no operator";
         }
         ConditionValue value = atomicCondition.getValue();
+        if (VALUE_LESS_OPERATORS.contains(atomicCondition.getOperator())) {
+            return value == null ? null : "gives a value, which " + atomicCondition.getOperator() + " does not take";
+        }
         if (value == null || value.getType() == null) {
             return "has no value";
         }

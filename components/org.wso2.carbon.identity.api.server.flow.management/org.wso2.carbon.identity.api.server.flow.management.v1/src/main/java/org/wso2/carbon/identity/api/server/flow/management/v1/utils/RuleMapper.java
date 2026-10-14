@@ -152,16 +152,20 @@ public class RuleMapper {
                 .operator(atomicCondition.getOperator());
 
         ConditionValue value = atomicCondition.getValue();
+        if (value == null) {
+            return builder.build();
+        }
         if (value.getType() == ConditionValue.TypeEnum.FIELD) {
+            FieldReference field = value.getField();
             builder.value(new Value(new org.wso2.carbon.identity.rule.management.api.model.FieldReference(
-                    value.getField().getName(), value.getField().getQualifier())));
+                    field == null ? null : field.getName(), field == null ? null : field.getQualifier())));
         } else if (value.getLiteral() instanceof List) {
             List<String> entries = new ArrayList<>();
             for (Object entry : (List<?>) value.getLiteral()) {
                 entries.add(String.valueOf(entry));
             }
             builder.value(new Value(entries));
-        } else {
+        } else if (value.getLiteral() != null) {
             builder.value(String.valueOf(value.getLiteral()));
         }
         return builder.build();

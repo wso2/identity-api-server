@@ -36,6 +36,41 @@ public class Operator  {
     private String name;
     private String displayName;
 
+@XmlType(name="ValueInputEnum")
+@XmlEnum(String.class)
+public enum ValueInputEnum {
+
+    @XmlEnumValue("none") NONE(String.valueOf("none")), @XmlEnumValue("single") SINGLE(String.valueOf("single")), @XmlEnumValue("list") LIST(String.valueOf("list"));
+
+
+    private String value;
+
+    ValueInputEnum(String v) {
+        value = v;
+    }
+
+    @JsonValue
+    public String value() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    public static ValueInputEnum fromValue(String value) {
+        for (ValueInputEnum b : ValueInputEnum.values()) {
+            if (b.value.equals(value)) {
+                return b;
+            }
+        }
+        throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+}
+
+    private ValueInputEnum valueInput;
+
     /**
     * Name of the operator. The immutable identifier of the operator referenced within the rule expression.
     **/
@@ -74,6 +109,25 @@ public class Operator  {
         this.displayName = displayName;
     }
 
+    /**
+    * The value a condition using the operator takes, which decides the input shown after the operator is picked:   - \&quot;none\&quot;: No value, as the operator checks the field alone (e.g., \&quot;isBlank\&quot;, \&quot;isEmpty\&quot;).   - \&quot;single\&quot;: A single value.   - \&quot;list\&quot;: A list of values (e.g., \&quot;in\&quot;, \&quot;notIn\&quot;). 
+    **/
+    public Operator valueInput(ValueInputEnum valueInput) {
+
+        this.valueInput = valueInput;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "The value a condition using the operator takes, which decides the input shown after the operator is picked:   - \"none\": No value, as the operator checks the field alone (e.g., \"isBlank\", \"isEmpty\").   - \"single\": A single value.   - \"list\": A list of values (e.g., \"in\", \"notIn\"). ")
+    @JsonProperty("valueInput")
+    @Valid
+    public ValueInputEnum getValueInput() {
+        return valueInput;
+    }
+    public void setValueInput(ValueInputEnum valueInput) {
+        this.valueInput = valueInput;
+    }
+
 
 
     @Override
@@ -87,12 +141,13 @@ public class Operator  {
         }
         Operator operator = (Operator) o;
         return Objects.equals(this.name, operator.name) &&
-            Objects.equals(this.displayName, operator.displayName);
+            Objects.equals(this.displayName, operator.displayName) &&
+            Objects.equals(this.valueInput, operator.valueInput);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, displayName);
+        return Objects.hash(name, displayName, valueInput);
     }
 
     @Override
@@ -103,6 +158,7 @@ public class Operator  {
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
+        sb.append("    valueInput: ").append(toIndentedString(valueInput)).append("\n");
         sb.append("}");
         return sb.toString();
     }

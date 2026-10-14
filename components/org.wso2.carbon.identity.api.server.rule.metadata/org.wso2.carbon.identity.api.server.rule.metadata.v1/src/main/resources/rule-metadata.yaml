@@ -358,6 +358,17 @@ components:
         displayName:
           type: string
           description: Display name of the operator. Use as a user friendly label of the operator to show in UI.
+        valueInput:
+          type: string
+          description: |
+            The value a condition using the operator takes, which decides the input shown after the operator is picked:
+              - "none": No value, as the operator checks the field alone (e.g., "isBlank", "isEmpty").
+              - "single": A single value.
+              - "list": A list of values (e.g., "in", "notIn").
+          enum:
+            - none
+            - single
+            - list
     ValueObject:
       type: object
       properties:

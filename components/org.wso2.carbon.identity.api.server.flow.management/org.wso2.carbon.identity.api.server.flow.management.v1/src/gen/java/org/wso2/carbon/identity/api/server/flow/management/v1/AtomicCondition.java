@@ -94,10 +94,9 @@ public class AtomicCondition  {
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "What the field is compared against.")
+    @ApiModelProperty(value = "What the field is compared against. Omitted for an operator whose valueInput is none, such as isBlank or isEmpty, which checks the field alone.")
     @JsonProperty("value")
     @Valid
-    @NotNull(message = "Property value cannot be null.")
 
     public ConditionValue getValue() {
         return value;

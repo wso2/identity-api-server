@@ -100,7 +100,9 @@ public class ServerRuleMetadataService {
         for (Operator operator : operators) {
             org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Operator operatorItem =
                     new org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Operator().name(operator.getName())
-                            .displayName(operator.getDisplayName());
+                            .displayName(operator.getDisplayName())
+                            .valueInput(org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Operator
+                                    .ValueInputEnum.fromValue(operator.getValueInput().getValue()));
             fieldDefinitionResponse.addOperatorsItem(operatorItem);
         }
     }

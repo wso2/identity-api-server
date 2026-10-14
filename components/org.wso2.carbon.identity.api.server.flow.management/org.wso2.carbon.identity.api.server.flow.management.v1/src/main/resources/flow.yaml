@@ -1078,7 +1078,6 @@ components:
       required:
         - field
         - operator
-        - value
       properties:
         field:
           $ref: '#/components/schemas/FieldReference'
@@ -1089,7 +1088,11 @@ components:
             per field in `ruleMetaData` and enforced against it.
           example: equals
         value:
-          $ref: '#/components/schemas/ConditionValue'
+          description: >
+            What the field is compared against. Omitted for an operator whose `valueInput` is `none`,
+            such as `isBlank` or `isEmpty`, which checks the field alone.
+          allOf:
+            - $ref: '#/components/schemas/ConditionValue'
 
     FieldReference:
       type: object
