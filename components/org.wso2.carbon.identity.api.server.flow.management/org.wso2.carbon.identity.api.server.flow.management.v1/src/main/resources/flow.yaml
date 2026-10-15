@@ -206,6 +206,54 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /flow/meta/rule:
+    get:
+      summary: Retrieve the condition metadata of a flow type
+      description: >
+        The fields a decision step's conditions can be written against in this flow type, and the limits the
+        conditions and decision steps are validated against.
+      operationId: getFlowRuleMeta
+      tags:
+        - Flow Composer
+      parameters:
+        - in: query
+          name: flowType
+          required: true
+          schema:
+            type: string
+            enum: [REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION]
+          description: Type of the flow to get condition metadata for
+      responses:
+        '200':
+          description: Successfully retrieved the condition metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlowRuleMetaResponse'
+        '400':
+          description: Invalid flow type specified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Encountered a server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /flow/extension:
     post:
       tags:
@@ -768,15 +816,6 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/FlowExtensionConnectionInfo'
-        ruleMetaData:
-          type: array
-          description: >
-            The fields a condition in this flow can be written against, with how each one is keyed,
-            the operators it accepts and how its value is entered. Same shape as the response of the
-            rule metadata endpoint, so a builder does not have to call that separately to render a
-            decision step.
-          items:
-            $ref: '#/components/schemas/RuleFieldDefinition'
         workflowEnabled:
           type: boolean
           example: false
@@ -1135,6 +1174,37 @@ components:
           example: Sri Lanka
         field:
           $ref: '#/components/schemas/FieldReference'
+
+    FlowRuleMetaResponse:
+      type: object
+      properties:
+        ruleMetaData:
+          type: array
+          description: >
+            The fields a condition in this flow can be written against, with how each one is keyed,
+            the operators it accepts and how its value is entered. Empty when the flow type publishes
+            no condition fields, or conditional branching is disabled.
+          items:
+            $ref: '#/components/schemas/RuleFieldDefinition'
+        limits:
+          $ref: '#/components/schemas/FlowRuleLimits'
+
+    FlowRuleLimits:
+      type: object
+      description: The limits the server validates decision steps and their conditions against.
+      properties:
+        maxDecisionNodes:
+          type: integer
+          description: Maximum number of decision steps in a flow.
+          example: 10
+        maxRulesCombinedWithOr:
+          type: integer
+          description: Maximum number of rules a condition may combine with OR.
+          example: 10
+        maxExpressionsCombinedWithAnd:
+          type: integer
+          description: Maximum number of expressions a rule may combine with AND.
+          example: 5
 
     RuleFieldDefinition:
       type: object

@@ -33,6 +33,7 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionUpdat
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRequest;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRuleMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Step;
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.AbstractMetaResponseHandler;
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.AskPasswordFlowMetaHandler;
@@ -118,6 +119,20 @@ public class ServerFlowMgtService {
         Utils.validateFlowType(flowType);
         AbstractMetaResponseHandler metaResponseHandler = resolveHandler(flowType);
         return metaResponseHandler.createResponse();
+    }
+
+    /**
+     * Retrieve the condition metadata of a flow type: the fields its decision steps' conditions can use, and the
+     * limits they are validated against.
+     *
+     * @param flowType Type of the flow.
+     * @return FlowRuleMetaResponse containing the condition metadata.
+     */
+    public FlowRuleMetaResponse getFlowRuleMeta(String flowType) {
+
+        Utils.validateFlowType(flowType);
+        AbstractMetaResponseHandler metaResponseHandler = resolveHandler(flowType);
+        return metaResponseHandler.createRuleMetaResponse();
     }
 
     /**

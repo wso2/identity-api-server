@@ -29,6 +29,8 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorConnection
 import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorMetadata;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionConnectionInfo;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRuleLimits;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRuleMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.RuleField;
 import org.wso2.carbon.identity.api.server.flow.management.v1.RuleFieldDefinition;
 import org.wso2.carbon.identity.api.server.flow.management.v1.RuleValueDefinition;
@@ -44,7 +46,9 @@ import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.flow.execution.engine.metadata.FlowExecutorInfo;
 import org.wso2.carbon.identity.flow.extension.model.FlowExtensionAction;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
+import org.wso2.carbon.identity.flow.mgt.utils.FlowMgtUtils;
 import org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants;
+import org.wso2.carbon.identity.rule.management.api.util.RuleLimits;
 import org.wso2.carbon.identity.rule.metadata.api.exception.RuleMetadataException;
 import org.wso2.carbon.identity.rule.metadata.api.model.FieldDefinition;
 import org.wso2.carbon.identity.rule.metadata.api.service.RuleMetadataService;
@@ -202,15 +206,44 @@ public abstract class AbstractMetaResponseHandler {
         response.setExtensionExecutors(getExtensionExecutors());
         response.setFlowExtensionConnections(getFlowExtensionConnections());
         response.setSupportedFlowCompletionConfigs(getSupportedFlowCompletionConfigs());
-        response.setRuleMetaData(getRuleMetaData());
         return response;
     }
 
     /**
-     * The fields a condition in this flow can be written against.
-     * <p>
-     * Carried on the flow metadata so a builder can render a decision step from one call rather than
-     * also asking the rule metadata endpoint. A flow type that publishes no condition fields simply
+     * Create the condition metadata response: the fields a decision step's conditions can use in this flow, and the
+     * limits the server validates decision steps and their conditions against.
+     *
+     * @return FlowRuleMetaResponse instance.
+     */
+    public FlowRuleMetaResponse createRuleMetaResponse() {
+
+        return new FlowRuleMetaResponse()
+                .ruleMetaData(getRuleMetaData())
+                .limits(getRuleLimits());
+    }
+
+    /**
+     * The limits decision steps and their conditions are validated against. A flow type without conditions gets
+     * the default rule limits.
+     *
+     * @return The limits.
+     */
+    protected FlowRuleLimits getRuleLimits() {
+
+        FlowRuleLimits limits = new FlowRuleLimits().maxDecisionNodes(FlowMgtUtils.getMaxRuleEvaluationNodes());
+        org.wso2.carbon.identity.rule.management.api.model.FlowType flowType;
+        try {
+            flowType = org.wso2.carbon.identity.rule.management.api.model.FlowType.valueOf(getFlowType());
+        } catch (IllegalArgumentException e) {
+            return limits;
+        }
+        return limits
+                .maxRulesCombinedWithOr(RuleLimits.getMaxRulesCombinedWithOr(flowType))
+                .maxExpressionsCombinedWithAnd(RuleLimits.getMaxExpressionsCombinedWithAnd(flowType));
+    }
+
+    /**
+     * The fields a condition in this flow can be written against. A flow type that publishes no condition fields
      * gets an empty list, which is how a builder knows not to offer decisions for it.
      *
      * @return The condition fields, never null.

@@ -56,8 +56,6 @@ public class FlowMetaResponse  {
 
     private List<FlowExtensionConnectionInfo> flowExtensionConnections = null;
 
-    private List<RuleFieldDefinition> ruleMetaData = null;
-
     private Boolean workflowEnabled;
 
     /**
@@ -289,26 +287,6 @@ public class FlowMetaResponse  {
         this.workflowEnabled = workflowEnabled;
     }
 
-    /**
-    * The fields a condition in this flow can be written against
-    **/
-    public FlowMetaResponse ruleMetaData(
-            List<RuleFieldDefinition> ruleMetaData) {
-
-        this.ruleMetaData = ruleMetaData;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "The fields a condition in this flow can be written against")
-    @JsonProperty("ruleMetaData")
-    @Valid
-    public List<RuleFieldDefinition> getRuleMetaData() {
-        return ruleMetaData;
-    }
-    public void setRuleMetaData(
-            List<RuleFieldDefinition> ruleMetaData) {
-        this.ruleMetaData = ruleMetaData;
-    }
 
 
 
@@ -331,13 +309,12 @@ public class FlowMetaResponse  {
             Objects.equals(this.attributeMetadata, flowMetaResponse.attributeMetadata) &&
             Objects.equals(this.executorConnections, flowMetaResponse.executorConnections) &&
             Objects.equals(this.flowExtensionConnections, flowMetaResponse.flowExtensionConnections) &&
-            Objects.equals(this.ruleMetaData, flowMetaResponse.ruleMetaData) &&
             Objects.equals(this.workflowEnabled, flowMetaResponse.workflowEnabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(flowType, supportedExecutors, extensionExecutors, connectorConfigs, attributeProfile, supportedFlowCompletionConfigs, attributeMetadata, executorConnections, flowExtensionConnections, ruleMetaData, workflowEnabled);
+        return Objects.hash(flowType, supportedExecutors, extensionExecutors, connectorConfigs, attributeProfile, supportedFlowCompletionConfigs, attributeMetadata, executorConnections, flowExtensionConnections, workflowEnabled);
     }
 
     @Override
@@ -355,7 +332,6 @@ public class FlowMetaResponse  {
         sb.append("    attributeMetadata: ").append(toIndentedString(attributeMetadata)).append("\n");
         sb.append("    executorConnections: ").append(toIndentedString(executorConnections)).append("\n");
         sb.append("    flowExtensionConnections: ").append(toIndentedString(flowExtensionConnections)).append("\n");
-        sb.append("    ruleMetaData: ").append(toIndentedString(ruleMetaData)).append("\n");
         sb.append("    workflowEnabled: ").append(toIndentedString(workflowEnabled)).append("\n");
         sb.append("}");
         return sb.toString();
