@@ -4211,6 +4211,8 @@ components:
           $ref: '#/components/schemas/CIBAAuthenticationRequestConfiguration'
         issuer:
           $ref: '#/components/schemas/AllowedIssuer'
+        tokenExchange:
+          $ref: '#/components/schemas/TokenExchangeConfiguration'
     OAuth2PKCEConfiguration:
       type: object
       properties:
@@ -4309,6 +4311,13 @@ components:
         applicationSubjectTokenExpiryInSeconds:
           type: integer
           example: 3600
+    TokenExchangeConfiguration:
+      type: object
+      properties:
+        restrictScopeIssuanceForFederatedTokens:
+          type: boolean
+          description: "If enabled, no scopes are issued for federated tokens in token exchange grant type."
+          example: false
     IdTokenConfiguration:
       type: object
       properties:

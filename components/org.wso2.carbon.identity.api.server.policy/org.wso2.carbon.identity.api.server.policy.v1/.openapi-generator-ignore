@@ -1,0 +1,4 @@
+# OpenAPI Generator Ignore
+# Prevents the generator from overwriting hand-written impl classes.
+
+**/impl/*

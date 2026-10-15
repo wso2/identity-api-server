@@ -37,6 +37,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.RefreshToke
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestObjectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectTokenConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.TokenExchangeConfiguration;
 import javax.validation.constraints.*;
 
 
@@ -110,6 +111,7 @@ public enum StateEnum {
     private FapiProfile fapiProfile = null;
     private CIBAAuthenticationRequestConfiguration cibaAuthenticationRequest;
     private AllowedIssuer issuer;
+    private TokenExchangeConfiguration tokenExchange;
 
     /**
     **/
@@ -637,6 +639,24 @@ public enum StateEnum {
         this.issuer = issuer;
     }
 
+    /**
+    **/
+    public OpenIDConnectConfiguration tokenExchange(TokenExchangeConfiguration tokenExchange) {
+
+        this.tokenExchange = tokenExchange;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("tokenExchange")
+    @Valid
+    public TokenExchangeConfiguration getTokenExchange() {
+        return tokenExchange;
+    }
+    public void setTokenExchange(TokenExchangeConfiguration tokenExchange) {
+        this.tokenExchange = tokenExchange;
+    }
+
     @Override
     public boolean equals(java.lang.Object o) {
 
@@ -673,13 +693,14 @@ public enum StateEnum {
             Objects.equals(this.fapiMetadata, openIDConnectConfiguration.fapiMetadata) &&
             Objects.equals(this.fapiProfile, openIDConnectConfiguration.fapiProfile) &&
             Objects.equals(this.cibaAuthenticationRequest, openIDConnectConfiguration.cibaAuthenticationRequest) &&
-            Objects.equals(this.issuer, openIDConnectConfiguration.issuer);
+            Objects.equals(this.issuer, openIDConnectConfiguration.issuer) &&
+            Objects.equals(this.tokenExchange, openIDConnectConfiguration.tokenExchange);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(clientId, clientSecret, clientSecretExpiresAt, multipleClientSecretsConfigured, state, grantTypes, callbackURLs, allowedOrigins, publicClient, pkce, accessToken, hybridFlow, refreshToken, subjectToken, idToken, logout, validateRequestObjectSignature, scopeValidators, clientAuthentication, requestObject, pushAuthorizationRequest, subject, isFAPIApplication, fapiMetadata, cibaAuthenticationRequest, issuer);
+        return Objects.hash(clientId, clientSecret, clientSecretExpiresAt, multipleClientSecretsConfigured, state, grantTypes, callbackURLs, allowedOrigins, publicClient, pkce, accessToken, hybridFlow, refreshToken, subjectToken, idToken, logout, validateRequestObjectSignature, scopeValidators, clientAuthentication, requestObject, pushAuthorizationRequest, subject, isFAPIApplication, fapiMetadata, cibaAuthenticationRequest, issuer, tokenExchange);
     }
 
     @Override
@@ -715,6 +736,7 @@ public enum StateEnum {
         sb.append("    fapiProfile: ").append(toIndentedString(fapiProfile)).append("\n");
         sb.append("    cibaAuthenticationRequest: ").append(toIndentedString(cibaAuthenticationRequest)).append("\n");
         sb.append("    issuer: ").append(toIndentedString(issuer)).append("\n");
+        sb.append("    tokenExchange: ").append(toIndentedString(tokenExchange)).append("\n");
         sb.append("}");
         return sb.toString();
     }
