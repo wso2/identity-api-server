@@ -138,6 +138,7 @@ import org.wso2.carbon.identity.core.model.ExpressionNode;
 import org.wso2.carbon.identity.core.model.FilterTreeBuilder;
 import org.wso2.carbon.identity.core.model.Node;
 import org.wso2.carbon.identity.core.model.OperationNode;
+import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.cors.mgt.core.constant.ErrorMessages;
@@ -155,8 +156,11 @@ import org.wso2.carbon.identity.template.mgt.TemplateMgtConstants;
 import org.wso2.carbon.identity.template.mgt.exception.TemplateManagementClientException;
 import org.wso2.carbon.identity.template.mgt.exception.TemplateManagementException;
 import org.wso2.carbon.identity.template.mgt.model.Template;
+import org.wso2.carbon.keystore.mgt.KeyStoreMgtException;
+import org.wso2.carbon.keystore.mgt.util.TenantKeyPairUtil;
 import org.wso2.carbon.user.core.common.AbstractUserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.yaml.snakeyaml.TypeDescription;
 
 import java.io.IOException;
@@ -253,6 +257,10 @@ public class ServerApplicationManagementService {
     private static final Set<String> SUPPORTED_FILTER_ATTRIBUTES = new HashSet<>();
     private static final List<String> SUPPORTED_REQUIRED_ATTRIBUTES = new ArrayList<>();
     private static final int DEFAULT_OFFSET = 0;
+
+    // OIDC algorithms that need the tenant EC key pair.
+    private static final String ES256 = "ES256";
+    private static final String ECDH_ES_PREFIX = "ECDH-ES";
 
     // WS-Trust related constants.
     private static final String WS_TRUST_TEMPLATE_ID = "061a3de4-8c08-4878-84a6-24245f11bf0e";
@@ -1246,6 +1254,7 @@ public class ServerApplicationManagementService {
          */
         validateCORSOrigins(oidcConfigModel.getAllowedOrigins());
         validateFapiProfile(oidcConfigModel);
+        provisionTenantECKeyIfRequired(oidcConfigModel);
         putApplicationInbound(applicationId, oidcConfigModel, OAuthInboundFunctions::getInboundProtocolConfig);
     }
 
@@ -2477,5 +2486,51 @@ public class ServerApplicationManagementService {
         return creationModel.getScopes().stream()
                 .map(scope -> new Scope.ScopeBuilder().name(scope).build())
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Add the EC key pair to the tenant keystore if the OIDC configuration uses an algorithm that needs the tenant
+     * EC key and the key does not exist. Tenants created before the EC key pair was generated at tenant creation do
+     * not have it. The super tenant EC key is part of the primary keystore and is not provisioned here.
+     *
+     * @param oidcConfig OIDC inbound configuration.
+     */
+    private void provisionTenantECKeyIfRequired(OpenIDConnectConfiguration oidcConfig) {
+
+        if (oidcConfig == null || !isTenantECKeyRequired(oidcConfig)) {
+            return;
+        }
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+            return;
+        }
+        try {
+            if (TenantKeyPairUtil.addECKeyEntryIfAbsent(IdentityTenantUtil.getTenantId(tenantDomain), tenantDomain)
+                    && log.isDebugEnabled()) {
+                log.debug("Added the EC key pair to the keystore of tenant: " + tenantDomain);
+            }
+        } catch (KeyStoreMgtException e) {
+            throw Utils.buildServerError("Error while adding the EC key pair required by the configured OIDC " +
+                    "algorithms to the keystore of tenant: " + tenantDomain, e);
+        }
+    }
+
+    /**
+     * Check whether the OIDC configuration uses an algorithm that needs the tenant EC key, which are ES256 ID token
+     * signing and ECDH-ES based request object encryption. ES256 request object signing and ECDH-ES based ID token
+     * encryption use the client keys and do not need the tenant EC key.
+     *
+     * @param oidcConfig OIDC inbound configuration.
+     * @return True if the tenant EC key is required.
+     */
+    private boolean isTenantECKeyRequired(OpenIDConnectConfiguration oidcConfig) {
+
+        if (oidcConfig.getIdToken() != null
+                && ES256.equals(StringUtils.trim(oidcConfig.getIdToken().getIdTokenSignedResponseAlg()))) {
+            return true;
+        }
+        return oidcConfig.getRequestObject() != null && oidcConfig.getRequestObject().getEncryption() != null
+                && StringUtils.startsWith(StringUtils.trim(oidcConfig.getRequestObject().getEncryption()
+                .getAlgorithm()), ECDH_ES_PREFIX);
     }
 }
