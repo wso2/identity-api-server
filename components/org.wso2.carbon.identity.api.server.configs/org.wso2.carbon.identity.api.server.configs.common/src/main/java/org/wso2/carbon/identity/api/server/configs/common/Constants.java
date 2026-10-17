@@ -85,6 +85,18 @@ public class Constants {
     public static final String SAML2_METADATA_ENDPOINT_URI_PATH = "/identity/metadata/saml2";
 
     /**
+     * Customer Data Service (CDS) configuration. The CDS extensions
+     * (wso2-extensions/identity-customer-data-service-extensions) read the same config store resource and handle
+     * the same event. Keep these names the same in both repositories.
+     */
+    public static final String CDS_CONFIG_RESOURCE_TYPE = "CDS_CONFIGURATION";
+    public static final String CDS_CONFIG_RESOURCE_NAME = "cds-config";
+    public static final String CDS_CONFIG_ENABLED_ATTRIBUTE = "enabled";
+    public static final String CDS_ENABLE_SERVER_CONFIG = "CustomerDataService.Enable";
+    public static final String PRE_UPDATE_CDS_CONFIG_EVENT = "PRE_UPDATE_CDS_CONFIG";
+    public static final String CDS_ENABLED_EVENT_PROPERTY = "cds_enabled";
+
+    /**
      * Enum for error messages.
      */
     public enum ErrorMessage {
@@ -348,7 +360,23 @@ public class Constants {
                 "Server encountered an error while retrieving the OpenID4VP configuration."),
         ERROR_CODE_OID4VP_CONFIG_UPDATE("65044",
                 "Unable to update OpenID4VP configuration.",
-                "Server encountered an error while updating the OpenID4VP configuration.");
+                "Server encountered an error while updating the OpenID4VP configuration."),
+
+        /**
+         * Customer Data Service (CDS) configuration errors.
+         */
+        ERROR_CODE_CDS_CONFIG_SYNC_REJECTED("60022",
+                "Unable to update CDS configuration.",
+                "The Customer Data Service rejected the configuration update. %s"),
+        ERROR_CODE_CDS_CONFIG_RETRIEVE("65045",
+                "Unable to retrieve CDS configuration.",
+                "Server encountered an error while retrieving the CDS configuration."),
+        ERROR_CODE_CDS_CONFIG_UPDATE("65046",
+                "Unable to update CDS configuration.",
+                "Server encountered an error while updating the CDS configuration."),
+        ERROR_CODE_CDS_CONFIG_SYNC("65047",
+                "Unable to update CDS configuration.",
+                "Server encountered an error while sending the configuration to the Customer Data Service. %s");
 
         private final String code;
         private final String message;

@@ -53,6 +53,8 @@ public interface ConfigsApiService {
 
       public Response getAuthenticator(String authenticatorId);
 
+      public Response getCDSConfiguration();
+
       public Response getCORSConfiguration();
 
       public Response getConfigs();
@@ -94,6 +96,8 @@ public interface ConfigsApiService {
       public Response getSchemas();
 
       public Response listAuthenticators(String type);
+
+      public Response patchCDSConfiguration(CDSConfig cdSConfig);
 
       public Response patchCORSConfiguration(List<CORSPatch> coRSPatch);
 

@@ -23,6 +23,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.core.ServerConfigManagemen
 import org.wso2.carbon.identity.api.server.configs.v1.factories.ServerConfigManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AgentConfigPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ApplicationObject;
+import org.wso2.carbon.identity.api.server.configs.v1.model.CDSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettings;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ConfigPreferenceRequestDTO;
@@ -68,6 +69,18 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     public Response getAuthenticator(String authenticatorId) {
 
         return Response.ok().entity(configManagementService.getAuthenticator(authenticatorId)).build();
+    }
+
+    @Override
+    public Response getCDSConfiguration() {
+
+        return Response.ok().entity(configManagementService.getCDSConfiguration()).build();
+    }
+
+    @Override
+    public Response patchCDSConfiguration(CDSConfig cdsConfig) {
+
+        return Response.ok().entity(configManagementService.patchCDSConfiguration(cdsConfig)).build();
     }
 
     @Override

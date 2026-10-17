@@ -1322,6 +1322,98 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /configs/cds:
+    get:
+      tags:
+        - Customer Data Service Configuration
+      summary: Retrieve the Customer Data Service (CDS) configuration.
+      operationId: getCDSConfiguration
+      description: |
+        Retrieve the CDS configuration of the tenant.
+
+        `cds_enabled` is the effective value. If the tenant has no value, the server-level value
+        `[customer_data_service] enable` applies. An organization gets the value of its root organization.
+
+        <b>Scope (Permission) required:</b> `internal_config_view`
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CDSConfig'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - Customer Data Service Configuration
+      summary: Update the Customer Data Service (CDS) configuration.
+      operationId: patchCDSConfiguration
+      description: |
+        Update the CDS configuration of the tenant. All fields are optional.
+
+        The server sends the new value to the Customer Data Service before it stores the value.
+        If the Customer Data Service does not accept the value, the server does not store it.
+
+        **Note:** This operation is only allowed for root tenants and will return
+        403 Forbidden when called from an organization context.
+
+        <b>Scope (Permission) required:</b> `internal_config_update`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CDSConfig'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CDSConfig'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /configs/fraud-detection:
     get:
       tags:
@@ -2481,6 +2573,13 @@ components:
         enableEmailNotification:
           type: boolean
           description: If true, then email notification will sent to user when impersonation starts.
+          example: true
+    CDSConfig:
+      type: object
+      properties:
+        cds_enabled:
+          type: boolean
+          description: If true, the Customer Data Service is enabled for the tenant.
           example: true
     FraudDetectionConfig:
       type: object

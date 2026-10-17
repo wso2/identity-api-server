@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2020-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -26,6 +26,7 @@ import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementServic
 import org.wso2.carbon.identity.compatibility.settings.core.service.CompatibilitySettingsService;
 import org.wso2.carbon.identity.configuration.mgt.core.ConfigurationManager;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
+import org.wso2.carbon.identity.event.services.IdentityEventService;
 import org.wso2.carbon.identity.fraud.detection.core.service.FraudDetectionConfigsService;
 import org.wso2.carbon.identity.notification.push.device.handler.DeviceHandlerService;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
@@ -142,6 +143,13 @@ public class ConfigsServiceHolder {
         static final ConfigurationManager SERVICE =
                 (ConfigurationManager) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                         .getOSGiService(ConfigurationManager.class, null);
+    }
+
+    private static class IdentityEventServiceHolder {
+
+        static final IdentityEventService SERVICE =
+                (IdentityEventService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(IdentityEventService.class, null);
     }
 
     private static class ConsentAppMappingServiceHolder {
@@ -313,6 +321,16 @@ public class ConfigsServiceHolder {
     public static ConfigurationManager getConfigurationManager() {
 
         return ConfigurationManagerHolder.SERVICE;
+    }
+
+    /**
+     * Get IdentityEventService osgi service.
+     *
+     * @return IdentityEventService
+     */
+    public static IdentityEventService getIdentityEventService() {
+
+        return IdentityEventServiceHolder.SERVICE;
     }
 
     /**
