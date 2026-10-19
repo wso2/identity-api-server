@@ -143,6 +143,17 @@ public abstract class AbstractMetaResponseHandler {
     }
 
     /**
+     * Groups of executors of which at least one must be present in a valid flow with the given executors.
+     *
+     * @param executors Executors in the flow.
+     * @return List of "at least one of" executor groups.
+     */
+    public List<Set<String>> getRequiredExecutorGroups(Set<String> executors) {
+
+        return getRequiredExecutorGroups();
+    }
+
+    /**
      * The executors registered with the engine for this flow type, resolved once per request.
      *
      * @return List of registered executor info.
