@@ -350,7 +350,7 @@ public class FlowApi  {
     @Path("/meta/rule")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve the condition metadata of a flow type", notes = "The fields a decision step's conditions can be written against in this flow type, and the limits the conditions and decision steps are validated against. ", response = FlowRuleMetaResponse.class, authorizations = {
+    @ApiOperation(value = "Retrieve the condition metadata of a flow type", notes = "The fields a decision step's conditions can be written against in this flow type. ", response = FlowRuleMetaResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -361,7 +361,8 @@ public class FlowApi  {
         @ApiResponse(code = 400, message = "Invalid flow type specified", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-        @ApiResponse(code = 500, message = "Encountered a server error", response = Error.class)
+        @ApiResponse(code = 500, message = "Encountered a server error", response = Error.class),
+        @ApiResponse(code = 501, message = "Conditional branching is not enabled on the server", response = Error.class)
     })
     public Response getFlowRuleMeta(    @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Type of the flow to get condition metadata for",required=true, allowableValues="REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION")  @QueryParam("flowType") String flowType) {
 

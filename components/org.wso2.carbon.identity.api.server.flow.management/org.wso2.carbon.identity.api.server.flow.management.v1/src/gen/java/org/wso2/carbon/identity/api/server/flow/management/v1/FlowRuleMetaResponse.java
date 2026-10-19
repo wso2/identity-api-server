@@ -25,7 +25,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRuleLimits;
 import org.wso2.carbon.identity.api.server.flow.management.v1.RuleFieldDefinition;
 import javax.validation.constraints.*;
 
@@ -39,7 +38,6 @@ public class FlowRuleMetaResponse  {
 
     private List<RuleFieldDefinition> ruleMetaData = null;
 
-    private FlowRuleLimits limits;
 
     /**
     * The fields a condition in this flow can be written against, with how each one is keyed, the operators it accepts and how its value is entered. Empty when the flow type publishes no condition fields, or conditional branching is disabled.
@@ -68,26 +66,6 @@ public class FlowRuleMetaResponse  {
         return this;
     }
 
-    /**
-    **/
-    public FlowRuleMetaResponse limits(FlowRuleLimits limits) {
-
-        this.limits = limits;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "")
-    @JsonProperty("limits")
-    @Valid
-    public FlowRuleLimits getLimits() {
-        return limits;
-    }
-    public void setLimits(FlowRuleLimits limits) {
-        this.limits = limits;
-    }
-
-
-
     @Override
     public boolean equals(java.lang.Object o) {
 
@@ -98,13 +76,12 @@ public class FlowRuleMetaResponse  {
             return false;
         }
         FlowRuleMetaResponse flowRuleMetaResponse = (FlowRuleMetaResponse) o;
-        return Objects.equals(this.ruleMetaData, flowRuleMetaResponse.ruleMetaData) &&
-            Objects.equals(this.limits, flowRuleMetaResponse.limits);
+        return Objects.equals(this.ruleMetaData, flowRuleMetaResponse.ruleMetaData);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(ruleMetaData, limits);
+        return Objects.hash(ruleMetaData);
     }
 
     @Override
@@ -114,7 +91,6 @@ public class FlowRuleMetaResponse  {
         sb.append("class FlowRuleMetaResponse {\n");
         
         sb.append("    ruleMetaData: ").append(toIndentedString(ruleMetaData)).append("\n");
-        sb.append("    limits: ").append(toIndentedString(limits)).append("\n");
         sb.append("}");
         return sb.toString();
     }

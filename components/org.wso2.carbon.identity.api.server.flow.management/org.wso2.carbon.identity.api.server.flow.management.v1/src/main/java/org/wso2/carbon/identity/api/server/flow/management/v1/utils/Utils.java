@@ -186,6 +186,22 @@ public class Utils {
     }
 
     /**
+     * Handles a decision step that is not valid. Every such failure shares one error code and says what is wrong
+     * through its own message and description.
+     *
+     * @param message     Error message.
+     * @param description Error description, formatted with the data.
+     * @param data        Data to be added to the description.
+     * @return APIError object.
+     */
+    public static APIError handleDecisionStepException(String message, String description, Object... data) {
+
+        return handleFlowMgtException(new FlowMgtClientException(
+                FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_DECISION_STEP.getCode(), message, description),
+                data);
+    }
+
+    /**
      * Handles {@link ActionMgtException} thrown when calling {@link
      * org.wso2.carbon.identity.action.management.api.service.ActionManagementService} from the
      * flow management layer and converts it into an {@link APIError}.
@@ -678,26 +694,19 @@ public class Utils {
 
         Action action = step.getData() == null ? null : step.getData().getAction();
         if (action == null || CollectionUtils.isEmpty(action.getBranches())) {
-            throw Utils.handleFlowMgtException(new FlowMgtClientException(
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_WITHOUT_BRANCHES.getCode(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_WITHOUT_BRANCHES.getMessage(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_WITHOUT_BRANCHES.getDescription()),
-                    step.getId());
+            throw handleDecisionStepException("Decision step has no branches.",
+                    "The decision step %s has no branches, so it cannot decide anything.", step.getId());
         }
         if (StringUtils.isNotBlank(action.getNext())) {
-            throw Utils.handleFlowMgtException(new FlowMgtClientException(
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_WITH_NEXT.getCode(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_WITH_NEXT.getMessage(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_WITH_NEXT.getDescription()),
-                    step.getId());
+            throw handleDecisionStepException("Decision step defines a next step.",
+                    "The decision step %s defines a next step. Where the flow goes is decided by its branches, " +
+                            "and the branch without a rule is what catches everything else.", step.getId());
         }
         // Evaluating the branches is what the step type itself does, so there is no executor to name.
         if (action.getExecutor() != null) {
-            throw Utils.handleFlowMgtException(new FlowMgtClientException(
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_INVALID_EXECUTOR.getCode(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_INVALID_EXECUTOR.getMessage(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_DECISION_INVALID_EXECUTOR.getDescription()),
-                    step.getId());
+            throw handleDecisionStepException("Executor not allowed on a decision step.",
+                    "The decision step %s names an executor. A decision only evaluates its branches, so it " +
+                            "carries no executor.", step.getId());
         }
         for (Branch branch : action.getBranches()) {
             validateBranchRule(step.getId(), branch);
@@ -726,12 +735,9 @@ public class Utils {
             for (AtomicCondition atomicCondition : condition.getConditions()) {
                 String problem = findConditionProblem(atomicCondition);
                 if (problem != null) {
-                    throw Utils.handleFlowMgtException(new FlowMgtClientException(
-                            FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_BRANCH_RULE.getCode(),
-                            FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_BRANCH_RULE.getMessage(),
-                            FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_BRANCH_RULE
-                                    .getDescription()),
-                            branch.getName(), stepId, problem);
+                    throw handleDecisionStepException("Invalid rule.",
+                            "A condition in branch %s of the decision step %s %s.", branch.getName(), stepId,
+                            problem);
                 }
             }
         }
@@ -805,10 +811,8 @@ public class Utils {
 
         if (step.getData() != null && step.getData().getAction() != null
                 && CollectionUtils.isNotEmpty(step.getData().getAction().getBranches())) {
-            throw Utils.handleFlowMgtException(new FlowMgtClientException(
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_BRANCHES_NOT_ALLOWED.getCode(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_BRANCHES_NOT_ALLOWED.getMessage(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_BRANCHES_NOT_ALLOWED.getDescription()),
+            throw handleDecisionStepException("Branches are not allowed for this step.",
+                    "Only a %s step has branches, but the step %s of type %s carries them.",
                     FlowEndpointConstants.FlowGeneration.RULE_EVALUATION, step.getId(), step.getType());
         }
     }

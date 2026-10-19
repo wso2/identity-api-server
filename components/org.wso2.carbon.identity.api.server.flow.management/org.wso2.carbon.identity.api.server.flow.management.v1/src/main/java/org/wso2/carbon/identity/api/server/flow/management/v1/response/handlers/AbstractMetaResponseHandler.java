@@ -29,7 +29,6 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorConnection
 import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorMetadata;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionConnectionInfo;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRuleLimits;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRuleMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.RuleField;
 import org.wso2.carbon.identity.api.server.flow.management.v1.RuleFieldDefinition;
@@ -46,9 +45,7 @@ import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.flow.execution.engine.metadata.FlowExecutorInfo;
 import org.wso2.carbon.identity.flow.extension.model.FlowExtensionAction;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
-import org.wso2.carbon.identity.flow.mgt.utils.FlowMgtUtils;
 import org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants;
-import org.wso2.carbon.identity.rule.management.api.util.RuleLimits;
 import org.wso2.carbon.identity.rule.metadata.api.exception.RuleMetadataException;
 import org.wso2.carbon.identity.rule.metadata.api.model.FieldDefinition;
 import org.wso2.carbon.identity.rule.metadata.api.service.RuleMetadataService;
@@ -218,28 +215,7 @@ public abstract class AbstractMetaResponseHandler {
     public FlowRuleMetaResponse createRuleMetaResponse() {
 
         return new FlowRuleMetaResponse()
-                .ruleMetaData(getRuleMetaData())
-                .limits(getRuleLimits());
-    }
-
-    /**
-     * The limits decision steps and their conditions are validated against. A flow type without conditions gets
-     * the default rule limits.
-     *
-     * @return The limits.
-     */
-    protected FlowRuleLimits getRuleLimits() {
-
-        FlowRuleLimits limits = new FlowRuleLimits().maxDecisionNodes(FlowMgtUtils.getMaxRuleEvaluationNodes());
-        org.wso2.carbon.identity.rule.management.api.model.FlowType flowType;
-        try {
-            flowType = org.wso2.carbon.identity.rule.management.api.model.FlowType.valueOf(getFlowType());
-        } catch (IllegalArgumentException e) {
-            return limits;
-        }
-        return limits
-                .maxRulesCombinedWithOr(RuleLimits.getMaxRulesCombinedWithOr(flowType))
-                .maxExpressionsCombinedWithAnd(RuleLimits.getMaxExpressionsCombinedWithAnd(flowType));
+                .ruleMetaData(getRuleMetaData());
     }
 
     /**

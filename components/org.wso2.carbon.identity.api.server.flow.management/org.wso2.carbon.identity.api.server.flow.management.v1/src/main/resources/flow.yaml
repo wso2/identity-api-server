@@ -210,8 +210,7 @@ paths:
     get:
       summary: Retrieve the condition metadata of a flow type
       description: >
-        The fields a decision step's conditions can be written against in this flow type, and the limits the
-        conditions and decision steps are validated against.
+        The fields a decision step's conditions can be written against in this flow type.
       operationId: getFlowRuleMeta
       tags:
         - Flow Composer
@@ -250,6 +249,12 @@ paths:
                 $ref: '#/components/schemas/Error'
         '500':
           description: Encountered a server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '501':
+          description: Conditional branching is not enabled on the server
           content:
             application/json:
               schema:
@@ -1048,7 +1053,8 @@ components:
             Branches of a rule evaluation step, in evaluation order. The first branch whose rule
             holds selects the next step. The branch carrying no rule is the default, taken when
             none of the others hold; it is accepted in any position and always returned last.
-            Only a RULE_EVALUATOR action has branches, and such an action has no `next` and no `executor`.
+            A decision has exactly one default branch and at least one branch with a rule.
+            Only a ROUTE action has branches, and such an action has no `next` and no `executor`.
           items:
             $ref: '#/components/schemas/Branch'
 
@@ -1186,25 +1192,6 @@ components:
             no condition fields, or conditional branching is disabled.
           items:
             $ref: '#/components/schemas/RuleFieldDefinition'
-        limits:
-          $ref: '#/components/schemas/FlowRuleLimits'
-
-    FlowRuleLimits:
-      type: object
-      description: The limits the server validates decision steps and their conditions against.
-      properties:
-        maxDecisionNodes:
-          type: integer
-          description: Maximum number of decision steps in a flow.
-          example: 10
-        maxRulesCombinedWithOr:
-          type: integer
-          description: Maximum number of rules a condition may combine with OR.
-          example: 10
-        maxExpressionsCombinedWithAnd:
-          type: integer
-          description: Maximum number of expressions a rule may combine with AND.
-          example: 5
 
     RuleFieldDefinition:
       type: object

@@ -24,8 +24,6 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.Condition;
 import org.wso2.carbon.identity.api.server.flow.management.v1.ConditionValue;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FieldReference;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Rule;
-import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
-import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
 import org.wso2.carbon.identity.flow.mgt.model.BranchDTO;
 import org.wso2.carbon.identity.rule.management.api.model.ANDCombinedRule;
 import org.wso2.carbon.identity.rule.management.api.model.Expression;
@@ -115,11 +113,8 @@ public class RuleMapper {
             return orBuilder.build();
         } catch (IllegalArgumentException e) {
             // The rule model refuses to be built from what was sent, which is the caller's mistake.
-            throw Utils.handleFlowMgtException(new FlowMgtClientException(
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNREADABLE_BRANCH_RULE.getCode(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNREADABLE_BRANCH_RULE.getMessage(),
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNREADABLE_BRANCH_RULE.getDescription()),
-                    branch.getName(), e.getMessage());
+            throw Utils.handleDecisionStepException("Invalid rule.",
+                    "A condition in branch %s cannot be read: %s", branch.getName(), e.getMessage());
         }
     }
 
