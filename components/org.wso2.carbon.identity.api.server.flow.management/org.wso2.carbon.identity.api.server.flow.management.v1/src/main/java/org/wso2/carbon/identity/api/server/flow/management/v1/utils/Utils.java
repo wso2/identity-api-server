@@ -709,6 +709,10 @@ public class Utils {
                             "carries no executor.", step.getId());
         }
         for (Branch branch : action.getBranches()) {
+            if (branch == null) {
+                throw handleDecisionStepException("Invalid branch.",
+                        "The decision step %s has an empty branch.", step.getId());
+            }
             validateBranchRule(step.getId(), branch);
         }
     }
@@ -729,7 +733,11 @@ public class Utils {
             return;
         }
         for (Condition condition : branch.getRule().getConditions()) {
-            if (condition == null || condition.getConditions() == null) {
+            if (condition == null) {
+                throw handleDecisionStepException("Invalid rule.",
+                        "A condition group in branch %s of the decision step %s is empty.", branch.getName(), stepId);
+            }
+            if (condition.getConditions() == null) {
                 continue;
             }
             for (AtomicCondition atomicCondition : condition.getConditions()) {

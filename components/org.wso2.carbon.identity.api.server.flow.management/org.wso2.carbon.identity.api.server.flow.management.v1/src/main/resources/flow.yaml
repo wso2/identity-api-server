@@ -1189,7 +1189,7 @@ components:
           description: >
             The fields a condition in this flow can be written against, with how each one is keyed,
             the operators it accepts and how its value is entered. Empty when the flow type publishes
-            no condition fields, or conditional branching is disabled.
+            no condition fields.
           items:
             $ref: '#/components/schemas/RuleFieldDefinition'
 
@@ -1214,6 +1214,17 @@ components:
               displayName:
                 type: string
                 example: equals
+              valueInput:
+                type: string
+                description: >
+                  The value a condition using the operator takes: none for an operator that checks the
+                  field alone, such as isBlank or isEmpty, list for in and notIn, and single for every
+                  other operator.
+                enum:
+                  - none
+                  - single
+                  - list
+                example: single
         value:
           $ref: '#/components/schemas/RuleValueDefinition'
 
