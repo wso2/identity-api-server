@@ -3401,6 +3401,9 @@ components:
         enhancedOrgAuthenticationEnabled:
           type: boolean
           example: false
+        organizationCustomRolesEnabled:
+          type: boolean
+          example: false
         applicationEnabled:
           type: boolean
           example: true
@@ -3449,6 +3452,11 @@ components:
           type: boolean
           example: false
           description: Decides whether the enhanced organization authentication is enabled for the application.
+        organizationCustomRolesEnabled:
+          type: boolean
+          example: false
+          description: For a main application, decides whether organizations can create custom roles for its
+            shared applications.
         applicationEnabled:
           default: true
           type: boolean
@@ -3521,6 +3529,11 @@ components:
           type: boolean
           example: false
           description: Decides whether the enhanced organization authentication is enabled for the application.
+        organizationCustomRolesEnabled:
+          type: boolean
+          example: false
+          description: For a main application, decides whether organizations can create custom roles for its
+            shared applications.
         applicationEnabled:
           type: boolean
           example: true
@@ -3575,6 +3588,11 @@ components:
           type: boolean
           example: false
           description: Decides whether the enhanced organization authentication is enabled for the application.
+        organizationCustomRolesEnabled:
+          type: boolean
+          example: false
+          description: For a main application, decides whether organizations can create custom roles for its
+            shared applications.
         applicationEnabled:
           type: boolean
           example: true
