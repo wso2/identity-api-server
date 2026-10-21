@@ -48,6 +48,8 @@ public class UpdateServiceProvider implements UpdateFunction<ServiceProvider, Ap
         setIfNotNull(applicationPatchModel.getApplicationEnabled(), serviceProvider::setApplicationEnabled);
         setIfNotNull(applicationPatchModel.getEnhancedOrgAuthenticationEnabled(),
                 serviceProvider::setEnhancedOrganizationAuthenticationEnabled);
+        setIfNotNull(applicationPatchModel.getAllowSharedAppRoleManagement(),
+                serviceProvider::setSharedAppRoleManagementAllowed);
 
         patchAssociatedRolesConfigurations(serviceProvider, applicationPatchModel.getAssociatedRoles());
         patchClaimConfiguration(serviceProvider, applicationPatchModel.getClaimConfiguration());
