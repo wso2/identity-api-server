@@ -54,6 +54,7 @@ public class ApplicationManagementConstants {
     public static final String DEFAULT_CERTIFICATE_ALIAS = "wso2carbon";
     public static final String ADVANCED_CONFIGURATIONS = "advancedConfigurations";
     public static final String APPLICATION_ENABLED = "applicationEnabled";
+    public static final String ORGANIZATION_CUSTOM_ROLES_ENABLED = "organizationCustomRolesEnabled";
     public static final String TEMPLATE_ID = "templateId";
     public static final String TEMPLATE_VERSION = "templateVersion";
     public static final String NAME = "name";
@@ -202,6 +203,14 @@ public class ApplicationManagementConstants {
         UNSUPPORTED_ENHANCED_ORGANIZATION_AUTHENTICATION_ENABLED_CONFIGURATION("60521",
                 "Enhanced organization authentication enabled property is not supported.",
                 "The 'enhancedOrgAuthenticationEnabled' property is not yet supported."),
+        UNSUPPORTED_ORGANIZATION_CUSTOM_ROLES_CONFIGURATION("60522",
+                "Organization custom roles property is not supported.",
+                "The 'organizationCustomRolesEnabled' property requires enhanced organization authentication " +
+                        "to be supported."),
+        ORGANIZATION_CUSTOM_ROLES_READ_ONLY_FOR_SHARED_APP("60523",
+                "Organization custom roles property cannot be updated.",
+                "The 'organizationCustomRolesEnabled' property is read-only for shared applications. Update it " +
+                        "on the main application."),
 
         // Server Errors.
         ERROR_RETRIEVING_SAML_METADATA("65001",
