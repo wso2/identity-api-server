@@ -211,6 +211,10 @@ public class ApplicationManagementConstants {
                 "Shared application role management property cannot be updated.",
                 "The 'allowSharedAppRoleManagement' property is read-only for shared applications. Update it " +
                         "on the main application."),
+        SHARED_APP_ROLE_MANAGEMENT_FEATURE_DISABLED("60524",
+                "Shared application role management property is not supported.",
+                "The 'allowSharedAppRoleManagement' property cannot be enabled as the shared application role " +
+                        "management feature is disabled in the server."),
 
         // Server Errors.
         ERROR_RETRIEVING_SAML_METADATA("65001",

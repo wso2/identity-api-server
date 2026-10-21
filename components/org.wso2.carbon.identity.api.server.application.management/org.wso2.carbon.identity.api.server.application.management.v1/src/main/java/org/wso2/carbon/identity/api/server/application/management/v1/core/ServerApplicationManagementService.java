@@ -124,6 +124,7 @@ import org.wso2.carbon.identity.application.common.util.IdentityApplicationConst
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationManagementUtil;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
+import org.wso2.carbon.identity.application.mgt.ApplicationMgtUtil;
 import org.wso2.carbon.identity.application.mgt.AuthorizedAPIManagementService;
 import org.wso2.carbon.identity.application.mgt.inbound.dto.ApplicationDTO;
 import org.wso2.carbon.identity.application.mgt.inbound.dto.InboundProtocolConfigurationDTO;
@@ -199,6 +200,7 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_PROCESSING_REQUEST;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.FORBIDDEN_OPERATION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.SHARED_APP_ROLE_MANAGEMENT_FEATURE_DISABLED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.SHARED_APP_ROLE_MANAGEMENT_READ_ONLY_FOR_SHARED_APP;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.UNSUPPORTED_ENHANCED_ORGANIZATION_AUTHENTICATION_ENABLED_CONFIGURATION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.UNSUPPORTED_FAPI_PROFILE;
@@ -864,6 +866,12 @@ public class ServerApplicationManagementService {
                 Boolean.TRUE.equals(applicationModel.getAllowSharedAppRoleManagement())) {
             throw buildBadRequestError(UNSUPPORTED_SHARED_APP_ROLE_MANAGEMENT_CONFIGURATION.getCode(),
                     UNSUPPORTED_SHARED_APP_ROLE_MANAGEMENT_CONFIGURATION.getDescription());
+        }
+
+        if (!ApplicationMgtUtil.isSharedAppRoleManagementFeatureEnabled() &&
+                Boolean.TRUE.equals(applicationModel.getAllowSharedAppRoleManagement())) {
+            throw buildBadRequestError(SHARED_APP_ROLE_MANAGEMENT_FEATURE_DISABLED.getCode(),
+                    SHARED_APP_ROLE_MANAGEMENT_FEATURE_DISABLED.getDescription());
         }
 
         if (applicationModel.getEnhancedOrgAuthenticationEnabled() == null
@@ -2433,8 +2441,8 @@ public class ServerApplicationManagementService {
 
     /**
      * Validate an update to the shared application role management configuration of an application. The configuration
-     * can only be updated on a main application, and enabling it requires enhanced organization authentication to be
-     * supported.
+     * can only be updated on a main application, and enabling it requires enhanced organization authentication and
+     * the shared application role management feature to be supported.
      *
      * @param applicationId              ID of the application to be updated.
      * @param allowSharedAppRoleManagement Updated value of the configuration.
@@ -2445,6 +2453,11 @@ public class ServerApplicationManagementService {
                 && Boolean.TRUE.equals(allowSharedAppRoleManagement)) {
             throw buildBadRequestError(UNSUPPORTED_SHARED_APP_ROLE_MANAGEMENT_CONFIGURATION.getCode(),
                     UNSUPPORTED_SHARED_APP_ROLE_MANAGEMENT_CONFIGURATION.getDescription());
+        }
+        if (!ApplicationMgtUtil.isSharedAppRoleManagementFeatureEnabled()
+                && Boolean.TRUE.equals(allowSharedAppRoleManagement)) {
+            throw buildBadRequestError(SHARED_APP_ROLE_MANAGEMENT_FEATURE_DISABLED.getCode(),
+                    SHARED_APP_ROLE_MANAGEMENT_FEATURE_DISABLED.getDescription());
         }
         try {
             if (applicationManagementService.getMainAppId(applicationId) != null) {
@@ -2461,7 +2474,7 @@ public class ServerApplicationManagementService {
      * Resolve whether organizations can manage application roles for the shared applications of the given
      * application. For a main application, this is its own configuration. For a shared application, this is resolved
      * from its main application, which must have enhanced organization authentication enabled and must use application
-     * audience roles as well.
+     * audience roles as well. This is always false when the shared application role management feature is disabled.
      *
      * @param application              Application.
      * @param resolvedMainApplications Main applications already resolved, keyed by the main application id.
@@ -2470,6 +2483,9 @@ public class ServerApplicationManagementService {
     private boolean resolveSharedAppRoleManagementAllowed(ServiceProvider application,
                                                         Map<String, ServiceProvider> resolvedMainApplications) {
 
+        if (!ApplicationMgtUtil.isSharedAppRoleManagementFeatureEnabled()) {
+            return false;
+        }
         String applicationId = application.getApplicationResourceId();
         try {
             String mainAppId = applicationManagementService.getMainAppId(applicationId);
