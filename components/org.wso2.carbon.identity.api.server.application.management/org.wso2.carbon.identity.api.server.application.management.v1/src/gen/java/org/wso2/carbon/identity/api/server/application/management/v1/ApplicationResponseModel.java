@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -55,6 +55,7 @@ public class ApplicationResponseModel  {
     private Boolean isManagementApp;
     private Boolean isB2BSelfServiceApp;
     private Boolean enhancedOrgAuthenticationEnabled;
+    private Boolean sharedAppRoleManagementEnabled;
     private Boolean applicationEnabled;
     private AssociatedRolesConfig associatedRoles;
     private ClaimConfiguration claimConfiguration;
@@ -375,6 +376,25 @@ public enum AccessEnum {
     }
 
     /**
+    * For a main application, decides whether organizations can manage their own roles for its shared applications.
+    **/
+    public ApplicationResponseModel sharedAppRoleManagementEnabled(Boolean sharedAppRoleManagementEnabled) {
+
+        this.sharedAppRoleManagementEnabled = sharedAppRoleManagementEnabled;
+        return this;
+    }
+
+    @ApiModelProperty(example = "false", value = "For a main application, decides whether organizations can manage their own roles for its shared applications.")
+    @JsonProperty("sharedAppRoleManagementEnabled")
+    @Valid
+    public Boolean getSharedAppRoleManagementEnabled() {
+        return sharedAppRoleManagementEnabled;
+    }
+    public void setSharedAppRoleManagementEnabled(Boolean sharedAppRoleManagementEnabled) {
+        this.sharedAppRoleManagementEnabled = sharedAppRoleManagementEnabled;
+    }
+
+    /**
     * Decides whether the application is enabled.
     **/
     public ApplicationResponseModel applicationEnabled(Boolean applicationEnabled) {
@@ -554,6 +574,7 @@ public enum AccessEnum {
             Objects.equals(this.isManagementApp, applicationResponseModel.isManagementApp) &&
             Objects.equals(this.isB2BSelfServiceApp, applicationResponseModel.isB2BSelfServiceApp) &&
             Objects.equals(this.enhancedOrgAuthenticationEnabled, applicationResponseModel.enhancedOrgAuthenticationEnabled) &&
+            Objects.equals(this.sharedAppRoleManagementEnabled, applicationResponseModel.sharedAppRoleManagementEnabled) &&
             Objects.equals(this.applicationEnabled, applicationResponseModel.applicationEnabled) &&
             Objects.equals(this.associatedRoles, applicationResponseModel.associatedRoles) &&
             Objects.equals(this.claimConfiguration, applicationResponseModel.claimConfiguration) &&
@@ -566,7 +587,7 @@ public enum AccessEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, applicationVersion, imageUrl, accessUrl, logoutReturnUrl, clientId, issuer, realm, templateId, templateVersion, isManagementApp, isB2BSelfServiceApp, enhancedOrgAuthenticationEnabled, applicationEnabled, associatedRoles, claimConfiguration, inboundProtocols, authenticationSequence, advancedConfigurations, provisioningConfigurations, access);
+        return Objects.hash(id, name, description, applicationVersion, imageUrl, accessUrl, logoutReturnUrl, clientId, issuer, realm, templateId, templateVersion, isManagementApp, isB2BSelfServiceApp, enhancedOrgAuthenticationEnabled, sharedAppRoleManagementEnabled, applicationEnabled, associatedRoles, claimConfiguration, inboundProtocols, authenticationSequence, advancedConfigurations, provisioningConfigurations, access);
     }
 
     @Override
@@ -590,6 +611,7 @@ public enum AccessEnum {
         sb.append("    isManagementApp: ").append(toIndentedString(isManagementApp)).append("\n");
         sb.append("    isB2BSelfServiceApp: ").append(toIndentedString(isB2BSelfServiceApp)).append("\n");
         sb.append("    enhancedOrgAuthenticationEnabled: ").append(toIndentedString(enhancedOrgAuthenticationEnabled)).append("\n");
+        sb.append("    sharedAppRoleManagementEnabled: ").append(toIndentedString(sharedAppRoleManagementEnabled)).append("\n");
         sb.append("    applicationEnabled: ").append(toIndentedString(applicationEnabled)).append("\n");
         sb.append("    associatedRoles: ").append(toIndentedString(associatedRoles)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");
