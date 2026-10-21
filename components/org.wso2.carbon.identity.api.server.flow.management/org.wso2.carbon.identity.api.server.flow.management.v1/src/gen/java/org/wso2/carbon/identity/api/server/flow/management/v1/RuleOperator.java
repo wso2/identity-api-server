@@ -73,7 +73,7 @@ public enum ValueInputEnum {
     private ValueInputEnum valueInput;
 
     /**
-    * Name of the operator, as a condition names it.
+    * Name of the operator.
     **/
     public RuleOperator name(String name) {
 
@@ -81,7 +81,7 @@ public enum ValueInputEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "equals", value = "Name of the operator, as a condition names it.")
+    @ApiModelProperty(example = "equals", value = "Name of the operator.")
     @JsonProperty("name")
     @Valid
     public String getName() {
@@ -111,7 +111,7 @@ public enum ValueInputEnum {
     }
 
     /**
-    * The value a condition using the operator takes: none for an operator that checks the field alone, such as isBlank or isEmpty, list for in and notIn, and single for every other operator. 
+    * The kind of value a condition with this operator takes: &#x60;none&#x60; for operators that check only the field, such as &#x60;isBlank&#x60; and &#x60;isEmpty&#x60;, &#x60;list&#x60; for &#x60;in&#x60; and &#x60;notIn&#x60;, and &#x60;single&#x60; for all other operators. 
     **/
     public RuleOperator valueInput(ValueInputEnum valueInput) {
 
@@ -119,7 +119,7 @@ public enum ValueInputEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "single", value = "The value a condition using the operator takes: none for an operator that checks the field alone, such as isBlank or isEmpty, list for in and notIn, and single for every other operator. ")
+    @ApiModelProperty(example = "single", value = "The kind of value a condition with this operator takes: `none` for operators that check only the field, such as `isBlank` and `isEmpty`, `list` for `in` and `notIn`, and `single` for all other operators. ")
     @JsonProperty("valueInput")
     @Valid
     public ValueInputEnum getValueInput() {

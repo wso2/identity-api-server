@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -35,12 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Converts branches and their rules between the API model and the flow model.
- * <p>
- * On the far side a rule is rule management's own model, which is what evaluation takes and what is stored:
- * the outer conditions become AND combined rules, the inner conditions become expressions, a qualifier becomes
- * the expression's key, and a value read from a field becomes a FIELD value. A branch with no rule is the
- * default and stays that way in both directions.
+ * Converts the branches of a decision step, and their rules, between the API model and the flow management model.
  */
 public class RuleMapper {
 
@@ -48,6 +43,12 @@ public class RuleMapper {
 
     }
 
+    /**
+     * Convert the branches of a decision step from the API model to the flow management model.
+     *
+     * @param branches Branches in the API model.
+     * @return Branches in the flow management model, or null when no branches are given.
+     */
     public static List<BranchDTO> toBranchDTOs(List<Branch> branches) {
 
         if (branches == null) {
@@ -66,32 +67,35 @@ public class RuleMapper {
     }
 
     /**
-     * Branches come back in evaluation order, with the default last however it was submitted, so a
-     * response reads top to bottom the way it is evaluated.
+     * Convert the branches of a decision step from the flow management model to the API model, in the order they
+     * are stored.
+     *
+     * @param branchDTOs Branches in the flow management model.
+     * @return Branches in the API model, or null when no branches are given.
      */
     public static List<Branch> toBranches(List<BranchDTO> branchDTOs) {
 
         if (branchDTOs == null) {
             return null;
         }
-        List<Branch> guarded = new ArrayList<>();
-        List<Branch> defaults = new ArrayList<>();
+        List<Branch> branches = new ArrayList<>();
         for (BranchDTO branchDTO : branchDTOs) {
             Branch branch = new Branch()
                     .id(branchDTO.getId())
                     .name(branchDTO.getName())
                     .next(branchDTO.getNextId())
                     .rule(toRule(branchDTO.getRule()));
-            if (branchDTO.isDefault()) {
-                defaults.add(branch);
-            } else {
-                guarded.add(branch);
-            }
+            branches.add(branch);
         }
-        guarded.addAll(defaults);
-        return guarded;
+        return branches;
     }
 
+    /**
+     * Convert a branch's rule from the API model to the rule management model.
+     *
+     * @param branch Branch whose rule is converted.
+     * @return The rule in the rule management model, or null for the default branch, which has no rule.
+     */
     private static ORCombinedRule toORCombinedRule(Branch branch) {
 
         Rule rule = branch.getRule();
@@ -113,12 +117,17 @@ public class RuleMapper {
             }
             return orBuilder.build();
         } catch (IllegalArgumentException e) {
-            // The rule model refuses to be built from what was sent, which is the caller's mistake.
             throw Utils.handleDecisionStepException("Invalid rule.",
-                    "A condition in branch %s cannot be read: %s", branch.getName(), e.getMessage());
+                    "A condition in the branch %s is not valid: %s", branch.getName(), e.getMessage());
         }
     }
 
+    /**
+     * Convert a rule from the rule management model to the API model.
+     *
+     * @param orCombinedRule Rule in the rule management model.
+     * @return The rule in the API model, or null when there is no rule.
+     */
     private static Rule toRule(ORCombinedRule orCombinedRule) {
 
         if (orCombinedRule == null) {
@@ -136,9 +145,12 @@ public class RuleMapper {
     }
 
     /**
-     * An atomic condition as rule management holds it. The qualifier is the expression's field qualifier; a
-     * literal is handed over raw, exactly as the action management API does, leaving its type to the field
-     * definition, except a list, which has no raw form and names its own type.
+     * Convert a condition from the API model to a rule management expression. A literal value is passed as text,
+     * and its type is resolved from the field definition, as the action management API does. A list of values is
+     * passed as a LIST value.
+     *
+     * @param atomicCondition Condition in the API model.
+     * @return The condition as a rule management expression.
      */
     private static Expression toRuleMgtExpression(AtomicCondition atomicCondition) {
 
@@ -167,6 +179,12 @@ public class RuleMapper {
         return builder.build();
     }
 
+    /**
+     * Convert a literal value to text. A number is written in plain form, so 18.0 and 1e1 become 18 and 10.
+     *
+     * @param literal Literal value from the request.
+     * @return The literal as text.
+     */
     private static String toLiteralText(Object literal) {
 
         if (literal instanceof Number) {
@@ -179,6 +197,12 @@ public class RuleMapper {
         return String.valueOf(literal);
     }
 
+    /**
+     * Convert a rule management expression to a condition in the API model.
+     *
+     * @param expression Rule management expression.
+     * @return The expression as a condition in the API model.
+     */
     private static AtomicCondition toAtomicCondition(Expression expression) {
 
         return new AtomicCondition()
@@ -188,9 +212,12 @@ public class RuleMapper {
     }
 
     /**
-     * A rule management value as the API shows it: a field reference for FIELD, an array for LIST, and the single
-     * value as a string for everything else. The resolved type is not published, since it is derived from the field
-     * definition and a client rebuilding the condition does not supply it.
+     * Convert a rule management value to the API model: a field reference for a FIELD value, a list for a LIST
+     * value, and a single value as text otherwise. The resolved value type is not returned, because it is derived
+     * from the field definition.
+     *
+     * @param value Rule management value.
+     * @return The value in the API model, or null when there is no value.
      */
     private static ConditionValue toConditionValue(Value value) {
 

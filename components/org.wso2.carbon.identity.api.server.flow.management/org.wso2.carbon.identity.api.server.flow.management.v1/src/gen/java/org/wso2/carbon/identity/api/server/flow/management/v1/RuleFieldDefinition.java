@@ -30,14 +30,14 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.RuleValueDefinitio
 import javax.validation.constraints.*;
 
 /**
- * A field a condition in this flow can be written against.
+ * A field that conditions in this flow can use.
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "A field a condition in this flow can be written against.")
+@ApiModel(description = "A field that conditions in this flow can use.")
 public class RuleFieldDefinition  {
   
     private RuleField field;
@@ -66,7 +66,7 @@ public class RuleFieldDefinition  {
     }
 
     /**
-    * The operators the field takes.
+    * The operators the field supports.
     **/
     public RuleFieldDefinition operators(List<RuleOperator> operators) {
 
@@ -74,7 +74,7 @@ public class RuleFieldDefinition  {
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "The operators the field takes.")
+    @ApiModelProperty(required = true, value = "The operators the field supports.")
     @JsonProperty("operators")
     @Valid
     @NotNull(message = "Property operators cannot be null.")

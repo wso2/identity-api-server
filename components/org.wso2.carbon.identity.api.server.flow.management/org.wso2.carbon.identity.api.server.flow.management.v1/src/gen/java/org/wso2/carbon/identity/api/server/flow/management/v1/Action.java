@@ -104,7 +104,7 @@ public class Action  {
 
 
     /**
-    * Branches of a rule evaluation step, in evaluation order
+    * Branches of a decision step, in evaluation order. The flow continues to the step of the first branch whose rule matches.
     **/
     public Action branches(List<Branch> branches) {
 
@@ -112,7 +112,7 @@ public class Action  {
         return this;
     }
     
-    @ApiModelProperty(value = "Branches of a rule evaluation step, in evaluation order")
+    @ApiModelProperty(value = "Branches of a decision step, in evaluation order. The flow continues to the step of the first branch whose rule matches.")
     @JsonProperty("branches")
     @Valid
     public List<Branch> getBranches() {

@@ -32,9 +32,9 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 /**
- * One branch of a rule evaluation step
+ * A branch of a decision step.
  **/
-@ApiModel(description = "One branch of a rule evaluation step")
+@ApiModel(description = "A branch of a decision step.")
 public class Branch  {
   
     private String id;
@@ -43,7 +43,7 @@ public class Branch  {
     private Rule rule;
 
     /**
-    * Identifier for this branch, stable across saves
+    * Unique identifier of the branch. It does not change when the flow is saved.
     **/
     public Branch id(String id) {
 
@@ -51,7 +51,7 @@ public class Branch  {
         return this;
     }
     
-    @ApiModelProperty(example = "rule_lk", required = true, value = "Identifier for this branch, stable across saves")
+    @ApiModelProperty(example = "rule_lk", required = true, value = "Unique identifier of the branch. It does not change when the flow is saved.")
     @JsonProperty("id")
     @Valid
     @NotNull(message = "Property id cannot be null.")
@@ -64,7 +64,7 @@ public class Branch  {
     }
 
     /**
-    * Label for the branch, shown on the canvas and cited in validation messages
+    * Name of the branch. It is shown in the flow builder and in validation errors.
     **/
     public Branch name(String name) {
 
@@ -72,7 +72,7 @@ public class Branch  {
         return this;
     }
     
-    @ApiModelProperty(example = "Sri Lanka", required = true, value = "Label for the branch, shown on the canvas and cited in validation messages")
+    @ApiModelProperty(example = "Sri Lanka", required = true, value = "Name of the branch. It is shown in the flow builder and in validation errors.")
     @JsonProperty("name")
     @Valid
     @NotNull(message = "Property name cannot be null.")
@@ -85,7 +85,7 @@ public class Branch  {
     }
 
     /**
-    * ID of the step taken when this branch is selected
+    * ID of the step the flow continues to when this branch is selected.
     **/
     public Branch next(String next) {
 
@@ -93,7 +93,7 @@ public class Branch  {
         return this;
     }
     
-    @ApiModelProperty(example = "dnd-step-3fa85f64-5717-4562-b3fc-2c963f66afa6", required = true, value = "ID of the step taken when this branch is selected")
+    @ApiModelProperty(example = "dnd-step-3fa85f64-5717-4562-b3fc-2c963f66afa6", required = true, value = "ID of the step the flow continues to when this branch is selected.")
     @JsonProperty("next")
     @Valid
     @NotNull(message = "Property next cannot be null.")
@@ -106,7 +106,7 @@ public class Branch  {
     }
 
     /**
-    * Rule this branch tests. Absent on the default branch, which always holds.
+    * The rule that decides whether the branch is selected. The default branch has no rule.
     **/
     public Branch rule(Rule rule) {
 
@@ -114,7 +114,7 @@ public class Branch  {
         return this;
     }
     
-    @ApiModelProperty(value = "Rule this branch tests. Absent on the default branch, which always holds.")
+    @ApiModelProperty(value = "The rule that decides whether the branch is selected. The default branch has no rule.")
     @JsonProperty("rule")
     @Valid
     public Rule getRule() {

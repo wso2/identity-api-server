@@ -27,21 +27,21 @@ import java.util.List;
 import javax.validation.constraints.*;
 
 /**
- * The fields a value may be read from. Absent when only literals are allowed.
+ * The fields whose values this field can be compared with. Not present when only literal values are allowed. 
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "The fields a value may be read from. Absent when only literals are allowed.")
+@ApiModel(description = "The fields whose values this field can be compared with. Not present when only literal values are allowed. ")
 public class RuleValueFieldDefinition  {
   
     private List<String> names = new ArrayList<String>();
 
 
     /**
-    * Names of the fields a value may be read from.
+    * Names of the fields.
     **/
     public RuleValueFieldDefinition names(List<String> names) {
 
@@ -49,7 +49,7 @@ public class RuleValueFieldDefinition  {
         return this;
     }
     
-    @ApiModelProperty(example = "[\"user.claims\",\"user.collectedClaims\"]", required = true, value = "Names of the fields a value may be read from.")
+    @ApiModelProperty(example = "[\"user.claims\",\"user.collectedClaims\"]", required = true, value = "Names of the fields.")
     @JsonProperty("names")
     @Valid
     @NotNull(message = "Property names cannot be null.")

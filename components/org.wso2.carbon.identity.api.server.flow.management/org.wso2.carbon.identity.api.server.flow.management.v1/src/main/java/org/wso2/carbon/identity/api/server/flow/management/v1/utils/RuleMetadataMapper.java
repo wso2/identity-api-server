@@ -107,9 +107,15 @@ public class RuleMetadataMapper {
         return ruleValue;
     }
 
+    /**
+     * Map a value type of the rule metadata to the API. The rule metadata calls a date value DATE_TIME, and the API
+     * calls it date.
+     *
+     * @param valueType Value type in the rule metadata.
+     * @return The value type in the API.
+     */
     private static RuleValue.ValueTypeEnum toValueType(Value.ValueType valueType) {
 
-        // The framework calls a date value DATE_TIME; the API calls it date.
         return valueType == Value.ValueType.DATE_TIME
                 ? RuleValue.ValueTypeEnum.DATE
                 : RuleValue.ValueTypeEnum.valueOf(valueType.name());

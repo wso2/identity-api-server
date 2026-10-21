@@ -33,9 +33,9 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 /**
- * A group of atomic conditions that must all hold.
+ * A group of conditions that must all match.
  **/
-@ApiModel(description = "A group of atomic conditions that must all hold.")
+@ApiModel(description = "A group of conditions that must all match.")
 public class Condition  {
   
 @XmlType(name="OperatorEnum")
@@ -76,7 +76,7 @@ public enum OperatorEnum {
     private List<AtomicCondition> conditions = new ArrayList<>();
 
     /**
-    * How the atomic conditions combine. Always AND.
+    * How the conditions are combined. Always AND.
     **/
     public Condition operator(OperatorEnum operator) {
 
@@ -84,7 +84,7 @@ public enum OperatorEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "AND", required = true, value = "How the atomic conditions combine. Always AND.")
+    @ApiModelProperty(example = "AND", required = true, value = "How the conditions are combined. Always AND.")
     @JsonProperty("operator")
     @Valid
     @NotNull(message = "Property operator cannot be null.")
@@ -97,7 +97,7 @@ public enum OperatorEnum {
     }
 
     /**
-    * Comparisons that must all hold.
+    * Conditions that must all match.
     **/
     public Condition conditions(List<AtomicCondition> conditions) {
 
@@ -105,7 +105,7 @@ public enum OperatorEnum {
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "Comparisons that must all hold.")
+    @ApiModelProperty(required = true, value = "Conditions that must all match.")
     @JsonProperty("conditions")
     @Valid
     @NotNull(message = "Property conditions cannot be null.")

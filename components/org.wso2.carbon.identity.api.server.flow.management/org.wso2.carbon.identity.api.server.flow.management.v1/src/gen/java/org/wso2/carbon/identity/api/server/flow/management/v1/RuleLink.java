@@ -108,7 +108,7 @@ public enum RelEnum {
     private RelEnum rel;
 
     /**
-    * Url of the endpoint.
+    * URL of the endpoint.
     **/
     public RuleLink href(String href) {
 
@@ -116,7 +116,7 @@ public enum RelEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "/applications?offset=0&limit=10", value = "Url of the endpoint.")
+    @ApiModelProperty(example = "/applications?offset=0&limit=10", value = "URL of the endpoint.")
     @JsonProperty("href")
     @Valid
     public String getHref() {
@@ -145,7 +145,7 @@ public enum RelEnum {
     }
 
     /**
-    * values for the endpoint that lists the values, filter for the one that filters them.
+    * &#x60;values&#x60; for the endpoint that lists the values, &#x60;filter&#x60; for the endpoint that filters them.
     **/
     public RuleLink rel(RelEnum rel) {
 
@@ -153,7 +153,7 @@ public enum RelEnum {
         return this;
     }
     
-    @ApiModelProperty(value = "values for the endpoint that lists the values, filter for the one that filters them.")
+    @ApiModelProperty(value = "`values` for the endpoint that lists the values, `filter` for the endpoint that filters them.")
     @JsonProperty("rel")
     @Valid
     public RelEnum getRel() {

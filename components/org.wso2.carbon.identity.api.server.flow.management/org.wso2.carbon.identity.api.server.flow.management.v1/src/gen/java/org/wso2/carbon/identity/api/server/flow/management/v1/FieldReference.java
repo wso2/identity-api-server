@@ -33,9 +33,9 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 /**
- * A field, and for a field that names a family of values, the qualifier that picks one.
+ * A field used in a condition.
  **/
-@ApiModel(description = "A field, and for a field that names a family of values, the qualifier that picks one.")
+@ApiModel(description = "A field used in a condition.")
 public class FieldReference  {
   
 
@@ -43,7 +43,7 @@ public class FieldReference  {
     private String qualifier;
 
     /**
-    * One of the field names published in ruleMetaData.
+    * Name of the field, as listed in the rule metadata. For example, user.claims is a claim stored for the user, and user.collectedClaims is a claim collected during the flow.
     **/
     public FieldReference name(String name) {
 
@@ -51,7 +51,7 @@ public class FieldReference  {
         return this;
     }
     
-    @ApiModelProperty(example = "user.collectedClaims", required = true, value = "One of the field names published in ruleMetaData.")
+    @ApiModelProperty(example = "user.collectedClaims", required = true, value = "Name of the field, as listed in the rule metadata. For example, user.claims is a claim stored for the user, and user.collectedClaims is a claim collected during the flow.")
     @JsonProperty("name")
     @Valid
     @NotNull(message = "Property name cannot be null.")
@@ -64,7 +64,7 @@ public class FieldReference  {
     }
 
     /**
-    * Picks a value within the field. Required for fields that publish a qualifier, rejected on the others.
+    * Identifies a value within the field, such as a claim URI. Required for fields that have a qualifier in the rule metadata, and not allowed for other fields.
     **/
     public FieldReference qualifier(String qualifier) {
 
@@ -72,7 +72,7 @@ public class FieldReference  {
         return this;
     }
     
-    @ApiModelProperty(example = "http://wso2.org/claims/country", value = "Picks a value within the field. Required for fields that publish a qualifier, rejected on the others.")
+    @ApiModelProperty(example = "http://wso2.org/claims/country", value = "Identifies a value within the field, such as a claim URI. Required for fields that have a qualifier in the rule metadata, and not allowed for other fields.")
     @JsonProperty("qualifier")
     @Valid
     public String getQualifier() {

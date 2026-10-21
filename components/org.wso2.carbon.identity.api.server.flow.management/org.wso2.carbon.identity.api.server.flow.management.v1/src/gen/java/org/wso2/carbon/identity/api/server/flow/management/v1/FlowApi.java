@@ -350,7 +350,7 @@ public class FlowApi  {
     @Path("/meta/rule")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve the condition metadata of a flow type", notes = "The fields a decision step's conditions can be written against in this flow type. ", response = FlowRuleMetaResponse.class, authorizations = {
+    @ApiOperation(value = "Retrieve the condition metadata of a flow type", notes = "Returns the fields that decision step conditions can use in the given flow type. ", response = FlowRuleMetaResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             

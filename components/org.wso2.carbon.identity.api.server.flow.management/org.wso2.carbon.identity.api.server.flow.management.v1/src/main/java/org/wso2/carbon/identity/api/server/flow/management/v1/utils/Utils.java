@@ -110,14 +110,8 @@ public class Utils {
      */
     private static final int MAX_EXECUTOR_DISPLAY_NAME_LENGTH = 100;
     private static final int MAX_EXECUTOR_DESCRIPTION_LENGTH = 1024;
-    /**
-     * The operators whose literal is a list of values rather than a single value.
-     */
     private static final Set<String> LIST_OPERATORS =
             Collections.unmodifiableSet(new HashSet<>(Arrays.asList("in", "notIn")));
-    /**
-     * The operators that check the field alone and take no value.
-     */
     private static final Set<String> VALUE_LESS_OPERATORS = Collections.unmodifiableSet(new HashSet<>(
             Arrays.asList("isBlank", "isNotBlank", "isEmpty", "isNotEmpty")));
 
@@ -681,12 +675,9 @@ public class Utils {
     }
 
     /**
-     * Check the shape of a decision step.
-     * <p>
-     * Only the shape: that it has branches, that it does not also name a single next step, and that
-     * it does not bring its own executor. Whether a condition means anything -- that the field is
-     * published, that the operator suits the claim -- is decided further in, where the metadata and
-     * the claims are known.
+     * Validate the structure of a decision step: it has a ROUTE action with branches, and no next step, executor or
+     * components. Each branch must have a next step and a unique ID, and its rule must be well formed. Whether the
+     * fields and operators in the rules are supported for the flow is validated by the flow framework.
      *
      * @param step Decision step to validate.
      */
@@ -695,28 +686,26 @@ public class Utils {
         Action action = step.getData() == null ? null : step.getData().getAction();
         if (action == null || CollectionUtils.isEmpty(action.getBranches())) {
             throw handleDecisionStepException("Decision step has no branches.",
-                    "The decision step %s has no branches, so it cannot decide anything.", step.getId());
+                    "The decision step %s has no branches.", step.getId());
         }
         if (StringUtils.isNotBlank(action.getNext())) {
-            throw handleDecisionStepException("Decision step defines a next step.",
-                    "The decision step %s defines a next step. Where the flow goes is decided by its branches, " +
-                            "and the branch without a rule is what catches everything else.", step.getId());
+            throw handleDecisionStepException("Next step not allowed on a decision step.",
+                    "The decision step %s has a next step. A branch should only decide the next step", step.getId());
         }
         if (!FlowEndpointConstants.FlowGeneration.ROUTE.equals(action.getType())) {
             throw handleDecisionStepException("Invalid action type for a decision step.",
-                    "The decision step %s has the action type %s. A decision step's action type should be %s.",
+                    "The decision step %s has the action type %s, but a decision step must have the action type %s.",
                     step.getId(), action.getType(), FlowEndpointConstants.FlowGeneration.ROUTE);
         }
         if (CollectionUtils.isNotEmpty(step.getData().getComponents())) {
             throw handleDecisionStepException("Components not allowed on a decision step.",
-                    "The decision step %s carries components. A decision step should not carry components.",
+                    "The decision step %s has components, but a decision step must not have components.",
                     step.getId());
         }
-        // Evaluating the branches is what the step type itself does, so there is no executor to name.
         if (action.getExecutor() != null) {
             throw handleDecisionStepException("Executor not allowed on a decision step.",
-                    "The decision step %s names an executor. A decision only evaluates its branches, so it " +
-                            "carries no executor.", step.getId());
+                    "The decision step %s has an executor, but a decision step must not have an executor.",
+                    step.getId());
         }
         Set<String> branchIds = new HashSet<>();
         for (Branch branch : action.getBranches()) {
@@ -726,7 +715,7 @@ public class Utils {
             }
             if (StringUtils.isBlank(branch.getNext())) {
                 throw handleDecisionStepException("Branch next step not provided.",
-                        "The branch %s of the decision step %s does not say where the flow goes next.",
+                        "The branch %s of the decision step %s has no next step.",
                         branch.getName(), step.getId());
             }
             if (!branchIds.add(branch.getId())) {
@@ -739,14 +728,11 @@ public class Utils {
     }
 
     /**
-     * Check that every condition of a branch's rule can be turned into rule management's model at all.
-     * <p>
-     * Whether the value suits the operator and the field is decided further in. What is caught here
-     * is what the rule model cannot even be built from, which would otherwise surface as a server
-     * error rather than as the author's mistake.
+     * Validate the structure of each condition in a branch's rule: a field, an operator, and a value that suits the
+     * operator. Whether the field and operator are supported for the flow is validated by the flow framework.
      *
-     * @param stepId Id of the decision step, for the message.
-     * @param branch Branch to check.
+     * @param stepId ID of the decision step, used in the error message.
+     * @param branch Branch to validate.
      */
     private static void validateBranchRule(String stepId, Branch branch) {
 
@@ -756,7 +742,8 @@ public class Utils {
         for (Condition condition : branch.getRule().getConditions()) {
             if (condition == null) {
                 throw handleDecisionStepException("Invalid rule.",
-                        "A condition group in branch %s of the decision step %s is empty.", branch.getName(), stepId);
+                        "The branch %s of the decision step %s has an empty condition group.", branch.getName(),
+                        stepId);
             }
             if (condition.getConditions() == null) {
                 continue;
@@ -773,9 +760,10 @@ public class Utils {
     }
 
     /**
-     * @param expression Expression to check.
-     * @return What is wrong with the expression, phrased to follow "A condition ... ", or null when
-     * nothing is.
+     * Find what is wrong with a condition of a branch rule.
+     *
+     * @param atomicCondition Condition to check.
+     * @return What is wrong with the condition, phrased to follow "A condition ... ", or null when nothing is.
      */
     private static String findConditionProblem(AtomicCondition atomicCondition) {
 
@@ -790,22 +778,23 @@ public class Utils {
         }
         ConditionValue value = atomicCondition.getValue();
         if (VALUE_LESS_OPERATORS.contains(atomicCondition.getOperator())) {
-            return value == null ? null : "gives a value, which " + atomicCondition.getOperator() + " does not take";
+            return value == null ? null : "has a value, but the operator " + atomicCondition.getOperator()
+                    + " does not take one";
         }
         if (value == null || value.getType() == null) {
             return "has no value";
         }
         if (value.getType() == ConditionValue.TypeEnum.FIELD) {
             if (value.getLiteral() != null) {
-                return "gives both a literal and a field";
+                return "has both a literal value and a field";
             }
             if (value.getField() == null || StringUtils.isBlank(value.getField().getName())) {
-                return "reads its value from a field but does not name it";
+                return "is compared with a field, but the field name is missing";
             }
             return null;
         }
         if (value.getField() != null) {
-            return "gives both a literal and a field";
+            return "has both a literal value and a field";
         }
         Object literal = value.getLiteral();
         if (literal == null) {
@@ -814,25 +803,29 @@ public class Utils {
         boolean membership = LIST_OPERATORS.contains(atomicCondition.getOperator());
         if (literal instanceof List) {
             if (!membership) {
-                return "gives a list of values, which only in and notIn take";
+                return "has a list of values, but only the in and notIn operators take a list";
             }
             if (((List<?>) literal).isEmpty()) {
                 return "has an empty list of values";
             }
+            for (Object entry : (List<?>) literal) {
+                if (entry == null || entry instanceof Map || entry instanceof List) {
+                    return "has a list entry that is not a single value";
+                }
+            }
             return null;
         }
         if (literal instanceof Map) {
-            return "gives an object as its literal, which must be a value or a list of values";
+            return "has an object as its value, but the value must be a single value or a list of values";
         }
         if (membership) {
-            return "gives a single value, but in and notIn take a list of values";
+            return "has a single value, but the in and notIn operators take a list of values";
         }
         return null;
     }
 
     /**
-     * Branches belong to a decision and nowhere else. Accepting them on another step type would store
-     * conditions that are never consulted.
+     * Reject branches on a step that is not a decision step. Such branches would be saved but never evaluated.
      *
      * @param step Step to check.
      */
@@ -840,9 +833,9 @@ public class Utils {
 
         if (step.getData() != null && step.getData().getAction() != null
                 && CollectionUtils.isNotEmpty(step.getData().getAction().getBranches())) {
-            throw handleDecisionStepException("Branches are not allowed for this step.",
-                    "Only a %s step has branches, but the step %s of type %s carries them.",
-                    FlowEndpointConstants.FlowGeneration.RULE_EVALUATION, step.getId(), step.getType());
+            throw handleDecisionStepException("Branches not allowed for this step.",
+                    "The step %s of type %s has branches, but only a %s step can have branches.",
+                    step.getId(), step.getType(), FlowEndpointConstants.FlowGeneration.RULE_EVALUATION);
         }
     }
 
@@ -897,8 +890,8 @@ public class Utils {
 
         // Only a decision step has branches; on a component they would be stored and never evaluated.
         if (component.getAction() != null && CollectionUtils.isNotEmpty(component.getAction().getBranches())) {
-            throw handleDecisionStepException("Branches not allowed here.",
-                    "The component %s carries branches. Only a %s step has branches.", component.getId(),
+            throw handleDecisionStepException("Branches not allowed for this component.",
+                    "The component %s has branches, but only a %s step can have branches.", component.getId(),
                     FlowEndpointConstants.FlowGeneration.RULE_EVALUATION);
         }
         if (component.getAction() != null && StringUtils.isBlank(component.getAction().getNext())) {

@@ -33,9 +33,9 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 /**
- * What a field is compared against: a literal given in the rule, or another field read when the rule is evaluated.
+ * The value a field is compared with. It is either a literal value given in the condition, or the value of another field, read when the flow runs. If the other field has no value, the condition does not match.
  **/
-@ApiModel(description = "What a field is compared against: a literal given in the rule, or another field read when the rule is evaluated.")
+@ApiModel(description = "The value a field is compared with. It is either a literal value given in the condition, or the value of another field, read when the flow runs. If the other field has no value, the condition does not match.")
 public class ConditionValue  {
   
 @XmlType(name="TypeEnum")
@@ -78,7 +78,7 @@ public enum TypeEnum {
     private FieldReference field;
 
     /**
-    * literal for a value given in the rule, field for one read from another field.
+    * Whether the value is a literal value or another field.
     **/
     public ConditionValue type(TypeEnum type) {
 
@@ -86,7 +86,7 @@ public enum TypeEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "literal", required = true, value = "literal for a value given in the rule, field for one read from another field.")
+    @ApiModelProperty(example = "literal", required = true, value = "Whether the value is a literal value or another field.")
     @JsonProperty("type")
     @Valid
     @NotNull(message = "Property type cannot be null.")
@@ -99,7 +99,7 @@ public enum TypeEnum {
     }
 
     /**
-    * The value given in the rule, when type is literal. An array for the in and notIn operators, a single value otherwise.
+    * The literal value, when type is literal. An array of values for the in and notIn operators, and a single value for all other operators.
     **/
     public ConditionValue literal(Object literal) {
 
@@ -107,7 +107,7 @@ public enum TypeEnum {
         return this;
     }
     
-    @ApiModelProperty(value = "The value given in the rule, when type is literal. An array for the in and notIn operators, a single value otherwise.")
+    @ApiModelProperty(value = "The literal value, when type is literal. An array of values for the in and notIn operators, and a single value for all other operators.")
     @JsonProperty("literal")
     @Valid
     public Object getLiteral() {
@@ -118,7 +118,7 @@ public enum TypeEnum {
     }
 
     /**
-    * The field read for the value, when type is field.
+    * The field whose value is used, when type is field.
     **/
     public ConditionValue field(FieldReference field) {
 
@@ -126,7 +126,7 @@ public enum TypeEnum {
         return this;
     }
     
-    @ApiModelProperty(value = "The field read for the value, when type is field.")
+    @ApiModelProperty(value = "The field whose value is used, when type is field.")
     @JsonProperty("field")
     @Valid
     public FieldReference getField() {

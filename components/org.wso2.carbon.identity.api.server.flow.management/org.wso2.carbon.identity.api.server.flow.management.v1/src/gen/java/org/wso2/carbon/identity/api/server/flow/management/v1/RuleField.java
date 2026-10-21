@@ -26,14 +26,14 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.RuleValue;
 import javax.validation.constraints.*;
 
 /**
- * A field a condition can be written against.
+ * A field that conditions can use.
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "A field a condition can be written against.")
+@ApiModel(description = "A field that conditions can use.")
 public class RuleField  {
   
     private String name;
@@ -62,7 +62,7 @@ public class RuleField  {
     }
 
     /**
-    * Label for the field.
+    * Display name of the field.
     **/
     public RuleField displayName(String displayName) {
 
@@ -70,7 +70,7 @@ public class RuleField  {
         return this;
     }
     
-    @ApiModelProperty(example = "Claim collected in this flow", value = "Label for the field.")
+    @ApiModelProperty(example = "Claim collected in this flow", value = "Display name of the field.")
     @JsonProperty("displayName")
     @Valid
     public String getDisplayName() {

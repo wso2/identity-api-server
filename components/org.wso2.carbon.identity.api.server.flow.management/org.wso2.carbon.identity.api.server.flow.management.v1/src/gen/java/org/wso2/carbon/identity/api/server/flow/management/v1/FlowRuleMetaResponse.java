@@ -39,7 +39,7 @@ public class FlowRuleMetaResponse  {
 
 
     /**
-    * The fields a condition in this flow can be written against, with how each one is keyed, the operators it accepts and how its value is entered. Empty when the flow type publishes no condition fields. 
+    * The fields that conditions in this flow can use, with the operators each field supports and how its values are entered. Empty when the flow type has no condition fields. 
     **/
     public FlowRuleMetaResponse ruleMetaData(List<RuleFieldDefinition> ruleMetaData) {
 
@@ -47,7 +47,7 @@ public class FlowRuleMetaResponse  {
         return this;
     }
     
-    @ApiModelProperty(value = "The fields a condition in this flow can be written against, with how each one is keyed, the operators it accepts and how its value is entered. Empty when the flow type publishes no condition fields. ")
+    @ApiModelProperty(value = "The fields that conditions in this flow can use, with the operators each field supports and how its values are entered. Empty when the flow type has no condition fields. ")
     @JsonProperty("ruleMetaData")
     @Valid
     public List<RuleFieldDefinition> getRuleMetaData() {

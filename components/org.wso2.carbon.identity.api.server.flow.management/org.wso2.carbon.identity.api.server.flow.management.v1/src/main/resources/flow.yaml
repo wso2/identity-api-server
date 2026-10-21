@@ -210,7 +210,7 @@ paths:
     get:
       summary: Retrieve the condition metadata of a flow type
       description: >
-        The fields a decision step's conditions can be written against in this flow type.
+        Returns the fields that decision step conditions can use in the given flow type.
       operationId: getFlowRuleMeta
       tags:
         - Flow Composer
@@ -1050,17 +1050,17 @@ components:
         branches:
           type: array
           description: >
-            Branches of a rule evaluation step, in evaluation order. The first branch whose rule
-            holds selects the next step. The branch carrying no rule is the default, taken when
-            none of the others hold; it is accepted in any position and always returned last.
-            A decision has exactly one default branch and at least one branch with a rule.
-            Only a ROUTE action has branches, and such an action has no `next` and no `executor`.
+            Branches of a decision step, in evaluation order. The flow continues to the step of the
+            first branch whose rule matches. The branch without a rule is the default branch, which is
+            used when no other branch matches. It can be in any position and is always returned last.
+            A decision step has exactly one default branch and at least one branch with a rule.
+            Only a `ROUTE` action has branches, and a `ROUTE` action has no `next` or `executor`.
           items:
             $ref: '#/components/schemas/Branch'
 
     Branch:
       type: object
-      description: One branch of a rule evaluation step
+      description: A branch of a decision step.
       required:
         - id
         - name
@@ -1068,17 +1068,15 @@ components:
       properties:
         id:
           type: string
-          description: Identifier for this branch, stable across saves
+          description: Unique identifier of the branch. It does not change when the flow is saved.
           example: rule_lk
         name:
           type: string
-          description: >
-            Label for the branch. Shown on the canvas and cited in validation messages, so that a
-            rejected condition names something an author recognises.
+          description: Name of the branch. It is shown in the flow builder and in validation errors.
           example: Sri Lanka
         next:
           type: string
-          description: ID of the step taken when this branch is selected
+          description: ID of the step the flow continues to when this branch is selected.
           example: dnd-step-3fa85f64-5717-4562-b3fc-2c963f66afa6
         rule:
           $ref: '#/components/schemas/Rule'
@@ -1086,8 +1084,8 @@ components:
     Rule:
       type: object
       description: >
-        A rule in disjunctive normal form: it holds when any one of its conditions holds.
-        Absent on the default branch, which always holds.
+        The rule that decides whether a branch is selected. The rule matches when any one of its
+        condition groups matches. The default branch has no rule.
       required:
         - operator
         - conditions
@@ -1103,7 +1101,7 @@ components:
 
     Condition:
       type: object
-      description: A group of atomic conditions that must all hold
+      description: A group of conditions that must all match.
       required:
         - operator
         - conditions
@@ -1119,7 +1117,7 @@ components:
 
     AtomicCondition:
       type: object
-      description: A single comparison of a field against a value
+      description: A comparison of a field with a value.
       required:
         - field
         - operator
@@ -1129,54 +1127,53 @@ components:
         operator:
           type: string
           description: >
-            How the field and the value are compared. Which operators a field accepts is published
-            per field in `ruleMetaData` and enforced against it.
+            The comparison operator. The operators that each field supports are listed in the rule
+            metadata (`GET /flow/meta/rule`).
           example: equals
         value:
           description: >
-            What the field is compared against. Omitted for an operator whose `valueInput` is `none`,
-            such as `isBlank` or `isEmpty`, which checks the field alone.
+            The value the field is compared with. Omit it for operators whose `valueInput` is `none`,
+            such as `isBlank` and `isEmpty`.
           allOf:
             - $ref: '#/components/schemas/ConditionValue'
 
     FieldReference:
       type: object
-      description: >
-        A field, and for a field that names a family of values, the qualifier that picks one.
+      description: A field used in a condition.
       required:
         - name
       properties:
         name:
           type: string
           description: >
-            One of the field names published in `ruleMetaData`. `user.claims` reads what is stored
-            for the user, `user.collectedClaims` what this run of the flow has gathered.
+            Name of the field, as listed in the rule metadata. For example, `user.claims` is a claim
+            stored for the user, and `user.collectedClaims` is a claim collected during the flow.
           example: user.collectedClaims
         qualifier:
           type: string
           description: >
-            Picks a value within the field. Required for fields that publish a `qualifier` in
-            `ruleMetaData`, rejected on the others.
+            Identifies a value within the field, such as a claim URI. Required for fields that have a
+            `qualifier` in the rule metadata, and not allowed for other fields.
           example: http://wso2.org/claims/country
 
     ConditionValue:
       type: object
       description: >
-        What a field is compared against. A `literal` is given in the rule; a `field` is read from
-        another field when the rule is evaluated, and a comparison with a field that has no value
-        does not hold.
+        The value a field is compared with. It is either a literal value given in the condition, or
+        the value of another field, read when the flow runs. If the other field has no value, the
+        condition does not match.
       required:
         - type
       properties:
         type:
           type: string
+          description: Whether the value is a `literal` value or another `field`.
           enum: [literal, field]
           example: literal
         literal:
           description: >
-            The value given in the rule, when `type` is `literal`. An array of values for the `in`
-            and `notIn` operators, a single value for every other operator. Its type is resolved
-            from the field's definition in `ruleMetaData`.
+            The literal value, when `type` is `literal`. An array of values for the `in` and `notIn`
+            operators, and a single value for all other operators.
           example: Sri Lanka
         field:
           $ref: '#/components/schemas/FieldReference'
@@ -1187,15 +1184,14 @@ components:
         ruleMetaData:
           type: array
           description: >
-            The fields a condition in this flow can be written against, with how each one is keyed,
-            the operators it accepts and how its value is entered. Empty when the flow type publishes
-            no condition fields.
+            The fields that conditions in this flow can use, with the operators each field supports
+            and how its values are entered. Empty when the flow type has no condition fields.
           items:
             $ref: '#/components/schemas/RuleFieldDefinition'
 
     RuleFieldDefinition:
       type: object
-      description: A field a condition in this flow can be written against.
+      description: A field that conditions in this flow can use.
       required:
         - field
         - operators
@@ -1205,7 +1201,7 @@ components:
           $ref: '#/components/schemas/RuleField'
         operators:
           type: array
-          description: The operators the field takes.
+          description: The operators the field supports.
           items:
             $ref: '#/components/schemas/RuleOperator'
         value:
@@ -1213,7 +1209,7 @@ components:
 
     RuleField:
       type: object
-      description: A field a condition can be written against.
+      description: A field that conditions can use.
       required:
         - name
       properties:
@@ -1223,7 +1219,7 @@ components:
           example: user.collectedClaims
         displayName:
           type: string
-          description: Label for the field.
+          description: Display name of the field.
           example: Claim collected in this flow
         qualifier:
           $ref: '#/components/schemas/RuleValue'
@@ -1233,7 +1229,7 @@ components:
       properties:
         name:
           type: string
-          description: Name of the operator, as a condition names it.
+          description: Name of the operator.
           example: equals
         displayName:
           type: string
@@ -1242,9 +1238,9 @@ components:
         valueInput:
           type: string
           description: >
-            The value a condition using the operator takes: none for an operator that checks the
-            field alone, such as isBlank or isEmpty, list for in and notIn, and single for every
-            other operator.
+            The kind of value a condition with this operator takes: `none` for operators that check
+            only the field, such as `isBlank` and `isEmpty`, `list` for `in` and `notIn`, and `single`
+            for all other operators.
           enum:
             - none
             - single
@@ -1253,7 +1249,7 @@ components:
 
     RuleValueDefinition:
       type: object
-      description: What a field can be compared against.
+      description: What a field can be compared with.
       properties:
         literal:
           $ref: '#/components/schemas/RuleValue'
@@ -1262,13 +1258,15 @@ components:
 
     RuleValueFieldDefinition:
       type: object
-      description: The fields a value may be read from. Absent when only literals are allowed.
+      description: >
+        The fields whose values this field can be compared with. Not present when only literal
+        values are allowed.
       required:
         - names
       properties:
         names:
           type: array
-          description: Names of the fields a value may be read from.
+          description: Names of the fields.
           items:
             type: string
           example: [user.claims, user.collectedClaims]
@@ -1276,20 +1274,22 @@ components:
     RuleValue:
       type: object
       description: >
-        How a value is entered: typed in, or picked from a list given here or fetched from the
-        linked endpoints. Also describes how a field's qualifier is picked; absent on a field that
-        names a single value.
+        How a value is entered: typed in, or selected from a list. The list is either given in
+        `values` or fetched from the endpoints in `links`. Also used to describe how a field's
+        qualifier is selected.
       properties:
         inputType:
           type: string
-          description: input for a value typed in, options for one picked from a list.
+          description: "`input` for a value that is typed in, `options` for a value selected from a list."
           enum:
             - input
             - options
           example: options
         valueType:
           type: string
-          description: The type of the value; reference for the id of a resource listed by the links.
+          description: >
+            Data type of the value. `reference` means the value is the ID of a resource listed by
+            `links`.
           enum:
             - string
             - number
@@ -1299,20 +1299,20 @@ components:
           example: reference
         valueReferenceAttribute:
           type: string
-          description: The attribute of a listed resource that is used as the value.
+          description: Attribute of a listed resource that is used as the value.
           example: id
         valueDisplayAttribute:
           type: string
-          description: The attribute of a listed resource that is shown for it.
+          description: Attribute of a listed resource that is displayed.
           example: name
         links:
           type: array
-          description: The endpoints that list or filter the values to pick from.
+          description: Endpoints that list or filter the values to select from.
           items:
             $ref: '#/components/schemas/RuleLink'
         values:
           type: array
-          description: The values to pick from, when they are listed here.
+          description: Values to select from, when they are listed here.
           items:
             $ref: '#/components/schemas/RuleValueOption'
 
@@ -1324,14 +1324,14 @@ components:
           description: The value used in a condition.
         displayName:
           type: string
-          description: The label shown for the value.
+          description: Display name of the value.
 
     RuleLink:
       type: object
       properties:
         href:
           type: string
-          description: Url of the endpoint.
+          description: URL of the endpoint.
           example: /applications?offset=0&limit=10
         method:
           type: string
@@ -1339,7 +1339,7 @@ components:
             - GET
         rel:
           type: string
-          description: values for the endpoint that lists the values, filter for the one that filters them.
+          description: "`values` for the endpoint that lists the values, `filter` for the endpoint that filters them."
           enum:
             - values
             - filter

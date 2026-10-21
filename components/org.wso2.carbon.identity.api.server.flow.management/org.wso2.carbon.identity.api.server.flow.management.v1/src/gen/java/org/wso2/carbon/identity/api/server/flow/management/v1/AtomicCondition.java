@@ -33,9 +33,9 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 /**
- * A single comparison of a field against a value.
+ * A comparison of a field with a value.
  **/
-@ApiModel(description = "A single comparison of a field against a value.")
+@ApiModel(description = "A comparison of a field with a value.")
 public class AtomicCondition  {
   
 
@@ -44,7 +44,7 @@ public class AtomicCondition  {
     private ConditionValue value;
 
     /**
-    * The field being compared.
+    * The field to compare.
     **/
     public AtomicCondition field(FieldReference field) {
 
@@ -52,7 +52,7 @@ public class AtomicCondition  {
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "The field being compared.")
+    @ApiModelProperty(required = true, value = "The field to compare.")
     @JsonProperty("field")
     @Valid
     @NotNull(message = "Property field cannot be null.")
@@ -65,7 +65,7 @@ public class AtomicCondition  {
     }
 
     /**
-    * How the field and the value are compared, one of the operators published for the field in ruleMetaData.
+    * The comparison operator. The operators that each field supports are listed in the rule metadata (GET /flow/meta/rule).
     **/
     public AtomicCondition operator(String operator) {
 
@@ -73,7 +73,7 @@ public class AtomicCondition  {
         return this;
     }
     
-    @ApiModelProperty(example = "equals", required = true, value = "How the field and the value are compared, one of the operators published for the field in ruleMetaData.")
+    @ApiModelProperty(example = "equals", required = true, value = "The comparison operator. The operators that each field supports are listed in the rule metadata (GET /flow/meta/rule).")
     @JsonProperty("operator")
     @Valid
     @NotNull(message = "Property operator cannot be null.")
@@ -94,7 +94,7 @@ public class AtomicCondition  {
         return this;
     }
     
-    @ApiModelProperty(value = "What the field is compared against. Omitted for an operator whose valueInput is none, such as isBlank or isEmpty, which checks the field alone.")
+    @ApiModelProperty(value = "The value the field is compared with. Omit it for operators whose valueInput is none, such as isBlank and isEmpty.")
     @JsonProperty("value")
     @Valid
 

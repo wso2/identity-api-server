@@ -33,9 +33,9 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 /**
- * A rule in disjunctive normal form. It holds when any one of its conditions holds. Absent on the default branch, which always holds.
+ * The rule that decides whether a branch is selected. The rule matches when any one of its condition groups matches. The default branch has no rule.
  **/
-@ApiModel(description = "A rule in disjunctive normal form. It holds when any one of its conditions holds. Absent on the default branch, which always holds.")
+@ApiModel(description = "The rule that decides whether a branch is selected. The rule matches when any one of its condition groups matches. The default branch has no rule.")
 public class Rule  {
   
 @XmlType(name="OperatorEnum")
@@ -76,7 +76,7 @@ public enum OperatorEnum {
     private List<Condition> conditions = new ArrayList<>();
 
     /**
-    * How the conditions combine. Always OR.
+    * How the condition groups are combined. Always OR.
     **/
     public Rule operator(OperatorEnum operator) {
 
@@ -84,7 +84,7 @@ public enum OperatorEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "OR", required = true, value = "How the conditions combine. Always OR.")
+    @ApiModelProperty(example = "OR", required = true, value = "How the condition groups are combined. Always OR.")
     @JsonProperty("operator")
     @Valid
     @NotNull(message = "Property operator cannot be null.")
@@ -97,7 +97,7 @@ public enum OperatorEnum {
     }
 
     /**
-    * Conditions, any one of which makes the expression hold.
+    * Condition groups. The rule matches when any one of them matches.
     **/
     public Rule conditions(List<Condition> conditions) {
 
@@ -105,7 +105,7 @@ public enum OperatorEnum {
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "Conditions, any one of which makes the expression hold.")
+    @ApiModelProperty(required = true, value = "Condition groups. The rule matches when any one of them matches.")
     @JsonProperty("conditions")
     @Valid
     @NotNull(message = "Property conditions cannot be null.")

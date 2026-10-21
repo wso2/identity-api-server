@@ -27,14 +27,14 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.RuleValueFieldDefi
 import javax.validation.constraints.*;
 
 /**
- * What a field can be compared against.
+ * What a field can be compared with.
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "What a field can be compared against.")
+@ApiModel(description = "What a field can be compared with.")
 public class RuleValueDefinition  {
   
     private RuleValue literal;

@@ -30,14 +30,14 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.RuleValueOption;
 import javax.validation.constraints.*;
 
 /**
- * How a value is entered: typed in, or picked from a list given here or fetched from the linked endpoints. Also describes how a field&#39;s qualifier is picked; absent on a field that names a single value. 
+ * How a value is entered: typed in, or selected from a list. The list is either given in &#x60;values&#x60; or fetched from the endpoints in &#x60;links&#x60;. Also used to describe how a field&#39;s qualifier is selected. 
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "How a value is entered: typed in, or picked from a list given here or fetched from the linked endpoints. Also describes how a field's qualifier is picked; absent on a field that names a single value. ")
+@ApiModel(description = "How a value is entered: typed in, or selected from a list. The list is either given in `values` or fetched from the endpoints in `links`. Also used to describe how a field's qualifier is selected. ")
 public class RuleValue  {
   
 
@@ -120,7 +120,7 @@ public enum ValueTypeEnum {
 
 
     /**
-    * input for a value typed in, options for one picked from a list.
+    * &#x60;input&#x60; for a value that is typed in, &#x60;options&#x60; for a value selected from a list.
     **/
     public RuleValue inputType(InputTypeEnum inputType) {
 
@@ -128,7 +128,7 @@ public enum ValueTypeEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "options", value = "input for a value typed in, options for one picked from a list.")
+    @ApiModelProperty(example = "options", value = "`input` for a value that is typed in, `options` for a value selected from a list.")
     @JsonProperty("inputType")
     @Valid
     public InputTypeEnum getInputType() {
@@ -139,7 +139,7 @@ public enum ValueTypeEnum {
     }
 
     /**
-    * The type of the value; reference for the id of a resource listed by the links.
+    * Data type of the value. &#x60;reference&#x60; means the value is the ID of a resource listed by &#x60;links&#x60;. 
     **/
     public RuleValue valueType(ValueTypeEnum valueType) {
 
@@ -147,7 +147,7 @@ public enum ValueTypeEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "reference", value = "The type of the value; reference for the id of a resource listed by the links.")
+    @ApiModelProperty(example = "reference", value = "Data type of the value. `reference` means the value is the ID of a resource listed by `links`. ")
     @JsonProperty("valueType")
     @Valid
     public ValueTypeEnum getValueType() {
@@ -158,7 +158,7 @@ public enum ValueTypeEnum {
     }
 
     /**
-    * The attribute of a listed resource that is used as the value.
+    * Attribute of a listed resource that is used as the value.
     **/
     public RuleValue valueReferenceAttribute(String valueReferenceAttribute) {
 
@@ -166,7 +166,7 @@ public enum ValueTypeEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "id", value = "The attribute of a listed resource that is used as the value.")
+    @ApiModelProperty(example = "id", value = "Attribute of a listed resource that is used as the value.")
     @JsonProperty("valueReferenceAttribute")
     @Valid
     public String getValueReferenceAttribute() {
@@ -177,7 +177,7 @@ public enum ValueTypeEnum {
     }
 
     /**
-    * The attribute of a listed resource that is shown for it.
+    * Attribute of a listed resource that is displayed.
     **/
     public RuleValue valueDisplayAttribute(String valueDisplayAttribute) {
 
@@ -185,7 +185,7 @@ public enum ValueTypeEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "name", value = "The attribute of a listed resource that is shown for it.")
+    @ApiModelProperty(example = "name", value = "Attribute of a listed resource that is displayed.")
     @JsonProperty("valueDisplayAttribute")
     @Valid
     public String getValueDisplayAttribute() {
@@ -196,7 +196,7 @@ public enum ValueTypeEnum {
     }
 
     /**
-    * The endpoints that list or filter the values to pick from.
+    * Endpoints that list or filter the values to select from.
     **/
     public RuleValue links(List<RuleLink> links) {
 
@@ -204,7 +204,7 @@ public enum ValueTypeEnum {
         return this;
     }
     
-    @ApiModelProperty(value = "The endpoints that list or filter the values to pick from.")
+    @ApiModelProperty(value = "Endpoints that list or filter the values to select from.")
     @JsonProperty("links")
     @Valid
     public List<RuleLink> getLinks() {
@@ -223,7 +223,7 @@ public enum ValueTypeEnum {
     }
 
         /**
-    * The values to pick from, when they are listed here.
+    * Values to select from, when they are listed here.
     **/
     public RuleValue values(List<RuleValueOption> values) {
 
@@ -231,7 +231,7 @@ public enum ValueTypeEnum {
         return this;
     }
     
-    @ApiModelProperty(value = "The values to pick from, when they are listed here.")
+    @ApiModelProperty(value = "Values to select from, when they are listed here.")
     @JsonProperty("values")
     @Valid
     public List<RuleValueOption> getValues() {

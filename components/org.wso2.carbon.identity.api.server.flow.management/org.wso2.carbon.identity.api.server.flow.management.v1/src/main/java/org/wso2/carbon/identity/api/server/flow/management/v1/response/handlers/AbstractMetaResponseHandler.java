@@ -206,15 +206,13 @@ public abstract class AbstractMetaResponseHandler {
     }
 
     /**
-     * Create the condition metadata response: the fields a decision step's conditions can use in this flow, and the
-     * limits the server validates decision steps and their conditions against.
+     * Create the condition metadata response: the fields a decision step's conditions can use in this flow.
      *
      * @return FlowRuleMetaResponse instance.
      */
     public FlowRuleMetaResponse createRuleMetaResponse() {
 
-        return new FlowRuleMetaResponse()
-                .ruleMetaData(getRuleMetaData());
+        return new FlowRuleMetaResponse().ruleMetaData(getRuleMetaData());
     }
 
     /**
@@ -255,6 +253,12 @@ public abstract class AbstractMetaResponseHandler {
         return ruleFields;
     }
 
+    /**
+     * Build the error returned when the rule metadata cannot be read.
+     *
+     * @param cause Cause of the failure, or null when the rule metadata service is not available.
+     * @return The server error.
+     */
     private APIError ruleMetadataError(Throwable cause) {
 
         FlowEndpointConstants.ErrorMessages error = FlowEndpointConstants.ErrorMessages.ERROR_CODE_GET_RULE_METADATA;

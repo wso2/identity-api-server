@@ -55,7 +55,7 @@ public class RuleValueOption  {
     }
 
     /**
-    * The label shown for the value.
+    * Display name of the value.
     **/
     public RuleValueOption displayName(String displayName) {
 
@@ -63,7 +63,7 @@ public class RuleValueOption  {
         return this;
     }
     
-    @ApiModelProperty(value = "The label shown for the value.")
+    @ApiModelProperty(value = "Display name of the value.")
     @JsonProperty("displayName")
     @Valid
     public String getDisplayName() {
