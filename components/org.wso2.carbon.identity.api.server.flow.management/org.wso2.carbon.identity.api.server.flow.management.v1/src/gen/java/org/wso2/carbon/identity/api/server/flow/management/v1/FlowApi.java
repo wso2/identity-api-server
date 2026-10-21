@@ -362,7 +362,7 @@ public class FlowApi  {
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
         @ApiResponse(code = 500, message = "Encountered a server error", response = Error.class),
-        @ApiResponse(code = 501, message = "Conditional branching is not enabled on the server", response = Error.class)
+        @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
     public Response getFlowRuleMeta(    @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Type of the flow to get condition metadata for",required=true, allowableValues="REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION")  @QueryParam("flowType") String flowType) {
 

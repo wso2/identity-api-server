@@ -30,6 +30,7 @@ import org.wso2.carbon.identity.rule.management.api.model.Expression;
 import org.wso2.carbon.identity.rule.management.api.model.ORCombinedRule;
 import org.wso2.carbon.identity.rule.management.api.model.Value;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -157,13 +158,25 @@ public class RuleMapper {
         } else if (value.getLiteral() instanceof List) {
             List<String> entries = new ArrayList<>();
             for (Object entry : (List<?>) value.getLiteral()) {
-                entries.add(String.valueOf(entry));
+                entries.add(toLiteralText(entry));
             }
             builder.value(new Value(entries));
         } else if (value.getLiteral() != null) {
-            builder.value(String.valueOf(value.getLiteral()));
+            builder.value(toLiteralText(value.getLiteral()));
         }
         return builder.build();
+    }
+
+    private static String toLiteralText(Object literal) {
+
+        if (literal instanceof Number) {
+            try {
+                return new BigDecimal(literal.toString()).stripTrailingZeros().toPlainString();
+            } catch (NumberFormatException e) {
+                return String.valueOf(literal);
+            }
+        }
+        return String.valueOf(literal);
     }
 
     private static AtomicCondition toAtomicCondition(Expression expression) {
@@ -184,10 +197,14 @@ public class RuleMapper {
         if (value == null) {
             return null;
         }
-        if (value.getType() == Value.Type.FIELD && value.getFieldReference() != null) {
-            return new ConditionValue().type(ConditionValue.TypeEnum.FIELD)
-                    .field(new FieldReference().name(value.getFieldReference().getName())
-                            .qualifier(value.getFieldReference().getQualifier()));
+        if (value.getType() == Value.Type.FIELD) {
+            if (value.getFieldReference() == null) {
+                return null;
+            }
+            FieldReference field = new FieldReference()
+                    .name(value.getFieldReference().getName())
+                    .qualifier(value.getFieldReference().getQualifier());
+            return new ConditionValue().type(ConditionValue.TypeEnum.FIELD).field(field);
         }
         ConditionValue literal = new ConditionValue().type(ConditionValue.TypeEnum.LITERAL);
         return value.getType() == Value.Type.LIST

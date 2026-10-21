@@ -18,28 +18,27 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.*;
 
+/**
+ * The fields a value may be read from. Absent when only literals are allowed.
+ **/
+
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-
-/**
- * The fields a value may be read from.
- **/
-@ApiModel(description = "The fields a value may be read from.")
+@ApiModel(description = "The fields a value may be read from. Absent when only literals are allowed.")
 public class RuleValueFieldDefinition  {
   
+    private List<String> names = new ArrayList<String>();
 
-    private List<String> names = new ArrayList<>();
 
     /**
     * Names of the fields a value may be read from.
@@ -50,7 +49,7 @@ public class RuleValueFieldDefinition  {
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "Names of the fields a value may be read from.")
+    @ApiModelProperty(example = "[\"user.claims\",\"user.collectedClaims\"]", required = true, value = "Names of the fields a value may be read from.")
     @JsonProperty("names")
     @Valid
     @NotNull(message = "Property names cannot be null.")
@@ -63,14 +62,11 @@ public class RuleValueFieldDefinition  {
     }
 
     public RuleValueFieldDefinition addNamesItem(String namesItem) {
-        if (this.names == null) {
-            this.names = new ArrayList<>();
-        }
         this.names.add(namesItem);
         return this;
     }
 
-
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -81,8 +77,8 @@ public class RuleValueFieldDefinition  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        RuleValueFieldDefinition other = (RuleValueFieldDefinition) o;
-        return Objects.equals(this.names, other.names);
+        RuleValueFieldDefinition ruleValueFieldDefinition = (RuleValueFieldDefinition) o;
+        return Objects.equals(this.names, ruleValueFieldDefinition.names);
     }
 
     @Override
@@ -113,3 +109,4 @@ public class RuleValueFieldDefinition  {
         return o.toString().replace("\n", "\n");
     }
 }
+

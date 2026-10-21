@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1.constants;
 
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -125,11 +124,13 @@ public class FlowEndpointConstants {
                 "Request body cannot be null."),
         ERROR_CODE_INVALID_DECISION_STEP("10025",
                 "Invalid decision step.",
-                "The decision step %s is not valid."),
-        ERROR_CODE_CONDITIONAL_BRANCHING_DISABLED("10026",
-                "Conditional branching is not enabled.",
-                "Conditional branching is not enabled on this server, so decision step conditions are not " +
-                        "available.");
+                "The decision step is not valid."),
+        ERROR_CODE_FLOW_RULE_META_NOT_IMPLEMENTED("10026",
+                "Flow rule metadata retrieval not implemented.",
+                "The flow rule metadata retrieval is not implemented for the given flow type."),
+        ERROR_CODE_GET_RULE_METADATA("10027",
+                "Unable to retrieve the condition metadata.",
+                "Server encountered an error while retrieving the fields a decision step condition can use.");
 
         private final String code;
         private final String message;
@@ -257,5 +258,6 @@ public class FlowEndpointConstants {
         public static final String NULL = "null";
         public static final String FORM = "FORM";
         public static final String RULE_EVALUATION = "RULE_EVALUATION";
+        public static final String ROUTE = "ROUTE";
     }
 }

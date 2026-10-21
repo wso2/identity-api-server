@@ -18,15 +18,15 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.flow.management.v1.RuleFieldDefinition;
 import javax.validation.constraints.*;
+
 
 import io.swagger.annotations.*;
 import java.util.Objects;
@@ -35,12 +35,11 @@ import javax.xml.bind.annotation.*;
 
 public class FlowRuleMetaResponse  {
   
-
     private List<RuleFieldDefinition> ruleMetaData = null;
 
 
     /**
-    * The fields a condition in this flow can be written against, with how each one is keyed, the operators it accepts and how its value is entered. Empty when the flow type publishes no condition fields, or conditional branching is disabled.
+    * The fields a condition in this flow can be written against, with how each one is keyed, the operators it accepts and how its value is entered. Empty when the flow type publishes no condition fields. 
     **/
     public FlowRuleMetaResponse ruleMetaData(List<RuleFieldDefinition> ruleMetaData) {
 
@@ -48,7 +47,7 @@ public class FlowRuleMetaResponse  {
         return this;
     }
     
-    @ApiModelProperty(value = "The fields a condition in this flow can be written against, with how each one is keyed, the operators it accepts and how its value is entered. Empty when the flow type publishes no condition fields, or conditional branching is disabled.")
+    @ApiModelProperty(value = "The fields a condition in this flow can be written against, with how each one is keyed, the operators it accepts and how its value is entered. Empty when the flow type publishes no condition fields. ")
     @JsonProperty("ruleMetaData")
     @Valid
     public List<RuleFieldDefinition> getRuleMetaData() {
@@ -65,6 +64,8 @@ public class FlowRuleMetaResponse  {
         this.ruleMetaData.add(ruleMetaDataItem);
         return this;
     }
+
+    
 
     @Override
     public boolean equals(java.lang.Object o) {

@@ -18,51 +18,47 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
+import org.wso2.carbon.identity.api.server.flow.management.v1.RuleValue;
+import org.wso2.carbon.identity.api.server.flow.management.v1.RuleValueFieldDefinition;
 import javax.validation.constraints.*;
+
+/**
+ * What a field can be compared against.
+ **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-
-/**
- * What a field can be compared against.
- **/
 @ApiModel(description = "What a field can be compared against.")
 public class RuleValueDefinition  {
   
-
-    private org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Value literal;
+    private RuleValue literal;
     private RuleValueFieldDefinition field;
 
     /**
-    * How a literal value is entered.
     **/
-    public RuleValueDefinition literal(org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Value literal) {
+    public RuleValueDefinition literal(RuleValue literal) {
 
         this.literal = literal;
         return this;
     }
     
-    @ApiModelProperty(value = "How a literal value is entered.")
+    @ApiModelProperty(value = "")
     @JsonProperty("literal")
     @Valid
-    public org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Value getLiteral() {
+    public RuleValue getLiteral() {
         return literal;
     }
-    public void setLiteral(org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Value literal) {
+    public void setLiteral(RuleValue literal) {
         this.literal = literal;
     }
 
     /**
-    * The fields a value may be read from. Absent when only literals are allowed.
     **/
     public RuleValueDefinition field(RuleValueFieldDefinition field) {
 
@@ -70,7 +66,7 @@ public class RuleValueDefinition  {
         return this;
     }
     
-    @ApiModelProperty(value = "The fields a value may be read from. Absent when only literals are allowed.")
+    @ApiModelProperty(value = "")
     @JsonProperty("field")
     @Valid
     public RuleValueFieldDefinition getField() {
@@ -91,9 +87,9 @@ public class RuleValueDefinition  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        RuleValueDefinition other = (RuleValueDefinition) o;
-        return Objects.equals(this.literal, other.literal) &&
-            Objects.equals(this.field, other.field);
+        RuleValueDefinition ruleValueDefinition = (RuleValueDefinition) o;
+        return Objects.equals(this.literal, ruleValueDefinition.literal) &&
+            Objects.equals(this.field, ruleValueDefinition.field);
     }
 
     @Override
@@ -125,3 +121,4 @@ public class RuleValueDefinition  {
         return o.toString().replace("\n", "\n");
     }
 }
+

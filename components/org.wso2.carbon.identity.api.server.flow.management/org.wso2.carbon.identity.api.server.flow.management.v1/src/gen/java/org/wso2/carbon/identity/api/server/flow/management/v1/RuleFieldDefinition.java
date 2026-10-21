@@ -18,33 +18,34 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.flow.management.v1.RuleField;
+import org.wso2.carbon.identity.api.server.flow.management.v1.RuleOperator;
+import org.wso2.carbon.identity.api.server.flow.management.v1.RuleValueDefinition;
 import javax.validation.constraints.*;
+
+/**
+ * A field a condition in this flow can be written against.
+ **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-
-/**
- * A field a condition in this flow can be written against.
- **/
 @ApiModel(description = "A field a condition in this flow can be written against.")
 public class RuleFieldDefinition  {
   
-
     private RuleField field;
-    private List<org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Operator> operators = new ArrayList<>();
+    private List<RuleOperator> operators = new ArrayList<RuleOperator>();
+
     private RuleValueDefinition value;
 
     /**
-    * The field, and how a value within it is picked.
     **/
     public RuleFieldDefinition field(RuleField field) {
 
@@ -52,7 +53,7 @@ public class RuleFieldDefinition  {
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "The field, and how a value within it is picked.")
+    @ApiModelProperty(required = true, value = "")
     @JsonProperty("field")
     @Valid
     @NotNull(message = "Property field cannot be null.")
@@ -67,7 +68,7 @@ public class RuleFieldDefinition  {
     /**
     * The operators the field takes.
     **/
-    public RuleFieldDefinition operators(List<org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Operator> operators) {
+    public RuleFieldDefinition operators(List<RuleOperator> operators) {
 
         this.operators = operators;
         return this;
@@ -78,23 +79,19 @@ public class RuleFieldDefinition  {
     @Valid
     @NotNull(message = "Property operators cannot be null.")
 
-    public List<org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Operator> getOperators() {
+    public List<RuleOperator> getOperators() {
         return operators;
     }
-    public void setOperators(List<org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Operator> operators) {
+    public void setOperators(List<RuleOperator> operators) {
         this.operators = operators;
     }
 
-    public RuleFieldDefinition addOperatorsItem(org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Operator operatorsItem) {
-        if (this.operators == null) {
-            this.operators = new ArrayList<>();
-        }
+    public RuleFieldDefinition addOperatorsItem(RuleOperator operatorsItem) {
         this.operators.add(operatorsItem);
         return this;
     }
 
-    /**
-    * What the field can be compared against.
+        /**
     **/
     public RuleFieldDefinition value(RuleValueDefinition value) {
 
@@ -102,7 +99,7 @@ public class RuleFieldDefinition  {
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "What the field can be compared against.")
+    @ApiModelProperty(required = true, value = "")
     @JsonProperty("value")
     @Valid
     @NotNull(message = "Property value cannot be null.")
@@ -125,10 +122,10 @@ public class RuleFieldDefinition  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        RuleFieldDefinition other = (RuleFieldDefinition) o;
-        return Objects.equals(this.field, other.field) &&
-            Objects.equals(this.operators, other.operators) &&
-            Objects.equals(this.value, other.value);
+        RuleFieldDefinition ruleFieldDefinition = (RuleFieldDefinition) o;
+        return Objects.equals(this.field, ruleFieldDefinition.field) &&
+            Objects.equals(this.operators, ruleFieldDefinition.operators) &&
+            Objects.equals(this.value, ruleFieldDefinition.value);
     }
 
     @Override
@@ -161,3 +158,4 @@ public class RuleFieldDefinition  {
         return o.toString().replace("\n", "\n");
     }
 }
+

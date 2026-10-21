@@ -18,30 +18,27 @@
 
 package org.wso2.carbon.identity.api.server.flow.management.v1;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
+import org.wso2.carbon.identity.api.server.flow.management.v1.RuleValue;
 import javax.validation.constraints.*;
+
+/**
+ * A field a condition can be written against.
+ **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-
-/**
- * A field a condition can be written against.
- **/
 @ApiModel(description = "A field a condition can be written against.")
 public class RuleField  {
   
-
     private String name;
     private String displayName;
-    private org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Value qualifier;
+    private RuleValue qualifier;
 
     /**
     * Name of the field.
@@ -84,21 +81,20 @@ public class RuleField  {
     }
 
     /**
-    * How a value within the field is picked. Absent on a field that names a single value.
     **/
-    public RuleField qualifier(org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Value qualifier) {
+    public RuleField qualifier(RuleValue qualifier) {
 
         this.qualifier = qualifier;
         return this;
     }
     
-    @ApiModelProperty(value = "How a value within the field is picked. Absent on a field that names a single value.")
+    @ApiModelProperty(value = "")
     @JsonProperty("qualifier")
     @Valid
-    public org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Value getQualifier() {
+    public RuleValue getQualifier() {
         return qualifier;
     }
-    public void setQualifier(org.wso2.carbon.identity.api.server.rule.metadata.v1.model.Value qualifier) {
+    public void setQualifier(RuleValue qualifier) {
         this.qualifier = qualifier;
     }
 
@@ -113,10 +109,10 @@ public class RuleField  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        RuleField other = (RuleField) o;
-        return Objects.equals(this.name, other.name) &&
-            Objects.equals(this.displayName, other.displayName) &&
-            Objects.equals(this.qualifier, other.qualifier);
+        RuleField ruleField = (RuleField) o;
+        return Objects.equals(this.name, ruleField.name) &&
+            Objects.equals(this.displayName, ruleField.displayName) &&
+            Objects.equals(this.qualifier, ruleField.qualifier);
     }
 
     @Override
@@ -149,3 +145,4 @@ public class RuleField  {
         return o.toString().replace("\n", "\n");
     }
 }
+

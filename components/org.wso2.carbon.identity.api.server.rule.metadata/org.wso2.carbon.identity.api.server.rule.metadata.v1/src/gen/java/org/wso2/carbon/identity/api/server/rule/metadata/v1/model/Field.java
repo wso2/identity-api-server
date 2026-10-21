@@ -37,7 +37,6 @@ public class Field  {
   
     private String name;
     private String displayName;
-    private Value qualifier;
     private List<String> dependantFields = null;
 
 
@@ -77,25 +76,6 @@ public class Field  {
     }
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
-    }
-
-    /**
-    * How a qualifier is chosen for this field, for fields that name a family of values rather than a single one, such as a claim, where the qualifier is the claim URI. Absent on fields that name one value.
-    **/
-    public Field qualifier(Value qualifier) {
-
-        this.qualifier = qualifier;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "How a qualifier is chosen for this field, for fields that name a family of values rather than a single one, such as a claim, where the qualifier is the claim URI. Absent on fields that name one value.")
-    @JsonProperty("qualifier")
-    @Valid
-    public Value getQualifier() {
-        return qualifier;
-    }
-    public void setQualifier(Value qualifier) {
-        this.qualifier = qualifier;
     }
 
     /**
@@ -139,13 +119,12 @@ public class Field  {
         Field field = (Field) o;
         return Objects.equals(this.name, field.name) &&
             Objects.equals(this.displayName, field.displayName) &&
-            Objects.equals(this.qualifier, field.qualifier) &&
             Objects.equals(this.dependantFields, field.dependantFields);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, displayName, qualifier, dependantFields);
+        return Objects.hash(name, displayName, dependantFields);
     }
 
     @Override
@@ -156,7 +135,6 @@ public class Field  {
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
-        sb.append("    qualifier: ").append(toIndentedString(qualifier)).append("\n");
         sb.append("    dependantFields: ").append(toIndentedString(dependantFields)).append("\n");
         sb.append("}");
         return sb.toString();

@@ -254,7 +254,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '501':
-          description: Conditional branching is not enabled on the server
+          description: Not Implemented
           content:
             application/json:
               schema:
@@ -1195,7 +1195,7 @@ components:
 
     RuleFieldDefinition:
       type: object
-      description: A field a condition in this flow can be written against
+      description: A field a condition in this flow can be written against.
       required:
         - field
         - operators
@@ -1205,65 +1205,144 @@ components:
           $ref: '#/components/schemas/RuleField'
         operators:
           type: array
+          description: The operators the field takes.
           items:
-            type: object
-            properties:
-              name:
-                type: string
-                example: equals
-              displayName:
-                type: string
-                example: equals
-              valueInput:
-                type: string
-                description: >
-                  The value a condition using the operator takes: none for an operator that checks the
-                  field alone, such as isBlank or isEmpty, list for in and notIn, and single for every
-                  other operator.
-                enum:
-                  - none
-                  - single
-                  - list
-                example: single
+            $ref: '#/components/schemas/RuleOperator'
         value:
           $ref: '#/components/schemas/RuleValueDefinition'
 
     RuleField:
       type: object
+      description: A field a condition can be written against.
       required:
         - name
       properties:
         name:
           type: string
+          description: Name of the field.
           example: user.collectedClaims
         displayName:
           type: string
+          description: Label for the field.
           example: Claim collected in this flow
         qualifier:
-          type: object
+          $ref: '#/components/schemas/RuleValue'
+
+    RuleOperator:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the operator, as a condition names it.
+          example: equals
+        displayName:
+          type: string
+          description: Display name of the operator.
+          example: equals
+        valueInput:
+          type: string
           description: >
-            How a value within the field is picked, in the same shape as a value definition of the
-            rule metadata endpoint. Absent on a field that names a single value.
+            The value a condition using the operator takes: none for an operator that checks the
+            field alone, such as isBlank or isEmpty, list for in and notIn, and single for every
+            other operator.
+          enum:
+            - none
+            - single
+            - list
+          example: single
 
     RuleValueDefinition:
       type: object
+      description: What a field can be compared against.
       properties:
         literal:
-          type: object
-          description: >
-            How a literal is entered, in the same shape as a value definition of the rule metadata
-            endpoint.
+          $ref: '#/components/schemas/RuleValue'
         field:
-          type: object
-          description: The fields a value may be read from. Absent when only literals are allowed.
-          required:
-            - names
-          properties:
-            names:
-              type: array
-              items:
-                type: string
-              example: [user.claims, user.collectedClaims]
+          $ref: '#/components/schemas/RuleValueFieldDefinition'
+
+    RuleValueFieldDefinition:
+      type: object
+      description: The fields a value may be read from. Absent when only literals are allowed.
+      required:
+        - names
+      properties:
+        names:
+          type: array
+          description: Names of the fields a value may be read from.
+          items:
+            type: string
+          example: [user.claims, user.collectedClaims]
+
+    RuleValue:
+      type: object
+      description: >
+        How a value is entered: typed in, or picked from a list given here or fetched from the
+        linked endpoints. Also describes how a field's qualifier is picked; absent on a field that
+        names a single value.
+      properties:
+        inputType:
+          type: string
+          description: input for a value typed in, options for one picked from a list.
+          enum:
+            - input
+            - options
+          example: options
+        valueType:
+          type: string
+          description: The type of the value; reference for the id of a resource listed by the links.
+          enum:
+            - string
+            - number
+            - boolean
+            - date
+            - reference
+          example: reference
+        valueReferenceAttribute:
+          type: string
+          description: The attribute of a listed resource that is used as the value.
+          example: id
+        valueDisplayAttribute:
+          type: string
+          description: The attribute of a listed resource that is shown for it.
+          example: name
+        links:
+          type: array
+          description: The endpoints that list or filter the values to pick from.
+          items:
+            $ref: '#/components/schemas/RuleLink'
+        values:
+          type: array
+          description: The values to pick from, when they are listed here.
+          items:
+            $ref: '#/components/schemas/RuleValueOption'
+
+    RuleValueOption:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The value used in a condition.
+        displayName:
+          type: string
+          description: The label shown for the value.
+
+    RuleLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: Url of the endpoint.
+          example: /applications?offset=0&limit=10
+        method:
+          type: string
+          enum:
+            - GET
+        rel:
+          type: string
+          description: values for the endpoint that lists the values, filter for the one that filters them.
+          enum:
+            - values
+            - filter
 
     Executor:
       type: object

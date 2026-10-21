@@ -702,16 +702,37 @@ public class Utils {
                     "The decision step %s defines a next step. Where the flow goes is decided by its branches, " +
                             "and the branch without a rule is what catches everything else.", step.getId());
         }
+        if (!FlowEndpointConstants.FlowGeneration.ROUTE.equals(action.getType())) {
+            throw handleDecisionStepException("Invalid action type for a decision step.",
+                    "The decision step %s has the action type %s. A decision step's action type should be %s.",
+                    step.getId(), action.getType(), FlowEndpointConstants.FlowGeneration.ROUTE);
+        }
+        if (CollectionUtils.isNotEmpty(step.getData().getComponents())) {
+            throw handleDecisionStepException("Components not allowed on a decision step.",
+                    "The decision step %s carries components. A decision step should not carry components.",
+                    step.getId());
+        }
         // Evaluating the branches is what the step type itself does, so there is no executor to name.
         if (action.getExecutor() != null) {
             throw handleDecisionStepException("Executor not allowed on a decision step.",
                     "The decision step %s names an executor. A decision only evaluates its branches, so it " +
                             "carries no executor.", step.getId());
         }
+        Set<String> branchIds = new HashSet<>();
         for (Branch branch : action.getBranches()) {
             if (branch == null) {
                 throw handleDecisionStepException("Invalid branch.",
                         "The decision step %s has an empty branch.", step.getId());
+            }
+            if (StringUtils.isBlank(branch.getNext())) {
+                throw handleDecisionStepException("Branch next step not provided.",
+                        "The branch %s of the decision step %s does not say where the flow goes next.",
+                        branch.getName(), step.getId());
+            }
+            if (!branchIds.add(branch.getId())) {
+                throw handleDecisionStepException("Duplicate branch id.",
+                        "The decision step %s has more than one branch with the id %s.", step.getId(),
+                        branch.getId());
             }
             validateBranchRule(step.getId(), branch);
         }
@@ -874,6 +895,12 @@ public class Utils {
      */
     public static void validateNextNodeReference(Component component) {
 
+        // Only a decision step has branches; on a component they would be stored and never evaluated.
+        if (component.getAction() != null && CollectionUtils.isNotEmpty(component.getAction().getBranches())) {
+            throw handleDecisionStepException("Branches not allowed here.",
+                    "The component %s carries branches. Only a %s step has branches.", component.getId(),
+                    FlowEndpointConstants.FlowGeneration.RULE_EVALUATION);
+        }
         if (component.getAction() != null && StringUtils.isBlank(component.getAction().getNext())) {
             throw Utils.handleFlowMgtException(new FlowMgtClientException(
                             FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_PROPERTY.getCode(),

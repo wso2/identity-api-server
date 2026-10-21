@@ -137,9 +137,9 @@ public class ServerFlowMgtService {
         Utils.validateFlowType(flowType);
         if (!FlowMgtUtils.isConditionalBranchingEnabled()) {
             FlowEndpointConstants.ErrorMessages error =
-                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_CONDITIONAL_BRANCHING_DISABLED;
-            throw Utils.handleException(Response.Status.NOT_IMPLEMENTED, error.getCode(), error.getMessage(),
-                    error.getDescription());
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_FLOW_RULE_META_NOT_IMPLEMENTED;
+            throw Utils.handleException(Response.Status.NOT_IMPLEMENTED,
+                    FlowEndpointConstants.FLOW_PREFIX + error.getCode(), error.getMessage(), error.getDescription());
         }
         AbstractMetaResponseHandler metaResponseHandler = resolveHandler(flowType);
         return metaResponseHandler.createRuleMetaResponse();
