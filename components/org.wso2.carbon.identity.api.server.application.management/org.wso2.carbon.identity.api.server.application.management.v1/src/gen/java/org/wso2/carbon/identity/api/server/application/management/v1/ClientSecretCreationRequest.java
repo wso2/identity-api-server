@@ -35,7 +35,27 @@ import javax.xml.bind.annotation.*;
 @ApiModel(description = "Request payload for creating a new client secret.")
 public class ClientSecretCreationRequest  {
   
+    private String secretValue;
     private Long expiresAt;
+
+    /**
+    * The client secret value to add. When omitted, a secret is generated.
+    **/
+    public ClientSecretCreationRequest secretValue(String secretValue) {
+
+        this.secretValue = secretValue;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "AbCd1234EfGh5678IjKlMnOp", value = "The client secret value to add. When omitted, a secret is generated.")
+    @JsonProperty("secretValue")
+    @Valid
+    public String getSecretValue() {
+        return secretValue;
+    }
+    public void setSecretValue(String secretValue) {
+        this.secretValue = secretValue;
+    }
 
     /**
     * Expiry time as Unix epoch seconds; must be a future time. 0 or omitted for a non-expiring secret.
@@ -68,12 +88,13 @@ public class ClientSecretCreationRequest  {
             return false;
         }
         ClientSecretCreationRequest clientSecretCreationRequest = (ClientSecretCreationRequest) o;
-        return Objects.equals(this.expiresAt, clientSecretCreationRequest.expiresAt);
+        return Objects.equals(this.secretValue, clientSecretCreationRequest.secretValue) &&
+            Objects.equals(this.expiresAt, clientSecretCreationRequest.expiresAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(expiresAt);
+        return Objects.hash(secretValue, expiresAt);
     }
 
     @Override
@@ -82,6 +103,7 @@ public class ClientSecretCreationRequest  {
         StringBuilder sb = new StringBuilder();
         sb.append("class ClientSecretCreationRequest {\n");
         
+        sb.append("    secretValue: ").append(toIndentedString(secretValue)).append("\n");
         sb.append("    expiresAt: ").append(toIndentedString(expiresAt)).append("\n");
         sb.append("}");
         return sb.toString();

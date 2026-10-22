@@ -4354,6 +4354,10 @@ components:
       type: object
       description: Request payload for creating a new client secret.
       properties:
+        secretValue:
+          type: string
+          description: The client secret value to add. When omitted, a secret is generated.
+          example: "AbCd1234EfGh5678IjKlMnOp"
         expiresAt:
           type: integer
           format: int64
