@@ -121,7 +121,16 @@ public class FlowEndpointConstants {
 
         ERROR_CODE_INVALID_REQUEST_BODY("10024",
                 "Invalid request body.",
-                "Request body cannot be null.");
+                "Request body cannot be null."),
+        ERROR_CODE_INVALID_DECISION_STEP("10025",
+                "Invalid decision step.",
+                "The decision step is not valid."),
+        ERROR_CODE_FLOW_RULE_META_NOT_IMPLEMENTED("10026",
+                "Flow rule metadata retrieval not implemented.",
+                "The flow rule metadata retrieval is not implemented for the given flow type."),
+        ERROR_CODE_GET_RULE_METADATA("10027",
+                "Unable to retrieve the condition metadata.",
+                "Server encountered an error while retrieving the fields a decision step condition can use.");
 
         private final String code;
         private final String message;
@@ -248,5 +257,7 @@ public class FlowEndpointConstants {
         public static final String EMPTY = "empty";
         public static final String NULL = "null";
         public static final String FORM = "FORM";
+        public static final String RULE_EVALUATION = "RULE_EVALUATION";
+        public static final String ROUTE = "ROUTE";
     }
 }

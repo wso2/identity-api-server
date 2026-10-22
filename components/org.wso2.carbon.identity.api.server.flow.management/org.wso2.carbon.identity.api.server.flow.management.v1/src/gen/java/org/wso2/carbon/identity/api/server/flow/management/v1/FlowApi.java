@@ -346,6 +346,30 @@ public class FlowApi  {
     }
 
     @Valid
+    @GET
+    @Path("/meta/rule")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve the condition metadata of a flow type", notes = "Returns the fields that decision step conditions can use in the given flow type. ", response = FlowRuleMetaResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Flow Composer", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successfully retrieved the condition metadata", response = FlowRuleMetaResponse.class),
+        @ApiResponse(code = 400, message = "Invalid flow type specified", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 500, message = "Encountered a server error", response = Error.class),
+        @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
+    })
+    public Response getFlowRuleMeta(    @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Type of the flow to get condition metadata for",required=true, allowableValues="REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION")  @QueryParam("flowType") String flowType) {
+
+        return delegate.getFlowRuleMeta(flowType );
+    }
+
+    @Valid
     @PUT
     
     @Consumes({ "application/json" })

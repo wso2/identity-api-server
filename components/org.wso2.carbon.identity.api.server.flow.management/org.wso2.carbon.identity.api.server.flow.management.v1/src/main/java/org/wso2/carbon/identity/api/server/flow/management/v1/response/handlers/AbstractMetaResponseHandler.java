@@ -23,13 +23,17 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.action.management.api.exception.ActionMgtException;
 import org.wso2.carbon.identity.action.management.api.model.Action;
+import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.flow.management.common.FlowMgtServiceHolder;
 import org.wso2.carbon.identity.api.server.flow.management.v1.AttributeMetadata;
 import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorConnections;
 import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorMetadata;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionConnectionInfo;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRuleMetaResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.RuleFieldDefinition;
 import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
+import org.wso2.carbon.identity.api.server.flow.management.v1.utils.RuleMetadataMapper;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
@@ -39,7 +43,11 @@ import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.flow.execution.engine.metadata.FlowExecutorInfo;
 import org.wso2.carbon.identity.flow.extension.model.FlowExtensionAction;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
+import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtServerException;
 import org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants;
+import org.wso2.carbon.identity.rule.metadata.api.exception.RuleMetadataException;
+import org.wso2.carbon.identity.rule.metadata.api.model.FieldDefinition;
+import org.wso2.carbon.identity.rule.metadata.api.service.RuleMetadataService;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdpManager;
 import org.wso2.carbon.idp.mgt.model.IdpSearchResult;
@@ -195,6 +203,67 @@ public abstract class AbstractMetaResponseHandler {
         response.setFlowExtensionConnections(getFlowExtensionConnections());
         response.setSupportedFlowCompletionConfigs(getSupportedFlowCompletionConfigs());
         return response;
+    }
+
+    /**
+     * Create the condition metadata response: the fields a decision step's conditions can use in this flow.
+     *
+     * @return FlowRuleMetaResponse instance.
+     */
+    public FlowRuleMetaResponse createRuleMetaResponse() {
+
+        return new FlowRuleMetaResponse().ruleMetaData(getRuleMetaData());
+    }
+
+    /**
+     * The fields a condition in this flow can be written against. A flow type that publishes no condition fields
+     * gets an empty list, which is how a builder knows not to offer decisions for it.
+     *
+     * @return The condition fields, never null.
+     */
+    protected List<RuleFieldDefinition> getRuleMetaData() {
+
+        org.wso2.carbon.identity.rule.metadata.api.model.FlowType flowType;
+        try {
+            flowType = org.wso2.carbon.identity.rule.metadata.api.model.FlowType.valueOf(getFlowType());
+        } catch (IllegalArgumentException e) {
+            // Not every flow type supports conditions; those simply publish no fields.
+            return Collections.emptyList();
+        }
+
+        // Looked up on every request rather than held, so a call made before the service is registered fails only
+        // that request, not every one after it.
+        RuleMetadataService ruleMetadataService = (RuleMetadataService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RuleMetadataService.class, null);
+        if (ruleMetadataService == null) {
+            throw ruleMetadataError(null);
+        }
+        List<FieldDefinition> definitions;
+        try {
+            definitions = ruleMetadataService.getExpressionMeta(flowType,
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+        } catch (RuleMetadataException e) {
+            throw ruleMetadataError(e);
+        }
+
+        List<RuleFieldDefinition> ruleFields = new ArrayList<>();
+        for (FieldDefinition definition : definitions) {
+            ruleFields.add(RuleMetadataMapper.toRuleFieldDefinition(definition));
+        }
+        return ruleFields;
+    }
+
+    /**
+     * Build the error returned when the rule metadata cannot be read.
+     *
+     * @param cause Cause of the failure, or null when the rule metadata service is not available.
+     * @return The server error.
+     */
+    private APIError ruleMetadataError(Throwable cause) {
+
+        FlowEndpointConstants.ErrorMessages error = FlowEndpointConstants.ErrorMessages.ERROR_CODE_GET_RULE_METADATA;
+        return Utils.handleFlowMgtException(
+                new FlowMgtServerException(error.getCode(), error.getMessage(), error.getDescription(), cause));
     }
 
     private List<String> getSupportedFlowCompletionConfigs() {
