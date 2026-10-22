@@ -83,6 +83,7 @@ public enum AccessEnum {
     private String templateVersion;
     private AssociatedRolesConfig associatedRoles;
     private Boolean enhancedOrgAuthenticationEnabled;
+    private Boolean allowSharedAppRoleManagement;
     private Boolean applicationEnabled;
 
     /**
@@ -376,6 +377,24 @@ public enum AccessEnum {
 
     /**
     **/
+    public ApplicationListItem allowSharedAppRoleManagement(Boolean allowSharedAppRoleManagement) {
+
+        this.allowSharedAppRoleManagement = allowSharedAppRoleManagement;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "")
+    @JsonProperty("allowSharedAppRoleManagement")
+    @Valid
+    public Boolean getAllowSharedAppRoleManagement() {
+        return allowSharedAppRoleManagement;
+    }
+    public void setAllowSharedAppRoleManagement(Boolean allowSharedAppRoleManagement) {
+        this.allowSharedAppRoleManagement = allowSharedAppRoleManagement;
+    }
+
+    /**
+    **/
     public ApplicationListItem applicationEnabled(Boolean applicationEnabled) {
 
         this.applicationEnabled = applicationEnabled;
@@ -420,12 +439,13 @@ public enum AccessEnum {
             Objects.equals(this.templateVersion, applicationListItem.templateVersion) &&
             Objects.equals(this.associatedRoles, applicationListItem.associatedRoles) &&
             Objects.equals(this.enhancedOrgAuthenticationEnabled, applicationListItem.enhancedOrgAuthenticationEnabled) &&
+            Objects.equals(this.allowSharedAppRoleManagement, applicationListItem.allowSharedAppRoleManagement) &&
             Objects.equals(this.applicationEnabled, applicationListItem.applicationEnabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, applicationVersion, image, accessUrl, clientId, issuer, realm, access, self, advancedConfigurations, templateId, templateVersion, associatedRoles, enhancedOrgAuthenticationEnabled, applicationEnabled);
+        return Objects.hash(id, name, description, applicationVersion, image, accessUrl, clientId, issuer, realm, access, self, advancedConfigurations, templateId, templateVersion, associatedRoles, enhancedOrgAuthenticationEnabled, allowSharedAppRoleManagement, applicationEnabled);
     }
 
     @Override
@@ -450,6 +470,7 @@ public enum AccessEnum {
         sb.append("    templateVersion: ").append(toIndentedString(templateVersion)).append("\n");
         sb.append("    associatedRoles: ").append(toIndentedString(associatedRoles)).append("\n");
         sb.append("    enhancedOrgAuthenticationEnabled: ").append(toIndentedString(enhancedOrgAuthenticationEnabled)).append("\n");
+        sb.append("    allowSharedAppRoleManagement: ").append(toIndentedString(allowSharedAppRoleManagement)).append("\n");
         sb.append("    applicationEnabled: ").append(toIndentedString(applicationEnabled)).append("\n");
         sb.append("}");
         return sb.toString();

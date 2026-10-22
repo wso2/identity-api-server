@@ -46,6 +46,7 @@ public class ApplicationPatchModel  {
     private String templateId;
     private String templateVersion;
     private Boolean enhancedOrgAuthenticationEnabled;
+    private Boolean allowSharedAppRoleManagement;
     private Boolean applicationEnabled;
     private AssociatedRolesConfig associatedRoles;
     private ClaimConfiguration claimConfiguration;
@@ -218,6 +219,25 @@ public class ApplicationPatchModel  {
     }
 
     /**
+    * For a main application, decides whether organizations can manage their own roles for its shared applications. This requires enhanced organization authentication to be enabled. With application audience roles, organizations can create application roles for the shared applications, and disabling it deletes them. With organization audience roles, the organization roles of the organizations are associated with the shared applications, and disabling it deletes no roles. For a shared application, this is a read-only value which is true only if organizations can create application roles for it.
+    **/
+    public ApplicationPatchModel allowSharedAppRoleManagement(Boolean allowSharedAppRoleManagement) {
+
+        this.allowSharedAppRoleManagement = allowSharedAppRoleManagement;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "For a main application, decides whether organizations can manage their own roles for its shared applications. This requires enhanced organization authentication to be enabled. With application audience roles, organizations can create application roles for the shared applications, and disabling it deletes them. With organization audience roles, the organization roles of the organizations are associated with the shared applications, and disabling it deletes no roles. For a shared application, this is a read-only value which is true only if organizations can create application roles for it.")
+    @JsonProperty("allowSharedAppRoleManagement")
+    @Valid
+    public Boolean getAllowSharedAppRoleManagement() {
+        return allowSharedAppRoleManagement;
+    }
+    public void setAllowSharedAppRoleManagement(Boolean allowSharedAppRoleManagement) {
+        this.allowSharedAppRoleManagement = allowSharedAppRoleManagement;
+    }
+
+    /**
     * Decides whether the application is enabled.
     **/
     public ApplicationPatchModel applicationEnabled(Boolean applicationEnabled) {
@@ -346,6 +366,7 @@ public class ApplicationPatchModel  {
             Objects.equals(this.templateId, applicationPatchModel.templateId) &&
             Objects.equals(this.templateVersion, applicationPatchModel.templateVersion) &&
             Objects.equals(this.enhancedOrgAuthenticationEnabled, applicationPatchModel.enhancedOrgAuthenticationEnabled) &&
+            Objects.equals(this.allowSharedAppRoleManagement, applicationPatchModel.allowSharedAppRoleManagement) &&
             Objects.equals(this.applicationEnabled, applicationPatchModel.applicationEnabled) &&
             Objects.equals(this.associatedRoles, applicationPatchModel.associatedRoles) &&
             Objects.equals(this.claimConfiguration, applicationPatchModel.claimConfiguration) &&
@@ -356,7 +377,7 @@ public class ApplicationPatchModel  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, imageUrl, accessUrl, logoutReturnUrl, templateId, templateVersion, enhancedOrgAuthenticationEnabled, applicationEnabled, associatedRoles, claimConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
+        return Objects.hash(name, description, imageUrl, accessUrl, logoutReturnUrl, templateId, templateVersion, enhancedOrgAuthenticationEnabled, allowSharedAppRoleManagement, applicationEnabled, associatedRoles, claimConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
     }
 
     @Override
@@ -373,6 +394,7 @@ public class ApplicationPatchModel  {
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    templateVersion: ").append(toIndentedString(templateVersion)).append("\n");
         sb.append("    enhancedOrgAuthenticationEnabled: ").append(toIndentedString(enhancedOrgAuthenticationEnabled)).append("\n");
+        sb.append("    allowSharedAppRoleManagement: ").append(toIndentedString(allowSharedAppRoleManagement)).append("\n");
         sb.append("    applicationEnabled: ").append(toIndentedString(applicationEnabled)).append("\n");
         sb.append("    associatedRoles: ").append(toIndentedString(associatedRoles)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");

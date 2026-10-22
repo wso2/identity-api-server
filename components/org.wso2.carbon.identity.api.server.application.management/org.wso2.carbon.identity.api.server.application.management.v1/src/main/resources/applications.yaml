@@ -3352,6 +3352,9 @@ components:
         enhancedOrgAuthenticationEnabled:
           type: boolean
           example: false
+        allowSharedAppRoleManagement:
+          type: boolean
+          example: false
         applicationEnabled:
           type: boolean
           example: true
@@ -3400,6 +3403,15 @@ components:
           type: boolean
           example: false
           description: Decides whether the enhanced organization authentication is enabled for the application.
+        allowSharedAppRoleManagement:
+          type: boolean
+          example: false
+          description: For a main application, decides whether organizations can manage their own roles for its
+            shared applications. This requires enhanced organization authentication to be enabled. With application
+            audience roles, organizations can create application roles for the shared applications, and disabling it
+            deletes them. With organization audience roles, the organization roles of the organizations are associated
+            with the shared applications, and disabling it deletes no roles. For a shared application, this is a
+            read-only value which is true only if organizations can create application roles for it.
         applicationEnabled:
           default: true
           type: boolean
@@ -3472,6 +3484,15 @@ components:
           type: boolean
           example: false
           description: Decides whether the enhanced organization authentication is enabled for the application.
+        allowSharedAppRoleManagement:
+          type: boolean
+          example: false
+          description: For a main application, decides whether organizations can manage their own roles for its
+            shared applications. This requires enhanced organization authentication to be enabled. With application
+            audience roles, organizations can create application roles for the shared applications, and disabling it
+            deletes them. With organization audience roles, the organization roles of the organizations are associated
+            with the shared applications, and disabling it deletes no roles. For a shared application, this is a
+            read-only value which is true only if organizations can create application roles for it.
         applicationEnabled:
           type: boolean
           example: true
@@ -3526,6 +3547,15 @@ components:
           type: boolean
           example: false
           description: Decides whether the enhanced organization authentication is enabled for the application.
+        allowSharedAppRoleManagement:
+          type: boolean
+          example: false
+          description: For a main application, decides whether organizations can manage their own roles for its
+            shared applications. This requires enhanced organization authentication to be enabled. With application
+            audience roles, organizations can create application roles for the shared applications, and disabling it
+            deletes them. With organization audience roles, the organization roles of the organizations are associated
+            with the shared applications, and disabling it deletes no roles. For a shared application, this is a
+            read-only value which is true only if organizations can create application roles for it.
         applicationEnabled:
           type: boolean
           example: true

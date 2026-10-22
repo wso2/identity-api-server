@@ -54,6 +54,7 @@ public class ApplicationManagementConstants {
     public static final String DEFAULT_CERTIFICATE_ALIAS = "wso2carbon";
     public static final String ADVANCED_CONFIGURATIONS = "advancedConfigurations";
     public static final String APPLICATION_ENABLED = "applicationEnabled";
+    public static final String ALLOW_SHARED_APP_ROLE_MANAGEMENT = "allowSharedAppRoleManagement";
     public static final String TEMPLATE_ID = "templateId";
     public static final String TEMPLATE_VERSION = "templateVersion";
     public static final String NAME = "name";
@@ -202,6 +203,18 @@ public class ApplicationManagementConstants {
         UNSUPPORTED_ENHANCED_ORGANIZATION_AUTHENTICATION_ENABLED_CONFIGURATION("60521",
                 "Enhanced organization authentication enabled property is not supported.",
                 "The 'enhancedOrgAuthenticationEnabled' property is not yet supported."),
+        UNSUPPORTED_SHARED_APP_ROLE_MANAGEMENT_CONFIGURATION("60522",
+                "Shared application role management property is not supported.",
+                "The 'allowSharedAppRoleManagement' property requires enhanced organization authentication " +
+                        "to be supported."),
+        SHARED_APP_ROLE_MANAGEMENT_READ_ONLY_FOR_SHARED_APP("60523",
+                "Shared application role management property cannot be updated.",
+                "The 'allowSharedAppRoleManagement' property is read-only for shared applications. Update it " +
+                        "on the main application."),
+        SHARED_APP_ROLE_MANAGEMENT_FEATURE_DISABLED("60524",
+                "Shared application role management property is not supported.",
+                "The 'allowSharedAppRoleManagement' property cannot be enabled as the shared application role " +
+                        "management feature is disabled in the server."),
 
         // Server Errors.
         ERROR_RETRIEVING_SAML_METADATA("65001",
