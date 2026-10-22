@@ -103,6 +103,7 @@ public class Utils {
 
     private static final Log LOG = LogFactory.getLog(Utils.class);
     private static final String EXECUTOR = "EXECUTOR";
+    private static final String EXTERNAL_CLAIM_RESOLUTION_ENABLED = "isExternalClaimResolutionEnabled";
 
     /*
      * Display strings originate in a third party jar and are rendered in an administrative UI, so they
@@ -403,6 +404,13 @@ public class Utils {
                         FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_METADATA.getMessage(),
                         FlowEndpointConstants.ErrorMessages.ERROR_CODE_INVALID_METADATA.getDescription(), e));
             }
+        }
+        // Steps of executors that honor the connection's external claim mappings get the flag.
+        if (FlowExecutorMetadataService.getInstance().getExecutor(executor.getName())
+                .map(FlowExecutorInfo::isExternalClaimResolutionEnabled).orElse(false)
+                && (executorDTO.getMetadata() == null
+                || !executorDTO.getMetadata().containsKey(EXTERNAL_CLAIM_RESOLUTION_ENABLED))) {
+            executorDTO.addMetadata(EXTERNAL_CLAIM_RESOLUTION_ENABLED, Boolean.TRUE.toString());
         }
         return executorDTO;
     }
