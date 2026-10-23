@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -46,6 +46,7 @@ public class ApplicationPatchModel  {
     private String templateId;
     private String templateVersion;
     private Boolean enhancedOrgAuthenticationEnabled;
+    private Boolean sharedAppRoleManagementEnabled;
     private Boolean applicationEnabled;
     private AssociatedRolesConfig associatedRoles;
     private ClaimConfiguration claimConfiguration;
@@ -218,6 +219,25 @@ public class ApplicationPatchModel  {
     }
 
     /**
+    * For a main application, decides whether organizations can manage their own roles for its shared applications.
+    **/
+    public ApplicationPatchModel sharedAppRoleManagementEnabled(Boolean sharedAppRoleManagementEnabled) {
+
+        this.sharedAppRoleManagementEnabled = sharedAppRoleManagementEnabled;
+        return this;
+    }
+
+    @ApiModelProperty(example = "false", value = "For a main application, decides whether organizations can manage their own roles for its shared applications.")
+    @JsonProperty("sharedAppRoleManagementEnabled")
+    @Valid
+    public Boolean getSharedAppRoleManagementEnabled() {
+        return sharedAppRoleManagementEnabled;
+    }
+    public void setSharedAppRoleManagementEnabled(Boolean sharedAppRoleManagementEnabled) {
+        this.sharedAppRoleManagementEnabled = sharedAppRoleManagementEnabled;
+    }
+
+    /**
     * Decides whether the application is enabled.
     **/
     public ApplicationPatchModel applicationEnabled(Boolean applicationEnabled) {
@@ -340,12 +360,14 @@ public class ApplicationPatchModel  {
         ApplicationPatchModel applicationPatchModel = (ApplicationPatchModel) o;
         return Objects.equals(this.name, applicationPatchModel.name) &&
             Objects.equals(this.description, applicationPatchModel.description) &&
+            Objects.equals(this.applicationVersion, applicationPatchModel.applicationVersion) &&
             Objects.equals(this.imageUrl, applicationPatchModel.imageUrl) &&
             Objects.equals(this.accessUrl, applicationPatchModel.accessUrl) &&
             Objects.equals(this.logoutReturnUrl, applicationPatchModel.logoutReturnUrl) &&
             Objects.equals(this.templateId, applicationPatchModel.templateId) &&
             Objects.equals(this.templateVersion, applicationPatchModel.templateVersion) &&
             Objects.equals(this.enhancedOrgAuthenticationEnabled, applicationPatchModel.enhancedOrgAuthenticationEnabled) &&
+            Objects.equals(this.sharedAppRoleManagementEnabled, applicationPatchModel.sharedAppRoleManagementEnabled) &&
             Objects.equals(this.applicationEnabled, applicationPatchModel.applicationEnabled) &&
             Objects.equals(this.associatedRoles, applicationPatchModel.associatedRoles) &&
             Objects.equals(this.claimConfiguration, applicationPatchModel.claimConfiguration) &&
@@ -356,7 +378,7 @@ public class ApplicationPatchModel  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, imageUrl, accessUrl, logoutReturnUrl, templateId, templateVersion, enhancedOrgAuthenticationEnabled, applicationEnabled, associatedRoles, claimConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
+        return Objects.hash(name, description, applicationVersion, imageUrl, accessUrl, logoutReturnUrl, templateId, templateVersion, enhancedOrgAuthenticationEnabled, sharedAppRoleManagementEnabled, applicationEnabled, associatedRoles, claimConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
     }
 
     @Override
@@ -367,12 +389,14 @@ public class ApplicationPatchModel  {
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
+        sb.append("    applicationVersion: ").append(toIndentedString(applicationVersion)).append("\n");
         sb.append("    imageUrl: ").append(toIndentedString(imageUrl)).append("\n");
         sb.append("    accessUrl: ").append(toIndentedString(accessUrl)).append("\n");
         sb.append("    logoutReturnUrl: ").append(toIndentedString(logoutReturnUrl)).append("\n");
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    templateVersion: ").append(toIndentedString(templateVersion)).append("\n");
         sb.append("    enhancedOrgAuthenticationEnabled: ").append(toIndentedString(enhancedOrgAuthenticationEnabled)).append("\n");
+        sb.append("    sharedAppRoleManagementEnabled: ").append(toIndentedString(sharedAppRoleManagementEnabled)).append("\n");
         sb.append("    applicationEnabled: ").append(toIndentedString(applicationEnabled)).append("\n");
         sb.append("    associatedRoles: ").append(toIndentedString(associatedRoles)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");
