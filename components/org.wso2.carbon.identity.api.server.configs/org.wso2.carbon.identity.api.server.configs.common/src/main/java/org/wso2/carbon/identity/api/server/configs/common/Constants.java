@@ -348,7 +348,23 @@ public class Constants {
                 "Server encountered an error while retrieving the OpenID4VP configuration."),
         ERROR_CODE_OID4VP_CONFIG_UPDATE("65044",
                 "Unable to update OpenID4VP configuration.",
-                "Server encountered an error while updating the OpenID4VP configuration.");
+                "Server encountered an error while updating the OpenID4VP configuration."),
+
+        /**
+         * Customer Data Service (CDS) configuration errors.
+         */
+        ERROR_CODE_CDS_CONFIG_SYNC_REJECTED("60022",
+                "Unable to update CDS configuration.",
+                "The Customer Data Service rejected the configuration update. %s"),
+        ERROR_CODE_CDS_NOT_SUPPORTED("60023",
+                "CDS is not supported.",
+                "The Customer Data Service is not supported in this deployment."),
+        ERROR_CODE_CDS_CONFIG_RETRIEVE("65045",
+                "Unable to retrieve CDS configuration.",
+                "Server encountered an error while retrieving the CDS configuration."),
+        ERROR_CODE_CDS_CONFIG_UPDATE("65046",
+                "Unable to update CDS configuration.",
+                "Server encountered an error while updating the CDS configuration. %s");
 
         private final String code;
         private final String message;

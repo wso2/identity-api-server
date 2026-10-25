@@ -27,6 +27,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.factories.ConfigsApiServic
 import org.wso2.carbon.identity.api.server.configs.v1.model.ApplicationObject;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
+import org.wso2.carbon.identity.api.server.configs.v1.model.CDSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettings;
@@ -217,6 +218,30 @@ public class ConfigsApi  {
     public Response getAuthenticator(@ApiParam(value = "ID of an authenticator",required=true) @PathParam("authenticator-id") String authenticatorId) {
 
         return delegate.getAuthenticator(authenticatorId );
+    }
+
+    @Valid
+    @GET
+    @Path("/cds")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve the Customer Data Service (CDS) configuration.", notes = "Retrieve the CDS configuration of the tenant.  `cds_enabled` is the effective value. If the tenant has no value, the server-level value `[customer_data_service] enable` applies. An organization gets the value of its root organization.  <b>Scope (Permission) required:</b> `internal_config_view` ", response = CDSConfig.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Customer Data Service Configuration", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = CDSConfig.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getCDSConfiguration() {
+
+        return delegate.getCDSConfiguration();
     }
 
     @Valid
@@ -700,6 +725,30 @@ public class ConfigsApi  {
     public Response listAuthenticators(    @Valid@ApiParam(value = "Type of authenticators. Can be either 'LOCAL' or 'REQUEST_PATH' ")  @QueryParam("type") String type) {
 
         return delegate.listAuthenticators(type );
+    }
+
+    @Valid
+    @PATCH
+    @Path("/cds")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update the Customer Data Service (CDS) configuration.", notes = "Update the CDS configuration of the tenant. All fields are optional.  The server sends the new value to the Customer Data Service before it stores the value. If the Customer Data Service does not accept the value, the server does not store it.  **Note:** This operation is only allowed for root tenants and will return 403 Forbidden when called from an organization context.  <b>Scope (Permission) required:</b> `internal_config_update` ", response = CDSConfig.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Customer Data Service Configuration", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = CDSConfig.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response patchCDSConfiguration(@ApiParam(value = "" ,required=true) @Valid CDSConfig cdSConfig) {
+
+        return delegate.patchCDSConfiguration(cdSConfig );
     }
 
     @Valid

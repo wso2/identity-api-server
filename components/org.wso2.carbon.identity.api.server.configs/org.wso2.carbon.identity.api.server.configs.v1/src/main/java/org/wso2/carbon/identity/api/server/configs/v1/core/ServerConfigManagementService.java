@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2020-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -50,6 +50,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticationType;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorProperty;
+import org.wso2.carbon.identity.api.server.configs.v1.model.CDSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettings;
@@ -2655,6 +2656,89 @@ public class ServerConfigManagementService {
         } catch (FraudDetectionConfigServerException e) {
             throw handleFraudDetectionConfigException(e,
                     Constants.ErrorMessage.ERROR_CODE_FRAUD_DETECTION_CONFIG_UPDATE, null);
+        }
+    }
+
+    /**
+     * Get the Customer Data Service (CDS) configuration of the tenant.
+     * If the tenant has no value, the server-level value applies. An organization gets the value of its root
+     * organization. The CDS extensions own the value.
+     *
+     * @return CDSConfig with the effective value.
+     */
+    public CDSConfig getCDSConfiguration() {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        validateCDSSupported();
+        try {
+            return new CDSConfig().cdsEnabled(CDSConfigServiceAdapter.isCDSEnabled(tenantDomain));
+        } catch (CDSConfigServiceAdapter.CDSConfigException e) {
+            log.error("Error while retrieving the CDS configuration of the tenant: " + tenantDomain, e);
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_CDS_CONFIG_RETRIEVE, null);
+        }
+    }
+
+    /**
+     * Update the Customer Data Service (CDS) configuration of the tenant.
+     * The CDS extensions send the new value to CDS first. If CDS does not accept the value, the value is not stored.
+     *
+     * @param cdsConfig CDS configuration to update. All fields are optional.
+     * @return CDSConfig with the effective value.
+     */
+    public CDSConfig patchCDSConfiguration(CDSConfig cdsConfig) {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        validateCDSSupported();
+        try {
+            if (OrganizationManagementUtil.isOrganization(tenantDomain)) {
+                throw handleException(Response.Status.FORBIDDEN,
+                        Constants.ErrorMessage.ERROR_CODE_CONFIG_UPDATE_NOT_ALLOWED, null);
+            }
+        } catch (OrganizationManagementException e) {
+            log.error("Error while checking whether the tenant: " + tenantDomain + " is an organization.", e);
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_CDS_CONFIG_UPDATE,
+                    "Unable to check whether the tenant is an organization.");
+        }
+
+        if (cdsConfig == null || cdsConfig.getCdsEnabled() == null) {
+            return getCDSConfiguration();
+        }
+        boolean cdsEnabled = cdsConfig.getCdsEnabled();
+        try {
+            CDSConfigServiceAdapter.updateCDSEnabled(tenantDomain, cdsEnabled);
+        } catch (CDSConfigServiceAdapter.CDSConfigException e) {
+            String details = StringUtils.isNotBlank(e.getMessage()) ? e.getMessage() : "No details are available.";
+            if (e.isClientError()) {
+                throw handleException(Response.Status.BAD_REQUEST,
+                        Constants.ErrorMessage.ERROR_CODE_CDS_CONFIG_SYNC_REJECTED, details);
+            }
+            log.error("Error while updating the CDS configuration of the tenant: " + tenantDomain, e);
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_CDS_CONFIG_UPDATE, details);
+        }
+        return new CDSConfig().cdsEnabled(cdsEnabled);
+    }
+
+    /**
+     * Check that the CDS extensions are in the pack and that their service is active.
+     */
+    private void validateCDSSupported() {
+
+        boolean supported;
+        try {
+            supported = CDSConfigServiceAdapter.isServiceAvailable();
+        } catch (NoClassDefFoundError e) {
+            // The CDS extensions are not in the pack.
+            if (log.isDebugEnabled()) {
+                log.debug("The CDS config service classes are not available.", e);
+            }
+            supported = false;
+        }
+        if (!supported) {
+            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage.ERROR_CODE_CDS_NOT_SUPPORTED,
+                    null);
         }
     }
 
