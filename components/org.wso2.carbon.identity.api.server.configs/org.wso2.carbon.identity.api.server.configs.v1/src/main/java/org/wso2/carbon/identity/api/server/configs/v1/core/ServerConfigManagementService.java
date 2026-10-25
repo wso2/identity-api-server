@@ -115,21 +115,13 @@ import org.wso2.carbon.identity.configuration.mgt.core.exception.ConfigurationMa
 import org.wso2.carbon.identity.configuration.mgt.core.exception.ConfigurationManagementException;
 import org.wso2.carbon.identity.configuration.mgt.core.model.Attribute;
 import org.wso2.carbon.identity.configuration.mgt.core.model.Resource;
-import org.wso2.carbon.identity.configuration.mgt.core.model.ResourceAdd;
-import org.wso2.carbon.identity.configuration.mgt.core.model.ResourceTypeAdd;
 import org.wso2.carbon.identity.core.ServiceURLBuilder;
 import org.wso2.carbon.identity.core.URLBuilderException;
-import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
-import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceClientException;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceException;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceServerException;
 import org.wso2.carbon.identity.cors.mgt.core.model.CORSConfiguration;
-import org.wso2.carbon.identity.event.IdentityEventClientException;
-import org.wso2.carbon.identity.event.IdentityEventConstants;
-import org.wso2.carbon.identity.event.IdentityEventException;
-import org.wso2.carbon.identity.event.event.Event;
 import org.wso2.carbon.identity.fraud.detection.core.exception.FraudDetectionConfigClientException;
 import org.wso2.carbon.identity.fraud.detection.core.exception.FraudDetectionConfigServerException;
 import org.wso2.carbon.identity.fraud.detection.core.exception.IdentityFraudDetectionException;
@@ -207,7 +199,6 @@ import static org.wso2.carbon.identity.api.server.configs.common.Constants.Error
 import static org.wso2.carbon.identity.api.server.configs.common.Constants.PATH_SEPERATOR;
 import static org.wso2.carbon.identity.configuration.mgt.core.constant.ConfigurationConstants.ErrorMessages.ERROR_CODE_DEFAULT_RESOLVER_DOES_NOT_EXISTS;
 import static org.wso2.carbon.identity.configuration.mgt.core.constant.ConfigurationConstants.ErrorMessages.ERROR_CODE_RESOURCE_DOES_NOT_EXISTS;
-import static org.wso2.carbon.identity.configuration.mgt.core.constant.ConfigurationConstants.ErrorMessages.ERROR_CODE_RESOURCE_TYPE_ALREADY_EXISTS;
 import static org.wso2.carbon.identity.configuration.mgt.core.constant.ConfigurationConstants.ErrorMessages.ERROR_CODE_RESOURCE_TYPE_DOES_NOT_EXISTS;
 
 /**
@@ -2671,32 +2662,26 @@ public class ServerConfigManagementService {
     /**
      * Get the Customer Data Service (CDS) configuration of the tenant.
      * If the tenant has no value, the server-level value applies. An organization gets the value of its root
-     * organization.
+     * organization. The CDS extensions own the value.
      *
      * @return CDSConfig with the effective value.
      */
     public CDSConfig getCDSConfiguration() {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        validateCDSSupported();
         try {
-            String rootTenantDomain = tenantDomain;
-            if (OrganizationManagementUtil.isOrganization(tenantDomain)) {
-                rootTenantDomain = OrganizationManagementUtil.getRootOrgTenantDomainBySubOrgTenantDomain(tenantDomain);
-            }
-            return new CDSConfig().cdsEnabled(isCDSEnabled(rootTenantDomain));
-        } catch (OrganizationManagementException e) {
-            log.error("Error while resolving the root organization of the tenant: " + tenantDomain, e);
+            return new CDSConfig().cdsEnabled(CDSConfigServiceAdapter.isCDSEnabled(tenantDomain));
+        } catch (CDSConfigServiceAdapter.CDSConfigException e) {
+            log.error("Error while retrieving the CDS configuration of the tenant: " + tenantDomain, e);
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     Constants.ErrorMessage.ERROR_CODE_CDS_CONFIG_RETRIEVE, null);
-        } catch (ConfigurationManagementException e) {
-            throw handleConfigMgtException(e, Constants.ErrorMessage.ERROR_CODE_CDS_CONFIG_RETRIEVE, null);
         }
     }
 
     /**
      * Update the Customer Data Service (CDS) configuration of the tenant.
-     * The new value goes to CDS first, through the PRE_UPDATE_CDS_CONFIG event. If CDS does not accept the value,
-     * the value is not stored.
+     * The CDS extensions send the new value to CDS first. If CDS does not accept the value, the value is not stored.
      *
      * @param cdsConfig CDS configuration to update. All fields are optional.
      * @return CDSConfig with the effective value.
@@ -2704,6 +2689,7 @@ public class ServerConfigManagementService {
     public CDSConfig patchCDSConfiguration(CDSConfig cdsConfig) {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        validateCDSSupported();
         try {
             if (OrganizationManagementUtil.isOrganization(tenantDomain)) {
                 throw handleException(Response.Status.FORBIDDEN,
@@ -2712,101 +2698,47 @@ public class ServerConfigManagementService {
         } catch (OrganizationManagementException e) {
             log.error("Error while checking whether the tenant: " + tenantDomain + " is an organization.", e);
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
-                    Constants.ErrorMessage.ERROR_CODE_CDS_CONFIG_UPDATE, null);
+                    Constants.ErrorMessage.ERROR_CODE_CDS_CONFIG_UPDATE,
+                    "Unable to check whether the tenant is an organization.");
         }
 
         if (cdsConfig == null || cdsConfig.getCdsEnabled() == null) {
             return getCDSConfiguration();
         }
         boolean cdsEnabled = cdsConfig.getCdsEnabled();
-        publishPreUpdateCDSConfigEvent(tenantDomain, cdsEnabled);
         try {
-            storeCDSEnabled(cdsEnabled);
-        } catch (ConfigurationManagementException e) {
-            throw handleConfigMgtException(e, Constants.ErrorMessage.ERROR_CODE_CDS_CONFIG_UPDATE, null);
+            CDSConfigServiceAdapter.updateCDSEnabled(tenantDomain, cdsEnabled);
+        } catch (CDSConfigServiceAdapter.CDSConfigException e) {
+            String details = StringUtils.isNotBlank(e.getMessage()) ? e.getMessage() : "No details are available.";
+            if (e.isClientError()) {
+                throw handleException(Response.Status.BAD_REQUEST,
+                        Constants.ErrorMessage.ERROR_CODE_CDS_CONFIG_SYNC_REJECTED, details);
+            }
+            log.error("Error while updating the CDS configuration of the tenant: " + tenantDomain, e);
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_CDS_CONFIG_UPDATE, details);
         }
         return new CDSConfig().cdsEnabled(cdsEnabled);
     }
 
-    private boolean isCDSEnabled(String tenantDomain) throws ConfigurationManagementException {
+    /**
+     * Check that the CDS extensions are in the pack and that their service is active.
+     */
+    private void validateCDSSupported() {
 
-        Resource resource = null;
+        boolean supported;
         try {
-            resource = ConfigsServiceHolder.getConfigurationManager().getResourceByTenantId(
-                    IdentityTenantUtil.getTenantId(tenantDomain), Constants.CDS_CONFIG_RESOURCE_TYPE,
-                    Constants.CDS_CONFIG_RESOURCE_NAME);
-        } catch (ConfigurationManagementException e) {
-            if (!isResourceNotExistsError(e)) {
-                throw e;
+            supported = CDSConfigServiceAdapter.isServiceAvailable();
+        } catch (NoClassDefFoundError e) {
+            // The CDS extensions are not in the pack.
+            if (log.isDebugEnabled()) {
+                log.debug("The CDS config service classes are not available.", e);
             }
+            supported = false;
         }
-        if (resource != null && resource.getAttributes() != null) {
-            for (Attribute attribute : resource.getAttributes()) {
-                if (Constants.CDS_CONFIG_ENABLED_ATTRIBUTE.equals(attribute.getKey())) {
-                    return Boolean.parseBoolean(attribute.getValue());
-                }
-            }
-        }
-        // The tenant has no value. The server-level value applies.
-        return Boolean.parseBoolean(IdentityUtil.getProperty(Constants.CDS_ENABLE_SERVER_CONFIG));
-    }
-
-    private void publishPreUpdateCDSConfigEvent(String tenantDomain, boolean cdsEnabled) {
-
-        Map<String, Object> properties = new HashMap<>();
-        properties.put(IdentityEventConstants.EventProperty.TENANT_DOMAIN, tenantDomain);
-        properties.put(Constants.CDS_ENABLED_EVENT_PROPERTY, cdsEnabled);
-        try {
-            ConfigsServiceHolder.getIdentityEventService().handleEvent(
-                    new Event(Constants.PRE_UPDATE_CDS_CONFIG_EVENT, properties));
-        } catch (IdentityEventClientException e) {
-            throw handleException(Response.Status.BAD_REQUEST,
-                    Constants.ErrorMessage.ERROR_CODE_CDS_CONFIG_SYNC_REJECTED, getEventErrorDetails(e));
-        } catch (IdentityEventException e) {
-            log.error("Error while sending the CDS configuration of the tenant: " + tenantDomain +
-                    " to the Customer Data Service.", e);
-            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
-                    Constants.ErrorMessage.ERROR_CODE_CDS_CONFIG_SYNC, getEventErrorDetails(e));
-        }
-    }
-
-    private String getEventErrorDetails(IdentityEventException e) {
-
-        return StringUtils.isNotBlank(e.getMessage()) ? e.getMessage() : "No details are available.";
-    }
-
-    private void storeCDSEnabled(boolean cdsEnabled) throws ConfigurationManagementException {
-
-        ResourceAdd resourceAdd = new ResourceAdd();
-        resourceAdd.setName(Constants.CDS_CONFIG_RESOURCE_NAME);
-        resourceAdd.setAttributes(Collections.singletonList(
-                new Attribute(Constants.CDS_CONFIG_ENABLED_ATTRIBUTE, String.valueOf(cdsEnabled))));
-
-        ConfigurationManager configurationManager = ConfigsServiceHolder.getConfigurationManager();
-        try {
-            configurationManager.replaceResource(Constants.CDS_CONFIG_RESOURCE_TYPE, resourceAdd);
-        } catch (ConfigurationManagementException e) {
-            if (!ERROR_CODE_RESOURCE_TYPE_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode())) {
-                throw e;
-            }
-            // The resource type is created on the first update.
-            addCDSConfigResourceType(configurationManager);
-            configurationManager.replaceResource(Constants.CDS_CONFIG_RESOURCE_TYPE, resourceAdd);
-        }
-    }
-
-    private void addCDSConfigResourceType(ConfigurationManager configurationManager)
-            throws ConfigurationManagementException {
-
-        ResourceTypeAdd resourceType = new ResourceTypeAdd();
-        resourceType.setName(Constants.CDS_CONFIG_RESOURCE_TYPE);
-        resourceType.setDescription("Resource type for the Customer Data Service configuration.");
-        try {
-            configurationManager.addResourceType(resourceType);
-        } catch (ConfigurationManagementException e) {
-            if (!ERROR_CODE_RESOURCE_TYPE_ALREADY_EXISTS.getCode().equals(e.getErrorCode())) {
-                throw e;
-            }
+        if (!supported) {
+            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage.ERROR_CODE_CDS_NOT_SUPPORTED,
+                    null);
         }
     }
 

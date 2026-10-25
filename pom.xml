@@ -652,9 +652,9 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.identity.framework</groupId>
-                <artifactId>org.wso2.carbon.identity.event</artifactId>
-                <version>${carbon.identity.framework.version}</version>
+                <groupId>org.wso2.identity.customer.data.service</groupId>
+                <artifactId>org.wso2.identity.customer.data.service.client</artifactId>
+                <version>${identity.customer.data.service.extensions.version}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
@@ -1169,6 +1169,7 @@
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
         <identity.governance.version>1.11.103</identity.governance.version>
+        <identity.customer.data.service.extensions.version>0.1.13-SNAPSHOT</identity.customer.data.service.extensions.version>
         <carbon.identity.framework.version>7.11.213</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
         <spotbugs.maven.plugin.version>4.9.8.2</spotbugs.maven.plugin.version>
