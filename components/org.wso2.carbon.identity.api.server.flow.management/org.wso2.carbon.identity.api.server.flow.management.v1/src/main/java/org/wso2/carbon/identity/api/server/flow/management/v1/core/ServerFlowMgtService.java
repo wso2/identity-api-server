@@ -33,7 +33,9 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionUpdat
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRequest;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRuleMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Step;
+import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.AbstractMetaResponseHandler;
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.AskPasswordFlowMetaHandler;
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.PasswordRecoveryFlowMetaHandler;
@@ -48,12 +50,15 @@ import org.wso2.carbon.identity.flow.mgt.FlowMgtService;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtFrameworkException;
 import org.wso2.carbon.identity.flow.mgt.model.FlowConfigDTO;
 import org.wso2.carbon.identity.flow.mgt.model.FlowDTO;
+import org.wso2.carbon.identity.flow.mgt.utils.FlowMgtUtils;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils.collectFlowData;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils.validateExecutors;
@@ -118,6 +123,26 @@ public class ServerFlowMgtService {
         Utils.validateFlowType(flowType);
         AbstractMetaResponseHandler metaResponseHandler = resolveHandler(flowType);
         return metaResponseHandler.createResponse();
+    }
+
+    /**
+     * Retrieve the condition metadata of a flow type: the fields its decision steps' conditions can use, and the
+     * limits they are validated against.
+     *
+     * @param flowType Type of the flow.
+     * @return FlowRuleMetaResponse containing the condition metadata.
+     */
+    public FlowRuleMetaResponse getFlowRuleMeta(String flowType) {
+
+        Utils.validateFlowType(flowType);
+        if (!FlowMgtUtils.isConditionalBranchingEnabled()) {
+            FlowEndpointConstants.ErrorMessages error =
+                    FlowEndpointConstants.ErrorMessages.ERROR_CODE_FLOW_RULE_META_NOT_IMPLEMENTED;
+            throw Utils.handleException(Response.Status.NOT_IMPLEMENTED,
+                    FlowEndpointConstants.FLOW_PREFIX + error.getCode(), error.getMessage(), error.getDescription());
+        }
+        AbstractMetaResponseHandler metaResponseHandler = resolveHandler(flowType);
+        return metaResponseHandler.createRuleMetaResponse();
     }
 
     /**

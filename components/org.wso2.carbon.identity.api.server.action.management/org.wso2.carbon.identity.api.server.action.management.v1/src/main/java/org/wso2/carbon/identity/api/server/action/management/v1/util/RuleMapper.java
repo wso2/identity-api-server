@@ -65,7 +65,7 @@ public class RuleMapper {
             for (Expression expression : expressionList) {
                 ExpressionResponse expressionResponse = new ExpressionResponse().field(expression.getField())
                         .operator(expression.getOperator())
-                        .value(expression.getValue().getFieldValue());
+                        .value(expression.getValue() == null ? null : expression.getValue().getFieldValue());
                 expressionResponseList.add(expressionResponse);
             }
             ANDRuleResponse andRuleResponse =

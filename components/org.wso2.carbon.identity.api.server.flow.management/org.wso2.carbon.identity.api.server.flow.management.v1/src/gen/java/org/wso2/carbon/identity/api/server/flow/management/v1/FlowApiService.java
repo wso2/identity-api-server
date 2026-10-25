@@ -37,6 +37,7 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateRespon
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateResult;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowGenerateStatus;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRuleMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRequest;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowResponse;
 import javax.ws.rs.core.Response;
@@ -69,6 +70,8 @@ public interface FlowApiService {
       public Response getFlowGenerationStatus(String operationId);
 
       public Response getFlowMeta(String flowType);
+
+      public Response getFlowRuleMeta(String flowType);
 
       public Response updateFlow(FlowRequest flowRequest);
 
