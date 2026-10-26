@@ -30,6 +30,7 @@ import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyRequest;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyResponse;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyUpdateRequest;
 import org.wso2.carbon.identity.api.server.policy.v1.util.PolicyManagementAPIErrorBuilder;
+import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.policy.management.api.exception.PolicyManagementException;
 import org.wso2.carbon.identity.policy.management.api.model.Policy;
 import org.wso2.carbon.identity.policy.management.api.model.PolicyBasicInfo;
@@ -63,6 +64,7 @@ public class PolicyManagementService {
      */
     public PolicyResponse addPolicy(PolicyRequest policyRequest) {
 
+        validateApiEnabled();
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             Policy policy = PolicyBuilder.buildPolicy(policyRequest, tenantDomain);
@@ -82,6 +84,7 @@ public class PolicyManagementService {
      */
     public PolicyResponse getPolicyById(String policyId) {
 
+        validateApiEnabled();
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             Policy policy = policyManagementService.getPolicyById(policyId, tenantDomain);
@@ -105,6 +108,7 @@ public class PolicyManagementService {
      */
     public PolicyResponse updatePolicy(String policyId, PolicyUpdateRequest policyUpdateRequest) {
 
+        validateApiEnabled();
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             Policy policy = PolicyBuilder.buildUpdatingPolicy(policyUpdateRequest, policyId, tenantDomain);
@@ -123,6 +127,7 @@ public class PolicyManagementService {
      */
     public void deletePolicy(String policyId) {
 
+        validateApiEnabled();
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             policyManagementService.deletePolicy(policyId, tenantDomain);
@@ -142,6 +147,7 @@ public class PolicyManagementService {
      */
     public PolicyListResponse getPoliciesBasicInfo(Integer limit, Integer offset, String filter) {
 
+        validateApiEnabled();
         int resolvedLimit = limit != null ? limit : DEFAULT_LIMIT;
         int resolvedOffset = offset != null ? offset : DEFAULT_OFFSET;
         validatePaginationParameters(resolvedLimit, resolvedOffset);
@@ -189,6 +195,20 @@ public class PolicyManagementService {
         if (limit < 1 || offset < 0) {
             throw PolicyManagementAPIErrorBuilder.handleException(Response.Status.BAD_REQUEST,
                     Constants.ErrorMessage.ERROR_CODE_INVALID_PAGINATION);
+        }
+    }
+
+    /**
+     * Rejects the request when the device management APIs are disabled via the
+     * {@value Constants#DISABLE_DEVICE_MANAGEMENT_APIS} config. The APIs stay disabled unless the config is
+     * explicitly set to false.
+     */
+    private void validateApiEnabled() {
+
+        String disableApis = IdentityUtil.getProperty(Constants.DISABLE_DEVICE_MANAGEMENT_APIS);
+        if (disableApis == null || disableApis.trim().isEmpty() || Boolean.parseBoolean(disableApis)) {
+            throw PolicyManagementAPIErrorBuilder.handleException(Response.Status.NOT_FOUND,
+                    Constants.ErrorMessage.ERROR_CODE_API_DISABLED);
         }
     }
 }

@@ -30,6 +30,7 @@ import org.wso2.carbon.identity.api.server.device.mgt.v1.model.DeviceListLink;
 import org.wso2.carbon.identity.api.server.device.mgt.v1.model.DeviceListResponse;
 import org.wso2.carbon.identity.api.server.device.mgt.v1.model.DevicePatchRequest;
 import org.wso2.carbon.identity.api.server.device.mgt.v1.model.DeviceResponse;
+import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.device.mgt.api.constant.ErrorMessage;
 import org.wso2.carbon.identity.device.mgt.api.exception.DeviceMgtClientException;
 import org.wso2.carbon.identity.device.mgt.api.exception.DeviceMgtException;
@@ -70,6 +71,7 @@ public class DeviceManagementApiService {
      */
     public DeviceListResponse listDevices(Integer limit, Integer offset, String userId) {
 
+        validateApiEnabled();
         int resolvedLimit = limit != null ? limit : DEFAULT_LIMIT;
         int resolvedOffset = offset != null ? offset : DEFAULT_OFFSET;
         validatePaginationParameters(resolvedLimit, resolvedOffset);
@@ -101,6 +103,23 @@ public class DeviceManagementApiService {
                     .links(links);
         } catch (DeviceMgtException e) {
             throw handleException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_DEVICES);
+        }
+    }
+
+    /**
+     * Rejects the request when the device management APIs are disabled via the
+     * {@value Constants#DISABLE_DEVICE_MANAGEMENT_APIS} config. The APIs stay disabled unless the config is
+     * explicitly set to false.
+     */
+    private void validateApiEnabled() {
+
+        String disableApis = IdentityUtil.getProperty(Constants.DISABLE_DEVICE_MANAGEMENT_APIS);
+        if (StringUtils.isBlank(disableApis) || Boolean.parseBoolean(disableApis)) {
+            throw new APIError(Response.Status.NOT_FOUND, new ErrorResponse.Builder()
+                    .withCode(Constants.ErrorMessage.ERROR_CODE_API_DISABLED.code())
+                    .withMessage(Constants.ErrorMessage.ERROR_CODE_API_DISABLED.message())
+                    .withDescription(Constants.ErrorMessage.ERROR_CODE_API_DISABLED.description())
+                    .build(LOG, "Device management API is disabled."));
         }
     }
 
@@ -184,6 +203,7 @@ public class DeviceManagementApiService {
      */
     public DeviceResponse getDevice(String deviceId) {
 
+        validateApiEnabled();
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             Device device = deviceManagementService.getDeviceById(deviceId, tenantDomain);
@@ -210,6 +230,7 @@ public class DeviceManagementApiService {
      */
     public DeviceResponse updateDeviceName(String deviceId, DevicePatchRequest patchRequest) {
 
+        validateApiEnabled();
         validateDeviceName(patchRequest);
 
         try {
@@ -241,6 +262,7 @@ public class DeviceManagementApiService {
      */
     public void deleteDevice(String deviceId) {
 
+        validateApiEnabled();
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             deviceManagementService.deleteDevice(deviceId, tenantDomain);
