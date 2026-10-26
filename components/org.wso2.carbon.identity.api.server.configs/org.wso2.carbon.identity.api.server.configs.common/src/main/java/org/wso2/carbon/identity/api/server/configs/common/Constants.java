@@ -56,6 +56,11 @@ public class Constants {
     public static final String CARBON = "carbon";
 
     /**
+     * Server-level property of the Customer Data Service (CDS) feature ([customer_data_service] enable).
+     */
+    public static final String CDS_ENABLE_PROPERTY = "CustomerDataService.Enable";
+
+    /**
      * PATCH operation path for Private Key JWT Validation configuration.
      */
     public static final String PRIVATE_KEY_JWT_VALIDATION_CONFIG_TOKEN_REUSE = "/enableTokenReuse";
@@ -356,15 +361,18 @@ public class Constants {
         ERROR_CODE_CDS_CONFIG_SYNC_REJECTED("60022",
                 "Unable to update CDS configuration.",
                 "The Customer Data Service rejected the configuration update. %s"),
-        ERROR_CODE_CDS_NOT_SUPPORTED("60023",
-                "CDS is not supported.",
-                "The Customer Data Service is not supported in this deployment."),
+        ERROR_CODE_CDS_NOT_ENABLED("60023",
+                "CDS is not enabled.",
+                "The Customer Data Service is not enabled for the server."),
         ERROR_CODE_CDS_CONFIG_RETRIEVE("65045",
                 "Unable to retrieve CDS configuration.",
                 "Server encountered an error while retrieving the CDS configuration."),
         ERROR_CODE_CDS_CONFIG_UPDATE("65046",
                 "Unable to update CDS configuration.",
-                "Server encountered an error while updating the CDS configuration. %s");
+                "Server encountered an error while updating the CDS configuration. %s"),
+        ERROR_CODE_CDS_CONFIG_SERVICE_UNAVAILABLE("65047",
+                "Unable to process CDS configuration.",
+                "The CDS configuration service is not available.");
 
         private final String code;
         private final String message;

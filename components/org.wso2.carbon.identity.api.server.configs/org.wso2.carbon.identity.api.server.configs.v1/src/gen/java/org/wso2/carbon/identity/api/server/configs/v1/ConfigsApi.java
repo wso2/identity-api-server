@@ -225,7 +225,7 @@ public class ConfigsApi  {
     @Path("/cds")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve the Customer Data Service (CDS) configuration.", notes = "Retrieve the CDS configuration of the tenant.  `cds_enabled` is the effective value. If the tenant has no value, the server-level value `[customer_data_service] enable` applies. An organization gets the value of its root organization.  <b>Scope (Permission) required:</b> `internal_config_view` ", response = CDSConfig.class, authorizations = {
+    @ApiOperation(value = "Retrieve the Customer Data Service (CDS) configuration.", notes = "Retrieve the CDS configuration of the tenant.  `cds_enabled` is the effective value. CDS is enabled for the tenant only if the server-level value `[customer_data_service] enable` is true and the tenant value is true. If the tenant has no value, CDS is not enabled for the tenant. An organization gets the value of its root organization.  If CDS is not enabled for the server, this operation returns 400 Bad Request.  <b>Scope (Permission) required:</b> `internal_config_view` ", response = CDSConfig.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -732,7 +732,7 @@ public class ConfigsApi  {
     @Path("/cds")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update the Customer Data Service (CDS) configuration.", notes = "Update the CDS configuration of the tenant. All fields are optional.  The server sends the new value to the Customer Data Service before it stores the value. If the Customer Data Service does not accept the value, the server does not store it.  **Note:** This operation is only allowed for root tenants and will return 403 Forbidden when called from an organization context.  <b>Scope (Permission) required:</b> `internal_config_update` ", response = CDSConfig.class, authorizations = {
+    @ApiOperation(value = "Update the Customer Data Service (CDS) configuration.", notes = "Update the CDS configuration of the tenant. All fields are optional.  The server sends the new value to the Customer Data Service before it stores the value. If the Customer Data Service does not accept the value, the server does not store it.  **Note:** This operation is only allowed for root tenants and will return 403 Forbidden when called from an organization context.  If CDS is not enabled for the server (`[customer_data_service] enable`), this operation returns 400 Bad Request.  <b>Scope (Permission) required:</b> `internal_config_update` ", response = CDSConfig.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             

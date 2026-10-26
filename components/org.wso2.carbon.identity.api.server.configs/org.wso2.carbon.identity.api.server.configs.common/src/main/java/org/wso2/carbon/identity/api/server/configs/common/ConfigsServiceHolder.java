@@ -38,6 +38,7 @@ import org.wso2.carbon.identity.openid4vc.presentation.core.service.Presentation
 import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 import org.wso2.carbon.idp.mgt.IdpManager;
 import org.wso2.carbon.logging.service.RemoteLoggingConfigService;
+import org.wso2.identity.cds.client.config.CDSConfigService;
 
 /**
  * Service holder class for server configuration related services.
@@ -163,6 +164,17 @@ public class ConfigsServiceHolder {
         static final PresentationConfigMgtService SERVICE =
                 (PresentationConfigMgtService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                         .getOSGiService(PresentationConfigMgtService.class, null);
+    }
+
+    /**
+     * The CDS extensions are optional. If they are not in the pack, the first access to this class gives
+     * NoClassDefFoundError.
+     */
+    private static class CDSConfigServiceHolder {
+
+        static final CDSConfigService SERVICE =
+                (CDSConfigService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(CDSConfigService.class, null);
     }
 
     /**
@@ -343,5 +355,16 @@ public class ConfigsServiceHolder {
     public static PresentationConfigMgtService getPresentationConfigMgtService() {
 
         return PresentationConfigMgtServiceHolder.SERVICE;
+    }
+
+    /**
+     * Get CDSConfigService osgi service. The CDS extensions register this service.
+     *
+     * @return CDSConfigService, or null if the service is not active.
+     * @throws NoClassDefFoundError If the CDS extensions are not in the pack.
+     */
+    public static CDSConfigService getCDSConfigService() {
+
+        return CDSConfigServiceHolder.SERVICE;
     }
 }

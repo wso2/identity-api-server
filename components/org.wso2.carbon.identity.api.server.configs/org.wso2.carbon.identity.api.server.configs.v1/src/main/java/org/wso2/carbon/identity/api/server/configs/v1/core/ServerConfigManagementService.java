@@ -36,6 +36,7 @@ import org.wso2.carbon.identity.api.server.configs.common.AllowedConfigList;
 import org.wso2.carbon.identity.api.server.configs.common.ConfigsServiceHolder;
 import org.wso2.carbon.identity.api.server.configs.common.Constants;
 import org.wso2.carbon.identity.api.server.configs.common.SchemaConfigParser;
+import org.wso2.carbon.identity.api.server.configs.v1.exception.CDSConfigException;
 import org.wso2.carbon.identity.api.server.configs.v1.exception.JWTClientAuthenticatorException;
 import org.wso2.carbon.identity.api.server.configs.v1.function.CORSConfigurationToCORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.function.CompatibilitySettingUtil;
@@ -117,6 +118,7 @@ import org.wso2.carbon.identity.configuration.mgt.core.model.Attribute;
 import org.wso2.carbon.identity.configuration.mgt.core.model.Resource;
 import org.wso2.carbon.identity.core.ServiceURLBuilder;
 import org.wso2.carbon.identity.core.URLBuilderException;
+import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceClientException;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceException;
@@ -2661,18 +2663,19 @@ public class ServerConfigManagementService {
 
     /**
      * Get the Customer Data Service (CDS) configuration of the tenant.
-     * If the tenant has no value, the server-level value applies. An organization gets the value of its root
-     * organization. The CDS extensions own the value.
+     * CDS is enabled for a tenant only if it is enabled for the server and the tenant value is true. If the tenant
+     * has no value, CDS is not enabled for the tenant. An organization gets the value of its root organization.
+     * The CDS extensions own the value.
      *
      * @return CDSConfig with the effective value.
      */
     public CDSConfig getCDSConfiguration() {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
-        validateCDSSupported();
+        validateCDSEnabled();
         try {
-            return new CDSConfig().cdsEnabled(CDSConfigServiceAdapter.isCDSEnabled(tenantDomain));
-        } catch (CDSConfigServiceAdapter.CDSConfigException e) {
+            return new CDSConfig().cdsEnabled(ServerCDSConfigManager.isCDSEnabled(tenantDomain));
+        } catch (CDSConfigException e) {
             log.error("Error while retrieving the CDS configuration of the tenant: " + tenantDomain, e);
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     Constants.ErrorMessage.ERROR_CODE_CDS_CONFIG_RETRIEVE, null);
@@ -2689,7 +2692,7 @@ public class ServerConfigManagementService {
     public CDSConfig patchCDSConfiguration(CDSConfig cdsConfig) {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
-        validateCDSSupported();
+        validateCDSEnabled();
         try {
             if (OrganizationManagementUtil.isOrganization(tenantDomain)) {
                 throw handleException(Response.Status.FORBIDDEN,
@@ -2707,8 +2710,8 @@ public class ServerConfigManagementService {
         }
         boolean cdsEnabled = cdsConfig.getCdsEnabled();
         try {
-            CDSConfigServiceAdapter.updateCDSEnabled(tenantDomain, cdsEnabled);
-        } catch (CDSConfigServiceAdapter.CDSConfigException e) {
+            ServerCDSConfigManager.updateCDSEnabled(tenantDomain, cdsEnabled);
+        } catch (CDSConfigException e) {
             String details = StringUtils.isNotBlank(e.getMessage()) ? e.getMessage() : "No details are available.";
             if (e.isClientError()) {
                 throw handleException(Response.Status.BAD_REQUEST,
@@ -2722,23 +2725,27 @@ public class ServerConfigManagementService {
     }
 
     /**
-     * Check that the CDS extensions are in the pack and that their service is active.
+     * Check that CDS is enabled for the server. If it is enabled, check that the CDS extensions are in the pack and
+     * that their service is active.
      */
-    private void validateCDSSupported() {
+    private void validateCDSEnabled() {
 
-        boolean supported;
-        try {
-            supported = CDSConfigServiceAdapter.isServiceAvailable();
-        } catch (NoClassDefFoundError e) {
-            // The CDS extensions are not in the pack.
-            if (log.isDebugEnabled()) {
-                log.debug("The CDS config service classes are not available.", e);
-            }
-            supported = false;
-        }
-        if (!supported) {
-            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage.ERROR_CODE_CDS_NOT_SUPPORTED,
+        if (!Boolean.parseBoolean(IdentityUtil.getProperty(Constants.CDS_ENABLE_PROPERTY))) {
+            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage.ERROR_CODE_CDS_NOT_ENABLED,
                     null);
+        }
+        boolean serviceAvailable;
+        try {
+            serviceAvailable = ServerCDSConfigManager.isServiceAvailable();
+        } catch (NoClassDefFoundError e) {
+            log.error("CDS is enabled for the server, but the CDS extensions are not in the pack.", e);
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_CDS_CONFIG_SERVICE_UNAVAILABLE, null);
+        }
+        if (!serviceAvailable) {
+            log.error("CDS is enabled for the server, but the CDS config service is not active.");
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_CDS_CONFIG_SERVICE_UNAVAILABLE, null);
         }
     }
 
