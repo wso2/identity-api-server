@@ -93,7 +93,7 @@ public class FlowApi  {
         @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
         @ApiResponse(code = 500, message = "Encountered a server error", response = Error.class)
     })
-    public Response deleteFlow(    @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Type of the flow to delete",required=true, allowableValues="REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD")  @QueryParam("flowType") String flowType) {
+    public Response deleteFlow(    @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Type of the flow to delete",required=true, allowableValues="REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD, DEVICE_REGISTRATION")  @QueryParam("flowType") String flowType) {
 
         return delegate.deleteFlow(flowType );
     }
@@ -161,7 +161,7 @@ public class FlowApi  {
         @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
         @ApiResponse(code = 404, message = "Flow of specified type not found", response = Error.class)
     })
-    public Response getFlow(    @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Type of the flow to retrieve",required=true, allowableValues="REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD")  @QueryParam("flowType") String flowType) {
+    public Response getFlow(    @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Type of the flow to retrieve",required=true, allowableValues="REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD, DEVICE_REGISTRATION")  @QueryParam("flowType") String flowType) {
 
         return delegate.getFlow(flowType );
     }
@@ -183,7 +183,7 @@ public class FlowApi  {
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Error.class)
     })
-    public Response getFlowConfigForFlow(    @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Type of the flow to get configurations for",required=true, allowableValues="REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD")  @QueryParam("flowType") String flowType) {
+    public Response getFlowConfigForFlow(    @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Type of the flow to get configurations for",required=true, allowableValues="REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD, DEVICE_REGISTRATION")  @QueryParam("flowType") String flowType) {
 
         return delegate.getFlowConfigForFlow(flowType );
     }
@@ -249,7 +249,7 @@ public class FlowApi  {
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Error.class)
     })
-    public Response getFlowExtensionContext(    @Valid@ApiParam(value = "Optional flow type. When omitted, the default tree is returned.", allowableValues="REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION, ASK_PASSWORD")  @QueryParam("flowType") String flowType) {
+    public Response getFlowExtensionContext(    @Valid@ApiParam(value = "Optional flow type. When omitted, the default tree is returned.", allowableValues="REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION, ASK_PASSWORD, DEVICE_REGISTRATION")  @QueryParam("flowType") String flowType) {
 
         return delegate.getFlowExtensionContext(flowType );
     }
@@ -340,7 +340,7 @@ public class FlowApi  {
         @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
         @ApiResponse(code = 404, message = "Metadata for specified flow type not found", response = Error.class)
     })
-    public Response getFlowMeta(    @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Type of the flow to get metadata for",required=true, allowableValues="REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD")  @QueryParam("flowType") String flowType) {
+    public Response getFlowMeta(    @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Type of the flow to get metadata for",required=true, allowableValues="REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD, DEVICE_REGISTRATION")  @QueryParam("flowType") String flowType) {
 
         return delegate.getFlowMeta(flowType );
     }
