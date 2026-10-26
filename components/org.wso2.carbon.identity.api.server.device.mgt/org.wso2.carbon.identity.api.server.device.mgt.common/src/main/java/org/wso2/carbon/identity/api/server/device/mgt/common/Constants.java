@@ -38,6 +38,9 @@ public class Constants {
     public static final String PAGE_LINK_REL_NEXT = "next";
     public static final String PAGE_LINK_REL_PREVIOUS = "previous";
 
+    // Identity config that disables the device management APIs.
+    public static final String DISABLE_DEVICE_MANAGEMENT_APIS = "DeviceManagement.DisableAPIs";
+
     /**
      * Error messages for the device management API.
      */
@@ -46,6 +49,9 @@ public class Constants {
         ERROR_CODE_DEVICE_NOT_FOUND("60001",
                 "Device not found.",
                 "No device found for the given device id: %s."),
+        ERROR_CODE_API_DISABLED("60002",
+                "Device management API is not enabled.",
+                "The device management API is disabled in this deployment."),
 
         ERROR_CODE_INVALID_PAGINATION("60101",
                 "Invalid pagination parameters.",

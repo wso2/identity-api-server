@@ -32,6 +32,9 @@ public class Constants {
     // Path component for building policy resource URIs.
     public static final String POLICY_PATH_COMPONENT = "/policies";
 
+    // Identity config that disables the device management APIs, including policy management.
+    public static final String DISABLE_DEVICE_MANAGEMENT_APIS = "DeviceManagement.DisableAPIs";
+
     /**
      * Error messages for Device Policy API.
      */
@@ -52,6 +55,9 @@ public class Constants {
         ERROR_CODE_INVALID_RULE("60004",
                 "Invalid policy rule.",
                 "The provided policy rule is invalid: %s"),
+        ERROR_CODE_API_DISABLED("60005",
+                "Policy management API is not enabled.",
+                "The policy management API is disabled in this deployment."),
 
         ERROR_CODE_ERROR_ADDING_POLICY("65001",
                 "Unable to add policy.",
