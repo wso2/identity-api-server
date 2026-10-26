@@ -82,6 +82,8 @@ paths:
         - $ref: '#/components/parameters/filterQueryParam'
         - $ref: '#/components/parameters/sortQueryParam'
         - $ref: '#/components/parameters/requiredAttributesQueryParam'
+        - $ref: '#/components/parameters/excludeAgentUserstoreQueryParam'
+
       responses:
         '200':
           description: Successful response.
@@ -641,6 +643,14 @@ components:
       description: Define set of user store attributes (as comma separated) to be returned.
       schema:
         type: string
+    excludeAgentUserstoreQueryParam:
+      in: query
+      name: excludeAgentUserstore
+      required: false
+      description: Whether to exclude AGENT userstore.
+      schema:
+        type: boolean
+        default: false
     fileTypeHeaderParam:
       in: header
       name: Accept
