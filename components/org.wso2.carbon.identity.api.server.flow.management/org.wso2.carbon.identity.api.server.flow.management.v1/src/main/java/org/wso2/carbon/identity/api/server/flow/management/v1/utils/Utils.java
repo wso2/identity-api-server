@@ -85,6 +85,7 @@ import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER;
+import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_DEVICE_REGISTRATION_WITHOUT_AUTHENTICATION;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_DUPLICATE_COMPONENT_ID;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_GET_GOVERNANCE_CONFIG;
 import static org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_EXECUTOR;
@@ -580,6 +581,14 @@ public class Utils {
                     ERROR_CODE_UNSUPPORTED_EXECUTOR.getDescription()));
         }
 
+        if (executors.contains(FlowEndpointConstants.Executors.DEVICE_REGISTRATION_EXECUTOR)
+                && executors.stream().noneMatch(Utils::isAuthenticationExecutor)) {
+            throw handleFlowMgtException(new FlowMgtClientException(
+                    ERROR_CODE_DEVICE_REGISTRATION_WITHOUT_AUTHENTICATION.getCode(),
+                    ERROR_CODE_DEVICE_REGISTRATION_WITHOUT_AUTHENTICATION.getMessage(),
+                    ERROR_CODE_DEVICE_REGISTRATION_WITHOUT_AUTHENTICATION.getDescription()));
+        }
+
         for (Set<String> requiredGroup : metaResponseHandler.getRequiredExecutorGroups()) {
             if (Collections.disjoint(requiredGroup, executors)) {
                 throw handleFlowMgtException(new FlowMgtClientException(
@@ -1026,6 +1035,25 @@ public class Utils {
             }
         }
         return matching;
+    }
+
+    /**
+     * Check whether the executor registered under the given name authenticates the user.
+     *
+     * @param executorName Executor name.
+     * @return True if the executor is a registered authentication executor.
+     */
+    private static boolean isAuthenticationExecutor(String executorName) {
+
+        try {
+            return FlowExecutorMetadataService.getInstance().getExecutor(executorName)
+                    .map(FlowExecutorInfo::isAuthenticationExecutor)
+                    .orElse(false);
+        } catch (Throwable e) {
+            // Executors are dynamically registered from /dropins, so a faulty one must not fail the endpoint.
+            LOG.warn("Failed to resolve executor metadata for executor: " + executorName, e);
+            return false;
+        }
     }
 
     private static List<FlowExecutorInfo> filterExtensionExecutors(List<FlowExecutorInfo> registeredExecutors,

@@ -130,7 +130,10 @@ public class FlowEndpointConstants {
                 "The flow rule metadata retrieval is not implemented for the given flow type."),
         ERROR_CODE_GET_RULE_METADATA("10027",
                 "Unable to retrieve the condition metadata.",
-                "Server encountered an error while retrieving the fields a decision step condition can use.");
+                "Server encountered an error while retrieving the fields a decision step condition can use."),
+        ERROR_CODE_DEVICE_REGISTRATION_WITHOUT_AUTHENTICATION("10028",
+                "Device registration requires authentication.",
+                "A flow that registers a device must also authenticate the user with an authentication executor.");
 
         private final String code;
         private final String message;
