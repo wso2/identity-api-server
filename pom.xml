@@ -654,7 +654,7 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.identity.customer.data.service</groupId>
-                <artifactId>org.wso2.identity.customer.data.service.client</artifactId>
+                <artifactId>org.wso2.identity.customer.data.service.config.mgt</artifactId>
                 <version>${identity.customer.data.service.extensions.version}</version>
                 <scope>provided</scope>
             </dependency>

@@ -20,13 +20,13 @@ package org.wso2.carbon.identity.api.server.configs.v1.core;
 
 import org.wso2.carbon.identity.api.server.configs.common.ConfigsServiceHolder;
 import org.wso2.carbon.identity.api.server.configs.v1.exception.CDSConfigException;
-import org.wso2.identity.cds.client.CDSClientException;
+import org.wso2.identity.cds.config.mgt.exception.CDSConfigMgtException;
 
 /**
  * Manages the Customer Data Service (CDS) configuration with the CDSConfigService of the CDS extensions.
  * The CDS extensions are optional. The JVM loads the exception types of a class when it verifies the class, so only
- * this class refers to CDSClientException. If the extensions are not in the pack, the first call to this class gives
- * NoClassDefFoundError, and the other classes of the configs API still load.
+ * this class refers to CDSConfigMgtException. If the extensions are not in the pack, the first call to this class
+ * gives NoClassDefFoundError, and the other classes of the configs API still load.
  */
 final class ServerCDSConfigManager {
 
@@ -55,7 +55,7 @@ final class ServerCDSConfigManager {
 
         try {
             return ConfigsServiceHolder.getCDSConfigService().isCDSEnabled(tenantDomain);
-        } catch (CDSClientException e) {
+        } catch (CDSConfigMgtException e) {
             throw new CDSConfigException(e.getMessage(), e.isClientError(), e);
         }
     }
@@ -71,7 +71,7 @@ final class ServerCDSConfigManager {
 
         try {
             ConfigsServiceHolder.getCDSConfigService().updateCDSEnabled(tenantDomain, cdsEnabled);
-        } catch (CDSClientException e) {
+        } catch (CDSConfigMgtException e) {
             throw new CDSConfigException(e.getMessage(), e.isClientError(), e);
         }
     }

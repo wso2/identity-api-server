@@ -38,7 +38,7 @@ import org.wso2.carbon.identity.openid4vc.presentation.core.service.Presentation
 import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 import org.wso2.carbon.idp.mgt.IdpManager;
 import org.wso2.carbon.logging.service.RemoteLoggingConfigService;
-import org.wso2.identity.cds.client.config.CDSConfigService;
+import org.wso2.identity.cds.config.mgt.CDSConfigService;
 
 /**
  * Service holder class for server configuration related services.

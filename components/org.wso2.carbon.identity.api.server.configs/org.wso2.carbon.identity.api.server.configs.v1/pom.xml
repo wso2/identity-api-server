@@ -207,7 +207,7 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.identity.customer.data.service</groupId>
-            <artifactId>org.wso2.identity.customer.data.service.client</artifactId>
+            <artifactId>org.wso2.identity.customer.data.service.config.mgt</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
