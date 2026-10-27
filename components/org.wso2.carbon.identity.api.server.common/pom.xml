@@ -38,6 +38,18 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- Pulled in transitively; its TestNG listener does not support the TestNG version used here. -->
+                    <classpathDependencyExcludes>
+                        <classpathDependencyExclude>
+                            org.wso2.carbon.identity.framework:org.wso2.carbon.identity.testutil
+                        </classpathDependencyExclude>
+                    </classpathDependencyExcludes>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -123,6 +135,16 @@
             <groupId>org.wso2.carbon.identity.organization.management.core</groupId>
             <artifactId>org.wso2.carbon.identity.organization.management.service</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

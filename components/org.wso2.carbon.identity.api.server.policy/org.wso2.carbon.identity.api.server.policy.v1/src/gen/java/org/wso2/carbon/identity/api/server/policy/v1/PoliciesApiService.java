@@ -38,7 +38,7 @@ public interface PoliciesApiService {
 
       public Response deletePolicy(String policyId);
 
-      public Response getPolicies(Integer limit, Integer offset, String filter);
+      public Response getPolicies(String type, Integer limit, Integer offset, String filter);
 
       public Response getPolicyById(String policyId);
 

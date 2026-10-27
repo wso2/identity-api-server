@@ -49,6 +49,7 @@ public class PolicyBuilder {
         List<PolicyResource> resources = buildPolicyResources(policyRequest.getResources(), tenantDomain);
         return new Policy.Builder()
                 .name(policyRequest.getName())
+                .type(policyRequest.getType())
                 .resources(resources)
                 .build();
     }
@@ -57,7 +58,7 @@ public class PolicyBuilder {
                                               String tenantDomain) throws PolicyManagementClientException {
 
         List<PolicyResource> resources = buildPolicyResources(policyUpdateRequest.getResources(), tenantDomain);
-        // Policy name is immutable; the backend retains the stored name.
+        // Policy name and type are immutable; the backend retains the stored values.
         return new Policy.Builder()
                 .id(policyId)
                 .resources(resources)

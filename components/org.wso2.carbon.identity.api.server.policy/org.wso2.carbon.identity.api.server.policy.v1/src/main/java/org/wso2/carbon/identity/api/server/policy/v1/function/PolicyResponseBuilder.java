@@ -45,6 +45,7 @@ public class PolicyResponseBuilder {
         PolicyResponse response = new PolicyResponse();
         response.setId(policy.getId());
         response.setName(policy.getName());
+        response.setType(policy.getType());
 
         if (policy.getResources() != null && !policy.getResources().isEmpty()) {
             List<PolicyResourceResponse> resourceResponses = policy.getResources().stream()

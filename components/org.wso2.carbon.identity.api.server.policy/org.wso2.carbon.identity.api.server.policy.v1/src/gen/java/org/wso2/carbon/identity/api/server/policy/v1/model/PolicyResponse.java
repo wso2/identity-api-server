@@ -37,6 +37,7 @@ public class PolicyResponse  {
   
     private String id;
     private String name;
+    private String type;
     private List<PolicyResourceResponse> resources = null;
 
 
@@ -83,6 +84,27 @@ public class PolicyResponse  {
     }
 
     /**
+    * The type of the policy.
+    **/
+    public PolicyResponse type(String type) {
+
+        this.type = type;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "DEVICE", required = true, value = "The type of the policy.")
+    @JsonProperty("type")
+    @Valid
+    @NotNull(message = "Property type cannot be null.")
+
+    public String getType() {
+        return type;
+    }
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    /**
     * Resources associated with the policy.
     **/
     public PolicyResponse resources(List<PolicyResourceResponse> resources) {
@@ -123,12 +145,13 @@ public class PolicyResponse  {
         PolicyResponse policyResponse = (PolicyResponse) o;
         return Objects.equals(this.id, policyResponse.id) &&
             Objects.equals(this.name, policyResponse.name) &&
+            Objects.equals(this.type, policyResponse.type) &&
             Objects.equals(this.resources, policyResponse.resources);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, resources);
+        return Objects.hash(id, name, type, resources);
     }
 
     @Override
@@ -139,6 +162,7 @@ public class PolicyResponse  {
         
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
         sb.append("}");
         return sb.toString();

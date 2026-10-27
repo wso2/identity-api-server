@@ -102,7 +102,7 @@ public class PoliciesApi  {
     
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "List policies.", notes = "This API provides the capability to retrieve a paginated list of policies for the tenant, optionally filtered by name.  <b>Scope (Permission) required:</b> `internal_policy_mgt_view` ", response = PolicyListResponse.class, authorizations = {
+    @ApiOperation(value = "List policies.", notes = "This API provides the capability to retrieve a paginated list of policies of a given type for the tenant, optionally filtered by name.  <b>Scope (Permission) required:</b> `internal_policy_mgt_view` ", response = PolicyListResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -115,9 +115,9 @@ public class PoliciesApi  {
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getPolicies(    @Valid @Min(1)@ApiParam(value = "Maximum number of records to return.", defaultValue="30") @DefaultValue("30")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination.", defaultValue="0") @DefaultValue("0")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Filter policies whose name contains the given value (case-insensitive). If omitted, all policies are returned.")  @QueryParam("filter") String filter) {
+    public Response getPolicies(    @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Type of the policies to list, for example DEVICE.",required=true)  @QueryParam("type") String type,     @Valid @Min(1)@ApiParam(value = "Maximum number of records to return.", defaultValue="30") @DefaultValue("30")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination.", defaultValue="0") @DefaultValue("0")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Filter policies whose name contains the given value (case-insensitive). If omitted, all policies of the type are returned.")  @QueryParam("filter") String filter) {
 
-        return delegate.getPolicies(limit,  offset,  filter );
+        return delegate.getPolicies(type,  limit,  offset,  filter );
     }
 
     @Valid

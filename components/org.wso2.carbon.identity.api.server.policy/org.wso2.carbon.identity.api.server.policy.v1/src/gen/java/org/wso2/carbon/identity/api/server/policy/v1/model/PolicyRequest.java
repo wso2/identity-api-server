@@ -36,6 +36,7 @@ import javax.xml.bind.annotation.*;
 public class PolicyRequest  {
   
     private String name;
+    private String type;
     private List<PolicyResourceRequest> resources = new ArrayList<>();
 
 
@@ -58,6 +59,27 @@ public class PolicyRequest  {
     }
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+    * The type of the policy, for example DEVICE. Policy names are unique within a type. The type cannot be changed after the policy is created.
+    **/
+    public PolicyRequest type(String type) {
+
+        this.type = type;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "DEVICE", required = true, value = "The type of the policy, for example DEVICE. Policy names are unique within a type. The type cannot be changed after the policy is created.")
+    @JsonProperty("type")
+    @Valid
+    @NotNull(message = "Property type cannot be null.")
+
+    public String getType() {
+        return type;
+    }
+    public void setType(String type) {
+        this.type = type;
     }
 
     /**
@@ -99,12 +121,13 @@ public class PolicyRequest  {
         }
         PolicyRequest policyRequest = (PolicyRequest) o;
         return Objects.equals(this.name, policyRequest.name) &&
+            Objects.equals(this.type, policyRequest.type) &&
             Objects.equals(this.resources, policyRequest.resources);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, resources);
+        return Objects.hash(name, type, resources);
     }
 
     @Override
@@ -114,6 +137,7 @@ public class PolicyRequest  {
         sb.append("class PolicyRequest {\n");
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
         sb.append("}");
         return sb.toString();

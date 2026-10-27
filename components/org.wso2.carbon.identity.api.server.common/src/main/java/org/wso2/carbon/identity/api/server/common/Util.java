@@ -19,8 +19,11 @@ package org.wso2.carbon.identity.api.server.common;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.MDC;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -143,6 +146,27 @@ public class Util {
                                                            String servicePathComponent, String requiredAttributes,
                                                            String filter) {
 
+        return buildPaginationLinks(limit, currentOffset, totalResultsFromSearch, servicePathComponent,
+                requiredAttributes, filter, Collections.emptyMap());
+    }
+
+    /**
+     * Build 'next' and 'previous' pagination links, carrying additional query parameters over to each link.
+     *
+     * @param limit                  Value of the 'limit' parameter.
+     * @param currentOffset          Value of the 'currentOffset' parameter.
+     * @param totalResultsFromSearch Value of the 'totalResultsFromSearch' parameter.
+     * @param servicePathComponent   API service path. E.g: applications/
+     * @param requiredAttributes     Value of the 'attributes' parameter.
+     * @param filter                 Value of the 'filter' parameter.
+     * @param additionalParams       Other query parameters to add to each link, in iteration order. Values are URL
+     *                               encoded, and parameters with an empty value are skipped.
+     * @return A map containing pagination link key-value pairs.
+     */
+    public static Map<String, String> buildPaginationLinks(int limit, int currentOffset, int totalResultsFromSearch,
+                                                           String servicePathComponent, String requiredAttributes,
+                                                           String filter, Map<String, String> additionalParams) {
+
         Map<String, String> links = new HashMap<>();
 
         StringBuilder otherParams = new StringBuilder();
@@ -151,6 +175,14 @@ public class Util {
         }
         if (!StringUtils.isEmpty(filter)) {
             otherParams.append("&filter=").append(filter.replace(" ", "+"));
+        }
+        if (additionalParams != null) {
+            for (Map.Entry<String, String> param : additionalParams.entrySet()) {
+                if (!StringUtils.isEmpty(param.getValue())) {
+                    otherParams.append("&").append(param.getKey()).append("=")
+                            .append(encodeQueryParamValue(param.getValue()));
+                }
+            }
         }
 
         // Next link.
@@ -177,6 +209,16 @@ public class Util {
         }
 
         return links;
+    }
+
+    private static String encodeQueryParamValue(String value) {
+
+        try {
+            return URLEncoder.encode(value, StandardCharsets.UTF_8.name());
+        } catch (UnsupportedEncodingException e) {
+            // UTF-8 is always supported.
+            throw new IllegalStateException(e);
+        }
     }
 
     private static int calculateOffsetForPreviousLink(int offset, int limit, int total) {
