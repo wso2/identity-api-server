@@ -34,6 +34,7 @@ public class PolicyListItem  {
   
     private String id;
     private String name;
+    private String type;
     private String self;
 
     /**
@@ -75,6 +76,25 @@ public class PolicyListItem  {
     }
 
     /**
+    * The type of the policy.
+    **/
+    public PolicyListItem type(String type) {
+
+        this.type = type;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "DEVICE", value = "The type of the policy.")
+    @JsonProperty("type")
+    @Valid
+    public String getType() {
+        return type;
+    }
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    /**
     * Location of the policy resource.
     **/
     public PolicyListItem self(String self) {
@@ -107,12 +127,13 @@ public class PolicyListItem  {
         PolicyListItem policyListItem = (PolicyListItem) o;
         return Objects.equals(this.id, policyListItem.id) &&
             Objects.equals(this.name, policyListItem.name) &&
+            Objects.equals(this.type, policyListItem.type) &&
             Objects.equals(this.self, policyListItem.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, self);
+        return Objects.hash(id, name, type, self);
     }
 
     @Override
@@ -123,6 +144,7 @@ public class PolicyListItem  {
         
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");
         return sb.toString();

@@ -28,10 +28,17 @@ paths:
       summary: List policies.
       operationId: getPolicies
       description: |
-        This API provides the capability to retrieve a paginated list of policies for the tenant, optionally filtered by name.
+        This API provides the capability to retrieve a paginated list of policies of a given type for the tenant, optionally filtered by name.
 
         <b>Scope (Permission) required:</b> `internal_policy_mgt_view`
       parameters:
+        - name: type
+          in: query
+          description: Type of the policies to list, for example DEVICE.
+          required: true
+          schema:
+            type: string
+            example: "DEVICE"
         - name: limit
           in: query
           description: Maximum number of records to return.
@@ -50,7 +57,7 @@ paths:
             default: 0
         - name: filter
           in: query
-          description: Filter policies whose name contains the given value (case-insensitive). If omitted, all policies are returned.
+          description: Filter policies whose name contains the given value (case-insensitive). If omitted, all policies of the type are returned.
           required: false
           schema:
             type: string
@@ -274,9 +281,11 @@ components:
       type: object
       required:
         - name
+        - type
         - resources
       example:
         name: "Corporate Policy"
+        type: "DEVICE"
         resources:
           - target: "ios"
             resourceType: "RULE"
@@ -296,6 +305,10 @@ components:
           type: string
           description: The name of the policy.
           example: "Corporate Policy"
+        type:
+          type: string
+          description: The type of the policy, for example DEVICE. Policy names are unique within a type. The type cannot be changed after the policy is created.
+          example: "DEVICE"
         resources:
           type: array
           description: Resources attached to the policy. Each target may have at most one resource of each type.
@@ -421,6 +434,10 @@ components:
           type: string
           description: The name of the policy.
           example: "Corporate Device Policy"
+        type:
+          type: string
+          description: The type of the policy.
+          example: "DEVICE"
         self:
           type: string
           description: Location of the policy resource.
@@ -441,6 +458,7 @@ components:
       required:
         - id
         - name
+        - type
       properties:
         id:
           type: string
@@ -450,6 +468,10 @@ components:
           type: string
           description: The name of the policy.
           example: "Corporate Device Policy"
+        type:
+          type: string
+          description: The type of the policy.
+          example: "DEVICE"
         resources:
           type: array
           description: Resources associated with the policy.

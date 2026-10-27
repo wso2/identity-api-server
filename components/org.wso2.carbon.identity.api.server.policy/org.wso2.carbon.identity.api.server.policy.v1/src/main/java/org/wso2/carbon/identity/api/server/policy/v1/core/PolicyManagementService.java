@@ -35,6 +35,7 @@ import org.wso2.carbon.identity.policy.management.api.exception.PolicyManagement
 import org.wso2.carbon.identity.policy.management.api.model.Policy;
 import org.wso2.carbon.identity.policy.management.api.model.PolicyBasicInfo;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
@@ -46,6 +47,7 @@ public class PolicyManagementService {
 
     private static final int DEFAULT_LIMIT = 30;
     private static final int DEFAULT_OFFSET = 0;
+    private static final String TYPE_QUERY_PARAM = "type";
 
     private final org.wso2.carbon.identity.policy.management.api.service.PolicyManagementService
             policyManagementService;
@@ -138,14 +140,16 @@ public class PolicyManagementService {
     }
 
     /**
-     * Get a paginated list of policy summaries for the current tenant, optionally filtered by name.
+     * Get a paginated list of summaries of the policies of the given type for the current tenant, optionally
+     * filtered by name.
      *
+     * @param type   Policy type.
      * @param limit  Maximum number of records to return (defaults to 30 when null).
      * @param offset Number of records to skip (defaults to 0 when null).
-     * @param filter Name substring filter; null or blank returns all policies.
+     * @param filter Name substring filter; null or blank returns all policies of the type.
      * @return Paginated policy list response.
      */
-    public PolicyListResponse getPoliciesBasicInfo(Integer limit, Integer offset, String filter) {
+    public PolicyListResponse getPoliciesBasicInfo(String type, Integer limit, Integer offset, String filter) {
 
         validateApiEnabled();
         int resolvedLimit = limit != null ? limit : DEFAULT_LIMIT;
@@ -154,16 +158,17 @@ public class PolicyManagementService {
 
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            int totalResults = policyManagementService.getPolicyCount(tenantDomain, filter);
+            int totalResults = policyManagementService.getPolicyCount(tenantDomain, type, filter);
             List<PolicyBasicInfo> policies =
-                    policyManagementService.getPolicies(tenantDomain, filter, resolvedOffset, resolvedLimit);
+                    policyManagementService.getPolicies(tenantDomain, type, filter, resolvedOffset, resolvedLimit);
 
             List<PolicyListItem> items = policies.stream()
                     .map(this::toPolicyListItem)
                     .collect(Collectors.toList());
 
             List<PolicyListLink> links = Util.buildPaginationLinks(
-                            resolvedLimit, resolvedOffset, totalResults, Constants.POLICY_PATH_COMPONENT, null, filter)
+                            resolvedLimit, resolvedOffset, totalResults, Constants.POLICY_PATH_COMPONENT, null, filter,
+                            Collections.singletonMap(TYPE_QUERY_PARAM, type))
                     .entrySet().stream()
                     .map(link -> new PolicyListLink().rel(link.getKey()).href(link.getValue()))
                     .collect(Collectors.toList());
@@ -185,6 +190,7 @@ public class PolicyManagementService {
         return new PolicyListItem()
                 .id(policy.getId())
                 .name(policy.getName())
+                .type(policy.getType())
                 .self(ContextLoader.buildURIForBody(
                         Constants.V1_API_PATH_COMPONENT + Constants.POLICY_PATH_COMPONENT
                                 + "/" + policy.getId()).toString());

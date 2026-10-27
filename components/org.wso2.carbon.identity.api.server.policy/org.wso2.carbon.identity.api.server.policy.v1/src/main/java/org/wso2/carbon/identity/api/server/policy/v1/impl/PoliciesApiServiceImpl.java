@@ -56,9 +56,9 @@ public class PoliciesApiServiceImpl implements PoliciesApiService {
     }
 
     @Override
-    public Response getPolicies(Integer limit, Integer offset, String filter) {
+    public Response getPolicies(String type, Integer limit, Integer offset, String filter) {
 
-        return Response.ok().entity(policyService.getPoliciesBasicInfo(limit, offset, filter)).build();
+        return Response.ok().entity(policyService.getPoliciesBasicInfo(type, limit, offset, filter)).build();
     }
 
     @Override
