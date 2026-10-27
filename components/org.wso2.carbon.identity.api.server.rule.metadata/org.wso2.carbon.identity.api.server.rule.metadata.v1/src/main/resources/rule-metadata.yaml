@@ -54,6 +54,7 @@ paths:
           - preRegistration
           - inRegistration
           - inPasswordExpiry
+          - devicePolicy
       responses:
         "200":
           description: Applicable fields and operators
