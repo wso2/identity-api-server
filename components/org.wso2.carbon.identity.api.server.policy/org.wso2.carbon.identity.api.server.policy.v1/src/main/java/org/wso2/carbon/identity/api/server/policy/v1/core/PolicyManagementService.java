@@ -34,6 +34,8 @@ import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.policy.management.api.exception.PolicyManagementException;
 import org.wso2.carbon.identity.policy.management.api.model.Policy;
 import org.wso2.carbon.identity.policy.management.api.model.PolicyBasicInfo;
+import org.wso2.carbon.identity.policy.management.api.model.PolicyResource.ResourceType;
+import org.wso2.carbon.identity.policy.management.api.model.PolicyResourceMetadata;
 
 import java.util.Collections;
 import java.util.List;
@@ -113,7 +115,13 @@ public class PolicyManagementService {
         validateApiEnabled();
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            Policy policy = PolicyBuilder.buildUpdatingPolicy(policyUpdateRequest, policyId, tenantDomain);
+            Policy existingPolicy = policyManagementService.getPolicyById(policyId, tenantDomain);
+            if (existingPolicy == null) {
+                throw PolicyManagementAPIErrorBuilder.handleException(Response.Status.NOT_FOUND,
+                        Constants.ErrorMessage.ERROR_CODE_POLICY_NOT_FOUND, policyId);
+            }
+            Policy policy = PolicyBuilder.buildUpdatingPolicy(policyUpdateRequest, policyId,
+                    existingPolicy.getType(), tenantDomain);
             Policy updatedPolicy = policyManagementService.updatePolicy(policy, tenantDomain);
             return PolicyResponseBuilder.buildPolicyResponse(updatedPolicy);
         } catch (PolicyManagementException e) {
@@ -182,6 +190,28 @@ public class PolicyManagementService {
         } catch (PolicyManagementException e) {
             throw PolicyManagementAPIErrorBuilder.handleException(e,
                     Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_POLICIES);
+        }
+    }
+
+    /**
+     * Describe how resources of a resource type can be built for a policy type and target.
+     *
+     * @param resourceType Resource type.
+     * @param type         Policy type.
+     * @param target       Resource target.
+     * @return Resource metadata in the format of the resource type.
+     */
+    public Object getResourceMetadata(ResourceType resourceType, String type, String target) {
+
+        validateApiEnabled();
+        try {
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            PolicyResourceMetadata metadata =
+                    policyManagementService.getResourceMetadata(type, resourceType, target, tenantDomain);
+            return PolicyResponseBuilder.buildResourceMetadataResponse(metadata);
+        } catch (PolicyManagementException e) {
+            throw PolicyManagementAPIErrorBuilder.handleException(e,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_METADATA);
         }
     }
 

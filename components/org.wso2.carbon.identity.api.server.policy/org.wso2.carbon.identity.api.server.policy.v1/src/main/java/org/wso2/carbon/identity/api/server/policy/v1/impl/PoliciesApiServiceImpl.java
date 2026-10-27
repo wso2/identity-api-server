@@ -26,6 +26,7 @@ import org.wso2.carbon.identity.api.server.policy.v1.factories.PolicyServiceFact
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyRequest;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyResponse;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyUpdateRequest;
+import org.wso2.carbon.identity.policy.management.api.model.PolicyResource.ResourceType;
 
 import java.net.URI;
 import javax.ws.rs.core.Response;
@@ -59,6 +60,12 @@ public class PoliciesApiServiceImpl implements PoliciesApiService {
     public Response getPolicies(String type, Integer limit, Integer offset, String filter) {
 
         return Response.ok().entity(policyService.getPoliciesBasicInfo(type, limit, offset, filter)).build();
+    }
+
+    @Override
+    public Response getRuleMetadata(String type, String target) {
+
+        return Response.ok().entity(policyService.getResourceMetadata(ResourceType.RULE, type, target)).build();
     }
 
     @Override

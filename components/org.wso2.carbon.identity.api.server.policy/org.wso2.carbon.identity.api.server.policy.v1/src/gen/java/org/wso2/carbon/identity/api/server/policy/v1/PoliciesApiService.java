@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -29,6 +29,7 @@ import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyListResponse;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyRequest;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyResponse;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyUpdateRequest;
+import org.wso2.carbon.identity.api.server.policy.v1.model.RuleFieldMetadata;
 import javax.ws.rs.core.Response;
 
 
@@ -41,6 +42,8 @@ public interface PoliciesApiService {
       public Response getPolicies(String type, Integer limit, Integer offset, String filter);
 
       public Response getPolicyById(String policyId);
+
+      public Response getRuleMetadata(String type, String target);
 
       public Response updatePolicy(String policyId, PolicyUpdateRequest policyUpdateRequest);
 }

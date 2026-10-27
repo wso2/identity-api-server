@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.api.server.policy.v1.function;
+package org.wso2.carbon.identity.api.server.policy.v1.function.resource.rule;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 /**
  * Builds a RuleResponse (API model) from a Rule (domain model).
  */
-public class RuleResponseBuilder {
+final class RuleResponseBuilder {
 
     private static final Log LOG = LogFactory.getLog(RuleResponseBuilder.class);
 
@@ -43,7 +43,7 @@ public class RuleResponseBuilder {
 
     }
 
-    public static RuleResponse buildRuleResponse(Rule rule) {
+    static RuleResponse buildRuleResponse(Rule rule) {
 
         if (!(rule instanceof ORCombinedRule)) {
             LOG.error("Unexpected top-level rule type: "
