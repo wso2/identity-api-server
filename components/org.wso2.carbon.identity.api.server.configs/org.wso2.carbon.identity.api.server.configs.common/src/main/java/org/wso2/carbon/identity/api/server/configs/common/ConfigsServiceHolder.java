@@ -166,10 +166,6 @@ public class ConfigsServiceHolder {
                         .getOSGiService(PresentationConfigMgtService.class, null);
     }
 
-    /**
-     * The CDS extensions are optional. If they are not in the pack, the first access to this class gives
-     * NoClassDefFoundError.
-     */
     private static class CDSConfigServiceHolder {
 
         static final CDSConfigService SERVICE =
@@ -358,10 +354,9 @@ public class ConfigsServiceHolder {
     }
 
     /**
-     * Get CDSConfigService osgi service. The CDS extensions register this service.
+     * Get CDSConfigService osgi service.
      *
-     * @return CDSConfigService, or null if the service is not active.
-     * @throws NoClassDefFoundError If the CDS extensions are not in the pack.
+     * @return CDSConfigService
      */
     public static CDSConfigService getCDSConfigService() {
 
