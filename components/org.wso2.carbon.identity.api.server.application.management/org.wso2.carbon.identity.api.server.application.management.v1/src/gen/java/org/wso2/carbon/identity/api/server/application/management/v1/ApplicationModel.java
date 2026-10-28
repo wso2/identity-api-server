@@ -49,6 +49,7 @@ public class ApplicationModel  {
     private Boolean isManagementApp = false;
     private Boolean isB2BSelfServiceApp = false;
     private Boolean enhancedOrgAuthenticationEnabled;
+    private Boolean organizationCustomRolesEnabled;
     private Boolean applicationEnabled = true;
     private AssociatedRolesConfig associatedRoles;
     private ClaimConfiguration claimConfiguration;
@@ -262,6 +263,25 @@ public class ApplicationModel  {
     }
 
     /**
+    * For a main application, decides whether organizations can create custom roles for its shared applications.
+    **/
+    public ApplicationModel organizationCustomRolesEnabled(Boolean organizationCustomRolesEnabled) {
+
+        this.organizationCustomRolesEnabled = organizationCustomRolesEnabled;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "For a main application, decides whether organizations can create custom roles for its shared applications.")
+    @JsonProperty("organizationCustomRolesEnabled")
+    @Valid
+    public Boolean getOrganizationCustomRolesEnabled() {
+        return organizationCustomRolesEnabled;
+    }
+    public void setOrganizationCustomRolesEnabled(Boolean organizationCustomRolesEnabled) {
+        this.organizationCustomRolesEnabled = organizationCustomRolesEnabled;
+    }
+
+    /**
     * Decides whether the application is enabled.
     **/
     public ApplicationModel applicationEnabled(Boolean applicationEnabled) {
@@ -411,6 +431,7 @@ public class ApplicationModel  {
             Objects.equals(this.isManagementApp, applicationModel.isManagementApp) &&
             Objects.equals(this.isB2BSelfServiceApp, applicationModel.isB2BSelfServiceApp) &&
             Objects.equals(this.enhancedOrgAuthenticationEnabled, applicationModel.enhancedOrgAuthenticationEnabled) &&
+            Objects.equals(this.organizationCustomRolesEnabled, applicationModel.organizationCustomRolesEnabled) &&
             Objects.equals(this.applicationEnabled, applicationModel.applicationEnabled) &&
             Objects.equals(this.associatedRoles, applicationModel.associatedRoles) &&
             Objects.equals(this.claimConfiguration, applicationModel.claimConfiguration) &&
@@ -422,7 +443,7 @@ public class ApplicationModel  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, imageUrl, accessUrl, logoutReturnUrl, templateId, templateVersion, isManagementApp, isB2BSelfServiceApp, enhancedOrgAuthenticationEnabled, applicationEnabled, associatedRoles, claimConfiguration, inboundProtocolConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
+        return Objects.hash(id, name, description, imageUrl, accessUrl, logoutReturnUrl, templateId, templateVersion, isManagementApp, isB2BSelfServiceApp, enhancedOrgAuthenticationEnabled, organizationCustomRolesEnabled, applicationEnabled, associatedRoles, claimConfiguration, inboundProtocolConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
     }
 
     @Override
@@ -442,6 +463,7 @@ public class ApplicationModel  {
         sb.append("    isManagementApp: ").append(toIndentedString(isManagementApp)).append("\n");
         sb.append("    isB2BSelfServiceApp: ").append(toIndentedString(isB2BSelfServiceApp)).append("\n");
         sb.append("    enhancedOrgAuthenticationEnabled: ").append(toIndentedString(enhancedOrgAuthenticationEnabled)).append("\n");
+        sb.append("    organizationCustomRolesEnabled: ").append(toIndentedString(organizationCustomRolesEnabled)).append("\n");
         sb.append("    applicationEnabled: ").append(toIndentedString(applicationEnabled)).append("\n");
         sb.append("    associatedRoles: ").append(toIndentedString(associatedRoles)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");
