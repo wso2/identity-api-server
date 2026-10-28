@@ -32,25 +32,25 @@ import javax.xml.bind.annotation.*;
 
 public class CDSConfig  {
   
-    private Boolean cdsEnabled;
+    private Boolean enabled;
 
     /**
     * If true, the Customer Data Service is enabled for the tenant.
     **/
-    public CDSConfig cdsEnabled(Boolean cdsEnabled) {
+    public CDSConfig enabled(Boolean enabled) {
 
-        this.cdsEnabled = cdsEnabled;
+        this.enabled = enabled;
         return this;
     }
     
     @ApiModelProperty(example = "true", value = "If true, the Customer Data Service is enabled for the tenant.")
-    @JsonProperty("cds_enabled")
+    @JsonProperty("enabled")
     @Valid
-    public Boolean getCdsEnabled() {
-        return cdsEnabled;
+    public Boolean getEnabled() {
+        return enabled;
     }
-    public void setCdsEnabled(Boolean cdsEnabled) {
-        this.cdsEnabled = cdsEnabled;
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
 
@@ -65,12 +65,12 @@ public class CDSConfig  {
             return false;
         }
         CDSConfig cdSConfig = (CDSConfig) o;
-        return Objects.equals(this.cdsEnabled, cdSConfig.cdsEnabled);
+        return Objects.equals(this.enabled, cdSConfig.enabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(cdsEnabled);
+        return Objects.hash(enabled);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class CDSConfig  {
         StringBuilder sb = new StringBuilder();
         sb.append("class CDSConfig {\n");
         
-        sb.append("    cdsEnabled: ").append(toIndentedString(cdsEnabled)).append("\n");
+        sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
         sb.append("}");
         return sb.toString();
     }

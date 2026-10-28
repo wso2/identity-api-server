@@ -55,9 +55,6 @@ public class Constants {
     public static final String AUDIT = "audit";
     public static final String CARBON = "carbon";
 
-    /**
-     * Server-level property of the Customer Data Service (CDS) feature ([customer_data_service] enable).
-     */
     public static final String CDS_ENABLE_PROPERTY = "CustomerDataService.Enable";
 
     /**
@@ -358,21 +355,15 @@ public class Constants {
         /**
          * Customer Data Service (CDS) configuration errors.
          */
-        ERROR_CODE_CDS_CONFIG_SYNC_REJECTED("60022",
-                "Unable to update CDS configuration.",
-                "The Customer Data Service rejected the configuration update. %s"),
-        ERROR_CODE_CDS_NOT_ENABLED("60023",
+        ERROR_CODE_CDS_NOT_ENABLED("60022",
                 "CDS is not enabled.",
-                "The Customer Data Service is not enabled for the server."),
+                "The Customer Data Service feature is not enabled."),
         ERROR_CODE_CDS_CONFIG_RETRIEVE("65045",
                 "Unable to retrieve CDS configuration.",
                 "Server encountered an error while retrieving the CDS configuration."),
         ERROR_CODE_CDS_CONFIG_UPDATE("65046",
                 "Unable to update CDS configuration.",
-                "Server encountered an error while updating the CDS configuration. %s"),
-        ERROR_CODE_CDS_CONFIG_SERVICE_UNAVAILABLE("65047",
-                "Unable to process CDS configuration.",
-                "The CDS configuration service is not available.");
+                "Server encountered an error while updating the CDS configuration.");
 
         private final String code;
         private final String message;

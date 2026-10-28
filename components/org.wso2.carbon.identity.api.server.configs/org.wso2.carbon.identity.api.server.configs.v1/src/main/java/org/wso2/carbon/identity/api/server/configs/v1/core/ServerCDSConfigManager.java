@@ -19,14 +19,18 @@
 package org.wso2.carbon.identity.api.server.configs.v1.core;
 
 import org.wso2.carbon.identity.api.server.configs.common.ConfigsServiceHolder;
+import org.wso2.carbon.identity.api.server.configs.v1.exception.CDSConfigClientException;
 import org.wso2.carbon.identity.api.server.configs.v1.exception.CDSConfigException;
+import org.wso2.carbon.identity.api.server.configs.v1.exception.CDSConfigServerException;
+import org.wso2.carbon.identity.api.server.configs.v1.model.CDSConfig;
+import org.wso2.identity.cds.config.mgt.exception.CDSConfigMgtClientException;
 import org.wso2.identity.cds.config.mgt.exception.CDSConfigMgtException;
 
 /**
  * Manages the Customer Data Service (CDS) configuration with the CDSConfigService of the CDS extensions.
  * The CDS extensions are optional. The JVM loads the exception types of a class when it verifies the class, so only
- * this class refers to CDSConfigMgtException. If the extensions are not in the pack, the first call to this class
- * gives NoClassDefFoundError, and the other classes of the configs API still load.
+ * this class refers to the classes of the CDS extensions. If the extensions are not in the pack, the other classes of
+ * the configs API still load.
  */
 final class ServerCDSConfigManager {
 
@@ -35,44 +39,44 @@ final class ServerCDSConfigManager {
     }
 
     /**
-     * Check whether the CDSConfigService is active.
-     *
-     * @return True if the CDSConfigService is active.
-     */
-    static boolean isServiceAvailable() {
-
-        return ConfigsServiceHolder.getCDSConfigService() != null;
-    }
-
-    /**
-     * Get the effective value of the CDS enable config of the tenant.
+     * Get the CDS configuration of the tenant.
      *
      * @param tenantDomain Tenant domain.
-     * @return True if CDS is enabled for the tenant.
-     * @throws CDSConfigException If the value cannot be read.
+     * @return CDS configuration of the tenant.
+     * @throws CDSConfigException If the configuration cannot be read.
      */
-    static boolean isCDSEnabled(String tenantDomain) throws CDSConfigException {
+    static CDSConfig getCDSConfig(String tenantDomain) throws CDSConfigException {
 
         try {
-            return ConfigsServiceHolder.getCDSConfigService().isCDSEnabled(tenantDomain);
+            return new CDSConfig().enabled(
+                    ConfigsServiceHolder.getCDSConfigService().getCDSConfig(tenantDomain).isEnabled());
         } catch (CDSConfigMgtException e) {
-            throw new CDSConfigException(e.getMessage(), e.isClientError(), e);
+            throw toCDSConfigException(e);
         }
     }
 
     /**
-     * Update the CDS enable config of the tenant. The CDS extensions send the value to CDS first, and then store it.
+     * Update the CDS configuration of the tenant.
      *
+     * @param cdsConfig    CDS configuration.
      * @param tenantDomain Tenant domain of a root organization.
-     * @param cdsEnabled   The new value.
-     * @throws CDSConfigException If CDS does not accept the value, or if the value cannot be stored.
+     * @throws CDSConfigException If the configuration cannot be updated.
      */
-    static void updateCDSEnabled(String tenantDomain, boolean cdsEnabled) throws CDSConfigException {
+    static void updateCDSConfig(CDSConfig cdsConfig, String tenantDomain) throws CDSConfigException {
 
         try {
-            ConfigsServiceHolder.getCDSConfigService().updateCDSEnabled(tenantDomain, cdsEnabled);
+            ConfigsServiceHolder.getCDSConfigService().updateCDSConfig(
+                    new org.wso2.identity.cds.config.mgt.model.CDSConfig(cdsConfig.getEnabled()), tenantDomain);
         } catch (CDSConfigMgtException e) {
-            throw new CDSConfigException(e.getMessage(), e.isClientError(), e);
+            throw toCDSConfigException(e);
         }
+    }
+
+    private static CDSConfigException toCDSConfigException(CDSConfigMgtException e) {
+
+        if (e instanceof CDSConfigMgtClientException) {
+            return new CDSConfigClientException(e.getMessage(), e.getErrorCode(), e);
+        }
+        return new CDSConfigServerException(e.getMessage(), e.getErrorCode(), e);
     }
 }

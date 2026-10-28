@@ -26,31 +26,21 @@ public class CDSConfigException extends Exception {
 
     private static final long serialVersionUID = -2934718406521735126L;
 
-    /**
-     * True if the request content caused the error.
-     */
-    private final boolean clientError;
+    private String errorCode;
 
-    /**
-     * Constructor with {@code message}, {@code clientError} and {@code cause} parameters.
-     *
-     * @param message     Message to be included in the exception.
-     * @param clientError True if the request content caused the error.
-     * @param cause       Exception to be wrapped.
-     */
-    public CDSConfigException(String message, boolean clientError, Throwable cause) {
+    public CDSConfigException() {
 
-        super(message, cause);
-        this.clientError = clientError;
+        super();
     }
 
-    /**
-     * Get whether the request content caused the error.
-     *
-     * @return True if the request content caused the error.
-     */
-    public boolean isClientError() {
+    public CDSConfigException(String message, String errorCode, Throwable cause) {
 
-        return clientError;
+        super(message, cause);
+        this.errorCode = errorCode;
+    }
+
+    public String getErrorCode() {
+
+        return errorCode;
     }
 }

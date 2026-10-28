@@ -1331,13 +1331,12 @@ paths:
       description: |
         Retrieve the CDS configuration of the tenant.
 
-        `cds_enabled` is the effective value. CDS is enabled for the tenant only if the server-level value
-        `[customer_data_service] enable` is true and the tenant value is true. If the tenant has no value, CDS is not
-        enabled for the tenant. An organization gets the value of its root organization.
+        When the CDS feature is enabled, this configuration enables CDS for the tenant. An organization uses the
+        configuration of its root organization.
 
-        If CDS is not enabled for the server, this operation returns 400 Bad Request.
+        If the CDS feature is not enabled, this operation returns 400 Bad Request.
 
-        <b>Scope (Permission) required:</b> `internal_config_view`
+        <b>Scope (Permission) required:</b> `internal_cds_admin_config_view`
       responses:
         '200':
           description: Successful Response
@@ -1375,16 +1374,15 @@ paths:
       description: |
         Update the CDS configuration of the tenant. All fields are optional.
 
-        The server sends the new value to the Customer Data Service before it stores the value.
-        If the Customer Data Service does not accept the value, the server does not store it.
+        The server sends the configuration to the Customer Data Service before it stores the configuration.
+        If the Customer Data Service does not accept the configuration, the server does not store it.
 
         **Note:** This operation is only allowed for root tenants and will return
         403 Forbidden when called from an organization context.
 
-        If CDS is not enabled for the server (`[customer_data_service] enable`), this operation returns
-        400 Bad Request.
+        If the CDS feature is not enabled, this operation returns 400 Bad Request.
 
-        <b>Scope (Permission) required:</b> `internal_config_update`
+        <b>Scope (Permission) required:</b> `internal_cds_admin_config_update`
       requestBody:
         content:
           application/json:
@@ -2583,7 +2581,7 @@ components:
     CDSConfig:
       type: object
       properties:
-        cds_enabled:
+        enabled:
           type: boolean
           description: If true, the Customer Data Service is enabled for the tenant.
           example: true
