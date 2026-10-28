@@ -18,13 +18,13 @@
 
 package org.wso2.carbon.identity.api.server.policy.v1.function;
 
+import org.wso2.carbon.identity.api.server.policy.v1.function.resource.PolicyResourceHandlerRegistry;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyRequest;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyResourceRequest;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyUpdateRequest;
-import org.wso2.carbon.identity.policy.management.api.exception.PolicyManagementClientException;
+import org.wso2.carbon.identity.policy.management.api.exception.PolicyManagementException;
 import org.wso2.carbon.identity.policy.management.api.model.Policy;
 import org.wso2.carbon.identity.policy.management.api.model.PolicyResource;
-import org.wso2.carbon.identity.policy.management.api.model.RulePolicyResource;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,9 +44,10 @@ public class PolicyBuilder {
     }
 
     public static Policy buildPolicy(PolicyRequest policyRequest, String tenantDomain)
-            throws PolicyManagementClientException {
+            throws PolicyManagementException {
 
-        List<PolicyResource> resources = buildPolicyResources(policyRequest.getResources(), tenantDomain);
+        List<PolicyResource> resources =
+                buildPolicyResources(policyRequest.getResources(), policyRequest.getType(), tenantDomain);
         return new Policy.Builder()
                 .name(policyRequest.getName())
                 .type(policyRequest.getType())
@@ -55,9 +56,11 @@ public class PolicyBuilder {
     }
 
     public static Policy buildUpdatingPolicy(PolicyUpdateRequest policyUpdateRequest, String policyId,
-                                              String tenantDomain) throws PolicyManagementClientException {
+                                              String policyType, String tenantDomain)
+            throws PolicyManagementException {
 
-        List<PolicyResource> resources = buildPolicyResources(policyUpdateRequest.getResources(), tenantDomain);
+        List<PolicyResource> resources =
+                buildPolicyResources(policyUpdateRequest.getResources(), policyType, tenantDomain);
         // Policy name and type are immutable; the backend retains the stored values.
         return new Policy.Builder()
                 .id(policyId)
@@ -66,25 +69,19 @@ public class PolicyBuilder {
     }
 
     private static List<PolicyResource> buildPolicyResources(List<PolicyResourceRequest> resourceRequests,
-                                                               String tenantDomain)
-            throws PolicyManagementClientException {
+                                                               String policyType, String tenantDomain)
+            throws PolicyManagementException {
 
         if (resourceRequests == null || resourceRequests.isEmpty()) {
             return Collections.emptyList();
         }
         List<PolicyResource> resources = new ArrayList<>();
         for (PolicyResourceRequest resourceRequest : resourceRequests) {
-            resources.add(toRulePolicyResource(resourceRequest, tenantDomain));
+            String resourceType = resourceRequest.getResourceType() != null
+                    ? resourceRequest.getResourceType().value() : null;
+            resources.add(PolicyResourceHandlerRegistry.getInstance().getHandler(resourceType)
+                    .buildResource(resourceRequest, policyType, tenantDomain));
         }
         return resources;
-    }
-
-    private static PolicyResource toRulePolicyResource(PolicyResourceRequest resourceRequest, String tenantDomain)
-            throws PolicyManagementClientException {
-
-        return new RulePolicyResource.Builder()
-                .target(resourceRequest.getTarget())
-                .rule(PolicyRuleBuilder.buildRule(resourceRequest.getRule(), tenantDomain))
-                .build();
     }
 }

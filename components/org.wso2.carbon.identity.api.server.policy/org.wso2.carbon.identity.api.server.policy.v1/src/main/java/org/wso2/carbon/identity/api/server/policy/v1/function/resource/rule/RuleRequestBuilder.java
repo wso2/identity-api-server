@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.api.server.policy.v1.function;
+package org.wso2.carbon.identity.api.server.policy.v1.function.resource.rule;
 
 import org.wso2.carbon.identity.api.server.policy.common.Constants;
 import org.wso2.carbon.identity.api.server.policy.v1.model.ANDRuleRequest;
@@ -40,17 +40,17 @@ import javax.ws.rs.core.Response;
  * resolved against the field metadata. This is what assigns the correct value type;
  * hand-constructing the Value here would bypass that validation and fail at rule evaluation time.
  */
-public class PolicyRuleBuilder {
+final class RuleRequestBuilder {
 
-    private PolicyRuleBuilder() {
+    private RuleRequestBuilder() {
 
     }
 
-    public static Rule buildRule(RuleRequest ruleRequest, String tenantDomain) {
+    static Rule buildRule(RuleRequest ruleRequest, FlowType flowType, String tenantDomain) {
 
         RuleBuilder ruleBuilder;
         try {
-            ruleBuilder = RuleBuilder.create(FlowType.DEVICE_POLICY, tenantDomain);
+            ruleBuilder = RuleBuilder.create(flowType, tenantDomain);
         } catch (RuleManagementException e) {
             throw PolicyManagementAPIErrorBuilder.handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     Constants.ErrorMessage.ERROR_CODE_ERROR_INITIALIZING_RULE_BUILDER, e);

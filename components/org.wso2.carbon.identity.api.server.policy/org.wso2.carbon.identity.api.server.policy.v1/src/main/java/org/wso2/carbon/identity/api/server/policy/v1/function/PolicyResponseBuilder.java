@@ -18,15 +18,15 @@
 
 package org.wso2.carbon.identity.api.server.policy.v1.function;
 
+import org.wso2.carbon.identity.api.server.policy.v1.function.resource.PolicyResourceHandlerRegistry;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyResourceResponse;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyResponse;
 import org.wso2.carbon.identity.policy.management.api.model.Policy;
 import org.wso2.carbon.identity.policy.management.api.model.PolicyResource;
-import org.wso2.carbon.identity.policy.management.api.model.RulePolicyResource;
-import org.wso2.carbon.identity.rule.management.api.model.Rule;
+import org.wso2.carbon.identity.policy.management.api.model.PolicyResourceMetadata;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Builds a PolicyResponse (API model) from a Policy (domain model).
@@ -48,29 +48,26 @@ public class PolicyResponseBuilder {
         response.setType(policy.getType());
 
         if (policy.getResources() != null && !policy.getResources().isEmpty()) {
-            List<PolicyResourceResponse> resourceResponses = policy.getResources().stream()
-                    .map(PolicyResponseBuilder::toPolicyResourceResponse)
-                    .collect(Collectors.toList());
+            List<PolicyResourceResponse> resourceResponses = new ArrayList<>();
+            for (PolicyResource resource : policy.getResources()) {
+                resourceResponses.add(PolicyResourceHandlerRegistry.getInstance().getHandler(resource.getResourceType())
+                        .buildResourceResponse(resource));
+            }
             response.setResources(resourceResponses);
         }
 
         return response;
     }
 
-    private static PolicyResourceResponse toPolicyResourceResponse(PolicyResource policyResource) {
+    /**
+     * Build the response of the metadata of a resource type, in the format of that resource type.
+     *
+     * @param metadata Resource metadata.
+     * @return Metadata response.
+     */
+    public static Object buildResourceMetadataResponse(PolicyResourceMetadata metadata) {
 
-        PolicyResourceResponse resourceResponse = new PolicyResourceResponse();
-        resourceResponse.setTarget(policyResource.getTarget());
-        if (policyResource.getResourceType() != null) {
-            resourceResponse.setResourceType(
-                    PolicyResourceResponse.ResourceTypeEnum.fromValue(policyResource.getResourceType().name()));
-        }
-        if (policyResource instanceof RulePolicyResource) {
-            Rule rule = ((RulePolicyResource) policyResource).getRule();
-            if (rule != null) {
-                resourceResponse.setRule(RuleResponseBuilder.buildRuleResponse(rule));
-            }
-        }
-        return resourceResponse;
+        return PolicyResourceHandlerRegistry.getInstance().getHandler(metadata.getResourceType())
+                .buildMetadataResponse(metadata);
     }
 }
