@@ -358,12 +358,18 @@ public class Constants {
         ERROR_CODE_CDS_NOT_ENABLED("60022",
                 "CDS is not enabled.",
                 "The Customer Data Service feature is not enabled."),
+        ERROR_CODE_INVALID_CDS_CONFIG("60023",
+                "Invalid CDS configuration.",
+                "The Customer Data Service did not accept the configuration."),
         ERROR_CODE_CDS_CONFIG_RETRIEVE("65045",
                 "Unable to retrieve CDS configuration.",
                 "Server encountered an error while retrieving the CDS configuration."),
         ERROR_CODE_CDS_CONFIG_UPDATE("65046",
                 "Unable to update CDS configuration.",
-                "Server encountered an error while updating the CDS configuration.");
+                "Server encountered an error while updating the CDS configuration."),
+        ERROR_CODE_CDS_CONFIG_SYNC("65047",
+                "Unable to update CDS configuration.",
+                "Server encountered an error while sending the CDS configuration to the Customer Data Service.");
 
         private final String code;
         private final String message;

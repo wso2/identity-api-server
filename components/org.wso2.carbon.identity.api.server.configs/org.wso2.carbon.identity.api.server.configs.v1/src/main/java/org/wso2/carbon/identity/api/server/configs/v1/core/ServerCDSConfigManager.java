@@ -19,12 +19,17 @@
 package org.wso2.carbon.identity.api.server.configs.v1.core;
 
 import org.wso2.carbon.identity.api.server.configs.common.ConfigsServiceHolder;
+import org.wso2.carbon.identity.api.server.configs.common.Constants;
 import org.wso2.carbon.identity.api.server.configs.v1.exception.CDSConfigClientException;
 import org.wso2.carbon.identity.api.server.configs.v1.exception.CDSConfigException;
 import org.wso2.carbon.identity.api.server.configs.v1.exception.CDSConfigServerException;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CDSConfig;
+import org.wso2.identity.cds.config.mgt.constant.CDSConfigMgtConstants;
 import org.wso2.identity.cds.config.mgt.exception.CDSConfigMgtClientException;
 import org.wso2.identity.cds.config.mgt.exception.CDSConfigMgtException;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Manages the Customer Data Service (CDS) configuration with the CDSConfigService of the CDS extensions.
@@ -33,6 +38,24 @@ import org.wso2.identity.cds.config.mgt.exception.CDSConfigMgtException;
  * the configs API still load.
  */
 final class ServerCDSConfigManager {
+
+    /**
+     * Maps the error codes of the CDS config service to the error codes of the configs API.
+     */
+    private static final Map<String, Constants.ErrorMessage> ERROR_CODE_MAP = new HashMap<>();
+
+    static {
+        ERROR_CODE_MAP.put(CDSConfigMgtConstants.ErrorMessages.ERROR_CODE_CDS_NOT_ENABLED.getCode(),
+                Constants.ErrorMessage.ERROR_CODE_CDS_NOT_ENABLED);
+        ERROR_CODE_MAP.put(CDSConfigMgtConstants.ErrorMessages.ERROR_CODE_INVALID_CDS_CONFIG.getCode(),
+                Constants.ErrorMessage.ERROR_CODE_INVALID_CDS_CONFIG);
+        ERROR_CODE_MAP.put(CDSConfigMgtConstants.ErrorMessages.ERROR_CODE_CDS_CONFIG_RETRIEVE.getCode(),
+                Constants.ErrorMessage.ERROR_CODE_CDS_CONFIG_RETRIEVE);
+        ERROR_CODE_MAP.put(CDSConfigMgtConstants.ErrorMessages.ERROR_CODE_CDS_CONFIG_UPDATE.getCode(),
+                Constants.ErrorMessage.ERROR_CODE_CDS_CONFIG_UPDATE);
+        ERROR_CODE_MAP.put(CDSConfigMgtConstants.ErrorMessages.ERROR_CODE_CDS_CONFIG_SYNC.getCode(),
+                Constants.ErrorMessage.ERROR_CODE_CDS_CONFIG_SYNC);
+    }
 
     private ServerCDSConfigManager() {
 
@@ -72,11 +95,17 @@ final class ServerCDSConfigManager {
         }
     }
 
+    /**
+     * Convert an exception of the CDS config service to an exception of the configs API. If the error code has no
+     * mapping, the exception has no error code and the API uses its default error code.
+     */
     private static CDSConfigException toCDSConfigException(CDSConfigMgtException e) {
 
+        Constants.ErrorMessage error = ERROR_CODE_MAP.get(e.getErrorCode());
+        String errorCode = error != null ? error.code() : null;
         if (e instanceof CDSConfigMgtClientException) {
-            return new CDSConfigClientException(e.getMessage(), e.getErrorCode(), e);
+            return new CDSConfigClientException(e.getMessage(), errorCode, e);
         }
-        return new CDSConfigServerException(e.getMessage(), e.getErrorCode(), e);
+        return new CDSConfigServerException(e.getMessage(), errorCode, e);
     }
 }
