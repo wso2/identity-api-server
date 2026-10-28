@@ -27,6 +27,8 @@ public class FlowExecutionEndpointConstants {
     public static final String SELF_REGISTRATION_ENABLED = "SelfRegistration.Enable";
     public static final String DYNAMIC_REGISTRATION_PORTAL_ENABLED = "SelfRegistration.EnableDynamicPortal";
     public static final String SHOW_USERNAME_UNAVAILABILITY = "SelfRegistration.ShowUsernameUnavailability";
+    // The inputs key that gives the variables of the flow their values.
+    public static final String VARIABLES = "variables";
     private FlowExecutionEndpointConstants() {
     }
 
@@ -55,6 +57,11 @@ public class FlowExecutionEndpointConstants {
         ERROR_CODE_FLOW_DISABLED("60104",
                 "Flow is disabled.",
                 "The requested flow %s is disabled. Please contact your administrator."
+        ),
+
+        ERROR_CODE_INVALID_VARIABLES("60105",
+                "Invalid variables.",
+                "The variables input must be an object of variable names to their values."
         ),
 
         // Server error codes.

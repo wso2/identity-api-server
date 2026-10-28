@@ -711,6 +711,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Step'
+        inputs:
+          $ref: '#/components/schemas/FlowInputs'
 
     FlowGenerateRequest:
       type: object
@@ -780,6 +782,79 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Step'
+        inputs:
+          $ref: '#/components/schemas/FlowInputs'
+
+    FlowInputs:
+      type: object
+      description: >
+        What the flow takes in besides its steps: the headers and query parameters it reads from each
+        request, and the variables it keeps. Conditions read them through the `request.headers`,
+        `request.queryParameters` and `variables` fields.
+      properties:
+        headers:
+          type: array
+          description: Headers the flow reads from each request. Names are matched ignoring case.
+          items:
+            $ref: '#/components/schemas/FlowRequestValueInput'
+        queryParams:
+          type: array
+          description: Query parameters the flow reads from each request.
+          items:
+            $ref: '#/components/schemas/FlowRequestValueInput'
+        variables:
+          type: array
+          description: Variables the flow keeps, each with the value every run of the flow starts from.
+          items:
+            $ref: '#/components/schemas/FlowVariableInput'
+
+    FlowRequestValueInput:
+      type: object
+      description: >
+        A header or query parameter the flow reads from each request. A request may repeat it, so it
+        holds an array, and a request without it keeps the value an earlier request gave.
+      required:
+        - name
+        - dataType
+      properties:
+        name:
+          type: string
+          description: Name of the header or query parameter.
+          example: x-ab-variant
+        dataType:
+          type: string
+          description: Type of each value the request gives.
+          enum: [STRING_ARRAY, NUMBER_ARRAY]
+          example: STRING_ARRAY
+
+    FlowVariableInput:
+      type: object
+      description: A variable the flow keeps.
+      required:
+        - name
+        - dataType
+      properties:
+        name:
+          type: string
+          description: Name of the variable, unique within the flow. Letters and digits only, up to 255 characters.
+          example: plan
+        dataType:
+          type: string
+          description: Type of value the variable holds.
+          enum: [STRING, INTEGER, DECIMAL, BOOLEAN, STRING_ARRAY, NUMBER_ARRAY]
+          example: STRING
+        value:
+          description: >
+            Value every run of the flow starts from, of the variable's type: a string, a number, a
+            boolean, or an array of strings or numbers. Absent when the variable starts without one.
+          example: basic
+        clientWritable:
+          type: boolean
+          description: >
+            Whether the app may set the variable when the flow starts. Its value is then accepted from
+            the `variables` object of the inputs that start the flow, and ignored on later requests.
+          default: false
+          example: false
 
     FlowMetaResponse:
       type: object
@@ -824,6 +899,38 @@ components:
         workflowEnabled:
           type: boolean
           example: false
+        inputConfigs:
+          $ref: '#/components/schemas/FlowInputConfigs'
+
+    FlowInputConfigs:
+      type: object
+      description: >
+        Whether flows may define headers, query parameters and variables as inputs on this server, and the
+        limits their inputs are checked against when a flow is saved.
+      properties:
+        enabled:
+          type: boolean
+          example: true
+        maxHeaders:
+          type: integer
+          description: Most headers a flow may define.
+          example: 10
+        maxQueryParams:
+          type: integer
+          description: Most query parameters a flow may define.
+          example: 10
+        maxVariables:
+          type: integer
+          description: Most variables a flow may define.
+          example: 20
+        maxValueLength:
+          type: integer
+          description: Longest text a value, or an entry of an array value, may have.
+          example: 255
+        maxArraySize:
+          type: integer
+          description: Most entries an array value may have.
+          example: 20
 
     ExecutorConnections:
       type: object

@@ -29,6 +29,7 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.AttributeMetadata;
 import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorConnections;
 import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorMetadata;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionConnectionInfo;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowInputConfigs;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRuleMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.RuleFieldDefinition;
@@ -44,6 +45,8 @@ import org.wso2.carbon.identity.flow.execution.engine.metadata.FlowExecutorInfo;
 import org.wso2.carbon.identity.flow.extension.model.FlowExtensionAction;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtServerException;
+import org.wso2.carbon.identity.flow.mgt.utils.FlowInputUtils;
+import org.wso2.carbon.identity.flow.mgt.utils.FlowMgtUtils;
 import org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants;
 import org.wso2.carbon.identity.rule.metadata.api.exception.RuleMetadataException;
 import org.wso2.carbon.identity.rule.metadata.api.model.FieldDefinition;
@@ -202,7 +205,25 @@ public abstract class AbstractMetaResponseHandler {
         response.setExtensionExecutors(getExtensionExecutors());
         response.setFlowExtensionConnections(getFlowExtensionConnections());
         response.setSupportedFlowCompletionConfigs(getSupportedFlowCompletionConfigs());
+        response.setInputConfigs(getFlowInputConfigs());
         return response;
+    }
+
+    /**
+     * Whether flows may define headers, query parameters and variables as inputs, and the limits their inputs are
+     * checked against, so a builder can keep within them before saving.
+     *
+     * @return The flow input configurations.
+     */
+    protected FlowInputConfigs getFlowInputConfigs() {
+
+        return new FlowInputConfigs()
+                .enabled(FlowMgtUtils.isFlowInputsEnabled())
+                .maxHeaders(FlowInputUtils.getMaxHeaders())
+                .maxQueryParams(FlowInputUtils.getMaxQueryParams())
+                .maxVariables(FlowInputUtils.getMaxVariables())
+                .maxValueLength(FlowInputUtils.getMaxValueLength())
+                .maxArraySize(FlowInputUtils.getMaxArraySize());
     }
 
     /**

@@ -25,6 +25,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.flow.management.v1.AttributeMetadata;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowInputConfigs;
 import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorConnections;
 import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorMetadata;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionConnectionInfo;
@@ -57,6 +58,7 @@ public class FlowMetaResponse  {
     private List<FlowExtensionConnectionInfo> flowExtensionConnections = null;
 
     private Boolean workflowEnabled;
+    private FlowInputConfigs inputConfigs;
 
     /**
     **/
@@ -287,6 +289,24 @@ public class FlowMetaResponse  {
         this.workflowEnabled = workflowEnabled;
     }
 
+    /**
+    **/
+    public FlowMetaResponse inputConfigs(FlowInputConfigs inputConfigs) {
+
+        this.inputConfigs = inputConfigs;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("inputConfigs")
+    @Valid
+    public FlowInputConfigs getInputConfigs() {
+        return inputConfigs;
+    }
+    public void setInputConfigs(FlowInputConfigs inputConfigs) {
+        this.inputConfigs = inputConfigs;
+    }
+
 
 
 
@@ -309,12 +329,13 @@ public class FlowMetaResponse  {
             Objects.equals(this.attributeMetadata, flowMetaResponse.attributeMetadata) &&
             Objects.equals(this.executorConnections, flowMetaResponse.executorConnections) &&
             Objects.equals(this.flowExtensionConnections, flowMetaResponse.flowExtensionConnections) &&
-            Objects.equals(this.workflowEnabled, flowMetaResponse.workflowEnabled);
+            Objects.equals(this.workflowEnabled, flowMetaResponse.workflowEnabled) &&
+            Objects.equals(this.inputConfigs, flowMetaResponse.inputConfigs);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(flowType, supportedExecutors, extensionExecutors, connectorConfigs, attributeProfile, supportedFlowCompletionConfigs, attributeMetadata, executorConnections, flowExtensionConnections, workflowEnabled);
+        return Objects.hash(flowType, supportedExecutors, extensionExecutors, connectorConfigs, attributeProfile, supportedFlowCompletionConfigs, attributeMetadata, executorConnections, flowExtensionConnections, workflowEnabled, inputConfigs);
     }
 
     @Override

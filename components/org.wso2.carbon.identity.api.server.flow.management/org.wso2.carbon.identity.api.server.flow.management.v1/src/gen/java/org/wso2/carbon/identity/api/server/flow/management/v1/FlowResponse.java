@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowInputs;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Step;
 import javax.validation.constraints.*;
 
@@ -39,6 +40,7 @@ import javax.xml.bind.annotation.*;
 public class FlowResponse  {
   
     private List<Step> steps = null;
+    private FlowInputs inputs;
 
 
     /**
@@ -67,6 +69,24 @@ public class FlowResponse  {
         return this;
     }
 
+    /**
+    **/
+    public FlowResponse inputs(FlowInputs inputs) {
+
+        this.inputs = inputs;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("inputs")
+    @Valid
+    public FlowInputs getInputs() {
+        return inputs;
+    }
+    public void setInputs(FlowInputs inputs) {
+        this.inputs = inputs;
+    }
+
     
 
     @Override
@@ -79,12 +99,13 @@ public class FlowResponse  {
             return false;
         }
         FlowResponse flowResponse = (FlowResponse) o;
-        return Objects.equals(this.steps, flowResponse.steps);
+        return Objects.equals(this.steps, flowResponse.steps) &&
+            Objects.equals(this.inputs, flowResponse.inputs);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(steps);
+        return Objects.hash(steps, inputs);
     }
 
     @Override
@@ -94,6 +115,7 @@ public class FlowResponse  {
         sb.append("class FlowResponse {\n");
         
         sb.append("    steps: ").append(toIndentedString(steps)).append("\n");
+        sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
         sb.append("}");
         return sb.toString();
     }

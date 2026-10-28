@@ -115,7 +115,7 @@ public class FlowExecutionRequest  {
     }
 
     /**
-    * Input values for the execution step
+    * Input values for the execution step. The `variables` object gives the variables of the flow their values, by name. A value is read for the type of its variable, so both 10 and "10" are an integer. Variables are accepted only in the request that starts the flow, and only those the flow lets the user update.
     **/
     public FlowExecutionRequest inputs(Object inputs) {
 
@@ -123,7 +123,7 @@ public class FlowExecutionRequest  {
         return this;
     }
     
-    @ApiModelProperty(example = "{\"username\":\"johnw\"}", value = "Input values for the execution step")
+    @ApiModelProperty(example = "{\"username\":\"johnw\",\"variables\":{\"abTestingKey\":10}}", value = "Input values for the execution step. The `variables` object gives the variables of the flow their values, by name. A value is read for the type of its variable, so both 10 and \"10\" are an integer. Variables are accepted only in the request that starts the flow, and only those the flow lets the user update.")
     @JsonProperty("inputs")
     @Valid
     public Object getInputs() {

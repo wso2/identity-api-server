@@ -26,17 +26,24 @@ import org.wso2.carbon.identity.api.server.flow.execution.v1.FlowExecutionReques
 import org.wso2.carbon.identity.api.server.flow.execution.v1.FlowExecutionResponse;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.utils.Utils;
 import org.wso2.carbon.identity.flow.execution.engine.FlowExecutionService;
+import org.wso2.carbon.identity.flow.execution.engine.exception.FlowEngineClientException;
 import org.wso2.carbon.identity.flow.execution.engine.exception.FlowEngineException;
 import org.wso2.carbon.identity.flow.execution.engine.model.FlowExecutionStep;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import static org.wso2.carbon.identity.api.server.flow.execution.v1.constants.FlowExecutionEndpointConstants.ErrorMessage.ERROR_CODE_INVALID_VARIABLES;
+import static org.wso2.carbon.identity.api.server.flow.execution.v1.constants.FlowExecutionEndpointConstants.VARIABLES;
 
 /**
  * Service class for flow execution.
  */
 public class FlowExecutionServiceCore {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final FlowExecutionService flowExecutionService;
 
@@ -59,13 +66,15 @@ public class FlowExecutionServiceCore {
                 Utils.validateFlowInitiation(flowExecutionRequest);
             }
 
-            ObjectMapper objectMapper = new ObjectMapper();
-            Map<String, String> inputMap = Optional.ofNullable(flowExecutionRequest.getInputs())
-                    .map(inputs -> objectMapper.convertValue(inputs, new MapTypeReference()))
-                    .orElse(Collections.emptyMap());
+            Map<String, Object> inputs = Optional.ofNullable(flowExecutionRequest.getInputs())
+                    .map(requestInputs -> OBJECT_MAPPER.convertValue(requestInputs, new ObjectMapTypeReference()))
+                    .orElseGet(HashMap::new);
+            Map<String, Object> variableInputs = takeVariableInputs(inputs);
+            Map<String, String> inputMap = OBJECT_MAPPER.convertValue(inputs, new MapTypeReference());
             FlowExecutionStep flowExecutionStep = flowExecutionService.executeFlow(tenantDomain,
                     flowExecutionRequest.getApplicationId(), flowExecutionRequest.getFlowId(),
-                    flowExecutionRequest.getActionId(), flowExecutionRequest.getFlowType(), inputMap);
+                    flowExecutionRequest.getActionId(), flowExecutionRequest.getFlowType(), inputMap,
+                    variableInputs);
             FlowExecutionResponse flowExecutionResponse = new FlowExecutionResponse();
 
             if (flowExecutionStep == null) {
@@ -84,9 +93,38 @@ public class FlowExecutionServiceCore {
     }
 
     /**
+     * Takes the variables object out of the inputs. Its values keep their JSON types, and the engine reads each for
+     * the type of its variable.
+     *
+     * @param inputs Inputs of the request.
+     * @return Values for the variables of the flow, by name.
+     */
+    private static Map<String, Object> takeVariableInputs(Map<String, Object> inputs) {
+
+        Object variables = inputs.remove(VARIABLES);
+        if (variables == null) {
+            return Collections.emptyMap();
+        }
+        if (!(variables instanceof Map)) {
+            throw Utils.handleFlowException(new FlowEngineClientException(
+                    ERROR_CODE_INVALID_VARIABLES.getCode(),
+                    ERROR_CODE_INVALID_VARIABLES.getMessage(),
+                    ERROR_CODE_INVALID_VARIABLES.getDescription()));
+        }
+        return OBJECT_MAPPER.convertValue(variables, new ObjectMapTypeReference());
+    }
+
+    /**
      * Static inner class for TypeReference.
      */
     private static class MapTypeReference extends TypeReference<Map<String, String>> {
+
+    }
+
+    /**
+     * Type reference for a JSON object whose values keep their JSON types.
+     */
+    private static class ObjectMapTypeReference extends TypeReference<Map<String, Object>> {
 
     }
 }
