@@ -29,6 +29,7 @@ import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 public class RuleFieldValueLink  {
   
@@ -47,6 +48,7 @@ public enum MethodEnum {
         value = v;
     }
 
+    @JsonValue
     public String value() {
         return value;
     }
@@ -81,6 +83,7 @@ public enum RelEnum {
         value = v;
     }
 
+    @JsonValue
     public String value() {
         return value;
     }

@@ -33,6 +33,7 @@ import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 public class RuleFieldValue  {
   
@@ -50,6 +51,7 @@ public enum InputTypeEnum {
         value = v;
     }
 
+    @JsonValue
     public String value() {
         return value;
     }
@@ -84,6 +86,7 @@ public enum ValueTypeEnum {
         value = v;
     }
 
+    @JsonValue
     public String value() {
         return value;
     }

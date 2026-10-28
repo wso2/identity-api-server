@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -35,6 +35,7 @@ import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
+import com.fasterxml.jackson.annotation.JsonValue;
 @ApiModel(description = "A rule that combines one or more AND-grouped sub-rules with an OR condition; the rule is satisfied when any sub-rule is satisfied.")
 public class RuleRequest  {
   
@@ -52,6 +53,7 @@ public enum ConditionEnum {
         value = v;
     }
 
+    @JsonValue
     public String value() {
         return value;
     }
