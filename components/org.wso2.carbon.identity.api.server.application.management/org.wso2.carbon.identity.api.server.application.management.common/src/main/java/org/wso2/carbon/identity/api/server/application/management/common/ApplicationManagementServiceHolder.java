@@ -30,6 +30,7 @@ import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
 import org.wso2.carbon.identity.oauth.ciba.api.CibaAuthService;
 import org.wso2.carbon.identity.oauth.ciba.api.CibaAuthServiceImpl;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
+import org.wso2.carbon.identity.oauth2.cimd.ClientIdMetadataDocumentService;
 import org.wso2.carbon.identity.oauth2.config.services.OAuth2OIDCConfigOrgUsageScopeMgtService;
 import org.wso2.carbon.identity.oauth2.fapi.services.FapiConfigMgtService;
 import org.wso2.carbon.identity.organization.management.application.OrgApplicationManager;
@@ -57,6 +58,12 @@ public class ApplicationManagementServiceHolder {
 
         static final OAuthAdminServiceImpl SERVICE = (OAuthAdminServiceImpl) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(OAuthAdminServiceImpl.class, null);
+    }
+
+    private static class ClientIdMetadataDocumentServiceHolder {
+
+        static final ClientIdMetadataDocumentService SERVICE = (ClientIdMetadataDocumentService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(ClientIdMetadataDocumentService.class, null);
     }
 
     private static class STSAdminServiceInterfaceHolder {
@@ -176,6 +183,16 @@ public class ApplicationManagementServiceHolder {
     public static OAuthAdminServiceImpl getOAuthAdminService() {
 
         return OAuthAdminServiceImplHolder.SERVICE;
+    }
+
+    /**
+     * Get ClientIdMetadataDocumentService.
+     *
+     * @return ClientIdMetadataDocumentService.
+     */
+    public static ClientIdMetadataDocumentService getClientIdMetadataDocumentService() {
+
+        return ClientIdMetadataDocumentServiceHolder.SERVICE;
     }
 
     /**
