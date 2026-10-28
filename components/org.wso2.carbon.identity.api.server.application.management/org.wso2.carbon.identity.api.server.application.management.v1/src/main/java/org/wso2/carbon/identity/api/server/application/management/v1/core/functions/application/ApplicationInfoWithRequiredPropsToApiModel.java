@@ -61,6 +61,7 @@ public class ApplicationInfoWithRequiredPropsToApiModel implements Function<Appl
                 .templateVersion(applicationResponseModel.getTemplateVersion())
                 .self(getApplicationLocation(applicationResponseModel.getId()))
                 .applicationEnabled(applicationResponseModel.getApplicationEnabled())
+                .organizationCustomRolesEnabled(applicationResponseModel.getOrganizationCustomRolesEnabled())
                 .associatedRoles(excludeAssociatedRoles(applicationResponseModel.getAssociatedRoles()));
     }
 

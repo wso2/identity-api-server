@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -83,6 +83,7 @@ public enum AccessEnum {
     private String templateVersion;
     private AssociatedRolesConfig associatedRoles;
     private Boolean enhancedOrgAuthenticationEnabled;
+    private Boolean organizationCustomRolesEnabled;
     private Boolean applicationEnabled;
 
     /**
@@ -376,6 +377,24 @@ public enum AccessEnum {
 
     /**
     **/
+    public ApplicationListItem organizationCustomRolesEnabled(Boolean organizationCustomRolesEnabled) {
+
+        this.organizationCustomRolesEnabled = organizationCustomRolesEnabled;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "")
+    @JsonProperty("organizationCustomRolesEnabled")
+    @Valid
+    public Boolean getOrganizationCustomRolesEnabled() {
+        return organizationCustomRolesEnabled;
+    }
+    public void setOrganizationCustomRolesEnabled(Boolean organizationCustomRolesEnabled) {
+        this.organizationCustomRolesEnabled = organizationCustomRolesEnabled;
+    }
+
+    /**
+    **/
     public ApplicationListItem applicationEnabled(Boolean applicationEnabled) {
 
         this.applicationEnabled = applicationEnabled;
@@ -420,12 +439,13 @@ public enum AccessEnum {
             Objects.equals(this.templateVersion, applicationListItem.templateVersion) &&
             Objects.equals(this.associatedRoles, applicationListItem.associatedRoles) &&
             Objects.equals(this.enhancedOrgAuthenticationEnabled, applicationListItem.enhancedOrgAuthenticationEnabled) &&
+            Objects.equals(this.organizationCustomRolesEnabled, applicationListItem.organizationCustomRolesEnabled) &&
             Objects.equals(this.applicationEnabled, applicationListItem.applicationEnabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, applicationVersion, image, accessUrl, clientId, issuer, realm, access, self, advancedConfigurations, templateId, templateVersion, associatedRoles, enhancedOrgAuthenticationEnabled, applicationEnabled);
+        return Objects.hash(id, name, description, applicationVersion, image, accessUrl, clientId, issuer, realm, access, self, advancedConfigurations, templateId, templateVersion, associatedRoles, enhancedOrgAuthenticationEnabled, organizationCustomRolesEnabled, applicationEnabled);
     }
 
     @Override
@@ -450,6 +470,7 @@ public enum AccessEnum {
         sb.append("    templateVersion: ").append(toIndentedString(templateVersion)).append("\n");
         sb.append("    associatedRoles: ").append(toIndentedString(associatedRoles)).append("\n");
         sb.append("    enhancedOrgAuthenticationEnabled: ").append(toIndentedString(enhancedOrgAuthenticationEnabled)).append("\n");
+        sb.append("    organizationCustomRolesEnabled: ").append(toIndentedString(organizationCustomRolesEnabled)).append("\n");
         sb.append("    applicationEnabled: ").append(toIndentedString(applicationEnabled)).append("\n");
         sb.append("}");
         return sb.toString();
