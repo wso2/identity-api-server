@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2020-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -23,22 +23,27 @@ import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.script.library.common.Constants;
+import org.wso2.carbon.identity.api.server.script.library.common.core.ScriptLibraryPage;
+import org.wso2.carbon.identity.api.server.script.library.common.core.ServerScriptLibrariesService;
+import org.wso2.carbon.identity.api.server.script.library.common.factories.ServerScriptLibrariesServiceFactory;
 import org.wso2.carbon.identity.api.server.script.library.v1.ScriptLibrariesApiService;
-import org.wso2.carbon.identity.api.server.script.library.v1.core.ServerScriptLibrariesService;
-import org.wso2.carbon.identity.api.server.script.library.v1.factories.ServerScriptLibrariesServiceFactory;
+import org.wso2.carbon.identity.api.server.script.library.v1.model.ScriptLibrary;
 import org.wso2.carbon.identity.api.server.script.library.v1.model.ScriptLibraryListResponse;
 import org.wso2.carbon.identity.api.server.script.library.v1.model.ScriptLibraryResponse;
+import org.wso2.carbon.identity.functions.library.mgt.model.FunctionLibrary;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
-
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.script.library.common.Constants.SCRIPT_LIBRARY_CONTENT_PATH;
 import static org.wso2.carbon.identity.api.server.script.library.common.Constants.SCRIPT_LIBRARY_PATH_COMPONENT;
 
 /**
@@ -69,12 +74,7 @@ public class ScriptLibrariesApiServiceImpl implements ScriptLibrariesApiService 
                             .replace("+", "%20"));
             return Response.created(location).build();
         } catch (UnsupportedEncodingException e) {
-            ErrorResponse errorResponse =
-                    new ErrorResponse.Builder().withCode(Constants.ErrorMessage.ERROR_CODE_ERROR_ENCODING_URL
-                            .getCode()).withMessage(Constants.ErrorMessage.ERROR_CODE_ERROR_ENCODING_URL.getMessage())
-                            .withDescription(Constants.ErrorMessage.ERROR_CODE_ERROR_ENCODING_URL.getDescription())
-                            .build();
-            throw new APIError(Response.Status.INTERNAL_SERVER_ERROR, errorResponse);
+            throw buildEncodingError();
         }
     }
 
@@ -88,22 +88,53 @@ public class ScriptLibrariesApiServiceImpl implements ScriptLibrariesApiService 
     @Override
     public Response getScriptLibraries(Integer limit, Integer offset) {
 
-        ScriptLibraryListResponse scriptLibraryListResponse = serverScriptLibrariesService.getScriptLibraries(limit,
-                offset);
+        ScriptLibraryPage page = serverScriptLibrariesService.getScriptLibraries(limit, offset);
+        ScriptLibraryListResponse scriptLibraryListResponse = new ScriptLibraryListResponse();
+        if (page.getTotalResults() == 0) {
+            scriptLibraryListResponse.setCount(0);
+            return Response.ok().entity(scriptLibraryListResponse).build();
+        }
+        List<ScriptLibrary> scriptLibraries = new ArrayList<>();
+        for (FunctionLibrary functionLibrary : page.getScriptLibraries()) {
+            ScriptLibrary scriptLibrary = new ScriptLibrary();
+            scriptLibrary.setName(functionLibrary.getFunctionLibraryName());
+            scriptLibrary.setDescription(functionLibrary.getDescription());
+            scriptLibrary.setSelf(
+                    ContextLoader.buildURIForBody(
+                            String.format(V1_API_PATH_COMPONENT + SCRIPT_LIBRARY_PATH_COMPONENT + "/%s",
+                                    functionLibrary.getFunctionLibraryName())).toString());
+            scriptLibraries.add(scriptLibrary);
+        }
+        scriptLibraryListResponse.setScriptLibraries(scriptLibraries);
+        scriptLibraryListResponse.setCount(scriptLibraries.size());
+        scriptLibraryListResponse.setTotalResults(page.getTotalResults());
+        scriptLibraryListResponse.setStartIndex(page.getOffset() + 1);
         return Response.ok().entity(scriptLibraryListResponse).build();
     }
 
     @Override
     public Response getScriptLibraryByName(String scriptLibraryName) {
 
-        ScriptLibraryResponse scriptLibraryResponse = serverScriptLibrariesService.getScriptLibrary(scriptLibraryName);
+        FunctionLibrary scriptLibrary = serverScriptLibrariesService.getScriptLibrary(scriptLibraryName);
+        ScriptLibraryResponse scriptLibraryResponse = new ScriptLibraryResponse();
+        scriptLibraryResponse.setName(scriptLibrary.getFunctionLibraryName());
+        scriptLibraryResponse.setDescription(scriptLibrary.getDescription());
+        try {
+            String displayName =
+                    URLEncoder.encode(scriptLibrary.getFunctionLibraryName(), StandardCharsets.UTF_8.name());
+            scriptLibraryResponse.setContentRef(ContextLoader.buildURIForBody(String.format(
+                    V1_API_PATH_COMPONENT + SCRIPT_LIBRARY_PATH_COMPONENT + "/%s" + SCRIPT_LIBRARY_CONTENT_PATH,
+                    displayName)).toString().replace("+", "%20"));
+        } catch (UnsupportedEncodingException e) {
+            throw buildEncodingError();
+        }
         return Response.ok().entity(scriptLibraryResponse).build();
     }
 
     @Override
     public Response getScriptLibraryContentByName(String scriptLibraryName) {
 
-        return Response.ok().entity(serverScriptLibrariesService.getScriptLibraryContentByName(scriptLibraryName))
+        return Response.ok().entity(serverScriptLibrariesService.getScriptLibraryContent(scriptLibraryName))
                 .build();
     }
 
@@ -113,5 +144,15 @@ public class ScriptLibrariesApiServiceImpl implements ScriptLibrariesApiService 
 
         serverScriptLibrariesService.updateScriptLibrary(scriptLibraryName, contentInputStream, description);
         return Response.ok().build();
+    }
+
+    private APIError buildEncodingError() {
+
+        ErrorResponse errorResponse =
+                new ErrorResponse.Builder().withCode(Constants.ErrorMessage.ERROR_CODE_ERROR_ENCODING_URL
+                        .getCode()).withMessage(Constants.ErrorMessage.ERROR_CODE_ERROR_ENCODING_URL.getMessage())
+                        .withDescription(Constants.ErrorMessage.ERROR_CODE_ERROR_ENCODING_URL.getDescription())
+                        .build();
+        return new APIError(Response.Status.INTERNAL_SERVER_ERROR, errorResponse);
     }
 }

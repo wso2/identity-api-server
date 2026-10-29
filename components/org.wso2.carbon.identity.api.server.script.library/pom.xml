@@ -28,6 +28,7 @@
     <artifactId>org.wso2.carbon.identity.api.server.script.library</artifactId>
     <modules>
         <module>org.wso2.carbon.identity.api.server.script.library.v1</module>
+        <module>org.wso2.carbon.identity.api.server.script.library.v2</module>
         <module>org.wso2.carbon.identity.api.server.script.library.common</module>
     </modules>
 </project>
