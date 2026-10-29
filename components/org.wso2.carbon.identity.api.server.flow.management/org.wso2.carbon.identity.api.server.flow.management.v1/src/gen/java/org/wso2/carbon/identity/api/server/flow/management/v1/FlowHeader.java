@@ -26,15 +26,15 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 
 /**
- * A variable the flow keeps.
+ * A header the flow reads from each request. A request may repeat it, so it holds an array, and a request without it keeps the value an earlier request gave.
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "A variable the flow keeps.")
-public class FlowVariableInput  {
+@ApiModel(description = "A header the flow reads from each request. A request may repeat it, so it holds an array, and a request without it keeps the value an earlier request gave.")
+public class FlowHeader  {
   
     private String name;
 
@@ -42,10 +42,6 @@ public class FlowVariableInput  {
 @XmlEnum(String.class)
 public enum DataTypeEnum {
 
-    @XmlEnumValue("STRING") STRING(String.valueOf("STRING")),
-    @XmlEnumValue("INTEGER") INTEGER(String.valueOf("INTEGER")),
-    @XmlEnumValue("DECIMAL") DECIMAL(String.valueOf("DECIMAL")),
-    @XmlEnumValue("BOOLEAN") BOOLEAN(String.valueOf("BOOLEAN")),
     @XmlEnumValue("STRING_ARRAY") STRING_ARRAY(String.valueOf("STRING_ARRAY")),
     @XmlEnumValue("NUMBER_ARRAY") NUMBER_ARRAY(String.valueOf("NUMBER_ARRAY"));
 
@@ -78,19 +74,17 @@ public enum DataTypeEnum {
 }
 
     private DataTypeEnum dataType;
-    private Object value;
-    private Boolean clientWritable = false;
 
     /**
-    * Name of the variable, unique within the flow. Letters and digits only, up to 255 characters.
+    * Name of the header.
     **/
-    public FlowVariableInput name(String name) {
+    public FlowHeader name(String name) {
 
         this.name = name;
         return this;
     }
     
-    @ApiModelProperty(example = "plan", required = true, value = "Name of the variable, unique within the flow. Letters and digits only, up to 255 characters.")
+    @ApiModelProperty(example = "x-ab-variant", required = true, value = "Name of the header.")
     @JsonProperty("name")
     @Valid
     @NotNull(message = "Property name cannot be null.")
@@ -103,15 +97,15 @@ public enum DataTypeEnum {
     }
 
     /**
-    * Type of value the variable holds.
+    * Type of each value the request gives.
     **/
-    public FlowVariableInput dataType(DataTypeEnum dataType) {
+    public FlowHeader dataType(DataTypeEnum dataType) {
 
         this.dataType = dataType;
         return this;
     }
     
-    @ApiModelProperty(example = "STRING", required = true, value = "Type of value the variable holds.")
+    @ApiModelProperty(example = "STRING_ARRAY", required = true, value = "Type of each value the request gives.")
     @JsonProperty("dataType")
     @Valid
     @NotNull(message = "Property dataType cannot be null.")
@@ -121,44 +115,6 @@ public enum DataTypeEnum {
     }
     public void setDataType(DataTypeEnum dataType) {
         this.dataType = dataType;
-    }
-
-    /**
-    * Value every run of the flow starts from, of the variable's type: a string, a number, a boolean, or an array of strings or numbers. Absent when the variable starts without one.
-    **/
-    public FlowVariableInput value(Object value) {
-
-        this.value = value;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "basic", value = "Value every run of the flow starts from, of the variable's type: a string, a number, a boolean, or an array of strings or numbers. Absent when the variable starts without one.")
-    @JsonProperty("value")
-    @Valid
-    public Object getValue() {
-        return value;
-    }
-    public void setValue(Object value) {
-        this.value = value;
-    }
-
-    /**
-    * Whether the user may set the variable when the flow starts. Its value is then accepted from the variables object of the inputs that start the flow, and ignored on later requests.
-    **/
-    public FlowVariableInput clientWritable(Boolean clientWritable) {
-
-        this.clientWritable = clientWritable;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "false", value = "Whether the user may set the variable when the flow starts. Its value is then accepted from the variables object of the inputs that start the flow, and ignored on later requests.")
-    @JsonProperty("clientWritable")
-    @Valid
-    public Boolean getClientWritable() {
-        return clientWritable;
-    }
-    public void setClientWritable(Boolean clientWritable) {
-        this.clientWritable = clientWritable;
     }
 
     
@@ -172,28 +128,24 @@ public enum DataTypeEnum {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        FlowVariableInput flowVariableInput = (FlowVariableInput) o;
-        return Objects.equals(this.name, flowVariableInput.name) &&
-            Objects.equals(this.dataType, flowVariableInput.dataType) &&
-            Objects.equals(this.value, flowVariableInput.value) &&
-            Objects.equals(this.clientWritable, flowVariableInput.clientWritable);
+        FlowHeader flowHeader = (FlowHeader) o;
+        return Objects.equals(this.name, flowHeader.name) &&
+            Objects.equals(this.dataType, flowHeader.dataType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, dataType, value, clientWritable);
+        return Objects.hash(name, dataType);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class FlowVariableInput {\n");
+        sb.append("class FlowHeader {\n");
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    dataType: ").append(toIndentedString(dataType)).append("\n");
-        sb.append("    value: ").append(toIndentedString(value)).append("\n");
-        sb.append("    clientWritable: ").append(toIndentedString(clientWritable)).append("\n");
         sb.append("}");
         return sb.toString();
     }

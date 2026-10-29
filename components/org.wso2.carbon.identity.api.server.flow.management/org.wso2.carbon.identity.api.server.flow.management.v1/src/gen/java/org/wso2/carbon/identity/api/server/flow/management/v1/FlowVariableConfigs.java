@@ -25,26 +25,25 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 
 /**
- * Whether flows may define headers, query parameters and variables as inputs on this server, and the limits their inputs are checked against when a flow is saved.
+ * Whether flows may define headers and runtime values as variables on this server, and the limits their variables are checked against when a flow is saved.
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "Whether flows may define headers, query parameters and variables as inputs on this server, and the limits their inputs are checked against when a flow is saved.")
-public class FlowInputConfigs  {
+@ApiModel(description = "Whether flows may define headers and runtime values as variables on this server, and the limits their variables are checked against when a flow is saved.")
+public class FlowVariableConfigs  {
   
     private Boolean enabled;
     private Integer maxHeaders;
-    private Integer maxQueryParams;
-    private Integer maxVariables;
+    private Integer maxRuntimeValues;
     private Integer maxValueLength;
     private Integer maxArraySize;
 
     /**
     **/
-    public FlowInputConfigs enabled(Boolean enabled) {
+    public FlowVariableConfigs enabled(Boolean enabled) {
 
         this.enabled = enabled;
         return this;
@@ -63,7 +62,7 @@ public class FlowInputConfigs  {
     /**
     * Most headers a flow may define.
     **/
-    public FlowInputConfigs maxHeaders(Integer maxHeaders) {
+    public FlowVariableConfigs maxHeaders(Integer maxHeaders) {
 
         this.maxHeaders = maxHeaders;
         return this;
@@ -80,47 +79,28 @@ public class FlowInputConfigs  {
     }
 
     /**
-    * Most query parameters a flow may define.
+    * Most runtime values a flow may define.
     **/
-    public FlowInputConfigs maxQueryParams(Integer maxQueryParams) {
+    public FlowVariableConfigs maxRuntimeValues(Integer maxRuntimeValues) {
 
-        this.maxQueryParams = maxQueryParams;
+        this.maxRuntimeValues = maxRuntimeValues;
         return this;
     }
     
-    @ApiModelProperty(example = "10", value = "Most query parameters a flow may define.")
-    @JsonProperty("maxQueryParams")
+    @ApiModelProperty(example = "20", value = "Most runtime values a flow may define.")
+    @JsonProperty("maxRuntimeValues")
     @Valid
-    public Integer getMaxQueryParams() {
-        return maxQueryParams;
+    public Integer getMaxRuntimeValues() {
+        return maxRuntimeValues;
     }
-    public void setMaxQueryParams(Integer maxQueryParams) {
-        this.maxQueryParams = maxQueryParams;
-    }
-
-    /**
-    * Most variables a flow may define.
-    **/
-    public FlowInputConfigs maxVariables(Integer maxVariables) {
-
-        this.maxVariables = maxVariables;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "20", value = "Most variables a flow may define.")
-    @JsonProperty("maxVariables")
-    @Valid
-    public Integer getMaxVariables() {
-        return maxVariables;
-    }
-    public void setMaxVariables(Integer maxVariables) {
-        this.maxVariables = maxVariables;
+    public void setMaxRuntimeValues(Integer maxRuntimeValues) {
+        this.maxRuntimeValues = maxRuntimeValues;
     }
 
     /**
     * Longest text a value, or an entry of an array value, may have.
     **/
-    public FlowInputConfigs maxValueLength(Integer maxValueLength) {
+    public FlowVariableConfigs maxValueLength(Integer maxValueLength) {
 
         this.maxValueLength = maxValueLength;
         return this;
@@ -139,7 +119,7 @@ public class FlowInputConfigs  {
     /**
     * Most entries an array value may have.
     **/
-    public FlowInputConfigs maxArraySize(Integer maxArraySize) {
+    public FlowVariableConfigs maxArraySize(Integer maxArraySize) {
 
         this.maxArraySize = maxArraySize;
         return this;
@@ -166,30 +146,28 @@ public class FlowInputConfigs  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        FlowInputConfigs flowInputConfigs = (FlowInputConfigs) o;
-        return Objects.equals(this.enabled, flowInputConfigs.enabled) &&
-            Objects.equals(this.maxHeaders, flowInputConfigs.maxHeaders) &&
-            Objects.equals(this.maxQueryParams, flowInputConfigs.maxQueryParams) &&
-            Objects.equals(this.maxVariables, flowInputConfigs.maxVariables) &&
-            Objects.equals(this.maxValueLength, flowInputConfigs.maxValueLength) &&
-            Objects.equals(this.maxArraySize, flowInputConfigs.maxArraySize);
+        FlowVariableConfigs flowVariableConfigs = (FlowVariableConfigs) o;
+        return Objects.equals(this.enabled, flowVariableConfigs.enabled) &&
+            Objects.equals(this.maxHeaders, flowVariableConfigs.maxHeaders) &&
+            Objects.equals(this.maxRuntimeValues, flowVariableConfigs.maxRuntimeValues) &&
+            Objects.equals(this.maxValueLength, flowVariableConfigs.maxValueLength) &&
+            Objects.equals(this.maxArraySize, flowVariableConfigs.maxArraySize);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(enabled, maxHeaders, maxQueryParams, maxVariables, maxValueLength, maxArraySize);
+        return Objects.hash(enabled, maxHeaders, maxRuntimeValues, maxValueLength, maxArraySize);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class FlowInputConfigs {\n");
+        sb.append("class FlowVariableConfigs {\n");
         
         sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
         sb.append("    maxHeaders: ").append(toIndentedString(maxHeaders)).append("\n");
-        sb.append("    maxQueryParams: ").append(toIndentedString(maxQueryParams)).append("\n");
-        sb.append("    maxVariables: ").append(toIndentedString(maxVariables)).append("\n");
+        sb.append("    maxRuntimeValues: ").append(toIndentedString(maxRuntimeValues)).append("\n");
         sb.append("    maxValueLength: ").append(toIndentedString(maxValueLength)).append("\n");
         sb.append("    maxArraySize: ").append(toIndentedString(maxArraySize)).append("\n");
         sb.append("}");

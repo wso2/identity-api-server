@@ -80,16 +80,9 @@ components:
           example: button_40f64
         inputs:
           type: object
-          description: >
-            Input values for the execution step. The `variables` object gives the variables of the flow their
-            values, by name. A value is read for the type of its variable, so both 10 and "10" are an integer.
-            Variables are accepted only in the request that starts the flow, and only those the flow lets the
-            user update.
+          description: Input values for the execution step
           example: {
-            "username": "johnw",
-            "variables": {
-              "abTestingKey": 10
-            }
+            "username": "johnw"
           }
 
     FlowExecutionResponse:

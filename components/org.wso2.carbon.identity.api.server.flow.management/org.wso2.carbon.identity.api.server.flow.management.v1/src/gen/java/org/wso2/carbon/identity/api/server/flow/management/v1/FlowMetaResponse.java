@@ -25,7 +25,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.flow.management.v1.AttributeMetadata;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowInputConfigs;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowVariableConfigs;
 import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorConnections;
 import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorMetadata;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionConnectionInfo;
@@ -58,7 +58,7 @@ public class FlowMetaResponse  {
     private List<FlowExtensionConnectionInfo> flowExtensionConnections = null;
 
     private Boolean workflowEnabled;
-    private FlowInputConfigs inputConfigs;
+    private FlowVariableConfigs variableConfigs;
 
     /**
     **/
@@ -291,20 +291,20 @@ public class FlowMetaResponse  {
 
     /**
     **/
-    public FlowMetaResponse inputConfigs(FlowInputConfigs inputConfigs) {
+    public FlowMetaResponse variableConfigs(FlowVariableConfigs variableConfigs) {
 
-        this.inputConfigs = inputConfigs;
+        this.variableConfigs = variableConfigs;
         return this;
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("inputConfigs")
+    @JsonProperty("variableConfigs")
     @Valid
-    public FlowInputConfigs getInputConfigs() {
-        return inputConfigs;
+    public FlowVariableConfigs getVariableConfigs() {
+        return variableConfigs;
     }
-    public void setInputConfigs(FlowInputConfigs inputConfigs) {
-        this.inputConfigs = inputConfigs;
+    public void setVariableConfigs(FlowVariableConfigs variableConfigs) {
+        this.variableConfigs = variableConfigs;
     }
 
 
@@ -330,12 +330,12 @@ public class FlowMetaResponse  {
             Objects.equals(this.executorConnections, flowMetaResponse.executorConnections) &&
             Objects.equals(this.flowExtensionConnections, flowMetaResponse.flowExtensionConnections) &&
             Objects.equals(this.workflowEnabled, flowMetaResponse.workflowEnabled) &&
-            Objects.equals(this.inputConfigs, flowMetaResponse.inputConfigs);
+            Objects.equals(this.variableConfigs, flowMetaResponse.variableConfigs);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(flowType, supportedExecutors, extensionExecutors, connectorConfigs, attributeProfile, supportedFlowCompletionConfigs, attributeMetadata, executorConnections, flowExtensionConnections, workflowEnabled, inputConfigs);
+        return Objects.hash(flowType, supportedExecutors, extensionExecutors, connectorConfigs, attributeProfile, supportedFlowCompletionConfigs, attributeMetadata, executorConnections, flowExtensionConnections, workflowEnabled, variableConfigs);
     }
 
     @Override

@@ -42,7 +42,7 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.
 import org.wso2.carbon.identity.api.server.flow.management.v1.response.handlers.RegistrationFlowMetaHandler;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.FlowExtensionContextMapper;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.FlowExtensionMapper;
-import org.wso2.carbon.identity.api.server.flow.management.v1.utils.FlowInputMapper;
+import org.wso2.carbon.identity.api.server.flow.management.v1.utils.FlowVariableMapper;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.Utils;
 import org.wso2.carbon.identity.flow.extension.metadata.FlowExtensionContextTreeMetadata;
 import org.wso2.carbon.identity.flow.extension.metadata.FlowExtensionContextTreeService;
@@ -107,7 +107,7 @@ public class ServerFlowMgtService {
             }
             flowResponse.steps(flowDTO.getSteps().stream().map(Utils::convertToStep)
                     .collect(Collectors.toList()));
-            flowResponse.inputs(FlowInputMapper.toFlowInputs(flowDTO.getFlowInputs()));
+            flowResponse.variables(FlowVariableMapper.toFlowVariables(flowDTO.getFlowVariables()));
             return flowResponse;
         } catch (FlowMgtFrameworkException e) {
             throw Utils.handleFlowMgtException(e);
@@ -185,7 +185,7 @@ public class ServerFlowMgtService {
             flowDTO.setSteps(flowRequest.getSteps().stream().map(Utils::convertToStepDTO)
                     .collect(Collectors.toList()));
             flowDTO.setFlowType(flowRequest.getFlowType());
-            flowDTO.setFlowInputs(FlowInputMapper.toFlowInputsDTO(flowRequest.getInputs()));
+            flowDTO.setFlowVariables(FlowVariableMapper.toFlowVariablesDTO(flowRequest.getVariables()));
             flowMgtService.updateFlow(flowDTO,
                     PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
         } catch (FlowMgtFrameworkException e) {

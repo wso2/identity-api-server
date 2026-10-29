@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowInputs;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowVariables;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Step;
 import javax.validation.constraints.*;
 
@@ -40,7 +40,7 @@ import javax.xml.bind.annotation.*;
 public class FlowResponse  {
   
     private List<Step> steps = null;
-    private FlowInputs inputs;
+    private FlowVariables variables;
 
 
     /**
@@ -71,20 +71,20 @@ public class FlowResponse  {
 
     /**
     **/
-    public FlowResponse inputs(FlowInputs inputs) {
+    public FlowResponse variables(FlowVariables variables) {
 
-        this.inputs = inputs;
+        this.variables = variables;
         return this;
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("inputs")
+    @JsonProperty("variables")
     @Valid
-    public FlowInputs getInputs() {
-        return inputs;
+    public FlowVariables getVariables() {
+        return variables;
     }
-    public void setInputs(FlowInputs inputs) {
-        this.inputs = inputs;
+    public void setVariables(FlowVariables variables) {
+        this.variables = variables;
     }
 
     
@@ -100,12 +100,12 @@ public class FlowResponse  {
         }
         FlowResponse flowResponse = (FlowResponse) o;
         return Objects.equals(this.steps, flowResponse.steps) &&
-            Objects.equals(this.inputs, flowResponse.inputs);
+            Objects.equals(this.variables, flowResponse.variables);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(steps, inputs);
+        return Objects.hash(steps, variables);
     }
 
     @Override
@@ -115,7 +115,7 @@ public class FlowResponse  {
         sb.append("class FlowResponse {\n");
         
         sb.append("    steps: ").append(toIndentedString(steps)).append("\n");
-        sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
+        sb.append("    variables: ").append(toIndentedString(variables)).append("\n");
         sb.append("}");
         return sb.toString();
     }

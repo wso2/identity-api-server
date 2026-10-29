@@ -26,15 +26,15 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 
 /**
- * A header or query parameter the flow reads from each request. A request may repeat it, so it holds an array, and a request without it keeps the value an earlier request gave.
+ * A runtime value the flow keeps.
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "A header or query parameter the flow reads from each request. A request may repeat it, so it holds an array, and a request without it keeps the value an earlier request gave.")
-public class FlowRequestValueInput  {
+@ApiModel(description = "A runtime value the flow keeps.")
+public class FlowRuntimeValue  {
   
     private String name;
 
@@ -42,6 +42,10 @@ public class FlowRequestValueInput  {
 @XmlEnum(String.class)
 public enum DataTypeEnum {
 
+    @XmlEnumValue("STRING") STRING(String.valueOf("STRING")),
+    @XmlEnumValue("INTEGER") INTEGER(String.valueOf("INTEGER")),
+    @XmlEnumValue("DECIMAL") DECIMAL(String.valueOf("DECIMAL")),
+    @XmlEnumValue("BOOLEAN") BOOLEAN(String.valueOf("BOOLEAN")),
     @XmlEnumValue("STRING_ARRAY") STRING_ARRAY(String.valueOf("STRING_ARRAY")),
     @XmlEnumValue("NUMBER_ARRAY") NUMBER_ARRAY(String.valueOf("NUMBER_ARRAY"));
 
@@ -74,17 +78,19 @@ public enum DataTypeEnum {
 }
 
     private DataTypeEnum dataType;
+    private Object value;
+    private Boolean clientWritable = false;
 
     /**
-    * Name of the header or query parameter.
+    * Name of the runtime value, unique within the flow. Letters and digits only, up to 255 characters.
     **/
-    public FlowRequestValueInput name(String name) {
+    public FlowRuntimeValue name(String name) {
 
         this.name = name;
         return this;
     }
     
-    @ApiModelProperty(example = "x-ab-variant", required = true, value = "Name of the header or query parameter.")
+    @ApiModelProperty(example = "plan", required = true, value = "Name of the runtime value, unique within the flow. Letters and digits only, up to 255 characters.")
     @JsonProperty("name")
     @Valid
     @NotNull(message = "Property name cannot be null.")
@@ -97,15 +103,15 @@ public enum DataTypeEnum {
     }
 
     /**
-    * Type of each value the request gives.
+    * Type of value the runtime value holds.
     **/
-    public FlowRequestValueInput dataType(DataTypeEnum dataType) {
+    public FlowRuntimeValue dataType(DataTypeEnum dataType) {
 
         this.dataType = dataType;
         return this;
     }
     
-    @ApiModelProperty(example = "STRING_ARRAY", required = true, value = "Type of each value the request gives.")
+    @ApiModelProperty(example = "STRING", required = true, value = "Type of value the runtime value holds.")
     @JsonProperty("dataType")
     @Valid
     @NotNull(message = "Property dataType cannot be null.")
@@ -115,6 +121,44 @@ public enum DataTypeEnum {
     }
     public void setDataType(DataTypeEnum dataType) {
         this.dataType = dataType;
+    }
+
+    /**
+    * Value every run of the flow starts from, of its type: a string, a number, a boolean, or an array of strings or numbers. Absent when it starts without one.
+    **/
+    public FlowRuntimeValue value(Object value) {
+
+        this.value = value;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "basic", value = "Value every run of the flow starts from, of its type: a string, a number, a boolean, or an array of strings or numbers. Absent when it starts without one.")
+    @JsonProperty("value")
+    @Valid
+    public Object getValue() {
+        return value;
+    }
+    public void setValue(Object value) {
+        this.value = value;
+    }
+
+    /**
+    * Whether the app may set the runtime value when the flow starts. Its value is then accepted from the inputs that start the flow, like any other input, and ignored on later requests.
+    **/
+    public FlowRuntimeValue clientWritable(Boolean clientWritable) {
+
+        this.clientWritable = clientWritable;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "Whether the app may set the runtime value when the flow starts. Its value is then accepted from the inputs that start the flow, like any other input, and ignored on later requests.")
+    @JsonProperty("clientWritable")
+    @Valid
+    public Boolean getClientWritable() {
+        return clientWritable;
+    }
+    public void setClientWritable(Boolean clientWritable) {
+        this.clientWritable = clientWritable;
     }
 
     
@@ -128,24 +172,28 @@ public enum DataTypeEnum {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        FlowRequestValueInput flowRequestValueInput = (FlowRequestValueInput) o;
-        return Objects.equals(this.name, flowRequestValueInput.name) &&
-            Objects.equals(this.dataType, flowRequestValueInput.dataType);
+        FlowRuntimeValue flowRuntimeValue = (FlowRuntimeValue) o;
+        return Objects.equals(this.name, flowRuntimeValue.name) &&
+            Objects.equals(this.dataType, flowRuntimeValue.dataType) &&
+            Objects.equals(this.value, flowRuntimeValue.value) &&
+            Objects.equals(this.clientWritable, flowRuntimeValue.clientWritable);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, dataType);
+        return Objects.hash(name, dataType, value, clientWritable);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class FlowRequestValueInput {\n");
+        sb.append("class FlowRuntimeValue {\n");
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    dataType: ").append(toIndentedString(dataType)).append("\n");
+        sb.append("    value: ").append(toIndentedString(value)).append("\n");
+        sb.append("    clientWritable: ").append(toIndentedString(clientWritable)).append("\n");
         sb.append("}");
         return sb.toString();
     }

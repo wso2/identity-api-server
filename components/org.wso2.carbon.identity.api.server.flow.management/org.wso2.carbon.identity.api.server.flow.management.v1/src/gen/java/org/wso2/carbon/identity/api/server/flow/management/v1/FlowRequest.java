@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowInputs;
+import org.wso2.carbon.identity.api.server.flow.management.v1.FlowVariables;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Step;
 import javax.validation.constraints.*;
 
@@ -41,7 +41,7 @@ public class FlowRequest  {
   
     private String flowType;
     private List<Step> steps = new ArrayList<Step>();
-    private FlowInputs inputs;
+    private FlowVariables variables;
 
 
     /**
@@ -92,20 +92,20 @@ public class FlowRequest  {
 
     /**
     **/
-    public FlowRequest inputs(FlowInputs inputs) {
+    public FlowRequest variables(FlowVariables variables) {
 
-        this.inputs = inputs;
+        this.variables = variables;
         return this;
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("inputs")
+    @JsonProperty("variables")
     @Valid
-    public FlowInputs getInputs() {
-        return inputs;
+    public FlowVariables getVariables() {
+        return variables;
     }
-    public void setInputs(FlowInputs inputs) {
-        this.inputs = inputs;
+    public void setVariables(FlowVariables variables) {
+        this.variables = variables;
     }
 
     
@@ -122,12 +122,12 @@ public class FlowRequest  {
         FlowRequest flowRequest = (FlowRequest) o;
         return Objects.equals(this.flowType, flowRequest.flowType) &&
             Objects.equals(this.steps, flowRequest.steps) &&
-            Objects.equals(this.inputs, flowRequest.inputs);
+            Objects.equals(this.variables, flowRequest.variables);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(flowType, steps, inputs);
+        return Objects.hash(flowType, steps, variables);
     }
 
     @Override
@@ -138,7 +138,7 @@ public class FlowRequest  {
         
         sb.append("    flowType: ").append(toIndentedString(flowType)).append("\n");
         sb.append("    steps: ").append(toIndentedString(steps)).append("\n");
-        sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
+        sb.append("    variables: ").append(toIndentedString(variables)).append("\n");
         sb.append("}");
         return sb.toString();
     }
