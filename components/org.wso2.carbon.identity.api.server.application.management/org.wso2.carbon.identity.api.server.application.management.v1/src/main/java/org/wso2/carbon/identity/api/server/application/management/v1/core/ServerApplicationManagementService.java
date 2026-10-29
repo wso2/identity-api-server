@@ -94,7 +94,6 @@ import org.wso2.carbon.identity.api.server.application.management.v1.factories.S
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.Util;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
-import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.common.file.FileContent;
 import org.wso2.carbon.identity.api.server.common.file.FileSerializationConfig;
 import org.wso2.carbon.identity.api.server.common.file.FileSerializationException;
@@ -178,11 +177,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -190,7 +186,6 @@ import java.util.stream.Stream;
 
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
-import javax.ws.rs.core.Response;
 import javax.xml.bind.Marshaller;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ADVANCED_CONFIGURATIONS;
@@ -260,9 +255,6 @@ public class ServerApplicationManagementService {
 
     private static final Log log = LogFactory.getLog(ServerApplicationManagementService.class);
     private static final Log AUDIT_LOG = CarbonConstants.AUDIT_LOG;
-    // Each preview makes an outbound request, so one organization may run only a few at a time.
-    private static final int MAX_CIMD_PREVIEWS_PER_TENANT = 2;
-    private static final Map<String, AtomicInteger> CIMD_PREVIEWS_IN_PROGRESS = new ConcurrentHashMap<>();
 
     // Allowed filter attributes mapped to real field names.
     private static final Set<String> SUPPORTED_FILTER_ATTRIBUTES = new HashSet<>();
@@ -2214,15 +2206,6 @@ public class ServerApplicationManagementService {
         }
         String clientId = cimdPreviewRequest == null ? null : cimdPreviewRequest.getClientId();
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
-        AtomicInteger inProgress = CIMD_PREVIEWS_IN_PROGRESS.computeIfAbsent(tenantDomain, key -> new AtomicInteger());
-        if (inProgress.incrementAndGet() > MAX_CIMD_PREVIEWS_PER_TENANT) {
-            inProgress.decrementAndGet();
-            ClientIdMetadataDocumentException.ErrorMessage error =
-                    ClientIdMetadataDocumentException.ErrorMessage.TOO_MANY_PREVIEWS;
-            throw new APIError(Response.Status.TOO_MANY_REQUESTS, new ErrorResponse.Builder()
-                    .withCode(error.getCode()).withMessage(error.getMessage()).withDescription(error.getDescription())
-                    .build());
-        }
         String result = "Success";
         try {
             ClientIdMetadataDocument document = service.preview(clientId, tenantDomain);
@@ -2239,7 +2222,6 @@ public class ServerApplicationManagementService {
             result = error.getCode();
             throw Utils.buildClientError(error.getCode(), error.getMessage(), error.getDescription());
         } finally {
-            inProgress.decrementAndGet();
             AUDIT_LOG.info(String.format(CarbonConstants.AUDIT_MESSAGE, ContextLoader.getUsernameFromContext(),
                     "Preview Client ID Metadata Document", clientId, "Tenant : " + tenantDomain, result));
         }
