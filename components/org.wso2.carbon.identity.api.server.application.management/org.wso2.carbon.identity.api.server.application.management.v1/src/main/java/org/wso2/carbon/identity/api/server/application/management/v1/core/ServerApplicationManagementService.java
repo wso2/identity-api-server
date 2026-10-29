@@ -2225,7 +2225,7 @@ public class ServerApplicationManagementService {
         }
         String result = "Success";
         try {
-            ClientIdMetadataDocument document = service.preview(clientId);
+            ClientIdMetadataDocument document = service.preview(clientId, tenantDomain);
             return new CimdPreviewResponse()
                     .clientId(document.getClientId())
                     .clientName(document.getClientName())
