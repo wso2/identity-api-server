@@ -35,6 +35,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Application
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationsApiService;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPICreationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIPatchModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.CimdPreviewRequest;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretCreationRequest;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretList;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretResponse;
@@ -324,6 +325,13 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
         LoginFlowGenerateResponse loginFlowGenerateResponse = LoginFlowAIServiceFactory.getLoginFlowAIService()
                 .generateAuthenticationSequence(loginFlowGenerateRequest);
         return Response.accepted(loginFlowGenerateResponse).build();
+    }
+
+    @Override
+    public Response previewClientIdMetadataDocument(CimdPreviewRequest cimdPreviewRequest) {
+
+        return Response.ok().entity(applicationManagementService.previewClientIdMetadataDocument(cimdPreviewRequest))
+                .build();
     }
 
     @Override

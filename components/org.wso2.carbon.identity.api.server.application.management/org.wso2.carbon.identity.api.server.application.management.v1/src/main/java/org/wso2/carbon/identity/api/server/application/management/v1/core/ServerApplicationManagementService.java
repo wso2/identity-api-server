@@ -29,6 +29,7 @@ import org.apache.cxf.jaxrs.ext.search.ConditionType;
 import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
+import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.resource.mgt.APIResourceMgtException;
@@ -52,6 +53,8 @@ import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedA
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAuthorizationDetailsTypes;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedScope;
+import org.wso2.carbon.identity.api.server.application.management.v1.CimdPreviewRequest;
+import org.wso2.carbon.identity.api.server.application.management.v1.CimdPreviewResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretCreationRequest;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretList;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretResponse;
@@ -145,6 +148,9 @@ import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceCli
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceException;
 import org.wso2.carbon.identity.cors.mgt.core.model.CORSOrigin;
 import org.wso2.carbon.identity.oauth.dao.OAuthAppDO;
+import org.wso2.carbon.identity.oauth2.cimd.ClientIdMetadataDocument;
+import org.wso2.carbon.identity.oauth2.cimd.ClientIdMetadataDocumentException;
+import org.wso2.carbon.identity.oauth2.cimd.ClientIdMetadataDocumentService;
 import org.wso2.carbon.identity.oauth2.fapi.exceptions.FapiConfigMgtException;
 import org.wso2.carbon.identity.oauth2.fapi.models.FapiProfileEnum;
 import org.wso2.carbon.identity.oauth2.fapi.services.FapiConfigMgtService;
@@ -248,6 +254,7 @@ public class ServerApplicationManagementService {
     }
 
     private static final Log log = LogFactory.getLog(ServerApplicationManagementService.class);
+    private static final Log AUDIT_LOG = CarbonConstants.AUDIT_LOG;
 
     // Allowed filter attributes mapped to real field names.
     private static final Set<String> SUPPORTED_FILTER_ATTRIBUTES = new HashSet<>();
@@ -2182,6 +2189,42 @@ public class ServerApplicationManagementService {
 
         String errorCode = getErrorCode(e, UNEXPECTED_SERVER_ERROR.getCode());
         return Utils.buildServerError(errorCode, message, e.getMessage(), e);
+    }
+
+    /**
+     * Retrieve and validate a Client ID Metadata Document, and return the values to register. Stores nothing.
+     *
+     * @param cimdPreviewRequest Client Identifier URL to preview.
+     * @return Values taken from the document.
+     */
+    public CimdPreviewResponse previewClientIdMetadataDocument(CimdPreviewRequest cimdPreviewRequest) {
+
+        ClientIdMetadataDocumentService service =
+                ApplicationManagementServiceHolder.getClientIdMetadataDocumentService();
+        if (service == null) {
+            throw Utils.buildServerError("The Client ID Metadata Document service is not available.");
+        }
+        String clientId = cimdPreviewRequest == null ? null : cimdPreviewRequest.getClientId();
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        String result = "Success";
+        try {
+            ClientIdMetadataDocument document = service.preview(clientId, tenantDomain);
+            return new CimdPreviewResponse()
+                    .clientId(document.getClientId())
+                    .clientName(document.getClientName())
+                    .clientUri(document.getClientUri())
+                    .redirectUris(new ArrayList<>(document.getRedirectUris()))
+                    .tokenEndpointAuthMethod(document.getTokenEndpointAuthMethod())
+                    .jwksUri(document.getJwksUri())
+                    .grantTypes(new ArrayList<>(document.getGrantTypes()));
+        } catch (ClientIdMetadataDocumentException e) {
+            ClientIdMetadataDocumentException.ErrorMessage error = e.getErrorMessage();
+            result = error.getCode();
+            throw Utils.buildClientError(error.getCode(), error.getMessage(), error.getDescription());
+        } finally {
+            AUDIT_LOG.info(String.format(CarbonConstants.AUDIT_MESSAGE, ContextLoader.getUsernameFromContext(),
+                    "Preview Client ID Metadata Document", clientId, "Tenant : " + tenantDomain, result));
+        }
     }
 
     private APIError buildClientError(IdentityApplicationManagementException e, String message) {

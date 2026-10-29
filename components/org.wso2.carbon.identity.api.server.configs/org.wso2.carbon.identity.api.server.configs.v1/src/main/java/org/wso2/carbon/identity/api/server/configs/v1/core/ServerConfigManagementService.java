@@ -220,6 +220,8 @@ public class ServerConfigManagementService {
     private final DeviceHandlerService pushDeviceHandlerService;
 
     private static final Log log = LogFactory.getLog(ServerConfigManagementService.class);
+    // Resident IdP OIDC property, read by ClientIdMetadataDocumentService in the OAuth component.
+    private static final String ENABLE_CLIENT_ID_METADATA_DOCUMENT = "enableClientIdMetadataDocument";
 
     public ServerConfigManagementService(ApplicationManagementService applicationManagementService,
                                          IdpManager idpManager,
@@ -2491,6 +2493,9 @@ public class ServerConfigManagementService {
                 inboundAuthConfig.setEnableJwtScopeAsArray(Boolean.parseBoolean(
                         IdentityApplicationManagementUtil.getPropertyValue(idpProperties,
                                 IdentityApplicationConstants.Authenticator.OIDC.ENABLE_JWT_SCOPE_AS_ARRAY)));
+                inboundAuthConfig.setEnableClientIdMetadataDocument(Boolean.parseBoolean(
+                        IdentityApplicationManagementUtil.getPropertyValue(idpProperties,
+                                ENABLE_CLIENT_ID_METADATA_DOCUMENT)));
             } else {
                 throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                         Constants.ErrorMessage.ERROR_CODE_RESIDENT_IDP_NOT_FOUND, tenantDomain);
@@ -2624,6 +2629,11 @@ public class ServerConfigManagementService {
                     IdentityApplicationConstants.Authenticator.OIDC.ENABLE_JWT_SCOPE_AS_ARRAY)) {
                 if (authConfigToUpdate.getEnableJwtScopeAsArray() != null) {
                     property.setValue(Boolean.toString(authConfigToUpdate.getEnableJwtScopeAsArray()));
+                }
+                updatedPropertyList.add(property);
+            } else if (property.getName().equals(ENABLE_CLIENT_ID_METADATA_DOCUMENT)) {
+                if (authConfigToUpdate.getEnableClientIdMetadataDocument() != null) {
+                    property.setValue(Boolean.toString(authConfigToUpdate.getEnableClientIdMetadataDocument()));
                 }
                 updatedPropertyList.add(property);
             }

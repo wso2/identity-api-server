@@ -34,6 +34,8 @@ public class InboundAuthOAuth2Config  {
   
     private Boolean enableJwtScopeAsArray;
 
+    private Boolean enableClientIdMetadataDocument;
+
     /**
     * Enable formatting scope claim in JWT access tokens as a JSON array instead of a space-separated string.
     **/
@@ -53,6 +55,25 @@ public class InboundAuthOAuth2Config  {
         this.enableJwtScopeAsArray = enableJwtScopeAsArray;
     }
 
+    /**
+    * Enable registering clients from their Client ID Metadata Document (CIMD), and advertise client_id_metadata_document_supported in discovery.
+    **/
+    public InboundAuthOAuth2Config enableClientIdMetadataDocument(Boolean enableClientIdMetadataDocument) {
+
+        this.enableClientIdMetadataDocument = enableClientIdMetadataDocument;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "Enable registering clients from their Client ID Metadata Document (CIMD), and advertise client_id_metadata_document_supported in discovery.")
+    @JsonProperty("enableClientIdMetadataDocument")
+    @Valid
+    public Boolean getEnableClientIdMetadataDocument() {
+        return enableClientIdMetadataDocument;
+    }
+    public void setEnableClientIdMetadataDocument(Boolean enableClientIdMetadataDocument) {
+        this.enableClientIdMetadataDocument = enableClientIdMetadataDocument;
+    }
+
 
 
     @Override
@@ -65,12 +86,13 @@ public class InboundAuthOAuth2Config  {
             return false;
         }
         InboundAuthOAuth2Config inboundAuthOAuth2Config = (InboundAuthOAuth2Config) o;
-        return Objects.equals(this.enableJwtScopeAsArray, inboundAuthOAuth2Config.enableJwtScopeAsArray);
+        return Objects.equals(this.enableJwtScopeAsArray, inboundAuthOAuth2Config.enableJwtScopeAsArray) &&
+            Objects.equals(this.enableClientIdMetadataDocument, inboundAuthOAuth2Config.enableClientIdMetadataDocument);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(enableJwtScopeAsArray);
+        return Objects.hash(enableJwtScopeAsArray, enableClientIdMetadataDocument);
     }
 
     @Override
@@ -80,6 +102,7 @@ public class InboundAuthOAuth2Config  {
         sb.append("class InboundAuthOAuth2Config {\n");
         
         sb.append("    enableJwtScopeAsArray: ").append(toIndentedString(enableJwtScopeAsArray)).append("\n");
+        sb.append("    enableClientIdMetadataDocument: ").append(toIndentedString(enableClientIdMetadataDocument)).append("\n");
         sb.append("}");
         return sb.toString();
     }

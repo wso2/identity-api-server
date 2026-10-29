@@ -42,6 +42,8 @@ import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtoco
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPICreationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.CimdPreviewRequest;
+import org.wso2.carbon.identity.api.server.application.management.v1.CimdPreviewResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretCreationRequest;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretList;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretResponse;
@@ -1189,6 +1191,29 @@ public class ApplicationsApi  {
     public Response patchAuthorizedAPI(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "ID of the API resource.",required=true) @PathParam("apiId") String apiId, @ApiParam(value = "" ) @Valid AuthorizedAPIPatchModel authorizedAPIPatchModel) {
 
         return delegate.patchAuthorizedAPI(applicationId,  apiId,  authorizedAPIPatchModel );
+    }
+
+    @Valid
+    @POST
+    @Path("/cimd/preview")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Preview a Client ID Metadata Document", notes = "This API retrieves and validates the Client ID Metadata Document at a Client Identifier URL, and returns the values to register. It stores nothing. <br> <b>Scope(Permission) required:</b> `internal_application_mgt_create` ", response = CimdPreviewResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Applications", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = CimdPreviewResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response previewClientIdMetadataDocument(@ApiParam(value = "" ,required=true) @Valid CimdPreviewRequest cimdPreviewRequest) {
+
+        return delegate.previewClientIdMetadataDocument(cimdPreviewRequest );
     }
 
     @Valid

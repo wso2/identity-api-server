@@ -44,6 +44,8 @@ import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtoco
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPICreationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.CimdPreviewRequest;
+import org.wso2.carbon.identity.api.server.application.management.v1.CimdPreviewResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretCreationRequest;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretList;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientSecretResponse;
@@ -170,6 +172,8 @@ public interface ApplicationsApiService {
       public Response patchApplicationSharing(ApplicationSharingPatchRequest applicationSharingPatchRequest);
 
       public Response patchAuthorizedAPI(String applicationId, String apiId, AuthorizedAPIPatchModel authorizedAPIPatchModel);
+
+      public Response previewClientIdMetadataDocument(CimdPreviewRequest cimdPreviewRequest);
 
       public Response regenerateOAuthClientSecret(String applicationId);
 
