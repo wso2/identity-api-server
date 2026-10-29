@@ -81,11 +81,11 @@ public class Constants {
 
         ERROR_CODE_ERROR_RETRIEVING_METADATA("65006",
                 "Unable to retrieve policy metadata.",
-                "Server encountered an error while retrieving device policy field metadata."),
+                "Server encountered an error while retrieving the rule metadata of the policy type."),
 
         ERROR_CODE_ERROR_INITIALIZING_RULE_BUILDER("65007",
                 "Unable to build policy rule.",
-                "Server encountered an error while initializing the rule builder for the device policy flow.");
+                "Server encountered an error while initializing the rule builder for the policy type.");
 
         private final String code;
         private final String message;

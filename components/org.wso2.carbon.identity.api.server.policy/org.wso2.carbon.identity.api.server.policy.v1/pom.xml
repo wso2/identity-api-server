@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.policy</artifactId>
-        <version>1.6.63-SNAPSHOT</version>
+        <version>1.6.65-SNAPSHOT</version>
     </parent>
 
     <artifactId>org.wso2.carbon.identity.api.server.policy.v1</artifactId>
@@ -95,6 +95,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <artifactId>org.wso2.carbon.identity.rule.metadata</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
         </dependency>
@@ -116,6 +121,7 @@
                         <configuration>
                             <inputSpec>${project.basedir}/src/main/resources/policy.yaml</inputSpec>
                             <generatorName>org.wso2.carbon.codegen.CxfWso2Generator</generatorName>
+                            <templateDirectory>${project.basedir}/src/main/resources/templates</templateDirectory>
                             <configOptions>
                                 <sourceFolder>src/gen/java</sourceFolder>
                                 <apiPackage>org.wso2.carbon.identity.api.server.policy.v1</apiPackage>

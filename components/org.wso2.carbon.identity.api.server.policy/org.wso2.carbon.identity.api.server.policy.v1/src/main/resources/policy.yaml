@@ -128,6 +128,54 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /policies/metadata/rule:
+    get:
+      tags:
+        - Policy Management
+      summary: Get rule metadata for a policy type.
+      operationId: getRuleMetadata
+      description: |
+        This API provides the fields, operators and values that rule resources of a policy type can use for a target. For device policies, the target is the device platform, and only the fields that apply to that platform are returned.
+
+        <b>Scope (Permission) required:</b> `internal_policy_mgt_view`
+      parameters:
+        - name: type
+          in: query
+          description: Policy type, for example DEVICE.
+          required: true
+          schema:
+            type: string
+            example: "DEVICE"
+        - name: target
+          in: query
+          description: Resource target, for example a device platform such as android.
+          required: true
+          schema:
+            type: string
+            example: "android"
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuleMetadata'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /policies/{policy-id}:
     get:
       tags:
@@ -532,6 +580,109 @@ components:
           type: string
           description: The value to compare against.
           example: "ios"
+    RuleMetadata:
+      type: array
+      description: Fields that rule resources of a policy type can use for a target.
+      items:
+        $ref: '#/components/schemas/RuleFieldMetadata'
+    RuleFieldMetadata:
+      type: object
+      properties:
+        field:
+          $ref: '#/components/schemas/RuleField'
+        operators:
+          type: array
+          description: Operators that can be applied to the field in rule expressions.
+          items:
+            $ref: '#/components/schemas/RuleOperator'
+        value:
+          $ref: '#/components/schemas/RuleFieldValue'
+    RuleField:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the field, used in rule expressions.
+          example: "androidOsVersion"
+        displayName:
+          type: string
+          description: User friendly label of the field.
+          example: "Android OS Version"
+    RuleOperator:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the operator, used in rule expressions.
+          example: "greaterThan"
+        displayName:
+          type: string
+          description: User friendly label of the operator.
+          example: "greater than"
+    RuleFieldValue:
+      type: object
+      properties:
+        inputType:
+          type: string
+          description: Whether the value is entered directly or selected from options.
+          enum:
+            - input
+            - options
+        valueType:
+          type: string
+          description: Data type of the value.
+          enum:
+            - string
+            - number
+            - boolean
+            - date
+            - reference
+        valueReferenceAttribute:
+          type: string
+          description: Attribute of the options data used as the value. Only available when 'valueType' is 'reference'.
+          example: "id"
+        valueDisplayAttribute:
+          type: string
+          description: Attribute of the options data shown as the label. Only available when 'valueType' is 'reference'.
+          example: "name"
+        links:
+          type: array
+          description: Endpoints to retrieve or search for options. Only available when 'valueType' is 'reference'.
+          items:
+            $ref: '#/components/schemas/RuleFieldValueLink'
+        values:
+          type: array
+          description: Selectable values of an options field.
+          items:
+            $ref: '#/components/schemas/RuleFieldValueOption'
+    RuleFieldValueOption:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Value used in rule expressions.
+          example: "14"
+        displayName:
+          type: string
+          description: User friendly label of the value.
+          example: "14"
+    RuleFieldValueLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: URL of the endpoint.
+        method:
+          type: string
+          description: HTTP method.
+          enum:
+            - GET
+        rel:
+          type: string
+          description: Relation of the endpoint to retrieving or filtering the values.
+          enum:
+            - values
+            - filter
     Error:
       type: object
       properties:

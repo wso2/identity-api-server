@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -28,6 +28,7 @@ import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyListResponse;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyRequest;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyResponse;
 import org.wso2.carbon.identity.api.server.policy.v1.model.PolicyUpdateRequest;
+import org.wso2.carbon.identity.api.server.policy.v1.model.RuleFieldMetadata;
 import org.wso2.carbon.identity.api.server.policy.v1.PoliciesApiService;
 import org.wso2.carbon.identity.api.server.policy.v1.factories.PoliciesApiServiceFactory;
 
@@ -142,6 +143,29 @@ public class PoliciesApi  {
     public Response getPolicyById(@ApiParam(value = "ID of the policy",required=true) @PathParam("policy-id") String policyId) {
 
         return delegate.getPolicyById(policyId );
+    }
+
+    @Valid
+    @GET
+    @Path("/metadata/rule")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Get rule metadata for a policy type.", notes = "This API provides the fields, operators and values that rule resources of a policy type can use for a target. For device policies, the target is the device platform, and only the fields that apply to that platform are returned.  <b>Scope (Permission) required:</b> `internal_policy_mgt_view` ", response = RuleFieldMetadata.class, responseContainer = "List", authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Policy Management", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = RuleFieldMetadata.class, responseContainer = "List"),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getRuleMetadata(    @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Policy type, for example DEVICE.",required=true)  @QueryParam("type") String type,     @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Resource target, for example a device platform such as android.",required=true)  @QueryParam("target") String target) {
+
+        return delegate.getRuleMetadata(type,  target );
     }
 
     @Valid
