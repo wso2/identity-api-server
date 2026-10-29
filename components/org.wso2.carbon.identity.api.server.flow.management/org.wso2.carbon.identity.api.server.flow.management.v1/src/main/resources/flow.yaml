@@ -711,6 +711,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Step'
+        variables:
+          $ref: '#/components/schemas/FlowVariables'
 
     FlowGenerateRequest:
       type: object
@@ -780,6 +782,73 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Step'
+        variables:
+          $ref: '#/components/schemas/FlowVariables'
+
+    FlowVariables:
+      type: object
+      description: >
+        What the flow defines besides its steps: the headers it reads from each request, and the runtime
+        values it keeps. Conditions read them through the `request.headers` and `runtimeValues` fields.
+      properties:
+        headers:
+          type: array
+          description: Headers the flow reads from each request. Names are matched ignoring case.
+          items:
+            $ref: '#/components/schemas/FlowHeader'
+        runtimeValues:
+          type: array
+          description: Runtime values the flow keeps, each with the value every run of the flow starts from.
+          items:
+            $ref: '#/components/schemas/FlowRuntimeValue'
+
+    FlowHeader:
+      type: object
+      description: >
+        A header the flow reads from each request. A request may repeat it, so it holds an array, and a
+        request without it keeps the value an earlier request gave.
+      required:
+        - name
+        - dataType
+      properties:
+        name:
+          type: string
+          description: Name of the header.
+          example: x-ab-variant
+        dataType:
+          type: string
+          description: Type of each value the request gives.
+          enum: [STRING_ARRAY, NUMBER_ARRAY]
+          example: STRING_ARRAY
+
+    FlowRuntimeValue:
+      type: object
+      description: A runtime value the flow keeps.
+      required:
+        - name
+        - dataType
+      properties:
+        name:
+          type: string
+          description: Name of the runtime value, unique within the flow. Letters and digits only, up to 255 characters.
+          example: plan
+        dataType:
+          type: string
+          description: Type of value the runtime value holds.
+          enum: [STRING, INTEGER, DECIMAL, BOOLEAN, STRING_ARRAY, NUMBER_ARRAY]
+          example: STRING
+        value:
+          description: >
+            Value every run of the flow starts from, of its type: a string, a number, a boolean, or an
+            array of strings or numbers. Absent when it starts without one.
+          example: basic
+        clientWritable:
+          type: boolean
+          description: >
+            Whether the app may set the runtime value when the flow starts. Its value is then accepted
+            from the inputs that start the flow, like any other input, and ignored on later requests.
+          default: false
+          example: false
 
     FlowMetaResponse:
       type: object
@@ -824,6 +893,14 @@ components:
         workflowEnabled:
           type: boolean
           example: false
+        maxValueLength:
+          type: integer
+          description: Longest text a value, or an entry of an array value, may have.
+          example: 255
+        maxArraySize:
+          type: integer
+          description: Most entries an array value may have.
+          example: 20
 
     ExecutorConnections:
       type: object
