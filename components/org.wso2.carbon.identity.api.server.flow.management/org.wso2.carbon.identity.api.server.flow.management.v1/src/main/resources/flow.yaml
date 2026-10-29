@@ -893,26 +893,6 @@ components:
         workflowEnabled:
           type: boolean
           example: false
-        variableConfigs:
-          $ref: '#/components/schemas/FlowVariableConfigs'
-
-    FlowVariableConfigs:
-      type: object
-      description: >
-        Whether flows may define headers and runtime values as variables on this server, and the limits
-        their variables are checked against when a flow is saved.
-      properties:
-        enabled:
-          type: boolean
-          example: true
-        maxHeaders:
-          type: integer
-          description: Most headers a flow may define.
-          example: 10
-        maxRuntimeValues:
-          type: integer
-          description: Most runtime values a flow may define.
-          example: 20
         maxValueLength:
           type: integer
           description: Longest text a value, or an entry of an array value, may have.

@@ -31,7 +31,6 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorMetadata;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionConnectionInfo;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowMetaResponse;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowRuleMetaResponse;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowVariableConfigs;
 import org.wso2.carbon.identity.api.server.flow.management.v1.RuleFieldDefinition;
 import org.wso2.carbon.identity.api.server.flow.management.v1.constants.FlowEndpointConstants;
 import org.wso2.carbon.identity.api.server.flow.management.v1.utils.RuleMetadataMapper;
@@ -45,8 +44,6 @@ import org.wso2.carbon.identity.flow.execution.engine.metadata.FlowExecutorInfo;
 import org.wso2.carbon.identity.flow.extension.model.FlowExtensionAction;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtServerException;
-import org.wso2.carbon.identity.flow.mgt.utils.FlowMgtUtils;
-import org.wso2.carbon.identity.flow.mgt.utils.FlowVariableUtils;
 import org.wso2.carbon.identity.multi.attribute.login.constants.MultiAttributeLoginConstants;
 import org.wso2.carbon.identity.rule.metadata.api.exception.RuleMetadataException;
 import org.wso2.carbon.identity.rule.metadata.api.model.FieldDefinition;
@@ -205,24 +202,7 @@ public abstract class AbstractMetaResponseHandler {
         response.setExtensionExecutors(getExtensionExecutors());
         response.setFlowExtensionConnections(getFlowExtensionConnections());
         response.setSupportedFlowCompletionConfigs(getSupportedFlowCompletionConfigs());
-        response.setVariableConfigs(getFlowVariableConfigs());
         return response;
-    }
-
-    /**
-     * Whether flows may define headers and runtime values as variables, and the limits their variables are
-     * checked against, so a builder can keep within them before saving.
-     *
-     * @return The flow variable configurations.
-     */
-    protected FlowVariableConfigs getFlowVariableConfigs() {
-
-        return new FlowVariableConfigs()
-                .enabled(FlowMgtUtils.isFlowVariablesEnabled())
-                .maxHeaders(FlowVariableUtils.getMaxHeaders())
-                .maxRuntimeValues(FlowVariableUtils.getMaxRuntimeValues())
-                .maxValueLength(FlowVariableUtils.getMaxValueLength())
-                .maxArraySize(FlowVariableUtils.getMaxArraySize());
     }
 
     /**

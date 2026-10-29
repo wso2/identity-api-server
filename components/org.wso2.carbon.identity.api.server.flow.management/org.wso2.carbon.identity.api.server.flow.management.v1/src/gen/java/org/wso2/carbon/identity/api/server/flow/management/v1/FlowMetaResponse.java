@@ -25,7 +25,6 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.flow.management.v1.AttributeMetadata;
-import org.wso2.carbon.identity.api.server.flow.management.v1.FlowVariableConfigs;
 import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorConnections;
 import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorMetadata;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowExtensionConnectionInfo;
@@ -58,7 +57,6 @@ public class FlowMetaResponse  {
     private List<FlowExtensionConnectionInfo> flowExtensionConnections = null;
 
     private Boolean workflowEnabled;
-    private FlowVariableConfigs variableConfigs;
 
     /**
     **/
@@ -289,24 +287,6 @@ public class FlowMetaResponse  {
         this.workflowEnabled = workflowEnabled;
     }
 
-    /**
-    **/
-    public FlowMetaResponse variableConfigs(FlowVariableConfigs variableConfigs) {
-
-        this.variableConfigs = variableConfigs;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "")
-    @JsonProperty("variableConfigs")
-    @Valid
-    public FlowVariableConfigs getVariableConfigs() {
-        return variableConfigs;
-    }
-    public void setVariableConfigs(FlowVariableConfigs variableConfigs) {
-        this.variableConfigs = variableConfigs;
-    }
-
 
 
 
@@ -329,13 +309,12 @@ public class FlowMetaResponse  {
             Objects.equals(this.attributeMetadata, flowMetaResponse.attributeMetadata) &&
             Objects.equals(this.executorConnections, flowMetaResponse.executorConnections) &&
             Objects.equals(this.flowExtensionConnections, flowMetaResponse.flowExtensionConnections) &&
-            Objects.equals(this.workflowEnabled, flowMetaResponse.workflowEnabled) &&
-            Objects.equals(this.variableConfigs, flowMetaResponse.variableConfigs);
+            Objects.equals(this.workflowEnabled, flowMetaResponse.workflowEnabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(flowType, supportedExecutors, extensionExecutors, connectorConfigs, attributeProfile, supportedFlowCompletionConfigs, attributeMetadata, executorConnections, flowExtensionConnections, workflowEnabled, variableConfigs);
+        return Objects.hash(flowType, supportedExecutors, extensionExecutors, connectorConfigs, attributeProfile, supportedFlowCompletionConfigs, attributeMetadata, executorConnections, flowExtensionConnections, workflowEnabled);
     }
 
     @Override
