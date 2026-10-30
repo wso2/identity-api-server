@@ -277,7 +277,6 @@ public class UsersApiServiceCore {
         }
 
         try {
-            enterFlow(Flow.Name.SHARED_USER_UPDATE);
             UserSharePatchDO userSharePatchDO = populateUserSharePatch(userSharingPatchRequest);
             userSharingPolicyHandlerServiceV2.updateSharedUserAttributesV2(userSharePatchDO);
             return Response.status(Response.Status.ACCEPTED)
@@ -288,8 +287,6 @@ public class UsersApiServiceCore {
         } catch (UserSharingMgtException e) {
             LOG.error("Error occurred while patching shared user attributes.", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
-        } finally {
-            IdentityContext.getThreadLocalIdentityContext().exitFlow();
         }
     }
 
