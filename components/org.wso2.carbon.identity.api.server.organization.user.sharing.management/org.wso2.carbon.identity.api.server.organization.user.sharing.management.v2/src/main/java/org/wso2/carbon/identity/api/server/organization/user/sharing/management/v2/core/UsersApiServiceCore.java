@@ -364,11 +364,8 @@ public class UsersApiServiceCore {
     // Helper methods to manage the flow of the user sharing operations.
 
     /**
-     * Enter a user sharing flow in the {@link IdentityContext} so that downstream components
-     * (e.g. event handlers/webhooks) can identify the user sharing operation being performed.
-     * <p>
-     * The flow is not started if the initiating persona cannot be resolved from the actor. Callers must invoke
-     * {@link IdentityContext#exitFlow()} in a finally block.
+     * Enter a user sharing flow, unless the initiating persona cannot be resolved.
+     * Callers must invoke {@link IdentityContext#exitFlow()} in a finally block.
      *
      * @param flowName The name of the user sharing flow being started.
      */
