@@ -42,6 +42,8 @@ import org.wso2.carbon.identity.api.server.organization.user.sharing.management.
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v2.model.UserSharingPatchRequest;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v2.model.UserUnshareAllRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v2.model.UserUnshareSelectedRequestBody;
+import org.wso2.carbon.identity.core.context.IdentityContext;
+import org.wso2.carbon.identity.core.context.model.Flow;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.UserSharingPolicyHandlerServiceV2;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.constant.RoleAssignmentMode;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.constant.UserSharePatchOperation;
@@ -136,6 +138,7 @@ public class UsersApiServiceCore {
         }
 
         try {
+            enterFlow(Flow.Name.USER_SHARE);
             SelectiveUserShareV2DO selectiveUserShareV2DO =
                     populateSelectiveUserShareV2DO(userShareSelectedRequestBody);
             userSharingPolicyHandlerServiceV2.populateSelectiveUserShareV2(selectiveUserShareV2DO);
@@ -146,6 +149,8 @@ public class UsersApiServiceCore {
         } catch (UserSharingMgtException e) {
             LOG.error("Error occurred while sharing user with specific organizations.", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
+        } finally {
+            IdentityContext.getThreadLocalIdentityContext().exitFlow();
         }
     }
 
@@ -168,6 +173,7 @@ public class UsersApiServiceCore {
         }
 
         try {
+            enterFlow(Flow.Name.USER_SHARE);
             GeneralUserShareV2DO generalUserShareV2DO = populateGeneralUserShareV2DO(userShareAllRequestBody);
             userSharingPolicyHandlerServiceV2.populateGeneralUserShareV2(generalUserShareV2DO);
             return Response.status(Response.Status.ACCEPTED)
@@ -177,6 +183,8 @@ public class UsersApiServiceCore {
         } catch (UserSharingMgtException e) {
             LOG.error("Error occurred while sharing user with all organizations.", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
+        } finally {
+            IdentityContext.getThreadLocalIdentityContext().exitFlow();
         }
     }
 
@@ -199,6 +207,7 @@ public class UsersApiServiceCore {
         }
 
         try {
+            enterFlow(Flow.Name.USER_UNSHARE);
             SelectiveUserUnshareDO selectiveUserUnshareDO =
                     populateSelectiveUserUnshareDO(userUnshareSelectedRequestBody);
             userSharingPolicyHandlerServiceV2.populateSelectiveUserUnshareV2(selectiveUserUnshareDO);
@@ -210,6 +219,8 @@ public class UsersApiServiceCore {
         } catch (UserSharingMgtException e) {
             LOG.error("Error occurred while unsharing user from specific organizations.", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
+        } finally {
+            IdentityContext.getThreadLocalIdentityContext().exitFlow();
         }
     }
 
@@ -231,6 +242,7 @@ public class UsersApiServiceCore {
         }
 
         try {
+            enterFlow(Flow.Name.USER_UNSHARE);
             GeneralUserUnshareDO generalUserUnshareDO = populateGeneralUserUnshareDO(userUnshareAllRequestBody);
             userSharingPolicyHandlerServiceV2.populateGeneralUserUnshareV2(generalUserUnshareDO);
             return Response.status(Response.Status.ACCEPTED)
@@ -241,6 +253,8 @@ public class UsersApiServiceCore {
         } catch (UserSharingMgtException e) {
             LOG.error("Error occurred while unsharing user from all organizations.", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
+        } finally {
+            IdentityContext.getThreadLocalIdentityContext().exitFlow();
         }
     }
 
@@ -263,6 +277,7 @@ public class UsersApiServiceCore {
         }
 
         try {
+            enterFlow(Flow.Name.SHARED_USER_UPDATE);
             UserSharePatchDO userSharePatchDO = populateUserSharePatch(userSharingPatchRequest);
             userSharingPolicyHandlerServiceV2.updateSharedUserAttributesV2(userSharePatchDO);
             return Response.status(Response.Status.ACCEPTED)
@@ -273,6 +288,8 @@ public class UsersApiServiceCore {
         } catch (UserSharingMgtException e) {
             LOG.error("Error occurred while patching shared user attributes.", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
+        } finally {
+            IdentityContext.getThreadLocalIdentityContext().exitFlow();
         }
     }
 
@@ -345,6 +362,51 @@ public class UsersApiServiceCore {
             LOG.error("Error occurred while retrieving organizations shared with user: " + userId, e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorResponse(e)).build();
         }
+    }
+
+    // Helper methods to manage the flow of the user sharing operations.
+
+    /**
+     * Enter a user sharing flow in the {@link IdentityContext} so that downstream components
+     * (e.g. event handlers/webhooks) can identify the user sharing operation being performed.
+     * <p>
+     * The flow is not started if the initiating persona cannot be resolved from the actor. Callers must invoke
+     * {@link IdentityContext#exitFlow()} in a finally block.
+     *
+     * @param flowName The name of the user sharing flow being started.
+     */
+    private void enterFlow(Flow.Name flowName) {
+
+        Flow.InitiatingPersona initiatingPersona = getFlowInitiatingPersona();
+        if (initiatingPersona == null) {
+            LOG.debug("Unable to resolve the initiating persona. Hence, not entering the flow: " + flowName);
+            return;
+        }
+        IdentityContext.getThreadLocalIdentityContext().enterFlow(new Flow.Builder()
+                .name(flowName)
+                .initiatingPersona(initiatingPersona)
+                .build());
+    }
+
+    /**
+     * Resolve the initiating persona of the flow from the flow already active in the identity context, falling back
+     * to the actor set in the identity context.
+     *
+     * @return The resolved initiating persona, or null if it cannot be determined.
+     */
+    private Flow.InitiatingPersona getFlowInitiatingPersona() {
+
+        IdentityContext identityContext = IdentityContext.getThreadLocalIdentityContext();
+        Flow existingFlow = identityContext.getCurrentFlow();
+        if (existingFlow != null) {
+            return existingFlow.getInitiatingPersona();
+        } else if (identityContext.isApplicationActor()) {
+            return Flow.InitiatingPersona.APPLICATION;
+        } else if (identityContext.isUserActor()) {
+            return Flow.InitiatingPersona.ADMIN;
+        }
+        LOG.debug("Actor is not set in the identity context.");
+        return null;
     }
 
     // Helper methods to build the relevant DTOs to send to the service layer.
