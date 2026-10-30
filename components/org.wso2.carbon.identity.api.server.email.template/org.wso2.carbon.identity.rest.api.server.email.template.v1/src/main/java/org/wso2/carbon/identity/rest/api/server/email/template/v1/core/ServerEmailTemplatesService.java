@@ -263,8 +263,18 @@ public class ServerEmailTemplatesService {
                 throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_ALREADY_EXISTS);
             }
         } catch (I18nEmailMgtException e) {
-            throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_ADDING_EMAIL_TEMPLATE);
+        // Check if the error is due to the template already existing (Conflict)
+        if (Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_ALREADY_EXISTS.getCode().equals(e.getErrorCode())) {
+            // We only log this as a DEBUG message to keep Carbon logs clean
+            if (log.isDebugEnabled()) {
+                log.debug("Email template already exists: " + emailTemplateWithID.getId(), e);
+            }
+        } else {
+            // Log as an actual error only if it's a real server-side failure
+            log.error("Error occurred while adding email template", e);
         }
+        throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_ADDING_EMAIL_TEMPLATE);
+    }
     }
 
     /**
