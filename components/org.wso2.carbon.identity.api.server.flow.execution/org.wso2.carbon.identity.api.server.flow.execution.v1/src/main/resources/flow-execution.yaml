@@ -106,7 +106,7 @@ components:
           example: INCOMPLETE
         type:
           type: string
-          enum: [VIEW, REDIRECTION, INTERNAL_PROMPT, WEBAUTHN]
+          enum: [VIEW, REDIRECTION, INTERNAL_PROMPT, WEBAUTHN, POLL]
           example: VIEW
         data:
           $ref: "#/components/schemas/Data"
