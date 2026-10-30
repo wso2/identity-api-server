@@ -106,6 +106,7 @@ public class ApplicationManagementConstants {
             "ApplicationMgt.SkipEnforceAuthorizedAPIUpdatePermission";
     public static final String SKIP_ENFORCE_CLIENT_SECRET_UPDATE_PERMISSION =
             "ApplicationMgt.SkipEnforceClientSecretPermission";
+    public static final String EXCLUDE_DEFAULT_SUBJECT_CLAIM = "ApplicationMgt.ExcludeDefaultSubjectClaim";
     /**
      * Enums for error messages.
      */

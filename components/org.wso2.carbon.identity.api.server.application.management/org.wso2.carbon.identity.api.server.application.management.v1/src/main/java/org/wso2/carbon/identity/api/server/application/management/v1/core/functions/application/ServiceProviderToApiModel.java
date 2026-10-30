@@ -367,7 +367,9 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
             subjectConfig.includeUserDomain(localAndOutboundAuthConfig.isUseUserstoreDomainInLocalSubjectIdentifier());
 
             if (StringUtils.isBlank(localAndOutboundAuthConfig.getSubjectClaimUri())) {
-                assignClaimForSubjectValue(application, subjectConfig);
+                if (!isDefaultSubjectClaimExcluded()) {
+                    assignClaimForSubjectValue(application, subjectConfig);
+                }
             } else {
                 subjectConfig.claim(buildClaimModel(localAndOutboundAuthConfig.getSubjectClaimUri()));
             }
@@ -385,6 +387,13 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 subjectConfig.claim(buildClaimModel(FrameworkConstants.USERNAME_CLAIM));
             }
         }
+    }
+
+    /** Whether the API leaves out the default subject claim for applications without a configured one. */
+    private boolean isDefaultSubjectClaimExcluded() {
+
+        return Boolean.parseBoolean(
+                IdentityUtil.getProperty(ApplicationManagementConstants.EXCLUDE_DEFAULT_SUBJECT_CLAIM));
     }
 
     private boolean isUserIdUsedAsDefaultSubject(ServiceProviderProperty[] spProperties) {
