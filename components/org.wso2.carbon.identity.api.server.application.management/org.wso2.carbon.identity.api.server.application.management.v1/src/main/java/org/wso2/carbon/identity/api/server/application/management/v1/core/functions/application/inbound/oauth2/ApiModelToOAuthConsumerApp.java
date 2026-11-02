@@ -42,7 +42,7 @@ import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 import org.wso2.carbon.identity.oauth2.config.models.IssuerDetails;
-import org.wso2.carbon.identity.oauth2.fapi.models.FapiProfileEnum;
+import org.wso2.carbon.identity.oauth2.fapi.utils.FapiUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -93,10 +93,10 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         updatePARConfigurations(consumerAppDTO, oidcModel.getPushAuthorizationRequest());
         updateSubjectConfigurations(consumerAppDTO, oidcModel.getSubject());
         consumerAppDTO.setFapiConformanceEnabled(oidcModel.getIsFAPIApplication());
-        // Convert FAPI profile enum to String for storage. If no profile specified; default is set to FAPI1_ADVANCED.
+        // Convert FAPI profile enum to String for storage. If no profile specified; the default FAPI profile is set.
         if (oidcModel.getIsFAPIApplication()) {
             consumerAppDTO.setFapiProfile(oidcModel.getFapiProfile() != null
-                    ? oidcModel.getFapiProfile().toString() : FapiProfileEnum.FAPI1_ADVANCED.value());
+                    ? oidcModel.getFapiProfile().toString() : FapiUtil.getDefaultFapiProfile().value());
         }
         updateSubjectTokenConfigurations(consumerAppDTO, oidcModel.getSubjectToken());
         updateCIBAAuthenticationRequestConfigurations(consumerAppDTO, oidcModel.getCibaAuthenticationRequest());
