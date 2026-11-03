@@ -30,6 +30,7 @@ public class ContextPath  {
   
     private String path;
     private Boolean encrypted = false;
+    private String flowType;
 
     /**
     **/
@@ -69,6 +70,25 @@ public class ContextPath  {
         this.encrypted = encrypted;
     }
 
+    /**
+    * Flow type the entry applies to. Required for /runtimeValues[name=...] and /request/additionalHeaders[name=...] paths, as each flow defines its own, and not allowed on other paths.
+    **/
+    public ContextPath flowType(String flowType) {
+
+        this.flowType = flowType;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "REGISTRATION", value = "Flow type the entry applies to. Required for /runtimeValues[name=...] and /request/additionalHeaders[name=...] paths, as each flow defines its own, and not allowed on other paths.")
+    @JsonProperty("flowType")
+    @Valid
+    public String getFlowType() {
+        return flowType;
+    }
+    public void setFlowType(String flowType) {
+        this.flowType = flowType;
+    }
+
 
 
     @Override
@@ -82,12 +102,13 @@ public class ContextPath  {
         }
         ContextPath contextPath = (ContextPath) o;
         return Objects.equals(this.path, contextPath.path) &&
-            Objects.equals(this.encrypted, contextPath.encrypted);
+            Objects.equals(this.encrypted, contextPath.encrypted) &&
+            Objects.equals(this.flowType, contextPath.flowType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(path, encrypted);
+        return Objects.hash(path, encrypted, flowType);
     }
 
     @Override
@@ -98,6 +119,7 @@ public class ContextPath  {
         
         sb.append("    path: ").append(toIndentedString(path)).append("\n");
         sb.append("    encrypted: ").append(toIndentedString(encrypted)).append("\n");
+        sb.append("    flowType: ").append(toIndentedString(flowType)).append("\n");
         sb.append("}");
         return sb.toString();
     }
