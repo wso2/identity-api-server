@@ -234,8 +234,7 @@ public final class FlowExtensionMapper {
                 .uri(endpointConfig.getUri())
                 .authentication(new AuthenticationTypeResponse()
                         .type(AuthenticationTypeResponse.TypeEnum.valueOf(
-                                endpointConfig.getAuthentication().getType().toString())))
-                .allowedHeaders(endpointConfig.getAllowedHeaders());
+                                endpointConfig.getAuthentication().getType().toString())));
     }
 
     private static Authentication buildAuthentication(Authentication.Type authType,
@@ -347,7 +346,7 @@ public final class FlowExtensionMapper {
         }
         return apiPaths.stream()
                 .map(cp -> new org.wso2.carbon.identity.flow.extension.model
-                        .ContextPath(cp.getPath(), Boolean.TRUE.equals(cp.getEncrypted())))
+                        .ContextPath(cp.getPath(), Boolean.TRUE.equals(cp.getEncrypted()), cp.getFlowType()))
                 .collect(Collectors.toList());
     }
 
@@ -360,12 +359,14 @@ public final class FlowExtensionMapper {
         AccessConfig model = new AccessConfig();
         if (engineConfig.getExpose() != null) {
             model.setExpose(engineConfig.getExpose().stream()
-                    .map(cp -> new ContextPath().path(cp.getPath()).encrypted(cp.isEncrypted()))
+                    .map(cp -> new ContextPath().path(cp.getPath()).encrypted(cp.isEncrypted())
+                            .flowType(cp.getFlowType()))
                     .collect(Collectors.toList()));
         }
         if (engineConfig.getModify() != null) {
             model.setModify(engineConfig.getModify().stream()
-                    .map(cp -> new ContextPath().path(cp.getPath()).encrypted(cp.isEncrypted()))
+                    .map(cp -> new ContextPath().path(cp.getPath()).encrypted(cp.isEncrypted())
+                            .flowType(cp.getFlowType()))
                     .collect(Collectors.toList()));
         }
         return model;
