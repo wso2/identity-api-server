@@ -119,6 +119,26 @@ public class ConsentManagementService {
         }
     }
 
+    /**
+     * Validates that the provided expiry time is in the future.
+     *
+     * @param expiryTime Expiry timestamp in milliseconds.
+     * @throws ConsentManagementException if the expiry time is not in the future.
+     */
+    private void validateExpiryTime(Long expiryTime) throws ConsentManagementException {
+
+        if (expiryTime != null && expiryTime <= System.currentTimeMillis()) {
+            throw handleClientException(ERROR_CODE_INVALID_QUERY_PARAM, "expiryTime must be in the future.");
+        }
+    }
+
+    /**
+     * Internal helper to validate and persist a new consent receipt.
+     *
+     * @param request Consent create request.
+     * @return ConsentResponseDTO with receipt details.
+     * @throws ConsentManagementException if validation fails or persistence fails.
+     */
     private ConsentResponseDTO createConsentInternal(ConsentCreateRequest request) throws ConsentManagementException {
 
         String subjectId = request.getSubjectId();
@@ -127,6 +147,8 @@ public class ConsentManagementService {
         if (rejected && hasAuthorizations) {
             throw handleClientException(ERROR_CODE_CONSENT_REJECTED_WITH_AUTHORIZATIONS, null);
         }
+
+        validateExpiryTime(request.getExpiryTime());
 
         ReceiptInput receiptInput = buildReceiptInput(request, subjectId);
         AddReceiptResponse addReceiptResponse = consentManager.addConsent(receiptInput);
@@ -355,6 +377,14 @@ public class ConsentManagementService {
         }
     }
 
+    /**
+     * Internal helper to validate and update an existing consent receipt.
+     *
+     * @param consentId Consent receipt ID.
+     * @param request   Update request containing fields to modify.
+     * @return Updated ConsentDTO.
+     * @throws ConsentManagementException if validation fails or update fails.
+     */
     private ConsentDTO updateConsentInternal(String consentId, ConsentUpdateRequest request)
             throws ConsentManagementException {
 
@@ -362,6 +392,7 @@ public class ConsentManagementService {
         updateInput.setConsentReceiptId(consentId);
 
         if (request.getExpiryTime() != null) {
+            validateExpiryTime(request.getExpiryTime());
             updateInput.setExpiryTime(new Timestamp(request.getExpiryTime()));
         }
 
