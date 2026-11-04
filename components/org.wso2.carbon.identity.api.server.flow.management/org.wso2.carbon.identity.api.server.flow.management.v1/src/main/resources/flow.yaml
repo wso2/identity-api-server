@@ -220,7 +220,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION]
+            enum: [REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION, PROFILE_UPDATE]
           description: Type of the flow to get condition metadata for
       responses:
         '200':
