@@ -73,7 +73,8 @@ public final class FlowExtensionContextMapper {
                 .readOnly(node.isReadOnly())
                 .replaceable(node.isReplaceable())
                 .dynamicEntryAllowed(node.isDynamicEntryAllowed())
-                .dynamicEntryType(node.getDynamicEntryType());
+                .dynamicEntryType(node.getDynamicEntryType())
+                .applicableFlowTypes(node.getApplicableFlowTypes());
 
         if (node.getAllowedOperations() != null) {
             out.setAllowedOperations(node.getAllowedOperations().stream()

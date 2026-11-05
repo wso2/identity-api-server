@@ -1654,6 +1654,13 @@ components:
         encrypted:
           type: boolean
           default: false
+        flowType:
+          type: string
+          description: >
+            Flow type the entry applies to. Required for /runtimeValues[name=...] and
+            /request/additionalHeaders[name=...] paths, as each flow defines its own, and not
+            allowed on other paths.
+          example: REGISTRATION
 
     Encryption:
       type: object
@@ -1728,6 +1735,12 @@ components:
         dynamicEntryType:
           type: string
           example: String
+        applicableFlowTypes:
+          type: array
+          description: Flow types the node applies to. ALL means every flow type.
+          items:
+            type: string
+          example: [ALL]
         children:
           type: array
           items:
