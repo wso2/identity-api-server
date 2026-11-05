@@ -59,7 +59,7 @@ paths:
             default: 0
         - name: userId
           in: query
-          description: Filter devices by the ID of the user who registered them. Returns devices of any status. Pagination applies as usual.
+          description: Filter devices by the ID of the user who registered them. Returns devices of any status. Pagination applies as usual. In an organization, a shared user gets the devices it inherits from its resident organization.
           required: false
           schema:
             type: string
