@@ -307,6 +307,22 @@ servers:
         default: "localhost:9443"
 
 components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://localhost:9443/oauth2/authorize'
+          tokenUrl: 'https://localhost:9443/oauth2/token'
+          scopes:
+            internal_functional_lib_view: View script libraries
+            internal_functional_lib_create: Create script libraries
+            internal_functional_lib_update: Update script libraries
+            internal_functional_lib_delete: Delete script libraries
+
   parameters:
     scriptLibraryIdPathParam:
       in: path

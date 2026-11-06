@@ -54,7 +54,12 @@ public class ScriptLibrariesApi  {
     
     @Consumes({ "multipart/form-data" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Add a new script library. ", notes = "This API provides the capability to create a new Script library. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/functionsLibrarymgt/create <br> <b>Scope required:</b> <br>     * internal_functional_lib_create <br> ", response = Void.class, tags={ "Script Libraries", })
+    @ApiOperation(value = "Add a new script library. ", notes = "This API provides the capability to create a new Script library. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/functionsLibrarymgt/create <br> <b>Scope required:</b> <br>     * internal_functional_lib_create <br> ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Script Libraries", })
     @ApiResponses(value = { 
         @ApiResponse(code = 201, message = "Successful response", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
@@ -73,7 +78,12 @@ public class ScriptLibrariesApi  {
     @Path("/{script-library-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete a script library. ", notes = "This API provides the capability to delete a script library using its id.<br> <b>Permission required:</b> <br>     * /permission/admin/manage/functionsLibrarymgt/delete <br> <b>Scope required:</b> <br>     * internal_functional_lib_delete ", response = Void.class, tags={ "Script Libraries", })
+    @ApiOperation(value = "Delete a script library. ", notes = "This API provides the capability to delete a script library using its id.<br> <b>Permission required:</b> <br>     * /permission/admin/manage/functionsLibrarymgt/delete <br> <b>Scope required:</b> <br>     * internal_functional_lib_delete ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Script Libraries", })
     @ApiResponses(value = { 
         @ApiResponse(code = 204, message = "Successfully Deleted", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
@@ -91,7 +101,12 @@ public class ScriptLibrariesApi  {
     
     
     @Produces({ "application/json", "application/xml" })
-    @ApiOperation(value = "List script libraries. ", notes = "This API provides the capability to list Script Libraries. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/functionsLibrarymgt/view <br> <b>Scope required:</b> <br>     * internal_functional_lib_view ", response = ScriptLibraryListResponse.class, tags={ "Script Libraries", })
+    @ApiOperation(value = "List script libraries. ", notes = "This API provides the capability to list Script Libraries. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/functionsLibrarymgt/view <br> <b>Scope required:</b> <br>     * internal_functional_lib_view ", response = ScriptLibraryListResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Script Libraries", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful Response", response = ScriptLibraryListResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
@@ -110,7 +125,12 @@ public class ScriptLibrariesApi  {
     @Path("/{script-library-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get script library. ", notes = "This API provides the capability to retrieve the details of a script library using its id.<br> <b>Permission required:</b> <br>     * /permission/admin/manage/functionsLibrarymgt/view <br> <b>Scope required:</b> <br>     * internal_functional_lib_view ", response = ScriptLibraryResponse.class, tags={ "Script Libraries", })
+    @ApiOperation(value = "Get script library. ", notes = "This API provides the capability to retrieve the details of a script library using its id.<br> <b>Permission required:</b> <br>     * /permission/admin/manage/functionsLibrarymgt/view <br> <b>Scope required:</b> <br>     * internal_functional_lib_view ", response = ScriptLibraryResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Script Libraries", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful Response", response = ScriptLibraryResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
@@ -129,7 +149,12 @@ public class ScriptLibrariesApi  {
     @Path("/{script-library-id}/content")
     
     @Produces({ "application/octet-stream", "application/json" })
-    @ApiOperation(value = "Get the content of the script library. ", notes = "This API provides the capability to retrieve the content of a script library using its id.<br> <b>Permission required:</b> <br>     * /permission/admin/manage/functionsLibrarymgt/view <br> <b>Scope required:</b> <br>     * internal_functional_lib_view ", response = Object.class, tags={ "Script Libraries", })
+    @ApiOperation(value = "Get the content of the script library. ", notes = "This API provides the capability to retrieve the content of a script library using its id.<br> <b>Permission required:</b> <br>     * /permission/admin/manage/functionsLibrarymgt/view <br> <b>Scope required:</b> <br>     * internal_functional_lib_view ", response = Object.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Script Libraries", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful Response", response = Object.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
@@ -148,7 +173,12 @@ public class ScriptLibrariesApi  {
     @Path("/{script-library-id}")
     @Consumes({ "multipart/form-data" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update a script library. ", notes = "This API provides the capability to update a script library using its id. The script library is renamed when a different name is given. Since the id is derived from the name, a renamed script library gets a new id, which is returned in the response.<br> <b>Permission required:</b> <br>     * /permission/admin/manage/functionsLibrarymgt/update <br> <b>Scope required:</b> <br>     * internal_functional_lib_update ", response = ScriptLibraryResponse.class, tags={ "Script Libraries" })
+    @ApiOperation(value = "Update a script library. ", notes = "This API provides the capability to update a script library using its id. The script library is renamed when a different name is given. Since the id is derived from the name, a renamed script library gets a new id, which is returned in the response.<br> <b>Permission required:</b> <br>     * /permission/admin/manage/functionsLibrarymgt/update <br> <b>Scope required:</b> <br>     * internal_functional_lib_update ", response = ScriptLibraryResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Script Libraries" })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successfully Updated", response = ScriptLibraryResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
