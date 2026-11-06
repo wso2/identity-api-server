@@ -4252,7 +4252,8 @@ components:
         fapiProfile:
           description: |
             The FAPI security profile applied to the application. Applicable only when isFAPIApplication is true.
-            If isFAPIApplication is true and this property is omitted, `FAPI1_ADVANCED` will be applied by default.
+            If isFAPIApplication is true and this property is omitted, the default FAPI profile is applied when the
+            application is created, and the current profile is kept when it is updated.
           allOf:
             - $ref: '#/components/schemas/FapiProfile'
           example: FAPI1_ADVANCED
