@@ -77,10 +77,12 @@ public class ServerScriptLibrariesService {
         if (CollectionUtils.isEmpty(functionLibraries)) {
             return new ScriptLibraryPage(Collections.emptyList(), 0, validatedOffset);
         }
-        List<FunctionLibrary> page = functionLibraries.subList(
-                Math.min(functionLibraries.size(), validatedOffset),
-                Math.min(functionLibraries.size(), validatedOffset + validatedLimit));
-        return new ScriptLibraryPage(page, functionLibraries.size(), validatedOffset);
+        int size = functionLibraries.size();
+        int fromIndex = Math.min(size, validatedOffset);
+        // Compared without adding, as offset + limit can overflow int for a very large offset.
+        int toIndex = validatedLimit > size - fromIndex ? size : fromIndex + validatedLimit;
+        List<FunctionLibrary> page = functionLibraries.subList(fromIndex, toIndex);
+        return new ScriptLibraryPage(page, size, validatedOffset);
     }
 
     /**
