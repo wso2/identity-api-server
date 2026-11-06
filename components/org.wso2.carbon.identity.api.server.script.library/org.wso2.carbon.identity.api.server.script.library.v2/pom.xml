@@ -94,11 +94,6 @@
             <artifactId>org.wso2.carbon.identity.functions.library.mgt</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
