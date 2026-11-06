@@ -580,7 +580,7 @@ public class Utils {
                     ERROR_CODE_UNSUPPORTED_EXECUTOR.getDescription()));
         }
 
-        for (Set<String> requiredGroup : metaResponseHandler.getRequiredExecutorGroups()) {
+        for (Set<String> requiredGroup : metaResponseHandler.getRequiredExecutorGroups(executors)) {
             if (Collections.disjoint(requiredGroup, executors)) {
                 throw handleFlowMgtException(new FlowMgtClientException(
                         FlowEndpointConstants.ErrorMessages.ERROR_CODE_REQUIRED_EXECUTOR_MISSING.getCode(),
