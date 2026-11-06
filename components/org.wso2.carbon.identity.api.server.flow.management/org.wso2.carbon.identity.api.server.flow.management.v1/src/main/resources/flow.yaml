@@ -954,6 +954,26 @@ components:
           type: string
           description: Name of the authenticator backing this executor
           example: CustomVerificationAuthenticator
+        phases:
+          type: array
+          description: >-
+            Phases of the executor. Each step of the executor runs one of them, set as action.executor.meta.phase.
+            Not set if the executor does not declare phases.
+          items:
+            $ref: "#/components/schemas/ExecutorPhase"
+
+    ExecutorPhase:
+      type: object
+      description: A phase of an executor. A step runs one phase of its executor, set as action.executor.meta.phase.
+      properties:
+        name:
+          type: string
+          description: Name of the phase
+          example: INIT_REGISTRATION
+        description:
+          type: string
+          description: Short description of the phase
+          example: Show a QR code to register another device and wait for the device.
 
     FlowExtensionConnectionInfo:
       type: object

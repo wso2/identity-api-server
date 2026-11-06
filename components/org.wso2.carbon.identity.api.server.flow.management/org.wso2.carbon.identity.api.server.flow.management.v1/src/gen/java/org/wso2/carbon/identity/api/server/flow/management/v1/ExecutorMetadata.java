@@ -22,6 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorPhase;
 import javax.validation.constraints.*;
 
 /**
@@ -42,6 +45,8 @@ public class ExecutorMetadata  {
     private String icon;
     private Boolean requiresConnection;
     private String associatedAuthenticator;
+    private List<ExecutorPhase> phases = null;
+
 
     /**
     * Unique name of the executor, as registered with the flow execution engine. Matches the entry in supportedExecutors and the executorName in executorConnections.
@@ -176,7 +181,34 @@ public class ExecutorMetadata  {
         this.associatedAuthenticator = associatedAuthenticator;
     }
 
+    /**
+    * Phases of the executor. Each step of the executor runs one of them, set as action.executor.meta.phase. Not set if the executor does not declare phases.
+    **/
+    public ExecutorMetadata phases(List<ExecutorPhase> phases) {
 
+        this.phases = phases;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "Phases of the executor. Each step of the executor runs one of them, set as action.executor.meta.phase. Not set if the executor does not declare phases.")
+    @JsonProperty("phases")
+    @Valid
+    public List<ExecutorPhase> getPhases() {
+        return phases;
+    }
+    public void setPhases(List<ExecutorPhase> phases) {
+        this.phases = phases;
+    }
+
+    public ExecutorMetadata addPhasesItem(ExecutorPhase phasesItem) {
+        if (this.phases == null) {
+            this.phases = new ArrayList<ExecutorPhase>();
+        }
+        this.phases.add(phasesItem);
+        return this;
+    }
+
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -194,12 +226,13 @@ public class ExecutorMetadata  {
             Objects.equals(this.isAuthenticationExecutor, executorMetadata.isAuthenticationExecutor) &&
             Objects.equals(this.icon, executorMetadata.icon) &&
             Objects.equals(this.requiresConnection, executorMetadata.requiresConnection) &&
-            Objects.equals(this.associatedAuthenticator, executorMetadata.associatedAuthenticator);
+            Objects.equals(this.associatedAuthenticator, executorMetadata.associatedAuthenticator) &&
+            Objects.equals(this.phases, executorMetadata.phases);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, displayName, description, isAuthenticationExecutor, icon, requiresConnection, associatedAuthenticator);
+        return Objects.hash(name, displayName, description, isAuthenticationExecutor, icon, requiresConnection, associatedAuthenticator, phases);
     }
 
     @Override
@@ -215,6 +248,7 @@ public class ExecutorMetadata  {
         sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
         sb.append("    requiresConnection: ").append(toIndentedString(requiresConnection)).append("\n");
         sb.append("    associatedAuthenticator: ").append(toIndentedString(associatedAuthenticator)).append("\n");
+        sb.append("    phases: ").append(toIndentedString(phases)).append("\n");
         sb.append("}");
         return sb.toString();
     }
