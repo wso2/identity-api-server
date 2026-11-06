@@ -57,8 +57,54 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /flow/poll:
+    get:
+      summary: Get the status of a polling entry of a flow
+      description: >
+        A client that waits for something outside its own requests, such as another device that scans a QR code,
+        polls the status with the token the flow gave it. When the status is SUCCESS, the client continues the flow.
+        When it is FAILED (also for an unknown or expired token), the flow cannot be continued.
+      tags:
+        - Poll a flow
+      security: []
+      parameters:
+        - name: token
+          in: query
+          required: true
+          description: Poll token the flow returned.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Status of the polling entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FlowPollResponse"
+        '400':
+          description: Bad request - the token is missing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        '500':
+          description: Internal server error - unexpected failure while reading the status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
+    FlowPollResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [WAITING, SUCCESS, FAILED]
+          example: WAITING
+
     FlowExecutionRequest:
       type: object
       properties:
@@ -106,7 +152,7 @@ components:
           example: INCOMPLETE
         type:
           type: string
-          enum: [VIEW, REDIRECTION, INTERNAL_PROMPT, WEBAUTHN]
+          enum: [VIEW, REDIRECTION, INTERNAL_PROMPT, WEBAUTHN, POLL]
           example: VIEW
         data:
           $ref: "#/components/schemas/Data"
