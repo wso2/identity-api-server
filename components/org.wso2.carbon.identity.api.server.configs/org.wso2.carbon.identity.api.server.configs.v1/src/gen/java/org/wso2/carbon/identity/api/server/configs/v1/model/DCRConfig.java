@@ -97,7 +97,7 @@ public class DCRConfig  {
     }
 
     /**
-    * The FAPI security profile to enforce for applications created via DCR. Applicable only when enableFapiEnforcement is true. If enableFapiEnforcement is true and this property is omitted, &#x60;FAPI1_ADVANCED&#x60; will be applied by default. 
+    * The FAPI security profile to enforce for applications created via DCR. Applicable only when enableFapiEnforcement is true. If enableFapiEnforcement is true and this property is omitted, the default FAPI profile is applied. 
     **/
     public DCRConfig fapiProfile(FapiProfile fapiProfile) {
 
@@ -105,7 +105,7 @@ public class DCRConfig  {
         return this;
     }
     
-    @ApiModelProperty(example = "FAPI1_ADVANCED", value = "The FAPI security profile to enforce for applications created via DCR. Applicable only when enableFapiEnforcement is true. If enableFapiEnforcement is true and this property is omitted, `FAPI1_ADVANCED` will be applied by default. ")
+    @ApiModelProperty(example = "FAPI1_ADVANCED", value = "The FAPI security profile to enforce for applications created via DCR. Applicable only when enableFapiEnforcement is true. If enableFapiEnforcement is true and this property is omitted, the default FAPI profile is applied. ")
     @JsonProperty("fapiProfile")
     @Valid
     public FapiProfile getFapiProfile() {
