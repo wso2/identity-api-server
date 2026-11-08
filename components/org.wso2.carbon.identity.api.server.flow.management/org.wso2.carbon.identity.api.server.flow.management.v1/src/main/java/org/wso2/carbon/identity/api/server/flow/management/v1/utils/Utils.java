@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -42,6 +42,7 @@ import org.wso2.carbon.identity.api.server.flow.management.v1.ConditionValue;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Data;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Executor;
 import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorMetadata;
+import org.wso2.carbon.identity.api.server.flow.management.v1.ExecutorPhase;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfig;
 import org.wso2.carbon.identity.api.server.flow.management.v1.FlowConfigPatchModel;
 import org.wso2.carbon.identity.api.server.flow.management.v1.Position;
@@ -53,6 +54,7 @@ import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.core.util.LambdaExceptionUtils;
 import org.wso2.carbon.identity.flow.execution.engine.metadata.FlowExecutorInfo;
 import org.wso2.carbon.identity.flow.execution.engine.metadata.FlowExecutorMetadataService;
+import org.wso2.carbon.identity.flow.execution.engine.metadata.FlowExecutorPhase;
 import org.wso2.carbon.identity.flow.mgt.Constants;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtClientException;
 import org.wso2.carbon.identity.flow.mgt.exception.FlowMgtFrameworkException;
@@ -1047,7 +1049,7 @@ public class Utils {
         String authenticator = StringUtils.isNotBlank(declared.getAssociatedAuthenticator())
                 ? declared.getAssociatedAuthenticator() : findAuthenticatorForExecutor(declared.getName());
 
-        return new ExecutorMetadata()
+        ExecutorMetadata metadata = new ExecutorMetadata()
                 .name(declared.getName())
                 .displayName(truncate(declared.getDisplayName(), MAX_EXECUTOR_DISPLAY_NAME_LENGTH))
                 .description(truncate(declared.getDescription(), MAX_EXECUTOR_DESCRIPTION_LENGTH))
@@ -1056,6 +1058,10 @@ public class Utils {
                 .associatedAuthenticator(authenticator)
                 .requiresConnection(declared.isConnectionRequired() || declared.isAuthenticationExecutor()
                         || authenticator != null);
+        for (FlowExecutorPhase phase : declared.getPhases()) {
+            metadata.addPhasesItem(new ExecutorPhase().name(phase.getName()).description(phase.getDescription()));
+        }
+        return metadata;
     }
 
     private static String findAuthenticatorForExecutor(String executorName) {
