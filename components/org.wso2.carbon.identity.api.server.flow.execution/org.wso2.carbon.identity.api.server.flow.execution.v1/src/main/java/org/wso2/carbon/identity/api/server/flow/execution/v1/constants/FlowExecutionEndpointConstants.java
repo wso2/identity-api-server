@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -55,6 +55,11 @@ public class FlowExecutionEndpointConstants {
         ERROR_CODE_FLOW_DISABLED("60104",
                 "Flow is disabled.",
                 "The requested flow %s is disabled. Please contact your administrator."
+        ),
+
+        ERROR_CODE_POLL_TOKEN_NOT_PROVIDED("60105",
+                "Poll token not provided.",
+                "The poll token is not provided in the request."
         ),
 
         // Server error codes.
