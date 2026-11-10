@@ -114,6 +114,8 @@ public enum AllowedOperationsEnum {
     private Boolean replaceable;
     private Boolean dynamicEntryAllowed;
     private String dynamicEntryType;
+    private List<String> applicableFlowTypes = null;
+
     private List<FlowExtensionContextNode> children = null;
 
 
@@ -308,6 +310,33 @@ public enum AllowedOperationsEnum {
     }
 
     /**
+    * Flow types the node applies to. ALL means every flow type.
+    **/
+    public FlowExtensionContextNode applicableFlowTypes(List<String> applicableFlowTypes) {
+
+        this.applicableFlowTypes = applicableFlowTypes;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "[\"ALL\"]", value = "Flow types the node applies to. ALL means every flow type.")
+    @JsonProperty("applicableFlowTypes")
+    @Valid
+    public List<String> getApplicableFlowTypes() {
+        return applicableFlowTypes;
+    }
+    public void setApplicableFlowTypes(List<String> applicableFlowTypes) {
+        this.applicableFlowTypes = applicableFlowTypes;
+    }
+
+    public FlowExtensionContextNode addApplicableFlowTypesItem(String applicableFlowTypesItem) {
+        if (this.applicableFlowTypes == null) {
+            this.applicableFlowTypes = new ArrayList<String>();
+        }
+        this.applicableFlowTypes.add(applicableFlowTypesItem);
+        return this;
+    }
+
+    /**
     **/
     public FlowExtensionContextNode children(List<FlowExtensionContextNode> children) {
 
@@ -355,12 +384,13 @@ public enum AllowedOperationsEnum {
             Objects.equals(this.replaceable, flowExtensionContextNode.replaceable) &&
             Objects.equals(this.dynamicEntryAllowed, flowExtensionContextNode.dynamicEntryAllowed) &&
             Objects.equals(this.dynamicEntryType, flowExtensionContextNode.dynamicEntryType) &&
+            Objects.equals(this.applicableFlowTypes, flowExtensionContextNode.applicableFlowTypes) &&
             Objects.equals(this.children, flowExtensionContextNode.children);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(key, title, path, dataType, nodeType, allowedOperations, readOnly, replaceable, dynamicEntryAllowed, dynamicEntryType, children);
+        return Objects.hash(key, title, path, dataType, nodeType, allowedOperations, readOnly, replaceable, dynamicEntryAllowed, dynamicEntryType, applicableFlowTypes, children);
     }
 
     @Override
@@ -379,6 +409,7 @@ public enum AllowedOperationsEnum {
         sb.append("    replaceable: ").append(toIndentedString(replaceable)).append("\n");
         sb.append("    dynamicEntryAllowed: ").append(toIndentedString(dynamicEntryAllowed)).append("\n");
         sb.append("    dynamicEntryType: ").append(toIndentedString(dynamicEntryType)).append("\n");
+        sb.append("    applicableFlowTypes: ").append(toIndentedString(applicableFlowTypes)).append("\n");
         sb.append("    children: ").append(toIndentedString(children)).append("\n");
         sb.append("}");
         return sb.toString();
