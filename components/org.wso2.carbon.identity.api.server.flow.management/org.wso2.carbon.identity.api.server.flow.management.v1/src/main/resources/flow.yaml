@@ -86,7 +86,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
+            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD, PROFILE_UPDATE]
           description: Type of the flow to retrieve
       responses:
         '200':
@@ -131,7 +131,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
+            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD, PROFILE_UPDATE]
           description: Type of the flow to delete
       responses:
         '204':
@@ -173,7 +173,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
+            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD, PROFILE_UPDATE]
           description: Type of the flow to get metadata for
       responses:
         '200':
@@ -220,7 +220,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION]
+            enum: [REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION, PROFILE_UPDATE]
           description: Type of the flow to get condition metadata for
       responses:
         '200':
@@ -422,7 +422,7 @@ paths:
           required: false
           schema:
             type: string
-            enum: [REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION, ASK_PASSWORD]
+            enum: [REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION, ASK_PASSWORD, PROFILE_UPDATE]
           description: Optional flow type. When omitted, the default tree is returned.
       responses:
         '200':
@@ -490,7 +490,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
+            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD, PROFILE_UPDATE]
           description: Type of the flow to get configurations for
       responses:
         '200':
@@ -954,6 +954,26 @@ components:
           type: string
           description: Name of the authenticator backing this executor
           example: CustomVerificationAuthenticator
+        phases:
+          type: array
+          description: >-
+            Phases of the executor. Each step of the executor runs one of them, set as action.executor.meta.phase.
+            Not set if the executor does not declare phases.
+          items:
+            $ref: "#/components/schemas/ExecutorPhase"
+
+    ExecutorPhase:
+      type: object
+      description: A phase of an executor. A step runs one phase of its executor, set as action.executor.meta.phase.
+      properties:
+        name:
+          type: string
+          description: Name of the phase
+          example: INIT_REGISTRATION
+        description:
+          type: string
+          description: Short description of the phase
+          example: Show a QR code to register another device and wait for the device.
 
     FlowExtensionConnectionInfo:
       type: object
