@@ -39,5 +39,5 @@ public interface DevicesApiService {
 
       public Response listDevices(Integer limit, Integer offset, String userId);
 
-      public Response updateDeviceName(String deviceId, DevicePatchRequest devicePatchRequest);
+      public Response updateDevice(String deviceId, DevicePatchRequest devicePatchRequest);
 }

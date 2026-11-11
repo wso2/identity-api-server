@@ -50,9 +50,9 @@ public class DevicesApiServiceImpl implements DevicesApiService {
     }
 
     @Override
-    public Response updateDeviceName(String deviceId, DevicePatchRequest patchRequest) {
+    public Response updateDevice(String deviceId, DevicePatchRequest patchRequest) {
 
-        return Response.ok().entity(service.updateDeviceName(deviceId, patchRequest)).build();
+        return Response.ok().entity(service.updateDevice(deviceId, patchRequest)).build();
     }
 
     @Override
