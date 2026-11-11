@@ -43,7 +43,8 @@ import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
 /**
- * Core service for Device Management API — handles listing, renaming and deleting devices.
+ * Core service for Device Management API — handles listing, renaming, activating, deactivating and deleting
+ * devices.
  */
 public class DeviceManagementApiService {
 
@@ -208,12 +209,7 @@ public class DeviceManagementApiService {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             Device device = deviceManagementService.getDeviceById(deviceId, tenantDomain);
             if (device == null) {
-                throw new APIError(Response.Status.NOT_FOUND, new ErrorResponse.Builder()
-                        .withCode(Constants.ErrorMessage.ERROR_CODE_DEVICE_NOT_FOUND.code())
-                        .withMessage(Constants.ErrorMessage.ERROR_CODE_DEVICE_NOT_FOUND.message())
-                        .withDescription(String.format(
-                                Constants.ErrorMessage.ERROR_CODE_DEVICE_NOT_FOUND.description(), deviceId))
-                        .build(LOG, "Device not found for id: " + deviceId));
+                throw buildDeviceNotFoundError(deviceId);
             }
             return DeviceResponseBuilder.buildDeviceResponse(device);
         } catch (DeviceMgtException e) {
@@ -221,38 +217,93 @@ public class DeviceManagementApiService {
         }
     }
 
+    private APIError buildDeviceNotFoundError(String deviceId) {
+
+        return new APIError(Response.Status.NOT_FOUND, new ErrorResponse.Builder()
+                .withCode(Constants.ErrorMessage.ERROR_CODE_DEVICE_NOT_FOUND.code())
+                .withMessage(Constants.ErrorMessage.ERROR_CODE_DEVICE_NOT_FOUND.message())
+                .withDescription(String.format(
+                        Constants.ErrorMessage.ERROR_CODE_DEVICE_NOT_FOUND.description(), deviceId))
+                .build(LOG, "Device not found for id: " + deviceId));
+    }
+
     /**
-     * Updates the display name of a device.
+     * Updates a device. Renames the device when a device name is given and activates or deactivates it when a
+     * status is given. Both can be applied in the same request.
      *
      * @param deviceId     Device UUID.
-     * @param patchRequest Request body containing the new name.
-     * @return Updated DeviceResponse.
+     * @param patchRequest Fields to update.
+     * @return DeviceResponse reflecting the updated device.
      */
-    public DeviceResponse updateDeviceName(String deviceId, DevicePatchRequest patchRequest) {
+    public DeviceResponse updateDevice(String deviceId, DevicePatchRequest patchRequest) {
 
         validateApiEnabled();
-        validateDeviceName(patchRequest);
+        validatePatchRequest(patchRequest);
 
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            Device updated = deviceManagementService.updateDeviceName(
-                    deviceId, patchRequest.getDeviceName(), tenantDomain);
-            return DeviceResponseBuilder.buildDeviceResponse(updated);
+            Device device = deviceManagementService.getDeviceById(deviceId, tenantDomain);
+            if (device == null) {
+                throw buildDeviceNotFoundError(deviceId);
+            }
+
+            if (patchRequest.getDeviceName() != null) {
+                device = deviceManagementService.updateDeviceName(
+                        deviceId, patchRequest.getDeviceName(), tenantDomain);
+            }
+            if (patchRequest.getStatus() != null) {
+                device = updateDeviceStatus(device, patchRequest.getStatus(), tenantDomain);
+            }
+            return DeviceResponseBuilder.buildDeviceResponse(device);
         } catch (DeviceMgtException e) {
             throw handleException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_DEVICE);
         }
     }
 
-    private void validateDeviceName(DevicePatchRequest patchRequest) {
+    /**
+     * Activates or deactivates the device. Nothing is changed when the device already has the requested status.
+     *
+     * @param device       Device to update.
+     * @param status       Requested status.
+     * @param tenantDomain Tenant domain.
+     * @return Device reflecting the requested status.
+     * @throws DeviceMgtException If the status update fails.
+     */
+    private Device updateDeviceStatus(Device device, DevicePatchRequest.StatusEnum status, String tenantDomain)
+            throws DeviceMgtException {
 
-        String deviceName = patchRequest != null ? patchRequest.getDeviceName() : null;
-        if (StringUtils.isBlank(deviceName) || deviceName.length() > DEVICE_NAME_MAX_LENGTH) {
-            throw new APIError(Response.Status.BAD_REQUEST, new ErrorResponse.Builder()
-                    .withCode(Constants.ErrorMessage.ERROR_CODE_INVALID_DEVICE_NAME.code())
-                    .withMessage(Constants.ErrorMessage.ERROR_CODE_INVALID_DEVICE_NAME.message())
-                    .withDescription(Constants.ErrorMessage.ERROR_CODE_INVALID_DEVICE_NAME.description())
-                    .build(LOG, "Invalid device name."));
+        Device.Status requestedStatus = Device.Status.valueOf(status.value());
+        if (requestedStatus == device.getStatus()) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("The device: " + device.getId() + " is already " + requestedStatus
+                        + ". Skipping the status update.");
+            }
+            return device;
         }
+        if (requestedStatus == Device.Status.ACTIVE) {
+            return deviceManagementService.activateDevice(device.getId(), tenantDomain);
+        }
+        return deviceManagementService.deactivateDevice(device.getId(), tenantDomain);
+    }
+
+    private void validatePatchRequest(DevicePatchRequest patchRequest) {
+
+        if (patchRequest == null || (patchRequest.getDeviceName() == null && patchRequest.getStatus() == null)) {
+            throw buildBadRequestError(Constants.ErrorMessage.ERROR_CODE_INVALID_PATCH_REQUEST);
+        }
+        String deviceName = patchRequest.getDeviceName();
+        if (deviceName != null && (StringUtils.isBlank(deviceName) || deviceName.length() > DEVICE_NAME_MAX_LENGTH)) {
+            throw buildBadRequestError(Constants.ErrorMessage.ERROR_CODE_INVALID_DEVICE_NAME);
+        }
+    }
+
+    private APIError buildBadRequestError(Constants.ErrorMessage error) {
+
+        return new APIError(Response.Status.BAD_REQUEST, new ErrorResponse.Builder()
+                .withCode(error.code())
+                .withMessage(error.message())
+                .withDescription(error.description())
+                .build(LOG, error.message()));
     }
 
     /**

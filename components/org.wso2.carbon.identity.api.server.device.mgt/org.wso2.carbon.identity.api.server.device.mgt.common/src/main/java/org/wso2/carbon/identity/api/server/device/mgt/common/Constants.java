@@ -62,6 +62,10 @@ public class Constants {
                 "Invalid device name.",
                 "Device name must be a non-blank string of at most 255 characters."),
 
+        ERROR_CODE_INVALID_PATCH_REQUEST("60103",
+                "Invalid device update request.",
+                "At least one of 'deviceName' or 'status' must be provided."),
+
         ERROR_CODE_ERROR_LISTING_DEVICES("65101",
                 "Unable to list devices.",
                 "Server encountered an error while listing devices."),
