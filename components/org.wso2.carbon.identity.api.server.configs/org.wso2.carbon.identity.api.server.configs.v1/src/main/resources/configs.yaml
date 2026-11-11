@@ -2451,7 +2451,7 @@ components:
         fapiProfile:
           description: |
             The FAPI security profile to enforce for applications created via DCR. Applicable only when enableFapiEnforcement is true.
-            If enableFapiEnforcement is true and this property is omitted, `FAPI1_ADVANCED` will be applied by default.
+            If enableFapiEnforcement is true and this property is omitted, the default FAPI profile is applied.
           allOf:
             - $ref: '#/components/schemas/FapiProfile'
           example: FAPI1_ADVANCED
