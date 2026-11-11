@@ -23,6 +23,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.wso2.carbon.identity.flow.mgt.Constants.FlowConfigConstants.IS_ENABLED;
+import static org.wso2.carbon.identity.flow.mgt.Constants.FlowConfigConstants.RESOURCE_NAME_PREFIX;
+import static org.wso2.carbon.identity.flow.mgt.Constants.FlowConfigConstants.RESOURCE_TYPE;
+import static org.wso2.carbon.identity.flow.mgt.Constants.FlowTypes.DEVICE_REGISTRATION;
 import static org.wso2.carbon.identity.notification.push.device.handler.constant.PushDeviceHandlerConstants.ATTR_ENABLE_MULTIPLE_DEVICE_ENROLLMENT;
 import static org.wso2.carbon.identity.notification.push.device.handler.constant.PushDeviceHandlerConstants.ATTR_MAX_DEVICE_LIMIT;
 import static org.wso2.carbon.identity.notification.push.device.handler.constant.PushDeviceHandlerConstants.PUSH_DEVICE_MGT_RESOURCE_NAME;
@@ -35,7 +39,10 @@ public enum AllowedConfigList {
 
     // Push authentication device management configuration.
     PUSH_DEVICE_MGT_CONFIG(PUSH_DEVICE_MGT_RESOURCE_TYPE, PUSH_DEVICE_MGT_RESOURCE_NAME,
-            ATTR_ENABLE_MULTIPLE_DEVICE_ENROLLMENT, ATTR_MAX_DEVICE_LIMIT);
+            ATTR_ENABLE_MULTIPLE_DEVICE_ENROLLMENT, ATTR_MAX_DEVICE_LIMIT),
+
+    // Device registration flow enablement, used by My Account to show the add device option.
+    DEVICE_REGISTRATION_FLOW_CONFIG(RESOURCE_TYPE, RESOURCE_NAME_PREFIX + DEVICE_REGISTRATION.getType(), IS_ENABLED);
 
     private final String resourceType;
     private final String resourceName;

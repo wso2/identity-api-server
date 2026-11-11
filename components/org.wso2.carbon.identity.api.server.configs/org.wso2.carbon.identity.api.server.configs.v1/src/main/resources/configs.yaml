@@ -1801,6 +1801,15 @@ paths:
                 </ul>
               </td>
             </tr>
+            <tr>
+              <td>flow-mgt-config</td>
+              <td>flow-mgt-config-DEVICE_REGISTRATION</td>
+              <td>
+                <ul>
+                  <li>isEnabled</li>
+                </ul>
+              </td>
+            </tr>
         
           </table>
         

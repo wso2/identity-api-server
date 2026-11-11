@@ -192,6 +192,7 @@ public class FlowEndpointConstants {
         public static final String PROVISIONING_DISPATCH_EXECUTOR = "ProvisioningDispatchExecutor";
         public static final String OPENID4VP_REGISTRATION_EXECUTOR = "PresentationExecutor";
         public static final String USER_VERIFICATION_EXECUTOR = "UserVerificationExecutor";
+        public static final String DEVICE_REGISTRATION_EXECUTOR = "DeviceRegistrationExecutor";
     }
 
     /**
