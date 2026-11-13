@@ -24,15 +24,52 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 
+/**
+ * Fields to update. At least one of &#39;deviceName&#39; or &#39;status&#39; must be provided.
+ **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-
+@ApiModel(description = "Fields to update. At least one of 'deviceName' or 'status' must be provided.")
 public class DevicePatchRequest  {
   
     private String deviceName;
+
+@XmlType(name="StatusEnum")
+@XmlEnum(String.class)
+public enum StatusEnum {
+
+    @XmlEnumValue("ACTIVE") ACTIVE(String.valueOf("ACTIVE")), @XmlEnumValue("INACTIVE") INACTIVE(String.valueOf("INACTIVE"));
+
+
+    private String value;
+
+    StatusEnum(String v) {
+        value = v;
+    }
+
+    public String value() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    public static StatusEnum fromValue(String value) {
+        for (StatusEnum b : StatusEnum.values()) {
+            if (b.value.equals(value)) {
+                return b;
+            }
+        }
+        throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+}
+
+    private StatusEnum status;
 
     /**
     * The new display name for the device.
@@ -43,16 +80,33 @@ public class DevicePatchRequest  {
         return this;
     }
     
-    @ApiModelProperty(example = "My Work Phone", required = true, value = "The new display name for the device.")
+    @ApiModelProperty(example = "My Work Phone", value = "The new display name for the device.")
     @JsonProperty("deviceName")
-    @Valid
-    @NotNull(message = "Property deviceName cannot be null.")
- @Size(min=1,max=255)
+    @Valid @Size(min=1,max=255)
     public String getDeviceName() {
         return deviceName;
     }
     public void setDeviceName(String deviceName) {
         this.deviceName = deviceName;
+    }
+
+    /**
+    * The new status of the device. An inactive device cannot be used for device-based login checks.
+    **/
+    public DevicePatchRequest status(StatusEnum status) {
+
+        this.status = status;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "INACTIVE", value = "The new status of the device. An inactive device cannot be used for device-based login checks.")
+    @JsonProperty("status")
+    @Valid
+    public StatusEnum getStatus() {
+        return status;
+    }
+    public void setStatus(StatusEnum status) {
+        this.status = status;
     }
 
 
@@ -67,12 +121,13 @@ public class DevicePatchRequest  {
             return false;
         }
         DevicePatchRequest devicePatchRequest = (DevicePatchRequest) o;
-        return Objects.equals(this.deviceName, devicePatchRequest.deviceName);
+        return Objects.equals(this.deviceName, devicePatchRequest.deviceName) &&
+            Objects.equals(this.status, devicePatchRequest.status);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(deviceName);
+        return Objects.hash(deviceName, status);
     }
 
     @Override
@@ -82,6 +137,7 @@ public class DevicePatchRequest  {
         sb.append("class DevicePatchRequest {\n");
         
         sb.append("    deviceName: ").append(toIndentedString(deviceName)).append("\n");
+        sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("}");
         return sb.toString();
     }

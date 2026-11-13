@@ -127,9 +127,10 @@ paths:
     patch:
       tags:
         - Device Management
-      summary: Rename a registered device.
-      operationId: updateDeviceName
-      description: "This API provides the capability to update the display name of a registered device.\n\n
+      summary: Update a registered device.
+      operationId: updateDevice
+      description: "This API provides the capability to rename, activate or deactivate a registered device.
+        At least one of 'deviceName' or 'status' must be provided.\n\n
         <b>Scope (Permission) required:</b> ``internal_device_mgt_update``\n\n"
       parameters:
         - name: device-id
@@ -288,8 +289,7 @@ components:
           example: "2026-04-27T10:00:00.000Z"
     DevicePatchRequest:
       type: object
-      required:
-        - deviceName
+      description: Fields to update. At least one of 'deviceName' or 'status' must be provided.
       properties:
         deviceName:
           type: string
@@ -297,6 +297,13 @@ components:
           maxLength: 255
           description: The new display name for the device.
           example: "My Work Phone"
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - INACTIVE
+          description: The new status of the device. An inactive device cannot be used for device-based login checks.
+          example: "INACTIVE"
     Error:
       type: object
       properties:

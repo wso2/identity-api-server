@@ -86,7 +86,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
+            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD, PROFILE_UPDATE]
           description: Type of the flow to retrieve
       responses:
         '200':
@@ -131,7 +131,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
+            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD, PROFILE_UPDATE]
           description: Type of the flow to delete
       responses:
         '204':
@@ -173,7 +173,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
+            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD, PROFILE_UPDATE]
           description: Type of the flow to get metadata for
       responses:
         '200':
@@ -220,7 +220,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION]
+            enum: [REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION, PROFILE_UPDATE]
           description: Type of the flow to get condition metadata for
       responses:
         '200':
@@ -422,7 +422,7 @@ paths:
           required: false
           schema:
             type: string
-            enum: [REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION, ASK_PASSWORD]
+            enum: [REGISTRATION, PASSWORD_RECOVERY, INVITED_USER_REGISTRATION, ASK_PASSWORD, PROFILE_UPDATE]
           description: Optional flow type. When omitted, the default tree is returned.
       responses:
         '200':
@@ -490,7 +490,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD]
+            enum: [REGISTRATION, PASSWORD_RECOVERY, ASK_PASSWORD, PROFILE_UPDATE]
           description: Type of the flow to get configurations for
       responses:
         '200':
@@ -1674,6 +1674,13 @@ components:
         encrypted:
           type: boolean
           default: false
+        flowType:
+          type: string
+          description: >
+            Flow type the entry applies to. Required for /runtimeValues[name=...] and
+            /request/additionalHeaders[name=...] paths, as each flow defines its own, and not
+            allowed on other paths.
+          example: REGISTRATION
 
     Encryption:
       type: object
@@ -1748,6 +1755,12 @@ components:
         dynamicEntryType:
           type: string
           example: String
+        applicableFlowTypes:
+          type: array
+          description: Flow types the node applies to. ALL means every flow type.
+          items:
+            type: string
+          example: [ALL]
         children:
           type: array
           items:

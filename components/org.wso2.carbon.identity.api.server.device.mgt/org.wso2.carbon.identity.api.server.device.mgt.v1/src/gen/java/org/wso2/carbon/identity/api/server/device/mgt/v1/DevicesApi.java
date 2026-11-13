@@ -113,7 +113,7 @@ public class DevicesApi  {
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response listDevices(    @Valid @Min(1) @Max(100)@ApiParam(value = "Maximum number of records to return.", defaultValue="30") @DefaultValue("30")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination.", defaultValue="0") @DefaultValue("0")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Filter devices by the ID of the user who registered them. Returns devices of any status. Pagination applies as usual.")  @QueryParam("userId") String userId) {
+    public Response listDevices(    @Valid @Min(1) @Max(100)@ApiParam(value = "Maximum number of records to return.", defaultValue="30") @DefaultValue("30")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination.", defaultValue="0") @DefaultValue("0")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Filter devices by the ID of the user who registered them. Returns devices of any status. Pagination applies as usual. In an organization, a shared user gets the devices it inherits from its resident organization.")  @QueryParam("userId") String userId) {
 
         return delegate.listDevices(limit,  offset,  userId );
     }
@@ -123,7 +123,7 @@ public class DevicesApi  {
     @Path("/{device-id}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Rename a registered device.", notes = "This API provides the capability to update the display name of a registered device.   <b>Scope (Permission) required:</b> ``internal_device_mgt_update``  ", response = DeviceResponse.class, authorizations = {
+    @ApiOperation(value = "Update a registered device.", notes = "This API provides the capability to rename, activate or deactivate a registered device. At least one of 'deviceName' or 'status' must be provided.   <b>Scope (Permission) required:</b> ``internal_device_mgt_update``  ", response = DeviceResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -137,9 +137,9 @@ public class DevicesApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response updateDeviceName(@ApiParam(value = "UUID of the registered device",required=true) @PathParam("device-id") String deviceId, @ApiParam(value = "" ,required=true) @Valid DevicePatchRequest devicePatchRequest) {
+    public Response updateDevice(@ApiParam(value = "UUID of the registered device",required=true) @PathParam("device-id") String deviceId, @ApiParam(value = "" ,required=true) @Valid DevicePatchRequest devicePatchRequest) {
 
-        return delegate.updateDeviceName(deviceId,  devicePatchRequest );
+        return delegate.updateDevice(deviceId,  devicePatchRequest );
     }
 
 }

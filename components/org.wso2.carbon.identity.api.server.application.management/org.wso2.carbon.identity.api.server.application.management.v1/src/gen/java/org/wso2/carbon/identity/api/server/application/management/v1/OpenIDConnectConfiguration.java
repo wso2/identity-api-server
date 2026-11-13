@@ -583,7 +583,7 @@ public enum StateEnum {
     }
 
     /**
-     * The FAPI security profile applied to the application. Applicable only when isFAPIApplication is true. If isFAPIApplication is true and this property is omitted, &#x60;FAPI1_ADVANCED&#x60; will be applied by default.
+     * The FAPI security profile applied to the application. Applicable only when isFAPIApplication is true. If isFAPIApplication is true and this property is omitted, the default FAPI profile is applied when the application is created, and the current profile is kept when it is updated.
      **/
     public OpenIDConnectConfiguration fapiProfile(FapiProfile fapiProfile) {
 
@@ -591,7 +591,7 @@ public enum StateEnum {
         return this;
     }
 
-    @ApiModelProperty(example = "FAPI1_ADVANCED", value = "The FAPI security profile applied to the application. Applicable only when isFAPIApplication is true. If isFAPIApplication is true and this property is omitted, `FAPI1_ADVANCED` will be applied by default. ")
+    @ApiModelProperty(example = "FAPI1_ADVANCED", value = "The FAPI security profile applied to the application. Applicable only when isFAPIApplication is true. If isFAPIApplication is true and this property is omitted, the default FAPI profile is applied when the application is created, and the current profile is kept when it is updated. ")
     @JsonProperty("fapiProfile")
     @Valid
     public FapiProfile getFapiProfile() {
