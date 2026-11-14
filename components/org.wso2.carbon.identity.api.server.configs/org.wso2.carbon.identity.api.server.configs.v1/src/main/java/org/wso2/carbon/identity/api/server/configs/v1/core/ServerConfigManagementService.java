@@ -3065,8 +3065,7 @@ public class ServerConfigManagementService {
 
     private boolean isDefaultResolverNotExistsError(ConfigurationManagementException e) {
 
-        return e instanceof ConfigurationManagementClientException
-                && ERROR_CODE_DEFAULT_RESOLVER_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode());
+        return ERROR_CODE_DEFAULT_RESOLVER_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode());
     }
 
     private APIError handleConfigMgtException(ConfigurationManagementException e, Constants.ErrorMessage errorEnum,
