@@ -142,7 +142,6 @@ import org.wso2.carbon.identity.core.model.ExpressionNode;
 import org.wso2.carbon.identity.core.model.FilterTreeBuilder;
 import org.wso2.carbon.identity.core.model.Node;
 import org.wso2.carbon.identity.core.model.OperationNode;
-import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.cors.mgt.core.constant.ErrorMessages;
@@ -177,10 +176,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -471,8 +468,7 @@ public class ServerApplicationManagementService {
     public ApplicationResponseModel getApplication(String applicationId) {
 
         ServiceProvider application = getServiceProvider(applicationId);
-        return new ServiceProviderToApiModel().apply(application)
-                .organizationCustomRolesEnabled(resolveOrganizationCustomRolesEnabled(application, new HashMap<>()));
+        return new ServiceProviderToApiModel().apply(application);
     }
 
     /**
@@ -2049,16 +2045,9 @@ public class ServerApplicationManagementService {
                                                               List<String> requiredAttributes) {
 
         List<ApplicationListItem> applicationListItems = new ArrayList<>();
-        boolean isOrganizationCustomRolesRequested = requiredAttributes.contains(ORGANIZATION_CUSTOM_ROLES_ENABLED);
-        // Main applications resolved for the shared applications in the list, keyed by the main application id.
-        Map<String, ServiceProvider> resolvedMainApplications = new HashMap<>();
         for (ServiceProvider serviceProvider : serviceProviderList) {
             ApplicationResponseModel applicationResponseModel =
                     new ServiceProviderToApiModel().apply(serviceProvider);
-            if (isOrganizationCustomRolesRequested) {
-                applicationResponseModel.organizationCustomRolesEnabled(
-                        resolveOrganizationCustomRolesEnabled(serviceProvider, resolvedMainApplications));
-            }
             if (requiredAttributes.stream().noneMatch(attribute -> attribute.equals(TEMPLATE_ID))) {
                 applicationResponseModel.templateId(null);
             }
@@ -2081,6 +2070,9 @@ public class ServerApplicationManagementService {
             }
             if (requiredAttributes.stream().noneMatch(attribute -> attribute.equals(APPLICATION_ENABLED))) {
                 applicationResponseModel.applicationEnabled(null);
+            }
+            if (!requiredAttributes.contains(ORGANIZATION_CUSTOM_ROLES_ENABLED)) {
+                applicationResponseModel.organizationCustomRolesEnabled(null);
             }
             applicationListItems.add(new ApplicationInfoWithRequiredPropsToApiModel().apply(applicationResponseModel));
         }
@@ -2516,7 +2508,8 @@ public class ServerApplicationManagementService {
     }
 
     /**
-     * Check whether the given value equals the resolved value of a shared application.
+     * Check whether the given value equals the value of a shared application, which is inherited from its main
+     * application when the application is retrieved.
      *
      * @param application                    Application to be updated.
      * @param organizationCustomRolesEnabled Requested value of the configuration.
@@ -2534,53 +2527,7 @@ public class ServerApplicationManagementService {
                     application.getApplicationResourceId();
             throw handleIdentityApplicationManagementException(e, msg);
         }
-        return organizationCustomRolesEnabled.equals(
-                resolveOrganizationCustomRolesEnabled(application, new HashMap<>()));
-    }
-
-    /**
-     * Resolve whether organizations can create custom application roles for the shared applications of the given
-     * application. For a main application, this is its own configuration. For a shared application, this is resolved
-     * from its main application, which must have enhanced organization authentication enabled and must use application
-     * audience roles as well. This is always false when the organization custom roles feature is disabled.
-     *
-     * @param application              Application.
-     * @param resolvedMainApplications Main applications already resolved, keyed by the main application id.
-     * @return True if organization custom roles are enabled for the shared applications.
-     */
-    private boolean resolveOrganizationCustomRolesEnabled(ServiceProvider application,
-                                                        Map<String, ServiceProvider> resolvedMainApplications) {
-
-        if (!ApplicationMgtUtil.isOrganizationCustomRolesFeatureEnabled()) {
-            return false;
-        }
-        String applicationId = application.getApplicationResourceId();
-        try {
-            String mainAppId = applicationManagementService.getMainAppId(applicationId);
-            if (mainAppId == null) {
-                return application.isOrganizationCustomRolesEnabled();
-            }
-            ServiceProvider mainApplication = resolvedMainApplications.get(mainAppId);
-            if (mainApplication == null) {
-                String mainAppTenantDomain =
-                        IdentityTenantUtil.getTenantDomain(applicationManagementService.getTenantIdByApp(mainAppId));
-                mainApplication = applicationManagementService.getApplicationByResourceId(mainAppId,
-                        mainAppTenantDomain);
-                if (mainApplication == null) {
-                    return false;
-                }
-                resolvedMainApplications.put(mainAppId, mainApplication);
-            }
-            return mainApplication.isEnhancedOrganizationAuthenticationEnabled() &&
-                    mainApplication.isOrganizationCustomRolesEnabled() &&
-                    mainApplication.getAssociatedRolesConfig() != null &&
-                    RoleConstants.APPLICATION.equalsIgnoreCase(
-                            mainApplication.getAssociatedRolesConfig().getAllowedAudience());
-        } catch (IdentityApplicationManagementException e) {
-            String msg = "Error while resolving the organization custom roles configuration of the " +
-                    "application with id: " + applicationId;
-            throw handleIdentityApplicationManagementException(e, msg);
-        }
+        return organizationCustomRolesEnabled.equals(application.isOrganizationCustomRolesEnabled());
     }
 
     private boolean isEnhancedOrganizationAuthenticationFeatureEnabled() {
