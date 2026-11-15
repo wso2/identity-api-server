@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2020-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -36,6 +36,9 @@ import org.wso2.carbon.identity.api.server.configs.common.AllowedConfigList;
 import org.wso2.carbon.identity.api.server.configs.common.ConfigsServiceHolder;
 import org.wso2.carbon.identity.api.server.configs.common.Constants;
 import org.wso2.carbon.identity.api.server.configs.common.SchemaConfigParser;
+import org.wso2.carbon.identity.api.server.configs.v1.exception.CDSConfigClientException;
+import org.wso2.carbon.identity.api.server.configs.v1.exception.CDSConfigException;
+import org.wso2.carbon.identity.api.server.configs.v1.exception.CDSConfigServerException;
 import org.wso2.carbon.identity.api.server.configs.v1.exception.JWTClientAuthenticatorException;
 import org.wso2.carbon.identity.api.server.configs.v1.function.CORSConfigurationToCORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.function.CompatibilitySettingUtil;
@@ -50,6 +53,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticationType;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorProperty;
+import org.wso2.carbon.identity.api.server.configs.v1.model.CDSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettings;
@@ -116,6 +120,7 @@ import org.wso2.carbon.identity.configuration.mgt.core.model.Attribute;
 import org.wso2.carbon.identity.configuration.mgt.core.model.Resource;
 import org.wso2.carbon.identity.core.ServiceURLBuilder;
 import org.wso2.carbon.identity.core.URLBuilderException;
+import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceClientException;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceException;
@@ -2666,6 +2671,101 @@ public class ServerConfigManagementService {
             throw handleFraudDetectionConfigException(e,
                     Constants.ErrorMessage.ERROR_CODE_FRAUD_DETECTION_CONFIG_UPDATE, null);
         }
+    }
+
+    /**
+     * Get the Customer Data Service (CDS) configuration of the tenant.
+     * An organization gets the configuration of its root organization.
+     *
+     * @return CDSConfig of the tenant.
+     */
+    public CDSConfig getCDSConfiguration() {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        validateCDSEnabled();
+        try {
+            return ServerCDSConfigManager.getCDSConfig(tenantDomain);
+        } catch (CDSConfigException e) {
+            throw handleCDSConfigException(e, Constants.ErrorMessage.ERROR_CODE_CDS_CONFIG_RETRIEVE, null);
+        }
+    }
+
+    /**
+     * Update the Customer Data Service (CDS) configuration of the tenant.
+     * The CDS extensions send the configuration to CDS first. If CDS does not accept it, it is not stored.
+     *
+     * @param cdsConfig CDS configuration to update. All fields are optional.
+     * @return CDSConfig of the tenant.
+     */
+    public CDSConfig patchCDSConfiguration(CDSConfig cdsConfig) {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        validateCDSEnabled();
+        try {
+            if (OrganizationManagementUtil.isOrganization(tenantDomain)) {
+                throw handleException(Response.Status.FORBIDDEN,
+                        Constants.ErrorMessage.ERROR_CODE_CONFIG_UPDATE_NOT_ALLOWED, null);
+            }
+        } catch (OrganizationManagementException e) {
+            log.error("Error while checking whether the tenant: " + tenantDomain + " is an organization.", e);
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_CDS_CONFIG_UPDATE, null);
+        }
+
+        if (cdsConfig == null || cdsConfig.getEnabled() == null) {
+            return getCDSConfiguration();
+        }
+        try {
+            ServerCDSConfigManager.updateCDSConfig(cdsConfig, tenantDomain);
+        } catch (CDSConfigException e) {
+            throw handleCDSConfigException(e, Constants.ErrorMessage.ERROR_CODE_CDS_CONFIG_UPDATE, null);
+        }
+        return new CDSConfig().enabled(cdsConfig.getEnabled());
+    }
+
+    /**
+     * Check that the CDS feature is enabled. If it is not enabled, the CDS extensions are not called.
+     */
+    private void validateCDSEnabled() {
+
+        if (!Boolean.parseBoolean(IdentityUtil.getProperty(Constants.CDS_ENABLE_PROPERTY))) {
+            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage.ERROR_CODE_CDS_NOT_ENABLED,
+                    null);
+        }
+    }
+
+    private APIError handleCDSConfigException(CDSConfigException e, Constants.ErrorMessage errorEnum, String data) {
+
+        ErrorResponse errorResponse;
+        Response.Status status;
+
+        if (e instanceof CDSConfigClientException) {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e.getMessage());
+            if (e.getErrorCode() != null) {
+                String errorCode = e.getErrorCode();
+                errorCode =
+                        errorCode.contains(org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER) ?
+                                errorCode : Constants.CONFIG_ERROR_PREFIX + errorCode;
+                errorResponse.setCode(errorCode);
+            }
+            errorResponse.setDescription(e.getMessage());
+            status = Response.Status.BAD_REQUEST;
+        } else if (e instanceof CDSConfigServerException) {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.description());
+            if (e.getErrorCode() != null) {
+                String errorCode = e.getErrorCode();
+                errorCode =
+                        errorCode.contains(org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER) ?
+                                errorCode : Constants.CONFIG_ERROR_PREFIX + errorCode;
+                errorResponse.setCode(errorCode);
+            }
+            errorResponse.setDescription(e.getMessage());
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+        } else {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.description());
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+        }
+        return new APIError(status, errorResponse);
     }
 
     /**

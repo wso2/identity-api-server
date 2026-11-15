@@ -38,6 +38,7 @@ import org.wso2.carbon.identity.openid4vc.presentation.core.service.Presentation
 import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 import org.wso2.carbon.idp.mgt.IdpManager;
 import org.wso2.carbon.logging.service.RemoteLoggingConfigService;
+import org.wso2.identity.cds.config.mgt.CDSConfigService;
 
 /**
  * Service holder class for server configuration related services.
@@ -163,6 +164,13 @@ public class ConfigsServiceHolder {
         static final PresentationConfigMgtService SERVICE =
                 (PresentationConfigMgtService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                         .getOSGiService(PresentationConfigMgtService.class, null);
+    }
+
+    private static class CDSConfigServiceHolder {
+
+        static final CDSConfigService SERVICE =
+                (CDSConfigService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(CDSConfigService.class, null);
     }
 
     /**
@@ -343,5 +351,15 @@ public class ConfigsServiceHolder {
     public static PresentationConfigMgtService getPresentationConfigMgtService() {
 
         return PresentationConfigMgtServiceHolder.SERVICE;
+    }
+
+    /**
+     * Get CDSConfigService osgi service.
+     *
+     * @return CDSConfigService
+     */
+    public static CDSConfigService getCDSConfigService() {
+
+        return CDSConfigServiceHolder.SERVICE;
     }
 }
