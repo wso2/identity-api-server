@@ -127,6 +127,7 @@ import org.wso2.carbon.identity.application.common.util.IdentityApplicationConst
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationManagementUtil;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
+import org.wso2.carbon.identity.application.mgt.ApplicationMgtUtil;
 import org.wso2.carbon.identity.application.mgt.AuthorizedAPIManagementService;
 import org.wso2.carbon.identity.application.mgt.inbound.dto.ApplicationDTO;
 import org.wso2.carbon.identity.application.mgt.inbound.dto.InboundProtocolConfigurationDTO;
@@ -201,11 +202,14 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_PROCESSING_REQUEST;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.FORBIDDEN_OPERATION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ORGANIZATION_CUSTOM_ROLES_FEATURE_DISABLED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.UNSUPPORTED_ENHANCED_ORGANIZATION_AUTHENTICATION_ENABLED_CONFIGURATION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.UNSUPPORTED_FAPI_PROFILE;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.UNSUPPORTED_ORGANIZATION_CUSTOM_ROLES_CONFIGURATION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.USE_EXTERNAL_CONSENT_PAGE_NOT_SUPPORTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ISSUER;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.NAME;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ORGANIZATION_CUSTOM_ROLES_ENABLED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.TEMPLATE_ID;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.TEMPLATE_VERSION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.VIEW_APPLICATION_CLIENT_SECRET_OPERATION;
@@ -290,6 +294,7 @@ public class ServerApplicationManagementService {
         SUPPORTED_REQUIRED_ATTRIBUTES.add(ISSUER);
         SUPPORTED_REQUIRED_ATTRIBUTES.add(APPLICATION_ENABLED);
         SUPPORTED_REQUIRED_ATTRIBUTES.add(IdentityApplicationConstants.ALLOWED_ROLE_AUDIENCE_REQUEST_ATTRIBUTE_NAME);
+        SUPPORTED_REQUIRED_ATTRIBUTES.add(ORGANIZATION_CUSTOM_ROLES_ENABLED);
     }
 
     @Deprecated
@@ -855,6 +860,18 @@ public class ServerApplicationManagementService {
                     UNSUPPORTED_ENHANCED_ORGANIZATION_AUTHENTICATION_ENABLED_CONFIGURATION.getDescription());
         }
 
+        if (!isEnhancedOrganizationAuthenticationFeatureEnabled() &&
+                Boolean.TRUE.equals(applicationModel.getOrganizationCustomRolesEnabled())) {
+            throw buildBadRequestError(UNSUPPORTED_ORGANIZATION_CUSTOM_ROLES_CONFIGURATION.getCode(),
+                    UNSUPPORTED_ORGANIZATION_CUSTOM_ROLES_CONFIGURATION.getDescription());
+        }
+
+        if (!ApplicationMgtUtil.isOrganizationCustomRolesFeatureEnabled() &&
+                Boolean.TRUE.equals(applicationModel.getOrganizationCustomRolesEnabled())) {
+            throw buildBadRequestError(ORGANIZATION_CUSTOM_ROLES_FEATURE_DISABLED.getCode(),
+                    ORGANIZATION_CUSTOM_ROLES_FEATURE_DISABLED.getDescription());
+        }
+
         if (applicationModel.getEnhancedOrgAuthenticationEnabled() == null
                 && isEnhancedOrganizationAuthenticationFeatureEnabled()) {
             applicationModel.setEnhancedOrgAuthenticationEnabled(isEnhancedOrgAuthEnabledByDefaultForNewApps());
@@ -926,6 +943,18 @@ public class ServerApplicationManagementService {
                 Boolean.TRUE.equals(applicationPatchModel.getEnhancedOrgAuthenticationEnabled())) {
             throw buildBadRequestError(UNSUPPORTED_ENHANCED_ORGANIZATION_AUTHENTICATION_ENABLED_CONFIGURATION.getCode(),
                     UNSUPPORTED_ENHANCED_ORGANIZATION_AUTHENTICATION_ENABLED_CONFIGURATION.getDescription());
+        }
+
+        if (!isEnhancedOrganizationAuthenticationFeatureEnabled() && applicationPatchModel != null &&
+                Boolean.TRUE.equals(applicationPatchModel.getOrganizationCustomRolesEnabled())) {
+            throw buildBadRequestError(UNSUPPORTED_ORGANIZATION_CUSTOM_ROLES_CONFIGURATION.getCode(),
+                    UNSUPPORTED_ORGANIZATION_CUSTOM_ROLES_CONFIGURATION.getDescription());
+        }
+
+        if (!ApplicationMgtUtil.isOrganizationCustomRolesFeatureEnabled() && applicationPatchModel != null &&
+                Boolean.TRUE.equals(applicationPatchModel.getOrganizationCustomRolesEnabled())) {
+            throw buildBadRequestError(ORGANIZATION_CUSTOM_ROLES_FEATURE_DISABLED.getCode(),
+                    ORGANIZATION_CUSTOM_ROLES_FEATURE_DISABLED.getDescription());
         }
 
         /*
@@ -2041,6 +2070,9 @@ public class ServerApplicationManagementService {
             }
             if (requiredAttributes.stream().noneMatch(attribute -> attribute.equals(APPLICATION_ENABLED))) {
                 applicationResponseModel.applicationEnabled(null);
+            }
+            if (!requiredAttributes.contains(ORGANIZATION_CUSTOM_ROLES_ENABLED)) {
+                applicationResponseModel.organizationCustomRolesEnabled(null);
             }
             applicationListItems.add(new ApplicationInfoWithRequiredPropsToApiModel().apply(applicationResponseModel));
         }

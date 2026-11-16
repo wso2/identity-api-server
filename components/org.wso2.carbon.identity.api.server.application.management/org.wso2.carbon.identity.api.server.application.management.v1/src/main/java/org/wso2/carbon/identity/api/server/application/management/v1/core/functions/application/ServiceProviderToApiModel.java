@@ -140,6 +140,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .isManagementApp(application.isManagementApp())
                     .applicationEnabled(application.isApplicationEnabled())
                     .enhancedOrgAuthenticationEnabled(application.isEnhancedOrganizationAuthenticationEnabled())
+                    .organizationCustomRolesEnabled(application.isOrganizationCustomRolesEnabled())
                     .associatedRoles(buildAssociatedRoles(application))
                     .claimConfiguration(buildClaimConfiguration(application))
                     .inboundProtocols(buildInboundProtocols(application))
