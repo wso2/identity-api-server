@@ -208,11 +208,7 @@ public class ApplicationManagementConstants {
                 "Organization custom roles property is not supported.",
                 "The 'organizationCustomRolesEnabled' property requires enhanced organization authentication " +
                         "to be supported."),
-        ORGANIZATION_CUSTOM_ROLES_READ_ONLY_FOR_SHARED_APP("60523",
-                "Organization custom roles property cannot be updated.",
-                "The 'organizationCustomRolesEnabled' property is read-only for shared applications. Update it " +
-                        "on the main application."),
-        ORGANIZATION_CUSTOM_ROLES_FEATURE_DISABLED("60524",
+        ORGANIZATION_CUSTOM_ROLES_FEATURE_DISABLED("60523",
                 "Organization custom roles property is not supported.",
                 "The 'organizationCustomRolesEnabled' property cannot be enabled as the organization custom roles " +
                         "feature is disabled in the server."),

@@ -203,7 +203,6 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.FORBIDDEN_OPERATION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ORGANIZATION_CUSTOM_ROLES_FEATURE_DISABLED;
-import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ORGANIZATION_CUSTOM_ROLES_READ_ONLY_FOR_SHARED_APP;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.UNSUPPORTED_ENHANCED_ORGANIZATION_AUTHENTICATION_ENABLED_CONFIGURATION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.UNSUPPORTED_FAPI_PROFILE;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.UNSUPPORTED_ORGANIZATION_CUSTOM_ROLES_CONFIGURATION;
@@ -946,15 +945,16 @@ public class ServerApplicationManagementService {
                     UNSUPPORTED_ENHANCED_ORGANIZATION_AUTHENTICATION_ENABLED_CONFIGURATION.getDescription());
         }
 
-        if (applicationPatchModel != null && applicationPatchModel.getOrganizationCustomRolesEnabled() != null) {
-            if (isUnchangedForSharedApplication(appToUpdate,
-                    applicationPatchModel.getOrganizationCustomRolesEnabled())) {
-                // A shared application resolves the value from its main application, so ignore an unchanged value.
-                applicationPatchModel.setOrganizationCustomRolesEnabled(null);
-            } else {
-                validateOrganizationCustomRolesUpdate(applicationId,
-                        applicationPatchModel.getOrganizationCustomRolesEnabled());
-            }
+        if (!isEnhancedOrganizationAuthenticationFeatureEnabled() && applicationPatchModel != null &&
+                Boolean.TRUE.equals(applicationPatchModel.getOrganizationCustomRolesEnabled())) {
+            throw buildBadRequestError(UNSUPPORTED_ORGANIZATION_CUSTOM_ROLES_CONFIGURATION.getCode(),
+                    UNSUPPORTED_ORGANIZATION_CUSTOM_ROLES_CONFIGURATION.getDescription());
+        }
+
+        if (!ApplicationMgtUtil.isOrganizationCustomRolesFeatureEnabled() && applicationPatchModel != null &&
+                Boolean.TRUE.equals(applicationPatchModel.getOrganizationCustomRolesEnabled())) {
+            throw buildBadRequestError(ORGANIZATION_CUSTOM_ROLES_FEATURE_DISABLED.getCode(),
+                    ORGANIZATION_CUSTOM_ROLES_FEATURE_DISABLED.getDescription());
         }
 
         /*
@@ -2474,60 +2474,6 @@ public class ServerApplicationManagementService {
                     .parseBoolean(IdentityUtil.getProperty(APPLICATION_BASED_OUTBOUND_PROVISIONING_ENABLED));
         }
         return applicationBasedOutboundProvisioningEnabled;
-    }
-
-    /**
-     * Validate an update to the organization custom roles configuration of an application. The configuration
-     * can only be updated on a main application, and enabling it requires enhanced organization authentication and
-     * the organization custom roles feature to be supported.
-     *
-     * @param applicationId                  ID of the application to be updated.
-     * @param organizationCustomRolesEnabled Updated value of the configuration.
-     */
-    private void validateOrganizationCustomRolesUpdate(String applicationId, Boolean organizationCustomRolesEnabled) {
-
-        if (!isEnhancedOrganizationAuthenticationFeatureEnabled()
-                && Boolean.TRUE.equals(organizationCustomRolesEnabled)) {
-            throw buildBadRequestError(UNSUPPORTED_ORGANIZATION_CUSTOM_ROLES_CONFIGURATION.getCode(),
-                    UNSUPPORTED_ORGANIZATION_CUSTOM_ROLES_CONFIGURATION.getDescription());
-        }
-        if (!ApplicationMgtUtil.isOrganizationCustomRolesFeatureEnabled()
-                && Boolean.TRUE.equals(organizationCustomRolesEnabled)) {
-            throw buildBadRequestError(ORGANIZATION_CUSTOM_ROLES_FEATURE_DISABLED.getCode(),
-                    ORGANIZATION_CUSTOM_ROLES_FEATURE_DISABLED.getDescription());
-        }
-        try {
-            if (applicationManagementService.getMainAppId(applicationId) != null) {
-                throw buildBadRequestError(ORGANIZATION_CUSTOM_ROLES_READ_ONLY_FOR_SHARED_APP.getCode(),
-                        ORGANIZATION_CUSTOM_ROLES_READ_ONLY_FOR_SHARED_APP.getDescription());
-            }
-        } catch (IdentityApplicationManagementException e) {
-            String msg = "Error while resolving the main application of the application with id: " + applicationId;
-            throw handleIdentityApplicationManagementException(e, msg);
-        }
-    }
-
-    /**
-     * Check whether the given value equals the value of a shared application, which is inherited from its main
-     * application when the application is retrieved.
-     *
-     * @param application                    Application to be updated.
-     * @param organizationCustomRolesEnabled Requested value of the configuration.
-     * @return True if the application is a shared application and the value is unchanged.
-     */
-    private boolean isUnchangedForSharedApplication(ServiceProvider application,
-                                                    Boolean organizationCustomRolesEnabled) {
-
-        try {
-            if (applicationManagementService.getMainAppId(application.getApplicationResourceId()) == null) {
-                return false;
-            }
-        } catch (IdentityApplicationManagementException e) {
-            String msg = "Error while resolving the main application of the application with id: " +
-                    application.getApplicationResourceId();
-            throw handleIdentityApplicationManagementException(e, msg);
-        }
-        return organizationCustomRolesEnabled.equals(application.isOrganizationCustomRolesEnabled());
     }
 
     private boolean isEnhancedOrganizationAuthenticationFeatureEnabled() {
