@@ -606,7 +606,9 @@ public class Utils {
         FlowConfigDTO config = new FlowConfigDTO();
         config.setFlowType(flowConfig.getFlowType());
         config.setIsEnabled(flowConfig.getIsEnabled() != null && flowConfig.getIsEnabled());
-        config.addAllFlowCompletionConfigs(flowConfig.getFlowCompletionConfigs());
+        if (flowConfig.getFlowCompletionConfigs() != null) {
+            config.addAllFlowCompletionConfigs(flowConfig.getFlowCompletionConfigs());
+        }
         return config;
     }
 

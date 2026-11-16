@@ -27,6 +27,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.factories.ConfigsApiServic
 import org.wso2.carbon.identity.api.server.configs.v1.model.ApplicationObject;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
+import org.wso2.carbon.identity.api.server.configs.v1.model.CDSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CompatibilitySettings;
@@ -217,6 +218,30 @@ public class ConfigsApi  {
     public Response getAuthenticator(@ApiParam(value = "ID of an authenticator",required=true) @PathParam("authenticator-id") String authenticatorId) {
 
         return delegate.getAuthenticator(authenticatorId );
+    }
+
+    @Valid
+    @GET
+    @Path("/cds")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve the Customer Data Service (CDS) configuration.", notes = "Retrieve the CDS configuration of the tenant.  When the CDS feature is enabled, this configuration enables CDS for the tenant. An organization uses the configuration of its root organization.  If the CDS feature is not enabled, this operation returns 400 Bad Request.  <b>Scope (Permission) required:</b> `internal_cds_admin_config_view` ", response = CDSConfig.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Customer Data Service Configuration", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = CDSConfig.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getCDSConfiguration() {
+
+        return delegate.getCDSConfiguration();
     }
 
     @Valid
@@ -704,6 +729,30 @@ public class ConfigsApi  {
 
     @Valid
     @PATCH
+    @Path("/cds")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update the Customer Data Service (CDS) configuration.", notes = "Update the CDS configuration of the tenant. All fields are optional.  The server sends the configuration to the Customer Data Service before it stores the configuration. If the Customer Data Service does not accept the configuration, the server does not store it.  **Note:** This operation is only allowed for root tenants and will return 403 Forbidden when called from an organization context.  If the CDS feature is not enabled, this operation returns 400 Bad Request.  <b>Scope (Permission) required:</b> `internal_cds_admin_config_update` ", response = CDSConfig.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Customer Data Service Configuration", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = CDSConfig.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response patchCDSConfiguration(@ApiParam(value = "" ,required=true) @Valid CDSConfig cdSConfig) {
+
+        return delegate.patchCDSConfiguration(cdSConfig );
+    }
+
+    @Valid
+    @PATCH
     @Path("/cors")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
@@ -1086,7 +1135,7 @@ public class ConfigsApi  {
     @Path("/preferences")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve config store preferences of a tenant.", notes = "Returns config store resource attributes for the specified resource types and names. Use this endpoint to expose allowed resources to users — only a permitted subset of resources given below is currently supported.   <table>     <tr>       <td><b>Resource Type</b></td>       <td><b>Resource Name</b></td>       <td><b>Properties</b></td>     </tr>     <tr>       <td rowspan=\"9\">DEVICE_MANAGEMENT</td>       <td>PUSH_DEVICE_MANAGEMENT</td>       <td>         <ul>           <li>enableMultipleDeviceEnrollment</li>           <li>maximumDeviceLimit</li>         </ul>       </td>     </tr>    </table>  <b>Scope (Permission) required:</b> `internal_login` ", response = ConfigPreferenceResponseDTO.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Retrieve config store preferences of a tenant.", notes = "Returns config store resource attributes for the specified resource types and names. Use this endpoint to expose allowed resources to users — only a permitted subset of resources given below is currently supported.   <table>     <tr>       <td><b>Resource Type</b></td>       <td><b>Resource Name</b></td>       <td><b>Properties</b></td>     </tr>     <tr>       <td rowspan=\"9\">DEVICE_MANAGEMENT</td>       <td>PUSH_DEVICE_MANAGEMENT</td>       <td>         <ul>           <li>enableMultipleDeviceEnrollment</li>           <li>maximumDeviceLimit</li>         </ul>       </td>     </tr>     <tr>       <td>flow-mgt-config</td>       <td>flow-mgt-config-DEVICE_REGISTRATION</td>       <td>         <ul>           <li>isEnabled</li>         </ul>       </td>     </tr>    </table>  <b>Scope (Permission) required:</b> `internal_login` ", response = ConfigPreferenceResponseDTO.class, responseContainer = "List", authorizations = {
             @Authorization(value = "BasicAuth"),
             @Authorization(value = "OAuth2", scopes = {
 
