@@ -32,6 +32,7 @@ import org.wso2.carbon.identity.api.server.flow.execution.v1.FlowExecutionReques
 import org.wso2.carbon.identity.api.server.flow.execution.v1.Message;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.constants.FlowExecutionEndpointConstants;
 import org.wso2.carbon.identity.api.server.flow.execution.v1.model.FlowExecutionErrorDTO;
+import org.wso2.carbon.identity.central.log.mgt.utils.LoggerUtils;
 import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 import org.wso2.carbon.identity.flow.execution.engine.exception.FlowEngineClientException;
 import org.wso2.carbon.identity.flow.execution.engine.exception.FlowEngineException;
@@ -95,7 +96,7 @@ public class Utils {
             LOG.debug(e.getMessage(), e);
             status = Response.Status.BAD_REQUEST;
         } else {
-            LOG.error(e.getMessage(), e);
+            logServerException(e);
         }
         String errorCode = e.getErrorCode();
         errorCode = errorCode.contains(ERROR_CODE_DELIMITER) ? errorCode :
@@ -118,11 +119,27 @@ public class Utils {
             LOG.debug(e.getMessage(), e);
             status = Response.Status.BAD_REQUEST;
         } else {
-            LOG.error(e.getMessage(), e);
+            logServerException(e);
         }
         errorCode = errorCode.contains(ERROR_CODE_DELIMITER) ? errorCode :
                 FlowExecutionEndpointConstants.REGISTRATION_FLOW_PREFIX + errorCode;
         return handleException(status, errorCode, e.getMessage(), e.getDescription(), e.getFlowType());
+    }
+
+    /**
+     * Logs a flow engine server exception. Failures caused by resources configured by tenant administrators
+     * (e.g. flow extension endpoints) are already published as diagnostic logs, hence they are logged via
+     * {@link LoggerUtils#logTenantResourceFailure} instead of as errors.
+     *
+     * @param e Flow engine exception.
+     */
+    private static void logServerException(FlowEngineException e) {
+
+        if (LoggerUtils.isTenantResourceFailure(e)) {
+            LoggerUtils.logTenantResourceFailure(LOG, e.getMessage(), e);
+            return;
+        }
+        LOG.error(e.getMessage(), e);
     }
 
     /**
