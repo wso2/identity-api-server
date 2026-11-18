@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -16,10 +16,10 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.api.server.script.library.v1.factories;
+package org.wso2.carbon.identity.api.server.script.library.common.factories;
 
 import org.wso2.carbon.identity.api.server.script.library.common.ScriptLibraryServiceHolder;
-import org.wso2.carbon.identity.api.server.script.library.v1.core.ServerScriptLibrariesService;
+import org.wso2.carbon.identity.api.server.script.library.common.core.ServerScriptLibrariesService;
 import org.wso2.carbon.identity.functions.library.mgt.FunctionLibraryManagementService;
 
 /**
