@@ -73,6 +73,11 @@ public class BrandingPreferenceManagementConstants {
                 "Custom text preferences are not configured for organization: %s."),
         ERROR_CODE_CONFLICT_CUSTOM_TEXT_PREFERENCE("60007", "Custom Text preference already exists.",
                 "There exists a custom text preference configurations in the organization: %s."),
+        ERROR_CODE_APP_CUSTOM_TEXT_PREFERENCE_NOT_EXISTS("60006",
+                "Custom text preferences are not configured.",
+                "Custom text preferences are not configured for application: %s."),
+        ERROR_CODE_CONFLICT_APP_CUSTOM_TEXT_PREFERENCE("60007", "Custom Text preference already exists.",
+                "There exists a custom text preference configurations for the application: %s."),
 
         // Server errors 650xx.
         ERROR_CODE_ERROR_GETTING_BRANDING_PREFERENCE("65001",
