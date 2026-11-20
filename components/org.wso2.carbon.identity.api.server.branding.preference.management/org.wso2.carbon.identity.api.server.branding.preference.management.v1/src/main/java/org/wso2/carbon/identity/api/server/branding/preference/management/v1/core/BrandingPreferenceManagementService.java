@@ -54,7 +54,9 @@ import static org.wso2.carbon.identity.api.server.branding.preference.management
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.CUSTOM_TEXT_PREFERENCE_ALREADY_EXISTS_ERROR_CODE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.CUSTOM_TEXT_PREFERENCE_NOT_EXISTS_ERROR_CODE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.DEFAULT_LOCALE;
+import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_APP_CUSTOM_TEXT_PREFERENCE_NOT_EXISTS;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_BRANDING_PREFERENCE_NOT_EXISTS;
+import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_CONFLICT_APP_CUSTOM_TEXT_PREFERENCE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_CONFLICT_BRANDING_PREFERENCE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_CONFLICT_CUSTOM_TEXT_PREFERENCE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_CUSTOM_TEXT_PREFERENCE_NOT_EXISTS;
@@ -328,8 +330,8 @@ public class BrandingPreferenceManagementService {
                 if (log.isDebugEnabled()) {
                     log.debug("Custom Text preferences are already exists for tenant: " + tenantDomain, e);
                 }
-                throw handleException(Response.Status.CONFLICT, ERROR_CODE_CONFLICT_CUSTOM_TEXT_PREFERENCE,
-                        tenantDomain);
+                throw handleCustomTextConflictException(customTextModal.getType().toString(),
+                        customTextModal.getName(), tenantDomain);
             }
             throw handleBrandingPreferenceMgtException(e, ERROR_CODE_ERROR_ADDING_CUSTOM_TEXT_PREFERENCE, tenantDomain);
         }
@@ -386,6 +388,36 @@ public class BrandingPreferenceManagementService {
     }
 
     /**
+     * Delete all the custom text preference resources of the given type and name.
+     * For the ORG type, all the organization level custom text preferences of the current tenant are deleted.
+     * For the APP type, all the custom text preferences of the given application are deleted.
+     *
+     * @param type Resource type.
+     * @param name Name of the application for the APP type.
+     */
+    public void deleteAllCustomTextPreferences(String type, String name) {
+
+        if (!APPLICATION_TYPE.equals(type)) {
+            deleteAllCustomTextPreferences();
+            return;
+        }
+        String tenantDomain = getTenantDomainFromContext();
+        try {
+            brandingPreferenceManager.deleteAllCustomText(type, name);
+        } catch (BrandingPreferenceMgtException e) {
+            if (CUSTOM_TEXT_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Can not find custom text preferences to delete for application: " + name +
+                            " in tenant: " + tenantDomain, e);
+                }
+                return;
+            }
+            throw handleBrandingPreferenceMgtException(e, ERROR_CODE_ERROR_DELETING_CUSTOM_TEXT_PREFERENCE,
+                    tenantDomain);
+        }
+    }
+
+    /**
      * Retrieve the requested branding preferences.
      *
      * @param type   Resource Type.
@@ -411,8 +443,7 @@ public class BrandingPreferenceManagementService {
                 if (log.isDebugEnabled()) {
                     log.debug("Can not find a custom text preference configurations for tenant: " + tenantDomain, e);
                 }
-                throw handleException(Response.Status.NOT_FOUND, ERROR_CODE_CUSTOM_TEXT_PREFERENCE_NOT_EXISTS,
-                        tenantDomain);
+                throw handleCustomTextNotFoundException(type, name, tenantDomain);
             }
             throw handleBrandingPreferenceMgtException(e, ERROR_CODE_ERROR_GETTING_CUSTOM_TEXT_PREFERENCE,
                     tenantDomain);
@@ -444,8 +475,7 @@ public class BrandingPreferenceManagementService {
                 if (log.isDebugEnabled()) {
                     log.debug("Can not find a custom text preference configurations for tenant: " + tenantDomain, e);
                 }
-                throw handleException(Response.Status.NOT_FOUND, ERROR_CODE_CUSTOM_TEXT_PREFERENCE_NOT_EXISTS,
-                        tenantDomain);
+                throw handleCustomTextNotFoundException(type, name, tenantDomain);
             }
             throw handleBrandingPreferenceMgtException(e, ERROR_CODE_ERROR_GETTING_CUSTOM_TEXT_PREFERENCE,
                     tenantDomain);
@@ -476,8 +506,8 @@ public class BrandingPreferenceManagementService {
                 if (log.isDebugEnabled()) {
                     log.debug("Can not find a custom text preferences to update for tenant: " + tenantDomain, e);
                 }
-                throw handleException(Response.Status.NOT_FOUND, ERROR_CODE_CUSTOM_TEXT_PREFERENCE_NOT_EXISTS,
-                        tenantDomain);
+                throw handleCustomTextNotFoundException(customTextModel.getType().toString(),
+                        customTextModel.getName(), tenantDomain);
             }
             throw handleBrandingPreferenceMgtException(e, ERROR_CODE_ERROR_UPDATING_CUSTOM_TEXT_PREFERENCE,
                     tenantDomain);
@@ -724,6 +754,38 @@ public class BrandingPreferenceManagementService {
      * @param error  Error Message information.
      * @return APIError.
      */
+    /**
+     * Build the not found error for custom text preferences, naming the application for the APP type.
+     *
+     * @param type         Resource type.
+     * @param name         Resource name. The application identifier for the APP type.
+     * @param tenantDomain Tenant domain.
+     * @return API error.
+     */
+    private APIError handleCustomTextNotFoundException(String type, String name, String tenantDomain) {
+
+        if (APPLICATION_TYPE.equals(type)) {
+            return handleException(Response.Status.NOT_FOUND, ERROR_CODE_APP_CUSTOM_TEXT_PREFERENCE_NOT_EXISTS, name);
+        }
+        return handleException(Response.Status.NOT_FOUND, ERROR_CODE_CUSTOM_TEXT_PREFERENCE_NOT_EXISTS, tenantDomain);
+    }
+
+    /**
+     * Build the conflict error for custom text preferences, naming the application for the APP type.
+     *
+     * @param type         Resource type.
+     * @param name         Resource name. The application identifier for the APP type.
+     * @param tenantDomain Tenant domain.
+     * @return API error.
+     */
+    private APIError handleCustomTextConflictException(String type, String name, String tenantDomain) {
+
+        if (APPLICATION_TYPE.equals(type)) {
+            return handleException(Response.Status.CONFLICT, ERROR_CODE_CONFLICT_APP_CUSTOM_TEXT_PREFERENCE, name);
+        }
+        return handleException(Response.Status.CONFLICT, ERROR_CODE_CONFLICT_CUSTOM_TEXT_PREFERENCE, tenantDomain);
+    }
+
     private APIError handleException(Response.Status status, BrandingPreferenceManagementConstants.ErrorMessage error,
                                      String data) {
 

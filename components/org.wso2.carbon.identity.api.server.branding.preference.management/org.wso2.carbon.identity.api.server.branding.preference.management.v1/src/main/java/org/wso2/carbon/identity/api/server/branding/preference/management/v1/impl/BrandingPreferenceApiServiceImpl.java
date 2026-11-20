@@ -106,8 +106,12 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
                 || StringUtils.isBlank(customTextModel.getScreen())) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        if (!ORGANIZATION_TYPE.equals(customTextModel.getType().toString())) {
+        String type = customTextModel.getType().toString();
+        if (!isSupportedCustomTextType(type)) {
             return Response.status(Response.Status.NOT_IMPLEMENTED).entity("Not Implemented.").build();
+        }
+        if (APPLICATION_TYPE.equals(type) && StringUtils.isBlank(customTextModel.getName())) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
         String locale = customTextModel.getLocale();
@@ -121,8 +125,9 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
         try {
             location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + BRANDING_PREFERENCE_CONTEXT_PATH
                     + QUERY_PARAM_INDICATOR +
-                    URLEncoder.encode(String.format(GET_CUSTOM_TEXT_COMPONENT_WITH_QUERY_PARAM, ORGANIZATION_TYPE,
-                                    getTenantDomainFromContext(), customTextModel.getScreen(), locale),
+                    URLEncoder.encode(String.format(GET_CUSTOM_TEXT_COMPONENT_WITH_QUERY_PARAM, type,
+                                    APPLICATION_TYPE.equals(type) ? customTextModel.getName() :
+                                            getTenantDomainFromContext(), customTextModel.getScreen(), locale),
                             StandardCharsets.UTF_8.name()));
         } catch (UnsupportedEncodingException e) {
             ErrorResponse errorResponse =
@@ -171,8 +176,17 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
             type = ORGANIZATION_TYPE;
         } else if (!(ORGANIZATION_TYPE.equals(type) || APPLICATION_TYPE.equals(type) || CUSTOM_TYPE.equals(type))) {
             return Response.status(Response.Status.BAD_REQUEST).build();
-        } else if (!ORGANIZATION_TYPE.equals(type)) {
+        } else if (!isSupportedCustomTextType(type)) {
             return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        if (APPLICATION_TYPE.equals(type) && StringUtils.isBlank(name)) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        if (APPLICATION_TYPE.equals(type) && StringUtils.isBlank(screen) && StringUtils.isBlank(locale)) {
+            // Delete all the custom text preferences of the application if no screen and locale were specified.
+            brandingPreferenceManagementService.deleteAllCustomTextPreferences(type, name);
+            return Response.noContent().build();
         }
 
         if (StringUtils.isBlank(screen)) {
@@ -233,11 +247,11 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
             type = ORGANIZATION_TYPE;
         } else if (!(ORGANIZATION_TYPE.equals(type) || APPLICATION_TYPE.equals(type) || CUSTOM_TYPE.equals(type))) {
             return Response.status(Response.Status.BAD_REQUEST).build();
-        } else if (!ORGANIZATION_TYPE.equals(type)) {
+        } else if (!isSupportedCustomTextType(type)) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        if (StringUtils.isBlank(screen)) {
+        if (StringUtils.isBlank(screen) || (APPLICATION_TYPE.equals(type) && StringUtils.isBlank(name))) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         return Response.ok().entity(brandingPreferenceManagementService.
@@ -265,7 +279,7 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
-        if (StringUtils.isBlank(screen)) {
+        if (StringUtils.isBlank(screen) || (APPLICATION_TYPE.equals(type) && StringUtils.isBlank(name))) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         return Response.ok().entity(brandingPreferenceManagementService.
@@ -298,15 +312,28 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
         if (StringUtils.isBlank(customTextModel.getType().toString())) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        if (!ORGANIZATION_TYPE.equals(customTextModel.getType().toString())) {
+        String type = customTextModel.getType().toString();
+        if (!isSupportedCustomTextType(type)) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        if (StringUtils.isBlank(customTextModel.getScreen())) {
+        if (StringUtils.isBlank(customTextModel.getScreen()) ||
+                (APPLICATION_TYPE.equals(type) && StringUtils.isBlank(customTextModel.getName()))) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
         CustomTextModel updatedCustomTextModel =
                 brandingPreferenceManagementService.updateCustomTextPreference(customTextModel);
         return Response.ok().entity(updatedCustomTextModel).build();
+    }
+
+    /**
+     * Check whether custom text preferences are supported for the given type.
+     *
+     * @param type Custom text preference type.
+     * @return True if custom text preferences are supported for the type.
+     */
+    private boolean isSupportedCustomTextType(String type) {
+
+        return ORGANIZATION_TYPE.equals(type) || APPLICATION_TYPE.equals(type);
     }
 }

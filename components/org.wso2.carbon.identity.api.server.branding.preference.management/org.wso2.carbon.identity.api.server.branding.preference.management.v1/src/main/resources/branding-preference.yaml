@@ -316,7 +316,7 @@ paths:
       operationId: getCustomText
       summary: Get Custom text of a tenant.
       description: |
-        This API provides the capability to retrieve the existing custom text configurations of a tenant for the specified screen and locale.<br>
+        This API provides the capability to retrieve the existing custom text configurations of a tenant or an application (type=APP, name=application ID) for the specified screen and locale.<br>
         If there is no custom texts available for the requested locale, API will check for the default locale('en-US') and return it.<br>
           <b>Permission required:</b> <br>
             * None <br>
@@ -347,7 +347,7 @@ paths:
       operationId: addCustomText
       summary: Add custom text for a tenant.
       description: |
-        This API provides the capability to add custom texts for the specified screen & locale.<br>
+        This API provides the capability to add custom texts of a tenant or an application (type=APP, name=application ID) for the specified screen & locale.<br>
           <b>Permission required:</b> <br>
             * /permission/admin/manage/identity/applicationmgt/update <br>
           <b>Scope required:</b> <br>
@@ -385,7 +385,7 @@ paths:
       operationId: updateCustomText
       summary: Update custom text of a tenant.
       description: |
-        This API provides the capability to update the custom texts for the specified screen & locale.<br>
+        This API provides the capability to update the custom texts of a tenant or an application (type=APP, name=application ID) for the specified screen & locale.<br>
           <b>Permission required:</b> <br>
             * /permission/admin/manage/identity/applicationmgt/update <br>
           <b>Scope required:</b> <br>
@@ -423,6 +423,7 @@ paths:
       description: |
         This API provides the capability to delete the custom texts for the specified screen & locale of a tenant.<br>
         If no query parameter was specified in the delete request, all the custom texts configured in the tenant will be deleted.<br>
+        If only the type=APP and name=application ID query parameters were specified, all the custom texts configured for the application will be deleted.<br>
           <b>Permission required:</b> <br>
             * /permission/admin/manage/identity/applicationmgt/update <br>
           <b>Scope required:</b> <br>
@@ -453,6 +454,7 @@ paths:
         This API provides the capability to retrieve the custom text configurations of an organization/specific application.<br>
         If there is no custom text available for the requested locale, API will check for the default locale('en-US') and return it.<br>
         If there is no custom text available for the requested organization, API will check for the parent organization's custom text configurations and return it.<br>
+        For an application (type=APP, name=application ID), the custom text is resolved in the following order: the application's custom text, the organization's custom text, and then for each ancestor organization, the shared application's custom text followed by the ancestor organization's custom text. The source is returned in the resolvedFrom attribute.<br>
           <b>Permission required:</b> <br>
             * None <br>
           <b>Scope required:</b> <br>
