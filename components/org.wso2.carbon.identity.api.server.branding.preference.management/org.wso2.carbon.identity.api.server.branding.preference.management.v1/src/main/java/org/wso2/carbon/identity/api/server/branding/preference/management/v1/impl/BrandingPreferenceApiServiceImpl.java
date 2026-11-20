@@ -125,11 +125,11 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
         URI location;
         try {
             location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + CUSTOM_TEXT_PREFERENCE_CONTEXT_PATH
-                    + QUERY_PARAM_INDICATOR +
-                    URLEncoder.encode(String.format(GET_CUSTOM_TEXT_COMPONENT_WITH_QUERY_PARAM, type,
-                                    APPLICATION_TYPE.equals(type) ? customTextModel.getName() :
-                                            getTenantDomainFromContext(), customTextModel.getScreen(), locale),
-                            StandardCharsets.UTF_8.name()));
+                    + QUERY_PARAM_INDICATOR + String.format(GET_CUSTOM_TEXT_COMPONENT_WITH_QUERY_PARAM,
+                    encodeQueryParamValue(type),
+                    encodeQueryParamValue(APPLICATION_TYPE.equals(type) ? customTextModel.getName() :
+                            getTenantDomainFromContext()),
+                    encodeQueryParamValue(customTextModel.getScreen()), encodeQueryParamValue(locale)));
         } catch (UnsupportedEncodingException e) {
             ErrorResponse errorResponse =
                     new ErrorResponse.Builder().withMessage("Error due to unsupported encoding.").build();
@@ -325,6 +325,18 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
         CustomTextModel updatedCustomTextModel =
                 brandingPreferenceManagementService.updateCustomTextPreference(customTextModel);
         return Response.ok().entity(updatedCustomTextModel).build();
+    }
+
+    /**
+     * Encode a query parameter value of the Location header.
+     *
+     * @param value Query parameter value.
+     * @return URL encoded value.
+     * @throws UnsupportedEncodingException If the UTF-8 encoding is not supported.
+     */
+    private String encodeQueryParamValue(String value) throws UnsupportedEncodingException {
+
+        return URLEncoder.encode(value, StandardCharsets.UTF_8.name());
     }
 
     /**
