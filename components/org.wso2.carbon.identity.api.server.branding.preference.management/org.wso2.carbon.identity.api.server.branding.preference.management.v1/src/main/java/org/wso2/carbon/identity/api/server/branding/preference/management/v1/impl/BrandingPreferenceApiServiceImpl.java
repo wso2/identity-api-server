@@ -42,6 +42,7 @@ import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.APPLICATION_TYPE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.BRANDING_PREFERENCE_CONTEXT_PATH;
+import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.CUSTOM_TEXT_PREFERENCE_CONTEXT_PATH;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.CUSTOM_TYPE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.DEFAULT_LOCALE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.GET_CUSTOM_TEXT_COMPONENT_WITH_QUERY_PARAM;
@@ -123,7 +124,7 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
                 brandingPreferenceManagementService.addCustomTextPreference(customTextModel);
         URI location;
         try {
-            location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + BRANDING_PREFERENCE_CONTEXT_PATH
+            location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + CUSTOM_TEXT_PREFERENCE_CONTEXT_PATH
                     + QUERY_PARAM_INDICATOR +
                     URLEncoder.encode(String.format(GET_CUSTOM_TEXT_COMPONENT_WITH_QUERY_PARAM, type,
                                     APPLICATION_TYPE.equals(type) ? customTextModel.getName() :
